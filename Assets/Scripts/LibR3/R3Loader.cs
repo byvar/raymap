@@ -27,6 +27,7 @@ namespace LibR3 {
         public R3Material[] materials;
         public R3Texture overlightTexture;
         public R3Texture lightmapTexture;
+        public R3Pointer[] persoInFix;
 
         uint off_textures_start_fix = 0;
         bool hasTransit;
@@ -299,7 +300,70 @@ namespace LibR3 {
                         }
                     }
                 }
+                for (uint i = 0; i < num_textures; i++) {
+                    reader.ReadUInt32(); // 0 or 8.
+                }
             }
+            // Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
+            int sz_inputStruct = 0x1adc;
+            int sz_entryActions = 0x100;
+            int sz_randomStructure = 0xDC;
+            int sz_fontStructure = 0x12B2;
+            int sz_videoStructure = 0x18;
+            int sz_musicMarkerSlot = 0x28;
+            int sz_binDataForMenu = 0x020C;
+
+            if (mode == Mode.Rayman3GC) {
+                sz_inputStruct = 0x1714;
+                sz_entryActions = 0xD0;
+                sz_fontStructure = 0x12E4;
+                sz_binDataForMenu = 0x01F0;
+            } else if (mode == Mode.RaymanArenaGC) {
+                sz_inputStruct = 0x1714;
+                sz_entryActions = 0x94;
+                sz_fontStructure = 0x12E4;
+            } else if (mode == Mode.RaymanArenaPC) {
+                sz_entryActions = 0xDC;
+            }
+            reader.ReadBytes(sz_inputStruct); // Input struct
+            R3Pointer keypadDefine = R3Pointer.Read(reader);
+            reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
+            uint num_persoInFix = reader.ReadUInt32();
+            persoInFix = new R3Pointer[num_persoInFix];
+            for (int i = 0; i < num_persoInFix; i++) {
+                persoInFix[i] = R3Pointer.Read(reader);
+            }
+            reader.ReadBytes(sz_randomStructure);
+            uint soundEventTableIndexInFix = reader.ReadUInt32();
+            R3Pointer off_soundEventTable = R3Pointer.Read(reader);
+            byte num_fontBitmap = reader.ReadByte();
+            byte num_font = reader.ReadByte();
+            for (int i = 0; i < num_font; i++) {
+                reader.ReadBytes(sz_fontStructure); // Font definition
+            }
+            reader.Align(4); // Align position
+            for (int i = 0; i < num_fontBitmap; i++) {
+                R3Pointer off_fontTexture = R3Pointer.Read(reader);
+            }
+            reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
+            if (mode == Mode.Rayman3GC || mode == Mode.Rayman3PC) {
+                uint num_musicMarkerSlots = reader.ReadUInt32();
+                for (int i = 0; i < num_musicMarkerSlots; i++) {
+                    reader.ReadBytes(sz_musicMarkerSlot);
+                }
+                reader.ReadBytes(sz_binDataForMenu);
+                if (mode == Mode.Rayman3PC) {
+                    R3Pointer off_bgMaterialForMenu2D = R3Pointer.Read(reader);
+                    R3Pointer off_fixMaterialForMenu2D = R3Pointer.Read(reader);
+                    R3Pointer off_fixMaterialForSelectedFilms = R3Pointer.Read(reader);
+                    R3Pointer off_fixMaterialForArcadeAndFilms = R3Pointer.Read(reader);
+                    for (int i = 0; i < 35; i++) { // 35 is again hardcoded
+                        R3Pointer off_menuPage = R3Pointer.Read(reader);
+                    }
+                }
+            }
+            R3Pointer off_animBankFix = R3Pointer.Read(reader); // Note: only one 0x104 bank in fix.
+            print("Fix animation bank address: " + off_animBankFix);
         }
 
         void LoadLVL() {
@@ -422,15 +486,20 @@ namespace LibR3 {
             }
             R3Pointer off_inactiveDynamic_world = R3Pointer.Read(reader);
             R3Pointer off_fatherSector = R3Pointer.Read(reader); // It is I, Father Sector.
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            R3Pointer off_firstSubMapPosition = R3Pointer.Read(reader);
+
+            /* The following 7 values are the "Always" structure. The spawnable perso data is dynamically copied to these superobjects.
+            There can be at most (num_always) objects of this type active in a level, and they get reused by other objects when they despawn.
+            */
+            uint num_always = reader.ReadUInt32();
             R3Pointer off_spawnable_perso_first = R3Pointer.Read(reader);
             R3Pointer off_spawnable_perso_last = R3Pointer.Read(reader);
             uint num_spawnable_perso = reader.ReadUInt32();
-            reader.ReadUInt32(); // a perso superobject offset?
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            R3Pointer off_always_reusableSO = R3Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+            R3Pointer off_always_reusableUnknown1 = R3Pointer.Read(reader); // (num_always) * 0x2c blocks
+            R3Pointer off_always_reusableUnknown2 = R3Pointer.Read(reader); // (num_always) * 0x4 blocks
 
+            // Read object types
             names = new string[3][];
             for (int i = 0; i < 3; i++) {
                 R3Pointer off_names_first = R3Pointer.Read(reader);
@@ -455,48 +524,53 @@ namespace LibR3 {
                 R3Pointer.Goto(ref reader, off_current);
             }
 
-
-            reader.ReadUInt32();
-            reader.ReadUInt32(); // this is an offset in fix.lvl
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            R3Pointer off_light = R3Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
+            R3Pointer off_characterLaunchingSoundEvents = R3Pointer.Read(reader);
+            R3Pointer off_collisionGeoObj = R3Pointer.Read(reader);
+            R3Pointer off_staticCollisionGeoObj = R3Pointer.Read(reader);
             if (!hasTransit) {
-                reader.ReadUInt32();
+                reader.ReadUInt32(); // viewport related
             }
 
             R3Pointer off_unknown_first = R3Pointer.Read(reader);
             R3Pointer off_unknown_last = R3Pointer.Read(reader);
             uint num_unknown = reader.ReadUInt32();
 
-            R3Pointer off_unknown2_first = R3Pointer.Read(reader);
-            R3Pointer off_unknown2_last = R3Pointer.Read(reader);
-            uint num_unknown2 = reader.ReadUInt32();
-
             R3Pointer off_familiesTable_first = R3Pointer.Read(reader);
             R3Pointer off_familiesTable_last = R3Pointer.Read(reader);
             uint num_familiesTable_entries = reader.ReadUInt32();
 
+            R3Pointer off_alwaysActiveCharacters_first = R3Pointer.Read(reader);
+            R3Pointer off_alwaysActiveCharacters_last = R3Pointer.Read(reader);
+            uint num_alwaysActiveChars = reader.ReadUInt32();
+
             if (!hasTransit) {
-                R3Pointer off_anotherTable_first = R3Pointer.Read(reader);
-                R3Pointer off_anotherTable_last = R3Pointer.Read(reader);
-                uint num_anotherTable_entries = reader.ReadUInt32();
+                R3Pointer off_mainCharacters_first = R3Pointer.Read(reader);
+                R3Pointer off_mainCharacters_last = R3Pointer.Read(reader);
+                uint num_mainCharacters_entries = reader.ReadUInt32();
             }
-            reader.ReadUInt32();
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            reader.ReadUInt32(); // only used if there was no transit in the previous lvl. Always 00165214 in R3GC?
+            reader.ReadUInt32(); // related to "SOL". What is this? Good question.
+            reader.ReadUInt32(); // same
+            reader.ReadUInt32(); // same
+            R3Pointer off_cineManager = R3Pointer.Read(reader);
+            byte unk = reader.ReadByte();
+            byte IPO_numRLItables = reader.ReadByte();
+            reader.ReadUInt16();
+            R3Pointer off_COL_taggedFacesTable = R3Pointer.Read(reader);
+            uint num_COL_maxTaggedFaces = reader.ReadUInt32();
+            off_collisionGeoObj = R3Pointer.Read(reader);
+            off_staticCollisionGeoObj = R3Pointer.Read(reader);
+
+            // The ptrsTable seems to be related to sound events. Perhaps cuuids.
             reader.ReadUInt32();
             uint num_ptrsTable = reader.ReadUInt32();
             if (mode == Mode.Rayman3GC || mode == Mode.Rayman3PC) {
                 uint bool_ptrsTable = reader.ReadUInt32();
             }
             R3Pointer off_ptrsTable = R3Pointer.Read(reader);
+
+
             uint num_internalStructure = num_ptrsTable;
             if (mode == Mode.Rayman3GC) {
                 reader.ReadUInt32();
@@ -516,7 +590,7 @@ namespace LibR3 {
 
             uint num_visual_materials = reader.ReadUInt32();
             R3Pointer off_array_visual_materials = R3Pointer.Read(reader);
-            if (mode == Mode.Rayman3PC || mode == Mode.Rayman3GC) {
+            if (mode == Mode.Rayman3PC || mode == Mode.Rayman3GC || mode == Mode.RaymanArenaPC) {
                 R3Pointer off_dynamic_so_list = R3Pointer.Read(reader);
 
                 // Parse SO list
@@ -607,28 +681,39 @@ namespace LibR3 {
             // off_current should be after the dynamic SO list positions.
 
             // Parse transformation matrices and other settings(state? :o) for fix characters
-            // There's ONE transformation matrix in the tribe levels in Rayman Arena, but without any header whatsoever
-            // so I don't know how to parse it, or what it's for. Oh well.
-            if (mode == Mode.Rayman3GC || mode == Mode.Rayman3PC) {
-                uint num_perso_with_settings_in_fix = reader.ReadUInt32();
-                for (int i = 0; i < num_perso_with_settings_in_fix; i++) {
-                    R3Pointer off_perso_with_settings_in_fix = R3Pointer.Read(reader);
-                    R3Pointer off_matrix = R3Pointer.Current(reader);
-                    R3Matrix mat = R3Matrix.Read(reader, off_matrix);
+            uint num_perso_with_settings_in_fix = (uint)persoInFix.Length;
+            if (mode == Mode.Rayman3GC || mode == Mode.Rayman3PC) num_perso_with_settings_in_fix = reader.ReadUInt32();
+            for (int i = 0; i < num_perso_with_settings_in_fix; i++) {
+                R3Pointer off_perso_so_with_settings_in_fix = null, off_matrix = null;
+                R3SuperObject so = null;
+                R3Matrix mat = null;
+                if (mode == Mode.Rayman3GC || mode == Mode.Rayman3PC) {
+                    off_perso_so_with_settings_in_fix = R3Pointer.Read(reader);
+                    off_matrix = R3Pointer.Current(reader);
+                    mat = R3Matrix.Read(reader, off_matrix);
                     reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
                     reader.ReadUInt32();
-                    R3SuperObject so = R3SuperObject.FromOffset(off_perso_with_settings_in_fix);
-                    if (so != null) {
-                        so.off_matrix = off_matrix;
-                        so.matrix = mat;
-                        if (so.Gao != null) {
-                            so.Gao.transform.localPosition = mat.GetPosition(convertAxes: true);
-                            so.Gao.transform.localRotation = mat.GetRotation(convertAxes: true);
-                            so.Gao.transform.localScale = mat.GetScale(convertAxes: true);
-                        }
+                    so = R3SuperObject.FromOffset(off_perso_so_with_settings_in_fix);
+                } else if (mode == Mode.RaymanArenaGC || mode == Mode.RaymanArenaPC) {
+                    off_matrix = R3Pointer.Current(reader);
+                    mat = R3Matrix.Read(reader, off_matrix);
+                    so = superObjects.Where(s => s.off_data == persoInFix[i]).FirstOrDefault();
+                }
+                if (so != null) {
+                    so.off_matrix = off_matrix;
+                    so.matrix = mat;
+                    if (so.Gao != null) {
+                        so.Gao.transform.localPosition = mat.GetPosition(convertAxes: true);
+                        so.Gao.transform.localRotation = mat.GetRotation(convertAxes: true);
+                        so.Gao.transform.localScale = mat.GetScale(convertAxes: true);
                     }
                 }
             }
+            if (mode == Mode.Rayman3GC || mode == Mode.RaymanArenaGC) {
+                reader.ReadBytes(0x800); // floats
+            }
+            R3Pointer off_animBankLvl = R3Pointer.Read(reader); // Note: 4 0x104 banks in lvl.
+            print("Lvl animation bank address: " + off_animBankLvl);
         }
 
         Texture2D CreateDummyTexture() {

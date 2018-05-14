@@ -52,5 +52,12 @@ namespace LibR3 {
             }
             return result;
         }
+
+        // To make sure position is a multiple of alignBytes
+        public void Align(int alignBytes) {
+            if (BaseStream.Position % alignBytes != 0) {
+                ReadBytes(alignBytes - (int)(BaseStream.Position % alignBytes));
+            }
+        }
     }
 }
