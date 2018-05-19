@@ -49,7 +49,6 @@ namespace LibR3 {
             }
         }
 
-
         public R3SubMesh(R3Pointer offset, R3Mesh mesh) {
             this.mesh = mesh;
             this.offset = offset;
@@ -353,6 +352,18 @@ namespace LibR3 {
                     sm.disconnected_triangles_spe[(j * 3) + 2] = reader.ReadInt16();
                 }
             }
+            return sm;
+        }
+
+        // Call after clone
+        public void Reset() {
+            gao = null;
+        }
+
+        public IR3GeometricElement Clone(R3Mesh mesh) {
+            R3SubMesh sm = (R3SubMesh)MemberwiseClone();
+            sm.mesh = mesh;
+            sm.Reset();
             return sm;
         }
     }

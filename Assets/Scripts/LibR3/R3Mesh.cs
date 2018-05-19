@@ -8,9 +8,11 @@ namespace LibR3 {
     /// <summary>
     /// Mesh data (both static and dynamic)
     /// </summary>
-    public class R3Mesh : R3PhysicalObject {
+    public class R3Mesh : IR3VisualObject {
+        public R3PhysicalObject po;
+        public R3Pointer offset;
+
         public GameObject gao = null;
-        public List<R3Unknown> listUnknown;
 
         public R3Pointer off_modelstart;
         public R3Pointer off_vertices;
@@ -29,13 +31,14 @@ namespace LibR3 {
         public R3DeformSet bones = null;
 
 
-        public R3Mesh(R3Pointer off_header, R3Pointer off_data) : base(off_header, off_data) {
-            listUnknown = new List<R3Unknown>();
+        public R3Mesh(R3PhysicalObject po, R3Pointer offset) {
+            this.po = po;
+            this.offset = offset;
         }
 
-        public static R3Mesh Read(EndianBinaryReader reader, R3Pointer off_header, R3Pointer off_data) {
+        public static R3Mesh Read(EndianBinaryReader reader, R3PhysicalObject po, R3Pointer offset) {
             R3Loader l = R3Loader.Loader;
-            R3Mesh m = new R3Mesh(off_header, off_data);
+            R3Mesh m = new R3Mesh(po, offset);
             R3Pointer off_modelstart = R3Pointer.Read(reader);
             m.off_modelstart = off_modelstart;
             R3Pointer.Goto(ref reader, off_modelstart);
@@ -142,8 +145,34 @@ namespace LibR3 {
                             Transform b = ds.bones[j];
                             b.transform.SetParent(m.gao.transform);
                         }
-                        //child.transform.SetParent(m.gao.transform);
-                        //child.transform.localPosition = Vector3.zero;
+                    }
+                }
+            }
+            return m;
+        }
+
+        public IR3VisualObject Clone() {
+            R3Mesh m = (R3Mesh)MemberwiseClone();
+            m.gao = new GameObject(m.name);
+            m.subblocks = new IR3GeometricElement[num_subblocks];
+            for (uint i = 0; i < m.num_subblocks; i++) {
+                if (subblocks[i] != null) {
+                    m.subblocks[i] = subblocks[i].Clone(m);
+                    if (m.subblocks[i] is R3DeformSet) m.bones = (R3DeformSet)m.subblocks[i];
+                }
+            }
+            for (uint i = 0; i < m.num_subblocks; i++) {
+                if (m.subblocks[i] != null) {
+                    if (m.subblocks[i] is R3SubMesh) {
+                        GameObject child = ((R3SubMesh)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (m.subblocks[i] is R3DeformSet) {
+                        R3DeformSet ds = (R3DeformSet)m.subblocks[i];
+                        for (int j = 0; j < ds.num_bones; j++) {
+                            Transform b = ds.bones[j];
+                            b.transform.SetParent(m.gao.transform);
+                        }
                     }
                 }
             }

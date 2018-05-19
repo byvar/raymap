@@ -14,6 +14,9 @@ namespace LibR3 {
         public string name0 = null;
         public string name1 = null;
         public string name2 = null;
+        public R3Family family = null;
+        public R3PhysicalObject[] physical_objects = null;
+
         private GameObject gao;
         public GameObject Gao {
             get {
@@ -63,7 +66,8 @@ namespace LibR3 {
             reader.ReadUInt32();
             R3Pointer off_subblocklist = R3Pointer.Read(reader);
             reader.ReadUInt32(); // same address?
-            R3Pointer off_rulelist = R3Pointer.Read(reader);
+            R3Pointer off_family = R3Pointer.Read(reader);
+            p.family = R3Family.FromOffset(off_family);
 
             if (off_nameIndices != null) {
                 R3Pointer off_current = R3Pointer.Goto(ref reader, off_nameIndices);
@@ -90,69 +94,22 @@ namespace LibR3 {
                     name = reader.ReadNullDelimitedString();
                 }
             }*/
-            if (off_subblocklist != null) {
-                //print("subblocks for " + name + " @ " + String.Format("0x{0:X}", off_subblocklist.offset));
-                R3Pointer.Goto(ref reader, off_subblocklist);
-                if (l.mode == R3Loader.Mode.Rayman3GC) {
-                    reader.ReadUInt32(); // 0
-                    reader.ReadUInt32(); // 0
-                    R3Pointer off_list_hdr_ptr = R3Pointer.Read(reader);
-                } else if (l.mode == R3Loader.Mode.Rayman3PC || l.mode == R3Loader.Mode.RaymanArenaPC) {
-                    reader.ReadUInt32(); // 0
-                }
-                R3Pointer off_list_start = R3Pointer.Read(reader);
-                R3Pointer off_list_2 = R3Pointer.Read(reader); // is this a copy of the list or something?
-                uint num_entries = reader.ReadUInt16();
-                reader.ReadUInt16();
-                if (l.mode == R3Loader.Mode.Rayman3PC || l.mode == R3Loader.Mode.Rayman3GC) {
-                    R3Pointer off_list_hdr_1 = R3Pointer.Read(reader); // copy of off_subblocklist?
-                    R3Pointer off_list_hdr_2 = R3Pointer.Read(reader); // same?
-                    reader.ReadUInt32(); // 1?
-                }
-                R3Pointer.Goto(ref reader, off_list_start);
-                R3PhysicalObject[] subblocks = new R3PhysicalObject[num_entries];
-                for (uint i = 0; i < num_entries; i++) {
-                    // each entry is 0x14
-                    R3Pointer off1 = R3Pointer.Read(reader);
-                    R3Pointer off_subblock = R3Pointer.Read(reader);
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    uint lastvalue = reader.ReadUInt32();
-                    //if ((raymanArena || off1 == null) && lastvalue != 0 && off_subblock != null) {
-                    if (lastvalue != 0 && off_subblock != null) {
-
-                        R3Pointer curPos = R3Pointer.Goto(ref reader, off_subblock);
-                        //print("Found mesh @ " + curPos.offset);
-                        R3PhysicalObject subobj = R3PhysicalObject.Read(reader, off_subblock);
-                        if (subobj != null) {
-                            subblocks[i] = subobj;
-                            if (subobj is R3Mesh) {
-                                GameObject meshGAO = ((R3Mesh)subobj).gao;
-                                meshGAO.transform.parent = p.Gao.transform;
-                            } /*else if(subobj is R3AnimationObject) {
-                            print(((R3AnimationObject)subobj).vector3s.Count);
-                        }*/
-                        }
-                        R3Pointer.Goto(ref reader, curPos);
-                    }
-                }
-
-                for (uint i = 0; i < num_entries; i++) {
-                    R3PhysicalObject o = subblocks[i];
-                    if (o != null && o is R3Unknown) {
-                        R3Unknown a = (R3Unknown)o;
-                        if (a.off_model != null) {
-                            R3PhysicalObject model = subblocks.Where(s => s != null && s is R3Mesh && ((R3Mesh)s).off_modelstart == a.off_model).FirstOrDefault();
-                            if (model != null && model is R3Mesh) {
-                                ((R3Mesh)model).listUnknown.Add(a);
-                                //((R3MeshObject)model).gao.name += "!";
-                            }
+            if (off_subblocklist != null && p.family != null && off_subblocklist == p.family.off_physical_list && p.family.physical_objects != null) {
+                // Clone family's physical objects into this perso
+                p.physical_objects = new R3PhysicalObject[p.family.physical_objects.Length];
+                for (int i = 0; i < p.family.physical_objects.Length; i++) {
+                    R3PhysicalObject o = p.family.physical_objects[i];
+                    if (o != null) {
+                        p.physical_objects[i] = o.Clone();
+                        if (p.physical_objects[i].visualSet.Count > 0 && p.physical_objects[i].visualSet[0].obj is R3Mesh) {
+                            GameObject meshGAO = ((R3Mesh)p.physical_objects[i].visualSet[0].obj).gao;
+                            meshGAO.transform.parent = p.Gao.transform;
                         }
                     }
                 }
-            } /*else {
-                print(String.Format("0x{0:X}", off_perso.offset));
-            }*/
+            } else if (off_subblocklist != null) {
+                l.print("Perso's physical list does not match family list at position " + offset);
+            }
             return p;
         }
     }

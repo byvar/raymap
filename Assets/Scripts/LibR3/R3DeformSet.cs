@@ -112,6 +112,21 @@ namespace LibR3 {
 
             return d;
         }
+
+        public IR3GeometricElement Clone(R3Mesh mesh) {
+            R3DeformSet d = (R3DeformSet)MemberwiseClone();
+            d.mesh = mesh;
+            d.r3bones = new R3DeformBone[r3bones.Length];
+            for (int i = 0; i < r3bones.Length; i++) {
+                d.r3bones[i] = r3bones[i].Clone();
+            }
+            d.r3weights = new R3DeformVertexWeights[r3weights.Length];
+            for (int i = 0; i < r3weights.Length; i++) {
+                d.r3weights[i] = r3weights[i].Clone();
+            }
+            d.InitUnityBones();
+            return d;
+        }
     }
 
     public class R3DeformVertexWeights {
@@ -167,6 +182,17 @@ namespace LibR3 {
                 return unityWeight;
             }
         }
+
+        // Call after clone
+        public void Reset() {
+            unityWeightCalculated = false;
+        }
+
+        public R3DeformVertexWeights Clone() {
+            R3DeformVertexWeights w = (R3DeformVertexWeights)MemberwiseClone();
+            w.Reset();
+            return w;
+        }
     }
 
     public class R3DeformBone {
@@ -187,6 +213,17 @@ namespace LibR3 {
                 }
                 return unityBone;
             }
+        }
+
+        // Call after clone
+        public void Reset() {
+            unityBone = null;
+        }
+
+        public R3DeformBone Clone() {
+            R3DeformBone b = (R3DeformBone)MemberwiseClone();
+            b.Reset();
+            return b;
         }
     }
 }

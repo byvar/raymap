@@ -5,5 +5,6 @@ namespace LibR3 {
     /// Subblocks of a geometric object / R3Mesh
     /// </summary>
     public interface IR3GeometricElement {
+        IR3GeometricElement Clone(R3Mesh mesh);
     }
 }

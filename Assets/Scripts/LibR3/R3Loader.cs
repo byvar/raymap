@@ -28,6 +28,8 @@ namespace LibR3 {
         public R3Texture overlightTexture;
         public R3Texture lightmapTexture;
         public R3Pointer[] persoInFix;
+        public R3AnimationBank[] animationBanks;
+        public R3Family[] families;
 
         uint off_textures_start_fix = 0;
         bool hasTransit;
@@ -364,6 +366,12 @@ namespace LibR3 {
             }
             R3Pointer off_animBankFix = R3Pointer.Read(reader); // Note: only one 0x104 bank in fix.
             print("Fix animation bank address: " + off_animBankFix);
+            animationBanks = new R3AnimationBank[5]; // 1 in fix, 4 in lvl
+            if (off_animBankFix != null) {
+                off_current = R3Pointer.Goto(ref reader, off_animBankFix);
+                animationBanks[0] = R3AnimationBank.Read(reader, off_animBankFix, 0, 1)[0];
+                R3Pointer.Goto(ref reader, off_current);
+            }
         }
 
         void LoadLVL() {
@@ -626,6 +634,21 @@ namespace LibR3 {
             }
             R3Pointer.Goto(ref reader, off_current);
 
+            if (num_familiesTable_entries > 0) {
+                families = new R3Family[num_familiesTable_entries];
+                GameObject familiesParent = new GameObject("Families");
+                familiesParent.SetActive(false); // Families do not need to be visible
+                off_current = R3Pointer.Goto(ref reader, off_familiesTable_first);
+                R3Pointer off_familiesTable_current = off_familiesTable_first;
+                for (uint i = 0; i < num_familiesTable_entries; i++) {
+                    families[i] = R3Family.Read(reader, off_familiesTable_current);
+                    families[i].Gao.transform.SetParent(familiesParent.transform,false);
+                    off_familiesTable_current = families[i].off_family_next;
+                    if (off_familiesTable_current != null) R3Pointer.Goto(ref reader, off_familiesTable_current);
+                }
+                R3Pointer.Goto(ref reader, off_current);
+            }
+
             if (hasTransit) {
                 R3Pointer startPointer = new R3Pointer(16, 2); // It's located at offset 20 in transit
                 off_current = R3Pointer.Goto(ref reader, startPointer);
@@ -714,6 +737,14 @@ namespace LibR3 {
             }
             R3Pointer off_animBankLvl = R3Pointer.Read(reader); // Note: 4 0x104 banks in lvl.
             print("Lvl animation bank address: " + off_animBankLvl);
+            if (off_animBankLvl != null) {
+                off_current = R3Pointer.Goto(ref reader, off_animBankLvl);
+                R3AnimationBank[] banks = R3AnimationBank.Read(reader, off_animBankLvl, 1, 4);
+                for (int i = 0; i < 4; i++) {
+                    animationBanks[1 + i] = banks[i];
+                }
+                R3Pointer.Goto(ref reader, off_current);
+            }
         }
 
         Texture2D CreateDummyTexture() {
