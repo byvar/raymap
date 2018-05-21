@@ -10,12 +10,12 @@ namespace LibR3 {
         public R3Pointer offset;
 
         public R3Pointer off_model;
-        public List<uint> ids;
+        public List<ushort> ids;
         public List<Vector3> vector3s;
         public R3Unknown(R3PhysicalObject po, R3Pointer offset) {
             this.po = po;
             this.offset = offset;
-            ids = new List<uint>();
+            ids = new List<ushort>();
             vector3s = new List<Vector3>();
         }
 
@@ -30,7 +30,7 @@ namespace LibR3 {
             if (off_arrayStart != null) {
                 R3Pointer.Goto(ref reader, off_arrayStart);
                 for (int i = 0; i < num_vector3s; i++) {
-                    uint id = reader.ReadUInt16();
+                    ushort id = reader.ReadUInt16();
                     reader.ReadUInt16();
                     float x = reader.ReadSingle();
                     float z = reader.ReadSingle();

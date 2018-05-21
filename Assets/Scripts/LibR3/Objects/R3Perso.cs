@@ -61,9 +61,9 @@ namespace LibR3 {
             reader.ReadUInt32();
             if (l.mode == R3Loader.Mode.RaymanArenaPC || l.mode == R3Loader.Mode.RaymanArenaGC) reader.ReadUInt32();
             //R3Pointer.Goto(ref reader, off_perso);
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            R3Pointer.Read(reader); // same as next
+            R3Pointer off_currentState = R3Pointer.Read(reader);
+            R3Pointer.Read(reader); // same as previous
             R3Pointer off_subblocklist = R3Pointer.Read(reader);
             reader.ReadUInt32(); // same address?
             R3Pointer off_family = R3Pointer.Read(reader);
@@ -74,11 +74,12 @@ namespace LibR3 {
                 uint index0 = reader.ReadUInt32();
                 uint index1 = reader.ReadUInt32();
                 uint index2 = reader.ReadUInt32();
-                p.name0 = l.names[0][index0];
-                p.name1 = l.names[1][index1];
-                p.name2 = l.names[2][index2];
+                p.name0 = l.objectTypes[0][index0].name;
+                p.name1 = l.objectTypes[1][index1].name;
+                p.name2 = l.objectTypes[2][index2].name;
                 R3Pointer.Goto(ref reader, off_current);
             }
+            l.print("[" + p.name0 + "] " + p.name1 + " | " + p.name2 + " - offset: " + offset);
             /*if (off_intelligence != null) {
                 R3Pointer.Goto(ref reader, off_intelligence);
                 reader.ReadUInt32();

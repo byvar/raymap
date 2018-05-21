@@ -14,7 +14,7 @@ namespace LibR3 {
         public byte giroPhare;
         public byte pulse;
         // ...
-        public UInt16 type;
+        public ushort type;
         // ...
         public float far;
         public float near;
@@ -41,7 +41,7 @@ namespace LibR3 {
         public float intensityMin;
         public float intensityMax;
         public Vector4 background_color;
-        public UInt32 createsShadowsOrNot;
+        public uint createsShadowsOrNot;
 
         private LightBehaviour light;
         public LightBehaviour Light {

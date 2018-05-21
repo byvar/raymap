@@ -13,20 +13,20 @@ namespace LibR3 {
         public R3Pointer off_material;
         public R3Material r3mat;
         public bool backfaceCulling;
-        public uint num_disconnected_triangles_spe;
-        public uint num_uvs;
-        public uint num_uvMaps;
+        public ushort num_disconnected_triangles_spe;
+        public ushort num_uvs;
+        public ushort num_uvMaps;
         public R3Pointer off_disconnected_triangles_spe;
         public R3Pointer off_mapping_uvs_spe;
         public R3Pointer off_weights_spe;
         public R3Pointer off_uvs;
         public R3Pointer off_vertex_indices;
-        public uint num_vertex_indices;
-        public uint num_mapping_entries;
+        public ushort num_vertex_indices;
+        public ushort num_mapping_entries;
         public R3Pointer off_mapping_vertices;
         public R3Pointer off_mapping_uvs;
-        public uint num_connected_vertices;
-        public uint num_disconnected_triangles;
+        public ushort num_connected_vertices;
+        public ushort num_disconnected_triangles;
         public R3Pointer off_connected_vertices;
         public R3Pointer off_disconnected_triangles;
         public int[] mapping_vertices = null;
@@ -64,7 +64,7 @@ namespace LibR3 {
             }*/
 
             Renderer mr_main = null, mr_spe = null;
-            uint num_triangles_main = ((num_connected_vertices > 2 ? num_connected_vertices - 2 : 0) + num_disconnected_triangles) * (uint)(backfaceCulling ? 1 : 2);
+            long num_triangles_main = ((num_connected_vertices > 2 ? num_connected_vertices - 2 : 0) + num_disconnected_triangles) * (backfaceCulling ? 1 : 2);
             uint triangle_size = 3 * (uint)(backfaceCulling ? 1 : 2);
             uint triangles_index = 0;
             if (num_triangles_main > 0) {

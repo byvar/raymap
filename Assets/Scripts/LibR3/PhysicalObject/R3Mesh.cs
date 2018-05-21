@@ -20,13 +20,13 @@ namespace LibR3 {
         public R3Pointer off_blendWeights;
         public R3Pointer off_subblock_types;
         public R3Pointer off_subblocks;
-        public uint num_vertices;
-        public uint num_subblocks;
+        public ushort num_vertices;
+        public ushort num_subblocks;
         public string name;
         public Vector3[] vertices = null;
         public Vector3[] normals = null;
         public float[] blendWeights = null;
-        public uint[] subblock_types = null;
+        public ushort[] subblock_types = null;
         public IR3GeometricElement[] subblocks = null;
         public R3DeformSet bones = null;
 
@@ -104,7 +104,7 @@ namespace LibR3 {
             }
             // Read subblock types & initialize arrays
             R3Pointer.Goto(ref reader, m.off_subblock_types);
-            m.subblock_types = new uint[m.num_subblocks];
+            m.subblock_types = new ushort[m.num_subblocks];
             m.subblocks = new IR3GeometricElement[m.num_subblocks];
             for (uint i = 0; i < m.num_subblocks; i++) {
                 m.subblock_types[i] = reader.ReadUInt16();

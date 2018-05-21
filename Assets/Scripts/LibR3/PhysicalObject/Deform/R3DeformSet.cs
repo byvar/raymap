@@ -11,7 +11,7 @@ namespace LibR3 {
 
         public R3Pointer off_weights;
         public R3Pointer off_bones;
-        public uint num_weights;
+        public ushort num_weights;
         public byte num_bones;
         
         public R3DeformVertexWeights[] r3weights;
@@ -73,13 +73,13 @@ namespace LibR3 {
             R3Pointer.Goto(ref reader, d.off_weights);
             for (int i = 0; i < d.num_weights; i++) {
                 R3Pointer off_weightsForVertex = R3Pointer.Read(reader);
-                uint vertex_index = reader.ReadUInt16();
+                ushort vertex_index = reader.ReadUInt16();
                 byte num_weightsForVertex = reader.ReadByte();
                 reader.ReadByte(); // 0, padding
                 d.r3weights[i] = new R3DeformVertexWeights(vertex_index);
                 R3Pointer curPos = R3Pointer.Goto(ref reader, off_weightsForVertex);
                 for (int j = 0; j < num_weightsForVertex; j++) {
-                    uint weight = reader.ReadUInt16();
+                    ushort weight = reader.ReadUInt16();
                     //float floatWeight = weight / UInt16.MaxValue;
                     byte boneIndex = reader.ReadByte();
                     reader.ReadByte(); // 0, padding
@@ -126,104 +126,6 @@ namespace LibR3 {
             }
             d.InitUnityBones();
             return d;
-        }
-    }
-
-    public class R3DeformVertexWeights {
-        public uint vertexIndex;
-        public Dictionary<byte, uint> boneWeights;
-
-        public R3DeformVertexWeights(uint vertexIndex) {
-            this.vertexIndex = vertexIndex;
-            boneWeights = new Dictionary<byte, uint>();
-        }
-
-        private bool unityWeightCalculated = false;
-        private BoneWeight unityWeight;
-        public BoneWeight UnityWeight {
-            get {
-                if (!unityWeightCalculated) {
-                    unityWeight = new BoneWeight();
-                    unityWeight.boneIndex0 = 0;
-                    unityWeight.boneIndex1 = 0;
-                    unityWeight.boneIndex2 = 0;
-                    unityWeight.boneIndex3 = 0;
-                    unityWeight.weight0 = 0;
-                    unityWeight.weight1 = 0;
-                    unityWeight.weight2 = 0;
-                    unityWeight.weight3 = 0;
-                    List<KeyValuePair<byte, uint>> sortedWeights = boneWeights.OrderByDescending(w => w.Value).ToList();
-                    UInt16 sortedWeightsSum = (UInt16)sortedWeights.Select(w => (Int32)(w.Value)).Sum();
-                    if (sortedWeightsSum < UInt16.MaxValue) {
-                        sortedWeights.Add(new KeyValuePair<byte, uint>(0, (uint)(UInt16.MaxValue - sortedWeightsSum)));
-                    }
-                    sortedWeights = sortedWeights.OrderByDescending(w => w.Value).ToList();
-                    if (sortedWeights.Count > 0) {
-                        unityWeight.boneIndex0 = sortedWeights[0].Key;
-                        unityWeight.weight0 = (float)sortedWeights[0].Value / (float)UInt16.MaxValue;
-                    }
-                    if (sortedWeights.Count > 1) {
-                        unityWeight.boneIndex1 = sortedWeights[1].Key;
-                        unityWeight.weight1 = (float)sortedWeights[1].Value / (float)UInt16.MaxValue;
-                    }
-                    if (sortedWeights.Count > 2) {
-                        unityWeight.boneIndex2 = sortedWeights[2].Key;
-                        unityWeight.weight2 = (float)sortedWeights[2].Value / (float)UInt16.MaxValue;
-                    }
-                    if (sortedWeights.Count > 3) {
-                        unityWeight.boneIndex3 = sortedWeights[3].Key;
-                        unityWeight.weight3 = (float)sortedWeights[3].Value / (float)UInt16.MaxValue;
-                    }
-                    if (sortedWeights.Count > 4) {
-                        R3Loader.Loader.print("Unity does not support more than 4 bones affecting a vertex at once.");
-                    }
-                    unityWeightCalculated = true;
-                }
-                return unityWeight;
-            }
-        }
-
-        // Call after clone
-        public void Reset() {
-            unityWeightCalculated = false;
-        }
-
-        public R3DeformVertexWeights Clone() {
-            R3DeformVertexWeights w = (R3DeformVertexWeights)MemberwiseClone();
-            w.Reset();
-            return w;
-        }
-    }
-
-    public class R3DeformBone {
-        public R3Matrix mat;
-        public float unknown1;
-        public uint unknown2;
-        public byte index;
-
-        private Transform unityBone = null;
-        public Transform UnityBone {
-            get {
-                if (unityBone == null) {
-                    GameObject gao = new GameObject("Bone " + index + " - " + unknown1 + " - " + unknown2);
-                    unityBone = gao.transform;
-                    unityBone.localPosition = mat.GetPosition(convertAxes: true);
-                    unityBone.localRotation = mat.GetRotation(convertAxes: true);
-                    unityBone.localScale = mat.GetScale(convertAxes: true);
-                }
-                return unityBone;
-            }
-        }
-
-        // Call after clone
-        public void Reset() {
-            unityBone = null;
-        }
-
-        public R3DeformBone Clone() {
-            R3DeformBone b = (R3DeformBone)MemberwiseClone();
-            b.Reset();
-            return b;
         }
     }
 }

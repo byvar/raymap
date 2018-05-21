@@ -6,12 +6,6 @@ using UnityEngine;
 
 namespace LibR3 {
     public class R3PhysicalObject : IEquatable<R3PhysicalObject> {
-        public struct R3VisualSetLOD {
-            public float LODdistance;
-            public R3Pointer off_data;
-            public IR3VisualObject obj;
-        }
-
         public R3Pointer offset;
         public R3Pointer off_visualSet;
         public R3Pointer off_collideSet;
@@ -57,8 +51,8 @@ namespace LibR3 {
             if (po.off_visualSet != null) {
                 R3Pointer.Goto(ref reader, po.off_visualSet);
                 reader.ReadUInt32(); // 0
-                uint numberOfLOD = reader.ReadUInt16();
-                uint type = reader.ReadUInt16();
+                ushort numberOfLOD = reader.ReadUInt16();
+                ushort type = reader.ReadUInt16();
                 for (uint i = 0; i < numberOfLOD; i++) {
                     // if distance > the float at this offset, game engine uses next LOD if there is one
                     R3VisualSetLOD lod = new R3VisualSetLOD();

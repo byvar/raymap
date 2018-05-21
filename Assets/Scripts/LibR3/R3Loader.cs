@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 
 namespace LibR3 {
-
     public class R3Loader {
         public string gameDataBinFolder;
         public string lvlName;
@@ -21,7 +20,7 @@ namespace LibR3 {
         public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC };
         public Mode mode = Mode.Rayman3PC;
 
-        public string[][] names;
+        public R3ObjectType[][] objectTypes;
 
         public R3Texture[] textures;
         public R3Material[] materials;
@@ -508,25 +507,25 @@ namespace LibR3 {
             R3Pointer off_always_reusableUnknown2 = R3Pointer.Read(reader); // (num_always) * 0x4 blocks
 
             // Read object types
-            names = new string[3][];
+            objectTypes = new R3ObjectType[3][];
             for (int i = 0; i < 3; i++) {
                 R3Pointer off_names_first = R3Pointer.Read(reader);
                 R3Pointer off_names_last = R3Pointer.Read(reader);
                 uint num_names = reader.ReadUInt32();
                 off_current = R3Pointer.Goto(ref reader, off_names_first);
-                names[i] = new string[num_names];
+                objectTypes[i] = new R3ObjectType[num_names];
                 for (int j = 0; j < num_names; j++) {
+                    objectTypes[i][j] = new R3ObjectType();
                     R3Pointer off_names_next = R3Pointer.Read(reader);
                     R3Pointer off_names_prev = R3Pointer.Read(reader);
                     R3Pointer off_header = R3Pointer.Read(reader);
                     R3Pointer off_name = R3Pointer.Read(reader);
-                    uint type = reader.ReadUInt32();
-                    /*It's actually more like this, but let's just read it as a uint32:
-                    byte type1 = reader.ReadByte();
-                    byte type2 = reader.ReadByte();
-                    uint type3 = reader.ReadUInt16();*/
+                    objectTypes[i][j].unk1 = reader.ReadByte();
+                    objectTypes[i][j].id = reader.ReadByte();
+                    objectTypes[i][j].unk2 = reader.ReadUInt16();
                     R3Pointer.Goto(ref reader, off_name);
-                    names[i][j] = reader.ReadNullDelimitedString();
+                    objectTypes[i][j].name = reader.ReadNullDelimitedString();
+                    
                     if (off_names_next != null) R3Pointer.Goto(ref reader, off_names_next);
                 }
                 R3Pointer.Goto(ref reader, off_current);

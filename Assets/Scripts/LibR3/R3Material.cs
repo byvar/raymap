@@ -127,7 +127,7 @@ namespace LibR3 {
             reader.ReadUInt32();
             R3Pointer off_animTextures = R3Pointer.Read(reader);
             reader.ReadUInt32(); // a repeat of last offset?
-            uint num_animTextures = reader.ReadUInt16();
+            ushort num_animTextures = reader.ReadUInt16();
             reader.ReadUInt16();
             reader.ReadUInt32();
             reader.ReadByte();
