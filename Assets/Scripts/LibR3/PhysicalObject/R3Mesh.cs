@@ -111,6 +111,7 @@ namespace LibR3 {
             }
             //R3Material[] materials = new R3Material[num_materials];
             m.gao = new GameObject(m.name);
+            m.gao.tag = "Visual";
             // Process blocks
             //uint material_i = 0;
             //print("Num: " + num_subblocks + " | Off: " + off_subblocks + " | Name: " + name);
@@ -154,6 +155,7 @@ namespace LibR3 {
         public IR3VisualObject Clone() {
             R3Mesh m = (R3Mesh)MemberwiseClone();
             m.gao = new GameObject(m.name);
+            m.gao.tag = "Visual";
             m.subblocks = new IR3GeometricElement[num_subblocks];
             for (uint i = 0; i < m.num_subblocks; i++) {
                 if (subblocks[i] != null) {

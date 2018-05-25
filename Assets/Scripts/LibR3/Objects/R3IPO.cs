@@ -50,12 +50,15 @@ namespace LibR3 {
             if (l.mode == R3Loader.Mode.Rayman3GC) ipo.name = new string(reader.ReadChars(0x32));
             R3Pointer.Goto(ref reader, ipo.off_data);
             ipo.data = R3PhysicalObject.Read(reader, ipo.off_data);
-            if (ipo.data != null && ipo.data.visualSet.Count > 0) {
+            if (ipo.data != null) {
+                ipo.data.Gao.transform.parent = ipo.Gao.transform;
+            }
+            /*if (ipo.data != null && ipo.data.visualSet.Count > 0) {
                 if (ipo.data.visualSet[0].obj is R3Mesh) {
                     GameObject meshGAO = ((R3Mesh)ipo.data.visualSet[0].obj).gao;
                     meshGAO.transform.parent = ipo.Gao.transform;
                 }
-            }
+            }*/
             return ipo;
         }
 

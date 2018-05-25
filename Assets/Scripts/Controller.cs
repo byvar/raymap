@@ -21,6 +21,8 @@ public class Controller : MonoBehaviour {
     public bool allowDeadPointers = false;
     public bool forceDisplayBackfaces = false;
     R3Loader loader = null;
+    bool viewCollision_ = false;
+    public bool viewCollision = false;
 
     // Use this for initialization
     void Start() {
@@ -72,10 +74,32 @@ public class Controller : MonoBehaviour {
         loader.Load();
         sectorManager.Init();
         lightManager.Init();
+        if (viewCollision) UpdateViewCollision();
     }
 	// Update is called once per frame
 	void Update () {
-	}
+        if (Input.GetKeyDown(KeyCode.C)) {
+            viewCollision = !viewCollision;
+        }
+        if (loader != null && viewCollision != viewCollision_) {
+            UpdateViewCollision();
+        }
+    }
+
+    public void UpdateViewCollision() {
+        if (loader != null) {
+            viewCollision_ = viewCollision;
+            foreach (R3PhysicalObject po in loader.physicalObjects) {
+                foreach (R3VisualSetLOD l in po.visualSet) {
+                    if (l.obj != null && l.obj is R3Mesh) {
+                        GameObject gao = ((R3Mesh)l.obj).gao;
+                        if (gao != null) gao.SetActive(!viewCollision);
+                    }
+                }
+                if (po.collideMesh != null) po.collideMesh.gao.SetActive(viewCollision);
+            }
+        }
+    }
 
     public void SaveChanges() {
         if(loader != null) loader.Save();

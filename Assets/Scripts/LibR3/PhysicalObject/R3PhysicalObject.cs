@@ -12,6 +12,16 @@ namespace LibR3 {
         public R3Pointer off_visualBoundingVolume;
         public R3Pointer off_collideBoundingVolume;
         public List<R3VisualSetLOD> visualSet;
+        public R3CollideMesh collideMesh;
+        private GameObject gao = null;
+        public GameObject Gao {
+            get {
+                if (gao == null) {
+                    gao = new GameObject("[PO]");
+                }
+                return gao;
+            }
+        }
 
         public R3PhysicalObject(R3Pointer offset) {
             this.offset = offset;
@@ -70,6 +80,9 @@ namespace LibR3 {
                         switch (type) {
                             case 0:
                                 lod.obj = R3Mesh.Read(reader, po, lod.off_data);
+                                R3Mesh m = ((R3Mesh)lod.obj);
+                                if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
+                                m.gao.transform.parent = po.Gao.transform;
                                 break;
                             case 1:
                                 lod.obj = R3Unknown.Read(reader, po, lod.off_data);
@@ -91,56 +104,43 @@ namespace LibR3 {
                 uint u2 = reader.ReadUInt32(); // 0
                 uint u3 = reader.ReadUInt32(); // 0
                 R3Pointer off_mesh = R3Pointer.Read(reader);
+                if (off_mesh != null) {
+                    R3Pointer.Goto(ref reader, off_mesh);
+                    po.collideMesh = R3CollideMesh.Read(reader, po, off_mesh);
+                    po.collideMesh.gao.transform.parent = po.Gao.transform;
+                }
                 //R3Loader.Loader.print("Collide set: " + po.off_collideSet + " - vol: " + po.off_visualBoundingVolume);
-
-                /* Example:
-                00000000
-                00000000
-                00000000
-                00258BCC off mesh
-                ------ this is off mesh. size of col geo obj = 0x2c ------
-                000C     num vertices
-                0001     num subblocks
-                0000
-                0000
-                00258BF8 points after 4 floats. 3 floats * num vertices
-                00258C88 subblock type pointer
-                00258C8C subblock pointer
-                00259078
-                00000000
-                400D895A float
-                BD619B7A float
-                BE5757CB float
-                BDA67A34 float
-                ----------------------- goto subblock header
-                0016273C
-                00258CB4 off triangles indices
-                00258D20 normals, one for each vertex referenced by triangles
-                0012     num triangles
-                FFFF
-                00000000
-                00258DF8
-                00258EA8 0x1d * 3*4
-                00259004 0x1d * 4
-                001D
-                0000
-                */
             }
+            R3Loader.Loader.physicalObjects.Add(po);
             return po;
         }
 
+        // Call after clone
+        public void Reset() {
+            gao = null;
+        }
 
         public R3PhysicalObject Clone() {
             R3PhysicalObject po = (R3PhysicalObject)MemberwiseClone();
             po.visualSet = new List<R3VisualSetLOD>();
+            po.Reset();
             for (int i = 0; i < visualSet.Count; i++) {
                 R3VisualSetLOD l = new R3VisualSetLOD();
                 l.LODdistance = visualSet[i].LODdistance;
                 l.off_data = visualSet[i].off_data;
                 l.obj = visualSet[i].obj.Clone();
                 po.visualSet.Add(l);
+                if (l.obj is R3Mesh) {
+                    R3Mesh m = ((R3Mesh)l.obj);
+                    if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
+                    m.gao.transform.parent = po.Gao.transform;
+                }
             }
-            // Add collide set here too
+            if (collideMesh != null) {
+                po.collideMesh = collideMesh.Clone();
+                po.collideMesh.gao.transform.parent = po.Gao.transform;
+            }
+            R3Loader.Loader.physicalObjects.Add(po);
             return po;
         }
     }

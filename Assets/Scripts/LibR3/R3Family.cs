@@ -120,10 +120,11 @@ namespace LibR3 {
                         R3PhysicalObject subobj = R3PhysicalObject.Read(reader, off_subblock);
                         if (subobj != null) {
                             f.physical_objects[i] = subobj;
-                            if (subobj.visualSet.Count > 0 && subobj.visualSet[0].obj is R3Mesh) {
+                            subobj.Gao.transform.parent = f.Gao.transform;
+                            /*if (subobj.visualSet.Count > 0 && subobj.visualSet[0].obj is R3Mesh) {
                                 GameObject meshGAO = ((R3Mesh)subobj.visualSet[0].obj).gao;
                                 meshGAO.transform.parent = f.Gao.transform;
-                            }
+                            }*/
                         }
                         R3Pointer.Goto(ref reader, curPos);
                     }

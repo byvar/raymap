@@ -102,10 +102,11 @@ namespace LibR3 {
                     R3PhysicalObject o = p.family.physical_objects[i];
                     if (o != null) {
                         p.physical_objects[i] = o.Clone();
-                        if (p.physical_objects[i].visualSet.Count > 0 && p.physical_objects[i].visualSet[0].obj is R3Mesh) {
+                        p.physical_objects[i].Gao.transform.parent = p.Gao.transform;
+                        /*if (p.physical_objects[i].visualSet.Count > 0 && p.physical_objects[i].visualSet[0].obj is R3Mesh) {
                             GameObject meshGAO = ((R3Mesh)p.physical_objects[i].visualSet[0].obj).gao;
                             meshGAO.transform.parent = p.Gao.transform;
-                        }
+                        }*/
                     }
                 }
             } else if (off_subblocklist != null) {

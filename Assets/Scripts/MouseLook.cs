@@ -94,9 +94,9 @@ public class MouseLook : MonoBehaviour {
         if (Input.GetAxis("Horizontal") != 0) {
             transform.Translate(defaultCamera.transform.right * flySpeed * Input.GetAxis("Horizontal"), Space.World);
         }
-        if (Input.GetKey(KeyCode.X)) {
+        if (Input.GetKey(KeyCode.R)) {
             transform.Translate(Vector3.up * flySpeed * 0.5f, Space.World);
-        } else if (Input.GetKey(KeyCode.C)) {
+        } else if (Input.GetKey(KeyCode.F)) {
             transform.Translate(-Vector3.up * flySpeed * 0.5f, Space.World);
         }
         if (Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.KeypadPlus)) {
