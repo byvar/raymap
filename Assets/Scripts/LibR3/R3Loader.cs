@@ -37,6 +37,7 @@ namespace LibR3 {
         public List<R3Light> lights = new List<R3Light>();
         public List<R3Sector> sectors = new List<R3Sector>();
         public List<R3PhysicalObject> physicalObjects = new List<R3PhysicalObject>(); // only required for quick switching between visual & collision geometry
+        public List<R3AIModel> aiModels = new List<R3AIModel>();
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
 
         public Dictionary<uint, R3Pointer>[] ptrs_array = new Dictionary<uint, R3Pointer>[3];

@@ -40,6 +40,16 @@ namespace LibR3 {
             return file + "|" + String.Format("0x{0:X8}", offset);
         }
 
+        public static R3Pointer GetPointerAtOffset(R3Pointer pointer) {
+            R3Loader l = R3Loader.Loader;
+            if (l.ptrs_array[pointer.file].ContainsKey(pointer.offset)) {
+                R3Pointer ptr = l.ptrs_array[pointer.file][pointer.offset];
+                if (ptr.offset == 0) return null;
+                return ptr;
+            }
+            return null;
+        }
+
         public static R3Pointer Read(EndianBinaryReader reader) {
             R3Loader l = R3Loader.Loader;
             uint current_off = (uint)(reader.BaseStream.Position) - 4;

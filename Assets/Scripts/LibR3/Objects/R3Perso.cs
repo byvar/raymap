@@ -16,6 +16,7 @@ namespace LibR3 {
         public string name2 = null;
         public R3Family family = null;
         public R3PhysicalObject[] physical_objects = null;
+        public R3Brain brain = null;
 
         private GameObject gao;
         public GameObject Gao {
@@ -51,7 +52,7 @@ namespace LibR3 {
             R3Pointer off_perso = R3Pointer.Read(reader);
             R3Pointer off_nameIndices = R3Pointer.Read(reader);
             R3Pointer off_unknown = R3Pointer.Read(reader);
-            R3Pointer off_intelligence = R3Pointer.Read(reader);
+            R3Pointer off_brain = R3Pointer.Read(reader);
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
@@ -80,6 +81,13 @@ namespace LibR3 {
                 R3Pointer.Goto(ref reader, off_current);
             }
             l.print("[" + p.name0 + "] " + p.name1 + " | " + p.name2 + " - offset: " + offset);
+
+            if (off_brain != null) {
+                R3Pointer off_current = R3Pointer.Goto(ref reader, off_brain);
+                p.brain = R3Brain.Read(reader, off_brain);
+                R3Pointer.Goto(ref reader, off_current);
+            }
+            //if (off_intelligence != null) l.print("Intelligence for " + p.name2 + ": " + off_intelligence);
             /*if (off_intelligence != null) {
                 R3Pointer.Goto(ref reader, off_intelligence);
                 reader.ReadUInt32();
