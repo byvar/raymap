@@ -1790,7 +1790,7 @@ namespace LibR3 {
             return NodeType.Unknown;
         }
 
-        public static string readableFunctionSubType(EndianBinaryReader reader, byte functionType, int param) {
+        public static string readableFunctionSubType(byte functionType, int param) {
             short mask = 0;
 
             Vector3 vector3 = new Vector3 { x = 0, y = 0, z = 0 };

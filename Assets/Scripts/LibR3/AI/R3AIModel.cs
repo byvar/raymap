@@ -8,10 +8,10 @@ namespace LibR3 {
     public class R3AIModel {
         public R3Pointer offset;
 
-        public R3Pointer off_actiontable_normal;
-        public R3Pointer off_actiontable_reflex;
+        public R3Pointer off_behaviors_normal;
+        public R3Pointer off_behaviors_reflex;
         public R3Pointer off_dsgMem;
-        public R3Pointer off_actiontable_macros;
+        public R3Pointer off_macros;
         public uint flags;
 
         public R3Behavior[] behaviors_normal = null;
@@ -25,14 +25,14 @@ namespace LibR3 {
         public static R3AIModel Read(EndianBinaryReader reader, R3Pointer offset) {
             R3Loader l = R3Loader.Loader;
             R3AIModel ai = new R3AIModel(offset);
-            ai.off_actiontable_normal = R3Pointer.Read(reader);
-            ai.off_actiontable_reflex = R3Pointer.Read(reader);
+            ai.off_behaviors_normal = R3Pointer.Read(reader);
+            ai.off_behaviors_reflex = R3Pointer.Read(reader);
             ai.off_dsgMem = R3Pointer.Read(reader);
-            ai.off_actiontable_macros = R3Pointer.Read(reader);
+            ai.off_macros = R3Pointer.Read(reader);
             ai.flags = reader.ReadUInt32();
             
-            if (ai.off_actiontable_normal != null) {
-                R3Pointer.Goto(ref reader, ai.off_actiontable_normal);
+            if (ai.off_behaviors_normal != null) {
+                R3Pointer.Goto(ref reader, ai.off_behaviors_normal);
                 R3Pointer off_entries = R3Pointer.Read(reader);
                 uint num_entries = reader.ReadUInt32();
                 ai.behaviors_normal = new R3Behavior[num_entries];
@@ -43,8 +43,8 @@ namespace LibR3 {
                     }
                 }
             }
-            if (ai.off_actiontable_reflex != null) {
-                R3Pointer.Goto(ref reader, ai.off_actiontable_reflex);
+            if (ai.off_behaviors_reflex != null) {
+                R3Pointer.Goto(ref reader, ai.off_behaviors_reflex);
                 R3Pointer off_entries = R3Pointer.Read(reader);
                 uint num_entries = reader.ReadUInt32();
                 ai.behaviors_reflex = new R3Behavior[num_entries];
@@ -55,8 +55,8 @@ namespace LibR3 {
                     }
                 }
             }
-            if (ai.off_actiontable_macros != null) {
-                R3Pointer.Goto(ref reader, ai.off_actiontable_macros);
+            if (ai.off_macros != null) {
+                R3Pointer.Goto(ref reader, ai.off_macros);
                 R3Pointer off_entries = R3Pointer.Read(reader);
                 byte num_entries = reader.ReadByte();
                 reader.ReadByte();

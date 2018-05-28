@@ -681,7 +681,7 @@ namespace LibR3 {
                 R3Pointer.Goto(ref reader, off_dynamic_world);
                 superObjectsActual.AddRange(R3SuperObject.Read(reader, off_dynamic_world, false, true));
             }
-            // Parse special SO's
+            // Parse spawnable SO's
             if (off_spawnable_perso_first != null && num_spawnable_perso > 0) {
                 GameObject spawnableParent = new GameObject("Spawnable persos");
                 spawnableParent.transform.localPosition = Vector3.zero;
@@ -695,7 +695,13 @@ namespace LibR3 {
                     if (off_spawnable_perso != null) {
                         R3Pointer.Goto(ref reader, off_spawnable_perso);
                         R3Perso perso = R3Perso.Read(reader, off_spawnable_perso, null);
-                        if (perso != null) perso.Gao.transform.parent = spawnableParent.transform;
+                        if (perso != null) {
+                            perso.Gao.transform.parent = spawnableParent.transform;
+                            // Also print its first script, if it has one.
+                            if (perso.brain != null && perso.brain.mind.AI_model != null && perso.brain.mind.AI_model.behaviors_normal.Length > 0) {
+                                perso.brain.mind.AI_model.behaviors_normal[0].scripts[0].print(perso);
+                            }
+                        }
                     }
                     if (off_spawnable_next != null) R3Pointer.Goto(ref reader, off_spawnable_next);
                 }

@@ -32,5 +32,22 @@ namespace LibR3 {
             }
             return s;
         }
+
+        public void print(R3Perso perso) {
+            // TODO: Use perso to print states, etc.
+            R3Loader l = R3Loader.Loader;
+            StringBuilder builder = new StringBuilder();
+            builder.Append("Script @ offset: " + offset + "\n");
+            foreach (R3ScriptNode sn in scriptNodes) {
+                if (sn.indent == 0) {
+                    builder.Append("---- END OF SCRIPT ----");
+                } else {
+                    builder.Append(new String(' ', (sn.indent - 1) * 4));
+                    builder.Append(R3AIFunctionTypes.readableFunctionSubType(sn.type, (int)sn.param));
+                }
+                builder.Append("\n");
+            }
+            l.print(builder.ToString());
+        }
     }
 }

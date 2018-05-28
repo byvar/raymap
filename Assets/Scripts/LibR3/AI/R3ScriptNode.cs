@@ -22,20 +22,22 @@ namespace LibR3 {
             sn.param = reader.ReadUInt32();
 
             // Could be read as one uint, but the code says that type is only 1 byte
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            sn.type = reader.ReadByte();
+            if (l.mode == R3Loader.Mode.Rayman3GC) {
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                sn.type = reader.ReadByte();
 
-            reader.ReadByte();
-            reader.ReadByte();
-            sn.indent = reader.ReadByte();
-            reader.ReadByte();
-            /*if (sn.indent == 0) {
-                l.print("---- END OF SCRIPT ----");
+                reader.ReadByte();
+                reader.ReadByte();
+                sn.indent = reader.ReadByte();
+                reader.ReadByte();
             } else {
-                l.print(new String(' ', sn.indent - 1) + R3AIFunctionTypes.readableFunctionSubType(reader, sn.type, (int)sn.param));
-            }*/
+                reader.ReadByte();
+                reader.ReadByte();
+                sn.indent = reader.ReadByte();
+                sn.type = reader.ReadByte();
+            }
             return sn;
         }
     }
