@@ -1,2 +1,2 @@
-# r3map
-Map viewer/editor for Rayman 3 and Rayman Arena for Gamecube and PC
+# Raymap
+Map viewer/editor for Rayman 2, Arena and 3 for PC & Gamecube
