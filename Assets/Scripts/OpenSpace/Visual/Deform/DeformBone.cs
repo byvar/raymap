@@ -17,6 +17,9 @@ namespace OpenSpace.Visual.Deform {
                 if (unityBone == null) {
                     GameObject gao = new GameObject("Bone " + index + " - " + unknown1 + " - " + unknown2);
                     unityBone = gao.transform;
+                    /*unityBone.localPosition = Vector3.zero;
+                    unityBone.localEulerAngles = Vector3.zero;
+                    unityBone.localScale = Vector3.one;*/
                     unityBone.localPosition = mat.GetPosition(convertAxes: true);
                     unityBone.localRotation = mat.GetRotation(convertAxes: true);
                     unityBone.localScale = mat.GetScale(convertAxes: true);

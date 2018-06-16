@@ -67,7 +67,6 @@ namespace OpenSpace.Visual {
             reader.ReadSingle();
             reader.ReadSingle();
             reader.ReadInt32();
-            reader.ReadInt32();
             if (l.mode != MapLoader.Mode.Rayman2PC) {
                 reader.ReadInt32();
                 reader.ReadInt16();

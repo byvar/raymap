@@ -77,6 +77,7 @@ public class Controller : MonoBehaviour {
         loader.Load();
         sectorManager.Init();
         lightManager.Init();
+        InitPersos();
         if (viewCollision) UpdateViewCollision();
     }
 	// Update is called once per frame
@@ -86,6 +87,16 @@ public class Controller : MonoBehaviour {
         }
         if (loader != null && viewCollision != viewCollision_) {
             UpdateViewCollision();
+        }
+    }
+
+    public void InitPersos() {
+        if (loader != null) {
+            for (int i = 0; i < loader.persos.Count; i++) {
+                PersoBehaviour unityBehaviour = loader.persos[i].Gao.AddComponent<PersoBehaviour>();
+                unityBehaviour.perso = loader.persos[i];
+                unityBehaviour.Init();
+            }
         }
     }
 

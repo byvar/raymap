@@ -91,7 +91,7 @@ namespace OpenSpace.Visual.Deform {
             // Read bones
             d.r3bones[0] = new DeformBone();
             d.r3bones[0].mat = new Matrix(null, 1, Matrix4x4.identity, new Vector4(1f, 1f, 1f, 1f));
-            d.r3bones[0].index = 0;
+            d.r3bones[0].index = 0xFF;
             Pointer.Goto(ref reader, d.off_bones);
             for (int i = 1; i < d.num_bones; i++) {
                 d.r3bones[i] = new DeformBone();

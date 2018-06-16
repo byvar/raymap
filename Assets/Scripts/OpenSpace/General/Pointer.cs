@@ -35,7 +35,7 @@ namespace OpenSpace {
             return !(x == y);
         }
         public static Pointer operator +(Pointer x, Decimal y) {
-            return new Pointer(x.offset + (uint)y, x.file);
+            return new Pointer((uint)((Decimal)x.offset + y), x.file);
         }
         public override string ToString() {
             return file.name + "|" + String.Format("0x{0:X8}", offset);

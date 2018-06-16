@@ -18,6 +18,7 @@ namespace OpenSpace.EngineObject {
         public Family family = null;
         public PhysicalObject[] physical_objects = null;
         public Brain brain = null;
+        public State initialState = null;
 
         private GameObject gao;
         public GameObject Gao {
@@ -51,6 +52,7 @@ namespace OpenSpace.EngineObject {
             MapLoader l = MapLoader.Loader;
             //l.print("Offset: " + offset);
             Perso p = new Perso(offset, so);
+            l.persos.Add(p);
             Pointer off_perso = Pointer.Read(reader);
             Pointer off_nameIndices = Pointer.Read(reader);
             Pointer off_unknown = Pointer.Read(reader);
@@ -77,6 +79,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32(); // same address?
             Pointer off_family = Pointer.Read(reader);
             p.family = Family.FromOffset(off_family);
+            p.initialState = State.FromOffset(p.family, off_currentState);
 
             if (off_nameIndices != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_nameIndices);
@@ -111,7 +114,7 @@ namespace OpenSpace.EngineObject {
                     name = reader.ReadNullDelimitedString();
                 }
             }*/
-            if (off_subblocklist != null && p.family != null && off_subblocklist == p.family.off_physical_list && p.family.physical_objects != null) {
+            /*if (off_subblocklist != null && p.family != null && off_subblocklist == p.family.off_physical_list && p.family.physical_objects != null) {
                 // Clone family's physical objects into this perso
                 p.physical_objects = new PhysicalObject[p.family.physical_objects.Length];
                 for (int i = 0; i < p.family.physical_objects.Length; i++) {
@@ -119,15 +122,12 @@ namespace OpenSpace.EngineObject {
                     if (o != null) {
                         p.physical_objects[i] = o.Clone();
                         p.physical_objects[i].Gao.transform.parent = p.Gao.transform;
-                        /*if (p.physical_objects[i].visualSet.Count > 0 && p.physical_objects[i].visualSet[0].obj is R3Mesh) {
-                            GameObject meshGAO = ((R3Mesh)p.physical_objects[i].visualSet[0].obj).gao;
-                            meshGAO.transform.parent = p.Gao.transform;
-                        }*/
+                        p.physical_objects[i].Gao.name = "" + i + " - " + p.physical_objects[i].Gao.name;
                     }
                 }
             } else if (off_subblocklist != null) {
                 l.print("Perso's physical list does not match family list at position " + offset);
-            }
+            }*/
             return p;
         }
     }

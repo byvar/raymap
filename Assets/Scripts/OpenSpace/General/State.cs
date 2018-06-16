@@ -9,7 +9,7 @@ namespace OpenSpace {
     public class State {
         public Pointer offset;
         public Family family;
-        public string name = "No name";
+        public string name;
         public Pointer off_state_next;
         public Pointer off_state_prev;
         public Pointer off_anim_ref;
@@ -28,6 +28,7 @@ namespace OpenSpace {
         public static State Read(EndianBinaryReader reader, Pointer offset, Family family) {
             MapLoader l = MapLoader.Loader;
             State s = new State(offset, family);
+            s.name = "Unnamed state @ " + offset;
             if (l.mode == MapLoader.Mode.Rayman3GC) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
             if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_next = Pointer.Read(reader);
             if (l.mode == MapLoader.Mode.Rayman3GC) {

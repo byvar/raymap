@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Animation.Component;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,8 @@ namespace OpenSpace.Animation {
         public AnimationStack events;
         public AnimationStack morphData;
         public AnimationStack deformations;
+
+        public AnimA3DGeneral[] animations;
 
         public AnimationBank(Pointer off_header) {
             this.off_header = off_header;
@@ -70,6 +73,7 @@ namespace OpenSpace.Animation {
                 } else {
                     banks[i].deformations = null;
                 }
+                banks[i].animations = new AnimA3DGeneral[banks[i].a3d_general.count];
             }
             if (l.mode == MapLoader.Mode.Rayman3PC || l.mode == MapLoader.Mode.Rayman2PC) {
                 for (int i = 0; i < num_banks; i++) {
@@ -88,6 +92,73 @@ namespace OpenSpace.Animation {
                     if (l.mode != MapLoader.Mode.Rayman2PC && banks[i].deformations.count > 0) banks[i].deformations.off_data = Pointer.Read(reader);
                 }
             }
+            Pointer off_current = Pointer.Current(reader);
+            Pointer off_a3d = null;
+            uint num_a3d = (uint)banks.Sum(b => b.a3d_general.count);
+            FileFormat.FileWithPointers kfFile = null;
+            if (index == 0 && l.files_array[MapLoader.Mem.FixKeyFrames] != null) {
+                kfFile = MapLoader.Loader.files_array[MapLoader.Mem.FixKeyFrames];
+            }
+            if (index > 0 && l.files_array[MapLoader.Mem.LvlKeyFrames] != null) {
+                kfFile = MapLoader.Loader.files_array[MapLoader.Mem.LvlKeyFrames];
+            }
+            if (kfFile != null && l.mode == MapLoader.Mode.Rayman3GC) {
+                kfFile.GotoHeader();
+                reader = kfFile.reader;
+                uint[] a3d_sizes = new uint[num_a3d];
+                for (uint i = 0; i < num_a3d; i++) {
+                    a3d_sizes[i] = reader.ReadUInt32();
+                }
+                off_a3d = Pointer.Current(reader);
+                uint current_anim = 0;
+                for (uint i = 0; i < banks.Length; i++) {
+                    uint num_a3d_in_bank = banks[i].a3d_general.count;
+                    for (uint j = 0; j < num_a3d_in_bank; j++) {
+                        Pointer.Goto(ref reader, off_a3d);
+                        // Read animation data here
+                        banks[i].animations[j] = AnimA3DGeneral.Read(reader, off_a3d);
+                        AnimA3DGeneral a = banks[i].animations[j];
+                        a.vectors       = new AnimVector[a.num_vectors];
+                        a.quaternions   = new AnimQuaternion[a.num_quaternions];
+                        a.hierarchies   = new AnimHierarchy[a.num_hierarchies];
+                        a.ntto          = new AnimNTTO[a.num_NTTO];
+                        a.onlyFrames    = new AnimOnlyFrame[a.num_onlyFrames];
+                        a.channels      = new AnimChannel[a.num_channels];
+                        a.numOfNTTO     = new AnimNumOfNTTO[a.num_numNTTO * a.num_channels];
+                        a.framesKFIndex = new AnimFramesKFIndex[a.num_onlyFrames * a.num_channels];
+                        a.keyframes     = new AnimKeyframe[a.num_keyframes];
+                        a.events        = new AnimEvent[a.num_events];
+                        a.morphData     = new AnimMorphData[a.num_morphData];
+                        a.deformations  = new AnimDeformation[a.num_deformations];
+                        for (uint k = 0; k < a.vectors.Length; k++) a.vectors[k] = AnimVector.Read(reader);
+                        for (uint k = 0; k < a.quaternions.Length; k++) a.quaternions[k] = AnimQuaternion.Read(reader);
+                        for (uint k = 0; k < a.hierarchies.Length; k++) a.hierarchies[k] = AnimHierarchy.Read(reader);
+                        for (uint k = 0; k < a.ntto.Length; k++) a.ntto[k] = AnimNTTO.Read(reader);
+                        for (uint k = 0; k < a.onlyFrames.Length; k++) a.onlyFrames[k] = AnimOnlyFrame.Read(reader);
+                        reader.Align(4);
+                        for (uint k = 0; k < a.channels.Length; k++) a.channels[k] = AnimChannel.Read(reader);
+                        for (uint k = 0; k < a.numOfNTTO.Length; k++) a.numOfNTTO[k] = AnimNumOfNTTO.Read(reader);
+                        reader.Align(4);
+                        for (uint k = 0; k < a.framesKFIndex.Length; k++) a.framesKFIndex[k] = AnimFramesKFIndex.Read(reader);
+                        for (uint k = 0; k < a.keyframes.Length; k++) a.keyframes[k] = AnimKeyframe.Read(reader);
+                        reader.Align(4);
+                        for (uint k = 0; k < a.events.Length; k++) a.events[k] = AnimEvent.Read(reader);
+                        for (uint k = 0; k < a.morphData.Length; k++) a.morphData[k] = AnimMorphData.Read(reader);
+                        reader.Align(4);
+                        for (uint k = 0; k < a.deformations.Length; k++) a.deformations[k] = AnimDeformation.Read(reader);
+                        off_a3d += a3d_sizes[current_anim];
+
+                        // Check if read correctly
+                        Pointer off_postAnim = Pointer.Current(reader);
+                        if (off_postAnim != off_a3d) l.print("Animation block size does not match data size: " +
+                            "Current offset: " + off_postAnim + " - Expected offset: " + off_a3d +
+                            " - Block start: " + (off_a3d + -(int)(a3d_sizes[current_anim])));
+
+                        current_anim++;
+                    }
+                }
+            }
+            Pointer.Goto(ref reader, off_current);
             return banks;
         }
     }

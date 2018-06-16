@@ -50,16 +50,17 @@ namespace OpenSpace {
         public List<Sector> sectors = new List<Sector>();
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
         public List<AIModel> aiModels = new List<AIModel>();
+        public List<Perso> persos = new List<Perso>();
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
         
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
-        public FileWithPointers[] files_array = new FileWithPointers[3];
+        public FileWithPointers[] files_array = new FileWithPointers[7];
 
 
-        string[] lvlNames = new string[3];
-        string[] lvlPaths = new string[3];
-        string[] ptrPaths = new string[3];
-        string[] tplPaths = new string[3];
+        string[] lvlNames = new string[7];
+        string[] lvlPaths = new string[7];
+        string[] ptrPaths = new string[7];
+        string[] tplPaths = new string[7];
         string[] cntPaths = null;
         CNT cnt = null;
         string menuTPLPath;
@@ -75,7 +76,7 @@ namespace OpenSpace {
             public const int FixKeyFrames = 5;
             public const int LvlKeyFrames = 6;
         }
-        public int[] loadOrder = new int[] { Mem.Fix, Mem.Transit, Mem.Lvl };
+        public int[] loadOrder = new int[] { Mem.Fix, Mem.Transit, Mem.Lvl, Mem.VertexBuffer, Mem.FixKeyFrames, Mem.LvlKeyFrames };
 
         
         static MapLoader loader = null;
@@ -175,6 +176,18 @@ namespace OpenSpace {
                     tplPaths[2] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "_Trans.tpl");
                     hasTransit = File.Exists(lvlPaths[2]) && (new FileInfo(lvlPaths[2]).Length > 4);
 
+                    lvlNames[4] = lvlName + "_vb";
+                    lvlPaths[4] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "_vb.lvl");
+                    ptrPaths[4] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "_vb.ptr");
+
+                    lvlNames[5] = "fixkf";
+                    lvlPaths[5] = Path.Combine(gameDataBinFolder, "fixkf.lvl");
+                    ptrPaths[5] = Path.Combine(gameDataBinFolder, "fixkf.ptr");
+
+                    lvlNames[6] = lvlName + "kf";
+                    lvlPaths[6] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "kf.lvl");
+                    ptrPaths[6] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "kf.ptr");
+
                     if (mode == Mode.Rayman3PC) {
                         cntPaths = new string[3];
                         cntPaths[0] = Path.Combine(gameDataBinFolder, "vignette.cnt");
@@ -188,12 +201,13 @@ namespace OpenSpace {
                         cnt = new CNT(cntPaths);
                     }
 
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < lvlPaths.Length; i++) {
+                        if (lvlPaths[i] == null) continue;
                         if (File.Exists(lvlPaths[i]) && File.Exists(ptrPaths[i])) {
                             files_array[i] = new LVL(lvlNames[i], lvlPaths[i]);
                         }
                     }
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < loadOrder.Length; i++) {
                         int j = loadOrder[i];
                         if (files_array[j] != null) {
                             ((LVL)files_array[j]).ReadPTR(ptrPaths[j]);
@@ -1135,12 +1149,6 @@ namespace OpenSpace {
                         Perso perso = Perso.Read(reader, off_spawnable_perso, null);
                         if (perso != null) {
                             perso.Gao.transform.parent = spawnableParent.transform;
-                            // Also print its first script, if it has one.
-                            if (perso.brain != null && perso.brain.mind.AI_model != null
-                                && perso.brain.mind.AI_model.behaviors_normal.Length > 0
-                                && perso.brain.mind.AI_model.behaviors_normal[0].scripts.Length > 0) {
-                                perso.brain.mind.AI_model.behaviors_normal[0].scripts[0].print(perso);
-                            }
                         }
                     }
                     if (off_spawnable_next != null) Pointer.Goto(ref reader, off_spawnable_next);

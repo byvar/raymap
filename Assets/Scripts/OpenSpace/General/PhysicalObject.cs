@@ -1,5 +1,6 @@
 ﻿using OpenSpace.Collide;
 using OpenSpace.Visual;
+using OpenSpace.Visual.Deform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,16 @@ namespace OpenSpace {
                     gao = new GameObject("[PO]");
                 }
                 return gao;
+            }
+        }
+        public DeformSet Bones {
+            get {
+                for (int i = 0; i < visualSet.Count; i++) {
+                    if (visualSet[i].obj != null && visualSet[i].obj is MeshObject && ((MeshObject)visualSet[i].obj).bones != null) {
+                        return ((MeshObject)visualSet[i].obj).bones;
+                    }
+                }
+                return null;
             }
         }
 
@@ -150,6 +161,10 @@ namespace OpenSpace {
             }
             MapLoader.Loader.physicalObjects.Add(po);
             return po;
+        }
+
+        public void Destroy() {
+            if (gao != null) GameObject.Destroy(gao);
         }
     }
 }
