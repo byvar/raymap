@@ -88,13 +88,17 @@ public class PersoBehaviour : MonoBehaviour {
             if (a3d != null) {
                 for (int i = 0; i < a3d.num_NTTO; i++) {
                     AnimNTTO ntto = a3d.ntto[i + a3d.start_NTTO];
-                    print("NTTO " + i + ": UNK0:" + ntto.flags + " - OBJIND:" + ntto.object_index +
+                    print("NTTO " + i + ": UNK0:" + ntto.flags1 + " - UNK1:" + ntto.flags2 + " - OBJIND:" + ntto.object_index +
                         " - UNK4:" + ntto.unk4 + " - UNK5:" + ntto.unk5);
                 }
                 for (int i = 0; i < a3d.num_deformations; i++) {
                     AnimDeformation d = a3d.deformations[i + a3d.start_deformations];
                     print("Deform " + i + ": CH1:" + d.channel + " - BI1:" + d.bone +
                         " - CH2:" + d.linkChannel + " - BI2:" + d.linkBone);
+                }
+                for (int i = 0; i < a3d.num_hierarchies; i++) {
+                    AnimHierarchy h = a3d.hierarchies[i + a3d.start_hierarchies];
+                    print("Hierarchy " + i + ": Child:" + h.childChannelID + " - Parent:" + h.parentChannelID);
                 }
             }
         }
@@ -183,6 +187,13 @@ public class PersoBehaviour : MonoBehaviour {
                             subObjects[i][j].Gao.transform.parent = channelObjects[i].transform;
                             subObjects[i][j].Gao.name = "[" + j + "] Bone PO";
                             subObjects[i][j].Gao.SetActive(false);
+                            /*GameObject boneVisualisation = new GameObject("Bone vis");
+                            boneVisualisation.transform.SetParent(subObjects[i][j].Gao.transform);
+                            MeshRenderer mr = boneVisualisation.AddComponent<MeshRenderer>();
+                            MeshFilter mf = boneVisualisation.AddComponent<MeshFilter>();
+                            Mesh mesh = Util.CreateBox(0.1f);
+                            mf.mesh = mesh;
+                            boneVisualisation.transform.localScale = Vector3.one / 4f;*/
                         } else {
                             if (perso.family != null && perso.family.physical_objects != null && perso.family.physical_objects.Length > ntto.object_index) {
                                 PhysicalObject o = perso.family.physical_objects[ntto.object_index];
@@ -204,6 +215,7 @@ public class PersoBehaviour : MonoBehaviour {
 
     void UpdateFrame(uint currentFrame) {
         if (loaded && a3d != null && channelObjects != null & subObjects != null) {
+            // First pass: reset TRS for all sub objects
             for (int i = 0; i < channelObjects.Length; i++) {
                 GameObject c = channelObjects[i];
                 if (c != null) {
@@ -222,10 +234,10 @@ public class PersoBehaviour : MonoBehaviour {
                 }
             }
             AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
+            // Create hierarchy for this frame
             for (int i = a3d.start_hierarchies + of.start_hierarchies_for_frame;
                 i < a3d.start_hierarchies + of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
                 AnimHierarchy h = a3d.hierarchies[i];
-                //print("Hierarchy for frame " + i + ": " + h.childChannelID + " - " + h.parentChannelID);
 
                 if (!channelIDDictionary.ContainsKey(h.childChannelID)
                     || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
@@ -236,7 +248,7 @@ public class PersoBehaviour : MonoBehaviour {
 
                 channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
             }
-            
+            // Final pass
             for (int i = 0; i < a3d.num_channels; i++) {
                 AnimChannel ch = a3d.channels[a3d.start_channels + i];
                 AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
@@ -245,11 +257,10 @@ public class PersoBehaviour : MonoBehaviour {
                 AnimQuaternion qua = a3d.quaternions[a3d.start_quaternions + kf.quaternion];
                 AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                 AnimNTTO ntto = a3d.ntto[a3d.start_NTTO + numOfNTTO.numOfNTTO];
+                //if (ntto.IsBoneNTTO) continue;
                 PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO];
-                //print("Channel: " + i + " - NTTO: " + ntto.object_index + " - Hierarchy: " + ch.unk0 + " - unk4: " + ch.vector + " - field0: " + ch.id);
                 Vector3 vector = vec.vector;
                 Quaternion quaternion = qua.quaternion;
-                //if (kf.interpolationFactor != 0) {
                 int framesSinceKF = (int)currentFrame - (int)kf.frame;
                 AnimKeyframe nextKF = null;
                 int framesDifference;
@@ -275,13 +286,20 @@ public class PersoBehaviour : MonoBehaviour {
                 AnimQuaternion qua2 = a3d.quaternions[a3d.start_quaternions + nextKF.quaternion];
                 vector = Vector3.Lerp(vec.vector, vec2.vector, interpolation);
                 quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
-                //}
+
                 if(physicalObject != null) physicalObject.Gao.SetActive(true);
                 channelObjects[i].transform.localPosition = vector;
                 channelObjects[i].transform.localRotation = quaternion;
-
+            }
+            for(int i = 0; i < a3d.num_channels; i++) {
+                AnimChannel ch = a3d.channels[a3d.start_channels + i];
+                AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
+                AnimNTTO ntto = a3d.ntto[a3d.start_NTTO + numOfNTTO.numOfNTTO];
+                PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO];
+                if (physicalObject == null) continue;
+                DeformSet bones = physicalObject.Bones;
                 // Deformations
-                if (ntto != null && ntto.IsBoneNTTO) {
+                if (bones != null) {
                     for (int j = 0; j < a3d.num_deformations; j++) {
                         AnimDeformation d = a3d.deformations[a3d.start_deformations + j];
                         if (d.channel < ch.id) continue;
@@ -294,41 +312,16 @@ public class PersoBehaviour : MonoBehaviour {
                         AnimNTTO ntto_link = a3d.ntto[a3d.start_NTTO + numOfNTTO_link.numOfNTTO];
                         PhysicalObject physicalObject_link = subObjects[ind_linkChannel][numOfNTTO_link.numOfNTTO];
                         if (physicalObject_link == null) continue;
-                        DeformSet bones = physicalObject_link.Bones;
-                        if (bones == null) continue;
-                        //print("" + (d.linkBone + 1) + " - " + bones.bones.Length);
-                        //if (bones == null || bones.bones.Length <= d.linkBone+1) continue;
-                        DeformBone boneMatch = bones.r3bones.FirstOrDefault(b => b.index == d.linkBone);
-                        if (boneMatch == null) continue;
-                        Transform boneTransform = boneMatch.UnityBone;
-                        //Transform boneTransform = bones.bones[d.linkBone+1];
-                        boneTransform.SetParent(channelObjects[i].transform);
-                        boneTransform.localPosition = Vector3.zero;
-                        boneTransform.localEulerAngles = Vector3.zero;
-                        boneTransform.localScale = Vector3.one;
-                        /*boneTransform.localPosition = vector;
-                        boneTransform.localRotation = quaternion;*/
-
-                    }
-                }
-                // Deformations
-                /*if (a3d.deformations != null
-                    && perso.physical_objects[ind].visualSet != null
-                    && perso.physical_objects[ind].visualSet.Count > 0
-                    && perso.physical_objects[ind].visualSet[0].obj != null
-                    && perso.physical_objects[ind].visualSet[0].obj is MeshObject
-                    && ((MeshObject)perso.physical_objects[ind].visualSet[0].obj).bones != null) {
-                    DeformSet deformSet = ((MeshObject)perso.physical_objects[ind].visualSet[0].obj).bones;
-                    for (int j = a3d.start_deformations; j < a3d.start_deformations + a3d.num_deformations; j++) {
-                        if (a3d.deformations[j].channel > i) break;
-                        if (a3d.deformations[j].channel == i) {
-                            ushort boneIndex = a3d.deformations[j].boneIndex;
-                            if (boneIndex < deformSet.num_bones) {
-
-                            }
+                        if (bones == null || bones.bones.Length <= d.bone + 1) continue;
+                        DeformBone bone = bones.r3bones[d.bone + 1];
+                        if (bone != null) {
+                            Transform channelTransform = channelObjects[ind_linkChannel].transform;
+                            bone.UnityBone.position = channelTransform.position;
+                            bone.UnityBone.rotation = channelTransform.rotation;
+                            bone.UnityBone.localScale = Vector3.one;
                         }
                     }
-                }*/
+                }
             }
             this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
         } /*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {

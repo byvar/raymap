@@ -37,8 +37,95 @@ namespace OpenSpace {
         }
 
 
-        public Quaternion GetRotation(bool convertAxes = false) {
-            Vector3 s = GetScale();
+        public static Matrix operator *(Matrix x, Matrix y) {
+            return new Matrix(x.offset, x.type, x.m * y.m, x.v);
+        }
+
+        public static Matrix Invert(Matrix src) {
+            Matrix dest = new Matrix(src.offset, src.type, new Matrix4x4(), src.v);
+            /*m.v.x = 1f / m.m[0, 0];
+            m.v.y = 1f / m.m[1, 1];
+            m.v.z = 1f / m.m[2, 2];*/
+            /*m.m[0, 0] = m.v.x;
+            m.m[1, 1] = m.v.y;
+            m.m[2, 2] = m.v.z;*/
+            dest.m.SetRow(0, src.m.GetRow(0));
+            dest.m.SetRow(1, src.m.GetRow(1));
+            dest.m.SetRow(2, src.m.GetRow(2));
+            dest.m.SetRow(3, src.m.GetRow(3));
+            
+            /*float v4 = src.m.m22 * src.m.m11 - src.m.m12 * src.m.m21;
+            dest.m.m00 = v4;
+            float v5 = v4 * src.m.m00;
+            float v6 = src.m.m02 * src.m.m21 - src.m.m01 * src.m.m22;
+            dest.m.m01 = v6;
+            float v7 = v5 + src.m.m10 * v6;
+            float v8 = src.m.m01 * src.m.m12 - src.m.m02 * src.m.m11;
+            dest.m.m02 = v8;
+            float determinant = v7 + src.m.m20 * v8;
+            dest.m.m10 = src.m.m20 * src.m.m12 - src.m.m10 * src.m.m22;
+            dest.m.m20 = src.m.m10 * src.m.m21 - src.m.m20 * src.m.m11;
+            dest.m.m11 = src.m.m22 * src.m.m00 - src.m.m20 * src.m.m02;
+            dest.m.m21 = src.m.m01 * src.m.m20 - src.m.m21 * src.m.m00;
+            dest.m.m12 = src.m.m02 * src.m.m10 - src.m.m12 * src.m.m00;
+            dest.m.m22 = src.m.m11 * src.m.m00 - src.m.m01 * src.m.m10;
+
+
+            float invertedDeterminant = 1f / determinant;
+
+            dest.m.m00 *= invertedDeterminant;
+            dest.m.m10 *= invertedDeterminant;
+            dest.m.m20 *= invertedDeterminant;
+
+            dest.m.m01 *= invertedDeterminant;
+            dest.m.m11 *= invertedDeterminant;
+            dest.m.m21 *= invertedDeterminant;
+
+            dest.m.m02 *= invertedDeterminant;
+            dest.m.m12 *= invertedDeterminant;
+            dest.m.m22 *= invertedDeterminant;*/
+            dest.m.SetColumn(0, src.m.GetRow(0));
+            dest.m.SetColumn(1, src.m.GetRow(1));
+            dest.m.SetColumn(2, src.m.GetRow(2));
+
+            dest.m.m03 = dest.m.m01 * -src.m.m13 + dest.m.m02 * -src.m.m23 + dest.m.m00 * -src.m.m03;
+            dest.m.m13 = dest.m.m11 * -src.m.m13 + dest.m.m12 * -src.m.m23 + dest.m.m10 * -src.m.m03;
+            dest.m.m23 = dest.m.m21 * -src.m.m13 + dest.m.m22 * -src.m.m23 + dest.m.m20 * -src.m.m03;
+
+            dest.m.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
+            return dest;
+        }
+
+        public Quaternion GetRotation(bool convertAxes = false, bool isBoneMatrix = false) {
+            float tr = m.m00 + m.m11 + m.m22;
+            Quaternion q = new Quaternion();
+            if (tr > 0) {
+                float S = Mathf.Sqrt(tr + 1.0f) * 2; // S=4*qw 
+                q.w = 0.25f * S;
+                q.x = (m.m21 - m.m12) / S;
+                q.y = (m.m02 - m.m20) / S;
+                q.z = (m.m10 - m.m01) / S;
+            } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) {
+                float S = Mathf.Sqrt(1.0f + m.m00 - m.m11 - m.m22) * 2; // S=4*qx 
+                q.w = (m.m21 - m.m12) / S;
+                q.x = 0.25f * S;
+                q.y = (m.m01 + m.m10) / S;
+                q.z = (m.m02 + m.m20) / S;
+            } else if (m.m11 > m.m22) {
+                float S = Mathf.Sqrt(1.0f + m.m11 - m.m00 - m.m22) * 2; // S=4*qy
+                q.w = (m.m02 - m.m20) / S;
+                q.x = (m.m01 + m.m10) / S;
+                q.y = 0.25f * S;
+                q.z = (m.m12 + m.m21) / S;
+            } else {
+                float S = Mathf.Sqrt(1.0f + m.m22 - m.m00 - m.m11) * 2; // S=4*qz
+                q.w = (m.m10 - m.m01) / S;
+                q.x = (m.m02 + m.m20) / S;
+                q.y = (m.m12 + m.m21) / S;
+                q.z = 0.25f * S;
+            }
+
+            /*Vector3 s = GetScale();
 
             // Normalize Scale from Matrix4x4
             float m00 = m[0, 0] / s.x;
@@ -65,12 +152,26 @@ namespace OpenSpace {
             q.w /= qMagnitude;
             q.x /= qMagnitude;
             q.y /= qMagnitude;
-            q.z /= qMagnitude;
+            q.z /= qMagnitude;*/
 
             if (convertAxes) {
-                Vector3 tempRot = q.eulerAngles;
-                tempRot = new Vector3(tempRot.y, -tempRot.z, tempRot.x);
-                q = Quaternion.Euler(tempRot);
+                /*float tmp = q.y;
+                q.y = q.z;
+                q.z = tmp;*/
+                q = new Quaternion(q.x, q.z, q.y, -q.w);
+                //q = q * Quaternion.Euler(new Vector3(0f, 0f, 0f));
+                //Vector3 tempRot = q.eulerAngles;
+                if (isBoneMatrix) {
+                    //tempRot = new Vector3(-tempRot.x, -tempRot.z, -tempRot.y); // z = tempRot.y * sign(something)
+                    /*float signX = m00 == 0 ? 0 : Mathf.Sign(m00);
+                    float signY = m11 == 0 ? 0 : Mathf.Sign(m11);
+                    float signZ = m22 == 0 ? 0 : Mathf.Sign(m22);*/
+                    //float signX = 1f, signY = 1f, signZ = 1f;
+                    //tempRot = new Vector3(-tempRot.y * signY, -tempRot.x * signX, tempRot.z * signZ);
+                }
+                //tempRot = new Vector3(tempRot.y, -tempRot.z, tempRot.x);
+                
+                //q = Quaternion.Euler(tempRot);
             }
 
             return q;

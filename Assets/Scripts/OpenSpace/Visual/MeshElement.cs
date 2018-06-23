@@ -40,6 +40,11 @@ namespace OpenSpace.Visual {
         public int[][] mapping_uvs_spe = null;
         public int[] disconnected_triangles_spe = null;
 
+        private SkinnedMeshRenderer s_mr_main = null;
+        private SkinnedMeshRenderer s_mr_spe = null;
+        private Mesh mesh_main = null;
+        private Mesh mesh_spe = null;
+
 
         private GameObject gao = null;
         public GameObject Gao {
@@ -122,26 +127,26 @@ namespace OpenSpace.Visual {
                         }
                     }
                 }
-                Mesh meshUnity = new Mesh();
-                meshUnity.vertices = new_vertices;
-                meshUnity.normals = new_normals;
-                meshUnity.triangles = triangles;
+                mesh_main = new Mesh();
+                mesh_main.vertices = new_vertices;
+                mesh_main.normals = new_normals;
+                mesh_main.triangles = triangles;
                 if (new_boneWeights != null) {
-                    meshUnity.boneWeights = new_boneWeights;
-                    meshUnity.bindposes = mesh.bones.bindPoses;
+                    mesh_main.boneWeights = new_boneWeights;
+                    mesh_main.bindposes = mesh.bones.bindPoses;
                 }
                 for (int i = 0; i < num_uvMaps; i++) {
-                    meshUnity.SetUVs(i, new_uvs[i].ToList());
+                    mesh_main.SetUVs(i, new_uvs[i].ToList());
                 }
                 if (new_boneWeights != null) {
                     mr_main = gao.AddComponent<SkinnedMeshRenderer>();
-                    SkinnedMeshRenderer s_mr_main = (SkinnedMeshRenderer)mr_main;
+                    s_mr_main = (SkinnedMeshRenderer)mr_main;
                     s_mr_main.bones = mesh.bones.bones;
                     s_mr_main.rootBone = mesh.bones.bones[0];
-                    s_mr_main.sharedMesh = meshUnity;
+                    s_mr_main.sharedMesh = CopyMesh(mesh_main);
                 } else {
                     MeshFilter mf = gao.AddComponent<MeshFilter>();
-                    mf.mesh = meshUnity;
+                    mf.mesh = mesh_main;
                     mr_main = gao.AddComponent<MeshRenderer>();
                 }
             }
@@ -205,28 +210,28 @@ namespace OpenSpace.Visual {
                     } else {
                         gao.name = "[SPE] " + gao.name;
                     }
-                    Mesh meshUnity = new Mesh();
-                    meshUnity.vertices = new_vertices_spe;
-                    meshUnity.normals = new_normals_spe;
-                    meshUnity.triangles = triangles_spe;
+                    mesh_spe = new Mesh();
+                    mesh_spe.vertices = new_vertices_spe;
+                    mesh_spe.normals = new_normals_spe;
+                    mesh_spe.triangles = triangles_spe;
                     if (new_boneWeights_spe != null) {
-                        meshUnity.boneWeights = new_boneWeights_spe;
-                        meshUnity.bindposes = mesh.bones.bindPoses;
+                        mesh_spe.boneWeights = new_boneWeights_spe;
+                        mesh_spe.bindposes = mesh.bones.bindPoses;
                     }
                     for (int i = 0; i < num_uvMaps; i++) {
-                        meshUnity.SetUVs(i, new_uvs_spe[i].ToList());
+                        mesh_spe.SetUVs(i, new_uvs_spe[i].ToList());
                     }
                     //mesh.SetUVs(0, new_uvs_spe.ToList());
                     /*mesh.uv = new_uvs_spe;*/
                     if (new_boneWeights_spe != null) {
                         mr_spe = gao_spe.AddComponent<SkinnedMeshRenderer>();
-                        SkinnedMeshRenderer s_mr_spe = (SkinnedMeshRenderer)mr_spe;
+                        s_mr_spe = (SkinnedMeshRenderer)mr_spe;
                         s_mr_spe.bones = mesh.bones.bones;
                         s_mr_spe.rootBone = mesh.bones.bones[0];
-                        s_mr_spe.sharedMesh = meshUnity;
+                        s_mr_spe.sharedMesh = CopyMesh(mesh_spe);
                     } else {
                         MeshFilter mf = gao_spe.AddComponent<MeshFilter>();
-                        mf.mesh = meshUnity;
+                        mf.mesh = mesh_spe;
                         mr_spe = gao_spe.AddComponent<MeshRenderer>();
                     }
                 //}
@@ -387,9 +392,26 @@ namespace OpenSpace.Visual {
             return sm;
         }
 
+        public void ReinitBindPoses() {
+            if (s_mr_main != null) {
+                Mesh newmesh = CopyMesh(mesh_main);
+                newmesh.bindposes = mesh.bones.bindPoses;
+                s_mr_main.sharedMesh = newmesh;
+            }
+            if (s_mr_spe != null) {
+                Mesh newmesh = CopyMesh(mesh_spe);
+                newmesh.bindposes = mesh.bones.bindPoses;
+                s_mr_spe.sharedMesh = newmesh;
+            }
+        }
+
         // Call after clone
         public void Reset() {
             gao = null;
+            s_mr_main = null;
+            s_mr_spe = null;
+            mesh_main = null;
+            mesh_spe = null;
         }
 
         public IGeometricElement Clone(MeshObject mesh) {
@@ -397,6 +419,23 @@ namespace OpenSpace.Visual {
             sm.mesh = mesh;
             sm.Reset();
             return sm;
+        }
+
+        private Mesh CopyMesh(Mesh mesh) {
+            Mesh newmesh = new Mesh();
+            newmesh.vertices = mesh.vertices;
+            newmesh.triangles = mesh.triangles;
+            for (int i = 0; i < num_uvMaps; i++) {
+                List<Vector2> uvsTemp = new List<Vector2>();
+                mesh.GetUVs(i, uvsTemp);
+                newmesh.SetUVs(i, uvsTemp);
+            }
+            newmesh.normals = mesh.normals;
+            newmesh.colors = mesh.colors;
+            newmesh.tangents = mesh.tangents;
+            newmesh.boneWeights = mesh.boneWeights;
+            newmesh.bindposes = mesh.bindposes;
+            return newmesh;
         }
     }
 }

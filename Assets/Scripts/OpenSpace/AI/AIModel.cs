@@ -10,7 +10,7 @@ namespace OpenSpace.AI {
 
         public Pointer off_behaviors_normal;
         public Pointer off_behaviors_reflex;
-        public Pointer off_dsgMem;
+        public Pointer off_dsgVar;
         public Pointer off_macros;
         public uint flags;
 
@@ -27,7 +27,7 @@ namespace OpenSpace.AI {
             AIModel ai = new AIModel(offset);
             ai.off_behaviors_normal = Pointer.Read(reader);
             ai.off_behaviors_reflex = Pointer.Read(reader);
-            ai.off_dsgMem = Pointer.Read(reader);
+            ai.off_dsgVar = Pointer.Read(reader);
             ai.off_macros = Pointer.Read(reader);
             ai.flags = reader.ReadUInt32();
             

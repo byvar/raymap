@@ -37,6 +37,40 @@ namespace OpenSpace.Visual {
             this.offset = offset;
         }
 
+        public void InitGameObjects() {
+            for (uint i = 0; i < num_subblocks; i++) {
+                if (subblocks[i] != null) {
+                    if (subblocks[i] is MeshElement) {
+                        GameObject child = ((MeshElement)subblocks[i]).Gao;
+                        child.transform.SetParent(gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (subblocks[i] is DeformSet) {
+                        DeformSet ds = ((DeformSet)subblocks[i]);
+                        for (int j = 0; j < ds.num_bones; j++) {
+                            Transform b = ds.bones[j];
+                            b.transform.SetParent(gao.transform);
+                        }
+                    } else if (subblocks[i] is SpriteElement) {
+                        GameObject child = ((SpriteElement)subblocks[i]).Gao;
+                        child.transform.SetParent(gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    }
+                }
+            }
+        }
+
+        public void ReinitBindposes() {
+            if (bones != null) {
+                for (uint i = 0; i < num_subblocks; i++) {
+                    if (subblocks[i] != null) {
+                        if (subblocks[i] is MeshElement) {
+                            ((MeshElement)subblocks[i]).ReinitBindPoses();
+                        }
+                    }
+                }
+            }
+        }
+
         public static MeshObject Read(EndianBinaryReader reader, PhysicalObject po, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             MeshObject m = new MeshObject(po, offset);
@@ -151,25 +185,7 @@ namespace OpenSpace.Visual {
                         break;
                 }
             }
-            for (uint i = 0; i < m.num_subblocks; i++) {
-                if (m.subblocks[i] != null) {
-                    if (m.subblocks[i] is MeshElement) {
-                        GameObject child = ((MeshElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    } else if (m.subblocks[i] is DeformSet) {
-                        DeformSet ds = ((DeformSet)m.subblocks[i]);
-                        for (int j = 0; j < ds.num_bones; j++) {
-                            Transform b = ds.bones[j];
-                            b.transform.SetParent(m.gao.transform);
-                        }
-                    } else if (m.subblocks[i] is SpriteElement) {
-                        GameObject child = ((SpriteElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    }
-                }
-            }
+            m.InitGameObjects();
             return m;
         }
 
@@ -184,25 +200,7 @@ namespace OpenSpace.Visual {
                     if (m.subblocks[i] is DeformSet) m.bones = (DeformSet)m.subblocks[i];
                 }
             }
-            for (uint i = 0; i < m.num_subblocks; i++) {
-                if (m.subblocks[i] != null) {
-                    if (m.subblocks[i] is MeshElement) {
-                        GameObject child = ((MeshElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    } else if (m.subblocks[i] is DeformSet) {
-                        DeformSet ds = (DeformSet)m.subblocks[i];
-                        for (int j = 0; j < ds.num_bones; j++) {
-                            Transform b = ds.bones[j];
-                            b.transform.SetParent(m.gao.transform);
-                        }
-                    } else if (m.subblocks[i] is SpriteElement) {
-                        GameObject child = ((SpriteElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    }
-                }
-            }
+            m.InitGameObjects();
             return m;
         }
     }

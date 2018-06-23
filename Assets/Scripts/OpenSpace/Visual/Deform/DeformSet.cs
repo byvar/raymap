@@ -53,6 +53,13 @@ namespace OpenSpace.Visual.Deform {
                 //bindPoses[i] = r3bones[i].mat.m * bones[i].worldToLocalMatrix * mesh.gao.transform.localToWorldMatrix;
             }
         }
+
+        public void RecalculateBindPoses() {
+            for (int i = 0; i < num_bones; i++) {
+                bindPoses[i] = bones[i].worldToLocalMatrix * mesh.gao.transform.localToWorldMatrix;
+            }
+            mesh.ReinitBindposes();
+        }
         
 
         public static DeformSet Read(EndianBinaryReader reader, Pointer offset, MeshObject m) {
@@ -91,20 +98,30 @@ namespace OpenSpace.Visual.Deform {
             // Read bones
             d.r3bones[0] = new DeformBone();
             d.r3bones[0].mat = new Matrix(null, 1, Matrix4x4.identity, new Vector4(1f, 1f, 1f, 1f));
-            d.r3bones[0].index = 0xFF;
+            d.r3bones[0].index = 0;
             Pointer.Goto(ref reader, d.off_bones);
             for (int i = 1; i < d.num_bones; i++) {
                 d.r3bones[i] = new DeformBone();
 
                 // each bone is a 0x38 block
                 Matrix4x4 mat = new Matrix4x4();
-                mat.SetColumn(3,new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f));
+                //if (i == 1) MapLoader.Loader.print("Curpos: " + Pointer.Current(reader));
+                float x = reader.ReadSingle();
+                float y = reader.ReadSingle();
+                float z = reader.ReadSingle();
+                mat.SetColumn(3,new Vector4(x, y, z, 1f));
                 for (int j = 0; j < 3; j++) {
                     mat.SetColumn(j, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f));
+                    /*if (mat[j, j] != 0) {
+                        mat[j, j] = 1f / mat[j, j];
+                    }*/
                 }
+                // then fastinvert it
+                //mat.SetRow(3, new Vector4(1f, 1f, 1f, 1f));
+                //mat.SetColumn(3, new Vector4(-x, -y, -z, 1f));
                 d.r3bones[i].mat = new Matrix(null, 1, mat, new Vector4(1f, 1f, 1f, 1f));
                 d.r3bones[i].unknown1 = reader.ReadSingle();
-                d.r3bones[i].unknown2 = reader.ReadUInt16();
+                d.r3bones[i].invert = reader.ReadUInt16();
                 d.r3bones[i].index = reader.ReadByte();
                 reader.ReadByte(); // 0, padding
             }
