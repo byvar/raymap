@@ -37,7 +37,7 @@ public class PersoBehaviour : MonoBehaviour {
         if (perso != null) {
             Family fam = perso.family;
             if (fam != null && fam.states != null && fam.states.Length > 0) {
-                stateNames = fam.states.Select(s => (s == null ? "Null" : s.name)).ToArray();
+                stateNames = fam.states.Select(s => (s == null ? "Null" : s.ToString())).ToArray();
                 hasStates = true;
                 state = perso.initialState;
                 for (int i = 0; i < fam.states.Length; i++) {
@@ -188,7 +188,6 @@ public class PersoBehaviour : MonoBehaviour {
                     channelObjects[i] = new GameObject("Channel " + id);
                     channelObjects[i].transform.SetParent(perso.Gao.transform);
                     AddChannelID(id, i);
-                    //if (channelIDDictionary.ContainsKey(id)) print("FUCK: " + perso.fullName + " - " + id);
                     subObjects[i] = new PhysicalObject[a3d.num_NTTO];
                     for (int j = 0; j < a3d.num_NTTO; j++) {
                         AnimNTTO ntto = a3d.ntto[a3d.start_NTTO + j];
@@ -268,14 +267,16 @@ public class PersoBehaviour : MonoBehaviour {
                 AnimChannel ch = a3d.channels[a3d.start_channels + i];
                 AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
                 AnimKeyframe kf = a3d.keyframes[kfi.kf];
-                AnimVector vec = a3d.vectors[kf.vector2];
+                AnimVector pos = a3d.vectors[kf.positionVector];
                 AnimQuaternion qua = a3d.quaternions[kf.quaternion];
+                AnimVector scl = a3d.vectors[kf.scaleVector];
                 AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                 AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
                 //if (ntto.IsBoneNTTO) continue;
                 PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO - a3d.start_NTTO];
-                Vector3 vector = vec.vector;
+                Vector3 vector = pos.vector;
                 Quaternion quaternion = qua.quaternion;
+                Vector3 scale = scl.vector;
                 int framesSinceKF = (int)currentFrame - (int)kf.frame;
                 AnimKeyframe nextKF = null;
                 int framesDifference;
@@ -297,17 +298,22 @@ public class PersoBehaviour : MonoBehaviour {
                     interpolation = framesSinceKF / (float)framesDifference;
                 }
                 //print(interpolation);
-                AnimVector vec2 = a3d.vectors[nextKF.vector2];
+                AnimVector pos2 = a3d.vectors[nextKF.positionVector];
                 AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
-                vector = Vector3.Lerp(vec.vector, vec2.vector, interpolation);
+                AnimVector scl2 = a3d.vectors[nextKF.scaleVector];
+                vector = Vector3.Lerp(pos.vector, pos2.vector, interpolation);
                 quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
+                scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
 
-                if(physicalObject != null) physicalObject.Gao.SetActive(true);
+                if (physicalObject != null) physicalObject.Gao.SetActive(true);
                 channelObjects[i].transform.localPosition = vector;
                 channelObjects[i].transform.localRotation = quaternion;
+                channelObjects[i].transform.localScale = scale;
             }
             for(int i = 0; i < a3d.num_channels; i++) {
                 AnimChannel ch = a3d.channels[a3d.start_channels + i];
+                Transform baseChannelTransform = channelObjects[i].transform;
+                Vector3 invertedScale = new Vector3(1f / baseChannelTransform.localScale.x, 1f/baseChannelTransform.localScale.y, 1f/baseChannelTransform.localScale.z);
                 AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                 AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
                 PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO - a3d.start_NTTO];
@@ -331,9 +337,14 @@ public class PersoBehaviour : MonoBehaviour {
                             DeformBone bone = bones.r3bones[d.bone + 1];
                             if (bone != null) {
                                 Transform channelTransform = channelObjects[ind_linkChannel].transform;
-                                bone.UnityBone.position = channelTransform.position;
-                                bone.UnityBone.rotation = channelTransform.rotation;
+                                bone.UnityBone.transform.SetParent(channelTransform);
+                                bone.UnityBone.localPosition = Vector3.zero;
+                                bone.UnityBone.localRotation = Quaternion.identity;
                                 bone.UnityBone.localScale = Vector3.one;
+                                /*bone.UnityBone.position = channelTransform.position;
+                                bone.UnityBone.rotation = channelTransform.rotation;
+                                //bone.UnityBone.localScale = Vector3.one;
+                                bone.UnityBone.localScale = channelTransform.localScale;*/
                             }
                         }
                     }
