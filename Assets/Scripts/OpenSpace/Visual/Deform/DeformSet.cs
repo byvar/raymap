@@ -105,20 +105,13 @@ namespace OpenSpace.Visual.Deform {
 
                 // each bone is a 0x38 block
                 Matrix4x4 mat = new Matrix4x4();
-                //if (i == 1) MapLoader.Loader.print("Curpos: " + Pointer.Current(reader));
                 float x = reader.ReadSingle();
                 float y = reader.ReadSingle();
                 float z = reader.ReadSingle();
                 mat.SetColumn(3,new Vector4(x, y, z, 1f));
                 for (int j = 0; j < 3; j++) {
                     mat.SetColumn(j, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f));
-                    /*if (mat[j, j] != 0) {
-                        mat[j, j] = 1f / mat[j, j];
-                    }*/
                 }
-                // then fastinvert it
-                //mat.SetRow(3, new Vector4(1f, 1f, 1f, 1f));
-                //mat.SetColumn(3, new Vector4(-x, -y, -z, 1f));
                 d.r3bones[i].mat = new Matrix(null, 1, mat, new Vector4(1f, 1f, 1f, 1f));
                 d.r3bones[i].unknown1 = reader.ReadSingle();
                 d.r3bones[i].invert = reader.ReadUInt16();

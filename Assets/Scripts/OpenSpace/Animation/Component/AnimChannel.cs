@@ -7,7 +7,7 @@ using UnityEngine;
 namespace OpenSpace.Animation.Component {
     public class AnimChannel {
         public ushort unk0;
-        public ushort id;
+        public short id;
         public ushort vector;
         public ushort numOfNTTO;
         public uint framesKF;
@@ -18,7 +18,7 @@ namespace OpenSpace.Animation.Component {
         public static AnimChannel Read(EndianBinaryReader reader) {
             AnimChannel ch = new AnimChannel();
             ch.unk0 = reader.ReadUInt16();
-            ch.id = reader.ReadUInt16();
+            ch.id = reader.ReadInt16();
             ch.vector = reader.ReadUInt16();
             ch.numOfNTTO = reader.ReadUInt16();
             ch.framesKF = reader.ReadUInt32();

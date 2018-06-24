@@ -18,9 +18,6 @@ namespace OpenSpace.Visual.Deform {
                 if (unityBone == null) {
                     GameObject gao = new GameObject("Bone " + index + " - " + unknown1 + " - " + invert);
                     unityBone = gao.transform;
-                    /*unityBone.localPosition = Vector3.zero;
-                    unityBone.localEulerAngles = Vector3.zero;
-                    unityBone.localScale = Vector3.one;*/
                     unityBone.localPosition = DefaultPosition;
                     unityBone.localRotation = DefaultRotation;
                     unityBone.localScale = DefaultScale;
@@ -46,7 +43,7 @@ namespace OpenSpace.Visual.Deform {
             get { return TransformedMatrix.GetPosition(convertAxes: true); }
         }
         public Quaternion DefaultRotation {
-            get { return TransformedMatrix.GetRotation(convertAxes: true, isBoneMatrix: true); }
+            get { return TransformedMatrix.GetRotation(convertAxes: true); }
         }
         public Vector3 DefaultScale {
             get { return TransformedMatrix.GetScale(convertAxes: true); }

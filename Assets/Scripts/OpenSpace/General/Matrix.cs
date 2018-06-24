@@ -96,7 +96,7 @@ namespace OpenSpace {
             return dest;
         }
 
-        public Quaternion GetRotation(bool convertAxes = false, bool isBoneMatrix = false) {
+        public Quaternion GetRotation(bool convertAxes = false) {
             float tr = m.m00 + m.m11 + m.m22;
             Quaternion q = new Quaternion();
             if (tr > 0) {
@@ -155,20 +155,17 @@ namespace OpenSpace {
             q.z /= qMagnitude;*/
 
             if (convertAxes) {
-                /*float tmp = q.y;
-                q.y = q.z;
-                q.z = tmp;*/
                 q = new Quaternion(q.x, q.z, q.y, -q.w);
                 //q = q * Quaternion.Euler(new Vector3(0f, 0f, 0f));
                 //Vector3 tempRot = q.eulerAngles;
-                if (isBoneMatrix) {
+                //if (isBoneMatrix) {
                     //tempRot = new Vector3(-tempRot.x, -tempRot.z, -tempRot.y); // z = tempRot.y * sign(something)
                     /*float signX = m00 == 0 ? 0 : Mathf.Sign(m00);
                     float signY = m11 == 0 ? 0 : Mathf.Sign(m11);
                     float signZ = m22 == 0 ? 0 : Mathf.Sign(m22);*/
                     //float signX = 1f, signY = 1f, signZ = 1f;
                     //tempRot = new Vector3(-tempRot.y * signY, -tempRot.x * signX, tempRot.z * signZ);
-                }
+                //}
                 //tempRot = new Vector3(tempRot.y, -tempRot.z, tempRot.x);
                 
                 //q = Quaternion.Euler(tempRot);

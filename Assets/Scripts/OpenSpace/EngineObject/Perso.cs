@@ -75,7 +75,7 @@ namespace OpenSpace.EngineObject {
             Pointer.Read(reader); // same as next
             Pointer off_currentState = Pointer.Read(reader);
             Pointer.Read(reader); // same as previous
-            Pointer off_subblocklist = Pointer.Read(reader);
+            Pointer off_physicalObjects = Pointer.Read(reader);
             reader.ReadUInt32(); // same address?
             Pointer off_family = Pointer.Read(reader);
             p.family = Family.FromOffset(off_family);
@@ -97,6 +97,9 @@ namespace OpenSpace.EngineObject {
                 Pointer off_current = Pointer.Goto(ref reader, off_brain);
                 p.brain = Brain.Read(reader, off_brain);
                 Pointer.Goto(ref reader, off_current);
+            }
+            if (p.family != null && p.family.GetIndexOfPhysicalList(off_physicalObjects) != -1) {
+                p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(off_physicalObjects)];
             }
             //if (off_intelligence != null) l.print("Intelligence for " + p.name2 + ": " + off_intelligence);
             /*if (off_intelligence != null) {

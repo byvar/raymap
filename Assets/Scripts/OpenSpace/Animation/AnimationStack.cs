@@ -6,8 +6,9 @@ using UnityEngine;
 
 namespace OpenSpace.Animation {
     public class AnimationStack {
-        public Pointer off_data;
+        public Pointer off_data = null;
         public uint count;
+        public uint countInFile;
 
         public AnimationStack() {}
 
@@ -15,7 +16,7 @@ namespace OpenSpace.Animation {
             AnimationStack stack = new AnimationStack();
             reader.ReadUInt32();
             stack.count = reader.ReadUInt32();
-            reader.ReadUInt32();
+            stack.countInFile = reader.ReadUInt32();
             if(MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC) reader.ReadUInt32();
             reader.ReadUInt32();
             return stack;
