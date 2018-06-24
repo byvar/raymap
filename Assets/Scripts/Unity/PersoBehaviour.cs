@@ -30,10 +30,12 @@ public class PersoBehaviour : MonoBehaviour {
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
     }
 
-	public void Init() {
+    public void Init()
+    {
         if (perso != null) {
             Family fam = perso.family;
             if (fam != null && fam.states != null && fam.states.Length > 0) {
@@ -58,7 +60,61 @@ public class PersoBehaviour : MonoBehaviour {
         loaded = true;
     }
 
-    public void PrintScripts() {
+    public void PrintDsgVar()
+    {
+        if (loaded && hasStates) {
+            if (perso.brain != null && perso.brain.mind != null) {
+
+                DsgVar dsgVar = perso.brain.mind.AI_model.dsgVar;
+                if (dsgVar != null) {
+                    MapLoader l = MapLoader.Loader;
+                    l.print("DsgVar.offset: " + dsgVar.offset);
+                    l.print("DsgVarFromModel.amountOfInfos: " + dsgVar.amountOfInfos);
+                    l.print("DsgVarFromModel.dsgMemBufferLength: " + dsgVar.dsgMemBufferLength);
+
+                    int c = 0;
+
+                    foreach (DsgVarInfoEntry entry in dsgVar.dsgVarInfos) {
+                        l.print("Info Entry " + c + ", type " + entry.type + ", offset " + entry.offsetInBuffer + " , value " + entry.value + ", initType " + entry.initType + ", saveType " + entry.saveType);
+                        c++;
+                    }
+                }
+
+            }
+        }
+    }
+
+    public void PrintDsgVarFromMindMem()
+    {
+        if (loaded && hasStates) {
+            if (perso.brain != null && perso.brain.mind != null) {
+
+                DsgMem dsgMem = perso.brain.mind.dsgMem;
+                if (dsgMem != null) {
+                    DsgVar dsgVar = perso.brain.mind.dsgMem.dsgVar;
+                    if (dsgVar != null) {
+                        MapLoader l = MapLoader.Loader;
+                        l.print("DsgVar.offset: " + dsgVar.offset);
+                        l.print("DsgVarFromModel.amountOfInfos: " + dsgVar.amountOfInfos);
+                        l.print("DsgVarFromModel.dsgMemBufferLength: " + dsgVar.dsgMemBufferLength);
+
+                        int c = 0;
+
+                        foreach (DsgVarInfoEntry entry in dsgVar.dsgVarInfos) {
+                            l.print("Info Entry " + c + ", type " + entry.type + ", offset " + entry.offsetInBuffer + " , value " + entry.value + ", initType " + entry.initType + ", saveType " + entry.saveType);
+                            c++;
+                        }
+                    }
+                }
+
+
+
+            }
+        }
+    }
+
+    public void PrintScripts()
+    {
         if (loaded && hasStates) {
             if (perso.brain != null
                 && perso.brain.mind != null
@@ -113,7 +169,8 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    public void SetState(int index) {
+    public void SetState(int index)
+    {
         if (index < 0 || index > perso.family.states.Length) return;
         state = perso.family.states[index];
 
@@ -140,7 +197,8 @@ public class PersoBehaviour : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
         if (loaded && hasStates) {
             if (stateIndex != currentState) {
                 currentState = stateIndex;
@@ -156,7 +214,8 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    void InitAnimation(AnimA3DGeneral a3d) {
+    void InitAnimation(AnimA3DGeneral a3d)
+    {
         if (a3d != this.a3d) {
             loaded = false;
             // Destroy currently loaded subobjects
@@ -222,7 +281,8 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    void UpdateFrame(uint currentFrame) {
+    void UpdateFrame(uint currentFrame)
+    {
         if (loaded && a3d != null && channelObjects != null & subObjects != null) {
             // First pass: reset TRS for all sub objects
             for (int i = 0; i < channelObjects.Length; i++) {
@@ -258,7 +318,7 @@ public class PersoBehaviour : MonoBehaviour {
                     foreach (int ch_parent in ch_parent_list) {
                         channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
                     }
-                } 
+                }
 
                 //channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
             }
@@ -310,10 +370,10 @@ public class PersoBehaviour : MonoBehaviour {
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
             }
-            for(int i = 0; i < a3d.num_channels; i++) {
+            for (int i = 0; i < a3d.num_channels; i++) {
                 AnimChannel ch = a3d.channels[a3d.start_channels + i];
                 Transform baseChannelTransform = channelObjects[i].transform;
-                Vector3 invertedScale = new Vector3(1f / baseChannelTransform.localScale.x, 1f/baseChannelTransform.localScale.y, 1f/baseChannelTransform.localScale.z);
+                Vector3 invertedScale = new Vector3(1f / baseChannelTransform.localScale.x, 1f / baseChannelTransform.localScale.y, 1f / baseChannelTransform.localScale.z);
                 AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                 AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
                 PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO - a3d.start_NTTO];
@@ -366,13 +426,15 @@ public class PersoBehaviour : MonoBehaviour {
         }*/
     }
 
-    List<int> GetChannelByID(short id) {
+    List<int> GetChannelByID(short id)
+    {
         if (channelIDDictionary.ContainsKey(id)) {
             return channelIDDictionary[id];
         } else return new List<int>();
     }
 
-    void AddChannelID(short id, int index) {
+    void AddChannelID(short id, int index)
+    {
         // Apparently there can be multiple channels with the ID -1, so this requires a list
         if (!channelIDDictionary.ContainsKey(id) || channelIDDictionary[id] == null) {
             channelIDDictionary[id] = new List<int>();

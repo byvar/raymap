@@ -16,13 +16,16 @@ namespace OpenSpace.AI {
 
         public Behavior[] behaviors_normal = null;
         public Behavior[] behaviors_reflex = null;
+        public DsgVar dsgVar;
         public Macro[] macros = null;
 
-        public AIModel(Pointer offset) {
+        public AIModel(Pointer offset)
+        {
             this.offset = offset;
         }
 
-        public static AIModel Read(EndianBinaryReader reader, Pointer offset) {
+        public static AIModel Read(EndianBinaryReader reader, Pointer offset)
+        {
             MapLoader l = MapLoader.Loader;
             AIModel ai = new AIModel(offset);
             ai.off_behaviors_normal = Pointer.Read(reader);
@@ -30,7 +33,7 @@ namespace OpenSpace.AI {
             ai.off_dsgVar = Pointer.Read(reader);
             ai.off_macros = Pointer.Read(reader);
             ai.flags = reader.ReadUInt32();
-            
+
             if (ai.off_behaviors_normal != null) {
                 Pointer.Goto(ref reader, ai.off_behaviors_normal);
                 Pointer off_entries = Pointer.Read(reader);
@@ -55,6 +58,12 @@ namespace OpenSpace.AI {
                     }
                 }
             }
+
+            if (ai.off_dsgVar != null) {
+                Pointer.Goto(ref reader, ai.off_dsgVar);
+                ai.dsgVar = DsgVar.Read(reader, ai.off_dsgVar);
+            }
+
             if (ai.off_macros != null) {
                 Pointer.Goto(ref reader, ai.off_macros);
                 Pointer off_entries = Pointer.Read(reader);
@@ -75,7 +84,8 @@ namespace OpenSpace.AI {
         }
 
 
-        public static AIModel FromOffset(Pointer offset) {
+        public static AIModel FromOffset(Pointer offset)
+        {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.aiModels.FirstOrDefault(f => f.offset == offset);

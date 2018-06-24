@@ -15,6 +15,7 @@ namespace OpenSpace.AI {
         public Pointer off_name;
 
         public AIModel AI_model;
+        public DsgMem dsgMem;
 
         public Mind(Pointer offset) {
             this.offset = offset;
