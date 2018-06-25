@@ -86,17 +86,19 @@ public class PersoBehaviour : MonoBehaviour {
 
     public void PrintDsgVarFromMindMem()
     {
+        MapLoader l = MapLoader.Loader;
+
         if (loaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
 
                 DsgMem dsgMem = perso.brain.mind.dsgMem;
                 if (dsgMem != null) {
+                    l.print("DsgMem.offset: " + dsgMem.offset);
                     DsgVar dsgVar = perso.brain.mind.dsgMem.dsgVar;
                     if (dsgVar != null) {
-                        MapLoader l = MapLoader.Loader;
                         l.print("DsgVar.offset: " + dsgVar.offset);
-                        l.print("DsgVarFromModel.amountOfInfos: " + dsgVar.amountOfInfos);
-                        l.print("DsgVarFromModel.dsgMemBufferLength: " + dsgVar.dsgMemBufferLength);
+                        l.print("DsgVarFromMem.amountOfInfos: " + dsgVar.amountOfInfos);
+                        l.print("DsgVarFromMem.dsgMemBufferLength: " + dsgVar.dsgMemBufferLength);
 
                         int c = 0;
 

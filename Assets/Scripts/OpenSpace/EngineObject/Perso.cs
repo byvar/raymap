@@ -19,6 +19,7 @@ namespace OpenSpace.EngineObject {
         public PhysicalObject[] physical_objects = null;
         public Brain brain = null;
         public State initialState = null;
+        public MSWay msWay = null;
 
         private GameObject gao;
         public GameObject Gao {
@@ -53,16 +54,16 @@ namespace OpenSpace.EngineObject {
             //l.print("Offset: " + offset);
             Perso p = new Perso(offset, so);
             l.persos.Add(p);
-            Pointer off_perso = Pointer.Read(reader);
-            Pointer off_nameIndices = Pointer.Read(reader);
-            Pointer off_unknown = Pointer.Read(reader);
-            Pointer off_brain = Pointer.Read(reader);
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            Pointer off_perso = Pointer.Read(reader); // 0x0
+            Pointer off_nameIndices = Pointer.Read(reader); // 4 Standard Game info
+            Pointer off_unknown = Pointer.Read(reader); // 0x8
+            Pointer off_brain = Pointer.Read(reader); // 0xC
+            reader.ReadUInt32(); // 0x10 is Camera in Rayman 2
+            reader.ReadUInt32(); // 0x14 platform info
+            Pointer off_msWay = Pointer.Read(reader); // 0x18
+            reader.ReadUInt32(); // 0x1C
+            reader.ReadUInt32(); // 0x20
+            reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
             if (l.mode == MapLoader.Mode.RaymanArenaPC || l.mode == MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
             if (l.mode == MapLoader.Mode.Rayman2PC) {
@@ -98,6 +99,30 @@ namespace OpenSpace.EngineObject {
                 p.brain = Brain.Read(reader, off_brain);
                 Pointer.Goto(ref reader, off_current);
             }
+
+            if (off_msWay != null) {
+                Pointer off_current = Pointer.Goto(ref reader, off_msWay);
+                p.msWay = MSWay.Read(reader, off_msWay);
+                Pointer.Goto(ref reader, off_current);
+
+                // Graph read?
+                if (p.msWay.graph != null) {
+                    GameObject go_msWay = new GameObject("MSWay");
+                    go_msWay.transform.SetParent(p.Gao.transform);
+
+                    GameObject go_graph = new GameObject("Graph");
+                    go_graph.transform.SetParent(go_msWay.transform);
+
+                    int nodeNum = 0;
+                    foreach (GraphNode node in p.msWay.graph.nodeList) {
+                        GameObject go_graphNode = new GameObject("GraphNode[" + nodeNum + "].WayPoint");
+                        go_graphNode.transform.position.Set(node.wayPoint.position.x, node.wayPoint.position.y, node.wayPoint.position.z);
+                        go_graphNode.transform.SetParent(go_graph.transform);
+                        nodeNum++;
+                    }
+                }
+            }
+
             if (p.family != null && p.family.GetIndexOfPhysicalList(off_physicalObjects) != -1) {
                 p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(off_physicalObjects)];
             }

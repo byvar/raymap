@@ -36,6 +36,11 @@ namespace OpenSpace.AI {
                     m.AI_model = AIModel.Read(reader, m.off_AI_model);
                 }
             }
+
+            if (m.off_dsgMem != null) {
+                Pointer.Goto(ref reader, m.off_dsgMem);
+                m.dsgMem = DsgMem.Read(reader, m.off_dsgMem);
+            }
             return m;
         }
     }

@@ -9,8 +9,8 @@ namespace OpenSpace.AI {
         public Pointer offset;
 
         public Pointer off_dsgVar;
-        public uint memBufferInitial; // initial state
-        public uint memBuffer; // current state
+        public Pointer memBufferInitial; // initial state
+        public Pointer memBuffer; // current state
 
         public DsgVar dsgVar;
 
@@ -19,18 +19,21 @@ namespace OpenSpace.AI {
         }
 
         public static DsgMem Read(EndianBinaryReader reader, Pointer offset) {
-            DsgMem d = new DsgMem(offset);
+            DsgMem dsgMem = new DsgMem(offset);
 
-            d.off_dsgVar = Pointer.Read(reader);
+            Pointer dsgVarPointer = Pointer.Read(reader);
+            Pointer original = Pointer.Goto(ref reader, dsgVarPointer);
+            dsgMem.off_dsgVar = Pointer.Read(reader);
+            Pointer.Goto(ref reader, original);
 
-            d.memBufferInitial = reader.ReadUInt32();
-            d.memBuffer = reader.ReadUInt32();
+            dsgMem.memBufferInitial = Pointer.Read(reader);
+            dsgMem.memBuffer = Pointer.Read(reader);
 
-            if (d.off_dsgVar != null) {
-                Pointer.Goto(ref reader, d.off_dsgVar);
-                d.dsgVar = DsgVar.Read(reader, d.off_dsgVar);
+            if (dsgMem.off_dsgVar != null) {
+                Pointer.Goto(ref reader, dsgMem.off_dsgVar);
+                dsgMem.dsgVar = DsgVar.Read(reader, dsgMem.off_dsgVar, dsgMem);
             }
-            return d;
+            return dsgMem;
         }
     }
 }

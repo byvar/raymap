@@ -6,16 +6,31 @@ using System.Text;
 namespace OpenSpace.AI {
     public enum DsgVarType {
         None = -1,
-        Boolean1,
-        Boolean2,
+        Boolean,
         Byte,
-        Word1,
-        Word2,
-        Integer1,
-        Integer2,
+        UByte, // Unsigned
+        Short,
+        UShort, // Unsigned
+        Int,
+        UInt, // Unsigned
         Float,
-        WaypointRef,
-        SuperObjectRef
+        Waypoint,
+        Perso,
+        List,
+        Vector,
+        Comport,
+        Action,
+        Text,
+        GameMaterial,
+        Caps, // Capabilities
+        Graph,
+        Array1,
+        Array2,
+        Array3,
+        Array4,
+        Array5,
+        Array6,
+        Input
     }
 
     /*public abstract class DsgVarTypeUtil {

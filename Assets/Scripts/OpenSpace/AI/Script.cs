@@ -27,6 +27,28 @@ namespace OpenSpace.AI {
                 while (!endReached) {
                     ScriptNode sn = ScriptNode.Read(reader, Pointer.Current(reader));
                     s.scriptNodes.Add(sn);
+
+                    bool waypointRef = false;
+                    if (l.mode == MapLoader.Mode.Rayman2PC) {
+                        if (R2AIFunctionTypes.getNodeType(sn.type) == R2AIFunctionTypes.NodeType.WayPointRef) {
+                            waypointRef = true;
+                        }
+                    } else if (l.mode == MapLoader.Mode.Rayman3PC) {
+                        if (R3AIFunctionTypes.getNodeType(sn.type) == R3AIFunctionTypes.NodeType.WayPointRef) {
+                            waypointRef = true;
+                        }
+                    }
+
+                    if (waypointRef) {
+                        Pointer off_wp = sn.param_ptr;
+                        Pointer original = Pointer.Goto(ref reader, off_wp);
+                        WayPoint waypoint = WayPoint.Read(reader, off_wp);
+
+                        l.print("Waypoint at " + waypoint.position.x + ", " + waypoint.position.y + ", " + waypoint.position.z);
+
+                        Pointer.Goto(ref reader, original);
+                    }
+
                     if (sn.indent == 0) endReached = true;
                 }
                 Pointer.Goto(ref reader, off_current);

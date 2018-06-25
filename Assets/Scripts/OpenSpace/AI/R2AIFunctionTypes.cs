@@ -1142,7 +1142,8 @@ namespace OpenSpace.AI {
             DataType42,
             Light,
             Caps,
-            SubRoutine
+            SubRoutine,
+            GraphRef
 
         };
 
@@ -1228,6 +1229,8 @@ namespace OpenSpace.AI {
                     return NodeType.Caps;
                 case 39:
                     return NodeType.SubRoutine;
+                case 44:
+                    return NodeType.GraphRef;
             }
 
             return NodeType.Unknown;
@@ -1268,7 +1271,16 @@ namespace OpenSpace.AI {
                     return "EvalField";
                 case 10:
                 case 11:
-                    return "DsgVarRef: " + "0x" + param.ToString("x8");
+                    string dsgVarString = "DsgVarRef: " + "0x" + param.ToString("x8");
+
+                    DsgVarInfoEntry info = perso.brain.mind.AI_model.dsgVar.dsgVarInfos[param];
+                    if (info!=null) {
+                        dsgVarString += " (type " + info.type+", value "+info.value+")";
+                    } else {
+                        dsgVarString += " (not found)";
+                    }
+
+                    return dsgVarString;
                 case 12:
 
                     return "Constant: " + param;
@@ -1330,6 +1342,10 @@ namespace OpenSpace.AI {
                     return "Caps: " + "0x" + (param).ToString("x8");
                 case 39:
                     return "Eval SubRoutine";
+                case 40:
+                    return "NULL";
+                case 44:
+                    return "Graph: " + "0x" + (param).ToString("x8");
             }
 
             return "unknown";

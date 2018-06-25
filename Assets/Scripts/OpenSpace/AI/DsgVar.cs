@@ -22,28 +22,39 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static DsgVar Read(EndianBinaryReader reader, Pointer offset) {
-            DsgVar d = new DsgVar(offset);
+        public static DsgVar Read(EndianBinaryReader reader, Pointer offset, DsgMem dsgMem=null) {
+            DsgVar dsgVar = new DsgVar(offset);
 
-            d.off_dsgMemBuffer = Pointer.Read(reader);
-            d.off_dsgVarInfo = Pointer.Read(reader);
+            dsgVar.off_dsgMemBuffer = Pointer.Read(reader);
+            dsgVar.off_dsgVarInfo = Pointer.Read(reader);
 
             // Unknown stuff
-            d.something3 = reader.ReadUInt32();
+            if (dsgMem==null) {
+                dsgVar.something3 = reader.ReadUInt32();
+            }
 
-            d.amountOfInfos = reader.ReadUInt32();
-            d.dsgMemBufferLength = reader.ReadUInt32() * 4;
+            if (dsgMem == null) {
+                dsgVar.amountOfInfos = reader.ReadUInt32();
+                dsgVar.dsgMemBufferLength = reader.ReadUInt32() * 4;
+            } else {
+                dsgVar.dsgMemBufferLength = reader.ReadUInt32();
+                dsgVar.amountOfInfos = reader.ReadUInt32();
+            }
 
-            d.dsgVarInfos = new DsgVarInfoEntry[d.amountOfInfos];
+            dsgVar.dsgVarInfos = new DsgVarInfoEntry[dsgVar.amountOfInfos];
 
-            if (d.off_dsgVarInfo != null && d.amountOfInfos > 0) {
+            if (dsgVar.off_dsgVarInfo != null && dsgVar.amountOfInfos > 0) {
 
-                Pointer off_current = Pointer.Goto(ref reader, d.off_dsgVarInfo);
-                for (int i = 0; i < d.amountOfInfos; i++) {
+                Pointer off_current = Pointer.Goto(ref reader, dsgVar.off_dsgVarInfo);
+                for (int i = 0; i < dsgVar.amountOfInfos; i++) {
                     DsgVarInfoEntry infoEntry = DsgVarInfoEntry.Read(reader, Pointer.Current(reader));
 
-                    infoEntry.value = d.ReadValueFromDsgMemBuffer(reader, infoEntry);
-                    d.dsgVarInfos[i] = infoEntry;
+                    if (dsgMem != null) {
+                        infoEntry.value = dsgVar.ReadValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                    } else {
+                        infoEntry.value = dsgVar.ReadValueFromDsgVarBuffer(reader, infoEntry, dsgVar);
+                    }
+                    dsgVar.dsgVarInfos[i] = infoEntry;
                 }
                 Pointer.Goto(ref reader, off_current); // Move the reader back to where it was
             }
@@ -52,31 +63,41 @@ namespace OpenSpace.AI {
                 Pointer.Goto(ref reader, d.off_AI_model);
                 d.AI_model = AIModel.Read(reader, d.off_AI_model);
             }*/
-            return d;
+            return dsgVar;
         }
 
-        public object ReadValueFromDsgMemBuffer(EndianBinaryReader reader, DsgVarInfoEntry infoEntry)
+        public object ReadValueFromBuffer(EndianBinaryReader reader, DsgVarInfoEntry infoEntry, Pointer buffer)
         {
-            
-            Pointer original = Pointer.Goto(ref reader, off_dsgMemBuffer + infoEntry.offsetInBuffer);
+
+            Pointer original = Pointer.Goto(ref reader, buffer + infoEntry.offsetInBuffer);
             object returnValue = null;
 
             try {
 
                 switch (infoEntry.type) {
-                    case DsgVarType.Boolean1:
-                    case DsgVarType.Boolean2:
+                    case DsgVarType.Boolean:
                         returnValue = reader.ReadBoolean(); break;
                     case DsgVarType.Byte:
+                        returnValue = reader.ReadSByte(); break;
+                    case DsgVarType.UByte:
                         returnValue = reader.ReadByte(); break;
                     case DsgVarType.Float:
                         returnValue = reader.ReadSingle(); break;
-                    case DsgVarType.Integer1:
-                    case DsgVarType.Integer2:
+                    case DsgVarType.Int:
                         returnValue = reader.ReadInt32(); break;
-                    case DsgVarType.Word1:
-                    case DsgVarType.Word2:
+                    case DsgVarType.UInt:
+                        returnValue = reader.ReadUInt32(); break;
+                    case DsgVarType.Short:
                         returnValue = reader.ReadInt16(); break;
+                    case DsgVarType.UShort:
+                        returnValue = reader.ReadUInt16(); break;
+                    case DsgVarType.Vector:
+                        Pointer off_vec = Pointer.Read(reader);
+                        Pointer.Goto(ref reader, off_vec);
+                        float x = reader.ReadSingle();
+                        float y = reader.ReadSingle();
+                        float z = reader.ReadSingle();
+                        returnValue = new Vector3(x, y, z); break;
                     default:
                         returnValue = reader.ReadInt32(); break;
                 }
@@ -88,6 +109,16 @@ namespace OpenSpace.AI {
             Pointer.Goto(ref reader, original);
 
             return returnValue;
+        }
+
+        public object ReadValueFromDsgMemBuffer(EndianBinaryReader reader, DsgVarInfoEntry infoEntry, DsgMem dsgMem)
+        {
+            return ReadValueFromBuffer(reader, infoEntry, dsgMem.memBuffer);
+        }
+
+        public object ReadValueFromDsgVarBuffer(EndianBinaryReader reader, DsgVarInfoEntry infoEntry, DsgVar dsgVar)
+        {
+            return ReadValueFromBuffer(reader, infoEntry, dsgVar.off_dsgMemBuffer);
         }
     }
 }
