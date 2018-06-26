@@ -100,7 +100,7 @@ namespace OpenSpace.EngineObject {
                 Pointer.Goto(ref reader, off_current);
             }
 
-            if (off_msWay != null) {
+            if (l.mode == MapLoader.Mode.Rayman2PC && off_msWay != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_msWay);
                 p.msWay = MSWay.Read(reader, off_msWay);
                 Pointer.Goto(ref reader, off_current);

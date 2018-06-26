@@ -37,7 +37,7 @@ namespace OpenSpace.AI {
                 }
             }
 
-            if (m.off_dsgMem != null) {
+            if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC && m.off_dsgMem != null) {
                 Pointer.Goto(ref reader, m.off_dsgMem);
                 m.dsgMem = DsgMem.Read(reader, m.off_dsgMem);
             }
