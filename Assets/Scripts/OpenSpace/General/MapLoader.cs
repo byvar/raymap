@@ -772,6 +772,7 @@ namespace OpenSpace {
             Pointer off_current = Pointer.Current(reader);
             animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
             animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1)[0];
+            print("Fix animation bank: " + off_current);
             Pointer off_fixInfo = Pointer.Read(reader);
 
             // Read PTX
@@ -986,8 +987,8 @@ namespace OpenSpace {
             }
             Pointer.Read(reader);
             off_current = Pointer.Current(reader);
-            //animationBanks[1] = R3AnimationBank.Read(reader, off_current, 1, 1)[0];
-            // let's not read this yet
+            AnimationBank.Read(reader, off_current, 0, 1, append: true);
+            animationBanks[1] = animationBanks[0];
 
 
             ((SNA)files_array[0]).CreateMemoryDump(Path.Combine(gameDataBinFolder, "fix.dmp"), true);

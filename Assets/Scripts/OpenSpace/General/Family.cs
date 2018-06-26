@@ -70,6 +70,7 @@ namespace OpenSpace {
             f.off_physical_list_first = Pointer.Read(reader);                       // first physical list
             if(l.mode != MapLoader.Mode.RaymanArenaGC) f.off_physical_list_last = Pointer.Read(reader); // last physical list
             f.num_physical_lists = reader.ReadUInt32();
+            if (f.off_physical_list_first == f.off_physical_list_last && f.num_physical_lists > 1) f.num_physical_lists = 1; // Correction for Rayman 2
             f.off_bounding_volume = Pointer.Read(reader);
             if (l.mode == MapLoader.Mode.Rayman3GC || l.mode == MapLoader.Mode.Rayman3PC) {
                 f.off_vector4s = Pointer.Read(reader);
@@ -136,18 +137,27 @@ namespace OpenSpace {
                         f.physical_objects[i] = new PhysicalObject[num_entries];
                         for (uint j = 0; j < num_entries; j++) {
                             // each entry is 0x14
-                            Pointer off1 = Pointer.Read(reader);
-                            Pointer off_subblock = Pointer.Read(reader);
+                            Pointer off_po_scale = Pointer.Read(reader);
+                            Pointer off_po = Pointer.Read(reader);
                             reader.ReadUInt32();
                             reader.ReadUInt32();
                             uint lastvalue = reader.ReadUInt32();
-                            if (lastvalue != 0 && off_subblock != null) {
+                            if (lastvalue != 0 && off_po != null) {
 
-                                Pointer curPos = Pointer.Goto(ref reader, off_subblock);
-                                PhysicalObject subobj = PhysicalObject.Read(reader, off_subblock);
-                                if (subobj != null) {
-                                    f.physical_objects[i][j] = subobj;
-                                    subobj.Gao.transform.parent = f.Gao.transform;
+                                Pointer curPos = Pointer.Goto(ref reader, off_po);
+                                PhysicalObject po = PhysicalObject.Read(reader, off_po);
+                                Vector3? scaleMultiplier = null;
+                                if (off_po_scale != null) {
+                                    Pointer.Goto(ref reader, off_po_scale);
+                                    float x = reader.ReadSingle();
+                                    float z = reader.ReadSingle();
+                                    float y = reader.ReadSingle();
+                                    scaleMultiplier = new Vector3(x, y, z);
+                                }
+                                if (po != null) {
+                                    f.physical_objects[i][j] = po;
+                                    po.Gao.transform.parent = f.Gao.transform;
+                                    po.scaleMultiplier = scaleMultiplier;
                                 }
                                 Pointer.Goto(ref reader, curPos);
                             }

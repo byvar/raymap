@@ -17,13 +17,16 @@ namespace OpenSpace.Animation.Component {
         public AnimOnlyFrame() {}
 
         public static AnimOnlyFrame Read(EndianBinaryReader reader) {
+            MapLoader l = MapLoader.Loader;
             AnimOnlyFrame of = new AnimOnlyFrame();
             of.quaternion = reader.ReadUInt16();
             of.vector = reader.ReadUInt16();
             of.num_hierarchies_for_frame = reader.ReadUInt16();
             of.start_hierarchies_for_frame = reader.ReadUInt16();
-            of.unk8 = reader.ReadUInt16();
-            of.deformation = reader.ReadUInt16();
+            if (l.mode != MapLoader.Mode.Rayman2PC) {
+                of.unk8 = reader.ReadUInt16();
+                of.deformation = reader.ReadUInt16();
+            }
             of.numOfNTTO = reader.ReadUInt16();
             return of;
         }

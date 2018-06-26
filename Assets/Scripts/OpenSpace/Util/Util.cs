@@ -7,6 +7,14 @@ using UnityEngine;
 
 namespace OpenSpace {
     public static class Util {
+        public static void AppendArrayAndMergeReferences<T>(ref T[] array1, ref T[] array2, int originalLength = -1) {
+            if (array1 == null || array2 == null) return;
+            if(originalLength == -1) originalLength = array1.Length;
+            Array.Resize<T>(ref array1, originalLength + array2.Length);
+            Array.Copy(array2, 0, array1, originalLength, array2.Length);
+            array2 = array1;
+        }
+
         public static bool ByteArrayToFile(string fileName, byte[] byteArray) {
             try {
                 using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write)) {

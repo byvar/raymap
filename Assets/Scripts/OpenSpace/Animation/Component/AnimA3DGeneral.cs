@@ -55,38 +55,71 @@ namespace OpenSpace.Animation.Component {
         public AnimA3DGeneral(Pointer offset) { this.offset = offset; }
 
         public static AnimA3DGeneral Read(EndianBinaryReader reader, Pointer offset) {
+            MapLoader l = MapLoader.Loader;
             AnimA3DGeneral a3d = new AnimA3DGeneral(offset);
-            /* Each a3d is 0x3c long */
-            a3d.unk_0 = reader.ReadUInt16();
-            a3d.num_vectors = reader.ReadUInt16();
-            a3d.num_quaternions = reader.ReadUInt16();
-            a3d.num_hierarchies = reader.ReadUInt16();
-            a3d.num_NTTO = reader.ReadUInt16();
-            a3d.num_numNTTO = reader.ReadUInt16();
-            a3d.num_deformations = reader.ReadUInt16();
-            a3d.num_channels = reader.ReadUInt16();
-            a3d.num_onlyFrames = reader.ReadUInt16();
-            a3d.unk_12 = reader.ReadUInt16();
-            a3d.unk_14 = reader.ReadUInt16();
-            a3d.num_keyframes = reader.ReadUInt16();
-            a3d.num_events = reader.ReadUInt16();
-            a3d.unk_1A = reader.ReadUInt16();
-            a3d.unk_1C = reader.ReadUInt16();
-            a3d.unk_1E = reader.ReadUInt16();
-            a3d.unk_20 = reader.ReadUInt16();
-            a3d.unk_22 = reader.ReadUInt16();
-            a3d.start_vectors2 = reader.ReadUInt16();
-            a3d.start_quaternions2 = reader.ReadUInt16();
-            a3d.num_morphData = reader.ReadUInt16();
-            a3d.start_vectors = reader.ReadUInt16();
-            a3d.start_quaternions = reader.ReadUInt16();
-            a3d.start_hierarchies = reader.ReadUInt16();
-            a3d.start_NTTO = reader.ReadUInt16();
-            a3d.start_deformations = reader.ReadUInt16();
-            a3d.start_onlyFrames = reader.ReadUInt16();
-            a3d.start_channels = reader.ReadUInt16();
-            a3d.start_events = reader.ReadUInt16();
-            a3d.start_morphData = reader.ReadUInt16();
+            if (l.mode == MapLoader.Mode.Rayman2PC) {
+                /* Each a3d is 0x38 long */
+                a3d.unk_0 = reader.ReadUInt16();
+                a3d.num_vectors = reader.ReadUInt16();
+                a3d.num_quaternions = reader.ReadUInt16();
+                a3d.num_hierarchies = reader.ReadUInt16();
+                a3d.num_NTTO = reader.ReadUInt16();
+                a3d.num_numNTTO = reader.ReadUInt16();
+                a3d.num_channels = reader.ReadUInt16();
+                a3d.num_onlyFrames = reader.ReadUInt16();
+                a3d.num_keyframes = reader.ReadUInt16();
+                a3d.unk_14 = reader.ReadUInt16();
+                a3d.num_events = reader.ReadUInt16();
+                a3d.unk_1A = reader.ReadUInt16(); // vector related
+                a3d.unk_1C = reader.ReadUInt16();
+                a3d.unk_1E = reader.ReadUInt16(); // only frames again?
+                a3d.unk_20 = reader.ReadUInt16(); // field0 again?
+                a3d.unk_22 = reader.ReadUInt16();
+                a3d.start_vectors2 = reader.ReadUInt16();
+                a3d.start_quaternions2 = reader.ReadUInt16();
+                a3d.num_morphData = reader.ReadUInt16();
+                a3d.start_vectors = reader.ReadUInt16();
+                a3d.start_quaternions = reader.ReadUInt16();
+                a3d.start_hierarchies = reader.ReadUInt16();
+                a3d.start_NTTO = reader.ReadUInt16();
+                a3d.start_onlyFrames = reader.ReadUInt16();
+                a3d.start_channels = reader.ReadUInt16();
+                a3d.start_events = reader.ReadUInt16();
+                a3d.start_morphData = reader.ReadUInt16();
+                reader.ReadUInt16(); // padding?
+            } else {
+                /* Each a3d is 0x3c long */
+                a3d.unk_0 = reader.ReadUInt16();
+                a3d.num_vectors = reader.ReadUInt16();
+                a3d.num_quaternions = reader.ReadUInt16();
+                a3d.num_hierarchies = reader.ReadUInt16();
+                a3d.num_NTTO = reader.ReadUInt16();
+                a3d.num_numNTTO = reader.ReadUInt16();
+                a3d.num_deformations = reader.ReadUInt16();
+                a3d.num_channels = reader.ReadUInt16();
+                a3d.num_onlyFrames = reader.ReadUInt16();
+                a3d.unk_12 = reader.ReadUInt16();
+                a3d.unk_14 = reader.ReadUInt16();
+                a3d.num_keyframes = reader.ReadUInt16();
+                a3d.num_events = reader.ReadUInt16();
+                a3d.unk_1A = reader.ReadUInt16();
+                a3d.unk_1C = reader.ReadUInt16();
+                a3d.unk_1E = reader.ReadUInt16();
+                a3d.unk_20 = reader.ReadUInt16();
+                a3d.unk_22 = reader.ReadUInt16();
+                a3d.start_vectors2 = reader.ReadUInt16();
+                a3d.start_quaternions2 = reader.ReadUInt16();
+                a3d.num_morphData = reader.ReadUInt16();
+                a3d.start_vectors = reader.ReadUInt16();
+                a3d.start_quaternions = reader.ReadUInt16();
+                a3d.start_hierarchies = reader.ReadUInt16();
+                a3d.start_NTTO = reader.ReadUInt16();
+                a3d.start_deformations = reader.ReadUInt16();
+                a3d.start_onlyFrames = reader.ReadUInt16();
+                a3d.start_channels = reader.ReadUInt16();
+                a3d.start_events = reader.ReadUInt16();
+                a3d.start_morphData = reader.ReadUInt16();
+            }
             return a3d;
         }
     }

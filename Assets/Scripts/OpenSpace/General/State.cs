@@ -31,7 +31,7 @@ namespace OpenSpace {
 
         public override string ToString() {
             string result = name != null ? name : ("Unnamed state @ " + offset);
-            if (cine_name != null) result += " - " + cine_name;
+            if (cine_name != null) result += " | " + cine_name;
             if (cine_mapname != null) result += " (" + cine_mapname + ") ";
             return result;
         }

@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
     public class AnimKeyframe {
+        public float x;
+        public float y;
+        public float z;
+        public float positionMultiplier = 1f;
         public ushort frame;
         public ushort flags;
         public ushort quaternion;
@@ -19,13 +23,25 @@ namespace OpenSpace.Animation.Component {
         public AnimKeyframe() {}
 
         public static AnimKeyframe Read(EndianBinaryReader reader) {
+            MapLoader l = MapLoader.Loader;
             AnimKeyframe kf = new AnimKeyframe();
+            if (l.mode == MapLoader.Mode.Rayman2PC) {
+                kf.x = reader.ReadSingle();
+                kf.y = reader.ReadSingle();
+                kf.z = reader.ReadSingle();
+                kf.positionMultiplier = reader.ReadSingle();
+            }
             kf.frame = reader.ReadUInt16();
             kf.flags = reader.ReadUInt16();
             kf.quaternion = reader.ReadUInt16();
             kf.quaternion2 = reader.ReadUInt16();
             kf.scaleVector = reader.ReadUInt16();
             kf.positionVector = reader.ReadUInt16();
+            if (l.mode == MapLoader.Mode.Rayman2PC) {
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+            }
             kf.interpolationFactor = (double)reader.ReadUInt16() * 0.00012207031;
             return kf;
         }

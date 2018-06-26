@@ -16,6 +16,7 @@ namespace OpenSpace {
         public Pointer off_collideBoundingVolume;
         public List<VisualSetLOD> visualSet;
         public CollideMeshObject collideMesh;
+        public Vector3? scaleMultiplier = null;
         private GameObject gao = null;
         public GameObject Gao {
             get {

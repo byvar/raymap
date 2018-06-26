@@ -27,7 +27,7 @@ namespace OpenSpace.Animation.Component {
         public bool IsBoneNTTO {
             get {
                 //return flags != 0;
-                return (flags & flag_isBoneNTTO) != 0;
+                return (MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC && (flags & flag_isBoneNTTO) != 0);
                 //return flags != 0;
             }
         }

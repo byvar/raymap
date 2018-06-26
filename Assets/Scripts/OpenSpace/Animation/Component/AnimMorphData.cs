@@ -11,7 +11,11 @@ namespace OpenSpace.Animation.Component {
 
         public static AnimMorphData Read(EndianBinaryReader reader) {
             AnimMorphData m = new AnimMorphData();
-            reader.ReadBytes(0x26); // Haven't deciphered this yet
+            if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
+                reader.ReadBytes(0x8); // Haven't deciphered this yet
+            } else {
+                reader.ReadBytes(0x26); // Haven't deciphered this yet
+            }
             return m;
         }
     }

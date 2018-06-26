@@ -81,7 +81,16 @@ namespace OpenSpace {
                 ReadBytes(alignBytes - (int)(BaseStream.Position % alignBytes));
             }
         }
-        
+
+        // Used in Rayman 2 when reading blocks with size sizeToRead, so that it is aligned after reading the block
+        public void PreAlign(int sizeToRead, int alignBytes) {
+            int rest = sizeToRead % alignBytes;
+            if (rest > 0) {
+                ReadBytes(alignBytes - rest);
+            }
+        }
+
+
         #region Masking (Rayman 2)
         public void ReadMask() {
             SetMask(ReadUInt32());
