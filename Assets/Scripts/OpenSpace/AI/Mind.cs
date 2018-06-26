@@ -15,6 +15,7 @@ namespace OpenSpace.AI {
         public Pointer off_name;
 
         public AIModel AI_model;
+        public DsgMem dsgMem;
 
         public Mind(Pointer offset) {
             this.offset = offset;
@@ -34,6 +35,11 @@ namespace OpenSpace.AI {
                     Pointer.Goto(ref reader, m.off_AI_model);
                     m.AI_model = AIModel.Read(reader, m.off_AI_model);
                 }
+            }
+
+            if (m.off_dsgMem != null) {
+                Pointer.Goto(ref reader, m.off_dsgMem);
+                m.dsgMem = DsgMem.Read(reader, m.off_dsgMem);
             }
             return m;
         }
