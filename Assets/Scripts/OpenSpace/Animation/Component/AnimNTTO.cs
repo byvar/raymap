@@ -14,6 +14,7 @@ namespace OpenSpace.Animation.Component {
         public AnimNTTO() {}
 
         public static ushort flag_isBoneNTTO = 0x00FF;
+        public static ushort flag_isInvisible = 0x2;
 
         public static AnimNTTO Read(EndianBinaryReader reader) {
             AnimNTTO n = new AnimNTTO();
@@ -24,11 +25,13 @@ namespace OpenSpace.Animation.Component {
             return n;
         }
 
-        public bool IsBoneNTTO {
+        public bool IsInvisibleNTTO {
             get {
-                //return flags != 0;
-                return (MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC && (flags & flag_isBoneNTTO) != 0);
-                //return flags != 0;
+                if (MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC) {
+                    return (flags & flag_isBoneNTTO) != 0;
+                } else {
+                    return (flags & flag_isInvisible) == flag_isInvisible;
+                }
             }
         }
     }

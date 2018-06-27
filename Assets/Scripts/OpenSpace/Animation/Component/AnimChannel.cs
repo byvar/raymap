@@ -9,7 +9,7 @@ namespace OpenSpace.Animation.Component {
         public ushort unk0;
         public short id;
         public ushort vector;
-        public short numOfNTTO;
+        public ushort numOfNTTO;
         public uint framesKF;
         public uint keyframe;
 
@@ -20,7 +20,7 @@ namespace OpenSpace.Animation.Component {
             ch.unk0 = reader.ReadUInt16();
             ch.id = reader.ReadInt16();
             ch.vector = reader.ReadUInt16();
-            ch.numOfNTTO = reader.ReadInt16();
+            ch.numOfNTTO = reader.ReadUInt16();
             ch.framesKF = reader.ReadUInt32();
             ch.keyframe = reader.ReadUInt32();
             return ch;

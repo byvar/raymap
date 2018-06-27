@@ -5,6 +5,7 @@ using OpenSpace.Animation.Component;
 using OpenSpace.EngineObject;
 using OpenSpace.Visual;
 using OpenSpace.Visual.Deform;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ public class PersoBehaviour : MonoBehaviour {
     public string[] stateNames = { "Placeholder" };
     int currentState = 0;
     public int stateIndex = 0;
+    public bool autoNextState = false;
 
     // Animation
     public AnimA3DGeneral a3d = null;
@@ -113,8 +115,7 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    public void PrintScripts()
-    {
+    public void PrintScripts() {
         if (loaded && hasStates) {
             if (perso.brain != null
                 && perso.brain.mind != null
@@ -146,6 +147,11 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
             }
+        }
+    }
+
+    public void PrintAnimationDebugInfo() {
+        if (loaded && hasStates) {
             if (a3d != null) {
                 for (int i = 0; i < a3d.num_NTTO; i++) {
                     AnimNTTO ntto = a3d.ntto[i + a3d.start_NTTO];
@@ -162,12 +168,16 @@ public class PersoBehaviour : MonoBehaviour {
                     print("Hierarchy " + i + ": Child:" + h.childChannelID + " - Parent:" + h.parentChannelID);
                 }
                 for (int i = 0; i < a3d.num_channels; i++) {
-                    AnimChannel c = a3d.channels[i + a3d.start_channels];
-                    print("Channel " + i + ": ID:" + c.id + " - U0:" + c.unk0 + " - V:" + c.vector + " - ");
+                    AnimChannel ch = a3d.channels[i + a3d.start_channels];
+                    AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
+                    AnimKeyframe kf = a3d.keyframes[kfi.kf];
+                    print("Channel " + i + ": ID:" + ch.id + " - U0:" + ch.unk0 + " - V:" + ch.vector + " - ");
+                    print("Current keyframe: Flags:" + kf.flags + " - Q2:" + kf.quaternion2 + " - Frame:" + kf.frame);
                 }
-                print("Objects offset: " + perso.family.off_physical_list_first);
-            } else if (state != null) {
 
+                //AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
+                print("POs offset: " + perso.family.off_physical_list_first);
+            } else if (state != null) {
                 MapLoader l = MapLoader.Loader;
                 ushort anim_index = 0;
                 byte bank_index = 0;
@@ -208,7 +218,7 @@ public class PersoBehaviour : MonoBehaviour {
             && l.animationBanks[bank_index].animations.Length > anim_index
             && l.animationBanks[bank_index].animations[anim_index] != null) {
             InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
-            UpdateFrame(currentFrame);
+            if(!playAnimation && !autoNextState) UpdateFrame(currentFrame);
         } else {
             a3d = null;
         }
@@ -276,10 +286,10 @@ public class PersoBehaviour : MonoBehaviour {
                     for (int k = 0; k < listOfNTTOforChannel.Count; k++) {
                         int j = listOfNTTOforChannel[k] - a3d.start_NTTO;
                         AnimNTTO ntto = a3d.ntto[a3d.start_NTTO + j];
-                        if (ntto.IsBoneNTTO) {
+                        if (ntto.IsInvisibleNTTO) {
                             subObjects[i][j] = new PhysicalObject(null);
                             subObjects[i][j].Gao.transform.parent = channelObjects[i].transform;
-                            subObjects[i][j].Gao.name = "[" + j + "] Bone PO";
+                            subObjects[i][j].Gao.name = "[" + j + "] Invisible PO";
                             subObjects[i][j].Gao.SetActive(false);
                             /*GameObject boneVisualisation = new GameObject("Bone vis");
                             boneVisualisation.transform.SetParent(subObjects[i][j].Gao.transform);
@@ -362,11 +372,7 @@ public class PersoBehaviour : MonoBehaviour {
                 PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO - a3d.start_NTTO];
                 Vector3 vector = pos.vector;
                 Quaternion quaternion = qua.quaternion;
-                Vector3 scaleMultiplier = a3d.vectors[ch.vector].vector;
-                //scaleMultiplier = new Vector3(Mathf.Sign(scaleMultiplier.x), Mathf.Sign(scaleMultiplier.y), Mathf.Sign(scaleMultiplier.z));
-                scaleMultiplier = Vector3.one;
                 Vector3 scale = scl.vector;
-                scale = new Vector3(scale.x * scaleMultiplier.x, scale.y * scaleMultiplier.y, scale.z * scaleMultiplier.z);
                 int framesSinceKF = (int)currentFrame - (int)kf.frame;
                 AnimKeyframe nextKF = null;
                 int framesDifference;
@@ -394,7 +400,6 @@ public class PersoBehaviour : MonoBehaviour {
                 vector = Vector3.Lerp(pos.vector, pos2.vector, interpolation);
                 quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
                 scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
-                scale = new Vector3(scale.x * scaleMultiplier.x, scale.y * scaleMultiplier.y, scale.z * scaleMultiplier.z);
                 float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
 
                 if (physicalObject != null) physicalObject.Gao.SetActive(true);
@@ -442,7 +447,13 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
             }
-            this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
+            uint nextFrame = currentFrame + 1;
+            if (nextFrame >= a3d.num_onlyFrames) {
+                nextFrame = nextFrame % a3d.num_onlyFrames;
+                this.currentFrame = 0;
+                if (autoNextState) GotoAutoNextState();
+            }
+            this.currentFrame = nextFrame;
         } /*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
             for (int i = 0; i < perso.physical_objects.Length; i++) {
                 if (perso.physical_objects[i] != null) {
@@ -470,5 +481,15 @@ public class PersoBehaviour : MonoBehaviour {
             channelIDDictionary[id] = new List<int>();
         }
         channelIDDictionary[id].Add(index);
+    }
+
+    void GotoAutoNextState() {
+        if (state != null && state.off_state_auto != null) {
+            State state_auto = State.FromOffset(perso.family, state.off_state_auto);
+            if (state_auto != null) {
+                int indexOfStateAuto = Array.IndexOf(perso.family.states, state_auto);
+                if (indexOfStateAuto > -1) SetState(indexOfStateAuto);
+            }
+        }
     }
 }

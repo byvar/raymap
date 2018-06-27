@@ -1272,12 +1272,15 @@ namespace OpenSpace.AI {
                 case 10:
                 case 11:
                     string dsgVarString = "DsgVarRef: " + "0x" + param.ToString("x8");
-
-                    DsgVarInfoEntry info = perso.brain.mind.AI_model.dsgVar.dsgVarInfos[param];
-                    if (info!=null) {
-                        dsgVarString += " (type " + info.type+", value "+info.value+")";
-                    } else {
-                        dsgVarString += " (not found)";
+                    if (perso.brain.mind.AI_model != null && perso.brain.mind.AI_model.dsgVar != null
+                        && perso.brain.mind.AI_model.dsgVar.dsgVarInfos != null
+                        && param < perso.brain.mind.AI_model.dsgVar.dsgVarInfos.Length) {
+                        DsgVarInfoEntry info = perso.brain.mind.AI_model.dsgVar.dsgVarInfos[param];
+                        if (info != null) {
+                            dsgVarString += " (type " + info.type + ", value " + info.value + ")";
+                        } else {
+                            dsgVarString += " (not found)";
+                        }
                     }
 
                     return dsgVarString;
