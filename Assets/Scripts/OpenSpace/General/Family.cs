@@ -163,7 +163,9 @@ namespace OpenSpace {
                             }
                         }
                     }
-                    if (off_list_hdr_next != null) Pointer.Goto(ref reader, off_list_hdr_next);
+                    if (off_list_hdr_next != null) {
+                        Pointer.Goto(ref reader, off_list_hdr_next);
+                    } else break;
                 }
             }
 

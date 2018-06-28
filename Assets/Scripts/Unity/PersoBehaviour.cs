@@ -218,7 +218,7 @@ public class PersoBehaviour : MonoBehaviour {
             && l.animationBanks[bank_index].animations.Length > anim_index
             && l.animationBanks[bank_index].animations[anim_index] != null) {
             InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
-            if(!playAnimation && !autoNextState) UpdateFrame(currentFrame);
+            UpdateFrame(currentFrame);
         } else {
             a3d = null;
         }
@@ -236,7 +236,12 @@ public class PersoBehaviour : MonoBehaviour {
             updateCounter += Time.deltaTime * animationSpeed;
             if (updateCounter >= 1f) {
                 updateCounter %= 1f;
-                UpdateFrame(currentFrame);
+                if (currentFrame == 0 && autoNextState) {
+                    GotoAutoNextState();
+                    if (currentFrame == 0) UpdateFrame(currentFrame);
+                } else {
+                    UpdateFrame(currentFrame);
+                }
             }
         }
     }
@@ -447,13 +452,7 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
             }
-            uint nextFrame = currentFrame + 1;
-            if (nextFrame >= a3d.num_onlyFrames) {
-                nextFrame = nextFrame % a3d.num_onlyFrames;
-                this.currentFrame = 0;
-                if (autoNextState) GotoAutoNextState();
-            }
-            this.currentFrame = nextFrame;
+            this.currentFrame = (currentFrame+1) % a3d.num_onlyFrames;
         } /*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
             for (int i = 0; i < perso.physical_objects.Length; i++) {
                 if (perso.physical_objects[i] != null) {

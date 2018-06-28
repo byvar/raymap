@@ -82,7 +82,7 @@ namespace OpenSpace {
 
         public static State FromOffset(Family f, Pointer offset) {
             if (f == null || offset == null) return null;
-            return f.states.FirstOrDefault(s => s.offset == offset);
+            return f.states.FirstOrDefault(s => (s != null && s.offset == offset));
         }
     }
 }
