@@ -26,14 +26,17 @@ public class GraphNode {
 
         node.off_nextNode = Pointer.Read(reader);
         node.off_prevNode = Pointer.Read(reader);
-        node.off_node = Pointer.Read(reader);
+
+        //node.off_node = Pointer.Read(reader);
+        reader.ReadUInt32();
+
         node.off_wayPoint = Pointer.Read(reader);
 
-        Pointer start = Pointer.Goto(ref reader, node.off_node);
+        /*Pointer start = Pointer.Goto(ref reader, node.off_node);
         node.node = GraphNode.Read(reader, node.off_node);
-        Pointer.Goto(ref reader, start);
+        Pointer.Goto(ref reader, start);*/
 
-        start = Pointer.Goto(ref reader, node.off_wayPoint);
+        Pointer start = Pointer.Goto(ref reader, node.off_wayPoint);
         node.wayPoint = WayPoint.Read(reader, node.off_wayPoint);
         Pointer.Goto(ref reader, start);
 

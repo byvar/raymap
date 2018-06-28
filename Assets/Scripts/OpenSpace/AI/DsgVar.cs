@@ -107,6 +107,19 @@ namespace OpenSpace.AI {
                             returnValue = "null";
                         }*/
                         break;
+                    case DsgVarType.Graph:
+                            Pointer off_graph = Pointer.Read(reader);
+                            if (off_graph != null) {
+                                Pointer originalBeforeGraph = Pointer.Goto(ref reader, off_graph);
+                                Graph graph = Graph.Read(reader, off_graph);
+                                Pointer.Goto(ref reader, originalBeforeGraph);
+
+                                MapLoader.Loader.AddGraph(graph);
+
+                            returnValue = "Graph " + off_graph;
+                        }
+
+                        break;
                     default:
                         returnValue = reader.ReadInt32(); break;
                 }

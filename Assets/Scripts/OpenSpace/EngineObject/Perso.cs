@@ -100,8 +100,10 @@ namespace OpenSpace.EngineObject {
                 Pointer.Goto(ref reader, off_current);
             }
 
-            if (l.mode == MapLoader.Mode.Rayman2PC && off_msWay != null) {
+            /*if (l.mode == MapLoader.Mode.Rayman2PC && off_msWay != null) {
+             * MS_Way is always empty at start, instead check DsgVars for graphs
                 Pointer off_current = Pointer.Goto(ref reader, off_msWay);
+
                 p.msWay = MSWay.Read(reader, off_msWay);
                 Pointer.Goto(ref reader, off_current);
 
@@ -121,7 +123,7 @@ namespace OpenSpace.EngineObject {
                         nodeNum++;
                     }
                 }
-            }
+            }*/
 
             if (p.family != null && p.family.GetIndexOfPhysicalList(off_physicalObjects) != -1) {
                 p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(off_physicalObjects)];

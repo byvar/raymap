@@ -51,6 +51,8 @@ namespace OpenSpace {
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
         public List<AIModel> aiModels = new List<AIModel>();
         public List<Perso> persos = new List<Perso>();
+        public List<Graph> graphs = new List<Graph>();
+        public GameObject graphRoot;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
         
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
@@ -94,6 +96,9 @@ namespace OpenSpace {
         
         public void Load() {
             try {
+                graphRoot = new GameObject("Graphs");
+                graphRoot.SetActive(false);
+
                 if (mode == Mode.RaymanArenaPC || mode == Mode.Rayman3PC || mode == Mode.Rayman2PC) {
                     isLittleEndian = true;
                 }
@@ -1173,6 +1178,32 @@ namespace OpenSpace {
                 }
                 Pointer.Goto(ref reader, off_current);
             }
+        }
+
+        public bool AddGraph(Graph graph)
+        {
+            foreach (Graph existingGraph in graphs) {
+                if (existingGraph.offset == graph.offset) {
+                    return false;
+                }
+            }
+
+            graphs.Add(graph);
+
+            GameObject go_graph = new GameObject("Graph " + graph.offset.ToString());
+            go_graph.transform.SetParent(graphRoot.transform);
+
+            int nodeNum = 0;
+            foreach (GraphNode node in graph.nodeList) {
+                GameObject go_graphNode = new GameObject("GraphNode[" + nodeNum + "].WayPoint");
+                go_graphNode.transform.position = new Vector3(node.wayPoint.position.x, node.wayPoint.position.z, node.wayPoint.position.y);
+                WaypointSprite wpSprite = go_graphNode.AddComponent<WaypointSprite>();
+
+                go_graphNode.transform.SetParent(go_graph.transform);
+                nodeNum++;
+            }
+
+            return true;
         }
     }
 }
