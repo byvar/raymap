@@ -1271,11 +1271,11 @@ namespace OpenSpace.AI {
                     return "EvalField";
                 case 10:
                 case 11:
-                    string dsgVarString = "DsgVarRef: " + "0x" + param.ToString("x8");
-                    if (perso.brain.mind.AI_model != null && perso.brain.mind.AI_model.dsgVar != null
-                        && perso.brain.mind.AI_model.dsgVar.dsgVarInfos != null
-                        && param < perso.brain.mind.AI_model.dsgVar.dsgVarInfos.Length) {
-                        DsgVarInfoEntry info = perso.brain.mind.AI_model.dsgVar.dsgVarInfos[param];
+                    string dsgVarString = "DsgVarRef: " + param;
+                    if (perso.brain.mind.dsgMem != null && perso.brain.mind.dsgMem.dsgVar != null
+                        && perso.brain.mind.dsgMem.dsgVar.dsgVarInfos != null
+                        && param < perso.brain.mind.dsgMem.dsgVar.dsgVarInfos.Length) {
+                        DsgVarInfoEntry info = perso.brain.mind.dsgMem.dsgVar.dsgVarInfos[param];
                         if (info != null) {
                             dsgVarString += " (type " + info.type + ", value " + info.value + ")";
                         } else {

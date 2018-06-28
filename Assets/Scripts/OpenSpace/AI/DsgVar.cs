@@ -92,18 +92,27 @@ namespace OpenSpace.AI {
                     case DsgVarType.UShort:
                         returnValue = reader.ReadUInt16(); break;
                     case DsgVarType.Vector:
-                        Pointer off_vec = Pointer.Read(reader);
-                        Pointer.Goto(ref reader, off_vec);
                         float x = reader.ReadSingle();
                         float y = reader.ReadSingle();
                         float z = reader.ReadSingle();
-                        returnValue = new Vector3(x, y, z); break;
+                        returnValue = new Vector3(x, y, z);
+                        /*Pointer off_vec = Pointer.Read(reader);
+                        if (off_vec != null) {
+                            Pointer.Goto(ref reader, off_vec);
+                            float x = reader.ReadSingle();
+                            float y = reader.ReadSingle();
+                            float z = reader.ReadSingle();
+                            returnValue = new Vector3(x, y, z);
+                        } else {
+                            returnValue = "null";
+                        }*/
+                        break;
                     default:
                         returnValue = reader.ReadInt32(); break;
                 }
 
             } catch (Exception e) {
-                returnValue = "Exception";
+                returnValue = "Exception: " + e.Message;
             }
 
             Pointer.Goto(ref reader, original);
