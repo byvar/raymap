@@ -3,6 +3,7 @@ using OpenSpace.Animation;
 using OpenSpace.EngineObject;
 using OpenSpace.FileFormat;
 using OpenSpace.FileFormat.Texture;
+using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -13,8 +13,8 @@ namespace OpenSpace.Visual {
         public Vector2 uv2;
         public ushort centerPoint;
 
-        public Vector2 info_uv1;
-        public Vector2 info_uv2;
+        public Vector2 info_scale;
+        public Vector2 info_unknown;
         public Pointer off_material_pointer;
         public Pointer off_material;
         public VisualMaterial r3mat;
@@ -50,10 +50,10 @@ namespace OpenSpace.Visual {
             for (uint i = 0; i < num_sprites; i++) {
                 Mesh meshUnity = new Mesh();
                 Vector3[] vertices = new Vector3[4];
-                vertices[0] = new Vector3(-sprites[i].size.x / 2f, -sprites[i].size.y / 2f, 0);
-                vertices[1] = new Vector3( sprites[i].size.x / 2f, -sprites[i].size.y / 2f, 0);
-                vertices[2] = new Vector3(-sprites[i].size.x / 2f,  sprites[i].size.y / 2f, 0);
-                vertices[3] = new Vector3( sprites[i].size.x / 2f,  sprites[i].size.y / 2f, 0);
+                vertices[0] = new Vector3(-sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
+                vertices[1] = new Vector3( sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
+                vertices[2] = new Vector3(-sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
+                vertices[3] = new Vector3( sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
                 Vector3[] normals = new Vector3[4];
                 normals[0] = Vector3.forward;
                 normals[1] = Vector3.forward;
@@ -126,19 +126,19 @@ namespace OpenSpace.Visual {
                         reader.ReadUInt32();
                         Pointer.Read(reader);
                         Pointer.Read(reader);
-                        Pointer off_info_uv1 = Pointer.Read(reader);
-                        Pointer off_info_uv2 = Pointer.Read(reader);
+                        Pointer off_info_scale = Pointer.Read(reader);
+                        Pointer off_info_unknown = Pointer.Read(reader);
                         s.sprites[i].off_material_pointer = Pointer.Read(reader);
                         Pointer.Goto(ref reader, off_current);
                         
-                        if (off_info_uv1 != null) {
-                            off_current = Pointer.Goto(ref reader, off_info_uv1);
-                            s.sprites[i].info_uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        if (off_info_scale != null) {
+                            off_current = Pointer.Goto(ref reader, off_info_scale);
+                            s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                             Pointer.Goto(ref reader, off_current);
                         }
-                        if (off_info_uv2 != null) {
-                            off_current = Pointer.Goto(ref reader, off_info_uv2);
-                            s.sprites[i].info_uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        if (off_info_unknown != null) {
+                            off_current = Pointer.Goto(ref reader, off_info_unknown);
+                            s.sprites[i].info_unknown = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                             Pointer.Goto(ref reader, off_current);
                         }
                         if (s.sprites[i].off_material_pointer != null) {

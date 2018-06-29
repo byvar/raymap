@@ -1,4 +1,5 @@
 ﻿using OpenSpace.AI;
+using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
 using System.Linq;

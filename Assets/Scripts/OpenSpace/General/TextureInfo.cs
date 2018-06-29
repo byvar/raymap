@@ -13,6 +13,7 @@ namespace OpenSpace {
         public Texture2D texture;
 
         public uint flags;
+        public uint flags2;
         public string name;
         public static uint flags_isTransparent = (1 << 3);
 
@@ -46,7 +47,7 @@ namespace OpenSpace {
             reader.ReadUInt32();
             tex.flags = reader.ReadUInt32();
             reader.ReadBytes(0x2E);
-            if (MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC) reader.ReadUInt32();
+            if (MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC) tex.flags2 = reader.ReadUInt32(); // contains flags such as tiling mode
             tex.name = reader.ReadNullDelimitedString();
             return tex;
         }
