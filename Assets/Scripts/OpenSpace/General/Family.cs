@@ -115,7 +115,8 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, f.off_physical_list_first);
                 for (uint i = 0; i < f.num_physical_lists; i++) {
                     f.off_physical_lists[i] = Pointer.Current(reader);
-                    Pointer off_list_hdr_next = Pointer.Read(reader);
+                    Pointer off_list_hdr_next = null;
+                    if(l.mode != MapLoader.Mode.RaymanArenaGC) off_list_hdr_next = Pointer.Read(reader);
                     if (l.mode == MapLoader.Mode.Rayman3GC) {
                         Pointer off_list_hdr_prev = Pointer.Read(reader);
                         Pointer off_list_hdr = Pointer.Read(reader);
@@ -165,7 +166,9 @@ namespace OpenSpace {
                     }
                     if (off_list_hdr_next != null) {
                         Pointer.Goto(ref reader, off_list_hdr_next);
-                    } else break;
+                    } else {
+                        if (l.mode != MapLoader.Mode.RaymanArenaGC) break;
+                    }
                 }
             }
 

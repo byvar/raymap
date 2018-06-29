@@ -52,7 +52,9 @@ namespace OpenSpace {
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
         public List<AIModel> aiModels = new List<AIModel>();
         public List<Perso> persos = new List<Perso>();
+        public List<State> states = new List<State>();
         public List<Graph> graphs = new List<Graph>();
+        public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
         public GameObject graphRoot;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
         

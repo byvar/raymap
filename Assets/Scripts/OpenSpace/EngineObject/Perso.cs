@@ -129,37 +129,13 @@ namespace OpenSpace.EngineObject {
             if (p.family != null && p.family.GetIndexOfPhysicalList(off_physicalObjects) != -1) {
                 p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(off_physicalObjects)];
             }
-            //if (off_intelligence != null) l.print("Intelligence for " + p.name2 + ": " + off_intelligence);
-            /*if (off_intelligence != null) {
-                R3Pointer.Goto(ref reader, off_intelligence);
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                R3Pointer off_name = R3Pointer.Read(reader);
-                if (off_name != null) {
-                    R3Pointer.Goto(ref reader, off_name);
-                    name = reader.ReadNullDelimitedString();
-                }
-            }*/
-            /*if (off_subblocklist != null && p.family != null && off_subblocklist == p.family.off_physical_list && p.family.physical_objects != null) {
-                // Clone family's physical objects into this perso
-                p.physical_objects = new PhysicalObject[p.family.physical_objects.Length];
-                for (int i = 0; i < p.family.physical_objects.Length; i++) {
-                    PhysicalObject o = p.family.physical_objects[i];
-                    if (o != null) {
-                        p.physical_objects[i] = o.Clone();
-                        p.physical_objects[i].Gao.transform.parent = p.Gao.transform;
-                        p.physical_objects[i].Gao.name = "" + i + " - " + p.physical_objects[i].Gao.name;
-                    }
-                }
-            } else if (off_subblocklist != null) {
-                l.print("Perso's physical list does not match family list at position " + offset);
-            }*/
             return p;
+        }
+
+        public static Perso FromOffset(Pointer offset) {
+            if (offset == null) return null;
+            MapLoader l = MapLoader.Loader;
+            return l.persos.FirstOrDefault(f => f.offset == offset);
         }
     }
 }

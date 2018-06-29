@@ -39,6 +39,7 @@ namespace OpenSpace {
         public static State Read(EndianBinaryReader reader, Pointer offset, Family family) {
             MapLoader l = MapLoader.Loader;
             State s = new State(offset, family);
+            l.states.Add(s);
             if (l.mode == MapLoader.Mode.Rayman3GC) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
             if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_next = Pointer.Read(reader);
             if (l.mode == MapLoader.Mode.Rayman3GC) {
@@ -83,6 +84,12 @@ namespace OpenSpace {
         public static State FromOffset(Family f, Pointer offset) {
             if (f == null || offset == null) return null;
             return f.states.FirstOrDefault(s => (s != null && s.offset == offset));
+        }
+
+        public static State FromOffset(Pointer offset) {
+            if (offset == null) return null;
+            MapLoader l = MapLoader.Loader;
+            return l.states.FirstOrDefault(s => s.offset == offset);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.AI {
-    public static class R3AIFunctionTypes {
+    public static class R3AITypes {
 
         #region Function Types
         public static List<string> functionTypes = new List<string>(new string[] {
@@ -94,23 +94,6 @@ namespace OpenSpace.AI {
             "BeginWhile",
             "EndWhile",
         });
-
-        internal static bool IsNodeTypeVariable(NodeType nodeType) {
-            switch (nodeType) {
-                case NodeType.Unknown: return false;
-                case NodeType.KeyWord: return false;
-                case NodeType.Condition: return false;
-                case NodeType.Operator: return false;
-                case NodeType.Function: return false;
-                case NodeType.Procedure: return false;
-                case NodeType.MetaAction: return false;
-                case NodeType.BeginMacro: return false;
-                case NodeType.EndMacro: return false;
-                case NodeType.SubRoutine: return false;
-            }
-
-            return true;
-        }
         #endregion
 
         #region Operators
@@ -1662,136 +1645,137 @@ namespace OpenSpace.AI {
         });
         #endregion
 
-        public enum NodeType {
-            Unknown,
-            KeyWord,
-            Condition,
-            Operator,
-            Function,
-            Procedure,
-            MetaAction,
-            BeginMacro,
-            EndMacro,
-            Field,
-            DsgVarRef,
-            Constant,
-            Real,
-            Button,
-            ConstantVector,
-            Vector,
-            Mask,
-            ModuleRef,
-            DsgVarId,
-            String,
-            LipsSynchroRef,
-            FamilyRef,
-            PersoRef,
-            ActionRef,
-            SuperObjectRef,
-            WayPointRef,
-            TextRef,
-            ComportRef,
-            SoundEventRef,
-            ObjectTableRef,
-            GameMaterialRef,
-            ParticleGenerator,
-            VisualMaterial,
-            Color,
-            DataType42,
-            Light,
-            Caps,
-            SubRoutine
+        #region DsgVar Types
+        public static List<DsgVarInfoEntry.DsgVarType> dsgVarTypeTable = new List<DsgVarInfoEntry.DsgVarType>(new DsgVarInfoEntry.DsgVarType[] {
+            DsgVarInfoEntry.DsgVarType.Boolean,
+            DsgVarInfoEntry.DsgVarType.Byte,
+            DsgVarInfoEntry.DsgVarType.UByte, // Unsigned
+            DsgVarInfoEntry.DsgVarType.Short,
+            DsgVarInfoEntry.DsgVarType.UShort, // Unsigned
+            DsgVarInfoEntry.DsgVarType.Int,
+            DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
+            DsgVarInfoEntry.DsgVarType.Float,
+            DsgVarInfoEntry.DsgVarType.Vector,
+            DsgVarInfoEntry.DsgVarType.List,
+            DsgVarInfoEntry.DsgVarType.Comport,
+            DsgVarInfoEntry.DsgVarType.Action,
+            DsgVarInfoEntry.DsgVarType.Caps,
+            DsgVarInfoEntry.DsgVarType.Input,
+            DsgVarInfoEntry.DsgVarType.SoundEvent,
+            DsgVarInfoEntry.DsgVarType.Light,
+            DsgVarInfoEntry.DsgVarType.GameMaterial,
+            DsgVarInfoEntry.DsgVarType.VisualMaterial,
+            DsgVarInfoEntry.DsgVarType.Perso,
+            DsgVarInfoEntry.DsgVarType.Waypoint,
+            DsgVarInfoEntry.DsgVarType.Graph,
+            DsgVarInfoEntry.DsgVarType.Text,
+            DsgVarInfoEntry.DsgVarType.SuperObject,
+            DsgVarInfoEntry.DsgVarType.SOLinks,
+            DsgVarInfoEntry.DsgVarType.Array1,
+            DsgVarInfoEntry.DsgVarType.Array2,
+            DsgVarInfoEntry.DsgVarType.Array3,
+            DsgVarInfoEntry.DsgVarType.Array4,
+            DsgVarInfoEntry.DsgVarType.Array5,
+            DsgVarInfoEntry.DsgVarType.Array6,
+            DsgVarInfoEntry.DsgVarType.Array7,
+            DsgVarInfoEntry.DsgVarType.Array8,
+            DsgVarInfoEntry.DsgVarType.Array9,
+            DsgVarInfoEntry.DsgVarType.Array10,
+            DsgVarInfoEntry.DsgVarType.Array11
+        });
+        #endregion
 
-        };
-
-        public static NodeType getNodeType(byte functionType) {
+        public static ScriptNode.NodeType getNodeType(byte functionType) {
 
             switch (functionType) {
                 case 0: // KeyWordFunctionPtr
-                    return NodeType.KeyWord;
+                    return ScriptNode.NodeType.KeyWord;
                 case 1: // GetConditionFunctionPtr
-                    return NodeType.Condition;
+                    return ScriptNode.NodeType.Condition;
                 case 2: // GetOperatorFunctionPtr
-                    return NodeType.Operator;
+                    return ScriptNode.NodeType.Operator;
                 case 3: // GetFunctionFunctionPtr
-                    return NodeType.Function;
+                    return ScriptNode.NodeType.Function;
                 case 4: // ProcedureFunctionReturn
-                    return NodeType.Procedure;
+                    return ScriptNode.NodeType.Procedure;
                 case 5: // meta action
-                    return NodeType.MetaAction;
+                    return ScriptNode.NodeType.MetaAction;
                 case 6:
-                    return NodeType.BeginMacro;
+                    return ScriptNode.NodeType.BeginMacro;
                 case 7:
-                    return NodeType.BeginMacro;
+                    return ScriptNode.NodeType.BeginMacro;
                 case 8:
-                    return NodeType.EndMacro;
+                    return ScriptNode.NodeType.EndMacro;
                 case 9:
-                    return NodeType.Field;
+                    return ScriptNode.NodeType.Field;
                 case 10:
                 case 11:
-                    return NodeType.DsgVarRef;
+                    return ScriptNode.NodeType.DsgVarRef;
                 case 12:
-                    return NodeType.Constant;
+                    return ScriptNode.NodeType.Constant;
                 case 13:
-                    return NodeType.Real;
+                    return ScriptNode.NodeType.Real;
                 case 14:
-                    return NodeType.Button;
+                    return ScriptNode.NodeType.Button;
                 case 15:
-                    return NodeType.ConstantVector;
+                    return ScriptNode.NodeType.ConstantVector;
                 case 16:
-                    return NodeType.Vector;
+                    return ScriptNode.NodeType.Vector;
                 case 17:
-                    return NodeType.Mask;
+                    return ScriptNode.NodeType.Mask;
                 case 18:
-                    return NodeType.ModuleRef;
+                    return ScriptNode.NodeType.ModuleRef;
                 case 19:
-                    return NodeType.DsgVarId;
+                    return ScriptNode.NodeType.DsgVarId;
                 case 20:
-                    return NodeType.String;
+                    return ScriptNode.NodeType.String;
                 case 21:
-                    return NodeType.LipsSynchroRef;
+                    return ScriptNode.NodeType.LipsSynchroRef;
                 case 22:
-                    return NodeType.FamilyRef;
+                    return ScriptNode.NodeType.FamilyRef;
                 case 23:
-                    return NodeType.PersoRef;
+                    return ScriptNode.NodeType.PersoRef;
                 case 24:
-                    return NodeType.ActionRef;
+                    return ScriptNode.NodeType.ActionRef;
                 case 25:
-                    return NodeType.SuperObjectRef;
+                    return ScriptNode.NodeType.SuperObjectRef;
                 case 26:
-                    return NodeType.WayPointRef;
+                    return ScriptNode.NodeType.WayPointRef;
                 case 27:
-                    return NodeType.TextRef;
+                    return ScriptNode.NodeType.TextRef;
                 case 28:
-                    return NodeType.ComportRef;
+                    return ScriptNode.NodeType.ComportRef;
                 case 29:
-                    return NodeType.ModuleRef;
+                    return ScriptNode.NodeType.ModuleRef;
                 case 30:
-                    return NodeType.SoundEventRef;
+                    return ScriptNode.NodeType.SoundEventRef;
                 case 31:
-                    return NodeType.ObjectTableRef;
+                    return ScriptNode.NodeType.ObjectTableRef;
                 case 32:
-                    return NodeType.GameMaterialRef;
+                    return ScriptNode.NodeType.GameMaterialRef;
                 case 33:
-                    return NodeType.ParticleGenerator;
+                    return ScriptNode.NodeType.ParticleGenerator;
                 case 34:
-                    return NodeType.VisualMaterial;
+                    return ScriptNode.NodeType.VisualMaterial;
                 case 35:
-                    return NodeType.Color;
+                    return ScriptNode.NodeType.Color;
                 case 36:
-                    return NodeType.DataType42;
+                    return ScriptNode.NodeType.DataType42;
                 case 37:
-                    return NodeType.Light;
+                    return ScriptNode.NodeType.Light;
                 case 38:
-                    return NodeType.Caps;
+                    return ScriptNode.NodeType.Caps;
                 case 39:
-                    return NodeType.SubRoutine;
+                    return ScriptNode.NodeType.SubRoutine;
+                case 44:
+                    return ScriptNode.NodeType.GraphRef;
             }
 
-            return NodeType.Unknown;
+            return ScriptNode.NodeType.Unknown;
         }
 
         public static string readableFunctionSubType(ScriptNode sn, Perso perso) {
+            MapLoader l = MapLoader.Loader;
             byte functionType = sn.type;
             int param = (int)sn.param;
             short mask = 0;
@@ -1826,7 +1810,18 @@ namespace OpenSpace.AI {
                     return "EvalField";
                 case 10:
                 case 11:
-                    return "DsgVarRef: " + "0x" + param.ToString("x8");
+                    string dsgVarString = "";
+                    if (perso.brain.mind.dsgMem != null && perso.brain.mind.dsgMem.dsgVar != null
+                        && perso.brain.mind.dsgMem.dsgVar.dsgVarInfos != null
+                        && param < perso.brain.mind.dsgMem.dsgVar.dsgVarInfos.Length) {
+                        DsgVarInfoEntry info = perso.brain.mind.dsgMem.dsgVar.dsgVarInfos[param];
+                        if (info != null) {
+                            dsgVarString += " (type " + info.type + ", value " + info.value + ")";
+                        } else {
+                            dsgVarString += " (not found)";
+                        }
+                    }
+                    return "DsgVarRef: " + param + dsgVarString;
                 case 12:
 
                     return "Constant: " + param;
@@ -1847,7 +1842,9 @@ namespace OpenSpace.AI {
                 case 19:
                     return "DsgVarId: " + "0x" + (param).ToString("x8");
                 case 20:
-                    return "String: " + "0x" + (param).ToString("x8");
+                    string str = "ERR_STRING_NOTFOUND";
+                    if (l.strings.ContainsKey(sn.param_ptr)) str = l.strings[sn.param_ptr];
+                    return "String: " + sn.param_ptr + " (" + str + ")";
                 case 21:
                     return "LipsSynchroRef: " + sn.param_ptr;
                 case 22:
@@ -1855,7 +1852,7 @@ namespace OpenSpace.AI {
                 case 23:
                     return "PersoRef: " + sn.param_ptr;
                 case 24:
-                    State state = State.FromOffset(perso.family, sn.param_ptr);
+                    State state = State.FromOffset(sn.param_ptr);
                     string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.name;
                     return "ActionRef: " + sn.param_ptr + " (" + stateName + ")";
                 case 25:

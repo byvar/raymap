@@ -24,17 +24,21 @@ namespace OpenSpace.AI {
         }
 
         public static DsgVar Read(EndianBinaryReader reader, Pointer offset, DsgMem dsgMem=null) {
+            MapLoader l = MapLoader.Loader;
             DsgVar dsgVar = new DsgVar(offset);
 
             dsgVar.off_dsgMemBuffer = Pointer.Read(reader);
             dsgVar.off_dsgVarInfo = Pointer.Read(reader);
 
             // Unknown stuff
-            if (dsgMem==null) {
+            if (dsgMem==null && l.mode != MapLoader.Mode.RaymanArenaGC && l.mode != MapLoader.Mode.Rayman3GC) {
                 dsgVar.something3 = reader.ReadUInt32();
             }
 
-            if (dsgMem == null) {
+            if (l.mode == MapLoader.Mode.RaymanArenaGC || l.mode == MapLoader.Mode.Rayman3GC) {
+                dsgVar.dsgMemBufferLength = reader.ReadUInt32();
+                dsgVar.amountOfInfos = reader.ReadByte();
+            } else if (dsgMem == null) {
                 dsgVar.amountOfInfos = reader.ReadUInt32();
                 dsgVar.dsgMemBufferLength = reader.ReadUInt32() * 4;
             } else {
@@ -76,23 +80,23 @@ namespace OpenSpace.AI {
             try {
 
                 switch (infoEntry.type) {
-                    case DsgVarType.Boolean:
+                    case DsgVarInfoEntry.DsgVarType.Boolean:
                         returnValue = reader.ReadBoolean(); break;
-                    case DsgVarType.Byte:
+                    case DsgVarInfoEntry.DsgVarType.Byte:
                         returnValue = reader.ReadSByte(); break;
-                    case DsgVarType.UByte:
+                    case DsgVarInfoEntry.DsgVarType.UByte:
                         returnValue = reader.ReadByte(); break;
-                    case DsgVarType.Float:
+                    case DsgVarInfoEntry.DsgVarType.Float:
                         returnValue = reader.ReadSingle(); break;
-                    case DsgVarType.Int:
+                    case DsgVarInfoEntry.DsgVarType.Int:
                         returnValue = reader.ReadInt32(); break;
-                    case DsgVarType.UInt:
+                    case DsgVarInfoEntry.DsgVarType.UInt:
                         returnValue = reader.ReadUInt32(); break;
-                    case DsgVarType.Short:
+                    case DsgVarInfoEntry.DsgVarType.Short:
                         returnValue = reader.ReadInt16(); break;
-                    case DsgVarType.UShort:
+                    case DsgVarInfoEntry.DsgVarType.UShort:
                         returnValue = reader.ReadUInt16(); break;
-                    case DsgVarType.Vector:
+                    case DsgVarInfoEntry.DsgVarType.Vector:
                         float x = reader.ReadSingle();
                         float y = reader.ReadSingle();
                         float z = reader.ReadSingle();
@@ -108,7 +112,7 @@ namespace OpenSpace.AI {
                             returnValue = "null";
                         }*/
                         break;
-                    case DsgVarType.Graph:
+                    case DsgVarInfoEntry.DsgVarType.Graph:
                             Pointer off_graph = Pointer.Read(reader);
                             if (off_graph != null) {
                                 Pointer originalBeforeGraph = Pointer.Goto(ref reader, off_graph);

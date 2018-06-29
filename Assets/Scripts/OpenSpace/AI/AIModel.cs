@@ -59,7 +59,7 @@ namespace OpenSpace.AI {
                 }
             }
 
-            if (l.mode == MapLoader.Mode.Rayman2PC && ai.off_dsgVar != null) {
+            if (ai.off_dsgVar != null) {
                 Pointer.Goto(ref reader, ai.off_dsgVar);
                 ai.dsgVar = DsgVar.Read(reader, ai.off_dsgVar);
             }
