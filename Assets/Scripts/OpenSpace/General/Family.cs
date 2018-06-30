@@ -94,6 +94,7 @@ namespace OpenSpace {
                 f.animBank = reader.ReadByte();
                 f.properties = reader.ReadByte();
             }
+            //l.print(f.name + " - Anim bank: " + f.animBank + " - id: " + l.objectTypes[0][f.family_index].id);
 
             f.states = new State[f.num_states];
             if (f.num_states > 0) {

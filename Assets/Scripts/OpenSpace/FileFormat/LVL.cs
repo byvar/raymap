@@ -6,12 +6,13 @@ using System.Text;
 
 namespace OpenSpace.FileFormat {
     public class LVL : FileWithPointers {
-        public LVL(string name, string path) : this(name, File.OpenRead(path)) { }
+        public LVL(string name, string path, int fileID) : this(name, File.OpenRead(path), fileID) { }
 
-        public LVL(string name, Stream stream) {
+        public LVL(string name, Stream stream, int fileID) {
             baseOffset = 4;
             headerOffset = 0;
             this.name = name;
+            this.fileID = fileID;
             reader = new EndianBinaryReader(stream, MapLoader.Loader.IsLittleEndian);
         }
 
@@ -27,7 +28,7 @@ namespace OpenSpace.FileFormat {
                     uint ptr_ptr = ptrReader.ReadUInt32();
                     reader.BaseStream.Seek(ptr_ptr + baseOffset, SeekOrigin.Begin);
                     uint ptr = reader.ReadUInt32();
-                    pointers[ptr_ptr] = new Pointer(ptr, l.files_array[file]);
+                    pointers[ptr_ptr] = new Pointer(ptr, GetFileWithID(file));
                 }
                 long num_fillInPtrs = (totalSize - ptrStream.Position) / 16;
                 for (uint j = 0; j < num_fillInPtrs; j++) {
@@ -35,11 +36,15 @@ namespace OpenSpace.FileFormat {
                     int src_file = ptrReader.ReadInt32(); // the file the pointer should be located in
                     uint ptr = ptrReader.ReadUInt32();
                     int target_file = ptrReader.ReadInt32();
-                    l.files_array[src_file].pointers[ptr_ptr] = new Pointer(ptr, (l.files_array[target_file])); // can overwrite if necessary
+                    GetFileWithID(src_file).pointers[ptr_ptr] = new Pointer(ptr, GetFileWithID(target_file)); // can overwrite if necessary
                 }
             }
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
             ptrStream.Close();
+        }
+
+        public FileWithPointers GetFileWithID(int id) {
+            return MapLoader.Loader.files_array.Where(f => f != null && f.fileID == id).FirstOrDefault();
         }
     }
 }

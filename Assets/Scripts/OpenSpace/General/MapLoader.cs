@@ -211,13 +211,13 @@ namespace OpenSpace {
 
                     for (int i = 0; i < lvlPaths.Length; i++) {
                         if (lvlPaths[i] == null) continue;
-                        if (File.Exists(lvlPaths[i]) && File.Exists(ptrPaths[i])) {
-                            files_array[i] = new LVL(lvlNames[i], lvlPaths[i]);
+                        if (File.Exists(lvlPaths[i])) {
+                            files_array[i] = new LVL(lvlNames[i], lvlPaths[i], i);
                         }
                     }
                     for (int i = 0; i < loadOrder.Length; i++) {
                         int j = loadOrder[i];
-                        if (files_array[j] != null) {
+                        if (files_array[j] != null && File.Exists(ptrPaths[j])) {
                             ((LVL)files_array[j]).ReadPTR(ptrPaths[j]);
                         }
                     }
@@ -227,7 +227,7 @@ namespace OpenSpace {
             } catch (Exception e) {
                 Debug.LogError(e.ToString());
             } finally {
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
                         files_array[i].Dispose();
                     }
@@ -440,7 +440,7 @@ namespace OpenSpace {
             animationBanks = new AnimationBank[5]; // 1 in fix, 4 in lvl
             if (off_animBankFix != null) {
                 off_current = Pointer.Goto(ref reader, off_animBankFix);
-                animationBanks[0] = AnimationBank.Read(reader, off_animBankFix, 0, 1)[0];
+                animationBanks[0] = AnimationBank.Read(reader, off_animBankFix, 0, 1, files_array[Mem.FixKeyFrames])[0];
                 Pointer.Goto(ref reader, off_current);
             }
         }
@@ -754,11 +754,35 @@ namespace OpenSpace {
             print("Lvl animation bank address: " + off_animBankLvl);
             if (off_animBankLvl != null) {
                 off_current = Pointer.Goto(ref reader, off_animBankLvl);
-                AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 1, 4);
+                AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 1, 4, files_array[Mem.LvlKeyFrames]);
                 for (int i = 0; i < 4; i++) {
                     animationBanks[1 + i] = banks[i];
                 }
                 Pointer.Goto(ref reader, off_current);
+            }
+            // Load additional animation banks
+            for (int i = 0; i < families.Length; i++) {
+                if (families[i].animBank > 4 && objectTypes[0][families[i].family_index].id != 0xFF) {
+                    int animBank = families[i].animBank;
+                    string animName = "Anim/ani" + objectTypes[0][families[i].family_index].id.ToString();
+                    string kfName = "Anim/key" + objectTypes[0][families[i].family_index].id.ToString() + "kf";
+                    int fileID = animBank + 102;
+                    int kfFileID = animBank + 2; // Anim bank will start at 5, so this will start at 7
+                    FileWithPointers animFile = InitExtraLVL(animName, fileID);
+                    FileWithPointers kfFile = InitExtraLVL(kfName, fileID);
+                    if (animFile != null) {
+                        if (animBank >= animationBanks.Length) {
+                            Array.Resize(ref animationBanks, animBank + 1);
+                        }
+                        Pointer off_animBankExtra = new Pointer(0, animFile);
+                        off_current = Pointer.Goto(ref reader, off_animBankExtra);
+                        int alignBytes = reader.ReadInt32();
+                        if (alignBytes > 0) reader.Align(4, alignBytes);
+                        off_animBankExtra = Pointer.Current(reader);
+                        animationBanks[animBank] = AnimationBank.Read(reader, off_animBankExtra, (uint)animBank, 1, kfFile)[0];
+                        Pointer.Goto(ref reader, off_current);
+                    }
+                }
             }
         }
         #endregion
@@ -779,7 +803,7 @@ namespace OpenSpace {
             reader.ReadBytes(0x14); // FON_g_stGeneral
             Pointer off_current = Pointer.Current(reader);
             animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
-            animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1)[0];
+            animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];
             print("Fix animation bank: " + off_current);
             Pointer off_fixInfo = Pointer.Read(reader);
 
@@ -995,7 +1019,7 @@ namespace OpenSpace {
             }
             Pointer.Read(reader);
             off_current = Pointer.Current(reader);
-            AnimationBank.Read(reader, off_current, 0, 1, append: true);
+            AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.LvlKeyFrames], append: true);
             animationBanks[1] = animationBanks[0];
 
 
@@ -1080,6 +1104,24 @@ namespace OpenSpace {
                 }
             }
             return null;
+        }
+
+        public FileWithPointers InitExtraLVL(string relativePath, int id) {
+            string path = Path.Combine(gameDataBinFolder, relativePath);
+            string lvlName = Path.GetFileNameWithoutExtension(relativePath);
+            string lvlPath = Path.ChangeExtension(path, "lvl");
+            string ptrPath = Path.ChangeExtension(path, "ptr");
+            if (File.Exists(lvlPath)) {
+                Array.Resize(ref files_array, files_array.Length + 1);
+                LVL lvl = new LVL(lvlName, lvlPath, id);
+                files_array[files_array.Length - 1] = lvl;
+                if (File.Exists(ptrPath)) {
+                    lvl.ReadPTR(ptrPath);
+                }
+                return lvl;
+            } else {
+                return null;
+            }
         }
 
         public void FillLinkedListPointers(EndianBinaryReader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {

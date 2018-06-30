@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using OpenSpace;
 using OpenSpace.Visual;
+using OpenSpace.EngineObject;
 
 public class Controller : MonoBehaviour {
     public MapLoader.Mode mode = MapLoader.Mode.Rayman3PC;
@@ -78,6 +79,7 @@ public class Controller : MonoBehaviour {
         sectorManager.Init();
         lightManager.Init();
         InitPersos();
+        InitCamera();
         if (viewCollision) UpdateViewCollision();
     }
 	// Update is called once per frame
@@ -96,6 +98,16 @@ public class Controller : MonoBehaviour {
                 PersoBehaviour unityBehaviour = loader.persos[i].Gao.AddComponent<PersoBehaviour>();
                 unityBehaviour.perso = loader.persos[i];
                 unityBehaviour.Init();
+            }
+        }
+    }
+
+    public void InitCamera() {
+        if (loader != null) {
+            Perso camera = loader.persos.Where(p => p != null && p.name2.Equals("StdCamer")).FirstOrDefault();
+            if (camera != null) {
+                Camera.main.transform.position = camera.Gao.transform.position;
+                Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0,180,0);
             }
         }
     }

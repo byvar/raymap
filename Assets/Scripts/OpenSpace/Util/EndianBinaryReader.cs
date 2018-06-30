@@ -82,9 +82,9 @@ namespace OpenSpace {
             }
         }
 
-        // Used in Rayman 2 when reading blocks with size sizeToRead, so that it is aligned after reading the block
-        public void PreAlign(int sizeToRead, int alignBytes) {
-            int rest = sizeToRead % alignBytes;
+        // To make sure position is a multiple of alignBytes after reading a block of blocksize, regardless of prior position
+        public void Align(int blockSize, int alignBytes) {
+            int rest = blockSize % alignBytes;
             if (rest > 0) {
                 ReadBytes(alignBytes - rest);
             }

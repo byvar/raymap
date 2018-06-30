@@ -7,6 +7,7 @@ using System.Text;
 namespace OpenSpace.FileFormat {
     public abstract class FileWithPointers : IDisposable {
         public string name = "Unknown";
+        public int fileID = 0;
         public EndianBinaryReader reader;
         public EndianBinaryWriter writer;
         public Dictionary<uint, Pointer> pointers = new Dictionary<uint, Pointer>();
