@@ -34,7 +34,7 @@ namespace OpenSpace.FileFormat {
             baseOffset = 0;
             headerOffset = 0;
             this.name = name;
-            reader = new EndianBinaryReader(stream, MapLoader.Loader.IsLittleEndian);
+            reader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian);
         }
 
         public uint GetOffset(RelocationTableReference rtref) {
@@ -169,9 +169,13 @@ namespace OpenSpace.FileFormat {
         public uint GetMask(RelocationTableReference rtref) {
             rtref.byte3 = (byte)~rtref.byte2;
             byte[] rtRefBytes = new byte[] { rtref.levelId, rtref.relocationType, rtref.byte2, rtref.byte3 };
-            if (MapLoader.Loader.IsLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(rtRefBytes);
+            if (Settings.s.IsLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(rtRefBytes);
             uint currentMask = BitConverter.ToUInt32(rtRefBytes, 0);
-            return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));
+            if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2IOS) {
+                return (uint)(16807 * ((currentMask ^ 0x75BD924) % 0x1F31D) - 2836 * ((currentMask ^ 0x75BD924) / 0x1F31D));
+            } else {
+                return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));
+            }
         }
     }
 }

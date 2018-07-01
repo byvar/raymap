@@ -42,11 +42,11 @@ namespace OpenSpace.FileFormat {
             headerOffset = 0;
             this.name = name;
             this.rtb = rtb;
-            using (EndianBinaryReader encodedReader = new EndianBinaryReader(stream, MapLoader.Loader.IsLittleEndian)) {
+            using (EndianBinaryReader encodedReader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian)) {
                 encodedReader.ReadMask();
                 data = encodedReader.ReadBytes((int)stream.Length - 4);
             }
-            reader = new EndianBinaryReader(new MemoryStream(data), MapLoader.Loader.IsLittleEndian);
+            reader = new EndianBinaryReader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ReadSNA();
         }
 
@@ -110,12 +110,12 @@ namespace OpenSpace.FileFormat {
             Stream gptStream = File.OpenRead(path);
             uint gptOffset = (uint)data.Length;
             byte[] gptData = null;
-            using (EndianBinaryReader gptReader = new EndianBinaryReader(gptStream, MapLoader.Loader.IsLittleEndian)) {
+            using (EndianBinaryReader gptReader = new EndianBinaryReader(gptStream, Settings.s.IsLittleEndian)) {
                 gptData = gptReader.ReadBytes((int)gptStream.Length);
             }
             data = data.Concat(gptData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
-            reader = new EndianBinaryReader(new MemoryStream(data), MapLoader.Loader.IsLittleEndian);
+            reader = new EndianBinaryReader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
             SNAMemoryBlock block = relocation_local[ptrRelocationKey];
             block.pointerList = null;
@@ -132,12 +132,12 @@ namespace OpenSpace.FileFormat {
             Stream ptxStream = File.OpenRead(path);
             uint ptxOffset = (uint)data.Length;
             byte[] ptxData = null;
-            using (EndianBinaryReader gptReader = new EndianBinaryReader(ptxStream, MapLoader.Loader.IsLittleEndian)) {
+            using (EndianBinaryReader gptReader = new EndianBinaryReader(ptxStream, Settings.s.IsLittleEndian)) {
                 ptxData = gptReader.ReadBytes((int)ptxStream.Length);
             }
             data = data.Concat(ptxData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
-            reader = new EndianBinaryReader(new MemoryStream(data), MapLoader.Loader.IsLittleEndian);
+            reader = new EndianBinaryReader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
             SNAMemoryBlock block = relocation_local[ptrRelocationKey];
             ptx = new SNAMemoryBlock();

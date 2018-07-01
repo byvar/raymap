@@ -69,7 +69,7 @@ namespace OpenSpace {
             po.off_visualSet = Pointer.Read(reader);
             po.off_collideSet = Pointer.Read(reader);
             po.off_visualBoundingVolume = Pointer.Read(reader);
-            if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 po.off_collideBoundingVolume = po.off_visualBoundingVolume;
                 reader.ReadUInt32();
             } else {

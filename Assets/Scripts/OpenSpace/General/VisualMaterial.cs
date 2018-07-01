@@ -142,7 +142,7 @@ namespace OpenSpace {
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             reader.ReadUInt32(); // some specular parameter
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 Pointer off_texture = Pointer.Read(reader);
                 //Pointer off_texture2 = Pointer.Read(reader);
                 int type_texture = reader.ReadInt32();

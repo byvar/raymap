@@ -36,13 +36,13 @@ namespace OpenSpace.Collide {
         public static CollideMeshObject Read(EndianBinaryReader reader, PhysicalObject po, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             CollideMeshObject m = new CollideMeshObject(po, offset);
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();
                 reader.ReadUInt32();
             }
             m.off_vertices = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 m.off_normals = Pointer.Read(reader);
                 Pointer.Read(reader);
                 reader.ReadInt32();
@@ -50,7 +50,7 @@ namespace OpenSpace.Collide {
             m.off_subblock_types = Pointer.Read(reader);
             m.off_subblocks = Pointer.Read(reader);
             Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 reader.ReadInt32();
                 reader.ReadInt32();
                 reader.ReadInt32();
@@ -63,7 +63,7 @@ namespace OpenSpace.Collide {
             reader.ReadSingle();
             reader.ReadSingle();
             reader.ReadSingle();
-            if (l.mode == MapLoader.Mode.Rayman2PC) reader.ReadUInt32();
+            if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32();
             
             // Vertices
             Pointer off_current = Pointer.Goto(ref reader, m.off_vertices);

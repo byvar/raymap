@@ -121,7 +121,7 @@ namespace OpenSpace {
             l.bigAlpha = reader.ReadSingle();
             l.giroStep = reader.ReadSingle();
             l.pulseStep = reader.ReadSingle();
-            if (lo.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 l.pulseMaxRange = reader.ReadSingle();
                 l.giroAngle = reader.ReadSingle();
                 reader.ReadSingle();
@@ -134,7 +134,7 @@ namespace OpenSpace {
             reader.ReadUInt32(); // 0
             reader.ReadUInt32(); // 0
             l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            if (lo.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 l.shadowIntensity = reader.ReadSingle(); // 0
             }
             reader.ReadByte();

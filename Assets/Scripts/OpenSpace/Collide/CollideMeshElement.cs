@@ -69,7 +69,7 @@ namespace OpenSpace.Collide {
             MapLoader l = MapLoader.Loader;
             CollideMeshElement sm = new CollideMeshElement(offset, m);
             sm.off_material = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 sm.num_triangles = reader.ReadUInt16();
                 reader.ReadUInt16();
                 sm.off_triangles = Pointer.Read(reader);

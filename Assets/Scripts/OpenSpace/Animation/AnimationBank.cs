@@ -81,17 +81,14 @@ namespace OpenSpace.Animation {
                 banks[i].keyframes = AnimationStack.Read(reader);
                 banks[i].events = AnimationStack.Read(reader);
                 banks[i].morphData = AnimationStack.Read(reader);
-                if (l.mode != MapLoader.Mode.Rayman2PC) {
+                if (Settings.s.hasDeformations) {
                     banks[i].deformations = AnimationStack.Read(reader);
                 } else {
                     banks[i].deformations = null;
                 }
                 banks[i].animations = new AnimA3DGeneral[banks[i].a3d_general.count];
             }
-            if (l.mode == MapLoader.Mode.Rayman3PC
-                || l.mode == MapLoader.Mode.RaymanArenaGC
-                || l.mode == MapLoader.Mode.RaymanArenaPC
-                || (l.mode == MapLoader.Mode.Rayman2PC && !append)) {
+            if (l.mode != MapLoader.Mode.Rayman3GC && !append) {
                 for (int i = 0; i < num_banks; i++) {
                     if (banks[i].a3d_general.reservedMemory > 0) banks[i].a3d_general.off_data = Pointer.Read(reader);
                     if (banks[i].vectors.reservedMemory > 0) banks[i].vectors.off_data = Pointer.Read(reader);
@@ -109,7 +106,7 @@ namespace OpenSpace.Animation {
                     }
                     if (banks[i].events.reservedMemory > 0) banks[i].events.off_data = Pointer.Read(reader);
                     if (banks[i].morphData.reservedMemory > 0) banks[i].morphData.off_data = Pointer.Read(reader);
-                    if (l.mode != MapLoader.Mode.Rayman2PC && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = Pointer.Read(reader);
+                    if (Settings.s.hasDeformations && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = Pointer.Read(reader);
                 }
             }
             Pointer off_current = Pointer.Current(reader);
@@ -170,11 +167,7 @@ namespace OpenSpace.Animation {
                         current_anim++;
                     }
                 }
-            } else if (l.mode == MapLoader.Mode.Rayman3PC
-                || l.mode == MapLoader.Mode.RaymanArenaGC
-                || l.mode == MapLoader.Mode.RaymanArenaPC
-                || l.mode == MapLoader.Mode.Rayman2PC) {
-                bool readArraysDirectly = l.mode == MapLoader.Mode.Rayman2PC && index == 0;
+            } else if (l.mode != MapLoader.Mode.Rayman3GC) {
                 for (uint i = 0; i < banks.Length; i++) {
                     banks[i].animations = new AnimA3DGeneral[banks[i].a3d_general.Count(append)];
                     banks[i].global_vectors = new AnimVector[banks[i].vectors.Count(append)];
@@ -188,51 +181,51 @@ namespace OpenSpace.Animation {
                     banks[i].global_keyframes = new AnimKeyframe[banks[i].keyframes.Count(append)];
                     banks[i].global_events = new AnimEvent[banks[i].events.Count(append)];
                     banks[i].global_morphData = new AnimMorphData[banks[i].morphData.Count(append)];
-                    if(l.mode != MapLoader.Mode.Rayman2PC) banks[i].global_deformations = new AnimDeformation[banks[i].deformations.Count(append)];
+                    if(Settings.s.hasDeformations) banks[i].global_deformations = new AnimDeformation[banks[i].deformations.Count(append)];
                     if (banks[i].animations.Length > 0) {
                         if (banks[i].a3d_general.off_data != null) Pointer.Goto(ref reader, banks[i].a3d_general.off_data);
                         for (uint j = 0; j < banks[i].animations.Length; j++) banks[i].animations[j] = AnimA3DGeneral.Read(reader, Pointer.Current(reader));
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(56 * banks[i].animations.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(56 * banks[i].animations.Length, 4);
                     }
                     if (banks[i].global_vectors.Length > 0) {
                         if(banks[i].vectors.off_data != null) Pointer.Goto(ref reader, banks[i].vectors.off_data);
                         for (uint j = 0; j < banks[i].global_vectors.Length; j++) banks[i].global_vectors[j] = AnimVector.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(12 * banks[i].global_vectors.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(12 * banks[i].global_vectors.Length, 4);
                     }
                     if (banks[i].global_quaternions.Length > 0) {
                         if (banks[i].quaternions.off_data != null) Pointer.Goto(ref reader, banks[i].quaternions.off_data);
                         for (uint j = 0; j < banks[i].global_quaternions.Length; j++) banks[i].global_quaternions[j] = AnimQuaternion.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(8 * banks[i].global_quaternions.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(8 * banks[i].global_quaternions.Length, 4);
                     }
                     if (banks[i].global_hierarchies.Length > 0) {
                         if (banks[i].hierarchies.off_data != null) Pointer.Goto(ref reader, banks[i].hierarchies.off_data);
                         for (uint j = 0; j < banks[i].global_hierarchies.Length; j++) banks[i].global_hierarchies[j] = AnimHierarchy.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(4 * banks[i].global_hierarchies.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(4 * banks[i].global_hierarchies.Length, 4);
                     }
                     if (banks[i].global_NTTO.Length > 0) {
                         if (banks[i].NTTO.off_data != null) Pointer.Goto(ref reader, banks[i].NTTO.off_data);
                         for (uint j = 0; j < banks[i].global_NTTO.Length; j++) banks[i].global_NTTO[j] = AnimNTTO.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(6 * banks[i].global_NTTO.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(6 * banks[i].global_NTTO.Length, 4);
                     }
                     if (banks[i].global_onlyFrames.Length > 0) {
                         if (banks[i].onlyFrames.off_data != null) Pointer.Goto(ref reader, banks[i].onlyFrames.off_data);
                         for (uint j = 0; j < banks[i].global_onlyFrames.Length; j++) banks[i].global_onlyFrames[j] = AnimOnlyFrame.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(10 * banks[i].global_onlyFrames.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(10 * banks[i].global_onlyFrames.Length, 4);
                     }
                     if (banks[i].global_channels.Length > 0) {
                         if (banks[i].channels.off_data != null) Pointer.Goto(ref reader, banks[i].channels.off_data);
                         for (uint j = 0; j < banks[i].global_channels.Length; j++) banks[i].global_channels[j] = AnimChannel.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(16 * banks[i].global_channels.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(16 * banks[i].global_channels.Length, 4);
                     }
                     if (banks[i].global_numOfNTTO.Length > 0) {
                         if (banks[i].framesNumOfNTTO.off_data != null) Pointer.Goto(ref reader, banks[i].framesNumOfNTTO.off_data);
                         for (uint j = 0; j < banks[i].global_numOfNTTO.Length; j++) banks[i].global_numOfNTTO[j] = AnimNumOfNTTO.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(2 * banks[i].global_numOfNTTO.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(2 * banks[i].global_numOfNTTO.Length, 4);
                     }
                     if (banks[i].global_framesKFIndex.Length > 0) {
                         if (banks[i].framesKFIndex.off_data != null) Pointer.Goto(ref reader, banks[i].framesKFIndex.off_data);
                         for (uint j = 0; j < banks[i].global_framesKFIndex.Length; j++) banks[i].global_framesKFIndex[j] = AnimFramesKFIndex.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(4 * banks[i].global_framesKFIndex.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(4 * banks[i].global_framesKFIndex.Length, 4);
                     }
                     if (banks[i].global_keyframes.Length > 0) {
                         if (banks[i].keyframes.off_data != null) Pointer.Goto(ref reader, banks[i].keyframes.off_data);
@@ -241,17 +234,17 @@ namespace OpenSpace.Animation {
                             if(alignBytes > 0) reader.Align(4, alignBytes);
                         }
                         for (uint j = 0; j < banks[i].global_keyframes.Length; j++) banks[i].global_keyframes[j] = AnimKeyframe.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(36 * banks[i].global_keyframes.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(36 * banks[i].global_keyframes.Length, 4);
                     }
                     if (banks[i].global_events.Length > 0) {
                         if (banks[i].events.off_data != null) Pointer.Goto(ref reader, banks[i].events.off_data);
                         for (uint j = 0; j < banks[i].global_events.Length; j++) banks[i].global_events[j] = AnimEvent.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(12 * banks[i].global_events.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(12 * banks[i].global_events.Length, 4);
                     }
                     if (banks[i].global_morphData.Length > 0) {
                         if (banks[i].morphData.off_data != null) Pointer.Goto(ref reader, banks[i].morphData.off_data);
                         for (uint j = 0; j < banks[i].global_morphData.Length; j++) banks[i].global_morphData[j] = AnimMorphData.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman2PC) reader.Align(8 * banks[i].global_morphData.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(8 * banks[i].global_morphData.Length, 4);
                     }
                     if (banks[i].global_deformations != null && banks[i].global_deformations.Length > 0) {
                         if (banks[i].deformations.off_data != null) Pointer.Goto(ref reader, banks[i].deformations.off_data);

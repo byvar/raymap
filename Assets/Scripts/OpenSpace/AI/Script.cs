@@ -45,7 +45,7 @@ namespace OpenSpace.AI {
                     builder.Append("---- END OF SCRIPT ----");
                 } else {
                     builder.Append(new String(' ', (sn.indent - 1) * 4));
-                    if (l.mode == MapLoader.Mode.Rayman2PC) {
+                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
                         builder.Append(R2AITypes.readableFunctionSubType(sn, perso));
                     } else {
                         builder.Append(R3AITypes.readableFunctionSubType(sn, perso));

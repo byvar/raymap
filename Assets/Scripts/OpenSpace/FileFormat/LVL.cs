@@ -13,15 +13,14 @@ namespace OpenSpace.FileFormat {
             headerOffset = 0;
             this.name = name;
             this.fileID = fileID;
-            reader = new EndianBinaryReader(stream, MapLoader.Loader.IsLittleEndian);
+            reader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian);
         }
 
         public void ReadPTR(string path) {
-            MapLoader l = MapLoader.Loader;
             if (!File.Exists(path)) return;
             Stream ptrStream = File.OpenRead(path);
             long totalSize = ptrStream.Length;
-            using (EndianBinaryReader ptrReader = new EndianBinaryReader(ptrStream, l.IsLittleEndian)) {
+            using (EndianBinaryReader ptrReader = new EndianBinaryReader(ptrStream, Settings.s.IsLittleEndian)) {
                 uint num_ptrs = ptrReader.ReadUInt32();
                 for (uint j = 0; j < num_ptrs; j++) {
                     int file = ptrReader.ReadInt32();

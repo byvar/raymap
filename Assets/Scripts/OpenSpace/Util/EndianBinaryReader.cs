@@ -106,7 +106,11 @@ namespace OpenSpace {
         }
 
         uint getNextMask(uint currentMask) {
-            return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));
+            if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2IOS) {
+                return (uint)(16807 * ((currentMask ^ 0x75BD924u) % 0x1F31D) - 2836 * ((currentMask ^ 0x75BD924u) / 0x1F31D));
+            } else {
+                return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));
+            }
         }
 
         // Turn off masking for this binary reader

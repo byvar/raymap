@@ -52,10 +52,13 @@ namespace OpenSpace.FileFormat.Texture {
             }
         }*/
 
+        public GF(string filePath) : this(File.OpenRead(filePath)) { }
+
         public GF(Stream stream) {
+            MapLoader l = MapLoader.Loader;
             EndianBinaryReader r = new EndianBinaryReader(stream, isLittleEndian);
 
-            r.ReadInt32(); // Signature
+            if(l.mode != MapLoader.Mode.Rayman2IOS) r.ReadInt32(); // Signature
 
             width = r.ReadUInt32();
             height = r.ReadUInt32();
@@ -63,7 +66,7 @@ namespace OpenSpace.FileFormat.Texture {
 
             byte channels = r.ReadByte();
             byte enlargeByte = 0;
-            if(MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC) enlargeByte = r.ReadByte();
+            if (Settings.s.engineMode == Settings.EngineMode.R3) enlargeByte = r.ReadByte();
             uint w = width, h = height;
             if (enlargeByte > 0) channelPixels = 0;
             for (int i = 0; i < enlargeByte; i++) {

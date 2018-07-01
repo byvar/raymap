@@ -67,7 +67,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
             if (l.mode == MapLoader.Mode.RaymanArenaPC || l.mode == MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();

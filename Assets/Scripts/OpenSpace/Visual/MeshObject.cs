@@ -80,8 +80,7 @@ namespace OpenSpace.Visual {
             m.off_vertices = Pointer.Read(reader);
             m.off_normals = Pointer.Read(reader);
             m.off_blendWeights = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman3PC || l.mode == MapLoader.Mode.RaymanArenaPC ||
-                l.mode == MapLoader.Mode.Rayman3GC || l.mode == MapLoader.Mode.Rayman2PC) {
+            if (l.mode != MapLoader.Mode.RaymanArenaGC) {
                 reader.ReadInt32();
             }
             m.off_subblock_types = Pointer.Read(reader);
@@ -89,7 +88,7 @@ namespace OpenSpace.Visual {
             reader.ReadInt32();
             reader.ReadInt32();
             reader.ReadInt32();
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 reader.ReadInt32();
                 reader.ReadInt32();
             }
@@ -101,7 +100,7 @@ namespace OpenSpace.Visual {
             reader.ReadSingle();
             reader.ReadSingle();
             reader.ReadInt32();
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 reader.ReadInt32();
                 reader.ReadInt16();
             }

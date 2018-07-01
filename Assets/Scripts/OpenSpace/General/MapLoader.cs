@@ -23,7 +23,7 @@ namespace OpenSpace {
         public Material negativeLightProjectorMaterial;
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
-        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC };
+        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2IOS };
         public Mode mode = Mode.Rayman3PC;
 
         public ObjectType[][] objectTypes;
@@ -38,12 +38,8 @@ namespace OpenSpace {
 
         uint off_textures_start_fix = 0;
         bool hasTransit;
-        bool isLittleEndian = false;
         public bool HasTransit {
             get { return hasTransit; }
-        }
-        public bool IsLittleEndian {
-            get { return isLittleEndian; }
         }
 
         public List<SuperObject> superObjects = new List<SuperObject>();
@@ -71,6 +67,7 @@ namespace OpenSpace {
         string menuTPLPath;
 
         public Globals globals = null;
+        public Settings settings = null;
 
         public static class Mem {
             public const int Fix = 0;
@@ -99,48 +96,56 @@ namespace OpenSpace {
         
         public void Load() {
             try {
+                switch (mode) {
+                    case Mode.Rayman2IOS: settings = Settings.R2IOS; break;
+                    case Mode.Rayman2PC: settings = Settings.R2PC; break;
+                    case Mode.Rayman3GC: settings = Settings.R3GC; break;
+                    case Mode.Rayman3PC: settings = Settings.R3PC; break;
+                    case Mode.RaymanArenaGC: settings = Settings.RAGC; break;
+                    case Mode.RaymanArenaPC: settings = Settings.RAPC; break;
+                }
+                Settings.s = settings;
+
                 graphRoot = new GameObject("Graphs");
                 graphRoot.SetActive(false);
 
-                if (mode == Mode.RaymanArenaPC || mode == Mode.Rayman3PC || mode == Mode.Rayman2PC) {
-                    isLittleEndian = true;
-                }
                 if (gameDataBinFolder == null || !Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
-                if (mode == Mode.Rayman2PC) {
+                if (settings.engineMode == Settings.EngineMode.R2) {
                     hasTransit = false;
-                    string dataPath = Path.Combine(gameDataBinFolder, "levels0.dat");
-                    DAT dat = new DAT("levels0", dataPath);
+                    DAT dat = null;
+                    if (mode == Mode.Rayman2PC) {
+                        string dataPath = Path.Combine(gameDataBinFolder, "levels0.dat");
+                        dat = new DAT("levels0", dataPath);
+                    }
+                    
+                    /*DSB dsb = new DSB(lvlName, Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dsb"));
+                    DSB gameDsb = new DSB("Game", Path.Combine(gameDataBinFolder, "Game.dsb"));
+                    gameDsb.Save(Path.Combine(gameDataBinFolder, "Game_dec.data"));
+                    dsb.Dispose();
+                    gameDsb.Dispose();*/
 
                     string fixSnaPath = Path.Combine(gameDataBinFolder, "fix.sna");
-                    string fixRtbPath = Path.Combine(gameDataBinFolder, "fix.rtb");
-                    RelocationTable fixRtb = new RelocationTable(fixRtbPath);
+                    RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
                     SNA fixSna = new SNA("fix", fixSnaPath, fixRtb);
                     string fixGptPath = Path.Combine(gameDataBinFolder, "fix.gpt");
-                    string fixRtpPath = Path.Combine(gameDataBinFolder, "fix.rtp");
-                    RelocationTable fixRtp = new RelocationTable(fixRtpPath);
+                    RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
                     fixSna.ReadGPT(fixGptPath, fixRtp);
                     
                     string fixPtxPath = Path.Combine(gameDataBinFolder, "fix.ptx");
-                    string fixRttPath = Path.Combine(gameDataBinFolder, "fix.rtt");
-                    RelocationTable fixRtt = new RelocationTable(fixRttPath);
+                    RelocationTable fixRtt = new RelocationTable(fixPtxPath, dat, "fix", RelocationType.RTT);
                     fixSna.ReadPTX(fixPtxPath, fixRtt);
 
                     string lvlSnaPath = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".sna");
-                    RelocationTable lvlRtb = new RelocationTable(dat, lvlName, RelocationType.RTB);
+                    RelocationTable lvlRtb = new RelocationTable(lvlSnaPath, dat, lvlName, RelocationType.RTB);
                     SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
                     string lvlGptPath = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".gpt");
-                    RelocationTable lvlRtp = new RelocationTable(dat, lvlName, RelocationType.RTP);
+                    RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
                     lvlSna.ReadGPT(lvlGptPath, lvlRtp);
                     string lvlPtxPath = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".ptx");
-                    RelocationTable lvlRtt = new RelocationTable(dat, lvlName, RelocationType.RTT);
+                    RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
                     lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
-
-                    /*DSB dsb = new DSB(lvlName, Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dsb"));
-                    DSB gameDsb = new DSB("Game", Path.Combine(gameDataBinFolder, "Game.dsb"));
-                    dsb.Dispose();
-                    gameDsb.Dispose();*/
 
 
                     fixSna.CreatePointers();
@@ -153,19 +158,21 @@ namespace OpenSpace {
                     fixSna.CreateMemoryDump(Path.Combine(gameDataBinFolder, "fix.dmp"), true);
                     lvlSna.CreateMemoryDump(Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dmp"), true);
 
-                    cntPaths = new string[2];
-                    cntPaths[0] = Path.Combine(gameDataBinFolder, "Vignette.cnt");
-                    cntPaths[1] = Path.Combine(gameDataBinFolder, "Textures.cnt");
-                    cnt = new CNT(cntPaths);
+                    if (mode != Mode.Rayman2IOS) {
+                        cntPaths = new string[2];
+                        cntPaths[0] = Path.Combine(gameDataBinFolder, "Vignette.cnt");
+                        cntPaths[1] = Path.Combine(gameDataBinFolder, "Textures.cnt");
+                        cnt = new CNT(cntPaths);
+                    }
 
                     LoadFIXSNA();
                     LoadLVLSNA();
 
                     fixSna.Dispose();
                     lvlSna.Dispose();
-                    dat.Dispose();
+                    if(dat != null) dat.Dispose();
 
-                } else {
+                } else if (settings.engineMode == Settings.EngineMode.R3) {
                     
                     menuTPLPath = Path.Combine(gameDataBinFolder, "menu.tpl");
                     lvlNames[0] = "fix";
@@ -266,7 +273,7 @@ namespace OpenSpace {
                 for (int i = 0; i < 3; i++) {
                     if (File.Exists(lvlPaths[i]) && File.Exists(ptrPaths[i])) {
                         FileStream stream = new FileStream(lvlPaths[i], FileMode.Open);
-                        files_array[i].writer = new EndianBinaryWriter(stream, isLittleEndian);
+                        files_array[i].writer = new EndianBinaryWriter(stream, settings.IsLittleEndian);
                     }
                 }
                 // Save changes
@@ -791,14 +798,19 @@ namespace OpenSpace {
         void LoadFIXSNA() {
             files_array[Mem.Fix].GotoHeader();
             EndianBinaryReader reader = files_array[Mem.Fix].reader;
+            print("FIX GPT offset: " + Pointer.Current(reader));
             Pointer off_identityMatrix = Pointer.Read(reader);
-            reader.ReadBytes(0xC8);
+            reader.ReadBytes(50 * 4);
             uint matrixInStack = reader.ReadUInt32();
             Pointer off_collisionGeoObj = Pointer.Read(reader);
             Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
             reader.ReadBytes(0xAC); // 3DOS_EntryActions
-            Pointer dword_50A980 = Pointer.Read(reader);
-            reader.ReadBytes(0xB20); // IPT_g_hInputStructure
+            Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+            if (mode == Mode.Rayman2IOS) {
+                reader.ReadBytes(0x2BC); // IPT_g_hInputStructure
+            } else {
+                reader.ReadBytes(0xB20); // IPT_g_hInputStructure
+            }
             Pointer off_IPT_entryElementList = Pointer.Read(reader);
             reader.ReadBytes(0x14); // FON_g_stGeneral
             Pointer off_current = Pointer.Current(reader);
@@ -823,8 +835,16 @@ namespace OpenSpace {
             }
             for (int i = 0; i < num_textures; i++) {
                 if (textures[i] != null) {
-                    GF gf = cnt.GetGFByTGAName(textures[i].name);
-                    if (gf != null) textures[i].texture = gf.GetTexture();
+                    if (mode == Mode.Rayman2IOS) {
+                        string texturePath = Path.ChangeExtension(Path.Combine(gameDataBinFolder, "../graphics/textures/" + textures[i].name), ".gf");
+                        if (File.Exists(texturePath)) {
+                            GF gf = new GF(texturePath);
+                            if (gf != null) textures[i].texture = gf.GetTexture();
+                        }
+                    } else {
+                        GF gf = cnt.GetGFByTGAName(textures[i].name);
+                        if (gf != null) textures[i].texture = gf.GetTexture();
+                    }
                 }
             }
             /*uint num_texturesToCreate = reader.ReadUInt32();
@@ -844,7 +864,7 @@ namespace OpenSpace {
             // First read GPT
             files_array[Mem.Lvl].GotoHeader();
             reader = files_array[Mem.Lvl].reader;
-            print("Offset: " + Pointer.Current(reader));
+            print("LVL GPT offset: " + Pointer.Current(reader));
 
             // Fill in fix -> lvl pointers for perso's in fix
             uint num_persoInFixPointers = reader.ReadUInt32();
@@ -915,7 +935,7 @@ namespace OpenSpace {
 
             Pointer dword_4A6B1C_always_header = Pointer.Read(reader);
             Pointer dword_4A6B20_always_last = Pointer.Read(reader);
-            print("Current: " + Pointer.Current(reader));
+
             Pointer v28 = Pointer.Read(reader);
             Pointer v31 = Pointer.Read(reader);
             Pointer v32 = Pointer.Read(reader);
@@ -941,8 +961,7 @@ namespace OpenSpace {
                 FillLinkedListPointers(reader, off_names_last, off_names_header);
                 ReadObjectNamesTable(reader, off_names_first, num_names, i);
             }
-
-            print("Offset after name table: " + Pointer.Current(reader));
+            
             // Begin of engineStructure
             reader.ReadByte();
             string mapName = new string(reader.ReadChars(0x1E)).TrimEnd('\0');
@@ -954,7 +973,7 @@ namespace OpenSpace {
             Pointer off_unknown_first = Pointer.Read(reader);
             Pointer off_unknown_last = Pointer.Read(reader);
             uint num_unknown = reader.ReadUInt32();
-
+            
             globals.off_familiesTable_first = Pointer.Read(reader);
             globals.off_familiesTable_last = Pointer.Read(reader);
             globals.num_familiesTable_entries = reader.ReadUInt32();
@@ -969,7 +988,7 @@ namespace OpenSpace {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-
+            
             for (uint i = 0; i < 2; i++) {
                 Pointer off_matrix = Pointer.Current(reader);
                 Matrix mat = Matrix.Read(reader, off_matrix);
@@ -1025,7 +1044,7 @@ namespace OpenSpace {
 
             ((SNA)files_array[0]).CreateMemoryDump(Path.Combine(gameDataBinFolder, "fix.dmp"), true);
             ((SNA)files_array[1]).CreateMemoryDump(Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dmp"), true);
-            print("Cur offset: " + Pointer.Current(reader));
+
 
             // Read PTX
             ((SNA)files_array[Mem.Lvl]).GotoPTX();
@@ -1049,8 +1068,16 @@ namespace OpenSpace {
             uint currentMemoryChannel = reader.ReadUInt32();
             for (uint i = num_textures_fix; i < num_textures_total; i++) {
                 if (textures[i] != null) {
-                    GF gf = cnt.GetGFByTGAName(textures[i].name);
-                    if (gf != null) textures[i].texture = gf.GetTexture();
+                    if (mode == Mode.Rayman2IOS) {
+                        string texturePath = Path.ChangeExtension(Path.Combine(gameDataBinFolder, "../graphics/textures/" + textures[i].name), ".gf");
+                        if (File.Exists(texturePath)) {
+                            GF gf = new GF(texturePath);
+                            if (gf != null) textures[i].texture = gf.GetTexture();
+                        }
+                    } else {
+                        GF gf = cnt.GetGFByTGAName(textures[i].name);
+                        if (gf != null) textures[i].texture = gf.GetTexture();
+                    }
                 }
                 /*uint file_texture = reader.ReadUInt32();
                 if (file_texture == 0xC0DE0005) {
@@ -1074,14 +1101,7 @@ namespace OpenSpace {
             ReadAlways(reader);
         }
         #endregion
-
-        Texture2D CreateDummyTexture() {
-            Texture2D texture = new Texture2D(1, 1);
-            texture.SetPixel(0, 0, UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f, 1f, 1f));
-            texture.Apply();
-            return texture;
-        }
-
+        
         public void print(string str) {
             MonoBehaviour.print(str);
         }

@@ -40,7 +40,7 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             State s = new State(offset, family);
             l.states.Add(s);
-            if (l.mode == MapLoader.Mode.Rayman3GC) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
+            if (Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
             if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_next = Pointer.Read(reader);
             if (l.mode == MapLoader.Mode.Rayman3GC) {
                 s.off_state_prev = Pointer.Read(reader);
@@ -48,14 +48,14 @@ namespace OpenSpace {
             }
             s.off_anim_ref = Pointer.Read(reader);
             s.off_state_transitions_first = Pointer.Read(reader);
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_transitions_last = Pointer.Read(reader); // same?
+            if (Settings.s.linkedListType == Settings.LinkedListType.Double) s.off_state_transitions_last = Pointer.Read(reader); // same?
             s.num_state_transitions = reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
             if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
             s.off_state_auto = Pointer.Read(reader);
             Pointer.Read(reader); // fam end?
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 s.off_cine_mapname = Pointer.Read(reader);
                 s.off_cine_name = Pointer.Read(reader);
             }
@@ -63,7 +63,7 @@ namespace OpenSpace {
             s.speed = reader.ReadByte();
             reader.ReadByte();
             reader.ReadByte();
-            if (l.mode == MapLoader.Mode.Rayman2PC) reader.ReadUInt32();
+            if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32();
 
             if (s.off_cine_mapname != null) {
                 Pointer.Goto(ref reader, s.off_cine_mapname);

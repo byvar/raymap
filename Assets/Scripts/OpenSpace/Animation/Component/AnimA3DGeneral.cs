@@ -57,7 +57,7 @@ namespace OpenSpace.Animation.Component {
         public static AnimA3DGeneral Read(EndianBinaryReader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             AnimA3DGeneral a3d = new AnimA3DGeneral(offset);
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 /* Each a3d is 0x38 long */
                 a3d.unk_0 = reader.ReadUInt16();
                 a3d.num_vectors = reader.ReadUInt16();

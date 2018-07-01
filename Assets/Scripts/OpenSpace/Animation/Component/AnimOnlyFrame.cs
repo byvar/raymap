@@ -23,7 +23,7 @@ namespace OpenSpace.Animation.Component {
             of.vector = reader.ReadUInt16();
             of.num_hierarchies_for_frame = reader.ReadUInt16();
             of.start_hierarchies_for_frame = reader.ReadUInt16();
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 of.unk8 = reader.ReadUInt16();
                 of.deformation = reader.ReadUInt16();
             }

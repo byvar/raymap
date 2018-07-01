@@ -119,7 +119,7 @@ namespace OpenSpace.Visual {
                     s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                     s.sprites[i].centerPoint = reader.ReadUInt16();
                     reader.ReadUInt16();
-                    if (l.mode == MapLoader.Mode.Rayman2PC) reader.ReadUInt32();
+                    if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32();
 
                     if (s.sprites[i].off_info != null) {
                         Pointer off_current = Pointer.Goto(ref reader, s.sprites[i].off_info);
@@ -144,7 +144,7 @@ namespace OpenSpace.Visual {
                         if (s.sprites[i].off_material_pointer != null) {
                             off_current = Pointer.Goto(ref reader, s.sprites[i].off_material_pointer);
                             s.sprites[i].off_material = Pointer.Read(reader);
-                            if (l.mode == MapLoader.Mode.Rayman2PC && s.sprites[i].off_material != null) {
+                            if (Settings.s.engineMode == Settings.EngineMode.R2 && s.sprites[i].off_material != null) {
                                 Pointer.Goto(ref reader, s.sprites[i].off_material);
                                 s.sprites[i].off_material = Pointer.Read(reader);
                             }

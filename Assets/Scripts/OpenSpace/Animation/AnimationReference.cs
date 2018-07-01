@@ -32,7 +32,7 @@ namespace OpenSpace.Animation {
             ar.field0_of_a3d = reader.ReadByte();
             ar.num_channels = reader.ReadByte();
             ar.off_events = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 ar.x = reader.ReadSingle();
                 ar.y = reader.ReadSingle();
                 ar.z = reader.ReadSingle();
@@ -41,7 +41,7 @@ namespace OpenSpace.Animation {
             ar.anim_index = reader.ReadUInt16();
             ar.num_events = reader.ReadByte();
             ar.transition = reader.ReadByte();
-            if (l.mode == MapLoader.Mode.Rayman2PC) reader.ReadUInt32(); // no idea what this is sadly
+            if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32(); // no idea what this is sadly
             return ar;
         }
     }

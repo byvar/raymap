@@ -23,7 +23,7 @@ namespace OpenSpace {
 
         public bool IsTransparent {
             get {
-                if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
+                if (Settings.s.engineMode == Settings.EngineMode.R2) {
                     return (flags & (1 << 1)) != 0;
                 } else {
                     return (flags & flags_isTransparent) != 0;
@@ -47,7 +47,7 @@ namespace OpenSpace {
             reader.ReadUInt32();
             tex.flags = reader.ReadUInt32();
             reader.ReadBytes(0x2E);
-            if (MapLoader.Loader.mode != MapLoader.Mode.Rayman2PC) tex.flags2 = reader.ReadUInt32(); // contains flags such as tiling mode
+            if (Settings.s.engineMode == Settings.EngineMode.R3) tex.flags2 = reader.ReadUInt32(); // contains flags such as tiling mode
             tex.name = reader.ReadNullDelimitedString();
             return tex;
         }

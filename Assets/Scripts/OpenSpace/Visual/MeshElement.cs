@@ -270,7 +270,7 @@ namespace OpenSpace.Visual {
             sm.name = "Submesh @ pos " + offset;
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 sm.r3mat = VisualMaterial.FromOffset(sm.off_material);
             } else {
                 Pointer off_current = Pointer.Goto(ref reader, sm.off_material);
@@ -286,7 +286,7 @@ namespace OpenSpace.Visual {
             }
             sm.num_disconnected_triangles_spe = reader.ReadUInt16();
             sm.num_uvs = reader.ReadUInt16();
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 sm.num_uvMaps = reader.ReadUInt16();
                 reader.ReadUInt16();
             }
@@ -295,7 +295,7 @@ namespace OpenSpace.Visual {
             sm.off_mapping_uvs_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
             sm.off_weights_spe = Pointer.Read(reader); // 1 entry = 3 floats
             sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
             }
@@ -303,7 +303,7 @@ namespace OpenSpace.Visual {
             sm.num_vertex_indices = reader.ReadUInt16();
             reader.ReadInt16();
             reader.ReadUInt32();
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 reader.ReadUInt16();
                 sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
                 sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)

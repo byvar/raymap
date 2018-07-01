@@ -179,7 +179,7 @@ namespace OpenSpace {
             UInt32 type = reader.ReadUInt32(); // 0x02: always at the start of a transformation matrix
             Matrix4x4 transMatrix = new Matrix4x4();
             Vector4 vec;
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 transMatrix.SetColumn(3, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f));
                 Vector4 colX1 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);
                 Vector4 colY1 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);

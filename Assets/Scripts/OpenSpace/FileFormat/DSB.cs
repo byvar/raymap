@@ -13,12 +13,15 @@ namespace OpenSpace.FileFormat {
             baseOffset = 0;
             headerOffset = 0;
             this.name = name;
-            using (EndianBinaryReader encodedReader = new EndianBinaryReader(stream, MapLoader.Loader.IsLittleEndian)) {
+            using (EndianBinaryReader encodedReader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian)) {
                 encodedReader.ReadMask();
                 data = encodedReader.ReadBytes((int)stream.Length - 4);
             }
-            //Util.ByteArrayToFile(name + "_dsb.data", data);
-            reader = new EndianBinaryReader(new MemoryStream(data), MapLoader.Loader.IsLittleEndian);
+            reader = new EndianBinaryReader(new MemoryStream(data), Settings.s.IsLittleEndian);
+        }
+
+        public void Save(string path) {
+            Util.ByteArrayToFile(path, data);
         }
     }
 }

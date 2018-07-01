@@ -30,7 +30,7 @@ namespace OpenSpace.AI {
             d.initType = reader.ReadUInt32();
 
             d.type = DsgVarType.None;
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 if (d.typeNumber >= 0 && d.typeNumber < R2AITypes.dsgVarTypeTable.Count) d.type = R2AITypes.dsgVarTypeTable[(int)d.typeNumber];
             } else {
                 if (d.typeNumber >= 0 && d.typeNumber < R3AITypes.dsgVarTypeTable.Count) d.type = R3AITypes.dsgVarTypeTable[(int)d.typeNumber];

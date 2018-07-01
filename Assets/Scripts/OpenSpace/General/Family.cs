@@ -61,14 +61,14 @@ namespace OpenSpace {
             f.off_states_first = Pointer.Read(reader);
             if (l.mode != MapLoader.Mode.RaymanArenaGC) f.off_states_last = Pointer.Read(reader);
             f.num_states = reader.ReadUInt32();
-            if (l.mode != MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 f.off_preloadAnim_first = Pointer.Read(reader); // (0x10 blocks: next, prev, list end, a3d pointer)
-                if (l.mode != MapLoader.Mode.RaymanArenaGC) f.off_preloadAnim_last = Pointer.Read(reader);
+                if (Settings.s.linkedListType == Settings.LinkedListType.Double) f.off_preloadAnim_last = Pointer.Read(reader);
                 f.num_preloadAnim = reader.ReadUInt32();
             }
             f.off_physical_list_default = Pointer.Read(reader); // Default objects table
             f.off_physical_list_first = Pointer.Read(reader);                       // first physical list
-            if(l.mode != MapLoader.Mode.RaymanArenaGC) f.off_physical_list_last = Pointer.Read(reader); // last physical list
+            if (Settings.s.linkedListType == Settings.LinkedListType.Double) f.off_physical_list_last = Pointer.Read(reader); // last physical list
             f.num_physical_lists = reader.ReadUInt32();
             if (f.off_physical_list_first == f.off_physical_list_last && f.num_physical_lists > 1) f.num_physical_lists = 1; // Correction for Rayman 2
             f.off_bounding_volume = Pointer.Read(reader);
@@ -77,7 +77,7 @@ namespace OpenSpace {
                 f.num_vector4s = reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-            if (l.mode == MapLoader.Mode.Rayman2PC) {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 reader.ReadUInt32();
                 f.animBank = reader.ReadByte();
                 reader.ReadByte();

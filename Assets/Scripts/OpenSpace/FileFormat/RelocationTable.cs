@@ -46,15 +46,45 @@ namespace OpenSpace.FileFormat {
 
         bool isLittleEndian = true;
 
+        // Use this to automatically decide whether to load it from RT* file or from DAT
+        public RelocationTable(string path, DAT dat, string name, RelocationType type) {
+            string newPath = path;
+            switch (type) {
+                case RelocationType.RTB:
+                    newPath = Path.ChangeExtension(path, "rtb"); break;
+                case RelocationType.RTP:
+                    newPath = Path.ChangeExtension(path, "rtp"); break;
+                case RelocationType.RTS:
+                    newPath = Path.ChangeExtension(path, "rts"); break;
+                case RelocationType.RTT:
+                    newPath = Path.ChangeExtension(path, "rtt"); break;
+                case RelocationType.RTL:
+                    newPath = Path.ChangeExtension(path, "rtl"); break;
+            }
+            if (File.Exists(newPath)) {
+                Load(File.OpenRead(newPath), false);
+            } else {
+                Load(dat, name, type);
+            }
+        }
+
         public RelocationTable(string path) : this(File.OpenRead(path)) { }
 
         public RelocationTable(Stream stream, bool masking = false) {
+            Load(stream, masking);
+        }
+
+        public RelocationTable(DAT dat, string name, RelocationType type) {
+            Load(dat, name, type);
+        }
+
+        private void Load(Stream stream, bool masking) {
             using (EndianBinaryReader reader = new EndianBinaryReader(stream, isLittleEndian)) {
                 Read(reader);
             }
         }
 
-        public RelocationTable(DAT dat, string name, RelocationType type) {
+        private void Load(DAT dat, string name, RelocationType type) {
             EndianBinaryReader reader = dat.reader;
             int levelIndex = 0;
             string[] levelList = DAT.levelList;
@@ -94,6 +124,10 @@ namespace OpenSpace.FileFormat {
             reader.ReadUInt32();
             pointerBlocks = new RelocationPointerList[count];
             for (int i = 0; i < count; i++) {
+                if (reader.BaseStream.Position >= reader.BaseStream.Length) {
+                    Array.Resize(ref pointerBlocks, i);
+                    break;
+                }
                 // A pointer list contains pointers located in SNA part with matching module & block
                 pointerBlocks[i] = new RelocationPointerList();
                 pointerBlocks[i].module = reader.ReadByte();
@@ -108,9 +142,6 @@ namespace OpenSpace.FileFormat {
                     // The part's baseInMemory should be subtracted from it to get the offset relative to the part.
                     pointerBlocks[i].pointers[j] = new RelocationPointerInfo();
                     pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
-                    if (pointerBlocks[i].pointers[j].offsetInMemory == 1824756 || pointerBlocks[i].pointers[j].offsetInMemory == 1824748) {
-                        l.print("Found! It's (" + pointerBlocks[i].module + "," + pointerBlocks[i].id + ")");
-                    }
                     pointerBlocks[i].pointers[j].module = reader.ReadByte();
                     pointerBlocks[i].pointers[j].id = reader.ReadByte();
                     pointerBlocks[i].pointers[j].byte6 = reader.ReadByte();
