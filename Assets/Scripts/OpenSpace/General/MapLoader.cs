@@ -23,7 +23,7 @@ namespace OpenSpace {
         public Material negativeLightProjectorMaterial;
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
-        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2IOS };
+        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2PCDemo, Rayman2IOS, DonaldPC };
         public Mode mode = Mode.Rayman3PC;
 
         public ObjectType[][] objectTypes;
@@ -99,10 +99,12 @@ namespace OpenSpace {
                 switch (mode) {
                     case Mode.Rayman2IOS: settings = Settings.R2IOS; break;
                     case Mode.Rayman2PC: settings = Settings.R2PC; break;
+                    case Mode.Rayman2PCDemo: settings = Settings.R2PCDemo; break;
                     case Mode.Rayman3GC: settings = Settings.R3GC; break;
                     case Mode.Rayman3PC: settings = Settings.R3PC; break;
                     case Mode.RaymanArenaGC: settings = Settings.RAGC; break;
                     case Mode.RaymanArenaPC: settings = Settings.RAPC; break;
+                    case Mode.DonaldPC: settings = Settings.DonaldPC; break;
                 }
                 Settings.s = settings;
 
@@ -115,9 +117,11 @@ namespace OpenSpace {
                 if (settings.engineMode == Settings.EngineMode.R2) {
                     hasTransit = false;
                     DAT dat = null;
-                    if (mode == Mode.Rayman2PC) {
+                    if (mode == Mode.Rayman2PC || mode == Mode.DonaldPC) {
                         string dataPath = Path.Combine(gameDataBinFolder, "levels0.dat");
-                        dat = new DAT("levels0", dataPath);
+                        if (File.Exists(dataPath)) {
+                            dat = new DAT("levels0", dataPath);
+                        }
                     }
                     
                     /*DSB dsb = new DSB(lvlName, Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dsb"));
@@ -159,10 +163,16 @@ namespace OpenSpace {
                     lvlSna.CreateMemoryDump(Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dmp"), true);
 
                     if (mode != Mode.Rayman2IOS) {
-                        cntPaths = new string[2];
-                        cntPaths[0] = Path.Combine(gameDataBinFolder, "Vignette.cnt");
-                        cntPaths[1] = Path.Combine(gameDataBinFolder, "Textures.cnt");
-                        cnt = new CNT(cntPaths);
+                        if (!settings.isR2Demo) { // Normal Game
+                            cntPaths = new string[2];
+                            cntPaths[0] = Path.Combine(gameDataBinFolder, "Vignette.cnt");
+                            cntPaths[1] = Path.Combine(gameDataBinFolder, "Textures.cnt");
+                            cnt = new CNT(cntPaths);
+                        } else { // R2 Demo
+                            cntPaths = new string[1];
+                            cntPaths[0] = Path.Combine(gameDataBinFolder, "Textures.cnt");
+                            cnt = new CNT(cntPaths);
+                        }
                     }
 
                     LoadFIXSNA();
@@ -804,8 +814,13 @@ namespace OpenSpace {
             uint matrixInStack = reader.ReadUInt32();
             Pointer off_collisionGeoObj = Pointer.Read(reader);
             Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
-            reader.ReadBytes(0xAC); // 3DOS_EntryActions
+            if (!settings.isR2Demo) {
+                reader.ReadBytes(0xAC); // 3DOS_EntryActions
+            } else {
+                reader.ReadBytes(0x1C); // 3DOS_EntryActions
+            }
             Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+
             if (mode == Mode.Rayman2IOS) {
                 reader.ReadBytes(0x2BC); // IPT_g_hInputStructure
             } else {
@@ -1023,20 +1038,48 @@ namespace OpenSpace {
             reader.ReadUInt16();
             reader.ReadUInt32();
             reader.ReadUInt32();
+
+            if (settings.isR2Demo) {
+                reader.ReadUInt32();
+            }
+
             // End of engineStructure
             Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
+            print("Light at " + off_light);
+
+            if (settings.isR2Demo) {
+                Pointer off_unknown = Pointer.Read(reader);
+                print("Unknown pointer at " + off_unknown);
+            }
+
             Pointer off_mainChar = Pointer.Read(reader); // superobject
-            Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
+            print("MainChar at " + off_mainChar);
+            if (!settings.isR2Demo) {
+                Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
+                print("CharacterLaunchingSoundEvents" + off_characterLaunchingSoundEvents);
+            }
             Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
+            print("ShadowPolygonVisualMaterial" + off_shadowPolygonVisualMaterial);
             Pointer off_shadowPolygonGameMaterialInit = Pointer.Read(reader);
+            print("ShadowPolygonGameMaterialInit" + off_shadowPolygonGameMaterialInit);
             Pointer off_shadowPolygonGameMaterial = Pointer.Read(reader);
+            print("ShadowPolygonGameMaterial" + off_shadowPolygonGameMaterial);
             Pointer off_textureOfTextureShadow = Pointer.Read(reader);
+            print("off_textureOfTextureShadow" + off_textureOfTextureShadow);
             Pointer off_col_taggedFacesTable = Pointer.Read(reader);
+            print("off_col_taggedFacesTable" + off_col_taggedFacesTable);
+
+            Pointer off_tmp;
             for (int i = 0; i < 10; i++) {
-                Pointer.Read(reader);
-                Pointer.Read(reader);
+                off_tmp = Pointer.Read(reader);
+                print("tmp " + i + " A " + off_tmp);
+                off_tmp = Pointer.Read(reader);
+                print("tmp " + i + " B " + off_tmp);
             }
             Pointer.Read(reader);
+            if (settings.isR2Demo) {
+                Pointer.Read(reader);
+            }
             off_current = Pointer.Current(reader);
             AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.LvlKeyFrames], append: true);
             animationBanks[1] = animationBanks[0];

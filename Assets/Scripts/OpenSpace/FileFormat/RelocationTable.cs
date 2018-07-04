@@ -88,6 +88,10 @@ namespace OpenSpace.FileFormat {
             EndianBinaryReader reader = dat.reader;
             int levelIndex = 0;
             string[] levelList = DAT.levelList;
+            if (MapLoader.Loader.settings.isDonald) {
+                levelList = DAT.levelListDonaldDuck;
+            }
+
             for (int i = 0; i < levelList.Length; i++) {
                 if (levelList[i].ToLower().Equals(name.ToLower())) {
                     levelIndex = i;
@@ -121,7 +125,9 @@ namespace OpenSpace.FileFormat {
             MapLoader l = MapLoader.Loader;
 
             byte count = reader.ReadByte();
-            reader.ReadUInt32();
+            if (!MapLoader.Loader.settings.isR2Demo) {
+                reader.ReadUInt32();
+            }
             pointerBlocks = new RelocationPointerList[count];
             for (int i = 0; i < count; i++) {
                 if (reader.BaseStream.Position >= reader.BaseStream.Length) {

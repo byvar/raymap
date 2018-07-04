@@ -66,29 +66,31 @@ namespace OpenSpace.Animation {
             MapLoader l = MapLoader.Loader;
             AnimationBank[] banks = new AnimationBank[num_banks];
 
+            l.print("A");
             for (int i = 0; i < num_banks; i++) {
                 // In R3, each animation bank is of size 0x104 = 13 times a stack description of 5 uint32s.
                 banks[i] = new AnimationBank(Pointer.Current(reader));
-                banks[i].a3d_general = AnimationStack.Read(reader);
-                banks[i].vectors = AnimationStack.Read(reader);
-                banks[i].quaternions = AnimationStack.Read(reader);
-                banks[i].hierarchies = AnimationStack.Read(reader);
-                banks[i].NTTO = AnimationStack.Read(reader);
-                banks[i].onlyFrames = AnimationStack.Read(reader);
-                banks[i].channels = AnimationStack.Read(reader);
-                banks[i].framesNumOfNTTO = AnimationStack.Read(reader);
-                banks[i].framesKFIndex = AnimationStack.Read(reader);
-                banks[i].keyframes = AnimationStack.Read(reader);
-                banks[i].events = AnimationStack.Read(reader);
-                banks[i].morphData = AnimationStack.Read(reader);
+                banks[i].a3d_general = AnimationStack.Read(reader, "a3d_general");
+                banks[i].vectors = AnimationStack.Read(reader, "vectors");
+                banks[i].quaternions = AnimationStack.Read(reader, "quaternions");
+                banks[i].hierarchies = AnimationStack.Read(reader, "hierarchies");
+                banks[i].NTTO = AnimationStack.Read(reader, "NTTO");
+                banks[i].onlyFrames = AnimationStack.Read(reader, "OnlyFrames");
+                banks[i].channels = AnimationStack.Read(reader, "Channels");
+                banks[i].framesNumOfNTTO = AnimationStack.Read(reader, "FramesNumOfNTTO");
+                banks[i].framesKFIndex = AnimationStack.Read(reader, "FramesKFIndex");
+                banks[i].keyframes = AnimationStack.Read(reader, "KeyFrames");
+                banks[i].events = AnimationStack.Read(reader, "Events");
+                banks[i].morphData = AnimationStack.Read(reader, "MorphData");
                 if (Settings.s.hasDeformations) {
-                    banks[i].deformations = AnimationStack.Read(reader);
+                    banks[i].deformations = AnimationStack.Read(reader, "Deformations");
                 } else {
                     banks[i].deformations = null;
                 }
                 banks[i].animations = new AnimA3DGeneral[banks[i].a3d_general.count];
             }
             if (l.mode != MapLoader.Mode.Rayman3GC && !append) {
+                l.print("B");
                 for (int i = 0; i < num_banks; i++) {
                     if (banks[i].a3d_general.reservedMemory > 0) banks[i].a3d_general.off_data = Pointer.Read(reader);
                     if (banks[i].vectors.reservedMemory > 0) banks[i].vectors.off_data = Pointer.Read(reader);
@@ -112,6 +114,7 @@ namespace OpenSpace.Animation {
             Pointer off_current = Pointer.Current(reader);
             Pointer off_a3d = null;
             uint num_a3d = (uint)banks.Sum(b => b.a3d_general.count);
+            l.print("C");
             if (kfFile != null && l.mode == MapLoader.Mode.Rayman3GC) {
                 kfFile.GotoHeader();
                 reader = kfFile.reader;
@@ -168,6 +171,7 @@ namespace OpenSpace.Animation {
                     }
                 }
             } else if (l.mode != MapLoader.Mode.Rayman3GC) {
+                l.print("D");
                 for (uint i = 0; i < banks.Length; i++) {
                     banks[i].animations = new AnimA3DGeneral[banks[i].a3d_general.Count(append)];
                     banks[i].global_vectors = new AnimVector[banks[i].vectors.Count(append)];
@@ -185,7 +189,13 @@ namespace OpenSpace.Animation {
                     if (banks[i].animations.Length > 0) {
                         if (banks[i].a3d_general.off_data != null) Pointer.Goto(ref reader, banks[i].a3d_general.off_data);
                         for (uint j = 0; j < banks[i].animations.Length; j++) banks[i].animations[j] = AnimA3DGeneral.Read(reader, Pointer.Current(reader));
-                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(56 * banks[i].animations.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                            if (Settings.s.isR2Demo) {
+                                reader.Align(52 * banks[i].animations.Length, 4);
+                            } else {
+                                reader.Align(56 * banks[i].animations.Length, 4);
+                            }
+                        }
                     }
                     if (banks[i].global_vectors.Length > 0) {
                         if(banks[i].vectors.off_data != null) Pointer.Goto(ref reader, banks[i].vectors.off_data);
@@ -225,7 +235,13 @@ namespace OpenSpace.Animation {
                     if (banks[i].global_framesKFIndex.Length > 0) {
                         if (banks[i].framesKFIndex.off_data != null) Pointer.Goto(ref reader, banks[i].framesKFIndex.off_data);
                         for (uint j = 0; j < banks[i].global_framesKFIndex.Length; j++) banks[i].global_framesKFIndex[j] = AnimFramesKFIndex.Read(reader);
-                        if (Settings.s.engineMode == Settings.EngineMode.R2) reader.Align(4 * banks[i].global_framesKFIndex.Length, 4);
+                        if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                            if (Settings.s.isR2Demo) {
+                                reader.Align(2 * banks[i].global_framesKFIndex.Length, 4);
+                            } else {
+                                reader.Align(4 * banks[i].global_framesKFIndex.Length, 4);
+                            }
+                        }
                     }
                     if (banks[i].global_keyframes.Length > 0) {
                         if (banks[i].keyframes.off_data != null) Pointer.Goto(ref reader, banks[i].keyframes.off_data);
