@@ -28,6 +28,11 @@ namespace OpenSpace.FileFormat {
             "Boat01", "Boat02", "Astro_00", "Astro_10", "Rhop_10", "end_10", "staff_10",
             "poloc_10", "poloc_20", "poloc_30", "poloc_40", "Raycap"
         };
+
+        public static string[] levelListDonaldDuck = {
+            "Brush", "City_2_b","City_boss","City_chase","Credits","edge","Forest_1_B","Forest_Boss","Forest_chase","Haunted_3_1","Haunted_3_2","Haunted_3_3","Haunted_3_4","Haunted_3_B","Haunted_3_boss","Inca_4_1","Inca_4_2","Inca_4_3","Inca_4_4","Inca_4_b","MapMonde","Menu","Roof","sidewalk","TheHike","Trail"
+        };
+
         public DAT(string name, string path) : this(name, File.OpenRead(path)) { }
 
         public DAT(string name, Stream stream) {

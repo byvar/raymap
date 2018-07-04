@@ -16,6 +16,8 @@ namespace OpenSpace {
         public LinkedListType linkedListType;
         public bool hasNames = false;
         public bool hasDeformations = false;
+        public bool isR2Demo = false;
+        public bool isDonald = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -60,7 +62,16 @@ namespace OpenSpace {
             engineMode = EngineMode.R2,
             platform = Platform.PC,
             endian = Endian.Little,
-            linkedListType = LinkedListType.Double
+            linkedListType = LinkedListType.Double,
+        };
+
+        public static Settings R2PCDemo = new Settings()
+        {
+            engineMode = EngineMode.R2,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            isR2Demo = true
         };
 
         public static Settings R2IOS = new Settings() {
@@ -68,6 +79,15 @@ namespace OpenSpace {
             platform = Platform.iOS,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double
+        };
+
+        public static Settings DonaldPC = new Settings()
+        {
+            engineMode = EngineMode.R2,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            isDonald = true
         };
     }
 }
