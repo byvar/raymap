@@ -81,6 +81,7 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, po.off_visualSet);
                 reader.ReadUInt32(); // 0
                 ushort numberOfLOD = reader.ReadUInt16();
+                if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
                 ushort type = reader.ReadUInt16();
                 for (uint i = 0; i < numberOfLOD; i++) {
                     // if distance > the float at this offset, game engine uses next LOD if there is one
