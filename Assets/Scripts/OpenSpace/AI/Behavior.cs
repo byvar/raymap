@@ -21,9 +21,10 @@ namespace OpenSpace.AI {
         public static Behavior Read(EndianBinaryReader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             Behavior entry = new Behavior(offset);
-            if (l.mode == MapLoader.Mode.Rayman3GC) entry.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
+            if (Settings.s.hasNames) entry.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
             entry.off_scripts = Pointer.Read(reader);
             entry.unknown = reader.ReadUInt32();
+            if(Settings.s.isR2Demo) reader.ReadUInt32();
             entry.num_scripts = reader.ReadByte();
             reader.ReadByte();
             reader.ReadByte();

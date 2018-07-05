@@ -1045,41 +1045,27 @@ namespace OpenSpace {
 
             // End of engineStructure
             Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
-            print("Light at " + off_light);
 
             if (settings.isR2Demo) {
                 Pointer off_unknown = Pointer.Read(reader);
-                print("Unknown pointer at " + off_unknown);
             }
 
             Pointer off_mainChar = Pointer.Read(reader); // superobject
-            print("MainChar at " + off_mainChar);
             if (!settings.isR2Demo) {
                 Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
-                print("CharacterLaunchingSoundEvents" + off_characterLaunchingSoundEvents);
             }
             Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
-            print("ShadowPolygonVisualMaterial" + off_shadowPolygonVisualMaterial);
             Pointer off_shadowPolygonGameMaterialInit = Pointer.Read(reader);
-            print("ShadowPolygonGameMaterialInit" + off_shadowPolygonGameMaterialInit);
             Pointer off_shadowPolygonGameMaterial = Pointer.Read(reader);
-            print("ShadowPolygonGameMaterial" + off_shadowPolygonGameMaterial);
             Pointer off_textureOfTextureShadow = Pointer.Read(reader);
-            print("off_textureOfTextureShadow" + off_textureOfTextureShadow);
             Pointer off_col_taggedFacesTable = Pointer.Read(reader);
-            print("off_col_taggedFacesTable" + off_col_taggedFacesTable);
-
-            Pointer off_tmp;
+            
             for (int i = 0; i < 10; i++) {
-                off_tmp = Pointer.Read(reader);
-                print("tmp " + i + " A " + off_tmp);
-                off_tmp = Pointer.Read(reader);
-                print("tmp " + i + " B " + off_tmp);
-            }
-            Pointer.Read(reader);
-            if (settings.isR2Demo) {
+                Pointer.Read(reader);
                 Pointer.Read(reader);
             }
+            Pointer.Read(reader);
+            if (settings.isR2Demo) Pointer.Read(reader);
             off_current = Pointer.Current(reader);
             AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.LvlKeyFrames], append: true);
             animationBanks[1] = animationBanks[0];

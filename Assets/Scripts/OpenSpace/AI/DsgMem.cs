@@ -22,9 +22,12 @@ namespace OpenSpace.AI {
             DsgMem dsgMem = new DsgMem(offset);
 
             Pointer dsgVarPointer = Pointer.Read(reader);
-            Pointer original = Pointer.Goto(ref reader, dsgVarPointer);
-            dsgMem.off_dsgVar = Pointer.Read(reader);
-            Pointer.Goto(ref reader, original);
+            if (dsgVarPointer != null) {
+                Pointer off_current = Pointer.Goto(ref reader, dsgVarPointer);
+                if (Settings.s.isR2Demo) Pointer.Read(reader);
+                dsgMem.off_dsgVar = Pointer.Read(reader);
+                Pointer.Goto(ref reader, off_current);
+            }
 
             dsgMem.memBufferInitial = Pointer.Read(reader);
             dsgMem.memBuffer = Pointer.Read(reader);

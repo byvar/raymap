@@ -26,7 +26,6 @@ namespace OpenSpace.AI {
         public static DsgVar Read(EndianBinaryReader reader, Pointer offset, DsgMem dsgMem=null) {
             MapLoader l = MapLoader.Loader;
             DsgVar dsgVar = new DsgVar(offset);
-
             dsgVar.off_dsgMemBuffer = Pointer.Read(reader);
             dsgVar.off_dsgVarInfo = Pointer.Read(reader);
 
