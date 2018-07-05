@@ -17,6 +17,7 @@ namespace OpenSpace {
         public bool hasNames = false;
         public bool hasDeformations = false;
         public bool isR2Demo = false;
+        public bool isOldR2Demo = false;
         public bool isDonald = false;
 
         public bool IsLittleEndian {
@@ -72,6 +73,16 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             isR2Demo = true
+        };
+
+        public static Settings R2PCOldDemo = new Settings()
+        {
+            engineMode = EngineMode.R2,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            isR2Demo = true,
+            isOldR2Demo = true
         };
 
         public static Settings R2IOS = new Settings() {

@@ -23,7 +23,7 @@ namespace OpenSpace {
         public Material negativeLightProjectorMaterial;
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
-        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2PCDemo, Rayman2IOS, DonaldPC };
+        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2PCDemo, Rayman2PCOldDemo, Rayman2IOS, DonaldPC };
         public Mode mode = Mode.Rayman3PC;
 
         public ObjectType[][] objectTypes;
@@ -100,6 +100,7 @@ namespace OpenSpace {
                     case Mode.Rayman2IOS: settings = Settings.R2IOS; break;
                     case Mode.Rayman2PC: settings = Settings.R2PC; break;
                     case Mode.Rayman2PCDemo: settings = Settings.R2PCDemo; break;
+                    case Mode.Rayman2PCOldDemo: settings = Settings.R2PCOldDemo; break;
                     case Mode.Rayman3GC: settings = Settings.R3GC; break;
                     case Mode.Rayman3PC: settings = Settings.R3PC; break;
                     case Mode.RaymanArenaGC: settings = Settings.RAGC; break;
@@ -817,8 +818,13 @@ namespace OpenSpace {
             if (!settings.isR2Demo) {
                 reader.ReadBytes(0xAC); // 3DOS_EntryActions
             } else {
-                reader.ReadBytes(0x1C); // 3DOS_EntryActions
+                if (settings.isOldR2Demo) {
+                    Pointer.Read(reader); // 3DOS_EntryActions* ?
+                } else {
+                    reader.ReadBytes(0x1C); // 3DOS_EntryActions
+                }
             }
+
             Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
 
             if (mode == Mode.Rayman2IOS) {
