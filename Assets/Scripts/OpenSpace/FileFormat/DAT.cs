@@ -30,7 +30,33 @@ namespace OpenSpace.FileFormat {
         };
 
         public static string[] levelListDonaldDuck = {
-            "Brush", "City_2_b","City_boss","City_chase","Credits","edge","Forest_1_B","Forest_Boss","Forest_chase","Haunted_3_1","Haunted_3_2","Haunted_3_3","Haunted_3_4","Haunted_3_B","Haunted_3_boss","Inca_4_1","Inca_4_2","Inca_4_3","Inca_4_4","Inca_4_b","MapMonde","Menu","Roof","sidewalk","TheHike","Trail"
+            "Menu",
+            "credits",
+            "MapMonde",
+            "trail",
+            "TheHike",
+            "brush",
+            "forest_chase",
+            "Forest_1_B",
+            "forest_Boss",
+            "sidewalk",
+            "roof",
+            "edge",
+            "city_chase",
+            "city_2_b",
+            "city_boss",
+            "Haunted_3_1",
+            "Haunted_3_2",
+            "Haunted_3_3",
+            "Haunted_3_4",
+            "Haunted_3_B",
+            "Haunted_boss",
+            "Inca_4_1",
+            "inca_4_2",
+            "inca_4_3",
+            "inca_4_4",
+            "inca_4_b",
+            "inca_boss"
         };
 
         public DAT(string name, string path) : this(name, File.OpenRead(path)) { }
