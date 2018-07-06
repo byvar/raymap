@@ -815,19 +815,13 @@ namespace OpenSpace {
             uint matrixInStack = reader.ReadUInt32();
             Pointer off_collisionGeoObj = Pointer.Read(reader);
             Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
-            if (!settings.isR2Demo) {
-                reader.ReadBytes(0xAC); // 3DOS_EntryActions
-            } else {
-                if (settings.isOldR2Demo) {
-                    Pointer.Read(reader); // 3DOS_EntryActions* ?
-                } else {
-                    reader.ReadBytes(0x1C); // 3DOS_EntryActions
-                }
+            for (int i = 0; i < Settings.s.numEntryActions; i++) {
+                Pointer.Read(reader); // 3DOS_EntryActions
             }
 
             Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
 
-            if (mode == Mode.Rayman2IOS) {
+            if (Settings.s.platform == Settings.Platform.iOS) {
                 reader.ReadBytes(0x2BC); // IPT_g_hInputStructure
             } else {
                 reader.ReadBytes(0xB20); // IPT_g_hInputStructure
@@ -945,7 +939,7 @@ namespace OpenSpace {
             globals.off_inactiveDynamicWorld = Pointer.Read(reader);
             globals.off_fatherSector = Pointer.Read(reader);
             globals.off_firstSubMapPosition = Pointer.Read(reader);
-
+            
             globals.num_always = reader.ReadUInt32();
             globals.off_spawnable_perso_first = Pointer.Read(reader);
             globals.off_spawnable_perso_last = Pointer.Read(reader);
@@ -954,6 +948,7 @@ namespace OpenSpace {
             globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
             globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
 
+            if (Settings.s.isDonald) reader.ReadUInt32();
             Pointer dword_4A6B1C_always_header = Pointer.Read(reader);
             Pointer dword_4A6B20_always_last = Pointer.Read(reader);
 
@@ -967,7 +962,7 @@ namespace OpenSpace {
             if (v31 != null) print("v31 is not null, it's " + v31);
             if (v32 != null) print("v32 is not null, it's " + v32);
             if (v33 != null) print("v33 is not null, it's " + v33);
-
+            
             // Fill in pointers for the unknown table related to "always".
             FillLinkedListPointers(reader, dword_4A6B20_always_last, dword_4A6B1C_always_header);
 
@@ -1036,7 +1031,7 @@ namespace OpenSpace {
 
             reader.ReadUInt32();
             reader.ReadUInt16();
-
+            
             for (int i = 0; i < 80; i++) {
                 new string(reader.ReadChars(0x1E)).TrimEnd('\0');
             }
@@ -1045,14 +1040,14 @@ namespace OpenSpace {
             reader.ReadUInt32();
             reader.ReadUInt32();
 
-            if (settings.isR2Demo) {
+            if (settings.isR2Demo || settings.isDonald) {
                 reader.ReadUInt32();
             }
 
             // End of engineStructure
             Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
 
-            if (settings.isR2Demo) {
+            if (settings.isR2Demo || settings.isDonald) {
                 Pointer off_unknown = Pointer.Read(reader);
             }
 

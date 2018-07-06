@@ -16,6 +16,7 @@ namespace OpenSpace {
         public LinkedListType linkedListType;
         public bool hasNames = false;
         public bool hasDeformations = false;
+        public int numEntryActions = 0;
         public bool isR2Demo = false;
         public bool isOldR2Demo = false;
         public bool isDonald = false;
@@ -63,6 +64,7 @@ namespace OpenSpace {
             engineMode = EngineMode.R2,
             platform = Platform.PC,
             endian = Endian.Little,
+            numEntryActions = 43,
             linkedListType = LinkedListType.Double,
         };
 
@@ -71,16 +73,17 @@ namespace OpenSpace {
             engineMode = EngineMode.R2,
             platform = Platform.PC,
             endian = Endian.Little,
+            numEntryActions = 7,
             linkedListType = LinkedListType.Double,
             isR2Demo = true
         };
 
-        public static Settings R2PCOldDemo = new Settings()
-        {
+        public static Settings R2PCOldDemo = new Settings() {
             engineMode = EngineMode.R2,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
+            numEntryActions = 1,
             isR2Demo = true,
             isOldR2Demo = true
         };
@@ -89,14 +92,15 @@ namespace OpenSpace {
             engineMode = EngineMode.R2,
             platform = Platform.iOS,
             endian = Endian.Little,
+            numEntryActions = 43,
             linkedListType = LinkedListType.Double
         };
 
-        public static Settings DonaldPC = new Settings()
-        {
+        public static Settings DonaldPC = new Settings() {
             engineMode = EngineMode.R2,
             platform = Platform.PC,
             endian = Endian.Little,
+            numEntryActions = 44,
             linkedListType = LinkedListType.Double,
             isDonald = true
         };
