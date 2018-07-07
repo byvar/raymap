@@ -27,7 +27,6 @@ namespace OpenSpace {
         public Mode mode = Mode.Rayman3PC;
 
         public ObjectType[][] objectTypes;
-
         public TextureInfo[] textures;
         public VisualMaterial[] materials;
         public TextureInfo overlightTexture;
@@ -50,8 +49,9 @@ namespace OpenSpace {
         public List<Perso> persos = new List<Perso>();
         public List<State> states = new List<State>();
         public List<Graph> graphs = new List<Graph>();
+        public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
-        public GameObject graphRoot;
+        public GameObject graphRoot = null;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
         
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
@@ -108,9 +108,6 @@ namespace OpenSpace {
                     case Mode.DonaldPC: settings = Settings.DonaldPC; break;
                 }
                 Settings.s = settings;
-
-                graphRoot = new GameObject("Graphs");
-                graphRoot.SetActive(false);
 
                 if (gameDataBinFolder == null || !Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -417,7 +414,8 @@ namespace OpenSpace {
                 sz_entryActions = 0xDC;
             }
             reader.ReadBytes(sz_inputStruct); // Input struct
-            Pointer keypadDefine = Pointer.Read(reader);
+            Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+            if (Settings.s.platform == Settings.Platform.PC) ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
             reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
             uint num_persoInFix = reader.ReadUInt32();
             persoInFix = new Pointer[num_persoInFix];
@@ -820,6 +818,7 @@ namespace OpenSpace {
             }
 
             Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+            ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 
             if (Settings.s.platform == Settings.Platform.iOS) {
                 reader.ReadBytes(0x2BC); // IPT_g_hInputStructure
@@ -1210,6 +1209,40 @@ namespace OpenSpace {
             Pointer.Goto(ref reader, off_current);
         }
 
+        public void ReadKeypadDefine(EndianBinaryReader reader, Pointer off_keypadDefine) {
+            if (off_keypadDefine == null) return;
+            //print("off keypad: " + off_keypadDefine);
+            Pointer off_current = Pointer.Goto(ref reader, off_keypadDefine);
+            bool readKeypadDefine = true;
+            while (readKeypadDefine) {
+                KeypadEntry entry = new KeypadEntry();
+                entry.keycode = reader.ReadInt16();
+                if (entry.keycode != -1) {
+                    entry.unk2 = reader.ReadInt16();
+                    /* Interestingly, some pointers in this list are not in the relocation table.
+                     * and don't point to any key name, so they can't be read with Pointer.Read.
+                     * Perhaps restoring this can help to restore debug functions... */
+                    Pointer off_name = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+                    reader.ReadUInt32();
+                    Pointer off_name2 = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+                    reader.ReadUInt32();
+                    Pointer off_current_entry = Pointer.Current(reader);
+                    if (off_name != null) {
+                        Pointer.Goto(ref reader, off_name);
+                        entry.name = reader.ReadNullDelimitedString();
+                        //print(entry.name + " - " + entry.keycode + " - " + entry.unk2);
+                    }
+                    if (off_name2 != null) {
+                        Pointer.Goto(ref reader, off_name2);
+                        entry.name2 = reader.ReadNullDelimitedString();
+                    }
+                    Pointer.Goto(ref reader, off_current_entry);
+                    keypadEntries.Add(entry);
+                } else readKeypadDefine = false;
+            }
+            Pointer.Goto(ref reader, off_current);
+        }
+
         public void ReadSuperObjects(EndianBinaryReader reader) {
             Pointer off_current = Pointer.Goto(ref reader, globals.off_actualWorld);
             List<SuperObject> superObjectsActual = SuperObject.Read(reader, globals.off_actualWorld, false, true);
@@ -1275,8 +1308,11 @@ namespace OpenSpace {
             }
         }
 
-        public bool AddGraph(Graph graph)
-        {
+        public bool AddGraph(Graph graph) {
+            if (graphRoot == null) {
+                graphRoot = new GameObject("Graphs");
+                graphRoot.SetActive(false);
+            }
             foreach (Graph existingGraph in graphs) {
                 if (existingGraph.offset == graph.offset) {
                     return false;
