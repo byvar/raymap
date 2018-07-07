@@ -1063,8 +1063,8 @@ namespace OpenSpace {
             Pointer off_col_taggedFacesTable = Pointer.Read(reader);
             
             for (int i = 0; i < 10; i++) {
-                Pointer.Read(reader);
-                Pointer.Read(reader);
+                Pointer off_elementForShadow = Pointer.Read(reader);
+                Pointer off_geometricShadowObject = Pointer.Read(reader);
             }
             Pointer.Read(reader);
             if (settings.isR2Demo) Pointer.Read(reader);

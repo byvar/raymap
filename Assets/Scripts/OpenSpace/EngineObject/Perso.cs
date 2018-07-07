@@ -17,6 +17,7 @@ namespace OpenSpace.EngineObject {
         public string name1 = null;
         public string name2 = null;
         public Family family = null;
+        public Pointer off_physicalObjects = null;
         public PhysicalObject[] physical_objects = null;
         public Brain brain = null;
         public State initialState = null;
@@ -77,7 +78,7 @@ namespace OpenSpace.EngineObject {
             Pointer.Read(reader); // same as next
             Pointer off_currentState = Pointer.Read(reader);
             Pointer.Read(reader); // same as previous
-            Pointer off_physicalObjects = Pointer.Read(reader);
+            p.off_physicalObjects = Pointer.Read(reader);
             reader.ReadUInt32(); // same address?
             Pointer off_family = Pointer.Read(reader);
             p.family = Family.FromOffset(off_family);
@@ -93,7 +94,7 @@ namespace OpenSpace.EngineObject {
                 p.name2 = l.objectTypes[2][index2].name;
                 Pointer.Goto(ref reader, off_current);
             }
-            l.print("[" + p.name0 + "] " + p.name1 + " | " + p.name2 + " - offset: " + offset);
+            l.print("[" + p.name0 + "] " + p.name1 + " | " + p.name2 + " - offset: " + offset + " - POs: " + p.off_physicalObjects);
 
             if (off_brain != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_brain);
@@ -125,9 +126,62 @@ namespace OpenSpace.EngineObject {
                     }
                 }
             }*/
-
-            if (p.family != null && p.family.GetIndexOfPhysicalList(off_physicalObjects) != -1) {
-                p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(off_physicalObjects)];
+            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
+                // Add physical objects tables hidden in scripts
+                AIModel ai = p.brain.mind.AI_model;
+                if (ai.behaviors_normal != null) {
+                    for (int i = 0; i < ai.behaviors_normal.Length; i++) {
+                        if (ai.behaviors_normal[i].scripts != null) {
+                            for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
+                                List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_normal[i].scripts[j].scriptNodes;
+                                foreach (ScriptNode node in nodes) {
+                                    if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
+                                        && p.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                        Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
+                                        p.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                        Pointer.Goto(ref reader, off_current);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (ai.behaviors_reflex != null) {
+                    for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
+                        if (ai.behaviors_reflex[i].scripts != null) {
+                            for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
+                                List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_reflex[i].scripts[j].scriptNodes;
+                                foreach (ScriptNode node in nodes) {
+                                    if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
+                                        && p.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                        Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
+                                        p.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                        Pointer.Goto(ref reader, off_current);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (ai.macros != null) {
+                    for (int i = 0; i < ai.macros.Length; i++) {
+                        if (ai.macros[i].script != null) {
+                            List<ScriptNode> nodes = p.brain.mind.AI_model.macros[i].script.scriptNodes;
+                            foreach (ScriptNode node in nodes) {
+                                if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
+                                    && p.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                    Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
+                                    p.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                    Pointer.Goto(ref reader, off_current);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //if (off_physicalObjects != null && off_physicalObjects.offset == 0x7029) off_physicalObjects.offset = 0x7659;
+            if (p.family != null && p.family.GetIndexOfPhysicalList(p.off_physicalObjects) != -1) {
+                p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(p.off_physicalObjects)];
             }
             return p;
         }

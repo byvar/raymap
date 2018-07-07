@@ -11,6 +11,7 @@ public class PersoBehaviourEditor : Editor {
         DrawDefaultInspector();
 
         PersoBehaviour pb = (PersoBehaviour)target;
+        pb.poListIndex = EditorGUILayout.Popup(pb.poListIndex, pb.poListNames);
         pb.stateIndex = EditorGUILayout.Popup(pb.stateIndex, pb.stateNames);
 
         GUILayout.BeginHorizontal();

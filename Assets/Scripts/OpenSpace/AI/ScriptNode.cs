@@ -61,6 +61,8 @@ namespace OpenSpace.AI {
                     string str = reader.ReadNullDelimitedString();
                     l.strings[sn.param_ptr] = str;
                     Pointer.Goto(ref reader, off_currentNode);
+                } else if (sn.nodeType == NodeType.ObjectTableRef) {
+                    // In R2 some objects have object tables that aren't listed normally, but are referenced through scripts.
                 }
             }
             return sn;

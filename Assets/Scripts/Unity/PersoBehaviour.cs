@@ -13,16 +13,24 @@ using UnityEngine;
 
 public class PersoBehaviour : MonoBehaviour {
     bool loaded = false;
-    bool hasStates = false;
     public Perso perso;
+
+    // States
+    bool hasStates = false;
     public State state = null;
     public string[] stateNames = { "Placeholder" };
     int currentState = 0;
     public int stateIndex = 0;
     public bool autoNextState = false;
 
+    // Physical object lists
+    public string[] poListNames = { "Placeholder" };
+    int currentPOList = 0;
+    public int poListIndex = 0;
+
     // Animation
     public AnimA3DGeneral a3d = null;
+    bool forceAnimUpdate = false;
     public uint currentFrame = 0;
     public bool playAnimation = true;
     public float animationSpeed = 15f;
@@ -38,6 +46,13 @@ public class PersoBehaviour : MonoBehaviour {
     public void Init() {
         if (perso != null) {
             Family fam = perso.family;
+
+            if (fam != null && fam.physical_objects != null && fam.physical_objects.Length > 0) {
+                poListNames = fam.off_physical_lists.Select(o => (o == null ? "Null" : o.ToString())).ToArray();
+                currentPOList = perso.off_physicalObjects == null ? 0 : fam.GetIndexOfPhysicalList(perso.off_physicalObjects);
+                if (currentPOList == -1) currentPOList = 0;
+                poListIndex = currentPOList;
+            }
             if (fam != null && fam.states != null && fam.states.Length > 0) {
                 stateNames = fam.states.Select(s => (s == null ? "Null" : s.ToString())).ToArray();
                 hasStates = true;
@@ -60,8 +75,7 @@ public class PersoBehaviour : MonoBehaviour {
         loaded = true;
     }
 
-    public void PrintDsgVar()
-    {
+    public void PrintDsgVar() {
         if (loaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
 
@@ -84,8 +98,7 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    public void PrintDsgVarFromMindMem()
-    {
+    public void PrintDsgVarFromMindMem() {
         MapLoader l = MapLoader.Loader;
 
         if (loaded && hasStates) {
@@ -226,10 +239,20 @@ public class PersoBehaviour : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (loaded && hasStates) {
-            if (stateIndex != currentState) {
-                currentState = stateIndex;
-                SetState(currentState);
+        if (loaded) {
+            if (hasStates) {
+                if (stateIndex != currentState) {
+                    currentState = stateIndex;
+                    SetState(currentState);
+                }
+            }
+            if (poListIndex != currentPOList) {
+                if (poListIndex >= 0 && poListIndex < perso.family.physical_objects.Length) {
+                    currentPOList = poListIndex;
+                    perso.physical_objects = perso.family.physical_objects[currentPOList];
+                    forceAnimUpdate = true;
+                    SetState(currentState);
+                } else poListIndex = 0;
             }
         }
         if (playAnimation) {
@@ -247,7 +270,8 @@ public class PersoBehaviour : MonoBehaviour {
     }
 
     void InitAnimation(AnimA3DGeneral a3d) {
-        if (a3d != this.a3d) {
+        if (a3d != this.a3d || forceAnimUpdate) {
+            forceAnimUpdate = false;
             loaded = false;
             // Destroy currently loaded subobjects
             if (subObjects != null) {

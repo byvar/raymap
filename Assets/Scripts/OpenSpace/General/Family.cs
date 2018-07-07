@@ -50,6 +50,62 @@ namespace OpenSpace {
             return Array.IndexOf(off_physical_lists, off_physicalList);
         }
 
+        public void ReadNewPhysicalList(EndianBinaryReader reader, Pointer off_physicalList) {
+            MapLoader l = MapLoader.Loader;
+            Array.Resize(ref off_physical_lists, off_physical_lists.Length + 1);
+            Array.Resize(ref physical_objects, physical_objects.Length + 1);
+            off_physical_lists[off_physical_lists.Length - 1] = Pointer.Current(reader);
+            Pointer off_list_hdr_next = null;
+            if (l.mode != MapLoader.Mode.RaymanArenaGC) off_list_hdr_next = Pointer.Read(reader);
+            if (l.mode == MapLoader.Mode.Rayman3GC) {
+                Pointer off_list_hdr_prev = Pointer.Read(reader);
+                Pointer off_list_hdr = Pointer.Read(reader);
+            }
+            Pointer off_list_start = Pointer.Read(reader);
+            Pointer off_list_2 = Pointer.Read(reader); // is this a copy of the list or something?
+            ushort num_entries = reader.ReadUInt16();
+            reader.ReadUInt16();
+
+
+            /*// format of list_hdr:
+            if (l.mode == MapLoader.Mode.Rayman3PC || l.mode == MapLoader.Mode.Rayman3GC) {
+                Pointer off_list_hdr_first = Pointer.Read(reader);
+                Pointer off_list_hdr_last = Pointer.Read(reader);
+                uint num_lists = reader.ReadUInt32(); // 1?
+            }*/
+            if (off_list_start != null) {
+                Pointer.Goto(ref reader, off_list_start);
+                physical_objects[physical_objects.Length-1] = new PhysicalObject[num_entries];
+                for (uint j = 0; j < num_entries; j++) {
+                    // each entry is 0x14
+                    Pointer off_po_scale = Pointer.Read(reader);
+                    Pointer off_po = Pointer.Read(reader);
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    uint lastvalue = reader.ReadUInt32();
+                    if (lastvalue != 0 && off_po != null) {
+
+                        Pointer curPos = Pointer.Goto(ref reader, off_po);
+                        PhysicalObject po = PhysicalObject.Read(reader, off_po);
+                        Vector3? scaleMultiplier = null;
+                        if (off_po_scale != null) {
+                            Pointer.Goto(ref reader, off_po_scale);
+                            float x = reader.ReadSingle();
+                            float z = reader.ReadSingle();
+                            float y = reader.ReadSingle();
+                            scaleMultiplier = new Vector3(x, y, z);
+                        }
+                        if (po != null) {
+                            physical_objects[physical_objects.Length-1][j] = po;
+                            po.Gao.transform.parent = Gao.transform;
+                            po.scaleMultiplier = scaleMultiplier;
+                        }
+                        Pointer.Goto(ref reader, curPos);
+                    }
+                }
+            }
+        }
+
         public static Family Read(EndianBinaryReader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             Family f = new Family(offset);
@@ -109,10 +165,10 @@ namespace OpenSpace {
                     }
                 }
             }
-            
             f.off_physical_lists = new Pointer[f.num_physical_lists]; // Offset for each list of POs
             f.physical_objects = new PhysicalObject[f.num_physical_lists][]; // Each list of POs. Each perso has zero/one of these lists and can switch between them.
             if (f.off_physical_list_first != null) {
+                //if (f.off_physical_list_first.offset == 0x7029) f.off_physical_list_first.offset = 0x7659;
                 Pointer.Goto(ref reader, f.off_physical_list_first);
                 for (uint i = 0; i < f.num_physical_lists; i++) {
                     f.off_physical_lists[i] = Pointer.Current(reader);
