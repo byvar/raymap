@@ -78,20 +78,19 @@ namespace OpenSpace.Visual {
                 mf.mesh = meshUnity;
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
                 if (sprites[i].r3mat != null) {
-                    Material unityMat = sprites[i].r3mat.Material;
+                    Material unityMat = sprites[i].r3mat.MaterialBillboard;
                     bool receiveShadows = (sprites[i].r3mat.properties & VisualMaterial.property_receiveShadows) != 0;
                     //if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
                     //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
                     mr.material = unityMat;
+                    /*mr.material.SetFloat("_ScaleX", sprites[i].info_scale.x);
+                    mr.material.SetFloat("_ScaleY", sprites[i].info_scale.y);*/
                     if (!receiveShadows) mr.receiveShadows = false;
                     if (sprites[i].r3mat.off_animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
                         mtmat.r3mat = sprites[i].r3mat;
                         mtmat.mat = mr.material;
                     }
-                }
-                if (sprites[i].r3mat != null) {
-                    mr.material = sprites[i].r3mat.Material;
                 }
             }
         }

@@ -21,9 +21,11 @@ namespace OpenSpace {
         public Material baseBlendMaterial;
         public Material baseBlendTransparentMaterial;
         public Material negativeLightProjectorMaterial;
+        public Material billboardMaterial;
+
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
-        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2PCDemo, Rayman2PCOldDemo, Rayman2IOS, DonaldPC };
+        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2PCDemo2, Rayman2PCDemo1, Rayman2IOS, DonaldDuckPC };
         public Mode mode = Mode.Rayman3PC;
 
         public ObjectType[][] objectTypes;
@@ -99,13 +101,13 @@ namespace OpenSpace {
                 switch (mode) {
                     case Mode.Rayman2IOS: settings = Settings.R2IOS; break;
                     case Mode.Rayman2PC: settings = Settings.R2PC; break;
-                    case Mode.Rayman2PCDemo: settings = Settings.R2PCDemo; break;
-                    case Mode.Rayman2PCOldDemo: settings = Settings.R2PCOldDemo; break;
+                    case Mode.Rayman2PCDemo1: settings = Settings.R2PCDemo1; break;
+                    case Mode.Rayman2PCDemo2: settings = Settings.R2PCDemo2; break;
                     case Mode.Rayman3GC: settings = Settings.R3GC; break;
                     case Mode.Rayman3PC: settings = Settings.R3PC; break;
                     case Mode.RaymanArenaGC: settings = Settings.RAGC; break;
                     case Mode.RaymanArenaPC: settings = Settings.RAPC; break;
-                    case Mode.DonaldPC: settings = Settings.DonaldPC; break;
+                    case Mode.DonaldDuckPC: settings = Settings.DDPC; break;
                 }
                 Settings.s = settings;
 
@@ -115,7 +117,7 @@ namespace OpenSpace {
                 if (settings.engineMode == Settings.EngineMode.R2) {
                     hasTransit = false;
                     DAT dat = null;
-                    if (mode == Mode.Rayman2PC || mode == Mode.DonaldPC) {
+                    if (mode == Mode.Rayman2PC || mode == Mode.DonaldDuckPC) {
                         string dataPath = Path.Combine(gameDataBinFolder, "levels0.dat");
                         if (File.Exists(dataPath)) {
                             dat = new DAT("levels0", dataPath);

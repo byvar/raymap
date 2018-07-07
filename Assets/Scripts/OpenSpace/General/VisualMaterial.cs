@@ -20,7 +20,7 @@ namespace OpenSpace {
         public Vector4 color;
         public byte properties;
         private Material material;
-        private Material materialCombined;
+        private Material materialBillboard;
 
         // flags
         public static uint flags_isTransparent = (1 << 3);
@@ -92,6 +92,50 @@ namespace OpenSpace {
                     }
                 }
                 return material;
+            }
+        }
+
+        public Material MaterialBillboard {
+            get {
+                if (materialBillboard == null) {
+                    MapLoader l = MapLoader.Loader;
+                    //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
+                    bool useAlphaMask = false;
+                    TextureInfo texMain = null, texSecondary = null;
+                    if (off_textures != null && off_textures.Count > 0) {
+                        texMain = TextureInfo.FromOffset(off_textures[0]);
+                        if (off_textures.Count > 1) {
+                            texSecondary = TextureInfo.FromOffset(off_textures[1]);
+                        }
+                    }
+                    Material baseMaterial = l.billboardMaterial;
+                    bool transparent = IsTransparent;
+                    materialBillboard = new Material(baseMaterial);
+                    materialBillboard.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, ambientCoef.w));
+                    if (color.w > 0) {
+                        materialBillboard.SetColor("_Color", new Color(color.x, color.y, color.z, color.w));
+                    } else {
+                        materialBillboard.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
+                    }
+                    if (texMain != null) materialBillboard.SetTexture("_MainTex", texMain.texture);
+                    if (texSecondary != null) {
+                        if (baseMaterial == l.baseBlendMaterial || baseMaterial == l.baseBlendTransparentMaterial) {
+                            materialBillboard.SetTexture("_MainTex2", texSecondary.texture);
+                            if (useAlphaMask) materialBillboard.SetFloat("_UseAlpha", 1f);
+                            //material.SetFloat("_Blend", 1f);
+                        } else {
+                            materialBillboard.SetTexture("_DetailAlbedoMap", texSecondary.texture);
+                        }
+                    }
+                    if (texMain == null || texMain.texture == null) {
+                        // Don't want to see all those textureless planes, so create transparent texture and use that
+                        Texture2D tex = new Texture2D(1, 1);
+                        tex.SetPixel(0, 0, new Color(0, 0, 0, 0));
+                        tex.Apply();
+                        material.SetTexture("_MainTex", tex);
+                    }
+                }
+                return materialBillboard;
             }
         }
 

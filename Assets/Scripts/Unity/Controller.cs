@@ -18,6 +18,7 @@ public class Controller : MonoBehaviour {
     public Material baseBlendMaterial;
     public Material baseBlendTransparentMaterial;
     public Material negativeLightProjectorMaterial;
+    public Material billboardMaterial;
     public SectorManager sectorManager;
     public LightManager lightManager;
     public bool allowDeadPointers = false;
@@ -59,6 +60,12 @@ public class Controller : MonoBehaviour {
                             mode = MapLoader.Mode.Rayman2PC; break;
                         case "r2_ios":
                             mode = MapLoader.Mode.Rayman2IOS; break;
+                        case "dd_pc":
+                            mode = MapLoader.Mode.DonaldDuckPC; break;
+                        case "r2_demo1_pc":
+                            mode = MapLoader.Mode.Rayman2PCDemo1; break;
+                        case "r2_demo2_pc":
+                            mode = MapLoader.Mode.Rayman2PCDemo2; break;
                     }
                     break;
             }
@@ -76,6 +83,7 @@ public class Controller : MonoBehaviour {
         loader.baseBlendTransparentMaterial = baseBlendTransparentMaterial;
         loader.negativeLightProjectorMaterial = negativeLightProjectorMaterial;
         loader.baseLightMaterial = baseLightMaterial;
+        loader.billboardMaterial = billboardMaterial;
 
         loader.Load();
         sectorManager.Init();
