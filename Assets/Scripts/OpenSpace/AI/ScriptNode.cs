@@ -1,4 +1,5 @@
-﻿using OpenSpace.Waypoints;
+﻿using OpenSpace.Input;
+using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace OpenSpace.AI {
         // derived fields
         public Pointer param_ptr;
         public NodeType nodeType;
+        public InputEntryElement value_inputEntryElement;
 
         public ScriptNode(Pointer offset) {
             this.offset = offset;
@@ -63,6 +65,11 @@ namespace OpenSpace.AI {
                     Pointer.Goto(ref reader, off_currentNode);
                 } else if (sn.nodeType == NodeType.ObjectTableRef) {
                     // In R2 some objects have object tables that aren't listed normally, but are referenced through scripts.
+                } else if (sn.nodeType == NodeType.Button) {
+                    Pointer off_current = Pointer.Goto(ref reader, sn.param_ptr);
+                    sn.value_inputEntryElement = InputEntryElement.Read(reader, sn.param_ptr);
+                    //l.print("Waypoint at " + waypoint.position.x + ", " + waypoint.position.y + ", " + waypoint.position.z);
+                    Pointer.Goto(ref reader, off_current);
                 }
             }
             return sn;
