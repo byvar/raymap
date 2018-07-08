@@ -62,11 +62,10 @@ namespace OpenSpace.AI {
             "If",
             "If",
             "If",
-            "Else1",
-            "Else2",
+            "IfDebug",
+            "IfNotU64",
             "Then",
-            "Else3",
-            "Else4",
+            "Else",
             "Goto",
             "Me",
             "MainActor",
@@ -74,7 +73,7 @@ namespace OpenSpace.AI {
             "NoInput",
             "Nowhere",
             "EmptyText",
-            "NULL",
+            "CapsNull",
             "NoGraph",
             "NoAction"
         });
@@ -1261,7 +1260,7 @@ namespace OpenSpace.AI {
 
                     return "Real: " + BitConverter.ToSingle(BitConverter.GetBytes(param), 0);
                 case 14:
-                    return "Button: " + "0x" + param.ToString("x8");
+                    return "Button: " + sn.param_ptr;
                 case 15:
                     return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
                 case 16:
