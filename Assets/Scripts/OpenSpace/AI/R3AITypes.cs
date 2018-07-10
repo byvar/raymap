@@ -1829,7 +1829,7 @@ namespace OpenSpace.AI {
 
                     return "Real: " + BitConverter.ToSingle(BitConverter.GetBytes(param), 0);
                 case 14:
-                    return "Button: " + "0x" + param.ToString("x8");
+                    return "Button: " + sn.value_inputEntryElement + "(" + sn.param_ptr + ")";
                 case 15:
                     return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
                 case 16:
