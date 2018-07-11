@@ -1317,7 +1317,7 @@ namespace OpenSpace.AI {
                 case 38:
                     return "Caps: " + "0x" + (param).ToString("x8");
                 case 39:
-                    return "Eval SubRoutine";
+                    return "Eval SubRoutine: " + sn.param_ptr;
                 case 40:
                     return "NULL";
                 case 44:

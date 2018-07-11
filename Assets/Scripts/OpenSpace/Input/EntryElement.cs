@@ -36,6 +36,8 @@ namespace OpenSpace.Input {
 
             Pointer.Goto(ref reader, original);
 
+            MapLoader.Loader.print("Action EntryElement: "+element.ToString());
+
             return element;
         }
 

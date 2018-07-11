@@ -134,7 +134,9 @@ public class PersoBehaviour : MonoBehaviour {
                 && perso.brain.mind != null
                 && perso.brain.mind.AI_model != null) {
                 AIModel ai = perso.brain.mind.AI_model;
+               
                 if (ai.behaviors_normal != null) {
+                    MapLoader.Loader.print("Normal behaviours");
                     for (int i = 0; i < ai.behaviors_normal.Length; i++) {
                         if (ai.behaviors_normal[i].scripts != null) {
                             for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
@@ -144,6 +146,7 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
                 if (ai.behaviors_reflex != null) {
+                    MapLoader.Loader.print("Reflex behaviours");
                     for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
                         if (ai.behaviors_reflex[i].scripts != null) {
                             for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
@@ -153,6 +156,7 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
                 if (ai.macros != null) {
+                    MapLoader.Loader.print("Macros");
                     for (int i = 0; i < ai.macros.Length; i++) {
                         if (ai.macros[i].script != null) {
                             perso.brain.mind.AI_model.macros[i].script.print(perso);
