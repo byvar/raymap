@@ -30,14 +30,19 @@ namespace OpenSpace.Input {
             KeyWord keyWord = new KeyWord(offset);
 
             // Read 20 in total for R2iOS
-            if (Settings.s.platform == Settings.Platform.iOS) {
+            if (Settings.s.hasExtraInputData) {
                 reader.ReadInt32();
                 reader.ReadInt32();
                 reader.ReadInt32();
             }
 
-            keyWord.indexOrKeyCode = reader.ReadByte();
-            keyWord.field_1 = reader.ReadByte();
+            if (Settings.s.IsLittleEndian) {
+                keyWord.indexOrKeyCode = reader.ReadByte();
+                keyWord.field_1 = reader.ReadByte();
+            } else {
+                keyWord.field_1 = reader.ReadByte();
+                keyWord.indexOrKeyCode = reader.ReadByte();
+            }
             keyWord.field_2 = reader.ReadByte();
             keyWord.field_3 = reader.ReadByte();
 

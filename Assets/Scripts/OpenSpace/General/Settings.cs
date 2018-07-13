@@ -19,6 +19,7 @@ namespace OpenSpace {
         public int numEntryActions = 0;
         public bool isR2Demo = false;
         public bool isDonald = false;
+        public bool hasExtraInputData = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -40,7 +41,8 @@ namespace OpenSpace {
             endian = Endian.Big,
             linkedListType = LinkedListType.Double,
             hasNames = true,
-            hasDeformations = true
+            hasDeformations = true,
+            hasExtraInputData = true
         };
 
         public static Settings RAPC = new Settings() {
@@ -90,7 +92,8 @@ namespace OpenSpace {
             platform = Platform.iOS,
             endian = Endian.Little,
             numEntryActions = 43,
-            linkedListType = LinkedListType.Double
+            linkedListType = LinkedListType.Double,
+            hasExtraInputData = true
         };
 
         public static Settings DDPC = new Settings() {

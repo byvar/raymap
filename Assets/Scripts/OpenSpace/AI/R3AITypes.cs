@@ -1,4 +1,5 @@
 ﻿using OpenSpace.EngineObject;
+using OpenSpace.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1829,7 +1830,9 @@ namespace OpenSpace.AI {
 
                     return "Real: " + BitConverter.ToSingle(BitConverter.GetBytes(param), 0);
                 case 14:
-                    return "Button: " + sn.value_inputEntryElement + "(" + sn.param_ptr + ")";
+                    EntryAction ea = EntryAction.FromOffset(sn.param_ptr);
+                    string eaName = ea == null ? "ERR_ENTRYACTION_NOTFOUND" : ea.ToString();
+                    return "Button: " + eaName + "(" + sn.param_ptr + ")";
                 case 15:
                     return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
                 case 16:
@@ -1850,7 +1853,9 @@ namespace OpenSpace.AI {
                 case 22:
                     return "FamilyRef: " + sn.param_ptr;
                 case 23:
-                    return "PersoRef: " + sn.param_ptr;
+                    Perso p = Perso.FromOffset(sn.param_ptr);
+                    string persoName = p == null ? "ERR_PERSO_NOTFOUND" : p.fullName;
+                    return "PersoRef: " + sn.param_ptr + " (" + persoName + ")";
                 case 24:
                     State state = State.FromOffset(sn.param_ptr);
                     string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.name;

@@ -3,6 +3,7 @@ using OpenSpace.Animation;
 using OpenSpace.EngineObject;
 using OpenSpace.FileFormat;
 using OpenSpace.FileFormat.Texture;
+using OpenSpace.Input;
 using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,8 @@ namespace OpenSpace {
         public Pointer[] persoInFix;
         public AnimationBank[] animationBanks;
         public Family[] families;
+
+        public InputStructure inputStruct;
 
         uint off_textures_start_fix = 0;
         bool hasTransit;
@@ -395,7 +398,6 @@ namespace OpenSpace {
                 }
             }
             // Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
-            int sz_inputStruct = 0x1adc;
             int sz_entryActions = 0x100;
             int sz_randomStructure = 0xDC;
             int sz_fontStructure = 0x12B2;
@@ -404,20 +406,20 @@ namespace OpenSpace {
             int sz_binDataForMenu = 0x020C;
 
             if (mode == Mode.Rayman3GC) {
-                sz_inputStruct = 0x1714;
-                sz_entryActions = 0xD0;
-                sz_fontStructure = 0x12E4;
+                sz_entryActions = 0xE8;
                 sz_binDataForMenu = 0x01F0;
+                sz_fontStructure = 0x12E4;
             } else if (mode == Mode.RaymanArenaGC) {
-                sz_inputStruct = 0x1714;
-                sz_entryActions = 0x94;
+                sz_entryActions = 0xC4;
                 sz_fontStructure = 0x12E4;
             } else if (mode == Mode.RaymanArenaPC) {
                 sz_entryActions = 0xDC;
             }
-            reader.ReadBytes(sz_inputStruct); // Input struct
-            Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
-            if (Settings.s.platform == Settings.Platform.PC) ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
+            inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+            if (Settings.s.platform == Settings.Platform.PC) {
+                Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+                ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
+            }
             reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
             uint num_persoInFix = reader.ReadUInt32();
             persoInFix = new Pointer[num_persoInFix];
@@ -822,12 +824,11 @@ namespace OpenSpace {
             Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
             ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 
-            if (Settings.s.platform == Settings.Platform.iOS) {
-                reader.ReadBytes(0x2BC); // IPT_g_hInputStructure
-            } else {
-                reader.ReadBytes(0xB20); // IPT_g_hInputStructure
-            }
+            inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+            print("Num entractions: " + inputStruct.num_entryActions);
+            print("Off entryactions: " + inputStruct.off_entryActions);
             Pointer off_IPT_entryElementList = Pointer.Read(reader);
+            print("Off entryelements: " + off_IPT_entryElementList);
             reader.ReadBytes(0x14); // FON_g_stGeneral
             Pointer off_current = Pointer.Current(reader);
             animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
