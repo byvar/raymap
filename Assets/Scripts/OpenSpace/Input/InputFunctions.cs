@@ -6,7 +6,7 @@ namespace OpenSpace.Input {
     public abstract class InputFunctions {
 
         public enum FunctionType {
-            _UNKNOWN,
+            Unknown,
             And,
             Or,
             Not,
@@ -50,7 +50,7 @@ namespace OpenSpace.Input {
             try {
                 return (FunctionType)(index);
             } catch (Exception) {
-                return FunctionType._UNKNOWN;
+                return FunctionType.Unknown;
             }
         }
     }

@@ -21,7 +21,7 @@ namespace OpenSpace.Input {
         }
 
         public static EntryAction Read(EndianBinaryReader reader, Pointer offset) {
-            MapLoader.Loader.print("Off: " + offset);
+            //MapLoader.Loader.print("Off: " + offset);
             EntryAction element = new EntryAction(offset);
 
             if (Settings.s.hasExtraInputData) {
@@ -54,7 +54,7 @@ namespace OpenSpace.Input {
                 Pointer.Goto(ref reader, off_current);
             }
 
-            MapLoader.Loader.print("Loaded " + element.ToString());
+            MapLoader.Loader.print(element.ToString());
 
             return element;
         }
