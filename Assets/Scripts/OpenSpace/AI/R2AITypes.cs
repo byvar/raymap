@@ -58,11 +58,11 @@ namespace OpenSpace.AI {
         #region Keywords
         public static List<string> keywordTable = new List<string>(new string[] {
             "If",
-            "If",
-            "If",
-            "If",
-            "If",
-            "If",
+            "IfNot",
+            "If2",
+            "If4",
+            "If8",
+            "If16",
             "IfDebug",
             "IfNotU64",
             "Then",
@@ -1206,6 +1206,122 @@ namespace OpenSpace.AI {
             return ScriptNode.NodeType.Unknown;
         }
 
+        public static string readableFunctionSubTypeBasic(ScriptNode sn, Perso perso)
+        {
+            MapLoader l = MapLoader.Loader;
+            byte functionType = sn.type;
+            int param = (int)sn.param;
+            short mask = 0;
+
+            Vector3 vector3 = new Vector3 { x = 0, y = 0, z = 0 };
+
+            switch (functionType)
+            {
+                case 0: // KeyWordFunctionPtr
+                    if (param < keywordTable.Count) { return keywordTable[param]; }
+                    return "Unknown Keyword (" + param + ")";
+                case 1: // GetConditionFunctionPtr
+                    if (param < conditionTable.Count) { return conditionTable[param]; }
+                    return "Unknown Condition (" + param + ")";
+                case 2: // GetOperatorFunctionPtr
+                    if (param < operatorTable.Count) { return operatorTable[param]; }
+                    return "Unknown Operator (" + param + ")";
+                case 3: // GetFunctionFunctionPtr
+                    if (param < functionTable.Count) { return functionTable[param]; }
+                    return "Unknown Function (" + param + ")";
+                case 4: // ProcedureFunctionReturn
+                    if (param < procedureTable.Count) { return procedureTable[param]; }
+                    return "Unknown Procedure (" + param + ")";
+                case 5: // meta action
+                    return "Meta Action";
+                case 6:
+                    return "Begin Macro";
+                case 7:
+                    return "Begin Macro";
+                case 8:
+                    return "End Macro";
+                case 9:
+                    return "EvalField";
+                case 10:
+                case 11:
+                    string dsgVarString = "";
+                    return "dsgVar_" + param;
+                case 12:
+
+                    return param.ToString();
+                case 13:
+
+                    return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString();
+                case 14:
+                    EntryAction ea = EntryAction.FromOffset(sn.param_ptr);
+                    string eaName = ea == null ? "ERR_ENTRYACTION_NOTFOUND" : ea.ToString();
+                    return "Button: " + eaName + "(" + sn.param_ptr + ")";
+                case 15:
+                    return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
+                case 16:
+                    return "Vector: " + "0x" + param.ToString("x8"); // TODO: same
+                case 17:
+                    mask = (short)param; // TODO: as short
+                    return "Mask: " + (mask).ToString("x4");
+                case 18:
+                    return "ModuleRef: " + "0x" + (param).ToString("x8");
+                case 19:
+                    return "DsgVarId: " + "0x" + (param).ToString("x8");
+                case 20:
+                    string str = "ERR_STRING_NOTFOUND";
+                    if (l.strings.ContainsKey(sn.param_ptr)) str = l.strings[sn.param_ptr];
+                    return "\"" + str + "\"";
+                case 21:
+                    return "LipsSynchroRef: " + sn.param_ptr;
+                case 22:
+                    return "FamilyRef: " + sn.param_ptr;
+                case 23:
+                    Perso p = Perso.FromOffset(sn.param_ptr);
+                    string persoName = p == null ? "ERR_PERSO_NOTFOUND" : p.fullName;
+                    return "PersoRef: " + sn.param_ptr + " (" + persoName + ")";
+                case 24:
+                    State state = State.FromOffset(sn.param_ptr);
+                    string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.name;
+                    return "ActionRef: " + sn.param_ptr + " (" + stateName + ")";
+                case 25:
+                    return "SuperObjectRef: " + sn.param_ptr;
+                case 26:
+                    return "WayPointRef: " + sn.param_ptr;
+                case 27:
+                    return "TextRef: " + sn.param_ptr;
+                case 28:
+                    return "ComportRef: " + sn.param_ptr;
+                case 29:
+                    return "ModuleRef: " + sn.param_ptr;
+                case 30:
+                    return "SoundEventRef: " + sn.param_ptr;
+                case 31:
+                    return "ObjectTableRef: " + sn.param_ptr;
+                case 32:
+                    return "GameMaterialRef: " + sn.param_ptr;
+                case 33:
+                    return "ParticleGenerator: " + "0x" + (param).ToString("x8");
+                case 34:
+                    return "VisualMaterial: " + sn.param_ptr;
+                case 35:
+                    return "Color: " + "0x" + (param).ToString("x8");
+                case 36:
+                    return "EvalDataType42: " + "0x" + (param).ToString("x8");
+                case 37:
+                    return "Light: " + "0x" + (param).ToString("x8");
+                case 38:
+                    return "Caps: " + "0x" + (param).ToString("x8");
+                case 39:
+                    return "Eval SubRoutine: " + sn.param_ptr;
+                case 40:
+                    return "NULL";
+                case 44:
+                    return "Graph: " + "0x" + (param).ToString("x8");
+            }
+
+            return "unknown";
+        }
+
         public static string readableFunctionSubType(ScriptNode sn, Perso perso) {
             MapLoader l = MapLoader.Loader;
             byte functionType = sn.type;
@@ -1216,20 +1332,20 @@ namespace OpenSpace.AI {
 
             switch (functionType) {
                 case 0: // KeyWordFunctionPtr
-                    if (param < keywordTable.Count) { return keywordTable[param] + "(" + param + ")"; }
-                    return "Unknown Keyword";
+                    if (param < keywordTable.Count) { return keywordTable[param]; }
+                    return "Unknown Keyword (" + param + ")";
                 case 1: // GetConditionFunctionPtr
-                    if (param < conditionTable.Count) { return conditionTable[param] + "(" + param + ")"; }
-                    return "Unknown Condition";
+                    if (param < conditionTable.Count) { return conditionTable[param]; }
+                    return "Unknown Condition (" + param + ")";
                 case 2: // GetOperatorFunctionPtr
-                    if (param < operatorTable.Count) { return operatorTable[param] + "(" + param + ")"; }
-                    return "Unknown Operator";
+                    if (param < operatorTable.Count) { return operatorTable[param] + " (" + param + ")"; }
+                    return "Unknown Operator (" + param + ")";
                 case 3: // GetFunctionFunctionPtr
-                    if (param < functionTable.Count) { return functionTable[param] + "(" + param + ")"; }
-                    return "Unknown Function";
+                    if (param < functionTable.Count) { return functionTable[param]; }
+                    return "Unknown Function (" + param + ")";
                 case 4: // ProcedureFunctionReturn
-                    if (param < procedureTable.Count) { return procedureTable[param] + "(" + param + ")"; }
-                    return "Unknown Procedure";
+                    if (param < procedureTable.Count) { return procedureTable[param]; }
+                    return "Unknown Procedure (" + param + ")";
                 case 5: // meta action
                     return "Meta Action";
                 case 6:

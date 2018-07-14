@@ -167,6 +167,62 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
+    public void PrintTranslatedScripts()
+    {
+        if (loaded && hasStates)
+        {
+            if (perso.brain != null
+                && perso.brain.mind != null
+                && perso.brain.mind.AI_model != null)
+            {
+                AIModel ai = perso.brain.mind.AI_model;
+
+                if (ai.behaviors_normal != null)
+                {
+                    MapLoader.Loader.print("Normal behaviours");
+                    for (int i = 0; i < ai.behaviors_normal.Length; i++)
+                    {
+                        if (ai.behaviors_normal[i].scripts != null)
+                        {
+                            for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++)
+                            {
+                                TranslatedScript ts = new TranslatedScript(perso.brain.mind.AI_model.behaviors_normal[i].scripts[j], perso);
+                                MapLoader.Loader.print(ts.ToString());
+                            }
+                        }
+                    }
+                }
+                if (ai.behaviors_reflex != null)
+                {
+                    MapLoader.Loader.print("Reflex behaviours");
+                    for (int i = 0; i < ai.behaviors_reflex.Length; i++)
+                    {
+                        if (ai.behaviors_reflex[i].scripts != null)
+                        {
+                            for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++)
+                            {
+                                TranslatedScript ts = new TranslatedScript(perso.brain.mind.AI_model.behaviors_reflex[i].scripts[j], perso);
+                                MapLoader.Loader.print(ts.ToString());
+                            }
+                        }
+                    }
+                }
+                if (ai.macros != null)
+                {
+                    MapLoader.Loader.print("Macros");
+                    for (int i = 0; i < ai.macros.Length; i++)
+                    {
+                        if (ai.macros[i].script != null)
+                        {
+                            TranslatedScript ts = new TranslatedScript(perso.brain.mind.AI_model.macros[i].script, perso);
+                            MapLoader.Loader.print(ts.ToString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void PrintAnimationDebugInfo() {
         if (loaded && hasStates) {
             if (a3d != null) {
