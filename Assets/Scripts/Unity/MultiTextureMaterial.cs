@@ -21,7 +21,7 @@ public class MultiTextureMaterial : MonoBehaviour {
         if (index < 0 || index > r3mat.off_animTextures.Count) return;
         TextureInfo tex = TextureInfo.FromOffset(r3mat.off_animTextures[index]);
         if (tex != null) {
-            mat.SetTexture("_MainTex", tex.texture);
+            mat.SetTexture("_MainTex", tex.Texture);
         }
     }
 

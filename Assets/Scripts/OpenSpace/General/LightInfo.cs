@@ -51,7 +51,7 @@ namespace OpenSpace {
                     GameObject gao = new GameObject("Light @ " + String.Format("0x{0:X}", offset.offset) + " | " +
                         "Type: " + type + " - Far: " + far + " - Near: " + near);
                     Vector3 pos = transMatrix.GetPosition(convertAxes: true);
-                    Quaternion rot = transMatrix.GetRotation(convertAxes: true);
+                    Quaternion rot = transMatrix.GetRotation(convertAxes: true); // * Quaternion.Euler(new Vector3(180, 0,0));
                     Vector3 scale = transMatrix.GetScale(convertAxes: true);
                     gao.transform.localPosition = pos;
                     gao.transform.localRotation = rot;

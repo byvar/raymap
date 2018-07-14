@@ -55,7 +55,7 @@ namespace OpenSpace {
                     } else if (texMain != null && texSecondary != null) {
                         if (transparent) {
                             baseMaterial = l.baseBlendTransparentMaterial;
-                            if (!texSecondary.texture.HasColor()) useAlphaMask = true;
+                            if (!texSecondary.Texture.HasColor()) useAlphaMask = true;
                         } /*else if (!texSecondary.texture.HasColor()) {
                             useAlphaMask = true;
                             baseMaterial = l.baseBlendTransparentMaterial;
@@ -73,17 +73,17 @@ namespace OpenSpace {
                     } else {
                         material.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
                     }
-                    if (texMain != null) material.SetTexture("_MainTex", texMain.texture);
+                    if (texMain != null) material.SetTexture("_MainTex", texMain.Texture);
                     if (texSecondary != null) {
                         if (baseMaterial == l.baseBlendMaterial || baseMaterial == l.baseBlendTransparentMaterial) {
-                            material.SetTexture("_MainTex2", texSecondary.texture);
+                            material.SetTexture("_MainTex2", texSecondary.Texture);
                             if (useAlphaMask) material.SetFloat("_UseAlpha", 1f);
                             //material.SetFloat("_Blend", 1f);
                         } else {
-                            material.SetTexture("_DetailAlbedoMap", texSecondary.texture);
+                            material.SetTexture("_DetailAlbedoMap", texSecondary.Texture);
                         }
                     }
-                    if (texMain == null || texMain.texture == null) {
+                    if (texMain == null || texMain.Texture == null) {
                         // Don't want to see all those textureless planes, so create transparent texture and use that
                         Texture2D tex = new Texture2D(1, 1);
                         tex.SetPixel(0, 0, new Color(0, 0, 0, 0));
@@ -109,6 +109,9 @@ namespace OpenSpace {
                         }
                     }
                     Material baseMaterial = l.billboardMaterial;
+                    if (textureTypes.Where(i => (i & 0x20) != 0).Count() > 0 || IsLight) {
+                        baseMaterial = l.billboardAdditiveMaterial;
+                    }
                     bool transparent = IsTransparent;
                     materialBillboard = new Material(baseMaterial);
                     materialBillboard.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, ambientCoef.w));
@@ -117,17 +120,17 @@ namespace OpenSpace {
                     } else {
                         materialBillboard.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
                     }
-                    if (texMain != null) materialBillboard.SetTexture("_MainTex", texMain.texture);
+                    if (texMain != null) materialBillboard.SetTexture("_MainTex", texMain.Texture);
                     if (texSecondary != null) {
                         if (baseMaterial == l.baseBlendMaterial || baseMaterial == l.baseBlendTransparentMaterial) {
-                            materialBillboard.SetTexture("_MainTex2", texSecondary.texture);
+                            materialBillboard.SetTexture("_MainTex2", texSecondary.Texture);
                             if (useAlphaMask) materialBillboard.SetFloat("_UseAlpha", 1f);
                             //material.SetFloat("_Blend", 1f);
                         } else {
-                            materialBillboard.SetTexture("_DetailAlbedoMap", texSecondary.texture);
+                            materialBillboard.SetTexture("_DetailAlbedoMap", texSecondary.Texture);
                         }
                     }
-                    if (texMain == null || texMain.texture == null) {
+                    if (texMain == null || texMain.Texture == null) {
                         // Don't want to see all those textureless planes, so create transparent texture and use that
                         Texture2D tex = new Texture2D(1, 1);
                         tex.SetPixel(0, 0, new Color(0, 0, 0, 0));
@@ -142,7 +145,7 @@ namespace OpenSpace {
         public bool IsTransparent {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((flags & flags_isTransparent) != 0) { // if (l.mode == R3Loader.Mode.Rayman2PC) 
+                if ((flags & flags_isTransparent) != 0 || MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
                     if (off_textures.Count > 0 && off_textures[0] != null) {
                         TextureInfo tex = TextureInfo.FromOffset(off_textures[0]);
                         if (tex != null) {
@@ -157,7 +160,7 @@ namespace OpenSpace {
         public bool IsLight {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((flags & flags_isTransparent) != 0) { // if (l.mode == R3Loader.Mode.Rayman2PC) 
+                if ((flags & flags_isTransparent) != 0 || MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
                     if (off_textures.Count > 0 && off_textures[0] != null) {
                         TextureInfo tex = TextureInfo.FromOffset(off_textures[0]);
                         if (tex != null) {

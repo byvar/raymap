@@ -23,6 +23,7 @@ namespace OpenSpace {
         public Material baseBlendTransparentMaterial;
         public Material negativeLightProjectorMaterial;
         public Material billboardMaterial;
+        public Material billboardAdditiveMaterial;
 
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
@@ -379,17 +380,17 @@ namespace OpenSpace {
                     for (uint i = 0; i < num_textures_menu; i++) {
                         Pointer off_texture = Pointer.Read(reader);
                         TextureInfo tex = textures.Where(t => t.offset == off_texture).First();
-                        tex.texture = menuTPL.textures[i];
+                        tex.Texture = menuTPL.textures[i];
                     }
                     for (int i = 0, j = 0; i < fixTPL.Count; i++, j++) {
-                        while (textures[j].texture != null) j++;
-                        textures[j].texture = fixTPL.textures[i];
+                        while (textures[j].Texture != null) j++;
+                        textures[j].Texture = fixTPL.textures[i];
                     }
                 } else if (mode == Mode.Rayman3PC || mode == Mode.RaymanArenaPC) {
                     for (int i = 0; i < num_textures; i++) {
                         GF gf = cnt.GetGFByTGAName(textures[i].name);
                         if (gf != null) {
-                            textures[i].texture = gf.GetTexture();
+                            textures[i].Texture = gf.GetTexture();
                         }
                     }
                 }
@@ -517,9 +518,9 @@ namespace OpenSpace {
                 for (int i = 0; i < num_textures_lvl; i++) {
                     uint file_texture = reader.ReadUInt32();
                     if (hasTransit && file_texture == 6) {
-                        textures[num_textures_fix + i].texture = transitTPL.textures[transitTexturesSeen++];
+                        textures[num_textures_fix + i].Texture = transitTPL.textures[transitTexturesSeen++];
                     } else {
-                        textures[num_textures_fix + i].texture = lvlTPL.textures[i - transitTexturesSeen];
+                        textures[num_textures_fix + i].Texture = lvlTPL.textures[i - transitTexturesSeen];
                     }
                 }
             } else if (mode == Mode.Rayman3PC || mode == Mode.RaymanArenaPC) {
@@ -549,12 +550,12 @@ namespace OpenSpace {
                         // texture is undefined
                     } else if (hasTransit && file_texture == 6) {
                         GF gf = cnt.GetGFByTGAName(textures[num_textures_fix + i].name);
-                        if (gf != null) textures[num_textures_fix + i].texture = gf.GetTexture();
+                        if (gf != null) textures[num_textures_fix + i].Texture = gf.GetTexture();
                         transitTexturesSeen++;
                         //textures[num_textures_fix + i].texture = transitTPL.textures[transitTexturesSeen++];
                     } else {
                         GF gf = cnt.GetGFByTGAName(textures[num_textures_fix + i].name);
-                        if (gf != null) textures[num_textures_fix + i].texture = gf.GetTexture();
+                        if (gf != null) textures[num_textures_fix + i].Texture = gf.GetTexture();
                         //textures[num_textures_fix + i].texture = lvlTPL.textures[i - transitTexturesSeen];
                     }
                 }
@@ -856,11 +857,11 @@ namespace OpenSpace {
                         string texturePath = Path.ChangeExtension(Path.Combine(gameDataBinFolder, "../graphics/textures/" + textures[i].name), ".gf");
                         if (File.Exists(texturePath)) {
                             GF gf = new GF(texturePath);
-                            if (gf != null) textures[i].texture = gf.GetTexture();
+                            if (gf != null) textures[i].Texture = gf.GetTexture();
                         }
                     } else {
                         GF gf = cnt.GetGFByTGAName(textures[i].name);
-                        if (gf != null) textures[i].texture = gf.GetTexture();
+                        if (gf != null) textures[i].Texture = gf.GetTexture();
                     }
                 }
             }
@@ -1104,11 +1105,11 @@ namespace OpenSpace {
                         string texturePath = Path.ChangeExtension(Path.Combine(gameDataBinFolder, "../graphics/textures/" + textures[i].name), ".gf");
                         if (File.Exists(texturePath)) {
                             GF gf = new GF(texturePath);
-                            if (gf != null) textures[i].texture = gf.GetTexture();
+                            if (gf != null) textures[i].Texture = gf.GetTexture();
                         }
                     } else {
                         GF gf = cnt.GetGFByTGAName(textures[i].name);
-                        if (gf != null) textures[i].texture = gf.GetTexture();
+                        if (gf != null) textures[i].Texture = gf.GetTexture();
                     }
                 }
                 /*uint file_texture = reader.ReadUInt32();

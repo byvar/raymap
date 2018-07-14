@@ -9,6 +9,7 @@ public class LightManager : MonoBehaviour {
     public bool simulateSectorLoading = true;
     public bool neighborSectorLights = true;
     public bool useTestFog = false;
+    public bool useAmbientColor = false;
     public SectorManager sectorManager;
     List<LightInfo> lights;
 
@@ -25,6 +26,7 @@ public class LightManager : MonoBehaviour {
                 Camera.main.renderingPath = RenderingPath.Forward;
             }
             bool fogSet = false;
+            bool ambientSet = false;
             if (simulateSectorLoading) {
                 for (int i = 0; i < lights.Count; i++) {
                     LightInfo l = lights[i];
@@ -38,6 +40,9 @@ public class LightManager : MonoBehaviour {
                             RenderSettings.fogEndDistance = Mathf.Lerp(RenderSettings.fogEndDistance, l.far * 5f, 0.5f * Time.deltaTime);
                             Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, l.Light.backgroundColor, 0.5f * Time.deltaTime);
                             fogSet = true;
+                        }
+                        if (useAmbientColor && l.type == 4 && !ambientSet) {
+                            RenderSettings.ambientLight = l.color;
                         }
                     } else {
                         l.Light.Deactivate();

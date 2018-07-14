@@ -48,36 +48,18 @@ namespace OpenSpace.Visual {
 
         private void CreateUnityMesh() {
             for (uint i = 0; i < num_sprites; i++) {
-                Mesh meshUnity = new Mesh();
-                Vector3[] vertices = new Vector3[4];
-                vertices[0] = new Vector3(-sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
-                vertices[1] = new Vector3( sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
-                vertices[2] = new Vector3(-sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
-                vertices[3] = new Vector3( sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
-                Vector3[] normals = new Vector3[4];
-                normals[0] = Vector3.forward;
-                normals[1] = Vector3.forward;
-                normals[2] = Vector3.forward;
-                normals[3] = Vector3.forward;
-                Vector2[] uvs = new Vector2[4];
-                uvs[0] = new Vector2(0, 0);
-                uvs[1] = new Vector2(1, 0);
-                uvs[2] = new Vector2(0, 1);
-                uvs[3] = new Vector2(1, 1);
-                int[] triangles = new int[] { 0, 2, 1, 1, 2, 3 };
-
-                meshUnity.vertices = vertices;
-                meshUnity.normals = normals;
-                meshUnity.triangles = triangles;
-                meshUnity.uv = uvs;
-
-
+                bool mirrorX = false;
+                bool mirrorY = false;
                 GameObject spr_gao = new GameObject(name + " - Sprite " + i);
                 spr_gao.transform.SetParent(gao.transform);
                 MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
-                mf.mesh = meshUnity;
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
                 if (sprites[i].r3mat != null) {
+                    if (sprites[i].r3mat.off_textures != null && sprites[i].r3mat.off_textures.Count > 0) {
+                        TextureInfo mainTex = TextureInfo.FromOffset(sprites[i].r3mat.off_textures[0]);
+                        if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
+                        if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
+                    }
                     Material unityMat = sprites[i].r3mat.MaterialBillboard;
                     bool receiveShadows = (sprites[i].r3mat.properties & VisualMaterial.property_receiveShadows) != 0;
                     //if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
@@ -92,6 +74,31 @@ namespace OpenSpace.Visual {
                         mtmat.mat = mr.material;
                     }
                 }
+                Mesh meshUnity = new Mesh();
+                Vector3[] vertices = new Vector3[4];
+                vertices[0] = new Vector3(-sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
+                vertices[1] = new Vector3( sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
+                vertices[2] = new Vector3(-sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
+                vertices[3] = new Vector3( sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
+                Vector3[] normals = new Vector3[4];
+                normals[0] = Vector3.forward;
+                normals[1] = Vector3.forward;
+                normals[2] = Vector3.forward;
+                normals[3] = Vector3.forward;
+                Vector2[] uvs = new Vector2[4];
+                uvs[0] = new Vector2(0, 0 - (mirrorY ? 1 : 0));
+                uvs[1] = new Vector2(1 + (mirrorX ? 1 : 0), 0 - (mirrorY ? 1 : 0));
+                uvs[2] = new Vector2(0, 1);
+                uvs[3] = new Vector2(1 + (mirrorX ? 1 : 0), 1);
+                int[] triangles = new int[] { 0, 2, 1, 1, 2, 3 };
+
+                meshUnity.vertices = vertices;
+                meshUnity.normals = normals;
+                meshUnity.triangles = triangles;
+                meshUnity.uv = uvs;
+
+                
+                mf.mesh = meshUnity;
             }
         }
 

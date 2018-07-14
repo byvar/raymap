@@ -19,6 +19,7 @@ public class Controller : MonoBehaviour {
     public Material baseBlendTransparentMaterial;
     public Material negativeLightProjectorMaterial;
     public Material billboardMaterial;
+    public Material billboardAdditiveMaterial;
     public SectorManager sectorManager;
     public LightManager lightManager;
     public bool allowDeadPointers = false;
@@ -84,6 +85,7 @@ public class Controller : MonoBehaviour {
         loader.negativeLightProjectorMaterial = negativeLightProjectorMaterial;
         loader.baseLightMaterial = baseLightMaterial;
         loader.billboardMaterial = billboardMaterial;
+        loader.billboardAdditiveMaterial = billboardAdditiveMaterial;
 
         loader.Load();
         sectorManager.Init();

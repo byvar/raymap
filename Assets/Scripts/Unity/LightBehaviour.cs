@@ -79,6 +79,7 @@ public class LightBehaviour : MonoBehaviour {
                     break;
                 case 3:
                     // hotspot light
+                    // r2: cone
                     break;
                 case 4:
                     // ambient light
@@ -93,6 +94,7 @@ public class LightBehaviour : MonoBehaviour {
                     l.range = r3l.attFactor3 * 1.5f;
                     break;
                 case 6:
+                    // r2: background color
                     // fog
                     // has the following properties:
                     // near

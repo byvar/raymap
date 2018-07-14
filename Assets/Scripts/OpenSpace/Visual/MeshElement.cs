@@ -237,6 +237,7 @@ namespace OpenSpace.Visual {
                 //}
             }
             if (r3mat != null) {
+                gao.name += " " + r3mat.offset;
                 Material unityMat = r3mat.Material;
                 bool receiveShadows = (r3mat.properties & VisualMaterial.property_receiveShadows) != 0;
                 if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
