@@ -22,6 +22,10 @@ namespace OpenSpace {
         private Material material;
         private Material materialBillboard;
 
+        // UV scrolling
+        public bool scrollingEnabled;
+        public float scrollX, scrollY;
+
         // flags
         public static uint flags_isTransparent = (1 << 3);
         public static uint flags_backfaceCulling = (1 << 10);
@@ -183,8 +187,8 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
             // Material struct = 0x188
-            m.flags = reader.ReadUInt32();
-            m.ambientCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            m.flags = reader.ReadUInt32(); // 0x4
+            m.ambientCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); //
             m.diffuseCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -192,9 +196,26 @@ namespace OpenSpace {
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 Pointer off_texture = Pointer.Read(reader);
                 //Pointer off_texture2 = Pointer.Read(reader);
-                int type_texture = reader.ReadInt32();
+                int type_texture = reader.ReadInt32(); // 0x20
                 m.off_textures.Add(off_texture);
                 m.textureTypes.Add(type_texture);
+
+                reader.ReadInt32(); // skip to 0x54
+                float scrollX = reader.ReadSingle();
+                float scrollY = reader.ReadSingle();
+                m.scrollingEnabled = reader.ReadUInt32()!=0;
+
+                if (m.scrollingEnabled)
+                {
+                    m.scrollX = scrollX;
+                    m.scrollY = scrollY;
+
+                    MapLoader.Loader.print("Scrolling enabled, scrollX = " + m.scrollX + ", scrollY = " + m.scrollY);
+                }
+
+                // 0x6F = char textureScrolling
+                // 0x7C = float scrollX;
+                // 0x80 = float scrollY;
             } else {
                 Pointer off_animTextures = Pointer.Read(reader);
                 reader.ReadUInt32(); // a repeat of last offset?

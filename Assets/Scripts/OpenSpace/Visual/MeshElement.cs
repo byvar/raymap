@@ -251,6 +251,12 @@ namespace OpenSpace.Visual {
                         mtmat.r3mat = r3mat;
                         mtmat.mat = mr_main.material;
                     }
+                    if (r3mat.scrollingEnabled)
+                    {
+                        ScrollingTexture scrollComponent = mr_main.gameObject.AddComponent<ScrollingTexture>();
+                        scrollComponent.r3mat = r3mat;
+                        scrollComponent.mat = mr_main.material;
+                    }
                 }
                 if (mr_spe != null) {
                     mr_spe.material = unityMat;
@@ -260,6 +266,12 @@ namespace OpenSpace.Visual {
                         MultiTextureMaterial mtmat = mr_spe.gameObject.AddComponent<MultiTextureMaterial>();
                         mtmat.r3mat = r3mat;
                         mtmat.mat = mr_spe.material;
+                    }
+                    if (r3mat.scrollingEnabled)
+                    {
+                        ScrollingTexture scrollComponent = mr_spe.gameObject.AddComponent<ScrollingTexture>();
+                        scrollComponent.r3mat = r3mat;
+                        scrollComponent.mat = mr_spe.material;
                     }
                 }
             }
