@@ -187,20 +187,20 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
             // Material struct = 0x188
-            m.flags = reader.ReadUInt32(); // 0x4
-            m.ambientCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); //
+            m.flags = reader.ReadUInt32(); // After this: 0x4
+            m.ambientCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.diffuseCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            reader.ReadUInt32(); // some specular parameter
+            reader.ReadUInt32(); // some specular parameter, 0x48
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                Pointer off_texture = Pointer.Read(reader);
+                Pointer off_texture = Pointer.Read(reader); // 0x4c
                 //Pointer off_texture2 = Pointer.Read(reader);
-                int type_texture = reader.ReadInt32(); // 0x20
+                int type_texture = reader.ReadInt32(); // 0x50
                 m.off_textures.Add(off_texture);
                 m.textureTypes.Add(type_texture);
 
-                reader.ReadInt32(); // skip to 0x54
+                reader.ReadInt32(); // 0x54
                 float scrollX = reader.ReadSingle();
                 float scrollY = reader.ReadSingle();
                 m.scrollingEnabled = reader.ReadUInt32()!=0;
@@ -233,14 +233,21 @@ namespace OpenSpace {
                 reader.ReadByte();
                 reader.ReadByte();
                 reader.ReadByte();
-                reader.ReadByte();
+                byte scrollByte1 = reader.ReadByte();
+                if ((scrollByte1 & 6) != 0) { // 6 = 110, so these two flags are for X and Y scrolling
+                    m.scrollingEnabled = true;
+                }
                 int type_texture1 = reader.ReadInt32();
-                reader.ReadBytes(0x3C);
+                reader.ReadInt32();
+                reader.ReadInt32();
+                m.scrollX = reader.ReadSingle();
+                m.scrollY = reader.ReadSingle();
+                reader.ReadBytes(0x2C);
                 Pointer off_texture2 = Pointer.Read(reader);
                 reader.ReadByte();
                 reader.ReadByte();
                 reader.ReadByte();
-                reader.ReadByte();
+                byte scrollByte2 = reader.ReadByte();
                 int type_texture2 = reader.ReadInt32();
                 uint num_textures = 0;
                 if (off_texture1 != null) {

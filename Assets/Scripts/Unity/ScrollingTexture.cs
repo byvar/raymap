@@ -10,9 +10,7 @@ public class ScrollingTexture : MonoBehaviour
     public VisualMaterial r3mat;
     public Material mat;
 
-    public void Start()
-    {
-        Console.WriteLine("test");
+    public void Start() {
     }
 
     public void Update()
