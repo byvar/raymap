@@ -17,10 +17,13 @@ public class MultiTextureMaterial : MonoBehaviour {
 
     public void Start() {
         textureNames = r3mat.animTextures.Select(a => (a == null || a.texture == null) ? "Null" : a.texture.name).ToArray();
+        SetTexture(r3mat.currentAnimTexture);
     }
 
     public void SetTexture(int index) {
         if (index < 0 || index > r3mat.animTextures.Count) return;
+        textureIndex = index;
+        currentTexture = index;
         TextureInfo tex = r3mat.animTextures[index].texture;
         if (tex != null) {
             mat.SetTexture("_MainTex", tex.Texture);
@@ -28,8 +31,7 @@ public class MultiTextureMaterial : MonoBehaviour {
     }
 
     public void Update() {
-        if (animate) {
-            if (r3mat.IsLockedAnimatedTexture) animate = false;
+        if (animate && !r3mat.IsLockedAnimatedTexture) {
             if (textureIndex >= 0 && textureIndex < r3mat.animTextures.Count) {
                 currentTime += Time.deltaTime;
                 float time = r3mat.animTextures[currentTexture].time;

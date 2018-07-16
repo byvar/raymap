@@ -18,11 +18,17 @@ namespace OpenSpace.Visual {
         public Vector4 diffuseCoef;
         public Vector4 specularCoef;
         public Vector4 color;
+
+        public Pointer off_animTextures_first;
+        public Pointer off_animTextures_current;
+        public ushort num_animTextures;
+
         public byte properties;
         private Material material;
         private Material materialBillboard;
 
         // UV scrolling
+        public int currentAnimTexture = 0;
         public bool scrollingEnabled;
         public float scrollX, scrollY;
 
@@ -191,10 +197,8 @@ namespace OpenSpace.Visual {
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             reader.ReadUInt32(); // some specular parameter, 0x48
-
-            Pointer off_animTextures;
+            
             List<Pointer> off_textures = new List<Pointer>();
-            uint num_animTextures;
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 Pointer off_texture = Pointer.Read(reader); // 0x4c
                 //Pointer off_texture2 = Pointer.Read(reader);
@@ -216,9 +220,9 @@ namespace OpenSpace.Visual {
                 }
 
                 reader.ReadInt32(); // 0x64
-                off_animTextures = Pointer.Read(reader); // 0x68
-                reader.ReadUInt32(); // a repeat of last offset?, 0x6c
-                num_animTextures = reader.ReadUInt16();
+                m.off_animTextures_first = Pointer.Read(reader); // 0x68
+                m.off_animTextures_current = Pointer.Read(reader); // 0x6c
+                m.num_animTextures = reader.ReadUInt16();
                 reader.ReadUInt16(); // 0x70
                 reader.ReadUInt32(); // 0x74
                 m.properties = reader.ReadByte();
@@ -226,9 +230,9 @@ namespace OpenSpace.Visual {
                 reader.ReadByte();
                 reader.ReadByte();
             } else {
-                off_animTextures = Pointer.Read(reader);
-                reader.ReadUInt32(); // a repeat of last offset?
-                num_animTextures = reader.ReadUInt16();
+                m.off_animTextures_first = Pointer.Read(reader);
+                m.off_animTextures_current = Pointer.Read(reader);
+                m.num_animTextures = reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt32();
                 reader.ReadByte();
@@ -295,14 +299,19 @@ namespace OpenSpace.Visual {
             for (int i = 0; i < off_textures.Count; i++) {
                 m.textures.Add(TextureInfo.FromOffset(off_textures[i]));
             }
-            if (num_animTextures > 0 && off_animTextures != null) {
-                Pointer.Goto(ref reader, off_animTextures);
-                for (int i = 0; i < num_animTextures; i++) {
+            if (m.num_animTextures > 0 && m.off_animTextures_first != null) {
+                Pointer off_currentAnimTexture = m.off_animTextures_first;
+                Pointer.Goto(ref reader, m.off_animTextures_first);
+                for (int i = 0; i < m.num_animTextures; i++) {
+                    if (off_currentAnimTexture == m.off_animTextures_current) m.currentAnimTexture = i;
                     Pointer off_animTexture = Pointer.Read(reader);
                     float time = reader.ReadSingle();
                     m.animTextures.Add(new AnimatedTexture(off_animTexture, time));
                     Pointer off_nextAnimTexture = Pointer.Read(reader);
-                    if (off_nextAnimTexture != null) Pointer.Goto(ref reader, off_nextAnimTexture);
+                    if (off_nextAnimTexture != null) {
+                        off_currentAnimTexture = off_nextAnimTexture;
+                        Pointer.Goto(ref reader, off_nextAnimTexture);
+                    }
                 }
             }
 

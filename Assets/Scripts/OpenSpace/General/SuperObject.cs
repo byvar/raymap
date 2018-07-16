@@ -63,7 +63,7 @@ namespace OpenSpace {
                 so.off_brother_prev = Pointer.Read(reader);
                 so.off_parent = Pointer.Read(reader);
                 so.off_matrix = Pointer.Read(reader); // 0x20->0x24
-                reader.ReadBytes(0x24);
+                reader.ReadInt32();
                 so.superObjectFlags = reader.ReadInt32();
 
                 //R3Pointer.Read(reader); // a copy of the matrix right after, at least in R3GC
