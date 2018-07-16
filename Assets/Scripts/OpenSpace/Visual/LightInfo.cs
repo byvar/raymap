@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace {
+namespace OpenSpace.Visual {
     public class LightInfo : IEquatable<LightInfo> {
         public Pointer offset;
         public List<Sector> containingSectors;

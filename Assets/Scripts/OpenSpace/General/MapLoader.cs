@@ -4,6 +4,7 @@ using OpenSpace.EngineObject;
 using OpenSpace.FileFormat;
 using OpenSpace.FileFormat.Texture;
 using OpenSpace.Input;
+using OpenSpace.Visual;
 using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;

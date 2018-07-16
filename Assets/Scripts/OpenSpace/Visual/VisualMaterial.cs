@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace {
+namespace OpenSpace.Visual {
     /// <summary>
     /// Visual Material definition
     /// </summary>
     public class VisualMaterial {
-        public List<Pointer> off_textures;
-        public List<Pointer> off_animTextures;
+        public List<TextureInfo> textures;
+        public List<AnimatedTexture> animTextures;
         public uint flags;
         public List<int> textureTypes;
         public Pointer offset;
@@ -46,10 +46,10 @@ namespace OpenSpace {
                     //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
                     bool useAlphaMask = false;
                     TextureInfo texMain = null, texSecondary = null;
-                    if (off_textures != null && off_textures.Count > 0) {
-                        texMain = TextureInfo.FromOffset(off_textures[0]);
-                        if (off_textures.Count > 1) {
-                            texSecondary = TextureInfo.FromOffset(off_textures[1]);
+                    if (textures != null && textures.Count > 0) {
+                        texMain = textures[0];
+                        if (textures.Count > 1) {
+                            texSecondary = textures[1];
                         }
                     }
                     Material baseMaterial = l.baseMaterial;
@@ -106,10 +106,10 @@ namespace OpenSpace {
                     //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
                     bool useAlphaMask = false;
                     TextureInfo texMain = null, texSecondary = null;
-                    if (off_textures != null && off_textures.Count > 0) {
-                        texMain = TextureInfo.FromOffset(off_textures[0]);
-                        if (off_textures.Count > 1) {
-                            texSecondary = TextureInfo.FromOffset(off_textures[1]);
+                    if (textures != null && textures.Count > 0) {
+                        texMain = textures[0];
+                        if (textures.Count > 1) {
+                            texSecondary = textures[1];
                         }
                     }
                     Material baseMaterial = l.billboardMaterial;
@@ -150,11 +150,8 @@ namespace OpenSpace {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
                 if ((flags & flags_isTransparent) != 0 || MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
-                    if (off_textures.Count > 0 && off_textures[0] != null) {
-                        TextureInfo tex = TextureInfo.FromOffset(off_textures[0]);
-                        if (tex != null) {
-                            return tex.IsTransparent;
-                        }
+                    if (textures.Count > 0 && textures[0] != null) {
+                        return textures[0].IsTransparent;
                     }
                     return false;
                 } else return true;
@@ -165,22 +162,23 @@ namespace OpenSpace {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
                 if ((flags & flags_isTransparent) != 0 || MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
-                    if (off_textures.Count > 0 && off_textures[0] != null) {
-                        TextureInfo tex = TextureInfo.FromOffset(off_textures[0]);
-                        if (tex != null) {
-                            return tex.IsLight;
-                        }
+                    if (textures.Count > 0 && textures[0] != null) {
+                        return textures[0].IsLight;
                     }
                     return false;
                 } else return true;
             }
         }
 
+        public bool IsLockedAnimatedTexture {
+            get { return (properties & 1) == 1; }
+        }
+
         public VisualMaterial(Pointer offset) {
             this.offset = offset;
-            off_textures = new List<Pointer>();
+            textures = new List<TextureInfo>();
             textureTypes = new List<int>();
-            off_animTextures = new List<Pointer>();
+            animTextures = new List<AnimatedTexture>();
         }
 
         public static VisualMaterial Read(EndianBinaryReader reader, Pointer offset) {
@@ -193,17 +191,21 @@ namespace OpenSpace {
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             reader.ReadUInt32(); // some specular parameter, 0x48
+
+            Pointer off_animTextures;
+            List<Pointer> off_textures = new List<Pointer>();
+            uint num_animTextures;
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 Pointer off_texture = Pointer.Read(reader); // 0x4c
                 //Pointer off_texture2 = Pointer.Read(reader);
                 int type_texture = reader.ReadInt32(); // 0x50
-                m.off_textures.Add(off_texture);
+                off_textures.Add(off_texture);
                 m.textureTypes.Add(type_texture);
 
                 reader.ReadInt32(); // 0x54
-                float scrollX = reader.ReadSingle();
-                float scrollY = reader.ReadSingle();
-                m.scrollingEnabled = reader.ReadUInt32()!=0;
+                float scrollX = reader.ReadSingle(); // 0x58
+                float scrollY = reader.ReadSingle(); // 0x5c
+                m.scrollingEnabled = reader.ReadUInt32()!=0; //0x60
 
                 if (m.scrollingEnabled)
                 {
@@ -213,13 +215,20 @@ namespace OpenSpace {
                     MapLoader.Loader.print("Scrolling enabled, scrollX = " + m.scrollX + ", scrollY = " + m.scrollY);
                 }
 
-                // 0x6F = char textureScrolling
-                // 0x7C = float scrollX;
-                // 0x80 = float scrollY;
+                reader.ReadInt32(); // 0x64
+                off_animTextures = Pointer.Read(reader); // 0x68
+                reader.ReadUInt32(); // a repeat of last offset?, 0x6c
+                num_animTextures = reader.ReadUInt16();
+                reader.ReadUInt16(); // 0x70
+                reader.ReadUInt32(); // 0x74
+                m.properties = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
             } else {
-                Pointer off_animTextures = Pointer.Read(reader);
+                off_animTextures = Pointer.Read(reader);
                 reader.ReadUInt32(); // a repeat of last offset?
-                ushort num_animTextures = reader.ReadUInt16();
+                num_animTextures = reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt32();
                 reader.ReadByte();
@@ -251,11 +260,11 @@ namespace OpenSpace {
                 int type_texture2 = reader.ReadInt32();
                 uint num_textures = 0;
                 if (off_texture1 != null) {
-                    m.off_textures.Add(off_texture1);
+                    off_textures.Add(off_texture1);
                     m.textureTypes.Add(type_texture1);
                 }
                 if (off_texture2 != null) {
-                    m.off_textures.Add(off_texture2);
+                    off_textures.Add(off_texture2);
                     m.textureTypes.Add(type_texture2);
                 }
                 /*if (off_texture2 != null) num_textures++;
@@ -282,15 +291,18 @@ namespace OpenSpace {
                     textureTypes[i] = reader.ReadInt32();
                     if (num_textures > i + 1) reader.ReadBytes(0x3C);
                 }*/
-                if (num_animTextures > 0 && off_animTextures != null) {
-                    Pointer.Goto(ref reader, off_animTextures);
-                    for (int i = 0; i < num_animTextures; i++) {
-                        Pointer off_animTexture = Pointer.Read(reader);
-                        m.off_animTextures.Add(off_animTexture);
-                        reader.ReadUInt32();
-                        Pointer off_nextAnimTexture = Pointer.Read(reader);
-                        if (off_nextAnimTexture != null) Pointer.Goto(ref reader, off_nextAnimTexture);
-                    }
+            }
+            for (int i = 0; i < off_textures.Count; i++) {
+                m.textures.Add(TextureInfo.FromOffset(off_textures[i]));
+            }
+            if (num_animTextures > 0 && off_animTextures != null) {
+                Pointer.Goto(ref reader, off_animTextures);
+                for (int i = 0; i < num_animTextures; i++) {
+                    Pointer off_animTexture = Pointer.Read(reader);
+                    float time = reader.ReadSingle();
+                    m.animTextures.Add(new AnimatedTexture(off_animTexture, time));
+                    Pointer off_nextAnimTexture = Pointer.Read(reader);
+                    if (off_nextAnimTexture != null) Pointer.Goto(ref reader, off_nextAnimTexture);
                 }
             }
 

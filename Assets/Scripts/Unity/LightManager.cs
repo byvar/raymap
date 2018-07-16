@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using OpenSpace;
 using System.Linq;
+using OpenSpace.Visual;
 
 public class LightManager : MonoBehaviour {
     bool loaded = false;
