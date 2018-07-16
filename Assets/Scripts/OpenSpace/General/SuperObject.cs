@@ -21,6 +21,8 @@ namespace OpenSpace {
         public Pointer off_matrix;
         public Matrix matrix;
         public IEngineObject data;
+        public int superObjectFlags;
+
         public GameObject Gao {
             get {
                 if (data != null) {
@@ -60,7 +62,10 @@ namespace OpenSpace {
                 so.off_brother_next = Pointer.Read(reader);
                 so.off_brother_prev = Pointer.Read(reader);
                 so.off_parent = Pointer.Read(reader);
-                so.off_matrix = Pointer.Read(reader);
+                so.off_matrix = Pointer.Read(reader); // 0x20->0x24
+                reader.ReadBytes(0x24);
+                so.superObjectFlags = reader.ReadInt32();
+
                 //R3Pointer.Read(reader); // a copy of the matrix right after, at least in R3GC
                 Vector3 pos = Vector3.zero;
                 Vector3 scale = Vector3.one;
@@ -105,6 +110,9 @@ namespace OpenSpace {
                     so.Gao.transform.localPosition = pos;
                     so.Gao.transform.localRotation = rot;
                     so.Gao.transform.localScale = scale;
+
+                    SuperObjectFlags soFlags = so.Gao.AddComponent<SuperObjectFlags>();
+                    soFlags.SetRawFlags(so.superObjectFlags);
                 }
                 isFirstNode = false;
                 if (isValidNode) {
