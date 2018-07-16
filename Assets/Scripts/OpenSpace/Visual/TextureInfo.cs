@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace {
+namespace OpenSpace.Visual {
     /// <summary>
     /// Texture definition
     /// </summary>

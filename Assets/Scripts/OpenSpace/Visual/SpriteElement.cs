@@ -55,8 +55,8 @@ namespace OpenSpace.Visual {
                 MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
                 if (sprites[i].r3mat != null) {
-                    if (sprites[i].r3mat.off_textures != null && sprites[i].r3mat.off_textures.Count > 0) {
-                        TextureInfo mainTex = TextureInfo.FromOffset(sprites[i].r3mat.off_textures[0]);
+                    if (sprites[i].r3mat.textures != null && sprites[i].r3mat.textures.Count > 0) {
+                        TextureInfo mainTex = sprites[i].r3mat.textures[0];
                         if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
                         if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
                     }
@@ -68,7 +68,7 @@ namespace OpenSpace.Visual {
                     /*mr.material.SetFloat("_ScaleX", sprites[i].info_scale.x);
                     mr.material.SetFloat("_ScaleY", sprites[i].info_scale.y);*/
                     if (!receiveShadows) mr.receiveShadows = false;
-                    if (sprites[i].r3mat.off_animTextures.Count > 0) {
+                    if (sprites[i].r3mat.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
                         mtmat.r3mat = sprites[i].r3mat;
                         mtmat.mat = mr.material;
