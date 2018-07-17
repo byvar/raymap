@@ -127,7 +127,9 @@ namespace OpenSpace.Visual {
                     }
                     Material baseMaterial = l.billboardMaterial;
                     if (textures.Where(t => (t.properties & 0x20) != 0).Count() > 0 || IsLight) {
-                        baseMaterial = l.billboardAdditiveMaterial;
+                        if (l.billboardAdditiveMaterial != null) {
+                            baseMaterial = l.billboardAdditiveMaterial;
+                        }
                     }
                     bool transparent = IsTransparent;
                     materialBillboard = new Material(baseMaterial);
