@@ -197,10 +197,10 @@ namespace OpenSpace.Visual {
             m.ambientCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.diffuseCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            reader.ReadUInt32(); // some specular parameter, 0x48
+            m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
             
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                reader.ReadUInt32(); // 0x48
                 VisualMaterialTexture t = new VisualMaterialTexture();
                 t.off_texture = Pointer.Read(reader); // 0x4c
                 t.texture = TextureInfo.FromOffset(t.off_texture);
@@ -211,7 +211,7 @@ namespace OpenSpace.Visual {
                 t.scrollMode = reader.ReadUInt32(); //0x60
                 m.textures.Add(t);
 
-                reader.ReadInt32(); // 0x64
+                reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
                 m.off_animTextures_first = Pointer.Read(reader); // 0x68
                 m.off_animTextures_current = Pointer.Read(reader); // 0x6c
                 m.num_animTextures = reader.ReadUInt16();
@@ -222,6 +222,7 @@ namespace OpenSpace.Visual {
                 reader.ReadByte();
                 reader.ReadByte();
             } else {
+                reader.ReadUInt32(); // current refresh number for scrolling/animated textures, 0x48
                 m.off_animTextures_first = Pointer.Read(reader);
                 m.off_animTextures_current = Pointer.Read(reader);
                 m.num_animTextures = reader.ReadUInt16();
