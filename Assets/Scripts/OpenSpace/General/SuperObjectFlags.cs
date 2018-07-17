@@ -29,7 +29,7 @@ public class SuperObjectFlags : MonoBehaviour
     public bool Invisible                   { get { return GetFlag(01); } set { SetFlag(01, value); } }
     public bool NoTransformMatrix           { get { return GetFlag(02); } set { SetFlag(02, value); } } // No scale, no rotation
     public bool ZoomInsteadOfScale          { get { return GetFlag(03); } set { SetFlag(03, value); } } // Same scale coëfficient over all 3 axes
-    public bool BoundingSphereInsteadOfBox  { get { return GetFlag(04); } set { SetFlag(04, value); } }
+    public bool BoundingBoxInsteadOfSphere  { get { return GetFlag(04); } set { SetFlag(04, value); } }
     public bool DisplayOnTop                { get { return GetFlag(05); } set { SetFlag(05, value); } } // displayed over all C - 0 ; non collisionnable
     public bool NoRayTracing                { get { return GetFlag(06); } set { SetFlag(06, value); } }
     public bool NoShadow                    { get { return GetFlag(07); } set { SetFlag(07, value); } }
@@ -81,7 +81,7 @@ public class SuperObjectFlags : MonoBehaviour
         this.flagPreview += Invisible                  ? "Invisible," : "";
         this.flagPreview += NoTransformMatrix          ? "NoTransformMatrix," : "";
         this.flagPreview += ZoomInsteadOfScale         ? "ZoomInsteadOfScale," : "";
-        this.flagPreview += BoundingSphereInsteadOfBox ? "BoundingSphereInsteadOfBox," : "";
+        this.flagPreview += BoundingBoxInsteadOfSphere ? "BoundingSphereInsteadOfBox," : "";
         this.flagPreview += DisplayOnTop               ? "DisplayOnTop," : "";
         this.flagPreview += NoRayTracing               ? "NoRayTracing," : "";
         this.flagPreview += NoShadow                   ? "NoShadow," : "";

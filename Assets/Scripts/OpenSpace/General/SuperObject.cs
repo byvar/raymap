@@ -22,6 +22,7 @@ namespace OpenSpace {
         public Matrix matrix;
         public IEngineObject data;
         public int superObjectFlags;
+        public SPOBoundingVolume boundingVolume;
 
         public GameObject Gao {
             get {
@@ -54,17 +55,20 @@ namespace OpenSpace {
                     so.parent = parent;
                 }
                 hasNextBrother = false;
-                so.type = reader.ReadUInt32();
-                so.off_data = Pointer.Read(reader);
-                so.off_child_first = Pointer.Read(reader);
-                so.off_child_last = Pointer.Read(reader);
-                so.num_children = reader.ReadUInt32();
-                so.off_brother_next = Pointer.Read(reader);
-                so.off_brother_prev = Pointer.Read(reader);
-                so.off_parent = Pointer.Read(reader);
+                so.type = reader.ReadUInt32(); // 0 - 4
+                so.off_data = Pointer.Read(reader); // 4 - 8
+                so.off_child_first = Pointer.Read(reader); // 8 - C
+                so.off_child_last = Pointer.Read(reader); // C - 10
+                so.num_children = reader.ReadUInt32(); // 10 - 14
+                so.off_brother_next = Pointer.Read(reader); // 14 - 18
+                so.off_brother_prev = Pointer.Read(reader); // 18 - 1C
+                so.off_parent = Pointer.Read(reader); // 1C - 20
                 so.off_matrix = Pointer.Read(reader); // 0x20->0x24
-                reader.ReadInt32();
-                so.superObjectFlags = reader.ReadInt32();
+                Pointer.Read(reader); // other matrix
+                reader.ReadInt32(); // 0x28 -> 0x2C
+                reader.ReadInt32(); // 0x2C -> 0x30
+                so.superObjectFlags = reader.ReadInt32(); // 0x30->0x34
+                Pointer off_boundingVolume = Pointer.Read(reader);
 
                 //R3Pointer.Read(reader); // a copy of the matrix right after, at least in R3GC
                 Vector3 pos = Vector3.zero;
@@ -88,7 +92,7 @@ namespace OpenSpace {
                         Pointer.Goto(ref reader, so.off_data);
                         so.data = IPO.Read(reader, so.off_data, so);
                         break;
-                    case 0x02: // e.o.
+                    case 0x02: // perso/engine object
                         Pointer.Goto(ref reader, so.off_data);
                         so.data = Perso.Read(reader, so.off_data, so);
                         break;
@@ -105,14 +109,40 @@ namespace OpenSpace {
                         isValidNode = false;
                         break;
                 }
+
+                SuperObjectFlags soFlags = null;
+                if (so.Gao != null) {
+                    soFlags = so.Gao.AddComponent<SuperObjectFlags>();
+                    soFlags.SetRawFlags(so.superObjectFlags);
+                }
+
+                if (off_boundingVolume != null && soFlags != null) {
+                    Pointer original = Pointer.Goto(ref reader, off_boundingVolume);
+                    so.boundingVolume = SPOBoundingVolume.Read(reader, off_boundingVolume, soFlags.BoundingBoxInsteadOfSphere ?
+                        SPOBoundingVolume.BoundingVolumeType.Box : SPOBoundingVolume.BoundingVolumeType.Sphere);
+                    Pointer.Goto(ref reader, original);
+                }
+
                 if (so.Gao != null) {
                     if (parent != null) so.Gao.transform.parent = parent.Gao.transform;
                     so.Gao.transform.localPosition = pos;
                     so.Gao.transform.localRotation = rot;
                     so.Gao.transform.localScale = scale;
 
-                    SuperObjectFlags soFlags = so.Gao.AddComponent<SuperObjectFlags>();
-                    soFlags.SetRawFlags(so.superObjectFlags);
+                    if (so.boundingVolume != null) {
+                        if (so.boundingVolume.type == SPOBoundingVolume.BoundingVolumeType.Box) {
+                            BoxCollider collider = so.Gao.AddComponent<BoxCollider>();
+
+                            collider.center = so.boundingVolume.boxCenter;
+                            collider.center -= so.Gao.transform.position;
+                            collider.size = so.boundingVolume.boxSize;
+                        } else {
+                            SphereCollider collider = so.Gao.AddComponent<SphereCollider>();
+
+                            collider.center = so.boundingVolume.sphereCenter;
+                            collider.radius = so.boundingVolume.sphereRadius;
+                        }
+                    }
                 }
                 isFirstNode = false;
                 if (isValidNode) {
