@@ -119,7 +119,7 @@ namespace OpenSpace.Visual {
 
         public static TextureInfo Read(EndianBinaryReader reader, Pointer offset) {
             TextureInfo tex = new TextureInfo(offset);
-            MapLoader.Loader.print("Tex off: " + offset);
+            //MapLoader.Loader.print("Tex off: " + offset);
             tex.field0 = reader.ReadUInt32(); // 888 or 8888
             tex.field4 = reader.ReadUInt16(); // 20
             tex.field6 = reader.ReadUInt16();
