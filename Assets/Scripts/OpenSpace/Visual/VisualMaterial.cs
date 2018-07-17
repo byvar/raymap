@@ -86,10 +86,14 @@ namespace OpenSpace.Visual {
                     } else {
                         material.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
                     }
-                    if (texMain != null) material.SetTexture("_MainTex", texMain.Texture);
+                    if (texMain != null) {
+                        material.SetTexture("_MainTex", texMain.Texture);
+                        material.SetTextureOffset("_MainTex", new Vector2(texMain.currentScrollX, texMain.currentScrollY));
+                    }
                     if (texSecondary != null) {
                         if (baseMaterial == l.baseBlendMaterial || baseMaterial == l.baseBlendTransparentMaterial) {
                             material.SetTexture("_MainTex2", texSecondary.Texture);
+                            material.SetTextureOffset("_MainTex2", new Vector2(texSecondary.currentScrollX, texSecondary.currentScrollY));
                             if (useAlphaMask) material.SetFloat("_UseAlpha", 1f);
                             //material.SetFloat("_Blend", 1f);
                         } else {
