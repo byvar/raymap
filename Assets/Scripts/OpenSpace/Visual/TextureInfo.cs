@@ -23,9 +23,9 @@ namespace OpenSpace.Visual {
         public ushort width_;     // field1A
         public ushort height;    // field1C
         public ushort width;    // field1E
-        public uint field20;
-        public uint field24;
-        public uint field28;
+        public uint currentScrollX;
+        public uint currentScrollY;
+        public uint textureScrollingEnabled;
         public uint alphaMask; // field2C
         public uint field30;
         public uint numMipmaps = 1;
@@ -71,7 +71,26 @@ namespace OpenSpace.Visual {
                 if (IsMirrorY) {
                     texture.wrapModeV = TextureWrapMode.Mirror;
                 }
+                if ((flags & 0x902) != 0 && Settings.s.engineMode == Settings.EngineMode.R2) {
+                    byte[] alphaMaskBytes = BitConverter.GetBytes(alphaMask);
+                    SetTextureAlpha(alphaMaskBytes[0] / 255f, alphaMaskBytes[1] / 255f, alphaMaskBytes[2] / 255f);
+                    /*MapLoader.Loader.print(name + " - Alpha mask: " + alphaMask + " - " + String.Format("{0:X}", alphaMask));
+                    MapLoader.Loader.print("Flags & 0x10: " + ((flags & 0x10) != 0));
+                    MapLoader.Loader.print("Flags & 0x808: " + ((flags & 0x808) != 0));
+                    MapLoader.Loader.print("Flags & 0x902: " + ((flags & 0x902) != 0));*/
+                }
             }
+        }
+
+        private void SetTextureAlpha(float r, float g, float b) {
+            Color[] pixels = texture.GetPixels();
+            for (int i = 0; i < pixels.Length; i++) {
+                if (pixels[i].r == r && pixels[i].g == g && pixels[i].b == b) {
+                    pixels[i] = new Color(r, g, b, 0);
+                }
+            }
+            texture.SetPixels(pixels);
+            texture.Apply();
         }
 
         public bool IsMirrorX {
@@ -80,6 +99,22 @@ namespace OpenSpace.Visual {
 
         public bool IsMirrorY {
             get { return (flagsByte & 8) != 0; }
+        }
+
+        public bool IsWaterEffect {
+            get { return (name != null && name.Contains("watereffect")); }
+        }
+
+        public bool IsWaterFX {
+            get { return (name != null && name.Contains("waterfx")); }
+        }
+
+        public bool IsFireFX {
+            get { return (name != null && name.Contains("firefx")); }
+        }
+
+        public bool IsGrassFX {
+            get { return (name != null && name.Contains("grassfx")); }
         }
 
         public static TextureInfo Read(EndianBinaryReader reader, Pointer offset) {
@@ -96,9 +131,9 @@ namespace OpenSpace.Visual {
             tex.width_ = reader.ReadUInt16();
             tex.height = reader.ReadUInt16();
             tex.width = reader.ReadUInt16();
-            tex.field20 = reader.ReadUInt32();
-            tex.field24 = reader.ReadUInt32();
-            tex.field28 = reader.ReadUInt32();
+            tex.currentScrollX = reader.ReadUInt32();
+            tex.currentScrollY = reader.ReadUInt32();
+            tex.textureScrollingEnabled = reader.ReadUInt32();
             tex.alphaMask = reader.ReadUInt32();
             tex.field30 = reader.ReadUInt32();
             if (Settings.s.engineMode == Settings.EngineMode.R3) tex.numMipmaps = reader.ReadUInt32();

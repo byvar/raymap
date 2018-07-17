@@ -246,8 +246,6 @@ namespace OpenSpace {
                     LoadFIX();
                     LoadLVL();
                 }
-            } catch (Exception e) {
-                Debug.LogError(e.ToString());
             } finally {
                 for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {

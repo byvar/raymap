@@ -56,7 +56,7 @@ namespace OpenSpace.Visual {
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
                 if (sprites[i].r3mat != null) {
                     if (sprites[i].r3mat.textures != null && sprites[i].r3mat.textures.Count > 0) {
-                        TextureInfo mainTex = sprites[i].r3mat.textures[0];
+                        TextureInfo mainTex = sprites[i].r3mat.textures[0].texture;
                         if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
                         if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
                     }

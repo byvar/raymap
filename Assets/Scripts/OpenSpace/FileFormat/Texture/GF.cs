@@ -91,7 +91,7 @@ namespace OpenSpace.FileFormat.Texture {
                     pixels[i] = new Color(red_channel[i] / 255f, green_channel[i] / 255f, blue_channel[i] / 255f, alpha_channel[i] / 255f);
                 } else {
                     float alphaValue = 1f;
-                    if (red_channel[i] == 0 && green_channel[i] == 0 && blue_channel[i] == 0) alphaValue = 0f;
+                    //if (red_channel[i] == 0 && green_channel[i] == 0 && blue_channel[i] == 0) alphaValue = 0f;
                     pixels[i] = new Color(red_channel[i] / 255f, green_channel[i] / 255f, blue_channel[i] / 255f, alphaValue);
                 }
             }
