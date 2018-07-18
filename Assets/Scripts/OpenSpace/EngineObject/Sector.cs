@@ -9,8 +9,22 @@ namespace OpenSpace.EngineObject {
     public class Sector : IEngineObject {
         public Pointer offset;
         public string name = "Sector";
-        public Vector3 minBorder;
-        public Vector3 maxBorder;
+
+        public Pointer off_persosInSector_first;
+        public Pointer off_persosInSector_last;
+        public uint num_persosInSector;
+
+        public Pointer off_lights_first;
+        public Pointer off_lights_last;
+        public uint num_lights;
+
+        public Pointer off_neighbors_first;
+        public Pointer off_neighbors_last;
+        public uint num_neighbors;
+
+        public byte isSectorVirtual;
+
+        public BoundingVolume sectorBorder;
         public List<LightInfo> sectorLights;
         public List<Sector> neighbors;
         public List<Pointer> neighborsPointers;
@@ -61,28 +75,28 @@ namespace OpenSpace.EngineObject {
 
         public static Sector Read(EndianBinaryReader reader, Pointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
-            Sector sect = new Sector(offset, so);
+            Sector s = new Sector(offset, so);
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-            Pointer off_lights_first = Pointer.Read(reader);
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) {
-                Pointer off_lights_last = Pointer.Read(reader);
+            s.off_lights_first = Pointer.Read(reader);
+            if (Settings.s.linkedListType == Settings.LinkedListType.Double) {
+                s.off_lights_last = Pointer.Read(reader);
             }
-            uint num_lights = reader.ReadUInt32();
+            s.num_lights = reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-            Pointer off_neighbor_first = Pointer.Read(reader);
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) {
-                Pointer off_subsector_last = Pointer.Read(reader);
+            s.off_neighbors_first = Pointer.Read(reader);
+            if (Settings.s.linkedListType == Settings.LinkedListType.Double) {
+                s.off_neighbors_last = Pointer.Read(reader);
             }
-            uint num_neighbors = reader.ReadUInt32();
+            s.num_neighbors = reader.ReadUInt32();
             reader.ReadUInt32();
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
+            if (Settings.s.linkedListType == Settings.LinkedListType.Double) reader.ReadUInt32();
             reader.ReadUInt32();
             Pointer off_subsector_unk_first = Pointer.Read(reader);
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) {
+            if (Settings.s.linkedListType == Settings.LinkedListType.Double) {
                 Pointer off_subsector_unk_last = Pointer.Read(reader);
             }
             uint num_subsectors_unk = reader.ReadUInt32();
@@ -93,34 +107,32 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadUInt32();
 
-            float minPoint_x = reader.ReadSingle();
-            float minPoint_z = reader.ReadSingle();
-            float minPoint_y = reader.ReadSingle();
-            float maxPoint_x = reader.ReadSingle();
-            float maxPoint_z = reader.ReadSingle();
-            float maxPoint_y = reader.ReadSingle();
-            sect.minBorder = new Vector3(minPoint_x, minPoint_y, minPoint_z);
-            sect.maxBorder = new Vector3(maxPoint_x, maxPoint_y, maxPoint_z);
+            s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
 
             reader.ReadUInt32();
-            reader.ReadUInt32();
+            s.isSectorVirtual = reader.ReadByte();
+            reader.ReadByte();
+            reader.ReadByte();
+            reader.ReadByte();
             reader.ReadUInt32();
             reader.ReadByte();
-            if (l.mode == MapLoader.Mode.Rayman3GC) {
-                sect.name = new string(reader.ReadChars(0x104));
-                l.print(sect.name);
+            if (Settings.s.hasNames) {
+                s.name = new string(reader.ReadChars(0x104));
+                l.print(s.name);
+            } else {
+                s.name = "Sector @ " + offset;
             }
-            if (num_lights > 0 && off_lights_first != null) {
+            if (s.num_lights > 0 && s.off_lights_first != null) {
                 if (l.mode == MapLoader.Mode.RaymanArenaGC) {
-                    Pointer.Goto(ref reader, off_lights_first);
-                    for (int i = 0; i < num_lights; i++) {
+                    Pointer.Goto(ref reader, s.off_lights_first);
+                    for (int i = 0; i < s.num_lights; i++) {
                         Pointer off_light = Pointer.Read(reader);
                         if (off_light != null) {
                             Pointer off_current = Pointer.Goto(ref reader, off_light);
-                            LightInfo r3l = LightInfo.Read(reader, off_light);
-                            if (r3l != null) {
-                                sect.sectorLights.Add(r3l);
-                                r3l.containingSectors.Add(sect);
+                            LightInfo li = LightInfo.Read(reader, off_light);
+                            if (li != null) {
+                                s.sectorLights.Add(li);
+                                li.containingSectors.Add(s);
                                 /*Light l = r3l.Light;
                                 if (l != null) {
                                     l.transform.parent = gao.transform;
@@ -130,8 +142,8 @@ namespace OpenSpace.EngineObject {
                         }
                     }
                 } else {
-                    Pointer off_lights_next = off_lights_first;
-                    for (int i = 0; i < num_lights; i++) {
+                    Pointer off_lights_next = s.off_lights_first;
+                    for (int i = 0; i < s.num_lights; i++) {
                         Pointer.Goto(ref reader, off_lights_next);
                         //reader.ReadUInt32();
                         Pointer off_light = Pointer.Read(reader);
@@ -142,10 +154,10 @@ namespace OpenSpace.EngineObject {
                         }
                         if (off_light != null) {
                             Pointer.Goto(ref reader, off_light);
-                            LightInfo r3l = LightInfo.Read(reader, off_light);
-                            if (r3l != null) {
-                                sect.sectorLights.Add(r3l);
-                                r3l.containingSectors.Add(sect);
+                            LightInfo li = LightInfo.Read(reader, off_light);
+                            if (li != null) {
+                                s.sectorLights.Add(li);
+                                li.containingSectors.Add(s);
                                 /*Light l = r3l.Light;
                                 if (l != null) {
                                     l.transform.parent = gao.transform;
@@ -155,9 +167,9 @@ namespace OpenSpace.EngineObject {
                     }
                 }
             }
-            if (num_neighbors > 0 && off_neighbor_first != null) {
-                Pointer off_neighbor_next = off_neighbor_first;
-                for (int i = 0; i < num_neighbors; i++) {
+            if (s.num_neighbors > 0 && s.off_neighbors_first != null) {
+                Pointer off_neighbor_next = s.off_neighbors_first;
+                for (int i = 0; i < s.num_neighbors; i++) {
                     Pointer.Goto(ref reader, off_neighbor_next);
                     reader.ReadUInt16();
                     reader.ReadUInt16();
@@ -172,7 +184,7 @@ namespace OpenSpace.EngineObject {
                         Pointer off_sector_start = Pointer.Read(reader);
                     }
                     if (off_neighbor != null) {
-                        sect.neighborsPointers.Add(off_neighbor);
+                        s.neighborsPointers.Add(off_neighbor);
                     }
                 }
             }
@@ -190,8 +202,8 @@ namespace OpenSpace.EngineObject {
                 }
             }*/
 
-            l.sectors.Add(sect);
-            return sect;
+            l.sectors.Add(s);
+            return s;
         }
     }
 }

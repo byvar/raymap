@@ -22,7 +22,7 @@ namespace OpenSpace {
         public Matrix matrix;
         public IEngineObject data;
         public int superObjectFlags;
-        public SPOBoundingVolume boundingVolume;
+        public BoundingVolume boundingVolume;
 
         public GameObject Gao {
             get {
@@ -68,6 +68,7 @@ namespace OpenSpace {
                 reader.ReadInt32(); // 0x28 -> 0x2C
                 reader.ReadInt32(); // 0x2C -> 0x30
                 so.superObjectFlags = reader.ReadInt32(); // 0x30->0x34
+                if (Settings.s.engineMode == Settings.EngineMode.R3) reader.ReadUInt32();
                 Pointer off_boundingVolume = Pointer.Read(reader);
 
                 //R3Pointer.Read(reader); // a copy of the matrix right after, at least in R3GC
@@ -118,8 +119,8 @@ namespace OpenSpace {
 
                 if (off_boundingVolume != null && soFlags != null) {
                     Pointer original = Pointer.Goto(ref reader, off_boundingVolume);
-                    so.boundingVolume = SPOBoundingVolume.Read(reader, off_boundingVolume, soFlags.BoundingBoxInsteadOfSphere ?
-                        SPOBoundingVolume.BoundingVolumeType.Box : SPOBoundingVolume.BoundingVolumeType.Sphere);
+                    so.boundingVolume = BoundingVolume.Read(reader, off_boundingVolume, soFlags.BoundingBoxInsteadOfSphere ?
+                        BoundingVolume.Type.Box : BoundingVolume.Type.Sphere);
                     Pointer.Goto(ref reader, original);
                 }
 
@@ -130,7 +131,7 @@ namespace OpenSpace {
                     so.Gao.transform.localScale = scale;
 
                     if (so.boundingVolume != null) {
-                        if (so.boundingVolume.type == SPOBoundingVolume.BoundingVolumeType.Box) {
+                        if (so.boundingVolume.type == BoundingVolume.Type.Box) {
                             BoxCollider collider = so.Gao.AddComponent<BoxCollider>();
 
                             collider.center = so.boundingVolume.boxCenter;

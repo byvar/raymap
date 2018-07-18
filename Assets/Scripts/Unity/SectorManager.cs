@@ -23,9 +23,7 @@ public class SectorManager : MonoBehaviour {
             for (int i = 0; i < sectors.Count; i++) {
                 Sector s = sectors[i];
                 s.Loaded = false;
-                s.Active = (camPos.x >= s.minBorder.x && camPos.x <= s.maxBorder.x
-                && camPos.y >= s.minBorder.y && camPos.y <= s.maxBorder.y
-                && camPos.z >= s.minBorder.z && camPos.z <= s.maxBorder.z);
+                s.Active = (s.isSectorVirtual == 0) && s.sectorBorder.ContainsPoint(camPos);
                 if (s.Active) activeSectors.Add(s);
             }
             for (int i = 0; i < activeSectors.Count; i++) {

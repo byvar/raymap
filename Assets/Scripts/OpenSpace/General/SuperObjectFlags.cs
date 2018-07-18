@@ -81,7 +81,7 @@ public class SuperObjectFlags : MonoBehaviour
         this.flagPreview += Invisible                  ? "Invisible," : "";
         this.flagPreview += NoTransformMatrix          ? "NoTransformMatrix," : "";
         this.flagPreview += ZoomInsteadOfScale         ? "ZoomInsteadOfScale," : "";
-        this.flagPreview += BoundingBoxInsteadOfSphere ? "BoundingSphereInsteadOfBox," : "";
+        this.flagPreview += BoundingBoxInsteadOfSphere ? "BoundingBoxInsteadOfSphere," : "";
         this.flagPreview += DisplayOnTop               ? "DisplayOnTop," : "";
         this.flagPreview += NoRayTracing               ? "NoRayTracing," : "";
         this.flagPreview += NoShadow                   ? "NoShadow," : "";
