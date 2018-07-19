@@ -89,9 +89,9 @@ namespace OpenSpace.EngineObject {
                 uint index0 = reader.ReadUInt32();
                 uint index1 = reader.ReadUInt32();
                 uint index2 = reader.ReadUInt32();
-                p.name0 = l.objectTypes[0][index0].name;
-                p.name1 = l.objectTypes[1][index1].name;
-                p.name2 = l.objectTypes[2][index2].name;
+                if (index0 >= 0 && index0 < l.objectTypes[0].Length) p.name0 = l.objectTypes[0][index0].name;
+                if (index1 >= 0 && index1 < l.objectTypes[1].Length) p.name1 = l.objectTypes[1][index1].name;
+                if (index2 >= 0 && index2 < l.objectTypes[2].Length) p.name2 = l.objectTypes[2][index2].name;
                 Pointer.Goto(ref reader, off_current);
             }
             l.print("[" + p.name0 + "] " + p.name1 + " | " + p.name2 + " - offset: " + offset + " - POs: " + p.off_physicalObjects);
