@@ -64,7 +64,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32(); // 0x14 platform info
             Pointer off_msWay = Pointer.Read(reader); // 0x18
             reader.ReadUInt32(); // 0x1C
-            reader.ReadUInt32(); // 0x20
+            reader.ReadUInt32(); // 0x20 // Pointer to struct that points to active sector
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
             if (l.mode == MapLoader.Mode.RaymanArenaPC || l.mode == MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
