@@ -107,7 +107,7 @@ namespace OpenSpace {
                         break;
                     default:
                         l.print("Unknown SO type " + so.type + " at offset " + String.Format("0x{0:X}", so.offset.offset));
-                        isValidNode = false;
+                        //isValidNode = false;
                         break;
                 }
 
@@ -125,7 +125,7 @@ namespace OpenSpace {
                 }
 
                 if (so.Gao != null) {
-                    if (parent != null) so.Gao.transform.parent = parent.Gao.transform;
+                    if (parent != null && parent.Gao != null) so.Gao.transform.parent = parent.Gao.transform;
                     so.Gao.transform.localPosition = pos;
                     so.Gao.transform.localRotation = rot;
                     so.Gao.transform.localScale = scale;

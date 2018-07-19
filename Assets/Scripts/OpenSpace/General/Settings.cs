@@ -75,6 +75,7 @@ namespace OpenSpace {
                 { "dynamicWorld", 0x00500FD0 },
                 { "inactiveDynamicWorld", 0x00500FC4 },
                 { "fatherSector", 0x00500FC0 },
+                { "firstSubmapPosition", 0x004FF760 },
                 { "always", 0x004A6B18 },
                 { "anim_stacks", 0x004A6B38 },
                 { "anim_framesKF", 0x00500274 },
@@ -91,7 +92,10 @@ namespace OpenSpace {
                 { "anim_quaternions", 0x005002A0 },
                 { "engineStructure", 0x00500380 },
                 { "families", 0x00500560 },
-                { "objectTypes", 0x005013E0 }
+                { "objectTypes", 0x005013E0 },
+                { "textures", 0x00502680 },
+                { "textureMemoryChannels", 0x00501660 },
+                { "inputStructure", 0x00509E60 }
             }
         };
 

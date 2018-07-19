@@ -20,10 +20,10 @@ namespace OpenSpace {
         public static extern bool CloseHandle(IntPtr hObject);
 
         [DllImport("kernel32.dll")]
-        public static extern bool ReadProcessMemory(IntPtr hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesRead);
+        public static extern bool ReadProcessMemory(IntPtr hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref UIntPtr lpNumberOfBytesRead);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool WriteProcessMemory(IntPtr hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref int lpNumberOfBytesWritten);
+        public static extern bool WriteProcessMemory(IntPtr hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref UIntPtr lpNumberOfBytesWritten);
 
         const int PROCESS_ALL_ACCESS = 0x1F0FFF;
         const int PROCESS_WM_READ = 0x0010;
@@ -108,13 +108,17 @@ namespace OpenSpace {
 
         public override int Read(byte[] buffer, int offset, int count) {
             if (!CanRead) throw new NotSupportedException();
-            int numBytesRead = 0;
+            UIntPtr numBytesRead = UIntPtr.Zero;
 #if ISWINDOWS
             byte[] tempBuf = new byte[count];
             bool success = ReadProcessMemory(processHandle, (int)currentAddress, tempBuf, count, ref numBytesRead);
-            Seek(numBytesRead, SeekOrigin.Current);
-            Array.Copy(tempBuf, 0, buffer, offset, numBytesRead);
-            return numBytesRead;
+            if (numBytesRead != UIntPtr.Zero) {
+                Seek(numBytesRead.ToUInt32(), SeekOrigin.Current);
+                Array.Copy(tempBuf, 0, buffer, offset, numBytesRead.ToUInt32());
+                return (int)numBytesRead.ToUInt32();
+            } else {
+                return 0;
+            }
 #else
             throw new NotImplementedException();
 #endif
@@ -144,12 +148,14 @@ namespace OpenSpace {
 
         public override void Write(byte[] buffer, int offset, int count) {
             if (!CanWrite) throw new NotSupportedException();
-            int numBytesWritten = 0;
+            UIntPtr numBytesWritten = UIntPtr.Zero;
 #if ISWINDOWS
             byte[] tempBuf = new byte[count];
             Array.Copy(buffer, offset, tempBuf, 0, count);
             bool success = WriteProcessMemory(processHandle, (int)currentAddress, tempBuf, count, ref numBytesWritten);
-            Seek(numBytesWritten, SeekOrigin.Current);
+            if (numBytesWritten != UIntPtr.Zero) {
+                Seek(numBytesWritten.ToUInt32(), SeekOrigin.Current);
+            }
 #else
             throw new NotImplementedException();
 #endif

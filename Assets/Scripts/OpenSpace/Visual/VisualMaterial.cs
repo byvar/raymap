@@ -154,7 +154,7 @@ namespace OpenSpace.Visual {
                         Texture2D tex = new Texture2D(1, 1);
                         tex.SetPixel(0, 0, new Color(0, 0, 0, 0));
                         tex.Apply();
-                        material.SetTexture("_MainTex", tex);
+                        materialBillboard.SetTexture("_MainTex", tex);
                     }
                 }
                 return materialBillboard;
