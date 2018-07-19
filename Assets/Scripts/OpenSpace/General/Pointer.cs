@@ -62,7 +62,10 @@ namespace OpenSpace {
             uint fileOff = (uint)(current_off - file.baseOffset);
             if (!file.pointers.ContainsKey(fileOff)) {
                 if (value == 0) return null;
-                if (!l.allowDeadPointers) throw new FormatException("Not a valid pointer in file " + file.name + " at position " + current_off);
+                if (!l.allowDeadPointers && !file.allowUnsafePointers) throw new FormatException("Not a valid pointer in file " + file.name + " at position " + current_off);
+                if (file.allowUnsafePointers) {
+                    return new Pointer(value, file);
+                }
                 return null;
             }
             return file.pointers[fileOff];

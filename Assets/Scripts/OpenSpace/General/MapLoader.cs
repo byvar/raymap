@@ -116,8 +116,13 @@ namespace OpenSpace {
                 }
                 Settings.s = settings;
 
-                if (gameDataBinFolder == null || !Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
+                if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
+                if (lvlName.EndsWith(".exe")) {
+                    if(!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
+                    MemoryFile mem = new MemoryFile(lvlName);
+                    files_array[0] = mem;
+                } else if (!Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 globals = new Globals();
                 if (settings.engineMode == Settings.EngineMode.R2) {
                     hasTransit = false;

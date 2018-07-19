@@ -20,6 +20,8 @@ namespace OpenSpace {
         public bool isR2Demo = false;
         public bool isDonald = false;
         public bool hasExtraInputData = false;
+        public bool hasMemorySupport = false;
+        public Dictionary<string, uint> memoryAddresses = null;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -67,6 +69,30 @@ namespace OpenSpace {
             endian = Endian.Little,
             numEntryActions = 43,
             linkedListType = LinkedListType.Double,
+            hasMemorySupport = true,
+            memoryAddresses = new Dictionary<string, uint> {
+                { "actualWorld", 0x005013C8 },
+                { "dynamicWorld", 0x00500FD0 },
+                { "inactiveDynamicWorld", 0x00500FC4 },
+                { "fatherSector", 0x00500FC0 },
+                { "always", 0x004A6B18 },
+                { "anim_stacks", 0x004A6B38 },
+                { "anim_framesKF", 0x00500274 },
+                { "anim_a3d", 0x00500278 },
+                { "anim_channels", 0x0050027C },
+                { "anim_frames", 0x00500280 },
+                { "anim_hierarchies", 0x00500284 },
+                { "anim_morphData", 0x00500288 },
+                { "anim_keyframes", 0x0050028C },
+                { "anim_onlyFrames", 0x00500290 },
+                { "anim_vectors", 0x00500294 },
+                { "anim_events", 0x00500298 },
+                { "anim_NTTO", 0x0050029C },
+                { "anim_quaternions", 0x005002A0 },
+                { "engineStructure", 0x00500380 },
+                { "families", 0x00500560 },
+                { "objectTypes", 0x005013E0 }
+            }
         };
 
         public static Settings R2PCDemo1 = new Settings() {

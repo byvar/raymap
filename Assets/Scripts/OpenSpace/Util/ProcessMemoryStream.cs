@@ -42,7 +42,7 @@ namespace OpenSpace {
         Mode mode = Mode.Read;
 
         public ProcessMemoryStream(string name, Mode mode) {
-            Process[] processes = Process.GetProcessesByName(name);
+            Process[] processes = Process.GetProcessesByName(name.Replace(".exe",""));
             if (processes.Length == 0) throw new FileNotFoundException("Process not found");
             for (int i = 1; i < processes.Length; i++) {
                 processes[i].Dispose();
@@ -94,11 +94,11 @@ namespace OpenSpace {
         public override long Position {
             get {
                 if (!CanSeek) throw new NotSupportedException();
-                return currentAddress - BaseAddress;
+                return currentAddress;
             }
             set {
                 if (!CanSeek) throw new NotSupportedException();
-                currentAddress = BaseAddress + value;
+                currentAddress = value;
             }
         }
 
@@ -124,7 +124,7 @@ namespace OpenSpace {
             if (!CanSeek) throw new NotSupportedException();
             switch (origin) {
                 case SeekOrigin.Begin:
-                    currentAddress = BaseAddress + offset;
+                    currentAddress = offset;
                     break;
                 case SeekOrigin.Current:
                     currentAddress += offset;

@@ -13,6 +13,7 @@ namespace OpenSpace.FileFormat {
         public Dictionary<uint, Pointer> pointers = new Dictionary<uint, Pointer>();
         public int baseOffset;
         public uint headerOffset = 0;
+        public bool allowUnsafePointers = false;
 
         public void Dispose() {
             if (reader != null) reader.Close();
