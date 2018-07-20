@@ -17,7 +17,7 @@ namespace OpenSpace.Visual {
         public ushort field6;
         public Pointer off_tempBuffer; // field8
         public uint fieldC;           //
-        public Pointer off_buffer;   //
+        public uint field10;         //
         public uint flags;          // field14
         public ushort height_;     // field18
         public ushort width_;     // field1A
@@ -93,7 +93,8 @@ namespace OpenSpace.Visual {
             texture.Apply();
         }
 
-        public void ReadTextureFromData(EndianBinaryReader reader) {
+        // Doesn't work
+        /*public void ReadTextureFromData(EndianBinaryReader reader) {
             if (off_buffer != null) {
                 MapLoader.Loader.print(off_buffer);
                 Pointer off_current = Pointer.Goto(ref reader, off_buffer);
@@ -106,7 +107,7 @@ namespace OpenSpace.Visual {
                 }
                 Pointer.Goto(ref reader, off_current);
             }
-        }
+        }*/
 
         public bool IsMirrorX {
             get { return (flagsByte & 4) != 0; }
@@ -140,12 +141,7 @@ namespace OpenSpace.Visual {
             tex.field6 = reader.ReadUInt16();
             tex.off_tempBuffer = Pointer.Read(reader); // always null because it's stored here dynamically
             tex.fieldC = reader.ReadUInt32();
-            if (MapLoader.Loader.settings.platform != Settings.Platform.iOS) {
-                tex.off_buffer = Pointer.Read(reader);
-            } else {
-                reader.ReadUInt32();
-                tex.off_buffer = null;
-            }
+            tex.field10 = reader.ReadUInt32();
             tex.flags = reader.ReadUInt32();
             tex.height_ = reader.ReadUInt16();
             tex.width_ = reader.ReadUInt16();
