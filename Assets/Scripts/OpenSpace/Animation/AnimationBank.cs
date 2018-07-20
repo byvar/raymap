@@ -89,24 +89,55 @@ namespace OpenSpace.Animation {
                 banks[i].animations = new AnimA3DGeneral[banks[i].a3d_general.count];
             }
             if (l.mode != MapLoader.Mode.Rayman3GC && !append) {
-                for (int i = 0; i < num_banks; i++) {
-                    if (banks[i].a3d_general.reservedMemory > 0) banks[i].a3d_general.off_data = Pointer.Read(reader);
-                    if (banks[i].vectors.reservedMemory > 0) banks[i].vectors.off_data = Pointer.Read(reader);
-                    if (banks[i].quaternions.reservedMemory > 0) banks[i].quaternions.off_data = Pointer.Read(reader);
-                    if (banks[i].hierarchies.reservedMemory > 0) banks[i].hierarchies.off_data = Pointer.Read(reader);
-                    if (banks[i].NTTO.reservedMemory > 0) banks[i].NTTO.off_data = Pointer.Read(reader);
-                    if (banks[i].onlyFrames.reservedMemory > 0) banks[i].onlyFrames.off_data = Pointer.Read(reader);
-                    if (banks[i].channels.reservedMemory > 0) banks[i].channels.off_data = Pointer.Read(reader);
-                    if (banks[i].framesNumOfNTTO.reservedMemory > 0) banks[i].framesNumOfNTTO.off_data = Pointer.Read(reader);
-                    if (banks[i].framesKFIndex.reservedMemory > 0) banks[i].framesKFIndex.off_data = Pointer.Read(reader);
-                    if (kfFile == null) {
-                        if (banks[i].keyframes.reservedMemory > 0) banks[i].keyframes.off_data = Pointer.Read(reader);
-                    } else {
-                        banks[i].keyframes.off_data = new Pointer(0, kfFile);
+                if (!Settings.s.loadFromMemory) {
+                    for (int i = 0; i < num_banks; i++) {
+                        if (banks[i].a3d_general.reservedMemory > 0) banks[i].a3d_general.off_data = Pointer.Read(reader);
+                        if (banks[i].vectors.reservedMemory > 0) banks[i].vectors.off_data = Pointer.Read(reader);
+                        if (banks[i].quaternions.reservedMemory > 0) banks[i].quaternions.off_data = Pointer.Read(reader);
+                        if (banks[i].hierarchies.reservedMemory > 0) banks[i].hierarchies.off_data = Pointer.Read(reader);
+                        if (banks[i].NTTO.reservedMemory > 0) banks[i].NTTO.off_data = Pointer.Read(reader);
+                        if (banks[i].onlyFrames.reservedMemory > 0) banks[i].onlyFrames.off_data = Pointer.Read(reader);
+                        if (banks[i].channels.reservedMemory > 0) banks[i].channels.off_data = Pointer.Read(reader);
+                        if (banks[i].framesNumOfNTTO.reservedMemory > 0) banks[i].framesNumOfNTTO.off_data = Pointer.Read(reader);
+                        if (banks[i].framesKFIndex.reservedMemory > 0) banks[i].framesKFIndex.off_data = Pointer.Read(reader);
+                        if (kfFile == null) {
+                            if (banks[i].keyframes.reservedMemory > 0) banks[i].keyframes.off_data = Pointer.Read(reader);
+                        } else {
+                            banks[i].keyframes.off_data = new Pointer(0, kfFile);
+                        }
+                        if (banks[i].events.reservedMemory > 0) banks[i].events.off_data = Pointer.Read(reader);
+                        if (banks[i].morphData.reservedMemory > 0) banks[i].morphData.off_data = Pointer.Read(reader);
+                        if (Settings.s.hasDeformations && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = Pointer.Read(reader);
                     }
-                    if (banks[i].events.reservedMemory > 0) banks[i].events.off_data = Pointer.Read(reader);
-                    if (banks[i].morphData.reservedMemory > 0) banks[i].morphData.off_data = Pointer.Read(reader);
-                    if (Settings.s.hasDeformations && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = Pointer.Read(reader);
+                } else {
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_a3d"], offset.file));
+                    banks[0].a3d_general.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_vectors"], offset.file));
+                    banks[0].vectors.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_quaternions"], offset.file));
+                    banks[0].quaternions.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_hierarchies"], offset.file));
+                    banks[0].hierarchies.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_NTTO"], offset.file));
+                    banks[0].NTTO.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_onlyFrames"], offset.file));
+                    banks[0].onlyFrames.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_channels"], offset.file));
+                    banks[0].channels.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_framesNumOfNTTO"], offset.file));
+                    banks[0].framesNumOfNTTO.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_framesKF"], offset.file));
+                    banks[0].framesKFIndex.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_keyframes"], offset.file));
+                    banks[0].keyframes.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_events"], offset.file));
+                    banks[0].events.off_data = Pointer.Read(reader);
+                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_morphData"], offset.file));
+                    banks[0].morphData.off_data = Pointer.Read(reader);
+                    if (Settings.s.hasDeformations) {
+                        Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_deformations"], offset.file));
+                        banks[0].deformations.off_data = Pointer.Read(reader);
+                    }
                 }
             }
             Pointer off_current = Pointer.Current(reader);

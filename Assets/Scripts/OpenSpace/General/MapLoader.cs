@@ -119,13 +119,26 @@ namespace OpenSpace {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
+                if (!Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName.EndsWith(".exe")) {
                     if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
+                    Settings.s.loadFromMemory = true;
+                    if (mode != Mode.Rayman2IOS) {
+                        if (!settings.isR2Demo) { // Normal Game
+                            cntPaths = new string[2];
+                            cntPaths[0] = Path.Combine(gameDataBinFolder, "Vignette.cnt");
+                            cntPaths[1] = Path.Combine(gameDataBinFolder, "Textures.cnt");
+                            cnt = new CNT(cntPaths);
+                        } else { // R2 Demo
+                            cntPaths = new string[1];
+                            cntPaths[0] = Path.Combine(gameDataBinFolder, "Textures.cnt");
+                            cnt = new CNT(cntPaths);
+                        }
+                    }
                     MemoryFile mem = new MemoryFile(lvlName);
                     files_array[0] = mem;
                     LoadMemory();
                 } else {
-                    if (!Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                     if (settings.engineMode == Settings.EngineMode.R2) {
                         hasTransit = false;
                         DAT dat = null;
@@ -1186,6 +1199,12 @@ namespace OpenSpace {
 
             materials = new VisualMaterial[0];
             textures = new TextureInfo[0];
+            animationBanks = new AnimationBank[2];
+
+            // Read animations
+            Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_stacks"], mem));
+            animationBanks[0] = AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, null)[0];
+            animationBanks[1] = animationBanks[0];
 
             // Read textures
             uint[] texMemoryChannels = new uint[1024];
@@ -1200,8 +1219,10 @@ namespace OpenSpace {
                 if (off_texture != null && texMemoryChannels[i] != 0xC0DE0005) {
                     Pointer off_current = Pointer.Goto(ref reader, off_texture);
                     TextureInfo texInfo = TextureInfo.Read(reader, off_texture);
-                    texInfo.ReadTextureFromData(reader);
-                    //texInfo.Texture = Util.CreateDummyTexture();
+                    //texInfo.ReadTextureFromData(reader); // Reading from GL memory doesn't seem to be possible sadly
+                    // texInfo.Texture = Util.CreateDummyTexture();
+                    GF gf = cnt.GetGFByTGAName(texInfo.name);
+                    texInfo.Texture = gf != null ? gf.GetTexture() : null;
                     textureInfos.Add(texInfo);
                     Pointer.Goto(ref reader, off_current);
                 }

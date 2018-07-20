@@ -15,9 +15,9 @@ namespace OpenSpace.Visual {
         public uint field0;
         public ushort field4;
         public ushort field6;
-        public Pointer off_buffer;     // field8
+        public Pointer off_tempBuffer; // field8
         public uint fieldC;           //
-        public uint field10;         //
+        public Pointer off_buffer;   //
         public uint flags;          // field14
         public ushort height_;     // field18
         public ushort width_;     // field1A
@@ -95,12 +95,15 @@ namespace OpenSpace.Visual {
 
         public void ReadTextureFromData(EndianBinaryReader reader) {
             if (off_buffer != null) {
+                MapLoader.Loader.print(off_buffer);
                 Pointer off_current = Pointer.Goto(ref reader, off_buffer);
                 Texture2D tex2D = new Texture2D(width_, height_, TextureFormat.ARGB32, false);
                 byte[] texBytes = reader.ReadBytes(width_ * height_ * 4);
-                tex2D.LoadRawTextureData(texBytes);
-                tex2D.Apply();
-                Texture = tex2D;
+                if (texBytes != null && texBytes.Length == width_ * height_ * 4) {
+                    tex2D.LoadRawTextureData(texBytes);
+                    tex2D.Apply();
+                    Texture = tex2D;
+                }
                 Pointer.Goto(ref reader, off_current);
             }
         }
@@ -135,9 +138,9 @@ namespace OpenSpace.Visual {
             tex.field0 = reader.ReadUInt32(); // 888 or 8888
             tex.field4 = reader.ReadUInt16(); // 20
             tex.field6 = reader.ReadUInt16();
-            tex.off_buffer = Pointer.Read(reader); // always null because it's stored here dynamically
+            tex.off_tempBuffer = Pointer.Read(reader); // always null because it's stored here dynamically
             tex.fieldC = reader.ReadUInt32();
-            tex.field10 = reader.ReadUInt32();
+            tex.off_buffer = Pointer.Read(reader);
             tex.flags = reader.ReadUInt32();
             tex.height_ = reader.ReadUInt16();
             tex.width_ = reader.ReadUInt16();

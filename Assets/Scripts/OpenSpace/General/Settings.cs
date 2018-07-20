@@ -22,6 +22,7 @@ namespace OpenSpace {
         public bool hasExtraInputData = false;
         public bool hasMemorySupport = false;
         public Dictionary<string, uint> memoryAddresses = null;
+        public bool loadFromMemory = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -81,7 +82,7 @@ namespace OpenSpace {
                 { "anim_framesKF", 0x00500274 },
                 { "anim_a3d", 0x00500278 },
                 { "anim_channels", 0x0050027C },
-                { "anim_frames", 0x00500280 },
+                { "anim_framesNumOfNTTO", 0x00500280 },
                 { "anim_hierarchies", 0x00500284 },
                 { "anim_morphData", 0x00500288 },
                 { "anim_keyframes", 0x0050028C },
