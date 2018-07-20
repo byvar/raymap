@@ -123,11 +123,11 @@ namespace OpenSpace {
                 uint u1 = reader.ReadUInt32(); // 0
                 uint u2 = reader.ReadUInt32(); // 0
                 uint u3 = reader.ReadUInt32(); // 0
-                Pointer off_mesh = Pointer.Read(reader);
-                if (off_mesh != null) {
+                Pointer off_zdr = Pointer.Read(reader);
+                if (off_zdr != null) {
                     //R3Loader.Loader.print("Collide mesh offset: " + off_mesh);
-                    Pointer.Goto(ref reader, off_mesh);
-                    po.collideMesh = CollideMeshObject.Read(reader, po, off_mesh);
+                    Pointer.Goto(ref reader, off_zdr);
+                    po.collideMesh = CollideMeshObject.Read(reader, po, off_zdr);
                     po.collideMesh.gao.transform.parent = po.Gao.transform;
                 }
                 //R3Loader.Loader.print("Collide set: " + po.off_collideSet + " - vol: " + po.off_visualBoundingVolume);

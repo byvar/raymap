@@ -28,11 +28,10 @@ namespace OpenSpace.AI
                 this.ts = ts;
             }
 
-            public string ToString()
-            {
+            public override string ToString() {
                 if (scriptNode != null)
                 {
-                    string firstChildNode = (this.children.Count>0 && this.children[0]!=null) ? this.children[0].ToString() : "null";
+                    string firstChildNode  = (this.children.Count > 0 && this.children[0] != null) ? this.children[0].ToString() : "null";
                     string secondChildNode = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString() : "null";
 
                     switch (scriptNode.nodeType)

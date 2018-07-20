@@ -93,6 +93,18 @@ namespace OpenSpace.Visual {
             texture.Apply();
         }
 
+        public void ReadTextureFromData(EndianBinaryReader reader) {
+            if (off_buffer != null) {
+                Pointer off_current = Pointer.Goto(ref reader, off_buffer);
+                Texture2D tex2D = new Texture2D(width_, height_, TextureFormat.ARGB32, false);
+                byte[] texBytes = reader.ReadBytes(width_ * height_ * 4);
+                tex2D.LoadRawTextureData(texBytes);
+                tex2D.Apply();
+                Texture = tex2D;
+                Pointer.Goto(ref reader, off_current);
+            }
+        }
+
         public bool IsMirrorX {
             get { return (flagsByte & 4) != 0; }
         }

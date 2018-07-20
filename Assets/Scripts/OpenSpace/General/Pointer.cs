@@ -47,6 +47,12 @@ namespace OpenSpace {
                 Pointer ptr = pointer.file.pointers[pointer.offset];
                 if (ptr.offset == 0) return null;
                 return ptr;
+            } else if (pointer.file.allowUnsafePointers) {
+                EndianBinaryReader reader = pointer.file.reader;
+                Pointer off_current = Pointer.Goto(ref reader, pointer);
+                Pointer ptr = Pointer.Read(reader);
+                Pointer.Goto(ref reader, off_current);
+                return ptr;
             }
             return null;
         }

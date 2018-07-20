@@ -1187,6 +1187,27 @@ namespace OpenSpace {
             materials = new VisualMaterial[0];
             textures = new TextureInfo[0];
 
+            // Read textures
+            uint[] texMemoryChannels = new uint[1024];
+            Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["textureMemoryChannels"], mem));
+            for (int i = 0; i < 1024; i++) {
+                texMemoryChannels[i] = reader.ReadUInt32();
+            }
+            Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["textures"], mem));
+            List<TextureInfo> textureInfos = new List<TextureInfo>();
+            for (int i = 0; i < 1024; i++) {
+                Pointer off_texture = Pointer.Read(reader);
+                if (off_texture != null && texMemoryChannels[i] != 0xC0DE0005) {
+                    Pointer off_current = Pointer.Goto(ref reader, off_texture);
+                    TextureInfo texInfo = TextureInfo.Read(reader, off_texture);
+                    texInfo.ReadTextureFromData(reader);
+                    //texInfo.Texture = Util.CreateDummyTexture();
+                    textureInfos.Add(texInfo);
+                    Pointer.Goto(ref reader, off_current);
+                }
+            }
+            textures = textureInfos.ToArray();
+
             // Parse actual world & always structure
             ReadFamilies(reader);
             ReadSuperObjects(reader);
@@ -1194,9 +1215,11 @@ namespace OpenSpace {
         }
         #endregion
 
-        public void print(string str) {
+        // Defining it this way, clicking the print will go straight to the code you want
+        public Action<object> print = MonoBehaviour.print;
+        /*public void print(string str) {
             MonoBehaviour.print(str);
-        }
+        }*/
 
         public FileWithPointers GetFileByReader(EndianBinaryReader reader) {
             for (int i = 0; i < files_array.Length; i++) {

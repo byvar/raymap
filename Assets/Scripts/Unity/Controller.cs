@@ -6,6 +6,7 @@ using UnityEngine;
 using OpenSpace;
 using OpenSpace.Visual;
 using OpenSpace.EngineObject;
+using OpenSpace.AI;
 
 public class Controller : MonoBehaviour {
     public MapLoader.Mode mode = MapLoader.Mode.Rayman3PC;
@@ -107,9 +108,63 @@ public class Controller : MonoBehaviour {
     public void InitPersos() {
         if (loader != null) {
             for (int i = 0; i < loader.persos.Count; i++) {
-                PersoBehaviour unityBehaviour = loader.persos[i].Gao.AddComponent<PersoBehaviour>();
-                unityBehaviour.perso = loader.persos[i];
+                Perso p = loader.persos[i];
+                PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
+                unityBehaviour.perso = p;
                 unityBehaviour.Init();
+
+                if (p.Gao) {
+                    if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
+                        if (p.brain.mind.AI_model.behaviors_normal != null) {
+                            GameObject intelParent = new GameObject("Intelligence behaviours");
+                            intelParent.transform.parent = p.Gao.transform;
+                            Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
+                            foreach (Behavior behavior in normalBehaviors) {
+                                if (behavior.scripts == null || behavior.scripts.Length == 0) {
+                                    continue;
+                                }
+                                GameObject behaviorGao = new GameObject("Behaviour");
+                                behaviorGao.transform.parent = intelParent.transform;
+                                if (behavior.scripts.Length > 1) {
+                                    foreach (Script script in behavior.scripts) {
+                                        GameObject scriptGao = new GameObject("Rule");
+                                        scriptGao.transform.parent = behaviorGao.transform;
+                                        ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
+                                        scriptComponent.SetScript(script, p);
+                                    }
+                                } else if (behavior.scripts.Length == 1) {
+                                    behaviorGao.name = "Single-rule behaviour";
+                                    ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
+                                    scriptComponent.SetScript(behavior.scripts[0], p);
+                                }
+                            }
+                        }
+                        if (p.brain.mind.AI_model.behaviors_reflex != null) {
+                            GameObject reflexParent = new GameObject("Reflex behaviours");
+                            reflexParent.transform.parent = p.Gao.transform;
+                            Behavior[] reflexBehaviors = p.brain.mind.AI_model.behaviors_reflex;
+                            foreach (Behavior behavior in reflexBehaviors) {
+                                if (behavior.scripts == null || behavior.scripts.Length == 0) {
+                                    continue;
+                                }
+                                GameObject behaviorGao = new GameObject("Behaviour");
+                                behaviorGao.transform.parent = reflexParent.transform;
+                                if (behavior.scripts.Length > 1) {
+                                    foreach (Script script in behavior.scripts) {
+                                        GameObject scriptGao = new GameObject("Rule");
+                                        scriptGao.transform.parent = behaviorGao.transform;
+                                        ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
+                                        scriptComponent.SetScript(script, p);
+                                    }
+                                } else if (behavior.scripts.Length == 1) {
+                                    behaviorGao.name = "Single-rule behaviour";
+                                    ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
+                                    scriptComponent.SetScript(behavior.scripts[0], p);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

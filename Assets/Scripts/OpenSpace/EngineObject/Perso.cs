@@ -100,59 +100,6 @@ namespace OpenSpace.EngineObject {
                 Pointer off_current = Pointer.Goto(ref reader, off_brain);
                 p.brain = Brain.Read(reader, off_brain);
                 Pointer.Goto(ref reader, off_current);
-
-                if (p.Gao) {
-                    if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model!=null) {
-                        if (p.brain.mind.AI_model.behaviors_normal!=null) {
-                            GameObject intelParent = new GameObject("Intelligence behaviours");
-                            intelParent.transform.parent = p.Gao.transform;
-                            Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
-                            foreach (Behavior behavior in normalBehaviors) {
-                                if (behavior.scripts==null || behavior.scripts.Length==0) {
-                                    continue;
-                                }
-                                GameObject behaviorGao = new GameObject("Behaviour");
-                                behaviorGao.transform.parent = intelParent.transform;
-                                if (behavior.scripts.Length > 1) {
-                                    foreach (Script script in behavior.scripts) {
-                                        GameObject scriptGao = new GameObject("Rule");
-                                        scriptGao.transform.parent = behaviorGao.transform;
-                                        ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
-                                        scriptComponent.SetScript(script, p);
-                                    }
-                                } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name = "Single-rule behaviour";
-                                    ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
-                                    scriptComponent.SetScript(behavior.scripts[0], p);
-                                }
-                            }
-                        }
-                        if (p.brain.mind.AI_model.behaviors_reflex!=null) {
-                            GameObject reflexParent = new GameObject("Reflex behaviours");
-                            reflexParent.transform.parent = p.Gao.transform;
-                            Behavior[] reflexBehaviors = p.brain.mind.AI_model.behaviors_reflex;
-                            foreach (Behavior behavior in reflexBehaviors) {
-                                if (behavior.scripts == null || behavior.scripts.Length == 0) {
-                                    continue;
-                                }
-                                GameObject behaviorGao = new GameObject("Behaviour");
-                                behaviorGao.transform.parent = reflexParent.transform;
-                                if (behavior.scripts.Length > 1) {
-                                    foreach (Script script in behavior.scripts) {
-                                        GameObject scriptGao = new GameObject("Rule");
-                                        scriptGao.transform.parent = behaviorGao.transform;
-                                        ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
-                                        scriptComponent.SetScript(script, p);
-                                    }
-                                } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name = "Single-rule behaviour";
-                                    ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
-                                    scriptComponent.SetScript(behavior.scripts[0], p);
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
             /*if (l.mode == MapLoader.Mode.Rayman2PC && off_msWay != null) {
@@ -179,7 +126,7 @@ namespace OpenSpace.EngineObject {
                     }
                 }
             }*/
-            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
+            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.family != null) {
                 // Add physical objects tables hidden in scripts
                 AIModel ai = p.brain.mind.AI_model;
                 if (ai.behaviors_normal != null) {
