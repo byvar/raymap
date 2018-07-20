@@ -116,24 +116,24 @@ public class Controller : MonoBehaviour {
                 if (p.Gao) {
                     if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
                         if (p.brain.mind.AI_model.behaviors_normal != null) {
-                            GameObject intelParent = new GameObject("Intelligence behaviours");
+                            GameObject intelParent = new GameObject("Rule behaviours");
                             intelParent.transform.parent = p.Gao.transform;
                             Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
                             foreach (Behavior behavior in normalBehaviors) {
                                 if (behavior.scripts == null || behavior.scripts.Length == 0) {
                                     continue;
                                 }
-                                GameObject behaviorGao = new GameObject("Behaviour");
+                                GameObject behaviorGao = new GameObject("Rule");
                                 behaviorGao.transform.parent = intelParent.transform;
                                 if (behavior.scripts.Length > 1) {
                                     foreach (Script script in behavior.scripts) {
-                                        GameObject scriptGao = new GameObject("Rule");
+                                        GameObject scriptGao = new GameObject("Script");
                                         scriptGao.transform.parent = behaviorGao.transform;
                                         ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
                                         scriptComponent.SetScript(script, p);
                                     }
                                 } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name = "Single-rule behaviour";
+                                    behaviorGao.name = "Single-script Rule";
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.scripts[0], p);
                                 }
@@ -147,17 +147,17 @@ public class Controller : MonoBehaviour {
                                 if (behavior.scripts == null || behavior.scripts.Length == 0) {
                                     continue;
                                 }
-                                GameObject behaviorGao = new GameObject("Behaviour");
+                                GameObject behaviorGao = new GameObject("Reflex");
                                 behaviorGao.transform.parent = reflexParent.transform;
                                 if (behavior.scripts.Length > 1) {
                                     foreach (Script script in behavior.scripts) {
-                                        GameObject scriptGao = new GameObject("Rule");
+                                        GameObject scriptGao = new GameObject("Script");
                                         scriptGao.transform.parent = behaviorGao.transform;
                                         ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
                                         scriptComponent.SetScript(script, p);
                                     }
                                 } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name = "Single-rule behaviour";
+                                    behaviorGao.name = "Single-script Reflex";
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.scripts[0], p);
                                 }

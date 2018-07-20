@@ -27,7 +27,7 @@ namespace OpenSpace.AI {
 
             if (m.off_script != null) {
                 Pointer off_current = Pointer.Goto(ref reader, m.off_script);
-                m.script = Script.Read(reader, Pointer.Current(reader));
+                m.script = Script.Read(reader, Pointer.Current(reader), null);
                 Pointer.Goto(ref reader, off_current);
             }
                 

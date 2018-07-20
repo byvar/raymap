@@ -8,6 +8,7 @@ using UnityEngine;
 namespace OpenSpace.AI {
     public class Script {
         public Pointer offset; // offset of the pointer to the script
+        public Behavior behavior;
 
         public Pointer off_script; // offset where the script starts
         public List<ScriptNode> scriptNodes = new List<ScriptNode>();
@@ -16,10 +17,12 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Script Read(EndianBinaryReader reader, Pointer offset) {
+        public static Script Read(EndianBinaryReader reader, Pointer offset, Behavior behavior) {
             MapLoader l = MapLoader.Loader;
             Script s = new Script(offset);
-            
+
+            s.behavior = behavior;
+
             s.off_script = Pointer.Read(reader);
             if (s.off_script != null) {
                 Pointer off_current = Pointer.Goto(ref reader, s.off_script);

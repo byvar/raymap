@@ -4,7 +4,7 @@ using OpenSpace.AI;
 using OpenSpace.EngineObject;
 
 public class ScriptComponent : MonoBehaviour {
-    private Script script;
+    public Script script;
     public string offset;
     [TextArea(30,80)]
     public string translatedScript;
