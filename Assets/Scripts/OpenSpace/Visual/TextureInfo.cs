@@ -140,7 +140,12 @@ namespace OpenSpace.Visual {
             tex.field6 = reader.ReadUInt16();
             tex.off_tempBuffer = Pointer.Read(reader); // always null because it's stored here dynamically
             tex.fieldC = reader.ReadUInt32();
-            tex.off_buffer = Pointer.Read(reader);
+            if (MapLoader.Loader.settings.platform != Settings.Platform.iOS) {
+                tex.off_buffer = Pointer.Read(reader);
+            } else {
+                reader.ReadUInt32();
+                tex.off_buffer = null;
+            }
             tex.flags = reader.ReadUInt32();
             tex.height_ = reader.ReadUInt16();
             tex.width_ = reader.ReadUInt16();
