@@ -20,6 +20,10 @@ namespace OpenSpace.FileFormat {
             reader = new EndianBinaryReader(new MemoryStream(data), Settings.s.IsLittleEndian);
         }
 
+        public override void CreateWriter() {
+            return; // Don't need to write to this file
+        }
+
         public void Save(string path) {
             Util.ByteArrayToFile(path, data);
         }

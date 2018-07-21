@@ -6,7 +6,11 @@ using System.Text;
 
 namespace OpenSpace.FileFormat {
     public class LVL : FileWithPointers {
-        public LVL(string name, string path, int fileID) : this(name, File.OpenRead(path), fileID) { }
+        string path;
+
+        public LVL(string name, string path, int fileID) : this(name, File.OpenRead(path), fileID) {
+            this.path = path;
+        }
 
         public LVL(string name, Stream stream, int fileID) {
             baseOffset = 4;
@@ -44,6 +48,13 @@ namespace OpenSpace.FileFormat {
 
         public FileWithPointers GetFileWithID(int id) {
             return MapLoader.Loader.files_array.Where(f => f != null && f.fileID == id).FirstOrDefault();
+        }
+        
+        public override void CreateWriter() {
+            if (path != null) {
+                FileStream stream = new FileStream(path, FileMode.Open);
+                writer = new EndianBinaryWriter(stream, Settings.s.IsLittleEndian);
+            }
         }
     }
 }

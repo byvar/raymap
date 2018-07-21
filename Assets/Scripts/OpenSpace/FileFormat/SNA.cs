@@ -25,6 +25,7 @@ namespace OpenSpace.FileFormat {
     }
 
     public class SNA : FileWithPointers {
+        string path;
         List<SNAMemoryBlock> blocks = new List<SNAMemoryBlock>();
         public Dictionary<ushort, SNAMemoryBlock> relocation_local = new Dictionary<ushort, SNAMemoryBlock>();
         byte[] data = null;
@@ -35,7 +36,9 @@ namespace OpenSpace.FileFormat {
         SNAMemoryBlock ptx;
         int tmpModule = 10;
 
-        public SNA(string name, string path, RelocationTable rtb) : this(name, File.OpenRead(path), rtb) { }
+        public SNA(string name, string path, RelocationTable rtb) : this(name, File.OpenRead(path), rtb) {
+            this.path = path;
+        }
 
         public SNA(string name, Stream stream, RelocationTable rtb) {
             baseOffset = 0; // we're skipping the first 4 bytes for this one.
@@ -260,138 +263,6 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        /*public void RelocateFillinPointers() {
-            R3Loader l = R3Loader.Loader;
-            List<RelocationPointerList> fillinPointerLists = new List<RelocationPointerList>();
-            foreach (RelocationPointerList ptrList in fillinPointerLists) {
-                ushort ptrListRelocationKey = GetRelocationKey(ptrList);
-                if (l.relocation_global.ContainsKey(ptrListRelocationKey)) {
-                    SNAMemoryBlock block = l.relocation_global[ptrListRelocationKey];
-                    if (block.sna != this) {
-                        l.print("Other sna????");
-                        return;
-                    }
-                    if (block.size > 0) {
-                        foreach (RelocationPointerInfo info in ptrList.pointers) {
-                            uint relativeAddress = (uint)(info.offsetInMemory - block.baseInMemory);
-                            reader.BaseStream.Seek(block.dataPosition + relativeAddress, SeekOrigin.Begin);
-                            uint ptrValue = reader.ReadUInt32();
-                            ushort ptrRelocationKey = GetRelocationKey(info);
-                            if (!l.relocation_global.ContainsKey(ptrRelocationKey)) {
-                                l.print("Info mod " + info.module + " - block " + info.id);
-                                return;
-                            }
-                            SNAMemoryBlock ptr_block = l.relocation_global[ptrRelocationKey];
-                            if (ptr_block != null && ptr_block.baseInMemory != -1) {
-                                if (ptrValue < ptr_block.baseInMemory) {
-                                    l.print("Info mod: " + info.module + " - block " + info.id);
-                                    l.print("Too low: " + ptrValue + " < " + ptr_block.baseInMemory + " + " + ptr_block.size);
-                                    l.print("Part 2:" + ptr_block.unk2 + " - 3:" + ptr_block.unk3 + " - 4:" + ptr_block.maxPosMinus9);
-                                    l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
-                                    return;
-                                }
-                                if (ptrValue >= ptr_block.maxPosMinus9 + 9) {
-                                    //if (ptrValue >= ptr_block.baseInMemory + ptr_block.size) {
-                                    //l.print("Part mod: " + block.module + " - block " + block.id);
-                                    l.print("Info mod: " + info.module + " - block " + info.id);
-                                    l.print("PtrList mod: " + ptrList.module + " - block " + ptrList.id);
-                                    l.print("Post relocation: " + (ptrValue - ptr_block.baseInMemory + ptr_block.dataPosition));
-                                    l.print("Too high: " + ptrValue + " > " + ptr_block.baseInMemory + " + " + ptr_block.size);
-                                    l.print("Part 2:" + ptr_block.unk2 + " - 3:" + ptr_block.unk3 + " - 4:" + ptr_block.maxPosMinus9);
-                                    l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
-                                    return;
-                                }
-                                ptrValue -= (uint)ptr_block.baseInMemory;
-                                if (!ptr_block.isGpt) ptrValue += ptr_block.dataPosition;
-                                // Test. There's a fillin pointer there
-                                if (ptrValue == 0x1b6a4) {
-                                    l.print("Fillin pointer is in block (" + ptr_block.module + "," + ptr_block.id + ") with base " + ptr_block.baseInMemory);
-                                    l.print("Its value prior to relocation is " + (ptrValue - ptr_block.dataPosition + ptr_block.baseInMemory));
-                                }
-                                Pointer pointer = new Pointer(ptrValue, ptr_block.sna);
-                                block.sna.pointers[block.dataPosition + relativeAddress] = pointer;
-                            } else {
-                                l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
-
-        /*public void CreatePointers2() {
-            R3Loader l = R3Loader.Loader;
-            foreach (SNAMemoryBlock block in blocks) {
-                if (block.pointerList != null && block.size > 0) {
-                    RelocationPointerList ptr_list = block.pointerList;
-                    foreach (RelocationPointerInfo info in block.pointerList.pointers) {
-                        uint relativeAddress = (uint)(info.offsetInMemory - block.baseInMemory);
-                        reader.BaseStream.Seek(block.dataPosition + relativeAddress, SeekOrigin.Begin);
-                        uint ptrValue = reader.ReadUInt32();
-                        ushort ptrRelocationKey = GetRelocationKey(info);
-                        if (!l.ptr_relocation.ContainsKey(ptrRelocationKey)) {
-                            l.print("Info mod " + info.module + " - block " + info.id);
-                        }
-                        SNAMemoryBlock ptr_block = l.ptr_relocation[ptrRelocationKey];
-                        if (ptr_block != null && ptr_block.baseInMemory != -1) {
-                            if (ptrValue < ptr_block.baseInMemory) {
-                                l.print("Info mod: " + info.module + " - block " + info.id);
-                                l.print("Too low: " + ptrValue + " < " + ptr_block.baseInMemory + " + " + ptr_block.size);
-                                l.print("Part 2:" + ptr_block.unk2 + " - 3:" + ptr_block.unk3 + " - 4:" + ptr_block.maxPosMinus9);
-                                l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
-                            }
-                            if (ptrValue >= ptr_block.maxPosMinus9 + 9) {
-                                //l.print("Part mod: " + block.module + " - block " + block.id);
-                                l.print("Info mod: " + info.module + " - block " + info.id);
-                                l.print("Too high: " + ptrValue + " > " + ptr_block.baseInMemory + " + " + ptr_block.size);
-                                l.print("Part 2:" + ptr_block.unk2 + " - 3:" + ptr_block.unk3 + " - 4:" + ptr_block.maxPosMinus9);
-                                l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
-                            }
-                            ptrValue -= (uint)ptr_block.baseInMemory;
-                            if (!ptr_block.isGpt) ptrValue += ptr_block.dataPosition;
-                            // Test. There's a fillin pointer there
-                            if (ptrValue == 0x1b6a4) {
-                                l.print("Fillin pointer is in block (" + ptr_block.module + "," + ptr_block.id + ") with base " + ptr_block.baseInMemory);
-                                l.print("Its value prior to relocation is " + (ptrValue - ptr_block.dataPosition + ptr_block.baseInMemory));
-                            }
-                            Pointer pointer = new Pointer(ptrValue, ptr_block.sna);
-                            block.sna.pointers[block.dataPosition + relativeAddress] = pointer;
-                        } else {
-                            l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
-                        }
-
-                        //if (info.offsetInMemory - part.baseInMemory < 0) l.print("Too low");
-                        //if (info.offsetInMemory - part.baseInMemory >= part.size) l.print("Too high");
-                        //l.print("Dword: " + (info.dword0-part.somethingRelatedToRelocation));
-                    }
-                }
-            }
-            // Now for the Global Pointer Table
-            reader.BaseStream.Seek(gpt.dataPosition, SeekOrigin.Begin);
-            RelocationPointerList list = rtp.pointerBlocks[0];
-            uint listIndex = 0;
-            for (uint i = 0; i < gpt.size / 4; i++) {
-                uint ptrValue = reader.ReadUInt32();
-                if (list.pointers[listIndex].offsetInMemory == ptrValue) {
-                    RelocationPointerInfo info = list.pointers[listIndex];
-                    ushort ptrRelocationKey = GetRelocationKey(info);
-                    SNAMemoryBlock ptr_block = l.ptr_relocation[ptrRelocationKey];
-                    if (ptr_block != null && ptr_block.baseInMemory != -1) {
-                        ptrValue -= (uint)ptr_block.baseInMemory;
-                        if(!ptr_block.isGpt) ptrValue += ptr_block.dataPosition;
-                        Pointer pointer = new Pointer(ptrValue, ptr_block.sna);
-                        pointers[gpt.dataPosition + (i*4)] = pointer;
-                    } else {
-                        l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
-                    }
-                    listIndex++;
-                    if (listIndex >= list.pointers.Length) break;
-                }
-            }
-            reader.BaseStream.Seek(gpt.dataPosition, SeekOrigin.Begin);
-        }*/
-
         ushort GetRelocationKey(byte module, byte block) {
             return (ushort)(module * 0x100 + block); // Originally this is 10 (to save space), but 0x100 makes more sense since they're two bytes
         }
@@ -434,6 +305,10 @@ namespace OpenSpace.FileFormat {
             if (reader != null) {
                 reader.BaseStream.Seek(ptx.dataPosition, SeekOrigin.Begin);
             }
+        }
+
+        public override void CreateWriter() {
+            return; // No writing support for SNA files yet
         }
     }
 }

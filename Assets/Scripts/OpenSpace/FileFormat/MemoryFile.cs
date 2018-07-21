@@ -17,5 +17,10 @@ namespace OpenSpace.FileFormat {
             stream.Seek(stream.BaseAddress, SeekOrigin.Begin);
             reader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian);
         }
+
+        public override void CreateWriter() {
+            ProcessMemoryStream stream = new ProcessMemoryStream(name, ProcessMemoryStream.Mode.AllAccess);
+            writer = new EndianBinaryWriter(stream, Settings.s.IsLittleEndian);
+        }
     }
 }

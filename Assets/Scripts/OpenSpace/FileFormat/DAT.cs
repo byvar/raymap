@@ -208,5 +208,9 @@ namespace OpenSpace.FileFormat {
                 return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));
             }
         }
+
+        public override void CreateWriter() {
+            return; // Don't need to write to this file
+        }
     }
 }

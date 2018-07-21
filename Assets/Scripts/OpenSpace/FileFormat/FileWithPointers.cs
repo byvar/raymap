@@ -29,5 +29,7 @@ namespace OpenSpace.FileFormat {
                 reader.BaseStream.Seek(headerOffset + baseOffset, SeekOrigin.Begin);
             }
         }
+
+        public abstract void CreateWriter();
     }
 }

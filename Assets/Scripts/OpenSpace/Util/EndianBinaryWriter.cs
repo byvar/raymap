@@ -4,6 +4,8 @@ using System.IO;
 namespace OpenSpace {
     public class EndianBinaryWriter : BinaryWriter {
         bool isLittleEndian = true;
+        bool masking = false; // for Rayman 2
+        uint mask = 0;
         public EndianBinaryWriter(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
         public EndianBinaryWriter(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
 
@@ -58,6 +60,21 @@ namespace OpenSpace {
         public void WriteNullDelimitedString(string value) {
             var data = value.ToCharArray();
             base.Write(data);
+        }
+
+        // To make sure position is a multiple of alignBytes
+        public void Align(int alignBytes) {
+            if (BaseStream.Position % alignBytes != 0) {
+                BaseStream.Seek(alignBytes - (int)(BaseStream.Position % alignBytes), SeekOrigin.Current);
+            }
+        }
+
+        // To make sure position is a multiple of alignBytes after reading a block of blocksize, regardless of prior position
+        public void Align(int blockSize, int alignBytes) {
+            int rest = blockSize % alignBytes;
+            if (rest > 0) {
+                BaseStream.Seek(alignBytes - rest, SeekOrigin.Current);
+            }
         }
     }
 }

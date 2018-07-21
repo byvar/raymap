@@ -57,7 +57,7 @@ namespace OpenSpace.EngineObject {
             Perso p = new Perso(offset, so);
             l.persos.Add(p);
             Pointer off_perso = Pointer.Read(reader); // 0x0
-            Pointer off_nameIndices = Pointer.Read(reader); // 4 Standard Game info
+            Pointer off_stdGame = Pointer.Read(reader); // 4 Standard Game info
             Pointer off_unknown = Pointer.Read(reader); // 0x8
             Pointer off_brain = Pointer.Read(reader); // 0xC
             reader.ReadUInt32(); // 0x10 is Camera in Rayman 2
@@ -84,8 +84,8 @@ namespace OpenSpace.EngineObject {
             p.family = Family.FromOffset(off_family);
             p.initialState = State.FromOffset(p.family, off_currentState);
 
-            if (off_nameIndices != null) {
-                Pointer off_current = Pointer.Goto(ref reader, off_nameIndices);
+            if (off_stdGame != null) {
+                Pointer off_current = Pointer.Goto(ref reader, off_stdGame);
                 uint index0 = reader.ReadUInt32();
                 uint index1 = reader.ReadUInt32();
                 uint index2 = reader.ReadUInt32();

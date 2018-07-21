@@ -225,14 +225,31 @@ namespace OpenSpace {
         public void Write(EndianBinaryWriter writer) {
             Pointer.Goto(ref writer, offset);
             writer.Write(type);
-            for (int i = 0; i < 4; i++) {
-                Vector4 col = m.GetColumn(i);
-                for (int j = 0; j < 4; j++) {
-                    writer.Write(col[j]);
+
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                Vector4 pos = m.GetColumn(3);
+                writer.Write(pos.x);
+                writer.Write(pos.y);
+                writer.Write(pos.z);
+                if (type == 4) {
+                    writer.BaseStream.Seek(36, System.IO.SeekOrigin.Current);
                 }
-            }
-            for (int j = 0; j < 4; j++) {
-                writer.Write(v[j]);
+                for (int j = 0; j < 3; j++) {
+                    Vector4 col = m.GetColumn(j);
+                    writer.Write(col.x);
+                    writer.Write(col.y);
+                    writer.Write(col.z);
+                }
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    Vector4 col = m.GetColumn(i);
+                    for (int j = 0; j < 4; j++) {
+                        writer.Write(col[j]);
+                    }
+                }
+                for (int j = 0; j < 4; j++) {
+                    writer.Write(v[j]);
+                }
             }
         }
     }

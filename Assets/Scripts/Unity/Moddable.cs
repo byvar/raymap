@@ -19,8 +19,12 @@ public class Moddable : MonoBehaviour {
 
     public void SaveChanges(EndianBinaryWriter writer) {
         if (startPos != transform.localPosition || startRot != transform.localRotation || startScale != transform.localScale) {
-            mat.type = 7;
-            mat.SetTRS(transform.localPosition, transform.localRotation, transform.localScale, convertAxes: true, setVec: true);
+            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+                mat.type = 7;
+                mat.SetTRS(transform.localPosition, transform.localRotation, transform.localScale, convertAxes: true, setVec: true);
+            } else {
+                mat.SetTRS(transform.localPosition, transform.localRotation, transform.localScale, convertAxes: true, setVec: false);
+            }
             mat.Write(writer);
         }
     }

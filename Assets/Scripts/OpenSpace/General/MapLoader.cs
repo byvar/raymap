@@ -289,7 +289,13 @@ namespace OpenSpace {
         }
 
         public void SaveModdables() {
-            EndianBinaryWriter writer = files_array[1].writer;
+            EndianBinaryWriter writer = null;
+            for (int i = 0; i < files_array.Length; i++) {
+                if (files_array[i] != null && files_array[i].writer != null) {
+                    writer = files_array[i].writer;
+                    break;
+                }
+            }
             if (writer == null) return;
             foreach (SuperObject so in superObjects) {
                 GameObject gao = so.Gao;
@@ -304,18 +310,15 @@ namespace OpenSpace {
 
         public void Save() {
             try {
-                for (int i = 0; i < 3; i++) {
-                    if (File.Exists(lvlPaths[i]) && File.Exists(ptrPaths[i])) {
-                        FileStream stream = new FileStream(lvlPaths[i], FileMode.Open);
-                        files_array[i].writer = new EndianBinaryWriter(stream, settings.IsLittleEndian);
-                    }
+                for (int i = 0; i < files_array.Length; i++) {
+                    if (files_array[i] != null) files_array[i].CreateWriter();
                 }
                 // Save changes
                 SaveModdables();
             } catch (Exception e) {
                 Debug.LogError(e.ToString());
             } finally {
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
                         files_array[i].Dispose();
                     }
