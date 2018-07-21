@@ -21,6 +21,8 @@ namespace OpenSpace.EngineObject {
         public PhysicalObject[] physical_objects = null;
         public Brain brain = null;
         public State initialState = null;
+        public Pointer off_currentState;
+        public Pointer off_pointerToCurrentState;
         public MSWay msWay = null;
 
         private GameObject gao;
@@ -40,6 +42,7 @@ namespace OpenSpace.EngineObject {
         }
 
         private SuperObject superObject;
+
         public SuperObject SuperObject {
             get {
                 return superObject;
@@ -76,13 +79,14 @@ namespace OpenSpace.EngineObject {
             }
             //R3Pointer.Goto(ref reader, off_perso);
             Pointer.Read(reader); // same as next
-            Pointer off_currentState = Pointer.Read(reader);
+            p.off_pointerToCurrentState = Pointer.Current(reader);
+            p.off_currentState = Pointer.Read(reader);
             Pointer.Read(reader); // same as previous
             p.off_physicalObjects = Pointer.Read(reader);
             reader.ReadUInt32(); // same address?
             Pointer off_family = Pointer.Read(reader);
             p.family = Family.FromOffset(off_family);
-            p.initialState = State.FromOffset(p.family, off_currentState);
+            p.initialState = State.FromOffset(p.family, p.off_currentState);
 
             if (off_stdGame != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_stdGame);
@@ -190,6 +194,22 @@ namespace OpenSpace.EngineObject {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.persos.FirstOrDefault(f => f.offset == offset);
+        }
+
+        public static void Write(Perso perso, EndianBinaryWriter writer)
+        {
+            PersoBehaviour persoBehaviour = perso.gao.GetComponent<PersoBehaviour>();
+            if (perso.off_pointerToCurrentState!=null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {
+                if (persoBehaviour.state.offset != perso.off_currentState)
+                {
+                    MapLoader.Loader.print("write state perso " + perso.fullName + ".off_pointerToCurrentState = " + perso.off_pointerToCurrentState);
+                    Pointer.Goto(ref writer, perso.off_pointerToCurrentState);
+                    writer.Write(persoBehaviour.state.offset.offset);
+                } else
+                {
+                    MapLoader.Loader.print("do not write state for perso " + perso.fullName);
+                }
+            }
         }
     }
 }

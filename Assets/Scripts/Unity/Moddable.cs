@@ -1,4 +1,5 @@
 ﻿using OpenSpace;
+using OpenSpace.EngineObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ public class Moddable : MonoBehaviour {
     Quaternion startRot;
     Vector3 startScale;
     public Matrix mat;
+    public PersoBehaviour persoBehaviour;
 
     public void Start() {
         startPos = transform.localPosition;
@@ -26,6 +28,11 @@ public class Moddable : MonoBehaviour {
                 mat.SetTRS(transform.localPosition, transform.localRotation, transform.localScale, convertAxes: true, setVec: false);
             }
             mat.Write(writer);
+        }
+
+        if (persoBehaviour!=null && persoBehaviour.perso!=null)
+        {
+            Perso.Write(persoBehaviour.perso, writer);
         }
     }
 }

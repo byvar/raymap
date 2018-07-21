@@ -110,6 +110,14 @@ public class Controller : MonoBehaviour {
             for (int i = 0; i < loader.persos.Count; i++) {
                 Perso p = loader.persos[i];
                 PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
+                if (p.SuperObject!=null && p.SuperObject.Gao!=null)
+                {
+                    Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
+                    if (mod!=null)
+                    {
+                        mod.persoBehaviour = unityBehaviour;
+                    }
+                }
                 unityBehaviour.perso = p;
                 unityBehaviour.Init();
 
