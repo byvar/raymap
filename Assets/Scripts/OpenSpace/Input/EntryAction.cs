@@ -69,6 +69,16 @@ namespace OpenSpace.Input {
             return result;
         }
 
+        public string ToBasicString()
+        {
+            string result = "<NullEntryAction>";
+            if (firstKeyWord != null)
+            {
+                result = firstKeyWord.ToString();
+            }
+            return result;
+        }
+
         public static EntryAction FromOffset(Pointer offset) {
             if (offset == null) return null;
             InputStructure i = MapLoader.Loader.inputStruct;

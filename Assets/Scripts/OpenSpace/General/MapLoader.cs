@@ -1232,6 +1232,9 @@ namespace OpenSpace {
             }
             textures = textureInfos.ToArray();
 
+            Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["inputStructure"], mem));
+            inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+
             // Parse actual world & always structure
             ReadFamilies(reader);
             ReadSuperObjects(reader);

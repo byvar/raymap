@@ -94,7 +94,7 @@ namespace OpenSpace.AI {
             "Affect",
             "Affect",
             "Affect",
-            "Dot",
+            "Dot", // 12
             "VectorDot",
             "VectorDot",
             "VectorDot",
@@ -434,6 +434,24 @@ namespace OpenSpace.AI {
 
         #region Procedures
         public static List<string> procedureTable = new List<string>(new string[] {
+            "fn_p_stHitPointsProcedure",
+            "fn_p_stHitPointsProcedure",
+            "fn_p_stHitPointsProcedure",
+            "fn_p_stHitPointsProcedure",
+            "fn_p_stHitPointsProcedure",
+            "fn_p_stHitPointsProcedure",
+            "fn_p_stHitPointsMaxProcedure",
+            "fn_p_stHitPointsMaxProcedure",
+            "fn_p_stHitPointsMaxProcedure",
+            "fn_p_stHitPointsMaxProcedure",
+            "fn_p_stHitPointsMaxProcedure",
+            "fn_p_stTransparenceProcedure",
+            "fn_p_stTransparenceProcedure",
+            "fn_p_st_ACT_SetDrawFlag",
+            "fn_p_stTransparenceProcedure",
+            "fn_p_stTransparenceProcedure",
+            "fn_p_stTransparenceProcedure",
+            "fn_p_stTransparenceProcedure",
             "fn_p_stListZDDZDEProcedure",
             "fn_p_stListZDDZDEProcedure",
             "fn_p_stListZDDZDEProcedure",
@@ -780,7 +798,7 @@ namespace OpenSpace.AI {
             "fn_p_stSetVideoOptions",
             "fn_p_stSetInStereoMode",
             "fn_p_stSetPrevMusicFadeOut",
-            "fn_p_stSomethingDynamics",
+            "fn_p_stSetaturationAndBackgroundDistance",
             "fn_p_stSaveCurrentSoundRequest",
             "fn_p_stSaveCurrentSoundRequest",
             "fn_p_stDummy",
@@ -979,10 +997,10 @@ namespace OpenSpace.AI {
             "fn_p_stListCondition",
             "fn_p_st_UserEvent_IsSet",
             "fn_p_st_UserEvent_IsSet",
-            "fn_p_stButtonCondition",
-            "fn_p_stButtonCondition",
-            "fn_p_stButtonCondition",
-            "fn_p_stButtonCondition",
+            "fn_p_stButtonCondition", // 44
+            "fn_p_stButtonCondition", // 45
+            "fn_p_stButtonCondition", // 46
+            "fn_p_stButtonCondition", // 47
             "fn_p_stTimeCondition",
             "fn_p_stValidityCondition",
             "fn_p_stValidityCondition",
@@ -1117,6 +1135,47 @@ namespace OpenSpace.AI {
         });
         #endregion
 
+        #region Fields
+        public static List<string> fieldTable = new List<string>(new string[] {
+            "GetFieldPosition",
+            "SetFieldPosition",
+            "GetFieldOrientation",
+            "SetFieldOrientation",
+            "GetFieldSpeed",
+            "SetFieldSpeed",
+            "GetFieldNormSpeed",
+            "SetFieldNormSpeed",
+            "GetFieldAbsoluteAxisX",
+            "SetFieldAbsoluteAxisX",
+            "GetFieldAbsoluteAxisY",
+            "SetFieldAbsoluteAxisY",
+            "GetFieldAbsoluteAxisZ",
+            "SetFieldAbsoluteAxisZ",
+            "GetFieldPrevComportIntell",
+            "SetFieldPrevComportIntell",
+            "GetFieldPrevComportReflex",
+            "SetFieldPrevComportReflex",
+            "GetFieldShadowScaleX",
+            "SetFieldShadowScaleX",
+            "GetFieldShadowScaleY",
+            "SetFieldShadowScaleY",
+            "GetFieldPadGlobalVector",
+            "SetFieldPadGlobalVector",
+            "GetFieldPadHorizontalAxis",
+            "SetFieldPadHorizontalAxis",
+            "GetFieldPadVerticalAxis",
+            "SetFieldPadVerticalAxis",
+            "GetFieldPadAnalogForce",
+            "SetFieldPadAnalogForce",
+            "GetFieldPadTrueAnalogForce",
+            "SetFieldPadTrueAnalogForce",
+            "GetFieldPadRotationAngle",
+            "SetFieldPadRotationAngle",
+            "GetFieldPadSector",
+            "SetFieldPadSector"
+        });
+        #endregion
+
         public static ScriptNode.NodeType getNodeType(byte functionType) {
 
             switch (functionType) {
@@ -1241,7 +1300,8 @@ namespace OpenSpace.AI {
                 case 8:
                     return "End Macro";
                 case 9:
-                    return "EvalField";
+                    if (param < fieldTable.Count) { return fieldTable[param]; }
+                    return "Unknown Field (" + param + ")";
                 case 10:
                 case 11:
                     string dsgVarString = "";
@@ -1252,10 +1312,10 @@ namespace OpenSpace.AI {
                 case 13:
 
                     return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString();
-                case 14:
+                case 14: // Button/entryaction
                     EntryAction ea = EntryAction.FromOffset(sn.param_ptr);
-                    string eaName = ea == null ? "ERR_ENTRYACTION_NOTFOUND" : ea.ToString();
-                    return "Button: " + eaName + "(" + sn.param_ptr + ")";
+                    string eaName = ea == null ? "ERR_ENTRYACTION_NOTFOUND" : ea.ToBasicString();
+                    return eaName;
                 case 15:
                     return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
                 case 16:
@@ -1278,7 +1338,7 @@ namespace OpenSpace.AI {
                 case 23:
                     Perso p = Perso.FromOffset(sn.param_ptr);
                     string persoName = p == null ? "ERR_PERSO_NOTFOUND" : p.fullName;
-                    return "PersoRef: " + sn.param_ptr + " (" + persoName + ")";
+                    return "(" + persoName + "@" + sn.param_ptr + ")";
                 case 24:
                     State state = State.FromOffset(sn.param_ptr);
                     string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.name;
@@ -1304,11 +1364,11 @@ namespace OpenSpace.AI {
                 case 34:
                     return "VisualMaterial: " + sn.param_ptr;
                 case 35:
-                    return "Color: " + "0x" + (param).ToString("x8");
+                    return "ModelCastType: " + "0x" + (param).ToString("x8");
                 case 36:
                     return "EvalDataType42: " + "0x" + (param).ToString("x8");
                 case 37:
-                    return "Light: " + "0x" + (param).ToString("x8");
+                    return "CustomBits: " + "0x" + (param).ToString("x8");
                 case 38:
                     return "Caps: " + "0x" + (param).ToString("x8");
                 case 39:
