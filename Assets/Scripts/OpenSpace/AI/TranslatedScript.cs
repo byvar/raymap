@@ -111,8 +111,8 @@ namespace OpenSpace.AI
                                 case 2: return "(" + firstChildNode + "*" + secondChildNode + ")";
                                 case 3: return "(" + firstChildNode + "/" + secondChildNode + ")";
                                 // affect:
-                                case 5: case 9: return firstChildNode + "+=" + secondChildNode;
-                                case 6: case 10: return firstChildNode + "-=" + secondChildNode;
+                                case 5: case 9: return this.children.Count>1 ? (firstChildNode + "+=" + secondChildNode) : firstChildNode + "++";
+                                case 6: case 10: return this.children.Count > 1 ? (firstChildNode + "-=" + secondChildNode) : firstChildNode + "--";
                                 case 7: return firstChildNode + "*=" + secondChildNode;
                                 case 8: return firstChildNode + "/=" + secondChildNode;
                                 case 11: return firstChildNode + "=" + secondChildNode;
