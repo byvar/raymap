@@ -24,12 +24,12 @@ namespace OpenSpace {
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool WriteProcessMemory(IntPtr hProcess, int lpBaseAddress, byte[] lpBuffer, int dwSize, ref UIntPtr lpNumberOfBytesWritten);
+#endif
 
         const int PROCESS_ALL_ACCESS = 0x1F0FFF;
         const int PROCESS_WM_READ = 0x0010;
         const int PROCESS_VM_WRITE = 0x0020;
         const int PROCESS_VM_OPERATION = 0x0008;
-#endif
         public enum Mode {
             Read,
             Write,
@@ -42,12 +42,14 @@ namespace OpenSpace {
         Mode mode = Mode.Read;
 
         public ProcessMemoryStream(string name, Mode mode) {
+#if ISWINDOWS
             Process[] processes = Process.GetProcessesByName(name.Replace(".exe",""));
             if (processes.Length == 0) throw new FileNotFoundException("Process not found");
             for (int i = 1; i < processes.Length; i++) {
                 processes[i].Dispose();
             }
             process = processes[0];
+#endif
             this.mode = mode;
 
             int accessLevel = PROCESS_WM_READ;
