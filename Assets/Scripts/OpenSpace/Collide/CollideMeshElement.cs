@@ -47,12 +47,12 @@ namespace OpenSpace.Collide {
             if(num_triangles > 0) {
                 Vector3[] new_vertices = new Vector3[num_triangles * 3];
                 Vector3[] new_normals = new Vector3[num_triangles * 3];
-                Vector2[] new_uvs = new Vector2[num_triangles * 3];
+                //Vector2[] new_uvs = new Vector2[num_triangles * 3];
 
                 for (int j = 0; j < num_triangles * 3; j++) {
                     new_vertices[j] = mesh.vertices[vertex_indices[j]];
                     new_normals[j] = normals[j/3];
-                    if (uvs != null) new_uvs[j] = uvs[mapping[j]];
+                    //if (uvs != null) new_uvs[j] = uvs[mapping[j]];
                 }
                 int[] triangles = new int[num_triangles * 3];
                 for (int j = 0; j < num_triangles; j++) {
@@ -64,23 +64,23 @@ namespace OpenSpace.Collide {
                 meshUnity.vertices = new_vertices;
                 meshUnity.normals = new_normals;
                 meshUnity.triangles = triangles;
-                if (uvs != null) meshUnity.uv = new_uvs;
+                //if (uvs != null) meshUnity.uv = new_uvs;
                 MeshFilter mf = gao.AddComponent<MeshFilter>();
                 mf.mesh = meshUnity;
                 MeshRenderer mr = gao.AddComponent<MeshRenderer>();
                 mr.material = MapLoader.Loader.baseMaterial;
-                mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
+                //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                 if (gameMaterial != null && gameMaterial.collideMaterial != null) {
                     CollideMaterial cm = gameMaterial.collideMaterial;
                     if (cm.NoCollision) {
                         mr.material = MapLoader.Loader.baseTransparentMaterial;
-                        mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
+                        //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                         mr.material.color = new Color(1, 1, 1, 0.3f); // transparent cyan
                     }
                     if (cm.Slide) mr.material.color = Color.blue;
                     if (cm.Water) {
                         mr.material = MapLoader.Loader.baseTransparentMaterial;
-                        mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
+                        //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                         mr.material.color = new Color(0, 1, 1, 0.5f); // transparent cyan
                     }
                     if (cm.ClimbableWall || cm.HangableCeiling) {

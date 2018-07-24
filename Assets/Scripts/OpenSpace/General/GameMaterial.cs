@@ -1,4 +1,5 @@
 ﻿using OpenSpace.Animation;
+using OpenSpace.Collide;
 using OpenSpace.Visual;
 using System;
 using System.Collections.Generic;

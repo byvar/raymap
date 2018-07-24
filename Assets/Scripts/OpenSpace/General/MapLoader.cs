@@ -1,5 +1,6 @@
 ﻿using OpenSpace.AI;
 using OpenSpace.Animation;
+using OpenSpace.Collide;
 using OpenSpace.EngineObject;
 using OpenSpace.FileFormat;
 using OpenSpace.FileFormat.Texture;

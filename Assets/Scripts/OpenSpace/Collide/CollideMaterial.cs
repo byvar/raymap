@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace {
+namespace OpenSpace.Collide {
     public class CollideMaterial {
         public Pointer offset;
 
