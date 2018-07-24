@@ -9,7 +9,7 @@ namespace OpenSpace.Animation {
         public Pointer offset;
         public string name = null;
         public ushort num_onlyFrames;
-        public byte field0_of_a3d;
+        public byte speed;
         public byte num_channels;
         public Pointer off_events;
         public float x;
@@ -29,7 +29,7 @@ namespace OpenSpace.Animation {
             AnimationReference ar = new AnimationReference(offset);
             if (l.mode == MapLoader.Mode.Rayman3GC) ar.name = new string(reader.ReadChars(0x50));
             ar.num_onlyFrames = reader.ReadUInt16();
-            ar.field0_of_a3d = reader.ReadByte();
+            ar.speed = reader.ReadByte();
             ar.num_channels = reader.ReadByte();
             ar.off_events = Pointer.Read(reader);
             if (Settings.s.engineMode == Settings.EngineMode.R2) {

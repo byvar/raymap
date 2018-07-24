@@ -164,8 +164,7 @@ namespace OpenSpace.AI
             AssignNodeChildren(nodes, nodes[0]);
         }
 
-        public string ToString()
-        {
+        public override string ToString() {
             string result = nodes[0].ToString();
             // Trim down duplicate newlines
             result = result.Replace("\n\n", "\n");

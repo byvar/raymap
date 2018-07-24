@@ -17,7 +17,7 @@ public class MouseLook : MonoBehaviour {
     
     private bool _mouselookEnabled = false;
     private bool _shifted = false;
-    public float flySpeed = 0.5f;
+    public float flySpeed = 20f;
     public GameObject defaultCamera;
 
 
@@ -89,20 +89,20 @@ public class MouseLook : MonoBehaviour {
 
         //movement
         if (Input.GetAxis("Vertical") != 0) {
-            transform.Translate(defaultCamera.transform.forward * flySpeed * Input.GetAxis("Vertical"), Space.World);
+            transform.Translate(defaultCamera.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
         }
         if (Input.GetAxis("Horizontal") != 0) {
-            transform.Translate(defaultCamera.transform.right * flySpeed * Input.GetAxis("Horizontal"), Space.World);
+            transform.Translate(defaultCamera.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
         }
         if (Input.GetKey(KeyCode.R)) {
-            transform.Translate(Vector3.up * flySpeed * 0.5f, Space.World);
+            transform.Translate(Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
         } else if (Input.GetKey(KeyCode.F)) {
-            transform.Translate(-Vector3.up * flySpeed * 0.5f, Space.World);
+            transform.Translate(-Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
         }
         if (Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.KeypadPlus)) {
-            flySpeed += 0.05f;
+            flySpeed += 1f;
         } else if (Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.KeypadMinus)) {
-            if(flySpeed > 0) flySpeed -= 0.05f;
+            if(flySpeed > 0) flySpeed -= 1f;
         }
     }
 }

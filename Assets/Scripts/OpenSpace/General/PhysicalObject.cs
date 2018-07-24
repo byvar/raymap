@@ -123,6 +123,7 @@ namespace OpenSpace {
                 uint u1 = reader.ReadUInt32(); // 0
                 uint u2 = reader.ReadUInt32(); // 0
                 uint u3 = reader.ReadUInt32(); // 0
+                //MapLoader.Loader.print(po.off_collideSet);
                 /*MapLoader.Loader.print(u1);
                 MapLoader.Loader.print(u2);
                 MapLoader.Loader.print(u3);*/

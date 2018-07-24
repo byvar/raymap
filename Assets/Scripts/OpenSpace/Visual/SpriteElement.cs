@@ -17,7 +17,8 @@ namespace OpenSpace.Visual {
         public Vector2 info_unknown;
         public Pointer off_material_pointer;
         public Pointer off_material;
-        public VisualMaterial r3mat;
+        public GameMaterial gameMaterial;
+        public VisualMaterial visualMaterial = null;
     }
 
     public class SpriteElement : IGeometricElement {
@@ -54,23 +55,23 @@ namespace OpenSpace.Visual {
                 spr_gao.transform.SetParent(gao.transform);
                 MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
-                if (sprites[i].r3mat != null) {
-                    if (sprites[i].r3mat.textures != null && sprites[i].r3mat.textures.Count > 0) {
-                        TextureInfo mainTex = sprites[i].r3mat.textures[0].texture;
+                if (sprites[i].visualMaterial != null) {
+                    if (sprites[i].visualMaterial.textures != null && sprites[i].visualMaterial.textures.Count > 0) {
+                        TextureInfo mainTex = sprites[i].visualMaterial.textures[0].texture;
                         if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
                         if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
                     }
-                    Material unityMat = sprites[i].r3mat.MaterialBillboard;
-                    bool receiveShadows = (sprites[i].r3mat.properties & VisualMaterial.property_receiveShadows) != 0;
+                    Material unityMat = sprites[i].visualMaterial.MaterialBillboard;
+                    bool receiveShadows = (sprites[i].visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                     //if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
                     //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
                     mr.material = unityMat;
                     /*mr.material.SetFloat("_ScaleX", sprites[i].info_scale.x);
                     mr.material.SetFloat("_ScaleY", sprites[i].info_scale.y);*/
                     if (!receiveShadows) mr.receiveShadows = false;
-                    if (sprites[i].r3mat.animTextures.Count > 0) {
+                    if (sprites[i].visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
-                        mtmat.r3mat = sprites[i].r3mat;
+                        mtmat.r3mat = sprites[i].visualMaterial;
                         mtmat.mat = mr.material;
                     }
                 }
@@ -150,14 +151,14 @@ namespace OpenSpace.Visual {
                         if (s.sprites[i].off_material_pointer != null) {
                             off_current = Pointer.Goto(ref reader, s.sprites[i].off_material_pointer);
                             s.sprites[i].off_material = Pointer.Read(reader);
-                            if (Settings.s.engineMode == Settings.EngineMode.R2 && s.sprites[i].off_material != null) {
-                                Pointer.Goto(ref reader, s.sprites[i].off_material);
-                                s.sprites[i].off_material = Pointer.Read(reader);
-                            }
                             if (s.sprites[i].off_material != null) {
-                                Pointer.Goto(ref reader, s.sprites[i].off_material);
-                                s.sprites[i].r3mat = VisualMaterial.FromOffset(s.sprites[i].off_material, createIfNull: true);
-                            } else s.sprites[i].r3mat = null;
+                                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                                    s.sprites[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
+                                    s.sprites[i].visualMaterial = s.sprites[i].gameMaterial.visualMaterial;
+                                } else {
+                                    s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
+                                }
+                            }
                             Pointer.Goto(ref reader, off_current);
                         }
                     }

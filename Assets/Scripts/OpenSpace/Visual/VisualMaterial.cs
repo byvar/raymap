@@ -294,17 +294,22 @@ namespace OpenSpace.Visual {
             return m;
         }
 
-        public static VisualMaterial FromOffset(Pointer offset, bool createIfNull = false) {
+        public static VisualMaterial FromOffsetOrRead(Pointer offset, EndianBinaryReader reader) {
+            VisualMaterial vm = FromOffset(offset);
+            if (vm == null) {
+                Pointer off_current = Pointer.Goto(ref reader, offset);
+                vm = VisualMaterial.Read(reader, offset);
+                Pointer.Goto(ref reader, off_current);
+                MapLoader.Loader.visualMaterials.Add(vm);
+            }
+            return vm;
+        }
+
+        public static VisualMaterial FromOffset(Pointer offset) {
             MapLoader l = MapLoader.Loader;
-            for (int i = 0; i < l.materials.Length; i++) {
-                if (offset == l.materials[i].offset) return l.materials[i];
+            for (int i = 0; i < l.visualMaterials.Count; i++) {
+                if (offset == l.visualMaterials[i].offset) return l.visualMaterials[i];
             }
-            if (createIfNull) {
-                Array.Resize(ref l.materials, l.materials.Length + 1);
-                l.materials[l.materials.Length - 1] = VisualMaterial.Read(offset.file.reader, offset);
-                return l.materials[l.materials.Length - 1];
-            }
-            l.print("Material was null!");
             return null;
         }
     }

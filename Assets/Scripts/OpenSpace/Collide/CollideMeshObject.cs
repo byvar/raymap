@@ -36,6 +36,7 @@ namespace OpenSpace.Collide {
         public static CollideMeshObject Read(EndianBinaryReader reader, PhysicalObject po, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             CollideMeshObject m = new CollideMeshObject(po, offset);
+            //l.print("Mesh obj: " + offset);
             if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();

@@ -14,7 +14,8 @@ namespace OpenSpace.Visual {
 
         public string name;
         public Pointer off_material;
-        public VisualMaterial r3mat;
+        public GameMaterial gameMaterial;
+        public VisualMaterial visualMaterial;
         public bool backfaceCulling;
         public ushort num_disconnected_triangles_spe;
         public ushort num_uvs;
@@ -236,24 +237,24 @@ namespace OpenSpace.Visual {
                     }
                 //}
             }
-            if (r3mat != null) {
-                gao.name += " " + r3mat.offset;
-                Material unityMat = r3mat.Material;
-                bool receiveShadows = (r3mat.properties & VisualMaterial.property_receiveShadows) != 0;
+            if (visualMaterial != null) {
+                gao.name += " " + visualMaterial.offset;
+                Material unityMat = visualMaterial.Material;
+                bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
                 //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
                 if (mr_main != null) {
                     mr_main.material = unityMat;
                     //mr_main.UpdateGIMaterials();
                     if (!receiveShadows) mr_main.receiveShadows = false;
-                    if (r3mat.animTextures.Count > 0) {
+                    if (visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr_main.gameObject.AddComponent<MultiTextureMaterial>();
-                        mtmat.r3mat = r3mat;
+                        mtmat.r3mat = visualMaterial;
                         mtmat.mat = mr_main.material;
                     }
-                    if (r3mat.ScrollingEnabled) {
+                    if (visualMaterial.ScrollingEnabled) {
                         ScrollingTexture scrollComponent = mr_main.gameObject.AddComponent<ScrollingTexture>();
-                        scrollComponent.r3mat = r3mat;
+                        scrollComponent.r3mat = visualMaterial;
                         scrollComponent.mat = mr_main.material;
                     }
                 }
@@ -261,14 +262,14 @@ namespace OpenSpace.Visual {
                     mr_spe.material = unityMat;
                     //mr_spe.UpdateGIMaterials();
                     if (!receiveShadows) mr_spe.receiveShadows = false;
-                    if (r3mat.animTextures.Count > 0) {
+                    if (visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr_spe.gameObject.AddComponent<MultiTextureMaterial>();
-                        mtmat.r3mat = r3mat;
+                        mtmat.r3mat = visualMaterial;
                         mtmat.mat = mr_spe.material;
                     }
-                    if (r3mat.textures.Where(t => t!=null && t.ScrollingEnabled).Count() > 0) {
+                    if (visualMaterial.textures.Where(t => t!=null && t.ScrollingEnabled).Count() > 0) {
                         ScrollingTexture scrollComponent = mr_spe.gameObject.AddComponent<ScrollingTexture>();
-                        scrollComponent.r3mat = r3mat;
+                        scrollComponent.r3mat = visualMaterial;
                         scrollComponent.mat = mr_spe.material;
                     }
                 }
@@ -282,18 +283,13 @@ namespace OpenSpace.Visual {
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
             if (Settings.s.engineMode == Settings.EngineMode.R3) {
-                sm.r3mat = VisualMaterial.FromOffset(sm.off_material);
+                sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
             } else {
-                Pointer off_current = Pointer.Goto(ref reader, sm.off_material);
-                sm.off_material = Pointer.Read(reader);
-                if (sm.off_material != null) {
-                    Pointer.Goto(ref reader, sm.off_material);
-                    sm.r3mat = VisualMaterial.FromOffset(sm.off_material, createIfNull: true);
-                } else sm.r3mat = null;
-                Pointer.Goto(ref reader, off_current);
+                sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
+                sm.visualMaterial = sm.gameMaterial.visualMaterial;
             }
-            if (sm.r3mat != null) {
-                sm.backfaceCulling = ((sm.r3mat.flags & VisualMaterial.flags_backfaceCulling) != 0) && !l.forceDisplayBackfaces;
+            if (sm.visualMaterial != null) {
+                sm.backfaceCulling = ((sm.visualMaterial.flags & VisualMaterial.flags_backfaceCulling) != 0) && !l.forceDisplayBackfaces;
             }
             sm.num_disconnected_triangles_spe = reader.ReadUInt16();
             sm.num_uvs = reader.ReadUInt16();

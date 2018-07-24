@@ -290,6 +290,8 @@ public class PersoBehaviour : MonoBehaviour {
             && l.animationBanks[bank_index].animations != null
             && l.animationBanks[bank_index].animations.Length > anim_index
             && l.animationBanks[bank_index].animations[anim_index] != null) {
+            animationSpeed = state.speed;
+            //animationSpeed = state.speed;
             InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
             UpdateFrame(currentFrame);
         } else {
@@ -354,6 +356,7 @@ public class PersoBehaviour : MonoBehaviour {
             this.a3d = a3d;
             currentFrame = 0;
             if (a3d != null) {
+                //animationSpeed = a3d.speed;
                 // Init channels & subobjects
                 subObjects = new PhysicalObject[a3d.num_channels][];
                 channelObjects = new GameObject[a3d.num_channels];

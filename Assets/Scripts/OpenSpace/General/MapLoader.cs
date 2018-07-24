@@ -33,7 +33,6 @@ namespace OpenSpace {
 
         public ObjectType[][] objectTypes;
         public TextureInfo[] textures;
-        public VisualMaterial[] materials;
         public TextureInfo overlightTexture;
         public TextureInfo lightmapTexture;
         public Pointer[] persoInFix;
@@ -49,6 +48,9 @@ namespace OpenSpace {
         }
 
         public List<SuperObject> superObjects = new List<SuperObject>();
+        public List<VisualMaterial> visualMaterials = new List<VisualMaterial>();
+        public List<GameMaterial> gameMaterials = new List<GameMaterial>();
+        public List<CollideMaterial> collideMaterials = new List<CollideMaterial>();
         public List<LightInfo> lights = new List<LightInfo>();
         public List<Sector> sectors = new List<Sector>();
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
@@ -718,12 +720,10 @@ namespace OpenSpace {
 
             // Parse materials list
             off_current = Pointer.Goto(ref reader, off_array_visual_materials);
-            materials = new VisualMaterial[num_visual_materials];
             for (uint i = 0; i < num_visual_materials; i++) {
                 Pointer off_material = Pointer.Read(reader);
                 Pointer off_current_mat = Pointer.Goto(ref reader, off_material);
-                materials[i] = VisualMaterial.Read(reader, off_material);
-                materials[i].offset = off_material;
+                visualMaterials.Add(VisualMaterial.Read(reader, off_material));
                 Pointer.Goto(ref reader, off_current_mat);
             }
             Pointer.Goto(ref reader, off_current);
@@ -1149,8 +1149,6 @@ namespace OpenSpace {
                 }*/
             }
 
-            materials = new VisualMaterial[0];
-
             // Parse actual world & always structure
             ReadFamilies(reader);
             ReadSuperObjects(reader);
@@ -1199,9 +1197,7 @@ namespace OpenSpace {
             globals.off_familiesTable_first = Pointer.Read(reader);
             globals.off_familiesTable_last = Pointer.Read(reader);
             globals.num_familiesTable_entries = reader.ReadUInt32();
-
-            materials = new VisualMaterial[0];
-            textures = new TextureInfo[0];
+            
             animationBanks = new AnimationBank[2];
 
             // Read animations

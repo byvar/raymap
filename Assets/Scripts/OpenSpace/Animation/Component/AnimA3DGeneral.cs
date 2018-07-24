@@ -8,7 +8,7 @@ namespace OpenSpace.Animation.Component {
     public class AnimA3DGeneral {
         public Pointer offset;
 
-        public ushort unk_0;
+        public ushort speed;
         public ushort num_vectors;
         public ushort num_quaternions;
         public ushort num_hierarchies;
@@ -59,7 +59,7 @@ namespace OpenSpace.Animation.Component {
             AnimA3DGeneral a3d = new AnimA3DGeneral(offset);
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 /* Each a3d is 0x38 long */
-                a3d.unk_0 = reader.ReadUInt16();
+                a3d.speed = reader.ReadUInt16();
                 a3d.num_vectors = reader.ReadUInt16();
                 a3d.num_quaternions = reader.ReadUInt16();
                 a3d.num_hierarchies = reader.ReadUInt16();
@@ -89,7 +89,7 @@ namespace OpenSpace.Animation.Component {
                 if(!Settings.s.isR2Demo) reader.ReadUInt16(); // padding?
             } else {
                 /* Each a3d is 0x3c long */
-                a3d.unk_0 = reader.ReadUInt16();
+                a3d.speed = reader.ReadUInt16();
                 a3d.num_vectors = reader.ReadUInt16();
                 a3d.num_quaternions = reader.ReadUInt16();
                 a3d.num_hierarchies = reader.ReadUInt16();
