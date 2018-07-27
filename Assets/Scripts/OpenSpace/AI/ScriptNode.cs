@@ -16,6 +16,7 @@ namespace OpenSpace.AI {
         // derived fields
         public Pointer param_ptr;
         public NodeType nodeType;
+        public string param_textRefString;
 
         public ScriptNode(Pointer offset) {
             this.offset = offset;
@@ -49,6 +50,11 @@ namespace OpenSpace.AI {
                 sn.nodeType = R2AITypes.getNodeType(sn.type);
             } else {
                 sn.nodeType = R3AITypes.getNodeType(sn.type);
+            }
+
+            if (sn.nodeType == NodeType.TextRef)
+            {
+                sn.param_textRefString = MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID(reader, (int)sn.param, 0); // Preview in english
             }
 
             if (sn.param_ptr != null && sn.nodeType != NodeType.Unknown) {

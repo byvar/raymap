@@ -41,6 +41,7 @@ namespace OpenSpace {
         public Family[] families;
 
         public InputStructure inputStruct;
+        public FontStruct fontStruct;
 
         uint off_textures_start_fix = 0;
         bool hasTransit;
@@ -854,7 +855,8 @@ namespace OpenSpace {
             print("Off entryactions: " + inputStruct.off_entryActions);
             Pointer off_IPT_entryElementList = Pointer.Read(reader);
             print("Off entryelements: " + off_IPT_entryElementList);
-            reader.ReadBytes(0x14); // FON_g_stGeneral
+            fontStruct = FontStruct.Read(reader, Pointer.Current(reader));
+            //reader.ReadBytes(0x14); // FON_g_stGeneral
             Pointer off_current = Pointer.Current(reader);
             animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
             animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];

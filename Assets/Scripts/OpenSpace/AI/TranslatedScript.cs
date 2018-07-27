@@ -96,9 +96,14 @@ namespace OpenSpace.AI
                         case ScriptNode.NodeType.Procedure:
 
                             switch (scriptNode.param) {
+                                case 76: return "for(int i=0;i<" + firstChildNode + ";i++)\n{";
+                                case 77: return prefix + "}\n";
+                                case 78: return prefix + "break;\n";
+
                                 default:
-                                string proc = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
-                                return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                    string proc = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
+                                    return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+
                             }
 
                         case ScriptNode.NodeType.Operator:
@@ -120,7 +125,7 @@ namespace OpenSpace.AI
                                 case 13: return firstChildNode + ".x"; // vector
                                 case 14: return firstChildNode + ".y"; // vector
                                 case 15: return firstChildNode + ".z"; // vector
-                                case 24: return firstChildNode + ".execute('\n{code}\n')".Replace("{code}", secondChildNode);
+                                case 24: return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
                                 default:
                                     string proc = "("+scriptNode.param+")"+R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
                                     return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
@@ -131,6 +136,7 @@ namespace OpenSpace.AI
                                 return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             else
                                 return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "()";
+
                         default:
                             return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
                     }
