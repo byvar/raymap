@@ -5,6 +5,7 @@ using OpenSpace.EngineObject;
 using OpenSpace.FileFormat;
 using OpenSpace.FileFormat.Texture;
 using OpenSpace.Input;
+using OpenSpace.Text;
 using OpenSpace.Visual;
 using OpenSpace.Waypoints;
 using System;
@@ -41,7 +42,7 @@ namespace OpenSpace {
         public Family[] families;
 
         public InputStructure inputStruct;
-        public FontStruct fontStruct;
+        public FontStructure fontStruct;
 
         uint off_textures_start_fix = 0;
         bool hasTransit;
@@ -354,7 +355,7 @@ namespace OpenSpace {
                 reader.ReadUInt32();
             }
             Pointer off_identityMatrix = Pointer.Read(reader);
-            fontStruct = FontStruct.Read(reader, Pointer.Current(reader));
+            fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
             uint num_lvlNames = reader.ReadUInt32();
             uint num_fixEntries1 = reader.ReadUInt32();
             // Read tables under header
@@ -423,7 +424,7 @@ namespace OpenSpace {
             // Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
             int sz_entryActions = 0x100;
             int sz_randomStructure = 0xDC;
-            int sz_fontStructure = 0x12B2;
+            int sz_fontDefine = 0x12B2;
             int sz_videoStructure = 0x18;
             int sz_musicMarkerSlot = 0x28;
             int sz_binDataForMenu = 0x020C;
@@ -431,10 +432,10 @@ namespace OpenSpace {
             if (mode == Mode.Rayman3GC) {
                 sz_entryActions = 0xE8;
                 sz_binDataForMenu = 0x01F0;
-                sz_fontStructure = 0x12E4;
+                sz_fontDefine = 0x12E4;
             } else if (mode == Mode.RaymanArenaGC) {
                 sz_entryActions = 0xC4;
-                sz_fontStructure = 0x12E4;
+                sz_fontDefine = 0x12E4;
             } else if (mode == Mode.RaymanArenaPC) {
                 sz_entryActions = 0xDC;
             }
@@ -455,7 +456,7 @@ namespace OpenSpace {
             byte num_fontBitmap = reader.ReadByte();
             byte num_font = reader.ReadByte();
             for (int i = 0; i < num_font; i++) {
-                reader.ReadBytes(sz_fontStructure); // Font definition
+                reader.ReadBytes(sz_fontDefine); // Font definition
             }
             reader.Align(4); // Align position
             for (int i = 0; i < num_fontBitmap; i++) {
@@ -850,7 +851,7 @@ namespace OpenSpace {
             print("Off entryactions: " + inputStruct.off_entryActions);
             Pointer off_IPT_entryElementList = Pointer.Read(reader);
             print("Off entryelements: " + off_IPT_entryElementList);
-            fontStruct = FontStruct.Read(reader, Pointer.Current(reader));
+            fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
             //reader.ReadBytes(0x14); // FON_g_stGeneral
             Pointer off_current = Pointer.Current(reader);
             animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
@@ -1230,7 +1231,7 @@ namespace OpenSpace {
             inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
 
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["fontStructure"], mem));
-            fontStruct = FontStruct.Read(reader, Pointer.Current(reader));
+            fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
 
             // Parse actual world & always structure
             ReadFamilies(reader);

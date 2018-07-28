@@ -1354,7 +1354,7 @@ namespace OpenSpace.AI {
                 case 26:
                     return "WayPointRef: " + sn.param_ptr;
                 case 27:
-                    return "TextRef: " + sn.param_textRefString;
+                    return "TextRef: " + l.fontStruct.GetTextForHandleAndLanguageID((int)sn.param, 0); // Preview in english
                 case 28:
                     return "ComportRef: " + sn.param_ptr;
                 case 29:
@@ -1478,7 +1478,7 @@ namespace OpenSpace.AI {
                 case 26:
                     return "WayPointRef: " + sn.param_ptr;
                 case 27:
-                    return "TextRef: " + sn.param + " ("+sn.param_textRefString+")";
+                    return "TextRef: " + sn.param + " ("+ l.fontStruct.GetTextForHandleAndLanguageID((int)sn.param, 0) + ")";
                 case 28:
                     return "ComportRef: " + sn.param_ptr;
                 case 29:

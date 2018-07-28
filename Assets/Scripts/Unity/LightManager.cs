@@ -43,7 +43,7 @@ public class LightManager : MonoBehaviour {
                             fogSet = true;
                         }
                         if (useAmbientColor && l.type == 4 && !ambientSet) {
-                            RenderSettings.ambientLight = l.color;
+                            RenderSettings.ambientLight = l.Light.color;
                         }
                     } else {
                         l.Light.Deactivate();

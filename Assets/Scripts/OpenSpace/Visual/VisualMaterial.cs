@@ -80,7 +80,7 @@ namespace OpenSpace.Visual {
                     }
                     //if (textureTypes.Where(i => ((i & 1) != 0)).Count() > 0) baseMaterial = loader.baseLightMaterial;
                     material = new Material(baseMaterial);
-                    material.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, ambientCoef.w));
+                    material.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, 1f - ambientCoef.w));
                     if (color.w > 0) {
                         material.SetColor("_Color", new Color(color.x, color.y, color.z, color.w));
                     } else {

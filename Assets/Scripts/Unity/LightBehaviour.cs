@@ -52,6 +52,8 @@ public class LightBehaviour : MonoBehaviour {
                 case 1:
                     // parallel light main
                     l.type = LightType.Directional;
+                    intensity /= 2f;
+                    l.intensity /= 2f;
                     break;
                 case 2:
                     // spherical light main
@@ -87,7 +89,8 @@ public class LightBehaviour : MonoBehaviour {
                     //RenderSettings.ambientLight = color;
                     l.range = 0f;
                     //l.range = 400f;
-                    l.intensity *= 0.4f;
+                    intensity = 0.2f;
+                    color = new Color(color.r * intensity, color.g * intensity, color.b * intensity, color.a * intensity);
                     break;
                 case 5:
                     // parallel light other type?

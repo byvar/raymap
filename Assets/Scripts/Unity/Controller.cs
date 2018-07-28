@@ -121,7 +121,7 @@ public class Controller : MonoBehaviour {
                 unityBehaviour.perso = p;
                 unityBehaviour.Init();
 
-                if (p.Gao) {
+                if (p.Gao && Settings.s.engineMode == Settings.EngineMode.R2) {
                     if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
                         if (p.brain.mind.AI_model.behaviors_normal != null) {
                             GameObject intelParent = new GameObject("Rule behaviours");
