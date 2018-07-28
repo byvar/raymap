@@ -98,15 +98,15 @@ namespace OpenSpace.AI {
             "VectorDot",
             "VectorDot",
             "VectorDot",
-            "Vector",
-            "Vector",
-            "Vector",
-            "Vector",
-            "Vector",
+            "VectorAdd", // 16
+            "VectorSubtract", // 17
+            "VectorScale", // 18
+            "VectorMultiply", // 19
+            "VectorNegate", // 20
             "Affect",
             "Affect",
             "Affect",
-            "Ultra",
+            "Ultra", // 24
             "ModelCast",
             "Array",
             "Affect"
@@ -1182,6 +1182,24 @@ namespace OpenSpace.AI {
         });
         #endregion
 
+        #region Meta Actions
+        public static List<string> metaActionTable = new List<string>(new string[] {
+            "TIME_FrozenWait",
+            "ACTION_ExecuteAction",
+            "ACTION_WaitEndOfAction",
+            "ACTION_WaitEndOfAnim",
+            "CAM_CineMoveAToBTgtC",
+            "CAM_CineMoveAToBTgtAC",
+            "CAM_CinePosATgtB",
+            "CAM_CinePosAMoveTgtBToC",
+            "CAM_CinePosATgtBTurnPosH",
+            "CAM_CinePosATgtBTurnTgtH",
+            "CAM_CinePosATgtBTurnPosV",
+            "CAM_CinePosATgtBTurnTgtV"
+        });
+
+        #endregion
+
         public static ScriptNode.NodeType getNodeType(byte functionType) {
 
             switch (functionType) {
@@ -1298,7 +1316,8 @@ namespace OpenSpace.AI {
                     if (param < procedureTable.Count) { return procedureTable[param]; }
                     return "Unknown Procedure (" + param + ")";
                 case 5: // meta action
-                    return "Meta Action";
+                    if (param < metaActionTable.Count) { return metaActionTable[param]; }
+                    return "Unknown Meta Action (" + param + ")";
                 case 6:
                     return "Begin Macro";
                 case 7:
@@ -1325,7 +1344,7 @@ namespace OpenSpace.AI {
                 case 15:
                     return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
                 case 16:
-                    return "Vector: " + "0x" + param.ToString("x8"); // TODO: same
+                    return "new Vector3"; // TODO: same
                 case 17:
                     mask = (short)param; // TODO: as short
                     return "Mask: " + (mask).ToString("x4");
@@ -1356,7 +1375,13 @@ namespace OpenSpace.AI {
                 case 27:
                     return "TextRef: " + l.fontStruct.GetTextForHandleAndLanguageID((int)sn.param, 0); // Preview in english
                 case 28:
-                    return "ComportRef: " + sn.param_ptr;
+                    Behavior comportRef = sn.script.behaviorOrMacro.aiModel.GetBehaviorByOffset(sn.param_ptr);
+                    if (comportRef == null) {
+                        return "null";
+                    } else {
+                        string type = comportRef.type == Behavior.BehaviorType.Intelligence ? "intelligence" : "reflex";
+                        return type + "[" + comportRef.number + "]";
+                    }
                 case 29:
                     return "ModuleRef: " + sn.param_ptr;
                 case 30:
@@ -1369,8 +1394,9 @@ namespace OpenSpace.AI {
                     return "ParticleGenerator: " + "0x" + (param).ToString("x8");
                 case 34:
                     return "VisualMaterial: " + sn.param_ptr;
-                case 35:
-                    return "ModelCastType: " + "0x" + (param).ToString("x8");
+                case 35: // ModelCast
+                    AIModel model = AIModel.FromOffset(sn.param_ptr);
+                    return model != null ? model.name : "null";
                 case 36:
                     return "EvalDataType42: " + "0x" + (param).ToString("x8");
                 case 37:
@@ -1378,9 +1404,13 @@ namespace OpenSpace.AI {
                 case 38:
                     return "Caps: " + "0x" + (param).ToString("x8");
                 case 39:
-                    return "Eval SubRoutine: " + sn.param_ptr;
+                    Macro macro = sn.script.behaviorOrMacro.aiModel.GetMacroByOffset(sn.param_ptr);
+                    if (macro == null) {
+                        return "null";
+                    }
+                    return "evalMacro("+macro.number+");";
                 case 40:
-                    return "NULL";
+                    return "null";
                 case 44:
                     return "Graph: " + "0x" + (param).ToString("x8");
             }

@@ -127,11 +127,12 @@ public class Controller : MonoBehaviour {
                             GameObject intelParent = new GameObject("Rule behaviours");
                             intelParent.transform.parent = p.Gao.transform;
                             Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
+                            int iter = 0;
                             foreach (Behavior behavior in normalBehaviors) {
                                 if (behavior.scripts == null || behavior.scripts.Length == 0) {
                                     continue;
                                 }
-                                GameObject behaviorGao = new GameObject("Rule");
+                                GameObject behaviorGao = new GameObject(behavior.name);
                                 behaviorGao.transform.parent = intelParent.transform;
                                 if (behavior.scripts.Length > 1) {
                                     foreach (Script script in behavior.scripts) {
@@ -141,9 +142,13 @@ public class Controller : MonoBehaviour {
                                         scriptComponent.SetScript(script, p);
                                     }
                                 } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name = "Single-script Rule";
+                                    behaviorGao.name += " (Single-script)";
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.scripts[0], p);
+                                }
+                                if (iter++ == 0)
+                                {
+                                    behaviorGao.name += "(Init)";
                                 }
                             }
                         }
@@ -151,11 +156,12 @@ public class Controller : MonoBehaviour {
                             GameObject reflexParent = new GameObject("Reflex behaviours");
                             reflexParent.transform.parent = p.Gao.transform;
                             Behavior[] reflexBehaviors = p.brain.mind.AI_model.behaviors_reflex;
+                            int iter = 0;
                             foreach (Behavior behavior in reflexBehaviors) {
                                 if (behavior.scripts == null || behavior.scripts.Length == 0) {
                                     continue;
                                 }
-                                GameObject behaviorGao = new GameObject("Reflex");
+                                GameObject behaviorGao = new GameObject(behavior.name);
                                 behaviorGao.transform.parent = reflexParent.transform;
                                 if (behavior.scripts.Length > 1) {
                                     foreach (Script script in behavior.scripts) {
@@ -165,10 +171,26 @@ public class Controller : MonoBehaviour {
                                         scriptComponent.SetScript(script, p);
                                     }
                                 } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name = "Single-script Reflex";
+                                    behaviorGao.name += " (Single-script)";
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.scripts[0], p);
                                 }
+                                iter++;
+                            }
+                        }
+                        if (p.brain.mind.AI_model.macros != null) {
+                            GameObject macroParent = new GameObject("Macros");
+                            macroParent.transform.parent = p.Gao.transform;
+                            Macro[] macros = p.brain.mind.AI_model.macros;
+                            int iter = 0;
+                            
+                            foreach (Macro macro in macros) {
+
+                                GameObject behaviorGao = new GameObject(macro.name);
+                                behaviorGao.transform.parent = macroParent.transform;
+                                ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
+                                scriptComponent.SetScript(macro.script, p);
+                                iter++;
                             }
                         }
                     }

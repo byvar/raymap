@@ -19,15 +19,24 @@ namespace OpenSpace.AI {
         public DsgVar dsgVar;
         public Macro[] macros = null;
 
+        public Mind mind;
+        public string name;
+
         public AIModel(Pointer offset)
         {
             this.offset = offset;
         }
 
-        public static AIModel Read(EndianBinaryReader reader, Pointer offset)
+        public static AIModel Read(EndianBinaryReader reader, Pointer offset, Mind mind)
         {
             MapLoader l = MapLoader.Loader;
             AIModel ai = new AIModel(offset);
+            ai.mind = mind;
+
+            if (mind!=null && mind.brain!=null && mind.brain.perso!=null) {
+                ai.name = mind.brain.perso.name1;
+            }
+
             ai.off_behaviors_normal = Pointer.Read(reader);
             ai.off_behaviors_reflex = Pointer.Read(reader);
             ai.off_dsgVar = Pointer.Read(reader);
@@ -42,7 +51,7 @@ namespace OpenSpace.AI {
                 if (num_entries > 0 && off_entries != null) {
                     Pointer.Goto(ref reader, off_entries);
                     for (int i = 0; i < num_entries; i++) {
-                        ai.behaviors_normal[i] = Behavior.Read(reader, Pointer.Current(reader), ai);
+                        ai.behaviors_normal[i] = Behavior.Read(reader, Pointer.Current(reader), ai, Behavior.BehaviorType.Intelligence, i);
                     }
                 }
             }
@@ -54,7 +63,7 @@ namespace OpenSpace.AI {
                 if (num_entries > 0 && off_entries != null) {
                     Pointer.Goto(ref reader, off_entries);
                     for (int i = 0; i < num_entries; i++) {
-                        ai.behaviors_reflex[i] = Behavior.Read(reader, Pointer.Current(reader), ai);
+                        ai.behaviors_reflex[i] = Behavior.Read(reader, Pointer.Current(reader), ai, Behavior.BehaviorType.Reflex, i);
                     }
                 }
             }
@@ -75,7 +84,7 @@ namespace OpenSpace.AI {
                 if (num_entries > 0 && off_entries != null) {
                     Pointer.Goto(ref reader, off_entries);
                     for (int i = 0; i < num_entries; i++) {
-                        ai.macros[i] = Macro.Read(reader, Pointer.Current(reader));
+                        ai.macros[i] = Macro.Read(reader, Pointer.Current(reader), ai, i);
                     }
                 }
             }
@@ -89,6 +98,50 @@ namespace OpenSpace.AI {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.aiModels.FirstOrDefault(f => f.offset == offset);
+        }
+
+        public Behavior GetBehaviorByOffset(Pointer offset)
+        {
+            if (offset == null) {
+                return null;
+            }
+            // Look in both behavior lists
+            if (behaviors_normal != null) {
+                foreach (Behavior behavior in behaviors_normal) {
+
+                    if (behavior.offset == offset) {
+                        return behavior;
+                    }
+                }
+            }
+            if (behaviors_reflex != null) {
+                foreach (Behavior behavior in behaviors_reflex) {
+
+                    if (behavior.offset == offset) {
+                        return behavior;
+                    }
+
+                }
+            }
+            return null;
+        }
+
+        public Macro GetMacroByOffset(Pointer offset)
+        {
+            if (offset == null) {
+                return null;
+            }
+            // Look in both behavior lists
+            if (macros != null) {
+                foreach (Macro macro in macros) {
+
+                    if (macro.offset == offset) {
+                        return macro;
+                    }
+                }
+            }
+            
+            return null;
         }
     }
 }

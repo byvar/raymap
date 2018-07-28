@@ -17,14 +17,17 @@ namespace OpenSpace.AI {
         public Pointer param_ptr;
         public NodeType nodeType;
 
+        public Script script;
+
         public ScriptNode(Pointer offset) {
             this.offset = offset;
         }
 
-        public static ScriptNode Read(EndianBinaryReader reader, Pointer offset) {
+        public static ScriptNode Read(EndianBinaryReader reader, Pointer offset, Script script) {
             MapLoader l = MapLoader.Loader;
             ScriptNode sn = new ScriptNode(offset);
-            
+
+            sn.script = script;
             sn.param = reader.ReadUInt32();
             sn.param_ptr = Pointer.GetPointerAtOffset(offset); // if parameter is pointer
             

@@ -102,7 +102,7 @@ namespace OpenSpace.EngineObject {
 
             if (off_brain != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_brain);
-                p.brain = Brain.Read(reader, off_brain);
+                p.brain = Brain.Read(reader, off_brain, p);
                 Pointer.Goto(ref reader, off_current);
             }
 
