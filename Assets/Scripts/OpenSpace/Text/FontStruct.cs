@@ -89,7 +89,11 @@ public class FontStruct {
         if (index == -1) {
             return "";
         } else if (index >= 20000) { // *(*fontStructure_0x10 + 4 * a1 - 80000);
-            return misc.entries[index - 20000];
+            if (misc.entries.Length > (index - 20000)) {
+                return misc.entries[index - 20000];
+            } else {
+                return "null";
+            }
         } else { // *(*(dialogStartOffset + 8 * currentLanguageID) + 4 * index);
             return languages[currentLanguageId].entries[index];
         }

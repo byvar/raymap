@@ -102,7 +102,7 @@ namespace OpenSpace.AI
 
                                 default:
                                     string proc = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
-                                    return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                    return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                             }
 
@@ -111,31 +111,47 @@ namespace OpenSpace.AI
                             switch (scriptNode.param)
                             {
                                 // scalar:
-                                case 0: return "(" + firstChildNode + "+" + secondChildNode + ")";
+                                case 0: return "(" + firstChildNode + (children[1].scriptNode.param>=0 ? "+" : "") + secondChildNode + ")";
                                 case 1: case 4: return "(" + firstChildNode + "-" + secondChildNode + ")";
                                 case 2: return "(" + firstChildNode + "*" + secondChildNode + ")";
                                 case 3: return "(" + firstChildNode + "/" + secondChildNode + ")";
                                 // affect:
-                                case 5: case 9: return this.children.Count>1 ? (firstChildNode + "+=" + secondChildNode) : firstChildNode + "++";
-                                case 6: case 10: return this.children.Count > 1 ? (firstChildNode + "-=" + secondChildNode) : firstChildNode + "--";
-                                case 7: return firstChildNode + "*=" + secondChildNode;
-                                case 8: return firstChildNode + "/=" + secondChildNode;
-                                case 11: return firstChildNode + "=" + secondChildNode;
+                                case 5: case 9: return this.children.Count>1 ? (firstChildNode + "+=" + secondChildNode + ";") : firstChildNode + "++" + ";";
+                                case 6: case 10: return this.children.Count > 1 ? (firstChildNode + "-=" + secondChildNode + ";") : firstChildNode + "--" + ";";
+                                case 7: return firstChildNode + "*=" + secondChildNode + ";";
+                                case 8: return firstChildNode + "/=" + secondChildNode + ";";
+                                case 11: return firstChildNode + "=" + secondChildNode + ";";
                                 case 12: return firstChildNode + "." + secondChildNode;
                                 case 13: return firstChildNode + ".x"; // vector
                                 case 14: return firstChildNode + ".y"; // vector
                                 case 15: return firstChildNode + ".z"; // vector
+                                case 16: return firstChildNode + "+" + secondChildNode; // 16
+                                case 17: return firstChildNode + "-" + secondChildNode; // 17
+                                case 18: case 19:  return firstChildNode + "*" + secondChildNode; // 18,19 scale and multiply
+                                case 20: return "-"+firstChildNode; // 20 negate
                                 case 24: return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
+                                case 25: return "((" + firstChildNode + ")(" + secondChildNode + ".brain.mind.aiModel))";
+                                case 26: return firstChildNode + "[" + secondChildNode + "]";
+
                                 default:
                                     string proc = "("+scriptNode.param+")"+R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
-                                    return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                    return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
                             }
 
                         case ScriptNode.NodeType.Field:
                             if (firstChildNode != null)
                                 return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             else
-                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "()";
+                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
+
+                        case ScriptNode.NodeType.Vector:
+                        case ScriptNode.NodeType.ConstantVector:
+
+                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+
+                        case ScriptNode.NodeType.MetaAction:
+
+                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                         default:
                             return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
@@ -155,6 +171,9 @@ namespace OpenSpace.AI
 
         public TranslatedScript(Script originalScript, Perso perso)
         {
+            if(originalScript==null) {
+                return;
+            }
             this.originalScript = originalScript;
             this.perso = perso;
             nodes = new Node[originalScript.scriptNodes.Count + 1];

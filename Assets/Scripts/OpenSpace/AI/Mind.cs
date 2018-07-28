@@ -14,26 +14,29 @@ namespace OpenSpace.AI {
         public Pointer off_dsgMem;
         public Pointer off_name;
 
-        public AIModel AI_model;
+        public Brain brain; // parent
+        public AIModel AI_model; // child
         public DsgMem dsgMem;
+        public string name = "";
 
         public Mind(Pointer offset) {
             this.offset = offset;
         }
 
-        public static Mind Read(EndianBinaryReader reader, Pointer offset) {
+        public static Mind Read(EndianBinaryReader reader, Pointer offset, Brain brain) {
             Mind m = new Mind(offset);
+            m.brain = brain;
             m.off_AI_model = Pointer.Read(reader);
             m.off_intelligence_normal = Pointer.Read(reader);
             m.off_intelligence_reflex = Pointer.Read(reader);
             m.off_dsgMem = Pointer.Read(reader);
             m.off_name = Pointer.Read(reader);
-            
+                
             if (m.off_AI_model != null) {
                 m.AI_model = AIModel.FromOffset(m.offset);
                 if (m.AI_model == null) {
                     Pointer.Goto(ref reader, m.off_AI_model);
-                    m.AI_model = AIModel.Read(reader, m.off_AI_model);
+                    m.AI_model = AIModel.Read(reader, m.off_AI_model, m);
                 }
             }
 

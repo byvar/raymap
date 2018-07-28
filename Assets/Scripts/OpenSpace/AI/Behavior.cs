@@ -5,10 +5,14 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.AI {
-    public class Behavior {
-        public Pointer offset;
+    public class Behavior : BehaviorOrMacro {
 
-        public AIModel aiModel;
+        public enum BehaviorType
+        {
+            Intelligence, Reflex
+        }
+
+        public Pointer offset;
 
         public string name = null;
         public Pointer off_scripts;
@@ -16,16 +20,28 @@ namespace OpenSpace.AI {
         public byte num_scripts;
         public Script[] scripts;
 
+        public BehaviorType type;
+        public int number;
+
         public Behavior(Pointer offset) {
             this.offset = offset;
         }
 
-        public static Behavior Read(EndianBinaryReader reader, Pointer offset, AIModel aiModel) {
+        public static Behavior Read(EndianBinaryReader reader, Pointer offset, AIModel aiModel, BehaviorType type, int number) {
             MapLoader l = MapLoader.Loader;
             Behavior entry = new Behavior(offset);
-            entry.aiModel = aiModel;
 
-            if (Settings.s.hasNames) entry.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
+            entry.aiModel = aiModel;
+            entry.type = type;
+            entry.number = number;
+
+            if (Settings.s.hasNames)
+            {
+                entry.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
+            } else
+            {
+                entry.name = entry.type.ToString() + " " + number;
+            }
             entry.off_scripts = Pointer.Read(reader);
             entry.unknown = reader.ReadUInt32();
             if(Settings.s.isR2Demo) reader.ReadUInt32();

@@ -13,12 +13,14 @@ public class ScriptComponent : MonoBehaviour {
     public string translatedScript;
 
     public void SetScript(Script script, Perso perso) {
-        this.script = script;
-        this.perso = perso;
-        TranslatedScript translation = new TranslatedScript(script, perso);
-        translation.printAddresses = showOffset;
-        translatedScript = translation.ToString();
-        offset = script.offset.ToString();
+        if (script != null) {
+            this.script = script;
+            this.perso = perso;
+            TranslatedScript translation = new TranslatedScript(script, perso);
+            translation.printAddresses = showOffset;
+            translatedScript = translation.ToString();
+            offset = script.offset.ToString();
+        }
     }
 
     private bool _showOffset = false;
