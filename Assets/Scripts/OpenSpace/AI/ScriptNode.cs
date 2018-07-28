@@ -52,9 +52,8 @@ namespace OpenSpace.AI {
                 sn.nodeType = R3AITypes.getNodeType(sn.type);
             }
 
-            if (sn.nodeType == NodeType.TextRef)
-            {
-                sn.param_textRefString = MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID(reader, (int)sn.param, 0); // Preview in english
+            if (sn.nodeType == NodeType.TextRef) {
+                sn.param_textRefString = MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)sn.param, 0); // Preview in english
             }
 
             if (sn.param_ptr != null && sn.nodeType != NodeType.Unknown) {

@@ -96,7 +96,8 @@ namespace OpenSpace {
                 { "objectTypes", 0x005013E0 },
                 { "textures", 0x00502680 },
                 { "textureMemoryChannels", 0x00501660 },
-                { "inputStructure", 0x00509E60 }
+                { "inputStructure", 0x00509E60 },
+                { "fontStructure", 0x00500260 }
             }
         };
 

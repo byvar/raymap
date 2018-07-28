@@ -353,13 +353,8 @@ namespace OpenSpace {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-            Pointer off_unk1 = Pointer.Read(reader);
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt16(); // 0x0A in R3, 0x09 in RA PC, so a number of something
-            reader.ReadUInt16(); // 0
-            Pointer off_unk2 = Pointer.Read(reader);
-            Pointer off_unk3 = Pointer.Read(reader);
+            Pointer off_identityMatrix = Pointer.Read(reader);
+            fontStruct = FontStruct.Read(reader, Pointer.Current(reader));
             uint num_lvlNames = reader.ReadUInt32();
             uint num_fixEntries1 = reader.ReadUInt32();
             // Read tables under header
@@ -1233,6 +1228,9 @@ namespace OpenSpace {
 
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["inputStructure"], mem));
             inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+
+            Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["fontStructure"], mem));
+            fontStruct = FontStruct.Read(reader, Pointer.Current(reader));
 
             // Parse actual world & always structure
             ReadFamilies(reader);
