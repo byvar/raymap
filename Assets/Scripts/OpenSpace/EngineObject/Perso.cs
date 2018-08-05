@@ -1,4 +1,5 @@
 ﻿using OpenSpace.AI;
+using OpenSpace.Collide;
 using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace OpenSpace.EngineObject {
         public Pointer off_currentState;
         public Pointer off_pointerToCurrentState;
         public MSWay msWay = null;
+        public CollSet collset;
 
         private GameObject gao;
         public GameObject Gao {
@@ -64,8 +66,7 @@ namespace OpenSpace.EngineObject {
             Pointer off_unknown = Pointer.Read(reader); // 0x8
             Pointer off_brain = Pointer.Read(reader); // 0xC
             reader.ReadUInt32(); // 0x10 is Camera in Rayman 2
-            Pointer off_collset = Pointer.Read(reader); // 0x14 platform info
-            if (off_collset != null) l.print(off_collset);
+            Pointer off_collSet = Pointer.Read(reader); // 0x14 collset
             Pointer off_msWay = Pointer.Read(reader); // 0x18
             reader.ReadUInt32(); // 0x1C
             Pointer off_sectInfo = Pointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
@@ -189,6 +190,12 @@ namespace OpenSpace.EngineObject {
             if (p.family != null && p.family.GetIndexOfPhysicalList(p.off_physicalObjects) != -1) {
                 p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(p.off_physicalObjects)];
             }
+
+            if (off_collSet!=null) {
+                Pointer.Goto(ref reader, off_collSet);
+                p.collset = CollSet.Read(reader, p, off_collSet);
+            }
+
             return p;
         }
 
