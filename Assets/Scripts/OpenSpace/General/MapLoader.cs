@@ -631,7 +631,7 @@ namespace OpenSpace {
             Pointer off_collisionGeoObj = Pointer.Read(reader);
             Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
             if (!hasTransit) {
-                reader.ReadUInt32(); // viewport related
+                reader.ReadUInt32(); // viewport related <--- cameras in here
             }
 
             Pointer off_unknown_first = Pointer.Read(reader);

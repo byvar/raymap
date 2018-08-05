@@ -80,12 +80,12 @@ namespace OpenSpace.Visual {
                     }
                     //if (textureTypes.Where(i => ((i & 1) != 0)).Count() > 0) baseMaterial = loader.baseLightMaterial;
                     material = new Material(baseMaterial);
-                    material.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, 1f - ambientCoef.w));
-                    if (color.w > 0) {
+                    //material.SetColor("_EmissionColor", new Color(1f, 1f, 1f, (1f - ambientCoef.w)*5f));
+                    /*if (color.w > 0) {
                         material.SetColor("_Color", new Color(color.x, color.y, color.z, color.w));
                     } else {
                         material.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
-                    }
+                    }*/
                     if (texMain != null) {
                         material.SetTexture("_MainTex", texMain.Texture);
                         material.SetTextureOffset("_MainTex", new Vector2(texMain.currentScrollX, texMain.currentScrollY));
@@ -95,10 +95,16 @@ namespace OpenSpace.Visual {
                             material.SetTexture("_MainTex2", texSecondary.Texture);
                             material.SetTextureOffset("_MainTex2", new Vector2(texSecondary.currentScrollX, texSecondary.currentScrollY));
                             if (useAlphaMask) material.SetFloat("_UseAlpha", 1f);
-                            //material.SetFloat("_Blend", 1f);
+                            material.SetFloat("_Blend", 1f);
                         } else {
                             material.SetTexture("_DetailAlbedoMap", texSecondary.Texture);
                         }
+                    }
+                    if (baseMaterial == l.baseMaterial || baseMaterial == l.baseTransparentMaterial) {
+                        material.SetVector("_AmbientCoef", ambientCoef);
+                        material.SetVector("_SpecularCoef", specularCoef);
+                        material.SetVector("_DiffuseCoef", diffuseCoef);
+                        material.SetVector("_Color", color);
                     }
                     if (texMain == null || texMain.Texture == null) {
                         // Don't want to see all those textureless planes, so create transparent texture and use that
@@ -164,7 +170,8 @@ namespace OpenSpace.Visual {
         public bool IsTransparent {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((flags & flags_isTransparent) != 0 || MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
+                if ((Settings.s.engineMode == Settings.EngineMode.R3 && (flags & flags_isTransparent) != 0)
+                    || Settings.s.engineMode == Settings.EngineMode.R2 && (flags & 0x4000000) != 0) {
                     if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
                         return textures[0].texture.IsTransparent;
                     }

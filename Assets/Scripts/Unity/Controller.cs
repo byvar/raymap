@@ -201,7 +201,7 @@ public class Controller : MonoBehaviour {
 
     public void InitCamera() {
         if (loader != null) {
-            Perso camera = loader.persos.Where(p => p != null && p.name2.Equals("StdCamer")).FirstOrDefault();
+            Perso camera = loader.persos.Where(p => p != null && p.namePerso.Equals("StdCamer")).FirstOrDefault();
             if (camera != null) {
                 Camera.main.transform.position = camera.Gao.transform.position;
                 Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0,180,0);

@@ -13,9 +13,9 @@ namespace OpenSpace.EngineObject {
     public class Perso : IEngineObject {
         public Pointer offset;
         public string fullName = "Perso";
-        public string name0 = null;
-        public string name1 = null;
-        public string name2 = null;
+        public string nameFamily = null;
+        public string nameModel = null;
+        public string namePerso = null;
         public Family family = null;
         public Pointer off_physicalObjects = null;
         public PhysicalObject[] physical_objects = null;
@@ -29,8 +29,8 @@ namespace OpenSpace.EngineObject {
         public GameObject Gao {
             get {
                 if (gao == null) {
-                    if (name0 != null && name1 != null && name2 != null) {
-                        fullName = "[" + name0 + "] " + name1 + " | " + name2;
+                    if (nameFamily != null && nameModel != null && namePerso != null) {
+                        fullName = "[" + nameFamily + "] " + nameModel + " | " + namePerso;
                         /*if (superObject != null) {
                             fullName = superObject.matrix.type + " " + superObject.matrix.v + fullName;
                         }*/
@@ -64,10 +64,11 @@ namespace OpenSpace.EngineObject {
             Pointer off_unknown = Pointer.Read(reader); // 0x8
             Pointer off_brain = Pointer.Read(reader); // 0xC
             reader.ReadUInt32(); // 0x10 is Camera in Rayman 2
-            reader.ReadUInt32(); // 0x14 platform info
+            Pointer off_collset = Pointer.Read(reader); // 0x14 platform info
+            if (off_collset != null) l.print(off_collset);
             Pointer off_msWay = Pointer.Read(reader); // 0x18
             reader.ReadUInt32(); // 0x1C
-            reader.ReadUInt32(); // 0x20 // Pointer to struct that points to active sector
+            Pointer off_sectInfo = Pointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
             if (l.mode == MapLoader.Mode.RaymanArenaPC || l.mode == MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
@@ -93,16 +94,17 @@ namespace OpenSpace.EngineObject {
                 uint index0 = reader.ReadUInt32();
                 uint index1 = reader.ReadUInt32();
                 uint index2 = reader.ReadUInt32();
-                if (index0 >= 0 && index0 < l.objectTypes[0].Length) p.name0 = l.objectTypes[0][index0].name;
-                if (index1 >= 0 && index1 < l.objectTypes[1].Length) p.name1 = l.objectTypes[1][index1].name;
-                if (index2 >= 0 && index2 < l.objectTypes[2].Length) p.name2 = l.objectTypes[2][index2].name;
+                if (index0 >= 0 && index0 < l.objectTypes[0].Length) p.nameFamily = l.objectTypes[0][index0].name;
+                if (index1 >= 0 && index1 < l.objectTypes[1].Length) p.nameModel = l.objectTypes[1][index1].name;
+                if (index2 >= 0 && index2 < l.objectTypes[2].Length) p.namePerso = l.objectTypes[2][index2].name;
                 Pointer.Goto(ref reader, off_current);
             }
-            l.print("[" + p.name0 + "] " + p.name1 + " | " + p.name2 + " - offset: " + offset + " - POs: " + p.off_physicalObjects);
+            l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset + " - POs: " + p.off_physicalObjects);
 
             if (off_brain != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_brain);
-                p.brain = Brain.Read(reader, off_brain, p);
+                p.brain = Brain.Read(reader, off_brain);
+                if (p.brain.mind != null && p.brain.mind.AI_model != null && p.nameModel != null) p.brain.mind.AI_model.name = p.nameModel;
                 Pointer.Goto(ref reader, off_current);
             }
 

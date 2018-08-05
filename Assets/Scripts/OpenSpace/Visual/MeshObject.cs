@@ -104,7 +104,7 @@ namespace OpenSpace.Visual {
                 reader.ReadInt32();
                 reader.ReadInt16();
             }
-            m.name = "Mesh";
+            m.name = "Mesh @ " + offset;
             if (l.mode == MapLoader.Mode.Rayman3GC) m.name = new string(reader.ReadChars(0x32)).TrimEnd('\0');
             // Vertices
             Pointer off_current = Pointer.Goto(ref reader, m.off_vertices);

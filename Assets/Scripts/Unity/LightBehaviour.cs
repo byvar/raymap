@@ -52,8 +52,8 @@ public class LightBehaviour : MonoBehaviour {
                 case 1:
                     // parallel light main
                     l.type = LightType.Directional;
-                    intensity /= 2f;
-                    l.intensity /= 2f;
+                    //intensity /= 2f;
+                    //l.intensity /= 2f;
                     break;
                 case 2:
                     // spherical light main
@@ -89,7 +89,7 @@ public class LightBehaviour : MonoBehaviour {
                     //RenderSettings.ambientLight = color;
                     l.range = 0f;
                     //l.range = 400f;
-                    intensity = 0.2f;
+                    intensity = 0.5f;
                     color = new Color(color.r * intensity, color.g * intensity, color.b * intensity, color.a * intensity);
                     break;
                 case 5:
@@ -125,11 +125,13 @@ public class LightBehaviour : MonoBehaviour {
                     break;
             }
         }
+        gameObject.SetActive(false);
         loaded = true;
     }
 	
 	// Update is called once per frame
 	void Update () {
+        return;
         if (loaded) {
             if (active == true && activeIntensity < 1f) {
                 activeIntensity += Time.deltaTime / 1.5f;

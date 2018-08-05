@@ -1,4 +1,4 @@
-﻿Shader "Custom/Gouraud" {
+﻿Shader "Custom/GouraudAlpha" {
 	Properties{
 		_MainTex("Texture 1 (RGBA)", 2D) = "white" {}
 		_MainTex2("Texture 2 (RGBA)", 2D) = "white" {}
@@ -12,15 +12,17 @@
 		[MaterialToggle] _Blend("Use secondary texture", Float) = 0
 	}
 	SubShader{
-		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
+		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" }
+		ZWrite Off
 		Pass{
 			Tags{ "LightMode" = "ForwardBase" }
 			// pass for ambient light and first light source
+			Blend SrcAlpha OneMinusSrcAlpha
 
 			CGPROGRAM
 
 			#pragma vertex vert  
-			#pragma fragment frag
+			#pragma fragment frag 
 			#pragma multi_compile_fog
 
 			#include "GouraudShared.cginc"
@@ -28,15 +30,15 @@
 			v2f vert(appdata_full v) {
 				return process_vert(v, 1.0);
 			}
-			float4 frag(v2f i) : COLOR{
-				return process_frag(i, 0.0);
+			float4 frag(v2f i) : COLOR { 
+				return process_frag(i, -1.0);
 			}
 			ENDCG
 		}
 		Pass{
 			Tags{ "LightMode" = "ForwardAdd" }
 			// pass for additional light sources
-			Blend One One // additive blending 
+			Blend SrcAlpha One // additive blending 
 
 			CGPROGRAM
 
@@ -50,7 +52,49 @@
 				return process_vert(v, 0.0);
 			}
 			float4 frag(v2f i) : COLOR{
-				return process_frag(i, 0.0);
+				return process_frag(i, -1.0);
+			}
+			ENDCG
+		}
+
+		Tags{ "Queue" = "AlphaTest" "IgnoreProjector" = "True" "RenderType" = "TransparentCutout" }
+		ZWrite On
+		Pass{
+			Tags{ "LightMode" = "ForwardBase" }
+			// pass for ambient light and first light source
+
+			CGPROGRAM
+
+			#pragma vertex vert  
+			#pragma fragment frag 
+
+			#include "GouraudShared.cginc"
+
+			v2f vert(appdata_full v) {
+				return process_vert(v, 1.0);
+			}
+			float4 frag(v2f i) : COLOR{
+				return process_frag(i, 1.0);
+			}
+			ENDCG
+		}
+		Pass{
+			Tags{ "LightMode" = "ForwardAdd" }
+			// pass for additional light sources
+			Blend One One // additive blending 
+
+			CGPROGRAM
+
+			#pragma vertex vert  
+			#pragma fragment frag 
+
+			#include "GouraudShared.cginc"
+
+			v2f vert(appdata_full v) {
+				return process_vert(v, 0.0);
+			}
+			float4 frag(v2f i) : COLOR{
+				return process_frag(i, 1.0);
 			}
 			ENDCG
 		}

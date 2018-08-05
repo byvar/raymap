@@ -32,6 +32,7 @@
 			CGPROGRAM
 #pragma vertex vert
 #pragma fragment frag
+#pragma multi_compile_fog
 #pragma target 2.0
 #pragma multi_compile _ PIXELSNAP_ON
 #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
@@ -52,6 +53,7 @@
 				float4 vertex   : SV_POSITION;
 				fixed4 color : COLOR;
 				float2 texcoord  : TEXCOORD0;
+				UNITY_FOG_COORDS(3)
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
 
@@ -77,6 +79,7 @@
 				//                OUT.vertex = UnityPixelSnap (OUT.vertex);
 				//    #endif
 
+				UNITY_TRANSFER_FOG(OUT, OUT.vertex);
 				return OUT;
 			}
 
@@ -99,6 +102,7 @@
 			{
 				fixed4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
 				c.rgb *= c.a;
+				UNITY_APPLY_FOG(IN.fogCoord, c);
 				return c;
 			}
 			ENDCG

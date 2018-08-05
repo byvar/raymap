@@ -13,9 +13,8 @@ namespace OpenSpace.AI {
         public Pointer off_intelligence_reflex;
         public Pointer off_dsgMem;
         public Pointer off_name;
-
-        public Brain brain; // parent
-        public AIModel AI_model; // child
+        
+        public AIModel AI_model;
         public DsgMem dsgMem;
         public string name = "";
 
@@ -23,11 +22,11 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Mind Read(EndianBinaryReader reader, Pointer offset, Brain brain) {
+        public static Mind Read(EndianBinaryReader reader, Pointer offset) {
             Mind m = new Mind(offset);
-            m.brain = brain;
             m.off_AI_model = Pointer.Read(reader);
             m.off_intelligence_normal = Pointer.Read(reader);
+            //if (m.off_intelligence_normal != null) MapLoader.Loader.print(m.off_intelligence_normal);
             m.off_intelligence_reflex = Pointer.Read(reader);
             m.off_dsgMem = Pointer.Read(reader);
             m.off_name = Pointer.Read(reader);
@@ -36,7 +35,7 @@ namespace OpenSpace.AI {
                 m.AI_model = AIModel.FromOffset(m.offset);
                 if (m.AI_model == null) {
                     Pointer.Goto(ref reader, m.off_AI_model);
-                    m.AI_model = AIModel.Read(reader, m.off_AI_model, m);
+                    m.AI_model = AIModel.Read(reader, m.off_AI_model);
                 }
             }
 

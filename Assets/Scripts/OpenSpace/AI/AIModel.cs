@@ -27,15 +27,10 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static AIModel Read(EndianBinaryReader reader, Pointer offset, Mind mind)
+        public static AIModel Read(EndianBinaryReader reader, Pointer offset)
         {
             MapLoader l = MapLoader.Loader;
             AIModel ai = new AIModel(offset);
-            ai.mind = mind;
-
-            if (mind!=null && mind.brain!=null && mind.brain.perso!=null) {
-                ai.name = mind.brain.perso.name1;
-            }
 
             ai.off_behaviors_normal = Pointer.Read(reader);
             ai.off_behaviors_reflex = Pointer.Read(reader);

@@ -28,6 +28,8 @@ namespace OpenSpace.EngineObject {
         public List<LightInfo> sectorLights;
         public List<Sector> neighbors;
         public List<Pointer> neighborsPointers;
+        public List<Pointer> persosPointers;
+        public List<SuperObject> persos;
         private GameObject gao;
         public GameObject Gao {
             get {
@@ -63,22 +65,29 @@ namespace OpenSpace.EngineObject {
             sectorLights = new List<LightInfo>();
             neighbors = new List<Sector>();
             neighborsPointers = new List<Pointer>();
+            persos = new List<SuperObject>();
+            persosPointers = new List<Pointer>();
         }
 
-        public void ProcessNeighbors() {
+        public void ProcessPointers() {
             MapLoader l = MapLoader.Loader;
             for (int i = 0; i < neighborsPointers.Count; i++) {
                 Sector neigh = l.sectors.FirstOrDefault(s => s.SuperObject.offset == neighborsPointers[i]);
                 if (neigh != null) neighbors.Add(neigh);
+            }
+            for (int i = 0; i < persosPointers.Count; i++) {
+                SuperObject so = l.superObjects.FirstOrDefault(s => s.offset == persosPointers[i]);
+                if (so != null) persos.Add(so);
             }
         }
 
         public static Sector Read(EndianBinaryReader reader, Pointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            //l.print(offset);
+            s.off_persosInSector_first = Pointer.Read(reader);
+            s.off_persosInSector_last = Pointer.Read(reader);
+            s.num_persosInSector = reader.ReadUInt32();
             s.off_lights_first = Pointer.Read(reader);
             if (Settings.s.linkedListType == Settings.LinkedListType.Double) {
                 s.off_lights_last = Pointer.Read(reader);
@@ -87,7 +96,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-            s.off_neighbors_first = Pointer.Read(reader);
+            s.off_neighbors_first = Pointer.Read(reader); // it sends this list from start to finish
             if (Settings.s.linkedListType == Settings.LinkedListType.Double) {
                 s.off_neighbors_last = Pointer.Read(reader);
             }
@@ -185,6 +194,18 @@ namespace OpenSpace.EngineObject {
                     }
                     if (off_neighbor != null) {
                         s.neighborsPointers.Add(off_neighbor);
+                    }
+                }
+            }
+            if (s.num_persosInSector > 0 && s.off_persosInSector_first != null) {
+                Pointer off_perso_next = s.off_persosInSector_first;
+                for (int i = 0; i < s.num_persosInSector; i++) {
+                    Pointer.Goto(ref reader, off_perso_next);
+                    Pointer off_perso = Pointer.Read(reader);
+                    off_perso_next = Pointer.Read(reader);
+                    Pointer off_perso_prev = Pointer.Read(reader);
+                    if (off_perso != null) {
+                        s.persosPointers.Add(off_perso);
                     }
                 }
             }

@@ -9,6 +9,9 @@ public class SectorManager : MonoBehaviour {
     bool loaded = false;
     public bool displayInactiveSectors = true;
     public List<Sector> sectors;
+    public List<SectorCamera> cameras = new List<SectorCamera>();
+    public SectorCamera sectorCameraPrefab;
+    public Camera mainCamera;
 
     // Use this for initialization
     void Start() {
@@ -17,6 +20,7 @@ public class SectorManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        return;
         if (loaded) {
             List<Sector> activeSectors = new List<Sector>();
             Vector3 camPos = Camera.main.transform.localPosition;
@@ -82,7 +86,15 @@ public class SectorManager : MonoBehaviour {
         sectors = MapLoader.Loader.sectors;
         for (int i = 0; i < sectors.Count; i++) {
             Sector s = sectors[i];
-            s.ProcessNeighbors();
+            s.ProcessPointers();
+            s.Gao.SetActive(false);
+            SectorCamera sc = Instantiate(sectorCameraPrefab, Vector3.zero, Quaternion.identity, mainCamera.transform);
+            cameras.Add(sc);
+            sc.transform.localPosition = Vector3.zero;
+            sc.transform.localRotation = Quaternion.identity;
+            sc.transform.localScale = Vector3.one;
+            sc.sectorIndex = i;
+            sc.sectorManager = this;
         }
         loaded = true;
     }
