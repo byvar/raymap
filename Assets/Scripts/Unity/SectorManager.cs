@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class SectorManager : MonoBehaviour {
     bool loaded = false;
+    public bool useMultiCameras = true;
     public bool displayInactiveSectors = true;
     public List<Sector> sectors;
     public List<SectorCamera> cameras = new List<SectorCamera>();
@@ -20,7 +21,7 @@ public class SectorManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        return;
+        if(useMultiCameras) return;
         if (loaded) {
             List<Sector> activeSectors = new List<Sector>();
             Vector3 camPos = Camera.main.transform.localPosition;
@@ -87,14 +88,18 @@ public class SectorManager : MonoBehaviour {
         for (int i = 0; i < sectors.Count; i++) {
             Sector s = sectors[i];
             s.ProcessPointers();
-            s.Gao.SetActive(false);
-            SectorCamera sc = Instantiate(sectorCameraPrefab, Vector3.zero, Quaternion.identity, mainCamera.transform);
-            cameras.Add(sc);
-            sc.transform.localPosition = Vector3.zero;
-            sc.transform.localRotation = Quaternion.identity;
-            sc.transform.localScale = Vector3.one;
-            sc.sectorIndex = i;
-            sc.sectorManager = this;
+            if (useMultiCameras) {
+                s.Gao.SetActive(false);
+                SectorCamera sc = Instantiate(sectorCameraPrefab, Vector3.zero, Quaternion.identity, mainCamera.transform);
+                cameras.Add(sc);
+                sc.transform.localPosition = Vector3.zero;
+                sc.transform.localRotation = Quaternion.identity;
+                sc.transform.localScale = Vector3.one;
+                sc.sectorIndex = i;
+                sc.sectorManager = this;
+            } else {
+                mainCamera.cullingMask = -1;
+            }
         }
         loaded = true;
     }

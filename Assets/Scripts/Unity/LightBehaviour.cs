@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 
 public class LightBehaviour : MonoBehaviour {
-    public LightInfo r3l;
+    public LightInfo li;
     public Light l = null;
     bool loaded = false;
     public Color color;
@@ -14,6 +14,7 @@ public class LightBehaviour : MonoBehaviour {
     float intensity;
     public float activeIntensity = 1f;
     public bool active = true;
+    public LightManager lightManager;
 
     // Use this for initialization
     void Start() {
@@ -21,34 +22,34 @@ public class LightBehaviour : MonoBehaviour {
 
 	public void Init() {
         //color = new Color(Mathf.Clamp01(r3l.color.x), Mathf.Clamp01(r3l.color.y), Mathf.Clamp01(r3l.color.z), Mathf.Clamp01(r3l.color.w));
-        intensity = Mathf.Max(r3l.color.x, r3l.color.y, r3l.color.z);
+        intensity = Mathf.Max(li.color.x, li.color.y, li.color.z);
         if (intensity > 1) {
-            Vector3 colorVector = new Vector3(r3l.color.x / intensity, r3l.color.y / intensity, r3l.color.z / intensity);
-            color = new Color(Mathf.Clamp01(colorVector.x), Mathf.Clamp01(colorVector.y), Mathf.Clamp01(colorVector.z), Mathf.Clamp01(r3l.color.w));
+            Vector3 colorVector = new Vector3(li.color.x / intensity, li.color.y / intensity, li.color.z / intensity);
+            color = new Color(Mathf.Clamp01(colorVector.x), Mathf.Clamp01(colorVector.y), Mathf.Clamp01(colorVector.z), Mathf.Clamp01(li.color.w));
         } else if (intensity > 0) {
-            color = new Color(Mathf.Clamp01(r3l.color.x), Mathf.Clamp01(r3l.color.y), Mathf.Clamp01(r3l.color.z), Mathf.Clamp01(r3l.color.w));
+            color = new Color(Mathf.Clamp01(li.color.x), Mathf.Clamp01(li.color.y), Mathf.Clamp01(li.color.z), Mathf.Clamp01(li.color.w));
         } else {
             // shadow, can't display it since colors are additive in Unity
         }
-        backgroundColor = new Color(Mathf.Clamp01(r3l.background_color.x), Mathf.Clamp01(r3l.background_color.y), Mathf.Clamp01(r3l.background_color.z), Mathf.Clamp01(r3l.background_color.w));
-        if (r3l.alphaLightFlag != 0) {
-            color = new Color(color.r * r3l.color.w, color.g * r3l.color.w, color.b * r3l.color.w);
+        backgroundColor = new Color(Mathf.Clamp01(li.background_color.x), Mathf.Clamp01(li.background_color.y), Mathf.Clamp01(li.background_color.z), Mathf.Clamp01(li.background_color.w));
+        if (li.alphaLightFlag != 0) {
+            color = new Color(color.r * li.color.w, color.g * li.color.w, color.b * li.color.w);
             backgroundColor = new Color(
-                backgroundColor.r * r3l.background_color.w,
-                backgroundColor.g * r3l.background_color.w,
-                backgroundColor.b * r3l.background_color.w);
+                backgroundColor.r * li.background_color.w,
+                backgroundColor.g * li.background_color.w,
+                backgroundColor.b * li.background_color.w);
         }
-        if (intensity > 0 && r3l.type != 6) {
+        if (intensity > 0 && li.type != 6) {
             l = gameObject.AddComponent<Light>();
             l.color = color;
             intensity = Mathf.Clamp(intensity, 0f, 2f); // don't want too bright lights
             if (intensity < 1) intensity = 1;
             l.intensity = intensity;
-            if (r3l.castShadows != 0 || r3l.createsShadowsOrNot != 0) {
+            if (li.castShadows != 0 || li.createsShadowsOrNot != 0) {
                 l.shadows = LightShadows.Hard;
                 l.shadowNearPlane = 0.1f;
             }
-            switch (r3l.type) {
+            switch (li.type) {
                 case 1:
                     // parallel light main
                     l.type = LightType.Directional;
@@ -66,7 +67,7 @@ public class LightBehaviour : MonoBehaviour {
 
                     which is 1 / (far^2 - near^2).
                     */
-                    l.range = r3l.far * 2f;
+                    l.range = li.far * 2f;
                     //light.intensity = Mathf.Pow((r3l.near / r3l.far), 0.5f) * 2f;
                     //light.intensity *= Mathf.Pow(far / near, 0.5f) * 2f;
                     //light.intensity = Mathf.Pow((near/far),0.5f) * 2f;
@@ -95,7 +96,7 @@ public class LightBehaviour : MonoBehaviour {
                 case 5:
                     // parallel light other type?
                     // also seems to be the one with exterMinPos & exterMaxPos, so not spherical
-                    l.range = r3l.attFactor3 * 1.5f;
+                    l.range = li.attFactor3 * 1.5f;
                     break;
                 case 6:
                     // r2: background color
@@ -118,14 +119,14 @@ public class LightBehaviour : MonoBehaviour {
                 case 7:
                     // parallel in a sphere light
                     // Since it's parallel this thing has a rotation, but it's also spherical so it makes more sense to use point lights.
-                    l.range = r3l.far*2;
+                    l.range = li.far*2;
                     break;
                 case 8:
                     // spherical light that ignores characters/persos?
                     break;
             }
         }
-        gameObject.SetActive(false);
+        if(lightManager != null && lightManager.sectorManager.useMultiCameras) gameObject.SetActive(false);
         loaded = true;
     }
 	

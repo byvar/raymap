@@ -57,7 +57,7 @@ namespace OpenSpace.Visual {
                     gao.transform.localRotation = rot;
                     gao.transform.localScale = scale;
                     light = gao.AddComponent<LightBehaviour>();
-                    light.r3l = this;
+                    light.li = this;
                 }
                 return light;
             }

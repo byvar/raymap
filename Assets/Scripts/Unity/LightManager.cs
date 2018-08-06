@@ -21,7 +21,7 @@ public class LightManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        return;
+        if(sectorManager != null && sectorManager.useMultiCameras) return;
         if (loaded) {
             if (useFog && Camera.main.renderingPath == RenderingPath.DeferredShading) {
                 // Fog doesn't work for deferred
@@ -109,6 +109,7 @@ public class LightManager : MonoBehaviour {
 
     public void Register(LightInfo light) {
         LightBehaviour l = light.Light;
+        l.lightManager = this;
         l.Init();
         l.transform.parent = transform;
     }
