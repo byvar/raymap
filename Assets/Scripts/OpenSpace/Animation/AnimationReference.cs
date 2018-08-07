@@ -24,7 +24,7 @@ namespace OpenSpace.Animation {
             this.offset = offset;
         }
 
-        public static AnimationReference Read(EndianBinaryReader reader, Pointer offset) {
+        public static AnimationReference Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             AnimationReference ar = new AnimationReference(offset);
             if (l.mode == MapLoader.Mode.Rayman3GC) ar.name = new string(reader.ReadChars(0x50));

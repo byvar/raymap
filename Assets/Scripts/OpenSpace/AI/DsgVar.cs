@@ -23,7 +23,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static DsgVar Read(EndianBinaryReader reader, Pointer offset, DsgMem dsgMem=null) {
+        public static DsgVar Read(Reader reader, Pointer offset, DsgMem dsgMem=null) {
             MapLoader l = MapLoader.Loader;
             DsgVar dsgVar = new DsgVar(offset);
             dsgVar.off_dsgMemBuffer = Pointer.Read(reader);
@@ -70,7 +70,7 @@ namespace OpenSpace.AI {
             return dsgVar;
         }
 
-        public object ReadValueFromBuffer(EndianBinaryReader reader, DsgVarInfoEntry infoEntry, Pointer buffer)
+        public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry infoEntry, Pointer buffer)
         {
 
             Pointer original = Pointer.Goto(ref reader, buffer + infoEntry.offsetInBuffer);
@@ -150,12 +150,12 @@ namespace OpenSpace.AI {
             return returnValue;
         }
 
-        public object ReadValueFromDsgMemBuffer(EndianBinaryReader reader, DsgVarInfoEntry infoEntry, DsgMem dsgMem)
+        public object ReadValueFromDsgMemBuffer(Reader reader, DsgVarInfoEntry infoEntry, DsgMem dsgMem)
         {
             return ReadValueFromBuffer(reader, infoEntry, dsgMem.memBuffer);
         }
 
-        public object ReadValueFromDsgVarBuffer(EndianBinaryReader reader, DsgVarInfoEntry infoEntry, DsgVar dsgVar)
+        public object ReadValueFromDsgVarBuffer(Reader reader, DsgVarInfoEntry infoEntry, DsgVar dsgVar)
         {
             return ReadValueFromBuffer(reader, infoEntry, dsgVar.off_dsgMemBuffer);
         }

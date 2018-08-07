@@ -13,7 +13,7 @@
             this.parentList = parentList;
         }
 
-        public static CollideElement Read(EndianBinaryReader reader, ZdxList parentList, Pointer offset)
+        public static CollideElement Read(Reader reader, ZdxList parentList, Pointer offset)
         {
             CollideElement element = new CollideElement(offset, parentList);
 

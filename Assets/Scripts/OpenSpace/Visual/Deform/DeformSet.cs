@@ -62,7 +62,7 @@ namespace OpenSpace.Visual.Deform {
         }
         
 
-        public static DeformSet Read(EndianBinaryReader reader, Pointer offset, MeshObject m) {
+        public static DeformSet Read(Reader reader, Pointer offset, MeshObject m) {
             MapLoader l = MapLoader.Loader;
             DeformSet d = new DeformSet(offset, m);
             d.off_weights = Pointer.Read(reader);

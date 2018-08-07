@@ -56,7 +56,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public GF(Stream stream) {
             MapLoader l = MapLoader.Loader;
-            EndianBinaryReader r = new EndianBinaryReader(stream, isLittleEndian);
+            Reader r = new Reader(stream, isLittleEndian);
 
             if(l.mode != MapLoader.Mode.Rayman2IOS) r.ReadInt32(); // Signature
 
@@ -105,7 +105,7 @@ namespace OpenSpace.FileFormat.Texture {
             r.Close();
         }
 
-        byte[] ReadChannel(EndianBinaryReader r, byte repeatByte, uint pixels) {
+        byte[] ReadChannel(Reader r, byte repeatByte, uint pixels) {
             byte[] channel = new byte[pixels];
 
             int pixel = 0;

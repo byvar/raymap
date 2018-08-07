@@ -15,12 +15,12 @@ namespace OpenSpace.FileFormat {
             MapLoader.Loader.print("Base addr: " + stream.BaseAddress);
             baseOffset = 0;
             stream.Seek(stream.BaseAddress, SeekOrigin.Begin);
-            reader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian);
+            reader = new Reader(stream, Settings.s.IsLittleEndian);
         }
 
         public override void CreateWriter() {
             ProcessMemoryStream stream = new ProcessMemoryStream(name, ProcessMemoryStream.Mode.AllAccess);
-            writer = new EndianBinaryWriter(stream, Settings.s.IsLittleEndian);
+            writer = new Writer(stream, Settings.s.IsLittleEndian);
         }
     }
 }

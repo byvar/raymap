@@ -54,7 +54,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimA3DGeneral(Pointer offset) { this.offset = offset; }
 
-        public static AnimA3DGeneral Read(EndianBinaryReader reader, Pointer offset) {
+        public static AnimA3DGeneral Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             AnimA3DGeneral a3d = new AnimA3DGeneral(offset);
             if (Settings.s.engineMode == Settings.EngineMode.R2) {

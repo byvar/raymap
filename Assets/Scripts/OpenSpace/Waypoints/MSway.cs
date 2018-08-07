@@ -13,7 +13,7 @@
             this.offset = offset;
         }
 
-        public static MSWay Read(EndianBinaryReader reader, Pointer offset) {
+        public static MSWay Read(Reader reader, Pointer offset) {
             MSWay msWay = new MSWay(offset);
 
             msWay.off_graph = Pointer.Read(reader);

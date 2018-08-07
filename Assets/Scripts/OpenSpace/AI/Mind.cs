@@ -22,7 +22,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Mind Read(EndianBinaryReader reader, Pointer offset) {
+        public static Mind Read(Reader reader, Pointer offset) {
             Mind m = new Mind(offset);
             m.off_AI_model = Pointer.Read(reader);
             m.off_intelligence_normal = Pointer.Read(reader);

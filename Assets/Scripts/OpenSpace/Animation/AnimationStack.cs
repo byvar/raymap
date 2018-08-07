@@ -13,7 +13,7 @@ namespace OpenSpace.Animation {
 
         public AnimationStack() {}
 
-        public static AnimationStack Read(EndianBinaryReader reader) {
+        public static AnimationStack Read(Reader reader) {
             AnimationStack stack = new AnimationStack();
             reader.ReadUInt32();
             stack.count = reader.ReadUInt32();

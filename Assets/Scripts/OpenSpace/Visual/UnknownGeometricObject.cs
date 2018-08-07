@@ -20,7 +20,7 @@ namespace OpenSpace.Visual {
         }
 
         // I don't even know what this is yet here I am parsing it
-        public static UnknownGeometricObject Read(EndianBinaryReader reader, PhysicalObject po, Pointer offset) {
+        public static UnknownGeometricObject Read(Reader reader, PhysicalObject po, Pointer offset) {
             UnknownGeometricObject lodObj = new UnknownGeometricObject(po, offset);
             Pointer off_start = Pointer.Read(reader);
             Pointer.Goto(ref reader, off_start);

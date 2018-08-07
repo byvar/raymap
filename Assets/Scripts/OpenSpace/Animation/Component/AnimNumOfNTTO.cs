@@ -10,7 +10,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimNumOfNTTO() {}
 
-        public static AnimNumOfNTTO Read(EndianBinaryReader reader) {
+        public static AnimNumOfNTTO Read(Reader reader) {
             AnimNumOfNTTO n = new AnimNumOfNTTO();
             n.numOfNTTO = reader.ReadUInt16();
             return n;

@@ -20,7 +20,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Macro Read(EndianBinaryReader reader, Pointer offset, AIModel model, int number) {
+        public static Macro Read(Reader reader, Pointer offset, AIModel model, int number) {
             MapLoader l = MapLoader.Loader;
             Macro m = new Macro(offset);
             m.aiModel = model;

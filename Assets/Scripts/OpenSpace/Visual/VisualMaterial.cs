@@ -202,7 +202,7 @@ namespace OpenSpace.Visual {
             animTextures = new List<AnimatedTexture>();
         }
 
-        public static VisualMaterial Read(EndianBinaryReader reader, Pointer offset) {
+        public static VisualMaterial Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
             // Material struct = 0x188
@@ -301,7 +301,7 @@ namespace OpenSpace.Visual {
             return m;
         }
 
-        public static VisualMaterial FromOffsetOrRead(Pointer offset, EndianBinaryReader reader) {
+        public static VisualMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
             VisualMaterial vm = FromOffset(offset);
             if (vm == null) {
                 Pointer off_current = Pointer.Goto(ref reader, offset);

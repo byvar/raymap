@@ -16,7 +16,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimOnlyFrame() {}
 
-        public static AnimOnlyFrame Read(EndianBinaryReader reader) {
+        public static AnimOnlyFrame Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
             AnimOnlyFrame of = new AnimOnlyFrame();
             of.quaternion = reader.ReadUInt16();

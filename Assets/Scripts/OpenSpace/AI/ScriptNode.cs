@@ -23,7 +23,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static ScriptNode Read(EndianBinaryReader reader, Pointer offset, Script script) {
+        public static ScriptNode Read(Reader reader, Pointer offset, Script script) {
             MapLoader l = MapLoader.Loader;
             ScriptNode sn = new ScriptNode(offset);
 

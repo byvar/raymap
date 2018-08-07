@@ -62,7 +62,7 @@ namespace OpenSpace {
             return !(x == y);
         }
 
-        public static PhysicalObject Read(EndianBinaryReader reader, Pointer offset) {
+        public static PhysicalObject Read(Reader reader, Pointer offset) {
             PhysicalObject po = new PhysicalObject(offset);
 
             // Header

@@ -174,7 +174,7 @@ namespace OpenSpace {
             return q;
         }
 
-        public static Matrix Read(EndianBinaryReader reader, Pointer offset) {
+        public static Matrix Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             UInt32 type = reader.ReadUInt32(); // 0x02: always at the start of a transformation matrix
             Matrix4x4 transMatrix = new Matrix4x4();
@@ -222,7 +222,7 @@ namespace OpenSpace {
             }
         }
 
-        public void Write(EndianBinaryWriter writer) {
+        public void Write(Writer writer) {
             Pointer.Goto(ref writer, offset);
             writer.Write(type);
 

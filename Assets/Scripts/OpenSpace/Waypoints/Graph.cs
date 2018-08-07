@@ -16,7 +16,7 @@
             this.offset = offset;
         }
 
-        public static Graph Read(EndianBinaryReader reader, Pointer offset) {
+        public static Graph Read(Reader reader, Pointer offset) {
             Graph graph = new Graph(offset);
 
             graph.off_firstNode = Pointer.Read(reader);

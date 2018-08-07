@@ -22,7 +22,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimKeyframe() {}
 
-        public static AnimKeyframe Read(EndianBinaryReader reader) {
+        public static AnimKeyframe Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
             AnimKeyframe kf = new AnimKeyframe();
             if (Settings.s.engineMode == Settings.EngineMode.R2) {

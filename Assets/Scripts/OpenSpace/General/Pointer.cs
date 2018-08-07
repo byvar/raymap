@@ -48,7 +48,7 @@ namespace OpenSpace {
                 if (ptr.offset == 0) return null;
                 return ptr;
             } else if (pointer.file.allowUnsafePointers) {
-                EndianBinaryReader reader = pointer.file.reader;
+                Reader reader = pointer.file.reader;
                 Pointer off_current = Pointer.Goto(ref reader, pointer);
                 Pointer ptr = Pointer.Read(reader);
                 Pointer.Goto(ref reader, off_current);
@@ -57,7 +57,7 @@ namespace OpenSpace {
             return null;
         }
 
-        public static Pointer Read(EndianBinaryReader reader) {
+        public static Pointer Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
             uint current_off = (uint)(reader.BaseStream.Position);
             uint value = reader.ReadUInt32();
@@ -78,49 +78,49 @@ namespace OpenSpace {
         }
 
         // For readers
-        public Pointer Goto(ref EndianBinaryReader reader) {
+        public Pointer Goto(ref Reader reader) {
             Pointer oldPos = Current(reader);
             reader = file.reader;
             reader.BaseStream.Seek(offset + file.baseOffset, SeekOrigin.Begin);
             return oldPos;
         }
 
-        public static Pointer Goto(ref EndianBinaryReader reader, Pointer newPos) {
+        public static Pointer Goto(ref Reader reader, Pointer newPos) {
             if (newPos != null) return newPos.Goto(ref reader);
             return null;
         }
 
-        public static Pointer Current(EndianBinaryReader reader) {
+        public static Pointer Current(Reader reader) {
             MapLoader l = MapLoader.Loader;
             uint curPos = (uint)reader.BaseStream.Position;
             FileWithPointers curFile = l.GetFileByReader(reader);
             return new Pointer((uint)(curPos - curFile.baseOffset), curFile);
         }
 
-        public void DoAt(ref EndianBinaryReader reader, EndianBinaryReader.ReadAction action) {
+        public void DoAt(ref Reader reader, Reader.ReadAction action) {
             Pointer off_current = Goto(ref reader, this);
             action(reader, this);
             Goto(ref reader, off_current);
         }
 
-        public static void DoAt(ref EndianBinaryReader reader, Pointer newPos, EndianBinaryReader.ReadAction action) {
+        public static void DoAt(ref Reader reader, Pointer newPos, Reader.ReadAction action) {
             if (newPos != null) newPos.DoAt(ref reader, action);
         }
 
         // For writers
-        public Pointer Goto(ref EndianBinaryWriter writer) {
+        public Pointer Goto(ref Writer writer) {
             Pointer oldPos = Current(writer);
             writer = file.writer;
             writer.BaseStream.Seek(offset + file.baseOffset, SeekOrigin.Begin);
             return oldPos;
         }
 
-        public static Pointer Goto(ref EndianBinaryWriter writer, Pointer newPos) {
+        public static Pointer Goto(ref Writer writer, Pointer newPos) {
             if (newPos != null) return newPos.Goto(ref writer);
             return null;
         }
 
-        public static Pointer Current(EndianBinaryWriter writer) {
+        public static Pointer Current(Writer writer) {
             MapLoader l = MapLoader.Loader;
             uint curPos = (uint)writer.BaseStream.Position;
             FileWithPointers curFile = l.GetFileByWriter(writer);

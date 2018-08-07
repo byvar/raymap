@@ -17,14 +17,14 @@ namespace OpenSpace.FileFormat {
             headerOffset = 0;
             this.name = name;
             this.fileID = fileID;
-            reader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian);
+            reader = new Reader(stream, Settings.s.IsLittleEndian);
         }
 
         public void ReadPTR(string path) {
             if (!File.Exists(path)) return;
             Stream ptrStream = File.OpenRead(path);
             long totalSize = ptrStream.Length;
-            using (EndianBinaryReader ptrReader = new EndianBinaryReader(ptrStream, Settings.s.IsLittleEndian)) {
+            using (Reader ptrReader = new Reader(ptrStream, Settings.s.IsLittleEndian)) {
                 uint num_ptrs = ptrReader.ReadUInt32();
                 for (uint j = 0; j < num_ptrs; j++) {
                     int file = ptrReader.ReadInt32();
@@ -53,7 +53,7 @@ namespace OpenSpace.FileFormat {
         public override void CreateWriter() {
             if (path != null) {
                 FileStream stream = new FileStream(path, FileMode.Open);
-                writer = new EndianBinaryWriter(stream, Settings.s.IsLittleEndian);
+                writer = new Writer(stream, Settings.s.IsLittleEndian);
             }
         }
     }

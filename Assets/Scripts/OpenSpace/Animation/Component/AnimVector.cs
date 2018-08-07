@@ -10,7 +10,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimVector() {}
 
-        public static AnimVector Read(EndianBinaryReader reader) {
+        public static AnimVector Read(Reader reader) {
             AnimVector vec = new AnimVector();
             float x = reader.ReadSingle();
             float z = reader.ReadSingle();

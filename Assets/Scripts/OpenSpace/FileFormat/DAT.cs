@@ -65,7 +65,7 @@ namespace OpenSpace.FileFormat {
             baseOffset = 0;
             headerOffset = 0;
             this.name = name;
-            reader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian);
+            reader = new Reader(stream, Settings.s.IsLittleEndian);
         }
 
         public uint GetOffset(RelocationTableReference rtref) {

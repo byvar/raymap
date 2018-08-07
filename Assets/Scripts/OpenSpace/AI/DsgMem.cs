@@ -18,7 +18,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static DsgMem Read(EndianBinaryReader reader, Pointer offset) {
+        public static DsgMem Read(Reader reader, Pointer offset) {
             DsgMem dsgMem = new DsgMem(offset);
 
             Pointer dsgVarPointer = Pointer.Read(reader);

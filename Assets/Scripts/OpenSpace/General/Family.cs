@@ -53,7 +53,7 @@ namespace OpenSpace {
             return Array.IndexOf(off_physical_lists, off_physicalList);
         }
 
-        public void ReadNewPhysicalList(EndianBinaryReader reader, Pointer off_physicalList) {
+        public void ReadNewPhysicalList(Reader reader, Pointer off_physicalList) {
             MapLoader l = MapLoader.Loader;
             Array.Resize(ref off_physical_lists, off_physical_lists.Length + 1);
             Array.Resize(ref physical_objects, physical_objects.Length + 1);
@@ -109,7 +109,7 @@ namespace OpenSpace {
             }
         }
 
-        public static Family Read(EndianBinaryReader reader, Pointer offset) {
+        public static Family Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             Family f = new Family(offset);
             f.off_family_next = Pointer.Read(reader);
@@ -117,7 +117,7 @@ namespace OpenSpace {
             f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
             f.family_index = reader.ReadUInt32();
             f.name = l.objectTypes[0][f.family_index].name;
-            f.states = LinkedList<State>.Read(reader, Pointer.Current(reader), (EndianBinaryReader r, Pointer o) => {
+            f.states = LinkedList<State>.Read(reader, Pointer.Current(reader), (Reader r, Pointer o) => {
                 State s = State.Read(r, o, f);
                 return s;
             });

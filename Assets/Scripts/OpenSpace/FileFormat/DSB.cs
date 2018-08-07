@@ -13,11 +13,11 @@ namespace OpenSpace.FileFormat {
             baseOffset = 0;
             headerOffset = 0;
             this.name = name;
-            using (EndianBinaryReader encodedReader = new EndianBinaryReader(stream, Settings.s.IsLittleEndian)) {
+            using (Reader encodedReader = new Reader(stream, Settings.s.IsLittleEndian)) {
                 encodedReader.ReadMask();
                 data = encodedReader.ReadBytes((int)stream.Length - 4);
             }
-            reader = new EndianBinaryReader(new MemoryStream(data), Settings.s.IsLittleEndian);
+            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
         }
 
         public override void CreateWriter() {

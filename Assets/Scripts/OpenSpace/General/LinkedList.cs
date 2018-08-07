@@ -20,7 +20,7 @@ namespace OpenSpace {
     }
 
     public class LinkedList<T> : IList<T> {
-        public delegate T ReadElement(EndianBinaryReader reader, Pointer offset);
+        public delegate T ReadElement(Reader reader, Pointer offset);
 
         public Pointer offset;
         public Type type;
@@ -50,7 +50,7 @@ namespace OpenSpace {
             if (typeof(ILinkedListEntry).IsAssignableFrom(typeof(T))) customEntries = true;
         }
 
-        public static LinkedList<T> ReadHeader(EndianBinaryReader reader, Pointer offset, Type type = Type.Default) {
+        public static LinkedList<T> ReadHeader(Reader reader, Pointer offset, Type type = Type.Default) {
             MapLoader l = MapLoader.Loader;
             LinkedList<T> li = new LinkedList<T>(offset);
             li.type = type;
@@ -64,7 +64,7 @@ namespace OpenSpace {
             return li;
         }
 
-        public void ReadEntries(EndianBinaryReader reader, ReadElement readElement, LinkedList.Flags flags = LinkedList.Flags.None) {
+        public void ReadEntries(Reader reader, ReadElement readElement, LinkedList.Flags flags = LinkedList.Flags.None) {
             Pointer off_next = off_head;
             bool elementPointerFirst = ((flags & LinkedList.Flags.ElementPointerFirst) != 0);
             bool hasHeaderPointers = ((flags & LinkedList.Flags.HasHeaderPointers) != 0);
@@ -85,7 +85,7 @@ namespace OpenSpace {
                     if (!readAtPointer) {
                         list[i] = readElement(reader, off_element);
                     } else {
-                        Pointer.DoAt(ref reader, off_element, (EndianBinaryReader r, Pointer o) => {
+                        Pointer.DoAt(ref reader, off_element, (Reader r, Pointer o) => {
                             list[i] = readElement(r, o);
                         });
                     }
@@ -104,7 +104,7 @@ namespace OpenSpace {
             }
         }
 
-        public static LinkedList<T> Read(EndianBinaryReader reader, Pointer offset, ReadElement readElement,
+        public static LinkedList<T> Read(Reader reader, Pointer offset, ReadElement readElement,
             LinkedList.Flags flags = LinkedList.Flags.None,
             Type type = Type.Default) {
             LinkedList<T> li = ReadHeader(reader, offset, type: type);
@@ -112,7 +112,7 @@ namespace OpenSpace {
             return li;
         }
 
-        public void FillPointers(EndianBinaryReader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
+        public void FillPointers(Reader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
             Pointer current_entry = lastEntry;
             Pointer next_entry = null;
             Pointer off_current = Pointer.Current(reader);

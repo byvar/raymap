@@ -29,7 +29,7 @@ namespace OpenSpace.Input {
             this.offset = offset;
         }
 
-        public static KeyWord Read(EndianBinaryReader reader, Pointer offset, bool isFunction=true) {
+        public static KeyWord Read(Reader reader, Pointer offset, bool isFunction=true) {
             KeyWord keyWord = new KeyWord(offset);
 
             // Read 20 in total for R2iOS

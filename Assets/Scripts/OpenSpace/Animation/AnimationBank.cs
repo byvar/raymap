@@ -62,7 +62,7 @@ namespace OpenSpace.Animation {
             return !(x == y);
         }
 
-        public static AnimationBank[] Read(EndianBinaryReader reader, Pointer offset, uint index, uint num_banks, FileFormat.FileWithPointers kfFile, bool append = false) {
+        public static AnimationBank[] Read(Reader reader, Pointer offset, uint index, uint num_banks, FileFormat.FileWithPointers kfFile, bool append = false) {
             MapLoader l = MapLoader.Loader;
             AnimationBank[] banks = new AnimationBank[num_banks];
             

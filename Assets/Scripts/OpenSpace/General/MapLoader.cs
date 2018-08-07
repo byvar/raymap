@@ -296,7 +296,7 @@ namespace OpenSpace {
         }
 
         public void SaveModdables() {
-            EndianBinaryWriter writer = null;
+            Writer writer = null;
             for (int i = 0; i < files_array.Length; i++) {
                 if (files_array[i] != null && files_array[i].writer != null) {
                     writer = files_array[i].writer;
@@ -336,7 +336,7 @@ namespace OpenSpace {
         #region FIX
         void LoadFIX() {
             files_array[Mem.Fix].GotoHeader();
-            EndianBinaryReader reader = files_array[Mem.Fix].reader;
+            Reader reader = files_array[Mem.Fix].reader;
             // Read fix header
             //reader.ReadUInt32();
             reader.ReadUInt32();
@@ -495,7 +495,7 @@ namespace OpenSpace {
         #region LVL
         void LoadLVL() {
             files_array[Mem.Lvl].GotoHeader();
-            EndianBinaryReader reader = files_array[Mem.Lvl].reader;
+            Reader reader = files_array[Mem.Lvl].reader;
             long totalSize = reader.BaseStream.Length;
             Pointer off_current = null;
             //reader.ReadUInt32();
@@ -835,7 +835,7 @@ namespace OpenSpace {
         #region FIXSNA
         void LoadFIXSNA() {
             files_array[Mem.Fix].GotoHeader();
-            EndianBinaryReader reader = files_array[Mem.Fix].reader;
+            Reader reader = files_array[Mem.Fix].reader;
             print("FIX GPT offset: " + Pointer.Current(reader));
             Pointer off_identityMatrix = Pointer.Read(reader);
             reader.ReadBytes(50 * 4);
@@ -901,7 +901,7 @@ namespace OpenSpace {
 
         #region LVLSNA
         void LoadLVLSNA() {
-            EndianBinaryReader reader = files_array[Mem.Lvl].reader;
+            Reader reader = files_array[Mem.Lvl].reader;
             Pointer off_current;
 
             // First read GPT
@@ -1161,7 +1161,7 @@ namespace OpenSpace {
         public void LoadMemory() {
             MemoryFile mem = (MemoryFile)files_array[0];
             if (mem == null || mem.reader == null) throw new NullReferenceException("File not initialized!");
-            EndianBinaryReader reader = mem.reader;
+            Reader reader = mem.reader;
 
             // Read object names
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["objectTypes"], mem));
@@ -1247,7 +1247,7 @@ namespace OpenSpace {
             MonoBehaviour.print(str);
         }*/
 
-        public FileWithPointers GetFileByReader(EndianBinaryReader reader) {
+        public FileWithPointers GetFileByReader(Reader reader) {
             for (int i = 0; i < files_array.Length; i++) {
                 FileWithPointers file = files_array[i];
                 if (file != null && reader.Equals(file.reader)) {
@@ -1257,7 +1257,7 @@ namespace OpenSpace {
             return null;
         }
 
-        public FileWithPointers GetFileByWriter(EndianBinaryWriter writer) {
+        public FileWithPointers GetFileByWriter(Writer writer) {
             for (int i = 0; i < files_array.Length; i++) {
                 FileWithPointers file = files_array[i];
                 if (file != null && writer.Equals(file.writer)) {
@@ -1285,7 +1285,7 @@ namespace OpenSpace {
             }
         }
 
-        public void FillLinkedListPointers(EndianBinaryReader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
+        public void FillLinkedListPointers(Reader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
             Pointer current_entry = lastEntry;
             Pointer next_entry = null;
             Pointer off_current = Pointer.Current(reader);
@@ -1301,7 +1301,7 @@ namespace OpenSpace {
             Pointer.Goto(ref reader, off_current);
         }
 
-        public void ReadObjectNamesTable(EndianBinaryReader reader, Pointer off_names_first, uint num_names, uint index) {
+        public void ReadObjectNamesTable(Reader reader, Pointer off_names_first, uint num_names, uint index) {
             Pointer off_current = Pointer.Goto(ref reader, off_names_first);
             objectTypes[index] = new ObjectType[num_names];
             for (int j = 0; j < num_names; j++) {
@@ -1321,7 +1321,7 @@ namespace OpenSpace {
             Pointer.Goto(ref reader, off_current);
         }
 
-        public void ReadKeypadDefine(EndianBinaryReader reader, Pointer off_keypadDefine) {
+        public void ReadKeypadDefine(Reader reader, Pointer off_keypadDefine) {
             if (off_keypadDefine == null) return;
             //print("off keypad: " + off_keypadDefine);
             Pointer off_current = Pointer.Goto(ref reader, off_keypadDefine);
@@ -1355,7 +1355,7 @@ namespace OpenSpace {
             Pointer.Goto(ref reader, off_current);
         }
 
-        public void ReadSuperObjects(EndianBinaryReader reader) {
+        public void ReadSuperObjects(Reader reader) {
             Pointer off_current = Pointer.Goto(ref reader, globals.off_actualWorld);
             List<SuperObject> superObjectsActual = SuperObject.Read(reader, globals.off_actualWorld, false, true);
             if (hasTransit && globals.off_transitDynamicWorld != null) {
@@ -1378,7 +1378,7 @@ namespace OpenSpace {
             Pointer.Goto(ref reader, off_current);
         }
 
-        public void ReadAlways(EndianBinaryReader reader) {
+        public void ReadAlways(Reader reader) {
             // Parse spawnable SO's
             if (globals.off_spawnable_perso_first != null && globals.num_spawnable_perso > 0) {
                 GameObject spawnableParent = new GameObject("Spawnable persos");
@@ -1403,11 +1403,11 @@ namespace OpenSpace {
             }
         }
 
-        public void ReadFamilies(EndianBinaryReader reader) {
+        public void ReadFamilies(Reader reader) {
             if (families.Count > 0) {
                 GameObject familiesParent = new GameObject("Families");
                 familiesParent.SetActive(false); // Families do not need to be visible
-                families.ReadEntries(reader, (EndianBinaryReader r, Pointer o) => {
+                families.ReadEntries(reader, (Reader r, Pointer o) => {
                     Family f = Family.Read(r, o);
                     f.Gao.transform.SetParent(familiesParent.transform, false);
                     return f;
@@ -1415,7 +1415,7 @@ namespace OpenSpace {
             }
         }
 
-        public void ReadCrossReferences(EndianBinaryReader reader) {
+        public void ReadCrossReferences(Reader reader) {
             for (int i = 0; i < sectors.Count; i++) {
                 sectors[i].ProcessPointers(reader);
             }

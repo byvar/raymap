@@ -27,7 +27,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static AIModel Read(EndianBinaryReader reader, Pointer offset)
+        public static AIModel Read(Reader reader, Pointer offset)
         {
             MapLoader l = MapLoader.Loader;
             AIModel ai = new AIModel(offset);

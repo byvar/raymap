@@ -51,7 +51,7 @@ namespace OpenSpace.Collide {
             this.offset = offset;
         }
 
-        public static CollideMaterial Read(EndianBinaryReader reader, Pointer offset) {
+        public static CollideMaterial Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             CollideMaterial cm = new CollideMaterial(offset);
             //l.print(offset);
@@ -66,7 +66,7 @@ namespace OpenSpace.Collide {
             return cm;
         }
 
-        public static CollideMaterial FromOffsetOrRead(Pointer offset, EndianBinaryReader reader) {
+        public static CollideMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
             CollideMaterial cm = FromOffset(offset);
             if (cm == null) {
                 Pointer off_current = Pointer.Goto(ref reader, offset);

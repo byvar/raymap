@@ -40,7 +40,7 @@ public class BoundingVolume {
     }
 
     // SuperObject BoundingVolume
-    public static BoundingVolume Read(EndianBinaryReader reader, Pointer offset, Type type) {
+    public static BoundingVolume Read(Reader reader, Pointer offset, Type type) {
         BoundingVolume volume = new BoundingVolume(offset);
 
         volume.type = type;

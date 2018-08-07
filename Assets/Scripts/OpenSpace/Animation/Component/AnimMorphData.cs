@@ -9,7 +9,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimMorphData() {}
 
-        public static AnimMorphData Read(EndianBinaryReader reader) {
+        public static AnimMorphData Read(Reader reader) {
             AnimMorphData m = new AnimMorphData();
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
                 reader.ReadBytes(0x8); // Haven't deciphered this yet

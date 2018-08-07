@@ -17,7 +17,7 @@ namespace OpenSpace.Collide
             this.offset = offset;
         }
 
-        public static ZdxList Read(EndianBinaryReader reader, CollSet collset, Pointer offset) {
+        public static ZdxList Read(Reader reader, CollSet collset, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             ZdxList zdxList = new ZdxList(collset, offset);
             zdxList.off_element_first = Pointer.Read(reader);

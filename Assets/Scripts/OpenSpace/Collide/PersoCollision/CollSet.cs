@@ -41,14 +41,14 @@ namespace OpenSpace.Collide {
             this.offset = offset;
         }
 
-        private static LinkedList<CollideMeshObject> ParseZdxList(EndianBinaryReader reader, Pointer offset) {
+        private static LinkedList<CollideMeshObject> ParseZdxList(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             LinkedList<CollideMeshObject> zdxList = null;
-            Pointer.DoAt(ref reader, offset, (EndianBinaryReader r1, Pointer o1) => {
+            Pointer.DoAt(ref reader, offset, (Reader r1, Pointer o1) => {
                 l.print(o1);
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
                 zdxList = LinkedList<CollideMeshObject>.Read(r1, o1,
-                    (EndianBinaryReader r, Pointer o) => {
+                    (Reader r, Pointer o) => {
                         return CollideMeshObject.Read(r, o);
                     }, LinkedList.Flags.ReadAtPointer
                         | (l.mode == MapLoader.Mode.Rayman3GC ?
@@ -59,7 +59,7 @@ namespace OpenSpace.Collide {
             return zdxList;
         }
 
-        public static CollSet Read(EndianBinaryReader reader, Perso perso, Pointer offset) {
+        public static CollSet Read(Reader reader, Perso perso, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             CollSet c = new CollSet(perso, offset);
 

@@ -103,7 +103,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public static SpriteElement Read(EndianBinaryReader reader, Pointer offset, MeshObject m) {
+        public static SpriteElement Read(Reader reader, Pointer offset, MeshObject m) {
             MapLoader l = MapLoader.Loader;
             SpriteElement s = new SpriteElement(offset, m);
             s.name = "Sprite @ pos " + offset;

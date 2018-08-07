@@ -79,13 +79,13 @@ namespace OpenSpace.FileFormat {
         }
 
         private void Load(Stream stream, bool masking) {
-            using (EndianBinaryReader reader = new EndianBinaryReader(stream, isLittleEndian)) {
+            using (Reader reader = new Reader(stream, isLittleEndian)) {
                 Read(reader);
             }
         }
 
         private void Load(DAT dat, string name, RelocationType type) {
-            EndianBinaryReader reader = dat.reader;
+            Reader reader = dat.reader;
             int levelIndex = 0;
             string[] levelList = DAT.levelList;
             if (MapLoader.Loader.settings.isDonald) {
@@ -121,7 +121,7 @@ namespace OpenSpace.FileFormat {
             return null;
         }
 
-        void Read(EndianBinaryReader reader) {
+        void Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
 
             byte count = reader.ReadByte();

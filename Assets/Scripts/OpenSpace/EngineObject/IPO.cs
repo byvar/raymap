@@ -36,7 +36,7 @@ namespace OpenSpace.EngineObject {
             this.superObject = so;
         }
 
-        public static IPO Read(EndianBinaryReader reader, Pointer offset, SuperObject so) {
+        public static IPO Read(Reader reader, Pointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             IPO ipo = new IPO(offset, so);
             ipo.off_data = Pointer.Read(reader);

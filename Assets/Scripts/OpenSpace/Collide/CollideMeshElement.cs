@@ -100,7 +100,7 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public static CollideMeshElement Read(EndianBinaryReader reader, Pointer offset, CollideMeshObject m) {
+        public static CollideMeshElement Read(Reader reader, Pointer offset, CollideMeshObject m) {
             MapLoader l = MapLoader.Loader;
             CollideMeshElement sm = new CollideMeshElement(offset, m);
             //l.print(offset + " - " + m.num_vertices);

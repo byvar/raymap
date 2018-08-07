@@ -48,7 +48,7 @@ namespace OpenSpace {
             return result;
         }
 
-        public static State Read(EndianBinaryReader reader, Pointer offset, Family family) {
+        public static State Read(Reader reader, Pointer offset, Family family) {
             MapLoader l = MapLoader.Loader;
             State s = new State(offset, family);
             l.states.Add(s);

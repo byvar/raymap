@@ -19,7 +19,7 @@ public class Moddable : MonoBehaviour {
         startScale = transform.localScale;
     }
 
-    public void SaveChanges(EndianBinaryWriter writer) {
+    public void SaveChanges(Writer writer) {
         if (startPos != transform.localPosition || startRot != transform.localRotation || startScale != transform.localScale) {
             if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 mat.type = 7;

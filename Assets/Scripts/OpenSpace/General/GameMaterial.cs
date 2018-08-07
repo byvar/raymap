@@ -25,7 +25,7 @@ namespace OpenSpace {
             this.offset = offset;
         }
 
-        public static GameMaterial Read(EndianBinaryReader reader, Pointer offset) {
+        public static GameMaterial Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             GameMaterial gm = new GameMaterial(offset);
 
@@ -51,7 +51,7 @@ namespace OpenSpace {
             return gm;
         }
 
-        public static GameMaterial FromOffsetOrRead(Pointer offset, EndianBinaryReader reader) {
+        public static GameMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
             GameMaterial gm = FromOffset(offset);
             if (gm == null) {
                 Pointer off_current = Pointer.Goto(ref reader, offset);

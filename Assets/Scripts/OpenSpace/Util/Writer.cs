@@ -2,12 +2,12 @@
 using System.IO;
 
 namespace OpenSpace {
-    public class EndianBinaryWriter : BinaryWriter {
+    public class Writer : BinaryWriter {
         bool isLittleEndian = true;
         bool masking = false; // for Rayman 2
         uint mask = 0;
-        public EndianBinaryWriter(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
-        public EndianBinaryWriter(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
+        public Writer(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
+        public Writer(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
 
         public override void Write(Int32 value) {
             var data = BitConverter.GetBytes(value);

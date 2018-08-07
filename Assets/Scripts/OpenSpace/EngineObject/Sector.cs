@@ -51,10 +51,10 @@ namespace OpenSpace.EngineObject {
             this.superObject = so;
         }
 
-        public void ProcessPointers(EndianBinaryReader reader) {
+        public void ProcessPointers(Reader reader) {
             MapLoader l = MapLoader.Loader;
             if (neighbors != null && neighbors.Count > 0) {
-                neighbors.ReadEntries(reader, (EndianBinaryReader r, Pointer o) => {
+                neighbors.ReadEntries(reader, (Reader r, Pointer o) => {
                     NeighborSector n = new NeighborSector();
                     n.short0 = r.ReadUInt16();
                     n.short2 = r.ReadUInt16();
@@ -73,18 +73,18 @@ namespace OpenSpace.EngineObject {
                 });
             }
             if (persos != null && persos.Count > 0) {
-                persos.ReadEntries(reader, (EndianBinaryReader r, Pointer o) => {
+                persos.ReadEntries(reader, (Reader r, Pointer o) => {
                     return l.persos.FirstOrDefault(p => p.SuperObject != null && p.SuperObject.offset == o);
                 }, LinkedList.Flags.ElementPointerFirst);
             }
         }
 
-        public static Sector Read(EndianBinaryReader reader, Pointer offset, SuperObject so) {
+        public static Sector Read(Reader reader, Pointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
             s.persos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             s.lights = LinkedList<LightInfo>.Read(reader, Pointer.Current(reader),
-                (EndianBinaryReader r, Pointer o) => {
+                (Reader r, Pointer o) => {
                     LightInfo li = LightInfo.Read(r, o);
                     if (li != null) li.containingSectors.Add(s);
                     return li;

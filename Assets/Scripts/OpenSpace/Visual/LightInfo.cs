@@ -90,7 +90,7 @@ namespace OpenSpace.Visual {
         }
 
 
-        public static LightInfo Read(EndianBinaryReader reader, Pointer offset) {
+        public static LightInfo Read(Reader reader, Pointer offset) {
             MapLoader lo = MapLoader.Loader;
             LightInfo parsedLight = lo.lights.FirstOrDefault(li => li.offset == offset);
             if (parsedLight != null) return parsedLight;

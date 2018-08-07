@@ -27,7 +27,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Behavior Read(EndianBinaryReader reader, Pointer offset, AIModel aiModel, BehaviorType type, int number) {
+        public static Behavior Read(Reader reader, Pointer offset, AIModel aiModel, BehaviorType type, int number) {
             MapLoader l = MapLoader.Loader;
             Behavior entry = new Behavior(offset);
 

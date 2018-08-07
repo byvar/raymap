@@ -16,7 +16,7 @@ namespace OpenSpace.Waypoints {
             this.offset = offset;
         }
 
-        public static GraphNode Read(EndianBinaryReader reader, Pointer offset) {
+        public static GraphNode Read(Reader reader, Pointer offset) {
             GraphNode node = new GraphNode(offset);
 
             node.off_nextNode = Pointer.Read(reader);

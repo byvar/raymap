@@ -25,7 +25,7 @@ namespace OpenSpace.Text {
             this.offset = offset;
         }
 
-        public static FontStructure Read(EndianBinaryReader reader, Pointer offset) {
+        public static FontStructure Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             FontStructure f = new FontStructure(offset);
 

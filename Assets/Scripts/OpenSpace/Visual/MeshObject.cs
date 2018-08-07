@@ -71,7 +71,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public static MeshObject Read(EndianBinaryReader reader, PhysicalObject po, Pointer offset) {
+        public static MeshObject Read(Reader reader, PhysicalObject po, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             MeshObject m = new MeshObject(po, offset);
             Pointer off_modelstart = Pointer.Read(reader);

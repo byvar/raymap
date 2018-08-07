@@ -10,7 +10,7 @@ namespace OpenSpace.Waypoints {
             this.offset = offset;
         }
 
-        public static WayPoint Read(EndianBinaryReader reader, Pointer offset) {
+        public static WayPoint Read(Reader reader, Pointer offset) {
             WayPoint wp = new WayPoint(offset);
 
             float x = reader.ReadSingle();

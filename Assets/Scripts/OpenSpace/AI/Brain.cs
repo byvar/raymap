@@ -19,7 +19,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Brain Read(EndianBinaryReader reader, Pointer offset) {
+        public static Brain Read(Reader reader, Pointer offset) {
             Brain b = new Brain(offset);
             b.off_mind = Pointer.Read(reader);
             b.unknown1 = reader.ReadUInt32(); // init at 0xCDCDCDCD

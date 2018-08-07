@@ -14,7 +14,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimEvent() {}
 
-        public static AnimEvent Read(EndianBinaryReader reader) {
+        public static AnimEvent Read(Reader reader) {
             AnimEvent e = new AnimEvent();
             e.unk0 = reader.ReadUInt32();
             e.unk4 = reader.ReadUInt16();

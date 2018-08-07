@@ -13,7 +13,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimDeformation() {}
 
-        public static AnimDeformation Read(EndianBinaryReader reader) {
+        public static AnimDeformation Read(Reader reader) {
             AnimDeformation d = new AnimDeformation();
             d.channel = reader.ReadInt16();
             d.bone = reader.ReadUInt16();

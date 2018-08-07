@@ -10,7 +10,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimFramesKFIndex() {}
 
-        public static AnimFramesKFIndex Read(EndianBinaryReader reader) {
+        public static AnimFramesKFIndex Read(Reader reader) {
             AnimFramesKFIndex kfi = new AnimFramesKFIndex();
             if (Settings.s.isR2Demo) {
                 kfi.kf = reader.ReadUInt16();

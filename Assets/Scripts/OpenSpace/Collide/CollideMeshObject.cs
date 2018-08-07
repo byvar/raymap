@@ -32,7 +32,7 @@ namespace OpenSpace.Collide {
             this.offset = offset;
         }
 
-        public static CollideMeshObject Read(EndianBinaryReader reader, Pointer offset) {
+        public static CollideMeshObject Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             CollideMeshObject m = new CollideMeshObject(offset);
             //l.print("Mesh obj: " + offset);

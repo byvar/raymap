@@ -15,7 +15,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimChannel() {}
 
-        public static AnimChannel Read(EndianBinaryReader reader) {
+        public static AnimChannel Read(Reader reader) {
             AnimChannel ch = new AnimChannel();
             ch.unk0 = reader.ReadUInt16();
             ch.id = reader.ReadInt16();

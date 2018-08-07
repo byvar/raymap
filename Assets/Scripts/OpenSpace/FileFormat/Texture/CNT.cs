@@ -51,7 +51,7 @@ namespace OpenSpace.FileFormat.Texture {
 
 
 
-        EndianBinaryReader[] readers = null;
+        Reader[] readers = null;
 
 
         bool isLittleEndian = true;
@@ -67,7 +67,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public CNT(string[] paths) {
             directoryList = new string[paths.Length][];
-            readers = new EndianBinaryReader[paths.Length];
+            readers = new Reader[paths.Length];
             for (int i = 0; i < paths.Length; i++) {
                 Init(i, File.OpenRead(paths[i]));
             }
@@ -75,13 +75,13 @@ namespace OpenSpace.FileFormat.Texture {
 
         public CNT(Stream stream) {
             directoryList = new string[1][];
-            readers = new EndianBinaryReader[1];
+            readers = new Reader[1];
             Init(0, stream);
         }
 
         void Init(int readerIndex, Stream stream) {
-            readers[readerIndex] = new EndianBinaryReader(stream, isLittleEndian);
-            EndianBinaryReader reader = readers[readerIndex];
+            readers[readerIndex] = new Reader(stream, isLittleEndian);
+            Reader reader = readers[readerIndex];
             int localDirCount = reader.ReadInt32();
             int localFileCount = reader.ReadInt32();
             directoryCount += localDirCount;

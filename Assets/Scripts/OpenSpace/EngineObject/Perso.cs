@@ -56,7 +56,7 @@ namespace OpenSpace.EngineObject {
             this.superObject = so;
         }
 
-        public static Perso Read(EndianBinaryReader reader, Pointer offset, SuperObject so) {
+        public static Perso Read(Reader reader, Pointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             //l.print("Offset: " + offset);
             Perso p = new Perso(offset, so);
@@ -205,7 +205,7 @@ namespace OpenSpace.EngineObject {
             return l.persos.FirstOrDefault(f => f.offset == offset);
         }
 
-        public static void Write(Perso perso, EndianBinaryWriter writer)
+        public static void Write(Perso perso, Writer writer)
         {
             PersoBehaviour persoBehaviour = perso.gao.GetComponent<PersoBehaviour>();
             if (perso.off_pointerToCurrentState!=null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {

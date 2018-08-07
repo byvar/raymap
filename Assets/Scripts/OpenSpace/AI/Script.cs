@@ -17,7 +17,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Script Read(EndianBinaryReader reader, Pointer offset, BehaviorOrMacro behaviorOrMacro) {
+        public static Script Read(Reader reader, Pointer offset, BehaviorOrMacro behaviorOrMacro) {
             MapLoader l = MapLoader.Loader;
             Script s = new Script(offset);
 

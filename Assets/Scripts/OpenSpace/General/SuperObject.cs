@@ -37,7 +37,7 @@ namespace OpenSpace {
             children = new List<SuperObject>();
         }
 
-        public static List<SuperObject> Read(EndianBinaryReader reader, Pointer off_so, bool parseSiblings = true, bool parseChildren = true, SuperObject parent = null) {
+        public static List<SuperObject> Read(Reader reader, Pointer off_so, bool parseSiblings = true, bool parseChildren = true, SuperObject parent = null) {
             MapLoader l = MapLoader.Loader;
             List<SuperObject> superObjects = new List<SuperObject>();
             if (IsParsed(off_so)) {

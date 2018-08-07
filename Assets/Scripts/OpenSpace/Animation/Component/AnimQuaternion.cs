@@ -10,7 +10,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimQuaternion() {}
 
-        public static AnimQuaternion Read(EndianBinaryReader reader) {
+        public static AnimQuaternion Read(Reader reader) {
             AnimQuaternion qua = new AnimQuaternion();
             float x = (float)reader.ReadInt16() / (float)Int16.MaxValue;
             float y = (float)reader.ReadInt16() / (float)Int16.MaxValue;

@@ -20,7 +20,7 @@ namespace OpenSpace.Input {
             this.offset = offset;
         }
 
-        public static EntryAction Read(EndianBinaryReader reader, Pointer offset) {
+        public static EntryAction Read(Reader reader, Pointer offset) {
             //MapLoader.Loader.print("Off: " + offset);
             EntryAction element = new EntryAction(offset);
 

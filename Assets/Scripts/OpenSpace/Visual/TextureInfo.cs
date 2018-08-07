@@ -133,7 +133,7 @@ namespace OpenSpace.Visual {
             get { return (name != null && name.Contains("grassfx")); }
         }
 
-        public static TextureInfo Read(EndianBinaryReader reader, Pointer offset) {
+        public static TextureInfo Read(Reader reader, Pointer offset) {
             TextureInfo tex = new TextureInfo(offset);
             //MapLoader.Loader.print("Tex off: " + offset);
             tex.field0 = reader.ReadUInt32(); // 888 or 8888

@@ -2,13 +2,13 @@
 using System.IO;
 
 namespace OpenSpace {
-    public class EndianBinaryReader : BinaryReader {
-        public delegate void ReadAction(EndianBinaryReader reader, Pointer offset);
+    public class Reader : BinaryReader {
+        public delegate void ReadAction(Reader reader, Pointer offset);
         bool isLittleEndian = true;
         bool masking = false; // for Rayman 2
         uint mask = 0;
-        public EndianBinaryReader(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
-        public EndianBinaryReader(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
+        public Reader(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
+        public Reader(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
 
         public override int ReadInt32() {
             var data = ReadBytes(4);

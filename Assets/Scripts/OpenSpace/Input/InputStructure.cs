@@ -14,7 +14,7 @@ namespace OpenSpace.Input {
             this.offset = offset;
         }
 
-        public static InputStructure Read(EndianBinaryReader reader, Pointer offset) {
+        public static InputStructure Read(Reader reader, Pointer offset) {
             InputStructure input = new InputStructure(offset);
             if (Settings.s.platform == Settings.Platform.GC) {
                 //reader.ReadBytes(0x1714);

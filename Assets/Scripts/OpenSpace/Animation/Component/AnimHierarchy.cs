@@ -11,7 +11,7 @@ namespace OpenSpace.Animation.Component {
 
         public AnimHierarchy() {}
 
-        public static AnimHierarchy Read(EndianBinaryReader reader) {
+        public static AnimHierarchy Read(Reader reader) {
             AnimHierarchy h = new AnimHierarchy();
             h.childChannelID = reader.ReadInt16();
             h.parentChannelID = reader.ReadInt16();

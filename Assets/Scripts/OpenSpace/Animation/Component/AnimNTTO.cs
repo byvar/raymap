@@ -16,7 +16,7 @@ namespace OpenSpace.Animation.Component {
         public static ushort flag_isBoneNTTO = 0x00FF;
         public static ushort flag_isInvisible = 0x2;
 
-        public static AnimNTTO Read(EndianBinaryReader reader) {
+        public static AnimNTTO Read(Reader reader) {
             AnimNTTO n = new AnimNTTO();
             n.flags = reader.ReadUInt16();
             n.object_index = reader.ReadUInt16();

@@ -276,7 +276,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public static MeshElement Read(EndianBinaryReader reader, Pointer offset, MeshObject m) {
+        public static MeshElement Read(Reader reader, Pointer offset, MeshObject m) {
             MapLoader l = MapLoader.Loader;
             MeshElement sm = new MeshElement(offset, m);
             sm.name = "Submesh @ pos " + offset;
