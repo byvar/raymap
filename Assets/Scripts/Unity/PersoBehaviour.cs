@@ -53,11 +53,11 @@ public class PersoBehaviour : MonoBehaviour {
                 if (currentPOList == -1) currentPOList = 0;
                 poListIndex = currentPOList;
             }
-            if (fam != null && fam.states != null && fam.states.Length > 0) {
+            if (fam != null && fam.states != null && fam.states.Count > 0) {
                 stateNames = fam.states.Select(s => (s == null ? "Null" : s.ToString())).ToArray();
                 hasStates = true;
                 state = perso.initialState;
-                for (int i = 0; i < fam.states.Length; i++) {
+                for (int i = 0; i < fam.states.Count; i++) {
                     if (state == fam.states[i]) {
                         currentState = i;
                         stateIndex = i;
@@ -65,7 +65,7 @@ public class PersoBehaviour : MonoBehaviour {
                         break;
                     }
                 }
-                if (state == null && fam.states.Length > 0) {
+                if (state == null && fam.states.Count > 0) {
                     currentState = 0;
                     stateIndex = 0;
                     SetState(0);
@@ -270,7 +270,7 @@ public class PersoBehaviour : MonoBehaviour {
     }
 
     public void SetState(int index) {
-        if (index < 0 || index >= perso.family.states.Length) return;
+        if (index < 0 || index >= perso.family.states.Count) return;
         stateIndex = index;
         currentState = index;
         state = perso.family.states[index];
@@ -573,7 +573,7 @@ public class PersoBehaviour : MonoBehaviour {
         if (state != null && state.off_state_auto != null) {
             State state_auto = State.FromOffset(perso.family, state.off_state_auto);
             if (state_auto != null) {
-                int indexOfStateAuto = Array.IndexOf(perso.family.states, state_auto);
+                int indexOfStateAuto = perso.family.states.IndexOf(state_auto);
                 if (indexOfStateAuto > -1) SetState(indexOfStateAuto);
             }
         }

@@ -28,14 +28,13 @@ namespace OpenSpace.Collide {
         public ICollideGeometricElement[] subblocks = null;
 
 
-        public CollideMeshObject(PhysicalObject po, Pointer offset) {
-            this.po = po;
+        public CollideMeshObject(Pointer offset) {
             this.offset = offset;
         }
 
-        public static CollideMeshObject Read(EndianBinaryReader reader, PhysicalObject po, Pointer offset) {
+        public static CollideMeshObject Read(EndianBinaryReader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
-            CollideMeshObject m = new CollideMeshObject(po, offset);
+            CollideMeshObject m = new CollideMeshObject(offset);
             //l.print("Mesh obj: " + offset);
             if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 m.num_vertices = reader.ReadUInt16();
@@ -101,13 +100,23 @@ namespace OpenSpace.Collide {
                 Pointer block_offset = Pointer.Read(reader);
                 Pointer.Goto(ref reader, block_offset);
                 switch (m.subblock_types[i]) {
+                    /*1 = indexedtriangles
+                    2 = facemap
+                    3 = sprite
+                    4 = TMesh
+                    5 = points
+                    6 = lines
+                    7 = spheres
+                    8 = alignedboxes
+                    9 = cones
+                    13 = deformationsetinfo*/
                     case 1: // Collide submesh
                         m.subblocks[i] = CollideMeshElement.Read(reader, block_offset, m);
                         //material_i++;
                         break;
                     default:
                         m.subblocks[i] = null;
-                        l.print("Unknown collide geometric element type " + m.subblock_types[i] + " at offset " + block_offset);
+                        l.print("(Object: " + offset + ") Unknown collide geometric element type " + m.subblock_types[i] + " at offset " + block_offset);
                         break;
                 }
             }

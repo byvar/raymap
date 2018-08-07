@@ -5,18 +5,14 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace {
-    public class Family {
+    public class Family : ILinkedListEntry {
         public Pointer offset;
         public Pointer off_family_next;
         public Pointer off_family_prev;
-        public Pointer off_family_unk; // at this offset, start and end pointers appear again
+        public Pointer off_family_hdr; // at this offset, start and end pointers appear again
         public uint family_index;
-        public Pointer off_states_first;
-        public Pointer off_states_last;
-        public uint num_states;
-        public Pointer off_preloadAnim_first = null; // (0x10 blocks: next, prev, list end, a3d pointer)
-        public Pointer off_preloadAnim_last = null;
-        public uint num_preloadAnim = 0;
+        public LinkedList<State> states;
+        public LinkedList<int> preloadAnim; // int is just a placeholder type, change to actual type when I finally read it
         public Pointer off_physical_list_default;
         public Pointer off_physical_list_first = null;
         public Pointer off_physical_list_last = null;
@@ -27,8 +23,7 @@ namespace OpenSpace {
         public uint num_vector4s;
         public byte animBank;
         public byte properties;
-
-        public State[] states = null;
+        
         public PhysicalObject[][] physical_objects = null;
 
         public string name;
@@ -40,6 +35,14 @@ namespace OpenSpace {
                 }
                 return gao;
             }
+        }
+
+        public Pointer NextEntry {
+            get { return off_family_next; }
+        }
+
+        public Pointer PreviousEntry {
+            get { return off_family_prev; }
         }
 
         public Family(Pointer offset) {
@@ -111,20 +114,20 @@ namespace OpenSpace {
             Family f = new Family(offset);
             f.off_family_next = Pointer.Read(reader);
             f.off_family_prev = Pointer.Read(reader);
-            f.off_family_unk = Pointer.Read(reader); // at this offset, start and end pointers appear again
+            f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
             f.family_index = reader.ReadUInt32();
             f.name = l.objectTypes[0][f.family_index].name;
-            f.off_states_first = Pointer.Read(reader);
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) f.off_states_last = Pointer.Read(reader);
-            f.num_states = reader.ReadUInt32();
+            f.states = LinkedList<State>.Read(reader, Pointer.Current(reader), (EndianBinaryReader r, Pointer o) => {
+                State s = State.Read(r, o, f);
+                return s;
+            });
             if (Settings.s.engineMode == Settings.EngineMode.R3) {
-                f.off_preloadAnim_first = Pointer.Read(reader); // (0x10 blocks: next, prev, list end, a3d pointer)
-                if (Settings.s.linkedListType == Settings.LinkedListType.Double) f.off_preloadAnim_last = Pointer.Read(reader);
-                f.num_preloadAnim = reader.ReadUInt32();
+                // (0x10 blocks: next, prev, list end, a3d pointer)
+                f.preloadAnim = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             }
             f.off_physical_list_default = Pointer.Read(reader); // Default objects table
             f.off_physical_list_first = Pointer.Read(reader);                       // first physical list
-            if (Settings.s.linkedListType == Settings.LinkedListType.Double) f.off_physical_list_last = Pointer.Read(reader); // last physical list
+            if (Settings.s.linkedListType == LinkedList.Type.Double) f.off_physical_list_last = Pointer.Read(reader); // last physical list
             f.num_physical_lists = reader.ReadUInt32();
             if (f.off_physical_list_first == f.off_physical_list_last && f.num_physical_lists > 1) f.num_physical_lists = 1; // Correction for Rayman 2
             f.off_bounding_volume = Pointer.Read(reader);
@@ -151,20 +154,7 @@ namespace OpenSpace {
                 f.properties = reader.ReadByte();
             }
             //l.print(f.name + " - Anim bank: " + f.animBank + " - id: " + l.objectTypes[0][f.family_index].id);
-
-            f.states = new State[f.num_states];
-            if (f.num_states > 0) {
-                Pointer off_states_current = f.off_states_first;
-                for (int i = 0; i < f.num_states; i++) {
-                    Pointer.Goto(ref reader, off_states_current);
-                    f.states[i] = State.Read(reader, off_states_current, f);
-                    if (l.mode == MapLoader.Mode.RaymanArenaGC) {
-                        off_states_current = f.states[i].offset + 0x28;
-                    } else {
-                        off_states_current = f.states[i].off_state_next;
-                    }
-                }
-            }
+            
             f.off_physical_lists = new Pointer[f.num_physical_lists]; // Offset for each list of POs
             f.physical_objects = new PhysicalObject[f.num_physical_lists][]; // Each list of POs. Each perso has zero/one of these lists and can switch between them.
             if (f.off_physical_list_first != null) {

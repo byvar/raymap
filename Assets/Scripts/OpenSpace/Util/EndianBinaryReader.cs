@@ -3,6 +3,7 @@ using System.IO;
 
 namespace OpenSpace {
     public class EndianBinaryReader : BinaryReader {
+        public delegate void ReadAction(EndianBinaryReader reader, Pointer offset);
         bool isLittleEndian = true;
         bool masking = false; // for Rayman 2
         uint mask = 0;

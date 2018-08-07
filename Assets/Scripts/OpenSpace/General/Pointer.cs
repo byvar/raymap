@@ -97,6 +97,16 @@ namespace OpenSpace {
             return new Pointer((uint)(curPos - curFile.baseOffset), curFile);
         }
 
+        public void DoAt(ref EndianBinaryReader reader, EndianBinaryReader.ReadAction action) {
+            Pointer off_current = Goto(ref reader, this);
+            action(reader, this);
+            Goto(ref reader, off_current);
+        }
+
+        public static void DoAt(ref EndianBinaryReader reader, Pointer newPos, EndianBinaryReader.ReadAction action) {
+            if (newPos != null) newPos.DoAt(ref reader, action);
+        }
+
         // For writers
         public Pointer Goto(ref EndianBinaryWriter writer) {
             Pointer oldPos = Current(writer);

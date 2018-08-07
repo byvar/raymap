@@ -1,18 +1,24 @@
 ﻿using OpenSpace.EngineObject;
+using System.Collections.Generic;
 
-namespace OpenSpace.Collide
-{
-    public class CollSet
-    {
+namespace OpenSpace.Collide {
+    public class CollSet {
         public Pointer offset;
         public Perso perso;
 
         // Struct
-
-        public Pointer off_zddList;
-        public Pointer off_zdeList;
-        public Pointer off_zdmList;
-        public Pointer off_zdrList;
+        public Pointer off_zdd;
+        public Pointer off_zde;
+        public Pointer off_zdm;
+        public Pointer off_zdr;
+        public Pointer off_activation_zdd;
+        public Pointer off_activation_zde;
+        public Pointer off_activation_zdm;
+        public Pointer off_activation_zdr;
+        public Pointer off_zones_zdd;
+        public Pointer off_zones_zde;
+        public Pointer off_zones_zdm;
+        public Pointer off_zones_zdr;
 
         public uint privilegedActivationZDD;
         public uint privilegedActivationZDE;
@@ -20,52 +26,86 @@ namespace OpenSpace.Collide
         public uint privilegedActivationZDR;
 
         // Generated
+        public LinkedList<CollideMeshObject> zdd;
+        public LinkedList<CollideMeshObject> zde;
+        public LinkedList<CollideMeshObject> zdm;
+        public LinkedList<CollideMeshObject> zdr;
 
-        public ZdxList zddList;
-        public ZdxList zdeList;
-        public ZdxList zdmList;
-        public ZdxList zdrList;
+        public ZdxList zddZones;
+        public ZdxList zdeZones;
+        public ZdxList zdmZones;
+        public ZdxList zdrZones;
 
-        public CollSet(Perso perso, Pointer offset)
-        {
+        public CollSet(Perso perso, Pointer offset) {
             this.perso = perso;
             this.offset = offset;
         }
 
-        public static CollSet Read(EndianBinaryReader reader, Perso perso, Pointer offset)
-        {
-            MapLoader loader = MapLoader.Loader;
-            CollSet collset = new CollSet(perso, offset);
+        private static LinkedList<CollideMeshObject> ParseZdxList(EndianBinaryReader reader, Pointer offset) {
+            MapLoader l = MapLoader.Loader;
+            LinkedList<CollideMeshObject> zdxList = null;
+            Pointer.DoAt(ref reader, offset, (EndianBinaryReader r1, Pointer o1) => {
+                l.print(o1);
+                //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
+                zdxList = LinkedList<CollideMeshObject>.Read(r1, o1,
+                    (EndianBinaryReader r, Pointer o) => {
+                        return CollideMeshObject.Read(r, o);
+                    }, LinkedList.Flags.ReadAtPointer
+                        | (l.mode == MapLoader.Mode.Rayman3GC ?
+                            LinkedList.Flags.HasHeaderPointers :
+                            LinkedList.Flags.NoPreviousPointersForDouble)
+                );
+            });
+            return zdxList;
+        }
 
-            reader.ReadBytes(32); // 32 byte gap
-            collset.off_zddList = Pointer.Read(reader);
-            collset.off_zdeList = Pointer.Read(reader);
-            collset.off_zdmList = Pointer.Read(reader);
-            collset.off_zdrList = Pointer.Read(reader);
+        public static CollSet Read(EndianBinaryReader reader, Perso perso, Pointer offset) {
+            MapLoader l = MapLoader.Loader;
+            CollSet c = new CollSet(perso, offset);
 
-            collset.privilegedActivationZDD = reader.ReadUInt32();
-            collset.privilegedActivationZDE = reader.ReadUInt32();
-            collset.privilegedActivationZDM = reader.ReadUInt32();
-            collset.privilegedActivationZDR = reader.ReadUInt32();
+            c.off_zdd = Pointer.Read(reader);
+            c.off_zde = Pointer.Read(reader);
+            c.off_zdm = Pointer.Read(reader);
+            c.off_zdr = Pointer.Read(reader);
 
-            if (collset.off_zddList != null) {
-                Pointer.Goto(ref reader, collset.off_zddList);
-                collset.zddList = ZdxList.Read(reader, collset, collset.off_zddList);
+            c.off_activation_zdd = Pointer.Read(reader);
+            c.off_activation_zde = Pointer.Read(reader);
+            c.off_activation_zdm = Pointer.Read(reader);
+            c.off_activation_zdr = Pointer.Read(reader);
+
+            c.off_zones_zdd = Pointer.Read(reader);
+            c.off_zones_zde = Pointer.Read(reader);
+            c.off_zones_zdr = Pointer.Read(reader);
+            c.off_zones_zdm = Pointer.Read(reader);
+
+            c.privilegedActivationZDD = reader.ReadUInt32();
+            c.privilegedActivationZDE = reader.ReadUInt32();
+            c.privilegedActivationZDM = reader.ReadUInt32();
+            c.privilegedActivationZDR = reader.ReadUInt32();
+
+            c.zdd = ParseZdxList(reader, c.off_zdd);
+            c.zde = ParseZdxList(reader, c.off_zde);
+            c.zdm = ParseZdxList(reader, c.off_zdm);
+            c.zdr = ParseZdxList(reader, c.off_zdr);
+
+            if (c.off_zones_zdd != null) {
+                Pointer.Goto(ref reader, c.off_zones_zdd);
+                c.zddZones = ZdxList.Read(reader, c, c.off_zones_zdd);
             }
-            if (collset.off_zdeList != null) {
-                Pointer.Goto(ref reader, collset.off_zdeList);
-                collset.zdeList = ZdxList.Read(reader, collset, collset.off_zdeList);
+            if (c.off_zones_zde != null) {
+                Pointer.Goto(ref reader, c.off_zones_zde);
+                c.zdeZones = ZdxList.Read(reader, c, c.off_zones_zde);
             }
-            if (collset.off_zdmList != null) {
-                Pointer.Goto(ref reader, collset.off_zdmList);
-                collset.zdmList = ZdxList.Read(reader, collset, collset.off_zdmList);
+            if (c.off_zones_zdm != null) {
+                Pointer.Goto(ref reader, c.off_zones_zdm);
+                c.zdmZones = ZdxList.Read(reader, c, c.off_zones_zdm);
             }
-            if (collset.off_zdrList != null) {
-                Pointer.Goto(ref reader, collset.off_zdrList);
-                collset.zdrList = ZdxList.Read(reader, collset, collset.off_zdrList);
+            if (c.off_zones_zdr != null) {
+                Pointer.Goto(ref reader, c.off_zones_zdr);
+                c.zdrZones = ZdxList.Read(reader, c, c.off_zones_zdr);
             }
 
-            return collset;
+            return c;
         }
     }
 }

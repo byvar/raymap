@@ -22,9 +22,5 @@ namespace OpenSpace {
         public Pointer off_always_reusableSO; // There are (num_always) empty SuperObjects starting with this one.
         public Pointer off_always_reusableUnknown1; // (num_always) * 0x2c blocks
         public Pointer off_always_reusableUnknown2; // (num_always) * 0x4 blocks
-
-        public Pointer off_familiesTable_first = null;
-        public Pointer off_familiesTable_last = null;
-        public uint num_familiesTable_entries;
     }
 }

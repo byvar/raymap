@@ -131,7 +131,7 @@ namespace OpenSpace {
                 if (off_zdr != null) {
                     //R3Loader.Loader.print("Collide mesh offset: " + off_mesh);
                     Pointer.Goto(ref reader, off_zdr);
-                    po.collideMesh = CollideMeshObject.Read(reader, po, off_zdr);
+                    po.collideMesh = CollideMeshObject.Read(reader, off_zdr);
                     po.collideMesh.gao.transform.parent = po.Gao.transform;
                 }
                 //R3Loader.Loader.print("Collide set: " + po.off_collideSet + " - vol: " + po.off_visualBoundingVolume);

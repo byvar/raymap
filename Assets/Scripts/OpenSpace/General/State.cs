@@ -6,16 +6,14 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace {
-    public class State {
+    public class State : ILinkedListEntry {
         public Pointer offset;
         public Family family;
         public string name = null;
         public Pointer off_state_next;
         public Pointer off_state_prev;
         public Pointer off_anim_ref;
-        public Pointer off_state_transitions_first;
-        public Pointer off_state_transitions_last;
-        public uint num_state_transitions;
+        public LinkedList<int> stateTransitions;
         public Pointer off_cine_mapname = null;
         public Pointer off_cine_name = null;
         public string cine_mapname = null;
@@ -23,6 +21,20 @@ namespace OpenSpace {
         public byte speed;
         public Pointer off_state_auto; // Go to this state after a while if nothing changes
         public AnimationReference anim_ref;
+
+        public Pointer NextEntry {
+            get {
+                if (MapLoader.Loader.mode == MapLoader.Mode.RaymanArenaGC) {
+                    return offset + 0x28;
+                } else {
+                    return off_state_next;
+                }
+            }
+        }
+
+        public Pointer PreviousEntry {
+            get { return off_state_prev; }
+        }
 
         public State(Pointer offset, Family family) {
             this.offset = offset;
@@ -44,12 +56,10 @@ namespace OpenSpace {
             if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_next = Pointer.Read(reader);
             if (l.mode == MapLoader.Mode.Rayman3GC) {
                 s.off_state_prev = Pointer.Read(reader);
-                Pointer.Read(reader); // unknown offset, end of state array?
+                Pointer.Read(reader); // another header at tail of state list
             }
             s.off_anim_ref = Pointer.Read(reader);
-            s.off_state_transitions_first = Pointer.Read(reader);
-            if (Settings.s.linkedListType == Settings.LinkedListType.Double) s.off_state_transitions_last = Pointer.Read(reader); // same?
-            s.num_state_transitions = reader.ReadUInt32();
+            s.stateTransitions = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // int is placeholder type
             reader.ReadUInt32();
             reader.ReadUInt32();
             if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();

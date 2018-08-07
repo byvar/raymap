@@ -39,7 +39,7 @@ namespace OpenSpace {
         public TextureInfo lightmapTexture;
         public Pointer[] persoInFix;
         public AnimationBank[] animationBanks;
-        public Family[] families;
+        public LinkedList<Family> families;
 
         public InputStructure inputStruct;
         public FontStructure fontStruct;
@@ -638,9 +638,7 @@ namespace OpenSpace {
             Pointer off_unknown_last = Pointer.Read(reader);
             uint num_unknown = reader.ReadUInt32();
 
-            globals.off_familiesTable_first = Pointer.Read(reader);
-            globals.off_familiesTable_last = Pointer.Read(reader);
-            globals.num_familiesTable_entries = reader.ReadUInt32();
+            families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
 
             Pointer off_alwaysActiveCharacters_first = Pointer.Read(reader);
             Pointer off_alwaysActiveCharacters_last = Pointer.Read(reader);
@@ -803,7 +801,7 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, off_current);
             }
             // Load additional animation banks
-            for (int i = 0; i < families.Length; i++) {
+            for (int i = 0; i < families.Count; i++) {
                 if (families[i].animBank > 4 && objectTypes[0][families[i].family_index].id != 0xFF) {
                     int animBank = families[i].animBank;
                     string animName = "Anim/ani" + objectTypes[0][families[i].family_index].id.ToString();
@@ -826,6 +824,9 @@ namespace OpenSpace {
                     }
                 }
             }
+
+
+            ReadCrossReferences(reader);
         }
         #endregion
 
@@ -1014,11 +1015,9 @@ namespace OpenSpace {
             Pointer off_unknown_first = Pointer.Read(reader);
             Pointer off_unknown_last = Pointer.Read(reader);
             uint num_unknown = reader.ReadUInt32();
-            
-            globals.off_familiesTable_first = Pointer.Read(reader);
-            globals.off_familiesTable_last = Pointer.Read(reader);
-            globals.num_familiesTable_entries = reader.ReadUInt32();
-            FillLinkedListPointers(reader, globals.off_familiesTable_last, globals.off_familiesTable_first);
+
+            families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+            families.FillPointers(reader, families.off_tail, families.off_head);
 
             Pointer off_alwaysActiveCharacters_first = Pointer.Read(reader);
             Pointer off_alwaysActiveCharacters_last = Pointer.Read(reader);
@@ -1152,6 +1151,7 @@ namespace OpenSpace {
             ReadFamilies(reader);
             ReadSuperObjects(reader);
             ReadAlways(reader);
+            ReadCrossReferences(reader);
         }
         #endregion
 
@@ -1193,10 +1193,8 @@ namespace OpenSpace {
             globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
             globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["families"], mem));
-            globals.off_familiesTable_first = Pointer.Read(reader);
-            globals.off_familiesTable_last = Pointer.Read(reader);
-            globals.num_familiesTable_entries = reader.ReadUInt32();
-            
+            families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+
             animationBanks = new AnimationBank[2];
 
             // Read animations
@@ -1237,6 +1235,7 @@ namespace OpenSpace {
             ReadFamilies(reader);
             ReadSuperObjects(reader);
             ReadAlways(reader);
+            ReadCrossReferences(reader);
         }
         #endregion
 
@@ -1403,19 +1402,20 @@ namespace OpenSpace {
         }
 
         public void ReadFamilies(EndianBinaryReader reader) {
-            if (globals.num_familiesTable_entries > 0) {
-                families = new Family[globals.num_familiesTable_entries];
+            if (families.Count > 0) {
                 GameObject familiesParent = new GameObject("Families");
                 familiesParent.SetActive(false); // Families do not need to be visible
-                Pointer off_current = Pointer.Goto(ref reader, globals.off_familiesTable_first);
-                Pointer off_familiesTable_current = globals.off_familiesTable_first;
-                for (uint i = 0; i < globals.num_familiesTable_entries; i++) {
-                    families[i] = Family.Read(reader, off_familiesTable_current);
-                    families[i].Gao.transform.SetParent(familiesParent.transform, false);
-                    off_familiesTable_current = families[i].off_family_next;
-                    if (off_familiesTable_current != null) Pointer.Goto(ref reader, off_familiesTable_current);
-                }
-                Pointer.Goto(ref reader, off_current);
+                families.ReadEntries(reader, (EndianBinaryReader r, Pointer o) => {
+                    Family f = Family.Read(r, o);
+                    f.Gao.transform.SetParent(familiesParent.transform, false);
+                    return f;
+                }, LinkedList.Flags.HasHeaderPointers);
+            }
+        }
+
+        public void ReadCrossReferences(EndianBinaryReader reader) {
+            for (int i = 0; i < sectors.Count; i++) {
+                sectors[i].ProcessPointers(reader);
             }
         }
 

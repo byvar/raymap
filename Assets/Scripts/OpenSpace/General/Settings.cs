@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LinkedListType = OpenSpace.LinkedList.Type;
 
 namespace OpenSpace {
     public class Settings {
         public enum EngineMode { R2, R3 };
         public enum Platform { PC, iOS, GC };
         public enum Endian { Little, Big };
-        public enum LinkedListType { Single, Double };
         
         public EngineMode engineMode;
         public Platform platform;

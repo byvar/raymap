@@ -34,7 +34,7 @@ public class SectorManager : MonoBehaviour {
             for (int i = 0; i < activeSectors.Count; i++) {
                 Sector s = activeSectors[i];
                 for (int j = 0; j < s.neighbors.Count; j++) {
-                    s.neighbors[j].Loaded = true;
+                    s.neighbors[j].sector.Loaded = true;
                 }
             }
             if (activeSectors.Count == 0) {
@@ -87,7 +87,6 @@ public class SectorManager : MonoBehaviour {
         sectors = MapLoader.Loader.sectors;
         for (int i = 0; i < sectors.Count; i++) {
             Sector s = sectors[i];
-            s.ProcessPointers();
             if (useMultiCameras) {
                 s.Gao.SetActive(false);
                 SectorCamera sc = Instantiate(sectorCameraPrefab, Vector3.zero, Quaternion.identity, mainCamera.transform);
