@@ -45,15 +45,18 @@ namespace OpenSpace.Collide {
             MapLoader l = MapLoader.Loader;
             LinkedList<CollideMeshObject> zdxList = null;
             Pointer.DoAt(ref reader, offset, (Reader r1, Pointer o1) => {
-                l.print(o1);
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
                 zdxList = LinkedList<CollideMeshObject>.Read(r1, o1,
                     (Reader r, Pointer o) => {
                         return CollideMeshObject.Read(r, o);
-                    }, LinkedList.Flags.ReadAtPointer
+                    },
+                    flags: LinkedList.Flags.ReadAtPointer
                         | (l.mode == MapLoader.Mode.Rayman3GC ?
                             LinkedList.Flags.HasHeaderPointers :
-                            LinkedList.Flags.NoPreviousPointersForDouble)
+                            LinkedList.Flags.NoPreviousPointersForDouble),
+                    type: l.mode == MapLoader.Mode.RaymanArenaGC ?
+                        LinkedList.Type.SingleNoElementPointers :
+                        LinkedList.Type.Default
                 );
             });
             return zdxList;
@@ -88,21 +91,23 @@ namespace OpenSpace.Collide {
             c.zdm = ParseZdxList(reader, c.off_zdm);
             c.zdr = ParseZdxList(reader, c.off_zdr);
 
-            if (c.off_zones_zdd != null) {
-                Pointer.Goto(ref reader, c.off_zones_zdd);
-                c.zddZones = ZdxList.Read(reader, c, c.off_zones_zdd);
-            }
-            if (c.off_zones_zde != null) {
-                Pointer.Goto(ref reader, c.off_zones_zde);
-                c.zdeZones = ZdxList.Read(reader, c, c.off_zones_zde);
-            }
-            if (c.off_zones_zdm != null) {
-                Pointer.Goto(ref reader, c.off_zones_zdm);
-                c.zdmZones = ZdxList.Read(reader, c, c.off_zones_zdm);
-            }
-            if (c.off_zones_zdr != null) {
-                Pointer.Goto(ref reader, c.off_zones_zdr);
-                c.zdrZones = ZdxList.Read(reader, c, c.off_zones_zdr);
+            if (l.mode != MapLoader.Mode.RaymanArenaGC) {
+                if (c.off_zones_zdd != null) {
+                    Pointer.Goto(ref reader, c.off_zones_zdd);
+                    c.zddZones = ZdxList.Read(reader, c, c.off_zones_zdd);
+                }
+                if (c.off_zones_zde != null) {
+                    Pointer.Goto(ref reader, c.off_zones_zde);
+                    c.zdeZones = ZdxList.Read(reader, c, c.off_zones_zde);
+                }
+                if (c.off_zones_zdm != null) {
+                    Pointer.Goto(ref reader, c.off_zones_zdm);
+                    c.zdmZones = ZdxList.Read(reader, c, c.off_zones_zdm);
+                }
+                if (c.off_zones_zdr != null) {
+                    Pointer.Goto(ref reader, c.off_zones_zdr);
+                    c.zdrZones = ZdxList.Read(reader, c, c.off_zones_zdr);
+                }
             }
 
             return c;
