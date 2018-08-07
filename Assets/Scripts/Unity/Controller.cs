@@ -129,9 +129,6 @@ public class Controller : MonoBehaviour {
                             Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
                             int iter = 0;
                             foreach (Behavior behavior in normalBehaviors) {
-                                if (behavior.scripts == null || behavior.scripts.Length == 0) {
-                                    continue;
-                                }
                                 GameObject behaviorGao = new GameObject(behavior.name);
                                 behaviorGao.transform.parent = intelParent.transform;
                                 if (behavior.scripts.Length > 1) {
@@ -145,6 +142,8 @@ public class Controller : MonoBehaviour {
                                     behaviorGao.name += " (Single-script)";
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.scripts[0], p);
+                                } else if (behavior.scripts.Length == 0) {
+                                    behaviorGao.name += " (Empty behaviour)";
                                 }
                                 if (iter++ == 0)
                                 {
@@ -158,9 +157,6 @@ public class Controller : MonoBehaviour {
                             Behavior[] reflexBehaviors = p.brain.mind.AI_model.behaviors_reflex;
                             int iter = 0;
                             foreach (Behavior behavior in reflexBehaviors) {
-                                if (behavior.scripts == null || behavior.scripts.Length == 0) {
-                                    continue;
-                                }
                                 GameObject behaviorGao = new GameObject(behavior.name);
                                 behaviorGao.transform.parent = reflexParent.transform;
                                 if (behavior.scripts.Length > 1) {
@@ -174,6 +170,8 @@ public class Controller : MonoBehaviour {
                                     behaviorGao.name += " (Single-script)";
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.scripts[0], p);
+                                } else if (behavior.scripts.Length == 0) {
+                                    behaviorGao.name += " (Empty behaviour)";
                                 }
                                 iter++;
                             }
@@ -192,6 +190,12 @@ public class Controller : MonoBehaviour {
                                 scriptComponent.SetScript(macro.script, p);
                                 iter++;
                             }
+                        }
+
+                        // DsgVars
+                        if (p.brain.mind.dsgMem != null) {
+                            DsgVarComponent dsgVarComponent = p.Gao.AddComponent<DsgVarComponent>();
+                            dsgVarComponent.SetPerso(p);
                         }
                     }
                 }

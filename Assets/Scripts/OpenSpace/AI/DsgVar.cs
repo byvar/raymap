@@ -124,6 +124,19 @@ namespace OpenSpace.AI {
                         }
 
                         break;
+                    case DsgVarInfoEntry.DsgVarType.Waypoint:
+                        Pointer off_waypoint = Pointer.Read(reader);
+                        if (off_waypoint != null) {
+                            Pointer originalBeforeWaypoint = Pointer.Goto(ref reader, off_waypoint);
+                            WayPoint wayPoint = WayPoint.Read(reader, off_waypoint);
+                            Pointer.Goto(ref reader, originalBeforeWaypoint);
+
+                            MapLoader.Loader.AddIsolateWaypoint(wayPoint);
+
+                            returnValue = "WayPoint " + off_waypoint;
+                        }
+
+                        break;
                     default:
                         returnValue = reader.ReadInt32(); break;
                 }
