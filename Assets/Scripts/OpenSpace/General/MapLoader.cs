@@ -61,11 +61,13 @@ namespace OpenSpace {
         public List<Perso> persos = new List<Perso>();
         public List<State> states = new List<State>();
         public List<Graph> graphs = new List<Graph>();
+        public List<WayPoint> isolateWaypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
         public GameObject graphRoot = null;
+        public GameObject isolateWaypointRoot = null;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
-        
+
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
         public FileWithPointers[] files_array = new FileWithPointers[7];
 
@@ -1417,6 +1419,29 @@ namespace OpenSpace {
             for (int i = 0; i < sectors.Count; i++) {
                 sectors[i].ProcessPointers(reader);
             }
+        }
+
+        public bool AddIsolateWaypoint(WayPoint wayPoint)
+        {
+            if (isolateWaypointRoot == null) {
+                isolateWaypointRoot = new GameObject("Isolate WayPoints");
+                isolateWaypointRoot.SetActive(false);
+            }
+
+            foreach (WayPoint existingWaypoint in isolateWaypoints) {
+                if (existingWaypoint.offset == wayPoint.offset) {
+                    return false;
+                }
+            }
+
+            isolateWaypoints.Add(wayPoint);
+            GameObject wayPointGao = new GameObject("Isolate WayPoint");
+            wayPointGao.transform.position = new Vector3(wayPoint.position.x, wayPoint.position.z, wayPoint.position.y);
+            WaypointSprite wpSprite = wayPointGao.AddComponent<WaypointSprite>();
+
+            wayPointGao.transform.SetParent(isolateWaypointRoot.transform);
+
+            return true;
         }
 
         public bool AddGraph(Graph graph) {
