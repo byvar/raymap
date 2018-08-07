@@ -73,6 +73,21 @@ namespace OpenSpace.Collide {
                 if (gameMaterial != null && gameMaterial.collideMaterial != null) {
                     gameMaterial.collideMaterial.SetMaterial(mr);
                 }
+                if (mesh.type != CollideMeshObject.Type.Default) {
+                    Color col = mr.material.color;
+                    mr.material = MapLoader.Loader.collideTransparentMaterial;
+                    mr.material.color = new Color(col.r, col.g, col.b, col.a * 0.7f);
+                    switch (mesh.type) {
+                        case CollideMeshObject.Type.ZDD:
+                            mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdd")); break;
+                        case CollideMeshObject.Type.ZDE:
+                            mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zde")); break;
+                        case CollideMeshObject.Type.ZDM:
+                            mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdm")); break;
+                        case CollideMeshObject.Type.ZDR:
+                            mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdr")); break;
+                    }
+                }
             }
         }
 

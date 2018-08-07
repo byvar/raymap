@@ -127,5 +127,18 @@ namespace OpenSpace {
             texture.Apply();
             return texture;
         }
+
+        public static Texture2D CreateDummyLineTexture() {
+            Texture2D texture = new Texture2D(2, 2);
+            Color col1 = Color.white;
+            Color col2 = new Color(0.9f, 0.9f, 0.9f, 1f); // very light grey
+            texture.SetPixel(0, 0, col1);
+            texture.SetPixel(1, 1, col2);
+            texture.SetPixel(0, 1, col1);
+            texture.SetPixel(1, 0, col2);
+            texture.filterMode = FilterMode.Point;
+            texture.Apply();
+            return texture;
+        }
     }
 }

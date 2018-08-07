@@ -9,8 +9,16 @@ namespace OpenSpace.Collide {
     /// Mesh data (both static and dynamic)
     /// </summary>
     public class CollideMeshObject {
+        public enum Type {
+            Default,
+            ZDD,
+            ZDE,
+            ZDR,
+            ZDM
+        }
         public PhysicalObject po;
         public Pointer offset;
+        public Type type;
 
         public GameObject gao = null;
 
@@ -28,13 +36,14 @@ namespace OpenSpace.Collide {
         public ICollideGeometricElement[] subblocks = null;
 
 
-        public CollideMeshObject(Pointer offset) {
+        public CollideMeshObject(Pointer offset, Type type = Type.Default) {
             this.offset = offset;
+            this.type = type;
         }
 
-        public static CollideMeshObject Read(Reader reader, Pointer offset) {
+        public static CollideMeshObject Read(Reader reader, Pointer offset, Type type = Type.Default) {
             MapLoader l = MapLoader.Loader;
-            CollideMeshObject m = new CollideMeshObject(offset);
+            CollideMeshObject m = new CollideMeshObject(offset, type);
             //l.print("Mesh obj: " + offset);
             if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 m.num_vertices = reader.ReadUInt16();
@@ -117,9 +126,12 @@ namespace OpenSpace.Collide {
                     case 7:
                         m.subblocks[i] = CollideSpheresElement.Read(reader, block_offset, m);
                         break;
+                    case 8:
+                        m.subblocks[i] = CollideAlignedBoxesElement.Read(reader, block_offset, m);
+                        break;
                     default:
                         m.subblocks[i] = null;
-                        l.print("(Object: " + offset + ") Unknown collide geometric element type " + m.subblock_types[i] + " at offset " + block_offset);
+                        l.print("Unknown collide geometric element type " + m.subblock_types[i] + " at offset " + block_offset + " (Object: " + offset + ")");
                         break;
                 }
             }
@@ -131,6 +143,10 @@ namespace OpenSpace.Collide {
                         child.transform.localPosition = Vector3.zero;
                     } else if (m.subblocks[i] is CollideSpheresElement) {
                         GameObject child = ((CollideSpheresElement)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (m.subblocks[i] is CollideAlignedBoxesElement) {
+                        GameObject child = ((CollideAlignedBoxesElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
                     }
@@ -158,6 +174,10 @@ namespace OpenSpace.Collide {
                         child.transform.localPosition = Vector3.zero;
                     } else if (m.subblocks[i] is CollideSpheresElement) {
                         GameObject child = ((CollideSpheresElement)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (m.subblocks[i] is CollideAlignedBoxesElement) {
+                        GameObject child = ((CollideAlignedBoxesElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
                     }

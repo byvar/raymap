@@ -5,11 +5,11 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Collide {
-    public class CollideSpheresElement : ICollideGeometricElement {
-        public class IndexedSphere {
-            public float radius;
+    public class CollideAlignedBoxesElement : ICollideGeometricElement {
+        public class IndexedAlignedBox {
+            public ushort minPoint;
+            public ushort maxPoint;
             public Pointer off_material;
-            public ushort centerPoint;
 
             public GameMaterial gameMaterial;
         }
@@ -18,40 +18,41 @@ namespace OpenSpace.Collide {
         public CollideMeshObject mesh;
         public Pointer offset;
 
-        public Pointer off_spheres; // called IndexedSprites in the game code
-        public ushort num_spheres;
-        public IndexedSphere[] spheres;
+        public Pointer off_boxes; // called IndexedSprites in the game code
+        public ushort num_boxes;
+        public IndexedAlignedBox[] boxes;
 
         private GameObject gao = null;
         public GameObject Gao {
             get {
                 if (gao == null) {
-                    gao = new GameObject("Collide Spheres @ " + offset);// Create object and read triangle data
+                    gao = new GameObject("Collide Aligned Boxes @ " + offset);// Create object and read triangle data
                     CreateUnityMesh();
                 }
                 return gao;
             }
         }
 
-        public CollideSpheresElement(Pointer offset, CollideMeshObject mesh) {
+        public CollideAlignedBoxesElement(Pointer offset, CollideMeshObject mesh) {
             this.mesh = mesh;
             this.offset = offset;
         }
 
         private void CreateUnityMesh() {
-            for (uint i = 0; i < num_spheres; i++) {
-                GameObject sphere_gao = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere_gao.name = "Collide Spheres @ " + offset + " - " + i;
+            for (uint i = 0; i < num_boxes; i++) {
+                GameObject sphere_gao = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                sphere_gao.name = "Collide Aligned Boxes @ " + offset + " - " + i;
                 sphere_gao.transform.SetParent(gao.transform);
                 MeshFilter mf = sphere_gao.GetComponent<MeshFilter>();
                 MeshRenderer mr = sphere_gao.GetComponent<MeshRenderer>();
                 MonoBehaviour.Destroy(sphere_gao.GetComponent<SphereCollider>());
-                sphere_gao.transform.localPosition = mesh.vertices[spheres[i].centerPoint];
-                sphere_gao.transform.localScale = Vector3.one * spheres[i].radius * 2; // default Unity sphere radius is 0.5
+                Vector3 center = Vector3.Lerp(mesh.vertices[boxes[i].minPoint], mesh.vertices[boxes[i].maxPoint], 0.5f);
+                sphere_gao.transform.localPosition = center;
+                sphere_gao.transform.localScale = mesh.vertices[boxes[i].maxPoint] - mesh.vertices[boxes[i].minPoint];
 
                 mr.material = MapLoader.Loader.collideMaterial;
-                if (spheres[i].gameMaterial != null && spheres[i].gameMaterial.collideMaterial != null) {
-                    spheres[i].gameMaterial.collideMaterial.SetMaterial(mr);
+                if (boxes[i].gameMaterial != null && boxes[i].gameMaterial.collideMaterial != null) {
+                    boxes[i].gameMaterial.collideMaterial.SetMaterial(mr);
                 }
                 if (mesh.type != CollideMeshObject.Type.Default) {
                     Color col = mr.material.color;
@@ -71,23 +72,22 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public static CollideSpheresElement Read(Reader reader, Pointer offset, CollideMeshObject m) {
+        public static CollideAlignedBoxesElement Read(Reader reader, Pointer offset, CollideMeshObject m) {
             MapLoader l = MapLoader.Loader;
-            CollideSpheresElement s = new CollideSpheresElement(offset, m);
-            s.off_spheres = Pointer.Read(reader);
-            s.num_spheres = reader.ReadUInt16();
+            CollideAlignedBoxesElement s = new CollideAlignedBoxesElement(offset, m);
+            s.off_boxes = Pointer.Read(reader);
+            s.num_boxes = reader.ReadUInt16();
             reader.ReadInt16(); // -1
 
-            if (s.off_spheres != null) {
-                Pointer off_current = Pointer.Goto(ref reader, s.off_spheres);
-                s.spheres = new IndexedSphere[s.num_spheres];
-                for (uint i = 0; i < s.num_spheres; i++) {
-                    s.spheres[i] = new IndexedSphere();
-                    s.spheres[i].radius = reader.ReadSingle();
-                    s.spheres[i].off_material = Pointer.Read(reader);
-                    s.spheres[i].centerPoint = reader.ReadUInt16();
-                    reader.ReadUInt16();
-                    s.spheres[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.spheres[i].off_material, reader);
+            if (s.off_boxes != null) {
+                Pointer off_current = Pointer.Goto(ref reader, s.off_boxes);
+                s.boxes = new IndexedAlignedBox[s.num_boxes];
+                for (uint i = 0; i < s.num_boxes; i++) {
+                    s.boxes[i] = new IndexedAlignedBox();
+                    s.boxes[i].minPoint = reader.ReadUInt16();
+                    s.boxes[i].maxPoint = reader.ReadUInt16();
+                    s.boxes[i].off_material = Pointer.Read(reader);
+                    s.boxes[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.boxes[i].off_material, reader);
                 }
                 Pointer.Goto(ref reader, off_current);
             }
@@ -100,7 +100,7 @@ namespace OpenSpace.Collide {
         }
 
         public ICollideGeometricElement Clone(CollideMeshObject mesh) {
-            CollideSpheresElement sm = (CollideSpheresElement)MemberwiseClone();
+            CollideAlignedBoxesElement sm = (CollideAlignedBoxesElement)MemberwiseClone();
             sm.mesh = mesh;
             sm.Reset();
             return sm;

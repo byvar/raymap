@@ -41,14 +41,14 @@ namespace OpenSpace.Collide {
             this.offset = offset;
         }
 
-        private static LinkedList<CollideMeshObject> ParseZdxList(Reader reader, Pointer offset) {
+        private static LinkedList<CollideMeshObject> ParseZdxList(Reader reader, Pointer offset, CollideMeshObject.Type type) {
             MapLoader l = MapLoader.Loader;
             LinkedList<CollideMeshObject> zdxList = null;
             Pointer.DoAt(ref reader, offset, (Reader r1, Pointer o1) => {
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
                 zdxList = LinkedList<CollideMeshObject>.Read(r1, o1,
                     (Reader r, Pointer o) => {
-                        return CollideMeshObject.Read(r, o);
+                        return CollideMeshObject.Read(r, o, type: type);
                     },
                     flags: LinkedList.Flags.ReadAtPointer
                         | (l.mode == MapLoader.Mode.Rayman3GC ?
@@ -86,10 +86,10 @@ namespace OpenSpace.Collide {
             c.privilegedActivationZDM = reader.ReadUInt32();
             c.privilegedActivationZDR = reader.ReadUInt32();
 
-            c.zdd = ParseZdxList(reader, c.off_zdd);
-            c.zde = ParseZdxList(reader, c.off_zde);
-            c.zdm = ParseZdxList(reader, c.off_zdm);
-            c.zdr = ParseZdxList(reader, c.off_zdr);
+            c.zdd = ParseZdxList(reader, c.off_zdd, CollideMeshObject.Type.ZDD);
+            c.zde = ParseZdxList(reader, c.off_zde, CollideMeshObject.Type.ZDE);
+            c.zdm = ParseZdxList(reader, c.off_zdm, CollideMeshObject.Type.ZDM);
+            c.zdr = ParseZdxList(reader, c.off_zdr, CollideMeshObject.Type.ZDR);
             if (c.zdd != null) foreach (CollideMeshObject col in c.zdd) {
                     if (col == null) continue;
                     col.gao.transform.SetParent(perso.Gao.transform);
