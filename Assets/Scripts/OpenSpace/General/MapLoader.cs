@@ -24,7 +24,8 @@ namespace OpenSpace {
         public Material baseTransparentMaterial;
         public Material baseBlendMaterial;
         public Material baseBlendTransparentMaterial;
-        public Material negativeLightProjectorMaterial;
+        public Material collideMaterial;
+        public Material collideTransparentMaterial;
         public Material billboardMaterial;
         public Material billboardAdditiveMaterial;
 

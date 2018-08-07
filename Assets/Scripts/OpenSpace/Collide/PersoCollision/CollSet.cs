@@ -90,6 +90,22 @@ namespace OpenSpace.Collide {
             c.zde = ParseZdxList(reader, c.off_zde);
             c.zdm = ParseZdxList(reader, c.off_zdm);
             c.zdr = ParseZdxList(reader, c.off_zdr);
+            if (c.zdd != null) foreach (CollideMeshObject col in c.zdd) {
+                    if (col == null) continue;
+                    col.gao.transform.SetParent(perso.Gao.transform);
+                }
+            if (c.zde != null) foreach (CollideMeshObject col in c.zde) {
+                    if (col == null) continue;
+                    col.gao.transform.SetParent(perso.Gao.transform);
+                }
+            if (c.zdm != null) foreach (CollideMeshObject col in c.zdm) {
+                    if (col == null) continue;
+                    col.gao.transform.SetParent(perso.Gao.transform);
+                }
+            if (c.zdr != null) foreach (CollideMeshObject col in c.zdr) {
+                    if (col == null) continue;
+                    col.gao.transform.SetParent(perso.Gao.transform);
+                }
 
             if (l.mode != MapLoader.Mode.RaymanArenaGC) {
                 if (c.off_zones_zdd != null) {

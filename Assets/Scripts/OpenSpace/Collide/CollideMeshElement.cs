@@ -68,34 +68,10 @@ namespace OpenSpace.Collide {
                 MeshFilter mf = gao.AddComponent<MeshFilter>();
                 mf.mesh = meshUnity;
                 MeshRenderer mr = gao.AddComponent<MeshRenderer>();
-                mr.material = MapLoader.Loader.baseMaterial;
-                //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
+
+                mr.material = MapLoader.Loader.collideMaterial;
                 if (gameMaterial != null && gameMaterial.collideMaterial != null) {
-                    CollideMaterial cm = gameMaterial.collideMaterial;
-                    if (cm.NoCollision) {
-                        mr.material = MapLoader.Loader.baseTransparentMaterial;
-                        //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
-                        mr.material.color = new Color(1, 1, 1, 0.3f); // transparent cyan
-                    }
-                    if (cm.Slide) mr.material.color = Color.blue;
-                    if (cm.Water) {
-                        mr.material = MapLoader.Loader.baseTransparentMaterial;
-                        //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
-                        mr.material.color = new Color(0, 1, 1, 0.5f); // transparent cyan
-                    }
-                    if (cm.ClimbableWall || cm.HangableCeiling) {
-                        mr.material.color = new Color(244f / 255f, 131f / 255f, 66f / 255f); // ORANGE
-                    }
-                    if (cm.LavaDeathWarp || cm.DeathWarp) {
-                        mr.material.color = Color.red;
-                    }
-                    if (cm.HurtTrigger) mr.material.color = new Color(126 / 255f, 2 / 255f, 204 / 255f); // purple
-                    if (cm.FallTrigger) mr.material.color = Color.black;
-                    if (cm.Trampoline) mr.material.color = Color.yellow;
-                    if (cm.Electric) mr.material.color = new Color(219f / 255f, 140 / 255f, 212 / 255f); // pink
-                    if (cm.Wall) mr.material.color = Color.grey;
-                    if (cm.GrabbableLedge) mr.material.color = Color.green;
-                    if (cm.FlagUnknown || cm.FlagUnk2 || cm.FlagUnk3) mr.material.color = new Color(124 / 255f, 68 / 255f, 33 / 255f); // brown
+                    gameMaterial.collideMaterial.SetMaterial(mr);
                 }
             }
         }

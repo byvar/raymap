@@ -7,6 +7,7 @@ using OpenSpace;
 using OpenSpace.Visual;
 using OpenSpace.EngineObject;
 using OpenSpace.AI;
+using OpenSpace.Collide;
 
 public class Controller : MonoBehaviour {
     public MapLoader.Mode mode = MapLoader.Mode.Rayman3PC;
@@ -18,7 +19,8 @@ public class Controller : MonoBehaviour {
     public Material baseTransparentMaterial;
     public Material baseBlendMaterial;
     public Material baseBlendTransparentMaterial;
-    public Material negativeLightProjectorMaterial;
+    public Material collideMaterial;
+    public Material collideTransparentMaterial;
     public Material billboardMaterial;
     public Material billboardAdditiveMaterial;
     public SectorManager sectorManager;
@@ -83,7 +85,8 @@ public class Controller : MonoBehaviour {
         loader.baseTransparentMaterial = baseTransparentMaterial;
         loader.baseBlendMaterial = baseBlendMaterial;
         loader.baseBlendTransparentMaterial = baseBlendTransparentMaterial;
-        loader.negativeLightProjectorMaterial = negativeLightProjectorMaterial;
+        loader.collideMaterial = collideMaterial;
+        loader.collideTransparentMaterial = collideTransparentMaterial;
         loader.baseLightMaterial = baseLightMaterial;
         loader.billboardMaterial = billboardMaterial;
         loader.billboardAdditiveMaterial = billboardAdditiveMaterial;
@@ -224,6 +227,27 @@ public class Controller : MonoBehaviour {
                     }
                 }
                 if (po.collideMesh != null) po.collideMesh.gao.SetActive(viewCollision);
+            }
+            foreach (Perso perso in loader.persos) {
+                if (perso.collset != null) {
+                    CollSet c = perso.collset;
+                    if (c.zdd != null) foreach (CollideMeshObject col in c.zdd) {
+                            if (col == null) continue;
+                            col.gao.SetActive(viewCollision);
+                        }
+                    if (c.zde != null) foreach (CollideMeshObject col in c.zde) {
+                            if (col == null) continue;
+                            col.gao.SetActive(viewCollision);
+                        }
+                    if (c.zdm != null) foreach (CollideMeshObject col in c.zdm) {
+                            if (col == null) continue;
+                            col.gao.SetActive(viewCollision);
+                        }
+                    if (c.zdr != null) foreach (CollideMeshObject col in c.zdr) {
+                            if (col == null) continue;
+                            col.gao.SetActive(viewCollision);
+                        }
+                }
             }
         }
     }

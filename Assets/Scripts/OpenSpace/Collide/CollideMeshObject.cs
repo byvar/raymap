@@ -114,6 +114,9 @@ namespace OpenSpace.Collide {
                         m.subblocks[i] = CollideMeshElement.Read(reader, block_offset, m);
                         //material_i++;
                         break;
+                    case 7:
+                        m.subblocks[i] = CollideSpheresElement.Read(reader, block_offset, m);
+                        break;
                     default:
                         m.subblocks[i] = null;
                         l.print("(Object: " + offset + ") Unknown collide geometric element type " + m.subblock_types[i] + " at offset " + block_offset);
@@ -124,6 +127,10 @@ namespace OpenSpace.Collide {
                 if (m.subblocks[i] != null) {
                     if (m.subblocks[i] is CollideMeshElement) {
                         GameObject child = ((CollideMeshElement)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (m.subblocks[i] is CollideSpheresElement) {
+                        GameObject child = ((CollideSpheresElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
                     }
@@ -147,6 +154,10 @@ namespace OpenSpace.Collide {
                 if (m.subblocks[i] != null) {
                     if (m.subblocks[i] is CollideMeshElement) {
                         GameObject child = ((CollideMeshElement)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (m.subblocks[i] is CollideSpheresElement) {
+                        GameObject child = ((CollideSpheresElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
                     }

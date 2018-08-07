@@ -84,5 +84,33 @@ namespace OpenSpace.Collide {
             }
             return null;
         }
+
+        public void SetMaterial(MeshRenderer mr) {
+            mr.material = MapLoader.Loader.collideMaterial;
+            if (NoCollision) {
+                mr.material = MapLoader.Loader.collideTransparentMaterial;
+                //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
+                mr.material.color = new Color(1, 1, 1, 0.3f); // transparent cyan
+            }
+            if (Slide) mr.material.color = Color.blue;
+            if (Water) {
+                mr.material = MapLoader.Loader.collideTransparentMaterial;
+                //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
+                mr.material.color = new Color(0, 1, 1, 0.5f); // transparent cyan
+            }
+            if (ClimbableWall || HangableCeiling) {
+                mr.material.color = new Color(244f / 255f, 131f / 255f, 66f / 255f); // ORANGE
+            }
+            if (LavaDeathWarp || DeathWarp) {
+                mr.material.color = Color.red;
+            }
+            if (HurtTrigger) mr.material.color = new Color(126 / 255f, 2 / 255f, 204 / 255f); // purple
+            if (FallTrigger) mr.material.color = Color.black;
+            if (Trampoline) mr.material.color = Color.yellow;
+            if (Electric) mr.material.color = new Color(219f / 255f, 140 / 255f, 212 / 255f); // pink
+            if (Wall) mr.material.color = Color.grey;
+            if (GrabbableLedge) mr.material.color = Color.green;
+            if (FlagUnknown || FlagUnk2 || FlagUnk3) mr.material.color = new Color(124 / 255f, 68 / 255f, 33 / 255f); // brown
+        }
     }
 }
