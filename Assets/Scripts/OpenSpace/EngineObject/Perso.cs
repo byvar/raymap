@@ -41,19 +41,10 @@ namespace OpenSpace.EngineObject {
                     gao = new GameObject(fullName);
 
                     // Custom Bits
-                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                        CustomBitsComponent customBitsComponent = gao.AddComponent<CustomBitsComponent>();
-                        customBitsComponent.SetRawFlags(stdGame.customBits);
-                        customBitsComponent.offset = stdGame.offset + 0x24;
-                    } else {
-                        CustomBitsComponent customBitsComponent = gao.AddComponent<CustomBitsComponent>();
-                        customBitsComponent.SetRawFlags(stdGame.customBits);
-                        customBitsComponent.offset = stdGame.offset + 0x20;
-
-                        CustomBitsComponent aiCustomBitsComponent = gao.AddComponent<CustomBitsComponent>();
-                        aiCustomBitsComponent.SetRawFlags(stdGame.aiCustomBits);
-                        aiCustomBitsComponent.title = "AI Custom Bits";
-                        aiCustomBitsComponent.offset = stdGame.offset + 0x24;
+                    if (stdGame != null) {
+                        CustomBitsComponent c = gao.AddComponent<CustomBitsComponent>();
+                        c.stdGame = stdGame;
+                        if (Settings.s.engineMode == Settings.EngineMode.R3) c.hasAiCustomBits = true;
                     }
                     
                 }
@@ -111,9 +102,9 @@ namespace OpenSpace.EngineObject {
             if (off_stdGame != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_stdGame);
                 p.stdGame = StandardGame.Read(reader, off_stdGame);
-                p.nameFamily = p.stdGame.GetFamilyName();
-                p.nameModel = p.stdGame.GetModelName();
-                p.namePerso = p.stdGame.GetPersoName();
+                p.nameFamily = p.stdGame.GetName(0);
+                p.nameModel = p.stdGame.GetName(1);
+                p.namePerso = p.stdGame.GetName(2);
 
                 Pointer.Goto(ref reader, off_current);
             }
@@ -222,19 +213,23 @@ namespace OpenSpace.EngineObject {
             return l.persos.FirstOrDefault(f => f.offset == offset);
         }
 
-        public static void Write(Perso perso, Writer writer)
-        {
-            PersoBehaviour persoBehaviour = perso.gao.GetComponent<PersoBehaviour>();
-            if (perso.off_pointerToCurrentState!=null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {
-                if (persoBehaviour.state.offset != perso.off_currentState)
+        public void Write(Writer writer) {
+            PersoBehaviour persoBehaviour = gao.GetComponent<PersoBehaviour>();
+            if (off_pointerToCurrentState!=null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {
+                if (persoBehaviour.state.offset != off_currentState)
                 {
-                    MapLoader.Loader.print("write state perso " + perso.fullName + ".off_pointerToCurrentState = " + perso.off_pointerToCurrentState);
-                    Pointer.Goto(ref writer, perso.off_pointerToCurrentState);
+                    MapLoader.Loader.print("write state perso " + fullName + ".off_pointerToCurrentState = " + off_pointerToCurrentState);
+                    Pointer.Goto(ref writer, off_pointerToCurrentState);
                     writer.Write(persoBehaviour.state.offset.offset);
                 } else
                 {
-                    MapLoader.Loader.print("do not write state for perso " + perso.fullName);
+                    MapLoader.Loader.print("do not write state for perso " + fullName);
                 }
+            }
+            CustomBitsComponent customBits = gao.GetComponent<CustomBitsComponent>();
+            if (customBits != null && customBits.modified && stdGame != null) {
+                Pointer.Goto(ref writer, stdGame.offset);
+                stdGame.Write(writer);
             }
         }
     }

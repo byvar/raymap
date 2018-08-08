@@ -32,13 +32,8 @@ public class Moddable : MonoBehaviour {
             mat.Write(writer);
         }
 
-        if (persoBehaviour!=null && persoBehaviour.perso!=null)
-        {
-            Perso.Write(persoBehaviour.perso, writer);
-
-            if (stdGame != null) {
-                stdGame.Write(writer, persoBehaviour.perso.Gao.GetComponents<CustomBitsComponent>());
-            }
+        if (persoBehaviour!=null && persoBehaviour.perso!=null) {
+            persoBehaviour.perso.Write(writer);
         }
 
         if (dsgVarComponent!=null) {

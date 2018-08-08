@@ -11,21 +11,24 @@ public class CustomBitsEditor : Editor {
     
 
     public override void OnInspectorGUI() {
-        DrawDefaultInspector();
+        //DrawDefaultInspector();
 
         CustomBitsComponent c = (CustomBitsComponent)target;
-
-        GUILayout.Label(c.title);
-
-        GUILayout.BeginVertical();
-        for (int j = 0; j < 4; j++) {
-            GUILayout.BeginHorizontal();
-            for (int i = 0; i < 8; i++) {
-                int flagNum = ((j * 8) + i);
-                GUILayout.Label(flagNum.ToString("D2"));
-                c.SetFlag(flagNum, EditorGUILayout.Toggle(c.GetFlag(flagNum)));
+        int len = c.hasAiCustomBits ? 4 : 2;
+        for (int k = 0; k < len; k++) {
+            CustomBitsComponent.CustomBitsType type = (CustomBitsComponent.CustomBitsType)k;
+            GUILayout.Label(type.ToString());
+            GUILayout.BeginVertical();
+            for (int j = 0; j < 4; j++) {
+                GUILayout.BeginHorizontal();
+                for (int i = 0; i < 8; i++) {
+                    int flagNum = ((j * 8) + i);
+                    GUILayout.Label(flagNum.ToString("D2"));
+                    c.SetFlag(type, flagNum, EditorGUILayout.Toggle(c.GetFlag(type, flagNum)));
+                }
+                GUILayout.EndHorizontal();
             }
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
     }
 }
