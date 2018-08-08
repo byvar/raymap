@@ -31,6 +31,7 @@ namespace OpenSpace
             public ushort valueAsUShort;
             public float valueAsFloat;
             public Vector3 valueAsVector;
+            public GameObject valueAsPersoGao;
 
             public bool valueAsBool_initial;
             public uint valueAsUInt_initial;
@@ -41,6 +42,7 @@ namespace OpenSpace
             public ushort valueAsUShort_initial;
             public float valueAsFloat_initial;
             public Vector3 valueAsVector_initial;
+            public GameObject valueAsPersoGao_initial;
 
             public DsgVarEditableEntry(int number, DsgVarInfoEntry entry)
             {
@@ -57,6 +59,7 @@ namespace OpenSpace
                     case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte   = (byte)    entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat  = (float)   entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector = (Vector3) entry.value;  break;
+                    case DsgVarInfoEntry.DsgVarType.Perso:   this.valueAsPersoGao  = (GameObject)entry.value; break;
                 }
 
                 if (entry.initialValue!=null) {
@@ -69,7 +72,8 @@ namespace OpenSpace
                         case DsgVarInfoEntry.DsgVarType.Byte:    this.valueAsSByte_initial = (sbyte)entry.initialValue;    break;
                         case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte_initial = (byte)entry.initialValue;      break;
                         case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat_initial = (float)entry.initialValue;    break;
-                        case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector_initial = (Vector3)entry.initialValue; break;    
+                        case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector_initial = (Vector3)entry.initialValue; break;
+                        case DsgVarInfoEntry.DsgVarType.Perso:   this.valueAsPersoGao_initial = (GameObject)entry.value; break;
                     }
                 }
             }
