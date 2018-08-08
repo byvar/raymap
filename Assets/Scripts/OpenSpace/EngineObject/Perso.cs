@@ -20,6 +20,7 @@ namespace OpenSpace.EngineObject {
         public Family family = null;
         public Pointer off_physicalObjects = null;
         public PhysicalObject[] physical_objects = null;
+        public StandardGame stdGame;
         public Brain brain = null;
         public State initialState = null;
         public Pointer off_currentState;
@@ -38,6 +39,23 @@ namespace OpenSpace.EngineObject {
                         }*/
                     }
                     gao = new GameObject(fullName);
+
+                    // Custom Bits
+                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                        CustomBitsComponent customBitsComponent = gao.AddComponent<CustomBitsComponent>();
+                        customBitsComponent.SetRawFlags(stdGame.customBits);
+                        customBitsComponent.offset = stdGame.offset + 0x24;
+                    } else {
+                        CustomBitsComponent customBitsComponent = gao.AddComponent<CustomBitsComponent>();
+                        customBitsComponent.SetRawFlags(stdGame.customBits);
+                        customBitsComponent.offset = stdGame.offset + 0x20;
+
+                        CustomBitsComponent aiCustomBitsComponent = gao.AddComponent<CustomBitsComponent>();
+                        aiCustomBitsComponent.SetRawFlags(stdGame.aiCustomBits);
+                        aiCustomBitsComponent.title = "AI Custom Bits";
+                        aiCustomBitsComponent.offset = stdGame.offset + 0x24;
+                    }
+                    
                 }
                 return gao;
             }
@@ -92,12 +110,11 @@ namespace OpenSpace.EngineObject {
 
             if (off_stdGame != null) {
                 Pointer off_current = Pointer.Goto(ref reader, off_stdGame);
-                uint index0 = reader.ReadUInt32();
-                uint index1 = reader.ReadUInt32();
-                uint index2 = reader.ReadUInt32();
-                if (index0 >= 0 && index0 < l.objectTypes[0].Length) p.nameFamily = l.objectTypes[0][index0].name;
-                if (index1 >= 0 && index1 < l.objectTypes[1].Length) p.nameModel = l.objectTypes[1][index1].name;
-                if (index2 >= 0 && index2 < l.objectTypes[2].Length) p.namePerso = l.objectTypes[2][index2].name;
+                p.stdGame = StandardGame.Read(reader, off_stdGame);
+                p.nameFamily = p.stdGame.GetFamilyName();
+                p.nameModel = p.stdGame.GetModelName();
+                p.namePerso = p.stdGame.GetPersoName();
+
                 Pointer.Goto(ref reader, off_current);
             }
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset + " - POs: " + p.off_physicalObjects);

@@ -12,6 +12,8 @@ public class Moddable : MonoBehaviour {
     Vector3 startScale;
     public Matrix mat;
     public PersoBehaviour persoBehaviour;
+    public DsgVarComponent dsgVarComponent;
+    public StandardGame stdGame;
 
     public void Start() {
         startPos = transform.localPosition;
@@ -33,6 +35,14 @@ public class Moddable : MonoBehaviour {
         if (persoBehaviour!=null && persoBehaviour.perso!=null)
         {
             Perso.Write(persoBehaviour.perso, writer);
+
+            if (stdGame != null) {
+                stdGame.Write(writer, persoBehaviour.perso.Gao.GetComponents<CustomBitsComponent>());
+            }
+        }
+
+        if (dsgVarComponent!=null) {
+            dsgVarComponent.Write(writer);
         }
     }
 }

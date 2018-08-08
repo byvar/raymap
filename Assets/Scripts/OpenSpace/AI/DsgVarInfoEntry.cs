@@ -16,6 +16,7 @@ namespace OpenSpace.AI {
         // Derived values
         public DsgVarType type;
         public object value;
+        public object initialValue;
 
         public DsgVarInfoEntry(Pointer offset) {
             this.offset = offset;

@@ -55,6 +55,9 @@ namespace OpenSpace.AI {
 
                     if (dsgMem != null) {
                         infoEntry.value = dsgVar.ReadValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                        if (dsgMem.memBufferInitial != null) {
+                            infoEntry.initialValue = dsgVar.ReadInitialValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                        }
                     } else {
                         infoEntry.value = dsgVar.ReadValueFromDsgVarBuffer(reader, infoEntry, dsgVar);
                     }
@@ -153,6 +156,11 @@ namespace OpenSpace.AI {
         public object ReadValueFromDsgMemBuffer(Reader reader, DsgVarInfoEntry infoEntry, DsgMem dsgMem)
         {
             return ReadValueFromBuffer(reader, infoEntry, dsgMem.memBuffer);
+        }
+
+        public object ReadInitialValueFromDsgMemBuffer(Reader reader, DsgVarInfoEntry infoEntry, DsgMem dsgMem)
+        {
+            return ReadValueFromBuffer(reader, infoEntry, dsgMem.memBufferInitial);
         }
 
         public object ReadValueFromDsgVarBuffer(Reader reader, DsgVarInfoEntry infoEntry, DsgVar dsgVar)

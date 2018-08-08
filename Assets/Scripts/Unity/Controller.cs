@@ -199,7 +199,15 @@ public class Controller : MonoBehaviour {
                         if (p.brain.mind.dsgMem != null) {
                             DsgVarComponent dsgVarComponent = p.Gao.AddComponent<DsgVarComponent>();
                             dsgVarComponent.SetPerso(p);
+
+                            if (p.SuperObject != null && p.SuperObject.Gao != null) {
+                                Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
+                                if (mod != null) {
+                                    mod.dsgVarComponent = dsgVarComponent;
+                                }
+                            }
                         }
+
                     }
                 }
             }
