@@ -52,7 +52,7 @@ namespace OpenSpace.EngineObject
         public string GetModelName()
         {
             MapLoader l = MapLoader.Loader;
-            if (index1 >= 1 && index1 < l.objectTypes[1].Length) {
+            if (index1 >= 0 && index1 < l.objectTypes[1].Length) {
                 return l.objectTypes[1][index1].name;
             } else {
                 return "";
@@ -62,7 +62,7 @@ namespace OpenSpace.EngineObject
         public string GetPersoName()
         {
             MapLoader l = MapLoader.Loader;
-            if (index2 >= 2 && index2 < l.objectTypes[2].Length) {
+            if (index2 >= 0 && index2 < l.objectTypes[2].Length) {
                 return l.objectTypes[2][index2].name;
             } else {
                 return "";
