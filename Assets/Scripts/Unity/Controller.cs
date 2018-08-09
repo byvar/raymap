@@ -210,6 +210,15 @@ public class Controller : MonoBehaviour {
 
                     }
                 }
+                if (p.Gao != null) {
+                    // Custom Bits
+                    if (p.stdGame != null) {
+                        CustomBitsComponent c = p.Gao.AddComponent<CustomBitsComponent>();
+                        c.stdGame = p.stdGame;
+                        if (Settings.s.engineMode == Settings.EngineMode.R3) c.hasAiCustomBits = true;
+                        c.Init();
+                    }
+                }
             }
         }
     }

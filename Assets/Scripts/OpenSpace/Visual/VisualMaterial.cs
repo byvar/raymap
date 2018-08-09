@@ -169,9 +169,12 @@ namespace OpenSpace.Visual {
 
         public bool IsTransparent {
             get {
-                //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((Settings.s.engineMode == Settings.EngineMode.R3 && (flags & flags_isTransparent) != 0)
-                    || Settings.s.engineMode == Settings.EngineMode.R2 && (flags & 0x4000000) != 0) {
+                bool transparent = false;
+                if (Settings.s.engineMode == Settings.EngineMode.R3 && (flags & flags_isTransparent) != 0) transparent = true;
+                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                    if ((flags & 0x4000000) != 0) transparent = true;
+                }
+                if (transparent) {
                     if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
                         return textures[0].texture.IsTransparent;
                     }
@@ -183,7 +186,7 @@ namespace OpenSpace.Visual {
         public bool IsLight {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((flags & flags_isTransparent) != 0 || MapLoader.Loader.mode == MapLoader.Mode.Rayman2PC) {
+                if ((flags & flags_isTransparent) != 0 || Settings.s.engineMode == Settings.EngineMode.R2) {
                     if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
                         return textures[0].texture.IsLight;
                     }
