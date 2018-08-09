@@ -47,11 +47,7 @@ namespace OpenSpace.Visual {
         public bool IsTransparent {
             get {
                 if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                    if (Settings.s.platform == Settings.Platform.iOS) {
-                        return (flags & 0x100) != 0 || (flags & flags_isTransparent) != 0;
-                    } else {
-                        return (flags & (1 << 1)) != 0 || (flags & flags_isTransparent) != 0;
-                    }
+                    return (flags & 0x100) != 0 || (flags & (1 << 1)) != 0 || (flags & flags_isTransparent) != 0;
                 } else {
                     return (flags & flags_isTransparent) != 0;
                 }
