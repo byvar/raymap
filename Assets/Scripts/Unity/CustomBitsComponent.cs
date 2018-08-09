@@ -8,6 +8,16 @@ public class CustomBitsComponent : MonoBehaviour {
     public StandardGame stdGame;
     public bool hasAiCustomBits = false;
     public bool modified = false;
+    private BitArray[] bits;
+
+    public void Init() {
+        if (hasAiCustomBits) {
+            bits = new BitArray[4];
+        } else bits = new BitArray[4];
+        for (int i = 0; i < bits.Length; i++) {
+            bits[i] = new BitArray(BitConverter.GetBytes(GetRawFlags((CustomBitsType)i)));
+        }
+    }
 
     public enum CustomBitsType {
         CustomBits = 0,
@@ -27,15 +37,17 @@ public class CustomBitsComponent : MonoBehaviour {
     }
 
     public void SetFlag(CustomBitsType type, int index, bool value) {
-        BitArray bitArray = new BitArray(BitConverter.GetBytes(GetRawFlags(type)));
-        bitArray.Set(index, value);
-        int[] array = new int[1];
-        bitArray.CopyTo(array, 0);
-        SetRawFlags(type, array[0]);
+        BitArray bitArray = bits[(int)type];
+        if (bitArray.Get(index) != value) {
+            bitArray.Set(index, value);
+            int[] array = new int[1];
+            bitArray.CopyTo(array, 0);
+            SetRawFlags(type, array[0]);
+        }
     }
 
     public bool GetFlag(CustomBitsType type, int index) {
-        BitArray bitArray = new BitArray(BitConverter.GetBytes(GetRawFlags(type)));
+        BitArray bitArray = bits[(int)type];
         return bitArray.Get(index);
     }
 

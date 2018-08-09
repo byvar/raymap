@@ -39,13 +39,6 @@ namespace OpenSpace.EngineObject {
                         }*/
                     }
                     gao = new GameObject(fullName);
-
-                    // Custom Bits
-                    if (stdGame != null) {
-                        CustomBitsComponent c = gao.AddComponent<CustomBitsComponent>();
-                        c.stdGame = stdGame;
-                        if (Settings.s.engineMode == Settings.EngineMode.R3) c.hasAiCustomBits = true;
-                    }
                     
                 }
                 return gao;
