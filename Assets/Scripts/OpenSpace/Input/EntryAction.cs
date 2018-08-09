@@ -76,6 +76,8 @@ namespace OpenSpace.Input {
             {
                 result = firstKeyWord.ToString();
             }
+            if (name != null && name.Trim() != "") result += " (" + name + ")";
+            if (name2 != null && name2.Trim() != "") result += "[" + name2 + "]";
             return result;
         }
 
