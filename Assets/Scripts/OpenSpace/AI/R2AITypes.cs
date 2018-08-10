@@ -1328,8 +1328,18 @@ namespace OpenSpace.AI {
                     if (param < fieldTable.Count) { return fieldTable[param]; }
                     return "Unknown Field (" + param + ")";
                 case 10:
-                case 11:
-                    string dsgVarString = "";
+                case 11: // Dsg Var
+                    
+                     if (perso!=null && perso.brain!=null && perso.brain.mind!=null) {
+                        Mind mind = perso.brain.mind;
+                        if (mind.dsgMem!=null && mind.dsgMem.dsgVar!=null) {
+                            if (param<mind.dsgMem.dsgVar.dsgVarInfos.Length)
+                                return mind.dsgMem.dsgVar.dsgVarInfos[param].NiceVariableName;
+                        } else if (mind.AI_model!=null && mind.AI_model.dsgVar!=null) {
+                            if (param < mind.AI_model.dsgVar.dsgVarInfos.Length)
+                                return mind.AI_model.dsgVar.dsgVarInfos[param].NiceVariableName;
+                        }
+                    }
                     return "dsgVar_" + param;
                 case 12:
 

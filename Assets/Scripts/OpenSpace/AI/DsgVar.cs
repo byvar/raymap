@@ -1,4 +1,5 @@
-﻿using OpenSpace.Waypoints;
+﻿using OpenSpace.EngineObject;
+using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,8 +51,8 @@ namespace OpenSpace.AI {
             if (dsgVar.off_dsgVarInfo != null && dsgVar.amountOfInfos > 0) {
 
                 Pointer off_current = Pointer.Goto(ref reader, dsgVar.off_dsgVarInfo);
-                for (int i = 0; i < dsgVar.amountOfInfos; i++) {
-                    DsgVarInfoEntry infoEntry = DsgVarInfoEntry.Read(reader, Pointer.Current(reader));
+                for (uint i = 0; i < dsgVar.amountOfInfos; i++) {
+                    DsgVarInfoEntry infoEntry = DsgVarInfoEntry.Read(reader, Pointer.Current(reader), i);
 
                     if (dsgMem != null) {
                         infoEntry.value = dsgVar.ReadValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
@@ -103,16 +104,7 @@ namespace OpenSpace.AI {
                         float y = reader.ReadSingle();
                         float z = reader.ReadSingle();
                         returnValue = new Vector3(x, y, z);
-                        /*Pointer off_vec = Pointer.Read(reader);
-                        if (off_vec != null) {
-                            Pointer.Goto(ref reader, off_vec);
-                            float x = reader.ReadSingle();
-                            float y = reader.ReadSingle();
-                            float z = reader.ReadSingle();
-                            returnValue = new Vector3(x, y, z);
-                        } else {
-                            returnValue = "null";
-                        }*/
+                        
                         break;
                     case DsgVarInfoEntry.DsgVarType.Graph:
                             Pointer off_graph = Pointer.Read(reader);
@@ -140,6 +132,13 @@ namespace OpenSpace.AI {
                         }
 
                         break;
+
+                    case DsgVarInfoEntry.DsgVarType.Perso:
+
+                        returnValue = Pointer.Read(reader);
+
+                        break;
+
                     default:
                         returnValue = reader.ReadInt32(); break;
                 }

@@ -219,6 +219,13 @@ namespace OpenSpace.EngineObject {
                     MapLoader.Loader.print("do not write state for perso " + fullName);
                 }
             }
+
+            if (persoBehaviour.clearTheBrain) {
+                Pointer.Goto(ref writer, this.offset + 0xC); // perso + 0xC = Brain * 
+                writer.Write((uint)0);
+                persoBehaviour.clearTheBrain = false;
+            }
+
             CustomBitsComponent customBits = gao.GetComponent<CustomBitsComponent>();
             if (customBits != null && customBits.modified && stdGame != null) {
                 Pointer.Goto(ref writer, stdGame.offset);

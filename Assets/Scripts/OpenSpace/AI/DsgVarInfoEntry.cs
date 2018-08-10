@@ -12,23 +12,34 @@ namespace OpenSpace.AI {
         public uint typeNumber;
         public uint saveType;
         public uint initType;
+        public uint number;
 
         // Derived values
         public DsgVarType type;
         public object value;
         public object initialValue;
 
+        public string NiceVariableName
+        {
+            get
+            {
+                return type + "_" + number;
+            }
+        }
+
         public DsgVarInfoEntry(Pointer offset) {
             this.offset = offset;
         }
 
-        public static DsgVarInfoEntry Read(Reader reader, Pointer offset) {
+        public static DsgVarInfoEntry Read(Reader reader, Pointer offset, uint number) {
             MapLoader l = MapLoader.Loader;
             DsgVarInfoEntry d = new DsgVarInfoEntry(offset);
             d.offsetInBuffer = reader.ReadUInt32();
             d.typeNumber = reader.ReadUInt32();
             d.saveType = reader.ReadUInt32();
             d.initType = reader.ReadUInt32();
+
+            d.number = number;
 
             d.type = DsgVarType.None;
             if (Settings.s.engineMode == Settings.EngineMode.R2) {

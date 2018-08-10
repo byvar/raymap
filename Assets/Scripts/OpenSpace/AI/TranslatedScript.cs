@@ -30,7 +30,13 @@ namespace OpenSpace.AI
                 this.ts = ts;
             }
 
-            public override string ToString() {
+
+            public override string ToString()
+            {
+                return this.ToString(this.ts.perso);
+            }
+
+            public string ToString(Perso perso) {
                 if (scriptNode != null)
                 {
                     string firstChildNode  = (this.children.Count > 0 && this.children[0] != null) ? this.children[0].ToString() : "null";
@@ -55,7 +61,7 @@ namespace OpenSpace.AI
                                 case 8: return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Else
                                 case 9: return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
-                                default: return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso); ;
+                                default: return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso); ;
                             }
                         case ScriptNode.NodeType.Condition:
                             switch (scriptNode.param)
@@ -81,16 +87,16 @@ namespace OpenSpace.AI
 
                                 default:
                                     if (firstChildNode!=null)
-                                        return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "("+string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString()))+")";
+                                        return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "("+string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString()))+")";
                                     else
-                                        return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso)+"()";
+                                        return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso)+"()";
 
 
                             }
 
                         case ScriptNode.NodeType.Function:
 
-                            string func = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
+                            string func = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
                             return prefix + func + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
 
                         case ScriptNode.NodeType.Procedure:
@@ -101,18 +107,25 @@ namespace OpenSpace.AI
                                 case 78: return prefix + "break;\n";
 
                                 default:
-                                    string proc = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
+                                    string proc = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
                                     return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                             }
 
                         case ScriptNode.NodeType.Operator:
 
+                            Pointer persoPtr = null;
+
                             switch (scriptNode.param)
                             {
                                 // scalar:
                                 case 0: return "(" + firstChildNode + (children[1].scriptNode.param>=0 ? "+" : "") + secondChildNode + ")";
-                                case 1: case 4: return "(" + firstChildNode + "-" + secondChildNode + ")";
+                                case 1: case 4:
+                                    if (children.Count > 1) {
+                                        return "(" + firstChildNode + "-" + secondChildNode + ")";
+                                    } else {
+                                        return "-" + firstChildNode;
+                                    }
                                 case 2: return "(" + firstChildNode + "*" + secondChildNode + ")";
                                 case 3: return "(" + firstChildNode + "/" + secondChildNode + ")";
                                 // affect:
@@ -121,7 +134,18 @@ namespace OpenSpace.AI
                                 case 7: return firstChildNode + "*=" + secondChildNode + ";";
                                 case 8: return firstChildNode + "/=" + secondChildNode + ";";
                                 case 11: return firstChildNode + "=" + secondChildNode + ";";
-                                case 12: return firstChildNode + "." + secondChildNode;
+                                case 12: // dot operator
+
+                                    persoPtr = this.children[0].scriptNode.param_ptr;
+                                    if (persoPtr != null) {
+                                        Perso firstNodePerso = Perso.FromOffset(persoPtr);
+                                        if (firstNodePerso != null) {
+                                            string secondChildNodeWithDifferentContext = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString(firstNodePerso) : "null";
+                                            return firstChildNode + "." + secondChildNodeWithDifferentContext;
+                                        }
+                                    }
+
+                                    return firstChildNode + "." + secondChildNode;
                                 case 13: return firstChildNode + ".x"; // vector
                                 case 14: return firstChildNode + ".y"; // vector
                                 case 15: return firstChildNode + ".z"; // vector
@@ -129,32 +153,34 @@ namespace OpenSpace.AI
                                 case 17: return firstChildNode + "-" + secondChildNode; // 17
                                 case 18: case 19:  return firstChildNode + "*" + secondChildNode; // 18,19 scale and multiply
                                 case 20: return "-"+firstChildNode; // 20 negate
-                                case 24: return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
+                                case 24: // Ultra operator (execute code for different object)
+                                    return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
+
                                 case 25: return "((" + firstChildNode + ")(" + secondChildNode + ".brain.mind.aiModel))";
                                 case 26: return firstChildNode + "[" + secondChildNode + "]";
 
                                 default:
-                                    string proc = "("+scriptNode.param+")"+R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
+                                    string proc = "("+scriptNode.param+")"+R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
                                     return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
                             }
 
                         case ScriptNode.NodeType.Field:
                             if (firstChildNode != null)
-                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             else
-                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
+                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
 
                         case ScriptNode.NodeType.Vector:
                         case ScriptNode.NodeType.ConstantVector:
 
-                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
 
                         case ScriptNode.NodeType.MetaAction:
 
-                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
+                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                         default:
-                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, this.ts.perso);
+                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
                     }
                 }
                 else // Root node returns all children concatenated
