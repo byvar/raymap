@@ -39,6 +39,9 @@ public class PersoBehaviour : MonoBehaviour {
     private GameObject[] channelObjects = null;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 
+    // Brain clearance
+    public bool clearTheBrain = false;
+
     // Use this for initialization
     void Start() {
     }

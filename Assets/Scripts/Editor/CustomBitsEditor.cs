@@ -30,6 +30,5 @@ public class CustomBitsEditor : Editor {
             }
             GUILayout.EndVertical();
         }
-        GUILayout.EndVertical();
     }
 }

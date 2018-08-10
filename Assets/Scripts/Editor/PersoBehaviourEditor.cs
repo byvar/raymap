@@ -21,7 +21,6 @@ public class PersoBehaviourEditor : Editor {
         if (GUILayout.Button("Next state")) pb.SetState(pb.stateIndex + 1);
         GUI.enabled = true;
         GUILayout.EndHorizontal();
-		
 
         if (GUILayout.Button("Print scripts")) pb.PrintScripts();
         if (GUILayout.Button("Print translated scripts")) pb.PrintTranslatedScripts();
