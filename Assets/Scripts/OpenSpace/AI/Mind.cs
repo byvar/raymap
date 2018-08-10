@@ -13,9 +13,15 @@ namespace OpenSpace.AI {
         public Pointer off_intelligence_reflex;
         public Pointer off_dsgMem;
         public Pointer off_name;
+        public byte byte0;
+        public byte byte1;
+        public byte byte2;
+        public byte byte3;
         
         public AIModel AI_model;
         public DsgMem dsgMem;
+        public Intelligence intelligenceNormal;
+        public Intelligence intelligenceReflex;
         public string name = "";
 
         public Mind(Pointer offset) {
@@ -29,8 +35,14 @@ namespace OpenSpace.AI {
             //if (m.off_intelligence_normal != null) MapLoader.Loader.print(m.off_intelligence_normal);
             m.off_intelligence_reflex = Pointer.Read(reader);
             m.off_dsgMem = Pointer.Read(reader);
-            m.off_name = Pointer.Read(reader);
-                
+            if (Settings.s.hasNames) {
+                m.off_name = Pointer.Read(reader);
+            }
+            m.byte0 = reader.ReadByte();
+            m.byte1 = reader.ReadByte();
+            m.byte2 = reader.ReadByte();
+            m.byte3 = reader.ReadByte();
+
             if (m.off_AI_model != null) {
                 m.AI_model = AIModel.FromOffset(m.offset);
                 if (m.AI_model == null) {
@@ -42,6 +54,16 @@ namespace OpenSpace.AI {
             if (m.off_dsgMem != null) {
                 Pointer.Goto(ref reader, m.off_dsgMem);
                 m.dsgMem = DsgMem.Read(reader, m.off_dsgMem);
+            }
+
+            if (m.off_intelligence_normal != null) {
+                Pointer.Goto(ref reader, m.off_intelligence_normal);
+                m.intelligenceNormal = Intelligence.Read(reader, m.off_intelligence_normal);
+            }
+
+            if (m.off_intelligence_reflex != null) {
+                Pointer.Goto(ref reader, m.off_intelligence_reflex);
+                m.intelligenceReflex = Intelligence.Read(reader, m.off_intelligence_reflex);
             }
             return m;
         }
