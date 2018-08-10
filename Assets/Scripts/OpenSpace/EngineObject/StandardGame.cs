@@ -25,7 +25,7 @@ namespace OpenSpace.EngineObject
         public static StandardGame Read(Reader reader, Pointer offset)
         {
             MapLoader l = MapLoader.Loader;
-            l.print(offset);
+            //l.print(offset);
             StandardGame stdGame = new StandardGame(offset);
             stdGame.objectTypes[0] = reader.ReadUInt32();
             stdGame.objectTypes[1] = reader.ReadUInt32();

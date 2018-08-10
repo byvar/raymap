@@ -45,10 +45,11 @@ public class LightBehaviour : MonoBehaviour {
             intensity = Mathf.Clamp(intensity, 0f, 2f); // don't want too bright lights
             if (intensity < 1) intensity = 1;
             l.intensity = intensity;
-            if (li.castShadows != 0 || li.createsShadowsOrNot != 0) {
+            l.shadows = LightShadows.None;
+            /*if (li.castShadows != 0 || li.createsShadowsOrNot != 0) {
                 l.shadows = LightShadows.Hard;
                 l.shadowNearPlane = 0.1f;
-            }
+            }*/
             switch (li.type) {
                 case 1:
                     // parallel light main

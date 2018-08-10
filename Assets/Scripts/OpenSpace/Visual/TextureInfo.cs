@@ -65,19 +65,21 @@ namespace OpenSpace.Visual {
             get { return texture; }
             set {
                 texture = value;
-                if (IsMirrorX) {
-                    texture.wrapModeU = TextureWrapMode.Mirror;
-                }
-                if (IsMirrorY) {
-                    texture.wrapModeV = TextureWrapMode.Mirror;
-                }
-                if ((flags & 0x902) != 0 && Settings.s.engineMode == Settings.EngineMode.R2) {
-                    byte[] alphaMaskBytes = BitConverter.GetBytes(alphaMask);
-                    SetTextureAlpha(alphaMaskBytes[0] / 255f, alphaMaskBytes[1] / 255f, alphaMaskBytes[2] / 255f);
-                    /*MapLoader.Loader.print(name + " - Alpha mask: " + alphaMask + " - " + String.Format("{0:X}", alphaMask));
-                    MapLoader.Loader.print("Flags & 0x10: " + ((flags & 0x10) != 0));
-                    MapLoader.Loader.print("Flags & 0x808: " + ((flags & 0x808) != 0));
-                    MapLoader.Loader.print("Flags & 0x902: " + ((flags & 0x902) != 0));*/
+                if (texture != null) {
+                    if (IsMirrorX) {
+                        texture.wrapModeU = TextureWrapMode.Mirror;
+                    }
+                    if (IsMirrorY) {
+                        texture.wrapModeV = TextureWrapMode.Mirror;
+                    }
+                    if ((flags & 0x902) != 0 && Settings.s.engineMode == Settings.EngineMode.R2) {
+                        byte[] alphaMaskBytes = BitConverter.GetBytes(alphaMask);
+                        SetTextureAlpha(alphaMaskBytes[0] / 255f, alphaMaskBytes[1] / 255f, alphaMaskBytes[2] / 255f);
+                        /*MapLoader.Loader.print(name + " - Alpha mask: " + alphaMask + " - " + String.Format("{0:X}", alphaMask));
+                        MapLoader.Loader.print("Flags & 0x10: " + ((flags & 0x10) != 0));
+                        MapLoader.Loader.print("Flags & 0x808: " + ((flags & 0x808) != 0));
+                        MapLoader.Loader.print("Flags & 0x902: " + ((flags & 0x902) != 0));*/
+                    }
                 }
             }
         }
