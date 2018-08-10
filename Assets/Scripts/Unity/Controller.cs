@@ -27,6 +27,7 @@ public class Controller : MonoBehaviour {
     public LightManager lightManager;
     public bool allowDeadPointers = false;
     public bool forceDisplayBackfaces = false;
+    public bool blockyMode = false;
     MapLoader loader = null;
     bool viewCollision_ = false;
     public bool viewCollision = false;
@@ -81,6 +82,7 @@ public class Controller : MonoBehaviour {
         loader.lvlName = lvlName;
         loader.allowDeadPointers = allowDeadPointers;
         loader.forceDisplayBackfaces = forceDisplayBackfaces;
+        loader.blockyMode = blockyMode;
         loader.baseMaterial = baseMaterial;
         loader.baseTransparentMaterial = baseTransparentMaterial;
         loader.baseBlendMaterial = baseBlendMaterial;

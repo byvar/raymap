@@ -31,6 +31,7 @@ namespace OpenSpace {
 
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
+        public bool blockyMode = false;
         public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2PCDemo2, Rayman2PCDemo1, Rayman2IOS, DonaldDuckPC };
         public Mode mode = Mode.Rayman3PC;
 

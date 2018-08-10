@@ -40,6 +40,7 @@ namespace OpenSpace.Visual {
         public int[] disconnected_triangles = null;
         public int[][] mapping_uvs_spe = null;
         public int[] disconnected_triangles_spe = null;
+        public Vector3[] normals_spe = null;
 
         private SkinnedMeshRenderer s_mr_main = null;
         private SkinnedMeshRenderer s_mr_spe = null;
@@ -164,6 +165,7 @@ namespace OpenSpace.Visual {
                 for (int um = 0; um < num_uvMaps; um++) {
                     for (int j = 0; j < num_disconnected_triangles_spe * 3; j++) {
                         new_uvs_spe[um][j] = uvs[mapping_uvs_spe[um][j]];
+                        if (MapLoader.Loader.blockyMode && normals_spe != null) new_uvs_spe[um][j] = uvs[mapping_uvs_spe[um][j-(j%3)]];
                         /*int i0 = reader.ReadInt16(), m0 = (j * 3) + 0; // Old index, mapped index
                         int i1 = reader.ReadInt16(), m1 = (j * 3) + 1;
                         int i2 = reader.ReadInt16(), m2 = (j * 3) + 2;
@@ -180,9 +182,15 @@ namespace OpenSpace.Visual {
                     new_vertices_spe[m0] = mesh.vertices[i0];
                     new_vertices_spe[m1] = mesh.vertices[i1];
                     new_vertices_spe[m2] = mesh.vertices[i2];
+                    
                     new_normals_spe[m0] = mesh.normals[i0];
                     new_normals_spe[m1] = mesh.normals[i1];
                     new_normals_spe[m2] = mesh.normals[i2];
+                    if (MapLoader.Loader.blockyMode && normals_spe != null) {
+                        new_normals_spe[m0] = normals_spe[j];
+                        new_normals_spe[m1] = normals_spe[j];
+                        new_normals_spe[m2] = normals_spe[j];
+                    }
                     if (new_boneWeights_spe != null) {
                         new_boneWeights_spe[m0] = mesh.bones.weights[i0];
                         new_boneWeights_spe[m1] = mesh.bones.weights[i1];
@@ -394,6 +402,16 @@ namespace OpenSpace.Visual {
                     sm.disconnected_triangles_spe[(j * 3) + 0] = reader.ReadInt16();
                     sm.disconnected_triangles_spe[(j * 3) + 1] = reader.ReadInt16();
                     sm.disconnected_triangles_spe[(j * 3) + 2] = reader.ReadInt16();
+                }
+                if (sm.off_weights_spe != null) {
+                    Pointer.Goto(ref reader, sm.off_weights_spe);
+                    sm.normals_spe = new Vector3[sm.num_disconnected_triangles_spe];
+                    for (int j = 0; j < sm.num_disconnected_triangles_spe; j++) {
+                        float x = reader.ReadSingle();
+                        float z = reader.ReadSingle();
+                        float y = reader.ReadSingle();
+                        sm.normals_spe[j] = new Vector3(x, y, z);
+                    }
                 }
             }
             return sm;

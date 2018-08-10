@@ -19,6 +19,7 @@ namespace OpenSpace.Visual {
         public Pointer off_vertices;
         public Pointer off_normals;
         public Pointer off_blendWeights;
+        public Pointer off_materials;
         public Pointer off_subblock_types;
         public Pointer off_subblocks;
         public ushort num_vertices;
@@ -79,7 +80,11 @@ namespace OpenSpace.Visual {
             Pointer.Goto(ref reader, off_modelstart);
             m.off_vertices = Pointer.Read(reader);
             m.off_normals = Pointer.Read(reader);
-            m.off_blendWeights = Pointer.Read(reader);
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                m.off_materials = Pointer.Read(reader);
+            } else {
+                m.off_blendWeights = Pointer.Read(reader);
+            }
             if (l.mode != MapLoader.Mode.RaymanArenaGC) {
                 reader.ReadInt32();
             }
