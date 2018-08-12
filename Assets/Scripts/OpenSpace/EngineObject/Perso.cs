@@ -30,15 +30,11 @@ namespace OpenSpace.EngineObject {
         public string nameFamily = null;
         public string nameModel = null;
         public string namePerso = null;
-        public Family family = null;
-        public Pointer off_physicalObjects = null;
-        public PhysicalObject[] physical_objects = null;
+
+        public Perso3dData p3dData;
         public StandardGame stdGame;
         public Dynam dynam;
         public Brain brain = null;
-        public State initialState = null;
-        public Pointer off_currentState;
-        public Pointer off_pointerToCurrentState;
         public MSWay msWay = null;
         public CollSet collset;
 
@@ -96,18 +92,9 @@ namespace OpenSpace.EngineObject {
                 reader.ReadUInt32();
             }
 
-            if (p.off_3dData != null) {
-                //R3Pointer.Goto(ref reader, off_perso);
-                Pointer.Read(reader); // same as next
-                p.off_pointerToCurrentState = Pointer.Current(reader);
-                p.off_currentState = Pointer.Read(reader);
-                Pointer.Read(reader); // same as previous
-                p.off_physicalObjects = Pointer.Read(reader);
-                reader.ReadUInt32(); // same address?
-                Pointer off_family = Pointer.Read(reader);
-                p.family = Family.FromOffset(off_family);
-                p.initialState = State.FromOffset(p.family, p.off_currentState);
-            }
+            Pointer.DoAt(reader, p.off_3dData, (r,o) => {
+                p.p3dData = Perso3dData.Read(r, o);
+            });
 
             if (p.off_stdGame != null) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_stdGame);
@@ -118,7 +105,7 @@ namespace OpenSpace.EngineObject {
 
                 Pointer.Goto(ref reader, off_current);
             }
-            l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset + " - POs: " + p.off_physicalObjects);
+            l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset);
             if (p.off_dynam != null) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_dynam);
                 p.dynam = Dynam.Read(reader, p.off_dynam);
@@ -156,7 +143,7 @@ namespace OpenSpace.EngineObject {
                     }
                 }
             }*/
-            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.family != null) {
+            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.p3dData != null && p.p3dData.family != null) {
                 // Add physical objects tables hidden in scripts
                 AIModel ai = p.brain.mind.AI_model;
                 if (ai.behaviors_normal != null) {
@@ -166,9 +153,9 @@ namespace OpenSpace.EngineObject {
                                 List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_normal[i].scripts[j].scriptNodes;
                                 foreach (ScriptNode node in nodes) {
                                     if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                        && p.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                        && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
                                         Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
-                                        p.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                        p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
                                         Pointer.Goto(ref reader, off_current);
                                     }
                                 }
@@ -183,9 +170,9 @@ namespace OpenSpace.EngineObject {
                                 List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_reflex[i].scripts[j].scriptNodes;
                                 foreach (ScriptNode node in nodes) {
                                     if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                        && p.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                        && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
                                         Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
-                                        p.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                        p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
                                         Pointer.Goto(ref reader, off_current);
                                     }
                                 }
@@ -199,9 +186,9 @@ namespace OpenSpace.EngineObject {
                             List<ScriptNode> nodes = p.brain.mind.AI_model.macros[i].script.scriptNodes;
                             foreach (ScriptNode node in nodes) {
                                 if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                    && p.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                    && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
                                     Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
-                                    p.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                    p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
                                     Pointer.Goto(ref reader, off_current);
                                 }
                             }
@@ -210,8 +197,8 @@ namespace OpenSpace.EngineObject {
                 }
             }
             //if (off_physicalObjects != null && off_physicalObjects.offset == 0x7029) off_physicalObjects.offset = 0x7659;
-            if (p.family != null && p.family.GetIndexOfPhysicalList(p.off_physicalObjects) != -1) {
-                p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(p.off_physicalObjects)];
+            if (p.p3dData != null && p.p3dData.family != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects) != -1) {
+                p.p3dData.physical_objects = p.p3dData.family.physical_objects[p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects)];
             }
 
             if (p.off_collSet!=null) {
@@ -230,21 +217,19 @@ namespace OpenSpace.EngineObject {
 
         public void Write(Writer writer) {
             PersoBehaviour persoBehaviour = gao.GetComponent<PersoBehaviour>();
-            if (off_pointerToCurrentState!=null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {
-                if (persoBehaviour.state.offset != off_currentState)
-                {
-                    MapLoader.Loader.print("write state perso " + fullName + ".off_pointerToCurrentState = " + off_pointerToCurrentState);
-                    Pointer.Goto(ref writer, off_pointerToCurrentState);
-                    writer.Write(persoBehaviour.state.offset.offset);
-                } else
-                {
+            if (p3dData != null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {
+                if (persoBehaviour.state.offset != p3dData.off_stateCurrent) {
+                    p3dData.off_stateCurrent = persoBehaviour.state.offset;
+                    Pointer.Goto(ref writer, p3dData.offset);
+                    p3dData.Write(writer);
+                } /*else {
                     MapLoader.Loader.print("do not write state for perso " + fullName);
-                }
+                }*/
             }
 
             if (persoBehaviour.clearTheBrain) {
                 Pointer.Goto(ref writer, this.offset + 0xC); // perso + 0xC = Brain * 
-                writer.Write((uint)0);
+                Pointer.Write(writer, null);
                 persoBehaviour.clearTheBrain = false;
             }
 

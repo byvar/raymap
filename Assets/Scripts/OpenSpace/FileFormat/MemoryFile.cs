@@ -22,5 +22,15 @@ namespace OpenSpace.FileFormat {
             ProcessMemoryStream stream = new ProcessMemoryStream(name, ProcessMemoryStream.Mode.AllAccess);
             writer = new Writer(stream, Settings.s.IsLittleEndian);
         }
+
+        public override void WritePointer(Pointer pointer) {
+            if (writer != null) {
+                if (pointer == null) {
+                    writer.Write((uint)0);
+                } else {
+                    writer.Write(pointer.offset);
+                }
+            }
+        }
     }
 }

@@ -169,5 +169,9 @@ namespace OpenSpace.FileFormat {
         public override void CreateWriter() {
             return; // Don't need to write to this file
         }
+
+        public override void WritePointer(Pointer pointer) {
+            return;
+        }
     }
 }

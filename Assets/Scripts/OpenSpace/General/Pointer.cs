@@ -62,9 +62,7 @@ namespace OpenSpace {
             uint current_off = (uint)(reader.BaseStream.Position);
             uint value = reader.ReadUInt32();
             FileWithPointers file = l.GetFileByReader(reader);
-            if (file == null) {
-                throw new FormatException("Reader wasn't recognized.");
-            }
+            if (file == null) throw new FormatException("Reader wasn't recognized.");
             uint fileOff = (uint)(current_off - file.baseOffset);
             if (!file.pointers.ContainsKey(fileOff)) {
                 if (value == 0) return null;
@@ -75,6 +73,22 @@ namespace OpenSpace {
                 return null;
             }
             return file.pointers[fileOff];
+        }
+
+        public static void Write(Writer writer, Pointer pointer) {
+            MapLoader l = MapLoader.Loader;
+            uint current_off = (uint)(writer.BaseStream.Position);
+            FileWithPointers file = l.GetFileByWriter(writer);
+            if (file == null) throw new FormatException("Writer wasn't recognized.");
+            file.WritePointer(pointer);
+        }
+
+        public void Write(Writer writer) {
+            MapLoader l = MapLoader.Loader;
+            uint current_off = (uint)(writer.BaseStream.Position);
+            FileWithPointers file = l.GetFileByWriter(writer);
+            if (file == null) throw new FormatException("Writer wasn't recognized.");
+            file.WritePointer(this);
         }
 
         // For readers
@@ -97,14 +111,14 @@ namespace OpenSpace {
             return new Pointer((uint)(curPos - curFile.baseOffset), curFile);
         }
 
-        public void DoAt(ref Reader reader, Reader.ReadAction action) {
+        public void DoAt(Reader reader, Reader.ReadAction action) {
             Pointer off_current = Goto(ref reader, this);
             action(reader, this);
             Goto(ref reader, off_current);
         }
 
-        public static void DoAt(ref Reader reader, Pointer newPos, Reader.ReadAction action) {
-            if (newPos != null) newPos.DoAt(ref reader, action);
+        public static void DoAt(Reader reader, Pointer newPos, Reader.ReadAction action) {
+            if (newPos != null) newPos.DoAt(reader, action);
         }
 
         // For writers

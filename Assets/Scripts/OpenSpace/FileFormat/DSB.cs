@@ -287,5 +287,9 @@ namespace OpenSpace.FileFormat {
             ushort strSize = reader.ReadUInt16();
             return reader.ReadString(strSize);
         }
+
+        public override void WritePointer(Pointer pointer) {
+            return; // No pointers in this file
+        }
     }
 }

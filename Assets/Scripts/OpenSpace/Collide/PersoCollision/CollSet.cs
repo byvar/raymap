@@ -44,7 +44,7 @@ namespace OpenSpace.Collide {
         private static LinkedList<CollideMeshObject> ParseZdxList(Reader reader, Pointer offset, CollideMeshObject.Type type) {
             MapLoader l = MapLoader.Loader;
             LinkedList<CollideMeshObject> zdxList = null;
-            Pointer.DoAt(ref reader, offset, (Reader r1, Pointer o1) => {
+            Pointer.DoAt(reader, offset, (r1,o1) => {
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
                 zdxList = LinkedList<CollideMeshObject>.Read(r1, o1,
                     (Reader r, Pointer o) => {

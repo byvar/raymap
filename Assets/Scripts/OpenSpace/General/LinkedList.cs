@@ -85,7 +85,7 @@ namespace OpenSpace {
                     if (!readAtPointer) {
                         list[i] = readElement(reader, off_element);
                     } else {
-                        Pointer.DoAt(ref reader, off_element, (Reader r, Pointer o) => {
+                        Pointer.DoAt(reader, off_element, (r,o) => {
                             list[i] = readElement(r, o);
                         });
                     }

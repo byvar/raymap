@@ -30,6 +30,8 @@ namespace OpenSpace.FileFormat {
             }
         }
 
+        public abstract void WritePointer(Pointer pointer);
+
         public abstract void CreateWriter();
     }
 }

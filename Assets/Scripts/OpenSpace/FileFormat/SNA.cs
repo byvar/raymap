@@ -310,5 +310,9 @@ namespace OpenSpace.FileFormat {
         public override void CreateWriter() {
             return; // No writing support for SNA files yet
         }
+
+        public override void WritePointer(Pointer pointer) {
+            throw new NotImplementedException();
+        }
     }
 }

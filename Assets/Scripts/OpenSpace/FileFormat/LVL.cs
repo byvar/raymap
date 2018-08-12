@@ -56,5 +56,9 @@ namespace OpenSpace.FileFormat {
                 writer = new Writer(stream, Settings.s.IsLittleEndian);
             }
         }
+
+        public override void WritePointer(Pointer pointer) {
+            throw new NotImplementedException();
+        }
     }
 }
