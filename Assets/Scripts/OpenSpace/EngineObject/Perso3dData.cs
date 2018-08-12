@@ -5,7 +5,7 @@ namespace OpenSpace.EngineObject {
     public class Perso3dData {
         public Pointer offset;
 
-        public Pointer off_state0;
+        public Pointer off_stateInitial;
         public Pointer off_stateCurrent;
         public Pointer off_state2;
 
@@ -25,7 +25,7 @@ namespace OpenSpace.EngineObject {
             MapLoader l = MapLoader.Loader;
             Perso3dData d = new Perso3dData(offset);
 
-            d.off_state0 = Pointer.Read(reader);
+            d.off_stateInitial = Pointer.Read(reader);
             d.off_stateCurrent = Pointer.Read(reader);
             d.off_state2 = Pointer.Read(reader);
 
@@ -39,8 +39,10 @@ namespace OpenSpace.EngineObject {
         }
 
         public void Write(Writer writer) {
-            Pointer.Goto(ref writer, offset + 4);
+            Pointer.Write(writer, off_stateInitial);
             Pointer.Write(writer, off_stateCurrent);
+            Pointer.Write(writer, off_stateCurrent);
+            Pointer.Write(writer, off_physicalObjects);
         }
     }
 }

@@ -84,11 +84,7 @@ namespace OpenSpace {
         }
 
         public void Write(Writer writer) {
-            MapLoader l = MapLoader.Loader;
-            uint current_off = (uint)(writer.BaseStream.Position);
-            FileWithPointers file = l.GetFileByWriter(writer);
-            if (file == null) throw new FormatException("Writer wasn't recognized.");
-            file.WritePointer(this);
+            Pointer.Write(writer, this);
         }
 
         // For readers

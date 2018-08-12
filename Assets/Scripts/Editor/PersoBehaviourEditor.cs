@@ -13,6 +13,11 @@ public class PersoBehaviourEditor : Editor {
         PersoBehaviour pb = (PersoBehaviour)target;
         pb.poListIndex = EditorGUILayout.Popup("Objects List", pb.poListIndex, pb.poListNames);
         pb.stateIndex = EditorGUILayout.Popup(pb.stateIndex, pb.stateNames);
+        /*if (pb.perso != null && pb.perso.p3dData != null) {
+            GUILayout.Label("S0: " + pb.perso.p3dData.off_stateInitial);
+            GUILayout.Label("S1: " + pb.perso.p3dData.off_stateCurrent);
+            GUILayout.Label("S2: " + pb.perso.p3dData.off_state2);
+        }*/
 
         GUILayout.BeginHorizontal();
         GUI.enabled = pb.stateIndex > 0;
