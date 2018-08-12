@@ -13,6 +13,19 @@ namespace OpenSpace.EngineObject {
     /// </summary>
     public class Perso : IEngineObject {
         public Pointer offset;
+
+        // Struct
+        public Pointer off_3dData;
+        public Pointer off_stdGame;
+        public Pointer off_dynam;
+        public Pointer off_brain;
+        public Pointer off_camera;
+        public Pointer off_collSet;
+        public Pointer off_msWay;
+        public Pointer off_sectInfo;
+
+
+        // Derived
         public string fullName = "Perso";
         public string nameFamily = null;
         public string nameModel = null;
@@ -63,15 +76,15 @@ namespace OpenSpace.EngineObject {
             //l.print("Offset: " + offset);
             Perso p = new Perso(offset, so);
             l.persos.Add(p);
-            Pointer off_perso = Pointer.Read(reader); // 0x0
-            Pointer off_stdGame = Pointer.Read(reader); // 4 Standard Game info
-            Pointer off_unknown = Pointer.Read(reader); // 0x8
-            Pointer off_brain = Pointer.Read(reader); // 0xC
-            reader.ReadUInt32(); // 0x10 is Camera in Rayman 2
-            Pointer off_collSet = Pointer.Read(reader); // 0x14 collset
-            Pointer off_msWay = Pointer.Read(reader); // 0x18
+            p.off_3dData = Pointer.Read(reader); // 0x0
+            p.off_stdGame = Pointer.Read(reader); // 4 Standard Game info
+            p.off_dynam = Pointer.Read(reader); // 0x8
+            p.off_brain = Pointer.Read(reader); // 0xC
+            p.off_camera = Pointer.Read(reader); // 0x10 is Camera in Rayman 2
+            p.off_collSet = Pointer.Read(reader); // 0x14 collset
+            p.off_msWay = Pointer.Read(reader); // 0x18
             reader.ReadUInt32(); // 0x1C
-            Pointer off_sectInfo = Pointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
+            p.off_sectInfo = Pointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
             if (l.mode == MapLoader.Mode.RaymanArenaPC || l.mode == MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
@@ -81,20 +94,23 @@ namespace OpenSpace.EngineObject {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-            //R3Pointer.Goto(ref reader, off_perso);
-            Pointer.Read(reader); // same as next
-            p.off_pointerToCurrentState = Pointer.Current(reader);
-            p.off_currentState = Pointer.Read(reader);
-            Pointer.Read(reader); // same as previous
-            p.off_physicalObjects = Pointer.Read(reader);
-            reader.ReadUInt32(); // same address?
-            Pointer off_family = Pointer.Read(reader);
-            p.family = Family.FromOffset(off_family);
-            p.initialState = State.FromOffset(p.family, p.off_currentState);
 
-            if (off_stdGame != null) {
-                Pointer off_current = Pointer.Goto(ref reader, off_stdGame);
-                p.stdGame = StandardGame.Read(reader, off_stdGame);
+            if (p.off_3dData != null) {
+                //R3Pointer.Goto(ref reader, off_perso);
+                Pointer.Read(reader); // same as next
+                p.off_pointerToCurrentState = Pointer.Current(reader);
+                p.off_currentState = Pointer.Read(reader);
+                Pointer.Read(reader); // same as previous
+                p.off_physicalObjects = Pointer.Read(reader);
+                reader.ReadUInt32(); // same address?
+                Pointer off_family = Pointer.Read(reader);
+                p.family = Family.FromOffset(off_family);
+                p.initialState = State.FromOffset(p.family, p.off_currentState);
+            }
+
+            if (p.off_stdGame != null) {
+                Pointer off_current = Pointer.Goto(ref reader, p.off_stdGame);
+                p.stdGame = StandardGame.Read(reader, p.off_stdGame);
                 p.nameFamily = p.stdGame.GetName(0);
                 p.nameModel = p.stdGame.GetName(1);
                 p.namePerso = p.stdGame.GetName(2);
@@ -103,9 +119,9 @@ namespace OpenSpace.EngineObject {
             }
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset + " - POs: " + p.off_physicalObjects);
 
-            if (off_brain != null) {
-                Pointer off_current = Pointer.Goto(ref reader, off_brain);
-                p.brain = Brain.Read(reader, off_brain);
+            if (p.off_brain != null) {
+                Pointer off_current = Pointer.Goto(ref reader, p.off_brain);
+                p.brain = Brain.Read(reader, p.off_brain);
                 if (p.brain.mind != null && p.brain.mind.AI_model != null && p.nameModel != null) p.brain.mind.AI_model.name = p.nameModel;
                 Pointer.Goto(ref reader, off_current);
             }
@@ -192,9 +208,9 @@ namespace OpenSpace.EngineObject {
                 p.physical_objects = p.family.physical_objects[p.family.GetIndexOfPhysicalList(p.off_physicalObjects)];
             }
 
-            if (off_collSet!=null) {
-                Pointer.Goto(ref reader, off_collSet);
-                p.collset = CollSet.Read(reader, p, off_collSet);
+            if (p.off_collSet!=null) {
+                Pointer.Goto(ref reader, p.off_collSet);
+                p.collset = CollSet.Read(reader, p, p.off_collSet);
             }
 
             return p;

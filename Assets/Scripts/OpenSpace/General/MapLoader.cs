@@ -155,7 +155,7 @@ namespace OpenSpace {
                         DAT dat = null;
 
                         DSB gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
-                        gameDsb.Save(gameDataBinFolder + "Game_dec.data");
+                        gameDsb.Save(gameDataBinFolder + "Game_dsb.dmp");
                         gameDsb.ReadAllSections();
                         gameDsb.Dispose();
                         string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
@@ -894,7 +894,7 @@ namespace OpenSpace {
             for (int i = 0; i < num_textures; i++) {
                 if (textures[i] != null) {
                     if (mode == Mode.Rayman2IOS) {
-                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "../graphics/textures/" + textures[i].name, ".gf");
+                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "world/graphics/textures/" + textures[i].name, ".gf");
                         if (File.Exists(texturePath)) {
                             GF gf = new GF(texturePath);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
@@ -1140,7 +1140,7 @@ namespace OpenSpace {
             for (uint i = num_textures_fix; i < num_textures_total; i++) {
                 if (textures[i] != null) {
                     if (mode == Mode.Rayman2IOS) {
-                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "../graphics/textures/" + textures[i].name, ".gf");
+                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "world/graphics/textures/" + textures[i].name, ".gf");
                         if (File.Exists(texturePath)) {
                             GF gf = new GF(texturePath);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
