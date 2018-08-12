@@ -20,7 +20,7 @@ namespace OpenSpace {
     }
 
     public class LinkedList<T> : IList<T> {
-        public delegate T ReadElement(Reader reader, Pointer offset);
+        public delegate T ReadElement(Pointer offset);
 
         public Pointer offset;
         public Type type;
@@ -64,7 +64,7 @@ namespace OpenSpace {
             return li;
         }
 
-        public void ReadEntries(Reader reader, ReadElement readElement, LinkedList.Flags flags = LinkedList.Flags.None) {
+        public void ReadEntries(ref Reader reader, ReadElement readElement, LinkedList.Flags flags = LinkedList.Flags.None) {
             Pointer off_next = off_head;
             bool elementPointerFirst = ((flags & LinkedList.Flags.ElementPointerFirst) != 0);
             bool hasHeaderPointers = ((flags & LinkedList.Flags.HasHeaderPointers) != 0);
@@ -83,10 +83,10 @@ namespace OpenSpace {
                     if (readAtPointer && !elementPointerFirst) off_element = Pointer.Read(reader);
                     // Read element
                     if (!readAtPointer) {
-                        list[i] = readElement(reader, off_element);
+                        list[i] = readElement(off_element);
                     } else {
-                        Pointer.DoAt(reader, off_element, (r,o) => {
-                            list[i] = readElement(r, o);
+                        Pointer.DoAt(ref reader, off_element, () => {
+                            list[i] = readElement(off_element);
                         });
                     }
 
@@ -104,11 +104,11 @@ namespace OpenSpace {
             }
         }
 
-        public static LinkedList<T> Read(Reader reader, Pointer offset, ReadElement readElement,
+        public static LinkedList<T> Read(ref Reader reader, Pointer offset, ReadElement readElement,
             LinkedList.Flags flags = LinkedList.Flags.None,
             Type type = Type.Default) {
             LinkedList<T> li = ReadHeader(reader, offset, type: type);
-            li.ReadEntries(reader, readElement, flags: flags);
+            li.ReadEntries(ref reader, readElement, flags: flags);
             return li;
         }
 

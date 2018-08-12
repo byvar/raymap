@@ -44,11 +44,11 @@ namespace OpenSpace.Collide {
         private static LinkedList<CollideMeshObject> ParseZdxList(Reader reader, Pointer offset, CollideMeshObject.Type type) {
             MapLoader l = MapLoader.Loader;
             LinkedList<CollideMeshObject> zdxList = null;
-            Pointer.DoAt(reader, offset, (r1,o1) => {
+            Pointer.DoAt(ref reader, offset, () => {
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
-                zdxList = LinkedList<CollideMeshObject>.Read(r1, o1,
-                    (Reader r, Pointer o) => {
-                        return CollideMeshObject.Read(r, o, type: type);
+                zdxList = LinkedList<CollideMeshObject>.Read(ref reader, offset,
+                    (off_element) => {
+                        return CollideMeshObject.Read(reader, off_element, type: type);
                     },
                     flags: LinkedList.Flags.ReadAtPointer
                         | (l.mode == MapLoader.Mode.Rayman3GC ?

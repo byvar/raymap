@@ -92,8 +92,8 @@ namespace OpenSpace.EngineObject {
                 reader.ReadUInt32();
             }
 
-            Pointer.DoAt(reader, p.off_3dData, (r,o) => {
-                p.p3dData = Perso3dData.Read(r, o);
+            Pointer.DoAt(ref reader, p.off_3dData, () => {
+                p.p3dData = Perso3dData.Read(reader, p.off_3dData);
             });
 
             if (p.off_stdGame != null) {

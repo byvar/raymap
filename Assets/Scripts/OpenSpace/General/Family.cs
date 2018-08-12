@@ -117,8 +117,8 @@ namespace OpenSpace {
             f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
             f.family_index = reader.ReadUInt32();
             f.name = l.objectTypes[0][f.family_index].name;
-            f.states = LinkedList<State>.Read(reader, Pointer.Current(reader), (Reader r, Pointer o) => {
-                State s = State.Read(r, o, f);
+            f.states = LinkedList<State>.Read(ref reader, Pointer.Current(reader), (off_element) => {
+                State s = State.Read(reader, off_element, f);
                 return s;
             });
             if (Settings.s.engineMode == Settings.EngineMode.R3) {

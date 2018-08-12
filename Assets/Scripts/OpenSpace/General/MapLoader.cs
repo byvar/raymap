@@ -1422,8 +1422,8 @@ namespace OpenSpace {
             if (families.Count > 0) {
                 GameObject familiesParent = new GameObject("Families");
                 familiesParent.SetActive(false); // Families do not need to be visible
-                families.ReadEntries(reader, (Reader r, Pointer o) => {
-                    Family f = Family.Read(r, o);
+                families.ReadEntries(ref reader, (off_element) => {
+                    Family f = Family.Read(reader, off_element);
                     f.Gao.transform.SetParent(familiesParent.transform, false);
                     return f;
                 }, LinkedList.Flags.HasHeaderPointers);

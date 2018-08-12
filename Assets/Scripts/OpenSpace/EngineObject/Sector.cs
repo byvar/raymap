@@ -54,27 +54,27 @@ namespace OpenSpace.EngineObject {
         public void ProcessPointers(Reader reader) {
             MapLoader l = MapLoader.Loader;
             if (neighbors != null && neighbors.Count > 0) {
-                neighbors.ReadEntries(reader, (Reader r, Pointer o) => {
+                neighbors.ReadEntries(ref reader, (off_element) => {
                     NeighborSector n = new NeighborSector();
-                    n.short0 = r.ReadUInt16();
-                    n.short2 = r.ReadUInt16();
-                    Pointer sp = Pointer.Read(r);
+                    n.short0 = reader.ReadUInt16();
+                    n.short2 = reader.ReadUInt16();
+                    Pointer sp = Pointer.Read(reader);
                     n.sector = l.sectors.FirstOrDefault(s => s.SuperObject.offset == sp);
                     if (l.mode == MapLoader.Mode.RaymanArenaGC) {
-                        n.off_next = o + 8; // We just read 8 bytes
+                        n.off_next = off_element + 8; // We just read 8 bytes
                     } else {
-                        n.off_next = Pointer.Read(r);
+                        n.off_next = Pointer.Read(reader);
                         if (l.mode == MapLoader.Mode.Rayman3GC) {
-                            n.off_previous = Pointer.Read(r);
-                            Pointer off_sector_start = Pointer.Read(r);
+                            n.off_previous = Pointer.Read(reader);
+                            Pointer off_sector_start = Pointer.Read(reader);
                         }
                     }
                     return n;
                 });
             }
             if (persos != null && persos.Count > 0) {
-                persos.ReadEntries(reader, (Reader r, Pointer o) => {
-                    return l.persos.FirstOrDefault(p => p.SuperObject != null && p.SuperObject.offset == o);
+                persos.ReadEntries(ref reader, (off_element) => {
+                    return l.persos.FirstOrDefault(p => p.SuperObject != null && p.SuperObject.offset == off_element);
                 }, LinkedList.Flags.ElementPointerFirst);
             }
         }
@@ -83,9 +83,9 @@ namespace OpenSpace.EngineObject {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
             s.persos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
-            s.lights = LinkedList<LightInfo>.Read(reader, Pointer.Current(reader),
-                (Reader r, Pointer o) => {
-                    LightInfo li = LightInfo.Read(r, o);
+            s.lights = LinkedList<LightInfo>.Read(ref reader, Pointer.Current(reader),
+                (off_element) => {
+                    LightInfo li = LightInfo.Read(reader, off_element);
                     if (li != null) li.containingSectors.Add(s);
                     return li;
                 },

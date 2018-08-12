@@ -107,14 +107,14 @@ namespace OpenSpace {
             return new Pointer((uint)(curPos - curFile.baseOffset), curFile);
         }
 
-        public void DoAt(Reader reader, Reader.ReadAction action) {
+        public void DoAt(ref Reader reader, Action action) {
             Pointer off_current = Goto(ref reader, this);
-            action(reader, this);
+            action();
             Goto(ref reader, off_current);
         }
 
-        public static void DoAt(Reader reader, Pointer newPos, Reader.ReadAction action) {
-            if (newPos != null) newPos.DoAt(reader, action);
+        public static void DoAt(ref Reader reader, Pointer newPos, Action action) {
+            if (newPos != null) newPos.DoAt(ref reader, action);
         }
 
         // For writers
