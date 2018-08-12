@@ -121,7 +121,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadByte();
             if (Settings.s.hasNames) {
-                s.name = new string(reader.ReadChars(0x104));
+                s.name = reader.ReadString(0x104);
                 l.print(s.name);
             } else {
                 s.name = "Sector @ " + offset;

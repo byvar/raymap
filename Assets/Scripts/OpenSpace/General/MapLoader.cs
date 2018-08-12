@@ -129,59 +129,66 @@ namespace OpenSpace {
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
                 if (!Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
+                gameDataBinFolder += "/";
                 if (lvlName.EndsWith(".exe")) {
                     if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
                     Settings.s.loadFromMemory = true;
-                    if (mode != Mode.Rayman2IOS) {
-                        if (!settings.isR2Demo) { // Normal Game
-                            cntPaths = new string[2];
-                            cntPaths[0] = Path.Combine(gameDataBinFolder, "Vignette.cnt");
-                            cntPaths[1] = Path.Combine(gameDataBinFolder, "Textures.cnt");
-                            cnt = new CNT(cntPaths);
-                        } else { // R2 Demo
-                            cntPaths = new string[1];
-                            cntPaths[0] = Path.Combine(gameDataBinFolder, "Textures.cnt");
-                            cnt = new CNT(cntPaths);
+                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                        DSB gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
+                        //gameDsb.Save(gameDataBinFolder + "Game_dec.data"));
+                        gameDsb.ReadAllSections();
+                        gameDsb.Dispose();
+                        string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
+                        List<string> cntPaths = new List<string>();
+                        if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
+                        if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
+                        if (cntPaths.Count > 0) {
+                            cnt = new CNT(cntPaths.ToArray());
                         }
                     }
                     MemoryFile mem = new MemoryFile(lvlName);
                     files_array[0] = mem;
                     LoadMemory();
                 } else {
-                    if (settings.engineMode == Settings.EngineMode.R2) {
+                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
                         hasTransit = false;
                         DAT dat = null;
+
+                        DSB gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
+                        gameDsb.Save(gameDataBinFolder + "Game_dec.data");
+                        gameDsb.ReadAllSections();
+                        gameDsb.Dispose();
+                        string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
+
                         if (mode == Mode.Rayman2PC || mode == Mode.DonaldDuckPC) {
-                            string dataPath = Path.Combine(gameDataBinFolder, "levels0.dat");
+                            string dataPath = levelsFolder + "LEVELS0.DAT";
                             if (File.Exists(dataPath)) {
-                                dat = new DAT("levels0", dataPath);
+                                dat = new DAT("LEVELS0", gameDsb, dataPath);
                             }
                         }
-
-                        /*DSB dsb = new DSB(lvlName, Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dsb"));
-                        DSB gameDsb = new DSB("Game", Path.Combine(gameDataBinFolder, "Game.dsb"));
-                        gameDsb.Save(Path.Combine(gameDataBinFolder, "Game_dec.data"));
+                        
+                        DSB dsb = new DSB(lvlName, levelsFolder + lvlName + "/" + lvlName + ".dsb");
+                        dsb.ReadAllSections();
                         dsb.Dispose();
-                        gameDsb.Dispose();*/
 
-                        string fixSnaPath = Path.Combine(gameDataBinFolder, "fix.sna");
+                        string fixSnaPath = levelsFolder + "fix.sna";
                         RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
                         SNA fixSna = new SNA("fix", fixSnaPath, fixRtb);
-                        string fixGptPath = Path.Combine(gameDataBinFolder, "fix.gpt");
+                        string fixGptPath = levelsFolder + "fix.gpt";
                         RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
                         fixSna.ReadGPT(fixGptPath, fixRtp);
 
-                        string fixPtxPath = Path.Combine(gameDataBinFolder, "fix.ptx");
+                        string fixPtxPath = levelsFolder + "fix.ptx";
                         RelocationTable fixRtt = new RelocationTable(fixPtxPath, dat, "fix", RelocationType.RTT);
                         fixSna.ReadPTX(fixPtxPath, fixRtt);
 
-                        string lvlSnaPath = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".sna");
+                        string lvlSnaPath = levelsFolder + lvlName + "/" + lvlName + ".sna";
                         RelocationTable lvlRtb = new RelocationTable(lvlSnaPath, dat, lvlName, RelocationType.RTB);
                         SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
-                        string lvlGptPath = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".gpt");
+                        string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
                         RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
                         lvlSna.ReadGPT(lvlGptPath, lvlRtp);
-                        string lvlPtxPath = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".ptx");
+                        string lvlPtxPath = levelsFolder + lvlName + "/" + lvlName + ".ptx";
                         RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
                         lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
 
@@ -193,21 +200,27 @@ namespace OpenSpace {
                         files_array[1] = lvlSna;
                         files_array[2] = dat;
 
-                        fixSna.CreateMemoryDump(Path.Combine(gameDataBinFolder, "fix.dmp"), true);
-                        lvlSna.CreateMemoryDump(Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dmp"), true);
+                        fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
+                        lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
 
-                        if (mode != Mode.Rayman2IOS) {
+                        List<string> cntPaths = new List<string>();
+                        if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
+                        if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
+                        if (cntPaths.Count > 0) {
+                            cnt = new CNT(cntPaths.ToArray());
+                        }
+                        /*if (mode != Mode.Rayman2IOS) {
                             if (!settings.isR2Demo) { // Normal Game
                                 cntPaths = new string[2];
-                                cntPaths[0] = Path.Combine(gameDataBinFolder, "Vignette.cnt");
-                                cntPaths[1] = Path.Combine(gameDataBinFolder, "Textures.cnt");
+                                cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
+                                cntPaths[1] = gameDataBinFolder + "Textures.cnt";
                                 cnt = new CNT(cntPaths);
                             } else { // R2 Demo
                                 cntPaths = new string[1];
-                                cntPaths[0] = Path.Combine(gameDataBinFolder, "Textures.cnt");
+                                cntPaths[0] = gameDataBinFolder + "Textures.cnt";
                                 cnt = new CNT(cntPaths);
                             }
-                        }
+                        }*/
 
                         LoadFIXSNA();
                         LoadLVLSNA();
@@ -216,47 +229,47 @@ namespace OpenSpace {
                         lvlSna.Dispose();
                         if (dat != null) dat.Dispose();
 
-                    } else if (settings.engineMode == Settings.EngineMode.R3) {
+                    } else if (Settings.s.engineMode == Settings.EngineMode.R3) {
 
-                        menuTPLPath = Path.Combine(gameDataBinFolder, "menu.tpl");
+                        menuTPLPath = gameDataBinFolder + "menu.tpl";
                         lvlNames[0] = "fix";
-                        lvlPaths[0] = Path.Combine(gameDataBinFolder, "fix.lvl");
-                        ptrPaths[0] = Path.Combine(gameDataBinFolder, "fix.ptr");
-                        tplPaths[0] = Path.Combine(gameDataBinFolder, ((mode == Mode.RaymanArenaGC) ? "../common.tpl" : "fix.tpl"));
+                        lvlPaths[0] = gameDataBinFolder + "fix.lvl";
+                        ptrPaths[0] = gameDataBinFolder + "fix.ptr";
+                        tplPaths[0] = gameDataBinFolder + ((mode == Mode.RaymanArenaGC) ? "../common.tpl" : "fix.tpl");
 
                         lvlNames[1] = lvlName;
-                        lvlPaths[1] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".lvl");
-                        ptrPaths[1] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".ptr");
-                        tplPaths[1] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ((mode == Mode.RaymanArenaGC) ? ".tpl" : "_Lvl.tpl"));
+                        lvlPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".lvl";
+                        ptrPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".ptr";
+                        tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ((mode == Mode.RaymanArenaGC) ? ".tpl" : "_Lvl.tpl");
 
                         lvlNames[2] = "transit";
-                        lvlPaths[2] = Path.Combine(gameDataBinFolder, lvlName + "/transit.lvl");
-                        ptrPaths[2] = Path.Combine(gameDataBinFolder, lvlName + "/transit.ptr");
-                        tplPaths[2] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "_Trans.tpl");
+                        lvlPaths[2] = gameDataBinFolder + lvlName + "/transit.lvl";
+                        ptrPaths[2] = gameDataBinFolder + lvlName + "/transit.ptr";
+                        tplPaths[2] = gameDataBinFolder + lvlName + "/" + lvlName + "_Trans.tpl";
                         hasTransit = File.Exists(lvlPaths[2]) && (new FileInfo(lvlPaths[2]).Length > 4);
 
                         lvlNames[4] = lvlName + "_vb";
-                        lvlPaths[4] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "_vb.lvl");
-                        ptrPaths[4] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "_vb.ptr");
+                        lvlPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName + "_vb.lvl";
+                        ptrPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName + "_vb.ptr";
 
                         lvlNames[5] = "fixkf";
-                        lvlPaths[5] = Path.Combine(gameDataBinFolder, "fixkf.lvl");
-                        ptrPaths[5] = Path.Combine(gameDataBinFolder, "fixkf.ptr");
+                        lvlPaths[5] = gameDataBinFolder + "fixkf.lvl";
+                        ptrPaths[5] = gameDataBinFolder + "fixkf.ptr";
 
                         lvlNames[6] = lvlName + "kf";
-                        lvlPaths[6] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "kf.lvl");
-                        ptrPaths[6] = Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + "kf.ptr");
+                        lvlPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName + "kf.lvl";
+                        ptrPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName + "kf.ptr";
 
                         if (mode == Mode.Rayman3PC) {
                             cntPaths = new string[3];
-                            cntPaths[0] = Path.Combine(gameDataBinFolder, "vignette.cnt");
-                            cntPaths[1] = Path.Combine(gameDataBinFolder, "tex32_1.cnt");
-                            cntPaths[2] = Path.Combine(gameDataBinFolder, "tex32_2.cnt");
+                            cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+                            cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
+                            cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
                             cnt = new CNT(cntPaths);
                         } else if (mode == Mode.RaymanArenaPC) {
                             cntPaths = new string[2];
-                            cntPaths[0] = Path.Combine(gameDataBinFolder, "vignette.cnt");
-                            cntPaths[1] = Path.Combine(gameDataBinFolder, "tex32.cnt");
+                            cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+                            cntPaths[1] = gameDataBinFolder + "tex32.cnt";
                             cnt = new CNT(cntPaths);
                         }
 
@@ -881,7 +894,7 @@ namespace OpenSpace {
             for (int i = 0; i < num_textures; i++) {
                 if (textures[i] != null) {
                     if (mode == Mode.Rayman2IOS) {
-                        string texturePath = Path.ChangeExtension(Path.Combine(gameDataBinFolder, "../graphics/textures/" + textures[i].name), ".gf");
+                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "../graphics/textures/" + textures[i].name, ".gf");
                         if (File.Exists(texturePath)) {
                             GF gf = new GF(texturePath);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
@@ -1100,8 +1113,8 @@ namespace OpenSpace {
             animationBanks[1] = animationBanks[0];
 
 
-            ((SNA)files_array[0]).CreateMemoryDump(Path.Combine(gameDataBinFolder, "fix.dmp"), true);
-            ((SNA)files_array[1]).CreateMemoryDump(Path.Combine(gameDataBinFolder, lvlName + "/" + lvlName + ".dmp"), true);
+            ((SNA)files_array[0]).CreateMemoryDump(gameDataBinFolder + "fix.dmp", true);
+            ((SNA)files_array[1]).CreateMemoryDump(gameDataBinFolder + lvlName + "/" + lvlName + ".dmp", true);
 
 
             // Read PTX
@@ -1127,7 +1140,7 @@ namespace OpenSpace {
             for (uint i = num_textures_fix; i < num_textures_total; i++) {
                 if (textures[i] != null) {
                     if (mode == Mode.Rayman2IOS) {
-                        string texturePath = Path.ChangeExtension(Path.Combine(gameDataBinFolder, "../graphics/textures/" + textures[i].name), ".gf");
+                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "../graphics/textures/" + textures[i].name, ".gf");
                         if (File.Exists(texturePath)) {
                             GF gf = new GF(texturePath);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
@@ -1270,7 +1283,7 @@ namespace OpenSpace {
         }
 
         public FileWithPointers InitExtraLVL(string relativePath, int id) {
-            string path = Path.Combine(gameDataBinFolder, relativePath);
+            string path = gameDataBinFolder + relativePath;
             string lvlName = Path.GetFileNameWithoutExtension(relativePath);
             string lvlPath = Path.ChangeExtension(path, "lvl");
             string ptrPath = Path.ChangeExtension(path, "ptr");

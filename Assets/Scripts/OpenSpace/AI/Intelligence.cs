@@ -25,8 +25,10 @@ namespace OpenSpace.AI {
             i.off_aiModel = Pointer.Read(reader);
             i.off_actionTree = Pointer.Read(reader);
             i.off_comport = Pointer.Read(reader);
-            i.off_lastComport = Pointer.Read(reader);
-            i.off_actionTable = Pointer.Read(reader);
+            if (!Settings.s.isR2Demo) {
+                i.off_lastComport = Pointer.Read(reader);
+                i.off_actionTable = Pointer.Read(reader);
+            }
             return i;
         }
     }

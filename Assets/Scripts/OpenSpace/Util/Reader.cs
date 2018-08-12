@@ -76,6 +76,10 @@ namespace OpenSpace {
             return result;
         }
 
+        public string ReadString(int size) {
+            return new string(ReadChars(size)).TrimEnd('\0');
+        }
+
         // To make sure position is a multiple of alignBytes
         public void Align(int alignBytes) {
             if (BaseStream.Position % alignBytes != 0) {

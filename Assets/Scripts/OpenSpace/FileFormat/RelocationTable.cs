@@ -87,13 +87,9 @@ namespace OpenSpace.FileFormat {
         private void Load(DAT dat, string name, RelocationType type) {
             Reader reader = dat.reader;
             int levelIndex = 0;
-            string[] levelList = DAT.levelList;
-            if (MapLoader.Loader.settings.isDonald) {
-                levelList = DAT.levelListDonaldDuck;
-            }
 
-            for (int i = 0; i < levelList.Length; i++) {
-                if (levelList[i].ToLower().Equals(name.ToLower())) {
+            for (int i = 0; i < dat.gameDsb.levels.Count; i++) {
+                if (dat.gameDsb.levels[i].ToLower().Equals(name.ToLower())) {
                     levelIndex = i;
                     break;
                 }

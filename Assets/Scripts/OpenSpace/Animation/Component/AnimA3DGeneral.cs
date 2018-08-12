@@ -22,7 +22,7 @@ namespace OpenSpace.Animation.Component {
         public ushort num_keyframes;
         public ushort num_events;
         public ushort unk_1A;
-        public ushort unk_1C;
+        public ushort subtractFramesForSpeed;
         public ushort unk_1E;
         public ushort unk_20;
         public ushort unk_22;
@@ -71,7 +71,7 @@ namespace OpenSpace.Animation.Component {
                 if (!Settings.s.isR2Demo) a3d.unk_14 = reader.ReadUInt16();
                 a3d.num_events = reader.ReadUInt16();
                 a3d.unk_1A = reader.ReadUInt16(); // vector related
-                a3d.unk_1C = reader.ReadUInt16();
+                a3d.subtractFramesForSpeed = reader.ReadUInt16();
                 a3d.unk_1E = reader.ReadUInt16(); // only frames again?
                 a3d.unk_20 = reader.ReadUInt16(); // field0 again?
                 a3d.unk_22 = reader.ReadUInt16();
@@ -103,7 +103,7 @@ namespace OpenSpace.Animation.Component {
                 a3d.num_keyframes = reader.ReadUInt16();
                 a3d.num_events = reader.ReadUInt16();
                 a3d.unk_1A = reader.ReadUInt16();
-                a3d.unk_1C = reader.ReadUInt16();
+                a3d.subtractFramesForSpeed = reader.ReadUInt16();
                 a3d.unk_1E = reader.ReadUInt16();
                 a3d.unk_20 = reader.ReadUInt16();
                 a3d.unk_22 = reader.ReadUInt16();

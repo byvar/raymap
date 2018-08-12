@@ -327,7 +327,7 @@ namespace OpenSpace.Visual {
                 sm.num_disconnected_triangles = reader.ReadUInt16();
                 sm.off_connected_vertices = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
                 sm.off_disconnected_triangles = Pointer.Read(reader);
-                if (l.mode == MapLoader.Mode.Rayman3GC) sm.name = new string(reader.ReadChars(0x34)).TrimEnd('\0');
+                if (l.mode == MapLoader.Mode.Rayman3GC) sm.name = reader.ReadString(0x34);
             } else {
                 // Defaults for Rayman 2
                 sm.num_uvMaps = 1;

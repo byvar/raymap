@@ -47,7 +47,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadUInt32();
             ipo.name = "IPO";
-            if (l.mode == MapLoader.Mode.Rayman3GC) ipo.name = new string(reader.ReadChars(0x32)).TrimEnd('\0');
+            if (Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
             Pointer.Goto(ref reader, ipo.off_data);
             ipo.data = PhysicalObject.Read(reader, ipo.off_data);
             if (ipo.data != null) {

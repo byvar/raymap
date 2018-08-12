@@ -11,7 +11,7 @@ namespace OpenSpace.EngineObject {
     /// - "actual world" (=everything)
     /// - "dynamic world" (=only dynamic IPOs and Persos)
     /// - "inactive dynamic world" (only ingame, visible in Unity as empty gameobject)
-    /// - a world containing the sectors
+    /// - "father sector", a world containing the sectors
     /// - a world containing the objects that remain loaded during transit, if transit exists
     /// </summary>
     public class World : IEngineObject {

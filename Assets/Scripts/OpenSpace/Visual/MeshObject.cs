@@ -110,7 +110,7 @@ namespace OpenSpace.Visual {
                 reader.ReadInt16();
             }
             m.name = "Mesh @ " + offset;
-            if (l.mode == MapLoader.Mode.Rayman3GC) m.name = new string(reader.ReadChars(0x32)).TrimEnd('\0');
+            if (Settings.s.hasNames) m.name = reader.ReadString(0x32);
             // Vertices
             Pointer off_current = Pointer.Goto(ref reader, m.off_vertices);
             //print("Loading vertices at " + String.Format("0x{0:X}", fs.Position) + " | Amount: " + num_vertices);
