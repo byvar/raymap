@@ -34,6 +34,7 @@ namespace OpenSpace.EngineObject {
         public Pointer off_physicalObjects = null;
         public PhysicalObject[] physical_objects = null;
         public StandardGame stdGame;
+        public Dynam dynam;
         public Brain brain = null;
         public State initialState = null;
         public Pointer off_currentState;
@@ -78,7 +79,7 @@ namespace OpenSpace.EngineObject {
             l.persos.Add(p);
             p.off_3dData = Pointer.Read(reader); // 0x0
             p.off_stdGame = Pointer.Read(reader); // 4 Standard Game info
-            p.off_dynam = Pointer.Read(reader); // 0x8
+            p.off_dynam = Pointer.Read(reader); // 0x8 Dynam
             p.off_brain = Pointer.Read(reader); // 0xC
             p.off_camera = Pointer.Read(reader); // 0x10 is Camera in Rayman 2
             p.off_collSet = Pointer.Read(reader); // 0x14 collset
@@ -118,6 +119,11 @@ namespace OpenSpace.EngineObject {
                 Pointer.Goto(ref reader, off_current);
             }
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset + " - POs: " + p.off_physicalObjects);
+            if (p.off_dynam != null) {
+                Pointer off_current = Pointer.Goto(ref reader, p.off_dynam);
+                p.dynam = Dynam.Read(reader, p.off_dynam);
+                Pointer.Goto(ref reader, off_current);
+            }
 
             if (p.off_brain != null) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_brain);

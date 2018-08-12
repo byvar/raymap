@@ -209,6 +209,12 @@ public class Controller : MonoBehaviour {
                                 }
                             }
                         }
+                        
+                        // Dynam
+                        if (p.dynam!=null && p.dynam.dynamics!=null) {
+                            DynamicsMechanicsComponent dynamicsBehaviour = p.Gao.AddComponent<DynamicsMechanicsComponent>();
+                            dynamicsBehaviour.SetDynamics(p.dynam.dynamics);
+                        }
 
                     }
                 }
