@@ -14,6 +14,7 @@ namespace OpenSpace {
         public Pointer off_state_prev;
         public Pointer off_anim_ref;
         public LinkedList<int> stateTransitions;
+        public Pointer off_mechanicsIDCard = null;
         public Pointer off_cine_mapname = null;
         public Pointer off_cine_name = null;
         public string cine_mapname = null;
@@ -21,6 +22,7 @@ namespace OpenSpace {
         public byte speed;
         public Pointer off_state_auto; // Go to this state after a while if nothing changes
         public AnimationReference anim_ref;
+        public MechanicsIDCard mechanicsIDCard;
 
         public Pointer NextEntry {
             get {
@@ -61,10 +63,10 @@ namespace OpenSpace {
             s.off_anim_ref = Pointer.Read(reader);
             s.stateTransitions = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // int is placeholder type
             reader.ReadUInt32();
-            reader.ReadUInt32();
+            Pointer.Read(reader);
             if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
             s.off_state_auto = Pointer.Read(reader);
-            Pointer.Read(reader); // fam end?
+            s.off_mechanicsIDCard = Pointer.Read(reader);
             if (Settings.s.engineMode == Settings.EngineMode.R3) {
                 s.off_cine_mapname = Pointer.Read(reader);
                 s.off_cine_name = Pointer.Read(reader);
@@ -74,7 +76,9 @@ namespace OpenSpace {
             reader.ReadByte();
             reader.ReadByte();
             if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32();
-
+            if (s.off_mechanicsIDCard != null) {
+                s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
+            }
             if (s.off_cine_mapname != null) {
                 Pointer.Goto(ref reader, s.off_cine_mapname);
                 s.cine_mapname = reader.ReadNullDelimitedString();

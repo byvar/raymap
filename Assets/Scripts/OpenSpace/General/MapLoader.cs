@@ -65,6 +65,7 @@ namespace OpenSpace {
         public List<Graph> graphs = new List<Graph>();
         public List<WayPoint> isolateWaypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
+        public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
         public GameObject graphRoot = null;
         public GameObject isolateWaypointRoot = null;
@@ -1258,9 +1259,10 @@ namespace OpenSpace {
 
         // Defining it this way, clicking the print will go straight to the code you want
         public Action<object> print = MonoBehaviour.print;
+
         /*public void print(string str) {
-            MonoBehaviour.print(str);
-        }*/
+MonoBehaviour.print(str);
+}*/
 
         public FileWithPointers GetFileByReader(Reader reader) {
             for (int i = 0; i < files_array.Length; i++) {
