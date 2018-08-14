@@ -81,6 +81,7 @@ namespace OpenSpace {
         string[] tplPaths = new string[7];
         string[] cntPaths = null;
         CNT cnt = null;
+        DSB gameDsb = null;
         string menuTPLPath;
 
         public Globals globals = null;
@@ -131,22 +132,18 @@ namespace OpenSpace {
                 globals = new Globals();
                 if (!Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 gameDataBinFolder += "/";
+
+                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                    gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
+                    gameDsb.Save(gameDataBinFolder + "Game_dsb.dmp");
+                    gameDsb.ReadAllSections();
+                    gameDsb.Dispose();
+                }
+                CreateCNT();
+
                 if (lvlName.EndsWith(".exe")) {
                     if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
                     Settings.s.loadFromMemory = true;
-                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                        DSB gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
-                        //gameDsb.Save(gameDataBinFolder + "Game_dec.data"));
-                        gameDsb.ReadAllSections();
-                        gameDsb.Dispose();
-                        string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
-                        List<string> cntPaths = new List<string>();
-                        if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
-                        if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
-                        if (cntPaths.Count > 0) {
-                            cnt = new CNT(cntPaths.ToArray());
-                        }
-                    }
                     MemoryFile mem = new MemoryFile(lvlName);
                     files_array[0] = mem;
                     LoadMemory();
@@ -154,11 +151,7 @@ namespace OpenSpace {
                     if (Settings.s.engineMode == Settings.EngineMode.R2) {
                         hasTransit = false;
                         DAT dat = null;
-
-                        DSB gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
-                        gameDsb.Save(gameDataBinFolder + "Game_dsb.dmp");
-                        gameDsb.ReadAllSections();
-                        gameDsb.Dispose();
+                        
                         string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
 
                         if (mode == Mode.Rayman2PC || mode == Mode.DonaldDuckPC) {
@@ -204,12 +197,6 @@ namespace OpenSpace {
                         fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
                         lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
 
-                        List<string> cntPaths = new List<string>();
-                        if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
-                        if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
-                        if (cntPaths.Count > 0) {
-                            cnt = new CNT(cntPaths.ToArray());
-                        }
                         /*if (mode != Mode.Rayman2IOS) {
                             if (!settings.isR2Demo) { // Normal Game
                                 cntPaths = new string[2];
@@ -260,19 +247,6 @@ namespace OpenSpace {
                         lvlNames[6] = lvlName + "kf";
                         lvlPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName + "kf.lvl";
                         ptrPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName + "kf.ptr";
-
-                        if (mode == Mode.Rayman3PC) {
-                            cntPaths = new string[3];
-                            cntPaths[0] = gameDataBinFolder + "vignette.cnt";
-                            cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
-                            cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
-                            cnt = new CNT(cntPaths);
-                        } else if (mode == Mode.RaymanArenaPC) {
-                            cntPaths = new string[2];
-                            cntPaths[0] = gameDataBinFolder + "vignette.cnt";
-                            cntPaths[1] = gameDataBinFolder + "tex32.cnt";
-                            cnt = new CNT(cntPaths);
-                        }
 
                         for (int i = 0; i < lvlPaths.Length; i++) {
                             if (lvlPaths[i] == null) continue;
@@ -1227,8 +1201,12 @@ namespace OpenSpace {
 
             // Read animations
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_stacks"], mem));
-            animationBanks[0] = AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, null)[0];
-            animationBanks[1] = animationBanks[0];
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                animationBanks[0] = AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, null)[0];
+                animationBanks[1] = animationBanks[0];
+            } else {
+                animationBanks = AnimationBank.Read(reader, Pointer.Current(reader), 0, 5, null);
+            }
 
             // Read textures
             uint[] texMemoryChannels = new uint[1024];
@@ -1252,6 +1230,23 @@ namespace OpenSpace {
                 }
             }
             textures = textureInfos.ToArray();
+            
+            // Parse materials list
+            if (Settings.s.memoryAddresses.ContainsKey("visualMaterials") && Settings.s.memoryAddresses.ContainsKey("num_visualMaterials")) {
+                Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["num_visualMaterials"], mem));
+                uint num_visual_materials = reader.ReadUInt32();
+                Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["visualMaterials"], mem));
+                Pointer off_visualMaterials = Pointer.Read(reader);
+                if (off_visualMaterials != null) {
+                    Pointer.Goto(ref reader, off_visualMaterials);
+                    for (uint i = 0; i < num_visual_materials; i++) {
+                        Pointer off_material = Pointer.Read(reader);
+                        Pointer off_current_mat = Pointer.Goto(ref reader, off_material);
+                        visualMaterials.Add(VisualMaterial.Read(reader, off_material));
+                        Pointer.Goto(ref reader, off_current_mat);
+                    }
+                }
+            }
 
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["inputStructure"], mem));
             inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
@@ -1309,6 +1304,31 @@ MonoBehaviour.print(str);
                 return lvl;
             } else {
                 return null;
+            }
+        }
+
+        public void CreateCNT() {
+            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
+                List<string> cntPaths = new List<string>();
+                if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
+                if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
+                if (cntPaths.Count > 0) {
+                    cnt = new CNT(cntPaths.ToArray());
+                }
+            } else {
+                if (mode == Mode.Rayman3PC) {
+                    cntPaths = new string[3];
+                    cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+                    cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
+                    cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
+                    cnt = new CNT(cntPaths);
+                } else if (mode == Mode.RaymanArenaPC) {
+                    cntPaths = new string[2];
+                    cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+                    cntPaths[1] = gameDataBinFolder + "tex32.cnt";
+                    cnt = new CNT(cntPaths);
+                }
             }
         }
 

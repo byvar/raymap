@@ -111,32 +111,32 @@ namespace OpenSpace.Animation {
                     }
                 } else {
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_a3d"], offset.file));
-                    banks[0].a3d_general.off_data = Pointer.Read(reader);
+                    for(int i = 0; i < num_banks; i++) banks[i].a3d_general.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_vectors"], offset.file));
-                    banks[0].vectors.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].vectors.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_quaternions"], offset.file));
-                    banks[0].quaternions.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].quaternions.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_hierarchies"], offset.file));
-                    banks[0].hierarchies.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].hierarchies.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_NTTO"], offset.file));
-                    banks[0].NTTO.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].NTTO.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_onlyFrames"], offset.file));
-                    banks[0].onlyFrames.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].onlyFrames.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_channels"], offset.file));
-                    banks[0].channels.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].channels.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_framesNumOfNTTO"], offset.file));
-                    banks[0].framesNumOfNTTO.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].framesNumOfNTTO.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_framesKF"], offset.file));
-                    banks[0].framesKFIndex.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].framesKFIndex.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_keyframes"], offset.file));
-                    banks[0].keyframes.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].keyframes.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_events"], offset.file));
-                    banks[0].events.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].events.off_data = Pointer.Read(reader);
                     Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_morphData"], offset.file));
-                    banks[0].morphData.off_data = Pointer.Read(reader);
+                    for (int i = 0; i < num_banks; i++) banks[i].morphData.off_data = Pointer.Read(reader);
                     if (Settings.s.hasDeformations) {
                         Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_deformations"], offset.file));
-                        banks[0].deformations.off_data = Pointer.Read(reader);
+                        for (int i = 0; i < num_banks; i++) banks[i].deformations.off_data = Pointer.Read(reader);
                     }
                 }
             }

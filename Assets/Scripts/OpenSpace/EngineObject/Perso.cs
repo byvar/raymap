@@ -143,7 +143,8 @@ namespace OpenSpace.EngineObject {
                     }
                 }
             }*/
-            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.p3dData != null && p.p3dData.family != null) {
+            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.p3dData != null && p.p3dData.family != null
+                && !(Settings.s.engineMode == Settings.EngineMode.R3 && Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
                 // Add physical objects tables hidden in scripts
                 AIModel ai = p.brain.mind.AI_model;
                 if (ai.behaviors_normal != null) {
