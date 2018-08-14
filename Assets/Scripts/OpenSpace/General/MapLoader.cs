@@ -329,6 +329,16 @@ namespace OpenSpace {
                     }
                 }
             }
+
+            foreach (Family family in families) {
+                GameObject gao = family.Gao;
+                if (gao != null) {
+                    FamilyComponent fc = gao.GetComponent<FamilyComponent>();
+                    if (fc != null) {
+                        fc.SaveChanges(writer);
+                    }
+                }
+            }
         }
 
         public void Save() {
