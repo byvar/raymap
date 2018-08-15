@@ -46,7 +46,7 @@ namespace OpenSpace.AI {
                 if (num_entries > 0 && off_entries != null) {
                     Pointer.Goto(ref reader, off_entries);
                     for (int i = 0; i < num_entries; i++) {
-                        ai.behaviors_normal[i] = Behavior.Read(reader, Pointer.Current(reader), ai, Behavior.BehaviorType.Intelligence, i);
+                        ai.behaviors_normal[i] = Behavior.Read(reader, Pointer.Current(reader), ai, Behavior.BehaviorType.Normal, i);
                     }
                 }
             }

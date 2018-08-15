@@ -216,6 +216,18 @@ public class Controller : MonoBehaviour {
                             dynamicsBehaviour.SetDynamics(p.dynam.dynamics);
                         }
 
+                        if (p.brain!=null && p.brain.mind!=null) {
+                            MindComponent mindComponent = p.Gao.AddComponent<MindComponent>();
+                            mindComponent.Init(p, p.brain.mind);
+
+                            if (p.SuperObject != null && p.SuperObject.Gao != null) {
+                                Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
+                                if (mod != null) {
+                                    mod.mindComponent = mindComponent;
+                                }
+                            }
+                        }
+
                     }
                 }
                 if (p.Gao != null) {

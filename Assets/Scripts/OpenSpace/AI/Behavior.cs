@@ -9,7 +9,7 @@ namespace OpenSpace.AI {
 
         public enum BehaviorType
         {
-            Intelligence, Reflex
+            Normal, Reflex
         }
 
         public Pointer offset;
@@ -27,39 +27,54 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
+        public static Behavior FromOffset(Pointer offset)
+        {
+            if (offset == null) return null;
+            MapLoader l = MapLoader.Loader;
+            return l.behaviors.FirstOrDefault(f => f.offset == offset);
+        }
+
         public static Behavior Read(Reader reader, Pointer offset, AIModel aiModel, BehaviorType type, int number) {
             MapLoader l = MapLoader.Loader;
-            Behavior entry = new Behavior(offset);
+            Behavior behavior = new Behavior(offset);
 
-            entry.aiModel = aiModel;
-            entry.type = type;
-            entry.number = number;
+            behavior.aiModel = aiModel;
+            behavior.type = type;
+            behavior.number = number;
 
             if (Settings.s.hasNames)
             {
-                entry.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
+                behavior.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
             } else
             {
-                entry.name = entry.type.ToString() + " " + number;
+                behavior.name = behavior.type.ToString() + "Behaviour #" + number + " @"+offset;
             }
-            entry.off_scripts = Pointer.Read(reader);
-            entry.unknown = reader.ReadUInt32();
+            behavior.off_scripts = Pointer.Read(reader);
+            behavior.unknown = reader.ReadUInt32();
             if(Settings.s.isR2Demo) reader.ReadUInt32();
-            entry.num_scripts = reader.ReadByte();
+            behavior.num_scripts = reader.ReadByte();
             reader.ReadByte();
             reader.ReadByte();
             reader.ReadByte();
             //if (entry.name != null) l.print(entry.name);
 
-            entry.scripts = new Script[entry.num_scripts];
-            if (entry.off_scripts != null && entry.num_scripts > 0) {
-                Pointer off_current = Pointer.Goto(ref reader, entry.off_scripts);
-                for (int i = 0; i < entry.num_scripts; i++) {
-                    entry.scripts[i] = Script.Read(reader, Pointer.Current(reader), entry);
+            behavior.scripts = new Script[behavior.num_scripts];
+            if (behavior.off_scripts != null && behavior.num_scripts > 0) {
+                Pointer off_current = Pointer.Goto(ref reader, behavior.off_scripts);
+                for (int i = 0; i < behavior.num_scripts; i++) {
+                    behavior.scripts[i] = Script.Read(reader, Pointer.Current(reader), behavior);
                 }
                 Pointer.Goto(ref reader, off_current);
             }
-            return entry;
+
+            l.behaviors.Add(behavior);
+
+            return behavior;
+        }
+
+        public override string ToString()
+        {
+            return "(" + this.aiModel.name + ") " + this.name;
         }
     }
 }
