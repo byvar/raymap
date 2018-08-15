@@ -29,8 +29,8 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             MechanicsIDCard c = new MechanicsIDCard(offset);
 
-            c.type = reader.ReadUInt32();
-            c.flags = reader.ReadUInt32();
+            c.type = reader.ReadUInt32(); // 0x0
+            c.flags = reader.ReadUInt32(); // 0x4
             c.gravity = reader.ReadSingle();
             c.maxRebound = reader.ReadSingle();
             reader.ReadUInt32();
@@ -47,6 +47,15 @@ namespace OpenSpace {
             y = reader.ReadSingle();
             c.maxInertia = new Vector3(x, y, z);
             return c;
+        }
+
+        public void Write(Writer writer)
+        {
+            // Write flags
+            (offset+0x4).DoAt(ref writer, () =>
+            {
+                writer.Write(this.flags);
+            });
         }
 
         public static MechanicsIDCard FromOffsetOrRead(Pointer offset, Reader reader) {

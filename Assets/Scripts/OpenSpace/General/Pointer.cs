@@ -136,5 +136,17 @@ namespace OpenSpace {
             FileWithPointers curFile = l.GetFileByWriter(writer);
             return new Pointer((uint)(curPos - curFile.baseOffset), curFile);
         }
+
+        public void DoAt(ref Writer writer, Action action)
+        {
+            Pointer off_current = Goto(ref writer, this);
+            action();
+            Goto(ref writer, off_current);
+        }
+
+        public static void DoAt(ref Writer writer, Pointer newPos, Action action)
+        {
+            if (newPos != null) newPos.DoAt(ref writer, action);
+        }
     }
 }

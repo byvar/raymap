@@ -13,6 +13,7 @@ public class Moddable : MonoBehaviour {
     public Matrix mat;
     public PersoBehaviour persoBehaviour;
     public DsgVarComponent dsgVarComponent;
+    public MindComponent mindComponent;
     public StandardGame stdGame;
 
     public void Start() {
@@ -34,6 +35,10 @@ public class Moddable : MonoBehaviour {
 
         if (persoBehaviour!=null && persoBehaviour.perso!=null) {
             persoBehaviour.perso.Write(writer);
+        }
+
+        if (mindComponent!=null) {
+            mindComponent.Write(writer);
         }
 
         if (dsgVarComponent!=null) {

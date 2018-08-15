@@ -32,6 +32,8 @@ namespace OpenSpace {
             get {
                 if (gao == null) {
                     gao = new GameObject("[Family] " + name);
+                    FamilyComponent component = gao.AddComponent<FamilyComponent>();
+                    component.Init(this);
                 }
                 return gao;
             }
@@ -117,8 +119,10 @@ namespace OpenSpace {
             f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
             f.family_index = reader.ReadUInt32();
             f.name = l.objectTypes[0][f.family_index].name;
+
+            int stateIndex = 0;
             f.states = LinkedList<State>.Read(ref reader, Pointer.Current(reader), (off_element) => {
-                State s = State.Read(reader, off_element, f);
+                State s = State.Read(reader, off_element, f, stateIndex++);
                 return s;
             });
             if (Settings.s.engineMode == Settings.EngineMode.R3) {

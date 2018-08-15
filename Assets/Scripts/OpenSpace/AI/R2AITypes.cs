@@ -1371,9 +1371,14 @@ namespace OpenSpace.AI {
                 case 22:
                     return "FamilyRef: " + sn.param_ptr;
                 case 23:
-                    Perso p = Perso.FromOffset(sn.param_ptr);
-                    string persoName = p == null ? "ERR_PERSO_NOTFOUND" : p.fullName;
-                    return "(" + persoName + "@" + sn.param_ptr + ")";
+
+                    Perso argPerso = Perso.FromOffset(sn.param_ptr);
+                    if (argPerso!=null && argPerso.offset == perso.offset) {
+                        return "this";
+                    }
+
+                    string persoName = argPerso == null ? "ERR_PERSO_NOTFOUND" : argPerso.fullName;
+                    return "getPersoByName(\"" + argPerso.namePerso + "\")";
                 case 24:
                     State state = State.FromOffset(sn.param_ptr);
                     string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.name;
@@ -1389,7 +1394,7 @@ namespace OpenSpace.AI {
                     if (comportRef == null) {
                         return "null";
                     } else {
-                        string type = comportRef.type == Behavior.BehaviorType.Intelligence ? "intelligence" : "reflex";
+                        string type = comportRef.type == Behavior.BehaviorType.Normal ? "intelligence" : "reflex";
                         return type + "[" + comportRef.number + "]";
                     }
                 case 29:

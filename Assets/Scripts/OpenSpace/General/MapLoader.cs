@@ -60,6 +60,7 @@ namespace OpenSpace {
         public List<Sector> sectors = new List<Sector>();
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
         public List<AIModel> aiModels = new List<AIModel>();
+        public List<Behavior> behaviors = new List<Behavior>();
         public List<Perso> persos = new List<Perso>();
         public List<State> states = new List<State>();
         public List<Graph> graphs = new List<Graph>();
@@ -300,6 +301,16 @@ namespace OpenSpace {
                     Moddable mod = gao.GetComponent<Moddable>();
                     if (mod != null) {
                         mod.SaveChanges(writer);
+                    }
+                }
+            }
+
+            foreach (Family family in families) {
+                GameObject gao = family.Gao;
+                if (gao != null) {
+                    FamilyComponent fc = gao.GetComponent<FamilyComponent>();
+                    if (fc != null) {
+                        fc.SaveChanges(writer);
                     }
                 }
             }

@@ -9,6 +9,7 @@ namespace OpenSpace {
     public class State : ILinkedListEntry {
         public Pointer offset;
         public Family family;
+        public int index = 0;
         public string name = null;
         public Pointer off_state_next;
         public Pointer off_state_prev;
@@ -38,21 +39,22 @@ namespace OpenSpace {
             get { return off_state_prev; }
         }
 
-        public State(Pointer offset, Family family) {
+        public State(Pointer offset, Family family, int index) {
             this.offset = offset;
             this.family = family;
+            this.index = index;
         }
 
         public override string ToString() {
-            string result = name != null ? name : ("Unnamed state @ " + offset);
+            string result = name != null ? name : ("State #"+index+" @ " + offset);
             if (cine_name != null) result += " | " + cine_name;
             if (cine_mapname != null) result += " (" + cine_mapname + ") ";
             return result;
         }
 
-        public static State Read(Reader reader, Pointer offset, Family family) {
+        public static State Read(Reader reader, Pointer offset, Family family, int index) {
             MapLoader l = MapLoader.Loader;
-            State s = new State(offset, family);
+            State s = new State(offset, family, index);
             l.states.Add(s);
             if (Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
             if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_next = Pointer.Read(reader);
