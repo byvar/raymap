@@ -21,10 +21,10 @@ public class DynamicsMechanicsComponent : MonoBehaviour
 
         this.type = dynamics.type;
         if (dynamics.matrixA != null) {
-            this.posA = dynamics.matrixA.GetPosition();
+            this.posA = dynamics.matrixA.GetPosition(convertAxes: true);
         }
         if (dynamics.matrixB != null) {
-            this.posB = dynamics.matrixB.GetPosition();
+            this.posB = dynamics.matrixB.GetPosition(convertAxes: true);
         }
         this.speed = dynamics.speedVector;
     }
