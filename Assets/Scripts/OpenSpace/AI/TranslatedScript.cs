@@ -96,8 +96,26 @@ namespace OpenSpace.AI
 
                         case ScriptNode.NodeType.Function:
 
-                            string func = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
-                            return prefix + func + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                            string ternaryCheck = "";
+
+                            switch (scriptNode.param) {
+                                // Ternary real operators (e.g. x > y ? true : false)
+                                case 36: ternaryCheck = "<"; goto case 40;
+                                case 37: ternaryCheck = ">"; goto case 40;
+                                case 38: ternaryCheck = "=="; goto case 40;
+                                case 39: ternaryCheck = "<="; goto case 40;
+                                case 40: ternaryCheck = ">=";
+                                    return prefix + "((" + this.children[0] + ternaryCheck + this.children[1] + ") ? " + this.children[2] + " : " + this.children[3] + ")";
+
+                                case 41: // conditional ternary operator (cond ? true : false)
+                                    return prefix + "((" + this.children[0] + ") ? " + this.children[1] + " : " + this.children [2]+")";
+
+                                default:
+                                    string func = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
+                                    return prefix + func + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                            }
+
+                            
 
                         case ScriptNode.NodeType.Procedure:
 
