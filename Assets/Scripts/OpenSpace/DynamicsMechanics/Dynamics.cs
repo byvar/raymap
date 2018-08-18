@@ -48,17 +48,7 @@ namespace OpenSpace
             dynamics.field_8 = reader.ReadUInt32();
             dynamics.field_C = reader.ReadUInt32();
 
-            Pointer.Goto(ref reader, offset + 0x54);
-            dynamics.off_speedVector = Pointer.Read(reader);
-
-            Pointer.Goto(ref reader, offset + 0x78);
-            dynamics.matrixA = Matrix.Read(reader, offset + 0x78);
-
-            Pointer.Goto(ref reader, offset + 0xD0);
-            dynamics.matrixB = Matrix.Read(reader, offset + 0xD0);
-
-            // Process data
-
+            // Determine type
             int type;
             if ((dynamics.field_C & 4) != 0) {
                 type = 2;
@@ -70,8 +60,28 @@ namespace OpenSpace
 
             dynamics.type = (DynamicsType)type;
 
-            Pointer.Goto(ref reader, dynamics.off_speedVector);
-            dynamics.speedVector = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            // Process data (common)
+
+            Pointer.Goto(ref reader, offset + 0x54);
+            dynamics.off_speedVector = Pointer.Read(reader);
+
+            Pointer.Goto(ref reader, offset + 0x78);
+            dynamics.matrixA = Matrix.Read(reader, offset + 0x78);
+
+            Pointer.Goto(ref reader, offset + 0xD0);
+            dynamics.matrixB = Matrix.Read(reader, offset + 0xD0);
+
+            // Process data (type specific)
+
+            if (dynamics.type == DynamicsType.Type0_SMALL) {
+
+            } else if (dynamics.type == DynamicsType.Type1_MEDIUM) {
+
+            } else if (dynamics.type == DynamicsType.Type2_BIG) {
+
+                Pointer.Goto(ref reader, dynamics.off_speedVector);
+                dynamics.speedVector = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            }
 
             return dynamics;
         }
