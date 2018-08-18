@@ -7,22 +7,25 @@ using LinkedListType = OpenSpace.LinkedList.Type;
 namespace OpenSpace {
     public class Settings {
         public enum EngineMode { R2, R3 };
+        public enum SubMode { R3, RA, R2, TT, R2Demo, DD };
         public enum Platform { PC, iOS, GC };
         public enum Endian { Little, Big };
         
         public EngineMode engineMode;
+        public SubMode subMode;
         public Platform platform;
         public Endian endian;
         public LinkedListType linkedListType;
         public bool hasNames = false;
         public bool hasDeformations = false;
         public int numEntryActions = 0;
-        public bool isR2Demo = false;
-        public bool isDonald = false;
         public bool hasExtraInputData = false;
         public bool hasMemorySupport = false;
         public Dictionary<string, uint> memoryAddresses = null;
         public bool loadFromMemory = false;
+        public bool fixedInitialMask = true;
+        public bool useInitialMask = false;
+        public bool useWindowMasking = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -32,6 +35,7 @@ namespace OpenSpace {
         public static Settings s = null;
         public static Settings R3PC = new Settings() {
             engineMode = EngineMode.R3,
+            subMode = SubMode.R3,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
@@ -71,6 +75,7 @@ namespace OpenSpace {
 
         public static Settings R3GC = new Settings() {
             engineMode = EngineMode.R3,
+            subMode = SubMode.R3,
             platform = Platform.GC,
             endian = Endian.Big,
             linkedListType = LinkedListType.Double,
@@ -81,6 +86,7 @@ namespace OpenSpace {
 
         public static Settings RAPC = new Settings() {
             engineMode = EngineMode.R3,
+            subMode = SubMode.RA,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
@@ -89,6 +95,7 @@ namespace OpenSpace {
 
         public static Settings RAGC = new Settings() {
             engineMode = EngineMode.R3,
+            subMode = SubMode.RA,
             platform = Platform.GC,
             endian = Endian.Big,
             linkedListType = LinkedListType.Single,
@@ -97,6 +104,7 @@ namespace OpenSpace {
 
         public static Settings R2PC = new Settings() {
             engineMode = EngineMode.R2,
+            subMode = SubMode.R2,
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 43,
@@ -134,24 +142,25 @@ namespace OpenSpace {
 
         public static Settings R2PCDemo1 = new Settings() {
             engineMode = EngineMode.R2,
+            subMode = SubMode.R2Demo,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
-            numEntryActions = 1,
-            isR2Demo = true
+            numEntryActions = 1
         };
 
         public static Settings R2PCDemo2 = new Settings() {
             engineMode = EngineMode.R2,
+            subMode = SubMode.R2Demo,
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 7,
-            linkedListType = LinkedListType.Double,
-            isR2Demo = true
+            linkedListType = LinkedListType.Double
         };
 
         public static Settings R2IOS = new Settings() {
             engineMode = EngineMode.R2,
+            subMode = SubMode.R2,
             platform = Platform.iOS,
             endian = Endian.Little,
             numEntryActions = 43,
@@ -161,11 +170,23 @@ namespace OpenSpace {
 
         public static Settings DDPC = new Settings() {
             engineMode = EngineMode.R2,
+            subMode = SubMode.DD,
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 44,
+            linkedListType = LinkedListType.Double
+        };
+
+        public static Settings TTPC = new Settings() {
+            engineMode = EngineMode.R2,
+            subMode = SubMode.TT,
+            platform = Platform.PC,
+            endian = Endian.Little,
             linkedListType = LinkedListType.Double,
-            isDonald = true
+            numEntryActions = 1,
+            useInitialMask = true,
+            fixedInitialMask = false,
+            useWindowMasking = true
         };
     }
 }

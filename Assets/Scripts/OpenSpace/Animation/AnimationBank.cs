@@ -217,7 +217,7 @@ namespace OpenSpace.Animation {
                         if (banks[i].a3d_general.off_data != null) Pointer.Goto(ref reader, banks[i].a3d_general.off_data);
                         for (uint j = 0; j < banks[i].animations.Length; j++) banks[i].animations[j] = AnimA3DGeneral.Read(reader, Pointer.Current(reader));
                         if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                            if (Settings.s.isR2Demo) {
+                            if (Settings.s.subMode == Settings.SubMode.R2Demo) {
                                 reader.Align(52 * banks[i].animations.Length, 4);
                             } else {
                                 reader.Align(56 * banks[i].animations.Length, 4);
@@ -263,7 +263,7 @@ namespace OpenSpace.Animation {
                         if (banks[i].framesKFIndex.off_data != null) Pointer.Goto(ref reader, banks[i].framesKFIndex.off_data);
                         for (uint j = 0; j < banks[i].global_framesKFIndex.Length; j++) banks[i].global_framesKFIndex[j] = AnimFramesKFIndex.Read(reader);
                         if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                            if (Settings.s.isR2Demo) {
+                            if (Settings.s.subMode == Settings.SubMode.R2Demo) {
                                 reader.Align(2 * banks[i].global_framesKFIndex.Length, 4);
                             } else {
                                 reader.Align(4 * banks[i].global_framesKFIndex.Length, 4);

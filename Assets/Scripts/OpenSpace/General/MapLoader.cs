@@ -32,7 +32,13 @@ namespace OpenSpace {
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
         public bool blockyMode = false;
-        public enum Mode { Rayman3PC, Rayman3GC, RaymanArenaPC, RaymanArenaGC, Rayman2PC, Rayman2PCDemo2, Rayman2PCDemo1, Rayman2IOS, DonaldDuckPC };
+        public enum Mode {
+            Rayman3PC, Rayman3GC,
+            RaymanArenaPC, RaymanArenaGC,
+            Rayman2PC, Rayman2IOS,
+            Rayman2PCDemo2, Rayman2PCDemo1,
+            DonaldDuckPC, TonicTroublePC
+        };
         public Mode mode = Mode.Rayman3PC;
 
         public ObjectType[][] objectTypes;
@@ -125,6 +131,7 @@ namespace OpenSpace {
                     case Mode.RaymanArenaGC: settings = Settings.RAGC; break;
                     case Mode.RaymanArenaPC: settings = Settings.RAPC; break;
                     case Mode.DonaldDuckPC: settings = Settings.DDPC; break;
+                    case Mode.TonicTroublePC: settings = Settings.TTPC; break;
                 }
                 Settings.s = settings;
 
@@ -161,13 +168,18 @@ namespace OpenSpace {
                                 dat = new DAT("LEVELS0", gameDsb, dataPath);
                             }
                         }
-                        
-                        DSB dsb = new DSB(lvlName, levelsFolder + lvlName + "/" + lvlName + ".dsb");
-                        dsb.ReadAllSections();
-                        dsb.Dispose();
 
                         string fixSnaPath = levelsFolder + "fix.sna";
+                        if (Settings.s.subMode == Settings.SubMode.TT) {
+                            DSB fixRTB = new DSB("fixrtb", levelsFolder + "fix.rtb");
+                            fixRTB.Save(levelsFolder + "fix.rtb.dmp");
+                            fixRTB.Dispose();
+                        }
                         RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
+                        if (File.Exists(levelsFolder + lvlName + "/FixLvl.rtb")) {
+                            // Fix -> Lvl pointers for Tonic Trouble
+                            fixRtb.Add(new RelocationTable(levelsFolder + lvlName + "/FixLvl.rtb", dat, lvlName, RelocationType.RTB));
+                        }
                         SNA fixSna = new SNA("fix", fixSnaPath, fixRtb);
                         string fixGptPath = levelsFolder + "fix.gpt";
                         RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
@@ -181,11 +193,16 @@ namespace OpenSpace {
                         RelocationTable lvlRtb = new RelocationTable(lvlSnaPath, dat, lvlName, RelocationType.RTB);
                         SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
                         string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
-                        RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
-                        lvlSna.ReadGPT(lvlGptPath, lvlRtp);
                         string lvlPtxPath = levelsFolder + lvlName + "/" + lvlName + ".ptx";
-                        RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
-                        lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
+                        if (Settings.s.subMode != Settings.SubMode.TT) {
+                            RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
+                            lvlSna.ReadGPT(lvlGptPath, lvlRtp);
+                            RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
+                            lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
+                        } else {
+                            lvlSna.ReadGPT(lvlGptPath, null);
+                            lvlSna.ReadPTX(lvlPtxPath, null);
+                        }
 
 
                         fixSna.CreatePointers();
@@ -977,7 +994,7 @@ namespace OpenSpace {
             globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
             globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
 
-            if (Settings.s.isDonald) reader.ReadUInt32();
+            if (Settings.s.subMode == Settings.SubMode.DD) reader.ReadUInt32();
             Pointer dword_4A6B1C_always_header = Pointer.Read(reader);
             Pointer dword_4A6B20_always_last = Pointer.Read(reader);
 
@@ -1067,19 +1084,19 @@ namespace OpenSpace {
             reader.ReadUInt32();
             reader.ReadUInt32();
 
-            if (settings.isR2Demo || settings.isDonald) {
+            if (Settings.s.subMode == Settings.SubMode.DD || Settings.s.subMode == Settings.SubMode.R2Demo) {
                 reader.ReadUInt32();
             }
 
             // End of engineStructure
             Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
 
-            if (settings.isR2Demo || settings.isDonald) {
+            if (Settings.s.subMode == Settings.SubMode.DD || Settings.s.subMode == Settings.SubMode.R2Demo) {
                 Pointer off_unknown = Pointer.Read(reader);
             }
 
             Pointer off_mainChar = Pointer.Read(reader); // superobject
-            if (!settings.isR2Demo) {
+            if (Settings.s.subMode != Settings.SubMode.R2Demo) {
                 Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
             }
             Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
@@ -1093,7 +1110,9 @@ namespace OpenSpace {
                 Pointer off_geometricShadowObject = Pointer.Read(reader);
             }
             Pointer.Read(reader);
-            if (settings.isR2Demo) Pointer.Read(reader);
+            if (Settings.s.subMode == Settings.SubMode.R2Demo) {
+                Pointer.Read(reader);
+            }
             off_current = Pointer.Current(reader);
             AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.LvlKeyFrames], append: true);
             animationBanks[1] = animationBanks[0];
@@ -1310,7 +1329,6 @@ MonoBehaviour.print(str);
 
         public void CreateCNT() {
             if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
                 List<string> cntPaths = new List<string>();
                 if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
                 if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);

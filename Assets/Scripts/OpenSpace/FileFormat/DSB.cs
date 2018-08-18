@@ -11,6 +11,7 @@ namespace OpenSpace.FileFormat {
         // Bigfile paths
         public string bigfileTextures;
         public string bigfileVignettes;
+        public string bigfileCredits;
 
         // Data paths
         public string dllDataPath;
@@ -49,8 +50,13 @@ namespace OpenSpace.FileFormat {
             headerOffset = 0;
             this.name = name;
             using (Reader encodedReader = new Reader(stream, Settings.s.IsLittleEndian)) {
-                encodedReader.ReadMask();
-                data = encodedReader.ReadBytes((int)stream.Length - 4);
+                if (Settings.s.useWindowMasking) {
+                    encodedReader.InitWindowMask();
+                    data = encodedReader.ReadBytes((int)stream.Length);
+                } else {
+                    encodedReader.ReadMask();
+                    data = encodedReader.ReadBytes((int)stream.Length - 4);
+                }
             }
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
         }
@@ -65,8 +71,15 @@ namespace OpenSpace.FileFormat {
 
         public void ReadAllSections() {
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
-            while (reader.BaseStream.Position < reader.BaseStream.Length) {
-                ReadSection();
+            if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
+                ReadMemoryDesc();
+                reader.ReadUInt32();
+                ReadDirectoriesDesc();
+                ReadBigFileDesc();
+            } else {
+                while (reader.BaseStream.Position < reader.BaseStream.Length) {
+                    ReadSection();
+                }
             }
         }
 
@@ -91,23 +104,46 @@ namespace OpenSpace.FileFormat {
             uint id = reader.ReadUInt32();
             uint memSize;
             while (id != 0xFFFF) {
-                switch (id) {
-                    case 1: memSize = reader.ReadUInt32(); break; // GAM_fn_vSetGameMemoryInFix
-                    case 2: memSize = reader.ReadUInt32(); break; // GEO Create & Select Memory Channel
-                    case 3: memSize = reader.ReadUInt32(); break; // GEO Create Memory Channel
-                    case 4: memSize = reader.ReadUInt32(); break; // AI Fix Memory
-                    case 5: memSize = reader.ReadUInt32(); break; // TMP Fix Memory
-                    case 6: memSize = reader.ReadUInt32(); break; // IPT Memory
-                    case 7: memSize = reader.ReadUInt32(); break; // SAI Fix Memory
-                    case 8: memSize = reader.ReadUInt32(); break; // FON Memory
-                    case 9: memSize = reader.ReadUInt32(); break; // POS Memory
-                    case 10: memSize = reader.ReadUInt32(); break; // ???
-                    case 11: memSize = reader.ReadUInt32(); break; // Mmg Init Specific Block
-                    case 12: memSize = reader.ReadUInt32(); break; // AI Level Memory
-                    case 13: memSize = reader.ReadUInt32(); break; // GEO Create & Select Memory Channel
-                    case 14: memSize = reader.ReadUInt32(); break; // SAI Level Memory
-                    case 15: memSize = reader.ReadUInt32(); break; // TMP Level Memory
-                    case 16: reader.ReadUInt32(); reader.ReadUInt32(); break;
+                if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
+                    switch (id) {
+                        // Memory descriptions
+                        case 10: reader.ReadUInt32(); break;
+                        case 11: reader.ReadUInt32(); break;
+                        case 0: reader.ReadUInt32(); break;
+                        case 6: reader.ReadUInt32(); break;
+                        case 8: reader.ReadUInt32(); break;
+                        case 4: reader.ReadUInt32(); break;
+                        case 2: reader.ReadUInt32(); reader.ReadUInt32(); break;
+                        case 3: reader.ReadUInt32(); reader.ReadUInt32(); break;
+                        case 14: reader.ReadUInt32(); break; // position memory
+                        case 13: reader.ReadUInt32(); reader.ReadUInt32(); break; // Inventory memory
+                        case 16: reader.ReadUInt32(); break; // lipsync memory
+                        case 15: reader.ReadUInt32(); reader.ReadUInt32(); break; // Script memory
+                        case 7: reader.ReadUInt32(); break;
+                        case 12: reader.ReadUInt32(); break;
+                        case 1: reader.ReadUInt32(); break;
+                        case 17: reader.ReadUInt32(); break;
+                        case 18: reader.ReadUInt32(); break;
+                    }
+                } else {
+                    switch (id) {
+                        case 1: memSize = reader.ReadUInt32(); break; // GAM_fn_vSetGameMemoryInFix
+                        case 2: memSize = reader.ReadUInt32(); break; // GEO Create & Select Memory Channel
+                        case 3: memSize = reader.ReadUInt32(); break; // GEO Create Memory Channel
+                        case 4: memSize = reader.ReadUInt32(); break; // AI Fix Memory
+                        case 5: memSize = reader.ReadUInt32(); break; // TMP Fix Memory
+                        case 6: memSize = reader.ReadUInt32(); break; // IPT Memory
+                        case 7: memSize = reader.ReadUInt32(); break; // SAI Fix Memory
+                        case 8: memSize = reader.ReadUInt32(); break; // FON Memory
+                        case 9: memSize = reader.ReadUInt32(); break; // POS Memory
+                        case 10: memSize = reader.ReadUInt32(); break; // ???
+                        case 11: memSize = reader.ReadUInt32(); break; // Mmg Init Specific Block
+                        case 12: memSize = reader.ReadUInt32(); break; // AI Level Memory
+                        case 13: memSize = reader.ReadUInt32(); break; // GEO Create & Select Memory Channel
+                        case 14: memSize = reader.ReadUInt32(); break; // SAI Level Memory
+                        case 15: memSize = reader.ReadUInt32(); break; // TMP Level Memory
+                        case 16: reader.ReadUInt32(); reader.ReadUInt32(); break;
+                    }
                 }
                 id = reader.ReadUInt32();
             }
@@ -129,47 +165,80 @@ namespace OpenSpace.FileFormat {
         }
 
         private void ReadDirectoriesDesc() {
-            uint id = reader.ReadUInt32();
-            while (id != 0xFFFF) {
-                if (Settings.s.isR2Demo) {
-                    switch (id) {
-                        case 41: dllDataPath = ReadString(); break;
-                        case 58: textureDataPath = ReadString(); break;
-                        case 43: textDataPath = ReadString(); break;
-                        case 44: worldDataPath = ReadString(); break;
-                        case 45: levelsDataPath = ReadString(); break;
-                        case 46: familiesDataPath = ReadString(); break;
-                        case 47: levelsDataPath = ReadString(); break;
-                        case 48: animsDataPath = ReadString(); break;
-                        case 49: objectClassesDataPath = ReadString(); break;
-                        case 50: objectBanksDataPath = ReadString(); break;
-                        case 51: mechanicsLibrariesDataPath = ReadString(); break;
-                        case 52: soundDataPath = ReadString(); break; // It also sets graphicsDataPath & adds soundDataPath/[language_id] as 2nd SNDdatapath
-                        case 53: visualsDataPath = ReadString(); break;
-                        case 54: environmentDataPath = ReadString(); break;
-                        case 55: materialsDataPath = ReadString(); break;
-                        case 56: saveGameDataPath = ReadString(); break;
-                        case 57: extrasPath = ReadString(); break;
-                        case 59: vignettesDataPath = ReadString(); break;
-                        case 60: optionsDataPath = ReadString(); break;
-                        case 61: lipSyncDataPath = ReadString(); break;
-                        case 62: levelsDataPath = ReadString(); break;
-                        case 63: effectsDataPath = ReadString(); break;
+            if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
+                dllDataPath = ReadString();
+                ReadString(); // gamedata/menus
+                ReadString(); // gamedata/menus/anims
+                gameDataPath = ReadString(); // gamedata
+                ReadString(); // GameData\Texts
+                worldDataPath = ReadString(); // GameData\World
+                levelsDataPath = ReadString(); // GameData\World\Levels
+                familiesDataPath = ReadString(); // GameData\World\Levels\_Common\Families
+                ReadString(); // GameData\World\Levels
+                animsDataPath = ReadString(); // GameData\World\Graphics\Anims
+                objectClassesDataPath = ReadString(); // GameData\World\Graphics\Objects\Classes
+                objectBanksDataPath = ReadString(); // GameData\World\Graphics\Objects\Banks
+                mechanicsLibrariesDataPath = ReadString(); // GameData\World\Libraries\Mechanics
+                soundDataPath = ReadString(); // GameData\World\Sound
+                visualsDataPath = ReadString(); // GameData\World\Graphics\Visuals
+                environmentDataPath = ReadString(); // GameData\World\Libraries\Environment
+                materialsDataPath = ReadString(); // GameData\World\Libraries\Materials
+                ReadString(); // GameData\World\Libraries\Materials
+                ReadString(); // GameData\World\Libraries\Materials
+                ReadString(); // GameData\World\Libraries\Materials
+                saveGameDataPath = ReadString(); // GameData\SaveGame
+                extrasPath = ReadString(); // GameData\Extras
+                textureDataPath = ReadString(); // GameData\World\Graphics\Textures
+                ReadString(); // GameData\FixTex
+                vignettesDataPath = ReadString(); // GameData\Vignette
+                optionsDataPath = ReadString(); // GameData\Options
+                lipSyncDataPath = ReadString(); // GameData\World\SyncLips
+                ReadString(); // GameData\World\Levels
+                effectsDataPath = ReadString(); // GameData\World\Effects
+                ReadString(); // GameData\Inventor
+            } else {
+                uint id = reader.ReadUInt32();
+                while (id != 0xFFFF) {
+                    if (Settings.s.subMode == Settings.SubMode.R2Demo) {
+                        switch (id) {
+                            case 41: dllDataPath = ReadString(); break;
+                            case 58: textureDataPath = ReadString(); break;
+                            case 43: textDataPath = ReadString(); break;
+                            case 44: worldDataPath = ReadString(); break;
+                            case 45: levelsDataPath = ReadString(); break;
+                            case 46: familiesDataPath = ReadString(); break;
+                            case 47: levelsDataPath = ReadString(); break;
+                            case 48: animsDataPath = ReadString(); break;
+                            case 49: objectClassesDataPath = ReadString(); break;
+                            case 50: objectBanksDataPath = ReadString(); break;
+                            case 51: mechanicsLibrariesDataPath = ReadString(); break;
+                            case 52: soundDataPath = ReadString(); break; // It also sets graphicsDataPath & adds soundDataPath/[language_id] as 2nd SNDdatapath
+                            case 53: visualsDataPath = ReadString(); break;
+                            case 54: environmentDataPath = ReadString(); break;
+                            case 55: materialsDataPath = ReadString(); break;
+                            case 56: saveGameDataPath = ReadString(); break;
+                            case 57: extrasPath = ReadString(); break;
+                            case 59: vignettesDataPath = ReadString(); break;
+                            case 60: optionsDataPath = ReadString(); break;
+                            case 61: lipSyncDataPath = ReadString(); break;
+                            case 62: levelsDataPath = ReadString(); break;
+                            case 63: effectsDataPath = ReadString(); break;
+                        }
+                    } else {
+                        switch (id) {
+                            case 41: dllDataPath = ReadString(); break;
+                            case 42: gameDataPath = ReadString(); break;
+                            case 43: worldDataPath = ReadString(); break;
+                            case 44: levelsDataPath = ReadString(); break;
+                            case 45: soundDataPath = ReadString(); break; // It also sets graphicsDataPath & adds soundDataPath/[language_id] as 2nd SNDdatapath
+                            case 46: saveGameDataPath = ReadString(); break;
+                            case 48: vignettesDataPath = ReadString(); break;
+                            case 49: optionsDataPath = ReadString(); break;
+                                // no 47!
+                        }
                     }
-                } else {
-                    switch (id) {
-                        case 41: dllDataPath = ReadString(); break;
-                        case 42: gameDataPath = ReadString(); break;
-                        case 43: worldDataPath = ReadString(); break;
-                        case 44: levelsDataPath = ReadString(); break;
-                        case 45: soundDataPath = ReadString(); break; // It also sets graphicsDataPath & adds soundDataPath/[language_id] as 2nd SNDdatapath
-                        case 46: saveGameDataPath = ReadString(); break;
-                        case 48: vignettesDataPath = ReadString(); break;
-                        case 49: optionsDataPath = ReadString(); break;
-                            // no 47!
-                    }
+                    id = reader.ReadUInt32();
                 }
-                id = reader.ReadUInt32();
             }
         }
 
@@ -212,9 +281,17 @@ namespace OpenSpace.FileFormat {
         private void ReadBigFileDesc() {
             uint id = reader.ReadUInt32();
             while (id != 0xFFFF) {
-                switch (id) {
-                    case 65: bigfileTextures = ReadString(); break;
-                    case 66: bigfileVignettes = ReadString(); break;
+                if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
+                    switch (id) {
+                        case 19: bigfileVignettes = ReadString(); break;
+                        case 20: bigfileTextures = ReadString(); break;
+                        case 21: bigfileCredits = ReadString(); break;
+                    }
+                } else {
+                    switch (id) {
+                        case 65: bigfileTextures = ReadString(); break;
+                        case 66: bigfileVignettes = ReadString(); break;
+                    }
                 }
                 id = reader.ReadUInt32();
             }
@@ -285,7 +362,9 @@ namespace OpenSpace.FileFormat {
 
         private string ReadString() {
             ushort strSize = reader.ReadUInt16();
-            return reader.ReadString(strSize);
+            string result = reader.ReadString(strSize);
+            if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) result = result.Replace("GameData\\", "");
+            return result;
         }
 
         public override void WritePointer(Pointer pointer) {

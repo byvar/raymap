@@ -46,8 +46,13 @@ namespace OpenSpace.FileFormat {
             this.name = name;
             this.rtb = rtb;
             using (Reader encodedReader = new Reader(stream, Settings.s.IsLittleEndian)) {
-                encodedReader.ReadMask();
-                data = encodedReader.ReadBytes((int)stream.Length - 4);
+                if (Settings.s.useWindowMasking) {
+                    encodedReader.InitWindowMask();
+                    data = encodedReader.ReadBytes((int)stream.Length);
+                } else {
+                    encodedReader.ReadMask();
+                    data = encodedReader.ReadBytes((int)stream.Length - 4);
+                }
             }
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ReadSNA();
@@ -56,13 +61,17 @@ namespace OpenSpace.FileFormat {
         void ReadSNA() {
             MapLoader l = MapLoader.Loader;
             uint szCounter = 0;
+            if (Settings.s.subMode == Settings.SubMode.TT) {
+                byte headerLength = reader.ReadByte();
+                reader.ReadBytes(headerLength);
+            }
             while (reader.BaseStream.Position < reader.BaseStream.Length) {
                 SNAMemoryBlock block = new SNAMemoryBlock();
                 block.sna = this;
                 block.position = (uint)reader.BaseStream.Position;
                 block.module = reader.ReadByte();
                 block.id = reader.ReadByte();
-                block.unk1 = reader.ReadByte();
+                if (Settings.s.subMode != Settings.SubMode.TT) block.unk1 = reader.ReadByte();
                 block.baseInMemory = reader.ReadInt32();
                 if (blocks.Count == 0) {
                     l.print("Initial block: " + block.module + "|" + block.id + " - base: " + block.baseInMemory);
@@ -78,6 +87,7 @@ namespace OpenSpace.FileFormat {
                     block.maxPosMinus9 = reader.ReadUInt32();
                     block.size = reader.ReadUInt32();
                     szCounter += block.size;
+                    if (Settings.s.subMode == Settings.SubMode.TT) block.unk1 = reader.ReadByte();
                     block.dataPosition = (uint)reader.BaseStream.Position;
                     reader.ReadBytes((int)block.size);
                     block.pointerList = rtb.GetListForPart(block.module, block.id);
@@ -114,8 +124,10 @@ namespace OpenSpace.FileFormat {
             uint gptOffset = (uint)data.Length;
             byte[] gptData = null;
             using (Reader gptReader = new Reader(gptStream, Settings.s.IsLittleEndian)) {
+                if (Settings.s.useWindowMasking) gptReader.InitWindowMask();
                 gptData = gptReader.ReadBytes((int)gptStream.Length);
             }
+            //Util.ByteArrayToFile(path + ".dmp", gptData);
             data = data.Concat(gptData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
@@ -135,13 +147,15 @@ namespace OpenSpace.FileFormat {
             Stream ptxStream = File.OpenRead(path);
             uint ptxOffset = (uint)data.Length;
             byte[] ptxData = null;
-            using (Reader gptReader = new Reader(ptxStream, Settings.s.IsLittleEndian)) {
-                ptxData = gptReader.ReadBytes((int)ptxStream.Length);
+            using (Reader ptxReader = new Reader(ptxStream, Settings.s.IsLittleEndian)) {
+                if (Settings.s.useWindowMasking) ptxReader.InitWindowMask();
+                ptxData = ptxReader.ReadBytes((int)ptxStream.Length);
             }
+            //Util.ByteArrayToFile(path + ".dmp", ptxData);
             data = data.Concat(ptxData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
-            ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
+            ushort ptrRelocationKey = GetRelocationKey(rtt.pointerBlocks[0]);
             SNAMemoryBlock block = relocation_local[ptrRelocationKey];
             ptx = new SNAMemoryBlock();
             ptx.baseInMemory = block.baseInMemory;

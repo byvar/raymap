@@ -43,7 +43,7 @@ namespace OpenSpace.FileFormat {
 
     public class RelocationTable {
         public RelocationPointerList[] pointerBlocks;
-
+        string path;
         bool isLittleEndian = true;
 
         // Use this to automatically decide whether to load it from RT* file or from DAT
@@ -61,9 +61,10 @@ namespace OpenSpace.FileFormat {
                 case RelocationType.RTL:
                     newPath = Path.ChangeExtension(path, "rtl"); break;
             }
+            this.path = newPath;
             if (File.Exists(newPath)) {
                 Load(File.OpenRead(newPath), false);
-            } else {
+            } else if(dat != null) {
                 Load(dat, name, type);
             }
         }
@@ -80,7 +81,31 @@ namespace OpenSpace.FileFormat {
 
         private void Load(Stream stream, bool masking) {
             using (Reader reader = new Reader(stream, isLittleEndian)) {
+                if (Settings.s.useWindowMasking) {
+                    reader.InitWindowMask();
+                    byte [] data = reader.ReadBytes((int)stream.Length);
+                    MapLoader.Loader.print(path);
+                    Util.ByteArrayToFile(path + ".dmp", data);
+                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
+                    reader.InitWindowMask();
+                }
                 Read(reader);
+            }
+        }
+
+        // Used for Tonic Trouble's Fixlvl.rtb, which contains a list of fix->lvl pointers that should be loaded along with the fix.rtb file
+        public void Add(RelocationTable rt) {
+            if (rt == null) return;
+            for (int i = 0; i < rt.pointerBlocks.Length; i++) {
+                RelocationPointerList ptrList = GetListForPart(rt.pointerBlocks[i].module, rt.pointerBlocks[i].id);
+                if (ptrList == null) {
+                    Array.Resize(ref pointerBlocks, pointerBlocks.Length + 1);
+                    pointerBlocks[pointerBlocks.Length - 1] = rt.pointerBlocks[i];
+                } else {
+                    ptrList.count += rt.pointerBlocks[i].count;
+                    Array.Resize(ref ptrList.pointers, (int)ptrList.count);
+                    Array.Copy(rt.pointerBlocks[i].pointers, 0, ptrList.pointers, ptrList.count - rt.pointerBlocks[i].count, rt.pointerBlocks[i].count);
+                }
             }
         }
 
@@ -121,7 +146,7 @@ namespace OpenSpace.FileFormat {
             MapLoader l = MapLoader.Loader;
 
             byte count = reader.ReadByte();
-            if (!MapLoader.Loader.settings.isR2Demo) {
+            if (Settings.s.subMode != Settings.SubMode.R2Demo && Settings.s.subMode != Settings.SubMode.TT) {
                 reader.ReadUInt32();
             }
             pointerBlocks = new RelocationPointerList[count];
@@ -143,11 +168,17 @@ namespace OpenSpace.FileFormat {
                     // The address that it points to is to be read at address offsetInMemory.
                     // The part's baseInMemory should be subtracted from it to get the offset relative to the part.
                     pointerBlocks[i].pointers[j] = new RelocationPointerInfo();
-                    pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
-                    pointerBlocks[i].pointers[j].module = reader.ReadByte();
-                    pointerBlocks[i].pointers[j].id = reader.ReadByte();
-                    pointerBlocks[i].pointers[j].byte6 = reader.ReadByte();
-                    pointerBlocks[i].pointers[j].byte7 = reader.ReadByte();
+                    if (Settings.s.subMode == Settings.SubMode.TT) {
+                        pointerBlocks[i].pointers[j].module = reader.ReadByte();
+                        pointerBlocks[i].pointers[j].id = reader.ReadByte();
+                        pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
+                    } else {
+                        pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
+                        pointerBlocks[i].pointers[j].module = reader.ReadByte();
+                        pointerBlocks[i].pointers[j].id = reader.ReadByte();
+                        pointerBlocks[i].pointers[j].byte6 = reader.ReadByte();
+                        pointerBlocks[i].pointers[j].byte7 = reader.ReadByte();
+                    }
                 }
             }
         }

@@ -67,6 +67,8 @@ public class Controller : MonoBehaviour {
                             mode = MapLoader.Mode.Rayman2IOS; break;
                         case "dd_pc":
                             mode = MapLoader.Mode.DonaldDuckPC; break;
+                        case "tt_pc":
+                            mode = MapLoader.Mode.TonicTroublePC; break;
                         case "r2_demo1_pc":
                             mode = MapLoader.Mode.Rayman2PCDemo1; break;
                         case "r2_demo2_pc":

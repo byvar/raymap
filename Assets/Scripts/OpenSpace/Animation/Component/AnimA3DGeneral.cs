@@ -68,7 +68,7 @@ namespace OpenSpace.Animation.Component {
                 a3d.num_channels = reader.ReadUInt16();
                 a3d.num_onlyFrames = reader.ReadUInt16();
                 a3d.num_keyframes = reader.ReadUInt16();
-                if (!Settings.s.isR2Demo) a3d.unk_14 = reader.ReadUInt16();
+                if (Settings.s.subMode != Settings.SubMode.R2Demo) a3d.unk_14 = reader.ReadUInt16();
                 a3d.num_events = reader.ReadUInt16();
                 a3d.unk_1A = reader.ReadUInt16(); // vector related
                 a3d.subtractFramesForSpeed = reader.ReadUInt16();
@@ -86,7 +86,7 @@ namespace OpenSpace.Animation.Component {
                 a3d.start_channels = reader.ReadUInt16();
                 a3d.start_events = reader.ReadUInt16();
                 a3d.start_morphData = reader.ReadUInt16();
-                if(!Settings.s.isR2Demo) reader.ReadUInt16(); // padding?
+                if (Settings.s.subMode != Settings.SubMode.R2Demo) reader.ReadUInt16(); // padding?
             } else {
                 /* Each a3d is 0x3c long */
                 a3d.speed = reader.ReadUInt16();

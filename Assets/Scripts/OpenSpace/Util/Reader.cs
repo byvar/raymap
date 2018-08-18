@@ -3,10 +3,18 @@ using System.IO;
 
 namespace OpenSpace {
     public class Reader : BinaryReader {
+        public enum MaskingMode {
+            Off,
+            Number,
+            Window
+        }
         public delegate void ReadAction(Reader reader, Pointer offset);
         bool isLittleEndian = true;
-        bool masking = false; // for Rayman 2
+        MaskingMode masking = MaskingMode.Off;
         uint mask = 0;
+        uint currentMaskByte = 0;
+        byte[] maskBytes;
+        byte[] originalMaskBytes = new byte[] { 0x41, 0x59, 0xBE, 0xC7, 0x0D, 0x99, 0x1C, 0xA3, 0x75, 0x3F };
         public Reader(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
         public Reader(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
 
@@ -48,10 +56,16 @@ namespace OpenSpace {
 
         public override byte[] ReadBytes(int count) {
             byte[] bytes = base.ReadBytes(count);
-            if (masking) {
-                for (int i = 0; i < count; i++) {
-                    bytes[i] = decodeByte(bytes[i], mask);
-                    mask = getNextMask(mask);
+            if (masking != MaskingMode.Off) {
+                if (masking == MaskingMode.Number) {
+                    for (int i = 0; i < count; i++) {
+                        bytes[i] = DecodeByte(bytes[i], mask);
+                        mask = GetNextMask(mask);
+                    }
+                } else if (masking == MaskingMode.Window) {
+                    for (int i = 0; i < count; i++) {
+                        bytes[i] = DecodeByteWindow(bytes[i]);
+                    }
                 }
             }
             return bytes;
@@ -59,9 +73,13 @@ namespace OpenSpace {
 
         public override byte ReadByte() {
             byte result = base.ReadByte();
-            if (masking) {
-                result = decodeByte(result, mask);
-                mask = getNextMask(mask);
+            if (masking != MaskingMode.Off) {
+                if (masking == MaskingMode.Number) {
+                    result = DecodeByte(result, mask);
+                    mask = GetNextMask(mask);
+                } else if (masking == MaskingMode.Window) {
+                    result = DecodeByteWindow(result);
+                }
             }
             return result;
         }
@@ -103,14 +121,28 @@ namespace OpenSpace {
 
         public void SetMask(uint mask) {
             this.mask = mask;
-            masking = true;
+            masking = MaskingMode.Number;
         }
 
-        byte decodeByte(byte toDecode, uint mask) {
+        public void InitWindowMask() {
+            maskBytes = new byte[10];
+            Array.Copy(originalMaskBytes, maskBytes, maskBytes.Length);
+            masking = MaskingMode.Window;
+            currentMaskByte = 0;
+        }
+
+        byte DecodeByte(byte toDecode, uint mask) {
             return (byte)(toDecode ^ ((mask >> 8) & 0xFF));
         }
 
-        uint getNextMask(uint currentMask) {
+        byte DecodeByteWindow(byte toDecode) {
+            byte returnByte = (byte)(toDecode ^ (maskBytes[currentMaskByte]));
+            maskBytes[currentMaskByte] = (byte)(originalMaskBytes[currentMaskByte] + toDecode);
+            currentMaskByte = (uint)((currentMaskByte + 1) % maskBytes.Length);
+            return returnByte;
+        }
+
+        uint GetNextMask(uint currentMask) {
             if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2IOS) {
                 return (uint)(16807 * ((currentMask ^ 0x75BD924u) % 0x1F31D) - 2836 * ((currentMask ^ 0x75BD924u) / 0x1F31D));
             } else {
@@ -118,9 +150,31 @@ namespace OpenSpace {
             }
         }
 
+        public void SetInitialMask() {
+            if (Settings.s.fixedInitialMask) {
+                mask = 0x6AB5CC79;
+            } else {
+                uint currentMask = 0xFFFFFFFF;
+                mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));
+                if ((mask & 0x80000000) != 0) {
+                    mask += 0x7FFFFFFF;
+                    currentMask = mask;
+                }
+                MapLoader.Loader.print(mask);
+            }
+        }
+
+        public void SetOrReadMask() {
+            if (Settings.s.useInitialMask) {
+                SetInitialMask();
+            } else {
+                ReadMask();
+            }
+        }
+
         // Turn off masking for this binary reader
         public void MaskingOff() {
-            masking = false;
+            masking = MaskingMode.Off;
         }
         #endregion
     }
