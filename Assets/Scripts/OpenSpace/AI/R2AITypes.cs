@@ -1131,13 +1131,13 @@ namespace OpenSpace.AI {
             DsgVarInfoEntry.DsgVarType.GameMaterial,
             DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
             DsgVarInfoEntry.DsgVarType.Graph,
-            DsgVarInfoEntry.DsgVarType.Array1,
-            DsgVarInfoEntry.DsgVarType.Array2,
-            DsgVarInfoEntry.DsgVarType.Array3,
-            DsgVarInfoEntry.DsgVarType.Array4,
-            DsgVarInfoEntry.DsgVarType.Array5,
-            DsgVarInfoEntry.DsgVarType.Array6,
-            DsgVarInfoEntry.DsgVarType.Input
+            DsgVarInfoEntry.DsgVarType.PersoArray,
+            DsgVarInfoEntry.DsgVarType.VectorArray,
+            DsgVarInfoEntry.DsgVarType.FloatArray,
+            DsgVarInfoEntry.DsgVarType.IntegerArray,
+            DsgVarInfoEntry.DsgVarType.WayPointArray,
+            DsgVarInfoEntry.DsgVarType.TextArray,
+            DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
         });
         #endregion
 
@@ -1382,7 +1382,9 @@ namespace OpenSpace.AI {
                 case 24:
                     State state = State.FromOffset(sn.param_ptr);
                     string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.name;
-                    return "ActionRef: " + sn.param_ptr + " (" + stateName + ")";
+                    int stateIndex = state.index;
+
+                    return "action["+stateIndex+"]";
                 case 25:
                     return "SuperObjectRef: " + sn.param_ptr;
                 case 26:
@@ -1394,7 +1396,7 @@ namespace OpenSpace.AI {
                     if (comportRef == null) {
                         return "null";
                     } else {
-                        string type = comportRef.type == Behavior.BehaviorType.Normal ? "intelligence" : "reflex";
+                        string type = comportRef.type == Behavior.BehaviorType.Normal ? "normalBehavior" : "reflexBehavior";
                         return type + "[" + comportRef.number + "]";
                     }
                 case 29:

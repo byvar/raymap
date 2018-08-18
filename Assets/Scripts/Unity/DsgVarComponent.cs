@@ -32,6 +32,7 @@ namespace OpenSpace
             public ushort valueAsUShort;
             public float valueAsFloat;
             public Vector3 valueAsVector;
+            public GameObject valueAsSuperObjectGao;
             public GameObject valueAsPersoGao;
 
             public bool valueAsBool_initial;
@@ -43,6 +44,7 @@ namespace OpenSpace
             public ushort valueAsUShort_initial;
             public float valueAsFloat_initial;
             public Vector3 valueAsVector_initial;
+            public GameObject valueAsSuperObjectGao_initial;
             public GameObject valueAsPersoGao_initial;
 
             public DsgVarEditableEntry(int number, DsgVarInfoEntry entry)
@@ -68,7 +70,17 @@ namespace OpenSpace
                                 this.valueAsPersoGao = perso.Gao;
                             }
                         }
-                    break;
+                        break;
+
+                    case DsgVarInfoEntry.DsgVarType.SuperObject:
+
+                        if (entry.value != null) {
+                            SuperObject spo = MapLoader.Loader.superObjects.Where(p => (p.offset!=null && p.offset == (Pointer)entry.value)).FirstOrDefault();
+                            if (spo != null) {
+                                this.valueAsSuperObjectGao = spo.Gao;
+                            }
+                        }
+                        break;
 
                 }
 
@@ -88,6 +100,14 @@ namespace OpenSpace
                                 Perso perso = MapLoader.Loader.persos.Where(p => p.SuperObject.offset == (Pointer)entry.initialValue).FirstOrDefault();
                                 if (perso != null) {
                                     this.valueAsPersoGao_initial = perso.Gao;
+                                }
+                            }
+                        break;
+                        case DsgVarInfoEntry.DsgVarType.SuperObject:
+                            if (entry.initialValue != null) {
+                                SuperObject spo = MapLoader.Loader.superObjects.Where(p => p.offset == (Pointer)entry.initialValue).FirstOrDefault();
+                                if (spo != null) {
+                                    this.valueAsSuperObjectGao_initial = spo.Gao;
                                 }
                             }
                         break;
@@ -157,6 +177,14 @@ namespace OpenSpace
                             this.valueAsPersoGao = selectedPersoBehaviour.gameObject;
                         }
                         break;
+                    case DsgVarInfoEntry.DsgVarType.SuperObject:
+                        GameObject currentGao = valueAsSuperObjectGao != null ? valueAsSuperObjectGao : null;
+                        GameObject selectedGao = ((GameObject)EditorGUILayout.ObjectField(currentGao, typeof(GameObject), true));
+
+                        if (selectedGao != null) {
+                            this.valueAsSuperObjectGao = selectedGao;
+                        }
+                        break;
 
 
                 }
@@ -188,6 +216,14 @@ namespace OpenSpace
 
                             if (selectedPersoBehaviour != null && selectedPersoBehaviour.gameObject != null) {
                                 this.valueAsPersoGao_initial = selectedPersoBehaviour.gameObject;
+                            }
+                            break;
+                        case DsgVarInfoEntry.DsgVarType.SuperObject:
+                            GameObject currentGao = valueAsSuperObjectGao_initial != null ? valueAsSuperObjectGao_initial : null;
+                            GameObject selectedGao = ((GameObject)EditorGUILayout.ObjectField(currentGao, typeof(GameObject), true));
+
+                            if (selectedGao != null) {
+                                this.valueAsSuperObjectGao_initial = selectedGao;
                             }
                             break;
 

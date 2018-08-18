@@ -160,6 +160,8 @@ namespace OpenSpace.AI
                                         if (firstNodePerso != null) {
                                             string secondChildNodeWithDifferentContext = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString(firstNodePerso) : "null";
                                             return firstChildNode + "." + secondChildNodeWithDifferentContext;
+                                        } else {
+                                            return firstChildNode + "." + this.children[1].ToString(null);
                                         }
                                     }
 

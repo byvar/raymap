@@ -139,6 +139,12 @@ namespace OpenSpace.AI {
 
                         break;
 
+                    case DsgVarInfoEntry.DsgVarType.SuperObject:
+
+                        returnValue = Pointer.Read(reader);
+
+                        break;
+
                     default:
                         returnValue = reader.ReadInt32(); break;
                 }
