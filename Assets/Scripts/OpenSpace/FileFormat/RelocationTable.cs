@@ -83,11 +83,11 @@ namespace OpenSpace.FileFormat {
             using (Reader reader = new Reader(stream, isLittleEndian)) {
                 if (Settings.s.useWindowMasking) {
                     reader.InitWindowMask();
-                    byte [] data = reader.ReadBytes((int)stream.Length);
+                    /*byte [] data = reader.ReadBytes((int)stream.Length);
                     MapLoader.Loader.print(path);
                     Util.ByteArrayToFile(path + ".dmp", data);
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                    reader.InitWindowMask();
+                    reader.InitWindowMask();*/
                 }
                 Read(reader);
             }
@@ -169,9 +169,9 @@ namespace OpenSpace.FileFormat {
                     // The part's baseInMemory should be subtracted from it to get the offset relative to the part.
                     pointerBlocks[i].pointers[j] = new RelocationPointerInfo();
                     if (Settings.s.subMode == Settings.SubMode.TT) {
+                        pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
                         pointerBlocks[i].pointers[j].module = reader.ReadByte();
                         pointerBlocks[i].pointers[j].id = reader.ReadByte();
-                        pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
                     } else {
                         pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
                         pointerBlocks[i].pointers[j].module = reader.ReadByte();

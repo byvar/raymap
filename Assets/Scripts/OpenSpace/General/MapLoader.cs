@@ -170,11 +170,6 @@ namespace OpenSpace {
                         }
 
                         string fixSnaPath = levelsFolder + "fix.sna";
-                        if (Settings.s.subMode == Settings.SubMode.TT) {
-                            DSB fixRTB = new DSB("fixrtb", levelsFolder + "fix.rtb");
-                            fixRTB.Save(levelsFolder + "fix.rtb.dmp");
-                            fixRTB.Dispose();
-                        }
                         RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
                         if (File.Exists(levelsFolder + lvlName + "/FixLvl.rtb")) {
                             // Fix -> Lvl pointers for Tonic Trouble
