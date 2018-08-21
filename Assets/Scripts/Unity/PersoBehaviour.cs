@@ -24,7 +24,7 @@ public class PersoBehaviour : MonoBehaviour {
     public bool autoNextState = false;
 
     // Physical object lists
-    public string[] poListNames = { "Placeholder" };
+    public string[] poListNames = { "Null" };
     int currentPOList = 0;
     public int poListIndex = 0;
 
@@ -49,10 +49,10 @@ public class PersoBehaviour : MonoBehaviour {
     public void Init() {
         if (perso != null && perso.p3dData != null) {
             Family fam = perso.p3dData.family;
-
             if (fam != null && fam.physical_objects != null && fam.physical_objects.Length > 0) {
-                poListNames = fam.off_physical_lists.Select(o => (o == null ? "Null" : o.ToString())).ToArray();
-                currentPOList = perso.p3dData.off_physicalObjects == null ? 0 : fam.GetIndexOfPhysicalList(perso.p3dData.off_physicalObjects);
+                Array.Resize(ref poListNames, fam.off_physical_lists.Length + 1);
+                Array.Copy(fam.off_physical_lists.Select(o => (o == null ? "Null" : o.ToString())).ToArray(), 0, poListNames, 1, fam.off_physical_lists.Length);
+                currentPOList = perso.p3dData.off_physicalObjects == null ? 0 : fam.GetIndexOfPhysicalList(perso.p3dData.off_physicalObjects) + 1;
                 if (currentPOList == -1) currentPOList = 0;
                 poListIndex = currentPOList;
             }
@@ -312,12 +312,16 @@ public class PersoBehaviour : MonoBehaviour {
                 }
             }
             if (poListIndex != currentPOList && perso.p3dData != null) {
-                if (poListIndex >= 0 && poListIndex < perso.p3dData.family.physical_objects.Length) {
+                if (poListIndex > 0 && poListIndex < perso.p3dData.family.physical_objects.Length + 1) {
                     currentPOList = poListIndex;
-                    perso.p3dData.physical_objects = perso.p3dData.family.physical_objects[currentPOList];
-                    forceAnimUpdate = true;
-                    SetState(currentState);
-                } else poListIndex = 0;
+                    perso.p3dData.physical_objects = perso.p3dData.family.physical_objects[currentPOList - 1];
+                } else {
+                    poListIndex = 0;
+                    currentPOList = 0;
+                    perso.p3dData.physical_objects = null;
+                }
+                forceAnimUpdate = true;
+                SetState(currentState);
             }
         }
         if (playAnimation) {
