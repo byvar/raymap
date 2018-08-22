@@ -849,31 +849,85 @@ namespace OpenSpace {
         void LoadFIXSNA() {
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
-            print("FIX GPT offset: " + Pointer.Current(reader));
-            Pointer off_identityMatrix = Pointer.Read(reader);
-            reader.ReadBytes(50 * 4);
-            uint matrixInStack = reader.ReadUInt32();
-            Pointer off_collisionGeoObj = Pointer.Read(reader);
-            Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
-            for (int i = 0; i < Settings.s.numEntryActions; i++) {
-                Pointer.Read(reader); // 3DOS_EntryActions
-            }
-
-            Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
-            ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
-
-            inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-            print("Num entractions: " + inputStruct.num_entryActions);
-            print("Off entryactions: " + inputStruct.off_entryActions);
-            Pointer off_IPT_entryElementList = Pointer.Read(reader);
-            print("Off entryelements: " + off_IPT_entryElementList);
-            fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
-            //reader.ReadBytes(0x14); // FON_g_stGeneral
             Pointer off_current = Pointer.Current(reader);
-            animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
-            animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];
-            print("Fix animation bank: " + off_current);
-            Pointer off_fixInfo = Pointer.Read(reader);
+            print("FIX GPT offset: " + off_current);
+
+            if (Settings.s.subMode != Settings.SubMode.TT) {
+                Pointer off_identityMatrix = Pointer.Read(reader);
+                reader.ReadBytes(50 * 4);
+                uint matrixInStack = reader.ReadUInt32();
+                Pointer off_collisionGeoObj = Pointer.Read(reader);
+                Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
+                for (int i = 0; i < Settings.s.numEntryActions; i++) {
+                    Pointer.Read(reader); // 3DOS_EntryActions
+                }
+
+                Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+                ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
+
+                inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+                print("Num entractions: " + inputStruct.num_entryActions);
+                print("Off entryactions: " + inputStruct.off_entryActions);
+                Pointer off_IPT_entryElementList = Pointer.Read(reader);
+                print("Off entryelements: " + off_IPT_entryElementList);
+                fontStruct = FontStructure.Read(reader, Pointer.Current(reader)); // FON_g_stGeneral
+                off_current = Pointer.Current(reader);
+                animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
+                animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];
+                print("Fix animation bank: " + off_current);
+                Pointer off_fixInfo = Pointer.Read(reader);
+            } else {
+                // Tonic Trouble
+                uint stringCount = (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                reader.ReadUInt32(); // 0x35
+                reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
+                reader.ReadBytes(0x90);
+                Pointer.Read(reader);
+                reader.ReadUInt32(); // 0x28
+                reader.ReadUInt32(); // 0x1
+                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                reader.ReadUInt32(); // 0x1
+                if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
+                    reader.ReadBytes(0x2CC);
+                } else { // French version: 598
+                    reader.ReadBytes(0x2C0);
+                }
+                reader.ReadBytes(0x1C);
+                reader.ReadUInt32(); // 0
+                reader.ReadUInt32(); // 1
+                reader.ReadUInt32(); // ???
+                Pointer.Read(reader);
+                
+                for (int i = 0; i < stringCount; i++) Pointer.Read(reader); // read num_loaded_strings pointers here
+
+                reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
+                reader.ReadUInt32();
+                Pointer.Read(reader);
+                reader.ReadBytes(0x14);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadBytes(0x30);
+                reader.ReadBytes(0x960);
+            }
 
             // Read PTX
             ((SNA)files_array[Mem.Fix]).GotoPTX();

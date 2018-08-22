@@ -95,7 +95,7 @@ namespace OpenSpace {
         }
 
         public string ReadString(int size) {
-            return new string(ReadChars(size)).TrimEnd('\0');
+            return System.Text.Encoding.UTF8.GetString(ReadBytes(size)).TrimEnd('\0');
         }
 
         // To make sure position is a multiple of alignBytes

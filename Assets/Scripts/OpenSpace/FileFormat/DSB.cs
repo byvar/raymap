@@ -6,7 +6,20 @@ using System.Text;
 
 namespace OpenSpace.FileFormat {
     public class DSB : FileWithPointers {
+        public class DSBText {
+            public struct DSBTextEntry {
+                public string key;
+                public string stringValue;
+                public int intValue;
+                public string type;
+                public string command;
+            }
+            public string name;
+            public List<DSBTextEntry> strings = new List<DSBTextEntry>();
+        }
+
         byte[] data = null;
+        public List<DSBText> textFiles = new List<DSBText>();
         
         // Bigfile paths
         public string bigfileTextures;
@@ -73,9 +86,16 @@ namespace OpenSpace.FileFormat {
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
             if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
                 ReadMemoryDesc();
-                reader.ReadUInt32();
+                reader.ReadUInt32(); // 1
                 ReadDirectoriesDesc();
                 ReadBigFileDesc();
+                vignetteName = ReadString(); // first vignette shown on startup, UbiSoft.bmp
+                ReadString(); // GameData\Options\IPT.bin
+                reader.ReadUInt32(); // 1000
+                ReadTextFiles();
+                ReadConfig();
+                ReadString(); // "3"
+                ReadString(); // "Totalski" = first level
             } else {
                 while (reader.BaseStream.Position < reader.BaseStream.Length) {
                     ReadSection();
@@ -355,6 +375,53 @@ namespace OpenSpace.FileFormat {
                     case 122: reader.ReadUInt32(); break;
                     case 123: break;
                     case 124: break; // Mouse device
+                }
+                id = reader.ReadUInt32();
+            }
+        }
+
+        private void ReadTextFiles() {
+            DSBText t = new DSBText();
+            t.name = ReadString();
+            while (t.name != "ENDTXT") {
+                bool readingTextFile = true;
+                while (readingTextFile) {
+                    DSBText.DSBTextEntry e = new DSBText.DSBTextEntry();
+                    e.command = ReadString();
+                    switch (e.command) {
+                        case "NewStringLenght":
+                            e.key = ReadString();
+                            e.intValue = reader.ReadInt32();
+                            e.type = ReadString();
+                            t.strings.Add(e);
+                            break;
+                        case "NewString":
+                            e.key = ReadString();
+                            e.stringValue = ReadString();
+                            e.type = ReadString();
+                            t.strings.Add(e);
+                            break;
+                        case "END":
+                            readingTextFile = false;
+                            break;
+                        default:
+                            throw new FormatException("Unknown DSBTEXT command: " + e.command);
+                    }
+                }
+                textFiles.Add(t);
+                // Start new text file
+                t = new DSBText();
+                t.name = ReadString();
+            }
+        }
+
+        private void ReadConfig() { // TT only
+            uint id = reader.ReadUInt32();
+            while (id != 0xFFFF) {
+                switch (id) {
+                    case 24: ReadString(); break; // Default.cfg
+                    case 25: ReadString(); break; // Current.cfg
+                    case 22: ReadString(); break; // outro
                 }
                 id = reader.ReadUInt32();
             }

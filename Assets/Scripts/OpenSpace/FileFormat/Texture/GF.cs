@@ -58,7 +58,7 @@ namespace OpenSpace.FileFormat.Texture {
             MapLoader l = MapLoader.Loader;
             Reader r = new Reader(stream, isLittleEndian);
 
-            if(l.mode != MapLoader.Mode.Rayman2IOS) r.ReadInt32(); // Signature
+            if(Settings.s.platform != Settings.Platform.iOS) r.ReadInt32(); // Signature, not in TT SE
 
             width = r.ReadUInt32();
             height = r.ReadUInt32();
@@ -77,14 +77,36 @@ namespace OpenSpace.FileFormat.Texture {
 
             pixels = new Color[width * height];
             byte repeatByte = r.ReadByte();
+            byte[] blue_channel = null, green_channel = null, red_channel = null, alpha_channel = null;
 
-            byte[] blue_channel = ReadChannel(r, repeatByte, channelPixels);
-            byte[] green_channel = ReadChannel(r, repeatByte, channelPixels);
-            byte[] red_channel = ReadChannel(r, repeatByte, channelPixels);
-            byte[] alpha_channel = null;
-            if (channels == 4) {
-                alpha_channel = ReadChannel(r, repeatByte, channelPixels);
-                isTransparent = true;
+            if (channels >= 3) {
+                blue_channel = ReadChannel(r, repeatByte, channelPixels);
+                green_channel = ReadChannel(r, repeatByte, channelPixels);
+                red_channel = ReadChannel(r, repeatByte, channelPixels);
+                if (channels == 4) {
+                    alpha_channel = ReadChannel(r, repeatByte, channelPixels);
+                    isTransparent = true;
+                }
+            } else if (channels == 2) {
+                byte[] channel_1 = ReadChannel(r, repeatByte, channelPixels);
+                byte[] channel_2 = ReadChannel(r, repeatByte, channelPixels);
+
+                red_channel = new byte[channelPixels];
+                green_channel = new byte[channelPixels];
+                blue_channel = new byte[channelPixels];
+                alpha_channel = new byte[channelPixels];
+
+                for (int i = 0; i < channelPixels; i++) {
+                    ushort pixel = BitConverter.ToUInt16(new byte[] { channel_1[i], channel_2[i] }, 0); // RRRRR, GGGGGG, BBBBB (565)
+                    
+                    uint red = extractBits(pixel, 5, 11);
+                    uint green = extractBits(pixel, 6, 5);
+                    uint blue = extractBits(pixel, 5, 0);
+
+                    red_channel[i] = (byte)((red / 31.0f) * 255.0f);
+                    green_channel[i] = (byte)((green / 63.0f) * 255.0f);
+                    blue_channel[i] = (byte)((blue / 31.0f) * 255.0f);
+                }
             }
             for (int i = 0; i < width * height; i++) {
                 if (isTransparent) {
@@ -134,6 +156,10 @@ namespace OpenSpace.FileFormat.Texture {
             tex.SetPixels(pixels);
             tex.Apply();
             return tex;
+        }
+
+        static uint extractBits(int number, int count, int offset) {
+            return (uint)(((1 << count) - 1) & (number >> (offset)));
         }
     }
 }

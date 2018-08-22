@@ -199,7 +199,9 @@ namespace OpenSpace.FileFormat {
                             
                             ushort ptrRelocationKey = GetRelocationKey(info);
                             if (!l.relocation_global.ContainsKey(ptrRelocationKey)) {
-                                l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
+                                if (Settings.s.subMode != Settings.SubMode.TT || !(info.module == 0xFF && info.id == 0xFF)) {
+                                    l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
+                                }
                             } else {
                                 SNAMemoryBlock ptr_block_local = relocation_local[ptrRelocationKey];
                                 SNAMemoryBlock ptr_block_global = (ptr_block_local.size != 0) ? ptr_block_local : l.relocation_global[ptrRelocationKey];
