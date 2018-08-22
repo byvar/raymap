@@ -43,7 +43,7 @@ namespace OpenSpace.EngineObject {
             get {
                 if (gao == null) {
                     if (nameFamily != null && nameModel != null && namePerso != null) {
-                        fullName = "[" + nameFamily + "] " + nameModel + " | " + namePerso;
+                        fullName = "[" + nameFamily + "] " + nameModel + " | " + namePerso; // + " @ " + offset;
                         /*if (superObject != null) {
                             fullName = superObject.matrix.type + " " + superObject.matrix.v + fullName;
                         }*/
@@ -143,63 +143,74 @@ namespace OpenSpace.EngineObject {
                     }
                 }
             }*/
-            if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.p3dData != null && p.p3dData.family != null
-                && !(Settings.s.engineMode == Settings.EngineMode.R3 && Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
-                // Add physical objects tables hidden in scripts
-                AIModel ai = p.brain.mind.AI_model;
-                if (ai.behaviors_normal != null) {
-                    for (int i = 0; i < ai.behaviors_normal.Length; i++) {
-                        if (ai.behaviors_normal[i].scripts != null) {
-                            for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
-                                List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_normal[i].scripts[j].scriptNodes;
+            if (p.p3dData != null && p.p3dData.family != null) {
+                if (p.p3dData.off_physicalObjects != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects) == -1) {
+                    Pointer.DoAt(ref reader, p.p3dData.off_physicalObjects, () => {
+                        p.p3dData.family.ReadNewPhysicalList(reader, p.p3dData.off_physicalObjects);
+                    });
+                }
+                if (p.p3dData.off_physicalObjectsInitial != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjectsInitial) == -1) {
+                    Pointer.DoAt(ref reader, p.p3dData.off_physicalObjectsInitial, () => {
+                        p.p3dData.family.ReadNewPhysicalList(reader, p.p3dData.off_physicalObjectsInitial);
+                    });
+                }
+                if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null
+                    && !(Settings.s.engineMode == Settings.EngineMode.R3 && Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
+                                                                                                          // Add physical objects tables hidden in scripts
+                    AIModel ai = p.brain.mind.AI_model;
+                    if (ai.behaviors_normal != null) {
+                        for (int i = 0; i < ai.behaviors_normal.Length; i++) {
+                            if (ai.behaviors_normal[i].scripts != null) {
+                                for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
+                                    List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_normal[i].scripts[j].scriptNodes;
+                                    foreach (ScriptNode node in nodes) {
+                                        if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
+                                            && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                            Pointer.DoAt(ref reader, node.param_ptr, () => {
+                                                p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (ai.behaviors_reflex != null) {
+                        for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
+                            if (ai.behaviors_reflex[i].scripts != null) {
+                                for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
+                                    List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_reflex[i].scripts[j].scriptNodes;
+                                    foreach (ScriptNode node in nodes) {
+                                        if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
+                                            && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
+                                            Pointer.DoAt(ref reader, node.param_ptr, () => {
+                                                p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (ai.macros != null) {
+                        for (int i = 0; i < ai.macros.Length; i++) {
+                            if (ai.macros[i].script != null) {
+                                List<ScriptNode> nodes = p.brain.mind.AI_model.macros[i].script.scriptNodes;
                                 foreach (ScriptNode node in nodes) {
                                     if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
                                         && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
-                                        Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
-                                        p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
-                                        Pointer.Goto(ref reader, off_current);
+                                        Pointer.DoAt(ref reader, node.param_ptr, () => {
+                                            p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
+                                        });
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (ai.behaviors_reflex != null) {
-                    for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
-                        if (ai.behaviors_reflex[i].scripts != null) {
-                            for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
-                                List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_reflex[i].scripts[j].scriptNodes;
-                                foreach (ScriptNode node in nodes) {
-                                    if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                        && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
-                                        Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
-                                        p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
-                                        Pointer.Goto(ref reader, off_current);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if (p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects) != -1) {
+                    p.p3dData.physical_objects = p.p3dData.family.physical_objects[p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects)];
                 }
-                if (ai.macros != null) {
-                    for (int i = 0; i < ai.macros.Length; i++) {
-                        if (ai.macros[i].script != null) {
-                            List<ScriptNode> nodes = p.brain.mind.AI_model.macros[i].script.scriptNodes;
-                            foreach (ScriptNode node in nodes) {
-                                if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                    && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
-                                    Pointer off_current = Pointer.Goto(ref reader, node.param_ptr);
-                                    p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
-                                    Pointer.Goto(ref reader, off_current);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            //if (off_physicalObjects != null && off_physicalObjects.offset == 0x7029) off_physicalObjects.offset = 0x7659;
-            if (p.p3dData != null && p.p3dData.family != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects) != -1) {
-                p.p3dData.physical_objects = p.p3dData.family.physical_objects[p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects)];
             }
 
             if (p.off_collSet!=null) {
