@@ -26,13 +26,14 @@ namespace OpenSpace.Animation {
 
         public static AnimationReference Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
+            if (Settings.s.game == Settings.Game.TT) return null;
             AnimationReference ar = new AnimationReference(offset);
-            if (l.mode == MapLoader.Mode.Rayman3GC) ar.name = new string(reader.ReadChars(0x50));
+            if (Settings.s.hasNames) ar.name = new string(reader.ReadChars(0x50));
             ar.num_onlyFrames = reader.ReadUInt16();
             ar.speed = reader.ReadByte();
             ar.num_channels = reader.ReadByte();
             ar.off_events = Pointer.Read(reader);
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 ar.x = reader.ReadSingle();
                 ar.y = reader.ReadSingle();
                 ar.z = reader.ReadSingle();
@@ -41,7 +42,7 @@ namespace OpenSpace.Animation {
             ar.anim_index = reader.ReadUInt16();
             ar.num_events = reader.ReadByte();
             ar.transition = reader.ReadByte();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32(); // no idea what this is sadly
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32(); // no idea what this is sadly
             return ar;
         }
     }

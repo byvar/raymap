@@ -51,7 +51,7 @@ namespace OpenSpace.AI {
             }
             behavior.off_scripts = Pointer.Read(reader);
             behavior.unknown = reader.ReadUInt32();
-            if (Settings.s.subMode == Settings.SubMode.R2Demo) {
+            if (Settings.s.game == Settings.Game.R2Demo) {
                 reader.ReadUInt32();
             }
             behavior.num_scripts = reader.ReadByte();

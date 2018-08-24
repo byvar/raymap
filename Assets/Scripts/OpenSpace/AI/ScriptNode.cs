@@ -48,7 +48,7 @@ namespace OpenSpace.AI {
                 sn.type = reader.ReadByte();
             }
             sn.nodeType = NodeType.Unknown;
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 sn.nodeType = R2AITypes.getNodeType(sn.type);
             } else {
                 sn.nodeType = R3AITypes.getNodeType(sn.type);

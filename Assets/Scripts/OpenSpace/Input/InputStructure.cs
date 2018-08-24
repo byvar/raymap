@@ -28,7 +28,7 @@ namespace OpenSpace.Input {
                 input.off_entryActions = Pointer.Read(reader);
                 reader.ReadBytes(0x418);
             } else if (Settings.s.platform == Settings.Platform.PC) {
-                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
                     reader.ReadBytes(0x700);
                 } else {
                     reader.ReadBytes(0x16BC);

@@ -170,8 +170,8 @@ namespace OpenSpace.Visual {
         public bool IsTransparent {
             get {
                 bool transparent = false;
-                if (Settings.s.engineMode == Settings.EngineMode.R3 && (flags & flags_isTransparent) != 0) transparent = true;
-                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3 && (flags & flags_isTransparent) != 0) transparent = true;
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     if ((flags & 0x4000000) != 0) transparent = true;
                 }
                 if (transparent) {
@@ -186,7 +186,7 @@ namespace OpenSpace.Visual {
         public bool IsLight {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((flags & flags_isTransparent) != 0 || Settings.s.engineMode == Settings.EngineMode.R2) {
+                if ((flags & flags_isTransparent) != 0 || Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
                         return textures[0].texture.IsLight;
                     }
@@ -215,9 +215,10 @@ namespace OpenSpace.Visual {
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
             
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt32(); // 0x48
                 VisualMaterialTexture t = new VisualMaterialTexture();
+                t.offset = Pointer.Current(reader);
                 t.off_texture = Pointer.Read(reader); // 0x4c
                 t.texture = TextureInfo.FromOffset(t.off_texture);
                 t.currentScrollX = reader.ReadSingle();
@@ -256,6 +257,7 @@ namespace OpenSpace.Visual {
                     if (off_texture == null) break;
 
                     VisualMaterialTexture t = new VisualMaterialTexture();
+                    t.offset = Pointer.Current(reader);
                     t.off_texture = off_texture;
                     t.texture = TextureInfo.FromOffset(t.off_texture);
 

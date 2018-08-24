@@ -48,7 +48,7 @@ namespace OpenSpace.AI {
                     builder.Append("---- END OF SCRIPT ----");
                 } else {
                     builder.Append(new String(' ', (sn.indent - 1) * 4));
-                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                         builder.Append(R2AITypes.readableFunctionSubType(sn, perso));
                     } else {
                         builder.Append(R3AITypes.readableFunctionSubType(sn, perso));

@@ -1,4 +1,5 @@
-﻿using OpenSpace.Visual;
+﻿using OpenSpace.Collide;
+using OpenSpace.Visual;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,10 +62,10 @@ namespace OpenSpace.EngineObject {
                     Pointer sp = Pointer.Read(reader);
                     n.sector = l.sectors.FirstOrDefault(s => s.SuperObject.offset == sp);
                     if (l.mode == MapLoader.Mode.RaymanArenaGC) {
-                        n.off_next = off_element + 8; // We just read 8 bytes
+                        n.off_next = off_element + 8; // No next pointer, each entry is immediately after the first one.
                     } else {
                         n.off_next = Pointer.Read(reader);
-                        if (l.mode == MapLoader.Mode.Rayman3GC) {
+                        if (Settings.s.hasLinkedListHeaderPointers) {
                             n.off_previous = Pointer.Read(reader);
                             Pointer off_sector_start = Pointer.Read(reader);
                         }
@@ -82,6 +83,16 @@ namespace OpenSpace.EngineObject {
         public static Sector Read(Reader reader, Pointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
+            s.name = "Sector @ " + offset;
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                Pointer off_collideObj = Pointer.Read(reader);
+                Pointer.DoAt(ref reader, off_collideObj, () => {
+                    //CollideMeshObject collider = CollideMeshObject.Read(reader, off_collideObj);
+                    // This has the exact same structure as a CollideMeshObject but with a sector superobject as material for the collieMeshElements
+                });
+                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // only one sector pointer in this list
+                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // ??? always null?
+            }
             s.persos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             s.lights = LinkedList<LightInfo>.Read(ref reader, Pointer.Current(reader),
                 (off_element) => {
@@ -91,7 +102,7 @@ namespace OpenSpace.EngineObject {
                 },
                 flags: LinkedList.Flags.ElementPointerFirst
                     | LinkedList.Flags.ReadAtPointer
-                    | ((l.mode == MapLoader.Mode.Rayman3GC) ?
+                    | ((Settings.s.hasLinkedListHeaderPointers) ?
                         LinkedList.Flags.HasHeaderPointers :
                         LinkedList.Flags.NoPreviousPointersForDouble),
                 type: (l.mode == MapLoader.Mode.RaymanArenaGC) ? LinkedList.Type.SingleNoElementPointers : LinkedList.Type.Default
@@ -99,10 +110,13 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+            }
             s.neighbors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader));
-            reader.ReadUInt32();
-            if (Settings.s.linkedListType == LinkedList.Type.Double) reader.ReadUInt32();
-            reader.ReadUInt32();
+            LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader));
             s.sectors_unk = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader));
             reader.ReadUInt32();
             reader.ReadUInt32();
@@ -110,21 +124,26 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
 
-            s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
-
-            reader.ReadUInt32();
-            s.isSectorVirtual = reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadUInt32();
-            reader.ReadByte();
-            if (Settings.s.hasNames) {
-                s.name = reader.ReadString(0x104);
-                l.print(s.name);
+                reader.ReadUInt32();
+                s.isSectorVirtual = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadUInt32();
+                reader.ReadByte();
+                if (Settings.s.hasNames) {
+                    s.name = reader.ReadString(0x104);
+                    l.print(s.name);
+                }
             } else {
-                s.name = "Sector @ " + offset;
+                reader.ReadUInt32();
+                Pointer off_name = Pointer.Read(reader);
+                Pointer.DoAt(ref reader, off_name, () => {
+                    s.name = reader.ReadNullDelimitedString();
+                });
             }
             /*if(num_subsectors_unk > 0 && off_subsector_unk_first != null) { // only for father sector
                 R3Pointer off_subsector_next = off_subsector_unk_first;

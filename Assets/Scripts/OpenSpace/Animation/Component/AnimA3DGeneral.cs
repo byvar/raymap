@@ -57,7 +57,7 @@ namespace OpenSpace.Animation.Component {
         public static AnimA3DGeneral Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             AnimA3DGeneral a3d = new AnimA3DGeneral(offset);
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 /* Each a3d is 0x38 long */
                 a3d.speed = reader.ReadUInt16();
                 a3d.num_vectors = reader.ReadUInt16();
@@ -68,7 +68,7 @@ namespace OpenSpace.Animation.Component {
                 a3d.num_channels = reader.ReadUInt16();
                 a3d.num_onlyFrames = reader.ReadUInt16();
                 a3d.num_keyframes = reader.ReadUInt16();
-                if (Settings.s.subMode != Settings.SubMode.R2Demo) a3d.unk_14 = reader.ReadUInt16();
+                if (Settings.s.game != Settings.Game.R2Demo) a3d.unk_14 = reader.ReadUInt16();
                 a3d.num_events = reader.ReadUInt16();
                 a3d.unk_1A = reader.ReadUInt16(); // vector related
                 a3d.subtractFramesForSpeed = reader.ReadUInt16();
@@ -86,7 +86,7 @@ namespace OpenSpace.Animation.Component {
                 a3d.start_channels = reader.ReadUInt16();
                 a3d.start_events = reader.ReadUInt16();
                 a3d.start_morphData = reader.ReadUInt16();
-                if (Settings.s.subMode != Settings.SubMode.R2Demo) reader.ReadUInt16(); // padding?
+                if (Settings.s.game != Settings.Game.R2Demo) reader.ReadUInt16(); // padding?
             } else {
                 /* Each a3d is 0x3c long */
                 a3d.speed = reader.ReadUInt16();

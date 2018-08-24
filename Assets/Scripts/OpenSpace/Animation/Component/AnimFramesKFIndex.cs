@@ -12,7 +12,7 @@ namespace OpenSpace.Animation.Component {
 
         public static AnimFramesKFIndex Read(Reader reader) {
             AnimFramesKFIndex kfi = new AnimFramesKFIndex();
-            if (Settings.s.subMode == Settings.SubMode.R2Demo) {
+            if (Settings.s.game == Settings.Game.R2Demo) {
                 kfi.kf = reader.ReadUInt16();
             } else {
                 kfi.kf = reader.ReadUInt32();

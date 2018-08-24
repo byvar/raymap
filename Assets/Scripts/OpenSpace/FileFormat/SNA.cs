@@ -61,7 +61,7 @@ namespace OpenSpace.FileFormat {
         void ReadSNA() {
             MapLoader l = MapLoader.Loader;
             uint szCounter = 0;
-            if (Settings.s.subMode == Settings.SubMode.TT) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
                 byte headerLength = reader.ReadByte();
                 reader.ReadBytes(headerLength);
             }
@@ -71,7 +71,7 @@ namespace OpenSpace.FileFormat {
                 block.position = (uint)reader.BaseStream.Position;
                 block.module = reader.ReadByte();
                 block.id = reader.ReadByte();
-                if (Settings.s.subMode != Settings.SubMode.TT) block.unk1 = reader.ReadByte();
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
                 block.baseInMemory = reader.ReadInt32();
                 if (blocks.Count == 0) {
                     l.print("Initial block: " + block.module + "|" + block.id + " - base: " + block.baseInMemory);
@@ -87,7 +87,7 @@ namespace OpenSpace.FileFormat {
                     block.maxPosMinus9 = reader.ReadUInt32();
                     block.size = reader.ReadUInt32();
                     szCounter += block.size;
-                    if (Settings.s.subMode == Settings.SubMode.TT) block.unk1 = reader.ReadByte();
+                    if (Settings.s.engineVersion <= Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
                     block.dataPosition = (uint)reader.BaseStream.Position;
                     reader.ReadBytes((int)block.size);
                     block.pointerList = rtb.GetListForPart(block.module, block.id);
@@ -131,7 +131,7 @@ namespace OpenSpace.FileFormat {
             data = data.Concat(gptData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
-            if (Settings.s.subMode != Settings.SubMode.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                 ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
                 SNAMemoryBlock block = relocation_local[ptrRelocationKey];
                 block.pointerList = null;
@@ -166,7 +166,7 @@ namespace OpenSpace.FileFormat {
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ptx = new SNAMemoryBlock();
-            if (Settings.s.subMode != Settings.SubMode.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                 // It doesn't exist in Tonic Trouble
                 ushort ptrRelocationKey = GetRelocationKey(rtt.pointerBlocks[0]);
                 SNAMemoryBlock block = relocation_local[ptrRelocationKey];
@@ -199,7 +199,7 @@ namespace OpenSpace.FileFormat {
                             
                             ushort ptrRelocationKey = GetRelocationKey(info);
                             if (!l.relocation_global.ContainsKey(ptrRelocationKey)) {
-                                if (Settings.s.subMode != Settings.SubMode.TT || !(info.module == 0xFF && info.id == 0xFF)) {
+                                if (Settings.s.engineVersion > Settings.EngineVersion.TT || !(info.module == 0xFF && info.id == 0xFF)) {
                                     l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
                                 }
                             } else {

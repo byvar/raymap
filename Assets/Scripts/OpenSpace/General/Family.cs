@@ -62,7 +62,7 @@ namespace OpenSpace {
             off_physical_lists[off_physical_lists.Length - 1] = Pointer.Current(reader);
             Pointer off_list_hdr_next = null;
             if (l.mode != MapLoader.Mode.RaymanArenaGC) off_list_hdr_next = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman3GC) {
+            if (Settings.s.hasLinkedListHeaderPointers) {
                 Pointer off_list_hdr_prev = Pointer.Read(reader);
                 Pointer off_list_hdr = Pointer.Read(reader);
             }
@@ -125,7 +125,7 @@ namespace OpenSpace {
                 State s = State.Read(reader, off_element, f, stateIndex++);
                 return s;
             });
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 // (0x10 blocks: next, prev, list end, a3d pointer)
                 f.preloadAnim = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             }
@@ -140,7 +140,7 @@ namespace OpenSpace {
                 f.num_vector4s = reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 f.animBank = reader.ReadByte();
                 reader.ReadByte();
@@ -168,7 +168,7 @@ namespace OpenSpace {
                     f.off_physical_lists[i] = Pointer.Current(reader);
                     Pointer off_list_hdr_next = null;
                     if(l.mode != MapLoader.Mode.RaymanArenaGC) off_list_hdr_next = Pointer.Read(reader);
-                    if (l.mode == MapLoader.Mode.Rayman3GC) {
+                    if (Settings.s.hasLinkedListHeaderPointers) {
                         Pointer off_list_hdr_prev = Pointer.Read(reader);
                         Pointer off_list_hdr = Pointer.Read(reader);
                     }

@@ -121,7 +121,7 @@ namespace OpenSpace.Visual {
             l.bigAlpha = reader.ReadSingle();
             l.giroStep = reader.ReadSingle();
             l.pulseStep = reader.ReadSingle();
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 l.pulseMaxRange = reader.ReadSingle();
                 l.giroAngle = reader.ReadSingle();
                 reader.ReadSingle();
@@ -134,7 +134,7 @@ namespace OpenSpace.Visual {
             reader.ReadUInt32(); // 0
             reader.ReadUInt32(); // 0
             l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 l.shadowIntensity = reader.ReadSingle(); // 0
             }
             reader.ReadByte();

@@ -29,7 +29,7 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             GameMaterial gm = new GameMaterial(offset);
 
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 gm.off_visualMaterial = Pointer.Read(reader);
                 gm.off_mechanicsMaterial = Pointer.Read(reader);
             }

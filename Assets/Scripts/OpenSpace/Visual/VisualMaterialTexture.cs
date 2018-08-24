@@ -29,7 +29,7 @@ namespace OpenSpace.Visual {
 
         public bool ScrollingEnabled {
             get {
-                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     return scrollMode != 0;
                 } else {
                     return ((scrollByte & 6) != 0);
@@ -39,7 +39,7 @@ namespace OpenSpace.Visual {
 
         public bool IsScrollX {
             get {
-                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     return scrollMode != 0 && scrollX != 0;
                 } else {
                     return ((scrollByte & 2) != 0) && scrollX != 0;
@@ -48,7 +48,7 @@ namespace OpenSpace.Visual {
         }
         public bool IsScrollY {
             get {
-                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     return scrollMode != 0 && scrollY != 0;
                 } else {
                     return ((scrollByte & 4) != 0) && scrollY != 0;

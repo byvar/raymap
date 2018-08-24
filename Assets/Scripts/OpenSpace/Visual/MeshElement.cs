@@ -246,7 +246,7 @@ namespace OpenSpace.Visual {
                 //}
             }
             if (visualMaterial != null) {
-                gao.name += " " + visualMaterial.offset;
+                //gao.name += " " + visualMaterial.offset;
                 Material unityMat = visualMaterial.Material;
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
@@ -290,7 +290,7 @@ namespace OpenSpace.Visual {
             sm.name = "Submesh @ pos " + offset;
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
             } else {
                 sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
@@ -301,7 +301,7 @@ namespace OpenSpace.Visual {
             }
             sm.num_disconnected_triangles_spe = reader.ReadUInt16();
             sm.num_uvs = reader.ReadUInt16();
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 sm.num_uvMaps = reader.ReadUInt16();
                 reader.ReadUInt16();
             }
@@ -310,7 +310,7 @@ namespace OpenSpace.Visual {
             sm.off_mapping_uvs_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
             sm.off_weights_spe = Pointer.Read(reader); // 1 entry = 3 floats
             sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
             }
@@ -318,7 +318,7 @@ namespace OpenSpace.Visual {
             sm.num_vertex_indices = reader.ReadUInt16();
             reader.ReadInt16();
             reader.ReadUInt32();
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 reader.ReadUInt16();
                 sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
                 sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
@@ -327,7 +327,7 @@ namespace OpenSpace.Visual {
                 sm.num_disconnected_triangles = reader.ReadUInt16();
                 sm.off_connected_vertices = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
                 sm.off_disconnected_triangles = Pointer.Read(reader);
-                if (l.mode == MapLoader.Mode.Rayman3GC) sm.name = reader.ReadString(0x34);
+                if (Settings.s.hasNames) sm.name = reader.ReadString(0x34);
             } else {
                 // Defaults for Rayman 2
                 sm.num_uvMaps = 1;

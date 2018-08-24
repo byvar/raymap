@@ -18,8 +18,7 @@ namespace OpenSpace
             this.offset = offset;
         }
 
-        public static Dynam Read(Reader reader, Pointer offset)
-        {
+        public static Dynam Read(Reader reader, Pointer offset) {
             Dynam dynam = new Dynam(offset);
 
             dynam.off_dynamics = Pointer.Read(reader);

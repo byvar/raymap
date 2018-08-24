@@ -85,7 +85,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
             if (l.mode == MapLoader.Mode.RaymanArenaPC || l.mode == MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
@@ -106,16 +106,16 @@ namespace OpenSpace.EngineObject {
                 Pointer.Goto(ref reader, off_current);
             }
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset);
-            if (p.off_dynam != null) {
+            if (p.off_dynam != null && Settings.s.game != Settings.Game.TT) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_dynam);
                 p.dynam = Dynam.Read(reader, p.off_dynam);
                 Pointer.Goto(ref reader, off_current);
             }
 
-            if (p.off_brain != null) {
+            if (p.off_brain != null && Settings.s.game != Settings.Game.TT) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_brain);
                 p.brain = Brain.Read(reader, p.off_brain);
-                if (p.brain.mind != null && p.brain.mind.AI_model != null && p.nameModel != null) p.brain.mind.AI_model.name = p.nameModel;
+                if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.nameModel != null) p.brain.mind.AI_model.name = p.nameModel;
                 Pointer.Goto(ref reader, off_current);
             }
 
@@ -155,7 +155,7 @@ namespace OpenSpace.EngineObject {
                     });
                 }
                 if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null
-                    && !(Settings.s.engineMode == Settings.EngineMode.R3 && Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
+                    && !(Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
                                                                                                           // Add physical objects tables hidden in scripts
                     AIModel ai = p.brain.mind.AI_model;
                     if (ai.behaviors_normal != null) {
@@ -213,7 +213,7 @@ namespace OpenSpace.EngineObject {
                 }
             }
 
-            if (p.off_collSet!=null) {
+            if (p.off_collSet!=null && Settings.s.game != Settings.Game.TT) {
                 Pointer.Goto(ref reader, p.off_collSet);
                 p.collset = CollSet.Read(reader, p, p.off_collSet);
             }

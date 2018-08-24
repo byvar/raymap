@@ -219,7 +219,7 @@ namespace OpenSpace.FileFormat {
             } else {
                 uint id = reader.ReadUInt32();
                 while (id != 0xFFFF) {
-                    if (Settings.s.subMode == Settings.SubMode.R2Demo) {
+                    if (Settings.s.game == Settings.Game.R2Demo) {
                         switch (id) {
                             case 41: dllDataPath = ReadString(); break;
                             case 58: textureDataPath = ReadString(); break;

@@ -74,19 +74,31 @@ namespace OpenSpace.Collide {
         public static CollideSpheresElement Read(Reader reader, Pointer offset, CollideMeshObject m) {
             MapLoader l = MapLoader.Loader;
             CollideSpheresElement s = new CollideSpheresElement(offset, m);
-            s.off_spheres = Pointer.Read(reader);
-            s.num_spheres = reader.ReadUInt16();
-            reader.ReadInt16(); // -1
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                s.off_spheres = Pointer.Read(reader);
+                s.num_spheres = reader.ReadUInt16();
+                reader.ReadInt16(); // -1
+            } else {
+                s.num_spheres = (ushort)reader.ReadUInt32();
+                s.off_spheres = Pointer.Read(reader);
+            }
 
             if (s.off_spheres != null) {
                 Pointer off_current = Pointer.Goto(ref reader, s.off_spheres);
                 s.spheres = new IndexedSphere[s.num_spheres];
                 for (uint i = 0; i < s.num_spheres; i++) {
                     s.spheres[i] = new IndexedSphere();
-                    s.spheres[i].radius = reader.ReadSingle();
-                    s.spheres[i].off_material = Pointer.Read(reader);
-                    s.spheres[i].centerPoint = reader.ReadUInt16();
-                    reader.ReadUInt16();
+                    if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                        s.spheres[i].radius = reader.ReadSingle();
+                        s.spheres[i].off_material = Pointer.Read(reader);
+                        s.spheres[i].centerPoint = reader.ReadUInt16();
+                        reader.ReadUInt16();
+                    } else {
+                        s.spheres[i].centerPoint = reader.ReadUInt16();
+                        reader.ReadUInt16();
+                        s.spheres[i].radius = reader.ReadSingle();
+                        s.spheres[i].off_material = Pointer.Read(reader);
+                    }
                     s.spheres[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.spheres[i].off_material, reader);
                 }
                 Pointer.Goto(ref reader, off_current);

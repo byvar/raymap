@@ -14,8 +14,7 @@ namespace OpenSpace.Visual {
         public Pointer offset;
 
         public GameObject gao = null;
-
-        public Pointer off_modelstart;
+        
         public Pointer off_vertices;
         public Pointer off_normals;
         public Pointer off_blendWeights;
@@ -75,12 +74,10 @@ namespace OpenSpace.Visual {
         public static MeshObject Read(Reader reader, PhysicalObject po, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             MeshObject m = new MeshObject(po, offset);
-            Pointer off_modelstart = Pointer.Read(reader);
-            m.off_modelstart = off_modelstart;
-            Pointer.Goto(ref reader, off_modelstart);
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_vertices = (ushort)reader.ReadUInt32();
             m.off_vertices = Pointer.Read(reader);
             m.off_normals = Pointer.Read(reader);
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 m.off_materials = Pointer.Read(reader);
             } else {
                 m.off_blendWeights = Pointer.Read(reader);
@@ -88,26 +85,35 @@ namespace OpenSpace.Visual {
             if (l.mode != MapLoader.Mode.RaymanArenaGC) {
                 reader.ReadInt32();
             }
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_subblocks = (ushort)reader.ReadUInt32();
             m.off_subblock_types = Pointer.Read(reader);
             m.off_subblocks = Pointer.Read(reader);
             reader.ReadInt32();
             reader.ReadInt32();
             reader.ReadInt32();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
+                    reader.ReadInt32();
+                    reader.ReadInt32();
+                }
+                m.num_vertices = reader.ReadUInt16();
+                m.num_subblocks = reader.ReadUInt16();
                 reader.ReadInt32();
+                reader.ReadSingle();
+                reader.ReadSingle();
+                reader.ReadSingle();
+                reader.ReadSingle();
                 reader.ReadInt32();
-            }
-            m.num_vertices = reader.ReadUInt16();
-            m.num_subblocks = reader.ReadUInt16();
-            reader.ReadInt32();
-            reader.ReadSingle();
-            reader.ReadSingle();
-            reader.ReadSingle();
-            reader.ReadSingle();
-            reader.ReadInt32();
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+                    reader.ReadInt32();
+                    reader.ReadInt16();
+                }
+            } else {
                 reader.ReadInt32();
-                reader.ReadInt16();
+                reader.ReadSingle();
+                reader.ReadSingle();
+                reader.ReadSingle();
+                reader.ReadSingle();
             }
             m.name = "Mesh @ " + offset;
             if (Settings.s.hasNames) m.name = reader.ReadString(0x32);

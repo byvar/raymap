@@ -25,7 +25,7 @@ namespace OpenSpace.Animation.Component {
         public static AnimKeyframe Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
             AnimKeyframe kf = new AnimKeyframe();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 kf.x = reader.ReadSingle();
                 kf.y = reader.ReadSingle();
                 kf.z = reader.ReadSingle();
@@ -37,7 +37,7 @@ namespace OpenSpace.Animation.Component {
             kf.quaternion2 = reader.ReadUInt16();
             kf.scaleVector = reader.ReadUInt16();
             kf.positionVector = reader.ReadUInt16();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt16();

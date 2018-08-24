@@ -21,10 +21,8 @@ namespace OpenSpace.Visual {
 
         // I don't even know what this is yet here I am parsing it
         public static UnknownGeometricObject Read(Reader reader, PhysicalObject po, Pointer offset) {
-            UnknownGeometricObject lodObj = new UnknownGeometricObject(po, offset);
-            Pointer off_start = Pointer.Read(reader);
-            Pointer.Goto(ref reader, off_start);
-            lodObj.off_model = Pointer.Read(reader);
+            UnknownGeometricObject unk = new UnknownGeometricObject(po, offset);
+            unk.off_model = Pointer.Read(reader);
             uint num_vector3s = reader.ReadUInt32();
             Pointer off_arrayStart = Pointer.Read(reader);
             if (off_arrayStart != null) {
@@ -35,11 +33,11 @@ namespace OpenSpace.Visual {
                     float x = reader.ReadSingle();
                     float z = reader.ReadSingle();
                     float y = reader.ReadSingle();
-                    lodObj.ids.Add(id);
-                    lodObj.vector3s.Add(new Vector3(x, y, z));
+                    unk.ids.Add(id);
+                    unk.vector3s.Add(new Vector3(x, y, z));
                 }
             }
-            return lodObj;
+            return unk;
         }
 
         public IGeometricObject Clone() {

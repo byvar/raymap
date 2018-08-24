@@ -27,7 +27,7 @@ namespace OpenSpace.Animation.Component {
 
         public bool IsInvisibleNTTO {
             get {
-                if (Settings.s.engineMode == Settings.EngineMode.R3) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                     return (flags & flag_isBoneNTTO) != 0;
                 } else {
                     return (flags & flag_isInvisible) == flag_isInvisible;
