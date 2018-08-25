@@ -91,6 +91,24 @@ namespace OpenSpace.FileFormat {
                 ReadConfig();
                 ReadString(); // "3"
                 ReadString(); // "Totalski" = first level
+            } else if (MapLoader.Loader.mode == MapLoader.Mode.HypePC) {
+                dllDataPath = ReadString();
+                gameDataPath = ReadString();
+                worldDataPath = ReadString();
+                levelsDataPath = ReadString();
+                soundDataPath = ReadString();
+                saveGameDataPath = ReadString();
+                textureDataPath = ReadString();
+                textureDataPath = ReadString();
+                vignettesDataPath = ReadString();
+                optionsDataPath = ReadString();
+                bigfileVignettes = ReadString();
+                bigfileTextures = ReadString();
+                reader.ReadUInt32(); // 10000
+                reader.ReadUInt16(); // 0
+                ReadString(); // Default.cfg
+                ReadString(); // Current.cfg
+                ReadString(); // "manoir" = first level
             } else {
                 while (reader.BaseStream.Position < reader.BaseStream.Length) {
                     ReadSection();
@@ -423,9 +441,14 @@ namespace OpenSpace.FileFormat {
         }
 
         private string ReadString() {
-            ushort strSize = reader.ReadUInt16();
+            ushort strSize;
+            if (MapLoader.Loader.mode == MapLoader.Mode.HypePC) {
+                strSize = reader.ReadByte();
+            } else {
+                strSize = reader.ReadUInt16();
+            }
             string result = reader.ReadString(strSize);
-            if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) result = result.Replace("GameData\\", "");
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) result = result.Replace("GameData\\", "");
             return result;
         }
 

@@ -147,7 +147,11 @@ namespace OpenSpace {
                 gameDataBinFolder += "/";
 
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                    gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
+                    if (mode == Mode.HypePC) {
+                        gameDsb = new DSB("Game", gameDataBinFolder + "gamedsc.bin");
+                    } else {
+                        gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
+                    }
                     gameDsb.Save(gameDataBinFolder + "Game_dsb.dmp");
                     gameDsb.ReadAllSections();
                     gameDsb.Dispose();
