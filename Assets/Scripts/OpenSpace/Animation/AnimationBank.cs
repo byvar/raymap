@@ -157,36 +157,7 @@ namespace OpenSpace.Animation {
                     for (uint j = 0; j < num_a3d_in_bank; j++) {
                         Pointer.Goto(ref reader, off_a3d);
                         // Read animation data here
-                        banks[i].animations[j] = AnimA3DGeneral.Read(reader, off_a3d);
-                        AnimA3DGeneral a = banks[i].animations[j];
-                        a.vectors = new AnimVector[a.num_vectors];
-                        a.quaternions = new AnimQuaternion[a.num_quaternions];
-                        a.hierarchies = new AnimHierarchy[a.num_hierarchies];
-                        a.ntto = new AnimNTTO[a.num_NTTO];
-                        a.onlyFrames = new AnimOnlyFrame[a.num_onlyFrames];
-                        a.channels = new AnimChannel[a.num_channels];
-                        a.numOfNTTO = new AnimNumOfNTTO[a.num_numNTTO * a.num_channels];
-                        a.framesKFIndex = new AnimFramesKFIndex[a.num_onlyFrames * a.num_channels];
-                        a.keyframes = new AnimKeyframe[a.num_keyframes];
-                        a.events = new AnimEvent[a.num_events];
-                        a.morphData = new AnimMorphData[a.num_morphData];
-                        a.deformations = new AnimDeformation[a.num_deformations];
-                        for (uint k = 0; k < a.vectors.Length; k++) a.vectors[k] = AnimVector.Read(reader);
-                        for (uint k = 0; k < a.quaternions.Length; k++) a.quaternions[k] = AnimQuaternion.Read(reader);
-                        for (uint k = 0; k < a.hierarchies.Length; k++) a.hierarchies[k] = AnimHierarchy.Read(reader);
-                        for (uint k = 0; k < a.ntto.Length; k++) a.ntto[k] = AnimNTTO.Read(reader);
-                        for (uint k = 0; k < a.onlyFrames.Length; k++) a.onlyFrames[k] = AnimOnlyFrame.Read(reader);
-                        reader.Align(4);
-                        for (uint k = 0; k < a.channels.Length; k++) a.channels[k] = AnimChannel.Read(reader);
-                        for (uint k = 0; k < a.numOfNTTO.Length; k++) a.numOfNTTO[k] = AnimNumOfNTTO.Read(reader);
-                        reader.Align(4);
-                        for (uint k = 0; k < a.framesKFIndex.Length; k++) a.framesKFIndex[k] = AnimFramesKFIndex.Read(reader);
-                        for (uint k = 0; k < a.keyframes.Length; k++) a.keyframes[k] = AnimKeyframe.Read(reader);
-                        reader.Align(4);
-                        for (uint k = 0; k < a.events.Length; k++) a.events[k] = AnimEvent.Read(reader);
-                        for (uint k = 0; k < a.morphData.Length; k++) a.morphData[k] = AnimMorphData.Read(reader);
-                        reader.Align(4);
-                        for (uint k = 0; k < a.deformations.Length; k++) a.deformations[k] = AnimDeformation.Read(reader);
+                        banks[i].animations[j] = AnimA3DGeneral.ReadFull(reader, off_a3d);
                         off_a3d += a3d_sizes[current_anim];
 
                         // Check if read correctly
@@ -213,63 +184,52 @@ namespace OpenSpace.Animation {
                     banks[i].global_events = new AnimEvent[banks[i].events.Count(append)];
                     banks[i].global_morphData = new AnimMorphData[banks[i].morphData.Count(append)];
                     if(Settings.s.hasDeformations) banks[i].global_deformations = new AnimDeformation[banks[i].deformations.Count(append)];
+                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.AutoAligning = true;
                     if (banks[i].animations.Length > 0) {
                         if (banks[i].a3d_general.off_data != null) Pointer.Goto(ref reader, banks[i].a3d_general.off_data);
                         for (uint j = 0; j < banks[i].animations.Length; j++) banks[i].animations[j] = AnimA3DGeneral.Read(reader, Pointer.Current(reader));
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                            if (Settings.s.game == Settings.Game.R2Demo) {
-                                reader.Align(52 * banks[i].animations.Length, 4);
-                            } else {
-                                reader.Align(56 * banks[i].animations.Length, 4);
-                            }
-                        }
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_vectors.Length > 0) {
                         if(banks[i].vectors.off_data != null) Pointer.Goto(ref reader, banks[i].vectors.off_data);
                         for (uint j = 0; j < banks[i].global_vectors.Length; j++) banks[i].global_vectors[j] = AnimVector.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(12 * banks[i].global_vectors.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_quaternions.Length > 0) {
                         if (banks[i].quaternions.off_data != null) Pointer.Goto(ref reader, banks[i].quaternions.off_data);
                         for (uint j = 0; j < banks[i].global_quaternions.Length; j++) banks[i].global_quaternions[j] = AnimQuaternion.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(8 * banks[i].global_quaternions.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_hierarchies.Length > 0) {
                         if (banks[i].hierarchies.off_data != null) Pointer.Goto(ref reader, banks[i].hierarchies.off_data);
                         for (uint j = 0; j < banks[i].global_hierarchies.Length; j++) banks[i].global_hierarchies[j] = AnimHierarchy.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(4 * banks[i].global_hierarchies.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_NTTO.Length > 0) {
                         if (banks[i].NTTO.off_data != null) Pointer.Goto(ref reader, banks[i].NTTO.off_data);
                         for (uint j = 0; j < banks[i].global_NTTO.Length; j++) banks[i].global_NTTO[j] = AnimNTTO.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(6 * banks[i].global_NTTO.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_onlyFrames.Length > 0) {
                         if (banks[i].onlyFrames.off_data != null) Pointer.Goto(ref reader, banks[i].onlyFrames.off_data);
                         for (uint j = 0; j < banks[i].global_onlyFrames.Length; j++) banks[i].global_onlyFrames[j] = AnimOnlyFrame.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(10 * banks[i].global_onlyFrames.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_channels.Length > 0) {
                         if (banks[i].channels.off_data != null) Pointer.Goto(ref reader, banks[i].channels.off_data);
                         for (uint j = 0; j < banks[i].global_channels.Length; j++) banks[i].global_channels[j] = AnimChannel.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(16 * banks[i].global_channels.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_numOfNTTO.Length > 0) {
                         if (banks[i].framesNumOfNTTO.off_data != null) Pointer.Goto(ref reader, banks[i].framesNumOfNTTO.off_data);
                         for (uint j = 0; j < banks[i].global_numOfNTTO.Length; j++) banks[i].global_numOfNTTO[j] = AnimNumOfNTTO.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(2 * banks[i].global_numOfNTTO.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_framesKFIndex.Length > 0) {
                         if (banks[i].framesKFIndex.off_data != null) Pointer.Goto(ref reader, banks[i].framesKFIndex.off_data);
                         for (uint j = 0; j < banks[i].global_framesKFIndex.Length; j++) banks[i].global_framesKFIndex[j] = AnimFramesKFIndex.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                            if (Settings.s.game == Settings.Game.R2Demo) {
-                                reader.Align(2 * banks[i].global_framesKFIndex.Length, 4);
-                            } else {
-                                reader.Align(4 * banks[i].global_framesKFIndex.Length, 4);
-                            }
-                        }
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_keyframes.Length > 0) {
                         if (banks[i].keyframes.off_data != null) Pointer.Goto(ref reader, banks[i].keyframes.off_data);
                         if (kfFile != null) {
@@ -277,22 +237,23 @@ namespace OpenSpace.Animation {
                             if(alignBytes > 0) reader.Align(4, alignBytes);
                         }
                         for (uint j = 0; j < banks[i].global_keyframes.Length; j++) banks[i].global_keyframes[j] = AnimKeyframe.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(36 * banks[i].global_keyframes.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_events.Length > 0) {
                         if (banks[i].events.off_data != null) Pointer.Goto(ref reader, banks[i].events.off_data);
                         for (uint j = 0; j < banks[i].global_events.Length; j++) banks[i].global_events[j] = AnimEvent.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(12 * banks[i].global_events.Length, 4);
                     }
+                    if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_morphData.Length > 0) {
                         if (banks[i].morphData.off_data != null) Pointer.Goto(ref reader, banks[i].morphData.off_data);
                         for (uint j = 0; j < banks[i].global_morphData.Length; j++) banks[i].global_morphData[j] = AnimMorphData.Read(reader);
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.Align(8 * banks[i].global_morphData.Length, 4);
                     }
+                    if (Settings.s.hasDeformations && reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].global_deformations != null && banks[i].global_deformations.Length > 0) {
                         if (banks[i].deformations.off_data != null) Pointer.Goto(ref reader, banks[i].deformations.off_data);
                         for (uint j = 0; j < banks[i].global_deformations.Length; j++) banks[i].global_deformations[j] = AnimDeformation.Read(reader);
                     }
+                    reader.AutoAligning = false;
                     if (append) {
                         AnimationBank b = l.animationBanks[index + i];
                         b.a3d_general = banks[i].a3d_general;

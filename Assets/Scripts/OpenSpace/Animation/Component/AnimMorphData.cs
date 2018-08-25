@@ -18,5 +18,20 @@ namespace OpenSpace.Animation.Component {
             }
             return m;
         }
+
+        public static int Size {
+            get {
+                switch (Settings.s.engineVersion) {
+                    case Settings.EngineVersion.R3: return 0x26;
+                    default: return 0x8;
+                }
+            }
+        }
+
+        public static bool Aligned {
+            get {
+                return false;
+            }
+        }
     }
 }

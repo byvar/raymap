@@ -64,22 +64,29 @@ namespace OpenSpace {
             }
             s.off_anim_ref = Pointer.Read(reader);
             s.stateTransitions = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // int is placeholder type
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            reader.ReadUInt32();
+            Pointer.Read(reader);
+            if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
+            s.off_state_auto = Pointer.Read(reader, allowMinusOne: true);
+            s.off_mechanicsIDCard = Pointer.Read(reader);
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+                s.off_cine_mapname = Pointer.Read(reader);
+                s.off_cine_name = Pointer.Read(reader);
+            }
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                 reader.ReadUInt32();
-                Pointer.Read(reader);
-                if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
-                s.off_state_auto = Pointer.Read(reader);
-                s.off_mechanicsIDCard = Pointer.Read(reader);
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                    s.off_cine_mapname = Pointer.Read(reader);
-                    s.off_cine_name = Pointer.Read(reader);
-                }
+                reader.ReadUInt32();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                s.speed = reader.ReadByte();
+            } else {
                 reader.ReadByte();
                 s.speed = reader.ReadByte();
                 reader.ReadByte();
                 reader.ReadByte();
-                if (Settings.s.engineVersion == Settings.EngineVersion.R2) reader.ReadUInt32();
             }
+            if (Settings.s.engineVersion <= Settings.EngineVersion.R2) reader.ReadUInt32();
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
             }

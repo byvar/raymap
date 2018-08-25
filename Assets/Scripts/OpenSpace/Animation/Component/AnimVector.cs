@@ -18,5 +18,13 @@ namespace OpenSpace.Animation.Component {
             vec.vector = new Vector3(x, y, z);
             return vec;
         }
+
+        public static int Size {
+            get { return 12; }
+        }
+
+        public static bool Aligned {
+            get { return true; }
+        }
     }
 }

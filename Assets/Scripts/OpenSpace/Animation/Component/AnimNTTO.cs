@@ -18,8 +18,13 @@ namespace OpenSpace.Animation.Component {
 
         public static AnimNTTO Read(Reader reader) {
             AnimNTTO n = new AnimNTTO();
-            n.flags = reader.ReadUInt16();
-            n.object_index = reader.ReadUInt16();
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                n.object_index = reader.ReadUInt16();
+                n.flags = reader.ReadUInt16();
+            } else {
+                n.flags = reader.ReadUInt16();
+                n.object_index = reader.ReadUInt16();
+            }
             n.unk4 = reader.ReadByte();
             n.unk5 = reader.ReadByte();
             return n;
@@ -32,6 +37,16 @@ namespace OpenSpace.Animation.Component {
                 } else {
                     return (flags & flag_isInvisible) == flag_isInvisible;
                 }
+            }
+        }
+
+        public static int Size {
+            get { return 6; }
+        }
+
+        public static bool Aligned {
+            get {
+                return false;
             }
         }
     }

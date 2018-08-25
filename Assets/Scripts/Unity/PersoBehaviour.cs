@@ -377,6 +377,7 @@ public class PersoBehaviour : MonoBehaviour {
                     List<ushort> listOfNTTOforChannel = new List<ushort>();
                     for (int j = 0; j < a3d.num_onlyFrames; j++) {
                         AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + j];
+                        //print(ch.numOfNTTO + " - " + of.numOfNTTO + " - " + a3d.numOfNTTO.Length);
                         AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                         if (!listOfNTTOforChannel.Contains(numOfNTTO.numOfNTTO)) {
                             listOfNTTOforChannel.Add(numOfNTTO.numOfNTTO);
@@ -442,16 +443,19 @@ public class PersoBehaviour : MonoBehaviour {
             for (int i = of.start_hierarchies_for_frame;
                 i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
                 AnimHierarchy h = a3d.hierarchies[i];
-
-                if (!channelIDDictionary.ContainsKey(h.childChannelID)
-                    || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
-                    continue;
-                }
-                List<int> ch_child_list = GetChannelByID(h.childChannelID);
-                List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
-                foreach (int ch_child in ch_child_list) {
-                    foreach (int ch_parent in ch_parent_list) {
-                        channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+                
+                if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                    channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
+                } else {
+                    if (!channelIDDictionary.ContainsKey(h.childChannelID) || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
+                        continue;
+                    }
+                    List<int> ch_child_list = GetChannelByID(h.childChannelID);
+                    List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
+                    foreach (int ch_child in ch_child_list) {
+                        foreach (int ch_parent in ch_parent_list) {
+                            channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+                        }
                     }
                 }
 
@@ -493,6 +497,7 @@ public class PersoBehaviour : MonoBehaviour {
                     interpolation = framesSinceKF / (float)framesDifference;
                 }
                 //print(interpolation);
+                //print(a3d.vectors.Length + " - " + nextKF.positionVector);
                 AnimVector pos2 = a3d.vectors[nextKF.positionVector];
                 AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
                 AnimVector scl2 = a3d.vectors[nextKF.scaleVector];

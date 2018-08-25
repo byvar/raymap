@@ -1240,6 +1240,22 @@ namespace OpenSpace {
 
             // Parse actual world & always structure
             ReadFamilies(reader);
+
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                uint maxAnimIndex = 0;
+                foreach (State s in states) {
+                    if (s.anim_ref != null && s.anim_ref.anim_index > maxAnimIndex) maxAnimIndex = s.anim_ref.anim_index;
+                }
+                animationBanks = new AnimationBank[2];
+                animationBanks[0] = new AnimationBank(null) {
+                    animations = new Animation.Component.AnimA3DGeneral[maxAnimIndex + 1]
+                };
+                foreach (State s in states) {
+                    if (s.anim_ref != null) animationBanks[0].animations[s.anim_ref.anim_index] = s.anim_ref.a3d;
+                }
+                animationBanks[1] = animationBanks[0];
+            }
+
             ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);

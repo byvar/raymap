@@ -21,5 +21,15 @@ namespace OpenSpace.Animation.Component {
             d.linkBone = reader.ReadUInt16();
             return d;
         }
+
+        public static int Size {
+            get { return 8; }
+        }
+
+        public static bool Aligned {
+            get {
+                return true;
+            }
+        }
     }
 }

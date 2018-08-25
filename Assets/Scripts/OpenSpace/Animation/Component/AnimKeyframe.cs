@@ -52,5 +52,24 @@ namespace OpenSpace.Animation.Component {
                 return false;
             }
         }
+
+        public static int Size {
+            get {
+                switch (Settings.s.engineVersion) {
+                    case Settings.EngineVersion.R3: return 14;
+                    default: return 36;
+                }
+            }
+        }
+
+        public static bool Aligned {
+            get {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
     }
 }

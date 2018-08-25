@@ -12,12 +12,30 @@ namespace OpenSpace.Animation.Component {
 
         public static AnimFramesKFIndex Read(Reader reader) {
             AnimFramesKFIndex kfi = new AnimFramesKFIndex();
-            if (Settings.s.game == Settings.Game.R2Demo) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.TT || Settings.s.game == Settings.Game.R2Demo) {
                 kfi.kf = reader.ReadUInt16();
             } else {
                 kfi.kf = reader.ReadUInt32();
             }
             return kfi;
+        }
+
+        public static int Size {
+            get {
+                if (Settings.s.engineVersion == Settings.EngineVersion.TT || Settings.s.game == Settings.Game.R2Demo) {
+                    return 2;
+                } else return 4;
+            }
+        }
+
+        public static bool Aligned {
+            get {
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT && Settings.s.game != Settings.Game.R2Demo) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
     }
 }

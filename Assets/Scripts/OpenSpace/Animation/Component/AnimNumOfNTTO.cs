@@ -15,5 +15,13 @@ namespace OpenSpace.Animation.Component {
             n.numOfNTTO = reader.ReadUInt16();
             return n;
         }
+
+        public static int Size {
+            get { return 2; }
+        }
+
+        public static bool Aligned {
+            get { return false; }
+        }
     }
 }
