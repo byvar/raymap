@@ -81,8 +81,9 @@ namespace OpenSpace.FileFormat {
 
         private void Load(Stream stream, bool masking) {
             using (Reader reader = new Reader(stream, isLittleEndian)) {
-                if (Settings.s.useWindowMasking) {
-                    reader.InitWindowMask();
+                if (Settings.s.encryptPointerFiles) {
+                    reader.InitMask();
+                    //reader.InitWindowMask();
                     /*byte [] data = reader.ReadBytes((int)stream.Length);
                     MapLoader.Loader.print(path);
                     Util.ByteArrayToFile(path + ".dmp", data);

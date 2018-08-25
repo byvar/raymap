@@ -45,12 +45,13 @@ namespace OpenSpace {
         }
 
         public static GameMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
+            if (offset == null) return null;
             GameMaterial gm = FromOffset(offset);
             if (gm == null) {
-                Pointer off_current = Pointer.Goto(ref reader, offset);
-                gm = GameMaterial.Read(reader, offset);
-                Pointer.Goto(ref reader, off_current);
-                MapLoader.Loader.gameMaterials.Add(gm);
+                Pointer.DoAt(ref reader, offset, () => {
+                    gm = GameMaterial.Read(reader, offset);
+                    MapLoader.Loader.gameMaterials.Add(gm);
+                });
             }
             return gm;
         }

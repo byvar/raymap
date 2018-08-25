@@ -60,5 +60,23 @@ namespace OpenSpace.Animation {
             }
             return ar;
         }
+
+        public static AnimationReference FromOffsetOrRead(Pointer offset, Reader reader) {
+            if (offset == null) return null;
+            AnimationReference ar = FromOffset(offset);
+            if (ar == null) {
+                Pointer.DoAt(ref reader, offset, () => {
+                    ar = AnimationReference.Read(reader, offset);
+                    MapLoader.Loader.animationReferences.Add(ar);
+                });
+            }
+            return ar;
+        }
+
+        public static AnimationReference FromOffset(Pointer offset) {
+            if (offset == null) return null;
+            MapLoader l = MapLoader.Loader;
+            return l.animationReferences.FirstOrDefault(ar => ar.offset == offset);
+        }
     }
 }

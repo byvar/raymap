@@ -14,6 +14,7 @@ namespace OpenSpace {
         public enum Game { R3, RA, R2, TT, R2Demo, DD };
         public enum Platform { PC, iOS, GC };
         public enum Endian { Little, Big };
+        public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
         
         public EngineVersion engineVersion;
         public Game game;
@@ -27,9 +28,8 @@ namespace OpenSpace {
         public bool hasMemorySupport = false;
         public Dictionary<string, uint> memoryAddresses = null;
         public bool loadFromMemory = false;
-        public bool fixedInitialMask = true;
-        public bool useInitialMask = false;
-        public bool useWindowMasking = false;
+        public Encryption encryption = Encryption.None;
+        public bool encryptPointerFiles = false;
         public bool hasLinkedListHeaderPointers = false;
 
         public bool IsLittleEndian {
@@ -115,6 +115,7 @@ namespace OpenSpace {
             endian = Endian.Little,
             numEntryActions = 43,
             linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
             hasMemorySupport = true,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x005013C8 },
@@ -152,6 +153,7 @@ namespace OpenSpace {
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
             numEntryActions = 1
         };
 
@@ -161,7 +163,8 @@ namespace OpenSpace {
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 7,
-            linkedListType = LinkedListType.Double
+            linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
         };
 
         public static Settings R2IOS = new Settings() {
@@ -171,6 +174,7 @@ namespace OpenSpace {
             endian = Endian.Little,
             numEntryActions = 43,
             linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
             hasExtraInputData = true
         };
 
@@ -180,7 +184,8 @@ namespace OpenSpace {
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 44,
-            linkedListType = LinkedListType.Double
+            linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit
         };
 
         public static Settings TTPC = new Settings() {
@@ -190,9 +195,28 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
-            useInitialMask = true,
-            fixedInitialMask = false,
-            useWindowMasking = true,
+            encryption = Encryption.Window,
+            encryptPointerFiles = true,
+            hasLinkedListHeaderPointers = true
+        };
+
+        public static Settings TTSEPC = new Settings() {
+            engineVersion = EngineVersion.TT,
+            game = Game.TT,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            numEntryActions = 1,
+            hasLinkedListHeaderPointers = true
+        };
+
+        public static Settings HypePC = new Settings() {
+            engineVersion = EngineVersion.TT,
+            game = Game.TT,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            numEntryActions = 1,
             hasLinkedListHeaderPointers = true
         };
     }

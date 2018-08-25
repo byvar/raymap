@@ -21,6 +21,16 @@ namespace OpenSpace.Visual.Deform {
         public Transform[] bones;
         public Matrix4x4[] bindPoses;
 
+        private GameObject gao = null;
+        public GameObject Gao {
+            get {
+                if (gao == null) {
+                    gao = new GameObject("Deform Set");
+                    InitUnityBones();
+                }
+                return gao;
+            }
+        }
 
         public DeformSet(Pointer offset, MeshObject mesh) {
             this.mesh = mesh;
@@ -49,14 +59,18 @@ namespace OpenSpace.Visual.Deform {
             }
             bindPoses = new Matrix4x4[num_bones];
             for (int i = 0; i < num_bones; i++) {
-                bindPoses[i] = bones[i].worldToLocalMatrix * mesh.gao.transform.localToWorldMatrix;
-                //bindPoses[i] = r3bones[i].mat.m * bones[i].worldToLocalMatrix * mesh.gao.transform.localToWorldMatrix;
+                bindPoses[i] = bones[i].worldToLocalMatrix * Gao.transform.localToWorldMatrix;
+            }
+            for (int j = 0; j < num_bones; j++) {
+                Transform b = bones[j];
+                b.transform.SetParent(gao.transform);
             }
         }
 
         public void RecalculateBindPoses() {
+            bindPoses = new Matrix4x4[num_bones];
             for (int i = 0; i < num_bones; i++) {
-                bindPoses[i] = bones[i].worldToLocalMatrix * mesh.gao.transform.localToWorldMatrix;
+                bindPoses[i] = bones[i].worldToLocalMatrix * Gao.transform.localToWorldMatrix;
             }
             mesh.ReinitBindposes();
         }
@@ -118,13 +132,18 @@ namespace OpenSpace.Visual.Deform {
                 d.r3bones[i].index = reader.ReadByte();
                 reader.ReadByte(); // 0, padding
             }
-            d.InitUnityBones();
 
             return d;
         }
 
+        // Call after clone
+        public void Reset() {
+            gao = null;
+        }
+
         public IGeometricElement Clone(MeshObject mesh) {
             DeformSet d = (DeformSet)MemberwiseClone();
+            d.Reset();
             d.mesh = mesh;
             d.r3bones = new DeformBone[r3bones.Length];
             for (int i = 0; i < r3bones.Length; i++) {
@@ -134,7 +153,6 @@ namespace OpenSpace.Visual.Deform {
             for (int i = 0; i < r3weights.Length; i++) {
                 d.r3weights[i] = r3weights[i].Clone();
             }
-            d.InitUnityBones();
             return d;
         }
     }

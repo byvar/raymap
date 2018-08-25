@@ -12,6 +12,11 @@ namespace OpenSpace.Visual {
         public Pointer off_model;
         public List<ushort> ids;
         public List<Vector3> vector3s;
+
+        public GameObject Gao {
+            get { return null; }
+        }
+
         public UnknownGeometricObject(PhysicalObject po, Pointer offset) {
             this.po = po;
             this.offset = offset;

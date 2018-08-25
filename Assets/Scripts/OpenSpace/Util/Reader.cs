@@ -140,7 +140,7 @@ namespace OpenSpace {
             masking = MaskingMode.Number;
         }
 
-        public void InitWindowMask() {
+        private void InitWindowMask() {
             maskBytes = new byte[10];
             Array.Copy(originalMaskBytes, maskBytes, maskBytes.Length);
             masking = MaskingMode.Window;
@@ -166,25 +166,24 @@ namespace OpenSpace {
             }
         }
 
-        public void SetInitialMask() {
-            if (Settings.s.fixedInitialMask) {
-                mask = 0x6AB5CC79;
-            } else {
-                uint currentMask = 0xFFFFFFFF;
-                mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));
-                if ((mask & 0x80000000) != 0) {
-                    mask += 0x7FFFFFFF;
-                    currentMask = mask;
-                }
-                MapLoader.Loader.print(mask);
-            }
-        }
-
-        public void SetOrReadMask() {
-            if (Settings.s.useInitialMask) {
-                SetInitialMask();
-            } else {
-                ReadMask();
+        public int InitMask() {
+            switch (Settings.s.encryption) {
+                case Settings.Encryption.ReadInit:
+                    ReadMask(); return 4;
+                case Settings.Encryption.Window:
+                    InitWindowMask(); return 0;
+                case Settings.Encryption.FixedInit:
+                    mask = 0x6AB5CC79; return 0;
+                case Settings.Encryption.CalculateInit:
+                    uint currentMask = 0xFFFFFFFF;
+                    mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));
+                    if ((mask & 0x80000000) != 0) {
+                        mask += 0x7FFFFFFF;
+                        currentMask = mask;
+                    }
+                    return 0;
+                default:
+                    return 0;
             }
         }
 

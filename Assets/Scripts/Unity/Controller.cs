@@ -260,8 +260,8 @@ public class Controller : MonoBehaviour {
             viewCollision_ = viewCollision;
             foreach (PhysicalObject po in loader.physicalObjects) {
                 foreach (VisualSetLOD l in po.visualSet) {
-                    if (l.obj != null && l.obj is MeshObject) {
-                        GameObject gao = ((MeshObject)l.obj).gao;
+                    if (l.obj != null) {
+                        GameObject gao = l.obj.Gao;
                         if (gao != null) gao.SetActive(!viewCollision);
                     }
                 }

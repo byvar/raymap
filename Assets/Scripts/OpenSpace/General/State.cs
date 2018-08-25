@@ -98,11 +98,7 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, s.off_cine_name);
                 s.cine_name = reader.ReadNullDelimitedString();
             }
-            if (s.off_anim_ref != null) {
-                Pointer.Goto(ref reader, s.off_anim_ref);
-                s.anim_ref = AnimationReference.Read(reader, s.off_anim_ref);
-            }
-
+            s.anim_ref = AnimationReference.FromOffsetOrRead(s.off_anim_ref, reader);
             return s;
         }
 

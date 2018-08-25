@@ -46,13 +46,8 @@ namespace OpenSpace.FileFormat {
             this.name = name;
             this.rtb = rtb;
             using (Reader encodedReader = new Reader(stream, Settings.s.IsLittleEndian)) {
-                if (Settings.s.useWindowMasking) {
-                    encodedReader.InitWindowMask();
-                    data = encodedReader.ReadBytes((int)stream.Length);
-                } else {
-                    encodedReader.ReadMask();
-                    data = encodedReader.ReadBytes((int)stream.Length - 4);
-                }
+                int maskBytes = encodedReader.InitMask();
+                data = encodedReader.ReadBytes((int)stream.Length - maskBytes);
             }
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ReadSNA();
@@ -124,8 +119,8 @@ namespace OpenSpace.FileFormat {
             uint gptOffset = (uint)data.Length;
             byte[] gptData = null;
             using (Reader gptReader = new Reader(gptStream, Settings.s.IsLittleEndian)) {
-                if (Settings.s.useWindowMasking) gptReader.InitWindowMask();
-                gptData = gptReader.ReadBytes((int)gptStream.Length);
+                int maskBytes = Settings.s.encryptPointerFiles ? gptReader.InitMask() : 0;
+                gptData = gptReader.ReadBytes((int)gptStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", gptData);
             data = data.Concat(gptData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
@@ -158,8 +153,8 @@ namespace OpenSpace.FileFormat {
             uint ptxOffset = (uint)data.Length;
             byte[] ptxData = null;
             using (Reader ptxReader = new Reader(ptxStream, Settings.s.IsLittleEndian)) {
-                if (Settings.s.useWindowMasking) ptxReader.InitWindowMask();
-                ptxData = ptxReader.ReadBytes((int)ptxStream.Length);
+                int maskBytes = Settings.s.encryptPointerFiles ? ptxReader.InitMask() : 0;
+                ptxData = ptxReader.ReadBytes((int)ptxStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", ptxData);
             data = data.Concat(ptxData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));

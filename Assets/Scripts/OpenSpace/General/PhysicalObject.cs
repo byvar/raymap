@@ -106,14 +106,13 @@ namespace OpenSpace {
                         }
                     });
                     for (uint i = 0; i < numberOfLOD; i++) {
-                        if (po.visualSet[i].off_data != null) {
-                            Pointer off_current = Pointer.Goto(ref reader, po.visualSet[i].off_data);
+                        Pointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
                             switch (type) {
                                 case 0:
                                     po.visualSet[i].obj = MeshObject.Read(reader, po, po.visualSet[i].off_data);
                                     MeshObject m = ((MeshObject)po.visualSet[i].obj);
                                     if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
-                                    m.gao.transform.parent = po.Gao.transform;
+                                    m.Gao.transform.parent = po.Gao.transform;
                                     break;
                                 case 1:
                                     po.visualSet[i].obj = UnknownGeometricObject.Read(reader, po, po.visualSet[i].off_data);
@@ -122,7 +121,12 @@ namespace OpenSpace {
                                     MapLoader.Loader.print("unknown type " + type + " at offset: " + offset);
                                     break;
                             }
-                            Pointer.Goto(ref reader, off_current);
+                        });
+                    }
+                    if (numberOfLOD > 1) {
+                        float bestLOD = po.visualSet.Min(v => v.LODdistance);
+                        foreach (VisualSetLOD lod in po.visualSet) {
+                            if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
                         }
                     }
                 }
@@ -167,7 +171,13 @@ namespace OpenSpace {
                 if (po.visualSet[i].obj is MeshObject) {
                     MeshObject m = ((MeshObject)po.visualSet[i].obj);
                     if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
-                    m.gao.transform.parent = po.Gao.transform;
+                    m.Gao.transform.parent = po.Gao.transform;
+                }
+            }
+            if (po.visualSet.Length > 1) {
+                float bestLOD = po.visualSet.Min(v => v.LODdistance);
+                foreach (VisualSetLOD lod in po.visualSet) {
+                    if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
                 }
             }
             if (collideMesh != null) {

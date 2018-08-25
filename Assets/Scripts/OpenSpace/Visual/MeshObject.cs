@@ -12,8 +12,6 @@ namespace OpenSpace.Visual {
     public class MeshObject : IGeometricObject {
         public PhysicalObject po;
         public Pointer offset;
-
-        public GameObject gao = null;
         
         public Pointer off_vertices;
         public Pointer off_normals;
@@ -30,31 +28,33 @@ namespace OpenSpace.Visual {
         public ushort[] subblock_types = null;
         public IGeometricElement[] subblocks = null;
         public DeformSet bones = null;
-
+        
+        private GameObject gao = null;
+        public GameObject Gao {
+            get {
+                if (gao == null) InitGameObject();
+                return gao;
+            }
+        }
 
         public MeshObject(PhysicalObject po, Pointer offset) {
             this.po = po;
             this.offset = offset;
         }
 
-        public void InitGameObjects() {
+        public void InitGameObject() {
+            gao = new GameObject(name);
+            gao.tag = "Visual";
+            if (bones != null) {
+                GameObject child = bones.Gao;
+                child.transform.SetParent(gao.transform);
+                child.transform.localPosition = Vector3.zero;
+            }
             for (uint i = 0; i < num_subblocks; i++) {
                 if (subblocks[i] != null) {
-                    if (subblocks[i] is MeshElement) {
-                        GameObject child = ((MeshElement)subblocks[i]).Gao;
-                        child.transform.SetParent(gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    } else if (subblocks[i] is DeformSet) {
-                        DeformSet ds = ((DeformSet)subblocks[i]);
-                        for (int j = 0; j < ds.num_bones; j++) {
-                            Transform b = ds.bones[j];
-                            b.transform.SetParent(gao.transform);
-                        }
-                    } else if (subblocks[i] is SpriteElement) {
-                        GameObject child = ((SpriteElement)subblocks[i]).Gao;
-                        child.transform.SetParent(gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    }
+                    GameObject child = subblocks[i].Gao;
+                    child.transform.SetParent(gao.transform);
+                    child.transform.localPosition = Vector3.zero;
                 }
             }
         }
@@ -161,8 +161,6 @@ namespace OpenSpace.Visual {
             for (uint i = 0; i < m.num_subblocks; i++) {
                 m.subblock_types[i] = reader.ReadUInt16();
             }
-            m.gao = new GameObject(m.name);
-            m.gao.tag = "Visual";
             // Process blocks
             for (uint i = 0; i < m.num_subblocks; i++) {
                 Pointer.Goto(ref reader, m.off_subblocks + (i * 4));
@@ -195,14 +193,18 @@ namespace OpenSpace.Visual {
                         break;
                 }
             }
-            m.InitGameObjects();
+            m.InitGameObject();
             return m;
+        }
+
+        // Call after clone
+        public void Reset() {
+            gao = null;
         }
 
         public IGeometricObject Clone() {
             MeshObject m = (MeshObject)MemberwiseClone();
-            m.gao = new GameObject(m.name);
-            m.gao.tag = "Visual";
+            m.Reset();
             m.subblocks = new IGeometricElement[num_subblocks];
             for (uint i = 0; i < m.num_subblocks; i++) {
                 if (subblocks[i] != null) {
@@ -210,7 +212,6 @@ namespace OpenSpace.Visual {
                     if (m.subblocks[i] is DeformSet) m.bones = (DeformSet)m.subblocks[i];
                 }
             }
-            m.InitGameObjects();
             return m;
         }
     }

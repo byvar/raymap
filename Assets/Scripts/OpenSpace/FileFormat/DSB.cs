@@ -63,13 +63,8 @@ namespace OpenSpace.FileFormat {
             headerOffset = 0;
             this.name = name;
             using (Reader encodedReader = new Reader(stream, Settings.s.IsLittleEndian)) {
-                if (Settings.s.useWindowMasking) {
-                    encodedReader.InitWindowMask();
-                    data = encodedReader.ReadBytes((int)stream.Length);
-                } else {
-                    encodedReader.ReadMask();
-                    data = encodedReader.ReadBytes((int)stream.Length - 4);
-                }
+                int maskBytes = encodedReader.InitMask();
+                data = encodedReader.ReadBytes((int)stream.Length - maskBytes);
             }
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
         }

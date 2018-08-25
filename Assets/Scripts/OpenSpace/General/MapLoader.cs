@@ -37,7 +37,9 @@ namespace OpenSpace {
             RaymanArenaPC, RaymanArenaGC,
             Rayman2PC, Rayman2IOS,
             Rayman2PCDemo2, Rayman2PCDemo1,
-            DonaldDuckPC, TonicTroublePC
+            DonaldDuckPC,
+            TonicTroublePC, TonicTroubleSEPC,
+            HypePC
         };
         public Mode mode = Mode.Rayman3PC;
 
@@ -73,6 +75,7 @@ namespace OpenSpace {
         public List<WayPoint> isolateWaypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
+        public List<AnimationReference> animationReferences = new List<AnimationReference>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
         public GameObject graphRoot = null;
         public GameObject isolateWaypointRoot = null;
@@ -132,6 +135,8 @@ namespace OpenSpace {
                     case Mode.RaymanArenaPC: settings = Settings.RAPC; break;
                     case Mode.DonaldDuckPC: settings = Settings.DDPC; break;
                     case Mode.TonicTroublePC: settings = Settings.TTPC; break;
+                    case Mode.TonicTroubleSEPC: settings = Settings.TTSEPC; break;
+                    case Mode.HypePC: settings = Settings.HypePC; break;
                 }
                 Settings.s = settings;
 

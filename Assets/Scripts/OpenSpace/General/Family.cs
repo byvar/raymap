@@ -192,26 +192,27 @@ namespace OpenSpace {
                             Pointer off_po_scale = Pointer.Read(reader);
                             Pointer off_po = Pointer.Read(reader);
                             reader.ReadUInt32();
-                            reader.ReadUInt32();
+                            reader.ReadUInt16();
+                            reader.ReadUInt16();
                             uint lastvalue = reader.ReadUInt32();
-                            if (lastvalue != 0 && off_po != null) {
-
-                                Pointer curPos = Pointer.Goto(ref reader, off_po);
-                                PhysicalObject po = PhysicalObject.Read(reader, off_po);
+                            // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
+                            if (lastvalue != 0 || Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                                PhysicalObject po = null;
                                 Vector3? scaleMultiplier = null;
-                                if (off_po_scale != null) {
-                                    Pointer.Goto(ref reader, off_po_scale);
+                                Pointer.DoAt(ref reader, off_po, () => {
+                                    po = PhysicalObject.Read(reader, off_po);
+                                });
+                                Pointer.DoAt(ref reader, off_po_scale, () => {
                                     float x = reader.ReadSingle();
                                     float z = reader.ReadSingle();
                                     float y = reader.ReadSingle();
                                     scaleMultiplier = new Vector3(x, y, z);
-                                }
+                                });
                                 if (po != null) {
                                     f.physical_objects[i][j] = po;
                                     po.Gao.transform.parent = f.Gao.transform;
                                     po.scaleMultiplier = scaleMultiplier;
                                 }
-                                Pointer.Goto(ref reader, curPos);
                             }
                         }
                     }
