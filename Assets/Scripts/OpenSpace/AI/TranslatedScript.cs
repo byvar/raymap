@@ -105,7 +105,10 @@ namespace OpenSpace.AI
                                 case 38: ternaryCheck = "=="; goto case 40;
                                 case 39: ternaryCheck = "<="; goto case 40;
                                 case 40: ternaryCheck = ">=";
-                                    return prefix + "((" + this.children[0] + ternaryCheck + this.children[1] + ") ? " + this.children[2] + " : " + this.children[3] + ")";
+                                    if (this.children.Count >= 4)
+                                        return prefix + "((" + this.children[0] + ternaryCheck + this.children[1] + ") ? " + this.children[2] + " : " + this.children[3] + ")";
+                                    else
+                                        return "ERROR";
 
                                 case 41: // conditional ternary operator (cond ? true : false)
                                     return prefix + "((" + this.children[0] + ") ? " + this.children[1] + " : " + this.children [2]+")";
