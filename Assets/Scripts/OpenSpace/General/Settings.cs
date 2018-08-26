@@ -6,13 +6,18 @@ using LinkedListType = OpenSpace.LinkedList.Type;
 
 namespace OpenSpace {
     public class Settings {
-        public enum EngineMode { R2, R3 };
-        public enum SubMode { R3, RA, R2, TT, R2Demo, DD };
+        public enum EngineVersion {
+            TT = 1,
+            R2 = 2,
+            R3 = 3
+        };
+        public enum Game { R3, RA, R2, TT, R2Demo, DD };
         public enum Platform { PC, iOS, GC };
         public enum Endian { Little, Big };
+        public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
         
-        public EngineMode engineMode;
-        public SubMode subMode;
+        public EngineVersion engineVersion;
+        public Game game;
         public Platform platform;
         public Endian endian;
         public LinkedListType linkedListType;
@@ -23,9 +28,9 @@ namespace OpenSpace {
         public bool hasMemorySupport = false;
         public Dictionary<string, uint> memoryAddresses = null;
         public bool loadFromMemory = false;
-        public bool fixedInitialMask = true;
-        public bool useInitialMask = false;
-        public bool useWindowMasking = false;
+        public Encryption encryption = Encryption.None;
+        public bool encryptPointerFiles = false;
+        public bool hasLinkedListHeaderPointers = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -34,8 +39,8 @@ namespace OpenSpace {
 
         public static Settings s = null;
         public static Settings R3PC = new Settings() {
-            engineMode = EngineMode.R3,
-            subMode = SubMode.R3,
+            engineVersion = EngineVersion.R3,
+            game = Game.R3,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
@@ -74,19 +79,20 @@ namespace OpenSpace {
         };
 
         public static Settings R3GC = new Settings() {
-            engineMode = EngineMode.R3,
-            subMode = SubMode.R3,
+            engineVersion = EngineVersion.R3,
+            game = Game.R3,
             platform = Platform.GC,
             endian = Endian.Big,
             linkedListType = LinkedListType.Double,
             hasNames = true,
             hasDeformations = true,
-            hasExtraInputData = true
+            hasExtraInputData = true,
+            hasLinkedListHeaderPointers = true
         };
 
         public static Settings RAPC = new Settings() {
-            engineMode = EngineMode.R3,
-            subMode = SubMode.RA,
+            engineVersion = EngineVersion.R3,
+            game = Game.RA,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
@@ -94,8 +100,8 @@ namespace OpenSpace {
         };
 
         public static Settings RAGC = new Settings() {
-            engineMode = EngineMode.R3,
-            subMode = SubMode.RA,
+            engineVersion = EngineVersion.R3,
+            game = Game.RA,
             platform = Platform.GC,
             endian = Endian.Big,
             linkedListType = LinkedListType.Single,
@@ -103,12 +109,13 @@ namespace OpenSpace {
         };
 
         public static Settings R2PC = new Settings() {
-            engineMode = EngineMode.R2,
-            subMode = SubMode.R2,
+            engineVersion = EngineVersion.R2,
+            game = Game.R2,
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 43,
             linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
             hasMemorySupport = true,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x005013C8 },
@@ -141,52 +148,76 @@ namespace OpenSpace {
         };
 
         public static Settings R2PCDemo1 = new Settings() {
-            engineMode = EngineMode.R2,
-            subMode = SubMode.R2Demo,
+            engineVersion = EngineVersion.R2,
+            game = Game.R2Demo,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
             numEntryActions = 1
         };
 
         public static Settings R2PCDemo2 = new Settings() {
-            engineMode = EngineMode.R2,
-            subMode = SubMode.R2Demo,
+            engineVersion = EngineVersion.R2,
+            game = Game.R2Demo,
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 7,
-            linkedListType = LinkedListType.Double
+            linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
         };
 
         public static Settings R2IOS = new Settings() {
-            engineMode = EngineMode.R2,
-            subMode = SubMode.R2,
+            engineVersion = EngineVersion.R2,
+            game = Game.R2,
             platform = Platform.iOS,
             endian = Endian.Little,
             numEntryActions = 43,
             linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
             hasExtraInputData = true
         };
 
         public static Settings DDPC = new Settings() {
-            engineMode = EngineMode.R2,
-            subMode = SubMode.DD,
+            engineVersion = EngineVersion.R2,
+            game = Game.DD,
             platform = Platform.PC,
             endian = Endian.Little,
             numEntryActions = 44,
-            linkedListType = LinkedListType.Double
+            linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit
         };
 
         public static Settings TTPC = new Settings() {
-            engineMode = EngineMode.R2,
-            subMode = SubMode.TT,
+            engineVersion = EngineVersion.TT,
+            game = Game.TT,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
-            useInitialMask = true,
-            fixedInitialMask = false,
-            useWindowMasking = true
+            encryption = Encryption.Window,
+            encryptPointerFiles = true,
+            hasLinkedListHeaderPointers = true
+        };
+
+        public static Settings TTSEPC = new Settings() {
+            engineVersion = EngineVersion.TT,
+            game = Game.TT,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            numEntryActions = 1,
+            hasLinkedListHeaderPointers = true
+        };
+
+        public static Settings HypePC = new Settings() {
+            engineVersion = EngineVersion.TT,
+            game = Game.TT,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            numEntryActions = 1,
+            hasLinkedListHeaderPointers = true
         };
     }
 }

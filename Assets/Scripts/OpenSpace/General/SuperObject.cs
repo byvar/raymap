@@ -7,8 +7,18 @@ using UnityEngine;
 
 namespace OpenSpace {
     public class SuperObject {
+        public enum Type {
+            Unknown,
+            World,
+            IPO,
+            IPO_2,
+            Perso,
+            Sector
+        }
+
         public Pointer offset;
-        public uint type;
+        public uint typeCode;
+        public Type type;
         public Pointer off_data;
         public Pointer off_child_first;
         public Pointer off_child_last;
@@ -55,7 +65,7 @@ namespace OpenSpace {
                     so.parent = parent;
                 }
                 hasNextBrother = false;
-                so.type = reader.ReadUInt32(); // 0 - 4
+                so.typeCode = reader.ReadUInt32(); // 0 - 4
                 so.off_data = Pointer.Read(reader); // 4 - 8
                 so.off_child_first = Pointer.Read(reader); // 8 - C
                 so.off_child_last = Pointer.Read(reader); // C - 10
@@ -68,7 +78,7 @@ namespace OpenSpace {
                 reader.ReadInt32(); // 0x28 -> 0x2C
                 reader.ReadInt32(); // 0x2C -> 0x30
                 so.superObjectFlags = reader.ReadInt32(); // 0x30->0x34
-                if (Settings.s.engineMode == Settings.EngineMode.R3) reader.ReadUInt32();
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32();
                 Pointer off_boundingVolume = Pointer.Read(reader);
 
                 //R3Pointer.Read(reader); // a copy of the matrix right after, at least in R3GC
@@ -83,30 +93,31 @@ namespace OpenSpace {
                     scale = so.matrix.GetScale(convertAxes: true);
                     Pointer.Goto(ref reader, curPos);
                 }
+                so.type = GetSOType(so.typeCode);
                 switch (so.type) {
-                    case 0x20: // IPO
+                    case Type.IPO:
                         Pointer.Goto(ref reader, so.off_data);
                         so.data = IPO.Read(reader, so.off_data, so);
                         break;
-                    case 0x40: // IPO
+                    case Type.IPO_2:
                         l.print("IPO with code 0x40 at offset " + String.Format("0x{0:X}", so.offset.offset));
                         Pointer.Goto(ref reader, so.off_data);
                         so.data = IPO.Read(reader, so.off_data, so);
                         break;
-                    case 0x02: // perso/engine object
+                    case Type.Perso:
                         Pointer.Goto(ref reader, so.off_data);
                         so.data = Perso.Read(reader, so.off_data, so);
                         break;
-                    case 0x01: // world superobject
+                    case Type.World:
                         so.data = World.New(so);
                         //print("parsing world superobject with " + num_children + " children");
                         break;
-                    case 0x04: // sector
+                    case Type.Sector:
                         Pointer.Goto(ref reader, so.off_data);
                         so.data = Sector.Read(reader, so.off_data, so);
                         break;
                     default:
-                        l.print("Unknown SO type " + so.type + " at offset " + String.Format("0x{0:X}", so.offset.offset));
+                        l.print("Unknown SO type " + so.typeCode + " at offset " + String.Format("0x{0:X}", so.offset.offset));
                         //isValidNode = false;
                         break;
                 }
@@ -171,6 +182,28 @@ namespace OpenSpace {
 
         public static bool IsParsed(Pointer offset) {
             return FromOffset(offset) != null;
+        }
+
+        public static Type GetSOType(uint typeCode) {
+            Type type = Type.Unknown;
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                switch (typeCode) {
+                    case 0x1: type = Type.World; break;
+                    case 0x2: type = Type.Perso; break;
+                    case 0x4: type = Type.Sector; break;
+                    case 0x20: type = Type.IPO; break;
+                    case 0x40: type = Type.IPO_2; break;
+                }
+            } else {
+                switch (typeCode) {
+                    case 0x0: type = Type.World; break;
+                    case 0x4: type = Type.Perso; break;
+                    case 0x8: type = Type.Sector; break;
+                    case 0xD: type = Type.IPO; break;
+                    case 0x15: type = Type.IPO_2; break;
+                }
+            }
+            return type;
         }
     }
 }

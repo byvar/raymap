@@ -42,7 +42,7 @@ namespace OpenSpace.AI {
             d.number = number;
 
             d.type = DsgVarType.None;
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 if (d.typeNumber >= 0 && d.typeNumber < R2AITypes.dsgVarTypeTable.Count) d.type = R2AITypes.dsgVarTypeTable[(int)d.typeNumber];
             } else {
                 if (d.typeNumber >= 0 && d.typeNumber < R3AITypes.dsgVarTypeTable.Count) d.type = R3AITypes.dsgVarTypeTable[(int)d.typeNumber];

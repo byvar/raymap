@@ -24,7 +24,7 @@ public class Moddable : MonoBehaviour {
 
     public void SaveChanges(Writer writer) {
         if (startPos != transform.localPosition || startRot != transform.localRotation || startScale != transform.localScale) {
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 mat.type = 7;
                 mat.SetTRS(transform.localPosition, transform.localRotation, transform.localScale, convertAxes: true, setVec: true);
             } else {

@@ -29,7 +29,7 @@ namespace OpenSpace.AI {
             i.off_aiModel = Pointer.Read(reader); // 0x0
             i.off_actionTree = Pointer.Read(reader); //0x4
             i.off_comport = Pointer.Read(reader); //0x8
-            if (Settings.s.subMode != Settings.SubMode.R2Demo) {
+            if (Settings.s.game != Settings.Game.R2Demo) {
                 i.off_lastComport = Pointer.Read(reader);
                 i.off_actionTable = Pointer.Read(reader);
             }

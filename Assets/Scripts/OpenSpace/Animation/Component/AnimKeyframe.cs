@@ -25,7 +25,7 @@ namespace OpenSpace.Animation.Component {
         public static AnimKeyframe Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
             AnimKeyframe kf = new AnimKeyframe();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 kf.x = reader.ReadSingle();
                 kf.y = reader.ReadSingle();
                 kf.z = reader.ReadSingle();
@@ -37,7 +37,7 @@ namespace OpenSpace.Animation.Component {
             kf.quaternion2 = reader.ReadUInt16();
             kf.scaleVector = reader.ReadUInt16();
             kf.positionVector = reader.ReadUInt16();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt16();
@@ -50,6 +50,25 @@ namespace OpenSpace.Animation.Component {
             get {
                 if((flags & flag_endKF) != 0) return true;
                 return false;
+            }
+        }
+
+        public static int Size {
+            get {
+                switch (Settings.s.engineVersion) {
+                    case Settings.EngineVersion.R3: return 14;
+                    default: return 36;
+                }
+            }
+        }
+
+        public static bool Aligned {
+            get {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
     }

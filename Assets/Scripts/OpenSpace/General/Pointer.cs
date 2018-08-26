@@ -37,6 +37,9 @@ namespace OpenSpace {
         public static Pointer operator +(Pointer x, Decimal y) {
             return new Pointer((uint)((Decimal)x.offset + y), x.file);
         }
+        public static Pointer operator -(Pointer x, Decimal y) {
+            return new Pointer((uint)((Decimal)x.offset - y), x.file);
+        }
         public override string ToString() {
             return file.name + "|" + String.Format("0x{0:X8}", offset);
         }
@@ -57,7 +60,7 @@ namespace OpenSpace {
             return null;
         }
 
-        public static Pointer Read(Reader reader) {
+        public static Pointer Read(Reader reader, bool allowMinusOne = false) {
             MapLoader l = MapLoader.Loader;
             uint current_off = (uint)(reader.BaseStream.Position);
             uint value = reader.ReadUInt32();
@@ -65,8 +68,8 @@ namespace OpenSpace {
             if (file == null) throw new FormatException("Reader wasn't recognized.");
             uint fileOff = (uint)(current_off - file.baseOffset);
             if (!file.pointers.ContainsKey(fileOff)) {
-                if (value == 0) return null;
-                if (!l.allowDeadPointers && !file.allowUnsafePointers) throw new FormatException("Not a valid pointer in file " + file.name + " at position " + current_off);
+                if (value == 0 || (allowMinusOne && value == 0xFFFFFFFF)) return null;
+                if (!l.allowDeadPointers && !file.allowUnsafePointers) throw new FormatException("Not a valid pointer at " + (Pointer.Current(reader)-4) + ": " + value);
                 if (file.allowUnsafePointers) {
                     return new Pointer(value, file);
                 }

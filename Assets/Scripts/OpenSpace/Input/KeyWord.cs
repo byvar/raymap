@@ -43,7 +43,7 @@ namespace OpenSpace.Input {
             keyWord.field_2 = reader.ReadByte();
             keyWord.field_3 = reader.ReadByte();
             reader.ReadInt32();
-            if (Settings.s.engineMode == Settings.EngineMode.R3) reader.ReadInt32();
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadInt32();
 
             if (isFunction) {
                 keyWord.isFunction = true;

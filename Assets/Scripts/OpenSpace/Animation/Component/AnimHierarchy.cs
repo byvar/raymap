@@ -17,5 +17,15 @@ namespace OpenSpace.Animation.Component {
             h.parentChannelID = reader.ReadInt16();
             return h;
         }
+
+        public static int Size {
+            get { return 4; }
+        }
+
+        public static bool Aligned {
+            get {
+                return false;
+            }
+        }
     }
 }

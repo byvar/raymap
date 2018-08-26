@@ -32,7 +32,7 @@ namespace OpenSpace.Input {
 
             element.off_firstKeyWord = Pointer.Read(reader);
             element.off_name = Pointer.Read(reader);
-            if (Settings.s.hasExtraInputData || Settings.s.engineMode == Settings.EngineMode.R3) element.off_name2 = Pointer.Read(reader);
+            if (Settings.s.hasExtraInputData || Settings.s.engineVersion == Settings.EngineVersion.R3) element.off_name2 = Pointer.Read(reader);
             reader.ReadInt32(); // -2
             reader.ReadUInt32();
             element.active = reader.ReadByte();

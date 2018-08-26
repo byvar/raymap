@@ -13,10 +13,8 @@ namespace OpenSpace {
 
         public Pointer off_visualMaterial;
         public Pointer off_mechanicsMaterial;
-        public Pointer off_soundMaterial;
+        public uint soundMaterial;
         public Pointer off_collideMaterial;
-        public int hasSoundMaterial;
-        public int hasCollideMaterial;
 
         public VisualMaterial visualMaterial;
         public CollideMaterial collideMaterial;
@@ -29,18 +27,13 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             GameMaterial gm = new GameMaterial(offset);
 
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 gm.off_visualMaterial = Pointer.Read(reader);
                 gm.off_mechanicsMaterial = Pointer.Read(reader);
             }
             // Very ugly code incoming
-            Pointer off_sndPtr = Pointer.Current(reader);
-            gm.hasSoundMaterial = reader.ReadInt32();
-            Pointer off_collidePtr = Pointer.Current(reader);
-            gm.hasCollideMaterial = reader.ReadInt32();
-
-            if(gm.hasSoundMaterial != -1) gm.off_soundMaterial = Pointer.GetPointerAtOffset(off_sndPtr);
-            if (gm.hasCollideMaterial != -1) gm.off_collideMaterial = Pointer.GetPointerAtOffset(off_collidePtr);
+            gm.soundMaterial = reader.ReadUInt32();
+            gm.off_collideMaterial = Pointer.Read(reader, allowMinusOne: true);
 
             if (gm.off_visualMaterial != null) {
                 gm.visualMaterial = VisualMaterial.FromOffsetOrRead(gm.off_visualMaterial, reader);
@@ -52,12 +45,13 @@ namespace OpenSpace {
         }
 
         public static GameMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
+            if (offset == null) return null;
             GameMaterial gm = FromOffset(offset);
             if (gm == null) {
-                Pointer off_current = Pointer.Goto(ref reader, offset);
-                gm = GameMaterial.Read(reader, offset);
-                Pointer.Goto(ref reader, off_current);
-                MapLoader.Loader.gameMaterials.Add(gm);
+                Pointer.DoAt(ref reader, offset, () => {
+                    gm = GameMaterial.Read(reader, offset);
+                    MapLoader.Loader.gameMaterials.Add(gm);
+                });
             }
             return gm;
         }

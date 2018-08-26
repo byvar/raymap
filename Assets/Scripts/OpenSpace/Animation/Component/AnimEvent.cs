@@ -23,5 +23,13 @@ namespace OpenSpace.Animation.Component {
             e.unkA = reader.ReadUInt16();
             return e;
         }
+
+        public static int Size {
+            get { return 12; }
+        }
+
+        public static bool Aligned {
+            get { return true; }
+        }
     }
 }

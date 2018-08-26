@@ -24,7 +24,7 @@ public class PersoBehaviour : MonoBehaviour {
     public bool autoNextState = false;
 
     // Physical object lists
-    public string[] poListNames = { "Placeholder" };
+    public string[] poListNames = { "Null" };
     int currentPOList = 0;
     public int poListIndex = 0;
 
@@ -49,10 +49,10 @@ public class PersoBehaviour : MonoBehaviour {
     public void Init() {
         if (perso != null && perso.p3dData != null) {
             Family fam = perso.p3dData.family;
-
             if (fam != null && fam.physical_objects != null && fam.physical_objects.Length > 0) {
-                poListNames = fam.off_physical_lists.Select(o => (o == null ? "Null" : o.ToString())).ToArray();
-                currentPOList = perso.p3dData.off_physicalObjects == null ? 0 : fam.GetIndexOfPhysicalList(perso.p3dData.off_physicalObjects);
+                Array.Resize(ref poListNames, fam.off_physical_lists.Length + 1);
+                Array.Copy(fam.off_physical_lists.Select(o => (o == null ? "Null" : o.ToString())).ToArray(), 0, poListNames, 1, fam.off_physical_lists.Length);
+                currentPOList = perso.p3dData.off_physicalObjects == null ? 0 : fam.GetIndexOfPhysicalList(perso.p3dData.off_physicalObjects) + 1;
                 if (currentPOList == -1) currentPOList = 0;
                 poListIndex = currentPOList;
             }
@@ -312,12 +312,16 @@ public class PersoBehaviour : MonoBehaviour {
                 }
             }
             if (poListIndex != currentPOList && perso.p3dData != null) {
-                if (poListIndex >= 0 && poListIndex < perso.p3dData.family.physical_objects.Length) {
+                if (poListIndex > 0 && poListIndex < perso.p3dData.family.physical_objects.Length + 1) {
                     currentPOList = poListIndex;
-                    perso.p3dData.physical_objects = perso.p3dData.family.physical_objects[currentPOList];
-                    forceAnimUpdate = true;
-                    SetState(currentState);
-                } else poListIndex = 0;
+                    perso.p3dData.physical_objects = perso.p3dData.family.physical_objects[currentPOList - 1];
+                } else {
+                    poListIndex = 0;
+                    currentPOList = 0;
+                    perso.p3dData.physical_objects = null;
+                }
+                forceAnimUpdate = true;
+                SetState(currentState);
             }
         }
         if (playAnimation) {
@@ -373,6 +377,7 @@ public class PersoBehaviour : MonoBehaviour {
                     List<ushort> listOfNTTOforChannel = new List<ushort>();
                     for (int j = 0; j < a3d.num_onlyFrames; j++) {
                         AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + j];
+                        //print(ch.numOfNTTO + " - " + of.numOfNTTO + " - " + a3d.numOfNTTO.Length);
                         AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                         if (!listOfNTTOforChannel.Contains(numOfNTTO.numOfNTTO)) {
                             listOfNTTOforChannel.Add(numOfNTTO.numOfNTTO);
@@ -438,16 +443,19 @@ public class PersoBehaviour : MonoBehaviour {
             for (int i = of.start_hierarchies_for_frame;
                 i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
                 AnimHierarchy h = a3d.hierarchies[i];
-
-                if (!channelIDDictionary.ContainsKey(h.childChannelID)
-                    || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
-                    continue;
-                }
-                List<int> ch_child_list = GetChannelByID(h.childChannelID);
-                List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
-                foreach (int ch_child in ch_child_list) {
-                    foreach (int ch_parent in ch_parent_list) {
-                        channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+                
+                if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                    channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
+                } else {
+                    if (!channelIDDictionary.ContainsKey(h.childChannelID) || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
+                        continue;
+                    }
+                    List<int> ch_child_list = GetChannelByID(h.childChannelID);
+                    List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
+                    foreach (int ch_child in ch_child_list) {
+                        foreach (int ch_parent in ch_parent_list) {
+                            channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+                        }
                     }
                 }
 
@@ -489,6 +497,7 @@ public class PersoBehaviour : MonoBehaviour {
                     interpolation = framesSinceKF / (float)framesDifference;
                 }
                 //print(interpolation);
+                //print(a3d.vectors.Length + " - " + nextKF.positionVector);
                 AnimVector pos2 = a3d.vectors[nextKF.positionVector];
                 AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
                 AnimVector scl2 = a3d.vectors[nextKF.scaleVector];

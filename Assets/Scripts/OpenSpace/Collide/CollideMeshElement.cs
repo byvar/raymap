@@ -96,7 +96,7 @@ namespace OpenSpace.Collide {
             CollideMeshElement sm = new CollideMeshElement(offset, m);
             //l.print(offset + " - " + m.num_vertices);
             sm.off_material = Pointer.Read(reader);
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 sm.num_triangles = reader.ReadUInt16();
                 sm.num_mapping = reader.ReadUInt16();
                 sm.off_triangles = Pointer.Read(reader);

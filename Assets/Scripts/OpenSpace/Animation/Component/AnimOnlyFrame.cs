@@ -23,12 +23,29 @@ namespace OpenSpace.Animation.Component {
             of.vector = reader.ReadUInt16();
             of.num_hierarchies_for_frame = reader.ReadUInt16();
             of.start_hierarchies_for_frame = reader.ReadUInt16();
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 of.unk8 = reader.ReadUInt16();
                 of.deformation = reader.ReadUInt16();
             }
             of.numOfNTTO = reader.ReadUInt16();
+            if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
+                of.unk8 = reader.ReadUInt16();
+            }
             return of;
+        }
+
+        public static int Size {
+            get {
+                switch (Settings.s.engineVersion) {
+                    case Settings.EngineVersion.R3: return 14;
+                    case Settings.EngineVersion.TT: return 12;
+                    default: return 10;
+                }
+            }
+        }
+
+        public static bool Aligned {
+            get { return false; }
         }
     }
 }

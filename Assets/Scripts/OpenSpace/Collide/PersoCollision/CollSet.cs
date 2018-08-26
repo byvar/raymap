@@ -51,7 +51,7 @@ namespace OpenSpace.Collide {
                         return CollideMeshObject.Read(reader, off_element, type: type);
                     },
                     flags: LinkedList.Flags.ReadAtPointer
-                        | (l.mode == MapLoader.Mode.Rayman3GC ?
+                        | (Settings.s.hasLinkedListHeaderPointers ?
                             LinkedList.Flags.HasHeaderPointers :
                             LinkedList.Flags.NoPreviousPointersForDouble),
                     type: l.mode == MapLoader.Mode.RaymanArenaGC ?

@@ -37,7 +37,9 @@ namespace OpenSpace {
             RaymanArenaPC, RaymanArenaGC,
             Rayman2PC, Rayman2IOS,
             Rayman2PCDemo2, Rayman2PCDemo1,
-            DonaldDuckPC, TonicTroublePC
+            DonaldDuckPC,
+            TonicTroublePC, TonicTroubleSEPC,
+            HypePC
         };
         public Mode mode = Mode.Rayman3PC;
 
@@ -73,6 +75,7 @@ namespace OpenSpace {
         public List<WayPoint> isolateWaypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
+        public List<AnimationReference> animationReferences = new List<AnimationReference>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
         public GameObject graphRoot = null;
         public GameObject isolateWaypointRoot = null;
@@ -132,6 +135,8 @@ namespace OpenSpace {
                     case Mode.RaymanArenaPC: settings = Settings.RAPC; break;
                     case Mode.DonaldDuckPC: settings = Settings.DDPC; break;
                     case Mode.TonicTroublePC: settings = Settings.TTPC; break;
+                    case Mode.TonicTroubleSEPC: settings = Settings.TTSEPC; break;
+                    case Mode.HypePC: settings = Settings.HypePC; break;
                 }
                 Settings.s = settings;
 
@@ -141,8 +146,12 @@ namespace OpenSpace {
                 if (!Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 gameDataBinFolder += "/";
 
-                if (Settings.s.engineMode == Settings.EngineMode.R2) {
-                    gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    if (mode == Mode.HypePC) {
+                        gameDsb = new DSB("Game", gameDataBinFolder + "gamedsc.bin");
+                    } else {
+                        gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
+                    }
                     gameDsb.Save(gameDataBinFolder + "Game_dsb.dmp");
                     gameDsb.ReadAllSections();
                     gameDsb.Dispose();
@@ -156,7 +165,7 @@ namespace OpenSpace {
                     files_array[0] = mem;
                     LoadMemory();
                 } else {
-                    if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                         hasTransit = false;
                         DAT dat = null;
                         
@@ -170,11 +179,6 @@ namespace OpenSpace {
                         }
 
                         string fixSnaPath = levelsFolder + "fix.sna";
-                        if (Settings.s.subMode == Settings.SubMode.TT) {
-                            DSB fixRTB = new DSB("fixrtb", levelsFolder + "fix.rtb");
-                            fixRTB.Save(levelsFolder + "fix.rtb.dmp");
-                            fixRTB.Dispose();
-                        }
                         RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
                         if (File.Exists(levelsFolder + lvlName + "/FixLvl.rtb")) {
                             // Fix -> Lvl pointers for Tonic Trouble
@@ -194,7 +198,7 @@ namespace OpenSpace {
                         SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
                         string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
                         string lvlPtxPath = levelsFolder + lvlName + "/" + lvlName + ".ptx";
-                        if (Settings.s.subMode != Settings.SubMode.TT) {
+                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                             RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
                             lvlSna.ReadGPT(lvlGptPath, lvlRtp);
                             RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
@@ -235,7 +239,7 @@ namespace OpenSpace {
                         lvlSna.Dispose();
                         if (dat != null) dat.Dispose();
 
-                    } else if (Settings.s.engineMode == Settings.EngineMode.R3) {
+                    } else if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 
                         menuTPLPath = gameDataBinFolder + "menu.tpl";
                         lvlNames[0] = "fix";
@@ -854,31 +858,85 @@ namespace OpenSpace {
         void LoadFIXSNA() {
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
-            print("FIX GPT offset: " + Pointer.Current(reader));
-            Pointer off_identityMatrix = Pointer.Read(reader);
-            reader.ReadBytes(50 * 4);
-            uint matrixInStack = reader.ReadUInt32();
-            Pointer off_collisionGeoObj = Pointer.Read(reader);
-            Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
-            for (int i = 0; i < Settings.s.numEntryActions; i++) {
-                Pointer.Read(reader); // 3DOS_EntryActions
-            }
-
-            Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
-            ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
-
-            inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-            print("Num entractions: " + inputStruct.num_entryActions);
-            print("Off entryactions: " + inputStruct.off_entryActions);
-            Pointer off_IPT_entryElementList = Pointer.Read(reader);
-            print("Off entryelements: " + off_IPT_entryElementList);
-            fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
-            //reader.ReadBytes(0x14); // FON_g_stGeneral
             Pointer off_current = Pointer.Current(reader);
-            animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
-            animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];
-            print("Fix animation bank: " + off_current);
-            Pointer off_fixInfo = Pointer.Read(reader);
+            print("FIX GPT offset: " + off_current);
+
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                Pointer off_identityMatrix = Pointer.Read(reader);
+                reader.ReadBytes(50 * 4);
+                uint matrixInStack = reader.ReadUInt32();
+                Pointer off_collisionGeoObj = Pointer.Read(reader);
+                Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
+                for (int i = 0; i < Settings.s.numEntryActions; i++) {
+                    Pointer.Read(reader); // 3DOS_EntryActions
+                }
+
+                Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+                ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
+
+                inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+                print("Num entractions: " + inputStruct.num_entryActions);
+                print("Off entryactions: " + inputStruct.off_entryActions);
+                Pointer off_IPT_entryElementList = Pointer.Read(reader);
+                print("Off entryelements: " + off_IPT_entryElementList);
+                fontStruct = FontStructure.Read(reader, Pointer.Current(reader)); // FON_g_stGeneral
+                off_current = Pointer.Current(reader);
+                animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
+                animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];
+                print("Fix animation bank: " + off_current);
+                Pointer off_fixInfo = Pointer.Read(reader);
+            } else {
+                // Tonic Trouble
+                uint stringCount = (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                reader.ReadUInt32(); // 0x35
+                reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
+                reader.ReadBytes(0x90);
+                Pointer.Read(reader);
+                reader.ReadUInt32(); // 0x28
+                reader.ReadUInt32(); // 0x1
+                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                reader.ReadUInt32(); // 0x1
+                if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
+                    reader.ReadBytes(0x2CC);
+                } else { // French version: 598
+                    reader.ReadBytes(0x2C0);
+                }
+                reader.ReadBytes(0x1C);
+                reader.ReadUInt32(); // 0
+                reader.ReadUInt32(); // 1
+                reader.ReadUInt32(); // ???
+                Pointer.Read(reader);
+                
+                for (int i = 0; i < stringCount; i++) Pointer.Read(reader); // read num_loaded_strings pointers here
+
+                reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
+                reader.ReadUInt32();
+                Pointer.Read(reader);
+                reader.ReadBytes(0x14);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadUInt32(); // 0, so can be pointer too
+                reader.ReadBytes(0x30);
+                reader.ReadBytes(0x960);
+            }
 
             // Read PTX
             ((SNA)files_array[Mem.Fix]).GotoPTX();
@@ -937,80 +995,108 @@ namespace OpenSpace {
                     reader.ReadUInt32();
                     Pointer off_stdGame = Pointer.Read(reader);
                     if (off_stdGame != null) {
-                        Pointer.Goto(ref reader, off_stdGame);
-                        reader.ReadUInt32(); // type 0
-                        reader.ReadUInt32(); // type 1
-                        reader.ReadUInt32(); // type 2
-                        Pointer off_superObject = Pointer.Read(reader);
-                        if (off_superObject != null) {
-                            // First read everything from the GPT
+                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                            Pointer.Goto(ref reader, off_stdGame);
+                            reader.ReadUInt32(); // type 0
+                            reader.ReadUInt32(); // type 1
+                            reader.ReadUInt32(); // type 2
+                            Pointer off_superObject = Pointer.Read(reader);
                             Pointer.Goto(ref reader, off_current);
-                            
-                            Pointer off_newSuperObject = Pointer.Read(reader);
-                            byte[] matrixData = reader.ReadBytes(0x58);
-                            byte[] renderBits = reader.ReadBytes(4);
-                            byte[] floatData = reader.ReadBytes(4);
-                            Pointer off_nextBrother = Pointer.Read(reader);
-                            Pointer off_prevBrother = Pointer.Read(reader);
-                            Pointer off_father = Pointer.Read(reader);
+                            if (off_superObject == null) continue;
+                        } else {
+                            Pointer.Goto(ref reader, off_current);
+                        }
+                        // First read everything from the GPT
+                        Pointer off_newSuperObject = null, off_nextBrother = null, off_prevBrother = null, off_father = null;
+                        byte[] matrixData = null, floatData = null, renderBits = null;
+                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                            off_newSuperObject = Pointer.Read(reader);
+                            matrixData = reader.ReadBytes(0x58);
+                            renderBits = reader.ReadBytes(4);
+                            floatData = reader.ReadBytes(4);
+                            off_nextBrother = Pointer.Read(reader);
+                            off_prevBrother = Pointer.Read(reader);
+                            off_father = Pointer.Read(reader);
+                        } else {
+                            matrixData = reader.ReadBytes(0x58);
+                            off_newSuperObject = Pointer.Read(reader);
+                            Pointer.DoAt(ref reader, off_stdGame + 0xC, () => {
+                                ((SNA)off_stdGame.file).AddPointer(off_stdGame.offset + 0xC, off_newSuperObject);
+                            });
+                        }
 
-                            // Then fill everything in
-                            off_current = Pointer.Goto(ref reader, off_newSuperObject);
-                            uint newSOtype = reader.ReadUInt32();
-                            Pointer off_newSOengineObject = Pointer.Read(reader);
-                            if (newSOtype == 2) {
-                                persoInFixPointers[i] = off_newSOengineObject;
-                            } else {
-                                persoInFixPointers[i] = null;
-                            }
-                            Pointer.Goto(ref reader, off_newSOengineObject);
-                            Pointer off_renderInfo = Pointer.Read(reader);
-                            ((SNA)off_renderInfo.file).OverwriteData(off_renderInfo.offset + 0x18, matrixData);
+                        // Then fill everything in
+                        off_current = Pointer.Goto(ref reader, off_newSuperObject);
+                        uint newSOtype = reader.ReadUInt32();
+                        Pointer off_newSOengineObject = Pointer.Read(reader);
+                        if (SuperObject.GetSOType(newSOtype) == SuperObject.Type.Perso) {
+                            persoInFixPointers[i] = off_newSOengineObject;
+                        } else {
+                            persoInFixPointers[i] = null;
+                        }
+                        Pointer.Goto(ref reader, off_newSOengineObject);
+                        Pointer off_p3dData = Pointer.Read(reader);
+                        ((SNA)off_p3dData.file).OverwriteData(off_p3dData.offset + 0x18, matrixData);
 
+                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                             FileWithPointers file = off_newSuperObject.file;
                             file.AddPointer(off_newSuperObject.offset + 0x14, off_nextBrother);
                             file.AddPointer(off_newSuperObject.offset + 0x18, off_prevBrother);
                             file.AddPointer(off_newSuperObject.offset + 0x1C, off_father);
                             ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x30, renderBits);
                             ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x38, floatData);
-
                         }
+
                     }
                     Pointer.Goto(ref reader, off_current);
                 }
             }
 
-            globals.off_actualWorld = Pointer.Read(reader);
-            globals.off_dynamicWorld = Pointer.Read(reader);
-            globals.off_inactiveDynamicWorld = Pointer.Read(reader);
-            globals.off_fatherSector = Pointer.Read(reader);
-            globals.off_firstSubMapPosition = Pointer.Read(reader);
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                globals.off_actualWorld = Pointer.Read(reader);
+                globals.off_dynamicWorld = Pointer.Read(reader);
+                globals.off_inactiveDynamicWorld = Pointer.Read(reader);
+                globals.off_fatherSector = Pointer.Read(reader);
+                globals.off_firstSubMapPosition = Pointer.Read(reader);
+            } else {
+                globals.off_actualWorld = Pointer.Read(reader);
+                globals.off_dynamicWorld = Pointer.Read(reader);
+                globals.off_fatherSector = Pointer.Read(reader);
+                uint soundEventIndex = reader.ReadUInt32();
+            }
             
             globals.num_always = reader.ReadUInt32();
             globals.off_spawnable_perso_first = Pointer.Read(reader);
             globals.off_spawnable_perso_last = Pointer.Read(reader);
             globals.num_spawnable_perso = reader.ReadUInt32();
             globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-            globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
-            globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
+                globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
+            } else {
+                reader.ReadUInt32(); // 0x6F
+                FillLinkedListPointers(reader, globals.off_spawnable_perso_last, Pointer.Current(reader));
+            }
 
-            if (Settings.s.subMode == Settings.SubMode.DD) reader.ReadUInt32();
-            Pointer dword_4A6B1C_always_header = Pointer.Read(reader);
-            Pointer dword_4A6B20_always_last = Pointer.Read(reader);
+            if (Settings.s.game == Settings.Game.DD) reader.ReadUInt32();
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                Pointer dword_4A6B1C_always_header = Pointer.Read(reader);
+                Pointer dword_4A6B20_always_last = Pointer.Read(reader);
 
-            Pointer v28 = Pointer.Read(reader);
-            Pointer v31 = Pointer.Read(reader);
-            Pointer v32 = Pointer.Read(reader);
-            Pointer v33 = Pointer.Read(reader);
+                Pointer v28 = Pointer.Read(reader);
+                Pointer v31 = Pointer.Read(reader);
+                Pointer v32 = Pointer.Read(reader);
+                Pointer v33 = Pointer.Read(reader);
 
-            // These things aren't parsed, but in raycap they're null. This way we'll notice when they aren't.
-            if (v28 != null) print("v28 is not null, it's " + v28);
-            if (v31 != null) print("v31 is not null, it's " + v31);
-            if (v32 != null) print("v32 is not null, it's " + v32);
-            if (v33 != null) print("v33 is not null, it's " + v33);
-            
-            // Fill in pointers for the unknown table related to "always".
-            FillLinkedListPointers(reader, dword_4A6B20_always_last, dword_4A6B1C_always_header);
+                // These things aren't parsed, but in raycap they're null. This way we'll notice when they aren't.
+                if (v28 != null) print("v28 is not null, it's " + v28);
+                if (v31 != null) print("v31 is not null, it's " + v31);
+                if (v32 != null) print("v32 is not null, it's " + v32);
+                if (v33 != null) print("v33 is not null, it's " + v33);
+
+                // Fill in pointers for the unknown table related to "always".
+                FillLinkedListPointers(reader, dword_4A6B20_always_last, dword_4A6B1C_always_header);
+            }
 
             // Fill in pointers for the object type tables and read them
             objectTypes = new ObjectType[3][];
@@ -1023,14 +1109,23 @@ namespace OpenSpace {
                 FillLinkedListPointers(reader, off_names_last, off_names_header);
                 ReadObjectNamesTable(reader, off_names_first, num_names, i);
             }
-            
+
             // Begin of engineStructure
-            reader.ReadByte();
-            string mapName = new string(reader.ReadChars(0x1E)).TrimEnd('\0');
-            reader.ReadChars(0x1E);
-            string mapName2 = new string(reader.ReadChars(0x1E)).TrimEnd('\0');
-            reader.ReadByte();
-            reader.ReadBytes(0x178); // don't know what this data is
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                reader.ReadByte();
+                string mapName = reader.ReadString(0x1E);
+                reader.ReadChars(0x1E);
+                string mapName2 = reader.ReadString(0x1E);
+                reader.ReadByte();
+                reader.ReadBytes(0x178); // don't know what this data is
+            } else {
+                reader.ReadByte();
+                string mapName = reader.ReadString(0x104);
+                reader.ReadChars(0x104);
+                string mapName2 = reader.ReadString(0x104);
+                string mapName3 = reader.ReadString(0x104);
+                reader.ReadBytes(0x47F7); // don't know what this data is
+            }
 
             Pointer off_unknown_first = Pointer.Read(reader);
             Pointer off_unknown_last = Pointer.Read(reader);
@@ -1043,80 +1138,63 @@ namespace OpenSpace {
             Pointer off_alwaysActiveCharacters_last = Pointer.Read(reader);
             uint num_alwaysActiveChars = reader.ReadUInt32();
 
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            
-            for (uint i = 0; i < 2; i++) {
-                Pointer off_matrix = Pointer.Current(reader);
-                Matrix mat = Matrix.Read(reader, off_matrix);
-            }
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
 
-            /*uint num_perso_with_settings_in_fix = (uint)persoInFix.Length;
-            for (int i = 0; i < num_perso_with_settings_in_fix; i++) {
-                Pointer off_matrix = null;
-                R3SuperObject so = null;
-                R3Matrix mat = null;
-                off_matrix = Pointer.Current(reader);
-                mat = R3Matrix.Read(reader, off_matrix);
-                so = superObjects.Where(s => s.off_data == persoInFix[i]).FirstOrDefault();
-                if (so != null) {
-                    so.off_matrix = off_matrix;
-                    so.matrix = mat;
-                    if (so.Gao != null) {
-                        so.Gao.transform.localPosition = mat.GetPosition(convertAxes: true);
-                        so.Gao.transform.localRotation = mat.GetRotation(convertAxes: true);
-                        so.Gao.transform.localScale = mat.GetScale(convertAxes: true);
-                    }
-                }
-            }*/
-
-            reader.ReadUInt32();
-            reader.ReadUInt16();
-            
-            for (int i = 0; i < 80; i++) {
-                new string(reader.ReadChars(0x1E)).TrimEnd('\0');
-            }
-            uint num_mapNames = reader.ReadUInt32();
-            reader.ReadUInt16();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-
-            if (Settings.s.subMode == Settings.SubMode.DD || Settings.s.subMode == Settings.SubMode.R2Demo) {
                 reader.ReadUInt32();
-            }
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
 
-            // End of engineStructure
-            Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
+                for (uint i = 0; i < 2; i++) {
+                    Pointer off_matrix = Pointer.Current(reader);
+                    Matrix mat = Matrix.Read(reader, off_matrix);
+                }
 
-            if (Settings.s.subMode == Settings.SubMode.DD || Settings.s.subMode == Settings.SubMode.R2Demo) {
-                Pointer off_unknown = Pointer.Read(reader);
-            }
+                reader.ReadUInt32();
+                reader.ReadUInt16();
 
-            Pointer off_mainChar = Pointer.Read(reader); // superobject
-            if (Settings.s.subMode != Settings.SubMode.R2Demo) {
-                Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
-            }
-            Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
-            Pointer off_shadowPolygonGameMaterialInit = Pointer.Read(reader);
-            Pointer off_shadowPolygonGameMaterial = Pointer.Read(reader);
-            Pointer off_textureOfTextureShadow = Pointer.Read(reader);
-            Pointer off_col_taggedFacesTable = Pointer.Read(reader);
-            
-            for (int i = 0; i < 10; i++) {
-                Pointer off_elementForShadow = Pointer.Read(reader);
-                Pointer off_geometricShadowObject = Pointer.Read(reader);
-            }
-            Pointer.Read(reader);
-            if (Settings.s.subMode == Settings.SubMode.R2Demo) {
+                for (int i = 0; i < 80; i++) {
+                    new string(reader.ReadChars(0x1E)).TrimEnd('\0');
+                }
+                uint num_mapNames = reader.ReadUInt32();
+                reader.ReadUInt16();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+
+                if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.R2Demo) {
+                    reader.ReadUInt32();
+                }
+
+                // End of engineStructure
+                Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
+
+                if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.R2Demo) {
+                    Pointer off_unknown = Pointer.Read(reader);
+                }
+
+                Pointer off_mainChar = Pointer.Read(reader); // superobject
+                if (Settings.s.game != Settings.Game.R2Demo) {
+                    Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
+                }
+                Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
+                Pointer off_shadowPolygonGameMaterialInit = Pointer.Read(reader);
+                Pointer off_shadowPolygonGameMaterial = Pointer.Read(reader);
+                Pointer off_textureOfTextureShadow = Pointer.Read(reader);
+                Pointer off_col_taggedFacesTable = Pointer.Read(reader);
+
+                for (int i = 0; i < 10; i++) {
+                    Pointer off_elementForShadow = Pointer.Read(reader);
+                    Pointer off_geometricShadowObject = Pointer.Read(reader);
+                }
                 Pointer.Read(reader);
+                if (Settings.s.game == Settings.Game.R2Demo) {
+                    Pointer.Read(reader);
+                }
+                off_current = Pointer.Current(reader);
+                AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.LvlKeyFrames], append: true);
+                animationBanks[1] = animationBanks[0];
             }
-            off_current = Pointer.Current(reader);
-            AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.LvlKeyFrames], append: true);
-            animationBanks[1] = animationBanks[0];
-
 
             ((SNA)files_array[0]).CreateMemoryDump(gameDataBinFolder + "fix.dmp", true);
             ((SNA)files_array[1]).CreateMemoryDump(gameDataBinFolder + lvlName + "/" + lvlName + ".dmp", true);
@@ -1171,6 +1249,22 @@ namespace OpenSpace {
 
             // Parse actual world & always structure
             ReadFamilies(reader);
+
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                uint maxAnimIndex = 0;
+                foreach (State s in states) {
+                    if (s.anim_ref != null && s.anim_ref.anim_index > maxAnimIndex) maxAnimIndex = s.anim_ref.anim_index;
+                }
+                animationBanks = new AnimationBank[2];
+                animationBanks[0] = new AnimationBank(null) {
+                    animations = new Animation.Component.AnimA3DGeneral[maxAnimIndex + 1]
+                };
+                foreach (State s in states) {
+                    if (s.anim_ref != null) animationBanks[0].animations[s.anim_ref.anim_index] = s.anim_ref.a3d;
+                }
+                animationBanks[1] = animationBanks[0];
+            }
+
             ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);
@@ -1221,7 +1315,7 @@ namespace OpenSpace {
 
             // Read animations
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_stacks"], mem));
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 animationBanks[0] = AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, null)[0];
                 animationBanks[1] = animationBanks[0];
             } else {
@@ -1328,7 +1422,7 @@ MonoBehaviour.print(str);
         }
 
         public void CreateCNT() {
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 List<string> cntPaths = new List<string>();
                 if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
                 if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);

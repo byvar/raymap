@@ -7,6 +7,7 @@ namespace OpenSpace.EngineObject
     {
         public Pointer offset;
         public uint[] objectTypes = new uint[3];
+        public Pointer superObject;
 
         public int customBits;
         public int aiCustomBits;
@@ -22,17 +23,16 @@ namespace OpenSpace.EngineObject
             this.offset = offset;
         }
 
-        public static StandardGame Read(Reader reader, Pointer offset)
-        {
+        public static StandardGame Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             //l.print(offset);
             StandardGame stdGame = new StandardGame(offset);
             stdGame.objectTypes[0] = reader.ReadUInt32();
             stdGame.objectTypes[1] = reader.ReadUInt32();
             stdGame.objectTypes[2] = reader.ReadUInt32();
-            Pointer.Read(reader); // 0xC SuperObject from Perso probably
+            stdGame.superObject = Pointer.Read(reader); // 0xC SuperObject from Perso probably
 
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadBytes(0x14); // 0x10 - 0x23
                 stdGame.customBits = reader.ReadInt32(); // 0x24 custom bits
                 stdGame.isAPlatform = reader.ReadByte();
@@ -66,7 +66,7 @@ namespace OpenSpace.EngineObject
         }
 
         public void Write(Writer writer) {
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 Pointer.Goto(ref writer, Pointer.Current(writer) + 0x24);
                 writer.Write(customBits);
                 writer.Write(isAPlatform);

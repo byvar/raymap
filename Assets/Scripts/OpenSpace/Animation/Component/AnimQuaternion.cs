@@ -63,5 +63,13 @@ namespace OpenSpace.Animation.Component {
         public void ConvertRotation() {
             quaternion = ToMatrix().GetRotation(convertAxes: true);
         }
+
+        public static int Size {
+            get { return 8; }
+        }
+
+        public static bool Aligned {
+            get { return false; }
+        }
     }
 }

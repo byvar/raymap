@@ -45,34 +45,40 @@ namespace OpenSpace.Collide {
             MapLoader l = MapLoader.Loader;
             CollideMeshObject m = new CollideMeshObject(offset, type);
             //l.print("Mesh obj: " + offset);
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();
                 reader.ReadUInt32();
             }
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_vertices = (ushort)reader.ReadUInt32();
             m.off_vertices = Pointer.Read(reader);
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 m.off_normals = Pointer.Read(reader);
                 Pointer.Read(reader);
                 reader.ReadInt32();
             }
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_subblocks = (ushort)reader.ReadUInt32();
             m.off_subblock_types = Pointer.Read(reader);
             m.off_subblocks = Pointer.Read(reader);
             Pointer.Read(reader);
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
                 reader.ReadInt32();
                 reader.ReadInt32();
                 reader.ReadInt32();
                 reader.ReadInt32();
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();
+            }
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                reader.ReadInt32();
+                reader.ReadInt32();
             }
             reader.ReadInt32();
             reader.ReadSingle();
             reader.ReadSingle();
             reader.ReadSingle();
             reader.ReadSingle();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32();
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
             
             // Vertices
             Pointer off_current = Pointer.Goto(ref reader, m.off_vertices);

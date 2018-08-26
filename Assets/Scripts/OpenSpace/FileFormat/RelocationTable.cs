@@ -81,13 +81,14 @@ namespace OpenSpace.FileFormat {
 
         private void Load(Stream stream, bool masking) {
             using (Reader reader = new Reader(stream, isLittleEndian)) {
-                if (Settings.s.useWindowMasking) {
-                    reader.InitWindowMask();
-                    byte [] data = reader.ReadBytes((int)stream.Length);
+                if (Settings.s.encryptPointerFiles) {
+                    reader.InitMask();
+                    //reader.InitWindowMask();
+                    /*byte [] data = reader.ReadBytes((int)stream.Length);
                     MapLoader.Loader.print(path);
                     Util.ByteArrayToFile(path + ".dmp", data);
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                    reader.InitWindowMask();
+                    reader.InitWindowMask();*/
                 }
                 Read(reader);
             }
@@ -146,7 +147,7 @@ namespace OpenSpace.FileFormat {
             MapLoader l = MapLoader.Loader;
 
             byte count = reader.ReadByte();
-            if (Settings.s.subMode != Settings.SubMode.R2Demo && Settings.s.subMode != Settings.SubMode.TT) {
+            if (Settings.s.game != Settings.Game.R2Demo && Settings.s.engineVersion > Settings.EngineVersion.TT) {
                 reader.ReadUInt32();
             }
             pointerBlocks = new RelocationPointerList[count];
@@ -168,14 +169,10 @@ namespace OpenSpace.FileFormat {
                     // The address that it points to is to be read at address offsetInMemory.
                     // The part's baseInMemory should be subtracted from it to get the offset relative to the part.
                     pointerBlocks[i].pointers[j] = new RelocationPointerInfo();
-                    if (Settings.s.subMode == Settings.SubMode.TT) {
-                        pointerBlocks[i].pointers[j].module = reader.ReadByte();
-                        pointerBlocks[i].pointers[j].id = reader.ReadByte();
-                        pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
-                    } else {
-                        pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
-                        pointerBlocks[i].pointers[j].module = reader.ReadByte();
-                        pointerBlocks[i].pointers[j].id = reader.ReadByte();
+                    pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
+                    pointerBlocks[i].pointers[j].module = reader.ReadByte();
+                    pointerBlocks[i].pointers[j].id = reader.ReadByte();
+                    if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                         pointerBlocks[i].pointers[j].byte6 = reader.ReadByte();
                         pointerBlocks[i].pointers[j].byte7 = reader.ReadByte();
                     }

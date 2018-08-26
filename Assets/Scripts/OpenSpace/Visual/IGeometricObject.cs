@@ -6,5 +6,8 @@ namespace OpenSpace.Visual {
     /// </summary>
     public interface IGeometricObject {
         IGeometricObject Clone();
+        GameObject Gao {
+            get;
+        }
     }
 }

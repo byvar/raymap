@@ -58,7 +58,7 @@ namespace OpenSpace.Collide {
 
             cm.type = reader.ReadUInt16();
             cm.identifier = reader.ReadUInt16();
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 cm.direction = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 cm.coef = reader.ReadSingle();
             }

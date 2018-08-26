@@ -13,10 +13,16 @@ namespace OpenSpace {
         MaskingMode masking = MaskingMode.Off;
         uint mask = 0;
         uint currentMaskByte = 0;
+        uint bytesReadSinceAlignStart = 0;
+        bool autoAlignOn = false;
         byte[] maskBytes;
         byte[] originalMaskBytes = new byte[] { 0x41, 0x59, 0xBE, 0xC7, 0x0D, 0x99, 0x1C, 0xA3, 0x75, 0x3F };
         public Reader(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
         public Reader(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
+        public bool AutoAligning {
+            get { return autoAlignOn; }
+            set { autoAlignOn = value; bytesReadSinceAlignStart = 0; }
+        }
 
         public override int ReadInt32() {
             var data = ReadBytes(4);
@@ -56,6 +62,7 @@ namespace OpenSpace {
 
         public override byte[] ReadBytes(int count) {
             byte[] bytes = base.ReadBytes(count);
+            if(autoAlignOn) bytesReadSinceAlignStart += (uint)bytes.Length;
             if (masking != MaskingMode.Off) {
                 if (masking == MaskingMode.Number) {
                     for (int i = 0; i < count; i++) {
@@ -73,6 +80,7 @@ namespace OpenSpace {
 
         public override byte ReadByte() {
             byte result = base.ReadByte();
+            if(autoAlignOn) bytesReadSinceAlignStart++;
             if (masking != MaskingMode.Off) {
                 if (masking == MaskingMode.Number) {
                     result = DecodeByte(result, mask);
@@ -86,16 +94,16 @@ namespace OpenSpace {
 
         public string ReadNullDelimitedString() {
             string result = "";
-            char c = ReadChar();
+            char c = Convert.ToChar(ReadByte());
             while (c != 0x0) {
                 result += c;
-                c = ReadChar();
+                c = Convert.ToChar(ReadByte());
             }
             return result;
         }
 
         public string ReadString(int size) {
-            return new string(ReadChars(size)).TrimEnd('\0');
+            return System.Text.Encoding.UTF8.GetString(ReadBytes(size)).TrimEnd('\0');
         }
 
         // To make sure position is a multiple of alignBytes
@@ -109,8 +117,16 @@ namespace OpenSpace {
         public void Align(int blockSize, int alignBytes) {
             int rest = blockSize % alignBytes;
             if (rest > 0) {
-                ReadBytes(alignBytes - rest);
+                byte[] aligned = ReadBytes(alignBytes - rest);
+                foreach (byte b in aligned) if (b != 0x0) throw new Exception("fuuuuuuuu");
             }
+        }
+        
+        public void AutoAlign(int alignBytes) {
+            if (bytesReadSinceAlignStart % alignBytes != 0) {
+                ReadBytes(alignBytes - (int)(bytesReadSinceAlignStart % alignBytes));
+            }
+            bytesReadSinceAlignStart = 0;
         }
 
 
@@ -124,7 +140,7 @@ namespace OpenSpace {
             masking = MaskingMode.Number;
         }
 
-        public void InitWindowMask() {
+        private void InitWindowMask() {
             maskBytes = new byte[10];
             Array.Copy(originalMaskBytes, maskBytes, maskBytes.Length);
             masking = MaskingMode.Window;
@@ -150,25 +166,24 @@ namespace OpenSpace {
             }
         }
 
-        public void SetInitialMask() {
-            if (Settings.s.fixedInitialMask) {
-                mask = 0x6AB5CC79;
-            } else {
-                uint currentMask = 0xFFFFFFFF;
-                mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));
-                if ((mask & 0x80000000) != 0) {
-                    mask += 0x7FFFFFFF;
-                    currentMask = mask;
-                }
-                MapLoader.Loader.print(mask);
-            }
-        }
-
-        public void SetOrReadMask() {
-            if (Settings.s.useInitialMask) {
-                SetInitialMask();
-            } else {
-                ReadMask();
+        public int InitMask() {
+            switch (Settings.s.encryption) {
+                case Settings.Encryption.ReadInit:
+                    ReadMask(); return 4;
+                case Settings.Encryption.Window:
+                    InitWindowMask(); return 0;
+                case Settings.Encryption.FixedInit:
+                    mask = 0x6AB5CC79; return 0;
+                case Settings.Encryption.CalculateInit:
+                    uint currentMask = 0xFFFFFFFF;
+                    mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));
+                    if ((mask & 0x80000000) != 0) {
+                        mask += 0x7FFFFFFF;
+                        currentMask = mask;
+                    }
+                    return 0;
+                default:
+                    return 0;
             }
         }
 

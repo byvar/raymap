@@ -128,7 +128,7 @@ public class Controller : MonoBehaviour {
                 unityBehaviour.perso = p;
                 unityBehaviour.Init();
 
-                if (p.Gao && Settings.s.engineMode == Settings.EngineMode.R2) {
+                if (p.Gao && Settings.s.engineVersion == Settings.EngineVersion.R2) {
                     if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
                         if (p.brain.mind.AI_model.behaviors_normal != null) {
                             GameObject intelParent = new GameObject("Rule behaviours");
@@ -237,7 +237,7 @@ public class Controller : MonoBehaviour {
                     if (p.stdGame != null) {
                         CustomBitsComponent c = p.Gao.AddComponent<CustomBitsComponent>();
                         c.stdGame = p.stdGame;
-                        if (Settings.s.engineMode == Settings.EngineMode.R3) c.hasAiCustomBits = true;
+                        if (Settings.s.engineVersion == Settings.EngineVersion.R3) c.hasAiCustomBits = true;
                         c.Init();
                     }
                 }
@@ -260,8 +260,8 @@ public class Controller : MonoBehaviour {
             viewCollision_ = viewCollision;
             foreach (PhysicalObject po in loader.physicalObjects) {
                 foreach (VisualSetLOD l in po.visualSet) {
-                    if (l.obj != null && l.obj is MeshObject) {
-                        GameObject gao = ((MeshObject)l.obj).gao;
+                    if (l.obj != null) {
+                        GameObject gao = l.obj.Gao;
                         if (gao != null) gao.SetActive(!viewCollision);
                     }
                 }

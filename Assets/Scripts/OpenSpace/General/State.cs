@@ -58,7 +58,7 @@ namespace OpenSpace {
             l.states.Add(s);
             if (Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
             if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_next = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman3GC) {
+            if (Settings.s.hasLinkedListHeaderPointers) {
                 s.off_state_prev = Pointer.Read(reader);
                 Pointer.Read(reader); // another header at tail of state list
             }
@@ -67,17 +67,26 @@ namespace OpenSpace {
             reader.ReadUInt32();
             Pointer.Read(reader);
             if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
-            s.off_state_auto = Pointer.Read(reader);
+            s.off_state_auto = Pointer.Read(reader, allowMinusOne: true);
             s.off_mechanicsIDCard = Pointer.Read(reader);
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 s.off_cine_mapname = Pointer.Read(reader);
                 s.off_cine_name = Pointer.Read(reader);
             }
-            reader.ReadByte();
-            s.speed = reader.ReadByte();
-            reader.ReadByte();
-            reader.ReadByte();
-            if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32();
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                s.speed = reader.ReadByte();
+            } else {
+                reader.ReadByte();
+                s.speed = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+            }
+            if (Settings.s.engineVersion <= Settings.EngineVersion.R2) reader.ReadUInt32();
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
             }
@@ -89,11 +98,7 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, s.off_cine_name);
                 s.cine_name = reader.ReadNullDelimitedString();
             }
-            if (s.off_anim_ref != null) {
-                Pointer.Goto(ref reader, s.off_anim_ref);
-                s.anim_ref = AnimationReference.Read(reader, s.off_anim_ref);
-            }
-
+            s.anim_ref = AnimationReference.FromOffsetOrRead(s.off_anim_ref, reader);
             return s;
         }
 

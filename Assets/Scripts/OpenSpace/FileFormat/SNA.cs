@@ -46,13 +46,8 @@ namespace OpenSpace.FileFormat {
             this.name = name;
             this.rtb = rtb;
             using (Reader encodedReader = new Reader(stream, Settings.s.IsLittleEndian)) {
-                if (Settings.s.useWindowMasking) {
-                    encodedReader.InitWindowMask();
-                    data = encodedReader.ReadBytes((int)stream.Length);
-                } else {
-                    encodedReader.ReadMask();
-                    data = encodedReader.ReadBytes((int)stream.Length - 4);
-                }
+                int maskBytes = encodedReader.InitMask();
+                data = encodedReader.ReadBytes((int)stream.Length - maskBytes);
             }
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ReadSNA();
@@ -61,7 +56,7 @@ namespace OpenSpace.FileFormat {
         void ReadSNA() {
             MapLoader l = MapLoader.Loader;
             uint szCounter = 0;
-            if (Settings.s.subMode == Settings.SubMode.TT) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
                 byte headerLength = reader.ReadByte();
                 reader.ReadBytes(headerLength);
             }
@@ -71,7 +66,7 @@ namespace OpenSpace.FileFormat {
                 block.position = (uint)reader.BaseStream.Position;
                 block.module = reader.ReadByte();
                 block.id = reader.ReadByte();
-                if (Settings.s.subMode != Settings.SubMode.TT) block.unk1 = reader.ReadByte();
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
                 block.baseInMemory = reader.ReadInt32();
                 if (blocks.Count == 0) {
                     l.print("Initial block: " + block.module + "|" + block.id + " - base: " + block.baseInMemory);
@@ -87,7 +82,7 @@ namespace OpenSpace.FileFormat {
                     block.maxPosMinus9 = reader.ReadUInt32();
                     block.size = reader.ReadUInt32();
                     szCounter += block.size;
-                    if (Settings.s.subMode == Settings.SubMode.TT) block.unk1 = reader.ReadByte();
+                    if (Settings.s.engineVersion <= Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
                     block.dataPosition = (uint)reader.BaseStream.Position;
                     reader.ReadBytes((int)block.size);
                     block.pointerList = rtb.GetListForPart(block.module, block.id);
@@ -124,20 +119,30 @@ namespace OpenSpace.FileFormat {
             uint gptOffset = (uint)data.Length;
             byte[] gptData = null;
             using (Reader gptReader = new Reader(gptStream, Settings.s.IsLittleEndian)) {
-                if (Settings.s.useWindowMasking) gptReader.InitWindowMask();
-                gptData = gptReader.ReadBytes((int)gptStream.Length);
+                int maskBytes = Settings.s.encryptPointerFiles ? gptReader.InitMask() : 0;
+                gptData = gptReader.ReadBytes((int)gptStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", gptData);
             data = data.Concat(gptData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
-            ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
-            SNAMemoryBlock block = relocation_local[ptrRelocationKey];
-            block.pointerList = null;
-            block.dataPosition = gptOffset;
-            block.size = (uint)gptData.Length;
-            block.isGpt = true;
-            gpt = block;
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
+                SNAMemoryBlock block = relocation_local[ptrRelocationKey];
+                block.pointerList = null;
+                block.dataPosition = gptOffset;
+                block.size = (uint)gptData.Length;
+                block.isGpt = true;
+                gpt = block;
+            } else {
+                // Tonic Trouble LVL
+                SNAMemoryBlock block = new SNAMemoryBlock();
+                block.pointerList = null;
+                block.dataPosition = gptOffset;
+                block.size = (uint)gptData.Length;
+                block.isGpt = true;
+                gpt = block;
+            }
             headerOffset = gpt.dataPosition;
             //R3Loader.Loader.print("Base " + block.baseInMemory + " - Size: " + block.size);
         }
@@ -148,22 +153,25 @@ namespace OpenSpace.FileFormat {
             uint ptxOffset = (uint)data.Length;
             byte[] ptxData = null;
             using (Reader ptxReader = new Reader(ptxStream, Settings.s.IsLittleEndian)) {
-                if (Settings.s.useWindowMasking) ptxReader.InitWindowMask();
-                ptxData = ptxReader.ReadBytes((int)ptxStream.Length);
+                int maskBytes = Settings.s.encryptPointerFiles ? ptxReader.InitMask() : 0;
+                ptxData = ptxReader.ReadBytes((int)ptxStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", ptxData);
             data = data.Concat(ptxData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
-            ushort ptrRelocationKey = GetRelocationKey(rtt.pointerBlocks[0]);
-            SNAMemoryBlock block = relocation_local[ptrRelocationKey];
             ptx = new SNAMemoryBlock();
-            ptx.baseInMemory = block.baseInMemory;
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                // It doesn't exist in Tonic Trouble
+                ushort ptrRelocationKey = GetRelocationKey(rtt.pointerBlocks[0]);
+                SNAMemoryBlock block = relocation_local[ptrRelocationKey];
+                ptx.baseInMemory = block.baseInMemory;
+                ptx.id = block.id;
+                ptx.module = block.module;
+                ptx.maxPosMinus9 = block.maxPosMinus9;
+                ptx.pointerList = rtt.pointerBlocks[0];
+            }
             ptx.dataPosition = ptxOffset;
-            ptx.id = block.id;
-            ptx.module = block.module;
-            ptx.maxPosMinus9 = block.maxPosMinus9;
-            ptx.pointerList = rtt.pointerBlocks[0];
             ptx.position = ptxOffset;
             ptx.size = (uint)ptxData.Length;
             ptx.sna = this;
@@ -180,65 +188,67 @@ namespace OpenSpace.FileFormat {
                     Reader cur_reader = block_global.sna.reader;
                     if (block_global.size > 0) {
                         foreach (RelocationPointerInfo info in ptrList.pointers) {
-                            uint relativeAddress = (uint)(info.offsetInMemory - block_local.baseInMemory);
+                            uint relativeAddress = info.offsetInMemory - (uint)block_local.baseInMemory;
                             cur_reader.BaseStream.Seek(block_global.dataPosition + relativeAddress, SeekOrigin.Begin);
                             uint ptrValue = cur_reader.ReadUInt32();
                             
                             ushort ptrRelocationKey = GetRelocationKey(info);
                             if (!l.relocation_global.ContainsKey(ptrRelocationKey)) {
-                                l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
-                                return;
-                            }
-                            SNAMemoryBlock ptr_block_local = relocation_local[ptrRelocationKey];
-                            SNAMemoryBlock ptr_block_global = (ptr_block_local.size != 0) ? ptr_block_local : l.relocation_global[ptrRelocationKey];
-                            if (ptr_block_global != null && ptr_block_local != null && ptr_block_local.baseInMemory != -1) {
-
-                                /*if (info.module == 0xA) {
-                                    l.print("Special pointer in (" + ptrList.module + "," + ptrList.id + ") with offset " + info.offsetInMemory +
-                                        "(Relative:" + relativeAddress + " - Datafile:" + (block_global.dataPosition + relativeAddress) + ")"
-                                        );
-                                    l.print("Value: " + ptrValue + " - Post relocation: " + (ptrValue - ptr_block_local.baseInMemory + ptr_block_global.dataPosition));
-                                }*/
-
-                                /*if (ptrValue < ptr_block_local.baseInMemory) {
-                                    l.print("Info mod: " + info.module + " - block " + info.id);
-                                    l.print("PtrList mod: " + ptrList.module + " - block " + ptrList.id);
-                                    l.print("Post relocation: " + (ptrValue - ptr_block_local.baseInMemory + ptr_block_global.dataPosition));
-                                    l.print("Too low: " + ptrValue + " < " + ptr_block_local.baseInMemory + " + " + ptr_block_global.size);
-                                    l.print("Part 2:" + ptr_block_local.unk2 + " - 3:" + ptr_block_local.unk3 + " - 4:" + ptr_block_local.maxPosMinus9);
-                                    l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
-                                    //return;
+                                if (Settings.s.engineVersion > Settings.EngineVersion.TT || !(info.module == 0xFF && info.id == 0xFF)) {
+                                    l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
                                 }
-                                if (ptrValue >= ptr_block_local.maxPosMinus9 + 9) {
-                                //if (ptrValue >= ptr_block_local.baseInMemory + ptr_block_global.size) {
-                                    //l.print("Part mod: " + block.module + " - block " + block.id);
-                                    l.print("Info mod: " + info.module + " - block " + info.id);
-                                    l.print("PtrList mod: " + ptrList.module + " - block " + ptrList.id);
-                                    l.print("Post relocation: " + (ptrValue - ptr_block_local.baseInMemory + ptr_block_global.dataPosition));
-                                    l.print("Post relocation 2: " + (ptrValue - ptr_block_local.baseInMemory));
-                                    l.print("Too high: " + ptrValue + " < " + ptr_block_local.baseInMemory + " + " + ptr_block_global.size);
-                                    l.print("Part 2:" + ptr_block_local.unk2 + " - 3:" + ptr_block_local.unk3 + " - 4:" + ptr_block_local.maxPosMinus9);
-                                    l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
-                                    //return;
-                                }*/
-                                uint ptrValuePrior = ptrValue;
-                                ptrValue -= (uint)ptr_block_local.baseInMemory;
-                                if (info.module != tmpModule) ptrValue += ptr_block_global.dataPosition;
-                                // Test. There's a fillin pointer there
-                                /*if (ptrValue == 0x1b6a4) {
-                                    l.print("Fillin pointer is located in block (" + block_global.module + "," + block_global.id + ") with base " + block_local.baseInMemory);
-                                    l.print("Its offset prior to relocation is " + (info.offsetInMemory));
-                                    l.print(info.byte6 + " - " + info.byte7);
-                                    l.print("Local base: " + ptr_block_local.baseInMemory + " - " + ptr_block_local.unk1 + " - " + ptr_block_local.unk2 + " - " + ptr_block_local.unk3);
-                                    l.print("Its offset in the data file is " + (block_global.dataPosition + relativeAddress));
-                                    l.print("Fillin pointer points to block (" + ptr_block_global.module + "," + ptr_block_global.id + ") with base " + ptr_block_global.baseInMemory);
-                                    l.print("Its value prior to relocation is " + ptrValuePrior + " - minus base: " + (ptrValuePrior - ptr_block_local.baseInMemory));
-                                }*/
-                                Pointer pointer = new Pointer(ptrValue, ptr_block_global.sna);
-                                block_global.sna.pointers[block_global.dataPosition + relativeAddress] = pointer;
                             } else {
-                                l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
-                                return;
+                                SNAMemoryBlock ptr_block_local = relocation_local[ptrRelocationKey];
+                                SNAMemoryBlock ptr_block_global = (ptr_block_local.size != 0) ? ptr_block_local : l.relocation_global[ptrRelocationKey];
+                                if (ptr_block_global != null && ptr_block_local != null && ptr_block_local.baseInMemory != -1) {
+
+                                    /*if (info.module == 0xA) {
+                                        l.print("Special pointer in (" + ptrList.module + "," + ptrList.id + ") with offset " + info.offsetInMemory +
+                                            "(Relative:" + relativeAddress + " - Datafile:" + (block_global.dataPosition + relativeAddress) + ")"
+                                            );
+                                        l.print("Value: " + ptrValue + " - Post relocation: " + (ptrValue - ptr_block_local.baseInMemory + ptr_block_global.dataPosition));
+                                    }*/
+
+                                    /*if (ptrValue < ptr_block_local.baseInMemory) {
+                                        l.print("Info mod: " + info.module + " - block " + info.id);
+                                        l.print("PtrList mod: " + ptrList.module + " - block " + ptrList.id);
+                                        l.print("Post relocation: " + (ptrValue - ptr_block_local.baseInMemory + ptr_block_global.dataPosition));
+                                        l.print("Too low: " + ptrValue + " < " + ptr_block_local.baseInMemory + " + " + ptr_block_global.size);
+                                        l.print("Part 2:" + ptr_block_local.unk2 + " - 3:" + ptr_block_local.unk3 + " - 4:" + ptr_block_local.maxPosMinus9);
+                                        l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
+                                        //return;
+                                    }
+                                    if (ptrValue >= ptr_block_local.maxPosMinus9 + 9) {
+                                    //if (ptrValue >= ptr_block_local.baseInMemory + ptr_block_global.size) {
+                                        //l.print("Part mod: " + block.module + " - block " + block.id);
+                                        l.print("Info mod: " + info.module + " - block " + info.id);
+                                        l.print("PtrList mod: " + ptrList.module + " - block " + ptrList.id);
+                                        l.print("Post relocation: " + (ptrValue - ptr_block_local.baseInMemory + ptr_block_global.dataPosition));
+                                        l.print("Post relocation 2: " + (ptrValue - ptr_block_local.baseInMemory));
+                                        l.print("Too high: " + ptrValue + " < " + ptr_block_local.baseInMemory + " + " + ptr_block_global.size);
+                                        l.print("Part 2:" + ptr_block_local.unk2 + " - 3:" + ptr_block_local.unk3 + " - 4:" + ptr_block_local.maxPosMinus9);
+                                        l.print("Info off:" + info.offsetInMemory + " - 6:" + info.byte6 + " - 7:" + info.byte7);
+                                        //return;
+                                    }*/
+                                    uint ptrValuePrior = ptrValue;
+                                    ptrValue -= (uint)ptr_block_local.baseInMemory;
+                                    if (info.module != tmpModule) ptrValue += ptr_block_global.dataPosition;
+                                    // Test. There's a fillin pointer there
+                                    /*if (ptrValue == 0x1b6a4) {
+                                        l.print("Fillin pointer is located in block (" + block_global.module + "," + block_global.id + ") with base " + block_local.baseInMemory);
+                                        l.print("Its offset prior to relocation is " + (info.offsetInMemory));
+                                        l.print(info.byte6 + " - " + info.byte7);
+                                        l.print("Local base: " + ptr_block_local.baseInMemory + " - " + ptr_block_local.unk1 + " - " + ptr_block_local.unk2 + " - " + ptr_block_local.unk3);
+                                        l.print("Its offset in the data file is " + (block_global.dataPosition + relativeAddress));
+                                        l.print("Fillin pointer points to block (" + ptr_block_global.module + "," + ptr_block_global.id + ") with base " + ptr_block_global.baseInMemory);
+                                        l.print("Its value prior to relocation is " + ptrValuePrior + " - minus base: " + (ptrValuePrior - ptr_block_local.baseInMemory));
+                                    }*/
+                                    Pointer pointer = new Pointer(ptrValue, ptr_block_global.sna);
+                                    block_global.sna.pointers[block_global.dataPosition + relativeAddress] = pointer;
+                                } else {
+                                    l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
+                                    return;
+                                }
                             }
                         }
                     }
@@ -253,25 +263,40 @@ namespace OpenSpace.FileFormat {
         private void RelocatePointerFile(SNAMemoryBlock pf, RelocationTable rt) {
             MapLoader l = MapLoader.Loader;
             reader.BaseStream.Seek(pf.dataPosition, SeekOrigin.Begin);
-            foreach (RelocationPointerList ptrList in rt.pointerBlocks) {
-                int listIndex = 0;
+            if (rt != null) {
+                foreach (RelocationPointerList ptrList in rt.pointerBlocks) {
+                    int listIndex = 0;
+                    for (uint i = 0; i < pf.size / 4; i++) {
+                        uint ptrValue = reader.ReadUInt32();
+                        if (ptrList.pointers[listIndex].offsetInMemory == ptrValue) {
+                            RelocationPointerInfo info = ptrList.pointers[listIndex];
+                            ushort ptrRelocationKey = GetRelocationKey(info);
+                            SNAMemoryBlock ptr_block_local = relocation_local[ptrRelocationKey];
+                            SNAMemoryBlock ptr_block_global = (ptr_block_local.size != 0) ? ptr_block_local : l.relocation_global[ptrRelocationKey];
+                            if (ptr_block_global != null && ptr_block_local != null && ptr_block_local.baseInMemory != -1) {
+                                ptrValue -= (uint)ptr_block_local.baseInMemory;
+                                if (info.module != tmpModule) ptrValue += ptr_block_global.dataPosition;
+                                Pointer pointer = new Pointer(ptrValue, ptr_block_global.sna);
+                                pointers[pf.dataPosition + (i * 4)] = pointer;
+                            } else {
+                                l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
+                            }
+                            listIndex++;
+                            if (listIndex >= ptrList.pointers.Length) break;
+                        }
+                    }
+                }
+            } else {
+                // Tonic Trouble has rt=null for the levels, so let's go with a little hack
                 for (uint i = 0; i < pf.size / 4; i++) {
                     uint ptrValue = reader.ReadUInt32();
-                    if (ptrList.pointers[listIndex].offsetInMemory == ptrValue) {
-                        RelocationPointerInfo info = ptrList.pointers[listIndex];
-                        ushort ptrRelocationKey = GetRelocationKey(info);
-                        SNAMemoryBlock ptr_block_local = relocation_local[ptrRelocationKey];
-                        SNAMemoryBlock ptr_block_global = (ptr_block_local.size != 0) ? ptr_block_local : l.relocation_global[ptrRelocationKey];
-                        if (ptr_block_global != null && ptr_block_local != null && ptr_block_local.baseInMemory != -1) {
-                            ptrValue -= (uint)ptr_block_local.baseInMemory;
-                            if (info.module != tmpModule) ptrValue += ptr_block_global.dataPosition;
-                            Pointer pointer = new Pointer(ptrValue, ptr_block_global.sna);
+                    foreach (SNAMemoryBlock block in MapLoader.Loader.relocation_global.Values) {
+                        if (ptrValue > block.baseInMemory && ptrValue < block.baseInMemory + block.size) {
+                            ptrValue -= (uint)block.baseInMemory;
+                            ptrValue += block.dataPosition;
+                            Pointer pointer = new Pointer(ptrValue, block.sna);
                             pointers[pf.dataPosition + (i * 4)] = pointer;
-                        } else {
-                            l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
                         }
-                        listIndex++;
-                        if (listIndex >= ptrList.pointers.Length) break;
                     }
                 }
             }

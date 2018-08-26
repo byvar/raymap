@@ -21,9 +21,33 @@ namespace OpenSpace.Animation.Component {
             ch.id = reader.ReadInt16();
             ch.vector = reader.ReadUInt16();
             ch.numOfNTTO = reader.ReadUInt16();
-            ch.framesKF = reader.ReadUInt32();
-            ch.keyframe = reader.ReadUInt32();
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                ch.framesKF = reader.ReadUInt32();
+                ch.keyframe = reader.ReadUInt32();
+            } else {
+                ch.framesKF = reader.ReadUInt16();
+                ch.keyframe = reader.ReadUInt16();
+            }
             return ch;
+        }
+
+        public static int Size {
+            get {
+                switch (Settings.s.engineVersion) {
+                    case Settings.EngineVersion.TT: return 12;
+                    default: return 16;
+                }
+            }
+        }
+
+        public static bool Aligned {
+            get {
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
     }
 }

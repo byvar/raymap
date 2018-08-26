@@ -58,6 +58,7 @@ namespace OpenSpace.Visual {
                 if (sprites[i].visualMaterial != null) {
                     if (sprites[i].visualMaterial.textures != null && sprites[i].visualMaterial.textures.Count > 0) {
                         TextureInfo mainTex = sprites[i].visualMaterial.textures[0].texture;
+                        
                         if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
                         if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
                     }
@@ -107,26 +108,36 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             SpriteElement s = new SpriteElement(offset, m);
             s.name = "Sprite @ pos " + offset;
-
-            s.off_sprites = Pointer.Read(reader);
-            s.num_sprites = reader.ReadUInt16();
-            reader.ReadInt16(); // -1
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                s.off_sprites = Pointer.Read(reader);
+                s.num_sprites = reader.ReadUInt16();
+                reader.ReadInt16(); // -1
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+            } else {
+                s.num_sprites = (ushort)reader.ReadUInt32();
+                s.off_sprites = Pointer.Read(reader);
+                reader.ReadUInt32();
+            }
 
             if (s.off_sprites != null) {
                 Pointer.Goto(ref reader, s.off_sprites);
                 s.sprites = new IndexedSprite[s.num_sprites];
                 for (uint i = 0; i < s.num_sprites; i++) {
                     s.sprites[i] = new IndexedSprite();
+                    if (Settings.s.engineVersion <= Settings.EngineVersion.TT) reader.ReadUInt32();
                     s.sprites[i].off_info = Pointer.Read(reader);
                     s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                    s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                    s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                    s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                    s.sprites[i].centerPoint = reader.ReadUInt16();
-                    reader.ReadUInt16();
-                    if (Settings.s.engineMode == Settings.EngineMode.R2) reader.ReadUInt32();
+
+                    if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                        s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                        s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        s.sprites[i].centerPoint = reader.ReadUInt16();
+                        reader.ReadUInt16();
+                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
+                    }
 
                     if (s.sprites[i].off_info != null) {
                         Pointer off_current = Pointer.Goto(ref reader, s.sprites[i].off_info);
@@ -137,22 +148,18 @@ namespace OpenSpace.Visual {
                         Pointer off_info_unknown = Pointer.Read(reader);
                         s.sprites[i].off_material_pointer = Pointer.Read(reader);
                         Pointer.Goto(ref reader, off_current);
-                        
-                        if (off_info_scale != null) {
-                            off_current = Pointer.Goto(ref reader, off_info_scale);
+
+                        Pointer.DoAt(ref reader, off_info_scale, () => {
                             s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                            Pointer.Goto(ref reader, off_current);
-                        }
-                        if (off_info_unknown != null) {
-                            off_current = Pointer.Goto(ref reader, off_info_unknown);
+                        });
+                        Pointer.DoAt(ref reader, off_info_unknown, () => {
                             s.sprites[i].info_unknown = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                            Pointer.Goto(ref reader, off_current);
-                        }
+                        });
                         if (s.sprites[i].off_material_pointer != null) {
                             off_current = Pointer.Goto(ref reader, s.sprites[i].off_material_pointer);
                             s.sprites[i].off_material = Pointer.Read(reader);
                             if (s.sprites[i].off_material != null) {
-                                if (Settings.s.engineMode == Settings.EngineMode.R2) {
+                                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                                     s.sprites[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
                                     s.sprites[i].visualMaterial = s.sprites[i].gameMaterial.visualMaterial;
                                 } else {

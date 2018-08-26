@@ -24,7 +24,7 @@ namespace OpenSpace.AI {
             Pointer dsgVarPointer = Pointer.Read(reader);
             if (dsgVarPointer != null) {
                 Pointer off_current = Pointer.Goto(ref reader, dsgVarPointer);
-                if (Settings.s.subMode == Settings.SubMode.R2Demo) {
+                if (Settings.s.game == Settings.Game.R2Demo) {
                     Pointer.Read(reader);
                 }
                 dsgMem.off_dsgVar = Pointer.Read(reader);

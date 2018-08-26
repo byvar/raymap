@@ -62,7 +62,7 @@ namespace OpenSpace {
             off_physical_lists[off_physical_lists.Length - 1] = Pointer.Current(reader);
             Pointer off_list_hdr_next = null;
             if (l.mode != MapLoader.Mode.RaymanArenaGC) off_list_hdr_next = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman3GC) {
+            if (Settings.s.hasLinkedListHeaderPointers) {
                 Pointer off_list_hdr_prev = Pointer.Read(reader);
                 Pointer off_list_hdr = Pointer.Read(reader);
             }
@@ -125,7 +125,7 @@ namespace OpenSpace {
                 State s = State.Read(reader, off_element, f, stateIndex++);
                 return s;
             });
-            if (Settings.s.engineMode == Settings.EngineMode.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 // (0x10 blocks: next, prev, list end, a3d pointer)
                 f.preloadAnim = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             }
@@ -140,7 +140,7 @@ namespace OpenSpace {
                 f.num_vector4s = reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-            if (Settings.s.engineMode == Settings.EngineMode.R2) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 f.animBank = reader.ReadByte();
                 reader.ReadByte();
@@ -168,7 +168,7 @@ namespace OpenSpace {
                     f.off_physical_lists[i] = Pointer.Current(reader);
                     Pointer off_list_hdr_next = null;
                     if(l.mode != MapLoader.Mode.RaymanArenaGC) off_list_hdr_next = Pointer.Read(reader);
-                    if (l.mode == MapLoader.Mode.Rayman3GC) {
+                    if (Settings.s.hasLinkedListHeaderPointers) {
                         Pointer off_list_hdr_prev = Pointer.Read(reader);
                         Pointer off_list_hdr = Pointer.Read(reader);
                     }
@@ -192,26 +192,27 @@ namespace OpenSpace {
                             Pointer off_po_scale = Pointer.Read(reader);
                             Pointer off_po = Pointer.Read(reader);
                             reader.ReadUInt32();
-                            reader.ReadUInt32();
+                            reader.ReadUInt16();
+                            reader.ReadUInt16();
                             uint lastvalue = reader.ReadUInt32();
-                            if (lastvalue != 0 && off_po != null) {
-
-                                Pointer curPos = Pointer.Goto(ref reader, off_po);
-                                PhysicalObject po = PhysicalObject.Read(reader, off_po);
+                            // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
+                            if (lastvalue != 0 || Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                                PhysicalObject po = null;
                                 Vector3? scaleMultiplier = null;
-                                if (off_po_scale != null) {
-                                    Pointer.Goto(ref reader, off_po_scale);
+                                Pointer.DoAt(ref reader, off_po, () => {
+                                    po = PhysicalObject.Read(reader, off_po);
+                                });
+                                Pointer.DoAt(ref reader, off_po_scale, () => {
                                     float x = reader.ReadSingle();
                                     float z = reader.ReadSingle();
                                     float y = reader.ReadSingle();
                                     scaleMultiplier = new Vector3(x, y, z);
-                                }
+                                });
                                 if (po != null) {
                                     f.physical_objects[i][j] = po;
                                     po.Gao.transform.parent = f.Gao.transform;
                                     po.scaleMultiplier = scaleMultiplier;
                                 }
-                                Pointer.Goto(ref reader, curPos);
                             }
                         }
                     }
