@@ -208,7 +208,6 @@ namespace OpenSpace {
                             lvlSna.ReadPTX(lvlPtxPath, null);
                         }
 
-
                         fixSna.CreatePointers();
                         lvlSna.CreatePointers();
 

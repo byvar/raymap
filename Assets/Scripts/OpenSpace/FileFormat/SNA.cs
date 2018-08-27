@@ -1,6 +1,8 @@
-﻿using System;
+﻿using lzo.net;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
@@ -66,11 +68,12 @@ namespace OpenSpace.FileFormat {
                 block.position = (uint)reader.BaseStream.Position;
                 block.module = reader.ReadByte();
                 block.id = reader.ReadByte();
-                if (Settings.s.engineVersion > Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
+                if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) block.unk1 = reader.ReadByte();
                 block.baseInMemory = reader.ReadInt32();
                 if (blocks.Count == 0) {
                     l.print("Initial block: " + block.module + "|" + block.id + " - base: " + block.baseInMemory);
                 }
+
 
                 // Initialize part
                 block.size = 0;
@@ -84,7 +87,7 @@ namespace OpenSpace.FileFormat {
                     szCounter += block.size;
                     if (Settings.s.engineVersion <= Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
                     block.dataPosition = (uint)reader.BaseStream.Position;
-                    reader.ReadBytes((int)block.size);
+                    ReadSNABlock(block);
                     block.pointerList = rtb.GetListForPart(block.module, block.id);
                     l.print("(" + block.module + "," + block.id + ") Base: " + block.baseInMemory + " - Size: " + block.size + " - 2:" + block.unk2 + " - 3:" + block.unk3 + " - 4:" + block.maxPosMinus9);
                     ushort ptrRelocationKey = GetRelocationKey(block);
@@ -113,6 +116,49 @@ namespace OpenSpace.FileFormat {
             //l.print("Size total: " + szCounter);
         }
 
+        void ReadSNABlock(SNAMemoryBlock block) {
+            if (block.size > 0) {
+                if (Settings.s.snaCompression) {
+                    uint isCompressed = reader.ReadUInt32();
+                    uint compressedSize = reader.ReadUInt32();
+                    uint compressedChecksum = reader.ReadUInt32();
+                    uint decompressedSize = reader.ReadUInt32();
+                    uint decompressedChecksum = reader.ReadUInt32();
+                    byte[] compressedData = reader.ReadBytes((int)compressedSize);
+                    byte[] uncompressedData = null;
+                    uint diff = 0;
+                    if (isCompressed != 0) {
+                        diff = decompressedSize - compressedSize;
+                        using (var compressedStream = new MemoryStream(compressedData))
+                        using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
+                        using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+                            uncompressedData = lzoReader.ReadBytes((int)block.size);
+                        }
+                    } else {
+                        diff = 0;
+                        using (var uncompressedStream = new MemoryStream(compressedData))
+                        using (Reader unCompressedReader = new Reader(uncompressedStream, Settings.s.IsLittleEndian)) {
+                            uncompressedData = unCompressedReader.ReadBytes((int)block.size);
+                        }
+                    }
+                    if (uncompressedData != null) {
+                        byte[] newData = new byte[data.Length + diff - 20];
+                        Array.Copy(data, newData, block.dataPosition);
+                        Array.Copy(uncompressedData, 0, newData, block.dataPosition, block.size);
+                        Array.Copy(data, block.dataPosition + 20 + compressedSize,
+                            newData, block.dataPosition + compressedSize + diff,
+                            data.Length - block.dataPosition - 20 - compressedSize);
+                        data = newData;
+                        reader.Close();
+                        reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+                        reader.BaseStream.Seek(block.dataPosition + compressedSize + diff, SeekOrigin.Begin);
+                    }
+                } else {
+                    reader.ReadBytes((int)block.size);
+                }
+            }
+        }
+
         public void ReadGPT(string path, RelocationTable rtp) {
             this.rtp = rtp;
             Stream gptStream = File.OpenRead(path);
@@ -126,7 +172,7 @@ namespace OpenSpace.FileFormat {
             data = data.Concat(gptData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
                 SNAMemoryBlock block = relocation_local[ptrRelocationKey];
                 block.pointerList = null;
@@ -161,7 +207,7 @@ namespace OpenSpace.FileFormat {
             reader.Close();
             reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
             ptx = new SNAMemoryBlock();
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 // It doesn't exist in Tonic Trouble
                 ushort ptrRelocationKey = GetRelocationKey(rtt.pointerBlocks[0]);
                 SNAMemoryBlock block = relocation_local[ptrRelocationKey];
@@ -188,13 +234,14 @@ namespace OpenSpace.FileFormat {
                     Reader cur_reader = block_global.sna.reader;
                     if (block_global.size > 0) {
                         foreach (RelocationPointerInfo info in ptrList.pointers) {
+                            //l.print(info.module + "," + info.id + "| " + info.offsetInMemory + " - " + block_local.baseInMemory + " - " + block_global.dataPosition + "|" + block_global.sna.name);
                             uint relativeAddress = info.offsetInMemory - (uint)block_local.baseInMemory;
                             cur_reader.BaseStream.Seek(block_global.dataPosition + relativeAddress, SeekOrigin.Begin);
                             uint ptrValue = cur_reader.ReadUInt32();
                             
                             ushort ptrRelocationKey = GetRelocationKey(info);
                             if (!l.relocation_global.ContainsKey(ptrRelocationKey)) {
-                                if (Settings.s.engineVersion > Settings.EngineVersion.TT || !(info.module == 0xFF && info.id == 0xFF)) {
+                                if (Settings.s.engineVersion > Settings.EngineVersion.Montreal || !(info.module == 0xFF && info.id == 0xFF)) {
                                     l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
                                 }
                             } else {
@@ -268,8 +315,20 @@ namespace OpenSpace.FileFormat {
                     int listIndex = 0;
                     for (uint i = 0; i < pf.size / 4; i++) {
                         uint ptrValue = reader.ReadUInt32();
-                        if (ptrList.pointers[listIndex].offsetInMemory == ptrValue) {
-                            RelocationPointerInfo info = ptrList.pointers[listIndex];
+                        RelocationPointerInfo info = null;
+                        if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                            foreach (RelocationPointerInfo info_new in ptrList.pointers) {
+                                if (info_new.offsetInMemory == ptrValue) {
+                                    info = info_new;
+                                    break;
+                                }
+                            }
+                        } else {
+                            if (ptrList.pointers[listIndex].offsetInMemory == ptrValue) {
+                                info = ptrList.pointers[listIndex];
+                            }
+                        }
+                        if (info != null) {
                             ushort ptrRelocationKey = GetRelocationKey(info);
                             SNAMemoryBlock ptr_block_local = relocation_local[ptrRelocationKey];
                             SNAMemoryBlock ptr_block_global = (ptr_block_local.size != 0) ? ptr_block_local : l.relocation_global[ptrRelocationKey];
@@ -281,8 +340,10 @@ namespace OpenSpace.FileFormat {
                             } else {
                                 l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
                             }
-                            listIndex++;
-                            if (listIndex >= ptrList.pointers.Length) break;
+                            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
+                                listIndex++;
+                                if (listIndex >= ptrList.pointers.Length) break;
+                            }
                         }
                     }
                 }

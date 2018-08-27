@@ -448,7 +448,7 @@ namespace OpenSpace.FileFormat {
                 strSize = reader.ReadUInt16();
             }
             string result = reader.ReadString(strSize);
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) result = result.Replace("GameData\\", "");
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) result = result.Replace("GameData\\", "");
             return result;
         }
 

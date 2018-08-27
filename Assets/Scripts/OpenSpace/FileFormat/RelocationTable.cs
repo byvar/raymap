@@ -1,6 +1,8 @@
-﻿using System;
+﻿using lzo.net;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
@@ -147,7 +149,9 @@ namespace OpenSpace.FileFormat {
             MapLoader l = MapLoader.Loader;
 
             byte count = reader.ReadByte();
-            if (Settings.s.game != Settings.Game.R2Demo && Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.game != Settings.Game.R2Demo
+                && Settings.s.game != Settings.Game.Hype
+                && Settings.s.engineVersion > Settings.EngineVersion.TT) {
                 reader.ReadUInt32();
             }
             pointerBlocks = new RelocationPointerList[count];
@@ -164,18 +168,45 @@ namespace OpenSpace.FileFormat {
                 //l.print("Module: " + parts[i].module + " - Block: " + parts[i].block);
                 pointerBlocks[i].count = reader.ReadUInt32();
                 pointerBlocks[i].pointers = new RelocationPointerInfo[pointerBlocks[i].count];
-                for (int j = 0; j < pointerBlocks[i].count; j++) {
-                    // One pointer info struct contains the address where the pointer is located and the module & block of the part it points to.
-                    // The address that it points to is to be read at address offsetInMemory.
-                    // The part's baseInMemory should be subtracted from it to get the offset relative to the part.
-                    pointerBlocks[i].pointers[j] = new RelocationPointerInfo();
-                    pointerBlocks[i].pointers[j].offsetInMemory = reader.ReadUInt32();
-                    pointerBlocks[i].pointers[j].module = reader.ReadByte();
-                    pointerBlocks[i].pointers[j].id = reader.ReadByte();
-                    if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-                        pointerBlocks[i].pointers[j].byte6 = reader.ReadByte();
-                        pointerBlocks[i].pointers[j].byte7 = reader.ReadByte();
+                if (pointerBlocks[i].count > 0) {
+                    if (Settings.s.snaCompression) {
+                        uint isCompressed = reader.ReadUInt32();
+                        uint compressedSize = reader.ReadUInt32();
+                        uint compressedChecksum = reader.ReadUInt32();
+                        uint decompressedSize = reader.ReadUInt32();
+                        uint decompressedChecksum = reader.ReadUInt32();
+                        byte[] compressedData = reader.ReadBytes((int)compressedSize);
+                        if (isCompressed != 0) {
+                            using (var compressedStream = new MemoryStream(compressedData))
+                            using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
+                            using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+                                ReadPointerBlock(lzoReader, pointerBlocks[i]);
+                            }
+                        } else {
+                            using (var uncompressedStream = new MemoryStream(compressedData))
+                            using (Reader unCompressedReader = new Reader(uncompressedStream, Settings.s.IsLittleEndian)) {
+                                ReadPointerBlock(unCompressedReader, pointerBlocks[i]);
+                            }
+                        }
+                    } else {
+                        ReadPointerBlock(reader, pointerBlocks[i]);
                     }
+                }
+            }
+        }
+
+        private void ReadPointerBlock(Reader reader, RelocationPointerList pointerBlock) {
+            for (int j = 0; j < pointerBlock.count; j++) {
+                // One pointer info struct contains the address where the pointer is located and the module & block of the part it points to.
+                // The address that it points to is to be read at address offsetInMemory.
+                // The part's baseInMemory should be subtracted from it to get the offset relative to the part.
+                pointerBlock.pointers[j] = new RelocationPointerInfo();
+                pointerBlock.pointers[j].offsetInMemory = reader.ReadUInt32();
+                pointerBlock.pointers[j].module = reader.ReadByte();
+                pointerBlock.pointers[j].id = reader.ReadByte();
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                    pointerBlock.pointers[j].byte6 = reader.ReadByte();
+                    pointerBlock.pointers[j].byte7 = reader.ReadByte();
                 }
             }
         }

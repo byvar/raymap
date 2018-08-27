@@ -21,7 +21,7 @@ namespace OpenSpace.Collide {
         public ushort num_mapping_entries;
 
         public GameMaterial gameMaterial;
-        public int[] vertex_indices = null;
+        public int[] triangles = null;
         public Vector3[] normals = null;
         public int[] mapping = null;
         public Vector2[] uvs = null;
@@ -50,20 +50,20 @@ namespace OpenSpace.Collide {
                 Vector2[] new_uvs = new Vector2[num_triangles * 3];
 
                 for (int j = 0; j < num_triangles * 3; j++) {
-                    new_vertices[j] = mesh.vertices[vertex_indices[j]];
+                    new_vertices[j] = mesh.vertices[triangles[j]];
                     new_normals[j] = normals[j/3];
                     if (uvs != null) new_uvs[j] = uvs[mapping[j]];
                 }
-                int[] triangles = new int[num_triangles * 3];
+                int[] new_triangles = new int[num_triangles * 3];
                 for (int j = 0; j < num_triangles; j++) {
-                    triangles[(j * 3) + 0] = (j * 3) + 0;
-                    triangles[(j * 3) + 1] = (j * 3) + 2;
-                    triangles[(j * 3) + 2] = (j * 3) + 1;
+                    new_triangles[(j * 3) + 0] = (j * 3) + 0;
+                    new_triangles[(j * 3) + 1] = (j * 3) + 2;
+                    new_triangles[(j * 3) + 2] = (j * 3) + 1;
                 }
                 Mesh meshUnity = new Mesh();
                 meshUnity.vertices = new_vertices;
                 meshUnity.normals = new_normals;
-                meshUnity.triangles = triangles;
+                meshUnity.triangles = new_triangles;
                 if (uvs != null) meshUnity.uv = new_uvs;
                 MeshFilter mf = gao.AddComponent<MeshFilter>();
                 mf.mesh = meshUnity;
@@ -121,11 +121,11 @@ namespace OpenSpace.Collide {
 
             if(sm.off_material != null) sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
             Pointer.Goto(ref reader, sm.off_triangles);
-            sm.vertex_indices = new int[sm.num_triangles * 3];
+            sm.triangles = new int[sm.num_triangles * 3];
             for (int j = 0; j < sm.num_triangles; j++) {
-                sm.vertex_indices[(j * 3) + 0] = reader.ReadInt16();
-                sm.vertex_indices[(j * 3) + 1] = reader.ReadInt16();
-                sm.vertex_indices[(j * 3) + 2] = reader.ReadInt16();
+                sm.triangles[(j * 3) + 0] = reader.ReadInt16();
+                sm.triangles[(j * 3) + 1] = reader.ReadInt16();
+                sm.triangles[(j * 3) + 2] = reader.ReadInt16();
             }
             Pointer.Goto(ref reader, sm.off_normals);
             sm.normals = new Vector3[sm.num_triangles];

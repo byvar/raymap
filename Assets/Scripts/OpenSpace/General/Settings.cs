@@ -7,11 +7,12 @@ using LinkedListType = OpenSpace.LinkedList.Type;
 namespace OpenSpace {
     public class Settings {
         public enum EngineVersion {
-            TT = 1,
+            TT = 0,
+            Montreal = 1,
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, R2, TT, R2Demo, DD };
+        public enum Game { R3, RA, R2, TT, R2Demo, DD, Hype };
         public enum Platform { PC, iOS, GC };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -31,6 +32,7 @@ namespace OpenSpace {
         public Encryption encryption = Encryption.None;
         public bool encryptPointerFiles = false;
         public bool hasLinkedListHeaderPointers = false;
+        public bool snaCompression = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -211,13 +213,14 @@ namespace OpenSpace {
         };
 
         public static Settings HypePC = new Settings() {
-            engineVersion = EngineVersion.TT,
-            game = Game.TT,
+            engineVersion = EngineVersion.Montreal,
+            game = Game.Hype,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
-            hasLinkedListHeaderPointers = true
+            hasLinkedListHeaderPointers = true,
+            snaCompression = true
         };
     }
 }
