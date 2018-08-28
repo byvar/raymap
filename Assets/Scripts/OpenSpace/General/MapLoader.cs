@@ -170,6 +170,7 @@ namespace OpenSpace {
                         DAT dat = null;
                         
                         string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
+                        string langDataPath = gameDataBinFolder + "../LangData/English/" + gameDsb.levelsDataPath + "/";
 
                         if (mode == Mode.Rayman2PC || mode == Mode.DonaldDuckPC) {
                             string dataPath = levelsFolder + "LEVELS0.DAT";
@@ -178,13 +179,23 @@ namespace OpenSpace {
                             }
                         }
 
+                        // FIX
                         string fixSnaPath = levelsFolder + "fix.sna";
                         RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
                         if (File.Exists(levelsFolder + lvlName + "/FixLvl.rtb")) {
                             // Fix -> Lvl pointers for Tonic Trouble
-                            fixRtb.Add(new RelocationTable(levelsFolder + lvlName + "/FixLvl.rtb", dat, lvlName, RelocationType.RTB));
+                            fixRtb.Add(new RelocationTable(levelsFolder + lvlName + "/FixLvl.rtb", dat, lvlName + "Fix", RelocationType.RTB));
                         }
                         SNA fixSna = new SNA("fix", fixSnaPath, fixRtb);
+                        if (Directory.Exists(langDataPath)) {
+                            string fixLangPath = langDataPath + "fix.lng";
+                            RelocationTable fixLangRTG = new RelocationTable(fixLangPath, dat, "fixLang", RelocationType.RTG);
+                            if (File.Exists(langDataPath + lvlName + "/FixLvl.rtg")) {
+                                fixLangRTG.Add(new RelocationTable(langDataPath + lvlName + "/FixLvl.rtg", dat, lvlName + "FixLang", RelocationType.RTG));
+                            }
+                            SNA fixLangSna = new SNA("fixLang", fixLangPath, fixLangRTG);
+                            fixSna.AddSNA(fixLangSna);
+                        }
                         string fixGptPath = levelsFolder + "fix.gpt";
                         RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
                         fixSna.ReadGPT(fixGptPath, fixRtp);
@@ -193,9 +204,21 @@ namespace OpenSpace {
                         RelocationTable fixRtt = new RelocationTable(fixPtxPath, dat, "fix", RelocationType.RTT);
                         fixSna.ReadPTX(fixPtxPath, fixRtt);
 
+                        if (File.Exists(levelsFolder + "fix.sda")) {
+                            fixSna.ReadSDA(levelsFolder + "fix.sda");
+                        }
+
+                        // LEVEL
                         string lvlSnaPath = levelsFolder + lvlName + "/" + lvlName + ".sna";
                         RelocationTable lvlRtb = new RelocationTable(lvlSnaPath, dat, lvlName, RelocationType.RTB);
                         SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
+                        if (Directory.Exists(langDataPath)) {
+                            string lvlLangPath = langDataPath + lvlName + "/" + lvlName + ".lng";
+                            RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
+                            SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
+                            lvlSna.AddSNA(lvlLangSna);
+                        }
+
                         string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
                         string lvlPtxPath = levelsFolder + lvlName + "/" + lvlName + ".ptx";
                         if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
@@ -207,6 +230,26 @@ namespace OpenSpace {
                             lvlSna.ReadGPT(lvlGptPath, null);
                             lvlSna.ReadPTX(lvlPtxPath, null);
                         }
+                        if (File.Exists(levelsFolder + lvlName + "/" + lvlName + ".sda")) {
+                            fixSna.ReadSDA(levelsFolder + lvlName + "/" + lvlName + ".sda");
+                        }
+                        
+                        /*if (Directory.Exists(langDataPath)) {
+                            string fixLangPath = langDataPath + "fix.lng";
+                            RelocationTable fixLangRTG = new RelocationTable(fixLangPath, dat, "fixLang", RelocationType.RTG);
+                            if (File.Exists(langDataPath + lvlName + "/FixLvl.rtg")) {
+                                // Fix -> Lvl pointers for Tonic Trouble
+                                fixLangRTG.Add(new RelocationTable(langDataPath + lvlName + "/FixLvl.rtg", dat, lvlName + "FixLang", RelocationType.RTG));
+                            }
+                            SNA fixLangSna = new SNA("fixLang", fixLangPath, fixLangRTG);
+                            files_array[3] = fixLangSna;
+                            string lvlLangPath = langDataPath + lvlName + "/" + lvlName + ".lng";
+                            RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
+                            SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
+                            files_array[4] = lvlLangSna;
+                            fixLangSna.CreatePointers();
+                            lvlLangSna.CreatePointers();
+                        }*/
 
                         fixSna.CreatePointers();
                         lvlSna.CreatePointers();
@@ -217,21 +260,25 @@ namespace OpenSpace {
 
                         fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
                         lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
-
-                        /*if (mode != Mode.Rayman2IOS) {
-                            if (!settings.isR2Demo) { // Normal Game
-                                cntPaths = new string[2];
-                                cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
-                                cntPaths[1] = gameDataBinFolder + "Textures.cnt";
-                                cnt = new CNT(cntPaths);
-                            } else { // R2 Demo
-                                cntPaths = new string[1];
-                                cntPaths[0] = gameDataBinFolder + "Textures.cnt";
-                                cnt = new CNT(cntPaths);
-                            }
+                        /*if (Directory.Exists(langDataPath)) {
+                            ((SNA)files_array[3]).CreateMemoryDump(langDataPath + "fix.lng.dmp", true);
+                            ((SNA)files_array[4]).CreateMemoryDump(langDataPath + lvlName + "/" + lvlName + ".lng.dmp", true);
                         }*/
 
-                        LoadFIXSNA();
+                            /*if (mode != Mode.Rayman2IOS) {
+                                if (!settings.isR2Demo) { // Normal Game
+                                    cntPaths = new string[2];
+                                    cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
+                                    cntPaths[1] = gameDataBinFolder + "Textures.cnt";
+                                    cnt = new CNT(cntPaths);
+                                } else { // R2 Demo
+                                    cntPaths = new string[1];
+                                    cntPaths[0] = gameDataBinFolder + "Textures.cnt";
+                                    cnt = new CNT(cntPaths);
+                                }
+                            }*/
+
+                            LoadFIXSNA();
                         LoadLVLSNA();
 
                         fixSna.Dispose();
@@ -860,31 +907,7 @@ namespace OpenSpace {
             Pointer off_current = Pointer.Current(reader);
             print("FIX GPT offset: " + off_current);
 
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-                Pointer off_identityMatrix = Pointer.Read(reader);
-                reader.ReadBytes(50 * 4);
-                uint matrixInStack = reader.ReadUInt32();
-                Pointer off_collisionGeoObj = Pointer.Read(reader);
-                Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
-                for (int i = 0; i < Settings.s.numEntryActions; i++) {
-                    Pointer.Read(reader); // 3DOS_EntryActions
-                }
-
-                Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
-                ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
-
-                inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-                print("Num entractions: " + inputStruct.num_entryActions);
-                print("Off entryactions: " + inputStruct.off_entryActions);
-                Pointer off_IPT_entryElementList = Pointer.Read(reader);
-                print("Off entryelements: " + off_IPT_entryElementList);
-                fontStruct = FontStructure.Read(reader, Pointer.Current(reader)); // FON_g_stGeneral
-                off_current = Pointer.Current(reader);
-                animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
-                animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];
-                print("Fix animation bank: " + off_current);
-                Pointer off_fixInfo = Pointer.Read(reader);
-            } else {
+            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                 // Tonic Trouble
                 uint stringCount = (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
                 Pointer.Read(reader);
@@ -910,7 +933,7 @@ namespace OpenSpace {
                 reader.ReadUInt32(); // 1
                 reader.ReadUInt32(); // ???
                 Pointer.Read(reader);
-                
+
                 for (int i = 0; i < stringCount; i++) Pointer.Read(reader); // read num_loaded_strings pointers here
 
                 reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
@@ -935,6 +958,45 @@ namespace OpenSpace {
                 reader.ReadUInt32(); // 0, so can be pointer too
                 reader.ReadBytes(0x30);
                 reader.ReadBytes(0x960);
+            } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                Pointer.Read(reader);
+                Pointer off_mainLight = Pointer.Read(reader);
+                uint lpPerformanceCount = reader.ReadUInt32();
+                Pointer.Read(reader);
+                Pointer off_defaultMaterial = Pointer.Read(reader);
+                Pointer off_geometricObject1 = Pointer.Read(reader);
+                Pointer off_geometricObject2 = Pointer.Read(reader);
+                Pointer off_geometricObject3 = Pointer.Read(reader);
+                reader.ReadBytes(0x90); // FON_ related
+                reader.ReadBytes(0x3D54); // FON_ related
+                for (int i = 0; i < 100; i++) Pointer.Read(reader); // matrix in stack
+                uint matrixInStack = reader.ReadUInt32(); // number of matrix in stack
+                reader.ReadBytes(0xC);
+                reader.ReadBytes(0x20);
+            } else {
+                Pointer off_identityMatrix = Pointer.Read(reader);
+                reader.ReadBytes(50 * 4);
+                uint matrixInStack = reader.ReadUInt32();
+                Pointer off_collisionGeoObj = Pointer.Read(reader);
+                Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
+                for (int i = 0; i < Settings.s.numEntryActions; i++) {
+                    Pointer.Read(reader); // 3DOS_EntryActions
+                }
+
+                Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+                ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
+
+                inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+                print("Num entractions: " + inputStruct.num_entryActions);
+                print("Off entryactions: " + inputStruct.off_entryActions);
+                Pointer off_IPT_entryElementList = Pointer.Read(reader);
+                print("Off entryelements: " + off_IPT_entryElementList);
+                fontStruct = FontStructure.Read(reader, Pointer.Current(reader)); // FON_g_stGeneral
+                off_current = Pointer.Current(reader);
+                animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
+                animationBanks[0] = AnimationBank.Read(reader, off_current, 0, 1, files_array[Mem.FixKeyFrames])[0];
+                print("Fix animation bank: " + off_current);
+                Pointer off_fixInfo = Pointer.Read(reader);
             }
 
             // Read PTX

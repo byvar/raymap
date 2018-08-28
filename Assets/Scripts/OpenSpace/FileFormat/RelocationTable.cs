@@ -26,7 +26,11 @@ namespace OpenSpace.FileFormat {
         RTP = 1,
         RTS = 2,
         RTT = 3,
-        RTL = 4
+        // ^ in Rayman 2 | v Not in Rayman 2
+        RTL = 4,
+        RTD = 5,
+        RTG = 6,
+        RTV = 7
     }
 
     public class RelocationTableReference {
@@ -62,6 +66,12 @@ namespace OpenSpace.FileFormat {
                     newPath = Path.ChangeExtension(path, "rtt"); break;
                 case RelocationType.RTL:
                     newPath = Path.ChangeExtension(path, "rtl"); break;
+                case RelocationType.RTD:
+                    newPath = Path.ChangeExtension(path, "rtd"); break;
+                case RelocationType.RTG:
+                    newPath = Path.ChangeExtension(path, "rtg"); break;
+                case RelocationType.RTV:
+                    newPath = Path.ChangeExtension(path, "rtv"); break;
             }
             this.path = newPath;
             if (File.Exists(newPath)) {

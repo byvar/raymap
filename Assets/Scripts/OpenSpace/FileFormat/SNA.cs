@@ -36,6 +36,7 @@ namespace OpenSpace.FileFormat {
         RelocationTable rtt;
         SNAMemoryBlock gpt;
         SNAMemoryBlock ptx;
+        SNAMemoryBlock sda;
         int tmpModule = 10;
 
         public SNA(string name, string path, RelocationTable rtb) : this(name, File.OpenRead(path), rtb) {
@@ -87,6 +88,8 @@ namespace OpenSpace.FileFormat {
                     szCounter += block.size;
                     if (Settings.s.engineVersion <= Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
                     block.dataPosition = (uint)reader.BaseStream.Position;
+                    //l.print("(" + block.module + "," + block.id + ") Base: " + block.baseInMemory + " - Size: " + block.size + " - 2:" + block.unk2 + " - 3:" + block.unk3 + " - 4:" + block.maxPosMinus9);
+
                     ReadSNABlock(block);
                     block.pointerList = rtb.GetListForPart(block.module, block.id);
                     l.print("(" + block.module + "," + block.id + ") Base: " + block.baseInMemory + " - Size: " + block.size + " - 2:" + block.unk2 + " - 3:" + block.unk3 + " - 4:" + block.maxPosMinus9);
@@ -116,7 +119,48 @@ namespace OpenSpace.FileFormat {
             //l.print("Size total: " + szCounter);
         }
 
+        public void AddSNA(SNA sna) {
+            sna.Dispose();
+            uint snaOffset = (uint)data.Length;
+            AppendData(sna.data);
+            rtb.Add(sna.rtb);
+            foreach (SNAMemoryBlock block in sna.blocks) {
+                block.sna = this;
+                block.pointerList = rtb.GetListForPart(block.module, block.id);
+                block.dataPosition += snaOffset;
+                block.position += snaOffset;
+                blocks.Add(block);
+                ushort ptrRelocationKey = GetRelocationKey(block);
+                if (relocation_local.ContainsKey(ptrRelocationKey)) {
+                    if (block.size != 0) relocation_local[ptrRelocationKey] = block;
+                } else relocation_local[ptrRelocationKey] = block;
+
+            }
+        }
+
+        private void AppendData(byte[] other) {
+            bool reading = false;
+            uint readerOffset = 0;
+            if (reader != null) {
+                reading = true;
+                readerOffset = (uint)reader.BaseStream.Position;
+            }
+            int oldLength = data.Length;
+            /*byte[] newData = new byte[data.Length + other.Length];
+            Array.Copy(data, newData, data.Length);
+            Array.Copy(other, 0, newData, data.Length, other.Length);
+            data = newData;*/
+            Array.Resize(ref data, oldLength + other.Length);
+            Array.Copy(other, 0, data, oldLength, other.Length);
+            if (reading) {
+                reader.Close();
+                reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+                reader.BaseStream.Seek(readerOffset, SeekOrigin.Begin);
+            }
+        }
+
         void ReadSNABlock(SNAMemoryBlock block) {
+            MapLoader l = MapLoader.Loader;
             if (block.size > 0) {
                 if (Settings.s.snaCompression) {
                     uint isCompressed = reader.ReadUInt32();
@@ -124,14 +168,23 @@ namespace OpenSpace.FileFormat {
                     uint compressedChecksum = reader.ReadUInt32();
                     uint decompressedSize = reader.ReadUInt32();
                     uint decompressedChecksum = reader.ReadUInt32();
+                    //l.print(isCompressed + " - " + compressedSize + " - " + decompressedSize);
                     byte[] compressedData = reader.ReadBytes((int)compressedSize);
                     byte[] uncompressedData = null;
                     uint diff = 0;
                     if (isCompressed != 0) {
                         diff = decompressedSize - compressedSize;
+
+                        /*LZOCompressor lzo = new LZOCompressor();
+                        uncompressedData = lzo.Decompress(compressedData);
+                        using (var uncompressedStream = new MemoryStream(uncompressedData))
+                        using (Reader unCompressedReader = new Reader(uncompressedStream, Settings.s.IsLittleEndian)) {
+                            uncompressedData = unCompressedReader.ReadBytes((int)block.size);
+                        }*/
                         using (var compressedStream = new MemoryStream(compressedData))
                         using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
                         using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+                            lzo.SetLength(decompressedSize);
                             uncompressedData = lzoReader.ReadBytes((int)block.size);
                         }
                     } else {
@@ -144,6 +197,7 @@ namespace OpenSpace.FileFormat {
                     if (uncompressedData != null) {
                         byte[] newData = new byte[data.Length + diff - 20];
                         Array.Copy(data, newData, block.dataPosition);
+                        //l.print(uncompressedData.Length);
                         Array.Copy(uncompressedData, 0, newData, block.dataPosition, block.size);
                         Array.Copy(data, block.dataPosition + 20 + compressedSize,
                             newData, block.dataPosition + compressedSize + diff,
@@ -169,9 +223,7 @@ namespace OpenSpace.FileFormat {
                 gptData = gptReader.ReadBytes((int)gptStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", gptData);
-            data = data.Concat(gptData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
-            reader.Close();
-            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+            AppendData(gptData);
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
                 SNAMemoryBlock block = relocation_local[ptrRelocationKey];
@@ -193,6 +245,21 @@ namespace OpenSpace.FileFormat {
             //R3Loader.Loader.print("Base " + block.baseInMemory + " - Size: " + block.size);
         }
 
+        public void ReadSDA(string path) {
+            Stream sdaStream = File.OpenRead(path);
+            uint sdaOffset = (uint)data.Length;
+            byte[] sdaData = null;
+            using (Reader sdaReader = new Reader(sdaStream, Settings.s.IsLittleEndian)) {
+                sdaData = sdaReader.ReadBytes((int)sdaStream.Length);
+            }
+            AppendData(sdaData);
+            sda = new SNAMemoryBlock();
+            sda.dataPosition = sdaOffset;
+            sda.position = sdaOffset;
+            sda.size = (uint)sdaData.Length;
+            sda.sna = this;
+        }
+
         public void ReadPTX(string path, RelocationTable rtt) {
             this.rtt = rtt;
             Stream ptxStream = File.OpenRead(path);
@@ -203,9 +270,7 @@ namespace OpenSpace.FileFormat {
                 ptxData = ptxReader.ReadBytes((int)ptxStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", ptxData);
-            data = data.Concat(ptxData).ToArray(); //Array.Resize(ref data, (int)(data.Length + gptData.Length));
-            reader.Close();
-            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+            AppendData(ptxData);
             ptx = new SNAMemoryBlock();
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 // It doesn't exist in Tonic Trouble
@@ -228,6 +293,7 @@ namespace OpenSpace.FileFormat {
             MapLoader l = MapLoader.Loader;
             foreach (RelocationPointerList ptrList in rtb.pointerBlocks) {
                 ushort ptrListRelocationKey = GetRelocationKey(ptrList);
+
                 if (l.relocation_global.ContainsKey(ptrListRelocationKey)) {
                     SNAMemoryBlock block_local = relocation_local[ptrListRelocationKey];
                     SNAMemoryBlock block_global = (block_local.size != 0) ? block_local : l.relocation_global[ptrListRelocationKey];
@@ -245,6 +311,7 @@ namespace OpenSpace.FileFormat {
                                     l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
                                 }
                             } else {
+                                //l.print("SNA block (" + ptrList.module + "," + ptrList.id + ")" + " - " + "Info block (" + info.module + "," + info.id + ")");
                                 SNAMemoryBlock ptr_block_local = relocation_local[ptrRelocationKey];
                                 SNAMemoryBlock ptr_block_global = (ptr_block_local.size != 0) ? ptr_block_local : l.relocation_global[ptrRelocationKey];
                                 if (ptr_block_global != null && ptr_block_local != null && ptr_block_local.baseInMemory != -1) {
@@ -301,8 +368,8 @@ namespace OpenSpace.FileFormat {
                     }
                 }
             }
-            RelocatePointerFile(gpt, rtp); // Now for the Global Pointer Table
-            RelocatePointerFile(ptx, rtt); // Now for the PTX
+            if(gpt != null) RelocatePointerFile(gpt, rtp); // Now for the Global Pointer Table
+            if(ptx != null) RelocatePointerFile(ptx, rtt); // Now for the PTX
             GotoHeader();
 
         }
@@ -404,6 +471,12 @@ namespace OpenSpace.FileFormat {
         public void GotoPTX() {
             if (reader != null) {
                 reader.BaseStream.Seek(ptx.dataPosition, SeekOrigin.Begin);
+            }
+        }
+
+        public void GotoSDA() {
+            if (reader != null && sda != null) {
+                reader.BaseStream.Seek(sda.dataPosition, SeekOrigin.Begin);
             }
         }
 

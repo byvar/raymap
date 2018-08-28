@@ -102,6 +102,20 @@ namespace lzo.net
             {
                 throw new Exception();
             }
+            if (Instruction >= 18) {
+                int num_literals = Instruction - 17;
+                // Need different decoding
+                DecodedBuffer = new byte[num_literals];
+                Copy(DecodedBuffer, 0, num_literals);
+                if (Instruction <= 21) {
+                    State = (LzoState)(num_literals);
+                } else {
+                    State = LzoState.LargeCopy;
+                }
+                Instruction = Source.ReadByte();
+                if (Instruction == -1)
+                    throw new EndOfStreamException();
+            }
         }
 
         private void Copy(byte[] buffer, int offset, int count)
