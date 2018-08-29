@@ -34,9 +34,11 @@ namespace OpenSpace.FileFormat {
         RelocationTable rtb;
         RelocationTable rtp;
         RelocationTable rtt;
+        RelocationTable rtd;
         SNAMemoryBlock gpt;
         SNAMemoryBlock ptx;
         SNAMemoryBlock sda;
+        SNAMemoryBlock dlg;
         int tmpModule = 10;
 
         public SNA(string name, string path, RelocationTable rtb) : this(name, File.OpenRead(path), rtb) {
@@ -145,12 +147,12 @@ namespace OpenSpace.FileFormat {
                 reading = true;
                 readerOffset = (uint)reader.BaseStream.Position;
             }
-            int oldLength = data.Length;
+            uint oldLength = (uint)data.Length;
             /*byte[] newData = new byte[data.Length + other.Length];
             Array.Copy(data, newData, data.Length);
             Array.Copy(other, 0, newData, data.Length, other.Length);
             data = newData;*/
-            Array.Resize(ref data, oldLength + other.Length);
+            Array.Resize(ref data, (int)(oldLength + other.Length));
             Array.Copy(other, 0, data, oldLength, other.Length);
             if (reading) {
                 reader.Close();
@@ -224,24 +226,46 @@ namespace OpenSpace.FileFormat {
             }
             //Util.ByteArrayToFile(path + ".dmp", gptData);
             AppendData(gptData);
+            SNAMemoryBlock block;
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
-                SNAMemoryBlock block = relocation_local[ptrRelocationKey];
-                block.pointerList = null;
-                block.dataPosition = gptOffset;
-                block.size = (uint)gptData.Length;
-                block.isGpt = true;
-                gpt = block;
+                block = relocation_local[ptrRelocationKey];
             } else {
                 // Tonic Trouble LVL
-                SNAMemoryBlock block = new SNAMemoryBlock();
-                block.pointerList = null;
-                block.dataPosition = gptOffset;
-                block.size = (uint)gptData.Length;
-                block.isGpt = true;
-                gpt = block;
+                block = new SNAMemoryBlock();
             }
+            block.pointerList = null;
+            block.dataPosition = gptOffset;
+            block.size = (uint)gptData.Length;
+            block.isGpt = true;
+            gpt = block;
             headerOffset = gpt.dataPosition;
+            //R3Loader.Loader.print("Base " + block.baseInMemory + " - Size: " + block.size);
+        }
+
+        public void ReadDLG(string path, RelocationTable rtd) {
+            this.rtd = rtd;
+            Stream dlgStream = File.OpenRead(path);
+            uint dlgOffset = (uint)data.Length;
+            byte[] dlgData = null;
+            using (Reader dlgReader = new Reader(dlgStream, Settings.s.IsLittleEndian)) {
+                int maskBytes = Settings.s.encryptPointerFiles ? dlgReader.InitMask() : 0;
+                dlgData = dlgReader.ReadBytes((int)dlgStream.Length - maskBytes);
+            }
+            //Util.ByteArrayToFile(path + ".dmp", gptData);
+            AppendData(dlgData);
+            SNAMemoryBlock block;
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+                ushort ptrRelocationKey = GetRelocationKey(rtd.pointerBlocks[0]);
+                block = relocation_local[ptrRelocationKey];
+            } else {
+                block = new SNAMemoryBlock();
+            }
+            block.pointerList = null;
+            block.dataPosition = dlgOffset;
+            block.size = (uint)dlgData.Length;
+            block.isGpt = true;
+            dlg = block;
             //R3Loader.Loader.print("Base " + block.baseInMemory + " - Size: " + block.size);
         }
 
@@ -368,8 +392,9 @@ namespace OpenSpace.FileFormat {
                     }
                 }
             }
-            if(gpt != null) RelocatePointerFile(gpt, rtp); // Now for the Global Pointer Table
-            if(ptx != null) RelocatePointerFile(ptx, rtt); // Now for the PTX
+            if (gpt != null) RelocatePointerFile(gpt, rtp); // Now for the Global Pointer Table
+            if (ptx != null) RelocatePointerFile(ptx, rtt); // Now for the PTX
+            if (dlg != null) RelocatePointerFile(dlg, rtd); // Now for the DLG
             GotoHeader();
 
         }
@@ -477,6 +502,12 @@ namespace OpenSpace.FileFormat {
         public void GotoSDA() {
             if (reader != null && sda != null) {
                 reader.BaseStream.Seek(sda.dataPosition, SeekOrigin.Begin);
+            }
+        }
+
+        public void GotoDLG() {
+            if (reader != null && dlg != null) {
+                reader.BaseStream.Seek(dlg.dataPosition, SeekOrigin.Begin);
             }
         }
 

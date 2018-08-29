@@ -22,15 +22,15 @@ namespace OpenSpace.FileFormat {
     }
 
     public enum RelocationType {
-        RTB = 0,
-        RTP = 1,
-        RTS = 2,
-        RTT = 3,
+        RTB = 0, // SNA
+        RTP = 1, // Pointer file (GPT)
+        RTS = 2, // Sound
+        RTT = 3, // Texture file (PTX)
         // ^ in Rayman 2 | v Not in Rayman 2
         RTL = 4,
-        RTD = 5,
-        RTG = 6,
-        RTV = 7
+        RTD = 5, // Language pointer file (DLG)
+        RTG = 6, // Language-specific SNA blocks (lng)
+        RTV = 7  // Video?
     }
 
     public class RelocationTableReference {

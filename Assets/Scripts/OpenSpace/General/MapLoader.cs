@@ -195,6 +195,10 @@ namespace OpenSpace {
                             }
                             SNA fixLangSna = new SNA("fixLang", fixLangPath, fixLangRTG);
                             fixSna.AddSNA(fixLangSna);
+
+                            string fixDlgPath = langDataPath + "fix.dlg";
+                            RelocationTable fixRtd = new RelocationTable(fixDlgPath, dat, "fixLang", RelocationType.RTD);
+                            fixSna.ReadDLG(fixDlgPath, fixRtd);
                         }
                         string fixGptPath = levelsFolder + "fix.gpt";
                         RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
@@ -217,6 +221,10 @@ namespace OpenSpace {
                             RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
                             SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
                             lvlSna.AddSNA(lvlLangSna);
+
+                            string lvlDlgPath = langDataPath + lvlName + "/" + lvlName + ".dlg";
+                            RelocationTable lvlRtd = new RelocationTable(lvlDlgPath, dat, lvlName + "Lang", RelocationType.RTD);
+                            lvlSna.ReadDLG(lvlDlgPath, lvlRtd);
                         }
 
                         string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
@@ -231,7 +239,7 @@ namespace OpenSpace {
                             lvlSna.ReadPTX(lvlPtxPath, null);
                         }
                         if (File.Exists(levelsFolder + lvlName + "/" + lvlName + ".sda")) {
-                            fixSna.ReadSDA(levelsFolder + lvlName + "/" + lvlName + ".sda");
+                            lvlSna.ReadSDA(levelsFolder + lvlName + "/" + lvlName + ".sda");
                         }
                         
                         /*if (Directory.Exists(langDataPath)) {
@@ -959,6 +967,28 @@ namespace OpenSpace {
                 reader.ReadBytes(0x30);
                 reader.ReadBytes(0x960);
             } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                SNA sna = (SNA)files_array[Mem.Fix];
+
+                // SDA
+                sna.GotoSDA();
+                print(Pointer.Current(reader));
+                reader.ReadUInt32();
+                reader.ReadUInt32(); // same as next
+                uint num_strings = reader.ReadUInt32();
+                uint indexOfTextGlobal = reader.ReadUInt32(); // dword_6EEE78
+                uint dword_83EC58 = reader.ReadUInt32();
+                print(num_strings + " - " + Pointer.Current(reader));
+                
+                // DLG
+                sna.GotoDLG();
+                Pointer off_strings = Pointer.Read(reader);
+                for (int i = 0; i < num_strings; i++) {
+                    Pointer.Read(reader);
+                }
+                reader.ReadUInt32();
+
+                // GPT
+                sna.GotoHeader();
                 Pointer.Read(reader);
                 Pointer off_mainLight = Pointer.Read(reader);
                 uint lpPerformanceCount = reader.ReadUInt32();
@@ -973,6 +1003,40 @@ namespace OpenSpace {
                 uint matrixInStack = reader.ReadUInt32(); // number of matrix in stack
                 reader.ReadBytes(0xC);
                 reader.ReadBytes(0x20);
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                Pointer.Read(reader);
+                Pointer.Read(reader);
+                for (int i = 0; i < num_strings; i++) {
+                    Pointer.Read(reader);
+                }
+                LinkedList<int> fontDefinitions = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
+                Pointer.Read(reader);
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                Pointer off_geometricObject4 = Pointer.Read(reader);
+                Pointer off_geometricObject5 = Pointer.Read(reader);
+                Pointer off_geometricObject6 = Pointer.Read(reader);
+                Pointer off_visualmaterial1 = Pointer.Read(reader);
+                Pointer off_visualmaterial2 = Pointer.Read(reader);
+                for (int i = 0; i < 10; i++) {
+                    Pointer off_texture = Pointer.Read(reader);
+                }
+                Pointer off_visualmaterial3 = Pointer.Read(reader);
+                Pointer off_gamematerial = Pointer.Read(reader);
+                uint geometricElementIndexGlobal = reader.ReadUInt32();
+                Pointer off_texture2 = Pointer.Read(reader);
+                Pointer off_geometricObject7 = Pointer.Read(reader);
+                for (uint i = 0; i < 7; i++) {
+                    Pointer.Read(reader); // Material for stencils. Order: corner, border, center, side, redarrow, bullet, and another one
+                }
+                Pointer dword_5DCB9C = Pointer.Read(reader);
+
+                // Now comes INV_fn_vSnaMultilanguageLoading
+
+
+                print(Pointer.Current(reader));
             } else {
                 Pointer off_identityMatrix = Pointer.Read(reader);
                 reader.ReadBytes(50 * 4);
@@ -1022,6 +1086,7 @@ namespace OpenSpace {
                             if (gf != null) textures[i].Texture = gf.GetTexture();
                         }
                     } else {
+                        //print(textures[i].name);
                         GF gf = cnt.GetGFByTGAName(textures[i].name);
                         if (gf != null) textures[i].Texture = gf.GetTexture();
                     }

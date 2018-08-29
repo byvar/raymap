@@ -137,7 +137,7 @@ namespace OpenSpace.Visual {
 
         public static TextureInfo Read(Reader reader, Pointer offset) {
             TextureInfo tex = new TextureInfo(offset);
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 //MapLoader.Loader.print("Tex off: " + offset);
                 tex.field0 = reader.ReadUInt32(); // 888 or 8888
                 tex.field4 = reader.ReadUInt16(); // 20
@@ -171,6 +171,12 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                }
                 tex.height = (ushort)reader.ReadUInt32();
                 tex.width = (ushort)reader.ReadUInt32();
                 reader.ReadUInt32();

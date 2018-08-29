@@ -174,9 +174,11 @@ namespace OpenSpace.FileFormat.Texture {
         }
 
         public GF GetGFByTGAName(string tgaName) {
-            FileStruct file = fileList.FirstOrDefault(f => f.TGAName.ToLower().Equals(tgaName.ToLower()));
+            FileStruct file = fileList.FirstOrDefault(f => f.TGAName.ToLower().Replace('/', '\\').Equals(tgaName.ToLower().Replace('/','\\')));
             if (file == null) return null;
-            return new GF(GetFileBytes(file));
+            byte[] bytes = GetFileBytes(file);
+            //Util.ByteArrayToFile("textures/" + file.FullName, bytes);
+            return new GF(bytes);
         }
 
         public void Dispose() {

@@ -30,27 +30,20 @@ Channel pixel = color value
 namespace OpenSpace.FileFormat.Texture {
     public class GF {
         public uint width, height;
+        public byte channels;
+        public byte repeatByte;
         public uint format;
         public uint channelPixels;
         public bool isTransparent = false;
         public bool isLittleEndian = true;
         public Color[] pixels;
 
-        public GF(byte[] bytes) : this(new MemoryStream(bytes)) { }
-        /*public GF3(byte[] bytes) {
-            ByteArrayToFile("hi.lol", bytes);
-        }*/
-
-        /*public bool ByteArrayToFile(string fileName, byte[] byteArray) {
-            try {
-                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write)) {
-                    fs.Write(byteArray, 0, byteArray.Length);
-                    return true;
-                }
-            } catch (Exception ex) {
-                Console.WriteLine("Exception caught in process: {0}", ex);
-                return false;
-            }
+        public GF(byte[] bytes) : this(new MemoryStream(bytes)) {}
+        /*public GF(byte[] bytes) {
+            Util.ByteArrayToFile("hi" + bytes.Length + ".lol", bytes);
+            GF gf = new GF(new MemoryStream(bytes));
+            pixels = gf.pixels;
+            //throw new Exception("exported");
         }*/
 
         public GF(string filePath) : this(File.OpenRead(filePath)) { }
@@ -58,15 +51,19 @@ namespace OpenSpace.FileFormat.Texture {
         public GF(Stream stream) {
             MapLoader l = MapLoader.Loader;
             Reader r = new Reader(stream, isLittleEndian);
-
-            format = 8888;
-            if(Settings.s.platform != Settings.Platform.iOS) format = r.ReadUInt32();
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                byte version = r.ReadByte();
+                format = 565;
+            } else {
+                format = 8888;
+                if (Settings.s.platform != Settings.Platform.iOS) format = r.ReadUInt32();
+            }
 
             width = r.ReadUInt32();
             height = r.ReadUInt32();
             channelPixels = width * height;
 
-            byte channels = r.ReadByte();
+            channels = r.ReadByte();
             byte enlargeByte = 0;
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) enlargeByte = r.ReadByte();
             uint w = width, h = height;
@@ -76,9 +73,22 @@ namespace OpenSpace.FileFormat.Texture {
                 w /= 2;
                 h /= 2;
             }
+            repeatByte = r.ReadByte();
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                ushort fieldB = r.ReadUInt16();
+                byte fieldD = r.ReadByte();
+                r.ReadByte();
+                r.ReadByte();
+                r.ReadByte();
+                r.ReadUInt32();
+                r.ReadUInt32(); // channelpixels?
+                if (fieldB != 0 && fieldD != 0) {
+                    r.ReadBytes(fieldD * fieldB);
+                }
+                r.ReadByte();
+            }
 
             pixels = new Color[width * height];
-            byte repeatByte = r.ReadByte();
             byte[] blue_channel = null, green_channel = null, red_channel = null, alpha_channel = null;
 
             if (channels >= 3) {
@@ -141,6 +151,16 @@ namespace OpenSpace.FileFormat.Texture {
                             blue_channel[i] = (byte)((blue / 31.0f) * 255.0f);
                             break;
                     }
+                }
+            } else if (channels == 1) {
+                byte[] channel_1 = ReadChannel(r, repeatByte, channelPixels);
+                red_channel = new byte[channelPixels];
+                green_channel = new byte[channelPixels];
+                blue_channel = new byte[channelPixels];
+                for (int i = 0; i < channelPixels; i++) {
+                    red_channel[i] = channel_1[i];
+                    blue_channel[i] = channel_1[i];
+                    green_channel[i] = channel_1[i];
                 }
             }
             for (int i = 0; i < width * height; i++) {
