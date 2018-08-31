@@ -109,7 +109,7 @@ namespace OpenSpace.Visual {
             SpriteElement s = new SpriteElement(offset, m);
             s.name = "Sprite @ pos " + offset;
             
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.off_sprites = Pointer.Read(reader);
                 s.num_sprites = reader.ReadUInt16();
                 reader.ReadInt16(); // -1
@@ -126,11 +126,11 @@ namespace OpenSpace.Visual {
                 s.sprites = new IndexedSprite[s.num_sprites];
                 for (uint i = 0; i < s.num_sprites; i++) {
                     s.sprites[i] = new IndexedSprite();
-                    if (Settings.s.engineVersion <= Settings.EngineVersion.TT) reader.ReadUInt32();
+                    if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) reader.ReadUInt32();
                     s.sprites[i].off_info = Pointer.Read(reader);
                     s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
-                    if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                    if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                         s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                         s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                         s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());

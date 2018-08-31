@@ -73,7 +73,7 @@ namespace OpenSpace {
                 s.off_cine_mapname = Pointer.Read(reader);
                 s.off_cine_name = Pointer.Read(reader);
             }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadByte();

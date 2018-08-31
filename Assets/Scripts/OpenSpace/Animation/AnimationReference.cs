@@ -32,32 +32,37 @@ namespace OpenSpace.Animation {
             MapLoader l = MapLoader.Loader;
             AnimationReference ar = new AnimationReference(offset);
             if (Settings.s.hasNames) ar.name = new string(reader.ReadChars(0x50));
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) reader.ReadUInt32();
-            ar.num_onlyFrames = reader.ReadUInt16();
-            ar.speed = reader.ReadByte();
-            ar.num_channels = reader.ReadByte();
-            ar.off_events = Pointer.Read(reader);
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                ar.x = reader.ReadSingle();
-                ar.y = reader.ReadSingle();
-                ar.z = reader.ReadSingle();
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                l.print(offset);
+                //ar.off_a3d = Pointer.Read(reader);
+            } else {
+                if (Settings.s.engineVersion <= Settings.EngineVersion.TT) reader.ReadUInt32();
+                ar.num_onlyFrames = reader.ReadUInt16();
+                ar.speed = reader.ReadByte();
+                ar.num_channels = reader.ReadByte();
+                ar.off_events = Pointer.Read(reader);
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    ar.x = reader.ReadSingle();
+                    ar.y = reader.ReadSingle();
+                    ar.z = reader.ReadSingle();
+                }
+                ar.off_morphData = Pointer.Read(reader);
+                if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                }
+                ar.anim_index = reader.ReadUInt16();
+                ar.num_events = reader.ReadByte();
+                ar.transition = reader.ReadByte();
+
+                if (Settings.s.engineVersion == Settings.EngineVersion.R2) reader.ReadUInt32(); // no idea what this is sadly
+                if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                    ar.off_a3d = Pointer.Read(reader);
+                }
             }
-            ar.off_morphData = Pointer.Read(reader);
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-            }
-            ar.anim_index = reader.ReadUInt16();
-            ar.num_events = reader.ReadByte();
-            ar.transition = reader.ReadByte();
-            
-            if (Settings.s.engineVersion == Settings.EngineVersion.R2) reader.ReadUInt32(); // no idea what this is sadly
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
-                Pointer off_a3d = Pointer.Read(reader);
-                Pointer.DoAt(ref reader, off_a3d, () => {
-                    ar.a3d = AnimA3DGeneral.ReadFull(reader, off_a3d);
-                });
-            }
+            Pointer.DoAt(ref reader, ar.off_a3d, () => {
+                ar.a3d = AnimA3DGeneral.ReadFull(reader, ar.off_a3d);
+            });
             return ar;
         }
 

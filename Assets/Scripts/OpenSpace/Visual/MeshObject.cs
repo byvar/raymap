@@ -74,7 +74,7 @@ namespace OpenSpace.Visual {
         public static MeshObject Read(Reader reader, PhysicalObject po, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             MeshObject m = new MeshObject(po, offset);
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_vertices = (ushort)reader.ReadUInt32();
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
             m.off_vertices = Pointer.Read(reader);
             m.off_normals = Pointer.Read(reader);
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
@@ -85,13 +85,13 @@ namespace OpenSpace.Visual {
             if (l.mode != MapLoader.Mode.RaymanArenaGC) {
                 reader.ReadInt32();
             }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_subblocks = (ushort)reader.ReadUInt32();
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();
             m.off_subblock_types = Pointer.Read(reader);
             m.off_subblocks = Pointer.Read(reader);
             reader.ReadInt32();
             reader.ReadInt32();
             reader.ReadInt32();
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
                     reader.ReadInt32();
                     reader.ReadInt32();

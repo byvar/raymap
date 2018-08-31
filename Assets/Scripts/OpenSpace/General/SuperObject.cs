@@ -186,7 +186,7 @@ namespace OpenSpace {
 
         public static Type GetSOType(uint typeCode) {
             Type type = Type.Unknown;
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 switch (typeCode) {
                     case 0x1: type = Type.World; break;
                     case 0x2: type = Type.Perso; break;

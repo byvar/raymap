@@ -84,7 +84,7 @@ namespace OpenSpace.EngineObject {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
             s.name = "Sector @ " + offset;
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 Pointer off_collideObj = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_collideObj, () => {
                     //CollideMeshObject collider = CollideMeshObject.Read(reader, off_collideObj);
@@ -110,7 +110,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
@@ -124,7 +124,7 @@ namespace OpenSpace.EngineObject {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
 
                 reader.ReadUInt32();
@@ -139,6 +139,12 @@ namespace OpenSpace.EngineObject {
                     l.print(s.name);
                 }
             } else {
+                if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                }
                 reader.ReadUInt32();
                 Pointer off_name = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_name, () => {

@@ -103,6 +103,9 @@ namespace OpenSpace.Collide {
                 sm.off_mapping = Pointer.Read(reader);
                 sm.off_normals = Pointer.Read(reader);
                 sm.off_uvs = Pointer.Read(reader);
+                if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                    reader.ReadUInt32();
+                }
                 Pointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
                 reader.ReadUInt16(); // num_unk
                 reader.ReadUInt16();

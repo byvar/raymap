@@ -313,6 +313,8 @@ namespace OpenSpace.Visual {
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
+            } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                reader.ReadUInt32();
             }
             sm.off_vertex_indices = Pointer.Read(reader);
             sm.num_vertex_indices = reader.ReadUInt16();

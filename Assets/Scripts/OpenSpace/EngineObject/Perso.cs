@@ -106,13 +106,13 @@ namespace OpenSpace.EngineObject {
                 Pointer.Goto(ref reader, off_current);
             }
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset);
-            if (p.off_dynam != null && Settings.s.game != Settings.Game.TT) {
+            if (p.off_dynam != null && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_dynam);
                 p.dynam = Dynam.Read(reader, p.off_dynam);
                 Pointer.Goto(ref reader, off_current);
             }
 
-            if (p.off_brain != null && Settings.s.game != Settings.Game.TT) {
+            if (p.off_brain != null && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_brain);
                 p.brain = Brain.Read(reader, p.off_brain);
                 if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.nameModel != null) p.brain.mind.AI_model.name = p.nameModel;
@@ -213,7 +213,7 @@ namespace OpenSpace.EngineObject {
                 }
             }
 
-            if (p.off_collSet!=null && Settings.s.game != Settings.Game.TT) {
+            if (p.off_collSet!=null && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 Pointer.Goto(ref reader, p.off_collSet);
                 p.collset = CollSet.Read(reader, p, p.off_collSet);
             }

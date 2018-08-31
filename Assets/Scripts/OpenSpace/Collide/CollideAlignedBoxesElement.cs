@@ -75,7 +75,7 @@ namespace OpenSpace.Collide {
         public static CollideAlignedBoxesElement Read(Reader reader, Pointer offset, CollideMeshObject m) {
             MapLoader l = MapLoader.Loader;
             CollideAlignedBoxesElement s = new CollideAlignedBoxesElement(offset, m);
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.off_boxes = Pointer.Read(reader);
                 s.num_boxes = reader.ReadUInt16();
                 reader.ReadInt16(); // -1

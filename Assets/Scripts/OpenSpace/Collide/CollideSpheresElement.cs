@@ -74,7 +74,7 @@ namespace OpenSpace.Collide {
         public static CollideSpheresElement Read(Reader reader, Pointer offset, CollideMeshObject m) {
             MapLoader l = MapLoader.Loader;
             CollideSpheresElement s = new CollideSpheresElement(offset, m);
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.off_spheres = Pointer.Read(reader);
                 s.num_spheres = reader.ReadUInt16();
                 reader.ReadInt16(); // -1
@@ -88,7 +88,7 @@ namespace OpenSpace.Collide {
                 s.spheres = new IndexedSphere[s.num_spheres];
                 for (uint i = 0; i < s.num_spheres; i++) {
                     s.spheres[i] = new IndexedSphere();
-                    if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                    if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                         s.spheres[i].radius = reader.ReadSingle();
                         s.spheres[i].off_material = Pointer.Read(reader);
                         s.spheres[i].centerPoint = reader.ReadUInt16();

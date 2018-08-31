@@ -50,14 +50,14 @@ namespace OpenSpace.Collide {
                 m.num_subblocks = reader.ReadUInt16();
                 reader.ReadUInt32();
             }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_vertices = (ushort)reader.ReadUInt32();
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
             m.off_vertices = Pointer.Read(reader);
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 m.off_normals = Pointer.Read(reader);
                 Pointer.Read(reader);
                 reader.ReadInt32();
             }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) m.num_subblocks = (ushort)reader.ReadUInt32();
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();
             m.off_subblock_types = Pointer.Read(reader);
             m.off_subblocks = Pointer.Read(reader);
             Pointer.Read(reader);
@@ -69,7 +69,7 @@ namespace OpenSpace.Collide {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();
             }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 reader.ReadInt32();
                 reader.ReadInt32();
             }

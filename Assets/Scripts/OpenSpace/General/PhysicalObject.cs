@@ -89,7 +89,7 @@ namespace OpenSpace {
                     Pointer off_LODDistances = Pointer.Read(reader);
                     Pointer off_LODDataOffsets = Pointer.Read(reader);
                     reader.ReadUInt32(); // always 0?
-                    reader.ReadUInt32(); // always 0?
+                    if(Settings.s.engineVersion > Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0?
                     po.visualSet = new VisualSetLOD[numberOfLOD];
                     for (uint i = 0; i < numberOfLOD; i++) {
                         po.visualSet[i] = new VisualSetLOD();
