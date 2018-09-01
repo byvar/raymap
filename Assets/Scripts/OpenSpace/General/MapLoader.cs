@@ -765,7 +765,6 @@ namespace OpenSpace {
                 Pointer unk_first = Pointer.Read(reader);
                 Pointer unk_last = Pointer.Read(reader);
             }
-
             uint num_visual_materials = reader.ReadUInt32();
             Pointer off_array_visual_materials = Pointer.Read(reader);
             if (mode == Mode.Rayman3PC || mode == Mode.Rayman3GC || mode == Mode.RaymanArenaPC) {
@@ -793,14 +792,14 @@ namespace OpenSpace {
             }
 
             // Parse materials list
-            off_current = Pointer.Goto(ref reader, off_array_visual_materials);
-            for (uint i = 0; i < num_visual_materials; i++) {
-                Pointer off_material = Pointer.Read(reader);
-                Pointer off_current_mat = Pointer.Goto(ref reader, off_material);
-                visualMaterials.Add(VisualMaterial.Read(reader, off_material));
-                Pointer.Goto(ref reader, off_current_mat);
-            }
-            Pointer.Goto(ref reader, off_current);
+            Pointer.DoAt(ref reader, off_array_visual_materials, () => {
+                for (uint i = 0; i < num_visual_materials; i++) {
+                    Pointer off_material = Pointer.Read(reader);
+                    Pointer.DoAt(ref reader, off_material, () => {
+                        visualMaterials.Add(VisualMaterial.Read(reader, off_material));
+                    });
+                }
+            });
 
             if (hasTransit) {
                 Pointer startPointer = new Pointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
@@ -880,7 +879,7 @@ namespace OpenSpace {
             }
             // Load additional animation banks
             for (int i = 0; i < families.Count; i++) {
-                if (families[i].animBank > 4 && objectTypes[0][families[i].family_index].id != 0xFF) {
+                if (families[i] != null && families[i].animBank > 4 && objectTypes[0][families[i].family_index].id != 0xFF) {
                     int animBank = families[i].animBank;
                     string animName = "Anim/ani" + objectTypes[0][families[i].family_index].id.ToString();
                     string kfName = "Anim/key" + objectTypes[0][families[i].family_index].id.ToString() + "kf";
