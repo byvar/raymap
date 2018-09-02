@@ -178,7 +178,8 @@ namespace OpenSpace.FileFormat.Texture {
             if (file == null) return null;
             byte[] bytes = GetFileBytes(file);
             //Util.ByteArrayToFile("textures/" + file.FullName, bytes);
-            return new GF(bytes);
+            GF gf = new GF(bytes);
+            return gf;
         }
 
         public void Dispose() {

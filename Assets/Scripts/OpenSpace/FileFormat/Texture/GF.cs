@@ -34,8 +34,16 @@ namespace OpenSpace.FileFormat.Texture {
         public byte repeatByte;
         public uint format;
         public uint channelPixels;
+        public byte byte1;
+        public byte byte2;
+        public byte byte3;
+        public uint num4;
         public bool isTransparent = false;
         public bool isLittleEndian = true;
+        public byte montrealType;
+        public ushort paletteNumColors;
+        public byte paletteBytesPerColor;
+        public byte[] palette = null;
         public Color[] pixels;
 
         public GF(byte[] bytes) : this(new MemoryStream(bytes)) {}
@@ -53,7 +61,7 @@ namespace OpenSpace.FileFormat.Texture {
             Reader r = new Reader(stream, isLittleEndian);
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 byte version = r.ReadByte();
-                format = 565;
+                format = 1555;
             } else {
                 format = 8888;
                 if (Settings.s.platform != Settings.Platform.iOS) format = r.ReadUInt32();
@@ -75,17 +83,24 @@ namespace OpenSpace.FileFormat.Texture {
             }
             repeatByte = r.ReadByte();
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-                ushort fieldB = r.ReadUInt16();
-                byte fieldD = r.ReadByte();
-                r.ReadByte();
-                r.ReadByte();
-                r.ReadByte();
-                r.ReadUInt32();
-                r.ReadUInt32(); // channelpixels?
-                if (fieldB != 0 && fieldD != 0) {
-                    r.ReadBytes(fieldD * fieldB);
+                paletteNumColors = r.ReadUInt16();
+                paletteBytesPerColor = r.ReadByte();
+                byte1 = r.ReadByte();
+                byte2 = r.ReadByte();
+                byte3 = r.ReadByte();
+                num4 = r.ReadUInt32();
+                channelPixels = r.ReadUInt32(); // Hype has mipmaps
+                montrealType = r.ReadByte();
+                if (paletteNumColors != 0 && paletteBytesPerColor != 0) {
+                    palette = r.ReadBytes(paletteBytesPerColor * paletteNumColors);
                 }
-                r.ReadByte();
+                switch (montrealType) {
+                    case 5: format = 0; break; // palette
+                    case 10: format = 565; break; // unsure
+                    case 11: format = 1555; break;
+                    case 12: format = 4444; break; // unsure
+                    default: throw new Exception("unknown Montreal GF format " + montrealType + "!");
+                }
             }
 
             pixels = new Color[width * height];
@@ -108,7 +123,6 @@ namespace OpenSpace.FileFormat.Texture {
                 blue_channel = new byte[channelPixels];
                 alpha_channel = new byte[channelPixels];
                 if (format == 1555) isTransparent = true;
-
                 for (int i = 0; i < channelPixels; i++) {
                     ushort pixel = BitConverter.ToUInt16(new byte[] { channel_1[i], channel_2[i] }, 0); // RRRRR, GGGGGG, BBBBB (565)
                     uint red, green, blue, alpha;
@@ -158,9 +172,15 @@ namespace OpenSpace.FileFormat.Texture {
                 green_channel = new byte[channelPixels];
                 blue_channel = new byte[channelPixels];
                 for (int i = 0; i < channelPixels; i++) {
-                    red_channel[i] = channel_1[i];
-                    blue_channel[i] = channel_1[i];
-                    green_channel[i] = channel_1[i];
+                    if (palette != null) {
+                        red_channel[i] = palette[channel_1[i] * paletteBytesPerColor + 2];
+                        green_channel[i] = palette[channel_1[i] * paletteBytesPerColor + 1];
+                        blue_channel[i] = palette[channel_1[i] * paletteBytesPerColor + 0];
+                    } else {
+                        red_channel[i] = channel_1[i];
+                        blue_channel[i] = channel_1[i];
+                        green_channel[i] = channel_1[i];
+                    }
                 }
             }
             for (int i = 0; i < width * height; i++) {
