@@ -12,6 +12,7 @@ namespace OpenSpace {
         public Pointer offset;
         public UInt32 type;
         public Matrix4x4 m;
+        public Matrix4x4? scaleMatrix;
         public Vector4 v;
 
         public Matrix(Pointer offset, uint type, Matrix4x4 matrix, Vector4 vec) {
@@ -20,6 +21,17 @@ namespace OpenSpace {
             this.m = matrix;
             this.v = vec;
         }
+
+        public static Matrix Identity {
+            get {
+                return new Matrix(null, 0, Matrix4x4.identity, Vector4.one);
+            }
+        }
+
+        public void SetScaleMatrix(Matrix4x4 scaleMatrix) {
+            this.scaleMatrix = scaleMatrix;
+        }
+
         public Vector3 GetPosition(bool convertAxes = false) {
             if (convertAxes) {
                 return new Vector3(m[0, 3], m[2, 3], m[1, 3]);
@@ -29,10 +41,18 @@ namespace OpenSpace {
         }
         
         public Vector3 GetScale(bool convertAxes = false) {
-            if (convertAxes) {
-                return new Vector3(m.GetColumn(0).magnitude, m.GetColumn(2).magnitude, m.GetColumn(1).magnitude);
+            if (scaleMatrix.HasValue) {
+                if (convertAxes) {
+                    return new Vector3(scaleMatrix.Value.GetColumn(0).magnitude, scaleMatrix.Value.GetColumn(2).magnitude, scaleMatrix.Value.GetColumn(1).magnitude);
+                } else {
+                    return new Vector3(scaleMatrix.Value.GetColumn(0).magnitude, scaleMatrix.Value.GetColumn(1).magnitude, scaleMatrix.Value.GetColumn(2).magnitude);
+                }
             } else {
-                return new Vector3(m.GetColumn(0).magnitude, m.GetColumn(1).magnitude, m.GetColumn(2).magnitude);
+                if (convertAxes) {
+                    return new Vector3(m.GetColumn(0).magnitude, m.GetColumn(2).magnitude, m.GetColumn(1).magnitude);
+                } else {
+                    return new Vector3(m.GetColumn(0).magnitude, m.GetColumn(1).magnitude, m.GetColumn(2).magnitude);
+                }
             }
         }
 
@@ -177,34 +197,108 @@ namespace OpenSpace {
         public static Matrix Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             UInt32 type = reader.ReadUInt32(); // 0x02: always at the start of a transformation matrix
-            Matrix4x4 transMatrix = new Matrix4x4();
-            Vector4 vec;
+            Matrix mat = new Matrix(offset, type, new Matrix4x4(), Vector4.one);
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                transMatrix.SetColumn(3, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f));
-                Vector4 colX1 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);
-                Vector4 colY1 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);
-                Vector4 colZ1 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);
-                Vector4 colX2 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);
-                Vector4 colY2 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);
-                Vector4 colZ2 = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f);
-                if (type != 4) {
-                    transMatrix.SetColumn(0, colX1);
-                    transMatrix.SetColumn(1, colY1);
-                    transMatrix.SetColumn(2, colZ1);
+                Vector3 pos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                mat.m.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+                mat.m.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+                mat.m.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+                mat.m.SetColumn(3, new Vector4(pos.x, pos.y, pos.z, 1f));
+                //Matrix rotM = new Matrix(offset, type, rotMatrix, vec);
+
+                Matrix4x4 sclMatrix = new Matrix4x4();
+                sclMatrix.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+                sclMatrix.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+                sclMatrix.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+                sclMatrix.SetColumn(3, new Vector4(0, 0, 0, 1f));
+                mat.SetScaleMatrix(sclMatrix);
+
+                /*if (type != 4) {
+                    transMatrix.SetColumn(0, rotColX);
+                    transMatrix.SetColumn(1, rotColY);
+                    transMatrix.SetColumn(2, rotColZ);
                 } else {
-                    transMatrix.SetColumn(0, colX2);
-                    transMatrix.SetColumn(1, colY2);
-                    transMatrix.SetColumn(2, colZ2);
-                }
-                vec = new Vector4(1f, 1f, 1f, 1f);
+                    transMatrix.SetColumn(0, sclColX);
+                    transMatrix.SetColumn(1, sclColY);
+                    transMatrix.SetColumn(2, sclColZ);
+                }*/
             } else {
-                transMatrix.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
-                transMatrix.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
-                transMatrix.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
-                transMatrix.SetColumn(3, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
-                vec = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                mat.m.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+                mat.m.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+                mat.m.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+                mat.m.SetColumn(3, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+                mat.v = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             }
-            return new Matrix(offset, type, transMatrix, vec);
+            return mat;
+        }
+
+        public static Matrix ReadCompressed(Reader reader, Pointer offset) {
+            MapLoader l = MapLoader.Loader;
+            ushort type = reader.ReadUInt16();
+            Vector4 vec = new Vector4(1f, 1f, 1f, 1f);
+            Vector3? pos = null;
+            Quaternion? rot = null;
+            Matrix4x4? sclM = null;
+            float x, y, z, w;
+            /*the first byte & 0xF is the type
+            1: translation
+            2: rotation only
+            3: translation & rotation
+            7: translation, rotation, zoom (1 word, conv to float). zoom is basically scale for all axes
+            11: translation, rotation, scale per axis (3 words, conv to float)
+            15: translation, rotation, scale (6 words, conv to float)*/
+            int actualType = type < 128 ? (type & 0xF) : 128;
+            if (actualType == 1 || actualType == 3 || actualType == 7 || actualType == 11 || actualType == 15) {
+                // Translation
+                x = (float)reader.ReadInt16() / (float)512;
+                y = (float)reader.ReadInt16() / (float)512;
+                z = (float)reader.ReadInt16() / (float)512;
+                pos = new Vector3(x, y, z);
+            }
+            if (actualType == 2 || actualType == 3 || actualType == 7 || actualType == 11 || actualType == 15) {
+                // Rotation
+                w = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+                x = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+                y = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+                z = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+                //rot = new Quaternion(x, y, z, w);
+                //rot = Quaternion.Euler(rot.Value.eulerAngles);
+                Animation.Component.AnimQuaternion q = new Animation.Component.AnimQuaternion();
+                q.quaternion = new Quaternion(x, y, z, w);
+                Matrix rotM = q.ToMatrix();
+                rot = rotM.GetRotation(convertAxes: false);
+            }
+            if (actualType == 7) {
+                // Zoom scale
+                x = (float)reader.ReadInt16() / (float)256;
+                sclM = Matrix4x4.Scale(new Vector3(x,x,x));
+            } else if (actualType == 11) {
+                // Axial scale
+                x = (float)reader.ReadInt16() / (float)256;
+                y = (float)reader.ReadInt16() / (float)256;
+                z = (float)reader.ReadInt16() / (float)256;
+                sclM = Matrix4x4.Scale(new Vector3(x,y,z));
+            } else if (actualType == 15) {
+                // Matrix scale
+                float m0 = (float)reader.ReadInt16() / (float)256;
+                float m1 = (float)reader.ReadInt16() / (float)256;
+                float m2 = (float)reader.ReadInt16() / (float)256;
+                float m3 = (float)reader.ReadInt16() / (float)256;
+                float m4 = (float)reader.ReadInt16() / (float)256;
+                float m5 = (float)reader.ReadInt16() / (float)256;
+                sclM = new Matrix4x4();
+                sclM.Value.SetColumn(0, new Vector4(m0, m1, m2, 0f));
+                sclM.Value.SetColumn(1, new Vector4(m1, m3, m4, 0f));
+                sclM.Value.SetColumn(2, new Vector4(m2, m4, m5, 0f));
+                sclM.Value.SetColumn(3, new Vector4(0f, 0f, 0f, 1f));
+            }
+            if (!pos.HasValue) pos = Vector3.zero;
+            if (!rot.HasValue) rot = Quaternion.identity;
+            Matrix mat = new Matrix(offset, type, Matrix4x4.TRS(pos.Value, rot.Value, Vector3.one), vec);
+            if (sclM.HasValue) {
+                mat.SetScaleMatrix(sclM.Value);
+            }
+            return mat;
         }
 
         // For writing

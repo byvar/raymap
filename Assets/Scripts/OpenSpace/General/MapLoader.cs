@@ -76,6 +76,7 @@ namespace OpenSpace {
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
         public List<AnimationReference> animationReferences = new List<AnimationReference>();
+        public List<AnimationMontreal> animationReferencesMontreal = new List<AnimationMontreal>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
         public GameObject graphRoot = null;
         public GameObject isolateWaypointRoot = null;
@@ -1138,7 +1139,7 @@ namespace OpenSpace {
                 Pointer.Read(reader);
                 reader.ReadUInt32();
             }
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
                 // Fill in fix -> lvl pointers for perso's in fix
                 uint num_persoInFixPointers = reader.ReadUInt32();
                 Pointer[] persoInFixPointers = new Pointer[num_persoInFixPointers];
@@ -1409,7 +1410,13 @@ namespace OpenSpace {
             // Parse actual world & always structure
             ReadFamilies(reader);
 
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                animationBanks = new AnimationBank[2];
+                animationBanks[0] = new AnimationBank(null) {
+                    animations = new Animation.Component.AnimA3DGeneral[0]
+                };
+                animationBanks[1] = animationBanks[0];
+            } else if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                 uint maxAnimIndex = 0;
                 foreach (State s in states) {
                     if (s.anim_ref != null && s.anim_ref.anim_index > maxAnimIndex) maxAnimIndex = s.anim_ref.anim_index;

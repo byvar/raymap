@@ -2,6 +2,7 @@
 using OpenSpace.AI;
 using OpenSpace.Animation;
 using OpenSpace.Animation.Component;
+using OpenSpace.Animation.ComponentMontreal;
 using OpenSpace.EngineObject;
 using OpenSpace.Visual;
 using OpenSpace.Visual.Deform;
@@ -30,6 +31,7 @@ public class PersoBehaviour : MonoBehaviour {
 
     // Animation
     public AnimA3DGeneral a3d = null;
+    public AnimationMontreal animMontreal = null;
     bool forceAnimUpdate = false;
     public uint currentFrame = 0;
     public bool playAnimation = true;
@@ -253,6 +255,19 @@ public class PersoBehaviour : MonoBehaviour {
 
                 //AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
                 print("POs offset: " + perso.p3dData.family.off_physical_list_first);
+            } else if (animMontreal != null) {
+                print("POs offset: " + perso.p3dData.family.off_physical_list_first + " - Length: " + perso.p3dData.family.physical_objects[0].Length);
+                for (int i = 0; i < animMontreal.num_channels; i++) {
+                    for (int j = 0; j < animMontreal.num_frames; j++) {
+                        print("Frame " + j + " ch " + i + ": "
+                            + animMontreal.frames[j].channels[i].objectIndex + " - "
+                            + animMontreal.frames[j].channels[i].unk2 + " - "
+                            + animMontreal.frames[j].channels[i].unk3 + " - "
+                            + animMontreal.frames[j].channels[i].unkByte1 + " - "
+                            + animMontreal.frames[j].channels[i].unkByte2 + " - "
+                            + animMontreal.frames[j].channels[i].unkUint);
+                    }
+                }
             } else if (state != null) {
                 MapLoader l = MapLoader.Loader;
                 ushort anim_index = 0;
@@ -286,13 +301,20 @@ public class PersoBehaviour : MonoBehaviour {
             anim_index = state.anim_ref.anim_index;
             bank_index = perso.p3dData.family.animBank;
         }
-        if (state.anim_ref != null
+        if (state.anim_refMontreal != null) {
+            a3d = null;
+            animationSpeed = state.speed;
+            //animationSpeed = state.speed;
+            InitAnimationMontreal(state.anim_refMontreal);
+            UpdateFrame(currentFrame);
+        } else if (state.anim_ref != null
             && l.animationBanks != null
             && l.animationBanks.Length > bank_index
             && l.animationBanks[bank_index] != null
             && l.animationBanks[bank_index].animations != null
             && l.animationBanks[bank_index].animations.Length > anim_index
             && l.animationBanks[bank_index].animations[anim_index] != null) {
+            animMontreal = null;
             animationSpeed = state.speed;
             //animationSpeed = state.speed;
             InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
@@ -338,27 +360,31 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
+    void DeinitAnimation() {
+        loaded = false;
+        // Destroy currently loaded subobjects
+        if (subObjects != null) {
+            for (int i = 0; i < subObjects.Length; i++) {
+                if (subObjects[i] == null) continue;
+                for (int j = 0; j < subObjects[i].Length; j++) {
+                    if (subObjects[i][j] != null) subObjects[i][j].Destroy();
+                }
+            }
+            subObjects = null;
+        }
+        if (channelObjects != null) {
+            for (int i = 0; i < channelObjects.Length; i++) {
+                if (channelObjects[i] != null) Destroy(channelObjects[i]);
+            }
+            channelObjects = null;
+        }
+        channelIDDictionary.Clear();
+    }
+
     void InitAnimation(AnimA3DGeneral a3d) {
         if (a3d != this.a3d || forceAnimUpdate) {
             forceAnimUpdate = false;
-            loaded = false;
-            // Destroy currently loaded subobjects
-            if (subObjects != null) {
-                for (int i = 0; i < subObjects.Length; i++) {
-                    if (subObjects[i] == null) continue;
-                    for (int j = 0; j < subObjects[i].Length; j++) {
-                        if (subObjects[i][j] != null) subObjects[i][j].Destroy();
-                    }
-                }
-                subObjects = null;
-            }
-            if (channelObjects != null) {
-                for (int i = 0; i < channelObjects.Length; i++) {
-                    if (channelObjects[i] != null) Destroy(channelObjects[i]);
-                }
-                channelObjects = null;
-            }
-            channelIDDictionary.Clear();
+            DeinitAnimation();
             // Init animation
             this.a3d = a3d;
             currentFrame = 0;
@@ -417,6 +443,62 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
+    void InitAnimationMontreal(AnimationMontreal animMontreal) {
+        if (animMontreal != this.animMontreal || forceAnimUpdate) {
+            forceAnimUpdate = false;
+            DeinitAnimation();
+            // Init animation
+            this.animMontreal = animMontreal;
+            currentFrame = 0;
+            if (animMontreal != null) {
+                //animationSpeed = a3d.speed;
+                // Init channels & subobjects
+                subObjects = new PhysicalObject[animMontreal.num_channels][];
+                channelObjects = new GameObject[animMontreal.num_channels];
+                for (int i = 0; i < animMontreal.num_channels; i++) {
+                    channelObjects[i] = new GameObject("Channel " + i);
+                    channelObjects[i].transform.SetParent(perso.Gao.transform);
+
+                    subObjects[i] = new PhysicalObject[animMontreal.num_frames];
+                    List<short> listOfNTTOforChannel = new List<short>();
+                    for (int j = 0; j < animMontreal.num_frames; j++) {
+                        AnimFrameMontreal of = animMontreal.frames[j];
+                        if (!listOfNTTOforChannel.Contains(of.channels[i].objectIndex)) {
+                            listOfNTTOforChannel.Add(of.channels[i].objectIndex);
+                        }
+                    }
+                    for (int k = 0; k < listOfNTTOforChannel.Count; k++) {
+                        PhysicalObject subObj = null;
+                        short object_index = listOfNTTOforChannel[k];
+                        if (object_index == -1) {
+                            subObj = new PhysicalObject(null);
+                            subObj.Gao.transform.parent = channelObjects[i].transform;
+                            subObj.Gao.name = "[" + i + "] Invisible PO";
+                            subObj.Gao.SetActive(false);
+                        } else {
+                            if (perso.p3dData.physical_objects != null && perso.p3dData.physical_objects.Length > object_index) {
+                                PhysicalObject o = perso.p3dData.physical_objects[object_index];
+                                if (o != null) {
+                                    subObj = o.Clone();
+                                    subObj.Gao.transform.parent = channelObjects[i].transform;
+                                    subObj.Gao.name = "[" + i + "] " + subObj.Gao.name;
+                                    subObj.Gao.SetActive(false);
+                                }
+                            }
+                        }
+                        for (int j = 0; j < animMontreal.num_frames; j++) {
+                            AnimFrameMontreal of = animMontreal.frames[j];
+                            if (of.channels[i].objectIndex == object_index) {
+                                subObjects[i][j] = subObj;
+                            }
+                        }
+                    }
+                }
+            }
+            loaded = true;
+        }
+    }
+
     void UpdateFrame(uint currentFrame) {
         if (loaded && a3d != null && channelObjects != null & subObjects != null) {
             // First pass: reset TRS for all sub objects
@@ -433,7 +515,7 @@ public class PersoBehaviour : MonoBehaviour {
                     subObjects[i][j].Gao.transform.parent = c.transform;
                     subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
                     subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
-                    subObjects[i][j].Gao.transform.localScale = 
+                    subObjects[i][j].Gao.transform.localScale =
                         subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
                     subObjects[i][j].Gao.SetActive(false);
                 }
@@ -443,7 +525,7 @@ public class PersoBehaviour : MonoBehaviour {
             for (int i = of.start_hierarchies_for_frame;
                 i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
                 AnimHierarchy h = a3d.hierarchies[i];
-                
+
                 if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                     channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
                 } else {
@@ -551,8 +633,10 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
             }
-            this.currentFrame = (currentFrame+1) % a3d.num_onlyFrames;
-        } /*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
+            this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
+        } else if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
+            UpdateFrameMontreal(currentFrame);
+        }/*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
             for (int i = 0; i < perso.physical_objects.Length; i++) {
                 if (perso.physical_objects[i] != null) {
                     GameObject poGao = perso.physical_objects[i].Gao;
@@ -565,6 +649,71 @@ public class PersoBehaviour : MonoBehaviour {
                 }
             }
         }*/
+    }
+
+    void UpdateFrameMontreal(uint currentFrame) {
+        if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
+            // First pass: reset TRS for all sub objects
+            for (int i = 0; i < channelObjects.Length; i++) {
+                GameObject c = channelObjects[i];
+                if (c != null) {
+                    c.transform.SetParent(perso.Gao.transform);
+                    c.transform.localPosition = Vector3.zero;
+                    c.transform.localEulerAngles = Vector3.zero;
+                    c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
+                }
+                /*HashSet<PhysicalObject> subObjSet = new HashSet<PhysicalObject>(subObjects[i]);
+                foreach(PhysicalObject subObj in subObjSet) {
+                    if (subObj == null) continue;
+                    subObj.Gao.transform.parent = c.transform;
+                    subObj.Gao.transform.localPosition = Vector3.zero;
+                    subObj.Gao.transform.localEulerAngles = Vector3.zero;
+                    subObj.Gao.transform.localScale =
+                        subObj.scaleMultiplier.HasValue ? subObj.scaleMultiplier.Value : Vector3.one;
+                    subObj.Gao.SetActive(false);
+                }*/
+                for (int j = 0; j < subObjects[i].Length; j++) {
+                    if (subObjects[i][j] == null) continue;
+                    subObjects[i][j].Gao.transform.parent = c.transform;
+                    subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
+                    subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
+                    subObjects[i][j].Gao.transform.localScale =
+                        subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
+                    subObjects[i][j].Gao.SetActive(false);
+                }
+            }
+            AnimFrameMontreal of = animMontreal.frames[currentFrame];
+            // Create hierarchy for this frame
+            if (of.hierarchies != null) {
+                for (int i = 0; i < of.hierarchies.Length; i++) {
+                    AnimHierarchy h = of.hierarchies[i];
+                    channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
+                }
+            }
+            // Final pass
+            for (int i = 0; i < animMontreal.num_channels; i++) {
+                AnimChannelMontreal ch = of.channels[i];
+                PhysicalObject physicalObject = subObjects[i][currentFrame];
+                Vector3 vector, scale;
+                Quaternion quaternion;
+                if (ch.matrix != null) {
+                    vector = ch.matrix.GetPosition(convertAxes: true);
+                    quaternion = ch.matrix.GetRotation(convertAxes: true);
+                    scale = ch.matrix.GetScale(convertAxes: true);
+                } else {
+                    vector = Vector3.zero;
+                    quaternion = Quaternion.identity;
+                    scale = Vector3.one;
+                }
+                //float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
+
+                if (physicalObject != null) physicalObject.Gao.SetActive(true);
+                channelObjects[i].transform.localPosition = vector;// * positionMultiplier;
+                channelObjects[i].transform.localRotation = quaternion;
+                channelObjects[i].transform.localScale = scale;
+            }
+            this.currentFrame = (currentFrame + 1) % animMontreal.num_frames;
+        }
     }
 
     List<int> GetChannelByID(short id) {

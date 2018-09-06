@@ -22,7 +22,8 @@ namespace OpenSpace {
         public string cine_name = null;
         public byte speed;
         public Pointer off_state_auto; // Go to this state after a while if nothing changes
-        public AnimationReference anim_ref;
+        public AnimationReference anim_ref = null;
+        public AnimationMontreal anim_refMontreal = null;
         public MechanicsIDCard mechanicsIDCard;
 
         public Pointer NextEntry {
@@ -98,7 +99,11 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, s.off_cine_name);
                 s.cine_name = reader.ReadNullDelimitedString();
             }
-            s.anim_ref = AnimationReference.FromOffsetOrRead(s.off_anim_ref, reader);
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                s.anim_refMontreal = AnimationMontreal.FromOffsetOrRead(s.off_anim_ref, reader);
+            } else {
+                s.anim_ref = AnimationReference.FromOffsetOrRead(s.off_anim_ref, reader);
+            }
             return s;
         }
 
