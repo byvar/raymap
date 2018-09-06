@@ -286,11 +286,13 @@ namespace OpenSpace {
                 float m3 = (float)reader.ReadInt16() / (float)256;
                 float m4 = (float)reader.ReadInt16() / (float)256;
                 float m5 = (float)reader.ReadInt16() / (float)256;
-                sclM = new Matrix4x4();
+                // Actually it should be like this, but oh well:
+                /*sclM = new Matrix4x4();
                 sclM.Value.SetColumn(0, new Vector4(m0, m1, m2, 0f));
                 sclM.Value.SetColumn(1, new Vector4(m1, m3, m4, 0f));
                 sclM.Value.SetColumn(2, new Vector4(m2, m4, m5, 0f));
-                sclM.Value.SetColumn(3, new Vector4(0f, 0f, 0f, 1f));
+                sclM.Value.SetColumn(3, new Vector4(0f, 0f, 0f, 1f));*/
+                sclM = Matrix4x4.Scale(new Vector3(m0, m3, m5));
             }
             if (!pos.HasValue) pos = Vector3.zero;
             if (!rot.HasValue) rot = Quaternion.identity;
