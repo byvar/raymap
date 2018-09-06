@@ -76,6 +76,7 @@ namespace OpenSpace.EngineObject {
             p.off_3dData = Pointer.Read(reader); // 0x0
             p.off_stdGame = Pointer.Read(reader); // 4 Standard Game info
             p.off_dynam = Pointer.Read(reader); // 0x8 Dynam
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) reader.ReadUInt32();
             p.off_brain = Pointer.Read(reader); // 0xC
             p.off_camera = Pointer.Read(reader); // 0x10 is Camera in Rayman 2
             p.off_collSet = Pointer.Read(reader); // 0x14 collset
@@ -213,10 +214,9 @@ namespace OpenSpace.EngineObject {
                 }
             }
 
-            if (p.off_collSet!=null && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                Pointer.Goto(ref reader, p.off_collSet);
+            Pointer.DoAt(ref reader, p.off_collSet, () => {
                 p.collset = CollSet.Read(reader, p, p.off_collSet);
-            }
+            });
 
             return p;
         }
