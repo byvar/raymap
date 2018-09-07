@@ -73,6 +73,12 @@ public class Controller : MonoBehaviour {
                             mode = MapLoader.Mode.Rayman2PCDemo1; break;
                         case "r2_demo2_pc":
                             mode = MapLoader.Mode.Rayman2PCDemo2; break;
+                        case "playmobil_hype_pc":
+                            mode = MapLoader.Mode.PlaymobilHypePC; break;
+                        case "playmobil_alex_pc":
+                            mode = MapLoader.Mode.PlaymobilAlexPC; break;
+                        case "playmobil_laura_pc":
+                            mode = MapLoader.Mode.PlaymobilLauraPC; break;
                     }
                     break;
             }

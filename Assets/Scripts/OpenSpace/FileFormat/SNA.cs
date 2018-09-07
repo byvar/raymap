@@ -493,21 +493,27 @@ namespace OpenSpace.FileFormat {
             OverwriteData(position, BitConverter.GetBytes(data));
         }
 
-        public void GotoPTX() {
-            if (reader != null) {
-                reader.BaseStream.Seek(ptx.dataPosition, SeekOrigin.Begin);
+        public Pointer PTX {
+            get {
+                if (ptx != null) {
+                    return new Pointer(ptx.dataPosition, this);
+                } else return null;
             }
         }
 
-        public void GotoSDA() {
-            if (reader != null && sda != null) {
-                reader.BaseStream.Seek(sda.dataPosition, SeekOrigin.Begin);
+        public Pointer SDA {
+            get {
+                if (sda != null) {
+                    return new Pointer(sda.dataPosition, this);
+                } else return null;
             }
         }
 
-        public void GotoDLG() {
-            if (reader != null && dlg != null) {
-                reader.BaseStream.Seek(dlg.dataPosition, SeekOrigin.Begin);
+        public Pointer DLG {
+            get {
+                if (dlg != null) {
+                    return new Pointer(dlg.dataPosition, this);
+                } else return null;
             }
         }
 

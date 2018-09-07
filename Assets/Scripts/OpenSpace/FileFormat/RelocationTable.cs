@@ -160,8 +160,7 @@ namespace OpenSpace.FileFormat {
 
             byte count = reader.ReadByte();
             if (Settings.s.game != Settings.Game.R2Demo
-                && Settings.s.game != Settings.Game.Hype
-                && Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
             }
             pointerBlocks = new RelocationPointerList[count];
@@ -214,7 +213,7 @@ namespace OpenSpace.FileFormat {
                 pointerBlock.pointers[j].offsetInMemory = reader.ReadUInt32();
                 pointerBlock.pointers[j].module = reader.ReadByte();
                 pointerBlock.pointers[j].id = reader.ReadByte();
-                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT && Settings.s.game != Settings.Game.PlaymobilLaura) {
                     pointerBlock.pointers[j].byte6 = reader.ReadByte();
                     pointerBlock.pointers[j].byte7 = reader.ReadByte();
                 }

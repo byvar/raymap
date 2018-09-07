@@ -39,7 +39,7 @@ namespace OpenSpace {
             Rayman2PCDemo2, Rayman2PCDemo1,
             DonaldDuckPC,
             TonicTroublePC, TonicTroubleSEPC,
-            HypePC
+            PlaymobilHypePC, PlaymobilAlexPC, PlaymobilLauraPC
         };
         public Mode mode = Mode.Rayman3PC;
 
@@ -137,7 +137,9 @@ namespace OpenSpace {
                     case Mode.DonaldDuckPC: settings = Settings.DDPC; break;
                     case Mode.TonicTroublePC: settings = Settings.TTPC; break;
                     case Mode.TonicTroubleSEPC: settings = Settings.TTSEPC; break;
-                    case Mode.HypePC: settings = Settings.HypePC; break;
+                    case Mode.PlaymobilHypePC: settings = Settings.PlaymobilHypePC; break;
+                    case Mode.PlaymobilAlexPC: settings = Settings.PlaymobilAlexPC; break;
+                    case Mode.PlaymobilLauraPC: settings = Settings.PlaymobilLauraPC; break;
                 }
                 Settings.s = settings;
 
@@ -148,7 +150,7 @@ namespace OpenSpace {
                 gameDataBinFolder += "/";
 
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                    if (mode == Mode.HypePC) {
+                    if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                         gameDsb = new DSB("Game", gameDataBinFolder + "gamedsc.bin");
                     } else {
                         gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
@@ -172,6 +174,14 @@ namespace OpenSpace {
                         
                         string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
                         string langDataPath = gameDataBinFolder + "../LangData/English/" + gameDsb.levelsDataPath + "/";
+                        if (!Directory.Exists(langDataPath)) {
+                            string langPath = gameDataBinFolder + "../LangData/";
+                            if (Directory.Exists(langPath)) {
+                                DirectoryInfo dirInfo = new DirectoryInfo(langPath);
+                                DirectoryInfo firstLang = dirInfo.GetDirectories().FirstOrDefault();
+                                langDataPath = firstLang.FullName + "/" + gameDsb.levelsDataPath + "/";
+                            }
+                        }
 
                         if (mode == Mode.Rayman2PC || mode == Mode.DonaldDuckPC) {
                             string dataPath = levelsFolder + "LEVELS0.DAT";
@@ -242,23 +252,6 @@ namespace OpenSpace {
                         if (File.Exists(levelsFolder + lvlName + "/" + lvlName + ".sda")) {
                             lvlSna.ReadSDA(levelsFolder + lvlName + "/" + lvlName + ".sda");
                         }
-                        
-                        /*if (Directory.Exists(langDataPath)) {
-                            string fixLangPath = langDataPath + "fix.lng";
-                            RelocationTable fixLangRTG = new RelocationTable(fixLangPath, dat, "fixLang", RelocationType.RTG);
-                            if (File.Exists(langDataPath + lvlName + "/FixLvl.rtg")) {
-                                // Fix -> Lvl pointers for Tonic Trouble
-                                fixLangRTG.Add(new RelocationTable(langDataPath + lvlName + "/FixLvl.rtg", dat, lvlName + "FixLang", RelocationType.RTG));
-                            }
-                            SNA fixLangSna = new SNA("fixLang", fixLangPath, fixLangRTG);
-                            files_array[3] = fixLangSna;
-                            string lvlLangPath = langDataPath + lvlName + "/" + lvlName + ".lng";
-                            RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
-                            SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
-                            files_array[4] = lvlLangSna;
-                            fixLangSna.CreatePointers();
-                            lvlLangSna.CreatePointers();
-                        }*/
 
                         fixSna.CreatePointers();
                         lvlSna.CreatePointers();
@@ -269,25 +262,8 @@ namespace OpenSpace {
 
                         fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
                         lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
-                        /*if (Directory.Exists(langDataPath)) {
-                            ((SNA)files_array[3]).CreateMemoryDump(langDataPath + "fix.lng.dmp", true);
-                            ((SNA)files_array[4]).CreateMemoryDump(langDataPath + lvlName + "/" + lvlName + ".lng.dmp", true);
-                        }*/
 
-                            /*if (mode != Mode.Rayman2IOS) {
-                                if (!settings.isR2Demo) { // Normal Game
-                                    cntPaths = new string[2];
-                                    cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
-                                    cntPaths[1] = gameDataBinFolder + "Textures.cnt";
-                                    cnt = new CNT(cntPaths);
-                                } else { // R2 Demo
-                                    cntPaths = new string[1];
-                                    cntPaths[0] = gameDataBinFolder + "Textures.cnt";
-                                    cnt = new CNT(cntPaths);
-                                }
-                            }*/
-
-                            LoadFIXSNA();
+                        LoadFIXSNA();
                         LoadLVLSNA();
 
                         fixSna.Dispose();
@@ -914,6 +890,7 @@ namespace OpenSpace {
             Reader reader = files_array[Mem.Fix].reader;
             Pointer off_current = Pointer.Current(reader);
             print("FIX GPT offset: " + off_current);
+            SNA sna = (SNA)files_array[Mem.Fix];
 
             if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                 // Tonic Trouble
@@ -967,25 +944,27 @@ namespace OpenSpace {
                 reader.ReadBytes(0x30);
                 reader.ReadBytes(0x960);
             } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-                SNA sna = (SNA)files_array[Mem.Fix];
+                uint num_strings = 0;
 
                 // SDA
-                sna.GotoSDA();
-                print(Pointer.Current(reader));
-                reader.ReadUInt32();
-                reader.ReadUInt32(); // same as next
-                uint num_strings = reader.ReadUInt32();
-                uint indexOfTextGlobal = reader.ReadUInt32(); // dword_6EEE78
-                uint dword_83EC58 = reader.ReadUInt32();
-                print(num_strings + " - " + Pointer.Current(reader));
-                
+                Pointer.DoAt(ref reader, sna.SDA, () => {
+                    print(Pointer.Current(reader));
+                    reader.ReadUInt32();
+                    reader.ReadUInt32(); // same as next
+                    num_strings = reader.ReadUInt32();
+                    uint indexOfTextGlobal = reader.ReadUInt32(); // dword_6EEE78
+                    uint dword_83EC58 = reader.ReadUInt32();
+                    print(num_strings + " - " + Pointer.Current(reader));
+                });
+
                 // DLG
-                sna.GotoDLG();
-                Pointer off_strings = Pointer.Read(reader);
-                for (int i = 0; i < num_strings; i++) {
-                    Pointer.Read(reader);
-                }
-                reader.ReadUInt32();
+                Pointer.DoAt(ref reader, sna.DLG, () => {
+                    Pointer off_strings = Pointer.Read(reader);
+                    for (int i = 0; i < num_strings; i++) {
+                        Pointer.Read(reader);
+                    }
+                    reader.ReadUInt32();
+                });
 
                 // GPT
                 sna.GotoHeader();
@@ -1064,40 +1043,40 @@ namespace OpenSpace {
             }
 
             // Read PTX
-            ((SNA)files_array[Mem.Fix]).GotoPTX();
-            uint num_textureMemoryChannels = reader.ReadUInt32();
-            uint num_textures = reader.ReadUInt32();
-            print("Texture count fix: " + num_textures);
-            textures = new TextureInfo[num_textures];
-            for (uint i = 0; i < num_textures; i++) {
-                Pointer off_texture = Pointer.Read(reader);
-                if (off_texture != null) {
-                    off_current = Pointer.Goto(ref reader, off_texture);
-                    textures[i] = TextureInfo.Read(reader, off_texture);
-                    Pointer.Goto(ref reader, off_current);
-                } else textures[i] = null;
-            }
-            for (int i = 0; i < num_textures; i++) {
-                if (textures[i] != null) {
-                    if (mode == Mode.Rayman2IOS) {
-                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "world/graphics/textures/" + textures[i].name, ".gf");
-                        if (File.Exists(texturePath)) {
-                            GF gf = new GF(texturePath);
+            Pointer.DoAt(ref reader, sna.PTX, () => {
+                uint num_textureMemoryChannels = reader.ReadUInt32();
+                uint num_textures = reader.ReadUInt32();
+                print("Texture count fix: " + num_textures);
+                textures = new TextureInfo[num_textures];
+                for (uint i = 0; i < num_textures; i++) {
+                    Pointer off_texture = Pointer.Read(reader);
+                    if (off_texture != null) {
+                        off_current = Pointer.Goto(ref reader, off_texture);
+                        textures[i] = TextureInfo.Read(reader, off_texture);
+                        Pointer.Goto(ref reader, off_current);
+                    } else textures[i] = null;
+                }
+                for (int i = 0; i < num_textures; i++) {
+                    if (textures[i] != null) {
+                        if (mode == Mode.Rayman2IOS) {
+                            string texturePath = Path.ChangeExtension(gameDataBinFolder + "world/graphics/textures/" + textures[i].name, ".gf");
+                            if (File.Exists(texturePath)) {
+                                GF gf = new GF(texturePath);
+                                if (gf != null) textures[i].Texture = gf.GetTexture();
+                            }
+                        } else {
+                            //print(textures[i].name);
+                            GF gf = cnt.GetGFByTGAName(textures[i].name);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
                         }
-                    } else {
-                        //print(textures[i].name);
-                        GF gf = cnt.GetGFByTGAName(textures[i].name);
-                        if (gf != null) textures[i].Texture = gf.GetTexture();
                     }
                 }
-            }
-            /*uint num_texturesToCreate = reader.ReadUInt32();
-            for (uint i = 0; i < num_texturesToCreate; i++) {
-                reader.ReadUInt32(); //1
-            }
-            uint currentMemoryChannel = reader.ReadUInt32();*/
-
+                /*uint num_texturesToCreate = reader.ReadUInt32();
+                for (uint i = 0; i < num_texturesToCreate; i++) {
+                    reader.ReadUInt32(); //1
+                }
+                uint currentMemoryChannel = reader.ReadUInt32();*/
+            });
         }
         #endregion
 
@@ -1105,6 +1084,7 @@ namespace OpenSpace {
         void LoadLVLSNA() {
             Reader reader = files_array[Mem.Lvl].reader;
             Pointer off_current;
+            SNA sna = (SNA)files_array[Mem.Lvl];
 
             // First read GPT
             files_array[Mem.Lvl].GotoHeader();
@@ -1112,7 +1092,6 @@ namespace OpenSpace {
             print("LVL GPT offset: " + Pointer.Current(reader));
 
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-                SNA sna = (SNA)files_array[Mem.Lvl];
 
                 // SDA
                 /*sna.GotoSDA();
@@ -1134,7 +1113,9 @@ namespace OpenSpace {
 
                 // GPT
                 sna.GotoHeader();
-                Pointer.Read(reader); // sound related
+                if (Settings.s.game != Settings.Game.PlaymobilLaura) {
+                    Pointer.Read(reader); // sound related
+                }
                 Pointer.Read(reader);
                 Pointer.Read(reader);
                 reader.ReadUInt32();
@@ -1219,6 +1200,9 @@ namespace OpenSpace {
                 globals.off_dynamicWorld = Pointer.Read(reader);
                 globals.off_fatherSector = Pointer.Read(reader);
                 uint soundEventIndex = reader.ReadUInt32(); // In Montreal version this is a pointer, also sound event related
+                if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+                    Pointer.Read(reader);
+                }
             }
 
             globals.num_always = reader.ReadUInt32();
@@ -1279,14 +1263,19 @@ namespace OpenSpace {
                 string mapName = reader.ReadString(0x104);
                 reader.ReadChars(0x104);
                 string mapName2 = reader.ReadString(0x104);
+                if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+                    reader.ReadChars(0x104);
+                    reader.ReadChars(0x104);
+                }
                 string mapName3 = reader.ReadString(0x104);
                 if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                     reader.ReadBytes(0x47F7); // don't know what this data is
+                } else if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+                    reader.ReadBytes(0x240F); // don't know what this data is
                 } else {
                     reader.ReadBytes(0x2627); // don't know what this data is
                 }
             }
-
             Pointer off_unknown_first = Pointer.Read(reader);
             Pointer off_unknown_last = Pointer.Read(reader);
             uint num_unknown = reader.ReadUInt32();
@@ -1294,9 +1283,11 @@ namespace OpenSpace {
             families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             families.FillPointers(reader, families.off_tail, families.off_head);
 
-            Pointer off_alwaysActiveCharacters_first = Pointer.Read(reader);
-            Pointer off_alwaysActiveCharacters_last = Pointer.Read(reader);
-            uint num_alwaysActiveChars = reader.ReadUInt32();
+            if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+            }
+
+            LinkedList<SuperObject> alwaysActiveCharacters = LinkedList<SuperObject>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
 
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
 
@@ -1359,53 +1350,41 @@ namespace OpenSpace {
             ((SNA)files_array[0]).CreateMemoryDump(levelsFolder + "fix.dmp", true);
             ((SNA)files_array[1]).CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
 
-
             // Read PTX
-            ((SNA)files_array[Mem.Lvl]).GotoPTX();
-            uint num_textures_fix = (uint)textures.Length;
-            uint num_textureMemoryChannels = reader.ReadUInt32();
-            uint num_textures_lvl = reader.ReadUInt32();
-            uint num_textures_total = num_textures_fix + num_textures_lvl;
-            Array.Resize(ref textures, (int)num_textures_total);
-            for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                Pointer off_texture = Pointer.Read(reader);
-                if (off_texture != null) {
-                    off_current = Pointer.Goto(ref reader, off_texture);
-                    textures[i] = TextureInfo.Read(reader, off_texture);
-                    Pointer.Goto(ref reader, off_current);
-                } else textures[i] = null;
-            }
-            uint num_texturesToCreate = reader.ReadUInt32();
-            for (uint i = 0; i < num_textures_fix; i++) { // ?
-                reader.ReadUInt32(); //1
-            }
-            uint currentMemoryChannel = reader.ReadUInt32();
-            for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                if (textures[i] != null) {
-                    if (mode == Mode.Rayman2IOS) {
-                        string texturePath = Path.ChangeExtension(gameDataBinFolder + "world/graphics/textures/" + textures[i].name, ".gf");
-                        if (File.Exists(texturePath)) {
-                            GF gf = new GF(texturePath);
+            Pointer.DoAt(ref reader, sna.PTX, () => {
+                uint num_textures_fix = (uint)textures.Length;
+                uint num_textureMemoryChannels = reader.ReadUInt32();
+                uint num_textures_lvl = reader.ReadUInt32();
+                uint num_textures_total = num_textures_fix + num_textures_lvl;
+                Array.Resize(ref textures, (int)num_textures_total);
+                for (uint i = num_textures_fix; i < num_textures_total; i++) {
+                    Pointer off_texture = Pointer.Read(reader);
+                    if (off_texture != null) {
+                        off_current = Pointer.Goto(ref reader, off_texture);
+                        textures[i] = TextureInfo.Read(reader, off_texture);
+                        Pointer.Goto(ref reader, off_current);
+                    } else textures[i] = null;
+                }
+                uint num_texturesToCreate = reader.ReadUInt32();
+                for (uint i = 0; i < num_textures_fix; i++) { // ?
+                    reader.ReadUInt32(); //1
+                }
+                uint currentMemoryChannel = reader.ReadUInt32();
+                for (uint i = num_textures_fix; i < num_textures_total; i++) {
+                    if (textures[i] != null) {
+                        if (mode == Mode.Rayman2IOS) {
+                            string texturePath = Path.ChangeExtension(gameDataBinFolder + "world/graphics/textures/" + textures[i].name, ".gf");
+                            if (File.Exists(texturePath)) {
+                                GF gf = new GF(texturePath);
+                                if (gf != null) textures[i].Texture = gf.GetTexture();
+                            }
+                        } else {
+                            GF gf = cnt.GetGFByTGAName(textures[i].name);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
                         }
-                    } else {
-                        GF gf = cnt.GetGFByTGAName(textures[i].name);
-                        if (gf != null) textures[i].Texture = gf.GetTexture();
                     }
                 }
-                /*uint file_texture = reader.ReadUInt32();
-                if (file_texture == 0xC0DE0005) {
-                    // texture is undefined
-                    textures[i] = null;
-                } else if (textures[i] != null) {
-                    GF3 gf = cnt.GetGFByTGAName(textures[i].name);
-                    if (gf != null) {
-                        textures[i].texture = gf.GetTexture();
-                    }
-                } else {
-                    print("Error in texture loading!");
-                }*/
-            }
+            });
 
             // Parse actual world & always structure
             ReadFamilies(reader);

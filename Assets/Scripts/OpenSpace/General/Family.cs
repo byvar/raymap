@@ -191,12 +191,12 @@ namespace OpenSpace {
                             // each entry is 0x14
                             Pointer off_po_scale = Pointer.Read(reader);
                             Pointer off_po = Pointer.Read(reader);
-                            reader.ReadUInt32();
+                            uint thirdvalue = reader.ReadUInt32();
                             reader.ReadUInt16();
                             reader.ReadUInt16();
                             uint lastvalue = reader.ReadUInt32();
                             // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
-                            if (lastvalue != 0 || Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                            if (lastvalue != 0 || thirdvalue != 0) {
                                 PhysicalObject po = null;
                                 Vector3? scaleMultiplier = null;
                                 Pointer.DoAt(ref reader, off_po, () => {

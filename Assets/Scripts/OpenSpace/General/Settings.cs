@@ -12,7 +12,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, R2, TT, R2Demo, DD, Hype };
+        public enum Game { R3, RA, R2, TT, R2Demo, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
         public enum Platform { PC, iOS, GC };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -212,15 +212,37 @@ namespace OpenSpace {
             hasLinkedListHeaderPointers = true
         };
 
-        public static Settings HypePC = new Settings() {
+        public static Settings PlaymobilHypePC = new Settings() {
             engineVersion = EngineVersion.Montreal,
-            game = Game.Hype,
+            game = Game.PlaymobilHype,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
             hasLinkedListHeaderPointers = true,
             snaCompression = true
+        };
+
+        public static Settings PlaymobilAlexPC = new Settings() {
+            engineVersion = EngineVersion.Montreal,
+            game = Game.PlaymobilAlex,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            numEntryActions = 1,
+            hasLinkedListHeaderPointers = true,
+            snaCompression = true
+        };
+
+        public static Settings PlaymobilLauraPC = new Settings() {
+            engineVersion = EngineVersion.Montreal,
+            game = Game.PlaymobilLaura,
+            platform = Platform.PC,
+            endian = Endian.Little,
+            linkedListType = LinkedListType.Double,
+            numEntryActions = 1,
+            hasLinkedListHeaderPointers = true,
+            snaCompression = false
         };
     }
 }

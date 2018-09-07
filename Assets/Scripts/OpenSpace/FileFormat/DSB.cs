@@ -91,7 +91,7 @@ namespace OpenSpace.FileFormat {
                 ReadConfig();
                 ReadString(); // "3"
                 ReadString(); // "Totalski" = first level
-            } else if (MapLoader.Loader.mode == MapLoader.Mode.HypePC) {
+            } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 dllDataPath = ReadString();
                 gameDataPath = ReadString();
                 worldDataPath = ReadString();
@@ -442,7 +442,7 @@ namespace OpenSpace.FileFormat {
 
         private string ReadString() {
             ushort strSize;
-            if (MapLoader.Loader.mode == MapLoader.Mode.HypePC) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 strSize = reader.ReadByte();
             } else {
                 strSize = reader.ReadUInt16();

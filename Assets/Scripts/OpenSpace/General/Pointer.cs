@@ -65,11 +65,13 @@ namespace OpenSpace {
             uint current_off = (uint)(reader.BaseStream.Position);
             uint value = reader.ReadUInt32();
             FileWithPointers file = l.GetFileByReader(reader);
-            if (file == null) throw new FormatException("Reader wasn't recognized.");
+            if (file == null) throw new PointerException("Reader wasn't recognized.", "Pointer.Read");
             uint fileOff = (uint)(current_off - file.baseOffset);
             if (!file.pointers.ContainsKey(fileOff)) {
                 if (value == 0 || (allowMinusOne && value == 0xFFFFFFFF)) return null;
-                if (!l.allowDeadPointers && !file.allowUnsafePointers) throw new FormatException("Not a valid pointer at " + (Pointer.Current(reader)-4) + ": " + value);
+                if (!l.allowDeadPointers && !file.allowUnsafePointers) {
+                    throw new PointerException("Not a valid pointer at " + (Pointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
+                }
                 if (file.allowUnsafePointers) {
                     return new Pointer(value, file);
                 }
