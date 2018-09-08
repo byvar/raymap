@@ -85,6 +85,7 @@ namespace OpenSpace.EngineObject {
             Sector s = new Sector(offset, so);
             s.name = "Sector @ " + offset;
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
+                if (Settings.s.game == Settings.Game.TTSE) reader.ReadUInt32(); // always 1 or 0. whether the sector is active or not?
                 Pointer off_collideObj = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_collideObj, () => {
                     //CollideMeshObject collider = CollideMeshObject.Read(reader, off_collideObj);
@@ -118,12 +119,15 @@ namespace OpenSpace.EngineObject {
             s.neighbors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader));
             LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader));
             s.sectors_unk = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader));
+
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
+
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
+
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
 
@@ -145,7 +149,7 @@ namespace OpenSpace.EngineObject {
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                 }
-                reader.ReadUInt32();
+                if(Settings.s.game != Settings.Game.TTSE) reader.ReadUInt32();
                 Pointer off_name = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_name, () => {
                     s.name = reader.ReadNullDelimitedString();

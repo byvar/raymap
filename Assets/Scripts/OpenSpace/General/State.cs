@@ -99,7 +99,7 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, s.off_cine_name);
                 s.cine_name = reader.ReadNullDelimitedString();
             }
-            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal || Settings.s.game == Settings.Game.TTSE) {
                 s.anim_refMontreal = AnimationMontreal.FromOffsetOrRead(s.off_anim_ref, reader);
             } else {
                 s.anim_ref = AnimationReference.FromOffsetOrRead(s.off_anim_ref, reader);

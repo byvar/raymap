@@ -107,9 +107,9 @@ namespace OpenSpace.Visual {
                         material.SetVector("_Color", color);
                     }
                     if (texMain == null || texMain.Texture == null) {
-                        // Don't want to see all those textureless planes, so create transparent texture and use that
+                        // No texture = just color. So create white texture and let that be colored by other properties.
                         Texture2D tex = new Texture2D(1, 1);
-                        tex.SetPixel(0, 0, new Color(0, 0, 0, 0));
+                        tex.SetPixel(0, 0, new Color(1, 1, 1, 1));
                         tex.Apply();
                         material.SetTexture("_MainTex", tex);
                     }
@@ -156,9 +156,9 @@ namespace OpenSpace.Visual {
                         }
                     }
                     if (texMain == null || texMain.Texture == null) {
-                        // Don't want to see all those textureless planes, so create transparent texture and use that
+                        // No texture = just color. So create white texture and let that be colored by other properties.
                         Texture2D tex = new Texture2D(1, 1);
-                        tex.SetPixel(0, 0, new Color(0, 0, 0, 0));
+                        tex.SetPixel(0, 0, new Color(1, 1, 1, 1));
                         tex.Apply();
                         materialBillboard.SetTexture("_MainTex", tex);
                     }

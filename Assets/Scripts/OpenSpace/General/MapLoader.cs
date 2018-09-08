@@ -152,6 +152,8 @@ namespace OpenSpace {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                         gameDsb = new DSB("Game", gameDataBinFolder + "gamedsc.bin");
+                    } else if (Settings.s.game == Settings.Game.TTSE) {
+                        gameDsb = new DSB("Game", gameDataBinFolder + "GAME.DSC");
                     } else {
                         gameDsb = new DSB("Game", gameDataBinFolder + "Game.dsb");
                     }
@@ -894,55 +896,66 @@ namespace OpenSpace {
 
             if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                 // Tonic Trouble
-                uint stringCount = (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
+                uint stringCount = Settings.s.game == Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
                 Pointer.Read(reader);
                 Pointer.Read(reader);
                 Pointer.Read(reader);
-                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                if (Settings.s.game == Settings.Game.TTSE) {
+                    for (int i = 0; i < 50; i++) Pointer.Read(reader);
+                } else {
+                    for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                }
                 reader.ReadUInt32(); // 0x35
-                reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
+                if (Settings.s.game != Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
                 reader.ReadBytes(0x90);
                 Pointer.Read(reader);
                 reader.ReadUInt32(); // 0x28
                 reader.ReadUInt32(); // 0x1
+                if (Settings.s.game == Settings.Game.TTSE) Pointer.Read(reader);
                 for (int i = 0; i < 100; i++) Pointer.Read(reader);
                 for (int i = 0; i < 100; i++) Pointer.Read(reader);
                 reader.ReadUInt32(); // 0x1
-                if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
-                    reader.ReadBytes(0x2CC);
-                } else { // French version: 598
-                    reader.ReadBytes(0x2C0);
+                if (Settings.s.game == Settings.Game.TTSE) {
+                    reader.ReadBytes(0xB4);
+                } else {
+                    if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
+                        reader.ReadBytes(0x2CC);
+                    } else { // French version: 598
+                        reader.ReadBytes(0x2C0);
+                    }
                 }
                 reader.ReadBytes(0x1C);
+
+                // Init strings
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 1
                 reader.ReadUInt32(); // ???
                 Pointer.Read(reader);
-
                 for (int i = 0; i < stringCount; i++) Pointer.Read(reader); // read num_loaded_strings pointers here
-
                 reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
-                reader.ReadUInt32();
-                Pointer.Read(reader);
-                reader.ReadBytes(0x14);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadUInt32(); // 0, so can be pointer too
-                reader.ReadBytes(0x30);
-                reader.ReadBytes(0x960);
+                if (Settings.s.game != Settings.Game.TTSE) { // There's more but what is even the point in reading all this
+                    reader.ReadUInt32();
+                    Pointer.Read(reader);
+                    reader.ReadBytes(0x14);
+                    Pointer.Read(reader);
+                    Pointer.Read(reader);
+                    Pointer.Read(reader);
+                    Pointer.Read(reader);
+                    Pointer.Read(reader);
+                    Pointer.Read(reader);
+                    Pointer.Read(reader);
+                    Pointer.Read(reader);
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadUInt32(); // 0, so can be pointer too
+                    reader.ReadBytes(0x30);
+                    reader.ReadBytes(0x960);
+                }
             } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 uint num_strings = 0;
 
@@ -1251,6 +1264,7 @@ namespace OpenSpace {
             }
 
             // Begin of engineStructure
+            print("Start of EngineStructure: " + Pointer.Current(reader));
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 reader.ReadByte();
                 string mapName = reader.ReadString(0x1E);
@@ -1268,11 +1282,13 @@ namespace OpenSpace {
                     reader.ReadChars(0x104);
                 }
                 string mapName3 = reader.ReadString(0x104);
-                if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+                if (Settings.s.game == Settings.Game.TT) {
                     reader.ReadBytes(0x47F7); // don't know what this data is
+                } else if (Settings.s.game == Settings.Game.TTSE) {
+                    reader.ReadBytes(0x240F);
                 } else if (Settings.s.game == Settings.Game.PlaymobilLaura) {
                     reader.ReadBytes(0x240F); // don't know what this data is
-                } else {
+                } else { // Hype & Alex
                     reader.ReadBytes(0x2627); // don't know what this data is
                 }
             }

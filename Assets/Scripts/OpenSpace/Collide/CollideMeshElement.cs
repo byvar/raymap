@@ -106,9 +106,11 @@ namespace OpenSpace.Collide {
                 if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                     reader.ReadUInt32();
                 }
-                Pointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
-                reader.ReadUInt16(); // num_unk
-                reader.ReadUInt16();
+                if (Settings.s.game != Settings.Game.TTSE) {
+                    Pointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
+                    reader.ReadUInt16(); // num_unk
+                    reader.ReadUInt16();
+                }
             } else {
                 sm.off_triangles = Pointer.Read(reader);
                 sm.off_normals = Pointer.Read(reader);

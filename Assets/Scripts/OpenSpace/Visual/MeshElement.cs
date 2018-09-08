@@ -246,7 +246,7 @@ namespace OpenSpace.Visual {
                 //}
             }
             if (visualMaterial != null) {
-                //gao.name += " " + visualMaterial.offset;
+                //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.Material;
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
@@ -316,10 +316,12 @@ namespace OpenSpace.Visual {
             } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
             }
-            sm.off_vertex_indices = Pointer.Read(reader);
-            sm.num_vertex_indices = reader.ReadUInt16();
-            reader.ReadInt16();
-            reader.ReadUInt32();
+            if (Settings.s.game != Settings.Game.TTSE) {
+                sm.off_vertex_indices = Pointer.Read(reader);
+                sm.num_vertex_indices = reader.ReadUInt16();
+                reader.ReadInt16();
+                reader.ReadUInt32();
+            }
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 reader.ReadUInt16();
                 sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts

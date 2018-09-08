@@ -12,7 +12,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, R2, TT, R2Demo, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
+        public enum Game { R3, RA, R2, TT, TTSE, R2Demo, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
         public enum Platform { PC, iOS, GC };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -204,7 +204,7 @@ namespace OpenSpace {
 
         public static Settings TTSEPC = new Settings() {
             engineVersion = EngineVersion.TT,
-            game = Game.TT,
+            game = Game.TTSE,
             platform = Platform.PC,
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,

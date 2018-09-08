@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OpenSpace.FileFormat {
     public class DSB : FileWithPointers {
@@ -79,18 +80,22 @@ namespace OpenSpace.FileFormat {
 
         public void ReadAllSections() {
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
-            if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
-                ReadMemoryDesc();
-                reader.ReadUInt32(); // 1
-                ReadDirectoriesDesc();
-                ReadBigFileDesc();
-                vignetteName = ReadString(); // first vignette shown on startup, UbiSoft.bmp
-                ReadString(); // GameData\Options\IPT.bin
-                reader.ReadUInt32(); // 1000
-                ReadTextFiles();
-                ReadConfig();
-                ReadString(); // "3"
-                ReadString(); // "Totalski" = first level
+            if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
+                if (Settings.s.game == Settings.Game.TTSE) {
+                    ReadAllAsText();
+                } else {
+                    ReadMemoryDesc();
+                    reader.ReadUInt32(); // 1
+                    ReadDirectoriesDesc();
+                    ReadBigFileDesc();
+                    vignetteName = ReadString(); // first vignette shown on startup, UbiSoft.bmp
+                    ReadString(); // GameData\Options\IPT.bin
+                    reader.ReadUInt32(); // 1000
+                    ReadTextFiles();
+                    ReadConfig();
+                    ReadString(); // "3"
+                    ReadString(); // "Totalski" = first level
+                }
             } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 dllDataPath = ReadString();
                 gameDataPath = ReadString();
@@ -112,6 +117,65 @@ namespace OpenSpace.FileFormat {
             } else {
                 while (reader.BaseStream.Position < reader.BaseStream.Length) {
                     ReadSection();
+                }
+            }
+        }
+
+        public void ReadAllAsText() {
+            string fileString = reader.ReadString((int)reader.BaseStream.Length);
+            string[] lines = fileString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < lines.Length; i++) {
+                string line = lines[i].Trim();
+
+                string methodPattern = @"(?<method>.+?)\((?<value>.+?)\)";
+                Match methodMatch = Regex.Match(line, methodPattern, RegexOptions.IgnoreCase);
+                if (methodMatch.Success) {
+                    string method = methodMatch.Groups["method"].Value.Trim();
+                    string value = methodMatch.Groups["value"].Value;
+                    Match stringValueMatch = Regex.Match(value, @"""(?<value>.+?)""", RegexOptions.IgnoreCase);
+                    if (stringValueMatch.Success) {
+                        value = stringValueMatch.Groups["value"].Value;
+                        if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) value = value.Replace("GameData\\", "");
+                        switch (method) {
+                            case "DirectoryOfEngineDLL": dllDataPath = value; break;
+                            case "DirectoryOfTexture": textureDataPath = value; break;
+                            case "DirectoryOfFixTexture": break; // FixTex
+                            case "DirectoryOfTexts": textDataPath = value; break;
+                            case "DirectoryOfGameData": gameDataPath = value; break;
+                            case "DirectoryOfWorld": worldDataPath = value; break;
+                            case "DirectoryOfLevels": levelsDataPath = value; break;
+                            case "DirectoryOfFamilies": familiesDataPath = value; break;
+                            case "DirectoryOfCharacters": break; // Same as levels dir
+                            case "DirectoryOfAnimations": animsDataPath = value; break;
+                            case "DirectoryOfGraphicsClasses": objectClassesDataPath = value; break;
+                            case "DirectoryOfGraphicsBanks": objectBanksDataPath = value; break;
+                            case "DirectoryOfMechanics": mechanicsLibrariesDataPath = value; break;
+                            case "DirectoryOfSound": soundDataPath = value; break;
+                            case "DirectoryOfVisuals": visualsDataPath = value; break;
+                            case "DirectoryOfMaterials": materialsDataPath = value; break;
+                            case "DirectoryOfEnvironment": environmentDataPath = value; break;
+                            case "DirectoryOfSaveGame": saveGameDataPath = value; break;
+                            case "DirectoryOfExtras": extrasPath = value; break;
+                            case "DirectoryOfVignettes": vignettesDataPath = value; break;
+                            case "DirectoryOfOptions": optionsDataPath = value; break;
+                            case "DirectoryOfZdx": break; // same as levels dir
+                            case "DirectoryOfLipsSync": lipSyncDataPath = value; break;
+                            case "DirectoryOfEffects": effectsDataPath = value; break;
+                            case "DirectoryOfInventory": break;
+                            case "Vignettes": bigfileVignettes = value; break;
+                            case "Textures": bigfileTextures = value; break;
+                            case "LoadVignette": vignetteName = value; break;
+                            case "AddInputDeviceFile":
+                            case "AddFontFile":
+                            case "AddStringsFile":
+                            case "InitRandomManager":
+                            case "DefaultFile":
+                            case "CurrentFile":
+                                break;
+                        }
+                    } else {
+                        // Value not in double quotes
+                    }
                 }
             }
         }

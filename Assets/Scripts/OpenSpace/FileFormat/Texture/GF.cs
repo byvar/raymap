@@ -64,7 +64,7 @@ namespace OpenSpace.FileFormat.Texture {
                 format = 1555;
             } else {
                 format = 8888;
-                if (Settings.s.platform != Settings.Platform.iOS) format = r.ReadUInt32();
+                if (Settings.s.platform != Settings.Platform.iOS && Settings.s.game != Settings.Game.TTSE) format = r.ReadUInt32();
             }
 
             width = r.ReadUInt32();

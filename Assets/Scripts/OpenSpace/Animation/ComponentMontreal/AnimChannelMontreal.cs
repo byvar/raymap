@@ -10,9 +10,10 @@ namespace OpenSpace.Animation.ComponentMontreal {
         public Pointer offset;
         public Pointer off_matrix;
         public uint isIdentity = 0;
-        public short objectIndex;
+        public byte objectIndex;
+        public byte unk1;
         public short unk2;
-        public short unk3; // always unk1 + 1 ?
+        public short unk3;
         public byte unkByte1; // object index?
         public byte unkByte2;
         public uint unkUint;
@@ -27,7 +28,8 @@ namespace OpenSpace.Animation.ComponentMontreal {
             AnimChannelMontreal ch = new AnimChannelMontreal(offset);
             ch.off_matrix = Pointer.GetPointerAtOffset(offset);
             ch.isIdentity = reader.ReadUInt32(); // if this is 1, don't check the pointer
-            ch.objectIndex = reader.ReadInt16();
+            ch.objectIndex = reader.ReadByte();
+            ch.unk1 = reader.ReadByte();
             ch.unk2 = reader.ReadInt16();
             ch.unk3 = reader.ReadInt16();
             ch.unkByte1 = reader.ReadByte();

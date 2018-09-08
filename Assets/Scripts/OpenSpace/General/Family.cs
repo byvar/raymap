@@ -119,7 +119,7 @@ namespace OpenSpace {
             f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
             f.family_index = reader.ReadUInt32();
             f.name = l.objectTypes[0][f.family_index].name;
-
+            //l.print("(" + f.family_index + ") " + f.name + " - " + offset);
             int stateIndex = 0;
             f.states = LinkedList<State>.Read(ref reader, Pointer.Current(reader), (off_element) => {
                 State s = State.Read(reader, off_element, f, stateIndex++);

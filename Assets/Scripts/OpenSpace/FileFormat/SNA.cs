@@ -61,7 +61,7 @@ namespace OpenSpace.FileFormat {
         void ReadSNA() {
             MapLoader l = MapLoader.Loader;
             uint szCounter = 0;
-            if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
+            if (Settings.s.game == Settings.Game.TT) {
                 byte headerLength = reader.ReadByte();
                 reader.ReadBytes(headerLength);
             }
@@ -88,7 +88,7 @@ namespace OpenSpace.FileFormat {
                     block.maxPosMinus9 = reader.ReadUInt32();
                     block.size = reader.ReadUInt32();
                     szCounter += block.size;
-                    if (Settings.s.engineVersion <= Settings.EngineVersion.TT) block.unk1 = reader.ReadByte();
+                    if (Settings.s.game == Settings.Game.TT) block.unk1 = reader.ReadByte();
                     block.dataPosition = (uint)reader.BaseStream.Position;
                     //l.print("(" + block.module + "," + block.id + ") Base: " + block.baseInMemory + " - Size: " + block.size + " - 2:" + block.unk2 + " - 3:" + block.unk3 + " - 4:" + block.maxPosMinus9);
 
