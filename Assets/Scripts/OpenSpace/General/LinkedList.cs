@@ -28,12 +28,13 @@ namespace OpenSpace {
         public Pointer off_tail;
         private uint num_elements;
         public Pointer off_header;
-        public bool customEntries = false;
+        private bool customEntries = false;
 
         private T[] list = null;
 
         public int Count {
             get { return (int)num_elements; }
+            set { num_elements = (uint)value; }
         }
 
         public bool IsReadOnly {
@@ -156,8 +157,9 @@ namespace OpenSpace {
             throw new NotImplementedException();
         }
 
-        void ICollection<T>.Add(T item) {
-            throw new NotImplementedException();
+        public void Add(T item) {
+            Array.Resize(ref list, list.Length + 1);
+            list[list.Length - 1] = item;
         }
 
         void ICollection<T>.Clear() {

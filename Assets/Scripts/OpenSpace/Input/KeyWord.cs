@@ -45,7 +45,7 @@ namespace OpenSpace.Input {
             reader.ReadInt32();
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadInt32();
 
-            if (isFunction) {
+            if (isFunction && Settings.s.game != Settings.Game.TTSE) {
                 keyWord.isFunction = true;
                 switch (keyWord.FunctionType) {
                     case InputFunctions.FunctionType.Not:
@@ -83,6 +83,54 @@ namespace OpenSpace.Input {
             }
 
             return keyWord;
+        }
+
+        public int FillInSubKeywords(LinkedList<KeyWord> keywords, int thisIndex) {
+            isFunction = true;
+            int keywordsRead = 1;
+            switch (FunctionType) {
+                case InputFunctions.FunctionType.Not:
+                    subkeywords = new KeyWord[1];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += subkeywords[0].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                    break;
+                case InputFunctions.FunctionType.And:
+                case InputFunctions.FunctionType.Or:
+                    subkeywords = new KeyWord[2];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += subkeywords[0].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                    subkeywords[1] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += subkeywords[1].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                    break;
+                case InputFunctions.FunctionType.KeyPressed:
+                case InputFunctions.FunctionType.KeyReleased:
+                case InputFunctions.FunctionType.KeyJustPressed:
+                case InputFunctions.FunctionType.KeyJustReleased:
+                    subkeywords = new KeyWord[1];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    break;
+                case InputFunctions.FunctionType.Sequence:
+                    subkeywords = new KeyWord[1];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    int sequenceLength = subkeywords[0].indexOrKeyCode;
+                    if (sequenceLength > 0) {
+                        Array.Resize(ref subkeywords, sequenceLength * 2 + 2);
+                        subkeywords[1] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += subkeywords[1].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                        for (int i = 0; i < sequenceLength; i++) {
+                            subkeywords[2 + i * 2] = keywords[thisIndex + keywordsRead]; // Keycode
+                            keywordsRead += 1;
+                            if (i < sequenceLength - 1) {
+                                subkeywords[3 + i * 2] = keywords[thisIndex + keywordsRead]; // SequenceKey
+                                keywordsRead += subkeywords[3 + i * 2].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                            }
+                        }
+                    }
+                    break;
+            }
+            return keywordsRead;
         }
 
         public override string ToString() {

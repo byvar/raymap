@@ -1,4 +1,4 @@
-﻿using OpenSpace.EngineObject;
+﻿using OpenSpace.Object;
 using System.Collections.Generic;
 
 namespace OpenSpace.Collide {

@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace {
-    public class PhysicalObject : IEquatable<PhysicalObject> {
+namespace OpenSpace.Object {
+    public class PhysicalObject : IEquatable<PhysicalObject>, IEngineObject {
         public Pointer offset;
         public Pointer off_visualSet;
         public Pointer off_collideSet;
@@ -35,6 +35,10 @@ namespace OpenSpace {
                 }
                 return null;
             }
+        }
+
+        public SuperObject SuperObject {
+            get { return null; }
         }
 
         public PhysicalObject(Pointer offset) {
@@ -83,7 +87,7 @@ namespace OpenSpace {
                 Pointer.Goto(ref reader, po.off_visualSet);
                 reader.ReadUInt32(); // 0
                 ushort numberOfLOD = reader.ReadUInt16();
-                if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
+                //if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
                 ushort type = reader.ReadUInt16();
                 if (numberOfLOD > 0) {
                     Pointer off_LODDistances = Pointer.Read(reader);

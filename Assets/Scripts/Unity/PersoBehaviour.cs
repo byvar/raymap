@@ -3,7 +3,8 @@ using OpenSpace.AI;
 using OpenSpace.Animation;
 using OpenSpace.Animation.Component;
 using OpenSpace.Animation.ComponentMontreal;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
+using OpenSpace.Object.Properties;
 using OpenSpace.Visual;
 using OpenSpace.Visual.Deform;
 using System;
@@ -49,12 +50,14 @@ public class PersoBehaviour : MonoBehaviour {
     }
 
     public void Init() {
+        MapLoader l = MapLoader.Loader;
         if (perso != null && perso.p3dData != null) {
             Family fam = perso.p3dData.family;
-            if (fam != null && fam.physical_objects != null && fam.physical_objects.Length > 0) {
-                Array.Resize(ref poListNames, fam.off_physical_lists.Length + 1);
-                Array.Copy(fam.off_physical_lists.Select(o => (o == null ? "Null" : o.ToString())).ToArray(), 0, poListNames, 1, fam.off_physical_lists.Length);
-                currentPOList = perso.p3dData.off_physicalObjects == null ? 0 : fam.GetIndexOfPhysicalList(perso.p3dData.off_physicalObjects) + 1;
+            if (fam != null && fam.objectLists != null && fam.objectLists.Count > 0) {
+                Array.Resize(ref poListNames, fam.objectLists.Count + 1 + l.uncategorizedObjectLists.Count);
+                Array.Copy(fam.objectLists.Select(o => (o == null ? "Null" : o.ToString())).ToArray(), 0, poListNames, 1, fam.objectLists.Count);
+                Array.Copy(l.uncategorizedObjectLists.Select(o => (o == null ? "Null" : o.ToString())).ToArray(), 0, poListNames, 1 + fam.objectLists.Count, l.uncategorizedObjectLists.Count);
+                currentPOList = perso.p3dData.off_objectList == null ? 0 : fam.GetIndexOfPhysicalList(perso.p3dData.off_objectList) + 1;
                 if (currentPOList == -1) currentPOList = 0;
                 poListIndex = currentPOList;
             }
@@ -254,9 +257,9 @@ public class PersoBehaviour : MonoBehaviour {
                 }
 
                 //AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
-                print("POs offset: " + perso.p3dData.family.off_physical_list_first);
+                print("POs offset: " + perso.p3dData.family.objectLists.off_head);
             } else if (animMontreal != null) {
-                print("POs offset: " + perso.p3dData.family.off_physical_list_first + " - Length: " + perso.p3dData.family.physical_objects[0].Length);
+                print("POs offset: " + perso.p3dData.family.objectLists.off_head + " - Length: " + perso.p3dData.family.objectLists[0].Count);
                 for (int i = 0; i < animMontreal.num_channels; i++) {
                     for (int j = 0; j < animMontreal.num_frames; j++) {
                         print("Frame " + j + " ch " + i + ": "
@@ -333,14 +336,18 @@ public class PersoBehaviour : MonoBehaviour {
                     SetState(currentState);
                 }
             }
+            MapLoader l = MapLoader.Loader;
             if (poListIndex != currentPOList && perso.p3dData != null) {
-                if (poListIndex > 0 && poListIndex < perso.p3dData.family.physical_objects.Length + 1) {
+                if (poListIndex > 0 && poListIndex < perso.p3dData.family.objectLists.Count + 1) {
                     currentPOList = poListIndex;
-                    perso.p3dData.physical_objects = perso.p3dData.family.physical_objects[currentPOList - 1];
+                    perso.p3dData.objectList = perso.p3dData.family.objectLists[currentPOList - 1];
+                } else if (poListIndex >= perso.p3dData.family.objectLists.Count + 1 && poListIndex < perso.p3dData.family.objectLists.Count + 1 + l.uncategorizedObjectLists.Count) {
+                    currentPOList = poListIndex;
+                    perso.p3dData.objectList = l.uncategorizedObjectLists[currentPOList - perso.p3dData.family.objectLists.Count - 1];
                 } else {
                     poListIndex = 0;
                     currentPOList = 0;
-                    perso.p3dData.physical_objects = null;
+                    perso.p3dData.objectList = null;
                 }
                 forceAnimUpdate = true;
                 SetState(currentState);
@@ -425,8 +432,8 @@ public class PersoBehaviour : MonoBehaviour {
                             mf.mesh = mesh;
                             boneVisualisation.transform.localScale = Vector3.one / 4f;*/
                         } else {
-                            if (perso.p3dData.physical_objects != null && perso.p3dData.physical_objects.Length > ntto.object_index) {
-                                PhysicalObject o = perso.p3dData.physical_objects[ntto.object_index];
+                            if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > ntto.object_index) {
+                                PhysicalObject o = perso.p3dData.objectList[ntto.object_index].po;
                                 if (o != null) {
                                     PhysicalObject c = o.Clone();
                                     subObjects[i][j] = c;
@@ -476,8 +483,8 @@ public class PersoBehaviour : MonoBehaviour {
                             subObj.Gao.name = "[" + i + "] Invisible PO";
                             subObj.Gao.SetActive(false);
                         } else {
-                            if (perso.p3dData.physical_objects != null && perso.p3dData.physical_objects.Length > object_index) {
-                                PhysicalObject o = perso.p3dData.physical_objects[object_index];
+                            if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > object_index) {
+                                PhysicalObject o = perso.p3dData.objectList[object_index].po;
                                 if (o != null) {
                                     subObj = o.Clone();
                                     subObj.Gao.transform.parent = channelObjects[i].transform;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace.EngineObject {
+namespace OpenSpace.Object {
     /// <summary>
     /// SuperObjects with type 1 are "worlds", which have no data but are used for hierarchy purposes.
     /// ex:

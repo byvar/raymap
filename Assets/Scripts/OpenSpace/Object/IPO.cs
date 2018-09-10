@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace.EngineObject {
+namespace OpenSpace.Object {
     /// <summary>
     /// IPO = Instantiated Physical Object. Used for level geometry
     /// </summary>

@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace OpenSpace.EngineObject
-{
-    public class StandardGame
-    {
+namespace OpenSpace.Object.Properties {
+    public class StandardGame {
         public Pointer offset;
         public uint[] objectTypes = new uint[3];
         public Pointer superObject;
@@ -18,8 +16,7 @@ namespace OpenSpace.EngineObject
         public int customBitsInitial;
         public int aiCustomBitsInitial;
 
-        public StandardGame(Pointer offset)
-        {
+        public StandardGame(Pointer offset) {
             this.offset = offset;
         }
 

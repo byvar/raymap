@@ -1,4 +1,4 @@
-﻿using OpenSpace.EngineObject;
+﻿using OpenSpace.Object;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,10 +25,10 @@ namespace OpenSpace.AI {
             b.unknown1 = reader.ReadUInt32(); // init at 0xCDCDCDCD
             b.unknown2 = reader.ReadUInt32(); // 0
 
-            if (b.off_mind != null) {
-                Pointer.Goto(ref reader, b.off_mind);
+            Pointer.DoAt(ref reader, b.off_mind, () => {
                 b.mind = Mind.Read(reader, b.off_mind);
-            }
+            });
+
             return b;
         }
     }

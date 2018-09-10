@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace.EngineObject {
+namespace OpenSpace.Object {
     public class Sector : IEngineObject {
 
         public Pointer offset;

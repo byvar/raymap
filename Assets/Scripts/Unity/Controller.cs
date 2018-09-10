@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using OpenSpace;
 using OpenSpace.Visual;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
 using OpenSpace.AI;
 using OpenSpace.Collide;
 

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using OpenSpace;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
 using System.Collections.Generic;
 
 public class DynamicsMechanicsComponent : MonoBehaviour

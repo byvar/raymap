@@ -1,7 +1,7 @@
 ﻿using OpenSpace.AI;
 using OpenSpace.Animation;
 using OpenSpace.Collide;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
 using OpenSpace.FileFormat;
 using OpenSpace.FileFormat.Texture;
 using OpenSpace.Input;
@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using OpenSpace.Object.Properties;
 
 namespace OpenSpace {
     public class MapLoader {
@@ -60,6 +61,12 @@ namespace OpenSpace {
             get { return hasTransit; }
         }
 
+        public SuperObject transitDynamicWorld;
+        public SuperObject actualWorld;
+        public SuperObject dynamicWorld;
+        public SuperObject inactiveDynamicWorld;
+        public SuperObject fatherSector;
+
         public List<SuperObject> superObjects = new List<SuperObject>();
         public List<VisualMaterial> visualMaterials = new List<VisualMaterial>();
         public List<GameMaterial> gameMaterials = new List<GameMaterial>();
@@ -77,9 +84,12 @@ namespace OpenSpace {
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
         public List<AnimationReference> animationReferences = new List<AnimationReference>();
         public List<AnimationMontreal> animationReferencesMontreal = new List<AnimationMontreal>();
+        public List<ObjectList> objectLists = new List<ObjectList>();
+        public List<ObjectList> uncategorizedObjectLists = new List<ObjectList>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
         public GameObject graphRoot = null;
         public GameObject isolateWaypointRoot = null;
+        public GameObject familiesRoot = null;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
 
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
@@ -896,6 +906,7 @@ namespace OpenSpace {
 
             if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                 // Tonic Trouble
+                inputStruct = new InputStructure(null);
                 uint stringCount = Settings.s.game == Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
                 Pointer.Read(reader);
                 Pointer.Read(reader);
@@ -958,6 +969,7 @@ namespace OpenSpace {
                 }
             } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 uint num_strings = 0;
+                inputStruct = new InputStructure(null);
 
                 // SDA
                 Pointer.DoAt(ref reader, sna.SDA, () => {
@@ -1677,26 +1689,17 @@ MonoBehaviour.print(str);
         }
 
         public void ReadSuperObjects(Reader reader) {
-            Pointer off_current = Pointer.Goto(ref reader, globals.off_actualWorld);
-            List<SuperObject> superObjectsActual = SuperObject.Read(reader, globals.off_actualWorld, false, true);
-            if (hasTransit && globals.off_transitDynamicWorld != null) {
-                Pointer.Goto(ref reader, globals.off_transitDynamicWorld);
-                superObjectsActual.AddRange(SuperObject.Read(reader, globals.off_transitDynamicWorld, false, true));
-            }
+            actualWorld = SuperObject.FromOffsetOrRead(globals.off_actualWorld, reader);
+            dynamicWorld = SuperObject.FromOffsetOrRead(globals.off_dynamicWorld, reader);
+            inactiveDynamicWorld = SuperObject.FromOffsetOrRead(globals.off_inactiveDynamicWorld, reader);
+            transitDynamicWorld = SuperObject.FromOffsetOrRead(globals.off_transitDynamicWorld, reader);
+            fatherSector = SuperObject.FromOffsetOrRead(globals.off_fatherSector, reader);
 
-
-            SuperObject actualWorld = SuperObject.FromOffset(globals.off_actualWorld);
-            SuperObject dynamicWorld = SuperObject.FromOffset(globals.off_dynamicWorld);
-            SuperObject inactiveDynamicWorld = SuperObject.FromOffset(globals.off_inactiveDynamicWorld);
-            SuperObject transitDynamicWorld = SuperObject.FromOffset(globals.off_transitDynamicWorld);
-            SuperObject fatherSector = SuperObject.FromOffset(globals.off_fatherSector);
             if (actualWorld != null) actualWorld.Gao.name = "Actual World";
             if (dynamicWorld != null) dynamicWorld.Gao.name = "Dynamic World";
             if (inactiveDynamicWorld != null) inactiveDynamicWorld.Gao.name = "Inactive Dynamic World";
             if (transitDynamicWorld != null) transitDynamicWorld.Gao.name = "Transit Dynamic World (perso in fix)";
             if (fatherSector != null) fatherSector.Gao.name = "Father Sector";
-
-            Pointer.Goto(ref reader, off_current);
         }
 
         public void ReadAlways(Reader reader) {
@@ -1726,11 +1729,11 @@ MonoBehaviour.print(str);
 
         public void ReadFamilies(Reader reader) {
             if (families.Count > 0) {
-                GameObject familiesParent = new GameObject("Families");
-                familiesParent.SetActive(false); // Families do not need to be visible
+                familiesRoot = new GameObject("Families");
+                familiesRoot.SetActive(false); // Families do not need to be visible
                 families.ReadEntries(ref reader, (off_element) => {
                     Family f = Family.Read(reader, off_element);
-                    f.Gao.transform.SetParent(familiesParent.transform, false);
+                    f.Gao.transform.SetParent(familiesRoot.transform, false);
                     return f;
                 }, LinkedList.Flags.HasHeaderPointers);
             }
@@ -1763,6 +1766,11 @@ MonoBehaviour.print(str);
             wayPointGao.transform.SetParent(isolateWaypointRoot.transform);
 
             return true;
+        }
+
+        public void AddUncategorizedObjectList(ObjectList objList) {
+            if (!uncategorizedObjectLists.Contains(objList)) uncategorizedObjectLists.Add(objList);
+            objList.Gao.transform.SetParent(familiesRoot.transform);
         }
 
         public bool AddGraph(Graph graph) {

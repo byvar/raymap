@@ -7,8 +7,7 @@ using UnityEngine;
 namespace OpenSpace.AI {
     public class Behavior : BehaviorOrMacro {
 
-        public enum BehaviorType
-        {
+        public enum BehaviorType {
             Normal, Reflex
         }
 
@@ -27,8 +26,7 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Behavior FromOffset(Pointer offset)
-        {
+        public static Behavior FromOffset(Pointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.behaviors.FirstOrDefault(f => f.offset == offset);
@@ -42,11 +40,9 @@ namespace OpenSpace.AI {
             behavior.type = type;
             behavior.number = number;
 
-            if (Settings.s.hasNames)
-            {
+            if (Settings.s.hasNames) {
                 behavior.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
-            } else
-            {
+            } else {
                 behavior.name = behavior.type.ToString() + "Behaviour #" + number + " @"+offset;
             }
             behavior.off_scripts = Pointer.Read(reader);

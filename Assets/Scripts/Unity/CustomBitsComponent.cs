@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
 using System.Collections.Generic;
+using OpenSpace.Object.Properties;
 
 public class CustomBitsComponent : MonoBehaviour {
     public StandardGame stdGame;

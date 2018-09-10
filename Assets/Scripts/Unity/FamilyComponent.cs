@@ -3,9 +3,9 @@ using System.Collections;
 using OpenSpace;
 using System.Collections.Generic;
 using System;
+using OpenSpace.Object.Properties;
 
-public class FamilyComponent : MonoBehaviour
-{
+public class FamilyComponent : MonoBehaviour {
     public Family family;
     public List<MechanicsIDCard> idCards;
     public int cardCount;

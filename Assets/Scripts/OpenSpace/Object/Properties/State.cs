@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace {
+namespace OpenSpace.Object.Properties {
     public class State : ILinkedListEntry {
         public Pointer offset;
         public Family family;

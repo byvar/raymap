@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using OpenSpace.AI;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
 using OpenSpace;
 
 public class MindComponent : MonoBehaviour {

@@ -1,4 +1,4 @@
-﻿using OpenSpace.EngineObject;
+﻿using OpenSpace.Object;
 using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
@@ -31,11 +31,11 @@ namespace OpenSpace.AI {
             dsgVar.off_dsgVarInfo = Pointer.Read(reader);
 
             // Unknown stuff
-            if (dsgMem==null && l.mode != MapLoader.Mode.RaymanArenaGC && l.mode != MapLoader.Mode.Rayman3GC) {
+            if (dsgMem==null && Settings.s.platform != Settings.Platform.GC && Settings.s.engineVersion >= Settings.EngineVersion.R2) {
                 dsgVar.something3 = reader.ReadUInt32();
             }
 
-            if (l.mode == MapLoader.Mode.RaymanArenaGC || l.mode == MapLoader.Mode.Rayman3GC) {
+            if (Settings.s.platform == Settings.Platform.GC || Settings.s.engineVersion < Settings.EngineVersion.R2) {
                 dsgVar.dsgMemBufferLength = reader.ReadUInt32();
                 dsgVar.amountOfInfos = reader.ReadByte();
             } else if (dsgMem == null) {
@@ -48,23 +48,22 @@ namespace OpenSpace.AI {
 
             dsgVar.dsgVarInfos = new DsgVarInfoEntry[dsgVar.amountOfInfos];
 
-            if (dsgVar.off_dsgVarInfo != null && dsgVar.amountOfInfos > 0) {
+            if (dsgVar.amountOfInfos > 0) {
+                Pointer.DoAt(ref reader, dsgVar.off_dsgVarInfo, () => {
+                    for (uint i = 0; i < dsgVar.amountOfInfos; i++) {
+                        DsgVarInfoEntry infoEntry = DsgVarInfoEntry.Read(reader, Pointer.Current(reader), i);
 
-                Pointer off_current = Pointer.Goto(ref reader, dsgVar.off_dsgVarInfo);
-                for (uint i = 0; i < dsgVar.amountOfInfos; i++) {
-                    DsgVarInfoEntry infoEntry = DsgVarInfoEntry.Read(reader, Pointer.Current(reader), i);
-
-                    if (dsgMem != null) {
-                        infoEntry.value = dsgVar.ReadValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
-                        if (dsgMem.memBufferInitial != null) {
-                            infoEntry.initialValue = dsgVar.ReadInitialValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                        if (dsgMem != null) {
+                            infoEntry.value = dsgVar.ReadValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                            if (dsgMem.memBufferInitial != null) {
+                                infoEntry.initialValue = dsgVar.ReadInitialValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                            }
+                        } else {
+                            infoEntry.value = dsgVar.ReadValueFromDsgVarBuffer(reader, infoEntry, dsgVar);
                         }
-                    } else {
-                        infoEntry.value = dsgVar.ReadValueFromDsgVarBuffer(reader, infoEntry, dsgVar);
+                        dsgVar.dsgVarInfos[i] = infoEntry;
                     }
-                    dsgVar.dsgVarInfos[i] = infoEntry;
-                }
-                Pointer.Goto(ref reader, off_current); // Move the reader back to where it was
+                });
             }
 
             /*if (d.off_AI_model != null) {

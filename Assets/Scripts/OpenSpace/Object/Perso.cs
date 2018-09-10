@@ -1,5 +1,6 @@
 ﻿using OpenSpace.AI;
 using OpenSpace.Collide;
+using OpenSpace.Object.Properties;
 using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace OpenSpace.EngineObject {
+namespace OpenSpace.Object {
     /// <summary>
     /// Also called "Actor" in the code which might be a better name, but I'll stick to the R2 one for now
     /// </summary>
@@ -113,12 +114,10 @@ namespace OpenSpace.EngineObject {
                 Pointer.Goto(ref reader, off_current);
             }
 
-            if (p.off_brain != null && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                Pointer off_current = Pointer.Goto(ref reader, p.off_brain);
+            Pointer.DoAt(ref reader, p.off_brain, () => {
                 p.brain = Brain.Read(reader, p.off_brain);
                 if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.nameModel != null) p.brain.mind.AI_model.name = p.nameModel;
-                Pointer.Goto(ref reader, off_current);
-            }
+            });
 
             /*if (l.mode == MapLoader.Mode.Rayman2PC && off_msWay != null) {
              * MS_Way is always empty at start, instead check DsgVars for graphs
@@ -145,15 +144,11 @@ namespace OpenSpace.EngineObject {
                 }
             }*/
             if (p.p3dData != null && p.p3dData.family != null) {
-                if (p.p3dData.off_physicalObjects != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects) == -1) {
-                    Pointer.DoAt(ref reader, p.p3dData.off_physicalObjects, () => {
-                        p.p3dData.family.ReadNewPhysicalList(reader, p.p3dData.off_physicalObjects);
-                    });
+                if (p.p3dData.off_objectList != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_objectList) == -1) {
+                    p.p3dData.family.AddNewPhysicalList(ObjectList.FromOffsetOrRead(p.p3dData.off_objectList, reader));
                 }
-                if (p.p3dData.off_physicalObjectsInitial != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjectsInitial) == -1) {
-                    Pointer.DoAt(ref reader, p.p3dData.off_physicalObjectsInitial, () => {
-                        p.p3dData.family.ReadNewPhysicalList(reader, p.p3dData.off_physicalObjectsInitial);
-                    });
+                if (p.p3dData.off_objectListInitial != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_objectListInitial) == -1) {
+                    p.p3dData.family.AddNewPhysicalList(ObjectList.FromOffsetOrRead(p.p3dData.off_objectListInitial, reader));
                 }
                 if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null
                     && !(Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
@@ -165,11 +160,10 @@ namespace OpenSpace.EngineObject {
                                 for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
                                     List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_normal[i].scripts[j].scriptNodes;
                                     foreach (ScriptNode node in nodes) {
-                                        if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                            && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
-                                            Pointer.DoAt(ref reader, node.param_ptr, () => {
-                                                p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
-                                            });
+                                        if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef) {
+                                            ObjectList ol = ObjectList.FromOffsetOrRead(node.param_ptr, reader);
+                                            ol.unknownFamilyName = p.p3dData.family.name;
+                                            ol.AddToFamilyLists();
                                         }
                                     }
                                 }
@@ -182,11 +176,10 @@ namespace OpenSpace.EngineObject {
                                 for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
                                     List<ScriptNode> nodes = p.brain.mind.AI_model.behaviors_reflex[i].scripts[j].scriptNodes;
                                     foreach (ScriptNode node in nodes) {
-                                        if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                            && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
-                                            Pointer.DoAt(ref reader, node.param_ptr, () => {
-                                                p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
-                                            });
+                                        if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef) {
+                                            ObjectList ol = ObjectList.FromOffsetOrRead(node.param_ptr, reader);
+                                            ol.unknownFamilyName = p.p3dData.family.name;
+                                            ol.AddToFamilyLists();
                                         }
                                     }
                                 }
@@ -198,19 +191,18 @@ namespace OpenSpace.EngineObject {
                             if (ai.macros[i].script != null) {
                                 List<ScriptNode> nodes = p.brain.mind.AI_model.macros[i].script.scriptNodes;
                                 foreach (ScriptNode node in nodes) {
-                                    if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef
-                                        && p.p3dData.family.GetIndexOfPhysicalList(node.param_ptr) == -1) {
-                                        Pointer.DoAt(ref reader, node.param_ptr, () => {
-                                            p.p3dData.family.ReadNewPhysicalList(reader, node.param_ptr);
-                                        });
+                                    if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef) {
+                                        ObjectList ol = ObjectList.FromOffsetOrRead(node.param_ptr, reader);
+                                        ol.unknownFamilyName = p.p3dData.family.name;
+                                        ol.AddToFamilyLists();
                                     }
                                 }
                             }
                         }
                     }
                 }
-                if (p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects) != -1) {
-                    p.p3dData.physical_objects = p.p3dData.family.physical_objects[p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_physicalObjects)];
+                if (p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_objectList) != -1) {
+                    p.p3dData.objectList = ObjectList.FromOffset(p.p3dData.off_objectList);
                 }
             }
 

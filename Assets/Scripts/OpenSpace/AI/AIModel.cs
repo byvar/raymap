@@ -35,8 +35,10 @@ namespace OpenSpace.AI {
             ai.off_behaviors_normal = Pointer.Read(reader);
             ai.off_behaviors_reflex = Pointer.Read(reader);
             ai.off_dsgVar = Pointer.Read(reader);
-            ai.off_macros = Pointer.Read(reader);
-            ai.flags = reader.ReadUInt32();
+            if (Settings.s.engineVersion >= Settings.EngineVersion.R2) {
+                ai.off_macros = Pointer.Read(reader);
+                ai.flags = reader.ReadUInt32();
+            }
 
             if (ai.off_behaviors_normal != null) {
                 Pointer.Goto(ref reader, ai.off_behaviors_normal);

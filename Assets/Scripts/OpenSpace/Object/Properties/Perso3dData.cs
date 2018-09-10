@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace OpenSpace.EngineObject {
+namespace OpenSpace.Object.Properties {
     public class Perso3dData {
         public Pointer offset;
 
@@ -9,12 +9,12 @@ namespace OpenSpace.EngineObject {
         public Pointer off_stateCurrent;
         public Pointer off_state2;
 
-        public Pointer off_physicalObjects;
-        public Pointer off_physicalObjectsInitial;
+        public Pointer off_objectList;
+        public Pointer off_objectListInitial;
         public Pointer off_family;
 
         public Family family = null;
-        public PhysicalObject[] physical_objects = null;
+        public ObjectList objectList = null;
         public State stateCurrent = null;
 
         public Perso3dData(Pointer offset) {
@@ -29,8 +29,8 @@ namespace OpenSpace.EngineObject {
             d.off_stateCurrent = Pointer.Read(reader);
             d.off_state2 = Pointer.Read(reader);
 
-            d.off_physicalObjects = Pointer.Read(reader);
-            d.off_physicalObjectsInitial = Pointer.Read(reader);
+            d.off_objectList = Pointer.Read(reader);
+            d.off_objectListInitial = Pointer.Read(reader);
             d.off_family = Pointer.Read(reader);
             d.family = Family.FromOffset(d.off_family);
             d.stateCurrent = State.FromOffset(d.family, d.off_stateCurrent);
@@ -42,7 +42,7 @@ namespace OpenSpace.EngineObject {
             Pointer.Write(writer, off_stateInitial);
             Pointer.Write(writer, off_stateCurrent);
             Pointer.Write(writer, off_stateCurrent);
-            Pointer.Write(writer, off_physicalObjects);
+            Pointer.Write(writer, off_objectList);
         }
     }
 }

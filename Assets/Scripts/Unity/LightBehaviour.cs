@@ -133,7 +133,7 @@ public class LightBehaviour : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        return;
+        if (lightManager != null && lightManager.sectorManager.useMultiCameras) return;
         if (loaded) {
             if (active == true && activeIntensity < 1f) {
                 activeIntensity += Time.deltaTime / 1.5f;

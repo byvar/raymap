@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
 using OpenSpace.AI;
 using System.Collections.Generic;
 using System;

@@ -8,7 +8,7 @@ namespace OpenSpace.Input {
         public Pointer offset;
         public uint num_entryActions;
         public Pointer off_entryActions;
-        public EntryAction[] entryActions;
+        public List<EntryAction> entryActions = new List<EntryAction>();
 
         public InputStructure(Pointer offset) {
             this.offset = offset;
@@ -44,10 +44,10 @@ namespace OpenSpace.Input {
             }
 
             if (input.off_entryActions != null && input.num_entryActions > 0) {
-                input.entryActions = new EntryAction[input.num_entryActions];
+                //input.entryActions = new EntryAction[input.num_entryActions];
                 Pointer off_current = Pointer.Goto(ref reader, input.off_entryActions);
                 for (int i = 0; i < input.num_entryActions; i++) {
-                    input.entryActions[i] = EntryAction.Read(reader, Pointer.Current(reader));
+                    input.entryActions.Add(EntryAction.Read(reader, Pointer.Current(reader)));
                 }
                 Pointer.Goto(ref reader, off_current);
             }

@@ -1,4 +1,4 @@
-﻿using OpenSpace.EngineObject;
+﻿using OpenSpace.Object;
 using OpenSpace.Input;
 using System;
 using System.Collections.Generic;
@@ -43,6 +43,8 @@ namespace OpenSpace.AI
                     string secondChildNode = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString() : "null";
                     string prefix = (ts.printAddresses ? "{0x" + scriptNode.offset.offset.ToString("X8")  + "}" : "");
 
+                    AITypes aiTypes = Settings.s.aiTypes;
+
                     switch (scriptNode.nodeType)
                     {
                         case ScriptNode.NodeType.KeyWord:
@@ -61,7 +63,7 @@ namespace OpenSpace.AI
                                 case 8: return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Else
                                 case 9: return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
-                                default: return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso); ;
+                                default: return prefix + scriptNode.ToString(perso);
                             }
                         case ScriptNode.NodeType.Condition:
                             switch (scriptNode.param)
@@ -87,9 +89,9 @@ namespace OpenSpace.AI
 
                                 default:
                                     if (firstChildNode!=null)
-                                        return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "("+string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString()))+")";
+                                        return prefix + scriptNode.ToString(perso) + "("+string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString()))+")";
                                     else
-                                        return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso)+"()";
+                                        return prefix + scriptNode.ToString(perso)+"()";
 
 
                             }
@@ -114,7 +116,7 @@ namespace OpenSpace.AI
                                     return prefix + "((" + this.children[0] + ") ? " + this.children[1] + " : " + this.children [2]+")";
 
                                 default:
-                                    string func = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
+                                    string func = scriptNode.ToString(perso);
                                     return prefix + func + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             }
 
@@ -128,7 +130,7 @@ namespace OpenSpace.AI
                                 case 78: return prefix + "break;\n";
 
                                 default:
-                                    string proc = R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
+                                    string proc = scriptNode.ToString(perso);
                                     return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                             }
@@ -183,27 +185,27 @@ namespace OpenSpace.AI
                                 case 26: return firstChildNode + "[" + secondChildNode + "]";
 
                                 default:
-                                    string proc = "("+scriptNode.param+")"+R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
+                                    string proc = "("+scriptNode.param+")"+ scriptNode.ToString(perso);
                                     return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
                             }
 
                         case ScriptNode.NodeType.Field:
                             if (firstChildNode != null)
-                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                return prefix + scriptNode.ToString(perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             else
-                                return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
+                                return prefix + scriptNode.ToString(perso);
 
                         case ScriptNode.NodeType.Vector:
                         case ScriptNode.NodeType.ConstantVector:
 
-                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
 
                         case ScriptNode.NodeType.MetaAction:
 
-                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
+                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                         default:
-                            return prefix + R2AITypes.readableFunctionSubTypeBasic(this.scriptNode, perso);
+                            return prefix + scriptNode.ToString(perso);
                     }
                 }
                 else // Root node returns all children concatenated

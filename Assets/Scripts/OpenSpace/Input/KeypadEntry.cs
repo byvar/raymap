@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace OpenSpace {
+namespace OpenSpace.Input {
     public struct KeypadEntry {
         public short keycode;
         public short unk2;

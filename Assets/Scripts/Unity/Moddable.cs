@@ -1,5 +1,6 @@
 ﻿using OpenSpace;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
+using OpenSpace.Object.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;

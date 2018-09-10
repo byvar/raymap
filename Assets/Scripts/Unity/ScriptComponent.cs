@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using OpenSpace.AI;
-using OpenSpace.EngineObject;
+using OpenSpace.Object;
 
 public class ScriptComponent : MonoBehaviour {
     private Script script;

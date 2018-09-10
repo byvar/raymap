@@ -1,4 +1,4 @@
-﻿using OpenSpace.EngineObject;
+﻿using OpenSpace.Object;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,11 +48,7 @@ namespace OpenSpace.AI {
                     builder.Append("---- END OF SCRIPT ----");
                 } else {
                     builder.Append(new String(' ', (sn.indent - 1) * 4));
-                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                        builder.Append(R2AITypes.readableFunctionSubType(sn, perso));
-                    } else {
-                        builder.Append(R3AITypes.readableFunctionSubType(sn, perso));
-                    }
+                    builder.Append(sn.ToString(perso, advanced: true));
                 }
                 builder.Append("\n");
             }

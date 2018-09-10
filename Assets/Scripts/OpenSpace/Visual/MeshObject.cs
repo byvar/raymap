@@ -1,4 +1,5 @@
-﻿using OpenSpace.Visual.Deform;
+﻿using OpenSpace.Object;
+using OpenSpace.Visual.Deform;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace OpenSpace.EngineObject {
+namespace OpenSpace.Object {
     /// <summary>
     /// Everything a superobject can contain.Gao gives the unity GameObject representation of it.
     /// </summary>
