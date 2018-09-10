@@ -105,17 +105,17 @@ namespace OpenSpace.AI {
                         returnValue = new Vector3(x, y, z);
                         
                         break;
+                    case DsgVarInfoEntry.DsgVarType.Text:
+                        uint textInd = reader.ReadUInt32();
+                        returnValue = MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)textInd, 0);
+                        break;
                     case DsgVarInfoEntry.DsgVarType.Graph:
-                            Pointer off_graph = Pointer.Read(reader);
-                            if (off_graph != null) {
-                                Pointer originalBeforeGraph = Pointer.Goto(ref reader, off_graph);
-                                Graph graph = Graph.Read(reader, off_graph);
-                                Pointer.Goto(ref reader, originalBeforeGraph);
-
-                                MapLoader.Loader.AddGraph(graph);
-
-                            returnValue = "Graph " + off_graph;
-                        }
+                        Pointer off_graph = Pointer.Read(reader);
+                        Pointer.DoAt(ref reader, off_graph, () => {
+                            Graph graph = Graph.Read(reader, off_graph);
+                            MapLoader.Loader.AddGraph(graph);
+                        });
+                        returnValue = "Graph " + off_graph;
 
                         break;
                     case DsgVarInfoEntry.DsgVarType.Waypoint:

@@ -34,6 +34,7 @@ namespace OpenSpace
             public Vector3 valueAsVector;
             public GameObject valueAsSuperObjectGao;
             public GameObject valueAsPersoGao;
+            public string valueAsString;
 
             public bool valueAsBool_initial;
             public uint valueAsUInt_initial;
@@ -46,6 +47,7 @@ namespace OpenSpace
             public Vector3 valueAsVector_initial;
             public GameObject valueAsSuperObjectGao_initial;
             public GameObject valueAsPersoGao_initial;
+            public string valueAsString_initial;
 
             public DsgVarEditableEntry(int number, DsgVarInfoEntry entry)
             {
@@ -62,6 +64,7 @@ namespace OpenSpace
                     case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte       = (byte)    entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat      = (float)   entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector     = (Vector3) entry.value;  break;
+                    case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsString     = (string)  entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Perso:
 
                         if (entry.value != null) {
@@ -95,6 +98,7 @@ namespace OpenSpace
                         case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte_initial       = (byte)entry.initialValue;         break;
                         case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat_initial      = (float)entry.initialValue;        break;
                         case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector_initial     = (Vector3)entry.initialValue;      break;
+                        case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsString_initial     = (string)entry.initialValue;       break;
                         case DsgVarInfoEntry.DsgVarType.Perso:
                             if (entry.initialValue != null) {
                                 Perso perso = MapLoader.Loader.persos.Where(p => p.SuperObject.offset == (Pointer)entry.initialValue).FirstOrDefault();
@@ -160,6 +164,7 @@ namespace OpenSpace
                     case DsgVarInfoEntry.DsgVarType.Byte:   stringVal = GUILayout.TextField(this.valueAsSByte.ToString()); SByte.TryParse(stringVal, out this.valueAsSByte); break;
                     case DsgVarInfoEntry.DsgVarType.UByte:  stringVal = GUILayout.TextField(this.valueAsByte.ToString()); Byte.TryParse(stringVal, out this.valueAsByte); break;
                     case DsgVarInfoEntry.DsgVarType.Float:  stringVal = GUILayout.TextField(this.valueAsFloat.ToString()); Single.TryParse(stringVal, out this.valueAsFloat); break;
+                    case DsgVarInfoEntry.DsgVarType.Text:   stringVal = GUILayout.TextField(this.valueAsString.ToString()); valueAsString = stringVal; break;
                     case DsgVarInfoEntry.DsgVarType.Vector:
                         float val_x = this.valueAsVector.x;
                         float val_y = this.valueAsVector.y;
@@ -201,6 +206,7 @@ namespace OpenSpace
                         case DsgVarInfoEntry.DsgVarType.Byte: stringVal = GUILayout.TextField(this.valueAsSByte_initial.ToString()); SByte.TryParse(stringVal, out this.valueAsSByte_initial); break;
                         case DsgVarInfoEntry.DsgVarType.UByte: stringVal = GUILayout.TextField(this.valueAsByte_initial.ToString()); Byte.TryParse(stringVal, out this.valueAsByte_initial); break;
                         case DsgVarInfoEntry.DsgVarType.Float: stringVal = GUILayout.TextField(this.valueAsFloat_initial.ToString()); Single.TryParse(stringVal, out this.valueAsFloat_initial); break;
+                        case DsgVarInfoEntry.DsgVarType.Text: stringVal = GUILayout.TextField(this.valueAsString_initial.ToString()); valueAsString_initial = stringVal; break;
                         case DsgVarInfoEntry.DsgVarType.Vector:
                             float val_x = this.valueAsVector_initial.x;
                             float val_y = this.valueAsVector_initial.y;
