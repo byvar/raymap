@@ -134,7 +134,7 @@ public class Controller : MonoBehaviour {
                 unityBehaviour.perso = p;
                 unityBehaviour.Init();
 
-                if (p.Gao && Settings.s.engineVersion == Settings.EngineVersion.R2) {
+                if (p.Gao) { // && Settings.s.engineVersion == Settings.EngineVersion.R2) {
                     if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
                         if (p.brain.mind.AI_model.behaviors_normal != null) {
                             GameObject intelParent = new GameObject("Rule behaviours");
@@ -144,19 +144,15 @@ public class Controller : MonoBehaviour {
                             foreach (Behavior behavior in normalBehaviors) {
                                 GameObject behaviorGao = new GameObject(behavior.name);
                                 behaviorGao.transform.parent = intelParent.transform;
-                                if (behavior.scripts.Length > 1) {
-                                    foreach (Script script in behavior.scripts) {
-                                        GameObject scriptGao = new GameObject("Script");
-                                        scriptGao.transform.parent = behaviorGao.transform;
-                                        ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
-                                        scriptComponent.SetScript(script, p);
-                                    }
-                                } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name += " (Single-script)";
+                                foreach (Script script in behavior.scripts) {
+                                    GameObject scriptGao = new GameObject("Script");
+                                    scriptGao.transform.parent = behaviorGao.transform;
+                                    ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
+                                    scriptComponent.SetScript(script, p);
+                                }
+                                if (behavior.firstScript != null) {
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
-                                    scriptComponent.SetScript(behavior.scripts[0], p);
-                                } else if (behavior.scripts.Length == 0) {
-                                    behaviorGao.name += " (Empty behaviour)";
+                                    scriptComponent.SetScript(behavior.firstScript, p);
                                 }
                                 if (iter++ == 0)
                                 {
@@ -172,19 +168,15 @@ public class Controller : MonoBehaviour {
                             foreach (Behavior behavior in reflexBehaviors) {
                                 GameObject behaviorGao = new GameObject(behavior.name);
                                 behaviorGao.transform.parent = reflexParent.transform;
-                                if (behavior.scripts.Length > 1) {
-                                    foreach (Script script in behavior.scripts) {
-                                        GameObject scriptGao = new GameObject("Script");
-                                        scriptGao.transform.parent = behaviorGao.transform;
-                                        ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
-                                        scriptComponent.SetScript(script, p);
-                                    }
-                                } else if (behavior.scripts.Length == 1) {
-                                    behaviorGao.name += " (Single-script)";
+                                foreach (Script script in behavior.scripts) {
+                                    GameObject scriptGao = new GameObject("Script");
+                                    scriptGao.transform.parent = behaviorGao.transform;
+                                    ScriptComponent scriptComponent = scriptGao.AddComponent<ScriptComponent>();
+                                    scriptComponent.SetScript(script, p);
+                                }
+                                if (behavior.firstScript != null) {
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
-                                    scriptComponent.SetScript(behavior.scripts[0], p);
-                                } else if (behavior.scripts.Length == 0) {
-                                    behaviorGao.name += " (Empty behaviour)";
+                                    scriptComponent.SetScript(behavior.firstScript, p);
                                 }
                                 iter++;
                             }

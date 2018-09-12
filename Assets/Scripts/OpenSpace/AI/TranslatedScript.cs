@@ -44,25 +44,27 @@ namespace OpenSpace.AI
                     string prefix = (ts.printAddresses ? "{0x" + scriptNode.offset.offset.ToString("X8")  + "}" : "");
 
                     AITypes aiTypes = Settings.s.aiTypes;
+                    uint param = scriptNode.param;
 
                     switch (scriptNode.nodeType)
                     {
                         case ScriptNode.NodeType.KeyWord:
-                            switch (scriptNode.param)
+                            string keyword = param < aiTypes.keywordTable.Length ? aiTypes.keywordTable[param] : "";
+                            switch (keyword)
                             {
                                 // If keywords
-                                case 0: return prefix+"if ({condition})".Replace("{condition}", firstChildNode);
-                                case 1: return prefix + "if (!({condition}))".Replace("{condition}", firstChildNode);
-                                case 2: return prefix + "if (globalRandomizer % 2 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case 3: return prefix + "if (globalRandomizer % 4 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case 4: return prefix + "if (globalRandomizer % 8 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case 5: return prefix + "if (globalRandomizer % 16 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case 6: return prefix + "if (debug && {condition})".Replace("{condition}", firstChildNode);
-                                case 7: return prefix + "if (!u64)\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
+                                case "If": return prefix+"if ({condition})".Replace("{condition}", firstChildNode);
+                                case "IfNot": return prefix + "if (!({condition}))".Replace("{condition}", firstChildNode);
+                                case "If2": return prefix + "if (globalRandomizer % 2 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If4": return prefix + "if (globalRandomizer % 4 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If8": return prefix + "if (globalRandomizer % 8 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If16": return prefix + "if (globalRandomizer % 16 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfDebug": return prefix + "if (debug && {condition})".Replace("{condition}", firstChildNode);
+                                case "IfNotU64": return prefix + "if (!u64)\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Then
-                                case 8: return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
+                                case "Then": return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Else
-                                case 9: return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
+                                case "Else": return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 default: return prefix + scriptNode.ToString(perso);
                             }
                         case ScriptNode.NodeType.Condition:
@@ -97,22 +99,29 @@ namespace OpenSpace.AI
                             }
 
                         case ScriptNode.NodeType.Function:
-
+                            string function = param < aiTypes.functionTable.Length ? aiTypes.functionTable[param] : "";
                             string ternaryCheck = "";
 
-                            switch (scriptNode.param) {
+                            switch (function) {
                                 // Ternary real operators (e.g. x > y ? true : false)
-                                case 36: ternaryCheck = "<"; goto case 40;
-                                case 37: ternaryCheck = ">"; goto case 40;
-                                case 38: ternaryCheck = "=="; goto case 40;
-                                case 39: ternaryCheck = "<="; goto case 40;
-                                case 40: ternaryCheck = ">=";
+                                case "Func_TernInf":
+                                case "Func_TernSup":
+                                case "Func_TernEq":
+                                case "Func_TernInfEq":
+                                case "Func_TernSupEq":
+                                    switch (function) {
+                                        case "Func_TernInf": ternaryCheck = "<"; break;
+                                        case "Func_TernSup": ternaryCheck = ">"; break;
+                                        case "Func_TernEq": ternaryCheck = "=="; break;
+                                        case "Func_TernInfEq": ternaryCheck = "<="; break;
+                                        case "Func_TernSupEq": ternaryCheck = ">="; break;
+                                    }
                                     if (this.children.Count >= 4)
                                         return prefix + "((" + this.children[0] + ternaryCheck + this.children[1] + ") ? " + this.children[2] + " : " + this.children[3] + ")";
                                     else
                                         return "ERROR";
 
-                                case 41: // conditional ternary operator (cond ? true : false)
+                                case "Func_TernOp": // conditional ternary operator (cond ? true : false)
                                     return prefix + "((" + this.children[0] + ") ? " + this.children[1] + " : " + this.children [2]+")";
 
                                 default:

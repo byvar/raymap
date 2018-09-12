@@ -80,7 +80,8 @@ namespace OpenSpace.AI {
             Array8,
             Array9,
             Array10,
-            Array11
+            Array11,
+            Way // TT SE only
         }
     }
 }

@@ -15,9 +15,10 @@ namespace OpenSpace.AI {
 
         public string name = null;
         public Pointer off_scripts;
-        public uint unknown;
+        private Pointer off_firstScript;
         public byte num_scripts;
         public Script[] scripts;
+        public Script firstScript;
 
         public BehaviorType type;
         public int number;
@@ -46,7 +47,7 @@ namespace OpenSpace.AI {
                 behavior.name = behavior.type.ToString() + "Behaviour #" + number + " @"+offset;
             }
             behavior.off_scripts = Pointer.Read(reader);
-            behavior.unknown = reader.ReadUInt32();
+            behavior.off_firstScript = Pointer.Read(reader);
             if (Settings.s.game == Settings.Game.R2Demo) {
                 reader.ReadUInt32();
             }
@@ -57,13 +58,14 @@ namespace OpenSpace.AI {
             //if (entry.name != null) l.print(entry.name);
 
             behavior.scripts = new Script[behavior.num_scripts];
-            if (behavior.off_scripts != null && behavior.num_scripts > 0) {
-                Pointer off_current = Pointer.Goto(ref reader, behavior.off_scripts);
+            Pointer.DoAt(ref reader, behavior.off_scripts, () => {
                 for (int i = 0; i < behavior.num_scripts; i++) {
                     behavior.scripts[i] = Script.Read(reader, Pointer.Current(reader), behavior);
                 }
-                Pointer.Goto(ref reader, off_current);
-            }
+            });
+            Pointer.DoAt(ref reader, behavior.off_firstScript, () => {
+                behavior.firstScript = Script.Read(reader, Pointer.Current(reader), behavior);
+            });
 
             l.behaviors.Add(behavior);
 

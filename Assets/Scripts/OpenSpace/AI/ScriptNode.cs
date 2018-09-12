@@ -171,6 +171,7 @@ namespace OpenSpace.AI {
                 case ScriptNode.NodeType.WayPointRef:
                     return "WayPointRef: " + param_ptr;
                 case ScriptNode.NodeType.TextRef:
+                    if (l.fontStruct == null) return "TextRef";
                     if (advanced) return "TextRef: " + param + " (" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + ")";
                     return "TextRef: " + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0); // Preview in english
                 case ScriptNode.NodeType.ComportRef:
@@ -192,7 +193,7 @@ namespace OpenSpace.AI {
                     return "ParticleGenerator: " + "0x" + (param).ToString("x8");
                 case ScriptNode.NodeType.VisualMaterial:
                     return "VisualMaterial: " + param_ptr;
-                case ScriptNode.NodeType.AIModel: // ModelCast
+                case ScriptNode.NodeType.ModelRef: // ModelCast
                     if (advanced) return "AIModel: " + param_ptr;
                     AIModel model = AIModel.FromOffset(param_ptr);
                     return model != null ? model.name : "null";
@@ -253,13 +254,24 @@ namespace OpenSpace.AI {
             GameMaterialRef,
             ParticleGenerator,
             VisualMaterial,
-            AIModel,
+            ModelRef,
             DataType42,
             CustomBits,
             Caps,
             SubRoutine,
             Null,
-            GraphRef
+            GraphRef,
+            // Types below here added for engineversions < R2
+            ConstantRef,
+            RealRef,
+            SurfaceRef,
+            Way,
+            DsgVar,
+            SectorRef,
+            EnvironmentRef,
+            FontRef,
+            Color,
+            Module // Different from ModuleRef
         };
 
         internal static bool IsNodeTypeVariable(NodeType nodeType) {

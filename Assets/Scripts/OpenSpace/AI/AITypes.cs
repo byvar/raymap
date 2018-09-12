@@ -137,72 +137,72 @@ namespace OpenSpace.AI {
 
             #region Functions
             functionTable = new string[] {
-                "Func_GetPersoAbsolutePosition",
+                "Func_GetPersoAbsolutePosition", // 0
                 "Func_GetMyAbsolutePosition",
                 "Func_GetAngleAroundZToPerso",
                 "Func_DistanceToPerso",
                 "Func_DistanceXToPerso",
-                "Func_DistanceYToPerso",
+                "Func_DistanceYToPerso", // 5
                 "Func_DistanceZToPerso",
                 "Func_DistanceXYToPerso",
                 "Func_DistanceXZToPerso",
                 "Func_DistanceYZToPerso",
-                "Func_DistanceToPersoCenter",
+                "Func_DistanceToPersoCenter", // 10
                 "Func_DistanceXToPersoCenter",
                 "Func_DistanceYToPersoCenter",
                 "Func_DistanceZToPersoCenter",
                 "Func_DistanceXYToPersoCenter",
-                "Func_DistanceXZToPersoCenter",
+                "Func_DistanceXZToPersoCenter", // 15
                 "Func_DistanceYZToPersoCenters",
                 "Func_DistanceToWP",
                 "fn_p_stGetWpAbsolutePosition",
                 "Func_Int",
-                "Func_RandomInt",
+                "Func_RandomInt", // 20
                 "Func_Real",
                 "Func_Sinus",
                 "Func_Cosinus",
                 "Func_Square",
-                "Func_SquareRoot",
+                "Func_SquareRoot", // 25
                 "Func_RandomReal",
                 "Func_MinimumReal",
                 "Func_MaximumReal",
                 "Func_DegreeToRadian",
-                "Func_RadianToDegree",
+                "Func_RadianToDegree", // 30
                 "Func_AbsoluteValue",
                 "Func_LimitRealInRange",
                 "Func_Sign",
                 "Func_Cube",
-                "Func_Modulo",
+                "Func_Modulo", // 35
                 "Func_TernInf",
                 "Func_TernSup",
                 "Func_TernEq",
                 "Func_TernInfEq",
-                "Func_TernSupEq",
+                "Func_TernSupEq", // 40
                 "Func_TernOp",
                 "fn_p_stRealFunction",
                 "Func_GetHitPoints",
                 "Func_AddAndGetHitPoints",
-                "Func_SubAndGetHitPoints",
+                "Func_SubAndGetHitPoints", // 45
                 "Func_GetHitPointsMax",
                 "Func_AddAndGetHitPointsMax",
                 "Func_SubAndGetHitPointsMax",
                 "Func_ListSize",
-                "Func_GivePersoInList",
+                "Func_GivePersoInList", // 50
                 "Func_AbsoluteVector",
                 "Func_RelativeVector",
                 "Func_VectorLocalToGlobal",
                 "Func_VectorGlobalToLocal",
-                "Func_MAGNETGetStrength",
+                "Func_MAGNETGetStrength", // 55
                 "Func_MAGNETGetFar",
                 "Func_MAGNETGetNear",
                 "Func_MAGNETGetDuration",
                 "Func_SPO_GetDrawFlag",
-                "Func_GetTime",
+                "Func_GetTime", // 60
                 "Func_ElapsedTime",
                 "Func_GetDeltaTime",
                 "Func_GetFrameLength",
                 "Func_GetInputAnalogicValue",
-                "Func_VitessePadAnalogique",
+                "Func_VitessePadAnalogique", // 65
                 "Func_GenerateObject",
                 "Func_CountGeneratedObjects",
                 "Func_GetGlobalCounter",
@@ -1258,7 +1258,7 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.GameMaterialRef,
                 ScriptNode.NodeType.ParticleGenerator,
                 ScriptNode.NodeType.VisualMaterial,
-                ScriptNode.NodeType.AIModel, // 35
+                ScriptNode.NodeType.ModelRef, // 35
                 ScriptNode.NodeType.DataType42,
                 ScriptNode.NodeType.CustomBits,
                 ScriptNode.NodeType.Caps,
@@ -3045,7 +3045,7 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.GameMaterialRef,
                 ScriptNode.NodeType.ParticleGenerator,
                 ScriptNode.NodeType.VisualMaterial,
-                ScriptNode.NodeType.AIModel, // 35
+                ScriptNode.NodeType.ModelRef, // 35
                 ScriptNode.NodeType.DataType42,
                 ScriptNode.NodeType.CustomBits,
                 ScriptNode.NodeType.Caps,
@@ -3059,17 +3059,183 @@ namespace OpenSpace.AI {
             #endregion
         };
         
-        public static AITypes TT = new AITypes() {
+        public static AITypes TTSE = new AITypes() {
             functionTypes = R2.functionTypes,
-            keywordTable = R2.keywordTable,
             operatorTable = R2.operatorTable,
-            functionTable = R2.functionTable,
             procedureTable = R2.procedureTable,
             conditionTable = R2.conditionTable,
             fieldTable = R2.fieldTable,
             metaActionTable = R2.metaActionTable,
-            dsgVarTypeTable = R2.dsgVarTypeTable,
             
+            #region Functions
+            functionTable = new string[] {
+                "Func_GetPersoAbsolutePosition",
+                "Func_GetAngleAroundZToPerso",
+                "Func_GetWPAbsolutePosition",
+                "Func_DistanceToPerso",
+                "Func_DistanceXToPerso",
+                "Func_DistanceYToPerso",
+                "Func_DistanceZToPerso",
+                "Func_DistanceXYToPerso",
+                "Func_DistanceXZToPerso",
+                "Func_DistanceYZToPerso",
+                "Func_DistanceToWP",
+                "Func_CloserWP",
+                "Func_DistanceToPersoCenter",
+                "Func_DistanceXToPersoCenter",
+                "Func_DistanceYToPersoCenter",
+                "Func_DistanceZToPersoCenter",
+                "Func_DistanceXYToPersoCenter",
+                "Func_DistanceXZToPersoCenter",
+                "Func_DistanceYZToPersoCenter",
+                "Func_Real",
+                "Func_Int",
+                "Func_Sinus",
+                "Func_Cosinus",
+                "Func_Square",
+                "Func_SquareRoot",
+                "Func_RandomInt",
+                "Func_RandomReal",
+                "Func_MinimumReal",
+                "Func_MaximumReal",
+                "Func_DegreeToRadian",
+                "Func_RadianToDegree",
+                "Func_AbsoluteValue",
+                "Func_GetHitPoints",
+                "Func_AddAndGetHitPoints",
+                "Func_SubAndGetHitPoints",
+                "Func_GetHitPointsMax",
+                "Func_AddAndGetHitPointsMax",
+                "Func_SubAndGetHitPointsMax",
+                "Func_GetTime",
+                "Func_ElapsedTime",
+                "Func_ListSize",
+                "Func_GivePersoInList",
+                "Func_GetInputAnalogicValue",
+                "Func_GenerateObject",
+                "Func_DepthEnvironment",
+                "Func_AltitudeEnvironment",
+                "Func_GetFather",
+                "Function_Camera_GetCamera",
+                "Function_Camera_GetMainCamera",
+                "Function_Camera_GetDistanceCameraTarget",
+                "Function_Camera_GetTargetCamera",
+                "Function_Camera_GetDistMin",
+                "Function_Camera_GetDistMax",
+                "Function_Camera_GetBoundDistMin",
+                "Function_Camera_GetBoundDistMax",
+                "Function_Camera_GetAlpha",
+                "Function_Camera_GetShiftAlpha",
+                "Function_Camera_GetTeta",
+                "Function_Camera_GetShiftTeta",
+                "Function_Camera_GetOrientationX",
+                "Function_Camera_GetOrientationY",
+                "Function_Camera_GetOrientationZ",
+                "Function_Camera_GetCamLinearSpeedMin",
+                "Function_Camera_GetCamLinearSpeedMax",
+                "Function_Camera_GetCamAngularSpeed",
+                "Function_Camera_GetTgtLinearSpeed",
+                "Function_Camera_GetFocal",
+                "Function_Camera_GetState",
+                "Function_Camera_GetFlag",
+                "Function_Camera_GetActivation",
+                "Function_Camera_GetShiftPerso",
+                "Function_Camera_GetShiftVertex",
+                "Function_Camera_GetLookVertex",
+                "Function_Camera_ComputeAlphaAngleCamTgt",
+                "Function_Camera_ComputeTetaAngleCamTgt",
+                "Function_Camera_GetOrientationSpeed",
+                "Function_Camera_GetOrientationLimitX",
+                "Function_Camera_GetOrientationLimitY",
+                "Function_Camera_GetOrientationLimitZ",
+                "Function_Camera_ComputeTargetPosition",
+                "Func_GetNormSpeed",
+                "Func_GetAlphaPas",
+                "Func_GetThetaPas",
+                "Func_GetAlpha",
+                "Func_GetTheta",
+                "Func_GetCurrentObjectInInventory",
+                "Func_GetObjectNumberInInventory",
+                "Func_UseObjectFromInventory",
+                "Func_UseNObjectsFromInventory",
+                "Func_GetVectorNorm",
+                "Func_AbsoluteVector",
+                "Func_RelativeVector",
+                "Func_GetEnvironmentToxicity",
+                "Func_AddColor",
+                "Func_AddRed",
+                "Func_AddGreen",
+                "Func_AddBlue",
+                "Func_AddAlpha",
+                "Func_ColorRGBA",
+                "Func_ColorRGB",
+                "Func_ColorRed",
+                "Func_ColorGreen",
+                "Func_ColorBlue",
+                "Func_ColorAlpha",
+                "Func_GetCurrentCollidedGMT",
+                "Func_GetMechanicalGMTAdhesionCoef",
+                "Func_GetMechanicalGMTAbsorptionCoef",
+                "Func_GetMechanicalGMTFrictionCoef",
+                "Func_GetMechanicalGMTSlideCoef",
+                "Func_GetMechanicalGMTProgressionCoef",
+                "Func_GetMechanicalGMTPenetrationCoef",
+                "Func_GetMechanicalGMTPenetrationMaxCoef",
+                "Func_GetVisualGMTColor",
+                "Func_GetVisualGMTSpecularCoef",
+                "Func_GetVisualGMTSpecularExponant",
+                "Func_GetVisualGMTDiffuseCoef",
+                "Func_GetVisualGMTAmbientCoef",
+                "Func_GetVisualGMTTextureScrollingCoefU",
+                "Func_GetVisualGMTTextureScrollingCoefV",
+                "Func_GetVisualGMTFrame",
+                "Func_GetVisualGMTNumberOfFrames"
+            },
+            #endregion
+
+            #region Keywords
+            keywordTable = new string[] {
+                "If",
+                "Then",
+                "Else",
+                "EngineGoto",
+                "Me",
+                "MainActor",
+                "World",
+                "Nobody",
+                "Nowhere"
+            },
+            #endregion
+
+            #region DsgVar Types
+            dsgVarTypeTable = new DsgVarInfoEntry.DsgVarType[] {
+                DsgVarInfoEntry.DsgVarType.Boolean,
+                DsgVarInfoEntry.DsgVarType.Byte,
+                DsgVarInfoEntry.DsgVarType.UByte, // Unsigned
+                DsgVarInfoEntry.DsgVarType.Short,
+                DsgVarInfoEntry.DsgVarType.UShort, // Unsigned
+                DsgVarInfoEntry.DsgVarType.Int,
+                DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
+                DsgVarInfoEntry.DsgVarType.Float,
+                DsgVarInfoEntry.DsgVarType.Waypoint,
+                DsgVarInfoEntry.DsgVarType.Way,
+                DsgVarInfoEntry.DsgVarType.Perso,
+                DsgVarInfoEntry.DsgVarType.List,
+                DsgVarInfoEntry.DsgVarType.Vector,
+                DsgVarInfoEntry.DsgVarType.Comport,
+                DsgVarInfoEntry.DsgVarType.Action,
+                DsgVarInfoEntry.DsgVarType.Text,
+                DsgVarInfoEntry.DsgVarType.GameMaterial,
+                DsgVarInfoEntry.DsgVarType.PersoArray,
+                DsgVarInfoEntry.DsgVarType.VectorArray,
+                DsgVarInfoEntry.DsgVarType.FloatArray,
+                DsgVarInfoEntry.DsgVarType.IntegerArray,
+                DsgVarInfoEntry.DsgVarType.WayPointArray,
+                DsgVarInfoEntry.DsgVarType.TextArray,
+                DsgVarInfoEntry.DsgVarType.None
+            },
+            #endregion
+
             #region Node types
             nodeTypes = new ScriptNode.NodeType[] {
                 ScriptNode.NodeType.KeyWord, // 0
@@ -3079,10 +3245,10 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.Procedure,
                 ScriptNode.NodeType.MetaAction, // 5
                 ScriptNode.NodeType.BeginMacro,
-                ScriptNode.NodeType.BeginMacro,
                 ScriptNode.NodeType.EndMacro,
+                ScriptNode.NodeType.Unknown,
                 ScriptNode.NodeType.Field,
-                ScriptNode.NodeType.DsgVarRef, // 10
+                ScriptNode.NodeType.DsgVar, // 10
                 ScriptNode.NodeType.DsgVarRef,
                 ScriptNode.NodeType.Constant,
                 ScriptNode.NodeType.Real,
@@ -3090,33 +3256,28 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.ConstantVector, // 15
                 ScriptNode.NodeType.Vector,
                 ScriptNode.NodeType.Mask,
-                ScriptNode.NodeType.ModuleRef,
+                ScriptNode.NodeType.Module,
                 ScriptNode.NodeType.DsgVarId,
                 ScriptNode.NodeType.String, // 20
                 ScriptNode.NodeType.LipsSynchroRef,
                 ScriptNode.NodeType.FamilyRef,
-                ScriptNode.NodeType.Unknown,
+                ScriptNode.NodeType.GraphRef,
                 ScriptNode.NodeType.PersoRef,
                 ScriptNode.NodeType.ActionRef, // 25
+                ScriptNode.NodeType.EnvironmentRef,
                 ScriptNode.NodeType.SuperObjectRef,
+                ScriptNode.NodeType.SurfaceRef,
                 ScriptNode.NodeType.WayPointRef,
-                ScriptNode.NodeType.TextRef,
+                ScriptNode.NodeType.TextRef, // 30
+                ScriptNode.NodeType.FontRef,
                 ScriptNode.NodeType.ComportRef,
-                ScriptNode.NodeType.ModuleRef, // 30
+                ScriptNode.NodeType.ModuleRef,
                 ScriptNode.NodeType.SoundEventRef,
-                ScriptNode.NodeType.Unknown,
-                ScriptNode.NodeType.Unknown,
-                ScriptNode.NodeType.Unknown,
                 ScriptNode.NodeType.ObjectTableRef, // 35
                 ScriptNode.NodeType.GameMaterialRef,
                 ScriptNode.NodeType.ParticleGenerator,
-                ScriptNode.NodeType.VisualMaterial,
-                ScriptNode.NodeType.AIModel,
-                ScriptNode.NodeType.DataType42, // 40
-                ScriptNode.NodeType.CustomBits,
-                ScriptNode.NodeType.Caps,
-                ScriptNode.NodeType.SubRoutine,
-                ScriptNode.NodeType.GraphRef
+                ScriptNode.NodeType.Color,
+                ScriptNode.NodeType.ModelRef
             }
             #endregion
         };
