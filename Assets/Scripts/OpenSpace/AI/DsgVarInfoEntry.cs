@@ -81,7 +81,8 @@ namespace OpenSpace.AI {
             Array9,
             Array10,
             Array11,
-            Way // TT SE only
+            Way, // TT SE only
+            ActionArray // Hype
         }
     }
 }

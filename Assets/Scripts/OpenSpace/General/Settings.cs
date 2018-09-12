@@ -232,7 +232,7 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
-            aiTypes = AITypes.TTSE,
+            aiTypes = AITypes.Hype,
             hasLinkedListHeaderPointers = true,
             snaCompression = true
         };
@@ -244,7 +244,7 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
-            aiTypes = AITypes.TTSE,
+            aiTypes = AITypes.Hype,
             hasLinkedListHeaderPointers = true,
             snaCompression = true
         };
@@ -256,7 +256,7 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
-            aiTypes = AITypes.TTSE,
+            aiTypes = AITypes.Hype,
             hasLinkedListHeaderPointers = true,
             snaCompression = false
         };

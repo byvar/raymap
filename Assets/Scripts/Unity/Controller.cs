@@ -154,10 +154,13 @@ public class Controller : MonoBehaviour {
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.firstScript, p);
                                 }
-                                if (iter++ == 0)
-                                {
-                                    behaviorGao.name += "(Init)";
+                                if (iter == 0) {
+                                    behaviorGao.name += " (Init)";
                                 }
+                                if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
+                                    behaviorGao.name += " (Empty)";
+                                }
+                                iter++;
                             }
                         }
                         if (p.brain.mind.AI_model.behaviors_reflex != null) {
@@ -177,6 +180,9 @@ public class Controller : MonoBehaviour {
                                 if (behavior.firstScript != null) {
                                     ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
                                     scriptComponent.SetScript(behavior.firstScript, p);
+                                }
+                                if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
+                                    behaviorGao.name += " (Empty)";
                                 }
                                 iter++;
                             }

@@ -96,6 +96,10 @@ namespace OpenSpace {
                         off_next = ((ILinkedListEntry)list[i]).NextEntry;
                     }
                     if (i < num_elements-1 && (customEntries || (type != Type.SingleNoElementPointers && type != Type.DoubleNoElementPointers))) {
+                        if (off_next == null) {
+                            num_elements = (uint)i + 1;
+                            break;
+                        }
                         Pointer.Goto(ref reader, off_next);
                     } else {
                         off_next = Pointer.Current(reader);

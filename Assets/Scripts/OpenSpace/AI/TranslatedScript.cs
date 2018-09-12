@@ -53,41 +53,42 @@ namespace OpenSpace.AI
                             switch (keyword)
                             {
                                 // If keywords
-                                case "If": return prefix+"if ({condition})".Replace("{condition}", firstChildNode);
-                                case "IfNot": return prefix + "if (!({condition}))".Replace("{condition}", firstChildNode);
-                                case "If2": return prefix + "if (globalRandomizer % 2 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If4": return prefix + "if (globalRandomizer % 4 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If8": return prefix + "if (globalRandomizer % 8 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If16": return prefix + "if (globalRandomizer % 16 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfDebug": return prefix + "if (debug && {condition})".Replace("{condition}", firstChildNode);
+                                case "If":       return prefix + "if ({condition})".Replace("{condition}", firstChildNode);
+                                case "IfNot":    return prefix + "if (!({condition}))".Replace("{condition}", firstChildNode);
+                                case "If2":      return prefix + "if (globalRandomizer % 2 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If4":      return prefix + "if (globalRandomizer % 4 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If8":      return prefix + "if (globalRandomizer % 8 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If16":     return prefix + "if (globalRandomizer % 16 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfDebug":  return prefix + "if (debug && {condition})".Replace("{condition}", firstChildNode);
                                 case "IfNotU64": return prefix + "if (!u64)\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Then
-                                case "Then": return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
+                                case "Then":     return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Else
-                                case "Else": return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
-                                default: return prefix + scriptNode.ToString(perso);
+                                case "Else":     return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
+                                default:         return prefix + scriptNode.ToString(perso);
                             }
                         case ScriptNode.NodeType.Condition:
-                            switch (scriptNode.param)
+                            string cond = param < aiTypes.conditionTable.Length ? aiTypes.conditionTable[param] : "";
+                            switch (cond)
                             {
                                 // Boolean conditions:
-                                case 0: return prefix + firstChildNode + " && " + secondChildNode;
-                                case 1: return prefix + firstChildNode + " || " + secondChildNode;
-                                case 2: return prefix + "!" + "(" + firstChildNode + ")";
-                                case 3: return firstChildNode + " != " + secondChildNode; // XOR
+                                case "Cond_And":            return prefix + firstChildNode + " && " + secondChildNode;
+                                case "Cond_Or":             return prefix + firstChildNode + " || " + secondChildNode;
+                                case "Cond_Not":            return prefix + "!" + "(" + firstChildNode + ")";
+                                case "Cond_XOR":            return prefix + firstChildNode + " != " + secondChildNode; // XOR
                                 // Real (float) comparisons:
-                                case 4: return prefix + firstChildNode + " == " + secondChildNode;
-                                case 5: return prefix + firstChildNode + " != " + secondChildNode;
-                                case 6: return prefix + firstChildNode + " < " + secondChildNode;
-                                case 7: return prefix + firstChildNode + " > " + secondChildNode;
-                                case 8: return prefix + firstChildNode + " <= " + secondChildNode;
-                                case 9: return prefix + firstChildNode + " >= " + secondChildNode;
+                                case "Cond_Equal":          return prefix + firstChildNode + " == " + secondChildNode;
+                                case "Cond_Different":      return prefix + firstChildNode + " != " + secondChildNode;
+                                case "Cond_Lesser":         return prefix + firstChildNode + " < " + secondChildNode;
+                                case "Cond_Greater":        return prefix + firstChildNode + " > " + secondChildNode;
+                                case "Cond_LesserOrEqual":  return prefix + firstChildNode + " <= " + secondChildNode;
+                                case "Cond_GreaterOrEqual": return prefix + firstChildNode + " >= " + secondChildNode;
                                 // Button condition:
-                                case 44:
+                                /*case 44:
                                 case 45:
                                 case 46:
                                 case 47:
-                                    return prefix + firstChildNode;
+                                    return prefix + firstChildNode;*/
 
                                 default:
                                     if (firstChildNode!=null)
@@ -110,9 +111,9 @@ namespace OpenSpace.AI
                                 case "Func_TernInfEq":
                                 case "Func_TernSupEq":
                                     switch (function) {
-                                        case "Func_TernInf": ternaryCheck = "<"; break;
-                                        case "Func_TernSup": ternaryCheck = ">"; break;
-                                        case "Func_TernEq": ternaryCheck = "=="; break;
+                                        case "Func_TernInf":   ternaryCheck = "<"; break;
+                                        case "Func_TernSup":   ternaryCheck = ">"; break;
+                                        case "Func_TernEq":    ternaryCheck = "=="; break;
                                         case "Func_TernInfEq": ternaryCheck = "<="; break;
                                         case "Func_TernSupEq": ternaryCheck = ">="; break;
                                     }
@@ -132,11 +133,11 @@ namespace OpenSpace.AI
                             
 
                         case ScriptNode.NodeType.Procedure:
-
-                            switch (scriptNode.param) {
-                                case 76: return "for(int i=0;i<" + firstChildNode + ";i++)\n{";
-                                case 77: return prefix + "}\n";
-                                case 78: return prefix + "break;\n";
+                            string procedure = param < aiTypes.procedureTable.Length ? aiTypes.procedureTable[param] : "";
+                            switch (procedure) {
+                                case "Proc_Loop":    return prefix + "for(int i=0;i<" + firstChildNode + ";i++)\n{";
+                                case "Proc_EndLoop": return prefix + "}\n";
+                                case "Proc_Break":   return prefix + "break;\n";
 
                                 default:
                                     string proc = scriptNode.ToString(perso);
@@ -145,29 +146,33 @@ namespace OpenSpace.AI
                             }
 
                         case ScriptNode.NodeType.Operator:
-
+                            string op = param < aiTypes.operatorTable.Length ? aiTypes.operatorTable[param] : "";
                             Pointer persoPtr = null;
 
-                            switch (scriptNode.param)
-                            {
+                            switch (op) {
                                 // scalar:
-                                case 0: return "(" + firstChildNode + (children[1].scriptNode.param>=0 ? "+" : "") + secondChildNode + ")";
-                                case 1: case 4:
+                                case "Operator_Plus": return "(" + firstChildNode + (children[1].scriptNode.param>=0 ? "+" : "") + secondChildNode + ")";
+                                case "Operator_Minus":
+                                case "Operator_UnaryMinus":
                                     if (children.Count > 1) {
                                         return "(" + firstChildNode + "-" + secondChildNode + ")";
                                     } else {
                                         return "-" + firstChildNode;
                                     }
-                                case 2: return "(" + firstChildNode + "*" + secondChildNode + ")";
-                                case 3: return "(" + firstChildNode + "/" + secondChildNode + ")";
+                                case "Operator_Mul": return "(" + firstChildNode + "*" + secondChildNode + ")";
+                                case "Operator_Div": return "(" + firstChildNode + "/" + secondChildNode + ")";
+                                case "Operator_Mod": return "(" + firstChildNode + "%" + secondChildNode + ")";
                                 // affect:
-                                case 5: case 9: return this.children.Count>1 ? (firstChildNode + "+=" + secondChildNode + ";") : firstChildNode + "++" + ";";
-                                case 6: case 10: return this.children.Count > 1 ? (firstChildNode + "-=" + secondChildNode + ";") : firstChildNode + "--" + ";";
-                                case 7: return firstChildNode + "*=" + secondChildNode + ";";
-                                case 8: return firstChildNode + "/=" + secondChildNode + ";";
-                                case 11: return firstChildNode + "=" + secondChildNode + ";";
-                                case 12: // dot operator
-
+                                case "Operator_PlusAffect":
+                                case "Operator_PlusPlusAffect":
+                                    return children.Count > 1 ? (firstChildNode + " += " + secondChildNode + ";") : firstChildNode + "++" + ";";
+                                case "Operator_MinusAffect":
+                                case "Operator_MinusMinusAffect":
+                                    return children.Count > 1 ? (firstChildNode + " -= " + secondChildNode + ";") : firstChildNode + "--" + ";";
+                                case "Operator_MulAffect": return firstChildNode + "*=" + secondChildNode + ";";
+                                case "Operator_DivAffect": return firstChildNode + "/=" + secondChildNode + ";";
+                                case "Operator_Affect": return firstChildNode + "=" + secondChildNode + ";";
+                                case "Operator_Dot": // dot operator
                                     persoPtr = this.children[0].scriptNode.param_ptr;
                                     if (persoPtr != null) {
                                         Perso firstNodePerso = Perso.FromOffset(persoPtr);
@@ -180,18 +185,21 @@ namespace OpenSpace.AI
                                     }
 
                                     return firstChildNode + "." + secondChildNode;
-                                case 13: return firstChildNode + ".x"; // vector
-                                case 14: return firstChildNode + ".y"; // vector
-                                case 15: return firstChildNode + ".z"; // vector
-                                case 16: return firstChildNode + "+" + secondChildNode; // 16
-                                case 17: return firstChildNode + "-" + secondChildNode; // 17
-                                case 18: case 19:  return firstChildNode + "*" + secondChildNode; // 18,19 scale and multiply
-                                case 20: return "-"+firstChildNode; // 20 negate
-                                case 24: // Ultra operator (execute code for different object)
+                                case ".X": return firstChildNode + ".x"; // vector
+                                case ".Y": return firstChildNode + ".y"; // vector
+                                case ".Z": return firstChildNode + ".z"; // vector
+                                case "Operator_VectorPlusVector": return firstChildNode + "+" + secondChildNode;
+                                case "Operator_VectorMinusVector": return firstChildNode + "-" + secondChildNode;
+                                case "Operator_VectorMulScalar": return firstChildNode + "*" + secondChildNode;
+                                case "Operator_VectorDivScalar": return firstChildNode + "/" + secondChildNode;
+                                case "Operator_VectorUnaryMinus": return "-"+firstChildNode;
+                                case ".X:=": return firstChildNode + ".x=" + secondChildNode; // vector
+                                case ".Y:=": return firstChildNode + ".y=" + secondChildNode; // vector
+                                case ".Z:=": return firstChildNode + ".z=" + secondChildNode; // vector
+                                case "Operator_Ultra": // Ultra operator (execute code for different object)
                                     return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
-
-                                case 25: return "((" + firstChildNode + ")(" + secondChildNode + ".brain.mind.aiModel))";
-                                case 26: return firstChildNode + "[" + secondChildNode + "]";
+                                case "Operator_ModelCast": return "((" + firstChildNode + ")(" + secondChildNode + ".brain.mind.aiModel))";
+                                case "Operator_Array": return firstChildNode + "[" + secondChildNode + "]";
 
                                 default:
                                     string proc = "("+scriptNode.param+")"+ scriptNode.ToString(perso);
