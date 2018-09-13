@@ -59,6 +59,14 @@ namespace OpenSpace.AI
                                 case "If4":      return prefix + "if (globalRandomizer % 4 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
                                 case "If8":      return prefix + "if (globalRandomizer % 8 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
                                 case "If16":     return prefix + "if (globalRandomizer % 16 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If32":     return prefix + "if (globalRandomizer % 32 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If64":     return prefix + "if (globalRandomizer % 64 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot2":   return prefix + "if (globalRandomizer % 2 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot4":   return prefix + "if (globalRandomizer % 4 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot8":   return prefix + "if (globalRandomizer % 8 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot16":  return prefix + "if (globalRandomizer % 16 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot32":  return prefix + "if (globalRandomizer % 32 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot64":  return prefix + "if (globalRandomizer % 64 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
                                 case "IfDebug":  return prefix + "if (debug && {condition})".Replace("{condition}", firstChildNode);
                                 case "IfNotU64": return prefix + "if (!u64)\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Then

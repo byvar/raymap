@@ -221,17 +221,31 @@ namespace OpenSpace.Visual {
                 t.offset = Pointer.Current(reader);
                 t.off_texture = Pointer.Read(reader); // 0x4c
                 t.texture = TextureInfo.FromOffset(t.off_texture);
-                t.currentScrollX = reader.ReadSingle();
-                t.currentScrollY = reader.ReadSingle();
-                t.scrollX = reader.ReadSingle(); // 0x58
-                t.scrollY = reader.ReadSingle(); // 0x5c
-                t.scrollMode = reader.ReadUInt32(); //0x60
-                m.textures.Add(t);
+                if (Settings.s.game == Settings.Game.TT) {
+                    m.off_animTextures_first = Pointer.Read(reader); // 0x68
+                    m.off_animTextures_current = Pointer.Read(reader); // 0x6c
+                    m.num_animTextures = reader.ReadUInt16();
+                    t.currentScrollX = reader.ReadSingle();
+                    t.currentScrollY = reader.ReadSingle();
+                    t.scrollX = reader.ReadSingle(); // 0x58
+                    t.scrollY = reader.ReadSingle(); // 0x5c
+                    t.scrollMode = reader.ReadUInt32(); //0x60
+                    m.textures.Add(t);
 
-                reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
-                m.off_animTextures_first = Pointer.Read(reader); // 0x68
-                m.off_animTextures_current = Pointer.Read(reader); // 0x6c
-                m.num_animTextures = reader.ReadUInt16();
+                    reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
+                } else {
+                    t.currentScrollX = reader.ReadSingle();
+                    t.currentScrollY = reader.ReadSingle();
+                    t.scrollX = reader.ReadSingle(); // 0x58
+                    t.scrollY = reader.ReadSingle(); // 0x5c
+                    t.scrollMode = reader.ReadUInt32(); //0x60
+                    m.textures.Add(t);
+
+                    reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
+                    m.off_animTextures_first = Pointer.Read(reader); // 0x68
+                    m.off_animTextures_current = Pointer.Read(reader); // 0x6c
+                    m.num_animTextures = reader.ReadUInt16();
+                }
                 reader.ReadUInt16(); // 0x70
                 reader.ReadUInt32(); // 0x74
                 m.properties = reader.ReadByte(); // whole byte for texture scroll lock in R2, no bitmasks
