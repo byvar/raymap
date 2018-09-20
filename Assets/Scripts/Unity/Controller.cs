@@ -15,10 +15,8 @@ public class Controller : MonoBehaviour {
     public string lvlName;
 
     public Material baseMaterial;
-    public Material baseLightMaterial;
     public Material baseTransparentMaterial;
-    public Material baseBlendMaterial;
-    public Material baseBlendTransparentMaterial;
+    public Material baseLightMaterial;
     public Material collideMaterial;
     public Material collideTransparentMaterial;
     public Material billboardMaterial;
@@ -93,8 +91,6 @@ public class Controller : MonoBehaviour {
         loader.blockyMode = blockyMode;
         loader.baseMaterial = baseMaterial;
         loader.baseTransparentMaterial = baseTransparentMaterial;
-        loader.baseBlendMaterial = baseBlendMaterial;
-        loader.baseBlendTransparentMaterial = baseBlendTransparentMaterial;
         loader.collideMaterial = collideMaterial;
         loader.collideTransparentMaterial = collideTransparentMaterial;
         loader.baseLightMaterial = baseLightMaterial;
@@ -105,6 +101,7 @@ public class Controller : MonoBehaviour {
         sectorManager.Init();
         lightManager.Init();
         InitPersos();
+        InitSectors();
         InitCamera();
         if (viewCollision) UpdateViewCollision();
     }
@@ -123,6 +120,8 @@ public class Controller : MonoBehaviour {
             for (int i = 0; i < loader.persos.Count; i++) {
                 Perso p = loader.persos[i];
                 PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
+                unityBehaviour.controller = this;
+                if (p.sectInfo != null && p.sectInfo.off_sector != null) unityBehaviour.sector = Sector.FromSuperObjectOffset(p.sectInfo.off_sector);
                 if (p.SuperObject!=null && p.SuperObject.Gao!=null)
                 {
                     Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
@@ -134,7 +133,7 @@ public class Controller : MonoBehaviour {
                 unityBehaviour.perso = p;
                 unityBehaviour.Init();
 
-                if (p.Gao) { // && Settings.s.engineVersion == Settings.EngineVersion.R2) {
+                if (p.Gao) {
                     if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
                         if (p.brain.mind.AI_model.behaviors_normal != null) {
                             GameObject intelParent = new GameObject("Rule behaviours");
@@ -255,6 +254,22 @@ public class Controller : MonoBehaviour {
             if (camera != null) {
                 Camera.main.transform.position = camera.Gao.transform.position;
                 Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0,180,0);
+            }
+        }
+    }
+
+    public void InitSectors() {
+        if (loader != null) {
+            foreach (Sector s in loader.sectors) {
+                sectorManager.ApplySectorLighting(s, s.Gao);
+                /*foreach (Perso p in s.persos) {
+                    if (p.Gao) {
+                        PersoBehaviour pb = p.Gao.GetComponent<PersoBehaviour>();
+                        if (pb != null) {
+                            pb.sector = s;
+                        }
+                    }
+                }*/
             }
         }
     }

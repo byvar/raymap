@@ -49,7 +49,9 @@ namespace OpenSpace.Visual {
             get {
                 if (light == null) {
                     GameObject gao = new GameObject("Light @ " + String.Format("0x{0:X}", offset.offset) + " | " +
-                        "Type: " + type + " - Far: " + far + " - Near: " + near);
+                        "Type: " + type + " - Far: " + far + " - Near: " + near +
+                        " - LittleAlpha: " + littleAlpha + " - BigAlpha: " + bigAlpha +
+                        " - AlphaLightFlag: " + alphaLightFlag);
                     Vector3 pos = transMatrix.GetPosition(convertAxes: true);
                     Quaternion rot = transMatrix.GetRotation(convertAxes: true) * Quaternion.Euler(-90, 0,0);
                     Vector3 scale = transMatrix.GetScale(convertAxes: true);

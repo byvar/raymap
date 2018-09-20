@@ -23,6 +23,7 @@ namespace OpenSpace.Object {
         public Pointer off_camera;
         public Pointer off_collSet;
         public Pointer off_msWay;
+        public Pointer off_msLight;
         public Pointer off_sectInfo;
 
 
@@ -38,6 +39,7 @@ namespace OpenSpace.Object {
         public Brain brain = null;
         public MSWay msWay = null;
         public CollSet collset;
+        public PersoSectorInfo sectInfo;
 
         private GameObject gao;
         public GameObject Gao {
@@ -57,7 +59,6 @@ namespace OpenSpace.Object {
         }
 
         private SuperObject superObject;
-
         public SuperObject SuperObject {
             get {
                 return superObject;
@@ -82,7 +83,8 @@ namespace OpenSpace.Object {
             p.off_camera = Pointer.Read(reader); // 0x10 is Camera in Rayman 2
             p.off_collSet = Pointer.Read(reader); // 0x14 collset
             p.off_msWay = Pointer.Read(reader); // 0x18
-            reader.ReadUInt32(); // 0x1C
+            p.off_msLight = Pointer.Read(reader); // 0x1C - MSLight
+            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) reader.ReadUInt32();
             p.off_sectInfo = Pointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
@@ -208,6 +210,10 @@ namespace OpenSpace.Object {
 
             Pointer.DoAt(ref reader, p.off_collSet, () => {
                 p.collset = CollSet.Read(reader, p, p.off_collSet);
+            });
+
+            Pointer.DoAt(ref reader, p.off_sectInfo, () => {
+                p.sectInfo = PersoSectorInfo.Read(reader, p.off_sectInfo);
             });
 
             return p;

@@ -15,12 +15,18 @@ public class LightBehaviour : MonoBehaviour {
     public float activeIntensity = 1f;
     public bool active = true;
     public LightManager lightManager;
+    public Vector3 pos;
+    public Quaternion rot;
+    public Vector3 scl;
 
     // Use this for initialization
     void Start() {
     }
 
 	public void Init() {
+        pos = transform.position;
+        rot = transform.rotation;
+        scl = transform.localScale;
         //color = new Color(Mathf.Clamp01(r3l.color.x), Mathf.Clamp01(r3l.color.y), Mathf.Clamp01(r3l.color.z), Mathf.Clamp01(r3l.color.w));
         intensity = Mathf.Max(li.color.x, li.color.y, li.color.z);
         if (intensity > 1) {
@@ -39,7 +45,7 @@ public class LightBehaviour : MonoBehaviour {
                 backgroundColor.g * li.background_color.w,
                 backgroundColor.b * li.background_color.w);
         }
-        if (intensity > 0 && li.type != 6) {
+        if (false && intensity > 0 && li.type != 6) {
             l = gameObject.AddComponent<Light>();
             l.color = color;
             intensity = Mathf.Clamp(intensity, 0f, 2f); // don't want too bright lights
@@ -133,28 +139,13 @@ public class LightBehaviour : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (lightManager != null && lightManager.sectorManager.useMultiCameras) return;
-        if (loaded) {
-            if (active == true && activeIntensity < 1f) {
-                activeIntensity += Time.deltaTime / 1.5f;
-            } else if (active == false && activeIntensity > 0f) {
-                activeIntensity -= Time.deltaTime / 1.5f;
-                if (activeIntensity < 0f) activeIntensity = 0f;
-                if (activeIntensity == 0f) {
-                    gameObject.SetActive(false);
-                }
+        if (loaded && lightManager != null) {
+            if (pos != transform.position || rot != transform.rotation || scl != transform.localScale) {
+                lightManager.sectorManager.RecalculateSectorLighting();
+                pos = transform.position;
+                rot = transform.rotation;
+                scl = transform.localScale;
             }
-            if (l != null) {
-                l.intensity = intensity * activeIntensity;
-            }
-            /*if (r3l.type == 7) {
-                if (r3l.containingSectors.FirstOrDefault(s => s.Active) != null) {
-                    Vector3 camPos = Camera.main.transform.localPosition;
-                    if (Vector3.Distance(camPos, transform.position) < r3l.far) {
-                        Camera.main.backgroundColor = backgroundColor;
-                    }
-                }
-            }*/
         }
 	}
 

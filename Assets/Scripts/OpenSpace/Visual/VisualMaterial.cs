@@ -53,7 +53,6 @@ namespace OpenSpace.Visual {
                 if (material == null) {
                     MapLoader l = MapLoader.Loader;
                     //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
-                    bool useAlphaMask = false;
                     TextureInfo texMain = null, texSecondary = null;
                     if (textures != null && textures.Count > 0) {
                         texMain = textures[0].texture;
@@ -67,13 +66,9 @@ namespace OpenSpace.Visual {
                         baseMaterial = l.baseLightMaterial;
                     } else if (texMain != null && texSecondary != null) {
                         if (transparent) {
-                            baseMaterial = l.baseBlendTransparentMaterial;
-                            if (!texSecondary.Texture.HasColor()) useAlphaMask = true;
-                        } /*else if (!texSecondary.texture.HasColor()) {
-                            useAlphaMask = true;
-                            baseMaterial = l.baseBlendTransparentMaterial;
-                        }*/ else {
-                            baseMaterial = l.baseBlendMaterial;
+                            baseMaterial = l.baseTransparentMaterial;
+                        } else {
+                            baseMaterial = l.baseMaterial;
                         }
                     } else if (texMain != null && transparent) {
                         baseMaterial = l.baseTransparentMaterial;
@@ -91,10 +86,10 @@ namespace OpenSpace.Visual {
                         material.SetTextureOffset("_MainTex", new Vector2(texMain.currentScrollX, texMain.currentScrollY));
                     }
                     if (texSecondary != null) {
-                        if (baseMaterial == l.baseBlendMaterial || baseMaterial == l.baseBlendTransparentMaterial) {
+                        if (baseMaterial == l.baseMaterial || baseMaterial == l.baseTransparentMaterial) {
                             material.SetTexture("_MainTex2", texSecondary.Texture);
                             material.SetTextureOffset("_MainTex2", new Vector2(texSecondary.currentScrollX, texSecondary.currentScrollY));
-                            if (useAlphaMask) material.SetFloat("_UseAlpha", 1f);
+                            //if (useAlphaMask) material.SetFloat("_UseAlpha", 1f);
                             material.SetFloat("_Blend", 1f);
                         } else {
                             material.SetTexture("_DetailAlbedoMap", texSecondary.Texture);
@@ -105,6 +100,7 @@ namespace OpenSpace.Visual {
                         material.SetVector("_SpecularCoef", specularCoef);
                         material.SetVector("_DiffuseCoef", diffuseCoef);
                         material.SetVector("_Color", color);
+                        if (IsPixelShaded) material.SetFloat("_ShadingMode", 1f);
                     }
                     if (texMain == null || texMain.Texture == null) {
                         // No texture = just color. So create white texture and let that be colored by other properties.
@@ -146,15 +142,6 @@ namespace OpenSpace.Visual {
                         materialBillboard.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
                     }
                     if (texMain != null) materialBillboard.SetTexture("_MainTex", texMain.Texture);
-                    if (texSecondary != null) {
-                        if (baseMaterial == l.baseBlendMaterial || baseMaterial == l.baseBlendTransparentMaterial) {
-                            materialBillboard.SetTexture("_MainTex2", texSecondary.Texture);
-                            if (useAlphaMask) materialBillboard.SetFloat("_UseAlpha", 1f);
-                            //material.SetFloat("_Blend", 1f);
-                        } else {
-                            materialBillboard.SetTexture("_DetailAlbedoMap", texSecondary.Texture);
-                        }
-                    }
                     if (texMain == null || texMain.Texture == null) {
                         // No texture = just color. So create white texture and let that be colored by other properties.
                         Texture2D tex = new Texture2D(1, 1);
@@ -195,6 +182,20 @@ namespace OpenSpace.Visual {
             }
         }
 
+        public bool IsPixelShaded {
+            get {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    return false;
+                } else {
+                    if (textures.Count > 0) {
+                        return textures.Where(t => t.IsPixelShaded).Count() > 0;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+
         public bool IsLockedAnimatedTexture {
             get { return (properties & 1) == 1; }
         }
@@ -222,9 +223,10 @@ namespace OpenSpace.Visual {
                 t.off_texture = Pointer.Read(reader); // 0x4c
                 t.texture = TextureInfo.FromOffset(t.off_texture);
                 if (Settings.s.game == Settings.Game.TT) {
-                    m.off_animTextures_first = Pointer.Read(reader); // 0x68
+                    /*m.off_animTextures_first = Pointer.Read(reader); // 0x68
                     m.off_animTextures_current = Pointer.Read(reader); // 0x6c
-                    m.num_animTextures = reader.ReadUInt16();
+                    m.num_animTextures = reader.ReadUInt16();*/
+                    Pointer.Read(reader); // detail texture
                     t.currentScrollX = reader.ReadSingle();
                     t.currentScrollY = reader.ReadSingle();
                     t.scrollX = reader.ReadSingle(); // 0x58
@@ -245,8 +247,8 @@ namespace OpenSpace.Visual {
                     m.off_animTextures_first = Pointer.Read(reader); // 0x68
                     m.off_animTextures_current = Pointer.Read(reader); // 0x6c
                     m.num_animTextures = reader.ReadUInt16();
+                    reader.ReadUInt16(); // 0x70
                 }
-                reader.ReadUInt16(); // 0x70
                 reader.ReadUInt32(); // 0x74
                 m.properties = reader.ReadByte(); // whole byte for texture scroll lock in R2, no bitmasks
                 reader.ReadByte();

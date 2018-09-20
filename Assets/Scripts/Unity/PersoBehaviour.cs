@@ -16,6 +16,8 @@ using UnityEngine;
 public class PersoBehaviour : MonoBehaviour {
     bool loaded = false;
     public Perso perso;
+    public Sector sector;
+    public Controller controller;
 
     // States
     bool hasStates = false;
@@ -445,6 +447,7 @@ public class PersoBehaviour : MonoBehaviour {
                         }
                     }
                 }
+                controller.sectorManager.ApplySectorLighting(sector, gameObject);
             }
             loaded = true;
         }
@@ -501,6 +504,7 @@ public class PersoBehaviour : MonoBehaviour {
                         }
                     }
                 }
+                controller.sectorManager.ApplySectorLighting(sector, gameObject);
             }
             loaded = true;
         }

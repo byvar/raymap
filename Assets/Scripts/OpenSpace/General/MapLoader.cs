@@ -21,10 +21,8 @@ namespace OpenSpace {
         public string lvlName;
 
         public Material baseMaterial;
-        public Material baseLightMaterial;
         public Material baseTransparentMaterial;
-        public Material baseBlendMaterial;
-        public Material baseBlendTransparentMaterial;
+        public Material baseLightMaterial;
         public Material collideMaterial;
         public Material collideTransparentMaterial;
         public Material billboardMaterial;

@@ -102,4 +102,72 @@ public class SectorManager : MonoBehaviour {
         }
         loaded = true;
     }
+
+    public void RecalculateSectorLighting() {
+        foreach (Sector s in sectors) {
+            ApplySectorLighting(s, s.Gao);
+            /*foreach (Perso p in s.persos) {
+                if (p.Gao) {
+                    PersoBehaviour pb = p.Gao.GetComponent<PersoBehaviour>();
+                    if (pb != null) {
+                        pb.sector = s;
+                    }
+                }
+            }*/
+        }
+    }
+
+    public void ApplySectorLighting(Sector s, GameObject gao) {
+        if (s == null) return;
+        if (s.staticLights != null) {
+            Vector4? fogColor = null;
+            Vector4? fogParams = null;
+            Vector4 ambientLight = Vector4.zero;
+            List<Vector4> staticLightPos = new List<Vector4>();
+            List<Vector4> staticLightDir = new List<Vector4>();
+            List<Vector4> staticLightCol = new List<Vector4>();
+            List<Vector4> staticLightParams = new List<Vector4>();
+            for (int i = 0; i < s.staticLights.Count; i++) {
+                if (s.staticLights[i].turnedOn == 0x0) continue;
+                switch (s.staticLights[i].type) {
+                    case 4:
+                        ambientLight += s.staticLights[i].color * 0.5f;
+                        break;
+                    case 6:
+                        if (!fogColor.HasValue) {
+                            fogColor = s.staticLights[i].color;
+                            fogParams = new Vector4(s.staticLights[i].littleAlpha, s.staticLights[i].bigAlpha, s.staticLights[i].near, s.staticLights[i].far);
+                        }
+                        break;
+                    default:
+                        staticLightPos.Add(new Vector4(s.staticLights[i].Light.transform.position.x, s.staticLights[i].Light.transform.position.y, s.staticLights[i].Light.transform.position.z, s.staticLights[i].type));
+                        staticLightDir.Add(s.staticLights[i].Light.transform.TransformVector(Vector3.back));
+                        staticLightCol.Add(s.staticLights[i].color);
+                        staticLightParams.Add(new Vector4(s.staticLights[i].near, s.staticLights[i].far, s.staticLights[i].littleAlpha, s.staticLights[i].alphaLightFlag));
+                        break;
+                }
+            }
+            Vector4[] staticLightPosArray = staticLightPos.ToArray();
+            Vector4[] staticLightDirArray = staticLightDir.ToArray();
+            Vector4[] staticLightColArray = staticLightCol.ToArray();
+            Vector4[] staticLightParamsArray = staticLightParams.ToArray();
+            if (gao) {
+                List<Renderer> rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
+                foreach (Renderer r in rs) {
+                    if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
+                        if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
+                        if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
+                        r.material.SetVector("_SectorAmbient", ambientLight);
+                        r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
+                        if (staticLightPosArray.Length > 0) {
+                            r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
+                            r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
+                            r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
+                            r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

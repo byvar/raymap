@@ -55,5 +55,15 @@ namespace OpenSpace.Visual {
                 }
             }
         }
+
+        public bool IsPixelShaded {
+            get {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    return false;
+                } else {
+                    return shadingMode != 2;
+                }
+            }
+        }
     }
 }

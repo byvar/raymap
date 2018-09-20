@@ -24,23 +24,23 @@ public class SectorCamera : MonoBehaviour {
             }
             Sector s = sectorManager.sectors[sectorIndex];
             s.Gao.SetActive(true);
-            if (s.lights != null) {
+            if (s.staticLights != null) {
                 Color ambientLight = Color.black;
-                for (int i = 0; i < s.lights.Count; i++) {
-                    s.lights[i].Light.gameObject.SetActive(true);
-                    if (s.lights[i].type == 4) {
+                for (int i = 0; i < s.staticLights.Count; i++) {
+                    s.staticLights[i].Light.gameObject.SetActive(true);
+                    if (s.staticLights[i].type == 4) {
                         ambientLight = new Color(
-                            ambientLight.r + s.lights[i].Light.color.r,
-                            ambientLight.g + s.lights[i].Light.color.g,
-                            ambientLight.b + s.lights[i].Light.color.b);
+                            ambientLight.r + s.staticLights[i].Light.color.r,
+                            ambientLight.g + s.staticLights[i].Light.color.g,
+                            ambientLight.b + s.staticLights[i].Light.color.b);
                     }
-                    if (!fogSet && s.lights[i].type == 6) {
+                    if (!fogSet && s.staticLights[i].type == 6) {
                         fogSet = true;
                         RenderSettings.fog = true;
-                        RenderSettings.fogColor = s.lights[i].color;
+                        RenderSettings.fogColor = s.staticLights[i].color;
                         RenderSettings.fogMode = FogMode.Linear;
-                        RenderSettings.fogStartDistance = s.lights[i].near;
-                        RenderSettings.fogEndDistance = s.lights[i].far;
+                        RenderSettings.fogStartDistance = s.staticLights[i].near;
+                        RenderSettings.fogEndDistance = s.staticLights[i].far;
                         //Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, l.Light.backgroundColor, 0.5f * Time.deltaTime);
                     }
                 }
@@ -69,9 +69,9 @@ public class SectorCamera : MonoBehaviour {
                 s.Gao.SetActive(false);
             }
             //s.Gao.SetActive(false);
-            if (s.lights != null) {
-                for (int i = 0; i < s.lights.Count; i++) {
-                    s.lights[i].Light.gameObject.SetActive(false);
+            if (s.staticLights != null) {
+                for (int i = 0; i < s.staticLights.Count; i++) {
+                    s.staticLights[i].Light.gameObject.SetActive(false);
                 }
                 if (fogSet) {
                     RenderSettings.fog = false;

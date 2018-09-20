@@ -13,7 +13,8 @@ namespace OpenSpace.Object {
         public string name = "Sector";
 
         public LinkedList<Perso> persos;
-        public LinkedList<LightInfo> lights;
+        public LinkedList<LightInfo> staticLights;
+        public LinkedList<int> dynamicLights; // Stub
         public LinkedList<NeighborSector> neighbors;
         public LinkedList<Sector> sectors_unk;
 
@@ -91,11 +92,11 @@ namespace OpenSpace.Object {
                     //CollideMeshObject collider = CollideMeshObject.Read(reader, off_collideObj);
                     // This has the exact same structure as a CollideMeshObject but with a sector superobject as material for the collieMeshElements
                 });
-                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // only one sector pointer in this list
-                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // ??? always null?
+                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // "environments list"
+                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // "surface list"
             }
             s.persos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
-            s.lights = LinkedList<LightInfo>.Read(ref reader, Pointer.Current(reader),
+            s.staticLights = LinkedList<LightInfo>.Read(ref reader, Pointer.Current(reader),
                 (off_element) => {
                     LightInfo li = LightInfo.Read(reader, off_element);
                     if (li != null) li.containingSectors.Add(s);
@@ -108,13 +109,9 @@ namespace OpenSpace.Object {
                         LinkedList.Flags.NoPreviousPointersForDouble),
                 type: (l.mode == MapLoader.Mode.RaymanArenaGC) ? LinkedList.Type.SingleNoElementPointers : LinkedList.Type.Default
             );
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            s.dynamicLights = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
+                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // "streams list", probably related to water
             }
             s.neighbors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader));
             LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader));
@@ -171,6 +168,18 @@ namespace OpenSpace.Object {
 
             l.sectors.Add(s);
             return s;
+        }
+
+        public static Sector FromOffset(Pointer offset) {
+            if (offset == null) return null;
+            MapLoader l = MapLoader.Loader;
+            return l.sectors.FirstOrDefault(s => s.offset == offset);
+        }
+
+        public static Sector FromSuperObjectOffset(Pointer offset) {
+            if (offset == null) return null;
+            MapLoader l = MapLoader.Loader;
+            return l.sectors.FirstOrDefault(s => s.SuperObject.offset == offset);
         }
 
         public struct NeighborSector : ILinkedListEntry {
