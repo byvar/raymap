@@ -30,7 +30,7 @@
             for (int i = 0; i < graph.nodeCount; i++) {
                 Pointer.Goto(ref reader, currentPointer);
 
-                GraphNode node = GraphNode.Read(reader, currentPointer);
+                GraphNode node = GraphNode.FromOffsetOrRead(currentPointer, reader);
                 graph.nodeList[i] = node;
                 currentPointer = node.off_nextNode;
                 if (currentPointer == null) {

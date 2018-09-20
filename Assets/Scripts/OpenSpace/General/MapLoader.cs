@@ -77,6 +77,7 @@ namespace OpenSpace {
         public List<Perso> persos = new List<Perso>();
         public List<State> states = new List<State>();
         public List<Graph> graphs = new List<Graph>();
+        public List<GraphNode> graphNodes = new List<GraphNode>();
         public List<WayPoint> isolateWaypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
@@ -1792,6 +1793,21 @@ MonoBehaviour.print(str);
                 GameObject go_graphNode = new GameObject("GraphNode[" + nodeNum + "].WayPoint");
                 go_graphNode.transform.position = new Vector3(node.wayPoint.position.x, node.wayPoint.position.z, node.wayPoint.position.y);
                 WaypointSprite wpSprite = go_graphNode.AddComponent<WaypointSprite>();
+
+                var arcList = node.arcList.list;
+                if (arcList.Count>0) {
+                    foreach(var arc in arcList) {
+                        Vector3 to = arc.graphNode.wayPoint.position;
+
+                        WaypointLine wpLine = go_graphNode.AddComponent<WaypointLine>();
+
+                        wpLine.from = new Vector3(node.wayPoint.position.x, node.wayPoint.position.z, node.wayPoint.position.y);
+                        wpLine.to = new Vector3(to.x, to.z, to.y);
+
+                        wpLine.weight = arc.weight;
+                        wpLine.capabilities = arc.capabilities;
+                    }
+                }
 
                 go_graphNode.transform.SetParent(go_graph.transform);
                 nodeNum++;
