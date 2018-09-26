@@ -23,11 +23,12 @@ float _ShadingMode;
 uniform float4 _SectorAmbient;
 uniform float4 _SectorFog;
 uniform float4 _SectorFogParams;
-float4 _StaticLightPos[128];
-float4 _StaticLightDir[128];
-float4 _StaticLightCol[128];
-float4 _StaticLightParams[128];
+float4 _StaticLightPos[512];
+float4 _StaticLightDir[512];
+float4 _StaticLightCol[512];
+float4 _StaticLightParams[512];
 float _StaticLightCount = 0;
+float _Luminosity = 0.5;
 
 struct v2f {
 	float4 pos : SV_POSITION;
@@ -40,59 +41,86 @@ struct v2f {
 	//UNITY_FOG_COORDS(3)
 };
 
+float CalcSphereAttenuation(float distance, float near, float far) {
+	if (distance <= near) {
+		return 1.0;
+	} else {
+		return 1.0 - (distance - near) / (far - near); // TODO: Get correct attenuation
+	}
+}
+
 float4 ApplyStaticLights(float3 colRgb, float3 normalDirection, float3 multipliedPosition) {
+
+	/* Alpha light flags:
+	    0 = Affect color and alpha
+	    1 = Only affect alpha
+	    2 = Only affect color
+	*/
+
 	float3 lightDirection;
 	float3 vertexToLightSource;
 	float attenuation;
 	float near;
 	float far;
 	float distance;
-	float alpha = 1.0;
+	float normalFactor;
+	float alpha = 0.0;
 	float3 diffuseReflection = float3(0.0, 0.0, 0.0);
+	float3 luminosity = float3(_Luminosity - 0.5, _Luminosity - 0.5, _Luminosity - 0.5);
+	float4 ambient = _AmbientCoef;
 	for (int i = 0; i < _StaticLightCount; i++) {
 		if (_StaticLightPos[i].w == 1) {
 			attenuation = 1.0; // no attenuation
 			lightDirection = normalize(_StaticLightDir[i].xyz);
-			diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz
-				* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-				* max(0.0, dot(normalDirection, lightDirection));
-			if(_StaticLightParams[i].w == 0) alpha = _StaticLightCol[i].w;
+			/*if (_StaticLightParams[i].z == 0) {
+				normalFactor = max(0.0, dot(normalDirection, lightDirection));
+			} else normalFactor = 1.0;*/
+			normalFactor = max(0.0, dot(normalDirection, lightDirection));
+			if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+				//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
+			if (_StaticLightParams[i].w != 2) alpha = alpha + _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
 		} else if (_StaticLightPos[i].w == 2) {
 			vertexToLightSource = _StaticLightPos[i].xyz - multipliedPosition;
 			distance = length(vertexToLightSource);
 			far = _StaticLightParams[i].y;
 			if (distance < far) {
 				near = _StaticLightParams[i].x;
-				if (distance <= near) {
-					attenuation = 1.0;
-				} else {
-					attenuation = 1.0 - (distance - near) / (far - near);
-				}
+				attenuation = CalcSphereAttenuation(distance, near, far);
 				lightDirection = normalize(vertexToLightSource);
-				diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz
-					* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-					* max(0.0, dot(normalDirection, lightDirection));
-				if (_StaticLightParams[i].w == 0) alpha = lerp(alpha, _StaticLightCol[i].w, attenuation);
+				if (_StaticLightParams[i].z == 0) {
+					normalFactor = max(0.0, dot(normalDirection, lightDirection));
+				} else normalFactor = 1.0;
+				if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
+				if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
 			}
+		} else if (_StaticLightPos[i].w == 4) {
+			if (_StaticLightParams[i].w != 1) ambient.xyz = ambient.xyz + _StaticLightCol[i].xyz * _DiffuseCoef.xyz;
+			//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
+			if (_StaticLightParams[i].w != 2) ambient.w = ambient.w + _StaticLightCol[i].w* _DiffuseCoef.w;// * _DiffuseCoef.w;
 		} else if (_StaticLightPos[i].w == 7) {
 			vertexToLightSource = _StaticLightPos[i].xyz - multipliedPosition;
 			distance = length(vertexToLightSource);
 			far = _StaticLightParams[i].y;
 			if (distance < far) {
 				near = _StaticLightParams[i].x;
-				if (distance <= near) {
-					attenuation = 1.0;
-				} else {
-					attenuation = 1.0 - (distance - near) / (far - near);
-				}
+				attenuation = CalcSphereAttenuation(distance, near, far);
 				lightDirection = normalize(_StaticLightDir[i].xyz);
-				diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz
-					* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-					* max(0.0, dot(normalDirection, lightDirection));
-				if (_StaticLightParams[i].w == 0) alpha = lerp(alpha, _StaticLightCol[i].w, attenuation);
+				if (_StaticLightParams[i].z == 0) {
+					normalFactor = max(0.0, dot(normalDirection, lightDirection));
+				} else normalFactor = 1.0;
+				if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
+				if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// *_DiffuseCoef.w;
 			}
 		}
 	}
+	//float3 ambientLighting = ambient.xyz * _DiffuseCoef.xyz;
+	diffuseReflection = luminosity + ambient.xyz + diffuseReflection * (luminosity + _DiffuseCoef.xyz);
+	diffuseReflection.x = saturate(diffuseReflection.x);
+	diffuseReflection.y = saturate(diffuseReflection.y);
+	diffuseReflection.z = saturate(diffuseReflection.z);
+	alpha = ambient.w + alpha * _DiffuseCoef.w;
 	return float4(diffuseReflection, alpha);
 }
 
@@ -118,7 +146,7 @@ v2f process_vert(appdata_full v, float isAdd) {
 	float3 colRgb = _Color.rgb * _Color.w + float3(1.0, 1.0, 1.0) * (1.0 - _Color.w);
 
 	float3 ambientLighting = 0.0;
-	if (isAdd == 0.0) {
+	/*if (isAdd == 0.0) {
 		ambientLighting = _SectorAmbient.rgb * _AmbientCoef.w;
 		ambientLighting = ambientLighting + _AmbientCoef.xyz * colRgb;
 
@@ -130,7 +158,7 @@ v2f process_vert(appdata_full v, float isAdd) {
 		
 		//UNITY_LIGHTMODEL_AMBIENT.rgb * colRgb * _AmbientCoef.xyz * (1.0-(_SpecularCoef.w/100.0));
 		//ambientLighting = ambientLighting + colRgb * (_SpecularCoef.w/100.0);
-	}
+	}*/
 	float3 diffuseReflection = float3(0.0, 0.0, 0.0);
 	//if (isAdd == 1.0) {
 	if (0.0 == _WorldSpaceLightPos0.w) { // directional light?
@@ -146,7 +174,7 @@ v2f process_vert(appdata_full v, float isAdd) {
 		* colRgb
 		* _DiffuseCoef.xyz //* _DiffuseCoef.w
 		* max(0.0, dot(normalDirection, lightDirection));
-	if (_ShadingMode == 0.0 && isAdd == 0.0) {
+	if (/*_ShadingMode == 0.0 && */isAdd == 0.0) {
 		float4 lightCol = ApplyStaticLights(colRgb, normalDirection, multipliedPosition);
 		diffuseReflection = diffuseReflection + lightCol.xyz;
 		alpha = lightCol.w;
@@ -169,9 +197,14 @@ v2f process_vert(appdata_full v, float isAdd) {
 	o.multipliedPosition = multipliedPosition;
 	o.diffuseColor = float4(ambientLighting + diffuseReflection, alpha);
 	if (_SectorFog.w == 1) {
-		float fogz = length(WorldSpaceViewDir(v.vertex));
-		o.fog = saturate((fogz - _SectorFogParams.z) / (_SectorFogParams.w - _SectorFogParams.z));
-		//o.diffuseColor = float4(ambientLighting + diffuseReflection, fog);
+		if (_SectorFogParams.x != _SectorFogParams.y) { // Blend near != Blend far
+			float fogz = length(WorldSpaceViewDir(v.vertex));
+			o.fog = _SectorFogParams.x + 
+				saturate((fogz - _SectorFogParams.z) / (_SectorFogParams.w - _SectorFogParams.z))
+				* (_SectorFogParams.y - _SectorFogParams.x);
+		} else {
+			o.fog = _SectorFogParams.y;
+		}
 	}
 	//o.specularColor = specularReflection;
 	//UNITY_TRANSFER_FOG(o, o.pos);
@@ -194,14 +227,14 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 	c.a = c.a * i.diffuseColor.w;
 	clip(clipAlpha * (c.a - 1.0));
 	c.rgb = c.rgb * (1 + (_EmissionColor.rgb * 2 * _EmissionColor.a));
-	if (_ShadingMode == 0.0 || isAdd == 1.0) {
+	//if (_ShadingMode == 0.0 || isAdd == 1.0) {
 		c = float4(i.diffuseColor.xyz * c, c.a);
-	} else {
+	/*} else {
 		float3 colRgb = _Color.rgb * _Color.w + float3(1.0, 1.0, 1.0) * (1.0 - _Color.w);
 		float4 lightColor = ApplyStaticLights(colRgb, normalize(i.normal), i.multipliedPosition);
 		c = float4((i.diffuseColor.xyz + lightColor) * c, c.a * lightColor.w);
 		clip(clipAlpha * (c.a - 1.0));
-	}
+	}*/
 	// Add fog
 	if (_SectorFog.w == 1) {
 		float fog = i.fog;

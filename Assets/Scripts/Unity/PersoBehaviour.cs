@@ -447,7 +447,7 @@ public class PersoBehaviour : MonoBehaviour {
                         }
                     }
                 }
-                controller.sectorManager.ApplySectorLighting(sector, gameObject);
+                controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
             }
             loaded = true;
         }
@@ -504,7 +504,7 @@ public class PersoBehaviour : MonoBehaviour {
                         }
                     }
                 }
-                controller.sectorManager.ApplySectorLighting(sector, gameObject);
+                controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
             }
             loaded = true;
         }

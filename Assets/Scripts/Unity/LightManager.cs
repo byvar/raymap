@@ -7,23 +7,30 @@ using OpenSpace.Visual;
 
 public class LightManager : MonoBehaviour {
     bool loaded = false;
-    public bool simulateSectorLoading = true;
-    public bool neighborSectorLights = true;
-    public bool useFog = false;
-    public bool useAmbientColor = false;
     public SectorManager sectorManager;
     List<LightInfo> lights;
 
+    [Range(0.0f, 1.0f)]
+    public float luminosity = 0.5f;
+    private float curLiminosity = 0.5f;
+
+    public bool IsLoaded {
+        get { return loaded; }
+    }
+
     // Use this for initialization
     void Start () {
-		
-	}
+        Shader.SetGlobalFloat("_Luminosity", luminosity);
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        if(sectorManager != null && sectorManager.useMultiCameras) return;
         if (loaded) {
-            if (useFog && Camera.main.renderingPath == RenderingPath.DeferredShading) {
+            if (curLiminosity != luminosity) {
+                curLiminosity = luminosity;
+                Shader.SetGlobalFloat("_Luminosity", luminosity);
+            }
+            /*if (useFog && Camera.main.renderingPath == RenderingPath.DeferredShading) {
                 // Fog doesn't work for deferred
                 Camera.main.renderingPath = RenderingPath.Forward;
             }
@@ -46,19 +53,7 @@ public class LightManager : MonoBehaviour {
                     Color ambientLight = Color.black;
                     if (ambientLights.Count > 0) {
                         LightInfo l = ambientLights[0];
-                        /*for (int i = 1; i < ambientLights.Count; i++) {
-                            if (Vector3.Distance(ambientLights[i].Light.transform.position, Camera.main.transform.position) <
-                                l.far) {
-                                l = ambientLights[i];
-                            }
-                        }*/
                         ambientLight = l.color;
-                        /*for (int i = 0; i < ambientLights.Count; i++) {
-                            ambientLight = new Color(
-                                ambientLight.r + ambientLights[i].Light.color.r,
-                                ambientLight.g + ambientLights[i].Light.color.g,
-                                ambientLight.b + ambientLights[i].Light.color.b);
-                        }*/
                     }
                     RenderSettings.ambientLight = ambientLight;
                 }
@@ -95,7 +90,7 @@ public class LightManager : MonoBehaviour {
                     LightInfo l = lights[i];
                     l.Light.Activate();
                 }
-            }
+            }*/
         }
 	}
 
@@ -112,5 +107,9 @@ public class LightManager : MonoBehaviour {
         l.lightManager = this;
         l.Init();
         l.transform.parent = transform;
+    }
+
+    public void RecalculateSectorLighting() {
+        if (sectorManager != null) sectorManager.RecalculateSectorLighting();
     }
 }

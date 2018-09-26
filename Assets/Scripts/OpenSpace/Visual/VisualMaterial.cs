@@ -43,7 +43,7 @@ namespace OpenSpace.Visual {
 
         public bool ScrollingEnabled {
             get {
-                return textures.Where(t => t.ScrollingEnabled).Count() > 0;
+                return textures.Where(t => t != null && t.ScrollingEnabled).Count() > 0;
             }
         }
 

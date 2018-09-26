@@ -16,7 +16,8 @@ namespace OpenSpace.Object {
         public LinkedList<LightInfo> staticLights;
         public LinkedList<int> dynamicLights; // Stub
         public LinkedList<NeighborSector> neighbors;
-        public LinkedList<Sector> sectors_unk;
+        public LinkedList<NeighborSector> sectors_unk1;
+        public LinkedList<Sector> sectors_unk2;
 
         public byte isSectorVirtual;
 
@@ -61,7 +62,8 @@ namespace OpenSpace.Object {
                     n.short0 = reader.ReadUInt16();
                     n.short2 = reader.ReadUInt16();
                     Pointer sp = Pointer.Read(reader);
-                    n.sector = l.sectors.FirstOrDefault(s => s.SuperObject.offset == sp);
+                    n.sector = Sector.FromSuperObjectOffset(sp);
+                    //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
                     if (l.mode == MapLoader.Mode.RaymanArenaGC) {
                         n.off_next = off_element + 8; // No next pointer, each entry is immediately after the first one.
                     } else {
@@ -73,6 +75,41 @@ namespace OpenSpace.Object {
                     }
                     return n;
                 });
+            }
+            if (sectors_unk1 != null && sectors_unk1.Count > 0) {
+                //l.print(sectors_unk1.off_head + " - " + sectors_unk1.off_tail + " - " + sectors_unk1.Count);
+                sectors_unk1.ReadEntries(ref reader, (off_element) => {
+                    NeighborSector n = new NeighborSector();
+                    if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                        n.short0 = reader.ReadUInt16();
+                        n.short2 = reader.ReadUInt16();
+                    }
+                    Pointer sp = Pointer.Read(reader);
+                    n.sector = Sector.FromSuperObjectOffset(sp);
+                    //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
+                    if (l.mode == MapLoader.Mode.RaymanArenaGC) {
+                        n.off_next = off_element + 4; // No next pointer, each entry is immediately after the first one.
+                    } else {
+                        n.off_next = Pointer.Read(reader);
+                        if (Settings.s.hasLinkedListHeaderPointers) {
+                            n.off_previous = Pointer.Read(reader);
+                            Pointer off_sector_start = Pointer.Read(reader);
+                        }
+                    }
+                    return n;
+                });
+            }
+            if (sectors_unk2 != null && sectors_unk2.Count > 0) {
+                //l.print(sectors_unk2.off_head + " - " + sectors_unk2.off_tail + " - " + sectors_unk2.Count);
+                sectors_unk2.ReadEntries(ref reader, (off_element) => {
+                    //l.print(Pointer.Current(reader) + " - " + off_element);
+                    return Sector.FromSuperObjectOffset(off_element);
+                },
+                flags: LinkedList.Flags.ElementPointerFirst
+                    | LinkedList.Flags.ReadAtPointer
+                    | ((Settings.s.hasLinkedListHeaderPointers) ?
+                        LinkedList.Flags.HasHeaderPointers :
+                        LinkedList.Flags.NoPreviousPointersForDouble));
             }
             if (persos != null && persos.Count > 0) {
                 persos.ReadEntries(ref reader, (off_element) => {
@@ -114,8 +151,10 @@ namespace OpenSpace.Object {
                 LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // "streams list", probably related to water
             }
             s.neighbors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader));
-            LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader));
-            s.sectors_unk = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader));
+            s.sectors_unk1 = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader),
+                type: (l.mode == MapLoader.Mode.RaymanArenaGC) ? LinkedList.Type.SingleNoElementPointers : LinkedList.Type.Default);
+            s.sectors_unk2 = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader),
+                type: (l.mode == MapLoader.Mode.RaymanArenaGC) ? LinkedList.Type.SingleNoElementPointers : LinkedList.Type.Default);
 
             reader.ReadUInt32();
             reader.ReadUInt32();
@@ -149,7 +188,7 @@ namespace OpenSpace.Object {
                 if(Settings.s.game != Settings.Game.TTSE) reader.ReadUInt32();
                 Pointer off_name = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_name, () => {
-                    s.name = reader.ReadNullDelimitedString();
+                    s.name = reader.ReadNullDelimitedString() + " @ " + offset;
                 });
             }
             /*if(num_subsectors_unk > 0 && off_subsector_unk_first != null) { // only for father sector

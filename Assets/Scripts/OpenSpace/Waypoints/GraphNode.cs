@@ -57,7 +57,7 @@ namespace OpenSpace.Waypoints {
             reader.ReadUInt32();
             node.off_arcList = Pointer.Read(reader);
 
-            MapLoader.Loader.print("ArcList: "+node.off_arcList);
+            //MapLoader.Loader.print("ArcList: "+node.off_arcList);
 
             /*Pointer start = Pointer.Goto(ref reader, node.off_node);
             node.node = GraphNode.Read(reader, node.off_node);

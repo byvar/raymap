@@ -376,6 +376,10 @@ namespace OpenSpace {
                         fc.SaveChanges(writer);
                     }
                 }
+
+                foreach (LightInfo light in lights) {
+                    light.Write(writer);
+                }
             }
         }
 

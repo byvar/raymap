@@ -19,8 +19,8 @@ namespace OpenSpace.Visual {
         // ...
         public float far;
         public float near;
-        public float littleAlpha;
-        public float bigAlpha;
+        public float littleAlpha_fogInfinite;
+        public float bigAlpha_fogBlendNear;
         public float giroStep;
         public float pulseStep;
         public float pulseMaxRange;
@@ -31,27 +31,41 @@ namespace OpenSpace.Visual {
         public Vector4 color;
         public float shadowIntensity;
         // ...
+        public byte sendLightFlag;
+        public byte objectLightedFlag;
         public byte paintingLightFlag;
         public byte alphaLightFlag;
         public Vector3 interMinPos;
         public Vector3 exterMinPos;
         public Vector3 interMaxPos;
         public Vector3 exterMaxPos;
+        public Vector3 exterCenterPos;
         // ...
         public float attFactor3;
-        public float intensityMin;
+        public float intensityMin_fogBlendFar;
         public float intensityMax;
         public Vector4 background_color;
         public uint createsShadowsOrNot;
+        public string name = null;
+
+
+        [Flags]
+        public enum ObjectLightedFlag {
+            None = 0,
+            Environment = 1,
+            Perso = 2
+        };
 
         private LightBehaviour light;
         public LightBehaviour Light {
             get {
                 if (light == null) {
-                    GameObject gao = new GameObject("Light @ " + String.Format("0x{0:X}", offset.offset) + " | " +
+                    GameObject gao = new GameObject((name == null ? "Light" : name) + " @ " + String.Format("0x{0:X}", offset.offset) + " | " +
                         "Type: " + type + " - Far: " + far + " - Near: " + near +
-                        " - LittleAlpha: " + littleAlpha + " - BigAlpha: " + bigAlpha +
-                        " - AlphaLightFlag: " + alphaLightFlag);
+                       // " - FogBlendNear: " + bigAlpha_fogBlendNear + " - FogBlendFar: " + intensityMin_fogBlendFar +
+                        " - AlphaLightFlag: " + alphaLightFlag +
+                        " - PaintingLightFlag: " + paintingLightFlag +
+                        " - ObjectLightedFlag: " + objectLightedFlag);
                     Vector3 pos = transMatrix.GetPosition(convertAxes: true);
                     Quaternion rot = transMatrix.GetRotation(convertAxes: true) * Quaternion.Euler(-90, 0,0);
                     Vector3 scale = transMatrix.GetScale(convertAxes: true);
@@ -91,7 +105,10 @@ namespace OpenSpace.Visual {
             return !(x == y);
         }
 
-
+        public bool IsObjectLighted(ObjectLightedFlag flags) {
+            return (((ObjectLightedFlag)objectLightedFlag & flags) == flags);
+        }
+        
         public static LightInfo Read(Reader reader, Pointer offset) {
             MapLoader lo = MapLoader.Loader;
             LightInfo parsedLight = lo.lights.FirstOrDefault(li => li.offset == offset);
@@ -106,6 +123,10 @@ namespace OpenSpace.Visual {
             perso also has light sometimes (at offset + 28)*/
 
             /* For R2:
+            0x100 size
+            example: learn_30 @ 0x38684
+
+            previously thought:
             0x160 size
             example: astro_00 @ 1d30c
             */
@@ -119,8 +140,8 @@ namespace OpenSpace.Visual {
             reader.ReadUInt16();
             l.far = reader.ReadSingle();
             l.near = reader.ReadSingle();
-            l.littleAlpha = reader.ReadSingle();
-            l.bigAlpha = reader.ReadSingle();
+            l.littleAlpha_fogInfinite = reader.ReadSingle();
+            l.bigAlpha_fogBlendNear = reader.ReadSingle();
             l.giroStep = reader.ReadSingle();
             l.pulseStep = reader.ReadSingle();
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
@@ -139,25 +160,43 @@ namespace OpenSpace.Visual {
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 l.shadowIntensity = reader.ReadSingle(); // 0
             }
-            reader.ReadByte();
-            reader.ReadByte();
+            l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
+            l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
             l.paintingLightFlag = reader.ReadByte();
             l.alphaLightFlag = reader.ReadByte();
-            l.interMinPos = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            l.exterMinPos = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            l.interMaxPos = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            l.exterMaxPos = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            l.attFactor3 = reader.ReadSingle();
-            l.intensityMin = reader.ReadSingle();
-            l.intensityMax = reader.ReadSingle();
-            l.background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            l.createsShadowsOrNot = reader.ReadUInt32();
+            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
+                l.interMinPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                l.exterMinPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                l.interMaxPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                l.exterMaxPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                l.exterCenterPos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                l.attFactor3 = reader.ReadSingle();
+                l.intensityMin_fogBlendFar = reader.ReadSingle();
+                l.intensityMax = reader.ReadSingle();
+                l.background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3) l.createsShadowsOrNot = reader.ReadUInt32();
+            } else {
+                l.name = reader.ReadNullDelimitedString();
+            }
 
             lo.lights.Add(l);
             return l;
+        }
+
+        public void Write(Writer writer) {
+            if (light != null && light.IsModified) {
+                Pointer.Goto(ref writer, transMatrix.offset);
+                transMatrix.Write(writer);
+                Pointer.Goto(ref writer, Pointer.Current(writer) + (6 * 4));
+                writer.Write(color.x); writer.Write(color.y); writer.Write(color.z); writer.Write(color.w);
+
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+                    writer.Write(shadowIntensity); // 0
+                }
+                Pointer.Goto(ref writer, Pointer.Current(writer) + 2);
+                writer.Write(paintingLightFlag);
+                writer.Write(alphaLightFlag);
+            }
         }
     }
 }

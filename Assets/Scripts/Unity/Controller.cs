@@ -101,7 +101,6 @@ public class Controller : MonoBehaviour {
         sectorManager.Init();
         lightManager.Init();
         InitPersos();
-        InitSectors();
         InitCamera();
         if (viewCollision) UpdateViewCollision();
     }
@@ -121,7 +120,11 @@ public class Controller : MonoBehaviour {
                 Perso p = loader.persos[i];
                 PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
                 unityBehaviour.controller = this;
-                if (p.sectInfo != null && p.sectInfo.off_sector != null) unityBehaviour.sector = Sector.FromSuperObjectOffset(p.sectInfo.off_sector);
+                if (p.sectInfo != null && p.sectInfo.off_sector != null) {
+                    unityBehaviour.sector = Sector.FromSuperObjectOffset(p.sectInfo.off_sector);
+                } else {
+                    unityBehaviour.sector = sectorManager.GetActiveSectorsAtPoint(p.Gao.transform.position).FirstOrDefault();
+                }
                 if (p.SuperObject!=null && p.SuperObject.Gao!=null)
                 {
                     Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
@@ -254,22 +257,6 @@ public class Controller : MonoBehaviour {
             if (camera != null) {
                 Camera.main.transform.position = camera.Gao.transform.position;
                 Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0,180,0);
-            }
-        }
-    }
-
-    public void InitSectors() {
-        if (loader != null) {
-            foreach (Sector s in loader.sectors) {
-                sectorManager.ApplySectorLighting(s, s.Gao);
-                /*foreach (Perso p in s.persos) {
-                    if (p.Gao) {
-                        PersoBehaviour pb = p.Gao.GetComponent<PersoBehaviour>();
-                        if (pb != null) {
-                            pb.sector = s;
-                        }
-                    }
-                }*/
             }
         }
     }

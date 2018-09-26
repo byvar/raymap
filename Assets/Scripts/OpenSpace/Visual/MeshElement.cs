@@ -249,7 +249,17 @@ namespace OpenSpace.Visual {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.Material;
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
-                if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
+                bool scroll = visualMaterial.ScrollingEnabled;
+                if (num_uvMaps > 1) {
+                    unityMat.SetFloat("_UVSec", 1f);
+                } else if (scroll) {
+                    for (int i = num_uvMaps; i < visualMaterial.textures.Count; i++) {
+                        if (visualMaterial.textures[i].ScrollingEnabled) {
+                            unityMat.SetFloat("_UVSec", 1f);
+                            break;
+                        }
+                    }
+                }
                 //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
                 if (mr_main != null) {
                     mr_main.material = unityMat;
@@ -260,7 +270,7 @@ namespace OpenSpace.Visual {
                         mtmat.r3mat = visualMaterial;
                         mtmat.mat = mr_main.material;
                     }
-                    if (visualMaterial.ScrollingEnabled) {
+                    if (scroll) {
                         ScrollingTexture scrollComponent = mr_main.gameObject.AddComponent<ScrollingTexture>();
                         scrollComponent.r3mat = visualMaterial;
                         scrollComponent.mat = mr_main.material;
@@ -275,7 +285,7 @@ namespace OpenSpace.Visual {
                         mtmat.r3mat = visualMaterial;
                         mtmat.mat = mr_spe.material;
                     }
-                    if (visualMaterial.textures.Where(t => t!=null && t.ScrollingEnabled).Count() > 0) {
+                    if (scroll) {
                         ScrollingTexture scrollComponent = mr_spe.gameObject.AddComponent<ScrollingTexture>();
                         scrollComponent.r3mat = visualMaterial;
                         scrollComponent.mat = mr_spe.material;
