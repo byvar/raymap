@@ -35,6 +35,7 @@ namespace OpenSpace {
         public bool hasLinkedListHeaderPointers = false;
         public bool snaCompression = false;
         public AITypes aiTypes;
+        public float textureAnimationSpeedModifier = 1f;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -51,6 +52,7 @@ namespace OpenSpace {
             hasDeformations = true,
             aiTypes = AITypes.R3,
             hasMemorySupport = true,
+            textureAnimationSpeedModifier = 10f,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x007D9A4C },
                 { "dynamicWorld", 0x007D9934 },
@@ -93,7 +95,8 @@ namespace OpenSpace {
             hasDeformations = true,
             aiTypes = AITypes.R3,
             hasExtraInputData = true,
-            hasLinkedListHeaderPointers = true
+            hasLinkedListHeaderPointers = true,
+            textureAnimationSpeedModifier = 10f
         };
 
         public static Settings RAPC = new Settings() {
@@ -103,7 +106,8 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R3,
-            hasDeformations = true
+            hasDeformations = true,
+            textureAnimationSpeedModifier = 10f
         };
 
         public static Settings RAGC = new Settings() {
@@ -113,8 +117,9 @@ namespace OpenSpace {
             endian = Endian.Big,
             linkedListType = LinkedListType.Single,
             aiTypes = AITypes.R3,
-            hasDeformations = true
-        };
+            hasDeformations = true,
+            textureAnimationSpeedModifier = -10f
+    };
 
         public static Settings R2PC = new Settings() {
             engineVersion = EngineVersion.R2,

@@ -5,8 +5,6 @@
 		_Color("Tint", Color) = (1,1,1,1)
 		//_Time ("Time", Float) = 0
 		[MaterialToggle] PixelSnap("Pixel snap", Float) = 0
-		_ScaleX("Scale X", Float) = 1.0
-		_ScaleY("Scale Y", Float) = 1.0
 	}
 
 	SubShader
@@ -58,8 +56,6 @@
 			};
 
 			fixed4 _Color;
-			uniform float _ScaleX;
-			uniform float _ScaleY;
 
 			v2f vert(appdata_t IN)
 			{
@@ -70,11 +66,15 @@
 				OUT.texcoord = IN.texcoord;
 				OUT.color = IN.color * _Color;
 				//    #ifdef PIXELSNAP_ON
+				float2 worldScale = float2(
+					length(float3(unity_ObjectToWorld[0].x, unity_ObjectToWorld[1].x, unity_ObjectToWorld[2].x)), // scale x axis
+					length(float3(unity_ObjectToWorld[0].y, unity_ObjectToWorld[1].y, unity_ObjectToWorld[2].y)) // scale y axis
+					);
 
 				OUT.vertex = mul(UNITY_MATRIX_P,
 					float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0)
 					+ float4(IN.vertex.x, IN.vertex.y, 0.0, 0.0)
-					* float4(_ScaleX, _ScaleY, 1.0, 1.0));
+					* float4(worldScale.x, worldScale.y, 1.0, 1.0));
 
 				//                OUT.vertex = UnityPixelSnap (OUT.vertex);
 				//    #endif

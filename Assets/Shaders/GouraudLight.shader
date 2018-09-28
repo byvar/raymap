@@ -1,10 +1,10 @@
-﻿Shader "Custom/Gouraud" {
+﻿Shader "Custom/GouraudLight" {
 	Properties{
 		_NumTextures("Number of textures", Float) = 0
-		_MainTex("Texture 1 (RGBA)", 2D) = "white" {}
-		_MainTex2("Texture 2 (RGBA)", 2D) = "white" {}
-		_MainTex3("Texture 3 (RGBA)", 2D) = "white" {}
-		_MainTex4("Texture 4 (RGBA)", 2D) = "white" {}
+		_MainTex("Texture 1 (RGBA)", 2D) = "black" {}
+		_MainTex2("Texture 2 (RGBA)", 2D) = "black" {}
+		_MainTex3("Texture 3 (RGBA)", 2D) = "black" {}
+		_MainTex4("Texture 4 (RGBA)", 2D) = "black" {}
 		_Color("Color", Vector) = (1,1,1,1)
 		_DiffuseCoef("Diffuse Coef", Vector) = (1,1,1,1)
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
@@ -21,9 +21,12 @@
 		_SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
 	}
 	SubShader{
-		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
+		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" "IGNOREPROJECTOR" = "true" "PreviewType" = "Plane" }
+		ZWrite Off
+		Cull Off
 		Pass{
 			Tags{ "LightMode" = "ForwardBase" }
+			Blend One One
 			// pass for ambient light and first light source
 
 			CGPROGRAM
@@ -38,7 +41,7 @@
 				return process_vert(v, 0.0);
 			}
 			float4 frag(v2f i) : COLOR{
-				return process_frag(i, 0.0, 0.0);
+				return process_frag(i, 0.0, 1.0);
 			}
 			ENDCG
 		}

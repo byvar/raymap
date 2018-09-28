@@ -47,6 +47,7 @@ namespace OpenSpace.Visual {
         public Vector4 background_color;
         public uint createsShadowsOrNot;
         public string name = null;
+        public Pointer dimmer;
 
 
         [Flags]
@@ -60,7 +61,7 @@ namespace OpenSpace.Visual {
         public LightBehaviour Light {
             get {
                 if (light == null) {
-                    GameObject gao = new GameObject((name == null ? "Light" : name) + " @ " + String.Format("0x{0:X}", offset.offset) + " | " +
+                    GameObject gao = new GameObject((name == null ? "Light" : name) + " @ " + offset + " | " +
                         "Type: " + type + " - Far: " + far + " - Near: " + near +
                        // " - FogBlendNear: " + bigAlpha_fogBlendNear + " - FogBlendFar: " + intensityMin_fogBlendFar +
                         " - AlphaLightFlag: " + alphaLightFlag +
@@ -106,7 +107,9 @@ namespace OpenSpace.Visual {
         }
 
         public bool IsObjectLighted(ObjectLightedFlag flags) {
-            return (((ObjectLightedFlag)objectLightedFlag & flags) == flags);
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) return true;
+            if (flags == ObjectLightedFlag.Environment) return true;
+            return ((objectLightedFlag & (int)flags) == (int)flags);
         }
         
         public static LightInfo Read(Reader reader, Pointer offset) {
@@ -154,17 +157,17 @@ namespace OpenSpace.Visual {
             reader.ReadUInt32(); // 0
             reader.ReadUInt32(); // 0
             reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
-            l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                l.shadowIntensity = reader.ReadSingle(); // 0
-            }
-            l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
-            l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
-            l.paintingLightFlag = reader.ReadByte();
-            l.alphaLightFlag = reader.ReadByte();
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
+                reader.ReadUInt32(); // 0
+                reader.ReadUInt32(); // 0
+                l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+                    l.shadowIntensity = reader.ReadSingle(); // 0
+                }
+                l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
+                l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
+                l.paintingLightFlag = reader.ReadByte();
+                l.alphaLightFlag = reader.ReadByte();
                 l.interMinPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 l.exterMinPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 l.interMaxPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -176,7 +179,17 @@ namespace OpenSpace.Visual {
                 l.background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3) l.createsShadowsOrNot = reader.ReadUInt32();
             } else {
-                l.name = reader.ReadNullDelimitedString();
+                l.paintingLightFlag = (byte)reader.ReadUInt32();
+                reader.ReadUInt32();
+                l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                l.createsShadowsOrNot = reader.ReadUInt32();
+                l.name = reader.ReadString(0x14);
+                reader.ReadByte();
+                l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
+                reader.ReadByte();
+                reader.ReadByte();
+                l.intensityMin_fogBlendFar = reader.ReadSingle();
+                l.dimmer = Pointer.Read(reader);
             }
 
             lo.lights.Add(l);

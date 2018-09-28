@@ -14,6 +14,9 @@ public class LightManager : MonoBehaviour {
     public float luminosity = 0.5f;
     private float curLiminosity = 0.5f;
 
+    public bool saturate = true;
+    private bool curSaturate = true;
+
     public bool IsLoaded {
         get { return loaded; }
     }
@@ -21,6 +24,7 @@ public class LightManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         Shader.SetGlobalFloat("_Luminosity", luminosity);
+        Shader.SetGlobalFloat("_Saturate", saturate ? 1f : 0f);
     }
 	
 	// Update is called once per frame
@@ -29,6 +33,10 @@ public class LightManager : MonoBehaviour {
             if (curLiminosity != luminosity) {
                 curLiminosity = luminosity;
                 Shader.SetGlobalFloat("_Luminosity", luminosity);
+            }
+            if (curSaturate != saturate) {
+                curSaturate = saturate;
+                Shader.SetGlobalFloat("_Saturate", saturate ? 1f : 0f);
             }
             /*if (useFog && Camera.main.renderingPath == RenderingPath.DeferredShading) {
                 // Fog doesn't work for deferred

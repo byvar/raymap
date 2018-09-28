@@ -25,7 +25,7 @@ namespace OpenSpace.Visual {
         public string name;
         public Vector3[] vertices = null;
         public Vector3[] normals = null;
-        public float[] blendWeights = null;
+        public float[][] blendWeights = null;
         public ushort[] subblock_types = null;
         public IGeometricElement[] subblocks = null;
         public DeformSet bones = null;
@@ -137,24 +137,25 @@ namespace OpenSpace.Visual {
                 float y = reader.ReadSingle();
                 m.normals[i] = new Vector3(x, y, z);
             }
-            if (m.off_blendWeights != null) {
-                Pointer.Goto(ref reader, m.off_blendWeights);
+            Pointer.DoAt(ref reader, m.off_blendWeights, () => {
+                m.blendWeights = new float[4][];
                 /*reader.ReadUInt32(); // 0
                 R3Pointer off_blendWeightsStart = R3Pointer.Read(reader);
                 R3Pointer.Goto(ref reader, off_blendWeightsStart);*/
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                m.blendWeights = new float[m.num_vertices];
-                for (int i = 0; i < m.num_vertices; i++) {
-                    m.blendWeights[i] = reader.ReadSingle();
+                for (int i = 0; i < 4; i++) {
+                    Pointer off_blendWeights = Pointer.Read(reader);
+                    Pointer.DoAt(ref reader, off_blendWeights, () => {
+                        m.blendWeights[i] = new float[m.num_vertices];
+                        for (int j = 0; j < m.num_vertices; j++) {
+                            m.blendWeights[i][j] = reader.ReadSingle();
+                        }
+                    });
                 }
-            }
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+            });
             // Read subblock types & initialize arrays
             Pointer.Goto(ref reader, m.off_subblock_types);
             m.subblock_types = new ushort[m.num_subblocks];

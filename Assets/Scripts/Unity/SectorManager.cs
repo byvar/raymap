@@ -102,6 +102,7 @@ public class SectorManager : MonoBehaviour {
             List<Vector4> staticLightParams = new List<Vector4>();
             for (int i = 0; i < s.staticLights.Count; i++) {
                 LightInfo li = s.staticLights[i];
+                //if (!li.IsObjectLighted(objectType)) continue;
                 //if (li.turnedOn == 0x0) continue;
                 switch (li.type) {
                     case 4:

@@ -72,6 +72,10 @@ namespace OpenSpace.Visual {
                     mesh.bones.bindPoses[j] = mesh.bones.bones[j].worldToLocalMatrix * gao.transform.localToWorldMatrix;
                 }
             }*/
+            uint num_textures = 0;
+            if (visualMaterial != null) {
+                num_textures = visualMaterial.num_textures;
+            }
 
             Renderer mr_main = null, mr_spe = null;
             long num_triangles_main = ((num_connected_vertices > 2 ? num_connected_vertices - 2 : 0) + num_disconnected_triangles) * (backfaceCulling ? 1 : 2);
@@ -80,19 +84,23 @@ namespace OpenSpace.Visual {
             if (num_triangles_main > 0) {
                 Vector3[] new_vertices = new Vector3[num_mapping_entries];
                 Vector3[] new_normals = new Vector3[num_mapping_entries];
-                Vector3[][] new_uvs = new Vector3[num_uvMaps][]; // Thanks to Unity we can only store the blend weights as a third component of the UVs
+                Vector3[][] new_uvs = new Vector3[num_textures][]; // Thanks to Unity we can only store the blend weights as a third component of the UVs
                 BoneWeight[] new_boneWeights = mesh.bones != null ? new BoneWeight[num_mapping_entries] : null;
-                for (int um = 0; um < num_uvMaps; um++) {
+                for (int um = 0; um < num_textures; um++) {
                     new_uvs[um] = new Vector3[num_mapping_entries];
                 }
                 for (int j = 0; j < num_mapping_entries; j++) {
                     new_vertices[j] = mesh.vertices[mapping_vertices[j]];
                     new_normals[j] = mesh.normals[mapping_vertices[j]];
                     if (new_boneWeights != null) new_boneWeights[j] = mesh.bones.weights[mapping_vertices[j]];
-                    for (int um = 0; um < num_uvMaps; um++) {
-                        new_uvs[um][j] = uvs[mapping_uvs[um][j]];
-                        if (mesh.blendWeights != null) {
-                            new_uvs[um][j].z = mesh.blendWeights[mapping_vertices[j]];
+                    for (int um = 0; um < num_textures; um++) {
+                        uint uvMap = (uint)visualMaterial.textures[um].uvFunction % num_uvMaps;
+                        //MapLoader.Loader.print(visualMaterial.textures[um].uvFunction + " - " + num_uvMaps);
+                        new_uvs[um][j] = uvs[mapping_uvs[uvMap][j]];
+                        if (mesh.blendWeights != null && mesh.blendWeights[visualMaterial.textures[um].blendIndex] != null) {
+                            new_uvs[um][j].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][mapping_vertices[j]];
+                        } else {
+                            new_uvs[um][j].z = 1;
                         }
                     }
                 }
@@ -137,7 +145,7 @@ namespace OpenSpace.Visual {
                     mesh_main.boneWeights = new_boneWeights;
                     mesh_main.bindposes = mesh.bones.bindPoses;
                 }
-                for (int i = 0; i < num_uvMaps; i++) {
+                for (int i = 0; i < num_textures; i++) {
                     mesh_main.SetUVs(i, new_uvs[i].ToList());
                 }
                 if (new_boneWeights != null) {
@@ -155,17 +163,19 @@ namespace OpenSpace.Visual {
             if (num_disconnected_triangles_spe > 0) {
                 Vector3[] new_vertices_spe = new Vector3[num_disconnected_triangles_spe * 3];
                 Vector3[] new_normals_spe = new Vector3[num_disconnected_triangles_spe * 3];
-                Vector3[][] new_uvs_spe = new Vector3[num_uvMaps][];
+                Vector3[][] new_uvs_spe = new Vector3[num_textures][];
                 BoneWeight[] new_boneWeights_spe = mesh.bones != null ? new BoneWeight[num_disconnected_triangles_spe * 3] : null;
-                for (int um = 0; um < num_uvMaps; um++) {
+                for (int um = 0; um < num_textures; um++) {
                     new_uvs_spe[um] = new Vector3[num_disconnected_triangles_spe * 3];
                 }
                 int[] triangles_spe = new int[num_disconnected_triangles_spe * triangle_size];
                 triangles_index = 0;
-                for (int um = 0; um < num_uvMaps; um++) {
+                for (int um = 0; um < num_textures; um++) {
                     for (int j = 0; j < num_disconnected_triangles_spe * 3; j++) {
-                        new_uvs_spe[um][j] = uvs[mapping_uvs_spe[um][j]];
-                        if (MapLoader.Loader.blockyMode && normals_spe != null) new_uvs_spe[um][j] = uvs[mapping_uvs_spe[um][j-(j%3)]];
+                        uint uvMap = (uint)visualMaterial.textures[um].uvFunction % num_uvMaps;
+                        new_uvs_spe[um][j] = uvs[mapping_uvs_spe[uvMap][j]];
+                        if (MapLoader.Loader.blockyMode && normals_spe != null) new_uvs_spe[um][j] = uvs[mapping_uvs_spe[uvMap][j-(j%3)]];
+                        new_uvs_spe[um][j].z = 1;
                         /*int i0 = reader.ReadInt16(), m0 = (j * 3) + 0; // Old index, mapped index
                         int i1 = reader.ReadInt16(), m1 = (j * 3) + 1;
                         int i2 = reader.ReadInt16(), m2 = (j * 3) + 2;
@@ -197,10 +207,12 @@ namespace OpenSpace.Visual {
                         new_boneWeights_spe[m2] = mesh.bones.weights[i2];
                     }
                     if (mesh.blendWeights != null) {
-                        for (int um = 0; um < num_uvMaps; um++) {
-                            new_uvs_spe[um][m0].z = mesh.blendWeights[i0];
-                            new_uvs_spe[um][m1].z = mesh.blendWeights[i1];
-                            new_uvs_spe[um][m2].z = mesh.blendWeights[i2];
+                        for (int um = 0; um < num_textures; um++) {
+                            if (mesh.blendWeights[visualMaterial.textures[um].blendIndex] != null) {
+                                new_uvs_spe[um][m0].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][i0];
+                                new_uvs_spe[um][m1].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][i1];
+                                new_uvs_spe[um][m2].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][i2];
+                            }
                         }
                     }
                     triangles_spe[triangles_index + 0] = m0;
@@ -227,7 +239,7 @@ namespace OpenSpace.Visual {
                         mesh_spe.boneWeights = new_boneWeights_spe;
                         mesh_spe.bindposes = mesh.bones.bindPoses;
                     }
-                    for (int i = 0; i < num_uvMaps; i++) {
+                    for (int i = 0; i < num_textures; i++) {
                         mesh_spe.SetUVs(i, new_uvs_spe[i].ToList());
                     }
                     //mesh.SetUVs(0, new_uvs_spe.ToList());
@@ -250,7 +262,7 @@ namespace OpenSpace.Visual {
                 Material unityMat = visualMaterial.Material;
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
-                if (num_uvMaps > 1) {
+                /*if (num_uvMaps > 1) {
                     unityMat.SetFloat("_UVSec", 1f);
                 } else if (scroll) {
                     for (int i = num_uvMaps; i < visualMaterial.textures.Count; i++) {
@@ -259,7 +271,7 @@ namespace OpenSpace.Visual {
                             break;
                         }
                     }
-                }
+                }*/
                 //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
                 if (mr_main != null) {
                     mr_main.material = unityMat;
@@ -461,11 +473,12 @@ namespace OpenSpace.Visual {
         }
 
         private Mesh CopyMesh(Mesh mesh) {
+            uint num_textures = visualMaterial != null ? visualMaterial.num_textures : 0;
             Mesh newmesh = new Mesh();
             newmesh.vertices = mesh.vertices;
             newmesh.triangles = mesh.triangles;
-            for (int i = 0; i < num_uvMaps; i++) {
-                List<Vector2> uvsTemp = new List<Vector2>();
+            for (int i = 0; i < num_textures; i++) {
+                List<Vector3> uvsTemp = new List<Vector3>();
                 mesh.GetUVs(i, uvsTemp);
                 newmesh.SetUVs(i, uvsTemp);
             }

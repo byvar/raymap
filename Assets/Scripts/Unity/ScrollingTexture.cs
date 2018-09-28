@@ -31,8 +31,8 @@ public class ScrollingTexture : MonoBehaviour {
         for (int i = 0; i < r3mat.textures.Count; i++) {
             VisualMaterialTexture t = r3mat.textures[i];
             if (t.ScrollingEnabled) {
-                float offsetU = t.currentScrollX + (t.IsScrollX ? currentFrame * t.scrollX : 0);
-                float offsetV = t.currentScrollY + (t.IsScrollY ? currentFrame * t.scrollY : 0);
+                float offsetU = t.currentScrollX + (t.IsScrollX ? currentFrame * t.ScrollX : 0);
+                float offsetV = t.currentScrollY + (t.IsScrollY ? currentFrame * t.ScrollY : 0);
                 if (i == 0) {
                     mat.SetTextureOffset("_MainTex", new Vector2(offsetU, offsetV));
                 } else  if (i == 1 && mat.HasProperty("_MainTex2")) mat.SetTextureOffset("_MainTex2", new Vector2(offsetU, offsetV));

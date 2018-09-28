@@ -1,7 +1,10 @@
 ﻿Shader "Custom/GouraudAlpha" {
 	Properties{
+		_NumTextures("Number of textures", Float) = 0
 		_MainTex("Texture 1 (RGBA)", 2D) = "white" {}
 		_MainTex2("Texture 2 (RGBA)", 2D) = "white" {}
+		_MainTex3("Texture 3 (RGBA)", 2D) = "white" {}
+		_MainTex4("Texture 4 (RGBA)", 2D) = "white" {}
 		_Color("Color", Vector) = (1,1,1,1)
 		_DiffuseCoef("Diffuse Coef", Vector) = (1,1,1,1)
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)

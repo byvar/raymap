@@ -17,6 +17,7 @@ namespace OpenSpace.Visual {
         public Vector4 diffuseCoef;
         public Vector4 specularCoef;
         public Vector4 color;
+        public uint num_textures;
 
         public Pointer off_animTextures_first;
         public Pointer off_animTextures_current;
@@ -53,46 +54,29 @@ namespace OpenSpace.Visual {
                 if (material == null) {
                     MapLoader l = MapLoader.Loader;
                     //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
-                    TextureInfo texMain = null, texSecondary = null;
-                    if (textures != null && textures.Count > 0) {
-                        texMain = textures[0].texture;
-                        if (textures.Count > 1) {
-                            texSecondary = textures[1].texture;
-                        }
-                    }
                     Material baseMaterial = l.baseMaterial;
                     bool transparent = IsTransparent;
                     if (textures.Where(t => (t.properties & 0x20) != 0).Count() > 0 || IsLight) {
                         baseMaterial = l.baseLightMaterial;
-                    } else if (texMain != null && texSecondary != null) {
-                        if (transparent) {
-                            baseMaterial = l.baseTransparentMaterial;
-                        } else {
-                            baseMaterial = l.baseMaterial;
-                        }
-                    } else if (texMain != null && transparent) {
+                    } else if (transparent) {
                         baseMaterial = l.baseTransparentMaterial;
                     }
                     //if (textureTypes.Where(i => ((i & 1) != 0)).Count() > 0) baseMaterial = loader.baseLightMaterial;
                     material = new Material(baseMaterial);
-                    //material.SetColor("_EmissionColor", new Color(1f, 1f, 1f, (1f - ambientCoef.w)*5f));
-                    /*if (color.w > 0) {
-                        material.SetColor("_Color", new Color(color.x, color.y, color.z, color.w));
-                    } else {
-                        material.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
-                    }*/
-                    if (texMain != null) {
-                        material.SetTexture("_MainTex", texMain.Texture);
-                        material.SetTextureOffset("_MainTex", new Vector2(texMain.currentScrollX, texMain.currentScrollY));
-                    }
-                    if (texSecondary != null) {
-                        if (baseMaterial == l.baseMaterial || baseMaterial == l.baseTransparentMaterial) {
-                            material.SetTexture("_MainTex2", texSecondary.Texture);
-                            material.SetTextureOffset("_MainTex2", new Vector2(texSecondary.currentScrollX, texSecondary.currentScrollY));
-                            //if (useAlphaMask) material.SetFloat("_UseAlpha", 1f);
-                            material.SetFloat("_Blend", 1f);
-                        } else {
-                            material.SetTexture("_DetailAlbedoMap", texSecondary.Texture);
+                    if (textures != null) {
+                        material.SetFloat("_NumTextures", num_textures);
+                        for (int i = 0; i < num_textures; i++) {
+                            string textureName = "_MainTex" + (i == 0 ? "" : (i + 1).ToString());
+                            if (textures[i].texture != null) {
+                                material.SetTexture(textureName, textures[i].texture.Texture);
+                                material.SetTextureOffset(textureName, new Vector2(textures[i].texture.currentScrollX, textures[i].texture.currentScrollY));
+                            } else {
+                                // No texture = just color. So create white texture and let that be colored by other properties.
+                                Texture2D tex = new Texture2D(1, 1);
+                                tex.SetPixel(0, 0, new Color(1, 1, 1, 1));
+                                tex.Apply();
+                                material.SetTexture(textureName, tex);
+                            }
                         }
                     }
                     if (baseMaterial == l.baseMaterial || baseMaterial == l.baseTransparentMaterial) {
@@ -101,13 +85,6 @@ namespace OpenSpace.Visual {
                         material.SetVector("_DiffuseCoef", diffuseCoef);
                         material.SetVector("_Color", color);
                         if (IsPixelShaded) material.SetFloat("_ShadingMode", 1f);
-                    }
-                    if (texMain == null || texMain.Texture == null) {
-                        // No texture = just color. So create white texture and let that be colored by other properties.
-                        Texture2D tex = new Texture2D(1, 1);
-                        tex.SetPixel(0, 0, new Color(1, 1, 1, 1));
-                        tex.Apply();
-                        material.SetTexture("_MainTex", tex);
                     }
                 }
                 return material;
@@ -217,6 +194,7 @@ namespace OpenSpace.Visual {
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
             
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                m.num_textures = 1;
                 reader.ReadUInt32(); // 0x48
                 VisualMaterialTexture t = new VisualMaterialTexture();
                 t.offset = Pointer.Current(reader);
@@ -267,7 +245,7 @@ namespace OpenSpace.Visual {
                 reader.ReadByte();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                reader.ReadUInt32();
+               /* m.num_textures = */reader.ReadUInt32();
                 for (int i = 0; i < 4; i++) {
                     Pointer off_texture = Pointer.Read(reader);
                     if (off_texture == null) break;
@@ -287,9 +265,8 @@ namespace OpenSpace.Visual {
                     reader.ReadInt32();
                     t.scrollX = reader.ReadSingle();
                     t.scrollY = reader.ReadSingle();
-
-                    reader.ReadInt32();
-                    reader.ReadInt32();
+                    t.rotateSpeed = reader.ReadSingle();
+                    t.rotateDirection = reader.ReadSingle();
                     reader.ReadInt32();
                     reader.ReadInt32();
                     t.currentScrollX = reader.ReadSingle();
@@ -298,10 +275,11 @@ namespace OpenSpace.Visual {
                     reader.ReadInt32();
                     reader.ReadInt32();
                     reader.ReadInt32();
-                    reader.ReadInt32();
+                    t.blendIndex = reader.ReadUInt32();
                     
                     m.textures.Add(t);
                 }
+                m.num_textures = (uint)m.textures.Count;
             }
             if (m.num_animTextures > 0 && m.off_animTextures_first != null) {
                 Pointer off_currentAnimTexture = m.off_animTextures_first;
