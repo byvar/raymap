@@ -111,6 +111,7 @@ namespace OpenSpace.Collide {
             }
             m.gao = new GameObject("Collide Set @ " + offset);
             m.gao.tag = "Collide";
+            m.gao.layer = LayerMask.NameToLayer("Collide");
             for (uint i = 0; i < m.num_subblocks; i++) {
                 Pointer.Goto(ref reader, m.off_subblocks + (i * 4));
                 Pointer block_offset = Pointer.Read(reader);

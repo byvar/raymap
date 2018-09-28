@@ -27,6 +27,7 @@ namespace OpenSpace.Collide {
             get {
                 if (gao == null) {
                     gao = new GameObject("Collide Spheres @ " + offset);// Create object and read triangle data
+                    gao.layer = LayerMask.NameToLayer("Collide");
                     CreateUnityMesh();
                 }
                 return gao;
