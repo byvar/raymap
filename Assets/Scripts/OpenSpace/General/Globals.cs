@@ -22,5 +22,8 @@ namespace OpenSpace {
         public Pointer off_always_reusableSO; // There are (num_always) empty SuperObjects starting with this one.
         public Pointer off_always_reusableUnknown1; // (num_always) * 0x2c blocks
         public Pointer off_always_reusableUnknown2; // (num_always) * 0x4 blocks
+
+        public Pointer off_backgroundGameMaterial = null; // Donald Duck only
+        public GameMaterial backgroundGameMaterial = null;
     }
 }

@@ -4,10 +4,16 @@ using UnityEngine;
 using OpenSpace;
 using System.Linq;
 using OpenSpace.Visual;
+using OpenSpace.Object;
+using UnityEngine.UI;
 
 public class LightManager : MonoBehaviour {
     bool loaded = false;
+    public Controller controller;
     public SectorManager sectorManager;
+    public MeshRenderer backgroundPanel;
+    private ScrollingTexture backgroundScroll;
+    private Sector previousActiveBackgroundSector = null;
     List<LightInfo> lights;
 
     [Range(0.0f, 1.0f)]
@@ -25,6 +31,15 @@ public class LightManager : MonoBehaviour {
     void Start () {
         Shader.SetGlobalFloat("_Luminosity", luminosity);
         Shader.SetGlobalFloat("_Saturate", saturate ? 1f : 0f);
+
+        // Set background UVs
+        Mesh mesh = backgroundPanel.GetComponent<MeshFilter>().sharedMesh;
+        List<Vector2> uvs = new List<Vector2>();
+        mesh.GetUVs(0, uvs);
+        mesh.SetUVs(0, uvs.Select(u => new Vector3(u.x, u.y, 1f)).ToList());
+        backgroundScroll = backgroundPanel.gameObject.AddComponent<ScrollingTexture>();
+        backgroundScroll.visMat = null;
+        backgroundScroll.mat = null;
     }
 	
 	// Update is called once per frame
@@ -37,6 +52,64 @@ public class LightManager : MonoBehaviour {
             if (curSaturate != saturate) {
                 curSaturate = saturate;
                 Shader.SetGlobalFloat("_Saturate", saturate ? 1f : 0f);
+            }
+
+            // Update background color or material
+            Color? backgroundColor = null;
+            VisualMaterial skyMaterial = null;
+            Sector activeBackgroundSector = null;
+            if (MapLoader.Loader.globals.backgroundGameMaterial != null && MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial != null) {
+                skyMaterial = MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial;
+            } else {
+                if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
+                    foreach (Sector s in sectorManager.sectors) {
+                        if (!s.Active) continue;
+                        if (s.skyMaterial != null && s.skyMaterial.textures.Count > 0 && s.skyMaterial.textures.Where(t => t.texture != null).Count() > 0) {
+                            skyMaterial = s.skyMaterial;
+                            activeBackgroundSector = s;
+                            break;
+                        } else {
+                            foreach (LightInfo li in s.staticLights) {
+                                if (li.type == 6) {
+                                    backgroundColor = li.background_color;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (skyMaterial != null && !controller.viewCollision) {
+                backgroundPanel.gameObject.SetActive(true);
+                if (backgroundScroll.visMat != skyMaterial) {
+                    Material skyboxMat = skyMaterial.Material;
+                    backgroundPanel.material = skyboxMat;
+                    backgroundScroll.ResetMaterial(skyMaterial, backgroundPanel.material);
+                }
+                //skyboxMat.SetFloat("_DisableLighting", 1f);
+                //backgroundPanel.material.SetFloat("_DisableLighting", 1f);
+                if (activeBackgroundSector != null) {
+                    if (activeBackgroundSector != previousActiveBackgroundSector) {
+                        backgroundPanel.material.SetFloat("_DisableLighting", 0f);
+                        sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
+                        previousActiveBackgroundSector = activeBackgroundSector;
+                    }
+                } else {
+                    backgroundPanel.material.SetFloat("_DisableLighting", 1f);
+                }
+                //RenderSettings.skybox = skyboxMat;
+                //Camera.main.clearFlags = CameraClearFlags.Skybox;
+            } else {
+                backgroundPanel.gameObject.SetActive(false);
+                //RenderSettings.skybox = null;
+                //Camera.main.clearFlags = CameraClearFlags.SolidColor;
+            }
+            if (backgroundColor.HasValue && !controller.viewCollision) {
+                Camera.main.backgroundColor = backgroundColor.Value;
+                //Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, backgroundColor.Value, 0.5f * Time.deltaTime);
+            } else {
+                Camera.main.backgroundColor = Color.black;
+                //Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, 0.5f * Time.deltaTime);
             }
             /*if (useFog && Camera.main.renderingPath == RenderingPath.DeferredShading) {
                 // Fog doesn't work for deferred

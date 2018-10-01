@@ -23,17 +23,6 @@ public class SectorManager : MonoBehaviour {
         if (loaded) {
             Vector3 camPos = Camera.main.transform.localPosition;
             List<Sector> activeSectors = GetActiveSectorsAtPoint(camPos);
-            for (int i = 0; i < activeSectors.Count; i++) {
-                Sector s = activeSectors[i];
-                for (int j = 0; j < s.neighbors.Count; j++) {
-                    s.neighbors[j].sector.Loaded = true;
-                }
-            }
-            if (activeSectors.Count == 0) {
-                for (int i = 0; i < sectors.Count; i++) {
-                    sectors[i].Loaded = true;
-                }
-            }
 
             if (!displayInactiveSectors) {
                 for (int i = 0; i < sectors.Count; i++) {
@@ -60,6 +49,17 @@ public class SectorManager : MonoBehaviour {
             s.Loaded = false;
             s.Active = (allowVirtual || s.isSectorVirtual == 0) && (s.sectorBorder != null ? s.sectorBorder.ContainsPoint(point) : true);
             if (s.Active) activeSectors.Add(s);
+        }
+        for (int i = 0; i < activeSectors.Count; i++) {
+            Sector s = activeSectors[i];
+            for (int j = 0; j < s.neighbors.Count; j++) {
+                s.neighbors[j].sector.Loaded = true;
+            }
+        }
+        if (activeSectors.Count == 0) {
+            for (int i = 0; i < sectors.Count; i++) {
+                sectors[i].Loaded = true;
+            }
         }
         return activeSectors;
     }
@@ -131,7 +131,22 @@ public class SectorManager : MonoBehaviour {
             Vector4[] staticLightColArray = staticLightCol.ToArray();
             Vector4[] staticLightParamsArray = staticLightParams.ToArray();
             if (gao) {
-                List<Renderer> rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
+                List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
+                foreach (Renderer r in rs) {
+                    if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
+                        if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
+                        if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
+                        r.material.SetVector("_SectorAmbient", ambientLight);
+                        r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
+                        if (staticLightPosArray.Length > 0) {
+                            r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
+                            r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
+                            r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
+                            r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
+                        }
+                    }
+                }
+                rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
                 foreach (Renderer r in rs) {
                     if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
                         if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);

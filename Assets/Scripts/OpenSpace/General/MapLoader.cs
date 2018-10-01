@@ -102,6 +102,7 @@ namespace OpenSpace {
         string[] cntPaths = null;
         CNT cnt = null;
         DSB gameDsb = null;
+        DSB lvlDsb = null;
         string menuTPLPath;
 
         public Globals globals = null;
@@ -199,6 +200,18 @@ namespace OpenSpace {
                             if (File.Exists(dataPath)) {
                                 dat = new DAT("LEVELS0", gameDsb, dataPath);
                             }
+                        }
+
+                        // LEVEL DSB
+                        string lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".dsb";
+                        if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
+                            lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".DSC";
+                        }
+                        if(File.Exists(lvlDsbPath)) {
+                            lvlDsb = new DSB(lvlName + ".dsc", lvlDsbPath);
+                            lvlDsb.Save(levelsFolder + lvlName + "/" + lvlName + "_dsb.dmp");
+                            //lvlDsb.ReadAllSections();
+                            lvlDsb.Dispose();
                         }
 
                         // FIX
@@ -1350,14 +1363,10 @@ namespace OpenSpace {
 
                 // End of engineStructure
                 Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
-
-                if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.R2Demo) {
-                    Pointer off_unknown = Pointer.Read(reader);
-                }
-
                 Pointer off_mainChar = Pointer.Read(reader); // superobject
-                if (Settings.s.game != Settings.Game.R2Demo) {
-                    Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
+                Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
+                if (Settings.s.game == Settings.Game.DD) {
+                    globals.off_backgroundGameMaterial = Pointer.Read(reader);
                 }
                 Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
                 Pointer off_shadowPolygonGameMaterialInit = Pointer.Read(reader);
@@ -1416,6 +1425,9 @@ namespace OpenSpace {
                     }
                 }
             });
+
+            // Read background game material (DD only)
+            globals.backgroundGameMaterial = GameMaterial.FromOffsetOrRead(globals.off_backgroundGameMaterial, reader);
 
             // Parse actual world & always structure
             ReadFamilies(reader);

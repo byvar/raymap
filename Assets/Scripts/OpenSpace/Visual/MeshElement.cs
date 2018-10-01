@@ -284,7 +284,7 @@ namespace OpenSpace.Visual {
                     }
                     if (scroll) {
                         ScrollingTexture scrollComponent = mr_main.gameObject.AddComponent<ScrollingTexture>();
-                        scrollComponent.r3mat = visualMaterial;
+                        scrollComponent.visMat = visualMaterial;
                         scrollComponent.mat = mr_main.material;
                     }
                 }
@@ -299,7 +299,7 @@ namespace OpenSpace.Visual {
                     }
                     if (scroll) {
                         ScrollingTexture scrollComponent = mr_spe.gameObject.AddComponent<ScrollingTexture>();
-                        scrollComponent.r3mat = visualMaterial;
+                        scrollComponent.visMat = visualMaterial;
                         scrollComponent.mat = mr_spe.material;
                     }
                 }

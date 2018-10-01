@@ -35,6 +35,7 @@ float4 _StaticLightParams[512];
 float _StaticLightCount = 0;
 float _Luminosity = 0.5;
 float _Saturate = 1.0;
+float _DisableLighting = 0;
 
 struct v2f {
 	float4 pos : SV_POSITION;
@@ -58,6 +59,7 @@ float CalcSphereAttenuation(float distance, float near, float far) {
 }
 
 float4 ApplyStaticLights(float3 colRgb, float3 normalDirection, float3 multipliedPosition) {
+	if(_DisableLighting == 1.0) return float4(1.0, 1.0, 1.0, 1.0);
 
 	/* Alpha light flags:
 	    0 = Affect color and alpha
@@ -205,7 +207,7 @@ v2f process_vert(appdata_full v, float isAdd) {
 	o.normal = normalDirection;
 	o.multipliedPosition = multipliedPosition;
 	o.diffuseColor = float4(ambientLighting + diffuseReflection, alpha);
-	if (_SectorFog.w == 1) {
+	if (_SectorFog.w != 0) {
 		if (_SectorFogParams.x != _SectorFogParams.y) { // Blend near != Blend far
 			float fogz = length(WorldSpaceViewDir(v.vertex));
 			o.fog = _SectorFogParams.x + 
@@ -253,12 +255,12 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 		clip(clipAlpha * (c.a - 1.0));
 	}*/
 	// Add fog
-	if (_SectorFog.w == 1) {
+	if (_SectorFog.w != 0) {
 		float fog = i.fog;
 		if (isAdd == 1.0) {
-			c.rgb = lerp(c.rgb, float3(0, 0, 0), fog);
+			c.rgb = lerp(c.rgb, float3(0, 0, 0), fog * _SectorFog.w);
 		} else {
-			c.rgb = lerp(c.rgb, _SectorFog.xyz, fog);
+			c.rgb = lerp(c.rgb, _SectorFog.xyz, fog * _SectorFog.w);
 		}
 		//c.rgb = lerp(c.rgb, _SectorFog.xyz, fog);
 	}

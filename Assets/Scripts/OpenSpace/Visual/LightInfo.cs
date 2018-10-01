@@ -63,7 +63,7 @@ namespace OpenSpace.Visual {
                 if (light == null) {
                     GameObject gao = new GameObject((name == null ? "Light" : name) + " @ " + offset + " | " +
                         "Type: " + type + " - Far: " + far + " - Near: " + near +
-                       // " - FogBlendNear: " + bigAlpha_fogBlendNear + " - FogBlendFar: " + intensityMin_fogBlendFar +
+                        //" - FogBlendNear: " + bigAlpha_fogBlendNear + " - FogBlendFar: " + intensityMin_fogBlendFar +
                         " - AlphaLightFlag: " + alphaLightFlag +
                         " - PaintingLightFlag: " + paintingLightFlag +
                         " - ObjectLightedFlag: " + objectLightedFlag);

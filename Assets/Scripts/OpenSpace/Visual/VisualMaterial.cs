@@ -96,7 +96,6 @@ namespace OpenSpace.Visual {
                 if (materialBillboard == null) {
                     MapLoader l = MapLoader.Loader;
                     //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
-                    bool useAlphaMask = false;
                     TextureInfo texMain = null, texSecondary = null;
                     if (textures != null && textures.Count > 0) {
                         texMain = textures[0].texture;
@@ -112,12 +111,13 @@ namespace OpenSpace.Visual {
                     }
                     bool transparent = IsTransparent;
                     materialBillboard = new Material(baseMaterial);
-                    materialBillboard.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, ambientCoef.w));
+                    //materialBillboard.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, ambientCoef.w));
                     if (color.w > 0) {
                         materialBillboard.SetColor("_Color", new Color(color.x, color.y, color.z, color.w));
                     } else {
                         materialBillboard.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
                     }
+                    //materialBillboard.SetColor("_Color", new Color(ambientCoef.x, ambientCoef.y, ambientCoef.z));
                     if (texMain != null) materialBillboard.SetTexture("_MainTex", texMain.Texture);
                     if (texMain == null || texMain.Texture == null) {
                         // No texture = just color. So create white texture and let that be colored by other properties.

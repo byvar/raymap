@@ -20,6 +20,8 @@ namespace OpenSpace.Object {
         public LinkedList<Sector> sectors_unk2;
 
         public byte isSectorVirtual;
+        public Pointer off_skyMaterial;
+        public VisualMaterial skyMaterial;
 
         public BoundingVolume sectorBorder;
         private GameObject gao;
@@ -172,7 +174,12 @@ namespace OpenSpace.Object {
                 reader.ReadByte();
                 reader.ReadByte();
                 reader.ReadByte();
-                reader.ReadUInt32();
+                if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
+                    s.off_skyMaterial = Pointer.Read(reader);
+                    s.skyMaterial = VisualMaterial.FromOffsetOrRead(s.off_skyMaterial, reader);
+                } else {
+                    reader.ReadUInt32();
+                }
                 reader.ReadByte();
                 if (Settings.s.hasNames) {
                     s.name = reader.ReadString(0x104);
