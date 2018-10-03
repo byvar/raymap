@@ -31,10 +31,10 @@ namespace OpenSpace.Collide {
         public LinkedList<CollideMeshObject> zdm;
         public LinkedList<CollideMeshObject> zdr;
 
-        public ZdxList zddZones;
-        public ZdxList zdeZones;
-        public ZdxList zdmZones;
-        public ZdxList zdrZones;
+        public LinkedList<CollideElement> zddZones;
+        public LinkedList<CollideElement> zdeZones;
+        public LinkedList<CollideElement> zdmZones;
+        public LinkedList<CollideElement> zdrZones;
 
         public CollSet(Perso perso, Pointer offset) {
             this.perso = perso;
@@ -54,16 +54,31 @@ namespace OpenSpace.Collide {
                         | (Settings.s.hasLinkedListHeaderPointers ?
                             LinkedList.Flags.HasHeaderPointers :
                             LinkedList.Flags.NoPreviousPointersForDouble),
-                    type: l.mode == MapLoader.Mode.RaymanArenaGC ?
-                        LinkedList.Type.SingleNoElementPointers :
-                        LinkedList.Type.Default
+                    type: LinkedList.Type.Minimize
                 );
             });
             return zdxList;
         }
 
+        private static LinkedList<CollideElement> ParseZdxZoneList(Reader reader, Pointer offset, CollideMeshObject.Type type) {
+            MapLoader l = MapLoader.Loader;
+            LinkedList<CollideElement> zdxZoneList = null;
+            Pointer.DoAt(ref reader, offset, () => {
+                //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
+                zdxZoneList = LinkedList<CollideElement>.Read(ref reader, offset,
+                    (off_element) => {
+                        return CollideElement.Read(reader, off_element);
+                    },
+                    flags: LinkedList.Flags.NoPreviousPointersForDouble,
+                    type: LinkedList.Type.Minimize
+                );
+            });
+            return zdxZoneList;
+        }
+
         public static CollSet Read(Reader reader, Perso perso, Pointer offset) {
             MapLoader l = MapLoader.Loader;
+            //if (Settings.s.platform == Settings.Platform.DC) return null;
             CollSet c = new CollSet(perso, offset);
 
             c.off_zdd = Pointer.Read(reader);
@@ -106,25 +121,10 @@ namespace OpenSpace.Collide {
                     if (col == null) continue;
                     col.gao.transform.SetParent(perso.Gao.transform);
                 }
-
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) {
-                if (c.off_zones_zdd != null) {
-                    Pointer.Goto(ref reader, c.off_zones_zdd);
-                    c.zddZones = ZdxList.Read(reader, c, c.off_zones_zdd);
-                }
-                if (c.off_zones_zde != null) {
-                    Pointer.Goto(ref reader, c.off_zones_zde);
-                    c.zdeZones = ZdxList.Read(reader, c, c.off_zones_zde);
-                }
-                if (c.off_zones_zdm != null) {
-                    Pointer.Goto(ref reader, c.off_zones_zdm);
-                    c.zdmZones = ZdxList.Read(reader, c, c.off_zones_zdm);
-                }
-                if (c.off_zones_zdr != null) {
-                    Pointer.Goto(ref reader, c.off_zones_zdr);
-                    c.zdrZones = ZdxList.Read(reader, c, c.off_zones_zdr);
-                }
-            }
+            c.zddZones = ParseZdxZoneList(reader, c.off_zones_zdd, CollideMeshObject.Type.ZDD);
+            c.zdeZones = ParseZdxZoneList(reader, c.off_zones_zde, CollideMeshObject.Type.ZDE);
+            c.zdmZones = ParseZdxZoneList(reader, c.off_zones_zdm, CollideMeshObject.Type.ZDM);
+            c.zdrZones = ParseZdxZoneList(reader, c.off_zones_zdr, CollideMeshObject.Type.ZDR);
 
             return c;
         }

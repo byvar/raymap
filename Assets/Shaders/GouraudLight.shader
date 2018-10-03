@@ -26,7 +26,7 @@
 		Cull Off
 		Pass{
 			Tags{ "LightMode" = "ForwardBase" }
-			Blend One OneMinusSrcColor
+			Blend SrcAlpha One
 			//Blend One One
 			// pass for ambient light and first light source
 
@@ -48,7 +48,7 @@
 		}
 		Pass{
 			Tags{ "LightMode" = "ForwardAdd" }
-			Blend One OneMinusSrcColor
+			Blend SrcAlpha One
 			// pass for additional light sources
 			//Blend One One // additive blending 
 

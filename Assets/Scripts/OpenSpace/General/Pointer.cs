@@ -41,20 +41,38 @@ namespace OpenSpace {
             return new Pointer((uint)((Decimal)x.offset - y), x.file);
         }
         public override string ToString() {
-            return file.name + "|" + String.Format("0x{0:X8}", offset);
+            if (file != null && file.baseOffset != 0) {
+                return file.name + "|" + String.Format("0x{0:X8}", offset) + "[" + String.Format("0x{0:X8}", offset + file.baseOffset) + "]";
+            } else {
+                return file.name + "|" + String.Format("0x{0:X8}", offset);
+            }
         }
 
         public static Pointer GetPointerAtOffset(Pointer pointer) {
             MapLoader l = MapLoader.Loader;
+            Pointer ptr = null;
             if (pointer.file.pointers.ContainsKey(pointer.offset)) {
-                Pointer ptr = pointer.file.pointers[pointer.offset];
+                ptr = pointer.file.pointers[pointer.offset];
                 if (ptr.offset == 0) return null;
                 return ptr;
             } else if (pointer.file.allowUnsafePointers) {
                 Reader reader = pointer.file.reader;
-                Pointer off_current = Pointer.Goto(ref reader, pointer);
-                Pointer ptr = Pointer.Read(reader);
-                Pointer.Goto(ref reader, off_current);
+                Pointer.DoAt(ref reader, pointer, () => {
+                    uint current_off = (uint)(reader.BaseStream.Position);
+                    uint value = reader.ReadUInt32();
+                    FileWithPointers file = pointer.file;
+                    uint fileOff = (uint)(current_off - file.baseOffset);
+
+                    if (file.pointers.ContainsKey(fileOff)) {
+                        ptr = file.pointers[fileOff];
+                    } else {
+                        if (value == 0 || value == 0xFFFFFFFF) {
+                            ptr = null;
+                        } else {
+                            ptr = file.GetUnsafePointer(value);
+                        }
+                    }
+                });
                 return ptr;
             }
             return null;
@@ -73,7 +91,11 @@ namespace OpenSpace {
                     throw new PointerException("Not a valid pointer at " + (Pointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
                 }
                 if (file.allowUnsafePointers) {
-                    return new Pointer(value, file);
+                    Pointer ptr = file.GetUnsafePointer(value);
+                    if (ptr == null) {
+                        throw new PointerException("Not a valid pointer at " + (Pointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
+                    }
+                    return ptr;
                 }
                 return null;
             }

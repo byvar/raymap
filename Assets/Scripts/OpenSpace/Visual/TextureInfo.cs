@@ -138,30 +138,40 @@ namespace OpenSpace.Visual {
         public static TextureInfo Read(Reader reader, Pointer offset) {
             TextureInfo tex = new TextureInfo(offset);
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                //MapLoader.Loader.print("Tex off: " + offset);
-                tex.field0 = reader.ReadUInt32(); // 888 or 8888
-                tex.field4 = reader.ReadUInt16(); // 20
-                tex.field6 = reader.ReadUInt16();
-                tex.off_tempBuffer = Pointer.Read(reader); // always null because it's stored here dynamically
-                tex.fieldC = reader.ReadUInt32();
-                tex.field10 = reader.ReadUInt32();
-                tex.flags = reader.ReadUInt32();
-                tex.height_ = reader.ReadUInt16();
-                tex.width_ = reader.ReadUInt16();
-                tex.height = reader.ReadUInt16();
-                tex.width = reader.ReadUInt16();
-                tex.currentScrollX = reader.ReadUInt32();
-                tex.currentScrollY = reader.ReadUInt32();
-                tex.textureScrollingEnabled = reader.ReadUInt32();
-                tex.alphaMask = reader.ReadUInt32();
-                tex.field30 = reader.ReadUInt32();
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3) tex.numMipmaps = reader.ReadUInt32();
-                tex.field38 = reader.ReadUInt32();
-                tex.field3C = reader.ReadUInt32();
-                tex.field40 = reader.ReadUInt32();
-                tex.field44 = reader.ReadUInt32();
-                tex.field48 = reader.ReadByte();
-                tex.flagsByte = reader.ReadByte(); // contains stuff like tiling mode
+                if (Settings.s.platform == Settings.Platform.DC) {
+                    reader.ReadUInt32();
+                    tex.flags = reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    tex.name = "Texture @ " + offset;
+                } else {
+                    tex.field0 = reader.ReadUInt32(); // 888 or 8888
+                    tex.field4 = reader.ReadUInt16(); // 20
+                    tex.field6 = reader.ReadUInt16();
+                    tex.off_tempBuffer = Pointer.Read(reader); // always null because it's stored here dynamically
+                    tex.fieldC = reader.ReadUInt32();
+                    tex.field10 = reader.ReadUInt32();
+                    tex.flags = reader.ReadUInt32();
+                    tex.height_ = reader.ReadUInt16();
+                    tex.width_ = reader.ReadUInt16();
+                    tex.height = reader.ReadUInt16();
+                    tex.width = reader.ReadUInt16();
+                    tex.currentScrollX = reader.ReadUInt32();
+                    tex.currentScrollY = reader.ReadUInt32();
+                    tex.textureScrollingEnabled = reader.ReadUInt32();
+                    tex.alphaMask = reader.ReadUInt32();
+                    tex.field30 = reader.ReadUInt32();
+                    if (Settings.s.engineVersion == Settings.EngineVersion.R3) tex.numMipmaps = reader.ReadUInt32();
+                    tex.field38 = reader.ReadUInt32();
+                    tex.field3C = reader.ReadUInt32();
+                    tex.field40 = reader.ReadUInt32();
+                    tex.field44 = reader.ReadUInt32();
+                    tex.field48 = reader.ReadByte();
+                    tex.flagsByte = reader.ReadByte(); // contains stuff like tiling mode
+                }
             } else {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
@@ -191,7 +201,7 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-            tex.name = reader.ReadNullDelimitedString();
+            if(Settings.s.platform != Settings.Platform.DC) tex.name = reader.ReadNullDelimitedString();
             return tex;
         }
 
@@ -202,7 +212,7 @@ namespace OpenSpace.Visual {
                 if (l.textures[i] == null) continue;
                 if (offset == l.textures[i].offset) return l.textures[i];
             }
-            Debug.LogWarning("Material looked for texture with offset " + String.Format("0x{0:X}", offset.offset) + ", but it wasn't found -- likely it's inline and dummy.");
+            Debug.LogWarning("Material looked for texture with offset " + offset + ", but it wasn't found -- likely it's inline and dummy.");
             return null;
         }
     }

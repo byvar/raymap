@@ -199,17 +199,23 @@ namespace OpenSpace {
             UInt32 type = reader.ReadUInt32(); // 0x02: always at the start of a transformation matrix
             Matrix mat = new Matrix(offset, type, new Matrix4x4(), Vector4.one);
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                Vector3 pos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                Vector3 pos = Vector3.zero;
+
+                if (Settings.s.platform != Settings.Platform.DC) {
+                    pos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                }
                 mat.m.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
                 mat.m.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
                 mat.m.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
-                mat.m.SetColumn(3, new Vector4(pos.x, pos.y, pos.z, 1f));
-                //Matrix rotM = new Matrix(offset, type, rotMatrix, vec);
-
                 Matrix4x4 sclMatrix = new Matrix4x4();
-                sclMatrix.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
-                sclMatrix.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
-                sclMatrix.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+                sclMatrix.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), Settings.s.platform == Settings.Platform.DC ? reader.ReadSingle() : 0f));
+                sclMatrix.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), Settings.s.platform == Settings.Platform.DC ? reader.ReadSingle() : 0f));
+                sclMatrix.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), Settings.s.platform == Settings.Platform.DC ? reader.ReadSingle() : 0f));
+                if (Settings.s.platform == Settings.Platform.DC) {
+                    pos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                }
+
+                mat.m.SetColumn(3, new Vector4(pos.x, pos.y, pos.z, 1f));
                 sclMatrix.SetColumn(3, new Vector4(0, 0, 0, 1f));
                 mat.SetScaleMatrix(sclMatrix);
 

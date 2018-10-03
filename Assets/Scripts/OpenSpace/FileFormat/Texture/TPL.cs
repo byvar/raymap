@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 namespace OpenSpace.FileFormat.Texture {
-    class TPL {
+    public class TPL {
         bool isLittleEndian = false;
         uint count = 0;
 

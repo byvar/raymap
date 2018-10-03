@@ -24,8 +24,8 @@ namespace OpenSpace.AI {
             s.behaviorOrMacro = behaviorOrMacro;
 
             s.off_script = Pointer.Read(reader);
-            if (s.off_script != null) {
-                Pointer off_current = Pointer.Goto(ref reader, s.off_script);
+            //l.print(s.off_script);
+            Pointer.DoAt(ref reader, s.off_script, () => {
                 bool endReached = false;
                 while (!endReached) {
                     ScriptNode sn = ScriptNode.Read(reader, Pointer.Current(reader), s);
@@ -33,8 +33,7 @@ namespace OpenSpace.AI {
 
                     if (sn.indent == 0) endReached = true;
                 }
-                Pointer.Goto(ref reader, off_current);
-            }
+            });
             return s;
         }
 

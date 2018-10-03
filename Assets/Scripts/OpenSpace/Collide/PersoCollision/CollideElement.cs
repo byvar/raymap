@@ -1,25 +1,33 @@
-﻿namespace OpenSpace.Collide
+﻿using System;
+
+namespace OpenSpace.Collide
 {
-    public class CollideElement
+    public class CollideElement : ILinkedListEntry
     {
         public Pointer offset;
-        public ZdxList parentList;
         public Pointer nextElement;
-        public int index;
+        public ushort index;
 
-        CollideElement(Pointer offset, ZdxList parentList)
-        {
-            this.offset = offset;
-            this.parentList = parentList;
+        public Pointer NextEntry {
+            get { return nextElement; }
         }
 
-        public static CollideElement Read(Reader reader, ZdxList parentList, Pointer offset)
-        {
-            CollideElement element = new CollideElement(offset, parentList);
+        public Pointer PreviousEntry {
+            get { return null; }
+        }
 
-            element.nextElement = Pointer.Read(reader);
-            element.index = reader.ReadInt32();
+        public CollideElement(Pointer offset) {
+            this.offset = offset;
+        }
 
+        public static CollideElement Read(Reader reader, Pointer offset) {
+            CollideElement element = new CollideElement(offset);
+
+            if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
+                element.nextElement = Pointer.Read(reader);
+            }
+            element.index = reader.ReadUInt16();
+            reader.ReadUInt16();
             return element;
         }
     }

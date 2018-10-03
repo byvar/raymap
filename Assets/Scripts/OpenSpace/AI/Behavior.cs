@@ -48,7 +48,7 @@ namespace OpenSpace.AI {
             }
             behavior.off_scripts = Pointer.Read(reader);
             behavior.off_firstScript = Pointer.Read(reader);
-            if (Settings.s.game == Settings.Game.R2Demo) {
+            if (Settings.s.game == Settings.Game.R2Demo || Settings.s.platform == Settings.Platform.DC) {
                 reader.ReadUInt32();
             }
             behavior.num_scripts = reader.ReadByte();
@@ -56,7 +56,6 @@ namespace OpenSpace.AI {
             reader.ReadByte();
             reader.ReadByte();
             //if (entry.name != null) l.print(entry.name);
-
             behavior.scripts = new Script[behavior.num_scripts];
             Pointer.DoAt(ref reader, behavior.off_scripts, () => {
                 for (int i = 0; i < behavior.num_scripts; i++) {

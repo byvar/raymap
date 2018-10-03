@@ -138,7 +138,7 @@ namespace OpenSpace.Visual {
             l.castShadows = reader.ReadByte();
             l.giroPhare = reader.ReadByte();
             l.pulse = reader.ReadByte();
-            reader.ReadUInt32();
+            if(Settings.s.platform != Settings.Platform.DC) reader.ReadUInt32();
             l.type = reader.ReadUInt16();
             reader.ReadUInt16();
             l.far = reader.ReadSingle();
@@ -152,14 +152,21 @@ namespace OpenSpace.Visual {
                 l.giroAngle = reader.ReadSingle();
                 reader.ReadSingle();
             }
+            if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
             l.transMatrix = Matrix.Read(reader, Pointer.Current(reader));
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
-            reader.ReadUInt32(); // 0
+            if (Settings.s.platform != Settings.Platform.DC) {
+                reader.ReadUInt32(); // 0
+                reader.ReadUInt32(); // 0
+                reader.ReadUInt32(); // 0
+                reader.ReadUInt32(); // 0
+            }
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
-                reader.ReadUInt32(); // 0
-                reader.ReadUInt32(); // 0
+                if (Settings.s.platform != Settings.Platform.DC) {
+                    reader.ReadUInt32(); // 0
+                    reader.ReadUInt32(); // 0
+                } else {
+                    reader.ReadSingle();
+                }
                 l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                     l.shadowIntensity = reader.ReadSingle(); // 0

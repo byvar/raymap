@@ -110,63 +110,83 @@ namespace OpenSpace.Visual {
             s.name = "Sprite @ pos " + offset;
             
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                s.off_sprites = Pointer.Read(reader);
-                s.num_sprites = reader.ReadUInt16();
-                reader.ReadInt16(); // -1
-                reader.ReadUInt32();
-                reader.ReadUInt32();
+                if (Settings.s.platform == Settings.Platform.DC) {
+                    s.off_sprites = offset;
+                    s.num_sprites = 1;
+                } else {
+                    s.off_sprites = Pointer.Read(reader);
+                    s.num_sprites = reader.ReadUInt16();
+                    reader.ReadInt16(); // -1
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                }
             } else {
                 s.num_sprites = (ushort)reader.ReadUInt32();
                 s.off_sprites = Pointer.Read(reader);
                 reader.ReadUInt32();
             }
+            if (Settings.s.platform == Settings.Platform.DC) {
+                s.sprites = new IndexedSprite[1];
+                s.sprites[0] = new IndexedSprite();
+                s.sprites[0].off_material = Pointer.Read(reader);
+                if (s.sprites[0].off_material != null) {
+                    s.sprites[0].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
+                }
+                s.sprites[0].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+                reader.ReadUInt16();
+            } else {
+                if (s.off_sprites != null) {
+                    Pointer.Goto(ref reader, s.off_sprites);
+                    s.sprites = new IndexedSprite[s.num_sprites];
+                    for (uint i = 0; i < s.num_sprites; i++) {
+                        s.sprites[i] = new IndexedSprite();
+                        if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) reader.ReadUInt32();
+                        s.sprites[i].off_info = Pointer.Read(reader);
+                        s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
-            if (s.off_sprites != null) {
-                Pointer.Goto(ref reader, s.off_sprites);
-                s.sprites = new IndexedSprite[s.num_sprites];
-                for (uint i = 0; i < s.num_sprites; i++) {
-                    s.sprites[i] = new IndexedSprite();
-                    if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) reader.ReadUInt32();
-                    s.sprites[i].off_info = Pointer.Read(reader);
-                    s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+                            s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                            s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                            s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                            s.sprites[i].centerPoint = reader.ReadUInt16();
+                            reader.ReadUInt16();
+                            if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
+                        }
 
-                    if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                        s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                        s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        s.sprites[i].centerPoint = reader.ReadUInt16();
-                        reader.ReadUInt16();
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
-                    }
-
-                    if (s.sprites[i].off_info != null) {
-                        Pointer off_current = Pointer.Goto(ref reader, s.sprites[i].off_info);
-                        reader.ReadUInt32();
-                        Pointer.Read(reader);
-                        Pointer.Read(reader);
-                        Pointer off_info_scale = Pointer.Read(reader);
-                        Pointer off_info_unknown = Pointer.Read(reader);
-                        s.sprites[i].off_material_pointer = Pointer.Read(reader);
-                        Pointer.Goto(ref reader, off_current);
-
-                        Pointer.DoAt(ref reader, off_info_scale, () => {
-                            s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        });
-                        Pointer.DoAt(ref reader, off_info_unknown, () => {
-                            s.sprites[i].info_unknown = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        });
-                        if (s.sprites[i].off_material_pointer != null) {
-                            off_current = Pointer.Goto(ref reader, s.sprites[i].off_material_pointer);
-                            s.sprites[i].off_material = Pointer.Read(reader);
-                            if (s.sprites[i].off_material != null) {
-                                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                                    s.sprites[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
-                                    s.sprites[i].visualMaterial = s.sprites[i].gameMaterial.visualMaterial;
-                                } else {
-                                    s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
-                                }
-                            }
+                        if (s.sprites[i].off_info != null) {
+                            Pointer off_current = Pointer.Goto(ref reader, s.sprites[i].off_info);
+                            reader.ReadUInt32();
+                            Pointer.Read(reader);
+                            Pointer.Read(reader);
+                            Pointer off_info_scale = Pointer.Read(reader);
+                            Pointer off_info_unknown = Pointer.Read(reader);
+                            s.sprites[i].off_material_pointer = Pointer.Read(reader);
                             Pointer.Goto(ref reader, off_current);
+
+                            Pointer.DoAt(ref reader, off_info_scale, () => {
+                                s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                            });
+                            Pointer.DoAt(ref reader, off_info_unknown, () => {
+                                s.sprites[i].info_unknown = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                            });
+                            if (s.sprites[i].off_material_pointer != null) {
+                                off_current = Pointer.Goto(ref reader, s.sprites[i].off_material_pointer);
+                                s.sprites[i].off_material = Pointer.Read(reader);
+                                if (s.sprites[i].off_material != null) {
+                                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                                        s.sprites[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
+                                        s.sprites[i].visualMaterial = s.sprites[i].gameMaterial.visualMaterial;
+                                    } else {
+                                        s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
+                                    }
+                                }
+                                Pointer.Goto(ref reader, off_current);
+                            }
                         }
                     }
                 }

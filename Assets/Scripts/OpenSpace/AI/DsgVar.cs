@@ -30,12 +30,22 @@ namespace OpenSpace.AI {
             dsgVar.off_dsgMemBuffer = Pointer.Read(reader);
             dsgVar.off_dsgVarInfo = Pointer.Read(reader);
 
+            /*if (dsgMem != null) {
+                l.print(offset + " - " + dsgVar.off_dsgMemBuffer + " - " + dsgVar.off_dsgVarInfo);
+                l.print("DsgMem initial: " + dsgMem.memBufferInitial + " - cur: " + dsgMem.memBuffer);
+            }*/
+
             // Unknown stuff
-            if (dsgMem==null && Settings.s.platform != Settings.Platform.GC && Settings.s.engineVersion >= Settings.EngineVersion.R2) {
+            if (dsgMem==null
+               && Settings.s.platform != Settings.Platform.GC
+               && Settings.s.platform != Settings.Platform.DC
+               && Settings.s.engineVersion >= Settings.EngineVersion.R2) {
                 dsgVar.something3 = reader.ReadUInt32();
             }
 
-            if (Settings.s.platform == Settings.Platform.GC || Settings.s.engineVersion < Settings.EngineVersion.R2) {
+            if (Settings.s.platform == Settings.Platform.GC
+                || Settings.s.platform == Settings.Platform.DC
+                || Settings.s.engineVersion < Settings.EngineVersion.R2) {
                 dsgVar.dsgMemBufferLength = reader.ReadUInt32();
                 dsgVar.amountOfInfos = reader.ReadByte();
             } else if (dsgMem == null) {
@@ -46,17 +56,25 @@ namespace OpenSpace.AI {
                 dsgVar.amountOfInfos = reader.ReadUInt32();
             }
 
+            if (dsgMem != null && dsgMem.memBufferInitial == null) dsgMem.memBufferInitial = dsgVar.off_dsgMemBuffer;
+
             dsgVar.dsgVarInfos = new DsgVarInfoEntry[dsgVar.amountOfInfos];
 
             if (dsgVar.amountOfInfos > 0) {
                 Pointer.DoAt(ref reader, dsgVar.off_dsgVarInfo, () => {
+                    //l.print(dsgVar.amountOfInfos);
                     for (uint i = 0; i < dsgVar.amountOfInfos; i++) {
                         DsgVarInfoEntry infoEntry = DsgVarInfoEntry.Read(reader, Pointer.Current(reader), i);
 
                         if (dsgMem != null) {
-                            infoEntry.value = dsgVar.ReadValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                            if (Settings.s.platform != Settings.Platform.DC) {
+                                infoEntry.value = dsgVar.ReadValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                            }
                             if (dsgMem.memBufferInitial != null) {
                                 infoEntry.initialValue = dsgVar.ReadInitialValueFromDsgMemBuffer(reader, infoEntry, dsgMem);
+                                if (Settings.s.platform == Settings.Platform.DC) {
+                                    infoEntry.value = infoEntry.initialValue;
+                                }
                             }
                         } else {
                             infoEntry.value = dsgVar.ReadValueFromDsgVarBuffer(reader, infoEntry, dsgVar);
@@ -75,7 +93,6 @@ namespace OpenSpace.AI {
 
         public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry infoEntry, Pointer buffer)
         {
-
             Pointer original = Pointer.Goto(ref reader, buffer + infoEntry.offsetInBuffer);
             object returnValue = null;
 

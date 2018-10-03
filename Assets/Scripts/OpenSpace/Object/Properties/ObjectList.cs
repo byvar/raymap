@@ -68,7 +68,7 @@ namespace OpenSpace.Object.Properties {
         public static ObjectList Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             ObjectList ol = new ObjectList(offset);
-            if(l.mode != MapLoader.Mode.RaymanArenaGC) ol.off_objList_next = Pointer.Read(reader);
+            if(Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Read(reader);
             if (Settings.s.hasLinkedListHeaderPointers) {
                 ol.off_objList_prev = Pointer.Read(reader);
                 ol.off_objList_hdr = Pointer.Read(reader);
@@ -77,6 +77,8 @@ namespace OpenSpace.Object.Properties {
             ol.off_objList_2 = Pointer.Read(reader); // is this a copy of the list or something?
             ol.num_entries = reader.ReadUInt16();
             reader.ReadUInt16();
+
+            if (Settings.s.linkedListType == LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Current(reader);
 
             if (ol.off_objList_start != null) {
                 Pointer.Goto(ref reader, ol.off_objList_start);
@@ -89,7 +91,9 @@ namespace OpenSpace.Object.Properties {
                     ol.entries[i].thirdvalue = reader.ReadUInt32();
                     ol.entries[i].unk0 = reader.ReadUInt16();
                     ol.entries[i].unk1 = reader.ReadUInt16();
-                    ol.entries[i].lastvalue = reader.ReadUInt32();
+                    if (Settings.s.platform != Settings.Platform.DC) {
+                        ol.entries[i].lastvalue = reader.ReadUInt32();
+                    }
                     // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
                     if (ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || Settings.s.engineVersion == Settings.EngineVersion.TT) {
                         ol.entries[i].po = null;
@@ -112,7 +116,7 @@ namespace OpenSpace.Object.Properties {
                     }
                 }
             }
-            if (l.mode == MapLoader.Mode.RaymanArenaGC) ol.off_objList_next = Pointer.Current(reader);
+            //if (l.mode == MapLoader.Mode.RaymanArenaGC) ol.off_objList_next = Pointer.Current(reader);
 
             /*if (l.mode == MapLoader.Mode.Rayman3GC) {
                 Pointer off_list_hdr_next = Pointer.Read(reader);

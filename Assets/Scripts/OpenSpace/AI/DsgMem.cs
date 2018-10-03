@@ -20,24 +20,21 @@ namespace OpenSpace.AI {
 
         public static DsgMem Read(Reader reader, Pointer offset) {
             DsgMem dsgMem = new DsgMem(offset);
-
+            //MapLoader.Loader.print(offset);
             Pointer dsgVarPointer = Pointer.Read(reader);
-            if (dsgVarPointer != null) {
-                Pointer off_current = Pointer.Goto(ref reader, dsgVarPointer);
+            Pointer.DoAt(ref reader, dsgVarPointer, () => {
                 if (Settings.s.game == Settings.Game.R2Demo) {
                     Pointer.Read(reader);
                 }
                 dsgMem.off_dsgVar = Pointer.Read(reader);
-                Pointer.Goto(ref reader, off_current);
-            }
-
+            });
+            
             dsgMem.memBufferInitial = Pointer.Read(reader);
             dsgMem.memBuffer = Pointer.Read(reader);
 
-            if (dsgMem.off_dsgVar != null) {
-                Pointer.Goto(ref reader, dsgMem.off_dsgVar);
+            Pointer.DoAt(ref reader, dsgMem.off_dsgVar, () => {
                 dsgMem.dsgVar = DsgVar.Read(reader, dsgMem.off_dsgVar, dsgMem);
-            }
+            });
             return dsgMem;
         }
     }

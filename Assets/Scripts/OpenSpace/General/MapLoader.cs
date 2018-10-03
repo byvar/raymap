@@ -34,7 +34,7 @@ namespace OpenSpace {
         public enum Mode {
             Rayman3PC, Rayman3GC,
             RaymanArenaPC, RaymanArenaGC,
-            Rayman2PC, Rayman2IOS,
+            Rayman2PC, Rayman2DC, Rayman2IOS,
             Rayman2PCDemo2, Rayman2PCDemo1,
             DonaldDuckPC,
             TonicTroublePC, TonicTroubleSEPC,
@@ -137,6 +137,7 @@ namespace OpenSpace {
             try {
                 switch (mode) {
                     case Mode.Rayman2IOS: settings = Settings.R2IOS; break;
+                    case Mode.Rayman2DC: settings = Settings.R2DC; break;
                     case Mode.Rayman2PC: settings = Settings.R2PC; break;
                     case Mode.Rayman2PCDemo1: settings = Settings.R2PCDemo1; break;
                     case Mode.Rayman2PCDemo2: settings = Settings.R2PCDemo2; break;
@@ -159,7 +160,7 @@ namespace OpenSpace {
                 if (!Directory.Exists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 gameDataBinFolder += "/";
 
-                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.platform != Settings.Platform.DC) {
                     if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                         gameDsb = new DSB("Game", gameDataBinFolder + "gamedsc.bin");
                     } else if (Settings.s.game == Settings.Game.TTSE) {
@@ -181,119 +182,138 @@ namespace OpenSpace {
                     LoadMemory();
                 } else {
                     if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                        hasTransit = false;
-                        DAT dat = null;
-                        
-                        string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
-                        string langDataPath = gameDataBinFolder + "../LangData/English/" + gameDsb.levelsDataPath + "/";
-                        if (!Directory.Exists(langDataPath)) {
-                            string langPath = gameDataBinFolder + "../LangData/";
-                            if (Directory.Exists(langPath)) {
-                                DirectoryInfo dirInfo = new DirectoryInfo(langPath);
-                                DirectoryInfo firstLang = dirInfo.GetDirectories().FirstOrDefault();
-                                langDataPath = firstLang.FullName + "/" + gameDsb.levelsDataPath + "/";
-                            }
-                        }
+                        if (Settings.s.platform == Settings.Platform.DC) {
+                            // FIX
+                            string fixDATPath = gameDataBinFolder + "FIX.DAT";
+                            tplPaths[0] = gameDataBinFolder + "FIX.TEX";
+                            DCDAT fixDAT = new DCDAT("fix", fixDATPath, 0);
 
-                        if (mode == Mode.Rayman2PC || mode == Mode.DonaldDuckPC) {
-                            string dataPath = levelsFolder + "LEVELS0.DAT";
-                            if (File.Exists(dataPath)) {
-                                dat = new DAT("LEVELS0", gameDsb, dataPath);
-                            }
-                        }
+                            // LEVEL
+                            string lvlDATPath = gameDataBinFolder + lvlName + "/" + lvlName + ".DAT";
+                            tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".TEX";
+                            DCDAT lvlDAT = new DCDAT(lvlName, lvlDATPath, 1);
 
-                        // LEVEL DSB
-                        string lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".dsb";
-                        if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
-                            lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".DSC";
-                        }
-                        if(File.Exists(lvlDsbPath)) {
-                            lvlDsb = new DSB(lvlName + ".dsc", lvlDsbPath);
-                            lvlDsb.Save(levelsFolder + lvlName + "/" + lvlName + "_dsb.dmp");
-                            //lvlDsb.ReadAllSections();
-                            lvlDsb.Dispose();
-                        }
+                            files_array[0] = fixDAT;
+                            files_array[1] = lvlDAT;
 
-                        // FIX
-                        string fixSnaPath = levelsFolder + "fix.sna";
-                        RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
-                        if (File.Exists(levelsFolder + lvlName + "/FixLvl.rtb")) {
-                            // Fix -> Lvl pointers for Tonic Trouble
-                            fixRtb.Add(new RelocationTable(levelsFolder + lvlName + "/FixLvl.rtb", dat, lvlName + "Fix", RelocationType.RTB));
-                        }
-                        SNA fixSna = new SNA("fix", fixSnaPath, fixRtb);
-                        if (Directory.Exists(langDataPath)) {
-                            string fixLangPath = langDataPath + "fix.lng";
-                            RelocationTable fixLangRTG = new RelocationTable(fixLangPath, dat, "fixLang", RelocationType.RTG);
-                            if (File.Exists(langDataPath + lvlName + "/FixLvl.rtg")) {
-                                fixLangRTG.Add(new RelocationTable(langDataPath + lvlName + "/FixLvl.rtg", dat, lvlName + "FixLang", RelocationType.RTG));
-                            }
-                            SNA fixLangSna = new SNA("fixLang", fixLangPath, fixLangRTG);
-                            fixSna.AddSNA(fixLangSna);
+                            LoadDreamcast();
 
-                            string fixDlgPath = langDataPath + "fix.dlg";
-                            RelocationTable fixRtd = new RelocationTable(fixDlgPath, dat, "fixLang", RelocationType.RTD);
-                            fixSna.ReadDLG(fixDlgPath, fixRtd);
-                        }
-                        string fixGptPath = levelsFolder + "fix.gpt";
-                        RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
-                        fixSna.ReadGPT(fixGptPath, fixRtp);
-
-                        string fixPtxPath = levelsFolder + "fix.ptx";
-                        RelocationTable fixRtt = new RelocationTable(fixPtxPath, dat, "fix", RelocationType.RTT);
-                        fixSna.ReadPTX(fixPtxPath, fixRtt);
-
-                        if (File.Exists(levelsFolder + "fix.sda")) {
-                            fixSna.ReadSDA(levelsFolder + "fix.sda");
-                        }
-
-                        // LEVEL
-                        string lvlSnaPath = levelsFolder + lvlName + "/" + lvlName + ".sna";
-                        RelocationTable lvlRtb = new RelocationTable(lvlSnaPath, dat, lvlName, RelocationType.RTB);
-                        SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
-                        if (Directory.Exists(langDataPath)) {
-                            string lvlLangPath = langDataPath + lvlName + "/" + lvlName + ".lng";
-                            RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
-                            SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
-                            lvlSna.AddSNA(lvlLangSna);
-
-                            string lvlDlgPath = langDataPath + lvlName + "/" + lvlName + ".dlg";
-                            RelocationTable lvlRtd = new RelocationTable(lvlDlgPath, dat, lvlName + "Lang", RelocationType.RTD);
-                            lvlSna.ReadDLG(lvlDlgPath, lvlRtd);
-                        }
-
-                        string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
-                        string lvlPtxPath = levelsFolder + lvlName + "/" + lvlName + ".ptx";
-                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-                            RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
-                            lvlSna.ReadGPT(lvlGptPath, lvlRtp);
-                            RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
-                            lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
+                            fixDAT.Dispose();
+                            lvlDAT.Dispose();
                         } else {
-                            lvlSna.ReadGPT(lvlGptPath, null);
-                            lvlSna.ReadPTX(lvlPtxPath, null);
+                            hasTransit = false;
+                            DAT dat = null;
+
+                            string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
+                            string langDataPath = gameDataBinFolder + "../LangData/English/" + gameDsb.levelsDataPath + "/";
+                            if (!Directory.Exists(langDataPath)) {
+                                string langPath = gameDataBinFolder + "../LangData/";
+                                if (Directory.Exists(langPath)) {
+                                    DirectoryInfo dirInfo = new DirectoryInfo(langPath);
+                                    DirectoryInfo firstLang = dirInfo.GetDirectories().FirstOrDefault();
+                                    langDataPath = firstLang.FullName + "/" + gameDsb.levelsDataPath + "/";
+                                }
+                            }
+
+                            if (mode == Mode.Rayman2PC || mode == Mode.DonaldDuckPC) {
+                                string dataPath = levelsFolder + "LEVELS0.DAT";
+                                if (File.Exists(dataPath)) {
+                                    dat = new DAT("LEVELS0", gameDsb, dataPath);
+                                }
+                            }
+
+                            // LEVEL DSB
+                            string lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".dsb";
+                            if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
+                                lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".DSC";
+                            }
+                            if (File.Exists(lvlDsbPath)) {
+                                lvlDsb = new DSB(lvlName + ".dsc", lvlDsbPath);
+                                lvlDsb.Save(levelsFolder + lvlName + "/" + lvlName + "_dsb.dmp");
+                                //lvlDsb.ReadAllSections();
+                                lvlDsb.Dispose();
+                            }
+
+                            // FIX
+                            string fixSnaPath = levelsFolder + "fix.sna";
+                            RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
+                            if (File.Exists(levelsFolder + lvlName + "/FixLvl.rtb")) {
+                                // Fix -> Lvl pointers for Tonic Trouble
+                                fixRtb.Add(new RelocationTable(levelsFolder + lvlName + "/FixLvl.rtb", dat, lvlName + "Fix", RelocationType.RTB));
+                            }
+                            SNA fixSna = new SNA("fix", fixSnaPath, fixRtb);
+                            if (Directory.Exists(langDataPath)) {
+                                string fixLangPath = langDataPath + "fix.lng";
+                                RelocationTable fixLangRTG = new RelocationTable(fixLangPath, dat, "fixLang", RelocationType.RTG);
+                                if (File.Exists(langDataPath + lvlName + "/FixLvl.rtg")) {
+                                    fixLangRTG.Add(new RelocationTable(langDataPath + lvlName + "/FixLvl.rtg", dat, lvlName + "FixLang", RelocationType.RTG));
+                                }
+                                SNA fixLangSna = new SNA("fixLang", fixLangPath, fixLangRTG);
+                                fixSna.AddSNA(fixLangSna);
+
+                                string fixDlgPath = langDataPath + "fix.dlg";
+                                RelocationTable fixRtd = new RelocationTable(fixDlgPath, dat, "fixLang", RelocationType.RTD);
+                                fixSna.ReadDLG(fixDlgPath, fixRtd);
+                            }
+                            string fixGptPath = levelsFolder + "fix.gpt";
+                            RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
+                            fixSna.ReadGPT(fixGptPath, fixRtp);
+
+                            string fixPtxPath = levelsFolder + "fix.ptx";
+                            RelocationTable fixRtt = new RelocationTable(fixPtxPath, dat, "fix", RelocationType.RTT);
+                            fixSna.ReadPTX(fixPtxPath, fixRtt);
+
+                            if (File.Exists(levelsFolder + "fix.sda")) {
+                                fixSna.ReadSDA(levelsFolder + "fix.sda");
+                            }
+
+                            // LEVEL
+                            string lvlSnaPath = levelsFolder + lvlName + "/" + lvlName + ".sna";
+                            RelocationTable lvlRtb = new RelocationTable(lvlSnaPath, dat, lvlName, RelocationType.RTB);
+                            SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
+                            if (Directory.Exists(langDataPath)) {
+                                string lvlLangPath = langDataPath + lvlName + "/" + lvlName + ".lng";
+                                RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
+                                SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
+                                lvlSna.AddSNA(lvlLangSna);
+
+                                string lvlDlgPath = langDataPath + lvlName + "/" + lvlName + ".dlg";
+                                RelocationTable lvlRtd = new RelocationTable(lvlDlgPath, dat, lvlName + "Lang", RelocationType.RTD);
+                                lvlSna.ReadDLG(lvlDlgPath, lvlRtd);
+                            }
+
+                            string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
+                            string lvlPtxPath = levelsFolder + lvlName + "/" + lvlName + ".ptx";
+                            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                                RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
+                                lvlSna.ReadGPT(lvlGptPath, lvlRtp);
+                                RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
+                                lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
+                            } else {
+                                lvlSna.ReadGPT(lvlGptPath, null);
+                                lvlSna.ReadPTX(lvlPtxPath, null);
+                            }
+                            if (File.Exists(levelsFolder + lvlName + "/" + lvlName + ".sda")) {
+                                lvlSna.ReadSDA(levelsFolder + lvlName + "/" + lvlName + ".sda");
+                            }
+
+                            fixSna.CreatePointers();
+                            lvlSna.CreatePointers();
+
+                            files_array[0] = fixSna;
+                            files_array[1] = lvlSna;
+                            files_array[2] = dat;
+
+                            fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
+                            lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
+
+                            LoadFIXSNA();
+                            LoadLVLSNA();
+
+                            fixSna.Dispose();
+                            lvlSna.Dispose();
+                            if (dat != null) dat.Dispose();
                         }
-                        if (File.Exists(levelsFolder + lvlName + "/" + lvlName + ".sda")) {
-                            lvlSna.ReadSDA(levelsFolder + lvlName + "/" + lvlName + ".sda");
-                        }
-
-                        fixSna.CreatePointers();
-                        lvlSna.CreatePointers();
-
-                        files_array[0] = fixSna;
-                        files_array[1] = lvlSna;
-                        files_array[2] = dat;
-
-                        fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
-                        lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
-
-                        LoadFIXSNA();
-                        LoadLVLSNA();
-
-                        fixSna.Dispose();
-                        lvlSna.Dispose();
-                        if (dat != null) dat.Dispose();
-
                     } else if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 
                         menuTPLPath = gameDataBinFolder + "menu.tpl";
@@ -1564,6 +1584,126 @@ namespace OpenSpace {
         }
         #endregion
 
+        #region Dreamcast
+        public void LoadDreamcast() {
+            textures = new TextureInfo[0];
+
+            files_array[Mem.Fix].GotoHeader();
+            Reader reader = files_array[Mem.Fix].reader;
+            Pointer.Goto(ref reader, Pointer.Current(reader) + 0x94);
+            uint num_textures_fix = reader.ReadUInt32();
+            Pointer off_textures_fix = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_textures_fix, () => {
+                Array.Resize(ref textures, (int)num_textures_fix);
+                for (uint i = 0; i < num_textures_fix; i++) {
+                    Pointer off_texture = Pointer.Read(reader);
+                    textures[i] = null;
+                    Pointer.DoAt(ref reader, off_texture, () => {
+                        textures[i] = TextureInfo.Read(reader, off_texture);
+                    });
+                }
+                TEX tex = new TEX(tplPaths[0]);
+                for (uint i = 0; i < num_textures_fix; i++) {
+                    if (textures[i] != null && tex.Count > i) {
+                        textures[i].Texture = tex.textures[i];
+                    }
+                }
+            });
+
+
+            files_array[Mem.Lvl].GotoHeader();
+            reader = files_array[Mem.Lvl].reader;
+
+            // Animation stuff
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            reader.ReadUInt32();
+            Pointer.Read(reader);
+
+            // Globals
+            globals.off_actualWorld = Pointer.Read(reader);
+            globals.off_dynamicWorld = Pointer.Read(reader);
+            globals.off_inactiveDynamicWorld = Pointer.Read(reader);
+            globals.off_fatherSector = Pointer.Read(reader);
+            reader.ReadUInt32();
+            Pointer off_always = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_always, () => {
+                globals.num_always = reader.ReadUInt32();
+                globals.off_spawnable_perso_first = Pointer.Read(reader);
+                globals.off_spawnable_perso_last = Pointer.Read(reader);
+                globals.num_spawnable_perso = reader.ReadUInt32();
+                FillLinkedListPointers(reader, globals.off_spawnable_perso_last, off_always + 4);
+                globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+            });
+            Pointer.Read(reader);
+            Pointer off_objectTypes = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_objectTypes, () => {
+                // Fill in pointers for the object type tables and read them
+                objectTypes = new ObjectType[3][];
+                for (uint i = 0; i < 3; i++) {
+                    Pointer off_names_header = Pointer.Current(reader);
+                    Pointer off_names_first = Pointer.Read(reader);
+                    Pointer off_names_last = Pointer.Read(reader);
+                    uint num_names = reader.ReadUInt32();
+
+                    FillLinkedListPointers(reader, off_names_last, off_names_header);
+                    ReadObjectNamesTable(reader, off_names_first, num_names, i);
+                }
+            });
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer off_families = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_families, () => {
+                families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+                families.FillPointers(reader, families.off_tail, families.off_head);
+            });
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            reader.ReadUInt32();
+            Pointer.Read(reader);
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            uint num_textures_lvl = reader.ReadUInt32();
+            uint num_textures_total = num_textures_fix + num_textures_lvl;
+            Pointer off_textures_lvl = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_textures_lvl, () => {
+                Array.Resize(ref textures, (int)num_textures_total);
+                for (uint i = num_textures_fix; i < num_textures_total; i++) {
+                    Pointer off_texture = Pointer.Read(reader);
+                    textures[i] = null;
+                    Pointer.DoAt(ref reader, off_texture, () => {
+                        textures[i] = TextureInfo.Read(reader, off_texture);
+                    });
+                }
+                TEX tex = new TEX(tplPaths[1]);
+                for (uint i = 0; i < num_textures_lvl; i++) {
+                    if (textures[num_textures_fix + i] != null && tex.Count > i) {
+                        textures[num_textures_fix + i].Texture = tex.textures[i];
+                    }
+                }
+            });
+
+            ReadFamilies(reader);
+            ReadSuperObjects(reader);
+            ReadAlways(reader);
+            ReadCrossReferences(reader);
+        }
+        #endregion
+
         // Defining it this way, clicking the print will go straight to the code you want
         public Action<object> print = MonoBehaviour.print;
 
@@ -1610,7 +1750,7 @@ MonoBehaviour.print(str);
         }
 
         public void CreateCNT() {
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.platform != Settings.Platform.DC) {
                 List<string> cntPaths = new List<string>();
                 if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
                 if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
@@ -1663,7 +1803,6 @@ MonoBehaviour.print(str);
                 objectTypes[index][j].unk2 = reader.ReadUInt16();
                 Pointer.Goto(ref reader, off_name);
                 objectTypes[index][j].name = reader.ReadNullDelimitedString();
-
                 if (off_names_next != null) Pointer.Goto(ref reader, off_names_next);
             }
             Pointer.Goto(ref reader, off_current);

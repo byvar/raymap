@@ -70,6 +70,7 @@ namespace OpenSpace.Object.Properties {
             //l.print("(" + f.family_index + ") " + f.name + " - " + offset);
             int stateIndex = 0;
             f.states = LinkedList<State>.Read(ref reader, Pointer.Current(reader), (off_element) => {
+                //l.print(f.name + " [" + stateIndex + "]: " + off_element);
                 State s = State.Read(reader, off_element, f, stateIndex++);
                 return s;
             });
@@ -104,7 +105,6 @@ namespace OpenSpace.Object.Properties {
                 f.properties = reader.ReadByte();
             }
             //l.print(f.name + " - Anim bank: " + f.animBank + " - id: " + l.objectTypes[0][f.family_index].id);
-
             f.objectLists.ReadEntries(ref reader, (off_list) => {
                 ObjectList ol = ObjectList.FromOffsetOrRead(off_list, reader);
                 if (ol.containingFamilies.Count == 0) {

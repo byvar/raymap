@@ -77,6 +77,8 @@ namespace OpenSpace.Object {
             so.flags = SuperObjectFlags.Read(reader); // 0x30->0x34
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32();
             Pointer off_boundingVolume = Pointer.Read(reader);
+            //l.print("SuperObject T" + so.typeCode + ": " + off_so + " - " + so.off_matrix);
+
             //R3Pointer.Read(reader); // a copy of the matrix right after, at least in R3GC
             Vector3 pos = Vector3.zero;
             Vector3 scale = Vector3.one;

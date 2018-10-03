@@ -85,53 +85,66 @@ namespace OpenSpace.Object {
             // Parse visual set
             if (po.off_visualSet != null) {
                 Pointer.Goto(ref reader, po.off_visualSet);
-                reader.ReadUInt32(); // 0
-                ushort numberOfLOD = reader.ReadUInt16();
-                //if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
-                ushort type = reader.ReadUInt16();
-                if (numberOfLOD > 0) {
-                    Pointer off_LODDistances = Pointer.Read(reader);
-                    Pointer off_LODDataOffsets = Pointer.Read(reader);
-                    reader.ReadUInt32(); // always 0?
-                    if(Settings.s.engineVersion > Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0?
-                    po.visualSet = new VisualSetLOD[numberOfLOD];
-                    for (uint i = 0; i < numberOfLOD; i++) {
-                        po.visualSet[i] = new VisualSetLOD();
-                    }
-                    Pointer.DoAt(ref reader, off_LODDistances, () => {
+                ushort numberOfLOD = 1;
+                ushort type = 0;
+                if (Settings.s.platform != Settings.Platform.DC) {
+                    reader.ReadUInt32(); // 0
+                    numberOfLOD = reader.ReadUInt16();
+                    //if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
+                    type = reader.ReadUInt16();
+                    if (numberOfLOD > 0) {
+                        Pointer off_LODDistances = Pointer.Read(reader);
+                        Pointer off_LODDataOffsets = Pointer.Read(reader);
+                        reader.ReadUInt32(); // always 0?
+                        if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0?
+                        po.visualSet = new VisualSetLOD[numberOfLOD];
                         for (uint i = 0; i < numberOfLOD; i++) {
-                            // if distance > the float at this offset, game engine uses next LOD if there is one
-                            po.visualSet[i].LODdistance = reader.ReadSingle();
+                            po.visualSet[i] = new VisualSetLOD();
                         }
-                    });
-                    Pointer.DoAt(ref reader, off_LODDataOffsets, () => {
-                        for (uint i = 0; i < numberOfLOD; i++) {
-                            po.visualSet[i].off_data = Pointer.Read(reader);
-                        }
-                    });
-                    for (uint i = 0; i < numberOfLOD; i++) {
-                        Pointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
-                            switch (type) {
-                                case 0:
-                                    po.visualSet[i].obj = MeshObject.Read(reader, po, po.visualSet[i].off_data);
-                                    MeshObject m = ((MeshObject)po.visualSet[i].obj);
-                                    if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
-                                    m.Gao.transform.parent = po.Gao.transform;
-                                    break;
-                                case 1:
-                                    po.visualSet[i].obj = UnknownGeometricObject.Read(reader, po, po.visualSet[i].off_data);
-                                    break;
-                                default:
-                                    MapLoader.Loader.print("unknown type " + type + " at offset: " + offset);
-                                    break;
+                        Pointer.DoAt(ref reader, off_LODDistances, () => {
+                            for (uint i = 0; i < numberOfLOD; i++) {
+                                // if distance > the float at this offset, game engine uses next LOD if there is one
+                                po.visualSet[i].LODdistance = reader.ReadSingle();
+                            }
+                        });
+                        Pointer.DoAt(ref reader, off_LODDataOffsets, () => {
+                            for (uint i = 0; i < numberOfLOD; i++) {
+                                po.visualSet[i].off_data = Pointer.Read(reader);
                             }
                         });
                     }
-                    if (numberOfLOD > 1) {
-                        float bestLOD = po.visualSet.Min(v => v.LODdistance);
-                        foreach (VisualSetLOD lod in po.visualSet) {
-                            if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
+                } else {
+                    // Platform = Dreamcast
+                    Pointer.Read(reader); // Material pointer?
+                    Pointer off_data = Pointer.Read(reader);
+                    reader.ReadUInt32(); // always 0?
+                    reader.ReadUInt32(); // always 0?
+                    po.visualSet = new VisualSetLOD[1];
+                    po.visualSet[0].off_data = off_data;
+                    po.visualSet[0].LODdistance = 5f;
+                }
+                for (uint i = 0; i < numberOfLOD; i++) {
+                    Pointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
+                        switch (type) {
+                            case 0:
+                                po.visualSet[i].obj = MeshObject.Read(reader, po, po.visualSet[i].off_data);
+                                MeshObject m = ((MeshObject)po.visualSet[i].obj);
+                                if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
+                                m.Gao.transform.parent = po.Gao.transform;
+                                break;
+                            case 1:
+                                po.visualSet[i].obj = UnknownGeometricObject.Read(reader, po, po.visualSet[i].off_data);
+                                break;
+                            default:
+                                MapLoader.Loader.print("unknown type " + type + " at offset: " + offset);
+                                break;
                         }
+                    });
+                }
+                if (numberOfLOD > 1) {
+                    float bestLOD = po.visualSet.Min(v => v.LODdistance);
+                    foreach (VisualSetLOD lod in po.visualSet) {
+                        if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
                     }
                 }
             }

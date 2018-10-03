@@ -7,7 +7,7 @@ using Type = OpenSpace.LinkedList.Type;
 
 namespace OpenSpace {
     public static class LinkedList {
-        public enum Type { Default = -1, Single, Double, SingleNoElementPointers, DoubleNoElementPointers };
+        public enum Type { Default = -1, Single, Double, SingleNoElementPointers, DoubleNoElementPointers, Minimize };
 
         [Flags]
         public enum Flags {
@@ -57,6 +57,19 @@ namespace OpenSpace {
             li.type = type;
             if (li.type == Type.Default) {
                 li.type = Settings.s.linkedListType;
+                if (li.type == Type.Minimize) {
+                    li.type = Type.Single;
+                }
+            } else if (li.type == Type.Minimize) {
+                /* Minimize works as follows. A linkedlist with type minimize is a default one,
+                but if the default type is also Minimize (RA GC, R2 DC) then it is a SingleNoElementPointers list (i.e. optimized to an array).
+                If the list itself does not specify the minimize type, it is read as a default one,
+                but if the default type is Minimize then it becomes a Single list (i.e. not an array, but no previous pointers).
+                */
+                li.type = Settings.s.linkedListType;
+                if (li.type == Type.Minimize) {
+                    li.type = Type.SingleNoElementPointers;
+                }
             }
             li.off_head = Pointer.Read(reader);
             if (li.type == Type.Double || li.type == Type.DoubleNoElementPointers) li.off_tail = Pointer.Read(reader);

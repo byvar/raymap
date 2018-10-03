@@ -28,10 +28,14 @@ namespace OpenSpace.Object.Properties {
 
         public Pointer NextEntry {
             get {
-                if (MapLoader.Loader.mode == MapLoader.Mode.RaymanArenaGC) {
-                    return offset + 0x28;
-                } else {
+                if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
                     return off_state_next;
+                } else {
+                    if (MapLoader.Loader.mode == MapLoader.Mode.RaymanArenaGC) {
+                        return offset + 0x28;
+                    } else {//if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2DC) {
+                        return offset + 0x20;
+                    }
                 }
             }
         }
@@ -58,16 +62,14 @@ namespace OpenSpace.Object.Properties {
             State s = new State(offset, family, index);
             l.states.Add(s);
             if (Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) s.off_state_next = Pointer.Read(reader);
+            if (Settings.s.linkedListType != LinkedList.Type.Minimize) s.off_state_next = Pointer.Read(reader);
             if (Settings.s.hasLinkedListHeaderPointers) {
                 s.off_state_prev = Pointer.Read(reader);
                 Pointer.Read(reader); // another header at tail of state list
             }
             s.off_anim_ref = Pointer.Read(reader);
             s.stateTransitions = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // int is placeholder type
-            reader.ReadUInt32();
-            Pointer.Read(reader);
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) reader.ReadUInt32();
+            LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             s.off_state_auto = Pointer.Read(reader, allowMinusOne: true);
             s.off_mechanicsIDCard = Pointer.Read(reader);
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
@@ -87,7 +89,6 @@ namespace OpenSpace.Object.Properties {
                 reader.ReadByte();
                 reader.ReadByte();
             }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.R2) reader.ReadUInt32();
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
             }

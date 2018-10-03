@@ -11,8 +11,8 @@ namespace OpenSpace.FileFormat {
         public Reader reader;
         public Writer writer;
         public Dictionary<uint, Pointer> pointers = new Dictionary<uint, Pointer>();
-        public int baseOffset;
-        public uint headerOffset = 0;
+        public long baseOffset; // Base offset within file
+        public long headerOffset = 0;
         public bool allowUnsafePointers = false;
 
         public void Dispose() {
@@ -28,6 +28,10 @@ namespace OpenSpace.FileFormat {
             if (reader != null) {
                 reader.BaseStream.Seek(headerOffset + baseOffset, SeekOrigin.Begin);
             }
+        }
+
+        public virtual Pointer GetUnsafePointer(uint value) {
+            return new Pointer(value, this);
         }
 
         public abstract void WritePointer(Pointer pointer);

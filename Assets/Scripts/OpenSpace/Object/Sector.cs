@@ -66,7 +66,7 @@ namespace OpenSpace.Object {
                     Pointer sp = Pointer.Read(reader);
                     n.sector = Sector.FromSuperObjectOffset(sp);
                     //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
-                    if (l.mode == MapLoader.Mode.RaymanArenaGC) {
+                    if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
                         n.off_next = off_element + 8; // No next pointer, each entry is immediately after the first one.
                     } else {
                         n.off_next = Pointer.Read(reader);
@@ -89,7 +89,7 @@ namespace OpenSpace.Object {
                     Pointer sp = Pointer.Read(reader);
                     n.sector = Sector.FromSuperObjectOffset(sp);
                     //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
-                    if (l.mode == MapLoader.Mode.RaymanArenaGC) {
+                    if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
                         n.off_next = off_element + 4; // No next pointer, each entry is immediately after the first one.
                     } else {
                         n.off_next = Pointer.Read(reader);
@@ -146,25 +146,18 @@ namespace OpenSpace.Object {
                     | ((Settings.s.hasLinkedListHeaderPointers) ?
                         LinkedList.Flags.HasHeaderPointers :
                         LinkedList.Flags.NoPreviousPointersForDouble),
-                type: (l.mode == MapLoader.Mode.RaymanArenaGC) ? LinkedList.Type.SingleNoElementPointers : LinkedList.Type.Default
+                type: LinkedList.Type.Minimize
             );
             s.dynamicLights = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // "streams list", probably related to water
             }
-            s.neighbors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader));
-            s.sectors_unk1 = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader),
-                type: (l.mode == MapLoader.Mode.RaymanArenaGC) ? LinkedList.Type.SingleNoElementPointers : LinkedList.Type.Default);
-            s.sectors_unk2 = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader),
-                type: (l.mode == MapLoader.Mode.RaymanArenaGC) ? LinkedList.Type.SingleNoElementPointers : LinkedList.Type.Default);
+            s.neighbors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.sectors_unk1 = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.sectors_unk2 = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
 
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // Placeholder
+            LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // Placeholder
 
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);

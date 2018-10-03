@@ -188,11 +188,11 @@ namespace OpenSpace.Visual {
             VisualMaterial m = new VisualMaterial(offset);
             // Material struct = 0x188
             m.flags = reader.ReadUInt32(); // After this: 0x4
+            if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
             m.ambientCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.diffuseCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
-            
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 m.num_textures = 1;
                 reader.ReadUInt32(); // 0x48
@@ -214,6 +214,10 @@ namespace OpenSpace.Visual {
 
                     reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
                 } else {
+                    if (Settings.s.platform == Settings.Platform.DC) {
+                        // For some reason there's a huge gap here
+                        reader.ReadBytes(0xD0);
+                    }
                     t.currentScrollX = reader.ReadSingle();
                     t.currentScrollY = reader.ReadSingle();
                     t.scrollX = reader.ReadSingle(); // 0x58
@@ -230,8 +234,8 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32(); // 0x74
                 m.properties = reader.ReadByte(); // whole byte for texture scroll lock in R2, no bitmasks
                 reader.ReadByte();
-                reader.ReadByte();
-                reader.ReadByte();
+                reader.ReadByte(); // padding, not in DC
+                reader.ReadByte(); // padding, not in DC
             } else {
                 reader.ReadUInt32(); // current refresh number for scrolling/animated textures, 0x48
                 m.off_animTextures_first = Pointer.Read(reader);
@@ -301,12 +305,13 @@ namespace OpenSpace.Visual {
         }
 
         public static VisualMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
+            if (offset == null) return null;
             VisualMaterial vm = FromOffset(offset);
             if (vm == null) {
-                Pointer off_current = Pointer.Goto(ref reader, offset);
-                vm = VisualMaterial.Read(reader, offset);
-                Pointer.Goto(ref reader, off_current);
-                MapLoader.Loader.visualMaterials.Add(vm);
+                Pointer.DoAt(ref reader, offset, () => {
+                    vm = VisualMaterial.Read(reader, offset);
+                    MapLoader.Loader.visualMaterials.Add(vm);
+                });
             }
             return vm;
         }

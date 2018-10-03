@@ -14,7 +14,7 @@ namespace OpenSpace {
             R3 = 3
         };
         public enum Game { R3, RA, R2, TT, TTSE, R2Demo, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
-        public enum Platform { PC, iOS, GC };
+        public enum Platform { PC, iOS, GC, DC };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
         
@@ -115,11 +115,11 @@ namespace OpenSpace {
             game = Game.RA,
             platform = Platform.GC,
             endian = Endian.Big,
-            linkedListType = LinkedListType.Single,
+            linkedListType = LinkedListType.Minimize,
             aiTypes = AITypes.R3,
             hasDeformations = true,
             textureAnimationSpeedModifier = -10f
-    };
+        };
 
         public static Settings R2PC = new Settings() {
             engineVersion = EngineVersion.R2,
@@ -181,6 +181,18 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R2,
             encryption = Encryption.ReadInit,
+        };
+
+        public static Settings R2DC = new Settings() {
+            engineVersion = EngineVersion.R2,
+            game = Game.R2,
+            platform = Platform.DC,
+            endian = Endian.Little,
+            numEntryActions = 43,
+            linkedListType = LinkedListType.Minimize,
+            encryption = Encryption.None,
+            aiTypes = AITypes.R2,
+            hasExtraInputData = true
         };
 
         public static Settings R2IOS = new Settings() {

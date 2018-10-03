@@ -32,6 +32,7 @@ namespace OpenSpace.AI {
         public static DsgVarInfoEntry Read(Reader reader, Pointer offset, uint number) {
             MapLoader l = MapLoader.Loader;
             DsgVarInfoEntry d = new DsgVarInfoEntry(offset);
+            //l.print(offset);
             d.offsetInBuffer = reader.ReadUInt32();
             d.typeNumber = reader.ReadUInt32();
             d.saveType = reader.ReadUInt32();
