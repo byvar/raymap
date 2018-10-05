@@ -192,7 +192,7 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Minimize,
             encryption = Encryption.None,
             aiTypes = AITypes.R2,
-            hasExtraInputData = true
+            hasExtraInputData = false
         };
 
         public static Settings R2IOS = new Settings() {

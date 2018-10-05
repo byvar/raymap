@@ -70,29 +70,22 @@ namespace OpenSpace.Input {
                 element.off_firstKeyWord = Pointer.Read(reader);
                 if (Settings.s.engineVersion < Settings.EngineVersion.R2) reader.ReadUInt32(); // Offset of extra input data in tmp memory? It's different by 0x18 every time
                 element.off_name = Pointer.Read(reader);
-                if (Settings.s.hasExtraInputData || Settings.s.engineVersion == Settings.EngineVersion.R3) element.off_name2 = Pointer.Read(reader);
+                if (Settings.s.hasExtraInputData || Settings.s.platform == Settings.Platform.DC || Settings.s.engineVersion == Settings.EngineVersion.R3) element.off_name2 = Pointer.Read(reader);
                 reader.ReadInt32(); // -2
                 reader.ReadUInt32();
                 element.active = reader.ReadByte();
                 reader.ReadBytes(3);
 
-                if (element.off_firstKeyWord != null) {
-                    Pointer off_current = Pointer.Goto(ref reader, element.off_firstKeyWord);
+                Pointer.DoAt(ref reader, element.off_firstKeyWord, () => {
                     element.firstKeyWord = KeyWord.Read(reader, element.off_firstKeyWord);
-                    Pointer.Goto(ref reader, off_current);
-                }
+                });
             }
-
-            if (element.off_name != null) {
-                Pointer off_current = Pointer.Goto(ref reader, element.off_name);
+            Pointer.DoAt(ref reader, element.off_name, () => {
                 element.name = reader.ReadNullDelimitedString();
-                Pointer.Goto(ref reader, off_current);
-            }
-            if (element.off_name2 != null) {
-                Pointer off_current = Pointer.Goto(ref reader, element.off_name2);
+            });
+            Pointer.DoAt(ref reader, element.off_name2, () => {
                 element.name2 = reader.ReadNullDelimitedString();
-                Pointer.Goto(ref reader, off_current);
-            }
+            });
 
             MapLoader.Loader.print(element.ToString());
 

@@ -318,7 +318,7 @@ namespace OpenSpace.Visual {
                 sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
                 sm.visualMaterial = sm.gameMaterial.visualMaterial;
                 /*if (sm.visualMaterial != null && sm.visualMaterial.textures.Count > 0 && sm.visualMaterial.textures[0].off_texture != null) {
-                    sm.name += " " + sm.visualMaterial.textures[0].offset;
+                    sm.name += " - VisMatTex:" + sm.visualMaterial.textures[0].offset + " - TexInfo:" + sm.visualMaterial.textures[0].off_texture;
                 }*/
             }
             if (sm.visualMaterial != null) {

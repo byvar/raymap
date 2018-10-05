@@ -1590,7 +1590,49 @@ namespace OpenSpace {
 
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
-            Pointer.Goto(ref reader, Pointer.Current(reader) + 0x94);
+            Pointer off_base_fix = Pointer.Current(reader);
+            reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
+            reader.ReadUInt16();
+            reader.ReadUInt16();
+            reader.ReadUInt32();
+            reader.ReadUInt16();
+            reader.ReadUInt16();
+            reader.ReadUInt32(); // base
+            Pointer off_text_general = Pointer.Read(reader);
+            Pointer off_inputStructure = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_inputStructure, () => {
+                inputStruct = InputStructure.Read(reader, off_inputStructure);
+            });
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            Pointer.Read(reader);
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            reader.ReadUInt32();
+            Pointer.Read(reader);
+            Pointer off_levelNames = Pointer.Read(reader);
+            Pointer off_languages = Pointer.Read(reader);
+            uint num_levelNames = reader.ReadUInt32();
+            uint num_languages = reader.ReadUInt32();
+            reader.ReadUInt32(); // same as num_levelNames
+            Pointer off_events_fix = Pointer.Read(reader);
+            uint num_events_fix = reader.ReadUInt32();
             uint num_textures_fix = reader.ReadUInt32();
             Pointer off_textures_fix = Pointer.Read(reader);
             Pointer.DoAt(ref reader, off_textures_fix, () => {
@@ -1615,6 +1657,7 @@ namespace OpenSpace {
             reader = files_array[Mem.Lvl].reader;
 
             // Animation stuff
+            Pointer off_animationBank = Pointer.Current(reader);
             Pointer.Read(reader);
             Pointer.Read(reader);
             Pointer.Read(reader);
@@ -1698,6 +1741,13 @@ namespace OpenSpace {
             });
 
             ReadFamilies(reader);
+
+            Pointer.DoAt(ref reader, off_animationBank, () => {
+                animationBanks = new AnimationBank[2];
+                animationBanks[0] = AnimationBank.ReadDreamcast(reader, off_animationBank, off_events_fix, num_events_fix);
+                animationBanks[1] = animationBanks[0];
+            });
+            
             ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);

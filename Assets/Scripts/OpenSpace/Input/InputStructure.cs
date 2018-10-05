@@ -41,6 +41,12 @@ namespace OpenSpace.Input {
                 input.num_entryActions = reader.ReadUInt32();
                 input.off_entryActions = Pointer.Read(reader);
                 reader.ReadBytes(0x14);
+            } else if (Settings.s.platform == Settings.Platform.DC) {
+                reader.ReadBytes(0x278);
+                input.num_entryActions = reader.ReadUInt32();
+                input.off_entryActions = Pointer.Read(reader);
+                reader.ReadUInt32();
+                Pointer.Read(reader);
             }
 
             if (input.off_entryActions != null && input.num_entryActions > 0) {

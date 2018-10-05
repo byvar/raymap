@@ -16,8 +16,10 @@ namespace OpenSpace.Animation.Component {
 
         public static AnimEvent Read(Reader reader) {
             AnimEvent e = new AnimEvent();
-            e.unk0 = reader.ReadUInt32();
-            e.unk4 = reader.ReadUInt16();
+            if (Settings.s.platform != Settings.Platform.DC) {
+                e.unk0 = reader.ReadUInt32();
+                e.unk4 = reader.ReadUInt16();
+            }
             e.unk6 = reader.ReadUInt16();
             e.unk8 = reader.ReadUInt16();
             e.unkA = reader.ReadUInt16();
@@ -25,7 +27,12 @@ namespace OpenSpace.Animation.Component {
         }
 
         public static int Size {
-            get { return 12; }
+            get {
+                if (Settings.s.platform == Settings.Platform.DC) {
+                    return 6;
+                }
+                return 12;
+            }
         }
 
         public static bool Aligned {

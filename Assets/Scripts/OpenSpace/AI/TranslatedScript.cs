@@ -41,7 +41,7 @@ namespace OpenSpace.AI
                 {
                     string firstChildNode  = (this.children.Count > 0 && this.children[0] != null) ? this.children[0].ToString() : "null";
                     string secondChildNode = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString() : "null";
-                    string prefix = (ts.printAddresses ? "{0x" + scriptNode.offset.offset.ToString("X8")  + "}" : "");
+                    string prefix = (ts.printAddresses ? "{" + scriptNode.offset.ToString()  + "}" : "");
 
                     AITypes aiTypes = Settings.s.aiTypes;
                     uint param = scriptNode.param;

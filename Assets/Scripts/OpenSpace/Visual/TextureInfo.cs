@@ -70,6 +70,25 @@ namespace OpenSpace.Visual {
                         texture.wrapModeU = TextureWrapMode.Mirror;
                     }
                     if (IsMirrorY) {
+                        if (Settings.s.platform == Settings.Platform.DC) {
+                            Texture2D flipped = new Texture2D(texture.width, texture.height);
+
+                            int w = texture.width;
+                            int h = texture.height;
+
+
+                            for (int x = 0; x < w; x++) {
+                                for (int y = 0; y < h; y++) {
+                                    flipped.SetPixel(x, h - y - 1, texture.GetPixel(x, y));
+                                }
+                            }
+                            flipped.Apply();
+                            texture = flipped;
+
+                            if (IsMirrorX) {
+                                texture.wrapModeU = TextureWrapMode.Mirror;
+                            }
+                        }
                         texture.wrapModeV = TextureWrapMode.Mirror;
                     }
                     if ((flags & 0x902) != 0 && Settings.s.engineVersion < Settings.EngineVersion.R3) {
@@ -145,7 +164,10 @@ namespace OpenSpace.Visual {
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                     reader.ReadUInt32();
-                    reader.ReadUInt32();
+                    tex.flagsByte = reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
                     tex.name = "Texture @ " + offset;
                 } else {
                     tex.field0 = reader.ReadUInt32(); // 888 or 8888

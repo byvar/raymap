@@ -1,4 +1,5 @@
 ﻿using OpenSpace.Animation.Component;
+using OpenSpace.Object.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -330,7 +331,161 @@ namespace OpenSpace.Animation {
                 }
             }
             Pointer.Goto(ref reader, off_current);
+            //Debug.LogError("Bank here: " + offset);
             return banks;
+        }
+
+        // A completely separate Read function for the Dreamcast version, since it's so different
+        public static AnimationBank ReadDreamcast(Reader reader, Pointer offset, Pointer off_events_fix, uint num_events_fix) {
+            MapLoader l = MapLoader.Loader;
+            AnimationBank bank = new AnimationBank(offset);
+            bank.a3d_general = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.vectors = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.quaternions = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.hierarchies = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.NTTO = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.onlyFrames = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.channels = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.framesNumOfNTTO = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.framesKFIndex = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.keyframes = new AnimationStack() { off_data = Pointer.Read(reader) };
+            bank.events = new AnimationStack() { off_data = Pointer.Read(reader), countInFix = num_events_fix };
+            bank.events.count = bank.events.countInFix + reader.ReadUInt32();
+            bank.morphData = new AnimationStack() { off_data = Pointer.Read(reader) };
+            Pointer off_current = Pointer.Current(reader);
+
+            uint max_a3d_ind = 0, num_vectors = 0, num_quaternions = 0, num_hierarchies = 0, num_NTTO = 0,
+                num_numNTTO = 0, num_channels = 0, num_onlyFrames = 0, num_framesKF = 0, num_keyframes = 0, num_morphData = 0;
+            foreach (State s in l.states) {
+                if (s.anim_ref != null && s.anim_ref.anim_index > max_a3d_ind) max_a3d_ind = s.anim_ref.anim_index;
+            }
+
+
+            bank.a3d_general.count = max_a3d_ind + 1;
+            bank.animations = new AnimA3DGeneral[bank.a3d_general.count];
+            Pointer.DoAt(ref reader, bank.a3d_general.off_data, () => {
+                for (int i = 0; i < bank.a3d_general.count; i++) {
+                    bank.animations[i] = AnimA3DGeneral.Read(reader, Pointer.Current(reader));
+                    AnimA3DGeneral a = bank.animations[i];
+                    if (a.start_vectors + a.num_vectors > num_vectors) num_vectors = (uint)a.start_vectors + a.num_vectors;
+                    if (a.start_quaternions + a.num_quaternions > num_quaternions) num_quaternions = (uint)a.start_quaternions + a.num_quaternions;
+                    //if (a.start_hierarchies + a.num_hierarchies > num_hierarchies) num_hierarchies = (uint)a.start_hierarchies + a.num_hierarchies;
+                    if (a.start_NTTO + a.num_NTTO > num_NTTO) num_NTTO = (uint)a.start_NTTO + a.num_NTTO;
+                    if (a.start_onlyFrames + a.num_onlyFrames > num_onlyFrames) num_onlyFrames = (uint)a.start_onlyFrames + a.num_onlyFrames;
+                    if (a.start_channels + a.num_channels > num_channels) num_channels = (uint)a.start_channels + a.num_channels;
+                    if (a.start_morphData + a.num_morphData > num_morphData) num_morphData = (uint)a.start_morphData + a.num_morphData;
+                }
+            });
+            bank.vectors.count = num_vectors;
+            bank.quaternions.count = num_quaternions;
+            //bank.hierarchies.count = num_hierarchies;
+            bank.NTTO.count = num_NTTO;
+            bank.onlyFrames.count = num_onlyFrames;
+            bank.channels.count = num_channels;
+            bank.morphData.count = num_morphData;
+            bank.global_vectors = new AnimVector[bank.vectors.Count(false)];
+            bank.global_quaternions = new AnimQuaternion[bank.quaternions.Count(false)];
+            //bank.global_hierarchies = new AnimHierarchy[bank.hierarchies.Count(false)];
+            bank.global_NTTO = new AnimNTTO[bank.NTTO.Count(false)];
+            bank.global_onlyFrames = new AnimOnlyFrame[bank.onlyFrames.Count(false)];
+            bank.global_channels = new AnimChannel[bank.channels.Count(false)];
+            /*bank.global_numOfNTTO = new AnimNumOfNTTO[bank.framesNumOfNTTO.Count(false)];
+            bank.global_framesKFIndex = new AnimFramesKFIndex[bank.framesKFIndex.Count(false)];
+            bank.global_keyframes = new AnimKeyframe[bank.keyframes.Count(false)];*/
+            bank.global_events = new AnimEvent[bank.events.Count(false)];
+            bank.global_morphData = new AnimMorphData[bank.morphData.Count(false)];
+            
+            if (bank.global_vectors.Length > 0) {
+                if (bank.vectors.off_data != null) Pointer.Goto(ref reader, bank.vectors.off_data);
+                for (uint j = 0; j < bank.global_vectors.Length; j++) bank.global_vectors[j] = AnimVector.Read(reader);
+            }
+            if (bank.global_quaternions.Length > 0) {
+                if (bank.quaternions.off_data != null) Pointer.Goto(ref reader, bank.quaternions.off_data);
+                for (uint j = 0; j < bank.global_quaternions.Length; j++) bank.global_quaternions[j] = AnimQuaternion.Read(reader);
+            }
+            if (bank.global_NTTO.Length > 0) {
+                if (bank.NTTO.off_data != null) Pointer.Goto(ref reader, bank.NTTO.off_data);
+                for (uint j = 0; j < bank.global_NTTO.Length; j++) bank.global_NTTO[j] = AnimNTTO.Read(reader);
+            }
+            if (bank.global_onlyFrames.Length > 0) {
+                if (bank.onlyFrames.off_data != null) Pointer.Goto(ref reader, bank.onlyFrames.off_data);
+                for (uint j = 0; j < bank.global_onlyFrames.Length; j++) bank.global_onlyFrames[j] = AnimOnlyFrame.Read(reader);
+            }
+            if (bank.global_channels.Length > 0) {
+                if (bank.channels.off_data != null) Pointer.Goto(ref reader, bank.channels.off_data);
+                for (uint j = 0; j < bank.global_channels.Length; j++) bank.global_channels[j] = AnimChannel.Read(reader);
+            }
+            if (bank.global_events.Length > 0) {
+                if (off_events_fix != null) Pointer.Goto(ref reader, off_events_fix);
+                for (uint j = 0; j < num_events_fix; j++) bank.global_events[j] = AnimEvent.Read(reader);
+                if (bank.events.off_data != null) Pointer.Goto(ref reader, bank.events.off_data);
+                for (uint j = num_events_fix; j < bank.global_events.Length; j++) bank.global_events[j] = AnimEvent.Read(reader);
+            }
+            if (bank.global_morphData.Length > 0) {
+                if (bank.morphData.off_data != null) Pointer.Goto(ref reader, bank.morphData.off_data);
+                for (uint j = 0; j < bank.global_morphData.Length; j++) bank.global_morphData[j] = AnimMorphData.Read(reader);
+            }
+
+            for (int i = 0; i < bank.a3d_general.count; i++) {
+                AnimA3DGeneral a = bank.animations[i];
+                for (int j = a.start_channels; j < a.start_channels + a.num_channels; j++) {
+                    AnimChannel ch = bank.global_channels[j];
+                    if (ch.framesKF + a.num_onlyFrames > num_framesKF) num_framesKF = (uint)ch.framesKF + a.num_onlyFrames;
+
+                    for (int k = a.start_onlyFrames; k < a.start_onlyFrames + a.num_onlyFrames; k++) {
+                        AnimOnlyFrame of = bank.global_onlyFrames[k];
+                        if (ch.numOfNTTO + of.numOfNTTO + 1 > num_numNTTO) num_numNTTO = (uint)ch.numOfNTTO + of.numOfNTTO + 1;
+                    }
+                }
+                for (int k = a.start_onlyFrames; k < a.start_onlyFrames + a.num_onlyFrames; k++) {
+                    AnimOnlyFrame of = bank.global_onlyFrames[k];
+                    if (of.start_hierarchies_for_frame + of.num_hierarchies_for_frame > num_hierarchies) num_hierarchies = (uint)of.start_hierarchies_for_frame + of.num_hierarchies_for_frame;
+                }
+            }
+            bank.hierarchies.count = num_hierarchies;
+            bank.framesNumOfNTTO.count = num_numNTTO;
+            bank.framesKFIndex.count = num_framesKF;
+            bank.global_hierarchies = new AnimHierarchy[bank.hierarchies.Count(false)];
+            bank.global_numOfNTTO = new AnimNumOfNTTO[bank.framesNumOfNTTO.Count(false)];
+            bank.global_framesKFIndex = new AnimFramesKFIndex[bank.framesKFIndex.Count(false)];
+            if (bank.global_hierarchies.Length > 0) {
+                if (bank.hierarchies.off_data != null) Pointer.Goto(ref reader, bank.hierarchies.off_data);
+                for (uint j = 0; j < bank.global_hierarchies.Length; j++) bank.global_hierarchies[j] = AnimHierarchy.Read(reader);
+            }
+            if (bank.global_numOfNTTO.Length > 0) {
+                if (bank.framesNumOfNTTO.off_data != null) Pointer.Goto(ref reader, bank.framesNumOfNTTO.off_data);
+                for (uint j = 0; j < bank.global_numOfNTTO.Length; j++) bank.global_numOfNTTO[j] = AnimNumOfNTTO.Read(reader);
+            }
+            if (bank.global_framesKFIndex.Length > 0) {
+                if (bank.framesKFIndex.off_data != null) Pointer.Goto(ref reader, bank.framesKFIndex.off_data);
+                for (uint j = 0; j < bank.global_framesKFIndex.Length; j++) {
+                    bank.global_framesKFIndex[j] = AnimFramesKFIndex.Read(reader);
+                    if (bank.global_framesKFIndex[j].kf + 1 > num_keyframes) num_keyframes = bank.global_framesKFIndex[j].kf + 1;
+                }
+            }
+            bank.keyframes.count = num_keyframes;
+            bank.global_keyframes = new AnimKeyframe[bank.keyframes.Count(false)];
+            if (bank.global_keyframes.Length > 0) {
+                if (bank.keyframes.off_data != null) Pointer.Goto(ref reader, bank.keyframes.off_data);
+                for (uint j = 0; j < bank.global_keyframes.Length; j++) bank.global_keyframes[j] = AnimKeyframe.Read(reader);
+            }
+            Pointer.Goto(ref reader, off_current);
+            for (uint j = 0; j < bank.animations.Length; j++) {
+                bank.animations[j].vectors = bank.global_vectors;
+                bank.animations[j].quaternions = bank.global_quaternions;
+                bank.animations[j].hierarchies = bank.global_hierarchies;
+                bank.animations[j].ntto = bank.global_NTTO;
+                bank.animations[j].onlyFrames = bank.global_onlyFrames;
+                bank.animations[j].channels = bank.global_channels;
+                bank.animations[j].numOfNTTO = bank.global_numOfNTTO;
+                bank.animations[j].framesKFIndex = bank.global_framesKFIndex;
+                bank.animations[j].keyframes = bank.global_keyframes;
+                bank.animations[j].events = bank.global_events;
+                bank.animations[j].morphData = bank.global_morphData;
+                bank.animations[j].deformations = bank.global_deformations;
+            }
+
+            return bank;
         }
     }
 }
