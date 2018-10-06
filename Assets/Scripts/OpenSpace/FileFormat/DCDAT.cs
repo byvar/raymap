@@ -8,6 +8,7 @@ namespace OpenSpace.FileFormat {
     public class DCDAT : FileWithPointers {
         string path;
         long length;
+        byte[] data = null;
 
         public DCDAT(string name, string path, int fileID) : this(name, File.OpenRead(path), fileID) {
             this.path = path;
@@ -15,24 +16,31 @@ namespace OpenSpace.FileFormat {
 
         public DCDAT(string name, Stream stream, int fileID) {
             allowUnsafePointers = true;
-            baseOffset = 0;
-            headerOffset = 0;
             this.name = name;
             this.fileID = fileID;
             length = stream.Length;
-            reader = new Reader(stream, Settings.s.IsLittleEndian);
+            using (Reader fileReader = new Reader(stream, Settings.s.IsLittleEndian)) {
+                data = fileReader.ReadBytes((int)stream.Length);
+            }
+            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+            //reader = new Reader(stream, Settings.s.IsLittleEndian);
             switch (fileID) {
                 case 0:
-                    stream.Seek(0x10, SeekOrigin.Begin);
+                    reader.BaseStream.Seek(0x10, SeekOrigin.Begin);
                     headerOffset = reader.ReadUInt32();
                     break;
                 case 1:
-                    stream.Seek(0x94, SeekOrigin.Begin);
+                    reader.BaseStream.Seek(0x94, SeekOrigin.Begin);
                     headerOffset = reader.ReadUInt32();
                     break;
             }
             baseOffset = -headerOffset;
-            stream.Seek(0, SeekOrigin.Begin);
+            reader.BaseStream.Seek(0, SeekOrigin.Begin);
+        }
+
+        public void SetHeaderOffset(uint headerOffset) {
+            this.headerOffset = headerOffset;
+            baseOffset = -headerOffset;
         }
 
         public override void CreateWriter() {
@@ -60,8 +68,24 @@ namespace OpenSpace.FileFormat {
                         return new Pointer(value, dcFile);
                     }
                 }
+                // Do a second loop over the files. If end and start overlap we want the start (returned by previous loop),
+                // but without the second loop some valid pointers will be null
+                foreach (FileWithPointers f in l.files_array) {
+                    DCDAT dcFile = f as DCDAT;
+                    if (dcFile != null && value == dcFile.headerOffset + dcFile.length) {
+                        return new Pointer(value, dcFile);
+                    }
+                }
             }
             return null;
+        }
+
+        public void OverwriteData(uint position, byte[] data) {
+            Array.Copy(data, 0, this.data, position, data.Length);
+        }
+
+        public void OverwriteData(uint position, uint data) {
+            OverwriteData(position, BitConverter.GetBytes(data));
         }
     }
 }

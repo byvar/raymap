@@ -52,6 +52,9 @@ namespace OpenSpace {
 
         public InputStructure inputStruct;
         public FontStructure fontStruct;
+        public string[] levels;
+        public string[] languages;
+        public string[] languages_loc;
 
         uint off_textures_start_fix = 0;
         bool hasTransit;
@@ -483,21 +486,23 @@ namespace OpenSpace {
             }
             uint num_languages = reader.ReadUInt32();
             Pointer off_languages = Pointer.Read(reader);
-            Pointer off_current = Pointer.Goto(ref reader, off_languages);
-            for (uint i = 0; i < num_languages; i++) {
-                string language_us = new string(reader.ReadChars(0x14));
-                string language_loc = new string(reader.ReadChars(0x14));
-            }
-            Pointer.Goto(ref reader, off_current);
+            Pointer.DoAt(ref reader, off_languages, () => {
+                languages = new string[num_languages];
+                languages_loc = new string[num_languages];
+                for (uint i = 0; i < num_languages; i++) {
+                    languages[i] = reader.ReadString(0x14);
+                    languages_loc[i] = reader.ReadString(0x14);
+                }
+            });
             uint num_textures = reader.ReadUInt32();
             print("Texture count fix: " + num_textures);
             textures = new TextureInfo[num_textures];
             if (num_textures > 0) {
                 for (uint i = 0; i < num_textures; i++) {
                     Pointer off_texture = Pointer.Read(reader);
-                    off_current = Pointer.Goto(ref reader, off_texture);
-                    textures[i] = TextureInfo.Read(reader, off_texture);
-                    Pointer.Goto(ref reader, off_current);
+                    Pointer.DoAt(ref reader, off_texture, () => {
+                        textures[i] = TextureInfo.Read(reader, off_texture);
+                    });
                 }
                 if (mode == Mode.Rayman3GC || mode == Mode.RaymanArenaGC) {
                     uint num_textures_menu = reader.ReadUInt32();
@@ -585,11 +590,9 @@ namespace OpenSpace {
             Pointer off_animBankFix = Pointer.Read(reader); // Note: only one 0x104 bank in fix.
             print("Fix animation bank address: " + off_animBankFix);
             animationBanks = new AnimationBank[5]; // 1 in fix, 4 in lvl
-            if (off_animBankFix != null) {
-                off_current = Pointer.Goto(ref reader, off_animBankFix);
+            Pointer.DoAt(ref reader, off_animBankFix, () => {
                 animationBanks[0] = AnimationBank.Read(reader, off_animBankFix, 0, 1, files_array[Mem.FixKeyFrames])[0];
-                Pointer.Goto(ref reader, off_current);
-            }
+            });
         }
         #endregion
 
@@ -1233,15 +1236,15 @@ namespace OpenSpace {
                             }
                             Pointer.Goto(ref reader, off_newSOengineObject);
                             Pointer off_p3dData = Pointer.Read(reader);
-                            ((SNA)off_p3dData.file).OverwriteData(off_p3dData.offset + 0x18, matrixData);
+                            ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x18, matrixData);
 
                             if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                                 FileWithPointers file = off_newSuperObject.file;
-                                file.AddPointer(off_newSuperObject.offset + 0x14, off_nextBrother);
-                                file.AddPointer(off_newSuperObject.offset + 0x18, off_prevBrother);
-                                file.AddPointer(off_newSuperObject.offset + 0x1C, off_father);
-                                ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x30, renderBits);
-                                ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x38, floatData);
+                                file.AddPointer(off_newSuperObject.FileOffset + 0x14, off_nextBrother);
+                                file.AddPointer(off_newSuperObject.FileOffset + 0x18, off_prevBrother);
+                                file.AddPointer(off_newSuperObject.FileOffset + 0x1C, off_father);
+                                ((SNA)file).OverwriteData(off_newSuperObject.FileOffset + 0x30, renderBits);
+                                ((SNA)file).OverwriteData(off_newSuperObject.FileOffset + 0x38, floatData);
                             }
 
                         }
@@ -1369,10 +1372,12 @@ namespace OpenSpace {
                 reader.ReadUInt32();
                 reader.ReadUInt16();
 
+                levels = new string[80];
                 for (int i = 0; i < 80; i++) {
-                    new string(reader.ReadChars(0x1E)).TrimEnd('\0');
+                    levels[i] = reader.ReadString(0x1E);
                 }
                 uint num_mapNames = reader.ReadUInt32();
+                Array.Resize(ref levels, (int)num_mapNames);
                 reader.ReadUInt16();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
@@ -1591,14 +1596,16 @@ namespace OpenSpace {
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
             Pointer off_base_fix = Pointer.Current(reader);
-            reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
-            reader.ReadUInt16();
-            reader.ReadUInt16();
+            uint base_language = reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
             reader.ReadUInt32();
+            uint num_text_language = reader.ReadUInt32();
             reader.ReadUInt16();
             reader.ReadUInt16();
             reader.ReadUInt32(); // base
             Pointer off_text_general = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_text_general, () => {
+                fontStruct = FontStructure.Read(reader, off_text_general);
+            });
             Pointer off_inputStructure = Pointer.Read(reader);
             Pointer.DoAt(ref reader, off_inputStructure, () => {
                 inputStruct = InputStructure.Read(reader, off_inputStructure);
@@ -1631,6 +1638,30 @@ namespace OpenSpace {
             uint num_levelNames = reader.ReadUInt32();
             uint num_languages = reader.ReadUInt32();
             reader.ReadUInt32(); // same as num_levelNames
+            Pointer.DoAt(ref reader, off_levelNames, () => {
+                lvlNames = new string[num_levelNames];
+                for (uint i = 0; i < num_levelNames; i++) {
+                    lvlNames[i] = reader.ReadString(0x1E);
+                }
+            });
+            Pointer.DoAt(ref reader, off_languages, () => {
+                languages = new string[num_languages];
+                languages_loc = new string[num_languages];
+                for (uint i = 0; i < num_languages; i++) {
+                    languages[i] = reader.ReadString(0x14);
+                    languages_loc[i] = reader.ReadString(0x14);
+                }
+            });
+            if (languages != null && fontStruct != null) {
+                for (int i = 0; i < num_languages; i++) {
+                    string langFilePath = gameDataBinFolder + "/TEXTS/" + languages[i].ToUpper() + ".LNG";
+                    files_array[2] = new DCDAT(languages[i], langFilePath, 2);
+                    ((DCDAT)files_array[2]).SetHeaderOffset(base_language);
+                    files_array[2].GotoHeader();
+                    fontStruct.ReadLanguageTableDreamcast(files_array[2].reader, i, (ushort)num_text_language);
+                    files_array[2].Dispose();
+                }
+            }
             Pointer off_events_fix = Pointer.Read(reader);
             uint num_events_fix = reader.ReadUInt32();
             uint num_textures_fix = reader.ReadUInt32();
@@ -1703,21 +1734,109 @@ namespace OpenSpace {
                 }
             });
             Pointer.Read(reader);
-            Pointer.Read(reader);
+            Pointer off_mainChar = Pointer.Read(reader);
             reader.ReadUInt32();
-            reader.ReadUInt32();
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
+            uint num_persoInFixPointers = reader.ReadUInt32();
+            Pointer off_persoInFixPointers = Pointer.Read(reader);
+
+            //Pointer[] persoInFixPointers = new Pointer[num_persoInFixPointers];
+            Pointer.DoAt(ref reader, off_persoInFixPointers, () => {
+                for (int i = 0; i < num_persoInFixPointers; i++) {
+                    Pointer off_perso = Pointer.Read(reader);
+                    Pointer off_so = Pointer.Read(reader);
+                    byte[] unk = reader.ReadBytes(4);
+                    Pointer off_matrix = Pointer.Current(reader); // It's better to change the pointer instead of the data as that is reused in some places
+                    byte[] matrixData = reader.ReadBytes(0x68);
+                    byte[] soFlags = reader.ReadBytes(4);
+                    byte[] brothersAndParent = reader.ReadBytes(12);
+
+                    Pointer.DoAt(ref reader, off_perso, () => {
+                        reader.ReadUInt32();
+                        Pointer off_stdGame = Pointer.Read(reader);
+                        if (off_stdGame != null && off_so != null) {
+                            ((DCDAT)off_stdGame.file).OverwriteData(off_stdGame.FileOffset + 0xC, off_so.offset);
+                        }
+                    });
+                    if (off_so != null) {
+                        ((DCDAT)off_so.file).OverwriteData(off_so.FileOffset + 0x14, brothersAndParent);
+                        ((DCDAT)off_so.file).OverwriteData(off_so.FileOffset + 0x20, off_matrix.offset);
+                        ((DCDAT)off_so.file).OverwriteData(off_so.FileOffset + 0x30, soFlags);
+                    }
+                }
+
+                /*if (off_perso != null) {
+                    off_current = Pointer.Goto(ref reader, off_perso);
+                    reader.ReadUInt32();
+                    Pointer off_stdGame = Pointer.Read(reader);
+                    if (off_stdGame != null) {
+                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                            Pointer.Goto(ref reader, off_stdGame);
+                            reader.ReadUInt32(); // type 0
+                            reader.ReadUInt32(); // type 1
+                            reader.ReadUInt32(); // type 2
+                            Pointer off_superObject = Pointer.Read(reader);
+                            Pointer.Goto(ref reader, off_current);
+                            if (off_superObject == null) continue;
+                        } else {
+                            Pointer.Goto(ref reader, off_current);
+                        }
+                        // First read everything from the GPT
+                        Pointer off_newSuperObject = null, off_nextBrother = null, off_prevBrother = null, off_father = null;
+                        byte[] matrixData = null, floatData = null, renderBits = null;
+                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                            off_newSuperObject = Pointer.Read(reader);
+                            matrixData = reader.ReadBytes(0x58);
+                            renderBits = reader.ReadBytes(4);
+                            floatData = reader.ReadBytes(4);
+                            off_nextBrother = Pointer.Read(reader);
+                            off_prevBrother = Pointer.Read(reader);
+                            off_father = Pointer.Read(reader);
+                        } else {
+                            matrixData = reader.ReadBytes(0x58);
+                            off_newSuperObject = Pointer.Read(reader);
+                            Pointer.DoAt(ref reader, off_stdGame + 0xC, () => {
+                                ((SNA)off_stdGame.file).AddPointer(off_stdGame.offset + 0xC, off_newSuperObject);
+                            });
+                        }
+
+                        // Then fill everything in
+                        off_current = Pointer.Goto(ref reader, off_newSuperObject);
+                        uint newSOtype = reader.ReadUInt32();
+                        Pointer off_newSOengineObject = Pointer.Read(reader);
+                        if (SuperObject.GetSOType(newSOtype) == SuperObject.Type.Perso) {
+                            persoInFixPointers[i] = off_newSOengineObject;
+                        } else {
+                            persoInFixPointers[i] = null;
+                        }
+                        Pointer.Goto(ref reader, off_newSOengineObject);
+                        Pointer off_p3dData = Pointer.Read(reader);
+                        ((SNA)off_p3dData.file).OverwriteData(off_p3dData.offset + 0x18, matrixData);
+
+                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                            FileWithPointers file = off_newSuperObject.file;
+                            file.AddPointer(off_newSuperObject.offset + 0x14, off_nextBrother);
+                            file.AddPointer(off_newSuperObject.offset + 0x18, off_prevBrother);
+                            file.AddPointer(off_newSuperObject.offset + 0x1C, off_father);
+                            ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x30, renderBits);
+                            ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x38, floatData);
+                        }
+
+                    }
+                    Pointer.Goto(ref reader, off_current);
+                }
+                }*/
+            });
+            Pointer.Read(reader); // contains a pointer to the camera SO
+            Pointer off_cameras = Pointer.Read(reader); // Double linkedlist of cameras
             Pointer off_families = Pointer.Read(reader);
             Pointer.DoAt(ref reader, off_families, () => {
                 families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
                 families.FillPointers(reader, families.off_tail, families.off_head);
             });
-            Pointer.Read(reader);
-            Pointer.Read(reader);
+            Pointer.Read(reader); // At this pointer: a double linkedlist of fix perso's with headers (soptr, next, prev, hdr)
+            Pointer.Read(reader); // Rayman
             reader.ReadUInt32();
-            Pointer.Read(reader);
+            Pointer.Read(reader); // Camera
             reader.ReadUInt32();
             reader.ReadUInt32();
             uint num_textures_lvl = reader.ReadUInt32();
@@ -1751,6 +1870,33 @@ namespace OpenSpace {
             ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);
+
+            // Parse transformation matrices and other settings for fix characters
+            /*if (off_mainChar != null && off_matrix_mainChar != null) {
+                SuperObject so = SuperObject.FromOffset(off_mainChar);
+                Pointer.DoAt(ref reader, off_matrix_mainChar, () => {
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    Pointer off_matrix = Pointer.Current(reader);
+                    Matrix mat = Matrix.Read(reader, off_matrix);
+                    if (so != null) {
+                        so.off_matrix = off_matrix;
+                        so.matrix = mat;
+                        if (so.Gao != null) {
+                            so.Gao.transform.localPosition = mat.GetPosition(convertAxes: true);
+                            so.Gao.transform.localRotation = mat.GetRotation(convertAxes: true);
+                            so.Gao.transform.localScale = mat.GetScale(convertAxes: true);
+                        }
+                    }
+                });
+            }*/
         }
         #endregion
 

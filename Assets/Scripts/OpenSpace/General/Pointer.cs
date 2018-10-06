@@ -14,6 +14,14 @@ namespace OpenSpace {
             this.file = file;
         }
 
+        public uint FileOffset {
+            get {
+                if (file != null) {
+                    return (uint)(offset + file.baseOffset);
+                } else return offset;
+            }
+        }
+
         public override bool Equals(System.Object obj) {
             return obj is Pointer && this == (Pointer)obj;
         }

@@ -30,59 +30,63 @@ namespace OpenSpace.Text {
             FontStructure f = new FontStructure(offset);
 
             f.field0 = reader.ReadUInt32();
-            f.field4 = reader.ReadUInt32();
+            if(Settings.s.platform != Settings.Platform.DC) f.field4 = reader.ReadUInt32();
             f.num_languages = reader.ReadUInt16();
             reader.ReadUInt16();
             f.off_text_languages = Pointer.Read(reader);
             f.off_text_misc = Pointer.Read(reader);
 
             // Read language table
-            if (f.off_text_languages != null) {
-                f.languages = new TextTable[f.num_languages];
-                Pointer off_current = Pointer.Goto(ref reader, f.off_text_languages);
+            f.languages = new TextTable[f.num_languages];
+            Pointer.DoAt(ref reader, f.off_text_languages, () => {
+                //f.languages = new TextTable[f.num_languages];
                 for (int i = 0; i < f.num_languages; i++) {
                     f.languages[i].off_textTable = Pointer.Read(reader);
                     f.languages[i].num_entries_max = reader.ReadUInt16();
                     f.languages[i].num_entries = reader.ReadUInt16();
                     f.languages[i].entries = new string[f.languages[i].num_entries];
-                    if (f.languages[i].off_textTable != null) {
-                        Pointer off_current_table = Pointer.Goto(ref reader, f.languages[i].off_textTable);
+                    Pointer.DoAt(ref reader, f.languages[i].off_textTable, () => {
                         for (int j = 0; j < f.languages[i].num_entries; j++) {
                             Pointer off_text = Pointer.Read(reader);
-                            if (off_text != null) {
-                                Pointer off_current_entry = Pointer.Goto(ref reader, off_text);
+                            Pointer.DoAt(ref reader, off_text, () => {
                                 f.languages[i].entries[j] = reader.ReadNullDelimitedString();
-                                Pointer.Goto(ref reader, off_current_entry);
-                            }
+                            });
                         }
-                        Pointer.Goto(ref reader, off_current_table);
-                    }
+                    });
                 }
-                Pointer.Goto(ref reader, off_current);
-            }
+            });
 
             // Read misc table
-            if (f.off_text_misc != null) {
-                Pointer off_current = Pointer.Goto(ref reader, f.off_text_misc);
+            Pointer.DoAt(ref reader, f.off_text_misc, () => {
                 f.misc.off_textTable = Pointer.Read(reader);
                 f.misc.num_entries_max = reader.ReadUInt16();
                 f.misc.num_entries = reader.ReadUInt16();
                 f.misc.entries = new string[f.misc.num_entries];
-                if (f.misc.off_textTable != null) {
-                    Pointer.Goto(ref reader, f.misc.off_textTable);
+
+                Pointer.DoAt(ref reader, f.misc.off_textTable, () => {
                     for (int j = 0; j < f.misc.num_entries; j++) {
                         Pointer off_text = Pointer.Read(reader);
-                        if (off_text != null) {
-                            Pointer off_current_entry = Pointer.Goto(ref reader, off_text);
+                        Pointer.DoAt(ref reader, off_text, () => {
                             f.misc.entries[j] = reader.ReadNullDelimitedString();
-                            Pointer.Goto(ref reader, off_current_entry);
-                        }
+                        });
                     }
-                }
-                Pointer.Goto(ref reader, off_current);
-            }
+                });
+            });
 
             return f;
+        }
+
+        public void ReadLanguageTableDreamcast(Reader reader, int index, ushort num_entries) {
+            languages[index].off_textTable = Pointer.Current(reader);
+            languages[index].num_entries = num_entries;
+            languages[index].num_entries_max = num_entries;
+            languages[index].entries = new string[num_entries];
+            for (int j = 0; j < languages[index].num_entries; j++) {
+                Pointer off_text = Pointer.Read(reader);
+                Pointer.DoAt(ref reader, off_text, () => {
+                    languages[index].entries[j] = reader.ReadNullDelimitedString();
+                });
+            }
         }
 
         public string GetTextForHandleAndLanguageID(int index, uint currentLanguageId) { // FON_fn_szGetTextPointerForHandle(index)

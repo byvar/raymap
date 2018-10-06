@@ -30,7 +30,17 @@ namespace OpenSpace.Object.Properties {
             stdGame.superObject = Pointer.Read(reader); // 0xC SuperObject from Perso probably
 
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                reader.ReadBytes(0x14); // 0x10 - 0x23
+                if (Settings.s.platform == Settings.Platform.DC) {
+                    reader.ReadInt32();
+                    reader.ReadInt32();
+                    reader.ReadInt32();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                } else {
+                    reader.ReadBytes(0x14); // 0x10 - 0x23
+                }
                 stdGame.customBits = reader.ReadInt32(); // 0x24 custom bits
                 stdGame.isAPlatform = reader.ReadByte();
                 stdGame.unk = reader.ReadByte();
