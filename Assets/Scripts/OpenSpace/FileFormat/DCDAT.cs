@@ -10,7 +10,7 @@ namespace OpenSpace.FileFormat {
         long length;
         byte[] data = null;
 
-        public DCDAT(string name, string path, int fileID) : this(name, File.OpenRead(path), fileID) {
+        public DCDAT(string name, string path, int fileID) : this(name, FileSystem.GetFileReadStream(path), fileID) {
             this.path = path;
         }
 

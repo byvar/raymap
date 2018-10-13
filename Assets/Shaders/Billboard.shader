@@ -71,10 +71,11 @@
 					length(float3(unity_ObjectToWorld[0].y, unity_ObjectToWorld[1].y, unity_ObjectToWorld[2].y)) // scale y axis
 					);
 
+				float4 scaledVertex = float4(IN.vertex.x, IN.vertex.y, 0.0, 0.0) * float4(worldScale.x, worldScale.y, 1.0, 1.0);
+				//float4 scaledVertex = float4(mul((float3x3)unity_ObjectToWorld, IN.vertex.xyz).x, mul((float3x3)unity_ObjectToWorld, IN.vertex.xyz).y, 0.0, 1.0);
 				OUT.vertex = mul(UNITY_MATRIX_P,
 					float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0)
-					+ float4(IN.vertex.x, IN.vertex.y, 0.0, 0.0)
-					* float4(worldScale.x, worldScale.y, 1.0, 1.0));
+					+ scaledVertex);
 
 				//                OUT.vertex = UnityPixelSnap (OUT.vertex);
 				//    #endif

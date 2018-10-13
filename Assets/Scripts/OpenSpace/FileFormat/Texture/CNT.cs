@@ -8,7 +8,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.FileFormat.Texture {
-    class CNT : IDisposable {
+    public class CNT : IDisposable {
         public enum CNTVersion {
             Rayman2,
             Rayman2Vignette
@@ -63,13 +63,13 @@ namespace OpenSpace.FileFormat.Texture {
 
         public Texture2D[] textures = null;
 
-        public CNT(string path) : this(File.OpenRead(path)) { }
+        public CNT(string path) : this(FileSystem.GetFileReadStream(path)) { }
 
         public CNT(string[] paths) {
             directoryList = new string[paths.Length][];
             readers = new Reader[paths.Length];
             for (int i = 0; i < paths.Length; i++) {
-                Init(i, File.OpenRead(paths[i]));
+                Init(i, FileSystem.GetFileReadStream(paths[i]));
             }
         }
 

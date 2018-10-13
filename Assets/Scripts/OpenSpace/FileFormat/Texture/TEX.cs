@@ -15,7 +15,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public Texture2D[] textures = null;
         public TEX(string path) {
-            FileStream fs = new FileStream(path, FileMode.Open);
+            Stream fs = FileSystem.GetFileReadStream(path);
             using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
                 reader.ReadUInt32(); // "LZSS"
                 List<Texture2D> texturesList = new List<Texture2D>();

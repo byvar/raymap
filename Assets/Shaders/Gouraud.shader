@@ -16,7 +16,7 @@
 		[MaterialToggle] _Blend("Use secondary texture", Float) = 0
 
 		// Lighting
-		_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
+		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
 		_SectorFog("Sector fog", Vector) = (0,0,0,0)
 		_SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
 	}

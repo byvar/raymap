@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace;
+using System;
 
 namespace VrSharp.PvrTexture
 {
@@ -20,7 +21,7 @@ namespace VrSharp.PvrTexture
 
             public override void DecodePixel(byte[] source, int sourceIndex, byte[] destination, int destinationIndex)
             {
-                ushort pixel = BitConverter.ToUInt16(source, sourceIndex);
+                ushort pixel = Util.ToUInt16(source, sourceIndex, true);
 
                 destination[destinationIndex + 3] = (byte)(((pixel >> 15) & 0x01) * 0xFF);
                 destination[destinationIndex + 2] = (byte)(((pixel >> 10) & 0x1F) * 0xFF / 0x1F);
@@ -58,7 +59,7 @@ namespace VrSharp.PvrTexture
 
             public override void DecodePixel(byte[] source, int sourceIndex, byte[] destination, int destinationIndex)
             {
-                ushort pixel = BitConverter.ToUInt16(source, sourceIndex);
+                ushort pixel = Util.ToUInt16(source, sourceIndex, true);
 
                 destination[destinationIndex + 3] = 0xFF;
                 destination[destinationIndex + 2] = (byte)(((pixel >> 11) & 0x1F) * 0xFF / 0x1F);
@@ -95,7 +96,7 @@ namespace VrSharp.PvrTexture
 
             public override void DecodePixel(byte[] source, int sourceIndex, byte[] destination, int destinationIndex)
             {
-                ushort pixel = BitConverter.ToUInt16(source, sourceIndex);
+                ushort pixel = Util.ToUInt16(source, sourceIndex, true);
 
                 destination[destinationIndex + 3] = (byte)(((pixel >> 12) & 0x0F) * 0xFF / 0x0F);
                 destination[destinationIndex + 2] = (byte)(((pixel >> 8)  & 0x0F) * 0xFF / 0x0F);

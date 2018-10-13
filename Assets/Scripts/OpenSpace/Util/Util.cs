@@ -7,6 +7,26 @@ using UnityEngine;
 
 namespace OpenSpace {
     public static class Util {
+        public static byte[] GetBytesInEndian(byte[] array, int position, int length, bool isLittleEndian) {
+            byte[] data = new byte[length];
+            Array.Copy(array, position, data, 0, length);
+            if (isLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(data);
+            return data;
+        }
+
+        public static uint ToUInt32(byte[] array, int position, bool isLittleEndian) {
+            return BitConverter.ToUInt32(GetBytesInEndian(array, position, 4, isLittleEndian), 0);
+        }
+        public static int ToInt32(byte[] array, int position, bool isLittleEndian) {
+            return BitConverter.ToInt32(GetBytesInEndian(array, position, 4, isLittleEndian), 0);
+        }
+        public static ushort ToUInt16(byte[] array, int position, bool isLittleEndian) {
+            return BitConverter.ToUInt16(GetBytesInEndian(array, position, 2, isLittleEndian), 0);
+        }
+        public static short ToInt16(byte[] array, int position, bool isLittleEndian) {
+            return BitConverter.ToInt16(GetBytesInEndian(array, position, 2, isLittleEndian), 0);
+        }
+
         public static void AppendArrayAndMergeReferences<T>(ref T[] array1, ref T[] array2, int originalLength = -1) {
             if (array1 == null || array2 == null) return;
             if(originalLength == -1) originalLength = array1.Length;
@@ -16,6 +36,7 @@ namespace OpenSpace {
         }
 
         public static bool ByteArrayToFile(string fileName, byte[] byteArray) {
+            if (Application.platform == RuntimePlatform.WebGLPlayer) return false;
             try {
                 Directory.CreateDirectory(new FileInfo(fileName).Directory.FullName);
                 using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write)) {

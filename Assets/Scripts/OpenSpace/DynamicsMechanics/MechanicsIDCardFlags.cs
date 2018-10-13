@@ -101,59 +101,5 @@ namespace OpenSpace
                 this.flagPreview = this.flagPreview.Substring(0, this.flagPreview.Length - 1);
             }
         }
-
-        public int DrawEditorAndReturnFlags()
-        {
-            GUILayoutOption [] widthOption = new GUILayoutOption[] { GUILayout.ExpandWidth(false), GUILayout.MaxWidth(100) };
-
-            GUILayout.BeginHorizontal();
-
-            GUILayout.BeginVertical();
-
-            this.Animation          = EditorGUILayout.ToggleLeft("Animation", this.Animation, widthOption);
-            this.Collision          = EditorGUILayout.ToggleLeft("Collision", this.Collision, widthOption);
-            this.Gravity            = EditorGUILayout.ToggleLeft("Gravity", this.Gravity, widthOption);
-            this.Tilt               = EditorGUILayout.ToggleLeft("Tilt", this.Tilt, widthOption);
-
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-
-            this.Gymnastics         = EditorGUILayout.ToggleLeft("Gymnastics", this.Gymnastics, widthOption);
-            this.OnGround           = EditorGUILayout.ToggleLeft("OnGround", this.OnGround, widthOption);
-            this.Climbing           = EditorGUILayout.ToggleLeft("Climbing", this.Climbing, widthOption);
-            this.Spider             = EditorGUILayout.ToggleLeft("Spider", this.Spider, widthOption);
-
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-
-            this.Shoot              = EditorGUILayout.ToggleLeft("Shoot", this.Shoot, widthOption);
-            this.CollisionControl   = EditorGUILayout.ToggleLeft("CollisionControl", this.CollisionControl, widthOption);
-            this.KeepZVelocity      = EditorGUILayout.ToggleLeft("KeepZVelocity", this.KeepZVelocity, widthOption);
-            this.SpeedLimit         = EditorGUILayout.ToggleLeft("SpeedLimit", this.SpeedLimit, widthOption);
-
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-
-            this.Inertia            = EditorGUILayout.ToggleLeft("Inertia", this.Inertia, widthOption);
-            this.Stream             = EditorGUILayout.ToggleLeft("Stream", this.Stream, widthOption);
-            this.StickOnPlatform    = EditorGUILayout.ToggleLeft("StickOnPlatform", this.StickOnPlatform, widthOption);
-            this.Scale              = EditorGUILayout.ToggleLeft("Scale", this.Scale, widthOption);
-
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-
-            this.Flag16             = EditorGUILayout.ToggleLeft("Flag16", this.Flag16, widthOption);
-            this.Swim               = EditorGUILayout.ToggleLeft("Swim", this.Swim, widthOption);
-
-            GUILayout.EndVertical();
-
-            GUILayout.EndHorizontal();
-
-            return this.rawFlags;
-        }
     }
 }

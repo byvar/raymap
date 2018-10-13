@@ -34,7 +34,7 @@ namespace OpenSpace.AI {
             sn.param_ptr = Pointer.GetPointerAtOffset(offset); // if parameter is pointer
             if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
 
-            if (l.mode == MapLoader.Mode.Rayman3GC) {
+            if (Settings.s.mode == Settings.Mode.Rayman3GC) {
                 reader.ReadByte();
                 reader.ReadByte();
                 reader.ReadByte();

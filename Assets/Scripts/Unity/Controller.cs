@@ -8,9 +8,10 @@ using OpenSpace.Visual;
 using OpenSpace.Object;
 using OpenSpace.AI;
 using OpenSpace.Collide;
+using System.Collections;
 
 public class Controller : MonoBehaviour {
-    public MapLoader.Mode mode = MapLoader.Mode.Rayman3PC;
+    public Settings.Mode mode = Settings.Mode.Rayman3PC;
     public string gameDataBinFolder;
     public string lvlName;
 
@@ -23,6 +24,7 @@ public class Controller : MonoBehaviour {
     public Material billboardAdditiveMaterial;
     public SectorManager sectorManager;
     public LightManager lightManager;
+    public LoadingScreen loadingScreen;
     public bool allowDeadPointers = false;
     public bool forceDisplayBackfaces = false;
     public bool blockyMode = false;
@@ -30,10 +32,21 @@ public class Controller : MonoBehaviour {
     bool viewCollision_ = false;
     public bool viewCollision = false;
 
+    public enum State {
+        None,
+        Downloading,
+        Loading,
+        Initializing,
+        Finished
+    }
+    private State state = State.None;
+    private string detailedState = "None";
+
     // Use this for initialization
     void Start() {
         // Read command line arguments
         string[] args = System.Environment.GetCommandLineArgs();
+        string modeString = "";
         for (int i = 0; i < args.Length; i++) {
             switch (args[i]) {
                 case "--lvl":
@@ -50,42 +63,69 @@ public class Controller : MonoBehaviour {
                     break;
                 case "--mode":
                 case "-m":
-                    switch (args[i + 1]) {
-                        case "r3_gc":
-                            mode = MapLoader.Mode.Rayman3GC; break;
-                        case "ra_gc":
-                            mode = MapLoader.Mode.RaymanArenaGC; break;
-                        case "r3_pc":
-                            mode = MapLoader.Mode.Rayman3PC; break;
-                        case "ra_pc":
-                            mode = MapLoader.Mode.RaymanArenaPC; break;
-                        case "r2_pc":
-                            mode = MapLoader.Mode.Rayman2PC; break;
-                        case "r2_dc":
-                            mode = MapLoader.Mode.Rayman2DC; break;
-                        case "r2_ios":
-                            mode = MapLoader.Mode.Rayman2IOS; break;
-                        case "dd_pc":
-                            mode = MapLoader.Mode.DonaldDuckPC; break;
-                        case "tt_pc":
-                            mode = MapLoader.Mode.TonicTroublePC; break;
-                        case "r2_demo1_pc":
-                            mode = MapLoader.Mode.Rayman2PCDemo1; break;
-                        case "r2_demo2_pc":
-                            mode = MapLoader.Mode.Rayman2PCDemo2; break;
-                        case "playmobil_hype_pc":
-                            mode = MapLoader.Mode.PlaymobilHypePC; break;
-                        case "playmobil_alex_pc":
-                            mode = MapLoader.Mode.PlaymobilAlexPC; break;
-                        case "playmobil_laura_pc":
-                            mode = MapLoader.Mode.PlaymobilLauraPC; break;
-                    }
+                    modeString = args[i + 1];
+                    i++;
                     break;
             }
         }
-
+        if (Application.platform == RuntimePlatform.WebGLPlayer) {
+            string url = Application.absoluteURL;
+            if (url.IndexOf('?') > 0) {
+                string urlArgsStr = url.Split('?')[1];
+                if (urlArgsStr.Length > 0) {
+                    string[] urlArgs = urlArgsStr.Split('&');
+                    foreach (string arg in urlArgs) {
+                        string[] argKeyVal = arg.Split('=');
+                        if (argKeyVal.Length > 1) {
+                            switch (argKeyVal[0]) {
+                                case "lvl":
+                                    lvlName = argKeyVal[1]; break;
+                                case "mode":
+                                    modeString = argKeyVal[1]; break;
+                                case "folder":
+                                case "directory":
+                                case "dir":
+                                    gameDataBinFolder = argKeyVal[1]; break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        switch (modeString) {
+            case "r3_gc":
+                mode = Settings.Mode.Rayman3GC; break;
+            case "ra_gc":
+                mode = Settings.Mode.RaymanArenaGC; break;
+            case "r3_pc":
+                mode = Settings.Mode.Rayman3PC; break;
+            case "ra_pc":
+                mode = Settings.Mode.RaymanArenaPC; break;
+            case "r2_pc":
+                mode = Settings.Mode.Rayman2PC; break;
+            case "r2_dc":
+                mode = Settings.Mode.Rayman2DC; break;
+            case "r2_ios":
+                mode = Settings.Mode.Rayman2IOS; break;
+            case "dd_pc":
+                mode = Settings.Mode.DonaldDuckPC; break;
+            case "tt_pc":
+                mode = Settings.Mode.TonicTroublePC; break;
+            case "r2_demo1_pc":
+                mode = Settings.Mode.Rayman2PCDemo1; break;
+            case "r2_demo2_pc":
+                mode = Settings.Mode.Rayman2PCDemo2; break;
+            case "playmobil_hype_pc":
+                mode = Settings.Mode.PlaymobilHypePC; break;
+            case "playmobil_alex_pc":
+                mode = Settings.Mode.PlaymobilAlexPC; break;
+            case "playmobil_laura_pc":
+                mode = Settings.Mode.PlaymobilLauraPC; break;
+        }
+        loadingScreen.Active = true;
+        Settings.Init(mode);
         loader = MapLoader.Loader;
-        loader.mode = mode;
+        loader.controller = this;
         loader.gameDataBinFolder = gameDataBinFolder;
         loader.lvlName = lvlName;
         loader.allowDeadPointers = allowDeadPointers;
@@ -99,15 +139,60 @@ public class Controller : MonoBehaviour {
         loader.billboardMaterial = billboardMaterial;
         loader.billboardAdditiveMaterial = billboardAdditiveMaterial;
 
-        loader.Load();
+        /*if (Application.platform == RuntimePlatform.WebGLPlayer) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {
+            StartCoroutine(DownloadInit());
+        } else {*/
+        StartCoroutine(Init());
+        //}
+    }
+
+    /*IEnumerator DownloadInit() {
+        state = State.Downloading;
+        string[] requiredFiles = {
+            "FIX.DAT",
+            "FIX.TEX",
+            lvlName + "/" + lvlName + ".DAT",
+            lvlName + "/" + lvlName + ".TEX",
+            "TEXTS/ENGLISH.LNG",
+            "TEXTS/FRENCH.LNG",
+            "TEXTS/GERMAN.LNG",
+            "TEXTS/ITALIAN.LNG",
+            "TEXTS/SPANISH.LNG",
+        };
+        foreach (string file in requiredFiles) {
+            detailedState = "Downloading file: " + file;
+            string path = loader.gameDataBinFolder + "/" + file;
+            yield return FileSystem.DownloadFile(path);
+        }
+        yield return StartCoroutine(Init());
+    }*/
+
+    IEnumerator Init() {
+        state = State.Loading;
+        yield return StartCoroutine(loader.Load());
+        state = State.Initializing;
+        detailedState = "Initializing sectors";
         sectorManager.Init();
+        detailedState = "Initializing lights";
         lightManager.Init();
-        InitPersos();
+        detailedState = "Initializing persos";
+        yield return StartCoroutine(InitPersos());
+        detailedState = "Initializing camera";
         InitCamera();
         if (viewCollision) UpdateViewCollision();
+        detailedState = "Finished";
+        loadingScreen.Active = false;
     }
+
 	// Update is called once per frame
 	void Update () {
+        if (loadingScreen.Active) {
+            if (state == State.Loading) {
+                loadingScreen.LoadingText = loader.loadingState;
+            } else {
+                loadingScreen.LoadingText = detailedState;
+            }
+        }
         if (Input.GetKeyDown(KeyCode.C)) {
             viewCollision = !viewCollision;
         }
@@ -116,9 +201,11 @@ public class Controller : MonoBehaviour {
         }
     }
 
-    public void InitPersos() {
+    public IEnumerator InitPersos() {
         if (loader != null) {
             for (int i = 0; i < loader.persos.Count; i++) {
+                detailedState = "Initializing persos: " + i + "/" + loader.persos.Count;
+                yield return null;
                 Perso p = loader.persos[i];
                 PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
                 unityBehaviour.controller = this;
@@ -127,17 +214,17 @@ public class Controller : MonoBehaviour {
                 } else {
                     unityBehaviour.sector = sectorManager.GetActiveSectorsAtPoint(p.Gao.transform.position).FirstOrDefault();
                 }
-                if (p.SuperObject!=null && p.SuperObject.Gao!=null)
-                {
-                    Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
-                    if (mod!=null)
-                    {
+                Moddable mod = null;
+                if (p.SuperObject!=null && p.SuperObject.Gao!=null) {
+                    mod = p.SuperObject.Gao.GetComponent<Moddable>();
+                    if (mod!=null) {
                         mod.persoBehaviour = unityBehaviour;
                     }
                 }
                 unityBehaviour.perso = p;
                 unityBehaviour.Init();
-
+                
+                // Scripts
                 if (p.Gao) {
                     if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
                         if (p.brain.mind.AI_model.behaviors_normal != null) {
@@ -198,7 +285,6 @@ public class Controller : MonoBehaviour {
                             int iter = 0;
                             
                             foreach (Macro macro in macros) {
-
                                 GameObject behaviorGao = new GameObject(macro.name);
                                 behaviorGao.transform.parent = macroParent.transform;
                                 ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
@@ -206,41 +292,24 @@ public class Controller : MonoBehaviour {
                                 iter++;
                             }
                         }
-
-                        // DsgVars
-                        if (p.brain.mind.dsgMem != null) {
-                            DsgVarComponent dsgVarComponent = p.Gao.AddComponent<DsgVarComponent>();
-                            dsgVarComponent.SetPerso(p);
-
-                            if (p.SuperObject != null && p.SuperObject.Gao != null) {
-                                Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
-                                if (mod != null) {
-                                    mod.dsgVarComponent = dsgVarComponent;
-                                }
-                            }
-                        }
-                        
-                        // Dynam
-                        if (p.dynam!=null && p.dynam.dynamics!=null) {
-                            DynamicsMechanicsComponent dynamicsBehaviour = p.Gao.AddComponent<DynamicsMechanicsComponent>();
-                            dynamicsBehaviour.SetDynamics(p.dynam.dynamics);
-                        }
-
-                        if (p.brain!=null && p.brain.mind!=null) {
-                            MindComponent mindComponent = p.Gao.AddComponent<MindComponent>();
-                            mindComponent.Init(p, p.brain.mind);
-
-                            if (p.SuperObject != null && p.SuperObject.Gao != null) {
-                                Moddable mod = p.SuperObject.Gao.GetComponent<Moddable>();
-                                if (mod != null) {
-                                    mod.mindComponent = mindComponent;
-                                }
-                            }
-                        }
-
                     }
-                }
-                if (p.Gao != null) {
+                    // DsgVars
+                    if (p.brain != null && p.brain.mind != null && p.brain.mind.dsgMem != null) {
+                        DsgVarComponent dsgVarComponent = p.Gao.AddComponent<DsgVarComponent>();
+                        dsgVarComponent.SetPerso(p);
+                        if (mod != null) mod.dsgVarComponent = dsgVarComponent;
+                    }
+                    // Dynam
+                    if (p.dynam != null && p.dynam.dynamics != null) {
+                        DynamicsMechanicsComponent dynamicsBehaviour = p.Gao.AddComponent<DynamicsMechanicsComponent>();
+                        dynamicsBehaviour.SetDynamics(p.dynam.dynamics);
+                    }
+                    // Mind
+                    if (p.brain != null && p.brain.mind != null) {
+                        MindComponent mindComponent = p.Gao.AddComponent<MindComponent>();
+                        mindComponent.Init(p, p.brain.mind);
+                        if (mod != null) mod.mindComponent = mindComponent;
+                    }
                     // Custom Bits
                     if (p.stdGame != null) {
                         CustomBitsComponent c = p.Gao.AddComponent<CustomBitsComponent>();

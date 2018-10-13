@@ -331,7 +331,7 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt16();
             }
             sm.off_disconnected_triangles_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_vertices
-            if (l.mode == MapLoader.Mode.Rayman3GC) reader.ReadUInt32();
+            if (Settings.s.mode == Settings.Mode.Rayman3GC) reader.ReadUInt32();
             sm.off_mapping_uvs_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
             sm.off_weights_spe = Pointer.Read(reader); // 1 entry = 3 floats
             sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats

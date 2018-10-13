@@ -31,7 +31,7 @@ namespace OpenSpace.Object.Properties {
                 if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
                     return off_state_next;
                 } else {
-                    if (MapLoader.Loader.mode == MapLoader.Mode.RaymanArenaGC) {
+                    if (Settings.s.mode == Settings.Mode.RaymanArenaGC) {
                         return offset + 0x28;
                     } else {//if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2DC) {
                         return offset + 0x20;

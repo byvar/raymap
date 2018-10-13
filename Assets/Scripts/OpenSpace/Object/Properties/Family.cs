@@ -82,7 +82,7 @@ namespace OpenSpace.Object.Properties {
             f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader));
             if (f.objectLists.off_head == f.objectLists.off_tail && f.objectLists.Count > 1) f.objectLists.Count = 1; // Correction for Rayman 2
             f.off_bounding_volume = Pointer.Read(reader);
-            if (l.mode == MapLoader.Mode.Rayman3GC || l.mode == MapLoader.Mode.Rayman3PC) {
+            if (Settings.s.game == Settings.Game.R3) {
                 f.off_vector4s = Pointer.Read(reader);
                 f.num_vector4s = reader.ReadUInt32();
                 reader.ReadUInt32();

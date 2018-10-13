@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace;
+using System;
 using System.IO;
 using System.Text;
 
@@ -71,7 +72,7 @@ namespace VrSharp.PvrTexture
             if (pixelCodec == null) return false;
 
             // Get the number of colors contained in the palette
-            paletteEntries = BitConverter.ToUInt16(encodedData, 0x0E);
+            paletteEntries = Util.ToUInt16(encodedData, 0x0E, true);
 
             return true;
         }
@@ -89,7 +90,7 @@ namespace VrSharp.PvrTexture
         {
             if (length >= 16 &&
                 PTMethods.Contains(source, offset + 0x00, Encoding.UTF8.GetBytes("PVPL")) &&
-                BitConverter.ToUInt32(source, offset + 0x04) == length - 8)
+                Util.ToUInt32(source, offset + 0x04, true) == length - 8)
                 return true;
 
             return false;
@@ -143,7 +144,7 @@ namespace VrSharp.PvrTexture
         /// <returns>True if this is a PVP palette, false otherwise.</returns>
         public static bool Is(string file)
         {
-            using (FileStream stream = File.OpenRead(file))
+            using (Stream stream = FileSystem.GetFileReadStream(file))
             {
                 return Is(stream);
             }

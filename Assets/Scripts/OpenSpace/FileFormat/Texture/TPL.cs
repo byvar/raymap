@@ -15,7 +15,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public Texture2D[] textures = null;
         public TPL(string path) {
-            FileStream fs = new FileStream(path, FileMode.Open);
+            Stream fs = FileSystem.GetFileReadStream(path);
             using (Reader reader = new Reader(fs, isLittleEndian)) {
                 reader.ReadUInt32();
                 count = reader.ReadUInt32();
@@ -62,7 +62,7 @@ namespace OpenSpace.FileFormat.Texture {
             }
         }
 
-        private Texture2D ReadTexture(FileStream fs, Reader reader, int height, int width, LibGC.Texture.GcTextureFormat format) {
+        private Texture2D ReadTexture(Stream fs, Reader reader, int height, int width, LibGC.Texture.GcTextureFormat format) {
             GcTextureFormatCodec codec = GcTextureFormatCodec.GetCodec(format);
             int byteSize = codec.CalcTextureSize(width, height);
             //int stride = (width / block_width) * bpp / 8;

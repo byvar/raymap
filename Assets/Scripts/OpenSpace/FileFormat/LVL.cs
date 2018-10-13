@@ -8,7 +8,7 @@ namespace OpenSpace.FileFormat {
     public class LVL : FileWithPointers {
         string path;
 
-        public LVL(string name, string path, int fileID) : this(name, File.OpenRead(path), fileID) {
+        public LVL(string name, string path, int fileID) : this(name, FileSystem.GetFileReadStream(path), fileID) {
             this.path = path;
         }
 
@@ -21,8 +21,8 @@ namespace OpenSpace.FileFormat {
         }
 
         public void ReadPTR(string path) {
-            if (!File.Exists(path)) return;
-            Stream ptrStream = File.OpenRead(path);
+            if (!FileSystem.FileExists(path)) return;
+            Stream ptrStream = FileSystem.GetFileReadStream(path);
             long totalSize = ptrStream.Length;
             using (Reader ptrReader = new Reader(ptrStream, Settings.s.IsLittleEndian)) {
                 uint num_ptrs = ptrReader.ReadUInt32();

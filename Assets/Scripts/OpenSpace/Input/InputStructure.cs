@@ -18,9 +18,9 @@ namespace OpenSpace.Input {
             InputStructure input = new InputStructure(offset);
             if (Settings.s.platform == Settings.Platform.GC) {
                 //reader.ReadBytes(0x1714);
-                if (MapLoader.Loader.mode == MapLoader.Mode.Rayman3GC) {
+                if (Settings.s.game == Settings.Game.R3) {
                     reader.ReadBytes(0x12E0);
-                } else if (MapLoader.Loader.mode == MapLoader.Mode.RaymanArenaGC) {
+                } else if (Settings.s.game == Settings.Game.RA) {
                     //reader.ReadBytes(0x16e8);
                     reader.ReadBytes(0x12C8);
                 }

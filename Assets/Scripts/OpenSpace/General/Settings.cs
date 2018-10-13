@@ -7,6 +7,17 @@ using LinkedListType = OpenSpace.LinkedList.Type;
 
 namespace OpenSpace {
     public class Settings {
+        public enum Mode {
+            Rayman3PC, Rayman3GC,
+            RaymanArenaPC, RaymanArenaGC,
+            Rayman2PC, Rayman2DC, Rayman2IOS,
+            Rayman2PCDemo2, Rayman2PCDemo1,
+            DonaldDuckPC,
+            TonicTroublePC, TonicTroubleSEPC,
+            PlaymobilHypePC, PlaymobilAlexPC, PlaymobilLauraPC
+        };
+        public Mode mode = Mode.Rayman3PC;
+
         public enum EngineVersion {
             TT = 0,
             Montreal = 1,
@@ -39,6 +50,27 @@ namespace OpenSpace {
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
+        }
+
+        public static void Init(Mode mode) {
+            switch (mode) {
+                case Mode.Rayman2IOS: s = Settings.R2IOS; break;
+                case Mode.Rayman2DC: s = Settings.R2DC; break;
+                case Mode.Rayman2PC: s = Settings.R2PC; break;
+                case Mode.Rayman2PCDemo1: s = Settings.R2PCDemo1; break;
+                case Mode.Rayman2PCDemo2: s = Settings.R2PCDemo2; break;
+                case Mode.Rayman3GC: s = Settings.R3GC; break;
+                case Mode.Rayman3PC: s = Settings.R3PC; break;
+                case Mode.RaymanArenaGC: s = Settings.RAGC; break;
+                case Mode.RaymanArenaPC: s = Settings.RAPC; break;
+                case Mode.DonaldDuckPC: s = Settings.DDPC; break;
+                case Mode.TonicTroublePC: s = Settings.TTPC; break;
+                case Mode.TonicTroubleSEPC: s = Settings.TTSEPC; break;
+                case Mode.PlaymobilHypePC: s = Settings.PlaymobilHypePC; break;
+                case Mode.PlaymobilAlexPC: s = Settings.PlaymobilAlexPC; break;
+                case Mode.PlaymobilLauraPC: s = Settings.PlaymobilLauraPC; break;
+            }
+            if (s != null) s.mode = mode;
         }
 
 

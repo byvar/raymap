@@ -41,7 +41,7 @@ namespace OpenSpace.FileFormat {
         SNAMemoryBlock dlg;
         int tmpModule = 10;
 
-        public SNA(string name, string path, RelocationTable rtb) : this(name, File.OpenRead(path), rtb) {
+        public SNA(string name, string path, RelocationTable rtb) : this(name, FileSystem.GetFileReadStream(path), rtb) {
             this.path = path;
         }
 
@@ -217,7 +217,7 @@ namespace OpenSpace.FileFormat {
 
         public void ReadGPT(string path, RelocationTable rtp) {
             this.rtp = rtp;
-            Stream gptStream = File.OpenRead(path);
+            Stream gptStream = FileSystem.GetFileReadStream(path);
             uint gptOffset = (uint)data.Length;
             byte[] gptData = null;
             using (Reader gptReader = new Reader(gptStream, Settings.s.IsLittleEndian)) {
@@ -245,7 +245,7 @@ namespace OpenSpace.FileFormat {
 
         public void ReadDLG(string path, RelocationTable rtd) {
             this.rtd = rtd;
-            Stream dlgStream = File.OpenRead(path);
+            Stream dlgStream = FileSystem.GetFileReadStream(path);
             uint dlgOffset = (uint)data.Length;
             byte[] dlgData = null;
             using (Reader dlgReader = new Reader(dlgStream, Settings.s.IsLittleEndian)) {
@@ -270,7 +270,7 @@ namespace OpenSpace.FileFormat {
         }
 
         public void ReadSDA(string path) {
-            Stream sdaStream = File.OpenRead(path);
+            Stream sdaStream = FileSystem.GetFileReadStream(path);
             uint sdaOffset = (uint)data.Length;
             byte[] sdaData = null;
             using (Reader sdaReader = new Reader(sdaStream, Settings.s.IsLittleEndian)) {
@@ -286,7 +286,7 @@ namespace OpenSpace.FileFormat {
 
         public void ReadPTX(string path, RelocationTable rtt) {
             this.rtt = rtt;
-            Stream ptxStream = File.OpenRead(path);
+            Stream ptxStream = FileSystem.GetFileReadStream(path);
             uint ptxOffset = (uint)data.Length;
             byte[] ptxData = null;
             using (Reader ptxReader = new Reader(ptxStream, Settings.s.IsLittleEndian)) {

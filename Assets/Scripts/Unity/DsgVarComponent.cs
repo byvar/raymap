@@ -17,8 +17,7 @@ namespace OpenSpace
         public DsgVarInfoEntry[] dsgVarEntries;
         public DsgVarEditableEntry[] editableEntries;
 
-        public class DsgVarEditableEntry
-        {
+        public class DsgVarEditableEntry {
             public DsgVarInfoEntry entry;
             public int number;
 
@@ -147,94 +146,6 @@ namespace OpenSpace
                         case DsgVarInfoEntry.DsgVarType.Float:      writer.Write(this.valueAsFloat_initial); break;
                         case DsgVarInfoEntry.DsgVarType.Vector:     writer.Write(this.valueAsVector_initial.x); writer.Write(this.valueAsVector_initial .y); writer.Write(this.valueAsVector_initial.z); break;
                     }
-                }
-            }
-
-            public void DrawInspector()
-            {
-                GUILayout.Label(entry.type + " dsgVar_" + number);
-                string stringVal = "";
-                switch (entry.type) {
-                    case DsgVarInfoEntry.DsgVarType.Boolean: this.valueAsBool = EditorGUILayout.Toggle(this.valueAsBool); break;
-                    case DsgVarInfoEntry.DsgVarType.Int:    stringVal = GUILayout.TextField(this.valueAsInt.ToString()); Int32.TryParse(stringVal, out this.valueAsInt); break;
-                    case DsgVarInfoEntry.DsgVarType.UInt:   stringVal = GUILayout.TextField(this.valueAsUInt.ToString()); UInt32.TryParse(stringVal, out this.valueAsUInt); break;
-                    case DsgVarInfoEntry.DsgVarType.Short:  stringVal = GUILayout.TextField(this.valueAsShort.ToString()); Int16.TryParse(stringVal, out this.valueAsShort); break;
-                    case DsgVarInfoEntry.DsgVarType.UShort: stringVal = GUILayout.TextField(this.valueAsUShort.ToString()); UInt16.TryParse(stringVal, out this.valueAsUShort); break;
-                    case DsgVarInfoEntry.DsgVarType.Byte:   stringVal = GUILayout.TextField(this.valueAsSByte.ToString()); SByte.TryParse(stringVal, out this.valueAsSByte); break;
-                    case DsgVarInfoEntry.DsgVarType.UByte:  stringVal = GUILayout.TextField(this.valueAsByte.ToString()); Byte.TryParse(stringVal, out this.valueAsByte); break;
-                    case DsgVarInfoEntry.DsgVarType.Float:  stringVal = GUILayout.TextField(this.valueAsFloat.ToString()); Single.TryParse(stringVal, out this.valueAsFloat); break;
-                    case DsgVarInfoEntry.DsgVarType.Text:   stringVal = GUILayout.TextField(this.valueAsString.ToString()); valueAsString = stringVal; break;
-                    case DsgVarInfoEntry.DsgVarType.Vector:
-                        float val_x = this.valueAsVector.x;
-                        float val_y = this.valueAsVector.y;
-                        float val_z = this.valueAsVector.z;
-                        stringVal = GUILayout.TextField(this.valueAsVector.x.ToString()); Single.TryParse(stringVal, out val_x);
-                        stringVal = GUILayout.TextField(this.valueAsVector.y.ToString()); Single.TryParse(stringVal, out val_y);
-                        stringVal = GUILayout.TextField(this.valueAsVector.z.ToString()); Single.TryParse(stringVal, out val_z);
-                        this.valueAsVector = new Vector3(val_x, val_y, val_z);
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.Perso:
-                        PersoBehaviour currentPersoBehaviour = valueAsPersoGao != null ? valueAsPersoGao.GetComponent<PersoBehaviour>() : null;
-                        PersoBehaviour selectedPersoBehaviour = ((PersoBehaviour)EditorGUILayout.ObjectField(currentPersoBehaviour, typeof(PersoBehaviour), true));
-
-                        if (selectedPersoBehaviour != null && selectedPersoBehaviour.gameObject != null) {
-                            this.valueAsPersoGao = selectedPersoBehaviour.gameObject;
-                        }
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.SuperObject:
-                        GameObject currentGao = valueAsSuperObjectGao != null ? valueAsSuperObjectGao : null;
-                        GameObject selectedGao = ((GameObject)EditorGUILayout.ObjectField(currentGao, typeof(GameObject), true));
-
-                        if (selectedGao != null) {
-                            this.valueAsSuperObjectGao = selectedGao;
-                        }
-                        break;
-
-
-                }
-
-                if (entry.initialValue != null) {
-                    GUILayout.Space(20);
-
-                    switch (entry.type) {
-                        case DsgVarInfoEntry.DsgVarType.Boolean: this.valueAsBool_initial = EditorGUILayout.Toggle(this.valueAsBool_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Int: stringVal = GUILayout.TextField(this.valueAsInt_initial.ToString()); Int32.TryParse(stringVal, out this.valueAsInt_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.UInt: stringVal = GUILayout.TextField(this.valueAsUInt_initial.ToString()); UInt32.TryParse(stringVal, out this.valueAsUInt_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Short: stringVal = GUILayout.TextField(this.valueAsShort_initial.ToString()); Int16.TryParse(stringVal, out this.valueAsShort_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.UShort: stringVal = GUILayout.TextField(this.valueAsUShort_initial.ToString()); UInt16.TryParse(stringVal, out this.valueAsUShort_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Byte: stringVal = GUILayout.TextField(this.valueAsSByte_initial.ToString()); SByte.TryParse(stringVal, out this.valueAsSByte_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.UByte: stringVal = GUILayout.TextField(this.valueAsByte_initial.ToString()); Byte.TryParse(stringVal, out this.valueAsByte_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Float: stringVal = GUILayout.TextField(this.valueAsFloat_initial.ToString()); Single.TryParse(stringVal, out this.valueAsFloat_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Text: stringVal = GUILayout.TextField(this.valueAsString_initial.ToString()); valueAsString_initial = stringVal; break;
-                        case DsgVarInfoEntry.DsgVarType.Vector:
-                            float val_x = this.valueAsVector_initial.x;
-                            float val_y = this.valueAsVector_initial.y;
-                            float val_z = this.valueAsVector_initial.z;
-                            stringVal = GUILayout.TextField(this.valueAsVector_initial.x.ToString()); Single.TryParse(stringVal, out val_x);
-                            stringVal = GUILayout.TextField(this.valueAsVector_initial.y.ToString()); Single.TryParse(stringVal, out val_y);
-                            stringVal = GUILayout.TextField(this.valueAsVector_initial.z.ToString()); Single.TryParse(stringVal, out val_z);
-                            this.valueAsVector_initial = new Vector3(val_x, val_y, val_z);
-                            break;
-                        case DsgVarInfoEntry.DsgVarType.Perso:
-                            PersoBehaviour currentPersoBehaviour = valueAsPersoGao_initial != null ? valueAsPersoGao_initial.GetComponent<PersoBehaviour>() : null;
-                            PersoBehaviour selectedPersoBehaviour = ((PersoBehaviour)EditorGUILayout.ObjectField(currentPersoBehaviour, typeof(PersoBehaviour), true));
-
-                            if (selectedPersoBehaviour != null && selectedPersoBehaviour.gameObject != null) {
-                                this.valueAsPersoGao_initial = selectedPersoBehaviour.gameObject;
-                            }
-                            break;
-                        case DsgVarInfoEntry.DsgVarType.SuperObject:
-                            GameObject currentGao = valueAsSuperObjectGao_initial != null ? valueAsSuperObjectGao_initial : null;
-                            GameObject selectedGao = ((GameObject)EditorGUILayout.ObjectField(currentGao, typeof(GameObject), true));
-
-                            if (selectedGao != null) {
-                                this.valueAsSuperObjectGao_initial = selectedGao;
-                            }
-                            break;
-
-                    }
-                } else {
-                    GUILayout.FlexibleSpace();
                 }
             }
         }

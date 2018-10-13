@@ -9,27 +9,39 @@ public class ScriptComponent : MonoBehaviour {
     public string offset;
     public bool showOffset = false;
 
-    [TextArea(30,80)]
-    public string translatedScript;
+    private TranslatedScript translation = null;
+    private string translatedScript = null;
+    public string TranslatedScript {
+        get {
+            if ((forceUpdateScript || translatedScript == null) && translation != null) {
+                translatedScript = translation.ToString();
+                forceUpdateScript = false;
+                //translation = null;
+            }
+            return translatedScript;
+        }
+    }
 
     public void SetScript(Script script, Perso perso) {
         if (script != null) {
             this.script = script;
             this.perso = perso;
-            TranslatedScript translation = new TranslatedScript(script, perso);
+            translation = new TranslatedScript(script, perso);
             translation.printAddresses = showOffset;
-            translatedScript = translation.ToString();
+            //translatedScript = translation.ToString();
             offset = script.offset.ToString();
         }
     }
 
     private bool _showOffset = false;
+    private bool forceUpdateScript = false;
     public void Update()
     {
         if (showOffset!=_showOffset)
         {
             _showOffset = showOffset;
-            SetScript(this.script, this.perso);
+            forceUpdateScript = true;
+            //SetScript(this.script, this.perso);
         }
     }
 }

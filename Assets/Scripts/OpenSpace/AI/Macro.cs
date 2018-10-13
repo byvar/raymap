@@ -26,8 +26,8 @@ namespace OpenSpace.AI {
             m.aiModel = model;
             m.number = number;
 
-            if (l.mode == MapLoader.Mode.Rayman3GC) {
-                m.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
+            if (Settings.s.hasNames) {
+                m.name = reader.ReadString(0x100);
             } else {
                 m.name = "Macro " + number;
             }

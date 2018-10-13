@@ -83,7 +83,7 @@ namespace OpenSpace.Visual {
             } else {
                 m.off_blendWeights = Pointer.Read(reader);
             }
-            if (l.mode != MapLoader.Mode.RaymanArenaGC) {
+            if (Settings.s.mode != Settings.Mode.RaymanArenaGC) {
                 reader.ReadInt32();
             }
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();

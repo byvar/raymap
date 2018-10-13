@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace;
+using System;
 using System.IO;
 
 namespace VrSharp.PvrTexture
@@ -115,12 +116,12 @@ namespace VrSharp.PvrTexture
             if (PTMethods.Contains(encodedData, 0x00, gbixFourCC))
             {
                 gbixOffset = 0x00;
-                pvrtOffset = 0x08 + BitConverter.ToInt32(encodedData, gbixOffset + 4);
+                pvrtOffset = 0x08 + Util.ToInt32(encodedData, gbixOffset + 4, true);
             }
             else if (PTMethods.Contains(encodedData, 0x04, gbixFourCC))
             {
                 gbixOffset = 0x04;
-                pvrtOffset = 0x0C + BitConverter.ToInt32(encodedData, gbixOffset + 4);
+                pvrtOffset = 0x0C + Util.ToInt32(encodedData, gbixOffset + 4, true);
             }
             else if (PTMethods.Contains(encodedData, 0x04, pvrtFourCC))
             {
@@ -136,7 +137,7 @@ namespace VrSharp.PvrTexture
             // Read the global index (if it is present). If it is not present, just set it to 0.
             if (gbixOffset != -1)
             {
-                globalIndex = BitConverter.ToUInt32(encodedData, gbixOffset + 0x08);
+                globalIndex = Util.ToUInt32(encodedData, gbixOffset + 0x08, true);
             }
             else
             {
@@ -144,8 +145,8 @@ namespace VrSharp.PvrTexture
             }
 
             // Read information about the texture
-            textureWidth  = BitConverter.ToUInt16(encodedData, pvrtOffset + 0x0C);
-            textureHeight = BitConverter.ToUInt16(encodedData, pvrtOffset + 0x0E);
+            textureWidth  = Util.ToUInt16(encodedData, pvrtOffset + 0x0C, true);
+            textureHeight = Util.ToUInt16(encodedData, pvrtOffset + 0x0E, true);
 
             pixelFormat = (PvrPixelFormat)encodedData[pvrtOffset + 0x08];
             dataFormat  = (PvrDataFormat)encodedData[pvrtOffset + 0x09];
@@ -260,7 +261,7 @@ namespace VrSharp.PvrTexture
         private PvrCompressionFormat GetCompressionFormat(byte[] data, int pvrtOffset, int dataOffset)
         {
             // RLE compression
-            if (BitConverter.ToUInt32(data, 0x00) == BitConverter.ToUInt32(data, pvrtOffset + 4) - pvrtOffset + dataOffset + 8)
+            if (Util.ToUInt32(data, 0x00, true) == Util.ToUInt32(data, pvrtOffset + 4, true) - pvrtOffset + dataOffset + 8)
                 return PvrCompressionFormat.Rle;
 
             return PvrCompressionFormat.None;
@@ -280,7 +281,7 @@ namespace VrSharp.PvrTexture
         {
             return PTMethods.Contains(source, offset, pvrtFourCC)
                 && source[offset + 0x09] < 0x60
-                && BitConverter.ToUInt32(source, offset + 0x04) == length - 8;
+                && Util.ToUInt32(source, offset + 0x04, true) == length - 8;
         }
 
         /// <summary>
@@ -300,7 +301,7 @@ namespace VrSharp.PvrTexture
 
             // Immediately after the "GBIX" part of the GBIX header, there is
             // an offset indicating where the PVRT header begins relative to 0x08.
-            int pvrtOffset = BitConverter.ToInt32(source, offset + 0x04) + 8;
+            int pvrtOffset = Util.ToInt32(source, offset + 0x04, true) + 8;
             return IsValidPvrt(source, offset + pvrtOffset, length - pvrtOffset);
         }
 
@@ -326,13 +327,13 @@ namespace VrSharp.PvrTexture
             }
 
             // GBIX and PVRT with RLE compression
-            if (length >= 36 && IsValidGbix(source, offset + 0x04, BitConverter.ToInt32(source, offset + 0x00)))
+            if (length >= 36 && IsValidGbix(source, offset + 0x04, Util.ToInt32(source, offset + 0x00, true)))
             {
                 return true;
             }
 
             // PVRT (and no GBIX chunk) with RLE compression 
-            if (length >= 20 && IsValidPvrt(source, offset + 0x04, BitConverter.ToInt32(source, offset + 0x00)))
+            if (length >= 20 && IsValidPvrt(source, offset + 0x04, Util.ToInt32(source, offset + 0x00, true)))
             {
                 return true;
             }
@@ -403,7 +404,7 @@ namespace VrSharp.PvrTexture
         /// <returns>True if this is a PVR texture, false otherwise.</returns>
         public static bool Is(string file)
         {
-            using (FileStream stream = File.OpenRead(file))
+            using (Stream stream = FileSystem.GetFileReadStream(file))
             {
                 return Is(stream);
             }

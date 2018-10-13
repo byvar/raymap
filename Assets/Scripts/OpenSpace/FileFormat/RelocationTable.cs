@@ -74,14 +74,14 @@ namespace OpenSpace.FileFormat {
                     newPath = Path.ChangeExtension(path, "rtv"); break;
             }
             this.path = newPath;
-            if (File.Exists(newPath)) {
-                Load(File.OpenRead(newPath), false);
+            if (FileSystem.FileExists(newPath)) {
+                Load(FileSystem.GetFileReadStream(newPath), false);
             } else if(dat != null) {
                 Load(dat, name, type);
             }
         }
 
-        public RelocationTable(string path) : this(File.OpenRead(path)) { }
+        public RelocationTable(string path) : this(FileSystem.GetFileReadStream(path)) { }
 
         public RelocationTable(Stream stream, bool masking = false) {
             Load(stream, masking);

@@ -136,7 +136,7 @@ public class SectorManager : MonoBehaviour {
                     if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
                         if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
                         if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
-                        r.material.SetVector("_SectorAmbient", ambientLight);
+                        //r.material.SetVector("_SectorAmbient", ambientLight);
                         r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
                         if (staticLightPosArray.Length > 0) {
                             r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);

@@ -57,7 +57,7 @@ namespace OpenSpace.FileFormat {
         public List<string> levels = new List<string>();
         public uint firstLevelIndex;
 
-        public DSB(string name, string path) : this(name, File.OpenRead(path)) { }
+        public DSB(string name, string path) : this(name, FileSystem.GetFileReadStream(path)) { }
 
         public DSB(string name, Stream stream) {
             baseOffset = 0;
@@ -201,7 +201,7 @@ namespace OpenSpace.FileFormat {
             uint id = reader.ReadUInt32();
             uint memSize;
             while (id != 0xFFFF) {
-                if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
+                if (Settings.s.mode == Settings.Mode.TonicTroublePC) {
                     switch (id) {
                         // Memory descriptions
                         case 10: reader.ReadUInt32(); break;
@@ -262,7 +262,7 @@ namespace OpenSpace.FileFormat {
         }
 
         private void ReadDirectoriesDesc() {
-            if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
+            if (Settings.s.mode == Settings.Mode.TonicTroublePC) {
                 dllDataPath = ReadString();
                 ReadString(); // gamedata/menus
                 ReadString(); // gamedata/menus/anims
@@ -378,7 +378,7 @@ namespace OpenSpace.FileFormat {
         private void ReadBigFileDesc() {
             uint id = reader.ReadUInt32();
             while (id != 0xFFFF) {
-                if (MapLoader.Loader.mode == MapLoader.Mode.TonicTroublePC) {
+                if (Settings.s.mode == Settings.Mode.TonicTroublePC) {
                     switch (id) {
                         case 19: bigfileVignettes = ReadString(); break;
                         case 20: bigfileTextures = ReadString(); break;

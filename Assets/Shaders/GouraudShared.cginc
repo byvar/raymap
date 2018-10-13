@@ -25,7 +25,7 @@ float _Blend;
 float _ShadingMode;
 
 // Lighting
-uniform float4 _SectorAmbient;
+//uniform float4 _SectorAmbient;
 uniform float4 _SectorFog;
 uniform float4 _SectorFogParams;
 float4 _StaticLightPos[512];

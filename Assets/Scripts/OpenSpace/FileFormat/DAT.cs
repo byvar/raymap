@@ -15,7 +15,7 @@ namespace OpenSpace.FileFormat {
     public class DAT : FileWithPointers {
         public DSB gameDsb;
 
-        public DAT(string name, DSB gameDsb, string path) : this(name, gameDsb, File.OpenRead(path)) { }
+        public DAT(string name, DSB gameDsb, string path) : this(name, gameDsb, FileSystem.GetFileReadStream(path)) { }
 
         public DAT(string name, DSB gameDsb, Stream stream) {
             this.gameDsb = gameDsb;
@@ -159,7 +159,7 @@ namespace OpenSpace.FileFormat {
             byte[] rtRefBytes = new byte[] { rtref.levelId, rtref.relocationType, rtref.byte2, rtref.byte3 };
             if (Settings.s.IsLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(rtRefBytes);
             uint currentMask = BitConverter.ToUInt32(rtRefBytes, 0);
-            if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2IOS) {
+            if (Settings.s.platform == Settings.Platform.iOS) {
                 return (uint)(16807 * ((currentMask ^ 0x75BD924) % 0x1F31D) - 2836 * ((currentMask ^ 0x75BD924) / 0x1F31D));
             } else {
                 return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));

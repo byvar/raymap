@@ -54,7 +54,7 @@ namespace OpenSpace.FileFormat.Texture {
             //throw new Exception("exported");
         }*/
 
-        public GF(string filePath) : this(File.OpenRead(filePath)) { }
+        public GF(string filePath) : this(FileSystem.GetFileReadStream(filePath)) { }
 
         public GF(Stream stream) {
             MapLoader l = MapLoader.Loader;
