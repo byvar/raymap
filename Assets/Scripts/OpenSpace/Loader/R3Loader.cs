@@ -54,8 +54,8 @@ namespace OpenSpace.Loader {
 
                     // Level
                     lvlNames[1] = lvlName;
-                    lvlPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".lvl";
-                    ptrPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".ptr";
+                    lvlPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".lvl";
+                    ptrPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".ptr";
                     tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ((Settings.s.mode == Settings.Mode.RaymanArenaGC) ? ".tpl" : "_Lvl.tpl");
                     yield return controller.StartCoroutine(PrepareFile(lvlPaths[1]));
                     if (FileSystem.FileExists(lvlPaths[1])) {
@@ -77,8 +77,8 @@ namespace OpenSpace.Loader {
 
                     // Vertex buffer
                     lvlNames[4] = lvlName + "_vb";
-                    lvlPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName + "_vb.lvl";
-                    ptrPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName + "_vb.ptr";
+                    lvlPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "_vb.lvl";
+                    ptrPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "_vb.ptr";
                     yield return controller.StartCoroutine(PrepareFile(lvlPaths[4]));
                     if (FileSystem.FileExists(lvlPaths[4])) {
                         yield return controller.StartCoroutine(PrepareFile(ptrPaths[4]));
@@ -95,8 +95,8 @@ namespace OpenSpace.Loader {
 
                     // Level Keyframes
                     lvlNames[6] = lvlName + "kf";
-                    lvlPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName + "kf.lvl";
-                    ptrPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName + "kf.ptr";
+                    lvlPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "kf.lvl";
+                    ptrPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "kf.ptr";
                     yield return controller.StartCoroutine(PrepareFile(lvlPaths[6]));
                     if (FileSystem.FileExists(lvlPaths[6])) {
                         yield return controller.StartCoroutine(PrepareFile(ptrPaths[6]));
@@ -523,14 +523,17 @@ namespace OpenSpace.Loader {
                     string kfName = "Anim/key" + objectTypes[0][families[i].family_index].id.ToString() + "kf";
                     int fileID = animBank + 102;
                     int kfFileID = animBank + 2; // Anim bank will start at 5, so this will start at 7
-                    yield return controller.StartCoroutine(PrepareFile(animName + ".lvl"));
-                    if (FileSystem.FileExists(animName + ".lvl")) {
-                        yield return controller.StartCoroutine(PrepareFile(animName + ".ptr"));
+
+                    // Prepare files for WebGL
+                    yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + animName + ".lvl"));
+                    if (FileSystem.FileExists(gameDataBinFolder + animName + ".lvl")) {
+                        yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + animName + ".ptr"));
                     }
-                    yield return controller.StartCoroutine(PrepareFile(kfName + "kf.lvl"));
-                    if (FileSystem.FileExists(kfName + "kf.lvl")) {
-                        yield return controller.StartCoroutine(PrepareFile(kfName + "kf.ptr"));
+                    yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + kfName + ".lvl"));
+                    if (FileSystem.FileExists(gameDataBinFolder + kfName + ".lvl")) {
+                        yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + kfName + ".ptr"));
                     }
+
                     FileWithPointers animFile = InitExtraLVL(animName, fileID);
                     FileWithPointers kfFile = InitExtraLVL(kfName, fileID);
                     if (animFile != null) {
