@@ -26,14 +26,14 @@ public class MultiTextureMaterial : MonoBehaviour {
         currentTexture = index;
         TextureInfo tex = r3mat.animTextures[index].texture;
         if (tex != null) {
-            mat.SetTexture("_MainTex", tex.Texture);
+            mat.SetTexture("_Tex0", tex.Texture);
         }
     }
 
     public void Update() {
         if (animate && !r3mat.IsLockedAnimatedTexture) {
             if (textureIndex >= 0 && textureIndex < r3mat.animTextures.Count) {
-                currentTime += Time.deltaTime;
+                currentTime += Time.deltaTime * Mathf.Abs(Settings.s.textureAnimationSpeedModifier);
                 float time = r3mat.animTextures[currentTexture].time;
                 //float time = 1f / 30f;
                 while (currentTime >= time) {

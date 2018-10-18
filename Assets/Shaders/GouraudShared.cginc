@@ -5,24 +5,26 @@
 uniform float4 _LightColor0; // color of light source (from "Lighting.cginc")
 
 // User-specified properties
-uniform float4 _Color;
 uniform float4 _AmbientCoef;
 uniform float4 _DiffuseCoef;
-uniform float4 _SpecularCoef;
-uniform float _SpecularFactor;
-uniform float4 _EmissionColor;
+
 float _NumTextures;
-sampler2D _MainTex;
-sampler2D _MainTex2;
-sampler2D _MainTex3;
-sampler2D _MainTex4;
-uniform float4 _MainTex_ST;
-uniform float4 _MainTex2_ST;
-uniform float4 _MainTex3_ST;
-uniform float4 _MainTex4_ST;
-float _UVSec;
-float _Blend;
-float _ShadingMode;
+sampler2D _Tex0;
+sampler2D _Tex1;
+sampler2D _Tex2;
+sampler2D _Tex3;
+uniform float4 _Tex0_ST;
+uniform float4 _Tex1_ST;
+uniform float4 _Tex2_ST;
+uniform float4 _Tex3_ST;
+float4 _Tex0Params;
+float4 _Tex1Params;
+float4 _Tex2Params;
+float4 _Tex3Params;
+float4 _Tex0Params2;
+float4 _Tex1Params2;
+float4 _Tex2Params2;
+float4 _Tex3Params2;
 
 // Lighting
 //uniform float4 _SectorAmbient;
@@ -58,7 +60,7 @@ float CalcSphereAttenuation(float distance, float near, float far) {
 	}
 }
 
-float4 ApplyStaticLights(float3 colRgb, float3 normalDirection, float3 multipliedPosition) {
+float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 	if(_DisableLighting == 1.0) return float4(1.0, 1.0, 1.0, 1.0);
 
 	/* Alpha light flags:
@@ -137,12 +139,29 @@ float4 ApplyStaticLights(float3 colRgb, float3 normalDirection, float3 multiplie
 	return float4(diffuseReflection, alpha);
 }
 
-v2f process_vert(appdata_full v, float isAdd) {
+float2 TransformUV(float2 uv_in, float4 tex_params, float4 tex_params_2) {
+	float2 uv_out = uv_in + tex_params_2.xy;
+	if (tex_params.y > 0) {
+		// y is scroll mode.
+		// 0: None
+		// 1: Regular scroll
+		// 2: Rotate
+		float time = floor(_Time.w * 20); // = Time.y (which is just time in seconds) * 60. Time.w = Time.y * 3
+		//float time = floor(_Time.y * 45);
+		if (tex_params.y == 1) {
+			uv_out.x = uv_out.x + time * tex_params_2.z;
+			uv_out.y = uv_out.y + time * tex_params_2.w;
+		}
+	}
+	return uv_out;
+}
+
+v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	v2f o;
-	o.uv1 = float3(TRANSFORM_TEX(v.texcoord.xy, _MainTex), v.texcoord.z);
-	o.uv2 = float3(TRANSFORM_TEX(v.texcoord1.xy, _MainTex2), v.texcoord1.z);
-	o.uv3 = float3(TRANSFORM_TEX(v.texcoord2.xy, _MainTex3), v.texcoord2.z);
-	o.uv4 = float3(TRANSFORM_TEX(v.texcoord3.xy, _MainTex4), v.texcoord3.z);
+	o.uv1 = float3(TRANSFORM_TEX(TransformUV( v.texcoord.xy, _Tex0Params, _Tex0Params2), _Tex0),  v.texcoord.z);
+	o.uv2 = float3(TRANSFORM_TEX(TransformUV(v.texcoord1.xy, _Tex1Params, _Tex1Params2), _Tex1), v.texcoord1.z);
+	o.uv3 = float3(TRANSFORM_TEX(TransformUV(v.texcoord2.xy, _Tex2Params, _Tex2Params2), _Tex2), v.texcoord2.z);
+	o.uv4 = float3(TRANSFORM_TEX(TransformUV(v.texcoord3.xy, _Tex3Params, _Tex3Params2), _Tex3), v.texcoord3.z);
 	o.pos = UnityObjectToClipPos(v.vertex);
 	float4x4 modelMatrix = unity_ObjectToWorld;
 	float4x4 modelMatrixInverse = unity_WorldToObject;
@@ -154,7 +173,7 @@ v2f process_vert(appdata_full v, float isAdd) {
 	float attenuation;
 
 	float alpha = 1.0;
-	float3 colRgb = _Color.rgb * _Color.w + float3(1.0, 1.0, 1.0) * (1.0 - _Color.w);
+	//float3 colRgb = _Color.rgb * _Color.w + float3(1.0, 1.0, 1.0) * (1.0 - _Color.w);
 
 	float3 ambientLighting = 0.0;
 	/*if (isAdd == 0.0) {
@@ -171,22 +190,26 @@ v2f process_vert(appdata_full v, float isAdd) {
 		//ambientLighting = ambientLighting + colRgb * (_SpecularCoef.w/100.0);
 	}*/
 	float3 diffuseReflection = float3(0.0, 0.0, 0.0);
-	//if (isAdd == 1.0) {
-	if (0.0 == _WorldSpaceLightPos0.w) { // directional light?
-		attenuation = 1.0; // no attenuation
-		lightDirection = normalize(_WorldSpaceLightPos0.xyz);
-	} else { // point or spot light
-		float3 vertexToLightSource = _WorldSpaceLightPos0.xyz - multipliedPosition;
-		float distance = length(vertexToLightSource);
-		attenuation = 1.0 / distance; // linear attenuation
-		lightDirection = normalize(vertexToLightSource);
+	if (isLight == 0.0) {
+		//if (isAdd == 1.0) {
+		/*if (0.0 == _WorldSpaceLightPos0.w) { // directional light?
+			attenuation = 1.0; // no attenuation
+			lightDirection = normalize(_WorldSpaceLightPos0.xyz);
+		} else { // point or spot light
+			float3 vertexToLightSource = _WorldSpaceLightPos0.xyz - multipliedPosition;
+			float distance = length(vertexToLightSource);
+			attenuation = 1.0 / distance; // linear attenuation
+			lightDirection = normalize(vertexToLightSource);
+		}
+		diffuseReflection = attenuation * _LightColor0.rgb
+			//* colRgb
+			* _DiffuseCoef.xyz //* _DiffuseCoef.w
+			* max(0.0, dot(normalDirection, lightDirection));*/
+	} else {
+		diffuseReflection = float3(1.0, 1.0, 1.0);
 	}
-	diffuseReflection = attenuation * _LightColor0.rgb
-		* colRgb
-		* _DiffuseCoef.xyz //* _DiffuseCoef.w
-		* max(0.0, dot(normalDirection, lightDirection));
-	if (/*_ShadingMode == 0.0 && */isAdd == 0.0) {
-		float4 lightCol = ApplyStaticLights(colRgb, normalDirection, multipliedPosition);
+	if (/*_ShadingMode == 0.0 && */isAdd == 0.0 && isLight == 0.0) {
+		float4 lightCol = ApplyStaticLights(normalDirection, multipliedPosition);
 		diffuseReflection = diffuseReflection + lightCol.xyz;
 		alpha = lightCol.w;
 	}
@@ -222,16 +245,36 @@ v2f process_vert(appdata_full v, float isAdd) {
 	return o;
 }
 
+float4 TextureOp(float4 color_in, float4 diffuseColor, sampler2D tex, float3 uv, float4 tex_params, float4 tex_params_2, float index) {
+	float4 texColor = tex2D(tex, uv.xy);
+	//if (tex_params.w == 1 && index > 0) return color_in; // Mirrors are not supported yet
+	if (tex_params.x == 1 && index > 0) {
+		// Additive
+		return color_in + float4(texColor.xyz * texColor.w * uv.z, 0);
+	} /*else if (tex_params.w == 8888 && index > 0) {
+		float alpha = (diffuseColor.w * texColor.w * uv.z);
+		return color_in + float4(diffuseColor.xyz * texColor.xyz * alpha, alpha);
+	}*/
+	/*else if (tex_params.x == 3) {
+		// Transparent
+		return lerp(color_in, diffuseColor * float4(texColor.xyz, 1), uv.z);
+	}*/ else {
+		return lerp(color_in, diffuseColor * texColor, uv.z);
+		//color_out.a = color_out.a = color_out.a * i.diffuseColor.w;
+		//return diffuseColor * color_out;
+	}
+}
+
 float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 	float4 c = float4(0.0, 0.0, 0.0, 0.0);
 	if (_NumTextures > 0) {
-		c = lerp(c, tex2D(_MainTex, i.uv1.xy), i.uv1.z);
+		c = TextureOp(c, i.diffuseColor, _Tex0, i.uv1, _Tex0Params, _Tex0Params2, 0);
 		if (_NumTextures > 1) {
-			c = lerp(c, tex2D(_MainTex2, i.uv2.xy), i.uv2.z);
+			c = TextureOp(c, i.diffuseColor, _Tex1, i.uv2, _Tex1Params, _Tex1Params2, 1);
 			if (_NumTextures > 2) {
-				c = lerp(c, tex2D(_MainTex3, i.uv3.xy), i.uv3.z);
+				c = TextureOp(c, i.diffuseColor, _Tex2, i.uv3, _Tex2Params, _Tex2Params2, 2);
 				if (_NumTextures > 3) {
-					c = lerp(c, tex2D(_MainTex4, i.uv4.xy), i.uv4.z);
+					c = TextureOp(c, i.diffuseColor, _Tex3, i.uv4, _Tex3Params, _Tex3Params2, 3);
 				}
 			}
 		}
@@ -243,11 +286,15 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 	} else {
 		c = tex2D(_MainTex, uv1.xy);
 	}*/
-	c.a = c.a * i.diffuseColor.w;
-	clip(clipAlpha * (c.a - 1.0));
-	c.rgb = c.rgb * (1 + (_EmissionColor.rgb * 2 * _EmissionColor.a));
+	//c.a = c.a * i.diffuseColor.w;
+	if (clipAlpha < 0) {
+		clip(clipAlpha * (c.a - 1.0));
+	} else {
+		clip(clipAlpha * (c.a - 0.999));
+	}
+	//c.rgb = c.rgb * (1 + (_EmissionColor.rgb * 2 * _EmissionColor.a));
 	//if (_ShadingMode == 0.0 || isAdd == 1.0) {
-		c = float4(i.diffuseColor.xyz * c, c.a);
+		//c = float4(i.diffuseColor.xyz * c, c.a);
 	/*} else {
 		float3 colRgb = _Color.rgb * _Color.w + float3(1.0, 1.0, 1.0) * (1.0 - _Color.w);
 		float4 lightColor = ApplyStaticLights(colRgb, normalize(i.normal), i.multipliedPosition);

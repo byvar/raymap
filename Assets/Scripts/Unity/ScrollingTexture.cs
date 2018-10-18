@@ -39,13 +39,9 @@ public class ScrollingTexture : MonoBehaviour {
             for (int i = 0; i < visMat.textures.Count; i++) {
                 VisualMaterialTexture t = visMat.textures[i];
                 if (t.ScrollingEnabled) {
-                    float offsetU = t.currentScrollX + (t.IsScrollX ? currentFrame * t.ScrollX : 0);
+                    float offsetU = t.currentScrollX + (t.IsScrollX ? currentFrame * t.ScrollX: 0);
                     float offsetV = t.currentScrollY + (t.IsScrollY ? currentFrame * t.ScrollY : 0);
-                    if (i == 0) {
-                        mat.SetTextureOffset("_MainTex", new Vector2(offsetU, offsetV));
-                    } else if (i > 0 && mat.HasProperty("_MainTex" + i)) {
-                        mat.SetTextureOffset("_MainTex" + i, new Vector2(offsetU, offsetV));
-                    }
+                    mat.SetTextureOffset("_Tex" + i, new Vector2(offsetU, offsetV));
                 }
             }
         }

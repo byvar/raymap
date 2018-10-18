@@ -188,10 +188,8 @@ namespace OpenSpace.Loader {
             Pointer off_always = Pointer.Read(reader);
             Pointer.DoAt(ref reader, off_always, () => {
                 globals.num_always = reader.ReadUInt32();
-                globals.off_spawnable_perso_first = Pointer.Read(reader);
-                globals.off_spawnable_perso_last = Pointer.Read(reader);
-                globals.num_spawnable_perso = reader.ReadUInt32();
-                FillLinkedListPointers(reader, globals.off_spawnable_perso_last, off_always + 4);
+                globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+                globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
                 globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
             });
             Pointer.Read(reader);

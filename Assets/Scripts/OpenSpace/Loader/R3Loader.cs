@@ -314,9 +314,7 @@ namespace OpenSpace.Loader {
             globals.off_firstSubMapPosition = Pointer.Read(reader);
 
             globals.num_always = reader.ReadUInt32();
-            globals.off_spawnable_perso_first = Pointer.Read(reader);
-            globals.off_spawnable_perso_last = Pointer.Read(reader);
-            globals.num_spawnable_perso = reader.ReadUInt32();
+            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
             globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
             globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
             globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks

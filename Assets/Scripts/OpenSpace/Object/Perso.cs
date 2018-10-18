@@ -47,9 +47,9 @@ namespace OpenSpace.Object {
                 if (gao == null) {
                     if (nameFamily != null && nameModel != null && namePerso != null) {
                         fullName = "[" + nameFamily + "] " + nameModel + " | " + namePerso; // + " @ " + offset;
-                        if (superObject != null) {
+                        /*if (superObject != null) {
                             fullName += " - " + superObject.offset;
-                        }
+                        }*/
                     }
                     gao = new GameObject(fullName);
                     

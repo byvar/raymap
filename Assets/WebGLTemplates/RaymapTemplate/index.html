@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Raymap</title>
+		
+		
+		<!-- style sheets -->
+		<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+		<link rel="stylesheet" type="text/css" href="css/rayman-origins.css" />
+		<link rel="stylesheet" type="text/css" href="css/source-sans-pro.css" />
+        <link rel="stylesheet" type="text/css" href="css/icomoon.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css" media="all" />
+		<link rel="stylesheet" type="text/css" href="css/main.css?1" />
+		
+		<!-- colors -->
+		<link rel="stylesheet" type="text/css" href="css/colors_main.css" title="Home" />
+		<!-- javascript -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="js/jquery-1.12.4.min.js">\x3C/script>')</script>
+		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+		<script type="text/javascript" src="js/jquery.jscrollpane.js"></script>
+		<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
+		<script type="text/javascript" src="js/modernizr.custom.js"></script>
+		<script type="text/javascript" src="js/jquery.mobile.custom.min.js"></script>
+		<script type="text/javascript" src="js/main.js?1"></script>
+
+		<script type="text/javascript" src="js/UnityProgress.js"></script>
+		<script src="%UNITY_WEBGL_LOADER_URL%"></script>
+		<script>var gameInstance = UnityLoader.instantiate("gameContainer", "%UNITY_WEBGL_BUILD_URL%", {onProgress: UnityProgress});</script>
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="container">
+				<div id="columns">
+					<div class="column column-objects">
+						<div class="column-header"><span id="header-objects-text">Objects</span></div>
+						<div id="content-objects" class="column-content column-content-scroll"></div>
+						<div class="column-footer"></div>
+					</div>
+					<div class="column column-description invisible">
+						<div class="column-header"><span id="header-objects-text">Current object</span>
+							<div id="btn-close-description" class="header-button disabled-button" title="Close object description panel"><i class="icon-trash"></i></div>
+						</div>
+						<div id="content-description" class="column-content column-content-scroll">
+							<div class="input-group">
+								<div class="input vector3"><div class="label main">Position</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="posX" type="text" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="posY" type="text" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="posZ" type="text" name="z" placeholder="0"></input></div></div></div>
+								<div class="input vector3"><div class="label main">Rotation</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="rotX" type="text" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="rotY" type="text" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="rotZ" type="text" name="z" placeholder="0"></input></div></div></div>
+								<div class="input vector3"><div class="label main">Scale</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="sclX" type="text" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="sclY" type="text" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="sclZ" type="text" name="z" placeholder="0"></input></div></div></div>
+							</div>
+							<div class="input-group perso-description invisible">
+								<div class="input dropdown">
+									<div class="label main">State</div><div class="fields"><div class="field"><select id="state">
+									  <option value="none">None</option>
+									</select></div></div>
+								</div>
+							</div>
+						</div>
+						<div class="column-footer"></div>
+					</div>
+					<div class="column column-unity">
+						<div class="column-header"><span id="header-objects-text">Raymap</span></div>
+						<div id="gameContainer" class="column-content"></div>
+						<div class="column-footer">
+							<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-info-circle"></i></div>
+						</div>
+					</div>
+				</div>
+				<!--<div id="footer">
+					<span id="footer-text">Rayman © Ubisoft Entertainment</span>
+				</div>-->
+			</div>
+			<div id="popup-overlay" class="hidden-overlay" onclick=""></div>
+			<div id="dialogue-popup" class="hidden-popup"><div id="dialogue-image"></div><div id="dialogue-content"></div></div>
+			<div id="notification-popup" class="hidden-popup"></div>
+		</div>
+	</body>
+</html>

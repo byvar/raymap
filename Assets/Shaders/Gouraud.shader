@@ -1,19 +1,25 @@
 ﻿Shader "Custom/Gouraud" {
 	Properties{
 		_NumTextures("Number of textures", Float) = 0
-		_MainTex("Texture 1 (RGBA)", 2D) = "white" {}
-		_MainTex2("Texture 2 (RGBA)", 2D) = "white" {}
-		_MainTex3("Texture 3 (RGBA)", 2D) = "white" {}
-		_MainTex4("Texture 4 (RGBA)", 2D) = "white" {}
-		_Color("Color", Vector) = (1,1,1,1)
+
+		_Tex0("Texture 0 (RGBA)", 2D) = "white" {}
+		_Tex0Params("Texture 0 Parameters", Vector) = (0,0,0,0)
+		_Tex0Params2("Texture 0 Parameters 2", Vector) = (0,0,0,0)
+
+		_Tex1("Texture 1 (RGBA)", 2D) = "white" {}
+		_Tex1Params("Texture 1 Parameters", Vector) = (0,0,0,0)
+		_Tex1Params2("Texture 1 Parameters 2", Vector) = (0,0,0,0)
+
+		_Tex2("Texture 2 (RGBA)", 2D) = "white" {}
+		_Tex2Params("Texture 2 Parameters", Vector) = (0,0,0,0)
+		_Tex2Params2("Texture 2 Parameters 2", Vector) = (0,0,0,0)
+
+		_Tex3("Texture 3 (RGBA)", 2D) = "white" {}
+		_Tex3Params("Texture 3 Parameters", Vector) = (0,0,0,0)
+		_Tex3Params2("Texture 3 Parameters 2", Vector) = (0,0,0,0)
+
 		_DiffuseCoef("Diffuse Coef", Vector) = (1,1,1,1)
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
-		_SpecularCoef("Specular Coef", Vector) = (1,1,1,1)
-		_SpecularFactor("Shininess", Float) = 1
-		_EmissionColor("Emission color", Color) = (0,0,0,1)
-		[MaterialToggle] _UVSec("Use secondary UVs", Float) = 0
-		[MaterialToggle] _ShadingMode("Is fragment shaded", Float) = 0
-		[MaterialToggle] _Blend("Use secondary texture", Float) = 0
 
 		// Lighting
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
@@ -23,7 +29,7 @@
 	SubShader{
 		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
 		Pass{
-			Tags{ "LightMode" = "ForwardBase" }
+			//Tags{ "LightMode" = "ForwardBase" }
 			// pass for ambient light and first light source
 
 			CGPROGRAM
@@ -35,14 +41,14 @@
 			#include "GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
-				return process_vert(v, 0.0);
+				return process_vert(v, 0.0, 0.0);
 			}
 			float4 frag(v2f i) : COLOR{
 				return process_frag(i, 0.0, 0.0);
 			}
 			ENDCG
 		}
-		Pass{
+		/*Pass{
 			Tags{ "LightMode" = "ForwardAdd" }
 			// pass for additional light sources
 			Blend One One // additive blending 
@@ -56,13 +62,13 @@
 			#include "GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
-				return process_vert(v, 1.0);
+				return process_vert(v, 0.0, 1.0);
 			}
 			float4 frag(v2f i) : COLOR{
 				return process_frag(i, 0.0, 1.0);
 			}
 			ENDCG
-		}
+		}*/
 
 	}
 	Fallback "Specular"

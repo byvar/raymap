@@ -236,9 +236,7 @@ namespace OpenSpace {
             globals.off_firstSubMapPosition = Pointer.Read(reader);
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["always"], mem));
             globals.num_always = reader.ReadUInt32();
-            globals.off_spawnable_perso_first = Pointer.Read(reader);
-            globals.off_spawnable_perso_last = Pointer.Read(reader);
-            globals.num_spawnable_perso = reader.ReadUInt32();
+            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
             globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
             globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
             globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
@@ -295,6 +293,12 @@ namespace OpenSpace {
                     }
                 }
             }
+
+            /*if (Settings.s.memoryAddresses.ContainsKey("brightness")) {
+                Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["brightness"], mem));
+                float brightness = reader.ReadSingle();
+                Debug.LogError("BRIGHTNESS IS " + brightness);
+            }*/
 
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["inputStructure"], mem));
             inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
@@ -600,26 +604,20 @@ MonoBehaviour.print(str);
 
         public void ReadAlways(Reader reader) {
             // Parse spawnable SO's
-            if (globals.off_spawnable_perso_first != null && globals.num_spawnable_perso > 0) {
+            if (globals.spawnablePersos != null && globals.spawnablePersos.Count > 0) {
                 GameObject spawnableParent = new GameObject("Spawnable persos");
-                spawnableParent.transform.localPosition = Vector3.zero;
-                Pointer off_current = Pointer.Goto(ref reader, globals.off_spawnable_perso_first);
-                for (uint i = 0; i < globals.num_spawnable_perso; i++) {
-                    Pointer off_spawnable_next = Pointer.Read(reader);
-                    Pointer off_spawnable_prev = Pointer.Read(reader);
-                    Pointer off_spawnable_header = Pointer.Read(reader);
+                globals.spawnablePersos.ReadEntries(ref reader, (offset) => {
                     uint index = reader.ReadUInt32();
                     Pointer off_spawnable_perso = Pointer.Read(reader);
-                    if (off_spawnable_perso != null) {
-                        Pointer.Goto(ref reader, off_spawnable_perso);
-                        Perso perso = Perso.Read(reader, off_spawnable_perso, null);
+                    Perso perso = null;
+                    Pointer.DoAt(ref reader, off_spawnable_perso, () => {
+                        perso = Perso.Read(reader, off_spawnable_perso, null);
                         if (perso != null) {
                             perso.Gao.transform.parent = spawnableParent.transform;
                         }
-                    }
-                    if (off_spawnable_next != null) Pointer.Goto(ref reader, off_spawnable_next);
-                }
-                Pointer.Goto(ref reader, off_current);
+                    });
+                    return perso;
+                }, LinkedList.Flags.HasHeaderPointers);
             }
         }
 

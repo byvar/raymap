@@ -66,6 +66,12 @@ namespace OpenSpace.Visual {
             set {
                 texture = value;
                 if (texture != null) {
+                    if (!IsRepeatU) {
+                        texture.wrapModeU = TextureWrapMode.Clamp;
+                    }
+                    if (!IsRepeatV) {
+                        texture.wrapModeV = TextureWrapMode.Clamp;
+                    }
                     if (IsMirrorX) {
                         texture.wrapModeU = TextureWrapMode.Mirror;
                     }
@@ -85,6 +91,9 @@ namespace OpenSpace.Visual {
                             flipped.Apply();
                             texture = flipped;
 
+                            if (!IsRepeatU) {
+                                texture.wrapModeU = TextureWrapMode.Clamp;
+                            }
                             if (IsMirrorX) {
                                 texture.wrapModeU = TextureWrapMode.Mirror;
                             }
@@ -136,6 +145,18 @@ namespace OpenSpace.Visual {
 
         public bool IsMirrorY {
             get { return (flagsByte & 8) != 0; }
+        }
+        public bool IsRepeatU {
+            get {
+                if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
+                return (flagsByte & 2) != 0;
+            }
+        }
+        public bool IsRepeatV {
+            get {
+                if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
+                return (flagsByte & 1) != 0;
+            }
         }
 
         public bool IsWaterEffect {

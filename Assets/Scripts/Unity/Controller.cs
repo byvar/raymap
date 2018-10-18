@@ -41,6 +41,9 @@ public class Controller : MonoBehaviour {
     }
     private State state = State.None;
     private string detailedState = "None";
+    public State LoadState {
+        get { return state; }
+    }
 
     // Use this for initialization
     void Start() {
@@ -71,7 +74,7 @@ public class Controller : MonoBehaviour {
         if (Application.platform == RuntimePlatform.WebGLPlayer) {
             string url = Application.absoluteURL;
             if (url.IndexOf('?') > 0) {
-                string urlArgsStr = url.Split('?')[1];
+                string urlArgsStr = url.Split('?')[1].Split('#')[0];
                 if (urlArgsStr.Length > 0) {
                     string[] urlArgs = urlArgsStr.Split('&');
                     foreach (string arg in urlArgs) {
@@ -179,8 +182,9 @@ public class Controller : MonoBehaviour {
         yield return StartCoroutine(InitPersos());
         detailedState = "Initializing camera";
         InitCamera();
-        if (viewCollision) UpdateViewCollision();
+        /*if (viewCollision)*/ UpdateViewCollision();
         detailedState = "Finished";
+        state = State.Finished;
         loadingScreen.Active = false;
     }
 
@@ -363,6 +367,13 @@ public class Controller : MonoBehaviour {
                             if (col == null) continue;
                             col.gao.SetActive(viewCollision);
                         }
+                }
+            }
+            foreach (SuperObject so in loader.superObjects) {
+                if (so.Gao != null) {
+                    if (so.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible)) {
+                        so.Gao.SetActive(viewCollision);
+                    }
                 }
             }
         }

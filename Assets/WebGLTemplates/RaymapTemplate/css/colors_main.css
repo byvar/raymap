@@ -1,0 +1,338 @@
+html {
+	background: url('../img/background.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+body {
+	/* background: #444; */
+	color: #9ed9a0;
+}
+
+#header h1 {
+	color: #19c8c3;
+}
+
+#header h1 span {
+	color: #9ed9a0;
+}
+
+#container {
+    background-color: rgba(3,61,82,1);
+}
+
+#footer a {
+	color: rgba(25, 200, 195, 1);
+}
+
+#footer a:hover {
+	background: rgba(1,33,45,0.5);
+}
+
+.column {
+    background-color: rgba(6,86,109,1);
+}
+.column-header,
+.column-footer,
+.column-sidebar {
+	color: #9ed9a0;
+    background-color: rgba(3,61,82,1);
+}
+
+.objects-item:hover {
+	background-color: rgba(3,61,82,1);
+}
+
+/*.song-item:active,
+.playlist-item:active,
+.game-item:active,
+.custom-active {
+	background-color: rgba(1,33,45,0.7);
+}*/
+
+.objects-item {
+	color: #9ed9a0;
+}
+
+.current-objects-item {
+	color: #19c8c3;
+	background-color: rgba(3,61,82,0.7);
+}
+
+.objects-item.object-world {
+	color: #9ed9a0;
+	background-color: rgba(3,61,82,1);
+}
+.objects-item.object-world:hover {
+	background-color: rgba(1,33,45,1);
+}
+.objects-item.object-world.current-objects-item {
+	color: #19c8c3;
+	background-color: rgba(1,33,45,1);
+}
+
+.song-buttons > .song-button {
+	color: rgba(6,86,109,1);
+}
+
+.sidebar-button:hover {
+	background-color: rgba(1,33,45,0.5);
+}
+
+.sidebar-button.sidebar-button-active {
+	background-color: rgba(1,33,45,0.7);
+}
+
+.sidebar-slider {
+	background-color: rgba(1,33,45,0.7);
+}
+
+.sidebar-arrow {
+	background-color: rgba(6,86,109,0.7);
+}
+
+.playlist-item > .song-remove,
+.faux-playlist-item > .faux-song-remove,
+.playlist-item > .song-handle,
+.faux-playlist-item > .song-handle {
+	color: rgba(6,86,109,1);
+}
+
+.playlist-item-placeholder {
+	border: 3px dotted rgba(3,61,82,1);
+	background-color: rgba(3,61,82,0.5);
+}
+
+.ui-sortable-helper,
+.ui-draggable-dragging {
+	background-color: rgba(3,61,82,1) !important;
+}
+
+.played {
+	color: #19c8c3;
+}
+
+.current-song {
+	color: #19c8c3;
+	background-color: rgba(3,61,82,0.7);
+}
+
+#footer-soundtrack a {
+	color: rgba(25, 200, 195, 1);
+}
+
+#footer-soundtrack.loading-header a {
+	color: rgba(25, 200, 195, 0);
+}
+
+#footer-soundtrack:not(.loading-header) a:hover {
+	background: rgba(1,33,45,0.5);
+}
+
+#footer-playlist {
+	color: #9ed9a0;
+}
+
+/* ============================== PLAYER ============================== */
+#player-cover {
+	border-color: #9ed9a0;
+}
+#player-cover.cover-loaded {
+	border-color: rgba(3,61,82,1);
+}
+
+.loading-header {
+	color: rgba(158,217,160,0) !important;
+}
+
+/* ============================== HEADER BUTTONS ============================== */
+.header-button {
+	color: rgba(158, 217, 160, 1);
+}
+
+.header-button:hover {
+	background: rgba(1,33,45,0.5);
+}
+.header-button.disabled-button {
+	color: rgba(6,86,109,1);
+}
+
+.header-button.current-game-item {
+	color: #19c8c3;
+	background-color: rgba(1,33,45,1);
+}
+
+#header-playlist-info {
+	color: rgba(158, 217, 160, 1);
+}
+
+#popup-overlay {
+	background-color: rgba(0,0,0,0.5);
+}
+#dialogue-content {
+    background-color: rgba(3,61,82,1);
+}
+.share-button {
+	background-color: rgba(3,61,82,1);
+	color: rgba(158, 217, 160, 1);
+}
+.share-button:hover {
+	background: rgba(1,33,45,1);
+}
+#cover-popup {
+    background-color: rgba(3,61,82,1);	
+}
+.cover-button {
+	background-color: rgba(3,61,82,1);
+}
+.cover-button:hover {
+	background: rgba(1,33,45,1);
+}
+.cover-button.disabled-button {
+	color: rgba(6,86,109,1);
+}
+#notification-popup {
+	-webkit-box-shadow: rgba(0,0,0,0.4) 0px 0 10px;
+	-moz-box-shadow: rgba(0,0,0,0.4) 0 0 10px;
+	box-shadow: rgba(0,0,0,0.4) 0 0 10px;
+    background-color: rgba(3,61,82,1);
+}
+#config-popup {
+    background-color: rgba(6,86,109,1);
+}
+.config-header {
+	background-color: rgba(3,61,82,1);
+}
+.style-item.current-style-item {
+	background-color: rgba(3,61,82,0.7);
+	color: #19c8c3;
+}
+.style-item:hover {
+	background-color: rgba(3,61,82,1);
+}
+/* ============================== MOBILE ONLY ============================== */
+.mobile-tabswitch-button {
+	background: rgba(1,33,45,0.5);
+	color: rgba(158, 217, 160, 1);
+}
+.mobile-tabswitch-button:hover {
+	background: rgba(1,33,45,1);
+}
+.mobile-tabswitch-button.disabled-button {
+	color: rgba(6,86,109,1);
+}
+.mobile-tabswitch-button.highlighted-button {
+	color: #19c8c3;
+}
+
+/* MEDIA QUERIES */
+@media only screen and (max-width: 900px) {
+    html {
+		background-color: rgba(3,61,82,1);
+		background-image: none;
+    }
+	#container {
+		background-color: transparent;
+	}
+	
+	#container:before {
+	  background-image: none;
+	}
+
+	.column-content {
+		background-color: rgba(6,86,109,1);
+	}
+	.song-buttons > .song-button,
+    .playlist-item > .song-remove,
+	.faux-playlist-item > .faux-song-remove,
+    .playlist-item > .song-handle,
+	.faux-playlist-item > .song-handle {
+		color: inherit;
+	}
+}
+
+
+/* ============================== JSCROLLPANE ============================== */
+.jspTrack {
+	background: rgba(3,61,82,0.7);
+}
+.jspDrag {
+	background: rgba(1,33,45,0.7);
+}
+.jspArrow {
+	background: #50506d;
+}
+.jspArrow.jspDisabled {
+	background: #80808d;
+}
+.jspCorner {
+	background: #eeeef4;
+}
+/* ============================== MEDIA ELEMENT PLAYER ============================== */
+.mejs-controls .mejs-button button {
+	color: #9ed9a0;
+}
+.mejs-controls .mejs-button:hover {
+	background: rgba(1,33,45,0.5);
+}
+
+.mejs-container .mejs-controls .mejs-time,
+.mejs-container .mejs-controls .mejs-time a {
+	color: #9ed9a0;
+}
+.mejs-controls .mejs-time-rail .mejs-time-total {
+	background: rgba(1,33,45,0.5);
+}
+.mejs-controls .mejs-time-rail .mejs-time-loaded {
+	background: rgba(1,33,45,1);
+}
+.mejs-controls .mejs-time-rail .mejs-time-current {
+	background: #9ed9a0;
+}
+.mejs-controls .mejs-time-rail .mejs-time-float {
+	background: rgba(1,33,45,1);
+	color: #9ed9a0;
+}
+.mejs-controls .mejs-time-rail .mejs-time-float-corner {
+	border-color: rgba(1,33,45,1) transparent transparent transparent;
+}
+
+.mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-total {
+	background: rgba(1,33,45,1);
+}
+
+.mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-current {
+	background: #9ed9a0;
+}
+
+.me-cannotplay a {
+	color: #fff;
+}
+.mejs-contextmenu {
+	background: #fff;
+	border: solid 1px #999;
+}
+.mejs-contextmenu .mejs-contextmenu-separator {
+	background: #333;
+}
+
+.mejs-contextmenu .mejs-contextmenu-item {
+	color: #333;
+}
+.mejs-contextmenu .mejs-contextmenu-item:hover {
+	background: #2C7C91;
+	color: #fff;
+}
+/* Highlight colors */
+.mejs-controls .mejs-loop-on button:before,
+.mejs-controls .mejs-shuffle-on button:before,
+.mejs-controls .mejs-loop-all button:before {
+  color: #19c8c3;
+}
+.mejs-controls .mejs-loop-on,
+.mejs-controls .mejs-loop-all,
+.mejs-controls .mejs-shuffle-on {
+	background-color: rgba(6,86,109,1);
+}

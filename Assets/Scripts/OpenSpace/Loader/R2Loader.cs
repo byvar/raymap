@@ -516,16 +516,14 @@ namespace OpenSpace.Loader {
             }
 
             globals.num_always = reader.ReadUInt32();
-            globals.off_spawnable_perso_first = Pointer.Read(reader);
-            globals.off_spawnable_perso_last = Pointer.Read(reader);
-            globals.num_spawnable_perso = reader.ReadUInt32();
+            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
             globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
                 globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
             } else {
                 reader.ReadUInt32(); // 0x6F. In Montreal version this is a pointer to a pointer table for always
-                FillLinkedListPointers(reader, globals.off_spawnable_perso_last, Pointer.Current(reader));
+                globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
             }
 
             if (Settings.s.game == Settings.Game.DD) reader.ReadUInt32();

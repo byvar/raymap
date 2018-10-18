@@ -47,6 +47,8 @@ namespace OpenSpace {
         public bool snaCompression = false;
         public AITypes aiTypes;
         public float textureAnimationSpeedModifier = 1f;
+        public float luminosity = 0.5f;
+        public bool saturate = true;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -85,6 +87,8 @@ namespace OpenSpace {
             aiTypes = AITypes.R3,
             hasMemorySupport = true,
             textureAnimationSpeedModifier = 10f,
+            luminosity = 0.1f,
+            saturate = false,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x007D9A4C },
                 { "dynamicWorld", 0x007D9934 },
@@ -114,6 +118,7 @@ namespace OpenSpace {
                 { "fontStructure", 0x007A84E0 },
                 { "num_visualMaterials", 0x005F5E80 },
                 { "visualMaterials", 0x005BFAD4 },
+                { "brightness", 0x005F5E20 },
             }
         };
 
@@ -128,7 +133,9 @@ namespace OpenSpace {
             aiTypes = AITypes.R3,
             hasExtraInputData = true,
             hasLinkedListHeaderPointers = true,
-            textureAnimationSpeedModifier = 10f
+            textureAnimationSpeedModifier = -10f,
+            luminosity = 0.1f,
+            saturate = false
         };
 
         public static Settings RAPC = new Settings() {
@@ -139,7 +146,9 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R3,
             hasDeformations = true,
-            textureAnimationSpeedModifier = 10f
+            textureAnimationSpeedModifier = 10f,
+            luminosity = 0.3f,
+            saturate = false
         };
 
         public static Settings RAGC = new Settings() {
@@ -150,7 +159,9 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Minimize,
             aiTypes = AITypes.R3,
             hasDeformations = true,
-            textureAnimationSpeedModifier = -10f
+            textureAnimationSpeedModifier = -10f,
+            luminosity = 0.1f,
+            saturate = false
         };
 
         public static Settings R2PC = new Settings() {
@@ -162,6 +173,8 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R2,
             encryption = Encryption.ReadInit,
+            luminosity = 0.5f,
+            saturate = true,
             hasMemorySupport = true,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x005013C8 },
@@ -200,6 +213,8 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             encryption = Encryption.ReadInit,
+            luminosity = 0.5f,
+            saturate = true,
             aiTypes = AITypes.R2,
             numEntryActions = 1
         };
@@ -213,6 +228,8 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R2,
             encryption = Encryption.ReadInit,
+            luminosity = 0.5f,
+            saturate = true
         };
 
         public static Settings R2DC = new Settings() {
@@ -223,6 +240,8 @@ namespace OpenSpace {
             numEntryActions = 43,
             linkedListType = LinkedListType.Minimize,
             encryption = Encryption.None,
+            luminosity = 0.5f,
+            saturate = true,
             aiTypes = AITypes.R2,
             hasExtraInputData = false
         };
@@ -236,7 +255,9 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Double,
             encryption = Encryption.ReadInit,
             aiTypes = AITypes.R2,
-            hasExtraInputData = true
+            hasExtraInputData = true,
+            luminosity = 0.5f,
+            saturate = true
         };
 
         public static Settings DDPC = new Settings() {
@@ -247,7 +268,9 @@ namespace OpenSpace {
             numEntryActions = 44,
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R2,
-            encryption = Encryption.ReadInit
+            encryption = Encryption.ReadInit,
+            luminosity = 0.5f,
+            saturate = true
         };
 
         public static Settings TTPC = new Settings() {
@@ -260,7 +283,9 @@ namespace OpenSpace {
             aiTypes = AITypes.TTSE,
             encryption = Encryption.Window,
             encryptPointerFiles = true,
-            hasLinkedListHeaderPointers = true
+            hasLinkedListHeaderPointers = true,
+            luminosity = 1f,
+            saturate = true
         };
 
         public static Settings TTSEPC = new Settings() {
@@ -271,7 +296,9 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Double,
             numEntryActions = 1,
             aiTypes = AITypes.TTSE,
-            hasLinkedListHeaderPointers = true
+            hasLinkedListHeaderPointers = true,
+            luminosity = 0.5f,
+            saturate = true
         };
 
         public static Settings PlaymobilHypePC = new Settings() {
@@ -283,7 +310,9 @@ namespace OpenSpace {
             numEntryActions = 1,
             aiTypes = AITypes.Hype,
             hasLinkedListHeaderPointers = true,
-            snaCompression = true
+            snaCompression = true,
+            luminosity = 0.5f,
+            saturate = true
         };
 
         public static Settings PlaymobilAlexPC = new Settings() {
@@ -295,7 +324,9 @@ namespace OpenSpace {
             numEntryActions = 1,
             aiTypes = AITypes.Hype,
             hasLinkedListHeaderPointers = true,
-            snaCompression = true
+            snaCompression = true,
+            luminosity = 0.5f,
+            saturate = true
         };
 
         public static Settings PlaymobilLauraPC = new Settings() {
@@ -307,7 +338,9 @@ namespace OpenSpace {
             numEntryActions = 1,
             aiTypes = AITypes.Hype,
             hasLinkedListHeaderPointers = true,
-            snaCompression = false
+            snaCompression = false,
+            luminosity = 0.5f,
+            saturate = true
         };
     }
 }

@@ -1,0 +1,7 @@
+@font-face{
+    font-family: 'Rayman Origins';
+    font-weight: 300;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('../fonts/RaymanOrigins.ttf') format('truetype');
+}

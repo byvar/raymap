@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Object;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,9 +17,7 @@ namespace OpenSpace {
         /* The following 7 values are the "Always" structure. The spawnable perso data is dynamically copied to these superobjects.
         There can be at most (num_always) objects of this type active in a level, and they get reused by other objects when they despawn. */
         public uint num_always;
-        public Pointer off_spawnable_perso_first;
-        public Pointer off_spawnable_perso_last;
-        public uint num_spawnable_perso;
+        public LinkedList<Perso> spawnablePersos;
         public Pointer off_always_reusableSO; // There are (num_always) empty SuperObjects starting with this one.
         public Pointer off_always_reusableUnknown1; // (num_always) * 0x2c blocks
         public Pointer off_always_reusableUnknown2; // (num_always) * 0x4 blocks

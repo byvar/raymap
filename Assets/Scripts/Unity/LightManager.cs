@@ -12,7 +12,7 @@ public class LightManager : MonoBehaviour {
     public Controller controller;
     public SectorManager sectorManager;
     public MeshRenderer backgroundPanel;
-    private ScrollingTexture backgroundScroll;
+    //private ScrollingTexture backgroundScroll;
     private Sector previousActiveBackgroundSector = null;
     List<LightInfo> lights;
 
@@ -22,6 +22,7 @@ public class LightManager : MonoBehaviour {
 
     public bool saturate = true;
     private bool curSaturate = true;
+    public bool useDefaultSettings = true;
 
     public bool IsLoaded {
         get { return loaded; }
@@ -37,9 +38,9 @@ public class LightManager : MonoBehaviour {
         List<Vector2> uvs = new List<Vector2>();
         mesh.GetUVs(0, uvs);
         mesh.SetUVs(0, uvs.Select(u => new Vector3(u.x, u.y, 1f)).ToList());
-        backgroundScroll = backgroundPanel.gameObject.AddComponent<ScrollingTexture>();
+        /*backgroundScroll = backgroundPanel.gameObject.AddComponent<ScrollingTexture>();
         backgroundScroll.visMat = null;
-        backgroundScroll.mat = null;
+        backgroundScroll.mat = null;*/
     }
 	
 	// Update is called once per frame
@@ -81,11 +82,11 @@ public class LightManager : MonoBehaviour {
             }
             if (skyMaterial != null && !controller.viewCollision) {
                 backgroundPanel.gameObject.SetActive(true);
-                if (backgroundScroll.visMat != skyMaterial) {
+                /*if (backgroundScroll.visMat != skyMaterial) {
                     Material skyboxMat = skyMaterial.Material;
                     backgroundPanel.material = skyboxMat;
                     backgroundScroll.ResetMaterial(skyMaterial, backgroundPanel.material);
-                }
+                }*/
                 //skyboxMat.SetFloat("_DisableLighting", 1f);
                 //backgroundPanel.material.SetFloat("_DisableLighting", 1f);
                 if (activeBackgroundSector != null) {
@@ -179,6 +180,10 @@ public class LightManager : MonoBehaviour {
         lights = MapLoader.Loader.lights;
         for (int i = 0; i < lights.Count; i++) {
             Register(lights[i]);
+        }
+        if (useDefaultSettings) {
+            luminosity = Settings.s.luminosity;
+            saturate = Settings.s.saturate;
         }
         loaded = true;
     }
