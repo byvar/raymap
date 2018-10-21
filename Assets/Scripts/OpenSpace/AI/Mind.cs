@@ -43,13 +43,7 @@ namespace OpenSpace.AI {
             m.byte2 = reader.ReadByte();
             m.byte3 = reader.ReadByte();
 
-            if (m.off_AI_model != null) {
-                m.AI_model = AIModel.FromOffset(m.offset);
-                if (m.AI_model == null) {
-                    Pointer.Goto(ref reader, m.off_AI_model);
-                    m.AI_model = AIModel.Read(reader, m.off_AI_model);
-                }
-            }
+            m.AI_model = AIModel.FromOffsetOrRead(m.off_AI_model, reader);
 
             if (m.off_dsgMem != null) {
                 Pointer.Goto(ref reader, m.off_dsgMem);

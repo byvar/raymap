@@ -15,6 +15,7 @@ using System.Linq;
 using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace OpenSpace.Loader {
     public class R2DCLoader : MapLoader {
@@ -46,6 +47,26 @@ namespace OpenSpace.Loader {
                 files_array[1] = lvlDAT;
 
                 yield return controller.StartCoroutine(LoadDreamcast());
+
+                string logPathTexFix = gameDataBinFolder + "TEXTURE_FIX.LOG";
+                string logPathTexLvl = gameDataBinFolder + lvlName + "/TEXTURE_" + lvlName + ".LOG";
+                string logPathInfo = gameDataBinFolder + lvlName + "/INFO.LOG";
+                /*yield return controller.StartCoroutine(PrepareFile(logPathTexFix));
+                yield return controller.StartCoroutine(PrepareFile(logPathTexLvl));*/
+                yield return controller.StartCoroutine(PrepareFile(logPathInfo));
+                if (FileSystem.FileExists(logPathInfo)) {
+                    ReadLog(FileSystem.GetFileReadStream(logPathInfo));
+                    yield return null;
+                }
+
+                /*if (FileSystem.FileExists(logPathTexFix)) {
+                    ReadLog(logPathTexFix);
+                    yield return null;
+                }
+                if (FileSystem.FileExists(logPathTexLvl)) {
+                    ReadLog(logPathTexLvl);
+                    yield return null;
+                }*/
 
                 fixDAT.Dispose();
                 lvlDAT.Dispose();
@@ -237,68 +258,6 @@ namespace OpenSpace.Loader {
                         ((DCDAT)off_so.file).OverwriteData(off_so.FileOffset + 0x30, soFlags);
                     }
                 }
-
-                /*if (off_perso != null) {
-                    off_current = Pointer.Goto(ref reader, off_perso);
-                    reader.ReadUInt32();
-                    Pointer off_stdGame = Pointer.Read(reader);
-                    if (off_stdGame != null) {
-                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-                            Pointer.Goto(ref reader, off_stdGame);
-                            reader.ReadUInt32(); // type 0
-                            reader.ReadUInt32(); // type 1
-                            reader.ReadUInt32(); // type 2
-                            Pointer off_superObject = Pointer.Read(reader);
-                            Pointer.Goto(ref reader, off_current);
-                            if (off_superObject == null) continue;
-                        } else {
-                            Pointer.Goto(ref reader, off_current);
-                        }
-                        // First read everything from the GPT
-                        Pointer off_newSuperObject = null, off_nextBrother = null, off_prevBrother = null, off_father = null;
-                        byte[] matrixData = null, floatData = null, renderBits = null;
-                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-                            off_newSuperObject = Pointer.Read(reader);
-                            matrixData = reader.ReadBytes(0x58);
-                            renderBits = reader.ReadBytes(4);
-                            floatData = reader.ReadBytes(4);
-                            off_nextBrother = Pointer.Read(reader);
-                            off_prevBrother = Pointer.Read(reader);
-                            off_father = Pointer.Read(reader);
-                        } else {
-                            matrixData = reader.ReadBytes(0x58);
-                            off_newSuperObject = Pointer.Read(reader);
-                            Pointer.DoAt(ref reader, off_stdGame + 0xC, () => {
-                                ((SNA)off_stdGame.file).AddPointer(off_stdGame.offset + 0xC, off_newSuperObject);
-                            });
-                        }
-
-                        // Then fill everything in
-                        off_current = Pointer.Goto(ref reader, off_newSuperObject);
-                        uint newSOtype = reader.ReadUInt32();
-                        Pointer off_newSOengineObject = Pointer.Read(reader);
-                        if (SuperObject.GetSOType(newSOtype) == SuperObject.Type.Perso) {
-                            persoInFixPointers[i] = off_newSOengineObject;
-                        } else {
-                            persoInFixPointers[i] = null;
-                        }
-                        Pointer.Goto(ref reader, off_newSOengineObject);
-                        Pointer off_p3dData = Pointer.Read(reader);
-                        ((SNA)off_p3dData.file).OverwriteData(off_p3dData.offset + 0x18, matrixData);
-
-                        if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-                            FileWithPointers file = off_newSuperObject.file;
-                            file.AddPointer(off_newSuperObject.offset + 0x14, off_nextBrother);
-                            file.AddPointer(off_newSuperObject.offset + 0x18, off_prevBrother);
-                            file.AddPointer(off_newSuperObject.offset + 0x1C, off_father);
-                            ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x30, renderBits);
-                            ((SNA)file).OverwriteData(off_newSuperObject.offset + 0x38, floatData);
-                        }
-
-                    }
-                    Pointer.Goto(ref reader, off_current);
-                }
-                }*/
             });
 
             yield return null;
@@ -386,6 +345,51 @@ namespace OpenSpace.Loader {
             }*/
         }
         #endregion
-        
+
+        private void ReadLog(Stream logStream) {
+            string logPattern = @"^0x(?<offset>[a-fA-F0-9]+?) : \((?<type>[^\)]+?)\)(?<name>.*?)    0x(?<offset2>[a-fA-F0-9]+?)$";
+            DCDAT file = files_array[0] as DCDAT;
+            using (StreamReader sr = new StreamReader(logStream)) {
+                while (sr.Peek() >= 0) {
+                    string line = sr.ReadLine().Trim();
+                    Match logMatch = Regex.Match(line, logPattern, RegexOptions.IgnoreCase);
+                    if (logMatch.Success) {
+                        string offsetStr = logMatch.Groups["offset"].Value;
+                        string type = logMatch.Groups["type"].Value;
+                        string name = logMatch.Groups["name"].Value;
+                        string offset2Str = logMatch.Groups["offset2"].Value;
+                        if (offsetStr.Length < 8) offsetStr = new String('0', offsetStr.Length - 8) + offsetStr;
+                        uint offsetUint = Convert.ToUInt32(offsetStr, 16);
+                        Pointer offset = file.GetUnsafePointer(offsetUint);
+                        switch (type) {
+                            case "eST_Comport":
+                                Behavior b = Behavior.FromOffset(offset);
+                                if (b != null) b.name = name;
+                                /*if (name.Contains("piranha\\MIC_PiranhaSauteurVisible\\MIC_PiranhaSauteurVisible")) {
+                                    print("Offset: " + offset + " - " + b);
+                                }*/
+                                break;
+                            case "eST_State":
+                                State state = State.FromOffset(offset);
+                                if (state != null) state.name = name;
+                                break;
+                            case "eST_Anim3d":
+                                AnimationReference ar = AnimationReference.FromOffset(offset);
+                                if (ar != null) ar.name = name;
+                                break;
+                            case "eST_Graph":
+                                break;
+                            case "eST_Sector":
+                                Sector s = Sector.FromOffset(offset);
+                                if (s != null) {
+                                    s.name = name;
+                                    s.Gao.name = name;
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+        }  
     }
 }

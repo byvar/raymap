@@ -1,4 +1,4 @@
-﻿Shader "Custom/GouraudAlpha" {
+﻿Shader "Custom/GouraudAlphaFallback" {
 	Properties{
 		_NumTextures("Number of textures", Float) = 0
 
@@ -61,7 +61,8 @@
 			#pragma vertex vert  
 			#pragma fragment frag 
 			#pragma multi_compile_fog
-
+			
+			#define GOURAUD_NUM_LIGHTS 16
 			#include "GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
@@ -84,6 +85,7 @@
 			#pragma vertex vert  
 			#pragma fragment frag 
 
+			#define GOURAUD_NUM_LIGHTS 16
 			#include "GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
@@ -96,5 +98,5 @@
 		}
 
 	}
-	Fallback "Custom/GouraudAlphaFallback"
+	Fallback Off
 }

@@ -85,7 +85,7 @@ namespace OpenSpace.AI {
                     }
                 }
             }
-            l.aiModels.Add(ai);
+            //l.aiModels.Add(ai);
             return ai;
         }
 
@@ -95,6 +95,18 @@ namespace OpenSpace.AI {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.aiModels.FirstOrDefault(f => f.offset == offset);
+        }
+
+        public static AIModel FromOffsetOrRead(Pointer offset, Reader reader) {
+            if (offset == null) return null;
+            AIModel ai = FromOffset(offset);
+            if (ai == null) {
+                Pointer.DoAt(ref reader, offset, () => {
+                    ai = AIModel.Read(reader, offset);
+                    MapLoader.Loader.aiModels.Add(ai);
+                });
+            }
+            return ai;
         }
 
         public Behavior GetBehaviorByOffset(Pointer offset)

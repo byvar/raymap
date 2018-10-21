@@ -237,7 +237,11 @@ public class Controller : MonoBehaviour {
                             Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
                             int iter = 0;
                             foreach (Behavior behavior in normalBehaviors) {
-                                GameObject behaviorGao = new GameObject(behavior.name);
+                                string name = behavior.name;
+                                if (name.Contains("^CreateComport:")) {
+                                    name = name.Substring(name.IndexOf("^CreateComport") + 15); 
+                                }
+                                GameObject behaviorGao = new GameObject(name);
                                 behaviorGao.transform.parent = intelParent.transform;
                                 foreach (Script script in behavior.scripts) {
                                     GameObject scriptGao = new GameObject("Script");
@@ -264,7 +268,11 @@ public class Controller : MonoBehaviour {
                             Behavior[] reflexBehaviors = p.brain.mind.AI_model.behaviors_reflex;
                             int iter = 0;
                             foreach (Behavior behavior in reflexBehaviors) {
-                                GameObject behaviorGao = new GameObject(behavior.name);
+                                string name = behavior.name;
+                                if (name.Contains("^CreateComport:")) {
+                                    name = name.Substring(name.IndexOf("^CreateComport:") + 15);
+                                }
+                                GameObject behaviorGao = new GameObject(name);
                                 behaviorGao.transform.parent = reflexParent.transform;
                                 foreach (Script script in behavior.scripts) {
                                     GameObject scriptGao = new GameObject("Script");

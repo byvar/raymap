@@ -42,6 +42,7 @@
 			#pragma fragment frag
 			#pragma multi_compile_fog
 
+			#define GOURAUD_NUM_LIGHTS 3
 			#include "GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
@@ -76,5 +77,5 @@
 		}*/
 
 	}
-	Fallback "Specular"
+	Fallback Off
 }

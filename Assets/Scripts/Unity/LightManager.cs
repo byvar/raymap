@@ -12,7 +12,7 @@ public class LightManager : MonoBehaviour {
     public Controller controller;
     public SectorManager sectorManager;
     public MeshRenderer backgroundPanel;
-    //private ScrollingTexture backgroundScroll;
+    private VisualMaterial backgroundMaterial;
     private Sector previousActiveBackgroundSector = null;
     List<LightInfo> lights;
 
@@ -82,11 +82,11 @@ public class LightManager : MonoBehaviour {
             }
             if (skyMaterial != null && !controller.viewCollision) {
                 backgroundPanel.gameObject.SetActive(true);
-                /*if (backgroundScroll.visMat != skyMaterial) {
-                    Material skyboxMat = skyMaterial.Material;
+                if (backgroundMaterial != skyMaterial) {
+                    backgroundMaterial = skyMaterial;
+                    Material skyboxMat = skyMaterial.GetMaterial();
                     backgroundPanel.material = skyboxMat;
-                    backgroundScroll.ResetMaterial(skyMaterial, backgroundPanel.material);
-                }*/
+                }
                 //skyboxMat.SetFloat("_DisableLighting", 1f);
                 //backgroundPanel.material.SetFloat("_DisableLighting", 1f);
                 if (activeBackgroundSector != null) {

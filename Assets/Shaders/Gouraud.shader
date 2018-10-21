@@ -71,5 +71,5 @@
 		}*/
 
 	}
-	Fallback "Specular"
+	Fallback "Custom/GouraudFallback"
 }

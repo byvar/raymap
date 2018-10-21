@@ -2,7 +2,7 @@
 #define SHARED_GOURAUD
 
 #include "UnityCG.cginc"
-uniform float4 _LightColor0; // color of light source (from "Lighting.cginc")
+//uniform float4 _LightColor0; // color of light source (from "Lighting.cginc")
 
 // User-specified properties
 uniform float4 _AmbientCoef;
@@ -30,10 +30,17 @@ float4 _Tex3Params2;
 //uniform float4 _SectorAmbient;
 uniform float4 _SectorFog;
 uniform float4 _SectorFogParams;
+#ifndef GOURAUD_NUM_LIGHTS
 float4 _StaticLightPos[512];
 float4 _StaticLightDir[512];
 float4 _StaticLightCol[512];
 float4 _StaticLightParams[512];
+#else
+float4 _StaticLightPos[GOURAUD_NUM_LIGHTS];
+float4 _StaticLightDir[GOURAUD_NUM_LIGHTS];
+float4 _StaticLightCol[GOURAUD_NUM_LIGHTS];
+float4 _StaticLightParams[GOURAUD_NUM_LIGHTS];
+#endif
 float _StaticLightCount = 0;
 float _Luminosity = 0.5;
 float _Saturate = 1.0;
@@ -80,7 +87,11 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 	float3 diffuseReflection = float3(0.0, 0.0, 0.0);
 	float3 luminosity = float3(_Luminosity - 0.5, _Luminosity - 0.5, _Luminosity - 0.5);
 	float4 ambient = _AmbientCoef;
-	for (int i = 0; i < _StaticLightCount; i++) {
+	float num_lights = _StaticLightCount;
+#ifdef GOURAUD_NUM_LIGHTS
+	if (num_lights > GOURAUD_NUM_LIGHTS) num_lights = GOURAUD_NUM_LIGHTS;
+#endif
+	for (int i = 0; i < num_lights; i++) {
 		if (_StaticLightPos[i].w == 1) {
 			attenuation = 1.0; // no attenuation
 			lightDirection = normalize(_StaticLightDir[i].xyz);
@@ -98,13 +109,15 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 			if (distance < far) {
 				near = _StaticLightParams[i].x;
 				attenuation = CalcSphereAttenuation(distance, near, far);
-				lightDirection = normalize(vertexToLightSource);
 				if (_StaticLightParams[i].z == 0) {
+					lightDirection = normalize(vertexToLightSource);
 					normalFactor = max(0.0, dot(normalDirection, lightDirection));
 				} else normalFactor = 1.0;
-				if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+				if (normalFactor != 0) {
+					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
 					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-				if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
+					if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
+				}
 			}
 		} else if (_StaticLightPos[i].w == 4) {
 			if (_StaticLightParams[i].w != 1) ambient.xyz = ambient.xyz + _StaticLightCol[i].xyz * _DiffuseCoef.xyz;
@@ -117,13 +130,15 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 			if (distance < far) {
 				near = _StaticLightParams[i].x;
 				attenuation = CalcSphereAttenuation(distance, near, far);
-				lightDirection = normalize(_StaticLightDir[i].xyz);
 				if (_StaticLightParams[i].z == 0) {
+					lightDirection = normalize(_StaticLightDir[i].xyz);
 					normalFactor = max(0.0, dot(normalDirection, lightDirection));
 				} else normalFactor = 1.0;
-				if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+				if (normalFactor != 0) {
+					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
 					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-				if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// *_DiffuseCoef.w;
+					if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// *_DiffuseCoef.w;
+				}
 			}
 		}
 	}

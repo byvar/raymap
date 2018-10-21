@@ -1,4 +1,4 @@
-﻿Shader "Custom/GouraudAlpha" {
+﻿Shader "Custom/GouraudFallback" {
 	Properties{
 		_NumTextures("Number of textures", Float) = 0
 
@@ -27,11 +27,33 @@
 		_SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
 	}
 	SubShader{
-		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" }
-		// extra pass that renders to depth buffer only
-		/*Pass {
-			ZWrite On
-			ColorMask 0
+		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
+		Pass{
+			//Tags{ "LightMode" = "ForwardBase" }
+			// pass for ambient light and first light source
+
+			CGPROGRAM
+
+			#pragma vertex vert  
+			#pragma fragment frag
+			#pragma multi_compile_fog
+
+			#define GOURAUD_NUM_LIGHTS 16
+			#include "GouraudShared.cginc"
+
+			v2f vert(appdata_full v) {
+				return process_vert(v, 0.0, 0.0);
+			}
+			float4 frag(v2f i) : COLOR{
+				return process_frag(i, 0.0, 0.0);
+			}
+			ENDCG
+		}
+		/*Pass{
+			Tags{ "LightMode" = "ForwardAdd" }
+			// pass for additional light sources
+			Blend One One // additive blending 
+
 			CGPROGRAM
 
 			#pragma vertex vert  
@@ -41,60 +63,14 @@
 			#include "GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
-				return process_vert(v, 1.0, 0.0);
+				return process_vert(v, 0.0, 1.0);
 			}
 			float4 frag(v2f i) : COLOR{
-				float4 col = process_frag(i, -1.0, 0.0);
-				clip(col.a - 0.9);
-				return col;
+				return process_frag(i, 0.0, 1.0);
 			}
 			ENDCG
 		}*/
 
-		Pass{
-			ZWrite Off
-			// pass for ambient light and first light source
-			Blend SrcAlpha OneMinusSrcAlpha
-
-			CGPROGRAM
-
-			#pragma vertex vert  
-			#pragma fragment frag 
-			#pragma multi_compile_fog
-
-			#include "GouraudShared.cginc"
-
-			v2f vert(appdata_full v) {
-				return process_vert(v, 0.0, 0.0);
-			}
-			float4 frag(v2f i) : COLOR { 
-				return process_frag(i, -1.0, 0.0);
-			}
-			ENDCG
-		}
-
-		Tags{ "Queue" = "AlphaTest" "IgnoreProjector" = "True" "RenderType" = "TransparentCutout" }
-		Pass{
-			ZWrite On
-			// pass for ambient light and first light source
-			Blend One Zero
-
-			CGPROGRAM
-
-			#pragma vertex vert  
-			#pragma fragment frag 
-
-			#include "GouraudShared.cginc"
-
-			v2f vert(appdata_full v) {
-				return process_vert(v, 0.0, 0.0);
-			}
-			float4 frag(v2f i) : COLOR{
-				return process_frag(i, 1.0, 0.0);
-			}
-			ENDCG
-		}
-
 	}
-	Fallback "Custom/GouraudAlphaFallback"
+	Fallback Off
 }

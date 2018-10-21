@@ -33,6 +33,17 @@ namespace OpenSpace.AI {
             return l.behaviors.FirstOrDefault(f => f.offset == offset);
         }
 
+        /*public static Behavior FromOffsetOrRead(Pointer offset, Reader reader, AIModel aiModel, BehaviorType type, int number) {
+            if (offset == null) return null;
+            Behavior b = FromOffset(offset);
+            if (b == null) {
+                Pointer.DoAt(ref reader, offset, () => {
+                    b = Behavior.Read(reader, offset, aiModel, type, number);
+                });
+            }
+            return b;
+        }*/
+
         public static Behavior Read(Reader reader, Pointer offset, AIModel aiModel, BehaviorType type, int number) {
             MapLoader l = MapLoader.Loader;
             Behavior behavior = new Behavior(offset);
