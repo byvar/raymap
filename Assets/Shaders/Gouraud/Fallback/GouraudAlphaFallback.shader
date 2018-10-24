@@ -1,4 +1,4 @@
-﻿Shader "Custom/GouraudAlpha" {
+﻿Shader "Custom/GouraudAlphaFallback" {
 	Properties{
 		_NumTextures("Number of textures", Float) = 0
 
@@ -22,12 +22,14 @@
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
 
 		// Lighting
+		[MaterialToggle] _Billboard("Is billboard", Float) = 0
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
 		_SectorFog("Sector fog", Vector) = (0,0,0,0)
 		_SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
 	}
 	SubShader{
 		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" }
+		Lighting Off
 		// extra pass that renders to depth buffer only
 		/*Pass {
 			ZWrite On
@@ -61,8 +63,9 @@
 			#pragma vertex vert  
 			#pragma fragment frag 
 			#pragma multi_compile_fog
-
-			#include "GouraudShared.cginc"
+			
+			#define GOURAUD_NUM_LIGHTS 16
+			#include "../GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
 				return process_vert(v, 0.0, 0.0);
@@ -84,7 +87,8 @@
 			#pragma vertex vert  
 			#pragma fragment frag 
 
-			#include "GouraudShared.cginc"
+			#define GOURAUD_NUM_LIGHTS 16
+			#include "../GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
 				return process_vert(v, 0.0, 0.0);
@@ -96,5 +100,5 @@
 		}
 
 	}
-	Fallback "Custom/GouraudAlphaFallback"
+	Fallback Off
 }

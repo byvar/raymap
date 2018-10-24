@@ -128,22 +128,14 @@ namespace OpenSpace.AI {
                         break;
                     case DsgVarInfoEntry.DsgVarType.Graph:
                         Pointer off_graph = Pointer.Read(reader);
-                        Pointer.DoAt(ref reader, off_graph, () => {
-                            Graph graph = Graph.Read(reader, off_graph);
-                            MapLoader.Loader.AddGraph(graph);
-                        });
+                        Graph graph = Graph.FromOffsetOrRead(off_graph, reader);
                         returnValue = "Graph " + off_graph;
 
                         break;
                     case DsgVarInfoEntry.DsgVarType.Waypoint:
                         Pointer off_waypoint = Pointer.Read(reader);
                         if (off_waypoint != null) {
-                            Pointer originalBeforeWaypoint = Pointer.Goto(ref reader, off_waypoint);
-                            WayPoint wayPoint = WayPoint.Read(reader, off_waypoint);
-                            Pointer.Goto(ref reader, originalBeforeWaypoint);
-
-                            MapLoader.Loader.AddIsolateWaypoint(wayPoint);
-
+                            WayPoint wayPoint = WayPoint.FromOffsetOrRead(off_waypoint, reader);
                             returnValue = "WayPoint " + off_waypoint;
                         }
 

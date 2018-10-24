@@ -34,6 +34,7 @@ namespace OpenSpace.Visual {
         public static uint flags_isTransparent = (1 << 3);
         public static uint flags_backfaceCulling = (1 << 10);
         public static uint flags_isMaterialChromed = (1 << 22);
+        public static uint flags_isBillboard = (1 << 9);
 
         //properties
         public static uint property_receiveShadows = 2;
@@ -58,6 +59,7 @@ namespace OpenSpace.Visual {
         // TODO: Split material into material_main and material_light, find how these are stored differently.
         public Material GetMaterial(Hint hints = Hint.None) {
             if (material == null || hints != receivedHints) {
+                bool billboard = (hints & Hint.Billboard) == Hint.Billboard;// || (flags & flags_isBillboard) == flags_isBillboard;
                 MapLoader l = MapLoader.Loader;
                 receivedHints = hints;
                 //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
@@ -101,6 +103,7 @@ namespace OpenSpace.Visual {
                 }
                 material.SetVector("_AmbientCoef", ambientCoef);
                 material.SetVector("_DiffuseCoef", diffuseCoef);
+                if (billboard) material.SetFloat("_Billboard", 1f);
                 /* if (baseMaterial == l.baseMaterial || baseMaterial == l.baseTransparentMaterial) {
                         material.SetVector("_AmbientCoef", ambientCoef);
                         //material.SetVector("_SpecularCoef", specularCoef);
@@ -110,46 +113,6 @@ namespace OpenSpace.Visual {
                     }*/
             }
             return material;
-        }
-
-        public Material MaterialBillboard {
-            get {
-                if (materialBillboard == null) {
-                    MapLoader l = MapLoader.Loader;
-                    //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
-                    TextureInfo texMain = null, texSecondary = null;
-                    if (textures != null && textures.Count > 0) {
-                        texMain = textures[0].texture;
-                        if (textures.Count > 1) {
-                            texSecondary = textures[1].texture;
-                        }
-                    }
-                    Material baseMaterial = l.billboardMaterial;
-                    if (textures.Where(t => (t.properties & 0x20) != 0).Count() > 0 || IsLight) {
-                        if (l.billboardAdditiveMaterial != null) {
-                            baseMaterial = l.billboardAdditiveMaterial;
-                        }
-                    }
-                    bool transparent = IsTransparent;
-                    materialBillboard = new Material(baseMaterial);
-                    //materialBillboard.SetColor("_EmissionColor", new Color(ambientCoef.x / 2f, ambientCoef.y / 2f, ambientCoef.z / 2f, ambientCoef.w));
-                    if (color.w > 0) {
-                        materialBillboard.SetColor("_Color", new Color(color.x, color.y, color.z, color.w));
-                    } else {
-                        materialBillboard.SetColor("_Color", new Color(diffuseCoef.x, diffuseCoef.y, diffuseCoef.z, diffuseCoef.w));
-                    }
-                    //materialBillboard.SetColor("_Color", new Color(ambientCoef.x, ambientCoef.y, ambientCoef.z));
-                    if (texMain != null) materialBillboard.SetTexture("_MainTex", texMain.Texture);
-                    if (texMain == null || texMain.Texture == null) {
-                        // No texture = just color. So create white texture and let that be colored by other properties.
-                        Texture2D tex = new Texture2D(1, 1);
-                        tex.SetPixel(0, 0, new Color(1, 1, 1, 1));
-                        tex.Apply();
-                        materialBillboard.SetTexture("_MainTex", tex);
-                    }
-                }
-                return materialBillboard;
-            }
         }
 
         public bool IsTransparent {

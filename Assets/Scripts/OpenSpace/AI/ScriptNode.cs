@@ -55,10 +55,7 @@ namespace OpenSpace.AI {
 
             if (sn.param_ptr != null && sn.nodeType != NodeType.Unknown) {
                 if (sn.nodeType == NodeType.WayPointRef) {
-                    Pointer off_current = Pointer.Goto(ref reader, sn.param_ptr);
-                    WayPoint waypoint = WayPoint.Read(reader, sn.param_ptr);
-                    //l.print("Waypoint at " + waypoint.position.x + ", " + waypoint.position.y + ", " + waypoint.position.z);
-                    Pointer.Goto(ref reader, off_current);
+                    WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);
                 } else if (sn.nodeType == NodeType.String) {
                     Pointer off_currentNode = Pointer.Goto(ref reader, sn.param_ptr);
                     string str = reader.ReadNullDelimitedString();

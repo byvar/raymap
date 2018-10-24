@@ -2,14 +2,8 @@
     public class Graph {
 
         public Pointer offset;
-        public GraphNode firstNode;
-        public GraphNode lastNode;
-        public int nodeCount;
-
-        public Pointer off_firstNode;
-        public Pointer off_lastNode;
-
-        public GraphNode[] nodeList;
+        public LinkedList<GraphNode> nodes;
+        public string name = null;
 
         public Graph(Pointer offset) // MicroStructure for Waypoint stuff, pointer to this is stored in Engine Object
         {
@@ -19,26 +13,31 @@
         public static Graph Read(Reader reader, Pointer offset) {
             Graph graph = new Graph(offset);
 
-            graph.off_firstNode = Pointer.Read(reader);
-            graph.off_lastNode = Pointer.Read(reader);
-            graph.nodeCount = reader.ReadInt32();
-
-            graph.nodeList = new GraphNode[graph.nodeCount];
-
-            Pointer currentPointer = graph.off_firstNode;
-
-            for (int i = 0; i < graph.nodeCount; i++) {
-                Pointer.Goto(ref reader, currentPointer);
-
-                GraphNode node = GraphNode.FromOffsetOrRead(currentPointer, reader);
-                graph.nodeList[i] = node;
-                currentPointer = node.off_nextNode;
-                if (currentPointer == null) {
-                    break;
-                }
-            }
+            graph.nodes = LinkedList<GraphNode>.Read(ref reader, Pointer.Current(reader), (off_element) => {
+                return GraphNode.FromOffsetOrRead(off_element, reader);
+            }, flags: LinkedList.Flags.HasHeaderPointers, type: LinkedList.Type.Double);
 
             return graph;
+        }
+
+        public static Graph FromOffsetOrRead(Pointer offset, Reader reader) {
+            if (offset == null) return null;
+            Graph g = FromOffset(offset);
+            if (g == null) {
+                Pointer.DoAt(ref reader, offset, () => {
+                    g = Graph.Read(reader, offset);
+                    MapLoader.Loader.graphs.Add(g);
+                });
+            }
+            return g;
+        }
+
+        public static Graph FromOffset(Pointer offset) {
+            MapLoader l = MapLoader.Loader;
+            for (int i = 0; i < l.graphs.Count; i++) {
+                if (offset == l.graphs[i].offset) return l.graphs[i];
+            }
+            return null;
         }
     }
 }

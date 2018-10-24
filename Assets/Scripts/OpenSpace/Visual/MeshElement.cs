@@ -72,7 +72,8 @@ namespace OpenSpace.Visual {
                     mesh.bones.bindPoses[j] = mesh.bones.bones[j].worldToLocalMatrix * gao.transform.localToWorldMatrix;
                 }
             }*/
-            VisualMaterial.Hint materialHints = VisualMaterial.Hint.None;
+            VisualMaterial.Hint materialHints = mesh.isLookAt != 0 ? VisualMaterial.Hint.Billboard : VisualMaterial.Hint.None;
+            //VisualMaterial.Hint materialHints = VisualMaterial.Hint.None;
             uint num_textures = 0;
             if (visualMaterial != null) {
                 num_textures = visualMaterial.num_textures;
@@ -99,7 +100,7 @@ namespace OpenSpace.Visual {
                         //MapLoader.Loader.print(visualMaterial.textures[um].uvFunction + " - " + num_uvMaps);
                         new_uvs[um][j] = uvs[mapping_uvs[uvMap][j]];
                         if (mesh.blendWeights != null && mesh.blendWeights[visualMaterial.textures[um].blendIndex] != null) {
-                            if (um == 0) materialHints = VisualMaterial.Hint.Transparent;
+                            if (um == 0) materialHints |= VisualMaterial.Hint.Transparent;
                             new_uvs[um][j].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][mapping_vertices[j]];
                         } else {
                             new_uvs[um][j].z = 1;
@@ -211,7 +212,7 @@ namespace OpenSpace.Visual {
                     if (mesh.blendWeights != null) {
                         for (int um = 0; um < num_textures; um++) {
                             if (mesh.blendWeights[visualMaterial.textures[um].blendIndex] != null) {
-                                if (um == 0) materialHints = VisualMaterial.Hint.Transparent;
+                                if (um == 0) materialHints |= VisualMaterial.Hint.Transparent;
                                 new_uvs_spe[um][m0].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][i0];
                                 new_uvs_spe[um][m1].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][i1];
                                 new_uvs_spe[um][m2].z = mesh.blendWeights[visualMaterial.textures[um].blendIndex][i2];
@@ -321,9 +322,9 @@ namespace OpenSpace.Visual {
                 sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
                 sm.visualMaterial = sm.gameMaterial.visualMaterial;
             }
-            if (sm.visualMaterial != null && sm.visualMaterial.textures.Count > 0 && sm.visualMaterial.textures[0].off_texture != null) {
+            /*if (sm.visualMaterial != null && sm.visualMaterial.textures.Count > 0 && sm.visualMaterial.textures[0].off_texture != null) {
                 sm.name += " - VisMatTex:" + sm.visualMaterial.textures[0].offset + " - TexInfo:" + sm.visualMaterial.textures[0].off_texture;
-            }
+            }*/
             if (sm.visualMaterial != null) {
                 sm.backfaceCulling = ((sm.visualMaterial.flags & VisualMaterial.flags_backfaceCulling) != 0) && !l.forceDisplayBackfaces;
             }

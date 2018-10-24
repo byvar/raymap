@@ -36,6 +36,8 @@ namespace OpenSpace.Visual {
             get {
                 if (gao == null) {
                     gao = new GameObject(name);// Create object and read triangle data
+                    BillboardBehaviour billboard = gao.AddComponent<BillboardBehaviour>();
+                    billboard.isLookAt = true;
                     CreateUnityMesh();
                 }
                 return gao;
@@ -62,7 +64,8 @@ namespace OpenSpace.Visual {
                         if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
                         if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
                     }
-                    Material unityMat = sprites[i].visualMaterial.MaterialBillboard;
+                    //Material unityMat = sprites[i].visualMaterial.MaterialBillboard;
+                    Material unityMat = sprites[i].visualMaterial.GetMaterial(VisualMaterial.Hint.Billboard);
                     bool receiveShadows = (sprites[i].visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                     //if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
                     //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
@@ -78,26 +81,26 @@ namespace OpenSpace.Visual {
                 }
                 Mesh meshUnity = new Mesh();
                 Vector3[] vertices = new Vector3[4];
-                vertices[0] = new Vector3(-sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
-                vertices[1] = new Vector3( sprites[i].info_scale.x, -sprites[i].info_scale.y, 0);
-                vertices[2] = new Vector3(-sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
-                vertices[3] = new Vector3( sprites[i].info_scale.x,  sprites[i].info_scale.y, 0);
+                vertices[0] = new Vector3(0, -sprites[i].info_scale.y, -sprites[i].info_scale.x);
+                vertices[1] = new Vector3(0, -sprites[i].info_scale.y,  sprites[i].info_scale.x);
+                vertices[2] = new Vector3(0,  sprites[i].info_scale.y, -sprites[i].info_scale.x);
+                vertices[3] = new Vector3(0,  sprites[i].info_scale.y,  sprites[i].info_scale.x);
                 Vector3[] normals = new Vector3[4];
                 normals[0] = Vector3.forward;
                 normals[1] = Vector3.forward;
                 normals[2] = Vector3.forward;
                 normals[3] = Vector3.forward;
-                Vector2[] uvs = new Vector2[4];
-                uvs[0] = new Vector2(0, 0 - (mirrorY ? 1 : 0));
-                uvs[1] = new Vector2(1 + (mirrorX ? 1 : 0), 0 - (mirrorY ? 1 : 0));
-                uvs[2] = new Vector2(0, 1);
-                uvs[3] = new Vector2(1 + (mirrorX ? 1 : 0), 1);
+                Vector3[] uvs = new Vector3[4];
+                uvs[0] = new Vector3(0, 0 - (mirrorY ? 1 : 0), 1);
+                uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), 0 - (mirrorY ? 1 : 0), 1);
+                uvs[2] = new Vector3(0, 1, 1);
+                uvs[3] = new Vector3(1 + (mirrorX ? 1 : 0), 1, 1);
                 int[] triangles = new int[] { 0, 2, 1, 1, 2, 3 };
 
                 meshUnity.vertices = vertices;
                 meshUnity.normals = normals;
                 meshUnity.triangles = triangles;
-                meshUnity.uv = uvs;
+                meshUnity.SetUVs(0, uvs.ToList());
 
                 
                 mf.mesh = meshUnity;

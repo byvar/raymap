@@ -22,12 +22,14 @@
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
 
 		// Lighting
+		[MaterialToggle] _Billboard("Is billboard", Float) = 0
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
 		_SectorFog("Sector fog", Vector) = (0,0,0,0)
 		_SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
 	}
 	SubShader{
 		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
+		Lighting Off
 		Pass{
 			//Tags{ "LightMode" = "ForwardBase" }
 			// pass for ambient light and first light source
@@ -39,7 +41,7 @@
 			#pragma multi_compile_fog
 
 			#define GOURAUD_NUM_LIGHTS 16
-			#include "GouraudShared.cginc"
+			#include "../GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
 				return process_vert(v, 0.0, 0.0);

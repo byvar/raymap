@@ -1,4 +1,4 @@
-﻿Shader "Custom/GouraudLight" {
+﻿Shader "Custom/Gouraud" {
 	Properties{
 		_NumTextures("Number of textures", Float) = 0
 
@@ -22,42 +22,37 @@
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
 
 		// Lighting
+		[MaterialToggle] _Billboard("Is billboard", Float) = 0
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
 		_SectorFog("Sector fog", Vector) = (0,0,0,0)
 		_SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
 	}
 	SubShader{
-		Tags{ "Queue" = "Transparent" "RenderType" = "Transparent" "IGNOREPROJECTOR" = "true" "PreviewType" = "Plane" }
-		ZWrite Off
-		Cull Off
+		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
+		Lighting Off
 		Pass{
 			//Tags{ "LightMode" = "ForwardBase" }
-			Blend SrcAlpha One
-			//Blend One One
 			// pass for ambient light and first light source
-
 			CGPROGRAM
 
 			#pragma vertex vert  
 			#pragma fragment frag
 			#pragma multi_compile_fog
 
-			#define GOURAUD_NUM_LIGHTS 3
 			#include "GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {
-				return process_vert(v, 1.0, 1.0);
+				return process_vert(v, 0.0, 0.0);
 			}
 			float4 frag(v2f i) : COLOR{
-				return process_frag(i, 0.0, 1.0);
+				return process_frag(i, 0.0, 0.0);
 			}
 			ENDCG
 		}
 		/*Pass{
 			Tags{ "LightMode" = "ForwardAdd" }
-			Blend SrcAlpha One
 			// pass for additional light sources
-			//Blend One One // additive blending 
+			Blend One One // additive blending 
 
 			CGPROGRAM
 
@@ -77,5 +72,5 @@
 		}*/
 
 	}
-	Fallback Off
+	Fallback "Custom/GouraudFallback"
 }

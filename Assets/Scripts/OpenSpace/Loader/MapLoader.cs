@@ -28,8 +28,6 @@ namespace OpenSpace {
         public Material baseLightMaterial;
         public Material collideMaterial;
         public Material collideTransparentMaterial;
-        public Material billboardMaterial;
-        public Material billboardAdditiveMaterial;
 
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
@@ -74,7 +72,7 @@ namespace OpenSpace {
         public List<State> states = new List<State>();
         public List<Graph> graphs = new List<Graph>();
         public List<GraphNode> graphNodes = new List<GraphNode>();
-        public List<WayPoint> isolateWaypoints = new List<WayPoint>();
+        public List<WayPoint> waypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
         public List<AnimationReference> animationReferences = new List<AnimationReference>();
@@ -82,8 +80,6 @@ namespace OpenSpace {
         public List<ObjectList> objectLists = new List<ObjectList>();
         public List<ObjectList> uncategorizedObjectLists = new List<ObjectList>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
-        public GameObject graphRoot = null;
-        public GameObject isolateWaypointRoot = null;
         public GameObject familiesRoot = null;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
 
@@ -639,79 +635,10 @@ MonoBehaviour.print(str);
             }
         }
 
-        public bool AddIsolateWaypoint(WayPoint wayPoint)
-        {
-            if (isolateWaypointRoot == null) {
-                isolateWaypointRoot = new GameObject("Isolate WayPoints");
-                isolateWaypointRoot.SetActive(false);
-            }
-
-            foreach (WayPoint existingWaypoint in isolateWaypoints) {
-                if (existingWaypoint.offset == wayPoint.offset) {
-                    return false;
-                }
-            }
-
-            isolateWaypoints.Add(wayPoint);
-            GameObject wayPointGao = new GameObject("Isolate WayPoint");
-            wayPointGao.transform.position = new Vector3(wayPoint.position.x, wayPoint.position.z, wayPoint.position.y);
-            WaypointSprite wpSprite = wayPointGao.AddComponent<WaypointSprite>();
-
-            wayPointGao.transform.SetParent(isolateWaypointRoot.transform);
-
-            return true;
-        }
-
         public void AddUncategorizedObjectList(ObjectList objList) {
             if (!uncategorizedObjectLists.Contains(objList)) uncategorizedObjectLists.Add(objList);
             objList.Gao.transform.SetParent(familiesRoot.transform);
         }
-
-        public bool AddGraph(Graph graph) {
-            if (graphRoot == null) {
-                graphRoot = new GameObject("Graphs");
-                graphRoot.SetActive(false);
-            }
-            foreach (Graph existingGraph in graphs) {
-                if (existingGraph.offset == graph.offset) {
-                    return false;
-                }
-            }
-
-            graphs.Add(graph);
-
-            GameObject go_graph = new GameObject("Graph " + graph.offset.ToString());
-            go_graph.transform.SetParent(graphRoot.transform);
-
-            int nodeNum = 0;
-            foreach (GraphNode node in graph.nodeList) {
-                GameObject go_graphNode = new GameObject("GraphNode[" + nodeNum + "].WayPoint");
-                go_graphNode.transform.position = new Vector3(node.wayPoint.position.x, node.wayPoint.position.z, node.wayPoint.position.y);
-                WaypointSprite wpSprite = go_graphNode.AddComponent<WaypointSprite>();
-
-                var arcList = node.arcList.list;
-                if (arcList.Count>0) {
-                    foreach(var arc in arcList) {
-                        Vector3 to = arc.graphNode.wayPoint.position;
-
-                        WaypointLine wpLine = go_graphNode.AddComponent<WaypointLine>();
-
-                        wpLine.from = new Vector3(node.wayPoint.position.x, node.wayPoint.position.z, node.wayPoint.position.y);
-                        wpLine.to = new Vector3(to.x, to.z, to.y);
-
-                        wpLine.weight = arc.weight;
-                        wpLine.capabilities = arc.capabilities;
-                    }
-                }
-
-                go_graphNode.transform.SetParent(go_graph.transform);
-                nodeNum++;
-            }
-
-            return true;
-        }
-
-
 
         protected IEnumerator PrepareFile(string path) {
             if (Application.platform == RuntimePlatform.WebGLPlayer) {

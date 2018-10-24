@@ -214,6 +214,7 @@ namespace OpenSpace.Visual {
                     tex.field44 = reader.ReadUInt32();
                     tex.field48 = reader.ReadByte();
                     tex.flagsByte = reader.ReadByte(); // contains stuff like tiling mode
+                    tex.name = reader.ReadNullDelimitedString();
                 }
             } else {
                 reader.ReadUInt32();
@@ -243,8 +244,18 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
+                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                    tex.name = reader.ReadString(0x50);
+                } else {
+                    tex.name = reader.ReadString(0x100);
+                }
+                if (Settings.s.game == Settings.Game.TTSE) {
+                    tex.field48 = (byte)reader.ReadUInt32();
+                } else {
+                    tex.field48 = reader.ReadByte();
+                }
+                tex.flagsByte = reader.ReadByte(); // contains stuff like tiling mode
             }
-            if(Settings.s.platform != Settings.Platform.DC) tex.name = reader.ReadNullDelimitedString();
             return tex;
         }
 

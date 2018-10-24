@@ -1,12 +1,10 @@
-﻿
+﻿using System;
 using System.Linq;
+using UnityEngine;
 
 namespace OpenSpace.Waypoints {
-    public class GraphNode {
+    public class GraphNode : ILinkedListEntry {
         public Pointer offset;
-        public GraphNode nextNode;
-        public GraphNode previousNode;
-        public GraphNode node;
         public WayPoint wayPoint;
         public ArcList arcList;
 
@@ -17,19 +15,44 @@ namespace OpenSpace.Waypoints {
 
         public Pointer off_arcList;
 
+        private GameObject gao = null;
+        public GameObject Gao {
+            get {
+                if (gao == null) InitGameObject();
+                return gao;
+            }
+        }
+
+        public Pointer NextEntry {
+            get {
+                return off_nextNode;
+            }
+        }
+
+        public Pointer PreviousEntry {
+            get {
+                return off_prevNode;
+            }
+        }
+
+        private void InitGameObject() {
+            gao = new GameObject("WayPoint");
+            gao.transform.position = new Vector3(wayPoint.position.x, wayPoint.position.z, wayPoint.position.y);
+            WaypointBehaviour wpBehaviour = gao.AddComponent<WaypointBehaviour>();
+            wpBehaviour.node = this;
+        }
+
         public GraphNode(Pointer offset) {
             this.offset = offset;
         }
 
-        public static GraphNode FromOffset(Pointer offset)
-        {
+        public static GraphNode FromOffset(Pointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.graphNodes.FirstOrDefault(g => g.offset == offset);
         }
 
-        public static GraphNode FromOffsetOrRead(Pointer offset, Reader reader)
-        {
+        public static GraphNode FromOffsetOrRead(Pointer offset, Reader reader) {
             if (offset == null) return null;
             GraphNode g = FromOffset(offset);
             if (g == null) {
@@ -63,13 +86,11 @@ namespace OpenSpace.Waypoints {
             node.node = GraphNode.Read(reader, node.off_node);
             Pointer.Goto(ref reader, start);*/
 
-            Pointer start = Pointer.Goto(ref reader, node.off_wayPoint);
-            node.wayPoint = WayPoint.Read(reader, node.off_wayPoint);
-            Pointer.Goto(ref reader, start);
-
-            start = Pointer.Goto(ref reader, node.off_arcList);
-            node.arcList = ArcList.Read(reader, node.off_arcList);
-            Pointer.Goto(ref reader, start);
+            node.wayPoint = WayPoint.FromOffsetOrRead(node.off_wayPoint, reader);
+            if (node.wayPoint != null) node.wayPoint.containingGraphNodes.Add(node);
+            Pointer.DoAt(ref reader, node.off_arcList, () => {
+                node.arcList = ArcList.Read(reader, node.off_arcList);
+            });
 
             return node;
         }

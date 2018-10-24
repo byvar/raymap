@@ -378,6 +378,8 @@ namespace OpenSpace.Loader {
                                 if (ar != null) ar.name = name;
                                 break;
                             case "eST_Graph":
+                                Graph g = Graph.FromOffset(offset);
+                                if (g != null) g.name = name;
                                 break;
                             case "eST_Sector":
                                 Sector s = Sector.FromOffset(offset);

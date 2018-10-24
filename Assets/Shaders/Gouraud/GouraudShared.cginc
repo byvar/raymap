@@ -27,6 +27,7 @@ float4 _Tex2Params2;
 float4 _Tex3Params2;
 
 // Lighting
+float _Billboard;
 //uniform float4 _SectorAmbient;
 uniform float4 _SectorFog;
 uniform float4 _SectorFogParams;
@@ -55,7 +56,7 @@ struct v2f {
 	float4 diffuseColor : TEXCOORD4;
 	float3 normal : TEXCOORD5;
 	float3 multipliedPosition : TEXCOORD6;
-	float fog : TEXCOORD7;
+	float3 fogViewPos : TEXCOORD7;
 	//UNITY_FOG_COORDS(3)
 };
 
@@ -64,6 +65,14 @@ float CalcSphereAttenuation(float distance, float near, float far) {
 		return 1.0;
 	} else {
 		return 1.0 - (distance - near) / (far - near); // TODO: Get correct attenuation
+	}
+}
+
+float CalcNormalFactor(float3 normalDirection, float3 lightDirection) {
+	if (_Billboard == 1.0) {
+		return 1.0;
+	} else {
+		return max(0.0, dot(normalDirection, lightDirection));
 	}
 }
 
@@ -98,7 +107,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 			/*if (_StaticLightParams[i].z == 0) {
 				normalFactor = max(0.0, dot(normalDirection, lightDirection));
 			} else normalFactor = 1.0;*/
-			normalFactor = max(0.0, dot(normalDirection, lightDirection));
+			normalFactor = CalcNormalFactor(normalDirection, lightDirection);
 			if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
 				//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
 			if (_StaticLightParams[i].w != 2) alpha = alpha + _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
@@ -111,7 +120,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 				attenuation = CalcSphereAttenuation(distance, near, far);
 				if (_StaticLightParams[i].z == 0) {
 					lightDirection = normalize(vertexToLightSource);
-					normalFactor = max(0.0, dot(normalDirection, lightDirection));
+					normalFactor = CalcNormalFactor(normalDirection, lightDirection);
 				} else normalFactor = 1.0;
 				if (normalFactor != 0) {
 					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
@@ -132,7 +141,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 				attenuation = CalcSphereAttenuation(distance, near, far);
 				if (_StaticLightParams[i].z == 0) {
 					lightDirection = normalize(_StaticLightDir[i].xyz);
-					normalFactor = max(0.0, dot(normalDirection, lightDirection));
+					normalFactor = CalcNormalFactor(normalDirection, lightDirection);
 				} else normalFactor = 1.0;
 				if (normalFactor != 0) {
 					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
@@ -177,12 +186,37 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	o.uv2 = float3(TRANSFORM_TEX(TransformUV(v.texcoord1.xy, _Tex1Params, _Tex1Params2), _Tex1), v.texcoord1.z);
 	o.uv3 = float3(TRANSFORM_TEX(TransformUV(v.texcoord2.xy, _Tex2Params, _Tex2Params2), _Tex2), v.texcoord2.z);
 	o.uv4 = float3(TRANSFORM_TEX(TransformUV(v.texcoord3.xy, _Tex3Params, _Tex3Params2), _Tex3), v.texcoord3.z);
-	o.pos = UnityObjectToClipPos(v.vertex);
+
 	float4x4 modelMatrix = unity_ObjectToWorld;
 	float4x4 modelMatrixInverse = unity_WorldToObject;
+	float3 normalDirection, multipliedPosition;
+	/*if (_Billboard == 1.0) {
+		// Billboard / LookAt as it is called in the engine
+				float2 worldScale = float2(
+					length(float3(unity_ObjectToWorld[0].x, unity_ObjectToWorld[1].x, unity_ObjectToWorld[2].x)), // scale x axis
+					length(float3(unity_ObjectToWorld[0].y, unity_ObjectToWorld[1].y, unity_ObjectToWorld[2].y)) // scale y axis
+					);
 
-	float3 normalDirection = normalize(mul(float4(v.normal, 0.0), modelMatrixInverse).xyz); // Normal in object space
-	float3 multipliedPosition = mul(modelMatrix, v.vertex).xyz;
+				o.pos = mul(UNITY_MATRIX_P,
+					float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0)
+					+ scaledVertex);
+		float4 viewSpaceCenter = float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0);
+		float4 scaledVertex = float4(v.vertex.z, v.vertex.y, 0.0, 0.0) * float4(worldScale.x, worldScale.y, 1.0, 1.0);
+		//float4 objectCenter = mul(modelMatrix, float4(0, 0, 0, 1.0));
+		//float4 worldVertex = mul(modelMatrix, v.vertex) - objectCenter;
+		//float4 viewSpaceVertex = viewSpaceCenter + float4(-worldVertex.z, worldVertex.y, 0, 0);
+		//float4 scaledVertex = float4(mul((float3x3)unity_ObjectToWorld, IN.vertex.xyz).x, mul((float3x3)unity_ObjectToWorld, IN.vertex.xyz).y, 0.0, 1.0);
+		viewSpaceVertex = viewSpaceCenter + scaledVertex;
+		o.pos = mul(UNITY_MATRIX_P, viewSpaceVertex);
+		//float4 viewSpaceNormal = viewSpaceVertex + float4(0.0, 0.0, -1.0, 0.0);
+		//normalDirection = normalize(mul(float4(mul(UNITY_MATRIX_I_V, viewSpaceNormal).xyz, 0.0), modelMatrixInverse).xyz); // Normal in object space
+		multipliedPosition = mul(UNITY_MATRIX_I_V, viewSpaceVertex).xyz; // Vertex in world space
+	} else {*/
+	o.pos = UnityObjectToClipPos(v.vertex);
+	multipliedPosition = mul(modelMatrix, v.vertex).xyz; // Vertex in world space
+	normalDirection = normalize(mul(float4(v.normal, 0.0), modelMatrixInverse).xyz); // Normal in object space
+
+	//}
 	//float3 viewDirection = normalize(_WorldSpaceCameraPos - mul(modelMatrix, v.vertex).xyz);
 	float3 lightDirection;
 	float attenuation;
@@ -245,16 +279,7 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	o.normal = normalDirection;
 	o.multipliedPosition = multipliedPosition;
 	o.diffuseColor = float4(ambientLighting + diffuseReflection, alpha);
-	if (_SectorFog.w != 0) {
-		if (_SectorFogParams.x != _SectorFogParams.y) { // Blend near != Blend far
-			float fogz = length(WorldSpaceViewDir(v.vertex));
-			o.fog = _SectorFogParams.x + 
-				saturate((fogz - _SectorFogParams.z) / (_SectorFogParams.w - _SectorFogParams.z))
-				* (_SectorFogParams.y - _SectorFogParams.x);
-		} else {
-			o.fog = _SectorFogParams.y;
-		}
-	}
+	if (_SectorFog.w != 0) o.fogViewPos = UnityObjectToViewPos(v.vertex).xyz;
 	//o.specularColor = specularReflection;
 	//UNITY_TRANSFER_FOG(o, o.pos);
 	return o;
@@ -318,7 +343,15 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 	}*/
 	// Add fog
 	if (_SectorFog.w != 0) {
-		float fog = i.fog;
+		float fog;
+		if (_SectorFogParams.x != _SectorFogParams.y) { // Blend near != Blend far
+			float fogz = length(i.fogViewPos);
+			fog = _SectorFogParams.x +
+				saturate((fogz - _SectorFogParams.z) / (_SectorFogParams.w - _SectorFogParams.z))
+				* (_SectorFogParams.y - _SectorFogParams.x);
+		} else {
+			fog = _SectorFogParams.y;
+		}
 		if (isAdd == 1.0) {
 			c.rgb = lerp(c.rgb, float3(0, 0, 0), fog * _SectorFog.w);
 		} else {

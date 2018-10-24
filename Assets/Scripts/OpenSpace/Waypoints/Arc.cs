@@ -36,8 +36,7 @@ namespace OpenSpace.Waypoints {
             arc.field_0x1C = reader.ReadInt32();
 
             if (arc.off_node != null) {
-                Pointer.DoAt(ref reader, arc.off_node, () =>
-                {
+                Pointer.DoAt(ref reader, arc.off_node, () => {
                     arc.graphNode = GraphNode.FromOffsetOrRead(arc.off_node, reader);
                 });
             }

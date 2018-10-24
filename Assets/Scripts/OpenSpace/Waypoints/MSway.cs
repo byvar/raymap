@@ -17,12 +17,7 @@
             MSWay msWay = new MSWay(offset);
 
             msWay.off_graph = Pointer.Read(reader);
-            if (msWay.off_graph != null) {
-                Pointer original = Pointer.Goto(ref reader, msWay.off_graph);
-                msWay.graph = Graph.Read(reader, msWay.off_graph);
-                Pointer.Goto(ref reader, original);
-            }
-
+            msWay.graph = Graph.FromOffsetOrRead(msWay.off_graph, reader);
             msWay.currentIndex = reader.ReadUInt32();
             msWay.someFlag = reader.ReadByte();
 
