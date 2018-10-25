@@ -37,7 +37,7 @@ namespace OpenSpace.Visual {
                 if (gao == null) {
                     gao = new GameObject(name);// Create object and read triangle data
                     BillboardBehaviour billboard = gao.AddComponent<BillboardBehaviour>();
-                    billboard.isLookAt = true;
+                    billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
                     CreateUnityMesh();
                 }
                 return gao;

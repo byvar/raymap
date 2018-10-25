@@ -72,7 +72,7 @@ namespace OpenSpace.Visual {
                     mesh.bones.bindPoses[j] = mesh.bones.bones[j].worldToLocalMatrix * gao.transform.localToWorldMatrix;
                 }
             }*/
-            VisualMaterial.Hint materialHints = mesh.isLookAt != 0 ? VisualMaterial.Hint.Billboard : VisualMaterial.Hint.None;
+            VisualMaterial.Hint materialHints = mesh.lookAtMode != 0 ? VisualMaterial.Hint.Billboard : VisualMaterial.Hint.None;
             //VisualMaterial.Hint materialHints = VisualMaterial.Hint.None;
             uint num_textures = 0;
             if (visualMaterial != null) {

@@ -20,7 +20,7 @@ namespace OpenSpace.Visual {
         public Pointer off_materials;
         public Pointer off_subblock_types;
         public Pointer off_subblocks;
-        public uint isLookAt;
+        public uint lookAtMode;
         public ushort num_vertices;
         public ushort num_subblocks;
         public string name;
@@ -59,9 +59,9 @@ namespace OpenSpace.Visual {
                     child.transform.localPosition = Vector3.zero;
                 }
             }
-            if (isLookAt != 0) {
+            if (lookAtMode != 0) {
                 BillboardBehaviour billboard = gao.AddComponent<BillboardBehaviour>();
-                billboard.isLookAt = true;
+                billboard.mode = (BillboardBehaviour.LookAtMode)lookAtMode;
             }
         }
 
@@ -100,8 +100,9 @@ namespace OpenSpace.Visual {
                 reader.ReadInt32();
                 reader.ReadInt32();
             }
-            m.isLookAt = reader.ReadUInt32();
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+                m.lookAtMode = reader.ReadUInt32();
+                //if (m.lookAtMode != 0) l.print(m.lookAtMode);
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();
                 reader.ReadInt32();
@@ -115,6 +116,7 @@ namespace OpenSpace.Visual {
                     reader.ReadInt16();
                 }
             } else {
+                reader.ReadInt32();
                 reader.ReadInt32();
                 reader.ReadSingle();
                 reader.ReadSingle();
