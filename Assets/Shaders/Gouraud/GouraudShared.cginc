@@ -65,6 +65,13 @@ float CalcSphereAttenuation(float distance, float near, float far) {
 		return 1.0;
 	} else {
 		return 1.0 - (distance - near) / (far - near); // TODO: Get correct attenuation
+		/*float attenuation = 1.0;
+		float nearNear = near*near;
+		float farFar = far*far;
+		if (nearNear != farFar) {
+			attenuation = 1.0 / (farFar - nearNear);
+		}
+		return (farFar - distance) * attenuation;*/
 	}
 }
 

@@ -30,6 +30,10 @@ public class Controller : MonoBehaviour {
     MapLoader loader = null;
     bool viewCollision_ = false;
     public bool viewCollision = false;
+    bool viewInvisible_ = false;
+    public bool viewInvisible = false;
+    bool viewGraphs_ = false;
+    public bool viewGraphs = false;
 
 
     private GameObject graphRoot = null;
@@ -182,8 +186,20 @@ public class Controller : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.C)) {
             viewCollision = !viewCollision;
         }
+        if (Input.GetKeyDown(KeyCode.I)) {
+            viewInvisible = !viewInvisible;
+        }
+        if (Input.GetKeyDown(KeyCode.G)) {
+            viewGraphs = !viewGraphs;
+        }
+        if (loader != null && viewInvisible != viewInvisible_) {
+            UpdateViewInvisible();
+        }
         if (loader != null && viewCollision != viewCollision_) {
             UpdateViewCollision();
+        }
+        if (loader != null && viewGraphs != viewGraphs_) {
+            UpdateViewGraphs();
         }
     }
 
@@ -326,6 +342,27 @@ public class Controller : MonoBehaviour {
         }
     }
 
+    public void UpdateViewGraphs() {
+        if (loader != null) {
+            viewGraphs_ = viewGraphs;
+            if(graphRoot != null) graphRoot.SetActive(viewGraphs);
+            if (isolateWaypointRoot != null) isolateWaypointRoot.SetActive(viewGraphs);
+        }
+    }
+
+    public void UpdateViewInvisible() {
+        if (loader != null) {
+            viewInvisible_ = viewInvisible;
+            foreach (SuperObject so in loader.superObjects) {
+                if (so.Gao != null) {
+                    if (so.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible)) {
+                        so.Gao.SetActive(viewCollision | viewInvisible);
+                    }
+                }
+            }
+        }
+    }
+
     public void UpdateViewCollision() {
         if (loader != null) {
             viewCollision_ = viewCollision;
@@ -362,7 +399,7 @@ public class Controller : MonoBehaviour {
             foreach (SuperObject so in loader.superObjects) {
                 if (so.Gao != null) {
                     if (so.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible)) {
-                        so.Gao.SetActive(viewCollision);
+                        so.Gao.SetActive(viewCollision | viewInvisible);
                     }
                 }
             }

@@ -18,11 +18,14 @@ public class LightManager : MonoBehaviour {
 
     [Range(0.0f, 1.0f)]
     public float luminosity = 0.5f;
-    private float curLiminosity = 0.5f;
+    private float _luminosity = 0.5f;
 
     public bool saturate = true;
-    private bool curSaturate = true;
+    private bool _saturate = true;
     public bool useDefaultSettings = true;
+
+    public bool enableLighting = true;
+    private bool _enableLighting = true;
 
     public bool IsLoaded {
         get { return loaded; }
@@ -46,12 +49,19 @@ public class LightManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (loaded) {
-            if (curLiminosity != luminosity) {
-                curLiminosity = luminosity;
+            if (Input.GetKeyDown(KeyCode.L)) {
+                enableLighting = !enableLighting;
+            }
+            if (_enableLighting != enableLighting) {
+                _enableLighting = enableLighting;
+                Shader.SetGlobalFloat("_DisableLighting", enableLighting ? 0f : 1f);
+            }
+            if (_luminosity != luminosity) {
+                _luminosity = luminosity;
                 Shader.SetGlobalFloat("_Luminosity", luminosity);
             }
-            if (curSaturate != saturate) {
-                curSaturate = saturate;
+            if (_saturate != saturate) {
+                _saturate = saturate;
                 Shader.SetGlobalFloat("_Saturate", saturate ? 1f : 0f);
             }
 
@@ -91,12 +101,12 @@ public class LightManager : MonoBehaviour {
                 //backgroundPanel.material.SetFloat("_DisableLighting", 1f);
                 if (activeBackgroundSector != null) {
                     if (activeBackgroundSector != previousActiveBackgroundSector) {
-                        backgroundPanel.material.SetFloat("_DisableLighting", 0f);
+                        //backgroundPanel.material.SetFloat("_DisableLighting", 0f);
                         sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
                         previousActiveBackgroundSector = activeBackgroundSector;
                     }
                 } else {
-                    backgroundPanel.material.SetFloat("_DisableLighting", 1f);
+                    //backgroundPanel.material.SetFloat("_DisableLighting", 1f);
                 }
                 //RenderSettings.skybox = skyboxMat;
                 //Camera.main.clearFlags = CameraClearFlags.Skybox;

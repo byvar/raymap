@@ -1,6 +1,7 @@
 ﻿using OpenSpace.Waypoints;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class WaypointBehaviour : MonoBehaviour {
@@ -32,6 +33,39 @@ public class WaypointBehaviour : MonoBehaviour {
                 //DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
             }
         }
+        CreateMesh();
+    }
+
+    void CreateMesh() {
+        MeshFilter mf = gameObject.AddComponent<MeshFilter>();
+        MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
+        Material unityMat = Resources.Load("Material_WP") as Material;
+        mr.material = unityMat;
+        Mesh meshUnity = new Mesh();
+        Vector3[] vertices = new Vector3[4];
+        vertices[0] = new Vector3(0, -1, -1);
+        vertices[1] = new Vector3(0, -1, 1);
+        vertices[2] = new Vector3(0, 1, -1);
+        vertices[3] = new Vector3(0, 1, 1);
+        Vector3[] normals = new Vector3[4];
+        normals[0] = Vector3.forward;
+        normals[1] = Vector3.forward;
+        normals[2] = Vector3.forward;
+        normals[3] = Vector3.forward;
+        Vector3[] uvs = new Vector3[4];
+        uvs[0] = new Vector3(0, 0, 1);
+        uvs[1] = new Vector3(1, 0, 1);
+        uvs[2] = new Vector3(0, 1, 1);
+        uvs[3] = new Vector3(1, 1, 1);
+        int[] triangles = new int[] { 0, 2, 1, 1, 2, 3 };
+
+        meshUnity.vertices = vertices;
+        meshUnity.normals = normals;
+        meshUnity.triangles = triangles;
+        meshUnity.SetUVs(0, uvs.ToList());
+
+
+        mf.mesh = meshUnity;
     }
 
     void Update() {
@@ -66,7 +100,7 @@ public class WaypointBehaviour : MonoBehaviour {
     }
 
     // Use this for initialization
-    void OnDrawGizmos() {
+    //void OnDrawGizmos() {
         /*if (node != null) {
             foreach (Arc arc in node.arcList.list) {
                 if (arc.weight == -1) {
@@ -78,8 +112,8 @@ public class WaypointBehaviour : MonoBehaviour {
                 DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
             }
         }*/
-        Gizmos.DrawIcon(transform.position, "WPtex.png", false);
-    }
+        //Gizmos.DrawIcon(transform.position, "WPtex.png", false);
+    //}
 
     /*public static void DrawLineThickness(Vector3 p1, Vector3 p2, float width) {
         int count = Mathf.CeilToInt(width); // how many lines are needed.

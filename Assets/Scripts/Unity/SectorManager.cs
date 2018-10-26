@@ -88,6 +88,12 @@ public class SectorManager : MonoBehaviour {
                 }
             }*/
         }
+        if (loaded) {
+            foreach (Perso p in MapLoader.Loader.persos) {
+                PersoBehaviour pb = p.Gao.GetComponent<PersoBehaviour>();
+                ApplySectorLighting(pb.sector, p.Gao, LightInfo.ObjectLightedFlag.Perso);
+            }
+        }
     }
 
     public void ApplySectorLighting(Sector s, GameObject gao, LightInfo.ObjectLightedFlag objectType) {
@@ -122,7 +128,9 @@ public class SectorManager : MonoBehaviour {
                         staticLightPos.Add(new Vector4(li.Light.transform.position.x, li.Light.transform.position.y, li.Light.transform.position.z, li.type));
                         staticLightDir.Add(li.Light.transform.TransformVector(Vector3.back));
                         staticLightCol.Add(li.color);
-                        staticLightParams.Add(new Vector4(li.near, li.far, li.paintingLightFlag, li.alphaLightFlag));
+                        Vector3 scale = li.transMatrix.GetScale(true);
+                        float maxScale = Mathf.Max(scale.x, scale.y, scale.z);
+                        staticLightParams.Add(new Vector4(li.near * maxScale, li.far * maxScale, li.paintingLightFlag, li.alphaLightFlag));
                         break;
                 }
             }

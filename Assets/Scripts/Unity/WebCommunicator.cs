@@ -113,7 +113,9 @@ public class WebCommunicator : MonoBehaviour {
         persoJSON["nameModel"] = perso.nameModel;
         persoJSON["nameInstance"] = perso.namePerso;
         if (perso.p3dData.family != null) persoJSON["family"] = perso.p3dData.family.family_index;
-        if (perso.p3dData.stateCurrent != null) persoJSON["state"] = perso.p3dData.stateCurrent.ToString();
+        if (perso.p3dData.stateCurrent != null && perso.p3dData.family != null) {
+            persoJSON["state"] = perso.p3dData.family.states.IndexOf(perso.p3dData.stateCurrent);
+        }
         if (perso.p3dData.objectList != null) persoJSON["objectList"] = perso.p3dData.objectList.ToString();
         return persoJSON;
     }

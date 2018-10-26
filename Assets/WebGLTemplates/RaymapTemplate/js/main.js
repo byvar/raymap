@@ -311,12 +311,10 @@ function showObjectDescription(so) {
 		stateSelector.empty();
 		let family = fullData.families[so.perso.family];
 		if(family != null && family.hasOwnProperty("states")) {
-			let stateIndex = 0;
 			$.each(family.states, function (idx, val) {
 				$('#state').append("<option value='" + val + "'> " + val + " </option>");
-				if(val === so.perso.state) stateIndex = idx;
 			});
-			stateSelector.prop("selectedIndex",stateIndex);
+			stateSelector.prop("selectedIndex", so.perso.state);
 		}
 	} else {
 		$('.perso-description').addClass('invisible');
