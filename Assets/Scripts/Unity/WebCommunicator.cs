@@ -109,6 +109,7 @@ public class WebCommunicator : MonoBehaviour {
     }
     private JSONObject GetPersoJSON(Perso perso) {
         JSONObject persoJSON = new JSONObject();
+        persoJSON["offset"] = perso.offset.ToString();
         persoJSON["nameFamily"] = perso.nameFamily;
         persoJSON["nameModel"] = perso.nameModel;
         persoJSON["nameInstance"] = perso.namePerso;
@@ -116,7 +117,7 @@ public class WebCommunicator : MonoBehaviour {
         if (perso.p3dData.stateCurrent != null && perso.p3dData.family != null) {
             persoJSON["state"] = perso.p3dData.family.states.IndexOf(perso.p3dData.stateCurrent);
         }
-        if (perso.p3dData.objectList != null) persoJSON["objectList"] = perso.p3dData.objectList.ToString();
+        if (perso.p3dData.objectList != null) persoJSON["objectList"] = perso.Gao.GetComponent<PersoBehaviour>().poListIndex;
         return persoJSON;
     }
     private JSONObject GetAlwaysJSON() {
@@ -132,20 +133,33 @@ public class WebCommunicator : MonoBehaviour {
         return alwaysJSON;
     }
 
-
-    public void SetSettingLuminosity(float luminosity) {
-        controller.lightManager.luminosity = luminosity;
+    
+    public void ParseMessage(string msgString) {
+        JSONNode msg = JSON.Parse(msgString);
+        if (msg["perso"] != null) {
+            ParsePersoJSON(msg["perso"]);
+        }
+        if (msg["settings"] != null) {
+            ParseSettingsJSON(msg["settings"]);
+        }
     }
-    public void SetSettingSaturate(bool saturate) {
-        controller.lightManager.saturate = saturate;
+    public void ParsePersoJSON(JSONNode msg) {
+        MapLoader l = MapLoader.Loader;
+        Perso perso = l.persos.Where(p => p.offset.ToString() == msg["offset"]).FirstOrDefault();
+        if (perso != null) {
+            PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+            if (msg["state"] != null) pb.SetState(msg["state"].AsInt);
+            if (msg["objectList"] != null) pb.poListIndex = msg["objectList"].AsInt;
+        }
     }
-    public void SetViewCollision(bool viewCollision) {
-        controller.viewCollision = viewCollision;
-    }
-    public void SetDisplayInactiveSectors(bool displayInactiveSectors) {
-        controller.sectorManager.displayInactiveSectors = displayInactiveSectors;
-    }
-    public void SetObjectSettings(string settings) {
-        JSONNode settingsJSON = JSON.Parse(settings);
+    public void ParseSettingsJSON(JSONNode msg) {
+        MapLoader l = MapLoader.Loader;
+        if (msg["viewCollision"] != null) controller.viewCollision = msg["viewCollision"].AsBool;
+        if (msg["luminosity"] != null) controller.lightManager.luminosity = msg["luminosity"].AsFloat;
+        if (msg["saturate"] != null) controller.lightManager.saturate = msg["saturate"].AsBool;
+        if (msg["viewGraphs"] != null) controller.viewGraphs = msg["viewGraphs"].AsBool;
+        if (msg["enableLighting"] != null) controller.lightManager.enableLighting = msg["enableLighting"].AsBool;
+        if (msg["viewInvisible"] != null) controller.viewInvisible = msg["viewInvisible"].AsBool;
+        if (msg["displayInactive"] != null) controller.sectorManager.displayInactiveSectors = msg["displayInactive"].AsBool;
     }
 }

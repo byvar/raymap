@@ -67,9 +67,10 @@ let notificationTimeout = null;
 let dialogueMsg = null;
 let fullData = null;
 let objectsList = [];
+let currentSO = null;
 
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description;
+let btn_close_description, stateSelector;
 
 // FUNCTIONS	
 function addSongsToPlaylist(songsJSON) {
@@ -307,7 +308,6 @@ function showObjectDescription(so) {
 	
 	if(so.hasOwnProperty("perso")) {
 		$('.perso-description').removeClass('invisible');
-		let stateSelector = $('#state');
 		stateSelector.empty();
 		let family = fullData.families[so.perso.family];
 		if(family != null && family.hasOwnProperty("states")) {
@@ -325,6 +325,18 @@ function showObjectDescription(so) {
 	}, 100);
 	btn_close_description.removeClass('disabled-button');
 	description_column.removeClass('invisible');
+}
+
+function setState(state) {
+	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
+		currentSO.perso.state = state;
+		let jsonObj = {}
+		let perso = {}
+		perso["offset"] = currentSO.perso.offset;
+		perso["state"] = state;
+        jsonObj["perso"] = perso;
+		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	}
 }
 
 /*function clickSoundtrack(jsonFile) {
@@ -419,6 +431,7 @@ $(function() {
 	description_content = $('#content-description');
 	description_column = $('.column-description');
 	btn_close_description = $('#btn-close-description');
+	stateSelector = $('#state');
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
@@ -429,6 +442,7 @@ $(function() {
 		$(".objects-item").removeClass("current-objects-item");
 		$(this).addClass("current-objects-item");
 		let so = getSuperObjectByIndex(index);
+		currentSO = so;
 		showObjectDescription(so);
 		return false;
 	});
@@ -436,6 +450,7 @@ $(function() {
 	$(document).on('click', "#btn-close-description", function() {
 		description_column.addClass('invisible');
 		$(".objects-item").removeClass("current-objects-item");
+		currentSO = null;
 		$(this).addClass("disabled-button");
 		return false;
 	});
@@ -445,6 +460,12 @@ $(function() {
 		return false;
 	});
 	
+	$(document).on('change', "#state", function() {
+		let selectedIndex = $(this).prop('selectedIndex');
+		setState(selectedIndex);
+		$(this).blur();
+		return false;
+	});
 	
 	
 	
