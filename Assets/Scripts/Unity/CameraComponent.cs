@@ -5,7 +5,7 @@ using UnityEngine;
 // http://forum.unity3d.com/threads/a-free-simple-smooth-mouselook.73117/
 
 
-public class MouseLook : MonoBehaviour {
+public class CameraComponent : MonoBehaviour {
     Vector2 _mouseAbsolute;
     Vector2 _smoothMouse;
 
@@ -15,10 +15,10 @@ public class MouseLook : MonoBehaviour {
     public Vector2 targetDirection;
     public Vector2 targetCharacterDirection;
     
-    private bool _mouselookEnabled = false;
+    public bool mouseLookEnabled = false;
     private bool _shifted = false;
     public float flySpeed = 20f;
-    public GameObject defaultCamera;
+    public Camera cam;
 
 
     void Start() {
@@ -26,29 +26,53 @@ public class MouseLook : MonoBehaviour {
         targetDirection = transform.localRotation.eulerAngles;
     }
 
+    public void JumpTo(GameObject gao) {
+        Vector3? center = null, size = null;
+        PersoBehaviour pb = gao.GetComponent<PersoBehaviour>();
+        if (pb != null) {
+            //print(pb.perso.SuperObject.boundingVolume.Center + " - " + pb.perso.SuperObject.boundingVolume.Size);
+            center = pb.perso.SuperObject != null ? (pb.transform.position + pb.perso.SuperObject.boundingVolume.Center) : pb.transform.position;
+            size = pb.perso.SuperObject != null ? pb.perso.SuperObject.boundingVolume.Size : Vector3.one;
+        }/* else {
+            SectorComponent sc = gao.GetComponent<SectorComponent>();
+            if (sc != null) {
+                jumpToPos = sc.sector.SuperObject.boundingVolume.Center;
+            }
+        }*/
+        if (center.HasValue) {
+            float cameraDistance = 4.0f; // Constant factor
+            float objectSize = Mathf.Max(size.Value.x, size.Value.y, size.Value.z);
+            float cameraView = 2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * cam.fieldOfView); // Visible height 1 meter in front
+            float distance = cameraDistance * objectSize / cameraView; // Combined wanted distance from the object
+            distance += objectSize; // Estimated offset from the center to the outside of the object * 2
+            transform.LookAt(center.Value, Vector3.up);
+            transform.position = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
+        }
+    }
+
     void Update() {
         if (Input.GetKeyUp(KeyCode.LeftShift) & _shifted)
             _shifted = false;
 
         if ((Input.GetKeyDown(KeyCode.LeftShift) & !_shifted) |
-            (Input.GetKeyDown(KeyCode.Escape) & _mouselookEnabled)) {
+            (Input.GetKeyDown(KeyCode.Escape) & mouseLookEnabled)) {
             _shifted = true;
 
-            if (!_mouselookEnabled) {
-                _mouselookEnabled = true;
+            if (!mouseLookEnabled) {
+                mouseLookEnabled = true;
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             } else {
                 if (Input.GetKeyDown(KeyCode.Escape))
                     _shifted = false;
 
-                _mouselookEnabled = false;
+                mouseLookEnabled = false;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
         }
 
-        if (!_mouselookEnabled)
+        if (!mouseLookEnabled)
             return;
 
         //ensure these stay this way
@@ -89,10 +113,10 @@ public class MouseLook : MonoBehaviour {
 
         //movement
         if (Input.GetAxis("Vertical") != 0) {
-            transform.Translate(defaultCamera.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
+            transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
         }
         if (Input.GetAxis("Horizontal") != 0) {
-            transform.Translate(defaultCamera.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
+            transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
         }
         if (Input.GetKey(KeyCode.R)) {
             transform.Translate(Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);

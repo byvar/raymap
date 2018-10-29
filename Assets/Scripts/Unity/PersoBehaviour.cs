@@ -311,7 +311,7 @@ public class PersoBehaviour : MonoBehaviour {
             animationSpeed = state.speed;
             //animationSpeed = state.speed;
             InitAnimationMontreal(state.anim_refMontreal);
-            UpdateFrame(currentFrame);
+            UpdateAnimation();
         } else if (state.anim_ref != null
             && l.animationBanks != null
             && l.animationBanks.Length > bank_index
@@ -323,7 +323,7 @@ public class PersoBehaviour : MonoBehaviour {
             animationSpeed = state.speed;
             //animationSpeed = state.speed;
             InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
-            UpdateFrame(currentFrame);
+            UpdateAnimation();
         } else {
             a3d = null;
         }
@@ -355,15 +355,42 @@ public class PersoBehaviour : MonoBehaviour {
                 SetState(currentState);
             }
         }
-        if (playAnimation) {
+        bool sectorActive = false, insideSectors = false;
+        if (sector == null || sector.Loaded) sectorActive = true;
+        if (sector == null || controller.sectorManager.activeSectors.Count > 0) insideSectors = true;
+        if (playAnimation && sectorActive) {
             updateCounter += Time.deltaTime * animationSpeed;
-            if (updateCounter >= 1f) {
-                updateCounter %= 1f;
-                if (currentFrame == 0 && autoNextState) {
-                    GotoAutoNextState();
-                    if (currentFrame == 0) UpdateFrame(currentFrame);
+            // If the camera is not inside a sector, animations will only update 1 out of 2 times (w/ frameskip) to avoid lag
+            if ((!insideSectors && updateCounter >= 2f) || (insideSectors && updateCounter >= 1f)) {
+                uint passedFrames = (uint)Mathf.FloorToInt(updateCounter);
+                updateCounter %= 1;
+                currentFrame += passedFrames;
+                if (a3d != null && currentFrame >= a3d.num_onlyFrames) {
+                    if (autoNextState) {
+                        AnimA3DGeneral prevAnim = a3d;
+                        GotoAutoNextState();
+                        if (a3d == prevAnim) {
+                            currentFrame = currentFrame % a3d.num_onlyFrames;
+                            UpdateAnimation();
+                        }
+                    } else {
+                        currentFrame = currentFrame % a3d.num_onlyFrames;
+                        UpdateAnimation();
+                    }
+                } else if (animMontreal != null && currentFrame >= animMontreal.num_frames) {
+                    if (autoNextState) {
+                        AnimationMontreal prevAnim = animMontreal;
+                        GotoAutoNextState();
+                        if (animMontreal == prevAnim) {
+                            currentFrame = currentFrame % animMontreal.num_frames;
+                            UpdateAnimation();
+                        }
+                    } else {
+                        currentFrame = currentFrame % animMontreal.num_frames;
+                        UpdateAnimation();
+                    }
                 } else {
-                    UpdateFrame(currentFrame);
+                    UpdateAnimation();
                 }
             }
         }
@@ -437,6 +464,7 @@ public class PersoBehaviour : MonoBehaviour {
                             if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > ntto.object_index) {
                                 PhysicalObject o = perso.p3dData.objectList[ntto.object_index].po;
                                 if (o != null) {
+                                    //if (o.visualSetType == 1) print(name);
                                     PhysicalObject c = o.Clone();
                                     subObjects[i][j] = c;
                                     c.Gao.transform.parent = channelObjects[i].transform;
@@ -510,8 +538,9 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    void UpdateFrame(uint currentFrame) {
+    void UpdateAnimation() {
         if (loaded && a3d != null && channelObjects != null & subObjects != null) {
+            if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
             // First pass: reset TRS for all sub objects
             for (int i = 0; i < channelObjects.Length; i++) {
                 GameObject c = channelObjects[i];
@@ -644,9 +673,9 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
             }
-            this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
+            //this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
         } else if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
-            UpdateFrameMontreal(currentFrame);
+            UpdateFrameMontreal();
         }/*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
             for (int i = 0; i < perso.physical_objects.Length; i++) {
                 if (perso.physical_objects[i] != null) {
@@ -662,8 +691,9 @@ public class PersoBehaviour : MonoBehaviour {
         }*/
     }
 
-    void UpdateFrameMontreal(uint currentFrame) {
+    void UpdateFrameMontreal() {
         if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
+            if (currentFrame >= animMontreal.num_frames) currentFrame %= animMontreal.num_frames;
             // First pass: reset TRS for all sub objects
             for (int i = 0; i < channelObjects.Length; i++) {
                 GameObject c = channelObjects[i];
@@ -723,7 +753,7 @@ public class PersoBehaviour : MonoBehaviour {
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
             }
-            this.currentFrame = (currentFrame + 1) % animMontreal.num_frames;
+            //this.currentFrame = (currentFrame + 1) % animMontreal.num_frames;
         }
     }
 

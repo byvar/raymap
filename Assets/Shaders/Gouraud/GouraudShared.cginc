@@ -128,7 +128,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 				if (_StaticLightParams[i].z == 0) {
 					lightDirection = normalize(vertexToLightSource);
 					normalFactor = CalcNormalFactor(normalDirection, lightDirection);
-				} else normalFactor = 1.0;
+				} else normalFactor = 1.0; // Painting light
 				if (normalFactor != 0) {
 					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
 					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
@@ -138,7 +138,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 		} else if (_StaticLightPos[i].w == 4) {
 			if (_StaticLightParams[i].w != 1) ambient.xyz = ambient.xyz + _StaticLightCol[i].xyz * _DiffuseCoef.xyz;
 			//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-			if (_StaticLightParams[i].w != 2) ambient.w = ambient.w + _StaticLightCol[i].w* _DiffuseCoef.w;// * _DiffuseCoef.w;
+			if (_StaticLightParams[i].w != 2) ambient.w = ambient.w + _StaticLightCol[i].w * _DiffuseCoef.w;// * _DiffuseCoef.w;
 		} else if (_StaticLightPos[i].w == 7) {
 			vertexToLightSource = _StaticLightPos[i].xyz - multipliedPosition;
 			distance = length(vertexToLightSource);
@@ -149,7 +149,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 				if (_StaticLightParams[i].z == 0) {
 					lightDirection = normalize(_StaticLightDir[i].xyz);
 					normalFactor = CalcNormalFactor(normalDirection, lightDirection);
-				} else normalFactor = 1.0;
+				} else normalFactor = 1.0; // Painting light
 				if (normalFactor != 0) {
 					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
 					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w

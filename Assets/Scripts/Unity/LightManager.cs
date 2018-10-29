@@ -69,7 +69,7 @@ public class LightManager : MonoBehaviour {
             Color? backgroundColor = null;
             VisualMaterial skyMaterial = null;
             Sector activeBackgroundSector = null;
-            if (MapLoader.Loader.globals.backgroundGameMaterial != null && MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial != null) {
+            if (MapLoader.Loader.globals != null && MapLoader.Loader.globals.backgroundGameMaterial != null && MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial != null) {
                 skyMaterial = MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial;
             } else {
                 if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {

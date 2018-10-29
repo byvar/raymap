@@ -1,4 +1,5 @@
-﻿using OpenSpace.Object.Properties;
+﻿using OpenSpace.Collide;
+using OpenSpace.Object.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -130,6 +131,7 @@ namespace OpenSpace.Object {
                 so.Gao.transform.localScale = scale;
 
                 SuperObjectComponent soc = so.Gao.AddComponent<SuperObjectComponent>();
+                so.Gao.layer = LayerMask.NameToLayer("SuperObject");
                 soc.so = so;
 
                 if (so.boundingVolume != null) {

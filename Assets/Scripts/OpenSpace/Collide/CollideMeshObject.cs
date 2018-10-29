@@ -42,6 +42,22 @@ namespace OpenSpace.Collide {
             this.type = type;
         }
 
+        public void SetVisualsActive(bool active) {
+            Renderer[] renderers = gao.GetComponentsInChildren<Renderer>(includeInactive: true);
+            foreach (Renderer ren in renderers) {
+                ren.enabled = active;
+            }
+            /*if (subblocks != null) {
+                foreach (ICollideGeometricElement subblock in subblocks) {
+                    GameObject child = subblock.Gao;
+                    if (child != null) {
+                        Renderer mainRen = child.GetComponent<Renderer>();
+                    }
+                    //subblock.Gao
+                }
+            }*/
+        }
+
         public static CollideMeshObject Read(Reader reader, Pointer offset, Type type = Type.Default) {
             MapLoader l = MapLoader.Loader;
             CollideMeshObject m = new CollideMeshObject(offset, type);
@@ -145,7 +161,10 @@ namespace OpenSpace.Collide {
             }
             for (uint i = 0; i < m.num_subblocks; i++) {
                 if (m.subblocks[i] != null) {
-                    if (m.subblocks[i] is CollideMeshElement) {
+                    GameObject child = m.subblocks[i].Gao;
+                    child.transform.SetParent(m.gao.transform);
+                    child.transform.localPosition = Vector3.zero;
+                    /*if (m.subblocks[i] is CollideMeshElement) {
                         GameObject child = ((CollideMeshElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
@@ -157,16 +176,17 @@ namespace OpenSpace.Collide {
                         GameObject child = ((CollideAlignedBoxesElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
-                    }
+                    }*/
                 }
             }
-            m.gao.SetActive(false); // Invisible by default
+            m.SetVisualsActive(false); // Invisible by default
+            //m.gao.SetActive(false); // Invisible by default
             return m;
         }
 
         public CollideMeshObject Clone() {
             CollideMeshObject m = (CollideMeshObject)MemberwiseClone();
-            m.gao = new GameObject("Collide Set");
+            m.gao = new GameObject("Collide Set @ " + offset);
             m.gao.tag = "Collide";
             m.subblocks = new ICollideGeometricElement[num_subblocks];
             for (uint i = 0; i < m.num_subblocks; i++) {
@@ -176,7 +196,10 @@ namespace OpenSpace.Collide {
             }
             for (uint i = 0; i < m.num_subblocks; i++) {
                 if (m.subblocks[i] != null) {
-                    if (m.subblocks[i] is CollideMeshElement) {
+                    GameObject child = m.subblocks[i].Gao;
+                    child.transform.SetParent(m.gao.transform);
+                    child.transform.localPosition = Vector3.zero;
+                    /*if (m.subblocks[i] is CollideMeshElement) {
                         GameObject child = ((CollideMeshElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
@@ -188,10 +211,11 @@ namespace OpenSpace.Collide {
                         GameObject child = ((CollideAlignedBoxesElement)m.subblocks[i]).Gao;
                         child.transform.SetParent(m.gao.transform);
                         child.transform.localPosition = Vector3.zero;
-                    }
+                    }*/
                 }
             }
-            m.gao.SetActive(false); // Invisible by default
+            m.SetVisualsActive(false); // Invisible by default
+            //m.gao.SetActive(false); // Invisible by default
             return m;
         }
     }

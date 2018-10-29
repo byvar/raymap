@@ -70,7 +70,7 @@ let objectsList = [];
 let currentSO = null;
 
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description, stateSelector;
+let btn_close_description, stateSelector, objectListSelector;
 
 // FUNCTIONS	
 function addSongsToPlaylist(songsJSON) {
@@ -309,13 +309,28 @@ function showObjectDescription(so) {
 	if(so.hasOwnProperty("perso")) {
 		$('.perso-description').removeClass('invisible');
 		stateSelector.empty();
+		objectListSelector.empty();
+		objectListSelector.append("<option value='0'>None</option>");
 		let family = fullData.families[so.perso.family];
-		if(family != null && family.hasOwnProperty("states")) {
-			$.each(family.states, function (idx, val) {
-				$('#state').append("<option value='" + val + "'> " + val + " </option>");
-			});
-			stateSelector.prop("selectedIndex", so.perso.state);
+		if(family != null) {
+			if(family.hasOwnProperty("states")) {
+				$.each(family.states, function (idx, val) {
+					stateSelector.append("<option value='" + idx + "'>" + val + "</option>");
+				});
+				stateSelector.prop("selectedIndex", so.perso.state);
+			}
+			if(family.hasOwnProperty("objectLists")) {
+				$.each(family.objectLists, function (idx, val) {
+					objectListSelector.append("<option value='" + idx + "'>" + val + "</option>");
+				});
+			}
 		}
+		if(fullData.hasOwnProperty("uncategorizedObjectLists")) {
+			$.each(fullData.uncategorizedObjectLists, function (idx, val) {
+				objectListSelector.append("<option value='" + idx + "'>" + val + "</option>");
+			});
+		}
+		objectListSelector.prop("selectedIndex", so.perso.objectList);
 	} else {
 		$('.perso-description').addClass('invisible');
 	}
@@ -327,6 +342,17 @@ function showObjectDescription(so) {
 	description_column.removeClass('invisible');
 }
 
+function setObjectList(ol) {
+	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
+		currentSO.perso.objectList = ol;
+		let jsonObj = {}
+		let perso = {}
+		perso["offset"] = currentSO.perso.offset;
+		perso["objectList"] = ol;
+        jsonObj["perso"] = perso;
+		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	}
+}
 function setState(state) {
 	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
 		currentSO.perso.state = state;
@@ -432,6 +458,7 @@ $(function() {
 	description_column = $('.column-description');
 	btn_close_description = $('#btn-close-description');
 	stateSelector = $('#state');
+	objectListSelector = $('#objectList');
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
@@ -460,6 +487,12 @@ $(function() {
 		return false;
 	});
 	
+	$(document).on('change', "#objectList", function() {
+		let selectedIndex = $(this).prop('selectedIndex');
+		setObjectList(selectedIndex);
+		$(this).blur();
+		return false;
+	});
 	$(document).on('change', "#state", function() {
 		let selectedIndex = $(this).prop('selectedIndex');
 		setState(selectedIndex);

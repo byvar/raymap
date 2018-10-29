@@ -373,26 +373,31 @@ public class Controller : MonoBehaviour {
                         if (gao != null) gao.SetActive(!viewCollision);
                     }
                 }
-                if (po.collideMesh != null) po.collideMesh.gao.SetActive(viewCollision);
+                if (po.collideMesh != null) po.collideMesh.SetVisualsActive(viewCollision);
+                //if (po.collideMesh != null) po.collideMesh.gao.SetActive(viewCollision);
             }
             foreach (Perso perso in loader.persos) {
                 if (perso.collset != null) {
                     CollSet c = perso.collset;
                     if (c.zdd != null) foreach (CollideMeshObject col in c.zdd) {
                             if (col == null) continue;
-                            col.gao.SetActive(viewCollision);
+                            col.SetVisualsActive(viewCollision);
+                            //col.gao.SetActive(viewCollision);
                         }
                     if (c.zde != null) foreach (CollideMeshObject col in c.zde) {
                             if (col == null) continue;
-                            col.gao.SetActive(viewCollision);
+                            col.SetVisualsActive(viewCollision);
+                            //col.gao.SetActive(viewCollision);
                         }
                     if (c.zdm != null) foreach (CollideMeshObject col in c.zdm) {
                             if (col == null) continue;
-                            col.gao.SetActive(viewCollision);
+                            col.SetVisualsActive(viewCollision);
+                            //col.gao.SetActive(viewCollision);
                         }
                     if (c.zdr != null) foreach (CollideMeshObject col in c.zdr) {
                             if (col == null) continue;
-                            col.gao.SetActive(viewCollision);
+                            col.SetVisualsActive(viewCollision);
+                            //col.gao.SetActive(viewCollision);
                         }
                 }
             }

@@ -47,6 +47,7 @@ namespace OpenSpace.Visual {
         public void InitGameObject() {
             gao = new GameObject(name);
             gao.tag = "Visual";
+            gao.layer = LayerMask.NameToLayer("Visual");
             if (bones != null) {
                 GameObject child = bones.Gao;
                 child.transform.SetParent(gao.transform);

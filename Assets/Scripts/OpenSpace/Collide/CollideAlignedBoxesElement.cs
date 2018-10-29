@@ -41,15 +41,16 @@ namespace OpenSpace.Collide {
 
         private void CreateUnityMesh() {
             for (uint i = 0; i < num_boxes; i++) {
-                GameObject sphere_gao = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                sphere_gao.name = "Collide Aligned Boxes @ " + offset + " - " + i;
-                sphere_gao.transform.SetParent(gao.transform);
-                MeshFilter mf = sphere_gao.GetComponent<MeshFilter>();
-                MeshRenderer mr = sphere_gao.GetComponent<MeshRenderer>();
-                MonoBehaviour.Destroy(sphere_gao.GetComponent<SphereCollider>());
+                GameObject box_gao = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                box_gao.layer = LayerMask.NameToLayer("Collide");
+                box_gao.name = "Collide Aligned Boxes @ " + offset + " - " + i;
+                box_gao.transform.SetParent(gao.transform);
+                MeshFilter mf = box_gao.GetComponent<MeshFilter>();
+                MeshRenderer mr = box_gao.GetComponent<MeshRenderer>();
+                //MonoBehaviour.Destroy(box_gao.GetComponent<BoxCollider>());
                 Vector3 center = Vector3.Lerp(mesh.vertices[boxes[i].minPoint], mesh.vertices[boxes[i].maxPoint], 0.5f);
-                sphere_gao.transform.localPosition = center;
-                sphere_gao.transform.localScale = mesh.vertices[boxes[i].maxPoint] - mesh.vertices[boxes[i].minPoint];
+                box_gao.transform.localPosition = center;
+                box_gao.transform.localScale = mesh.vertices[boxes[i].maxPoint] - mesh.vertices[boxes[i].minPoint];
 
                 mr.material = MapLoader.Loader.collideMaterial;
                 if (boxes[i].gameMaterial != null && boxes[i].gameMaterial.collideMaterial != null) {

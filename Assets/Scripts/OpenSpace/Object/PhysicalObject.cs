@@ -15,6 +15,7 @@ namespace OpenSpace.Object {
         public Pointer off_visualBoundingVolume;
         public Pointer off_collideBoundingVolume;
         public VisualSetLOD[] visualSet;
+        public ushort visualSetType = 0;
         public CollideMeshObject collideMesh;
         public Vector3? scaleMultiplier = null;
         private GameObject gao = null;
@@ -83,20 +84,19 @@ namespace OpenSpace.Object {
             }
 
             // Parse visual set
-            if (po.off_visualSet != null) {
-                Pointer.Goto(ref reader, po.off_visualSet);
+            Pointer.DoAt(ref reader, po.off_visualSet, () => {
                 ushort numberOfLOD = 1;
-                ushort type = 0;
+                po.visualSetType = 0;
                 if (Settings.s.platform != Settings.Platform.DC) {
                     reader.ReadUInt32(); // 0
                     numberOfLOD = reader.ReadUInt16();
                     //if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
-                    type = reader.ReadUInt16();
+                    po.visualSetType = reader.ReadUInt16();
                     if (numberOfLOD > 0) {
                         Pointer off_LODDistances = Pointer.Read(reader);
                         Pointer off_LODDataOffsets = Pointer.Read(reader);
-                        reader.ReadUInt32(); // always 0?
-                        if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0?
+                        reader.ReadUInt32(); // always 0? RLI table offset
+                        if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0? number of RLI
                         po.visualSet = new VisualSetLOD[numberOfLOD];
                         for (uint i = 0; i < numberOfLOD; i++) {
                             po.visualSet[i] = new VisualSetLOD();
@@ -125,20 +125,24 @@ namespace OpenSpace.Object {
                 }
                 for (uint i = 0; i < numberOfLOD; i++) {
                     Pointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
-                        switch (type) {
+                        switch (po.visualSetType) {
                             case 0:
                                 po.visualSet[i].obj = MeshObject.Read(reader, po, po.visualSet[i].off_data);
                                 MeshObject m = ((MeshObject)po.visualSet[i].obj);
                                 if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
-                                m.Gao.transform.parent = po.Gao.transform;
                                 break;
                             case 1:
-                                po.visualSet[i].obj = UnknownGeometricObject.Read(reader, po, po.visualSet[i].off_data);
+                                po.visualSet[i].obj = MeshModificationObject.Read(reader, po, po.visualSet[i].off_data);
+                                MeshModificationObject mod = po.visualSet[i].obj as MeshModificationObject;
+                                if (mod != null && mod.mesh != null && mod.mesh.name != "Mesh") {
+                                    po.Gao.name = "[PO] " + mod.mesh.name;
+                                }
                                 break;
                             default:
-                                MapLoader.Loader.print("unknown type " + type + " at offset: " + offset);
+                                MapLoader.Loader.print("unknown type " + po.visualSetType + " at offset: " + offset);
                                 break;
                         }
+                        if (po.visualSet[i].obj.Gao != null) po.visualSet[i].obj.Gao.transform.parent = po.Gao.transform;
                     });
                 }
                 if (numberOfLOD > 1) {
@@ -147,11 +151,10 @@ namespace OpenSpace.Object {
                         if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
                     }
                 }
-            }
+            });
 
             // Parse collide set
-            if (po.off_collideSet != null) {
-                Pointer.Goto(ref reader, po.off_collideSet);
+            Pointer.DoAt(ref reader, po.off_collideSet, () => {
                 uint u1 = reader.ReadUInt32(); // 0
                 uint u2 = reader.ReadUInt32(); // 0
                 uint u3 = reader.ReadUInt32(); // 0
@@ -160,14 +163,13 @@ namespace OpenSpace.Object {
                 MapLoader.Loader.print(u2);
                 MapLoader.Loader.print(u3);*/
                 Pointer off_zdr = Pointer.Read(reader);
-                if (off_zdr != null) {
+                Pointer.DoAt(ref reader, off_zdr, () => {
                     //R3Loader.Loader.print("Collide mesh offset: " + off_mesh);
-                    Pointer.Goto(ref reader, off_zdr);
                     po.collideMesh = CollideMeshObject.Read(reader, off_zdr);
                     po.collideMesh.gao.transform.parent = po.Gao.transform;
-                }
+                });
                 //R3Loader.Loader.print("Collide set: " + po.off_collideSet + " - vol: " + po.off_visualBoundingVolume);
-            }
+            });
             MapLoader.Loader.physicalObjects.Add(po);
             return po;
         }

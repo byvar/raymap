@@ -36,6 +36,7 @@ namespace OpenSpace.Visual {
             get {
                 if (gao == null) {
                     gao = new GameObject(name);// Create object and read triangle data
+                    gao.layer = LayerMask.NameToLayer("Visual");
                     BillboardBehaviour billboard = gao.AddComponent<BillboardBehaviour>();
                     billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
                     CreateUnityMesh();
@@ -57,6 +58,9 @@ namespace OpenSpace.Visual {
                 spr_gao.transform.SetParent(gao.transform);
                 MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
+                BoxCollider bc = spr_gao.AddComponent<BoxCollider>();
+                bc.size = new Vector3(0, sprites[i].info_scale.y * 2, sprites[i].info_scale.x * 2);
+                spr_gao.layer = LayerMask.NameToLayer("Visual");
                 if (sprites[i].visualMaterial != null) {
                     if (sprites[i].visualMaterial.textures != null && sprites[i].visualMaterial.textures.Count > 0) {
                         TextureInfo mainTex = sprites[i].visualMaterial.textures[0].texture;

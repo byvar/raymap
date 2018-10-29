@@ -46,9 +46,10 @@ namespace OpenSpace.Collide {
                 sphere_gao.transform.SetParent(gao.transform);
                 MeshFilter mf = sphere_gao.GetComponent<MeshFilter>();
                 MeshRenderer mr = sphere_gao.GetComponent<MeshRenderer>();
-                MonoBehaviour.Destroy(sphere_gao.GetComponent<SphereCollider>());
+                //MonoBehaviour.Destroy(sphere_gao.GetComponent<SphereCollider>());
                 sphere_gao.transform.localPosition = mesh.vertices[spheres[i].centerPoint];
                 sphere_gao.transform.localScale = Vector3.one * spheres[i].radius * 2; // default Unity sphere radius is 0.5
+                sphere_gao.layer = LayerMask.NameToLayer("Collide");
 
                 mr.material = MapLoader.Loader.collideMaterial;
                 if (spheres[i].gameMaterial != null && spheres[i].gameMaterial.collideMaterial != null) {

@@ -12,6 +12,7 @@ public class SectorManager : MonoBehaviour {
     public List<Sector> sectors;
     private List<SectorComponent> sectorComponents;
     public Camera mainCamera;
+    public List<Sector> activeSectors = new List<Sector>();
 
     // Use this for initialization
     void Start() {
@@ -22,7 +23,7 @@ public class SectorManager : MonoBehaviour {
     void Update() {
         if (loaded) {
             Vector3 camPos = Camera.main.transform.localPosition;
-            List<Sector> activeSectors = GetActiveSectorsAtPoint(camPos);
+            activeSectors = GetActiveSectorsAtPoint(camPos);
 
             if (!displayInactiveSectors) {
                 for (int i = 0; i < sectors.Count; i++) {
