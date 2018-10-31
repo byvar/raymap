@@ -16,8 +16,13 @@ using System.Runtime.InteropServices;
 public class WebCommunicator : MonoBehaviour {
     [DllImport("__Internal")]
     private static extern void SetAllJSON(string jsonString);
+    [DllImport("__Internal")]
+    private static extern void UnityJSMessage(string jsonString);
 
     public Controller controller;
+    public ObjectSelector selector;
+    private PersoBehaviour highlightedPerso_;
+    private PersoBehaviour selectedPerso_;
     bool sentHierarchy = false;
     string allJSON = null;
     public void Start() {
@@ -28,6 +33,16 @@ public class WebCommunicator : MonoBehaviour {
             SendHierarchy();
             sentHierarchy = true;
         }
+        if (controller.LoadState == Controller.State.Finished) {
+            if (highlightedPerso_ != selector.highlightedPerso) {
+                highlightedPerso_ = selector.highlightedPerso;
+                Send(GetHighlightJSON());
+            }
+            if (selectedPerso_ != selector.selectedPerso) {
+                selectedPerso_ = selector.selectedPerso;
+                Send(GetSelectionJSON());
+            }
+        }
     }
 
     public void SendHierarchy() {
@@ -37,7 +52,13 @@ public class WebCommunicator : MonoBehaviour {
                 SetAllJSON(allJSON);
             }
         }
-        
+    }
+    public void Send(JSONObject obj) {
+        if (Application.platform == RuntimePlatform.WebGLPlayer) {
+            if (controller.LoadState == Controller.State.Finished) {
+                UnityJSMessage(obj.ToString());
+            }
+        }
     }
 
     private JSONObject GetHierarchyJSON() {
@@ -77,7 +98,7 @@ public class WebCommunicator : MonoBehaviour {
         JSONObject soJSON = new JSONObject();
         soJSON["name"] = so.Gao.name;
         soJSON["type"] = so.type.ToString();
-        soJSON["hash"] = so.offset.GetHashCode();
+        soJSON["offset"] = so.offset.ToString();
         soJSON["position"] = so.Gao.transform.localPosition;
         soJSON["rotation"] = so.Gao.transform.localEulerAngles;
         soJSON["scale"] = so.Gao.transform.localScale;
@@ -109,15 +130,16 @@ public class WebCommunicator : MonoBehaviour {
     }
     private JSONObject GetPersoJSON(Perso perso) {
         JSONObject persoJSON = new JSONObject();
+        PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
         persoJSON["offset"] = perso.offset.ToString();
         persoJSON["nameFamily"] = perso.nameFamily;
         persoJSON["nameModel"] = perso.nameModel;
         persoJSON["nameInstance"] = perso.namePerso;
         if (perso.p3dData.family != null) persoJSON["family"] = perso.p3dData.family.family_index;
-        if (perso.p3dData.stateCurrent != null && perso.p3dData.family != null) {
-            persoJSON["state"] = perso.p3dData.family.states.IndexOf(perso.p3dData.stateCurrent);
+        if (pb != null) {
+            persoJSON["state"] = pb.stateIndex;
+            if (perso.p3dData.objectList != null) persoJSON["objectList"] = pb.poListIndex;
         }
-        if (perso.p3dData.objectList != null) persoJSON["objectList"] = perso.Gao.GetComponent<PersoBehaviour>().poListIndex;
         return persoJSON;
     }
     private JSONObject GetAlwaysJSON() {
@@ -132,8 +154,29 @@ public class WebCommunicator : MonoBehaviour {
         alwaysJSON["spawnablePersos"] = spawnables;
         return alwaysJSON;
     }
+    private JSONObject GetSelectionJSON() {
+        MapLoader l = MapLoader.Loader;
+        JSONObject selectionJSON = new JSONObject();
+        selectionJSON["type"] = "selection";
+        bool selectionIsAlways = l.globals.spawnablePersos.Contains(selector.selectedPerso.perso);
+        selectionJSON["selectionType"] = selectionIsAlways ? "always" : "superobject";
+        if (selectionIsAlways) {
+            selectionJSON["selection"] = GetPersoJSON(selector.selectedPerso.perso);
+        } else {
+            selectionJSON["selection"] = GetSuperObjectJSON(selector.selectedPerso.perso.SuperObject);
+        }
+        return selectionJSON;
+    }
+    private JSONObject GetHighlightJSON() {
+        MapLoader l = MapLoader.Loader;
+        JSONObject selectionJSON = new JSONObject();
+        selectionJSON["type"] = "highlight";
+        if (highlightedPerso_ != null) {
+            selectionJSON["perso"] = GetPersoJSON(highlightedPerso_.perso);
+        }
+        return selectionJSON;
+    }
 
-    
     public void ParseMessage(string msgString) {
         JSONNode msg = JSON.Parse(msgString);
         if (msg["perso"] != null) {
@@ -142,10 +185,30 @@ public class WebCommunicator : MonoBehaviour {
         if (msg["settings"] != null) {
             ParseSettingsJSON(msg["settings"]);
         }
+        if (msg["selection"] != null) {
+            ParseSelectionJSON(msg["selection"]);
+        }
+    }
+    public void ParseSelectionJSON(JSONNode msg) {
+        MapLoader l = MapLoader.Loader;
+        Perso perso = null;
+        if (msg["offset"] != null && msg["offset"] != "null") {
+            perso = l.persos.Where(p => p.offset.ToString() == msg["offset"]).FirstOrDefault();
+            if(perso != null) {
+                PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+                selector.Select(pb, view: msg["view"] != null);
+                //Send(GetSelectionJSON());
+            }
+        } else {
+            selector.Deselect();
+        }
     }
     public void ParsePersoJSON(JSONNode msg) {
         MapLoader l = MapLoader.Loader;
-        Perso perso = l.persos.Where(p => p.offset.ToString() == msg["offset"]).FirstOrDefault();
+        Perso perso = null;
+        if (msg["offset"] != null) {
+            perso = l.persos.Where(p => p.offset.ToString() == msg["offset"]).FirstOrDefault();
+        }
         if (perso != null) {
             PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
             if (msg["state"] != null) pb.SetState(msg["state"].AsInt);

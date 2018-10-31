@@ -42,7 +42,7 @@
 					</div>
 					<div class="column column-description invisible">
 						<div class="column-header"><span id="header-objects-text">Current object</span>
-							<div id="btn-close-description" class="header-button disabled-button" title="Close object description panel"><i class="icon-trash"></i></div>
+							<div class="header-buttons-right"><div id="btn-close-description" class="header-button disabled-button" title="Close object description panel"><i class="icon-trash"></i></div></div>
 						</div>
 						<div id="content-description" class="column-content column-content-scroll">
 							<div class="input-group">
@@ -69,7 +69,14 @@
 						<div class="column-header"><span id="header-objects-text">Raymap</span></div>
 						<div id="gameContainer" class="column-content"></div>
 						<div class="column-footer">
-							<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-info-circle"></i></div>
+							<div class="header-buttons-left">
+								<div id="btn-lighting" class="header-button disabled-button selected" title="Lighting on/off"><i class="icon-info-circle"></i></div>
+								<div class="header-slider-container"><input id="range-luminosity" class="header-slider disabled-button lighting-settings" type="range" min="0" max="1" value="0.5" step="0.01"></div>
+								<div id="btn-saturate" class="header-button disabled-button lighting-settings" title="Allow overlight"><i class="icon-info-circle"></i></div>
+							</div>
+							<div class="header-buttons-right">
+								<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-info-circle"></i></div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -78,6 +85,9 @@
 				</div>-->
 			</div>
 			<div id="popup-overlay" class="hidden-overlay" onclick=""></div>
+			<div id="perso-tooltip" class="hidden-tooltip">
+				<div class='name-family'>family</div><div class='name-model'>model</div><div class='name-instance'>instance</div>
+			</div>
 			<div id="dialogue-popup" class="hidden-popup"><div id="dialogue-image"></div><div id="dialogue-content"></div></div>
 			<div id="notification-popup" class="hidden-popup"></div>
 		</div>

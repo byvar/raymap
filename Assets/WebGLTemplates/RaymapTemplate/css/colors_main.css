@@ -73,6 +73,11 @@ body {
 	background-color: rgba(1,33,45,1);
 }
 
+#perso-tooltip {
+    background-color: rgba(6,86,109,1);
+	color: #9ed9a0;
+}
+
 .song-buttons > .song-button {
 	color: rgba(6,86,109,1);
 }
@@ -155,13 +160,43 @@ body {
 .header-button:hover {
 	background: rgba(1,33,45,0.5);
 }
-.header-button.disabled-button {
-	color: rgba(6,86,109,1);
-}
-
-.header-button.current-game-item {
+.header-button.selected {
 	color: #19c8c3;
 	background-color: rgba(1,33,45,1);
+}
+.header-button.disabled-button {
+	color: rgba(6,86,109,1);
+	background-color: transparent;
+}
+input[type=range]::-webkit-slider-thumb {
+    background: #9ed9a0; /* Green background */
+}
+
+input[type=range]::-moz-range-thumb {
+    background: #9ed9a0; /* Green background */
+}
+input[type=range]::-webkit-slider-runnable-track {
+  background: rgba(1,33,45,1);
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: rgba(1,33,45,1);
+}
+
+input[type=range]::-moz-range-track {
+  background: rgba(1,33,45,1);
+}
+input[type=range]::-ms-fill-lower {
+  background: #2a6495;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: rgba(1,33,45,1);
+}
+input[type=range]::-ms-fill-upper {
+  background: rgba(1,33,45,1);
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: rgba(1,33,45,1);
 }
 
 #header-playlist-info {

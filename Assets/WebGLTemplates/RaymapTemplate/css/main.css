@@ -215,7 +215,8 @@ a:focus {
 	font-weight: bold;
 }
 
-.objects-item > .name-family {
+.objects-item > .name-family,
+#perso-tooltip > .name-family {
 	text-align: right;
 	display: inline-block;
 	font-weight: bold;
@@ -226,7 +227,8 @@ a:focus {
     text-decoration: inherit; /* no underline */
 	text-overflow: ellipsis;
 }
-.objects-item > .name-model {
+.objects-item > .name-model,
+#perso-tooltip > .name-model {
 	padding: 0 0.5em 0 0.5em;
 	text-align: center;
 	display: inline-block;
@@ -239,7 +241,8 @@ a:focus {
 	text-overflow: ellipsis;
 	
 }
-.objects-item > .name-instance {
+.objects-item > .name-instance,
+#perso-tooltip > .name-instance {
 	text-align: left;
 	display: inline-block;
 	width: 40%;
@@ -249,6 +252,25 @@ a:focus {
     text-decoration: inherit; /* no underline */
 	text-overflow: ellipsis;
 }
+
+#perso-tooltip {
+    display: block;
+	box-sizing: border-box;
+	padding: 0 0.5em 0 0.5em;
+    margin-left: 15px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1000;
+    width:25em;
+    height:2.5em;
+    border-radius: 0.75em;
+    pointer-events: none;
+}
+
+#perso-tooltip.hidden-tooltip {
+    display: none;
+}
+
 
 
 /* ============================== OBJECT DESCRIPTION ============================== */
@@ -836,17 +858,34 @@ canvas + * {
 
 
 /* ============================== HEADER BUTTONS ============================== */
-.header-button {
+.header-buttons-right {
 	display: block;
 	position: absolute;
 	right: 1.2em;
 	top: 0.3em;
+	width: 16.6em;
+	height: 1.3em;
+	line-height: 1.5em;
+	font-size: 0.8em;
+	text-align: right;
+}
+.header-buttons-left {
+	display: block;
+	position: absolute;
+	left: 1.2em;
+	top: 0.3em;
+	width: 16.6em;
+	height: 1.3em;
+	line-height: 1.5em;
+	font-size: 0.8em;
+	text-align: left;
+}
+.header-button {
+	display: inline-block;
 	width: 1.3em;
 	height: 1.3em;
 	background-color: transparent;
 	text-align: center;
-	line-height: 1.5em;
-	font-size: 0.8em;
 	padding: 0.3em;
 	
 	border-radius: 50%;
@@ -865,12 +904,112 @@ canvas + * {
     -ms-user-select: none;
     user-select: none;
 }
-.header-button.disabled-button {
-	pointer-events: none;
-}
 .header-button.invisible-button {
 	opacity: 0;
 	pointer-events: none;
+}
+.header-button.selected {
+	font-weight: bold;
+}
+.header-button.disabled-button {
+	pointer-events: none;
+}
+.header-slider-container {
+	display: inline-block;
+	width: 5.2em;
+	height: 1.3em;
+	box-sizing: border-box;
+	padding-top: 0.4em;
+	
+}
+.header-slider {
+	box-sizing: border-box;
+	display: block;
+	width: 5.2em;
+	height: 1.0em;
+	outline: none;
+	-webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+	transition: opacity .4s;
+	-moz-transition: opacity .4s;
+	-webkit-transition: opacity .4s;
+    background: transparent;
+}
+.header-slider.invisible-button {
+	opacity: 0;
+	pointer-events: none;
+}
+.header-slider.disabled-button {
+	opacity: 0.5;
+	pointer-events: none;
+}
+input[type=range] {
+	padding: 0;
+	-webkit-appearance: none;
+    background: transparent;
+	margin: 0;
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    cursor: pointer; /* Cursor on hover */
+    width: 0.7em; /* Set a specific slider handle width */
+    height: 0.7em; /* Slider handle height */
+    border-radius: 50%;
+	margin-top: -0.35em;
+}
+
+input[type=range]::-moz-range-thumb {
+    width: 0.7em; /* Set a specific slider handle width */
+    height: 0.7em; /* Slider handle height */
+    border-radius: 50%; 
+    cursor: pointer; /* Cursor on hover */
+}
+
+input[type=range]:focus {
+  outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+input[type=range]::-ms-track {
+  width: 100%;
+  cursor: pointer;
+
+  /* Hides the slider so custom styles can be added */
+  background: transparent; 
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 0.25em;
+  cursor: pointer;
+  border-radius: 1.3px;
+  margin-top: -0.35em;
+}
+
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 0.25em;
+  cursor: pointer;
+  border-radius: 1.3px;
+}
+
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 0.25em;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 16px 0;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+}
+input[type=range]::-ms-fill-upper {
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
 }
 /*#btn-home {
 	right: auto;
@@ -1340,289 +1479,6 @@ canvas + * {
     html {
         font-size: 0.6em;
     }
-}
-@media only screen and (max-width: 900px) {
-    html {
-        font-size: 0.7em;
-		background-image: none;
-		background-position: right top;
-		-webkit-background-size: contain;
-		-moz-background-size: contain;
-		-o-background-size: contain;
-		background-size: contain;
-    }
-	
-	#header {
-		height: 7em;
-		text-align: center;
-	}
-
-	#header h1 {
-		font-size: 3.5em;
-		text-align: center;
-		/*cursor: pointer;*/
-	}
-	
-	#container {
-		height: calc(100% - 7em);
-		padding-bottom:0px;
-		background-color: transparent;
-	}
-	
-	#container:before {
-	  content:'';
-	  width:100%;
-	  height: 0em;
-	  position:absolute;
-	  bottom:100%;
-	  left:0;
-	  background-image: none;
-	  background-position: -2em 0;
-	  background-size: 4em 100%;
-	  background-repeat:repeat-x;
-	}
-	
-    #columns {
-		/*padding: 0;*/
-		box-sizing: border-box;
-		height: calc(100% - 2em);
-		position: relative;
-	}
-
-	.column {
-		border-radius: 0;
-		height: 100%;
-		position: absolute;
-		top: 0;
-		font-size: 1.2em;
-		margin: 0;
-		width: 100%;
-		display: block;
-		float: none;
-		-webkit-transition: left .4s;
-		-moz-transition: left .4s;
-		transition: left .4s;
-	}
-
-	.column-select {
-		left: -100%;
-		z-index: 10;
-	}
-
-	.column-soundtrack {
-		left: 0%;
-	}
-
-	.column-playlist {
-		left: 100%;
-		z-index: 11;
-	}
-	
-	.column-select.visible-column {
-		left: 0%;
-	}
-	
-	.column-playlist.visible-column {
-		left: 0%;
-	}
-	
-	a.logo-item {
-		height: 6em;
-		width: 50%;
-		line-height: 6em;
-	}
-
-	.logo-item img {
-		/*width: 60%;*/
-		max-width: 60%;
-		max-height: 100%;
-		vertical-align: middle;
-	}
-
-	.column-content {
-		height: calc(100% - 5.455em);
-		overflow-y: auto;
-	}
-	
-	#content-playlist {
-		height: calc(100% - 10.91em) !important;
-	}
-	
-	.column-sidebar {
-		height: calc(100% - 5.455em);
-	}
-
-	.column-sidebar-content {
-		width: calc(100% + 40px);
-		height: 100%;
-		overflow-y: auto;
-		overflow-x: hidden;
-		position: relative;
-	}
-
-	.column-footer {
-		margin: 0;
-	}
-	
-	.news-item {
-		display: block;
-		width: 100%;
-		height: auto;
-		padding: 1em 1em 1em 1em;
-		box-sizing: border-box;
-		line-height: 2em;
-		background-color: transparent;
-		position: relative;
-		z-index: 1;
-		/*font-size: 1.4em;*/
-	}
-	.news-item > .news-item-image {
-		display: block;
-		padding: 0em;
-		box-sizing: border-box;
-		width: 4em;
-		height: 4em;
-		margin-right: 0em;
-		margin-left: 0em;
-		position: absolute;
-		top: 0em;
-		right: 20%;
-		z-index: 3;
-		-moz-transform: scaleX(-1);
-		-o-transform: scaleX(-1);
-		-webkit-transform: scaleX(-1);
-		transform: scaleX(-1);
-	}
-
-	.news-item-image-flipped {
-		-moz-transform: none !important;
-		-o-transform: none !important;
-		-webkit-transform: none !important;
-		transform: none !important;
-		filter: none !important;
-		-ms-filter: none !important;
-		right: auto !important;
-		left: 20%;
-	}
-
-	.news-item > .news-item-content {
-		display: block;
-		vertical-align: middle;
-		border-radius: 3em;
-		margin-top: 1em;
-		padding: 2em 2em 1em 2em;
-		line-height: 1.5em;
-		box-sizing: border-box;
-		height: auto;
-		width: 100%;
-		overflow: visible;
-		position: relative;
-		z-index: 2;
-	}
-
-	.news-item-content > .news-item-date {
-		left: 3em;
-	}
-
-	.news-item-date-flipped {
-		right: 3em;
-	}
-	
-	.mobile-tabswitch-button {
-		display: block;
-	}
-	
-	#dialogue-popup {
-		bottom: 2em;
-		left: calc(50%);
-		transform: translateX(-50%);
-		font-size: 1.3em;
-		width: 95%;
-		height: 9em;
-	}
-	#dialogue-image {
-		width: 6em;
-	}
-	#dialogue-content {
-		border-radius: 3.5em;
-		padding: 1em 2em 1em 2em;
-		width: calc(100% - 6em);
-	}
-	#share-popup {
-		bottom: 0.9em;
-		left: 9em;
-		transform: none !important;
-		font-size: 1.5em;
-	}
-	#config-popup {
-		max-width: 95%;
-	}
-	
-	#btn-download-mp3 {
-		right:auto;
-		top: 0.3em;
-		left: 0.7em;
-	}
-	#btn-download-flac {
-		right: auto;
-		top: 0.3em;
-		left: 4.8em;
-	}
-	
-	.song-item,
-	.playlist-item,
-	.faux-playlist-item,
-	.playlist-item-placeholder {
-		height: 2.5em;
-		line-height: 2.5em;
-		cursor: pointer;
-	}
-	
-	.song-buttons > .song-button {
-		vertical-align: top;
-		color: inherit;
-		opacity: 0.2;
-	}
-	
-	.playlist-item > .song-remove,
-	.faux-playlist-item > .faux-song-remove {
-		color: inherit;
-		opacity: 0.2;
-	}
-	
-	.playlist-item > .song-handle,
-	.faux-playlist-item > .song-handle {
-		display: block;
-		top: 0em;
-		left: 0.5em;
-		width: 1.5em;
-		height: 100%;
-	}
-	
-	.playlist-item > .song-handle,
-	.faux-playlist-item > .song-handle {
-		display: block;
-		color: inherit;
-		opacity: 0.2;
-		left: 1em;
-		top: 0.1em;
-	}
-	
-	.song-buttons > .song-button {
-		/*height: 2.5em;*/
-		width: 2.5em;
-		
-		margin-left: 0em;
-		margin-right: 0em;
-		margin: 0;
-	}
-	
-	#popup-overlay {
-		cursor: pointer;
-	}
-	#popup-overlay.hidden-overlay {
-		cursor: auto;
-	}
 }
 
 @media only screen and (max-width: 500px) {

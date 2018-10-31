@@ -8,7 +8,8 @@ using UnityEngine;
 public class ObjectSelector : MonoBehaviour {
     public Controller controller;
     public CameraComponent cam;
-    public PersoBehaviour currentPerso;
+    public PersoBehaviour highlightedPerso = null;
+    public PersoBehaviour selectedPerso = null;
 
     private void HandleCollision() {
         int layerMask = 0;
@@ -24,10 +25,9 @@ public class ObjectSelector : MonoBehaviour {
                 // the object identified by hit.transform was clicked
                 PersoBehaviour pb = hits[i].transform.GetComponentInParent<PersoBehaviour>();
                 if (pb != null) {
-                    currentPerso = pb;
+                    highlightedPerso = pb;
                     if (Input.GetMouseButtonDown(0)) {
-                        //print(pb.name);
-                        cam.JumpTo(pb.gameObject);
+                        Select(pb);
                     }
                     return;
                 }
@@ -55,8 +55,20 @@ public class ObjectSelector : MonoBehaviour {
         }*/
     }
 
+    public void Select(PersoBehaviour pb, bool view = false) {
+        //print(pb.name);
+        if (selectedPerso != pb || view) {
+            selectedPerso = pb;
+            cam.JumpTo(pb.gameObject);
+        }
+    }
+
+    public void Deselect() {
+        selectedPerso = null;
+    }
+
     void Update() {
-        currentPerso = null;
-        if(!cam.mouseLookEnabled) HandleCollision();
+        highlightedPerso = null;
+        if(!cam.mouseLookEnabled && controller.LoadState == Controller.State.Finished) HandleCollision();
     }
 }

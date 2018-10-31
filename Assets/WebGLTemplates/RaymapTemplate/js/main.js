@@ -70,7 +70,7 @@ let objectsList = [];
 let currentSO = null;
 
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description, stateSelector, objectListSelector;
+let btn_close_description, stateSelector, objectListSelector, perso_tooltip;
 
 // FUNCTIONS	
 function addSongsToPlaylist(songsJSON) {
@@ -242,10 +242,10 @@ function showNotification(msg,mobile_only) {
 	}, 3000);
 }
 
+// SUPEROBJECT PARSING
 function getSuperObjectByIndex(index) {
 	return objectsList[index];
 }
-
 function parseSuperObject(so) {
 	let items = [];
 	objectsList.push(so);
@@ -275,10 +275,9 @@ function parseSuperObject(so) {
 	}
 	return items;
 }
-
 function setAllJSON(jsonString) {
 	//alert(jsonString);
-	console.log(jsonString); 
+	//console.log(jsonString); 
 	fullData = $.parseJSON(jsonString);
 	if(fullData != null) {
 		if(fullData.hasOwnProperty("actualWorld")) {
@@ -290,9 +289,21 @@ function setAllJSON(jsonString) {
 				api.reinitialise();
 			}, 100);
 		}
+		$("#btn-lighting").removeClass("disabled-button");
+		$(".lighting-settings").removeClass("disabled-button");
+		if(fullData.hasOwnProperty("settings")) {
+			if(!fullData.settings.saturate) {
+				$("#btn-saturate").addClass("selected");
+			}
+			$("#range-luminosity").val(fullData.settings.luminosity);
+			/*settingsJSON["luminosity"] = controller.lightManager.luminosity;
+			settingsJSON["saturate"] = controller.lightManager.saturate;
+			settingsJSON["displayInactiveSectors"] = controller.sectorManager.displayInactiveSectors;*/
+		}
 	}
 }
 
+// PERSO OBJECT DESCRIPTION
 function showObjectDescription(so) {
 	$('#posX').val(so.position[0]);
 	$('#posY').val(so.position[1]);
@@ -362,6 +373,80 @@ function setState(state) {
 		perso["state"] = state;
         jsonObj["perso"] = perso;
 		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	}
+}
+
+// SELECTION
+function setSelection(perso) {
+	let jsonObj = {}
+	let select = {}
+	select["offset"] = perso.offset;
+	jsonObj["selection"] = select;
+	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	
+}
+function clearSelection() {
+	description_column.addClass('invisible');
+	$(".objects-item").removeClass("current-objects-item");
+	currentSO = null;
+	let jsonObj = {}
+	let select = {}
+	select["offset"] = "null";
+	jsonObj["selection"] = select;
+	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+}
+function handleMessage_selection(msg) {
+	if(msg.selectionType === "superobject") {
+		let so_selection, index_selection = -1;
+		if(fullData != null) {
+			for (let i = 0; i < objectsList.length; i++) {
+				if(objectsList[i].offset === msg.selection.offset) {
+					objectsList[i] = msg.selection;
+					index_selection = i;
+					break;
+				}
+			}
+		}
+		if(index_selection > -1) {
+			$(".objects-item").removeClass("current-objects-item");
+			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
+			currentSO = msg.selection;
+			showObjectDescription(currentSO);
+		}
+	}
+}
+function handleMessage_highlight(msg) {
+	if(msg.hasOwnProperty("perso")) {
+		perso_tooltip.html("<div class='name-family'>" + msg.perso.nameFamily + "</div><div class='name-model'>" + msg.perso.nameModel + "</div><div class='name-instance'>" + msg.perso.nameInstance + "</div>");
+		perso_tooltip.removeClass("hidden-tooltip");
+	} else {
+		perso_tooltip.addClass("hidden-tooltip");
+	}
+}
+
+// SETTINGS
+function sendSettings() {
+	let jsonObj = {}
+	let settings = {}
+	settings["enableLighting"] = $("#btn-lighting").hasClass("selected");
+	settings["luminosity"] = $("#range-luminosity").val();
+	settings["saturate"] = !$("#btn-saturate").hasClass("selected");
+	jsonObj["settings"] = settings;
+	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+}
+
+// MESSAGE
+function handleMessage(jsonString) {
+	let msg = $.parseJSON(jsonString);
+	if(msg != null && msg.hasOwnProperty("type")) {
+		switch(msg.type){
+			case "highlight":
+				handleMessage_highlight(msg); break;
+			case "selection":
+				handleMessage_selection(msg); break;
+			default:
+				console.log('default');break;
+			}
 	}
 }
 
@@ -449,6 +534,9 @@ $(function() {
 	window.addEventListener('allJSON', function (e) {
 		setAllJSON(e.detail);
 	}, false);
+	window.addEventListener('unityJSMessage', function (e) {
+		handleMessage(e.detail);
+	}, false);
 	
 	
 	wrapper = $('#wrapper');
@@ -459,31 +547,63 @@ $(function() {
 	btn_close_description = $('#btn-close-description');
 	stateSelector = $('#state');
 	objectListSelector = $('#objectList');
+	perso_tooltip = $("#perso-tooltip");
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
 	}
 	
+	$(document).mousemove(function( event ) {
+		perso_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
+	});
+	
 	$(document).on('click', ".objects-item", function() {
 		let index = $(".objects-item").index(this);
-		$(".objects-item").removeClass("current-objects-item");
-		$(this).addClass("current-objects-item");
+		//$(".objects-item").removeClass("current-objects-item");
+		//$(this).addClass("current-objects-item");
 		let so = getSuperObjectByIndex(index);
-		currentSO = so;
-		showObjectDescription(so);
+		if(so.hasOwnProperty("perso")) {
+			setSelection(so.perso);
+			//currentSO = so;
+			//showObjectDescription(so);
+		}
 		return false;
 	});
 	
 	$(document).on('click', "#btn-close-description", function() {
-		description_column.addClass('invisible');
-		$(".objects-item").removeClass("current-objects-item");
-		currentSO = null;
+		clearSelection();
 		$(this).addClass("disabled-button");
 		return false;
 	});
 	
 	$(document).on('click', "#btn-fullscreen", function() {
 		gameInstance.SetFullscreen(1);
+		return false;
+	});
+	
+	$(document).on('click', "#btn-lighting", function() {
+		if($(this).hasClass("selected")) {
+			$(this).removeClass("selected");
+			$(".lighting-settings").addClass("disabled-button");
+		} else {
+			$(this).addClass("selected");
+			$(".lighting-settings").removeClass("disabled-button");
+		}
+		sendSettings();
+		return false;
+	});
+	$(document).on('change', "#range-luminosity", function() {
+		sendSettings();
+		return false;
+	});
+	
+	$(document).on('click', "#btn-saturate", function() {
+		if($(this).hasClass("selected")) {
+			$(this).removeClass("selected");
+		} else {
+			$(this).addClass("selected");
+		}
+		sendSettings();
 		return false;
 	});
 	
@@ -638,7 +758,7 @@ $(function() {
 		animateEase: "swing"
 	};
 	pane.jScrollPane(settings);
-	initContent();
+	//initContent();
 	
 });
 
