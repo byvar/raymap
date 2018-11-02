@@ -19,8 +19,11 @@ public class SectorComponent : MonoBehaviour {
     }
 
     public void Init() {
-        //staticLights = sector.staticLights.Select(l => l.Light).ToArray();
-        neighbors = sector.neighbors.Select(s => s.sector.Gao.GetComponent<SectorComponent>()).ToArray();
+		if (gameObject.name.Contains("^Sector:")) {
+			gameObject.name = name.Substring(name.IndexOf("^Sector:") + 8);
+		}
+		//staticLights = sector.staticLights.Select(l => l.Light).ToArray();
+		neighbors = sector.neighbors.Select(s => s.sector.Gao.GetComponent<SectorComponent>()).ToArray();
         sectors_unk1 = sector.sectors_unk1.Select(s => s.sector.Gao.GetComponent<SectorComponent>()).ToArray();
         sectors_unk2 = sector.sectors_unk2.Select(s => s.Gao.GetComponent<SectorComponent>()).ToArray();
         //dynamicLights = sector.dynamicLights.Select(l => l.Light).ToArray();

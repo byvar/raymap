@@ -24,6 +24,7 @@ public class Controller : MonoBehaviour {
     public SectorManager sectorManager;
     public LightManager lightManager;
     public LoadingScreen loadingScreen;
+	public WebCommunicator communicator;
     public bool allowDeadPointers = false;
     public bool forceDisplayBackfaces = false;
     public bool blockyMode = false;
@@ -192,15 +193,22 @@ public class Controller : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.G)) {
             viewGraphs = !viewGraphs;
         }
+		bool updatedSettings = false;
         if (loader != null && viewInvisible != viewInvisible_) {
+			updatedSettings = true;
             UpdateViewInvisible();
         }
         if (loader != null && viewCollision != viewCollision_) {
-            UpdateViewCollision();
+			updatedSettings = true;
+			UpdateViewCollision();
         }
         if (loader != null && viewGraphs != viewGraphs_) {
-            UpdateViewGraphs();
+			updatedSettings = true;
+			UpdateViewGraphs();
         }
+		if (updatedSettings) {
+			communicator.SendSettings();
+		}
     }
 
     public IEnumerator InitPersos() {
@@ -418,7 +426,7 @@ public class Controller : MonoBehaviour {
             graphRoot.SetActive(false);
         }
         foreach (Graph graph in l.graphs) {
-            GameObject go_graph = new GameObject(graph.name != null ? graph.name : ("Graph " + graph.offset.ToString()));
+            GameObject go_graph = new GameObject(graph.name ?? "Graph " + graph.offset.ToString());
             go_graph.transform.SetParent(graphRoot.transform);
 
             for (int i = 0; i < graph.nodes.Count; i++) {

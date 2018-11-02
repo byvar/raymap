@@ -53,6 +53,11 @@ public class WebCommunicator : MonoBehaviour {
             }
         }
     }
+	public void SendSettings() {
+		if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
+			Send(GetSettingsJSON());
+		}
+	}
     public void Send(JSONObject obj) {
         if (Application.platform == RuntimePlatform.WebGLPlayer) {
             if (controller.LoadState == Controller.State.Finished) {
@@ -84,15 +89,25 @@ public class WebCommunicator : MonoBehaviour {
         if (l.transitDynamicWorld != null) {
             allJSON["transitDynamicWorld"] = GetSuperObjectJSON(l.transitDynamicWorld);
         }
+		if (l.globals != null) {
+			allJSON["always"] = GetAlwaysJSON();
+		}
         allJSON["settings"] = GetSettingsJSON();
         return allJSON;
     }
     private JSONObject GetSettingsJSON() {
+		JSONObject settingsJSONcontainer = new JSONObject();
         JSONObject settingsJSON = new JSONObject();
-        settingsJSON["luminosity"] = controller.lightManager.luminosity;
+		settingsJSON["viewCollision"] = controller.viewCollision;
+		settingsJSON["viewGraphs"] = controller.viewGraphs;
+		settingsJSON["viewInvisible"] = controller.viewInvisible;
+		settingsJSON["enableLighting"] = controller.lightManager.enableLighting;
+		settingsJSON["luminosity"] = controller.lightManager.luminosity;
         settingsJSON["saturate"] = controller.lightManager.saturate;
-        settingsJSON["displayInactiveSectors"] = controller.sectorManager.displayInactiveSectors;
-        return settingsJSON;
+        settingsJSON["displayInactive"] = controller.sectorManager.displayInactiveSectors;
+		settingsJSONcontainer["type"] = "settings";
+		settingsJSONcontainer["settings"] = settingsJSON;
+        return settingsJSONcontainer;
     }
     private JSONObject GetSuperObjectJSON(SuperObject so) {
         JSONObject soJSON = new JSONObject();
@@ -179,10 +194,13 @@ public class WebCommunicator : MonoBehaviour {
 
     public void ParseMessage(string msgString) {
         JSONNode msg = JSON.Parse(msgString);
-        if (msg["perso"] != null) {
-            ParsePersoJSON(msg["perso"]);
-        }
-        if (msg["settings"] != null) {
+        if (msg["superobject"] != null) {
+            ParseSuperObjectJSON(msg["superobject"]);
+		}
+		if (msg["perso"] != null) {
+			ParsePersoJSON(msg["perso"]);
+		}
+		if (msg["settings"] != null) {
             ParseSettingsJSON(msg["settings"]);
         }
         if (msg["selection"] != null) {
@@ -202,12 +220,24 @@ public class WebCommunicator : MonoBehaviour {
         } else {
             selector.Deselect();
         }
-    }
-    public void ParsePersoJSON(JSONNode msg) {
+	}
+	public void ParseSuperObjectJSON(JSONNode msg) {
+		MapLoader l = MapLoader.Loader;
+		SuperObject so = null;
+		if (msg["offset"] != null) {
+			so = l.superObjects.FirstOrDefault(s => s.offset.ToString() == msg["offset"]);
+		}
+		if (so != null) {
+			if (msg["position"] != null) so.Gao.transform.localPosition = msg["position"].ReadVector3();
+			if (msg["rotation"] != null) so.Gao.transform.localEulerAngles = msg["rotation"].ReadVector3();
+			if (msg["scale"] != null) so.Gao.transform.localScale = msg["scale"].ReadVector3();
+		}
+	}
+	public void ParsePersoJSON(JSONNode msg) {
         MapLoader l = MapLoader.Loader;
         Perso perso = null;
         if (msg["offset"] != null) {
-            perso = l.persos.Where(p => p.offset.ToString() == msg["offset"]).FirstOrDefault();
+			perso = l.persos.FirstOrDefault(p => p.offset.ToString() == msg["offset"]);
         }
         if (perso != null) {
             PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();

@@ -51,11 +51,12 @@ public class LightManager : MonoBehaviour {
         if (loaded) {
             if (Input.GetKeyDown(KeyCode.L)) {
                 enableLighting = !enableLighting;
-            }
-            if (_enableLighting != enableLighting) {
-                _enableLighting = enableLighting;
+			}
+			if (_enableLighting != enableLighting) {
+				_enableLighting = enableLighting;
                 Shader.SetGlobalFloat("_DisableLighting", enableLighting ? 0f : 1f);
-            }
+				controller.communicator.SendSettings();
+			}
             if (_luminosity != luminosity) {
                 _luminosity = luminosity;
                 Shader.SetGlobalFloat("_Luminosity", luminosity);

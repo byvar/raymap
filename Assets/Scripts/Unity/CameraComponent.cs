@@ -20,6 +20,10 @@ public class CameraComponent : MonoBehaviour {
     public float flySpeed = 20f;
     public Camera cam;
 
+    public float lerpFactor = 1f;
+    Vector3? targetPos = null;
+    Quaternion? targetRot = null;
+
 
     void Start() {
         // Set target direction to the camera's initial orientation.
@@ -32,7 +36,7 @@ public class CameraComponent : MonoBehaviour {
         if (pb != null) {
             //print(pb.perso.SuperObject.boundingVolume.Center + " - " + pb.perso.SuperObject.boundingVolume.Size);
             center = pb.perso.SuperObject != null ? (pb.transform.position + pb.perso.SuperObject.boundingVolume.Center) : pb.transform.position;
-            size = pb.perso.SuperObject != null ? pb.perso.SuperObject.boundingVolume.Size : Vector3.one;
+            size = pb.perso.SuperObject != null ? Vector3.Scale(pb.perso.SuperObject.boundingVolume.Size, pb.transform.lossyScale) : pb.transform.lossyScale;
         }/* else {
             SectorComponent sc = gao.GetComponent<SectorComponent>();
             if (sc != null) {
@@ -41,13 +45,17 @@ public class CameraComponent : MonoBehaviour {
         }*/
         if (center.HasValue) {
             float cameraDistance = 4.0f; // Constant factor
-            float objectSize = Mathf.Max(size.Value.x, size.Value.y, size.Value.z);
+            float objectSize = Mathf.Min(5f, Mathf.Max(size.Value.x, size.Value.y, size.Value.z));
             float cameraView = 2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * cam.fieldOfView); // Visible height 1 meter in front
             float distance = cameraDistance * objectSize / cameraView; // Combined wanted distance from the object
             distance += objectSize; // Estimated offset from the center to the outside of the object * 2
-            transform.LookAt(center.Value, Vector3.up);
-            transform.position = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
-        }
+            /*transform.position = center.Value + -transform.right * distance;
+            transform.LookAt(center.Value, Vector3.up);*/
+            //transform.LookAt(center.Value, Vector3.up);
+            //transform.position = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
+			targetPos = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
+			targetRot = Quaternion.LookRotation(center.Value - transform.position, Vector3.up);
+		}
     }
 
     void Update() {
@@ -72,61 +80,75 @@ public class CameraComponent : MonoBehaviour {
             }
         }
 
-        if (!mouseLookEnabled)
-            return;
+		if (!mouseLookEnabled) {
+			if (targetPos.HasValue) {
+				transform.position = Vector3.Lerp(transform.position, targetPos.Value, 0.05f * lerpFactor);
+				if (Vector3.Distance(transform.position, targetPos.Value) < 0.4f) {
+					targetPos = null;
+				}
+			}
+			if (targetRot.HasValue) {
+				transform.rotation = Quaternion.Lerp(transform.rotation, targetRot.Value, 0.05f * lerpFactor);
+				if (Mathf.Abs(Quaternion.Angle(transform.rotation, targetRot.Value)) < 10) {
+					targetRot = null;
+				}
+			}
+		} else {
+			targetPos = null;
+			targetRot = null;
+			//ensure these stay this way
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
 
-        //ensure these stay this way
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+			// Allow the script to clamp based on a desired target value.
+			var targetOrientation = Quaternion.Euler(targetDirection);
+			var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
 
-        // Allow the script to clamp based on a desired target value.
-        var targetOrientation = Quaternion.Euler(targetDirection);
-        var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
+			// Get raw mouse input for a cleaner reading on more sensitive mice.
+			var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
-        // Get raw mouse input for a cleaner reading on more sensitive mice.
-        var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+			// Scale input against the sensitivity setting and multiply that against the smoothing value.
+			mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
 
-        // Scale input against the sensitivity setting and multiply that against the smoothing value.
-        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
+			// Interpolate mouse movement over time to apply smoothing delta.
+			_smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
+			_smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
 
-        // Interpolate mouse movement over time to apply smoothing delta.
-        _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
-        _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
+			// Find the absolute mouse movement value from point zero.
+			_mouseAbsolute += _smoothMouse;
 
-        // Find the absolute mouse movement value from point zero.
-        _mouseAbsolute += _smoothMouse;
+			// Clamp and apply the local x value first, so as not to be affected by world transforms.
+			if (clampInDegrees.x < 360)
+				_mouseAbsolute.x = Mathf.Clamp(_mouseAbsolute.x, -clampInDegrees.x * 0.5f, clampInDegrees.x * 0.5f);
 
-        // Clamp and apply the local x value first, so as not to be affected by world transforms.
-        if (clampInDegrees.x < 360)
-            _mouseAbsolute.x = Mathf.Clamp(_mouseAbsolute.x, -clampInDegrees.x * 0.5f, clampInDegrees.x * 0.5f);
+			// Then clamp and apply the global y value.
+			if (clampInDegrees.y < 360)
+				_mouseAbsolute.y = Mathf.Clamp(_mouseAbsolute.y, -clampInDegrees.y * 0.5f, clampInDegrees.y * 0.5f);
 
-        // Then clamp and apply the global y value.
-        if (clampInDegrees.y < 360)
-            _mouseAbsolute.y = Mathf.Clamp(_mouseAbsolute.y, -clampInDegrees.y * 0.5f, clampInDegrees.y * 0.5f);
+			var xRotation = Quaternion.AngleAxis(-_mouseAbsolute.y, targetOrientation * Vector3.right);
+			transform.localRotation = xRotation * targetOrientation;
 
-        var xRotation = Quaternion.AngleAxis(-_mouseAbsolute.y, targetOrientation * Vector3.right);
-        transform.localRotation = xRotation * targetOrientation;
+			// If there's a character body that acts as a parent to the camera
+			var yRotation = Quaternion.AngleAxis(_mouseAbsolute.x, transform.InverseTransformDirection(Vector3.up));
+			transform.localRotation *= yRotation;
 
-        // If there's a character body that acts as a parent to the camera
-        var yRotation = Quaternion.AngleAxis(_mouseAbsolute.x, transform.InverseTransformDirection(Vector3.up));
-        transform.localRotation *= yRotation;
-
-        //movement
-        if (Input.GetAxis("Vertical") != 0) {
-            transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
-        }
-        if (Input.GetAxis("Horizontal") != 0) {
-            transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
-        }
-        if (Input.GetKey(KeyCode.R)) {
-            transform.Translate(Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
-        } else if (Input.GetKey(KeyCode.F)) {
-            transform.Translate(-Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
-        }
-        if (Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.KeypadPlus)) {
-            flySpeed += 1f;
-        } else if (Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.KeypadMinus)) {
-            if(flySpeed > 0) flySpeed -= 1f;
-        }
+			//movement
+			if (Input.GetAxis("Vertical") != 0) {
+				transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
+			}
+			if (Input.GetAxis("Horizontal") != 0) {
+				transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
+			}
+			if (Input.GetKey(KeyCode.R)) {
+				transform.Translate(Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
+			} else if (Input.GetKey(KeyCode.F)) {
+				transform.Translate(-Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
+			}
+			if (Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.KeypadPlus)) {
+				flySpeed += 1f;
+			} else if (Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.KeypadMinus)) {
+				if (flySpeed > 0) flySpeed -= 1f;
+			}
+		}
     }
 }

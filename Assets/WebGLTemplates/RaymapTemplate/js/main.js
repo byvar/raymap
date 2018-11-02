@@ -275,6 +275,27 @@ function parseSuperObject(so) {
 	}
 	return items;
 }
+function handleMessage_settings(msg) {
+	if(msg.hasOwnProperty("settings")) {
+		$("#btn-lighting").removeClass("disabled-button");
+		if(msg.settings.enableLighting) {
+			$("#btn-lighting").addClass("selected");
+			$(".lighting-settings").removeClass("disabled-button");
+		} else {
+			$("#btn-lighting").removeClass("selected");
+			$(".lighting-settings").addClass("disabled-button");
+		}
+		if(!msg.settings.saturate) {
+			$("#btn-saturate").addClass("selected");
+		} else {
+			$("#btn-saturate").removeClass("selected");
+		}
+		$("#range-luminosity").val(msg.settings.luminosity);
+		/*settingsJSON["luminosity"] = controller.lightManager.luminosity;
+		settingsJSON["saturate"] = controller.lightManager.saturate;
+		settingsJSON["displayInactiveSectors"] = controller.sectorManager.displayInactiveSectors;*/
+	}
+}
 function setAllJSON(jsonString) {
 	//alert(jsonString);
 	//console.log(jsonString); 
@@ -289,16 +310,8 @@ function setAllJSON(jsonString) {
 				api.reinitialise();
 			}, 100);
 		}
-		$("#btn-lighting").removeClass("disabled-button");
-		$(".lighting-settings").removeClass("disabled-button");
 		if(fullData.hasOwnProperty("settings")) {
-			if(!fullData.settings.saturate) {
-				$("#btn-saturate").addClass("selected");
-			}
-			$("#range-luminosity").val(fullData.settings.luminosity);
-			/*settingsJSON["luminosity"] = controller.lightManager.luminosity;
-			settingsJSON["saturate"] = controller.lightManager.saturate;
-			settingsJSON["displayInactiveSectors"] = controller.sectorManager.displayInactiveSectors;*/
+			handleMessage_settings(fullData.settings);
 		}
 	}
 }
@@ -444,6 +457,8 @@ function handleMessage(jsonString) {
 				handleMessage_highlight(msg); break;
 			case "selection":
 				handleMessage_selection(msg); break;
+			case "settings":
+				handleMessage_settings(msg); break;
 			default:
 				console.log('default');break;
 			}
