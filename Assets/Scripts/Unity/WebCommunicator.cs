@@ -112,6 +112,7 @@ public class WebCommunicator : MonoBehaviour {
         settingsJSON["saturate"] = controller.lightManager.saturate;
         settingsJSON["displayInactive"] = controller.sectorManager.displayInactiveSectors;
 		settingsJSON["playAnimations"] = controller.playAnimations;
+		settingsJSON["playTextureAnimations"] = controller.playTextureAnimations;
 		settingsJSONcontainer["type"] = "settings";
 		settingsJSONcontainer["settings"] = settingsJSON;
         return settingsJSONcontainer;
@@ -159,7 +160,8 @@ public class WebCommunicator : MonoBehaviour {
         persoJSON["nameInstance"] = perso.namePerso;
         if (perso.p3dData.family != null) persoJSON["family"] = perso.p3dData.family.family_index;
         if (pb != null) {
-            persoJSON["state"] = pb.stateIndex;
+			persoJSON["enabled"] = pb.gameObject.activeSelf;
+			persoJSON["state"] = pb.stateIndex;
             if (perso.p3dData.objectList != null) persoJSON["objectList"] = pb.poListIndex;
 			persoJSON["playAnimation"] = pb.playAnimation;
 			persoJSON["animationSpeed"] = pb.animationSpeed;
@@ -220,13 +222,20 @@ public class WebCommunicator : MonoBehaviour {
     public void ParseSelectionJSON(JSONNode msg) {
         MapLoader l = MapLoader.Loader;
         Perso perso = null;
+		SuperObject so = null;
         if (msg["offset"] != null && msg["offset"] != "null") {
-            perso = l.persos.Where(p => p.offset.ToString() == msg["offset"]).FirstOrDefault();
-            if(perso != null) {
-                PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
-                selector.Select(pb, view: msg["view"] != null);
-                //Send(GetSelectionJSON());
-            }
+			if (msg["type"] != null && msg["type"] == SuperObject.Type.Perso.ToString()) {
+				perso = l.persos.FirstOrDefault(p => p.offset.ToString() == msg["offset"]);
+				if (perso != null) {
+					PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+					selector.Select(pb, view: msg["view"] != null);
+				}
+			} else {
+				so = l.superObjects.FirstOrDefault(s => s.offset.ToString() == msg["offset"]);
+				if (so != null) {
+					selector.Select(so);
+				}
+			}
         } else {
             selector.Deselect();
         }
@@ -251,6 +260,7 @@ public class WebCommunicator : MonoBehaviour {
         }
         if (perso != null) {
             PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+			if (msg["enabled"] != null) pb.gameObject.SetActive(msg["enabled"].AsBool);
             if (msg["state"] != null) pb.SetState(msg["state"].AsInt);
             if (msg["objectList"] != null) pb.poListIndex = msg["objectList"].AsInt;
 			if (msg["playAnimation"] != null) pb.playAnimation = msg["playAnimation"].AsBool;
@@ -268,5 +278,6 @@ public class WebCommunicator : MonoBehaviour {
         if (msg["viewInvisible"] != null) controller.viewInvisible = msg["viewInvisible"].AsBool;
         if (msg["displayInactive"] != null) controller.sectorManager.displayInactiveSectors = msg["displayInactive"].AsBool;
 		if (msg["playAnimations"] != null) controller.playAnimations = msg["playAnimations"].AsBool;
-    }
+		if (msg["playTextureAnimations"] != null) controller.playTextureAnimations = msg["playTextureAnimations"].AsBool;
+	}
 }

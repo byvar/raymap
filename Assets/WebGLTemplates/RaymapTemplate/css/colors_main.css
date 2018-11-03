@@ -41,10 +41,6 @@ body {
     background-color: rgba(3,61,82,1);
 }
 
-.objects-item:hover {
-	background-color: rgba(3,61,82,1);
-}
-
 /*.song-item:active,
 .playlist-item:active,
 .game-item:active,
@@ -61,16 +57,22 @@ body {
 	background-color: rgba(3,61,82,0.7);
 }
 
-.objects-item.object-world {
+.objects-item.object-world,
+.objects-item.object-sector {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
-.objects-item.object-world:hover {
+.objects-item.object-sector:hover {
 	background-color: rgba(1,33,45,1);
 }
-.objects-item.object-world.current-objects-item {
+.objects-item.object-world.current-objects-item,
+.objects-item.object-sector.current-objects-item {
 	color: #19c8c3;
 	background-color: rgba(1,33,45,1);
+}
+.objects-item.object-perso:hover,
+.objects-item.object-IPO:hover {
+	background-color: rgba(3,61,82,1);
 }
 
 #perso-tooltip {

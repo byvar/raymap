@@ -66,7 +66,7 @@ namespace OpenSpace
                     case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsString     = (string)  entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Perso:
                         if (entry.value != null) {
-                            Perso perso = MapLoader.Loader.persos.Where(p => (p.SuperObject!=null && p.SuperObject.offset == (Pointer)entry.value)).FirstOrDefault(); // find perso that belongs to the superobject
+                            Perso perso = MapLoader.Loader.persos.FirstOrDefault(p => (p.SuperObject!=null && p.SuperObject.offset == (Pointer)entry.value)); // find perso that belongs to the superobject
                             if (perso!=null) {
                                 this.valueAsPersoGao = perso.Gao;
                             }
@@ -76,7 +76,7 @@ namespace OpenSpace
                     case DsgVarInfoEntry.DsgVarType.SuperObject:
 
                         if (entry.value != null) {
-                            SuperObject spo = MapLoader.Loader.superObjects.Where(p => (p.offset!=null && p.offset == (Pointer)entry.value)).FirstOrDefault();
+                            SuperObject spo = MapLoader.Loader.superObjects.FirstOrDefault(p => (p.offset!=null && p.offset == (Pointer)entry.value));
                             if (spo != null) {
                                 this.valueAsSuperObjectGao = spo.Gao;
                             }
@@ -99,7 +99,7 @@ namespace OpenSpace
                         case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsString_initial     = (string)entry.initialValue;       break;
                         case DsgVarInfoEntry.DsgVarType.Perso:
                             if (entry.initialValue != null) {
-                                Perso perso = MapLoader.Loader.persos.Where(p => p.SuperObject.offset == (Pointer)entry.initialValue).FirstOrDefault();
+                                Perso perso = MapLoader.Loader.persos.FirstOrDefault(p => p.SuperObject.offset == (Pointer)entry.initialValue);
                                 if (perso != null) {
                                     this.valueAsPersoGao_initial = perso.Gao;
                                 }
@@ -107,7 +107,7 @@ namespace OpenSpace
                         break;
                         case DsgVarInfoEntry.DsgVarType.SuperObject:
                             if (entry.initialValue != null) {
-                                SuperObject spo = MapLoader.Loader.superObjects.Where(p => p.offset == (Pointer)entry.initialValue).FirstOrDefault();
+                                SuperObject spo = MapLoader.Loader.superObjects.FirstOrDefault(p => p.offset == (Pointer)entry.initialValue);
                                 if (spo != null) {
                                     this.valueAsSuperObjectGao_initial = spo.Gao;
                                 }

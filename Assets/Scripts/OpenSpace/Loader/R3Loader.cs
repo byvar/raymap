@@ -486,7 +486,7 @@ namespace OpenSpace.Loader {
                 } else if (Settings.s.game == Settings.Game.RA) {
                     off_matrix = Pointer.Current(reader);
                     mat = Matrix.Read(reader, off_matrix);
-                    so = superObjects.Where(s => s.off_data == persoInFix[i]).FirstOrDefault();
+                    so = superObjects.FirstOrDefault(s => s.off_data == persoInFix[i]);
                 }
                 if (so != null) {
                     so.off_matrix = off_matrix;

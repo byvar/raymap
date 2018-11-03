@@ -7,6 +7,7 @@ namespace OpenSpace.Visual {
     public class AnimatedTexture {
         public Pointer off_texture;
         public float time;
+		public float currentTime; // Used to update this texture
 
         public TextureInfo texture;
 

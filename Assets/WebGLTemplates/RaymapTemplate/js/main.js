@@ -247,31 +247,43 @@ function showNotification(msg,mobile_only) {
 function getSuperObjectByIndex(index) {
 	return objectsList[index];
 }
-function parseSuperObject(so) {
+function parseSuperObject(so, level) {
 	let items = [];
 	objectsList.push(so);
 	let type = "Unknown";
 	if(so.hasOwnProperty("type")) {
 		type = so.type;
 	}
-	if(type === "World") {
-		items.push("<div class='objects-item object-world' alt='" + so.name + "'>" + so.name + "</div>");
-	} else if(type === "Perso") {
-		let family = "Family";
-		let model = "Model";
-		let instance = "Instance";
-		if(so.hasOwnProperty("perso")) {
-			family = so.perso.nameFamily;
-			model = so.perso.nameModel;
-			instance = so.perso.nameInstance;
-		}
-		items.push("<div class='objects-item object-perso' title='" + so.name + "'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
-	} else {
-		items.push("<div class='objects-item object-regular' title='" + so.name + "'>" + so.name + "</div>");
+	switch(type) {
+		case "World":
+			items.push("<div class='objects-item object-world level-" + level + "' alt='" + so.name + "'>" + so.name + "</div>");
+			break;
+		case "Perso":
+			let family = "Family";
+			let model = "Model";
+			let instance = "Instance";
+			if(so.hasOwnProperty("perso")) {
+				family = so.perso.nameFamily;
+				model = so.perso.nameModel;
+				instance = so.perso.nameInstance;
+			}
+			items.push("<div class='objects-item object-perso' title='" + so.name + "'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
+			break;
+		case "Sector":
+			items.push("<div class='objects-item object-sector level-" + level + "' title='" + so.name + "'>" + so.name + "</div>");
+			break;
+		case "IPO":
+		case "IPO_2":
+			items.push("<div class='objects-item object-IPO level-" + level + "' title='" + so.name + "'>" + so.name + "</div>");
+			break;
+		default:
+			items.push("<div class='objects-item object-regular' title='" + so.name + "'>" + so.name + "</div>");
+			break;
+			
 	}
 	if(so.hasOwnProperty("children")) {
 		$.each(so.children, function(i, child) {
-			items = items.concat(parseSuperObject(child));
+			items = items.concat(parseSuperObject(child, level+1));
 		});
 	}
 	return items;
@@ -302,14 +314,17 @@ function setAllJSON(jsonString) {
 	//console.log(jsonString); 
 	fullData = $.parseJSON(jsonString);
 	if(fullData != null) {
+		let totalWorld = [];
+		if(fullData.hasOwnProperty("transitDynamicWorld")) {
+			let transitDynamicWorld = parseSuperObject(fullData.transitDynamicWorld, 0);
+			totalWorld = totalWorld.concat(transitDynamicWorld);
+		}
 		if(fullData.hasOwnProperty("actualWorld")) {
+			let actualWorld = parseSuperObject(fullData.actualWorld, 0);
+			totalWorld = totalWorld.concat(actualWorld);
+		}
+		if(totalWorld.length > 0) {
 			let api = objects_content.data('jsp');
-			let totalWorld = parseSuperObject(fullData.actualWorld);
-			
-			if(fullData.hasOwnProperty("transitDynamicWorld")) {
-				let transitDynamicWorld = parseSuperObject(fullData.transitDynamicWorld);
-				totalWorld = totalWorld.concat(transitDynamicWorld);
-			}
 			api.getContentPane().append(totalWorld.join(""));
 			// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
 			setTimeout(function(){
@@ -427,15 +442,25 @@ function setObjectTransform() {
 }
 
 // SELECTION
-function setSelection(perso) {
+function setSelectionPerso(perso) {
 	let jsonObj = {
 		selection: {
 			offset: perso.offset,
+			type: "Perso",
 			view: true
 		}
 	}
 	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
-	
+}
+function setSelection(so) {
+	let jsonObj = {
+		selection: {
+			offset: so.hasOwnProperty("perso") ? so.perso.offset : so.offset,
+			type: so.type,
+			view: true
+		}
+	}
+	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 }
 function clearSelection() {
 	description_column.addClass('invisible');
@@ -613,16 +638,25 @@ $(function() {
 		perso_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
 	});
 	
-	$(document).on('click', ".objects-item", function() {
+	$(document).on('click', ".objects-item.object-perso", function() {
 		let index = $(".objects-item").index(this);
 		//$(".objects-item").removeClass("current-objects-item");
 		//$(this).addClass("current-objects-item");
 		let so = getSuperObjectByIndex(index);
 		if(so.hasOwnProperty("perso")) {
-			setSelection(so.perso);
+			setSelectionPerso(so.perso);
 			//currentSO = so;
 			//showObjectDescription(so);
 		}
+		return false;
+	});
+	
+	$(document).on('click', ".objects-item.object-IPO, .objects-item.object-sector", function() {
+		let index = $(".objects-item").index(this);
+		//$(".objects-item").removeClass("current-objects-item");
+		//$(this).addClass("current-objects-item");
+		let so = getSuperObjectByIndex(index);
+		setSelection(so);
 		return false;
 	});
 	

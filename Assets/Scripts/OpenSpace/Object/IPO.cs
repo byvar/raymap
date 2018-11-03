@@ -46,13 +46,14 @@ namespace OpenSpace.Object {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-            ipo.name = "IPO";
+            ipo.name = "IPO @ " + offset;
             if (Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
-            Pointer.Goto(ref reader, ipo.off_data);
-            ipo.data = PhysicalObject.Read(reader, ipo.off_data);
-            if (ipo.data != null) {
-                ipo.data.Gao.transform.parent = ipo.Gao.transform;
-            }
+			Pointer.DoAt(ref reader, ipo.off_data, () => {
+				ipo.data = PhysicalObject.Read(reader, ipo.off_data);
+				if (ipo.data != null) {
+					ipo.data.Gao.transform.parent = ipo.Gao.transform;
+				}
+			});
             /*if (ipo.data != null && ipo.data.visualSet.Count > 0) {
                 if (ipo.data.visualSet[0].obj is R3Mesh) {
                     GameObject meshGAO = ((R3Mesh)ipo.data.visualSet[0].obj).gao;

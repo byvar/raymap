@@ -7,7 +7,7 @@ using System.Text;
 using UnityEngine;
 
 public class MultiTextureMaterial : MonoBehaviour {
-    public VisualMaterial r3mat;
+    public VisualMaterial visMat;
     public Material mat;
     public string[] textureNames = { "Placeholder" };
     int currentTexture = 0;
@@ -16,25 +16,28 @@ public class MultiTextureMaterial : MonoBehaviour {
     float currentTime = 0f;
 
     public void Start() {
-        textureNames = r3mat.animTextures.Select(a => (a == null || a.texture == null) ? "Null" : a.texture.name).ToArray();
-        SetTexture(r3mat.currentAnimTexture);
+        textureNames = visMat.animTextures.Select(a => (a == null || a.texture == null) ? "Null" : a.texture.name).ToArray();
+        SetTexture(visMat.currentAnimTexture);
     }
 
     public void SetTexture(int index) {
-        if (index < 0 || index > r3mat.animTextures.Count) return;
+        if (index < 0 || index > visMat.animTextures.Count) return;
         textureIndex = index;
         currentTexture = index;
-        TextureInfo tex = r3mat.animTextures[index].texture;
+        TextureInfo tex = visMat.animTextures[index].texture;
         if (tex != null) {
             mat.SetTexture("_Tex0", tex.Texture);
         }
     }
 
     public void Update() {
-        if (animate && !r3mat.IsLockedAnimatedTexture) {
-            if (textureIndex >= 0 && textureIndex < r3mat.animTextures.Count) {
+		if (animate) {
+			textureIndex = visMat.currentAnimTexture;
+		}
+        /*if (animate && !visMat.IsLockedAnimatedTexture) {
+            if (textureIndex >= 0 && textureIndex < visMat.animTextures.Count) {
                 currentTime += Time.deltaTime * Mathf.Abs(Settings.s.textureAnimationSpeedModifier);
-                float time = r3mat.animTextures[currentTexture].time;
+                float time = visMat.animTextures[currentTexture].time;
                 //float time = 1f / 30f;
                 while (currentTime >= time) {
                     if (time <= 0) {
@@ -42,13 +45,13 @@ public class MultiTextureMaterial : MonoBehaviour {
                         break;
                     }
                     currentTime -= time;
-                    textureIndex = ++textureIndex % r3mat.animTextures.Count;
-                    time = r3mat.animTextures[textureIndex].time;
+                    textureIndex = ++textureIndex % visMat.animTextures.Count;
+                    time = visMat.animTextures[textureIndex].time;
                 }
             } else {
                 textureIndex = 0;
             }
-        }
+        }*/
         if (textureIndex != currentTexture) {
             currentTexture = textureIndex;
             SetTexture(currentTexture);

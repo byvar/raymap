@@ -33,6 +33,7 @@ public class Controller : MonoBehaviour {
 	bool viewInvisible_ = false; public bool viewInvisible = false;
 	bool viewGraphs_ = false; public bool viewGraphs = false;
 	bool playAnimations_ = true; public bool playAnimations = true;
+	bool playTextureAnimations_ = true; public bool playTextureAnimations = true;
 
 
 	private GameObject graphRoot = null;
@@ -158,6 +159,7 @@ public class Controller : MonoBehaviour {
 		state = State.Loading;
 		yield return new WaitForEndOfFrame();
 		yield return StartCoroutine(loader.Load());
+		yield return new WaitForEndOfFrame();
 		if (state == State.Error) yield break;
 		state = State.Initializing;
 		detailedState = "Initializing sectors";
@@ -208,6 +210,9 @@ public class Controller : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.P)) {
 			playAnimations = !playAnimations;
 		}
+		if (Input.GetKeyDown(KeyCode.T)) {
+			playTextureAnimations = !playTextureAnimations;
+		}
 		bool updatedSettings = false;
 		if (loader != null && viewInvisible != viewInvisible_) {
 			updatedSettings = true;
@@ -221,7 +226,8 @@ public class Controller : MonoBehaviour {
 			updatedSettings = true;
 			UpdateViewGraphs();
 		}
-		if (loader != null && playAnimations != playAnimations_) {
+		if (loader != null && playAnimations != playAnimations_ ||
+			loader != null && playTextureAnimations != playTextureAnimations_) {
 			updatedSettings = true;
 		}
 		if (updatedSettings) {
@@ -360,7 +366,7 @@ public class Controller : MonoBehaviour {
 
 	public void InitCamera() {
 		if (loader != null) {
-			Perso camera = loader.persos.Where(p => p != null && p.namePerso.Equals("StdCamer")).FirstOrDefault();
+			Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
 			if (camera != null) {
 				Camera.main.transform.position = camera.Gao.transform.position;
 				Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0, 180, 0);
@@ -477,9 +483,13 @@ public class Controller : MonoBehaviour {
 			case LogType.Exception:
 			case LogType.Error:
 				if (state != State.Finished) {
+					// Allowed exceptions
+					if (condition.Contains("cleaning the mesh failed")) break;
+
+					// Go to error state
 					state = State.Error;
 					if (loadingScreen.Active) {
-						detailedState = "ERROR: " + condition;
+						detailedState = condition;
 					}
 				}
 				break;

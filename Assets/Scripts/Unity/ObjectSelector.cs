@@ -1,3 +1,4 @@
+using OpenSpace.Object;
 using UnityEngine;
 
 // Very simple smooth mouselook modifier for the MainCamera in Unity
@@ -19,15 +20,16 @@ public class ObjectSelector : MonoBehaviour {
             layerMask |= 1 << LayerMask.NameToLayer("Visual");
         }
         Ray ray = cam.cam.ScreenPointToRay(Input.mousePosition);
-        RaycastHit[] hits = Physics.RaycastAll(ray, 1000f, layerMask, QueryTriggerInteraction.Ignore);
-        if (hits != null && hits.Length > 0) {
-            for (int i = 0; i < hits.Length; i++) {
+        RaycastHit[] hits = Physics.RaycastAll(ray, Mathf.Infinity, layerMask, QueryTriggerInteraction.Ignore);
+		if (hits != null && hits.Length > 0) {
+			System.Array.Sort(hits, (x, y) => (x.distance.CompareTo(y.distance)));
+			for (int i = 0; i < hits.Length; i++) {
                 // the object identified by hit.transform was clicked
                 PersoBehaviour pb = hits[i].transform.GetComponentInParent<PersoBehaviour>();
                 if (pb != null) {
                     highlightedPerso = pb;
                     if (Input.GetMouseButtonDown(0)) {
-                        Select(pb);
+                        Select(pb, view: true);
                     }
                     return;
                 }
@@ -63,12 +65,19 @@ public class ObjectSelector : MonoBehaviour {
         }
     }
 
+	public void Select(SuperObject so) {
+		cam.JumpTo(so.Gao);
+	}
+
     public void Deselect() {
         selectedPerso = null;
     }
 
     void Update() {
         highlightedPerso = null;
-        if(!cam.mouseLookEnabled && controller.LoadState == Controller.State.Finished) HandleCollision();
+		Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
+		if (!cam.mouseLookEnabled
+			&& controller.LoadState == Controller.State.Finished
+			&& screenRect.Contains(Input.mousePosition)) HandleCollision();
     }
 }

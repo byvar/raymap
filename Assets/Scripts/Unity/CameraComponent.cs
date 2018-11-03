@@ -37,12 +37,13 @@ public class CameraComponent : MonoBehaviour {
             //print(pb.perso.SuperObject.boundingVolume.Center + " - " + pb.perso.SuperObject.boundingVolume.Size);
             center = pb.perso.SuperObject != null ? (pb.transform.position + pb.perso.SuperObject.boundingVolume.Center) : pb.transform.position;
             size = pb.perso.SuperObject != null ? Vector3.Scale(pb.perso.SuperObject.boundingVolume.Size, pb.transform.lossyScale) : pb.transform.lossyScale;
-        }/* else {
-            SectorComponent sc = gao.GetComponent<SectorComponent>();
+        } else {
+            SuperObjectComponent sc = gao.GetComponent<SuperObjectComponent>();
             if (sc != null) {
-                jumpToPos = sc.sector.SuperObject.boundingVolume.Center;
-            }
-        }*/
+				center = (gao.transform.position + sc.so.boundingVolume.Center);
+				size = Vector3.Scale(sc.so.boundingVolume.Size, gao.transform.lossyScale);
+			}
+        }
         if (center.HasValue) {
             float cameraDistance = 4.0f; // Constant factor
             float objectSize = Mathf.Min(5f, Mathf.Max(size.Value.x, size.Value.y, size.Value.z));
@@ -82,15 +83,17 @@ public class CameraComponent : MonoBehaviour {
 
 		if (!mouseLookEnabled) {
 			if (targetPos.HasValue) {
-				transform.position = Vector3.Lerp(transform.position, targetPos.Value, 0.05f * lerpFactor);
 				if (Vector3.Distance(transform.position, targetPos.Value) < 0.4f) {
 					targetPos = null;
+				} else {
+					transform.position = Vector3.Lerp(transform.position, targetPos.Value, 0.05f * lerpFactor);
 				}
 			}
 			if (targetRot.HasValue) {
-				transform.rotation = Quaternion.Lerp(transform.rotation, targetRot.Value, 0.05f * lerpFactor);
 				if (Mathf.Abs(Quaternion.Angle(transform.rotation, targetRot.Value)) < 10) {
 					targetRot = null;
+				} else {
+					transform.rotation = Quaternion.Lerp(transform.rotation, targetRot.Value, 0.05f * lerpFactor);
 				}
 			}
 		} else {

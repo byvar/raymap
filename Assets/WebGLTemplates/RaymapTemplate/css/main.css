@@ -185,7 +185,6 @@ a:focus {
 	padding: 0 1.5em 0 1.5em;
 	text-overflow: ellipsis;
 	text-align: left;
-	cursor: pointer;
 	
 	-webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -196,6 +195,11 @@ a:focus {
 }
 .objects-item.object-perso {
 	padding: 0 0.5em 0 0.5em;
+	cursor: pointer;
+}
+.objects-item.object-IPO,
+.objects-item.object-sector {
+	cursor: pointer;
 }
 
 .objects-item > * {
@@ -212,7 +216,34 @@ a:focus {
 	padding: 0 3em 0 3em;
 	height: 3em;
 	line-height: 3em;
+}
+
+.object-world.level-0 {
+	text-transform: uppercase;
 	font-weight: bold;
+}
+.object-world.level-1 {
+	text-transform: uppercase;
+	padding: 0 3em 0 4em;
+}
+.objects-item.object-sector {
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	padding: 0 3em 0 5em;
+}
+.object-sector.level-0 {
+	padding: 0 3em 0 3em;
+}
+.object-sector.level-1 {
+	padding: 0 3em 0 4em;
+}
+.object-sector.level-2 {
+	padding: 0 3em 0 5em;
+}
+.object-sector.level-3 {
+	padding: 0 3em 0 6em;
 }
 
 .objects-item > .name-family,

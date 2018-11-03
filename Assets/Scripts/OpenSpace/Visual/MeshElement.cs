@@ -152,20 +152,24 @@ namespace OpenSpace.Visual {
                 for (int i = 0; i < num_textures; i++) {
                     mesh_main.SetUVs(i, new_uvs[i].ToList());
                 }
-                MeshCollider mc_main = gao.AddComponent<MeshCollider>();
-                if (new_boneWeights != null) {
+				if (new_boneWeights != null) {
                     mr_main = gao.AddComponent<SkinnedMeshRenderer>();
                     s_mr_main = (SkinnedMeshRenderer)mr_main;
                     s_mr_main.bones = mesh.bones.bones;
                     s_mr_main.rootBone = mesh.bones.bones[0];
                     s_mr_main.sharedMesh = CopyMesh(mesh_main);
-                    mc_main.sharedMesh = s_mr_main.sharedMesh;
-                } else {
+					
+					BoxCollider bc = gao.AddComponent<BoxCollider>();
+					bc.center = s_mr_main.bounds.center;
+					bc.size = s_mr_main.bounds.size;
+				} else {
                     MeshFilter mf = gao.AddComponent<MeshFilter>();
                     mf.mesh = mesh_main;
                     mr_main = gao.AddComponent<MeshRenderer>();
-                    mc_main.sharedMesh = mf.sharedMesh;
-                }
+					MeshCollider mc = gao.AddComponent<MeshCollider>();
+					mc.isTrigger = false;
+					mc.sharedMesh = mesh_main;
+				}
             }
             if (num_disconnected_triangles_spe > 0) {
                 Vector3[] new_vertices_spe = new Vector3[num_disconnected_triangles_spe * 3];
@@ -252,20 +256,24 @@ namespace OpenSpace.Visual {
                 }
                 //mesh.SetUVs(0, new_uvs_spe.ToList());
                 /*mesh.uv = new_uvs_spe;*/
-                MeshCollider mc_spe = gao_spe.AddComponent<MeshCollider>();
-                if (new_boneWeights_spe != null) {
+				if (new_boneWeights_spe != null) {
                     mr_spe = gao_spe.AddComponent<SkinnedMeshRenderer>();
                     s_mr_spe = (SkinnedMeshRenderer)mr_spe;
                     s_mr_spe.bones = mesh.bones.bones;
                     s_mr_spe.rootBone = mesh.bones.bones[0];
                     s_mr_spe.sharedMesh = CopyMesh(mesh_spe);
-                    mc_spe.sharedMesh = s_mr_spe.sharedMesh;
-                } else {
+					
+					BoxCollider bc = gao_spe.AddComponent<BoxCollider>();
+					bc.center = s_mr_spe.bounds.center;
+					bc.size = s_mr_spe.bounds.size;
+				} else {
                     MeshFilter mf = gao_spe.AddComponent<MeshFilter>();
                     mf.mesh = mesh_spe;
                     mr_spe = gao_spe.AddComponent<MeshRenderer>();
-                    mc_spe.sharedMesh = mf.sharedMesh;
-                }
+					MeshCollider mc = gao_spe.AddComponent<MeshCollider>();
+					mc.isTrigger = false;
+					mc.sharedMesh = mesh_spe;
+				}
                 //}
             }
             if (visualMaterial != null) {
@@ -290,7 +298,7 @@ namespace OpenSpace.Visual {
                     if (!receiveShadows) mr_main.receiveShadows = false;
                     if (visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr_main.gameObject.AddComponent<MultiTextureMaterial>();
-                        mtmat.r3mat = visualMaterial;
+                        mtmat.visMat = visualMaterial;
                         mtmat.mat = mr_main.material;
                     }
                     /*if (scroll) {
@@ -305,7 +313,7 @@ namespace OpenSpace.Visual {
                     if (!receiveShadows) mr_spe.receiveShadows = false;
                     if (visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr_spe.gameObject.AddComponent<MultiTextureMaterial>();
-                        mtmat.r3mat = visualMaterial;
+                        mtmat.visMat = visualMaterial;
                         mtmat.mat = mr_spe.material;
                     }
                     /*if (scroll) {

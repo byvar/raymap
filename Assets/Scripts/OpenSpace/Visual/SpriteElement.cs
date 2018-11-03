@@ -79,7 +79,7 @@ namespace OpenSpace.Visual {
                     if (!receiveShadows) mr.receiveShadows = false;
                     if (sprites[i].visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
-                        mtmat.r3mat = sprites[i].visualMaterial;
+                        mtmat.visMat = sprites[i].visualMaterial;
                         mtmat.mat = mr.material;
                     }
                 }

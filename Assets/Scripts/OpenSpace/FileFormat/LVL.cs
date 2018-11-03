@@ -47,7 +47,7 @@ namespace OpenSpace.FileFormat {
         }
 
         public FileWithPointers GetFileWithID(int id) {
-            return MapLoader.Loader.files_array.Where(f => f != null && f.fileID == id).FirstOrDefault();
+            return MapLoader.Loader.files_array.FirstOrDefault(f => f != null && f.fileID == id);
         }
         
         public override void CreateWriter() {

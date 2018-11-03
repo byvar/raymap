@@ -146,7 +146,7 @@ namespace OpenSpace.Loader {
             });
             if (languages != null && fontStruct != null) {
                 for (int i = 0; i < num_languages; i++) {
-                    loadingState = "Loading text files: " + i + "/" + num_languages;
+                    loadingState = "Loading text files: " + (i+1) + "/" + num_languages;
                     string langFilePath = gameDataBinFolder + "TEXTS/" + languages[i].ToUpper() + ".LNG";
                     yield return controller.StartCoroutine(PrepareFile(langFilePath));
                     files_array[2] = new DCDAT(languages[i], langFilePath, 2);
