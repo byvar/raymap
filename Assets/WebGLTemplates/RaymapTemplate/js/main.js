@@ -68,6 +68,7 @@ let dialogueMsg = null;
 let fullData = null;
 let objectsList = [];
 let currentSO = null;
+let inputHasFocus = false;
 
 let wrapper, objects_content, unity_content, description_content, description_column;
 let btn_close_description, stateSelector, objectListSelector, perso_tooltip;
@@ -303,8 +304,13 @@ function setAllJSON(jsonString) {
 	if(fullData != null) {
 		if(fullData.hasOwnProperty("actualWorld")) {
 			let api = objects_content.data('jsp');
-			let actualWorld = parseSuperObject(fullData.actualWorld);
-			api.getContentPane().append(actualWorld.join(""));
+			let totalWorld = parseSuperObject(fullData.actualWorld);
+			
+			if(fullData.hasOwnProperty("transitDynamicWorld")) {
+				let transitDynamicWorld = parseSuperObject(fullData.transitDynamicWorld);
+				totalWorld = totalWorld.concat(transitDynamicWorld);
+			}
+			api.getContentPane().append(totalWorld.join(""));
 			// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
 			setTimeout(function(){
 				api.reinitialise();
@@ -369,32 +375,65 @@ function showObjectDescription(so) {
 function setObjectList(ol) {
 	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
 		currentSO.perso.objectList = ol;
-		let jsonObj = {}
-		let perso = {}
-		perso["offset"] = currentSO.perso.offset;
-		perso["objectList"] = ol;
-        jsonObj["perso"] = perso;
+		let jsonObj = {
+			perso: {
+				offset: currentSO.perso.offset,
+				objectList: ol
+			}
+		}
 		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 	}
 }
 function setState(state) {
 	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
 		currentSO.perso.state = state;
-		let jsonObj = {}
-		let perso = {}
-		perso["offset"] = currentSO.perso.offset;
-		perso["state"] = state;
-        jsonObj["perso"] = perso;
+		let jsonObj = {
+			perso: {
+				offset: currentSO.perso.offset,
+				state: state
+			}
+		}
 		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	}
+}
+function setObjectTransform() {
+	if(currentSO != null) {
+		let posX = $('#posX').val();
+		let posY = $('#posY').val();
+		let posZ = $('#posZ').val();
+		
+		let rotX = $('#rotX').val();
+		let rotY = $('#rotY').val();
+		let rotZ = $('#rotZ').val();
+		
+		let sclX = $('#sclX').val();
+		let sclY = $('#sclY').val();
+		let sclZ = $('#sclZ').val();
+		
+		if($.isNumeric(posX) && $.isNumeric(posY) && $.isNumeric(posZ) &&
+		   $.isNumeric(rotX) && $.isNumeric(rotY) && $.isNumeric(rotZ) &&
+		   $.isNumeric(sclX) && $.isNumeric(sclY) && $.isNumeric(sclZ)) {
+			let jsonObj = {
+				superobject: {
+					offset:   currentSO.offset,
+					position: [posX, posY, posZ],
+					rotation: [rotX, rotY, rotZ],
+					scale:    [sclX, sclY, sclZ]
+				}
+			}
+			gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+		}
 	}
 }
 
 // SELECTION
 function setSelection(perso) {
-	let jsonObj = {}
-	let select = {}
-	select["offset"] = perso.offset;
-	jsonObj["selection"] = select;
+	let jsonObj = {
+		selection: {
+			offset: perso.offset,
+			view: true
+		}
+	}
 	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 	
 }
@@ -402,10 +441,11 @@ function clearSelection() {
 	description_column.addClass('invisible');
 	$(".objects-item").removeClass("current-objects-item");
 	currentSO = null;
-	let jsonObj = {}
-	let select = {}
-	select["offset"] = "null";
-	jsonObj["selection"] = select;
+	let jsonObj = {
+		selection: {
+			offset: "null"
+		}
+	}
 	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 }
 function handleMessage_selection(msg) {
@@ -439,12 +479,13 @@ function handleMessage_highlight(msg) {
 
 // SETTINGS
 function sendSettings() {
-	let jsonObj = {}
-	let settings = {}
-	settings["enableLighting"] = $("#btn-lighting").hasClass("selected");
-	settings["luminosity"] = $("#range-luminosity").val();
-	settings["saturate"] = !$("#btn-saturate").hasClass("selected");
-	jsonObj["settings"] = settings;
+	let jsonObj = {
+		settings: {
+			enableLighting: $("#btn-lighting").hasClass("selected"),
+			luminosity: $("#range-luminosity").val(),
+			saturate: !$("#btn-saturate").hasClass("selected")
+		}
+	}
 	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 }
 
@@ -607,7 +648,7 @@ $(function() {
 		sendSettings();
 		return false;
 	});
-	$(document).on('change', "#range-luminosity", function() {
+	$(document).on('input', "#range-luminosity", function() {
 		sendSettings();
 		return false;
 	});
@@ -632,6 +673,32 @@ $(function() {
 		let selectedIndex = $(this).prop('selectedIndex');
 		setState(selectedIndex);
 		$(this).blur();
+		return false;
+	});
+	$(document).on('focusin', ".input-transform", function() {
+		if(!inputHasFocus) {
+			for (var i in gameInstance.Module.getJSEvents().eventHandlers) {
+				var event = gameInstance.Module.getJSEvents().eventHandlers[i];
+				if (event.eventTypeString == 'keydown' || event.eventTypeString == 'keypress' || event.eventTypeString == 'keyup') {
+					window.removeEventListener(event.eventTypeString, event.eventListenerFunc, event.useCapture);
+				}
+			}
+		}
+		inputHasFocus = true;
+	});
+	$(document).on('focusout', ".input-transform", function() {
+		if(inputHasFocus && !$(".input-transform").is(":focus")) {
+			for (var i in gameInstance.Module.getJSEvents().eventHandlers) {
+				var event = gameInstance.Module.getJSEvents().eventHandlers[i];
+				if (event.eventTypeString == 'keydown' || event.eventTypeString == 'keypress' || event.eventTypeString == 'keyup') {
+					window.addEventListener(event.eventTypeString, event.eventListenerFunc, event.useCapture);
+				}
+			}
+			inputHasFocus = false;
+		}
+	});
+	$(document).on('input', ".input-transform", function() {
+		setObjectTransform();
 		return false;
 	});
 	

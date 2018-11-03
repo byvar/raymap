@@ -30,6 +30,11 @@ public class LoadingScreen : MonoBehaviour {
         set { loadingPanel.sprite = value; }
     }
 
+	public Color LoadingtextColor {
+		get { return loadingText.color; }
+		set { loadingText.color = value; }
+	}
+
     public bool Active {
         get { return gameObject.activeSelf; }
         set { gameObject.SetActive(value); }

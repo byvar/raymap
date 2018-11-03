@@ -23,9 +23,11 @@ public class WebCommunicator : MonoBehaviour {
     public ObjectSelector selector;
     private PersoBehaviour highlightedPerso_;
     private PersoBehaviour selectedPerso_;
+	private int selectedPersoStateIndex_;
     bool sentHierarchy = false;
     string allJSON = null;
-    public void Start() {
+
+	public void Start() {
     }
 
     public void Update() {
@@ -40,8 +42,12 @@ public class WebCommunicator : MonoBehaviour {
             }
             if (selectedPerso_ != selector.selectedPerso) {
                 selectedPerso_ = selector.selectedPerso;
+				if (selectedPerso_ != null) selectedPersoStateIndex_ = selectedPerso_.stateIndex;
                 Send(GetSelectionJSON());
             }
+			if (selectedPerso_ != null && selectedPersoStateIndex_ != selectedPerso_.stateIndex) {
+				Send(GetSelectionJSON());
+			}
         }
     }
 
@@ -105,6 +111,7 @@ public class WebCommunicator : MonoBehaviour {
 		settingsJSON["luminosity"] = controller.lightManager.luminosity;
         settingsJSON["saturate"] = controller.lightManager.saturate;
         settingsJSON["displayInactive"] = controller.sectorManager.displayInactiveSectors;
+		settingsJSON["playAnimations"] = controller.playAnimations;
 		settingsJSONcontainer["type"] = "settings";
 		settingsJSONcontainer["settings"] = settingsJSON;
         return settingsJSONcontainer;
@@ -154,6 +161,9 @@ public class WebCommunicator : MonoBehaviour {
         if (pb != null) {
             persoJSON["state"] = pb.stateIndex;
             if (perso.p3dData.objectList != null) persoJSON["objectList"] = pb.poListIndex;
+			persoJSON["playAnimation"] = pb.playAnimation;
+			persoJSON["animationSpeed"] = pb.animationSpeed;
+			persoJSON["autoNextState"] = pb.autoNextState;
         }
         return persoJSON;
     }
@@ -243,6 +253,9 @@ public class WebCommunicator : MonoBehaviour {
             PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
             if (msg["state"] != null) pb.SetState(msg["state"].AsInt);
             if (msg["objectList"] != null) pb.poListIndex = msg["objectList"].AsInt;
+			if (msg["playAnimation"] != null) pb.playAnimation = msg["playAnimation"].AsBool;
+			if (msg["animationSpeed"] != null) pb.animationSpeed = msg["animationSpeed"].AsFloat;
+			if (msg["autoNextState"] != null) pb.autoNextState = msg["autoNextState"].AsBool;
         }
     }
     public void ParseSettingsJSON(JSONNode msg) {
@@ -254,5 +267,6 @@ public class WebCommunicator : MonoBehaviour {
         if (msg["enableLighting"] != null) controller.lightManager.enableLighting = msg["enableLighting"].AsBool;
         if (msg["viewInvisible"] != null) controller.viewInvisible = msg["viewInvisible"].AsBool;
         if (msg["displayInactive"] != null) controller.sectorManager.displayInactiveSectors = msg["displayInactive"].AsBool;
+		if (msg["playAnimations"] != null) controller.playAnimations = msg["playAnimations"].AsBool;
     }
 }
