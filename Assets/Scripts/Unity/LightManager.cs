@@ -99,10 +99,10 @@ public class LightManager : MonoBehaviour {
                     backgroundPanel.material = skyboxMat;
                 }
                 //skyboxMat.SetFloat("_DisableLighting", 1f);
-                //backgroundPanel.material.SetFloat("_DisableLighting", 1f);
+                backgroundPanel.material.SetFloat("_DisableLightingLocal", 1f);
                 if (activeBackgroundSector != null) {
                     if (activeBackgroundSector != previousActiveBackgroundSector) {
-                        //backgroundPanel.material.SetFloat("_DisableLighting", 0f);
+                        //backgroundPanel.material.SetFloat("_DisableLightingLocal", 0f);
                         sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
                         previousActiveBackgroundSector = activeBackgroundSector;
                     }

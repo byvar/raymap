@@ -13,7 +13,7 @@ public class MultiTextureMaterial : MonoBehaviour {
     int currentTexture = 0;
     public int textureIndex = 0;
     public bool animate = true;
-    float currentTime = 0f;
+    //float currentTime = 0f;
 
     public void Start() {
         textureNames = visMat.animTextures.Select(a => (a == null || a.texture == null) ? "Null" : a.texture.name).ToArray();
@@ -30,7 +30,7 @@ public class MultiTextureMaterial : MonoBehaviour {
         }
     }
 
-    public void Update() {
+    public void LateUpdate() {
 		if (animate) {
 			textureIndex = visMat.currentAnimTexture;
 		}

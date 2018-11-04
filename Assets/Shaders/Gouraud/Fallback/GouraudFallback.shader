@@ -41,6 +41,7 @@
 			#pragma multi_compile_fog
 
 			#define GOURAUD_NUM_LIGHTS 16
+			#define FALLBACK 1
 			#include "../GouraudShared.cginc"
 
 			v2f vert(appdata_full v) {

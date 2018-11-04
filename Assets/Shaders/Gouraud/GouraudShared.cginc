@@ -46,6 +46,7 @@ float _StaticLightCount = 0;
 float _Luminosity = 0.5;
 float _Saturate = 1.0;
 float _DisableLighting = 0;
+float _DisableLightingLocal = 0;
 
 struct v2f {
 	float4 pos : SV_POSITION;
@@ -84,7 +85,7 @@ float CalcNormalFactor(float3 normalDirection, float3 lightDirection) {
 }
 
 float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
-	if(_DisableLighting == 1.0) return float4(1.0, 1.0, 1.0, 1.0);
+	if(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0) return float4(1.0, 1.0, 1.0, 1.0);
 
 	/* Alpha light flags:
 	    0 = Affect color and alpha
@@ -107,7 +108,12 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 #ifdef GOURAUD_NUM_LIGHTS
 	if (num_lights > GOURAUD_NUM_LIGHTS) num_lights = GOURAUD_NUM_LIGHTS;
 #endif
+#if defined(FALLBACK) && defined(GOURAUD_NUM_LIGHTS)
+	for (int i = 0; i < GOURAUD_NUM_LIGHTS; i++) {
+		if(i < _StaticLightCount) {
+#else
 	for (int i = 0; i < num_lights; i++) {
+#endif
 		if (_StaticLightPos[i].w == 1) {
 			attenuation = 1.0; // no attenuation
 			lightDirection = normalize(_StaticLightDir[i].xyz);
@@ -116,7 +122,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 			} else normalFactor = 1.0;*/
 			normalFactor = CalcNormalFactor(normalDirection, lightDirection);
 			if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
-				//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
+			//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
 			if (_StaticLightParams[i].w != 2) alpha = alpha + _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
 		} else if (_StaticLightPos[i].w == 2) {
 			vertexToLightSource = _StaticLightPos[i].xyz - multipliedPosition;
@@ -157,6 +163,9 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 				}
 			}
 		}
+#if defined(FALLBACK) && defined(GOURAUD_NUM_LIGHTS)
+	}
+#endif
 	}
 	//float3 ambientLighting = ambient.xyz * _DiffuseCoef.xyz;
 	diffuseReflection = luminosity + ambient.xyz + diffuseReflection * (luminosity + _DiffuseCoef.xyz);
