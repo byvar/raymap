@@ -288,6 +288,37 @@ function parseSuperObject(so, level) {
 	}
 	return items;
 }
+function parseAlways(alwaysData) {
+	let items = [];
+	let so = {
+		offset: "null",
+		type: "AlwaysWorld",
+		position: [0,0,0],
+		rotation: [0,0,0],
+		scale:    [0,0,0]
+	};
+	objectsList.push(so);
+	items.push("<div class='objects-item object-world level-0' alt='Spawnable objects'>Spawnable objects</div>");
+	
+	if(alwaysData.hasOwnProperty("spawnablePersos")) {
+		$.each(alwaysData.spawnablePersos, function(i, child) {
+			let family = alwaysData.spawnablePersos[i].nameFamily;
+			let model = alwaysData.spawnablePersos[i].nameModel;
+			let instance = alwaysData.spawnablePersos[i].nameInstance;
+			items.push("<div class='objects-item object-always object-perso' title='Spawnable'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
+			let persoSO = {
+				offset: alwaysData.spawnablePersos[i].offset,
+				type: "Always",
+				perso: alwaysData.spawnablePersos[i],
+				position: alwaysData.spawnablePersos[i].position,
+				rotation: alwaysData.spawnablePersos[i].rotation,
+				scale:    alwaysData.spawnablePersos[i].scale
+			};
+			objectsList.push(persoSO);
+		});
+	}
+	return items;
+}
 function handleMessage_settings(msg) {
 	if(msg.hasOwnProperty("settings")) {
 		$("#btn-lighting").removeClass("disabled-button");
@@ -315,6 +346,10 @@ function setAllJSON(jsonString) {
 	fullData = $.parseJSON(jsonString);
 	if(fullData != null) {
 		let totalWorld = [];
+		if(fullData.hasOwnProperty("always")) {
+			let fakeAlwaysWorld = parseAlways(fullData.always);
+			totalWorld = totalWorld.concat(fakeAlwaysWorld);
+		}
 		if(fullData.hasOwnProperty("transitDynamicWorld")) {
 			let transitDynamicWorld = parseSuperObject(fullData.transitDynamicWorld, 0);
 			totalWorld = totalWorld.concat(transitDynamicWorld);
@@ -376,6 +411,28 @@ function showObjectDescription(so) {
 			});
 		}
 		objectListSelector.prop("selectedIndex", so.perso.objectList);
+		
+		
+		if(so.perso.enabled) {
+			$("#btn-enabled").addClass("selected");
+		} else {
+			$("#btn-enabled").removeClass("selected");
+		}
+		$("#objectName").html("<div class='name-family'>" + so.perso.nameFamily + "</div><div class='name-model'>" + so.perso.nameModel + "</div><div class='name-instance'>" + so.perso.nameInstance + "</div>");
+		
+		// Animation stuff
+		if(so.perso.playAnimation) {
+			$("#btn-playAnimation").addClass("selected");
+		} else {
+			$("#btn-playAnimation").removeClass("selected");
+		}
+		if(so.perso.autoNextState) {
+			$("#btn-autoNextState").addClass("selected");
+		} else {
+			$("#btn-autoNextState").removeClass("selected");
+		}
+		$('#animationSpeed').val(so.perso.animationSpeed);
+		
 	} else {
 		$('.perso-description').addClass('invisible');
 	}
@@ -387,25 +444,18 @@ function showObjectDescription(so) {
 	description_column.removeClass('invisible');
 }
 
-function setObjectList(ol) {
+function sendPerso() {
 	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
-		currentSO.perso.objectList = ol;
+		let animationSpeed = $('#animationSpeed').val();
 		let jsonObj = {
 			perso: {
 				offset: currentSO.perso.offset,
-				objectList: ol
-			}
-		}
-		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
-	}
-}
-function setState(state) {
-	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
-		currentSO.perso.state = state;
-		let jsonObj = {
-			perso: {
-				offset: currentSO.perso.offset,
-				state: state
+				objectList: $("#objectList").prop('selectedIndex'),
+				state: $("#state").prop('selectedIndex'),
+				enabled: $("#btn-enabled").hasClass("selected"),
+				playAnimation: $("#btn-playAnimation").hasClass("selected"),
+				autoNextState: $("#btn-autoNextState").hasClass("selected"),
+				animationSpeed: $.isNumeric(animationSpeed) ? animationSpeed : currentSO.perso.animationSpeed
 			}
 		}
 		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
@@ -431,6 +481,7 @@ function setObjectTransform() {
 			let jsonObj = {
 				superobject: {
 					offset:   currentSO.offset,
+					type:     currentSO.type,
 					position: [posX, posY, posZ],
 					rotation: [rotX, rotY, rotZ],
 					scale:    [sclX, sclY, sclZ]
@@ -489,6 +540,26 @@ function handleMessage_selection(msg) {
 			$(".objects-item").removeClass("current-objects-item");
 			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
 			currentSO = msg.selection;
+			showObjectDescription(currentSO);
+		}
+	} else if(msg.selectionType === "always") {
+		let perso_selection, index_selection = -1;
+		if(fullData != null) {
+			for (let i = 0; i < objectsList.length; i++) {
+				if(objectsList[i].offset === msg.selection.offset) {
+					objectsList[i].perso = msg.selection;
+					objectsList[i].position = msg.selection.position;
+					objectsList[i].rotation = msg.selection.rotation;
+					objectsList[i].scale = msg.selection.scale;
+					index_selection = i;
+					break;
+				}
+			}
+		}			
+		if(index_selection > -1) {
+			$(".objects-item").removeClass("current-objects-item");
+			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
+			currentSO = objectsList[index_selection];
 			showObjectDescription(currentSO);
 		}
 	}
@@ -697,19 +768,31 @@ $(function() {
 		return false;
 	});
 	
+	$(document).on('click', "#btn-enabled, #btn-autoNextState, #btn-playAnimation", function() {
+		if($(this).hasClass("selected")) {
+			$(this).removeClass("selected");
+		} else {
+			$(this).addClass("selected");
+		}
+		sendPerso();
+		return false;
+	});
+	
 	$(document).on('change', "#objectList", function() {
-		let selectedIndex = $(this).prop('selectedIndex');
-		setObjectList(selectedIndex);
+		//let selectedIndex = $(this).prop('selectedIndex');
+		//setObjectList(selectedIndex);
+		sendPerso();
 		$(this).blur();
 		return false;
 	});
 	$(document).on('change', "#state", function() {
-		let selectedIndex = $(this).prop('selectedIndex');
-		setState(selectedIndex);
+		//let selectedIndex = $(this).prop('selectedIndex');
+		//setState(selectedIndex);
+		sendPerso();
 		$(this).blur();
 		return false;
 	});
-	$(document).on('focusin', ".input-transform", function() {
+	$(document).on('focusin', ".input-typing", function() {
 		if(!inputHasFocus) {
 			for (var i in gameInstance.Module.getJSEvents().eventHandlers) {
 				var event = gameInstance.Module.getJSEvents().eventHandlers[i];
@@ -720,8 +803,8 @@ $(function() {
 		}
 		inputHasFocus = true;
 	});
-	$(document).on('focusout', ".input-transform", function() {
-		if(inputHasFocus && !$(".input-transform").is(":focus")) {
+	$(document).on('focusout', ".input-typing", function() {
+		if(inputHasFocus && !$(".input-typing").is(":focus")) {
 			for (var i in gameInstance.Module.getJSEvents().eventHandlers) {
 				var event = gameInstance.Module.getJSEvents().eventHandlers[i];
 				if (event.eventTypeString == 'keydown' || event.eventTypeString == 'keypress' || event.eventTypeString == 'keyup') {
@@ -733,6 +816,11 @@ $(function() {
 	});
 	$(document).on('input', ".input-transform", function() {
 		setObjectTransform();
+		return false;
+	});
+	
+	$(document).on('input', "#animationSpeed", function() {
+		sendPerso();
 		return false;
 	});
 	

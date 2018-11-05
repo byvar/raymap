@@ -247,7 +247,8 @@ a:focus {
 }
 
 .objects-item > .name-family,
-#perso-tooltip > .name-family {
+#perso-tooltip > .name-family,
+#objectName > .name-family {
 	text-align: right;
 	display: inline-block;
 	font-weight: bold;
@@ -257,9 +258,11 @@ a:focus {
 	overflow: hidden;
     text-decoration: inherit; /* no underline */
 	text-overflow: ellipsis;
+	flex: 1 1 auto;
 }
 .objects-item > .name-model,
-#perso-tooltip > .name-model {
+#perso-tooltip > .name-model,
+#objectName > .name-model {
 	padding: 0 0.5em 0 0.5em;
 	text-align: center;
 	display: inline-block;
@@ -270,10 +273,12 @@ a:focus {
 	overflow: hidden;
     text-decoration: inherit; /* no underline */
 	text-overflow: ellipsis;
+	flex: 1 1 auto;
 	
 }
 .objects-item > .name-instance,
-#perso-tooltip > .name-instance {
+#perso-tooltip > .name-instance,
+#objectName > .name-instance {
 	text-align: left;
 	display: inline-block;
 	width: 40%;
@@ -282,18 +287,23 @@ a:focus {
 	overflow: hidden;
     text-decoration: inherit; /* no underline */
 	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+#perso-tooltip > *,
+#objectName > * {
+	width: auto !important;
 }
 
 #perso-tooltip {
-    display: block;
+    display: flex;
+	align-items: center;
 	box-sizing: border-box;
 	padding: 0 0.5em 0 0.5em;
     margin-left: 15px;
-    padding: 10px;
     position: absolute;
     z-index: 1000;
-    width:25em;
-    height:2.5em;
+    width: 25em;
+    height: 2.5em;
     border-radius: 0.75em;
     pointer-events: none;
 }
@@ -308,7 +318,15 @@ a:focus {
 .input-group {
 	padding: 1em 0.5em 1em 1em;
 	display: block;
-	box-sizing: border-box;
+	box-sizing: content-box;
+}
+.input-group.small {
+	padding: 0.45em 0.5em 0.45em 1em;
+}
+.input-group.input-flex {
+	display: flex;
+	align-items: center;
+	height: 1.3em;
 }
 .input-group.invisible {
 	display: none;
@@ -317,10 +335,15 @@ a:focus {
 	display: block;
 	box-sizing: border-box;
 }
-.input .label.main {
-	float: left;
+.label.main {
 	display: block;
 	width: 20%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.input .label.main {
+	float: left;
 }
 .input > .fields {
 	width: calc(100% - 1.5em);
@@ -328,6 +351,21 @@ a:focus {
 .input > .label.main + .fields {
 	display: inline-block;
 	width: 80%;
+	flex: 1 1 0;
+}
+.input-flex > .flexible {
+	box-sizing: border-box;
+	display: block;
+	width: auto;
+	flex: 1 1 auto;
+}
+.input-flex > .label.main {
+	box-sizing: border-box;
+	display: block;
+	flex: 0 0 auto;
+}
+.input-flex > .header-button {
+	flex: 0 0 auto;
 }
 .input > .fields > .field {
 	display: inline-block;
@@ -360,6 +398,19 @@ a:focus {
 .label.sub {
 	/*width:*/
 }
+#objectName {
+	display: flex;
+	text-align: left;
+	height: 1.3em;
+	line-height: 1.3em;
+	flex: 1 1 auto;
+	padding-left: 0.5em;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 
 
 /* ============================== RAYMAP ===================================== */

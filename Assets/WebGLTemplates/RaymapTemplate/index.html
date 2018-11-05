@@ -45,22 +45,31 @@
 							<div class="header-buttons-right"><div id="btn-close-description" class="header-button disabled-button" title="Close object description panel"><i class="icon-trash"></i></div></div>
 						</div>
 						<div id="content-description" class="column-content column-content-scroll">
-							<div class="input-group">
-								<div class="input vector3"><div class="label main">Position</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="posX" class="input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="posY" class="input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="posZ" class="input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
-								<div class="input vector3"><div class="label main">Rotation</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="rotX" class="input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="rotY" class="input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="rotZ" class="input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
-								<div class="input vector3"><div class="label main">Scale</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="sclX" class="input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="sclY" class="input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="sclZ" class="input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
+							<div class="input-group input-flex perso-description invisible">
+								<div id="btn-enabled" class="header-button" title="Show/hide"><i class="icon-info-circle"></i></div>
+								<div id="objectName"><div class='name-family'>family</div><div class='name-model'>model</div><div class='name-instance'>instance</div></div>
 							</div>
-							<div class="input-group perso-description invisible">
+							<div class="input-group">
+								<div class="input vector3"><div class="label main">Position</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="posX" class="input-typing input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="posY" class="input-typing input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="posZ" class="input-typing input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
+								<div class="input vector3"><div class="label main">Rotation</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="rotX" class="input-typing input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="rotY" class="input-typing input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="rotZ" class="input-typing input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
+								<div class="input vector3"><div class="label main">Scale</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="sclX" class="input-typing input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="sclY" class="input-typing input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="sclZ" class="input-typing input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
+							</div>
+							<div class="input-group small perso-description invisible">
 								<div class="input dropdown">
 									<div class="label main">Object List</div><div class="fields"><div class="field"><select id="objectList">
 									  <option value="none">None</option>
 									</select></div></div>
 								</div>
-								<div class="input dropdown">
-									<div class="label main">State</div><div class="fields"><div class="field"><select id="state">
-									  <option value="none">None</option>
-									</select></div></div>
-								</div>
+							</div>
+							<div class="input-group small input-flex perso-description invisible">
+								<div class="label main">State</div>
+								<div class="field flexible"><select id="state"><option value="none">None</option></select></div>
+								<div id="btn-autoNextState" class="field header-button" title="Automatically go to next state"><i class="icon-info-circle"></i></div>
+							</div>
+							<div class="input-group small input-flex perso-description invisible">
+								<div class="label main">Speed</div>
+								<div class="field flexible"><input id="animationSpeed" class="input-typing" type="number" step="any" name="x" placeholder="0" min="0"></input></div>
+								<div id="btn-playAnimation" class="field header-button" title="Play animation"><i class="icon-info-circle"></i></div>
 							</div>
 						</div>
 						<div class="column-footer"></div>

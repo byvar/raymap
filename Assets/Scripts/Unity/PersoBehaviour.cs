@@ -43,9 +43,14 @@ public class PersoBehaviour : MonoBehaviour {
     private PhysicalObject[][] subObjects = null; // [channel][ntto]
     private GameObject[] channelObjects = null;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
+	private bool isAlways = false;
+	public bool IsAlways {
+		get { return isAlways; }
+		set { isAlways = value; }
+	}
 
-    // Brain clearance
-    public bool clearTheBrain = false;
+	// Brain clearance
+	public bool clearTheBrain = false;
 
     // Use this for initialization
     void Start() {
@@ -356,8 +361,8 @@ public class PersoBehaviour : MonoBehaviour {
             }
         }
         bool sectorActive = false, insideSectors = false;
-        if (sector == null || sector.Loaded) sectorActive = true;
-        if (sector == null || controller.sectorManager.activeSectors.Count > 0) insideSectors = true;
+        if (sector == null || isAlways || sector.Loaded) sectorActive = true;
+        if (sector == null || isAlways || controller.sectorManager.activeSectors.Count > 0) insideSectors = true;
         if (controller.playAnimations && playAnimation && sectorActive) {
             updateCounter += Time.deltaTime * animationSpeed;
             // If the camera is not inside a sector, animations will only update 1 out of 2 times (w/ frameskip) to avoid lag
@@ -475,7 +480,11 @@ public class PersoBehaviour : MonoBehaviour {
                         }
                     }
                 }
-                controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
+				if (!isAlways) {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
+				} else {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
+				}
             }
             loaded = true;
         }
@@ -531,9 +540,13 @@ public class PersoBehaviour : MonoBehaviour {
                             }
                         }
                     }
-                }
-                controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
-            }
+				}
+				if (!isAlways) {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
+				} else {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
+				}
+			}
             loaded = true;
         }
     }

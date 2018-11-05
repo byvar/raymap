@@ -243,11 +243,19 @@ public class Controller : MonoBehaviour {
 				Perso p = loader.persos[i];
 				PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
 				unityBehaviour.controller = this;
-				if (p.sectInfo != null && p.sectInfo.off_sector != null) {
-					unityBehaviour.sector = Sector.FromSuperObjectOffset(p.sectInfo.off_sector);
-				} else {
-					unityBehaviour.sector = sectorManager.GetActiveSectorsAtPoint(p.Gao.transform.position).FirstOrDefault();
+				if (loader.globals != null && loader.globals.spawnablePersos != null) {
+					if (loader.globals.spawnablePersos.IndexOf(p) > -1) {
+						unityBehaviour.IsAlways = true;
+						unityBehaviour.transform.position = new Vector3(i * 10, -1000, 0);
+					}
 				}
+				if (!unityBehaviour.IsAlways) {
+					if (p.sectInfo != null && p.sectInfo.off_sector != null) {
+						unityBehaviour.sector = Sector.FromSuperObjectOffset(p.sectInfo.off_sector);
+					} else {
+						unityBehaviour.sector = sectorManager.GetActiveSectorsAtPoint(p.Gao.transform.position).FirstOrDefault();
+					}
+				} else unityBehaviour.sector = null;
 				Moddable mod = null;
 				if (p.SuperObject != null && p.SuperObject.Gao != null) {
 					mod = p.SuperObject.Gao.GetComponent<Moddable>();

@@ -98,79 +98,96 @@ public class SectorManager : MonoBehaviour {
     }
 
     public void ApplySectorLighting(Sector s, GameObject gao, LightInfo.ObjectLightedFlag objectType) {
-        if (s == null) return;
-        if (s.staticLights != null) {
-            Vector4? fogColor = null;
-            Vector4? fogParams = null;
-            Vector4 ambientLight = Vector4.zero;
-            List<Vector4> staticLightPos = new List<Vector4>();
-            List<Vector4> staticLightDir = new List<Vector4>();
-            List<Vector4> staticLightCol = new List<Vector4>();
-            List<Vector4> staticLightParams = new List<Vector4>();
-            for (int i = 0; i < s.staticLights.Count; i++) {
-                LightInfo li = s.staticLights[i];
-                //if (!li.IsObjectLighted(objectType)) continue;
-                //if (li.turnedOn == 0x0) continue;
-                switch (li.type) {
-                    case 4:
-                        ambientLight += li.color;
-                        staticLightPos.Add(new Vector4(li.Light.transform.position.x, li.Light.transform.position.y, li.Light.transform.position.z, li.type));
-                        staticLightDir.Add(li.Light.transform.TransformVector(Vector3.back));
-                        staticLightCol.Add(li.color);
-                        staticLightParams.Add(new Vector4(li.near, li.far, li.paintingLightFlag, li.alphaLightFlag));
-                        break;
-                    case 6:
-                        if (!fogColor.HasValue) {
-                            fogColor = li.color;
-                            fogParams = new Vector4(li.bigAlpha_fogBlendNear / 255f, li.intensityMin_fogBlendFar / 255f, li.near, li.far);
-                        }
-                        break;
-                    default:
-                        staticLightPos.Add(new Vector4(li.Light.transform.position.x, li.Light.transform.position.y, li.Light.transform.position.z, li.type));
-                        staticLightDir.Add(li.Light.transform.TransformVector(Vector3.back));
-                        staticLightCol.Add(li.color);
-                        Vector3 scale = li.transMatrix.GetScale(true);
-                        float maxScale = Mathf.Max(scale.x, scale.y, scale.z);
-                        staticLightParams.Add(new Vector4(li.near * maxScale, li.far * maxScale, li.paintingLightFlag, li.alphaLightFlag));
-                        break;
-                }
-            }
-            Vector4[] staticLightPosArray = staticLightPos.ToArray();
-            Vector4[] staticLightDirArray = staticLightDir.ToArray();
-            Vector4[] staticLightColArray = staticLightCol.ToArray();
-            Vector4[] staticLightParamsArray = staticLightParams.ToArray();
-            if (gao) {
-                List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
-                foreach (Renderer r in rs) {
-                    if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
-                        if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
-                        if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
-                        //r.material.SetVector("_SectorAmbient", ambientLight);
-                        r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
-                        if (staticLightPosArray.Length > 0) {
-                            r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
-                            r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
-                            r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
-                            r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
-                        }
-                    }
-                }
-                rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
-                foreach (Renderer r in rs) {
-                    if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
-                        if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
-                        if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
-                        r.material.SetVector("_SectorAmbient", ambientLight);
-                        r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
-                        if (staticLightPosArray.Length > 0) {
-                            r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
-                            r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
-                            r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
-                            r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
-                        }
-                    }
-                }
-            }
-        }
+		if (objectType == LightInfo.ObjectLightedFlag.None) {
+			if (gao) {
+				List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
+				foreach (Renderer r in rs) {
+					if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
+						r.material.SetFloat("_DisableLightingLocal", 1);
+					}
+				}
+				rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
+				foreach (Renderer r in rs) {
+					if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
+						r.material.SetFloat("_DisableLightingLocal", 1);
+					}
+				}
+			}
+		} else {
+			if (s == null) return;
+			if (s.staticLights != null) {
+				Vector4? fogColor = null;
+				Vector4? fogParams = null;
+				Vector4 ambientLight = Vector4.zero;
+				List<Vector4> staticLightPos = new List<Vector4>();
+				List<Vector4> staticLightDir = new List<Vector4>();
+				List<Vector4> staticLightCol = new List<Vector4>();
+				List<Vector4> staticLightParams = new List<Vector4>();
+				for (int i = 0; i < s.staticLights.Count; i++) {
+					LightInfo li = s.staticLights[i];
+					//if (!li.IsObjectLighted(objectType)) continue;
+					//if (li.turnedOn == 0x0) continue;
+					switch (li.type) {
+						case 4:
+							ambientLight += li.color;
+							staticLightPos.Add(new Vector4(li.Light.transform.position.x, li.Light.transform.position.y, li.Light.transform.position.z, li.type));
+							staticLightDir.Add(li.Light.transform.TransformVector(Vector3.back));
+							staticLightCol.Add(li.color);
+							staticLightParams.Add(new Vector4(li.near, li.far, li.paintingLightFlag, li.alphaLightFlag));
+							break;
+						case 6:
+							if (!fogColor.HasValue) {
+								fogColor = li.color;
+								fogParams = new Vector4(li.bigAlpha_fogBlendNear / 255f, li.intensityMin_fogBlendFar / 255f, li.near, li.far);
+							}
+							break;
+						default:
+							staticLightPos.Add(new Vector4(li.Light.transform.position.x, li.Light.transform.position.y, li.Light.transform.position.z, li.type));
+							staticLightDir.Add(li.Light.transform.TransformVector(Vector3.back));
+							staticLightCol.Add(li.color);
+							Vector3 scale = li.transMatrix.GetScale(true);
+							float maxScale = Mathf.Max(scale.x, scale.y, scale.z);
+							staticLightParams.Add(new Vector4(li.near * maxScale, li.far * maxScale, li.paintingLightFlag, li.alphaLightFlag));
+							break;
+					}
+				}
+				Vector4[] staticLightPosArray = staticLightPos.ToArray();
+				Vector4[] staticLightDirArray = staticLightDir.ToArray();
+				Vector4[] staticLightColArray = staticLightCol.ToArray();
+				Vector4[] staticLightParamsArray = staticLightParams.ToArray();
+				if (gao) {
+					List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
+					foreach (Renderer r in rs) {
+						if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
+							if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
+							if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
+							//r.material.SetVector("_SectorAmbient", ambientLight);
+							r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
+							if (staticLightPosArray.Length > 0) {
+								r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
+								r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
+								r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
+								r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
+							}
+						}
+					}
+					rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
+					foreach (Renderer r in rs) {
+						if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
+							if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
+							if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
+							r.material.SetVector("_SectorAmbient", ambientLight);
+							r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
+							if (staticLightPosArray.Length > 0) {
+								r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
+								r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
+								r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
+								r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
+							}
+						}
+					}
+				}
+			}
+		}
     }
 }

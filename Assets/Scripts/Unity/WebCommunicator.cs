@@ -175,7 +175,13 @@ public class WebCommunicator : MonoBehaviour {
         JSONArray spawnables = new JSONArray();
         if (l.globals.spawnablePersos != null) {
             for (int i = 0; i < l.globals.spawnablePersos.Count; i++) {
-                spawnables.Add(GetPersoJSON(l.globals.spawnablePersos[i]));
+				JSONObject alwaysPersoJSON = GetPersoJSON(l.globals.spawnablePersos[i]);
+				alwaysPersoJSON["name"] = l.globals.spawnablePersos[i].Gao.name;
+				alwaysPersoJSON["type"] = "Always";
+				alwaysPersoJSON["position"] = l.globals.spawnablePersos[i].Gao.transform.localPosition;
+				alwaysPersoJSON["rotation"] = l.globals.spawnablePersos[i].Gao.transform.localEulerAngles;
+				alwaysPersoJSON["scale"] = l.globals.spawnablePersos[i].Gao.transform.localScale;
+				spawnables.Add(alwaysPersoJSON);
             }
         }
         alwaysJSON["spawnablePersos"] = spawnables;
@@ -189,7 +195,12 @@ public class WebCommunicator : MonoBehaviour {
         selectionJSON["selectionType"] = selectionIsAlways ? "always" : "superobject";
         if (selectionIsAlways) {
             selectionJSON["selection"] = GetPersoJSON(selector.selectedPerso.perso);
-        } else {
+			selectionJSON["selection"]["name"] = selector.selectedPerso.name;
+			selectionJSON["selection"]["type"] = "Always";
+			selectionJSON["selection"]["position"] = selector.selectedPerso.transform.localPosition;
+			selectionJSON["selection"]["rotation"] = selector.selectedPerso.transform.localEulerAngles;
+			selectionJSON["selection"]["scale"] = selector.selectedPerso.transform.localScale;
+		} else {
             selectionJSON["selection"] = GetSuperObjectJSON(selector.selectedPerso.perso.SuperObject);
         }
         return selectionJSON;
@@ -243,13 +254,23 @@ public class WebCommunicator : MonoBehaviour {
 	public void ParseSuperObjectJSON(JSONNode msg) {
 		MapLoader l = MapLoader.Loader;
 		SuperObject so = null;
-		if (msg["offset"] != null) {
-			so = l.superObjects.FirstOrDefault(s => s.offset.ToString() == msg["offset"]);
-		}
-		if (so != null) {
-			if (msg["position"] != null) so.Gao.transform.localPosition = msg["position"].ReadVector3();
-			if (msg["rotation"] != null) so.Gao.transform.localEulerAngles = msg["rotation"].ReadVector3();
-			if (msg["scale"] != null) so.Gao.transform.localScale = msg["scale"].ReadVector3();
+		if (msg["type"] != null && msg["type"] == "Always") {
+			// Fake superobject
+			Perso alwaysPerso = l.globals.spawnablePersos.FirstOrDefault(s => s.offset.ToString() == msg["offset"]);
+			if (alwaysPerso != null) {
+				if (msg["position"] != null) alwaysPerso.Gao.transform.localPosition = msg["position"].ReadVector3();
+				if (msg["rotation"] != null) alwaysPerso.Gao.transform.localEulerAngles = msg["rotation"].ReadVector3();
+				if (msg["scale"] != null) alwaysPerso.Gao.transform.localScale = msg["scale"].ReadVector3();
+			}
+		} else {
+			if (msg["offset"] != null) {
+				so = l.superObjects.FirstOrDefault(s => s.offset.ToString() == msg["offset"]);
+			}
+			if (so != null) {
+				if (msg["position"] != null) so.Gao.transform.localPosition = msg["position"].ReadVector3();
+				if (msg["rotation"] != null) so.Gao.transform.localEulerAngles = msg["rotation"].ReadVector3();
+				if (msg["scale"] != null) so.Gao.transform.localScale = msg["scale"].ReadVector3();
+			}
 		}
 	}
 	public void ParsePersoJSON(JSONNode msg) {
