@@ -114,6 +114,7 @@ public class WebCommunicator : MonoBehaviour {
         settingsJSON["displayInactive"] = controller.sectorManager.displayInactiveSectors;
 		settingsJSON["playAnimations"] = controller.playAnimations;
 		settingsJSON["playTextureAnimations"] = controller.playTextureAnimations;
+		settingsJSON["showPersos"] = controller.showPersos;
 		settingsJSONcontainer["type"] = "settings";
 		settingsJSONcontainer["settings"] = settingsJSON;
         return settingsJSONcontainer;
@@ -161,7 +162,7 @@ public class WebCommunicator : MonoBehaviour {
         persoJSON["nameInstance"] = perso.namePerso;
         if (perso.p3dData.family != null) persoJSON["family"] = perso.p3dData.family.family_index;
         if (pb != null) {
-			persoJSON["enabled"] = pb.gameObject.activeSelf;
+			persoJSON["enabled"] = pb.IsEnabled;
 			persoJSON["state"] = pb.stateIndex;
             if (perso.p3dData.objectList != null) persoJSON["objectList"] = pb.poListIndex;
 			persoJSON["playAnimation"] = pb.playAnimation;
@@ -282,7 +283,7 @@ public class WebCommunicator : MonoBehaviour {
         }
         if (perso != null) {
             PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
-			if (msg["enabled"] != null) pb.gameObject.SetActive(msg["enabled"].AsBool);
+			if (msg["enabled"] != null) pb.IsEnabled = (msg["enabled"].AsBool);
 			if (msg["state"] != null) {
 				pb.SetState(msg["state"].AsInt);
 				if (pb == selectedPerso_) {
@@ -306,5 +307,6 @@ public class WebCommunicator : MonoBehaviour {
         if (msg["displayInactive"] != null) controller.sectorManager.displayInactiveSectors = msg["displayInactive"].AsBool;
 		if (msg["playAnimations"] != null) controller.playAnimations = msg["playAnimations"].AsBool;
 		if (msg["playTextureAnimations"] != null) controller.playTextureAnimations = msg["playTextureAnimations"].AsBool;
+		if (msg["showPersos"] != null) controller.showPersos = msg["showPersos"].AsBool;
 	}
 }

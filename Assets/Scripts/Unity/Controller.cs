@@ -34,6 +34,7 @@ public class Controller : MonoBehaviour {
 	bool viewGraphs_ = false; public bool viewGraphs = false;
 	bool playAnimations_ = true; public bool playAnimations = true;
 	bool playTextureAnimations_ = true; public bool playTextureAnimations = true;
+	bool showPersos_ = true; public bool showPersos = true;
 
 
 	private GameObject graphRoot = null;
@@ -213,22 +214,32 @@ public class Controller : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.T)) {
 			playTextureAnimations = !playTextureAnimations;
 		}
+		if (Input.GetKeyDown(KeyCode.U)) {
+			showPersos = !showPersos;
+		}
 		bool updatedSettings = false;
-		if (loader != null && viewInvisible != viewInvisible_) {
-			updatedSettings = true;
-			UpdateViewInvisible();
-		}
-		if (loader != null && viewCollision != viewCollision_) {
-			updatedSettings = true;
-			UpdateViewCollision();
-		}
-		if (loader != null && viewGraphs != viewGraphs_) {
-			updatedSettings = true;
-			UpdateViewGraphs();
-		}
-		if (loader != null && playAnimations != playAnimations_ ||
-			loader != null && playTextureAnimations != playTextureAnimations_) {
-			updatedSettings = true;
+		if (loader != null) {
+			if (viewInvisible != viewInvisible_) {
+				updatedSettings = true;
+				UpdateViewInvisible();
+			}
+			if (viewCollision != viewCollision_) {
+				updatedSettings = true;
+				UpdateViewCollision();
+			}
+			if (viewGraphs != viewGraphs_) {
+				updatedSettings = true;
+				UpdateViewGraphs();
+			}
+			if (showPersos != showPersos_) {
+				updatedSettings = true;
+				UpdateShowPersos();
+			}
+			if (playAnimations != playAnimations_ || playTextureAnimations != playTextureAnimations_) {
+				playTextureAnimations_ = playTextureAnimations;
+				playAnimations_ = playAnimations;
+				updatedSettings = true;
+			}
 		}
 		if (updatedSettings) {
 			communicator.SendSettings();
@@ -394,11 +405,37 @@ public class Controller : MonoBehaviour {
 		if (loader != null) {
 			viewInvisible_ = viewInvisible;
 			foreach (SuperObject so in loader.superObjects) {
-				if (so.Gao != null) {
-					if (so.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible)) {
-						so.Gao.SetActive(viewCollision | viewInvisible);
+				if (so.type == SuperObject.Type.Perso) {
+					UpdatePersoActive(so.data as Perso);
+				} else {
+					if (so.Gao != null) {
+						if (so.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible)) {
+							so.Gao.SetActive(viewCollision || viewInvisible);
+						}
 					}
 				}
+			}
+		}
+	}
+
+	public void UpdateShowPersos() {
+		if (loader != null) {
+			showPersos_ = showPersos;
+			foreach (Perso perso in loader.persos) {
+				UpdatePersoActive(perso);
+			}
+		}
+	}
+
+	public void UpdatePersoActive(Perso perso) {
+		if (perso != null && perso.Gao != null) {
+			PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+			if (pb != null) {
+				bool isVisible = true;
+				if (perso.SuperObject != null) {
+					isVisible = !perso.SuperObject.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible);
+				}
+				perso.Gao.SetActive(showPersos && pb.IsEnabled && (isVisible || (viewCollision || viewInvisible)));
 			}
 		}
 	}
@@ -444,7 +481,11 @@ public class Controller : MonoBehaviour {
 			foreach (SuperObject so in loader.superObjects) {
 				if (so.Gao != null) {
 					if (so.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible)) {
-						so.Gao.SetActive(viewCollision | viewInvisible);
+						if (so.type == SuperObject.Type.Perso) {
+							UpdatePersoActive(so.data as Perso);
+						} else {
+							so.Gao.SetActive(viewCollision || viewInvisible);
+						}
 					}
 				}
 			}

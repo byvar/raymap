@@ -48,6 +48,14 @@ public class PersoBehaviour : MonoBehaviour {
 		get { return isAlways; }
 		set { isAlways = value; }
 	}
+	private bool isEnabled = true;
+	public bool IsEnabled {
+		get { return isEnabled; }
+		set {
+			isEnabled = value;
+			controller.UpdatePersoActive(perso);
+		}
+	}
 
 	// Brain clearance
 	public bool clearTheBrain = false;
@@ -474,7 +482,14 @@ public class PersoBehaviour : MonoBehaviour {
                                     subObjects[i][j] = c;
                                     c.Gao.transform.parent = channelObjects[i].transform;
                                     c.Gao.name = "[" + j + "] " + c.Gao.name;
-                                    c.Gao.SetActive(false);
+									foreach (VisualSetLOD l in c.visualSet) {
+										if (l.obj != null) {
+											GameObject gao = l.obj.Gao;
+											if (gao != null) gao.SetActive(!controller.viewCollision);
+										}
+									}
+									if (c.collideMesh != null) c.collideMesh.SetVisualsActive(controller.viewCollision);
+									c.Gao.SetActive(false);
                                 }
                             }
                         }
@@ -529,8 +544,15 @@ public class PersoBehaviour : MonoBehaviour {
                                     subObj = o.Clone();
                                     subObj.Gao.transform.parent = channelObjects[i].transform;
                                     subObj.Gao.name = "[" + i + "] " + subObj.Gao.name;
-                                    subObj.Gao.SetActive(false);
-                                }
+									foreach (VisualSetLOD l in subObj.visualSet) {
+										if (l.obj != null) {
+											GameObject gao = l.obj.Gao;
+											if (gao != null) gao.SetActive(!controller.viewCollision);
+										}
+									}
+									if (subObj.collideMesh != null) subObj.collideMesh.SetVisualsActive(controller.viewCollision);
+									subObj.Gao.SetActive(false);
+								}
                             }
                         }
                         for (int j = 0; j < animMontreal.num_frames; j++) {

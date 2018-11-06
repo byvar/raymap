@@ -342,6 +342,7 @@ function handleMessage_settings(msg) {
 		selectButton($("#btn-viewGraphs"), msg.settings.viewGraphs);
 		selectButton($("#btn-viewInvisible"), msg.settings.viewInvisible);
 		selectButton($("#btn-displayInactive"), msg.settings.displayInactive);
+		selectButton($("#btn-showPersos"), msg.settings.showPersos);
 		selectButton($("#btn-playAnimations"), msg.settings.playAnimations);
 		selectButton($("#btn-playTextureAnimations"), msg.settings.playTextureAnimations);
 		$("#range-luminosity").val(msg.settings.luminosity);
@@ -578,6 +579,7 @@ function sendSettings() {
 			viewGraphs: $("#btn-viewGraphs").hasClass("selected"),
 			viewInvisible: $("#btn-viewInvisible").hasClass("selected"),
 			displayInactive: $("#btn-displayInactive").hasClass("selected"),
+			showPersos: $("#btn-showPersos").hasClass("selected"),
 			playAnimations: $("#btn-playAnimations").hasClass("selected"),
 			playTextureAnimations: $("#btn-playTextureAnimations").hasClass("selected")
 		}
