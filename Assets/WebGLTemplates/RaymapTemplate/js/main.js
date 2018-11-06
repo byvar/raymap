@@ -342,6 +342,8 @@ function handleMessage_settings(msg) {
 		selectButton($("#btn-viewGraphs"), msg.settings.viewGraphs);
 		selectButton($("#btn-viewInvisible"), msg.settings.viewInvisible);
 		selectButton($("#btn-displayInactive"), msg.settings.displayInactive);
+		selectButton($("#btn-playAnimations"), msg.settings.playAnimations);
+		selectButton($("#btn-playTextureAnimations"), msg.settings.playTextureAnimations);
 		$("#range-luminosity").val(msg.settings.luminosity);
 	}
 }
@@ -575,9 +577,9 @@ function sendSettings() {
 			viewCollision: $("#btn-viewCollision").hasClass("selected"),
 			viewGraphs: $("#btn-viewGraphs").hasClass("selected"),
 			viewInvisible: $("#btn-viewInvisible").hasClass("selected"),
-			displayInactive: $("#btn-displayInactive").hasClass("selected")
-			/*if (msg["playAnimations"] != null) controller.playAnimations = msg["playAnimations"].AsBool;
-			  if (msg["playTextureAnimations"] != null) controller.playTextureAnimations = msg["playTextureAnimations"].AsBool;*/
+			displayInactive: $("#btn-displayInactive").hasClass("selected"),
+			playAnimations: $("#btn-playAnimations").hasClass("selected"),
+			playTextureAnimations: $("#btn-playTextureAnimations").hasClass("selected")
 		}
 	}
 	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
