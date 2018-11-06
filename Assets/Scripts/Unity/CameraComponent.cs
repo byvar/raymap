@@ -55,7 +55,9 @@ public class CameraComponent : MonoBehaviour {
             //transform.LookAt(center.Value, Vector3.up);
             //transform.position = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
 			targetPos = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
-			targetRot = Quaternion.LookRotation(center.Value - transform.position, Vector3.up);
+			if (center.Value - transform.position != Vector3.zero) {
+				targetRot = Quaternion.LookRotation(center.Value - transform.position, Vector3.up);
+			}
 		}
     }
 

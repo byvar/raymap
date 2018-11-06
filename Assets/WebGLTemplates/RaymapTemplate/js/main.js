@@ -243,6 +243,14 @@ function showNotification(msg,mobile_only) {
 	}, 3000);
 }
 
+function selectButton(button, selected) {
+	if(selected) {
+		button.addClass("selected");
+	} else {
+		button.removeClass("selected");
+	}
+}
+
 // SUPEROBJECT PARSING
 function getSuperObjectByIndex(index) {
 	return objectsList[index];
@@ -321,23 +329,20 @@ function parseAlways(alwaysData) {
 }
 function handleMessage_settings(msg) {
 	if(msg.hasOwnProperty("settings")) {
+		$(".settings-toggle").removeClass("disabled-button");
 		$("#btn-lighting").removeClass("disabled-button");
 		if(msg.settings.enableLighting) {
-			$("#btn-lighting").addClass("selected");
 			$(".lighting-settings").removeClass("disabled-button");
 		} else {
-			$("#btn-lighting").removeClass("selected");
 			$(".lighting-settings").addClass("disabled-button");
 		}
-		if(!msg.settings.saturate) {
-			$("#btn-saturate").addClass("selected");
-		} else {
-			$("#btn-saturate").removeClass("selected");
-		}
+		selectButton($("#btn-lighting"), msg.settings.enableLighting);
+		selectButton($("#btn-saturate"), !msg.settings.saturate);
+		selectButton($("#btn-viewCollision"), msg.settings.viewCollision);
+		selectButton($("#btn-viewGraphs"), msg.settings.viewGraphs);
+		selectButton($("#btn-viewInvisible"), msg.settings.viewInvisible);
+		selectButton($("#btn-displayInactive"), msg.settings.displayInactive);
 		$("#range-luminosity").val(msg.settings.luminosity);
-		/*settingsJSON["luminosity"] = controller.lightManager.luminosity;
-		settingsJSON["saturate"] = controller.lightManager.saturate;
-		settingsJSON["displayInactiveSectors"] = controller.sectorManager.displayInactiveSectors;*/
 	}
 }
 function setAllJSON(jsonString) {
@@ -412,25 +417,12 @@ function showObjectDescription(so) {
 		}
 		objectListSelector.prop("selectedIndex", so.perso.objectList);
 		
-		
-		if(so.perso.enabled) {
-			$("#btn-enabled").addClass("selected");
-		} else {
-			$("#btn-enabled").removeClass("selected");
-		}
+		selectButton($("#btn-enabled"), so.perso.enabled);
 		$("#objectName").html("<div class='name-family'>" + so.perso.nameFamily + "</div><div class='name-model'>" + so.perso.nameModel + "</div><div class='name-instance'>" + so.perso.nameInstance + "</div>");
 		
 		// Animation stuff
-		if(so.perso.playAnimation) {
-			$("#btn-playAnimation").addClass("selected");
-		} else {
-			$("#btn-playAnimation").removeClass("selected");
-		}
-		if(so.perso.autoNextState) {
-			$("#btn-autoNextState").addClass("selected");
-		} else {
-			$("#btn-autoNextState").removeClass("selected");
-		}
+		selectButton($("#btn-playAnimation"), so.perso.playAnimation);
+		selectButton($("#btn-autoNextState"), so.perso.autoNextState);
 		$('#animationSpeed').val(so.perso.animationSpeed);
 		
 	} else {
@@ -579,7 +571,13 @@ function sendSettings() {
 		settings: {
 			enableLighting: $("#btn-lighting").hasClass("selected"),
 			luminosity: $("#range-luminosity").val(),
-			saturate: !$("#btn-saturate").hasClass("selected")
+			saturate: !$("#btn-saturate").hasClass("selected"),
+			viewCollision: $("#btn-viewCollision").hasClass("selected"),
+			viewGraphs: $("#btn-viewGraphs").hasClass("selected"),
+			viewInvisible: $("#btn-viewInvisible").hasClass("selected"),
+			displayInactive: $("#btn-displayInactive").hasClass("selected")
+			/*if (msg["playAnimations"] != null) controller.playAnimations = msg["playAnimations"].AsBool;
+			  if (msg["playTextureAnimations"] != null) controller.playTextureAnimations = msg["playTextureAnimations"].AsBool;*/
 		}
 	}
 	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
@@ -744,12 +742,11 @@ $(function() {
 	
 	$(document).on('click', "#btn-lighting", function() {
 		if($(this).hasClass("selected")) {
-			$(this).removeClass("selected");
 			$(".lighting-settings").addClass("disabled-button");
 		} else {
-			$(this).addClass("selected");
 			$(".lighting-settings").removeClass("disabled-button");
 		}
+		selectButton($(this), !$(this).hasClass("selected"));
 		sendSettings();
 		return false;
 	});
@@ -758,22 +755,14 @@ $(function() {
 		return false;
 	});
 	
-	$(document).on('click', "#btn-saturate", function() {
-		if($(this).hasClass("selected")) {
-			$(this).removeClass("selected");
-		} else {
-			$(this).addClass("selected");
-		}
+	$(document).on('click', ".settings-toggle", function() {
+		selectButton($(this), !$(this).hasClass("selected"));
 		sendSettings();
 		return false;
 	});
 	
 	$(document).on('click', "#btn-enabled, #btn-autoNextState, #btn-playAnimation", function() {
-		if($(this).hasClass("selected")) {
-			$(this).removeClass("selected");
-		} else {
-			$(this).addClass("selected");
-		}
+		selectButton($(this), !$(this).hasClass("selected"));
 		sendPerso();
 		return false;
 	});

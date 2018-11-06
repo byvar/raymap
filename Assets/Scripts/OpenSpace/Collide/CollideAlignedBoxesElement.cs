@@ -47,12 +47,12 @@ namespace OpenSpace.Collide {
                 box_gao.transform.SetParent(gao.transform);
                 MeshFilter mf = box_gao.GetComponent<MeshFilter>();
                 MeshRenderer mr = box_gao.GetComponent<MeshRenderer>();
-                //MonoBehaviour.Destroy(box_gao.GetComponent<BoxCollider>());
-                Vector3 center = Vector3.Lerp(mesh.vertices[boxes[i].minPoint], mesh.vertices[boxes[i].maxPoint], 0.5f);
+				//MonoBehaviour.Destroy(box_gao.GetComponent<BoxCollider>());
+				Vector3 center = Vector3.Lerp(mesh.vertices[boxes[i].minPoint], mesh.vertices[boxes[i].maxPoint], 0.5f);
                 box_gao.transform.localPosition = center;
                 box_gao.transform.localScale = mesh.vertices[boxes[i].maxPoint] - mesh.vertices[boxes[i].minPoint];
 
-                mr.material = MapLoader.Loader.collideMaterial;
+				mr.material = MapLoader.Loader.collideMaterial;
                 if (boxes[i].gameMaterial != null && boxes[i].gameMaterial.collideMaterial != null) {
                     boxes[i].gameMaterial.collideMaterial.SetMaterial(mr);
                 }

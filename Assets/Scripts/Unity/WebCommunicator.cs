@@ -46,6 +46,7 @@ public class WebCommunicator : MonoBehaviour {
                 Send(GetSelectionJSON());
             }
 			if (selectedPerso_ != null && selectedPersoStateIndex_ != selectedPerso_.stateIndex) {
+				selectedPersoStateIndex_ = selectedPerso_.stateIndex;
 				Send(GetSelectionJSON());
 			}
         }
@@ -282,7 +283,12 @@ public class WebCommunicator : MonoBehaviour {
         if (perso != null) {
             PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
 			if (msg["enabled"] != null) pb.gameObject.SetActive(msg["enabled"].AsBool);
-            if (msg["state"] != null) pb.SetState(msg["state"].AsInt);
+			if (msg["state"] != null) {
+				pb.SetState(msg["state"].AsInt);
+				if (pb == selectedPerso_) {
+					selectedPersoStateIndex_ = msg["state"].AsInt;
+				}
+			}
             if (msg["objectList"] != null) pb.poListIndex = msg["objectList"].AsInt;
 			if (msg["playAnimation"] != null) pb.playAnimation = msg["playAnimation"].AsBool;
 			if (msg["animationSpeed"] != null) pb.animationSpeed = msg["animationSpeed"].AsFloat;
