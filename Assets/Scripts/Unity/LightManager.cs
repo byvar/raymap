@@ -96,10 +96,10 @@ public class LightManager : MonoBehaviour {
                 if (backgroundMaterial != skyMaterial) {
                     backgroundMaterial = skyMaterial;
                     Material skyboxMat = skyMaterial.GetMaterial();
-                    backgroundPanel.material = skyboxMat;
+                    backgroundPanel.sharedMaterial = skyboxMat;
                 }
                 //skyboxMat.SetFloat("_DisableLighting", 1f);
-                backgroundPanel.material.SetFloat("_DisableLightingLocal", 1f);
+                backgroundPanel.sharedMaterial.SetFloat("_DisableLightingLocal", 1f);
                 if (activeBackgroundSector != null) {
                     if (activeBackgroundSector != previousActiveBackgroundSector) {
                         //backgroundPanel.material.SetFloat("_DisableLightingLocal", 0f);

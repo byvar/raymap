@@ -23,8 +23,9 @@ namespace OpenSpace.Loader {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
-                if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
-                gameDataBinFolder += "/";
+				gameDataBinFolder += "/";
+				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 
                 loadingState = "Initializing files";
                 yield return null;
@@ -33,15 +34,18 @@ namespace OpenSpace.Loader {
                     gameDsbPath = gameDataBinFolder + "gamedsc.bin";
                 } else if (Settings.s.game == Settings.Game.TTSE) {
                     gameDsbPath = gameDataBinFolder + "GAME.DSC";
-                }
-                gameDsb = new DSB("Game", gameDsbPath);
-                gameDsb.Save(gameDataBinFolder + "Game_dsb.dmp");
+				}
+				yield return controller.StartCoroutine(PrepareFile(gameDsbPath));
+				gameDsb = new DSB("Game", gameDsbPath);
+				if (FileSystem.mode != FileSystem.Mode.Web) {
+					gameDsb.Save(gameDataBinFolder + "Game_dsb.dmp");
+				}
                 gameDsb.ReadAllSections();
                 gameDsb.Dispose();
 
-                CreateCNT();
+				yield return controller.StartCoroutine(CreateCNT());
 
-                if (lvlName.EndsWith(".exe")) {
+				if (lvlName.EndsWith(".exe")) {
                     if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
                     Settings.s.loadFromMemory = true;
                     MemoryFile mem = new MemoryFile(lvlName);
@@ -54,7 +58,7 @@ namespace OpenSpace.Loader {
 
                     string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
                     string langDataPath = gameDataBinFolder + "../LangData/English/" + gameDsb.levelsDataPath + "/";
-                    if (!FileSystem.DirectoryExists(langDataPath)) {
+                    if (FileSystem.mode != FileSystem.Mode.Web && !FileSystem.DirectoryExists(langDataPath)) {
                         string langPath = gameDataBinFolder + "../LangData/";
                         if (FileSystem.DirectoryExists(langPath)) {
                             DirectoryInfo dirInfo = new DirectoryInfo(langPath);
@@ -66,6 +70,7 @@ namespace OpenSpace.Loader {
                     yield return null;
                     if (Settings.s.mode == Settings.Mode.Rayman2PC || Settings.s.mode == Settings.Mode.DonaldDuckPC) {
                         string dataPath = levelsFolder + "LEVELS0.DAT";
+						yield return controller.StartCoroutine(PrepareBigFile(dataPath, 512*1024));
                         if (FileSystem.FileExists(dataPath)) {
                             dat = new DAT("LEVELS0", gameDsb, dataPath);
                         }
@@ -75,29 +80,41 @@ namespace OpenSpace.Loader {
                     yield return null;
                     string lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".dsb";
                     if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
-                        lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".DSC";
-                    }
-                    if (FileSystem.FileExists(lvlDsbPath)) {
+						lvlDsbPath = levelsFolder + lvlName + "/" + lvlName + ".DSC";
+					}
+					yield return controller.StartCoroutine(PrepareFile(lvlDsbPath));
+					if (FileSystem.FileExists(lvlDsbPath)) {
                         lvlDsb = new DSB(lvlName + ".dsc", lvlDsbPath);
-                        lvlDsb.Save(levelsFolder + lvlName + "/" + lvlName + "_dsb.dmp");
+						if (FileSystem.mode != FileSystem.Mode.Web) {
+							lvlDsb.Save(levelsFolder + lvlName + "/" + lvlName + "_dsb.dmp");
+						}
                         //lvlDsb.ReadAllSections();
                         lvlDsb.Dispose();
                     }
 
-                    // FIX
-                    yield return null;
-                    string fixSnaPath = levelsFolder + "fix.sna";
-                    RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "fix", RelocationType.RTB);
-                    if (FileSystem.FileExists(levelsFolder + lvlName + "/FixLvl.rtb")) {
-                        // Fix -> Lvl pointers for Tonic Trouble
-                        fixRtb.Add(new RelocationTable(levelsFolder + lvlName + "/FixLvl.rtb", dat, lvlName + "Fix", RelocationType.RTB));
+					// FIX
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + "Fix.sna"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + "Fix.rtb"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/fixLvl.rtb"));
+					string fixSnaPath = levelsFolder + "Fix.sna";
+                    RelocationTable fixRtb = new RelocationTable(fixSnaPath, dat, "Fix", RelocationType.RTB);
+					yield return controller.StartCoroutine(fixRtb.Init());
+					if (FileSystem.FileExists(levelsFolder + lvlName + "/fixLvl.rtb")) {
+						// Fix -> Lvl pointers for Tonic Trouble
+						RelocationTable fixRtb2 = new RelocationTable(levelsFolder + lvlName + "/fixLvl.rtb", dat, lvlName + "Fix", RelocationType.RTB);
+						yield return controller.StartCoroutine(fixRtb2.Init());
+						fixRtb.Add(fixRtb2);
                     }
-                    SNA fixSna = new SNA("fix", fixSnaPath, fixRtb);
-                    if (FileSystem.DirectoryExists(langDataPath)) {
+                    SNA fixSna = new SNA("Fix", fixSnaPath, fixRtb);
+					yield return controller.StartCoroutine(FileSystem.CheckDirectory(langDataPath));
+					if (FileSystem.DirectoryExists(langDataPath)) {
                         string fixLangPath = langDataPath + "fix.lng";
                         RelocationTable fixLangRTG = new RelocationTable(fixLangPath, dat, "fixLang", RelocationType.RTG);
-                        if (FileSystem.FileExists(langDataPath + lvlName + "/FixLvl.rtg")) {
-                            fixLangRTG.Add(new RelocationTable(langDataPath + lvlName + "/FixLvl.rtg", dat, lvlName + "FixLang", RelocationType.RTG));
+						yield return controller.StartCoroutine(fixLangRTG.Init());
+						if (FileSystem.FileExists(langDataPath + lvlName + "/FixLvl.rtg")) {
+							RelocationTable fixLangRTG2 = new RelocationTable(langDataPath + lvlName + "/FixLvl.rtg", dat, lvlName + "FixLang", RelocationType.RTG);
+							yield return controller.StartCoroutine(fixLangRTG2.Init());
+							fixLangRTG.Add(fixLangRTG2);
                         }
                         SNA fixLangSna = new SNA("fixLang", fixLangPath, fixLangRTG);
                         yield return null;
@@ -106,54 +123,73 @@ namespace OpenSpace.Loader {
                         yield return null;
                         string fixDlgPath = langDataPath + "fix.dlg";
                         RelocationTable fixRtd = new RelocationTable(fixDlgPath, dat, "fixLang", RelocationType.RTD);
-                        fixSna.ReadDLG(fixDlgPath, fixRtd);
+						yield return controller.StartCoroutine(fixRtd.Init());
+						fixSna.ReadDLG(fixDlgPath, fixRtd);
+					}
+					string fixGptPath = levelsFolder + "Fix.gpt";
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + "Fix.gpt"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + "Fix.rtp"));
+					RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
+					yield return controller.StartCoroutine(fixRtp.Init());
+					fixSna.ReadGPT(fixGptPath, fixRtp);
+					
+                    string fixPtxPath = levelsFolder + "Fix.ptx";
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + "Fix.ptx"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + "Fix.rtt"));
+					RelocationTable fixRtt = new RelocationTable(fixPtxPath, dat, "fix", RelocationType.RTT);
+					yield return controller.StartCoroutine(fixRtt.Init());
+					fixSna.ReadPTX(fixPtxPath, fixRtt);
+
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + "Fix.sda"));
+					if (FileSystem.FileExists(levelsFolder + "Fix.sda")) {
+                        fixSna.ReadSDA(levelsFolder + "Fix.sda");
                     }
-                    yield return null;
-                    string fixGptPath = levelsFolder + "fix.gpt";
-                    RelocationTable fixRtp = new RelocationTable(fixGptPath, dat, "fix", RelocationType.RTP);
-                    fixSna.ReadGPT(fixGptPath, fixRtp);
 
-                    yield return null;
-                    string fixPtxPath = levelsFolder + "fix.ptx";
-                    RelocationTable fixRtt = new RelocationTable(fixPtxPath, dat, "fix", RelocationType.RTT);
-                    fixSna.ReadPTX(fixPtxPath, fixRtt);
-
-                    if (FileSystem.FileExists(levelsFolder + "fix.sda")) {
-                        yield return null;
-                        fixSna.ReadSDA(levelsFolder + "fix.sda");
-                    }
-
-                    // LEVEL
-                    yield return null;
-                    string lvlSnaPath = levelsFolder + lvlName + "/" + lvlName + ".sna";
+					// LEVEL
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/" + lvlName + ".sna"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/" + lvlName + ".rtb"));
+					string lvlSnaPath = levelsFolder + lvlName + "/" + lvlName + ".sna";
                     RelocationTable lvlRtb = new RelocationTable(lvlSnaPath, dat, lvlName, RelocationType.RTB);
-                    SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
-                    if (FileSystem.DirectoryExists(langDataPath)) {
-                        string lvlLangPath = langDataPath + lvlName + "/" + lvlName + ".lng";
-                        RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
-                        SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
+					yield return controller.StartCoroutine(lvlRtb.Init());
+					SNA lvlSna = new SNA(lvlName, lvlSnaPath, lvlRtb);
+					yield return controller.StartCoroutine(FileSystem.CheckDirectory(langDataPath));
+					if (FileSystem.DirectoryExists(langDataPath)) {
+						yield return controller.StartCoroutine(PrepareFile(langDataPath + lvlName + "/" + lvlName + ".lng"));
+						yield return controller.StartCoroutine(PrepareFile(langDataPath + lvlName + "/" + lvlName + ".rtg"));
+						yield return controller.StartCoroutine(PrepareFile(langDataPath + lvlName + "/" + lvlName + ".dlg"));
+						yield return controller.StartCoroutine(PrepareFile(langDataPath + lvlName + "/" + lvlName + ".rtd"));
+						string lvlLangPath = langDataPath + lvlName + "/" + lvlName + ".lng";
+						RelocationTable lvlLangRTG = new RelocationTable(lvlLangPath, dat, lvlName + "Lang", RelocationType.RTG);
+						yield return controller.StartCoroutine(lvlLangRTG.Init());
+						SNA lvlLangSna = new SNA(lvlName + "Lang", lvlLangPath, lvlLangRTG);
                         yield return null;
                         lvlSna.AddSNA(lvlLangSna);
-
-                        yield return null;
-                        string lvlDlgPath = langDataPath + lvlName + "/" + lvlName + ".dlg";
+						yield return null;
+						string lvlDlgPath = langDataPath + lvlName + "/" + lvlName + ".dlg";
                         RelocationTable lvlRtd = new RelocationTable(lvlDlgPath, dat, lvlName + "Lang", RelocationType.RTD);
-                        lvlSna.ReadDLG(lvlDlgPath, lvlRtd);
+						yield return controller.StartCoroutine(lvlRtd.Init());
+						lvlSna.ReadDLG(lvlDlgPath, lvlRtd);
                     }
 
-                    yield return null;
-                    string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/" + lvlName + ".gpt"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/" + lvlName + ".ptx"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/" + lvlName + ".rtp"));
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/" + lvlName + ".rtt"));
+					string lvlGptPath = levelsFolder + lvlName + "/" + lvlName + ".gpt";
                     string lvlPtxPath = levelsFolder + lvlName + "/" + lvlName + ".ptx";
                     if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                         RelocationTable lvlRtp = new RelocationTable(lvlGptPath, dat, lvlName, RelocationType.RTP);
-                        lvlSna.ReadGPT(lvlGptPath, lvlRtp);
+						yield return controller.StartCoroutine(lvlRtp.Init());
+						lvlSna.ReadGPT(lvlGptPath, lvlRtp);
                         RelocationTable lvlRtt = new RelocationTable(lvlPtxPath, dat, lvlName, RelocationType.RTT);
-                        lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
+						yield return controller.StartCoroutine(lvlRtt.Init());
+						lvlSna.ReadPTX(lvlPtxPath, lvlRtt);
                     } else {
                         lvlSna.ReadGPT(lvlGptPath, null);
                         lvlSna.ReadPTX(lvlPtxPath, null);
-                    }
-                    if (FileSystem.FileExists(levelsFolder + lvlName + "/" + lvlName + ".sda")) {
+					}
+					yield return controller.StartCoroutine(PrepareFile(levelsFolder + lvlName + "/" + lvlName + ".sda"));
+					if (FileSystem.FileExists(levelsFolder + lvlName + "/" + lvlName + ".sda")) {
                         yield return null;
                         lvlSna.ReadSDA(levelsFolder + lvlName + "/" + lvlName + ".sda");
                     }
@@ -167,10 +203,12 @@ namespace OpenSpace.Loader {
                     files_array[1] = lvlSna;
                     files_array[2] = dat;
 
-                    yield return null;
-                    fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
-                    yield return null;
-                    lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
+					if (FileSystem.mode != FileSystem.Mode.Web) {
+						yield return null;
+						fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
+						yield return null;
+						lvlSna.CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
+					}
 
                     yield return controller.StartCoroutine(LoadFIXSNA());
                     yield return controller.StartCoroutine(LoadLVLSNA());
@@ -374,14 +412,15 @@ namespace OpenSpace.Loader {
             // Read PTX
             loadingState = "Loading fixed textures";
             yield return null;
-            Pointer.DoAt(ref reader, sna.PTX, () => {
+			// Can't yield inside a lambda, so we must do it the old fashioned way, with off_current
+			if (sna.PTX != null) {
+				Pointer off_current = Pointer.Goto(ref reader, sna.PTX);
+				yield return controller.StartCoroutine(ReadTexturesFix(reader, Pointer.Current(reader)));
+				Pointer.Goto(ref reader, off_current);
+			}
+            /*Pointer.DoAt(ref reader, sna.PTX, () => {
                 ReadTexturesFix(reader, Pointer.Current(reader));
-                /*uint num_texturesToCreate = reader.ReadUInt32();
-                for (uint i = 0; i < num_texturesToCreate; i++) {
-                    reader.ReadUInt32(); //1
-                }
-                uint currentMemoryChannel = reader.ReadUInt32();*/
-            });
+            });*/
         }
         #endregion
 
@@ -655,7 +694,7 @@ namespace OpenSpace.Loader {
                 AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, files_array[Mem.LvlKeyFrames], append: true);
                 animationBanks[1] = animationBanks[0];
             }
-            if (Application.platform != RuntimePlatform.WebGLPlayer) {
+            if (FileSystem.mode != FileSystem.Mode.Web) {
                 string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
                 ((SNA)files_array[0]).CreateMemoryDump(levelsFolder + "fix.dmp", true);
                 ((SNA)files_array[1]).CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
@@ -664,9 +703,16 @@ namespace OpenSpace.Loader {
             // Read PTX
             loadingState = "Loading level textures";
             yield return null;
-            Pointer.DoAt(ref reader, sna.PTX, () => {
+
+			// Can't yield inside a lambda, so we must do it the old fashioned way, with off_current
+			if (sna.PTX != null) {
+				off_current = Pointer.Goto(ref reader, sna.PTX);
+				yield return controller.StartCoroutine(ReadTexturesLvl(reader, Pointer.Current(reader)));
+				Pointer.Goto(ref reader, off_current);
+			}
+			/*Pointer.DoAt(ref reader, sna.PTX, () => {
                 ReadTexturesLvl(reader, Pointer.Current(reader));
-            });
+            });*/
 
             // Read background game material (DD only)
             globals.backgroundGameMaterial = GameMaterial.FromOffsetOrRead(globals.off_backgroundGameMaterial, reader);

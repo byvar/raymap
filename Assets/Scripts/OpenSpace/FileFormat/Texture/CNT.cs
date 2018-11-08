@@ -2,6 +2,7 @@
 // https://github.com/szymski/Rayman2Lib/blob/master/csharp_tools/Rayman2Lib/CNTFile.cs
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,6 +43,7 @@ namespace OpenSpace.FileFormat.Texture {
         }
 
         public CNTVersion version;
+		public GF preparedGF = null;
 
 
         public string[][] directoryList = null;
@@ -69,19 +71,25 @@ namespace OpenSpace.FileFormat.Texture {
             directoryList = new string[paths.Length][];
             readers = new Reader[paths.Length];
             for (int i = 0; i < paths.Length; i++) {
-                Init(i, FileSystem.GetFileReadStream(paths[i]));
+				readers[i] = new Reader(FileSystem.GetFileReadStream(paths[i]), isLittleEndian);
             }
         }
 
         public CNT(Stream stream) {
             directoryList = new string[1][];
             readers = new Reader[1];
-            Init(0, stream);
         }
 
-        void Init(int readerIndex, Stream stream) {
-            readers[readerIndex] = new Reader(stream, isLittleEndian);
-            Reader reader = readers[readerIndex];
+		public IEnumerator Init() {
+			for (int i = 0; i < readers.Length; i++) {
+				yield return MapLoader.Loader.controller.StartCoroutine(Init(i, readers[i]));
+			}
+		}
+
+        public IEnumerator Init(int readerIndex, Reader reader) {
+			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
+			Controller c = MapLoader.Loader.controller;
+			if(httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(11));
             int localDirCount = reader.ReadInt32();
             int localFileCount = reader.ReadInt32();
             directoryCount += localDirCount;
@@ -94,20 +102,26 @@ namespace OpenSpace.FileFormat.Texture {
 
             byte xorKey = reader.ReadByte();
 
-            // Load directories
-            for (int i = 0; i < localDirCount; i++) {
-                int strLen = reader.ReadInt32();
+			// Load directories
+			//Debug.Log("directories");
+			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(300 * localDirCount));
+			yield return null;
+			for (int i = 0; i < localDirCount; i++) {
+				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4));
+				int strLen = reader.ReadInt32();
                 string directory = "";
 
-                for (int j = 0; j < strLen; j++) {
+				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(strLen));
+				for (int j = 0; j < strLen; j++) {
                     directory += (char)(xorKey ^ reader.ReadByte());
                 }
 
                 directoryList[readerIndex][i] = directory;
             }
 
-            // Load and check version
-            byte verId = reader.ReadByte();
+			// Load and check version
+			//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(1));
+			byte verId = reader.ReadByte();
 
             switch (verId) {
                 case 246:
@@ -116,14 +130,18 @@ namespace OpenSpace.FileFormat.Texture {
                     version = CNTVersion.Rayman2Vignette; break;
             }
 
-            // Read files
-            for (int i = 0; i < localFileCount; i++) {
-                int dirIndex = reader.ReadInt32();
+			// Read files
+			//Debug.Log("files");
+			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(300 * localFileCount));
+			for (int i = 0; i < localFileCount; i++) {
+				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(8));
+				int dirIndex = reader.ReadInt32();
                 int size = reader.ReadInt32();
 
                 string file = "";
 
-                for (int j = 0; j < size; j++) {
+				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(size + 16));
+				for (int j = 0; j < size; j++) {
                     file += (char)(xorKey ^ reader.ReadByte());
                 }
 
@@ -146,19 +164,20 @@ namespace OpenSpace.FileFormat.Texture {
                     magic2 = magic2,
                     fileNum = readerIndex
                 });
-            }
-        }
+			}
+		}
 
 
 
         public byte[] GetFileBytes(FileStruct file) {
             if (file == null) return null;
-            readers[file.fileNum].BaseStream.Position = file.pointer;
+			
+            readers[file.fileNum].BaseStream.Seek(file.pointer, SeekOrigin.Begin);
 
             byte[] data = new byte[file.size];
             readers[file.fileNum].Read(data, 0, data.Length);
 
-            for (int i = 0; i < file.size; i++) {
+			for (int i = 0; i < file.size; i++) {
                 if ((file.size % 4) + i < file.size)
                     data[i] = (byte)(data[i] ^ file.xorKey[i % 4]);
             }
@@ -181,6 +200,24 @@ namespace OpenSpace.FileFormat.Texture {
             GF gf = new GF(bytes);
             return gf;
         }
+
+		public IEnumerator PrepareGFByTGAName(string tgaName) {
+			FileStruct file = fileList.FirstOrDefault(f => f.TGAName.ToLower().Replace('/', '\\').Equals(tgaName.ToLower().Replace('/', '\\')));
+			if (file == null) {
+				preparedGF = null;
+				yield break;
+			}
+			Reader reader = readers[file.fileNum];
+			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
+			if (httpStream != null) {
+				Controller c = MapLoader.Loader.controller;
+				readers[file.fileNum].BaseStream.Seek(file.pointer, SeekOrigin.Begin);
+				yield return c.StartCoroutine(httpStream.FillCacheForRead(file.size));
+			}
+			byte[] bytes = GetFileBytes(file);
+			//Util.ByteArrayToFile("textures/" + file.FullName, bytes);
+			preparedGF = new GF(bytes);
+		}
 
         public void Dispose() {
             for (int i = 0; i < readers.Length; i++) {

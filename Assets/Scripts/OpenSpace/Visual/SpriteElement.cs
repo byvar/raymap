@@ -19,6 +19,7 @@ namespace OpenSpace.Visual {
         public Pointer off_material;
         public GameMaterial gameMaterial;
         public VisualMaterial visualMaterial = null;
+		public Mesh meshUnity = null;
     }
 
     public class SpriteElement : IGeometricElement {
@@ -73,41 +74,43 @@ namespace OpenSpace.Visual {
                     bool receiveShadows = (sprites[i].visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                     //if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
                     //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
-                    mr.material = unityMat;
+                    mr.sharedMaterial = unityMat;
                     /*mr.material.SetFloat("_ScaleX", sprites[i].info_scale.x);
                     mr.material.SetFloat("_ScaleY", sprites[i].info_scale.y);*/
                     if (!receiveShadows) mr.receiveShadows = false;
                     if (sprites[i].visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
                         mtmat.visMat = sprites[i].visualMaterial;
-                        mtmat.mat = mr.material;
+                        mtmat.mat = mr.sharedMaterial;
                     }
                 }
-                Mesh meshUnity = new Mesh();
-                Vector3[] vertices = new Vector3[4];
-                vertices[0] = new Vector3(0, -sprites[i].info_scale.y, -sprites[i].info_scale.x);
-                vertices[1] = new Vector3(0, -sprites[i].info_scale.y,  sprites[i].info_scale.x);
-                vertices[2] = new Vector3(0,  sprites[i].info_scale.y, -sprites[i].info_scale.x);
-                vertices[3] = new Vector3(0,  sprites[i].info_scale.y,  sprites[i].info_scale.x);
-                Vector3[] normals = new Vector3[4];
-                normals[0] = Vector3.forward;
-                normals[1] = Vector3.forward;
-                normals[2] = Vector3.forward;
-                normals[3] = Vector3.forward;
-                Vector3[] uvs = new Vector3[4];
-                uvs[0] = new Vector3(0, 0 - (mirrorY ? 1 : 0), 1);
-                uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), 0 - (mirrorY ? 1 : 0), 1);
-                uvs[2] = new Vector3(0, 1, 1);
-                uvs[3] = new Vector3(1 + (mirrorX ? 1 : 0), 1, 1);
-                int[] triangles = new int[] { 0, 2, 1, 1, 2, 3 };
+				if (sprites[i].meshUnity == null) {
+					sprites[i].meshUnity = new Mesh();
+					Vector3[] vertices = new Vector3[4];
+					vertices[0] = new Vector3(0, -sprites[i].info_scale.y, -sprites[i].info_scale.x);
+					vertices[1] = new Vector3(0, -sprites[i].info_scale.y, sprites[i].info_scale.x);
+					vertices[2] = new Vector3(0, sprites[i].info_scale.y, -sprites[i].info_scale.x);
+					vertices[3] = new Vector3(0, sprites[i].info_scale.y, sprites[i].info_scale.x);
+					Vector3[] normals = new Vector3[4];
+					normals[0] = Vector3.forward;
+					normals[1] = Vector3.forward;
+					normals[2] = Vector3.forward;
+					normals[3] = Vector3.forward;
+					Vector3[] uvs = new Vector3[4];
+					uvs[0] = new Vector3(0, 0 - (mirrorY ? 1 : 0), 1);
+					uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), 0 - (mirrorY ? 1 : 0), 1);
+					uvs[2] = new Vector3(0, 1, 1);
+					uvs[3] = new Vector3(1 + (mirrorX ? 1 : 0), 1, 1);
+					int[] triangles = new int[] { 0, 2, 1, 1, 2, 3 };
 
-                meshUnity.vertices = vertices;
-                meshUnity.normals = normals;
-                meshUnity.triangles = triangles;
-                meshUnity.SetUVs(0, uvs.ToList());
+					sprites[i].meshUnity.vertices = vertices;
+					sprites[i].meshUnity.normals = normals;
+					sprites[i].meshUnity.triangles = triangles;
+					sprites[i].meshUnity.SetUVs(0, uvs.ToList());
+				}
 
                 
-                mf.mesh = meshUnity;
+                mf.sharedMesh = sprites[i].meshUnity;
             }
         }
 

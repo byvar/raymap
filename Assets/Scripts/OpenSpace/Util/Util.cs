@@ -36,7 +36,7 @@ namespace OpenSpace {
         }
 
         public static bool ByteArrayToFile(string fileName, byte[] byteArray) {
-            if (Application.platform == RuntimePlatform.WebGLPlayer) return false;
+            if (FileSystem.mode == FileSystem.Mode.Web) return false;
             try {
                 Directory.CreateDirectory(new FileInfo(fileName).Directory.FullName);
                 using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write)) {
@@ -162,5 +162,20 @@ namespace OpenSpace {
             texture.Apply();
             return texture;
         }
+
+		private static readonly string[] SizeSuffixes =
+				  { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+		public static string SizeSuffix(Int64 value, int decimalPlaces = 1) {
+			if (value < 0) { return "-" + SizeSuffix(-value); }
+
+			int i = 0;
+			decimal dValue = (decimal)value;
+			while (Math.Round(dValue, decimalPlaces) >= 1000) {
+				dValue /= 1024;
+				i++;
+			}
+
+			return string.Format("{0:n" + decimalPlaces + "} {1}", dValue, SizeSuffixes[i]);
+		}
     }
 }

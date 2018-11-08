@@ -23,15 +23,14 @@ namespace OpenSpace.Loader {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
-                if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
-                gameDataBinFolder += "/";
+				gameDataBinFolder += "/";
+				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 
                 loadingState = "Initializing files";
-                yield return null;
-                CreateCNT();
-                yield return null;
+				yield return controller.StartCoroutine(CreateCNT());
 
-                if (lvlName.EndsWith(".exe")) {
+				if (lvlName.EndsWith(".exe")) {
                     if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
                     Settings.s.loadFromMemory = true;
                     MemoryFile mem = new MemoryFile(lvlName);
@@ -185,8 +184,7 @@ namespace OpenSpace.Loader {
                 ReadLanguages(reader, off_languages, num_languages);
             });
             loadingState = "Loading fixed textures";
-            yield return null;
-            ReadTexturesFix(reader, Pointer.Current(reader));
+            yield return controller.StartCoroutine(ReadTexturesFix(reader, Pointer.Current(reader)));
             // Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
             int sz_entryActions = 0x100;
             int sz_randomStructure = 0xDC;
@@ -289,8 +287,7 @@ namespace OpenSpace.Loader {
             reader.ReadBytes(0x104); // vignette
             reader.ReadUInt32();
             loadingState = "Loading level textures";
-            yield return null;
-            ReadTexturesLvl(reader, Pointer.Current(reader));
+            yield return controller.StartCoroutine(ReadTexturesLvl(reader, Pointer.Current(reader)));
             if (Settings.s.platform == Settings.Platform.PC && !hasTransit) {
                 Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
                 Pointer.DoAt(ref reader, off_lightMapTexture, () => {

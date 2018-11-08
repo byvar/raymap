@@ -141,17 +141,19 @@ namespace OpenSpace.Visual {
                         }
                     }
                 }
-                mesh_main = new Mesh();
-                mesh_main.vertices = new_vertices;
-                mesh_main.normals = new_normals;
-                mesh_main.triangles = triangles;
-                if (new_boneWeights != null) {
-                    mesh_main.boneWeights = new_boneWeights;
-                    mesh_main.bindposes = mesh.bones.bindPoses;
-                }
-                for (int i = 0; i < num_textures; i++) {
-                    mesh_main.SetUVs(i, new_uvs[i].ToList());
-                }
+				if (mesh_main == null) {
+					mesh_main = new Mesh();
+					mesh_main.vertices = new_vertices;
+					mesh_main.normals = new_normals;
+					mesh_main.triangles = triangles;
+					if (new_boneWeights != null) {
+						mesh_main.boneWeights = new_boneWeights;
+						mesh_main.bindposes = mesh.bones.bindPoses;
+					}
+					for (int i = 0; i < num_textures; i++) {
+						mesh_main.SetUVs(i, new_uvs[i].ToList());
+					}
+				}
 				if (new_boneWeights != null) {
                     mr_main = gao.AddComponent<SkinnedMeshRenderer>();
                     s_mr_main = (SkinnedMeshRenderer)mr_main;
@@ -164,7 +166,7 @@ namespace OpenSpace.Visual {
 					bc.size = s_mr_main.bounds.size;
 				} else {
                     MeshFilter mf = gao.AddComponent<MeshFilter>();
-                    mf.mesh = mesh_main;
+                    mf.sharedMesh = mesh_main;
                     mr_main = gao.AddComponent<MeshRenderer>();
 					MeshCollider mc = gao.AddComponent<MeshCollider>();
 					mc.isTrigger = false;
@@ -243,17 +245,19 @@ namespace OpenSpace.Visual {
                 } else {
                     gao.name = "[SPE] " + gao.name;
                 }
-                mesh_spe = new Mesh();
-                mesh_spe.vertices = new_vertices_spe;
-                mesh_spe.normals = new_normals_spe;
-                mesh_spe.triangles = triangles_spe;
-                if (new_boneWeights_spe != null) {
-                    mesh_spe.boneWeights = new_boneWeights_spe;
-                    mesh_spe.bindposes = mesh.bones.bindPoses;
-                }
-                for (int i = 0; i < num_textures; i++) {
-                    mesh_spe.SetUVs(i, new_uvs_spe[i].ToList());
-                }
+				if (mesh_spe == null) {
+					mesh_spe = new Mesh();
+					mesh_spe.vertices = new_vertices_spe;
+					mesh_spe.normals = new_normals_spe;
+					mesh_spe.triangles = triangles_spe;
+					if (new_boneWeights_spe != null) {
+						mesh_spe.boneWeights = new_boneWeights_spe;
+						mesh_spe.bindposes = mesh.bones.bindPoses;
+					}
+					for (int i = 0; i < num_textures; i++) {
+						mesh_spe.SetUVs(i, new_uvs_spe[i].ToList());
+					}
+				}
                 //mesh.SetUVs(0, new_uvs_spe.ToList());
                 /*mesh.uv = new_uvs_spe;*/
 				if (new_boneWeights_spe != null) {
@@ -268,7 +272,7 @@ namespace OpenSpace.Visual {
 					bc.size = s_mr_spe.bounds.size;
 				} else {
                     MeshFilter mf = gao_spe.AddComponent<MeshFilter>();
-                    mf.mesh = mesh_spe;
+                    mf.sharedMesh = mesh_spe;
                     mr_spe = gao_spe.AddComponent<MeshRenderer>();
 					MeshCollider mc = gao_spe.AddComponent<MeshCollider>();
 					mc.isTrigger = false;
@@ -293,13 +297,13 @@ namespace OpenSpace.Visual {
                 }*/
                 //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
                 if (mr_main != null) {
-                    mr_main.material = unityMat;
+                    mr_main.sharedMaterial = unityMat;
                     //mr_main.UpdateGIMaterials();
                     if (!receiveShadows) mr_main.receiveShadows = false;
                     if (visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr_main.gameObject.AddComponent<MultiTextureMaterial>();
                         mtmat.visMat = visualMaterial;
-                        mtmat.mat = mr_main.material;
+                        mtmat.mat = mr_main.sharedMaterial;
                     }
                     /*if (scroll) {
                         ScrollingTexture scrollComponent = mr_main.gameObject.AddComponent<ScrollingTexture>();
@@ -308,13 +312,13 @@ namespace OpenSpace.Visual {
                     }*/
                 }
                 if (mr_spe != null) {
-                    mr_spe.material = unityMat;
+                    mr_spe.sharedMaterial = unityMat;
                     //mr_spe.UpdateGIMaterials();
                     if (!receiveShadows) mr_spe.receiveShadows = false;
                     if (visualMaterial.animTextures.Count > 0) {
                         MultiTextureMaterial mtmat = mr_spe.gameObject.AddComponent<MultiTextureMaterial>();
                         mtmat.visMat = visualMaterial;
-                        mtmat.mat = mr_spe.material;
+                        mtmat.mat = mr_spe.sharedMaterial;
                     }
                     /*if (scroll) {
                         ScrollingTexture scrollComponent = mr_spe.gameObject.AddComponent<ScrollingTexture>();
@@ -483,8 +487,10 @@ namespace OpenSpace.Visual {
             gao = null;
             s_mr_main = null;
             s_mr_spe = null;
-            mesh_main = null;
-            mesh_spe = null;
+			if (mesh.bones != null) {
+				mesh_main = null;
+				mesh_spe = null;
+			}
         }
 
         public IGeometricElement Clone(MeshObject mesh) {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace OpenSpace.FileFormat {
 
     public class DAT : FileWithPointers {
         public DSB gameDsb;
+		public uint lastOffset = 0;
 
         public DAT(string name, DSB gameDsb, string path) : this(name, gameDsb, FileSystem.GetFileReadStream(path)) { }
 
@@ -25,11 +27,14 @@ namespace OpenSpace.FileFormat {
             reader = new Reader(stream, Settings.s.IsLittleEndian);
         }
 
-        public uint GetOffset(RelocationTableReference rtref) {
-            reader.MaskingOff();
+        public IEnumerator GetOffset(RelocationTableReference rtref) {
+			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
+			Controller c = MapLoader.Loader.controller;
+			reader.MaskingOff();
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
-            DATHeader header = new DATHeader();
+			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(12*4));
+			DATHeader header = new DATHeader();
             header.field_0 = reader.ReadInt32();
             header.field_4 = reader.ReadInt32();
             header.field_8 = reader.ReadInt32();
@@ -126,8 +131,9 @@ namespace OpenSpace.FileFormat {
             long v14 = (long)Math.Floor(levels0DatValue_0 * v13);
 
             reader.BaseStream.Seek(levels0DatValue_4 + levels0DatValue_5 * v14, SeekOrigin.Begin);
+			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4 * 4));
 
-            header.field_0 = reader.ReadInt32();
+			header.field_0 = reader.ReadInt32();
             header.field_4 = reader.ReadInt32();
             header.field_8 = reader.ReadInt32();
             header.field_C = reader.ReadInt32();
@@ -147,11 +153,12 @@ namespace OpenSpace.FileFormat {
             }
 
             reader.BaseStream.Seek(4 * v28, SeekOrigin.Current);
-            uint value1 = reader.ReadUInt32();
+			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4));
+			uint value1 = reader.ReadUInt32();
 
             uint dataOffset = (uint)(header.field_4 ^ (value1 - header.field_0));
 
-            return dataOffset;
+			lastOffset = dataOffset;
         }
 
         public uint GetMask(RelocationTableReference rtref) {

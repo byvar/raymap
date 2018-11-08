@@ -110,7 +110,6 @@ namespace OpenSpace {
             public const int LvlKeyFrames = 6;
         }
         public int[] loadOrder = new int[] { Mem.Fix, Mem.Transit, Mem.Lvl, Mem.VertexBuffer, Mem.FixKeyFrames, Mem.LvlKeyFrames };
-
         
         private static MapLoader loader = null;
         public static MapLoader Loader {
@@ -357,12 +356,15 @@ MonoBehaviour.print(str);
             }
         }
 
-        public void CreateCNT() {
+		protected IEnumerator CreateCNT() {
             if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.platform != Settings.Platform.DC) {
                 List<string> cntPaths = new List<string>();
                 if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
                 if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
                 if (cntPaths.Count > 0) {
+					foreach (string path in cntPaths) {
+						yield return controller.StartCoroutine(PrepareBigFile(path, 8 * 1024 * 1024));
+					}
                     cnt = new CNT(cntPaths.ToArray());
                 }
             } else {
@@ -372,15 +374,26 @@ MonoBehaviour.print(str);
                         cntPaths[0] = gameDataBinFolder + "vignette.cnt";
                         cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
                         cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
-                        cnt = new CNT(cntPaths);
+						foreach (string path in cntPaths) {
+							yield return controller.StartCoroutine(PrepareBigFile(path, 8 * 1024 * 1024));
+						}
+						cnt = new CNT(cntPaths);
                     } else if (Settings.s.game == Settings.Game.RA) {
                         cntPaths = new string[2];
                         cntPaths[0] = gameDataBinFolder + "vignette.cnt";
                         cntPaths[1] = gameDataBinFolder + "tex32.cnt";
-                        cnt = new CNT(cntPaths);
+						foreach (string path in cntPaths) {
+							yield return controller.StartCoroutine(PrepareBigFile(path, 8 * 1024 * 1024));
+						}
+						cnt = new CNT(cntPaths);
                     }
                 }
             }
+			if (cnt != null) {
+				yield return controller.StartCoroutine(cnt.Init());
+				//Debug.Log("CNT init Finished!");
+				yield return null;
+			}
         }
 
         public void FillLinkedListPointers(Reader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
@@ -468,14 +481,17 @@ MonoBehaviour.print(str);
             }
         }
 
-        public void ReadTexturesFix(Reader reader, Pointer off_textures) {
+        protected IEnumerator ReadTexturesFix(Reader reader, Pointer off_textures) {
             uint num_textureMemoryChannels = 0;
             if (Settings.s.engineVersion <= Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
             uint num_textures = reader.ReadUInt32();
             print("Texture count fix: " + num_textures);
+			string state = loadingState;
 
-            textures = new TextureInfo[num_textures];
+			textures = new TextureInfo[num_textures];
             if (num_textures > 0) {
+				loadingState = "Loading fixed textures";
+				yield return null;
                 for (uint i = 0; i < num_textures; i++) {
                     Pointer off_texture = Pointer.Read(reader);
                     Pointer.DoAt(ref reader, off_texture, () => {
@@ -497,7 +513,9 @@ MonoBehaviour.print(str);
                     }
                 } else if (Settings.s.platform == Settings.Platform.iOS) {
                     for (int i = 0; i < num_textures; i++) {
-                        string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";
+						loadingState = "Loading fixed textures: " + (i+1) + "/" + num_textures;
+						yield return null;
+						string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";
                         if (FileSystem.FileExists(texturePath)) {
                             GF gf = new GF(texturePath);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
@@ -505,7 +523,9 @@ MonoBehaviour.print(str);
                     }
                 } else {
                     for (int i = 0; i < num_textures; i++) {
-                        GF gf = cnt.GetGFByTGAName(textures[i].name);
+						loadingState = "Loading fixed textures: " + (i + 1) + "/" + num_textures;
+						yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
+						GF gf = cnt.preparedGF;
                         if (gf != null) textures[i].Texture = gf.GetTexture();
                     }
                 }
@@ -515,15 +535,19 @@ MonoBehaviour.print(str);
                     }
                 }
             }
-        }
 
-        public void ReadTexturesLvl(Reader reader, Pointer off_textures) {
+			loadingState = state;
+		}
+
+		protected IEnumerator ReadTexturesLvl(Reader reader, Pointer off_textures) {
             uint num_textures_fix = (uint)textures.Length,
                 num_memoryChannels = 0,
                 num_textures_lvl = 0,
                 num_textures_total = 0;
+			string state = loadingState;
+			loadingState = "Loading level textures";
 
-            if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
+			if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
                 num_textures_fix = (uint)textures.Length;
                 num_memoryChannels = reader.ReadUInt32();
                 num_textures_lvl = reader.ReadUInt32();
@@ -565,8 +589,11 @@ MonoBehaviour.print(str);
             } else if (Settings.s.platform == Settings.Platform.iOS) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                    string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";
-                    if (FileSystem.FileExists(texturePath)) {
+					loadingState = "Loading level textures: " + (i - num_textures_fix + 1) + "/" + (num_textures_total - num_textures_fix);
+					yield return null;
+					string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";
+					yield return controller.StartCoroutine(PrepareFile(texturePath));
+					if (FileSystem.FileExists(texturePath)) {
                         GF gf = new GF(texturePath);
                         if (gf != null) textures[i].Texture = gf.GetTexture();
                     }
@@ -577,12 +604,15 @@ MonoBehaviour.print(str);
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
                     uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
                     if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
-                    if (hasTransit && file_texture == 6) transitTexturesSeen++;
-                    GF gf = cnt.GetGFByTGAName(textures[i].name);
-                    if (gf != null) textures[i].Texture = gf.GetTexture();
+					loadingState = "Loading level textures: " + (i - num_textures_fix + 1) + "/" + (num_textures_total - num_textures_fix);
+					if (hasTransit && file_texture == 6) transitTexturesSeen++;
+					yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
+					GF gf = cnt.preparedGF;
+					if (gf != null) textures[i].Texture = gf.GetTexture();
                 }
-            }
-        }
+			}
+			loadingState = state;
+		}
 
         public void ReadSuperObjects(Reader reader) {
             actualWorld = SuperObject.FromOffsetOrRead(globals.off_actualWorld, reader);
@@ -641,13 +671,23 @@ MonoBehaviour.print(str);
         }
 
         protected IEnumerator PrepareFile(string path) {
-            if (Application.platform == RuntimePlatform.WebGLPlayer) {
+            if (FileSystem.mode == FileSystem.Mode.Web) {
                 string state = loadingState;
                 loadingState = "Downloading file: " + path;
                 yield return controller.StartCoroutine(FileSystem.DownloadFile(path));
                 loadingState = state;
                 yield return null;
             }
-        }
-    }
+		}
+
+		protected IEnumerator PrepareBigFile(string path, int cacheLength) {
+			if (FileSystem.mode == FileSystem.Mode.Web) {
+				string state = loadingState;
+				loadingState = "Initializing bigfile: " + path + " (Cache size: " + Util.SizeSuffix(cacheLength) + ")";
+				yield return controller.StartCoroutine(FileSystem.InitBigFile(path, cacheLength));
+				loadingState = state;
+				yield return null;
+			}
+		}
+	}
 }

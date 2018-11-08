@@ -51,6 +51,13 @@ namespace OpenSpace.Object {
 			Pointer.DoAt(ref reader, ipo.off_data, () => {
 				ipo.data = PhysicalObject.Read(reader, ipo.off_data);
 				if (ipo.data != null) {
+					/*if (ipo.data.visualSet != null) {
+						foreach (Visual.VisualSetLOD lod in ipo.data.visualSet) {
+							if (lod.obj.Gao != null) {
+								StaticBatchingUtility.Combine(lod.obj.Gao);
+							}
+						}
+					}*/
 					ipo.data.Gao.transform.parent = ipo.Gao.transform;
 				}
 			});

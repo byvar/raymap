@@ -24,8 +24,8 @@
 		// Lighting
 		[MaterialToggle] _Billboard("Is billboard", Float) = 0
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
-		_SectorFog("Sector fog", Vector) = (0,0,0,0)
-		_SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
+		[PerRendererData] _SectorFog("Sector fog", Vector) = (0,0,0,0)
+		[PerRendererData] _SectorFogParams("Sector fog params", Vector) = (0,0,0,0)
 	}
 	SubShader{
 		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }

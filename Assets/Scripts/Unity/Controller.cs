@@ -157,6 +157,14 @@ public class Controller : MonoBehaviour {
 	}
 
 	IEnumerator Init() {
+#if UNITY_EDITOR
+		if (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL) {
+			FileSystem.mode = FileSystem.Mode.Web;
+		}
+#endif
+		if (Application.platform == RuntimePlatform.WebGLPlayer) {
+			FileSystem.mode = FileSystem.Mode.Web;
+		}
 		state = State.Loading;
 		yield return new WaitForEndOfFrame();
 		yield return StartCoroutine(loader.Load());

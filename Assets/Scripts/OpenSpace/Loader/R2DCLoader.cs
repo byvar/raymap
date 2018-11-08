@@ -24,10 +24,11 @@ namespace OpenSpace.Loader {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
-                if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
-                gameDataBinFolder += "/";
+				gameDataBinFolder += "/";
+				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 loadingState = "Initializing files";
-                CreateCNT();
+                yield return controller.StartCoroutine(CreateCNT());
 
                 // FIX
                 string fixDATPath = gameDataBinFolder + "FIX.DAT";

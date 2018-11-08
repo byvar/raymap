@@ -102,14 +102,14 @@ public class SectorManager : MonoBehaviour {
 			if (gao) {
 				List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
 				foreach (Renderer r in rs) {
-					if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
-						r.material.SetFloat("_DisableLightingLocal", 1);
+					if (r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend")) {
+						r.sharedMaterial.SetFloat("_DisableLightingLocal", 1);
 					}
 				}
 				rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
 				foreach (Renderer r in rs) {
-					if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
-						r.material.SetFloat("_DisableLightingLocal", 1);
+					if (r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend")) {
+						r.sharedMaterial.SetFloat("_DisableLightingLocal", 1);
 					}
 				}
 			}
@@ -158,32 +158,38 @@ public class SectorManager : MonoBehaviour {
 				if (gao) {
 					List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
 					foreach (Renderer r in rs) {
-						if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
-							if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
-							if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
+						if (r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend")) {
+							MaterialPropertyBlock props = new MaterialPropertyBlock();
+							r.GetPropertyBlock(props);
+							if (fogColor.HasValue) props.SetVector("_SectorFog", fogColor.Value);
+							if (fogParams.HasValue) props.SetVector("_SectorFogParams", fogParams.Value);
 							//r.material.SetVector("_SectorAmbient", ambientLight);
-							r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
+							props.SetFloat("_StaticLightCount", staticLightPosArray.Length);
 							if (staticLightPosArray.Length > 0) {
-								r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
-								r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
-								r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
-								r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
+								props.SetVectorArray("_StaticLightPos", staticLightPosArray);
+								props.SetVectorArray("_StaticLightDir", staticLightDirArray);
+								props.SetVectorArray("_StaticLightCol", staticLightColArray);
+								props.SetVectorArray("_StaticLightParams", staticLightParamsArray);
 							}
+							r.SetPropertyBlock(props);
 						}
 					}
 					rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
 					foreach (Renderer r in rs) {
-						if (r.material.shader.name.Contains("Gouraud") || r.material.shader.name.Contains("Texture Blend")) {
-							if (fogColor.HasValue) r.material.SetVector("_SectorFog", fogColor.Value);
-							if (fogParams.HasValue) r.material.SetVector("_SectorFogParams", fogParams.Value);
-							r.material.SetVector("_SectorAmbient", ambientLight);
-							r.material.SetFloat("_StaticLightCount", staticLightPosArray.Length);
+						if (r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend")) {
+							MaterialPropertyBlock props = new MaterialPropertyBlock();
+							r.GetPropertyBlock(props);
+							if (fogColor.HasValue) props.SetVector("_SectorFog", fogColor.Value);
+							if (fogParams.HasValue) props.SetVector("_SectorFogParams", fogParams.Value);
+							//r.material.SetVector("_SectorAmbient", ambientLight);
+							props.SetFloat("_StaticLightCount", staticLightPosArray.Length);
 							if (staticLightPosArray.Length > 0) {
-								r.material.SetVectorArray("_StaticLightPos", staticLightPosArray);
-								r.material.SetVectorArray("_StaticLightDir", staticLightDirArray);
-								r.material.SetVectorArray("_StaticLightCol", staticLightColArray);
-								r.material.SetVectorArray("_StaticLightParams", staticLightParamsArray);
+								props.SetVectorArray("_StaticLightPos", staticLightPosArray);
+								props.SetVectorArray("_StaticLightDir", staticLightDirArray);
+								props.SetVectorArray("_StaticLightCol", staticLightColArray);
+								props.SetVectorArray("_StaticLightParams", staticLightParamsArray);
 							}
+							r.SetPropertyBlock(props);
 						}
 					}
 				}

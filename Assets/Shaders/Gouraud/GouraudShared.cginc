@@ -1,6 +1,6 @@
 #ifndef SHARED_GOURAUD
 #define SHARED_GOURAUD
-
+#pragma multi_compile_instancing
 #include "UnityCG.cginc"
 //uniform float4 _LightColor0; // color of light source (from "Lighting.cginc")
 
@@ -29,20 +29,22 @@ float4 _Tex3Params2;
 // Lighting
 float _Billboard;
 //uniform float4 _SectorAmbient;
-uniform float4 _SectorFog;
-uniform float4 _SectorFogParams;
+UNITY_INSTANCING_BUFFER_START(Props)
+UNITY_DEFINE_INSTANCED_PROP(float4, _SectorFog)
+UNITY_DEFINE_INSTANCED_PROP(float4, _SectorFogParams)
 #ifndef GOURAUD_NUM_LIGHTS
-float4 _StaticLightPos[512];
-float4 _StaticLightDir[512];
-float4 _StaticLightCol[512];
-float4 _StaticLightParams[512];
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightPos[512])
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightDir[512])
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightCol[512])
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightParams[512])
 #else
-float4 _StaticLightPos[GOURAUD_NUM_LIGHTS];
-float4 _StaticLightDir[GOURAUD_NUM_LIGHTS];
-float4 _StaticLightCol[GOURAUD_NUM_LIGHTS];
-float4 _StaticLightParams[GOURAUD_NUM_LIGHTS];
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightPos[GOURAUD_NUM_LIGHTS])
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightDir[GOURAUD_NUM_LIGHTS])
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightCol[GOURAUD_NUM_LIGHTS])
+UNITY_DEFINE_INSTANCED_PROP(float4, _StaticLightParams[GOURAUD_NUM_LIGHTS])
 #endif
-float _StaticLightCount = 0;
+UNITY_DEFINE_INSTANCED_PROP(float, _StaticLightCount)
+UNITY_INSTANCING_BUFFER_END(Props)
 float _Luminosity = 0.5;
 float _Saturate = 1.0;
 float _DisableLighting = 0;
@@ -58,6 +60,7 @@ struct v2f {
 	float3 normal : TEXCOORD5;
 	float3 multipliedPosition : TEXCOORD6;
 	float3 fogViewPos : TEXCOORD7;
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 	//UNITY_FOG_COORDS(3)
 };
 
@@ -104,62 +107,66 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 	float3 diffuseReflection = float3(0.0, 0.0, 0.0);
 	float3 luminosity = float3(_Luminosity - 0.5, _Luminosity - 0.5, _Luminosity - 0.5);
 	float4 ambient = _AmbientCoef;
-	float num_lights = _StaticLightCount;
+	float num_lights = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightCount);
 #ifdef GOURAUD_NUM_LIGHTS
 	if (num_lights > GOURAUD_NUM_LIGHTS) num_lights = GOURAUD_NUM_LIGHTS;
 #endif
 #if defined(FALLBACK) && defined(GOURAUD_NUM_LIGHTS)
 	for (int i = 0; i < GOURAUD_NUM_LIGHTS; i++) {
-		if(i < _StaticLightCount) {
+		if(i < num_lights) {
 #else
 	for (int i = 0; i < num_lights; i++) {
 #endif
-		if (_StaticLightPos[i].w == 1) {
+		float4 lightPos = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightPos)[i];
+		float4 lightDir = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightDir)[i];
+		float4 lightCol = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightCol)[i];
+		float4 lightParams = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightParams)[i];
+		if (lightPos.w == 1) {
 			attenuation = 1.0; // no attenuation
-			lightDirection = normalize(_StaticLightDir[i].xyz);
-			/*if (_StaticLightParams[i].z == 0) {
+			lightDirection = normalize(lightDir.xyz);
+			/*if (lightParams.z == 0) {
 				normalFactor = max(0.0, dot(normalDirection, lightDirection));
 			} else normalFactor = 1.0;*/
 			normalFactor = CalcNormalFactor(normalDirection, lightDirection);
-			if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+			if (lightParams.w != 1) diffuseReflection = diffuseReflection + attenuation * lightCol.xyz * normalFactor;
 			//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-			if (_StaticLightParams[i].w != 2) alpha = alpha + _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
-		} else if (_StaticLightPos[i].w == 2) {
-			vertexToLightSource = _StaticLightPos[i].xyz - multipliedPosition;
+			if (lightParams.w != 2) alpha = alpha + lightCol.w * normalFactor;// * _DiffuseCoef.w;
+		} else if (lightPos.w == 2) {
+			vertexToLightSource = lightPos.xyz - multipliedPosition;
 			distance = length(vertexToLightSource);
-			far = _StaticLightParams[i].y;
+			far = lightParams.y;
 			if (distance < far) {
-				near = _StaticLightParams[i].x;
+				near = lightParams.x;
 				attenuation = CalcSphereAttenuation(distance, near, far);
-				if (_StaticLightParams[i].z == 0) {
+				if (lightParams.z == 0) {
 					lightDirection = normalize(vertexToLightSource);
 					normalFactor = CalcNormalFactor(normalDirection, lightDirection);
 				} else normalFactor = 1.0; // Painting light
 				if (normalFactor != 0) {
-					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+					if (lightParams.w != 1) diffuseReflection = diffuseReflection + attenuation * lightCol.xyz * normalFactor;
 					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-					if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// * _DiffuseCoef.w;
+					if (lightParams.w != 2) alpha = alpha + attenuation * lightCol.w * normalFactor;// * _DiffuseCoef.w;
 				}
 			}
-		} else if (_StaticLightPos[i].w == 4) {
-			if (_StaticLightParams[i].w != 1) ambient.xyz = ambient.xyz + _StaticLightCol[i].xyz * _DiffuseCoef.xyz;
+		} else if (lightPos.w == 4) {
+			if (lightParams.w != 1) ambient.xyz = ambient.xyz + lightCol.xyz * _DiffuseCoef.xyz;
 			//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-			if (_StaticLightParams[i].w != 2) ambient.w = ambient.w + _StaticLightCol[i].w * _DiffuseCoef.w;// * _DiffuseCoef.w;
-		} else if (_StaticLightPos[i].w == 7) {
-			vertexToLightSource = _StaticLightPos[i].xyz - multipliedPosition;
+			if (lightParams.w != 2) ambient.w = ambient.w + lightCol.w * _DiffuseCoef.w;// * _DiffuseCoef.w;
+		} else if (lightPos.w == 7) {
+			vertexToLightSource = lightPos.xyz - multipliedPosition;
 			distance = length(vertexToLightSource);
-			far = _StaticLightParams[i].y;
+			far = lightParams.y;
 			if (distance < far) {
-				near = _StaticLightParams[i].x;
+				near = lightParams.x;
 				attenuation = CalcSphereAttenuation(distance, near, far);
-				if (_StaticLightParams[i].z == 0) {
-					lightDirection = normalize(_StaticLightDir[i].xyz);
+				if (lightParams.z == 0) {
+					lightDirection = normalize(lightDir.xyz);
 					normalFactor = CalcNormalFactor(normalDirection, lightDirection);
 				} else normalFactor = 1.0; // Painting light
 				if (normalFactor != 0) {
-					if (_StaticLightParams[i].w != 1) diffuseReflection = diffuseReflection + attenuation * _StaticLightCol[i].xyz * normalFactor;
+					if (lightParams.w != 1) diffuseReflection = diffuseReflection + attenuation * lightCol.xyz * normalFactor;
 					//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
-					if (_StaticLightParams[i].w != 2) alpha = alpha + attenuation * _StaticLightCol[i].w * normalFactor;// *_DiffuseCoef.w;
+					if (lightParams.w != 2) alpha = alpha + attenuation * lightCol.w * normalFactor;// *_DiffuseCoef.w;
 				}
 			}
 		}
@@ -198,6 +205,8 @@ float2 TransformUV(float2 uv_in, float4 tex_params, float4 tex_params_2) {
 
 v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	v2f o;
+	UNITY_SETUP_INSTANCE_ID(v);
+	UNITY_TRANSFER_INSTANCE_ID(v, o);
 	o.uv1 = float3(TRANSFORM_TEX(TransformUV( v.texcoord.xy, _Tex0Params, _Tex0Params2), _Tex0),  v.texcoord.z);
 	o.uv2 = float3(TRANSFORM_TEX(TransformUV(v.texcoord1.xy, _Tex1Params, _Tex1Params2), _Tex1), v.texcoord1.z);
 	o.uv3 = float3(TRANSFORM_TEX(TransformUV(v.texcoord2.xy, _Tex2Params, _Tex2Params2), _Tex2), v.texcoord2.z);
@@ -322,6 +331,7 @@ float4 TextureOp(float4 color_in, float4 diffuseColor, sampler2D tex, float3 uv,
 }
 
 float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
+	UNITY_SETUP_INSTANCE_ID(i);
 	float4 c = float4(0.0, 0.0, 0.0, 0.0);
 	if (_NumTextures > 0) {
 		c = TextureOp(c, i.diffuseColor, _Tex0, i.uv1, _Tex0Params, _Tex0Params2, 0);
@@ -358,20 +368,22 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 		clip(clipAlpha * (c.a - 1.0));
 	}*/
 	// Add fog
-	if (_SectorFog.w != 0) {
+	float4 sectFog = UNITY_ACCESS_INSTANCED_PROP(Props, _SectorFog);
+	if (sectFog.w != 0) {
+		float4 sectFogParams = UNITY_ACCESS_INSTANCED_PROP(Props, _SectorFogParams);
 		float fog;
-		if (_SectorFogParams.x != _SectorFogParams.y) { // Blend near != Blend far
+		if (sectFogParams.x != sectFogParams.y) { // Blend near != Blend far
 			float fogz = length(i.fogViewPos);
-			fog = _SectorFogParams.x +
-				saturate((fogz - _SectorFogParams.z) / (_SectorFogParams.w - _SectorFogParams.z))
-				* (_SectorFogParams.y - _SectorFogParams.x);
+			fog = sectFogParams.x +
+				saturate((fogz - sectFogParams.z) / (sectFogParams.w - sectFogParams.z))
+				* (sectFogParams.y - sectFogParams.x);
 		} else {
-			fog = _SectorFogParams.y;
+			fog = sectFogParams.y;
 		}
 		if (isAdd == 1.0) {
-			c.rgb = lerp(c.rgb, float3(0, 0, 0), fog * _SectorFog.w);
+			c.rgb = lerp(c.rgb, float3(0, 0, 0), fog * sectFog.w);
 		} else {
-			c.rgb = lerp(c.rgb, _SectorFog.xyz, fog * _SectorFog.w);
+			c.rgb = lerp(c.rgb, sectFog.xyz, fog * sectFog.w);
 		}
 		//c.rgb = lerp(c.rgb, _SectorFog.xyz, fog);
 	}
