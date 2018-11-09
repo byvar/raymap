@@ -681,11 +681,11 @@ public class PersoBehaviour : MonoBehaviour {
                 float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
 				
 				if (poNum != currentActivePO[i]) {
-					physicalObject.Gao.SetActive(true);
 					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
 						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
 					}
 					currentActivePO[i] = poNum;
+					physicalObject.Gao.SetActive(true);
 				}
 				if(!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
 				channelObjects[i].transform.localPosition = vector * positionMultiplier;
@@ -804,11 +804,11 @@ public class PersoBehaviour : MonoBehaviour {
 
 
 				if (currentFrame != currentActivePO[i]) {
-					physicalObject.Gao.SetActive(true);
 					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
 						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
 					}
 					currentActivePO[i] = (int)currentFrame;
+					physicalObject.Gao.SetActive(true);
 				}
 				if (!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
 				channelObjects[i].transform.localPosition = vector;// * positionMultiplier;
