@@ -363,7 +363,7 @@ MonoBehaviour.print(str);
                 if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
                 if (cntPaths.Count > 0) {
 					foreach (string path in cntPaths) {
-						yield return controller.StartCoroutine(PrepareBigFile(path, 8 * 1024 * 1024));
+						yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 					}
                     cnt = new CNT(cntPaths.ToArray());
                 }
@@ -375,7 +375,7 @@ MonoBehaviour.print(str);
                         cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
                         cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
 						foreach (string path in cntPaths) {
-							yield return controller.StartCoroutine(PrepareBigFile(path, 8 * 1024 * 1024));
+							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 						}
 						cnt = new CNT(cntPaths);
                     } else if (Settings.s.game == Settings.Game.RA) {
@@ -383,7 +383,7 @@ MonoBehaviour.print(str);
                         cntPaths[0] = gameDataBinFolder + "vignette.cnt";
                         cntPaths[1] = gameDataBinFolder + "tex32.cnt";
 						foreach (string path in cntPaths) {
-							yield return controller.StartCoroutine(PrepareBigFile(path, 8 * 1024 * 1024));
+							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 						}
 						cnt = new CNT(cntPaths);
                     }
@@ -391,6 +391,7 @@ MonoBehaviour.print(str);
             }
 			if (cnt != null) {
 				yield return controller.StartCoroutine(cnt.Init());
+				cnt.SetCacheSize(2 * 1024 * 1024);
 				//Debug.Log("CNT init Finished!");
 				yield return null;
 			}
@@ -601,10 +602,20 @@ MonoBehaviour.print(str);
             } else {
                 // Load textures from CNT
                 int transitTexturesSeen = 0;
-                for (uint i = num_textures_fix; i < num_textures_total; i++) {
+				int num_textures_level_real = 0;
+				Pointer off_current = Pointer.Current(reader);
+				for (uint i = num_textures_fix; i < num_textures_total; i++) {
+					uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
+					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+					num_textures_level_real++;
+				}
+				Pointer.Goto(ref reader, off_current);
+				int current_texture = 0;
+				for (uint i = num_textures_fix; i < num_textures_total; i++) {
                     uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
                     if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
-					loadingState = "Loading level textures: " + (i - num_textures_fix + 1) + "/" + (num_textures_total - num_textures_fix);
+					current_texture++;
+					loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
 					if (hasTransit && file_texture == 6) transitTexturesSeen++;
 					yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
 					GF gf = cnt.preparedGF;
@@ -673,7 +684,7 @@ MonoBehaviour.print(str);
         protected IEnumerator PrepareFile(string path) {
             if (FileSystem.mode == FileSystem.Mode.Web) {
                 string state = loadingState;
-                loadingState = "Downloading file: " + path;
+                loadingState = state + "\nDownloading file: " + path;
                 yield return controller.StartCoroutine(FileSystem.DownloadFile(path));
                 loadingState = state;
                 yield return null;
@@ -683,7 +694,7 @@ MonoBehaviour.print(str);
 		protected IEnumerator PrepareBigFile(string path, int cacheLength) {
 			if (FileSystem.mode == FileSystem.Mode.Web) {
 				string state = loadingState;
-				loadingState = "Initializing bigfile: " + path + " (Cache size: " + Util.SizeSuffix(cacheLength) + ")";
+				loadingState = state + "\nInitializing bigfile: " + path + " (Cache size: " + Util.SizeSuffix(cacheLength, 0) + ")";
 				yield return controller.StartCoroutine(FileSystem.InitBigFile(path, cacheLength));
 				loadingState = state;
 				yield return null;

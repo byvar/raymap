@@ -26,7 +26,7 @@ namespace OpenSpace {
 		private static Dictionary<string, byte[]> virtualFiles = new Dictionary<string, byte[]>();
 		private static Dictionary<string, BigFileEntry> virtualBigFiles = new Dictionary<string, BigFileEntry>();
 		private static Dictionary<string, bool> existingDirectories = new Dictionary<string, bool>();
-        private static string serverAddress = "https://getramone.com/raymap/data/";
+        public static string serverAddress = "https://getramone.com/raymap/data/";
 
         public static bool DirectoryExists(string path) {
             if (FileSystem.mode == FileSystem.Mode.Web) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {

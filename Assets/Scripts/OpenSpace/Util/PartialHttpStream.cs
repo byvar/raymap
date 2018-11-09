@@ -59,6 +59,9 @@ namespace OpenSpace {
 		public int HttpRequestsCount { get; private set; }
 
 		public override void SetLength(long value) { throw new NotImplementedException(); }
+		public void SetCacheLength(int value) {
+			cacheLen = value;
+		}
 
 		public override int Read(byte[] buffer, int offset, int count) {
 			if (buffer == null)
@@ -361,6 +364,9 @@ namespace OpenSpace {
 		private IEnumerator HttpRead(byte[] buffer, int offset, int count, long startPosition) {
 			HttpRequestsCount++;
 			UnityWebRequest www = UnityWebRequest.Get(Url);
+			string state = MapLoader.Loader.loadingState;
+			int totalSize = caches.Sum(c => c.Value.Length);
+			MapLoader.Loader.loadingState = state + "\nDownloading part of bigfile: " + Url.Replace(FileSystem.serverAddress, "") + " (New size: " + Util.SizeSuffix(totalSize + count,0) + "/" + Util.SizeSuffix(Length, 0) + ")";
 			UnityEngine.Debug.Log("Requesting range: " + string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1) + " - " + Url);
 			www.SetRequestHeader("Range", string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1));
 			yield return www.SendWebRequest();
@@ -376,6 +382,7 @@ namespace OpenSpace {
 				lastRequestRead = 0;
 			}
 
+			MapLoader.Loader.loadingState = state;
 			/*using (BinaryReader sr = new BinaryReader(httpResponse.GetResponseStream(), Encoding.GetEncoding(httpResponse.CharacterSet))) {
 				sr.ReadBlock(buffer, offset, count);
 			}*/

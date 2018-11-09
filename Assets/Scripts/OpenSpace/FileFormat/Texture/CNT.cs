@@ -75,6 +75,14 @@ namespace OpenSpace.FileFormat.Texture {
             }
         }
 
+		public void SetCacheSize(int size) {
+			for (int i = 0; i < readers.Length; i++) {
+				if (readers[i] != null && (readers[i].BaseStream as PartialHttpStream) != null) {
+					((PartialHttpStream)readers[i].BaseStream).SetCacheLength(size);
+				}
+			}
+		}
+
         public CNT(Stream stream) {
             directoryList = new string[1][];
             readers = new Reader[1];

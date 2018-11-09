@@ -8,11 +8,12 @@ using UnityEngine;
 
 public class SectorManager : MonoBehaviour {
     bool loaded = false;
-    public bool displayInactiveSectors = true;
+    public bool displayInactiveSectors = true; bool _displayInactiveSectors = true;
     public List<Sector> sectors;
     private List<SectorComponent> sectorComponents;
     public Camera mainCamera;
     public List<Sector> activeSectors = new List<Sector>();
+	Vector3 camPosPrevious;
 
     // Use this for initialization
     void Start() {
@@ -25,23 +26,38 @@ public class SectorManager : MonoBehaviour {
             Vector3 camPos = Camera.main.transform.localPosition;
             activeSectors = GetActiveSectorsAtPoint(camPos);
 
-            if (!displayInactiveSectors) {
-                for (int i = 0; i < sectors.Count; i++) {
-                    Sector s = sectors[i];
-                    if (s.Loaded) {
-                        s.Gao.SetActive(true);
-                    } else {
-                        s.Gao.SetActive(false);
-                    }
-                }
-            } else {
-                for (int i = 0; i < sectors.Count; i++) {
-                    Sector s = sectors[i];
-                    s.Gao.SetActive(true);
-                }
-            }
+
+			if (Input.GetKeyDown(KeyCode.Y)) {
+				displayInactiveSectors = !displayInactiveSectors;
+			}
+
+			if (_displayInactiveSectors != displayInactiveSectors) {
+				_displayInactiveSectors = displayInactiveSectors;
+				UpdateSectors();
+			} else if (camPos != camPosPrevious) {
+				camPosPrevious = camPos;
+				UpdateSectors();
+			}
         }
     }
+
+	private void UpdateSectors() {
+		if (!displayInactiveSectors) {
+			for (int i = 0; i < sectors.Count; i++) {
+				Sector s = sectors[i];
+				if (s.Loaded) {
+					s.Gao.SetActive(true);
+				} else {
+					s.Gao.SetActive(false);
+				}
+			}
+		} else {
+			for (int i = 0; i < sectors.Count; i++) {
+				Sector s = sectors[i];
+				s.Gao.SetActive(true);
+			}
+		}
+	}
 
     public List<Sector> GetActiveSectorsAtPoint(Vector3 point, bool allowVirtual = false) {
         List<Sector> activeSectors = new List<Sector>();

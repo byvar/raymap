@@ -42,7 +42,9 @@ public class PersoBehaviour : MonoBehaviour {
     private float updateCounter = 0f;
     private PhysicalObject[][] subObjects = null; // [channel][ntto]
     private GameObject[] channelObjects = null;
+	private int[] currentActivePO = null;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
+	bool hasBones = false; // We can optimize a tiny bit if this object doesn't have bones
 	private bool isAlways = false;
 	public bool IsAlways {
 		get { return isAlways; }
@@ -428,6 +430,7 @@ public class PersoBehaviour : MonoBehaviour {
             channelObjects = null;
         }
         channelIDDictionary.Clear();
+		hasBones = false;
     }
 
     void InitAnimation(AnimA3DGeneral a3d) {
@@ -442,11 +445,13 @@ public class PersoBehaviour : MonoBehaviour {
                 // Init channels & subobjects
                 subObjects = new PhysicalObject[a3d.num_channels][];
                 channelObjects = new GameObject[a3d.num_channels];
+				currentActivePO = new int[a3d.num_channels];
                 for (int i = 0; i < a3d.num_channels; i++) {
                     short id = a3d.channels[a3d.start_channels + i].id;
                     channelObjects[i] = new GameObject("Channel " + id);
                     channelObjects[i].transform.SetParent(perso.Gao.transform);
-                    AddChannelID(id, i);
+					currentActivePO[i] = -1;
+					AddChannelID(id, i);
                     subObjects[i] = new PhysicalObject[a3d.num_NTTO];
                     AnimChannel ch = a3d.channels[a3d.start_channels + i];
                     List<ushort> listOfNTTOforChannel = new List<ushort>();
@@ -482,6 +487,7 @@ public class PersoBehaviour : MonoBehaviour {
                                     subObjects[i][j] = c;
                                     c.Gao.transform.parent = channelObjects[i].transform;
                                     c.Gao.name = "[" + j + "] " + c.Gao.name;
+									if (Settings.s.hasDeformations && c.Bones != null) hasBones = true;
 									foreach (VisualSetLOD l in c.visualSet) {
 										if (l.obj != null) {
 											GameObject gao = l.obj.Gao;
@@ -517,10 +523,11 @@ public class PersoBehaviour : MonoBehaviour {
                 // Init channels & subobjects
                 subObjects = new PhysicalObject[animMontreal.num_channels][];
                 channelObjects = new GameObject[animMontreal.num_channels];
-                for (int i = 0; i < animMontreal.num_channels; i++) {
+				currentActivePO = new int[animMontreal.num_channels];
+				for (int i = 0; i < animMontreal.num_channels; i++) {
                     channelObjects[i] = new GameObject("Channel " + i);
                     channelObjects[i].transform.SetParent(perso.Gao.transform);
-
+					currentActivePO[i] = -1;
                     subObjects[i] = new PhysicalObject[animMontreal.num_frames];
                     List<short> listOfNTTOforChannel = new List<short>();
                     for (int j = 0; j < animMontreal.num_frames; j++) {
@@ -577,7 +584,7 @@ public class PersoBehaviour : MonoBehaviour {
         if (loaded && a3d != null && channelObjects != null & subObjects != null) {
             if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
             // First pass: reset TRS for all sub objects
-            for (int i = 0; i < channelObjects.Length; i++) {
+            /*for (int i = 0; i < channelObjects.Length; i++) {
                 GameObject c = channelObjects[i];
                 if (c != null) {
                     c.transform.SetParent(perso.Gao.transform);
@@ -594,7 +601,7 @@ public class PersoBehaviour : MonoBehaviour {
                         subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
                     subObjects[i][j].Gao.SetActive(false);
                 }
-            }
+            }*/
             AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
             // Create hierarchy for this frame
             for (int i = of.start_hierarchies_for_frame;
@@ -628,8 +635,9 @@ public class PersoBehaviour : MonoBehaviour {
                 AnimVector scl = a3d.vectors[kf.scaleVector];
                 AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                 AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
-                //if (ntto.IsBoneNTTO) continue;
-                PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO - a3d.start_NTTO];
+				//if (ntto.IsBoneNTTO) continue;
+				int poNum = numOfNTTO.numOfNTTO - a3d.start_NTTO;
+				PhysicalObject physicalObject = subObjects[i][poNum];
                 Vector3 vector = pos.vector;
                 Quaternion quaternion = qua.quaternion;
                 Vector3 scale = scl.vector;
@@ -662,52 +670,60 @@ public class PersoBehaviour : MonoBehaviour {
                 quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
                 scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
                 float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
-
-                if (physicalObject != null) physicalObject.Gao.SetActive(true);
+				
+				if (poNum != currentActivePO[i]) {
+					physicalObject.Gao.SetActive(true);
+					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
+						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
+					}
+					currentActivePO[i] = poNum;
+				}
                 channelObjects[i].transform.localPosition = vector * positionMultiplier;
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
             }
-            for (int i = 0; i < a3d.num_channels; i++) {
-                AnimChannel ch = a3d.channels[a3d.start_channels + i];
-                Transform baseChannelTransform = channelObjects[i].transform;
-                Vector3 invertedScale = new Vector3(1f / baseChannelTransform.localScale.x, 1f / baseChannelTransform.localScale.y, 1f / baseChannelTransform.localScale.z);
-                AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
-                AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
-                PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO - a3d.start_NTTO];
-                if (physicalObject == null) continue;
-                DeformSet bones = physicalObject.Bones;
-                // Deformations
-                if (bones != null) {
-                    for (int j = 0; j < a3d.num_deformations; j++) {
-                        AnimDeformation d = a3d.deformations[a3d.start_deformations + j];
-                        if (d.channel < ch.id) continue;
-                        if (d.channel > ch.id) break;
-                        if (!channelIDDictionary.ContainsKey(d.linkChannel)) continue;
-                        List<int> ind_linkChannel_list = GetChannelByID(d.linkChannel);
-                        foreach (int ind_linkChannel in ind_linkChannel_list) {
-                            AnimChannel ch_link = a3d.channels[a3d.start_channels + ind_linkChannel];
-                            AnimNumOfNTTO numOfNTTO_link = a3d.numOfNTTO[ch_link.numOfNTTO + of.numOfNTTO];
-                            AnimNTTO ntto_link = a3d.ntto[numOfNTTO_link.numOfNTTO];
-                            PhysicalObject physicalObject_link = subObjects[ind_linkChannel][numOfNTTO_link.numOfNTTO - a3d.start_NTTO];
-                            if (physicalObject_link == null) continue;
-                            if (bones == null || bones.bones.Length <= d.bone + 1) continue;
-                            DeformBone bone = bones.r3bones[d.bone + 1];
-                            if (bone != null) {
-                                Transform channelTransform = channelObjects[ind_linkChannel].transform;
-                                bone.UnityBone.transform.SetParent(channelTransform);
-                                bone.UnityBone.localPosition = Vector3.zero;
-                                bone.UnityBone.localRotation = Quaternion.identity;
-                                bone.UnityBone.localScale = Vector3.one;
-                                /*bone.UnityBone.position = channelTransform.position;
-                                bone.UnityBone.rotation = channelTransform.rotation;
-                                //bone.UnityBone.localScale = Vector3.one;
-                                bone.UnityBone.localScale = channelTransform.localScale;*/
-                            }
-                        }
-                    }
-                }
-            }
+			if (hasBones) {
+				for (int i = 0; i < a3d.num_channels; i++) {
+					AnimChannel ch = a3d.channels[a3d.start_channels + i];
+					Transform baseChannelTransform = channelObjects[i].transform;
+					Vector3 invertedScale = new Vector3(1f / baseChannelTransform.localScale.x, 1f / baseChannelTransform.localScale.y, 1f / baseChannelTransform.localScale.z);
+					AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
+					AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
+					PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO - a3d.start_NTTO];
+					if (physicalObject == null) continue;
+					DeformSet bones = physicalObject.Bones;
+					// Deformations
+					if (bones != null) {
+						for (int j = 0; j < a3d.num_deformations; j++) {
+							AnimDeformation d = a3d.deformations[a3d.start_deformations + j];
+							if (d.channel < ch.id) continue;
+							if (d.channel > ch.id) break;
+							if (!channelIDDictionary.ContainsKey(d.linkChannel)) continue;
+							List<int> ind_linkChannel_list = GetChannelByID(d.linkChannel);
+							foreach (int ind_linkChannel in ind_linkChannel_list) {
+								AnimChannel ch_link = a3d.channels[a3d.start_channels + ind_linkChannel];
+								AnimNumOfNTTO numOfNTTO_link = a3d.numOfNTTO[ch_link.numOfNTTO + of.numOfNTTO];
+								AnimNTTO ntto_link = a3d.ntto[numOfNTTO_link.numOfNTTO];
+								PhysicalObject physicalObject_link = subObjects[ind_linkChannel][numOfNTTO_link.numOfNTTO - a3d.start_NTTO];
+								if (physicalObject_link == null) continue;
+								if (bones == null || bones.bones.Length <= d.bone + 1) continue;
+								DeformBone bone = bones.r3bones[d.bone + 1];
+								if (bone != null) {
+									Transform channelTransform = channelObjects[ind_linkChannel].transform;
+									bone.UnityBone.transform.SetParent(channelTransform);
+									bone.UnityBone.localPosition = Vector3.zero;
+									bone.UnityBone.localRotation = Quaternion.identity;
+									bone.UnityBone.localScale = Vector3.one;
+									/*bone.UnityBone.position = channelTransform.position;
+									bone.UnityBone.rotation = channelTransform.rotation;
+									//bone.UnityBone.localScale = Vector3.one;
+									bone.UnityBone.localScale = channelTransform.localScale;*/
+								}
+							}
+						}
+					}
+				}
+			}
             //this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
         } else if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
             UpdateFrameMontreal();
@@ -730,7 +746,7 @@ public class PersoBehaviour : MonoBehaviour {
         if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
             if (currentFrame >= animMontreal.num_frames) currentFrame %= animMontreal.num_frames;
             // First pass: reset TRS for all sub objects
-            for (int i = 0; i < channelObjects.Length; i++) {
+            /*for (int i = 0; i < channelObjects.Length; i++) {
                 GameObject c = channelObjects[i];
                 if (c != null) {
                     c.transform.SetParent(perso.Gao.transform);
@@ -738,16 +754,6 @@ public class PersoBehaviour : MonoBehaviour {
                     c.transform.localEulerAngles = Vector3.zero;
                     c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
                 }
-                /*HashSet<PhysicalObject> subObjSet = new HashSet<PhysicalObject>(subObjects[i]);
-                foreach(PhysicalObject subObj in subObjSet) {
-                    if (subObj == null) continue;
-                    subObj.Gao.transform.parent = c.transform;
-                    subObj.Gao.transform.localPosition = Vector3.zero;
-                    subObj.Gao.transform.localEulerAngles = Vector3.zero;
-                    subObj.Gao.transform.localScale =
-                        subObj.scaleMultiplier.HasValue ? subObj.scaleMultiplier.Value : Vector3.one;
-                    subObj.Gao.SetActive(false);
-                }*/
                 for (int j = 0; j < subObjects[i].Length; j++) {
                     if (subObjects[i][j] == null) continue;
                     subObjects[i][j].Gao.transform.parent = c.transform;
@@ -757,7 +763,7 @@ public class PersoBehaviour : MonoBehaviour {
                         subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
                     subObjects[i][j].Gao.SetActive(false);
                 }
-            }
+            }*/
             AnimFrameMontreal of = animMontreal.frames[currentFrame];
             // Create hierarchy for this frame
             if (of.hierarchies != null) {
@@ -781,10 +787,17 @@ public class PersoBehaviour : MonoBehaviour {
                     quaternion = Quaternion.identity;
                     scale = Vector3.one;
                 }
-                //float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
+				//float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
 
-                if (physicalObject != null) physicalObject.Gao.SetActive(true);
-                channelObjects[i].transform.localPosition = vector;// * positionMultiplier;
+
+				if (currentFrame != currentActivePO[i]) {
+					physicalObject.Gao.SetActive(true);
+					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
+						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
+					}
+					currentActivePO[i] = (int)currentFrame;
+				}
+				channelObjects[i].transform.localPosition = vector;// * positionMultiplier;
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
             }
