@@ -43,6 +43,7 @@ public class PersoBehaviour : MonoBehaviour {
     private PhysicalObject[][] subObjects = null; // [channel][ntto]
     private GameObject[] channelObjects = null;
 	private int[] currentActivePO = null;
+	private bool[] channelParents = null;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	bool hasBones = false; // We can optimize a tiny bit if this object doesn't have bones
 	private bool isAlways = false;
@@ -446,6 +447,7 @@ public class PersoBehaviour : MonoBehaviour {
                 subObjects = new PhysicalObject[a3d.num_channels][];
                 channelObjects = new GameObject[a3d.num_channels];
 				currentActivePO = new int[a3d.num_channels];
+				channelParents = new bool[a3d.num_channels];
                 for (int i = 0; i < a3d.num_channels; i++) {
                     short id = a3d.channels[a3d.start_channels + i].id;
                     channelObjects[i] = new GameObject("Channel " + id);
@@ -485,7 +487,9 @@ public class PersoBehaviour : MonoBehaviour {
                                     //if (o.visualSetType == 1) print(name);
                                     PhysicalObject c = o.Clone();
                                     subObjects[i][j] = c;
-                                    c.Gao.transform.parent = channelObjects[i].transform;
+									subObjects[i][j].Gao.transform.localScale =
+										subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
+									c.Gao.transform.parent = channelObjects[i].transform;
                                     c.Gao.name = "[" + j + "] " + c.Gao.name;
 									if (Settings.s.hasDeformations && c.Bones != null) hasBones = true;
 									foreach (VisualSetLOD l in c.visualSet) {
@@ -524,6 +528,7 @@ public class PersoBehaviour : MonoBehaviour {
                 subObjects = new PhysicalObject[animMontreal.num_channels][];
                 channelObjects = new GameObject[animMontreal.num_channels];
 				currentActivePO = new int[animMontreal.num_channels];
+				channelParents = new bool[animMontreal.num_channels];
 				for (int i = 0; i < animMontreal.num_channels; i++) {
                     channelObjects[i] = new GameObject("Channel " + i);
                     channelObjects[i].transform.SetParent(perso.Gao.transform);
@@ -551,6 +556,7 @@ public class PersoBehaviour : MonoBehaviour {
                                     subObj = o.Clone();
                                     subObj.Gao.transform.parent = channelObjects[i].transform;
                                     subObj.Gao.name = "[" + i + "] " + subObj.Gao.name;
+									subObj.Gao.transform.localScale = subObj.scaleMultiplier.HasValue ? subObj.scaleMultiplier.Value : Vector3.one;
 									foreach (VisualSetLOD l in subObj.visualSet) {
 										if (l.obj != null) {
 											GameObject gao = l.obj.Gao;
@@ -584,33 +590,35 @@ public class PersoBehaviour : MonoBehaviour {
         if (loaded && a3d != null && channelObjects != null & subObjects != null) {
             if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
             // First pass: reset TRS for all sub objects
-            /*for (int i = 0; i < channelObjects.Length; i++) {
-                GameObject c = channelObjects[i];
+            for (int i = 0; i < channelParents.Length; i++) {
+				channelParents[i] = false;
+                /*GameObject c = channelObjects[i];
                 if (c != null) {
                     c.transform.SetParent(perso.Gao.transform);
                     c.transform.localPosition = Vector3.zero;
                     c.transform.localEulerAngles = Vector3.zero;
                     c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
                 }
-                for (int j = 0; j < subObjects[i].Length; j++) {
+               for (int j = 0; j < subObjects[i].Length; j++) {
                     if (subObjects[i][j] == null) continue;
                     subObjects[i][j].Gao.transform.parent = c.transform;
                     subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
                     subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
                     subObjects[i][j].Gao.transform.localScale =
                         subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
-                    subObjects[i][j].Gao.SetActive(false);
-                }
-            }*/
+                    //subObjects[i][j].Gao.SetActive(false);
+                }*/
+            }
             AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
-            // Create hierarchy for this frame
+			// Create hierarchy for this frame
             for (int i = of.start_hierarchies_for_frame;
                 i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
                 AnimHierarchy h = a3d.hierarchies[i];
 
                 if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
                     channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
-                } else {
+					channelParents[h.childChannelID] = true;
+				} else {
                     if (!channelIDDictionary.ContainsKey(h.childChannelID) || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
                         continue;
                     }
@@ -619,6 +627,7 @@ public class PersoBehaviour : MonoBehaviour {
                     foreach (int ch_child in ch_child_list) {
                         foreach (int ch_parent in ch_parent_list) {
                             channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+							channelParents[ch_child] = true;
                         }
                     }
                 }
@@ -678,7 +687,8 @@ public class PersoBehaviour : MonoBehaviour {
 					}
 					currentActivePO[i] = poNum;
 				}
-                channelObjects[i].transform.localPosition = vector * positionMultiplier;
+				if(!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
+				channelObjects[i].transform.localPosition = vector * positionMultiplier;
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
             }
@@ -746,8 +756,9 @@ public class PersoBehaviour : MonoBehaviour {
         if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
             if (currentFrame >= animMontreal.num_frames) currentFrame %= animMontreal.num_frames;
             // First pass: reset TRS for all sub objects
-            /*for (int i = 0; i < channelObjects.Length; i++) {
-                GameObject c = channelObjects[i];
+            for (int i = 0; i < channelParents.Length; i++) {
+				channelParents[i] = false;
+                /*GameObject c = channelObjects[i];
                 if (c != null) {
                     c.transform.SetParent(perso.Gao.transform);
                     c.transform.localPosition = Vector3.zero;
@@ -762,14 +773,16 @@ public class PersoBehaviour : MonoBehaviour {
                     subObjects[i][j].Gao.transform.localScale =
                         subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
                     subObjects[i][j].Gao.SetActive(false);
-                }
-            }*/
+                }*/
+            }
             AnimFrameMontreal of = animMontreal.frames[currentFrame];
-            // Create hierarchy for this frame
-            if (of.hierarchies != null) {
+			// Create hierarchy for this frame
+			//bool[] channelParents = new bool[channelObjects.Length];
+			if (of.hierarchies != null) {
                 for (int i = 0; i < of.hierarchies.Length; i++) {
                     AnimHierarchy h = of.hierarchies[i];
                     channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
+					channelParents[h.childChannelID] = true;
                 }
             }
             // Final pass
@@ -797,6 +810,7 @@ public class PersoBehaviour : MonoBehaviour {
 					}
 					currentActivePO[i] = (int)currentFrame;
 				}
+				if (!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
 				channelObjects[i].transform.localPosition = vector;// * positionMultiplier;
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;

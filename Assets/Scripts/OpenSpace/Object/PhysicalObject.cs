@@ -23,7 +23,7 @@ namespace OpenSpace.Object {
             get {
                 if (gao == null) {
                     gao = new GameObject("[PO]");
-                }
+				}
                 return gao;
             }
         }
