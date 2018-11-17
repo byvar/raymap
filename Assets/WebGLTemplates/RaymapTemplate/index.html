@@ -4,6 +4,24 @@
 		<meta charset="utf-8">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<title>Raymap</title>
+		<meta name="description" content="Explore Rayman 2, 3 and Arena levels and animations online!">
+		<meta name="keywords" content="Rayman, level, unity, map">
+		
+		<!-- facebook open graph tags -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://getramone.com/raymap"/>
+		<meta property="og:title" content="Raymap - The 3D Rayman level viewer"/>
+		<meta property="og:description" content="Explore Rayman 2, 3 and Arena levels and animations online!"/>
+		<meta property="og:site_name" content="Raymap"/>
+		<meta property="og:image" content="https://getramone.com/raymap/preview.png" />
+		
+		<!-- twitter card tags -->
+		<meta name="twitter:card" content="summary_large_image">
+		<!--<meta name="twitter:domain" value="raytunes.raymanpc.com" />-->
+		<meta name="twitter:title" value="Raymap - The 3D Rayman level viewer" />
+		<meta name="twitter:description" value="Explore Rayman 2, 3 and Arena levels and animations online!" />
+		<meta name="twitter:image" content="https://getramone.com/raymap/preview.png" />
+		<meta name="twitter:url" value="https://getramone.com/raymap" />
 		
 		
 		<!-- style sheets -->
@@ -17,6 +35,8 @@
 		<!-- colors -->
 		<link rel="stylesheet" type="text/css" href="css/colors_main.css" title="Home" />
 		<!-- javascript -->
+		<script type="text/javascript" src="js/UnityProgress.js"></script>
+		<script src="%UNITY_WEBGL_LOADER_URL%"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<script>window.jQuery || document.write('<script src="js/jquery-1.12.4.min.js">\x3C/script>')</script>
 		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
@@ -26,17 +46,17 @@
 		<script type="text/javascript" src="js/modernizr.custom.js"></script>
 		<script type="text/javascript" src="js/jquery.mobile.custom.min.js"></script>
 		<script type="text/javascript" src="js/main.js?1"></script>
-
-		<script type="text/javascript" src="js/UnityProgress.js"></script>
-		<script src="%UNITY_WEBGL_LOADER_URL%"></script>
-		<script>var gameInstance = UnityLoader.instantiate("gameContainer", "%UNITY_WEBGL_BUILD_URL%", {onProgress: UnityProgress});</script>
+		
+		<link rel="icon" type="image/png" href="img/favicon/favicon-32x32.png" sizes="32x32" />
 	</head>
 	<body>
 		<div id="wrapper">
 			<div id="container">
 				<div id="columns">
 					<div class="column column-objects">
-						<div class="column-header"><span id="header-objects-text">Objects</span></div>
+						<div class="column-header"><span id="header-objects-text">Objects</span>
+							<div class="header-buttons-left"><div id="btn-levelselect" class="header-button" title="Select a new level"><i class="icon-world"></i></div></div>
+						</div>
 						<div id="content-objects" class="column-content column-content-scroll"></div>
 						<div class="column-footer"><div class="header-buttons-left">
 							<div id="btn-viewCollision" class="header-button disabled-button settings-toggle" title="View collision (C)"><i class="icon-flash"></i></div>
@@ -91,8 +111,8 @@
 								<div class="header-slider-container"><input id="range-luminosity" class="header-slider disabled-button lighting-settings" type="range" min="0" max="1" value="0.5" step="0.01"></div>
 								<div id="btn-saturate" class="header-button disabled-button lighting-settings settings-toggle" title="Allow overlight"><i class="icon-adjust-brightness"></i></div>
 							</div>
-							<div class="header-buttons-right">
-								<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-info-circle"></i></div>
+							<div class="small-text">Camera controls: Shift + WASD</div>
+							<div class="header-buttons-right"><div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-fullscreen"></i></div>
 							</div>
 						</div>
 					</div>
@@ -106,6 +126,18 @@
 				<div class='name-family'>family</div><div class='name-model'>model</div><div class='name-instance'>instance</div>
 			</div>
 			<div id="dialogue-popup" class="hidden-popup"><div id="dialogue-image"></div><div id="dialogue-content"></div></div>
+			<div id="levelselect-popup" class="hidden-popup">
+				<div class="column-header">Level selection</div>
+				<div id="sidebar-levels" class="column-sidebar hidden-sidebar">
+					<div id="sidebar-levels-content" class="column-sidebar-content">
+						<div id="sidebar-levels-slider" class="sidebar-slider"></div>
+					</div>
+					<div class="sidebar-arrow sidebar-arrow-up sidebar-arrow-disabled"></div>
+					<div class="sidebar-arrow sidebar-arrow-down sidebar-arrow-disabled"></div>
+				</div>
+				<div id="content-levels" class="column-content column-content-scroll"></div>
+				<div class="column-footer"></div>
+			</div>
 			<div id="notification-popup" class="hidden-popup"></div>
 		</div>
 	</body>

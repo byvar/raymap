@@ -62,141 +62,96 @@ let baseURL = "./"
 let baseURL_local = "https://getramone.com/raymap/"
 let gameLoading = true;
 let currentJSON = null;
+let levelsJSON = null;
 let baseTitle = "Raymap"
 let notificationTimeout = null;
 let dialogueMsg = null;
 let fullData = null;
 let objectsList = [];
 let currentSO = null;
+let gameInstance = null;
 let inputHasFocus = false;
+let mode, lvl, folder;
 
 let wrapper, objects_content, unity_content, description_content, description_column;
 let btn_close_description, stateSelector, objectListSelector, perso_tooltip;
 
-// FUNCTIONS	
-function addSongsToPlaylist(songsJSON) {
-	let api = playlist_content.data('jsp');
-	//api.getContentPane().empty();
-	let items = [];
-	playlistJSON = playlistJSON.concat(songsJSON);
-	$.each( songsJSON, function(index, value) {
-		items.push("<li class='playlist-item'>");
-		items.push("<div class='song-handle'><i class='icon-menu'></i></div>");
-		items.push("<div class='song-details song-game'>" + value.album_short_title + "</div>");
-		items.push("<div class='song-details song-number'>" + value.track + "</div>");
-		items.push("<div class='song-details song-title'>" + value.title + "</div>");
-		items.push("<div class='song-details song-time'>" + fmtMSS(value.length_seconds) +"</div>");
-		items.push("<div class='song-details song-remove' title='Remove from playlist'><i class=\"icon-remove\"></i></div></li>");
-	});
-	playlist_content_list.append(items.join(""));
-	btn_clear_playlist.removeClass('disabled-button');
-	refreshPlaylistText();
-	if(cur_tab_index != 2) {
-		if(songsJSON.length == 1) {
-			let value = songsJSON[0];
-			showNotification("Added to playlist: (" + value.album_short_title + ") " +  value.track + " - " + value.title, true);
-		} else {
-			showNotification("Added " + songsJSON.length + " tracks to the playlist.", true);
-		}
-	}
-	//api.getContentPane().append(items.join(""));
-	// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
-	setTimeout(function(){
-		refreshPlaylistSortable(true);
-		api.reinitialise();
-		api.scrollToBottom(true);
-	}, 100);
-}
-
-function addCurrentSoundtrack() {
-	if(currentJSON == null) return;
-	let newJSON = currentJSON.songs;
-	
-	let api = playlist_content.data('jsp');
-	let items = [];
-	$.each( newJSON, function(index, value) {
-		newJSON[index]["album_link"] = currentJSON.link;
-		newJSON[index]["album_title"] = currentJSON.album;
-		newJSON[index]["album_short_title"] = currentJSON.short_title;
-		items.push("<li class='playlist-item'>");
-		items.push("<div class='song-handle'><i class='icon-menu'></i></div>");
-		items.push("<div class='song-details song-game'>" + currentJSON.short_title + "</div>");
-		items.push("<div class='song-details song-number'>" + value.track + "</div>");
-		items.push("<div class='song-details song-title'>" + value.title + "</div>");
-		items.push("<div class='song-details song-time'>" + fmtMSS(value.length_seconds) +"</div>");
-		items.push("<div class='song-details song-remove' title='Remove from playlist'><i class=\"icon-remove\"></i></div></li>");
-	});
-	playlistJSON = playlistJSON.concat(newJSON);
-	playlist_content_list.append(items.join(""));
-	btn_clear_playlist.removeClass('disabled-button');
-	refreshPlaylistText();
-	if(cur_tab_index != 2) {
-		if(newJSON.length == 1) {
-			let value = newJSON[0];
-			showNotification("Added to playlist: (" + value.album_short_title + ") " +  value.track + " - " + value.title, true);
-		} else {
-			showNotification("Added " + newJSON.length + " tracks to the playlist.", true);
-		}
-	}
-	//api.getContentPane().append(items.join(""));
-	// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
-	setTimeout(function(){
-		refreshPlaylistSortable(true);
-		api.reinitialise();
-		//api.scrollToBottom(true);
-	}, 100);
-}
-
-function clearPlaylist() {
-	if(playlistJSON.length > 0) {
-		playIndex(-1);
-		playlistJSON = [];
-		refreshPlaylistText();
-		$(".playlist-item").remove();
-		btn_clear_playlist.addClass('disabled-button');
-		let api = playlist_content.data('jsp');
-		setTimeout(function(){
-			refreshPlaylistSortable(true);
-			api.reinitialise();
-			api.scrollToY(0, false);
-		}, 100);
+// FUNCTIONS
+function sendMessage(jsonObj) {
+	if(gameInstance != null) {
+		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 	}
 }
 
 function initContent() {
 	$.getJSON( "json/content.json", function( data ) {
-		let api = games_content.data('jsp');
+		$('#sidebar-levels').removeClass('hidden-sidebar');
+		$('.sidebar-button').remove();
+		$('#sidebar-levels-slider').css('top','0px');
+		$('#sidebar-levels').scrollTop(0);
+		let sidebarItems = [];
+		levelsJSON = data;
+		let api = $("#content-levels").data('jsp');
 		let items = [];
-		let categories = data.categories;
-		let locationHash = window.location.hash;
-		let isLoading = false;
-		if(locationHash.length > 1) locationHash = locationHash.substr(1);
-		$.each( categories, function(index_cat, value_cat) {
-			let soundtracks = value_cat.soundtracks;
-			items.push("<div class='game-category-item' alt='" + value_cat.name + "'>" + value_cat.name + "</div>");
-			$.each( soundtracks, function(index, value) {
+		let games = data.games;
+		let totalEm = 0;
+		$.each( games, function(index_game, value_game) {
+			let levels = value_game.levels;
+			items.push("<div class='levels-item game' alt='" + value_game.name + "'>" + value_game.name + "</div>");
+			totalEm += 3;
+			let iconClass = "world-image";
+			if(levels.length < 7) {
+				iconClass = iconClass + " small";
+			}
+			let iconSidebar = "<div class='sidebar-button' style='background-image: url(\"" + encodeURI(value_game.image) + "\");'></div>";
+			items.push("<div class='" + iconClass + "' style='background-image: url(\"" + encodeURI(value_game.image) + "\"); top: " + (totalEm+1) + "em;'></div>");
+			sidebarItems.push(iconSidebar);
+			$.each( levels, function(index, value) {
+				let levelFolder = value.hasOwnProperty("folder") ? value.folder : value_game.folder;
 				//items.push("<a class='logo-item' href='#" + value.json + "' title='" + value.title + "'><img src='" + encodeURI(value.image) + "' alt='" + value.title + "'></a>");
-				if(locationHash != null && locationHash == value.json) {
-					isLoading = true;
-					clickSoundtrack("./json/" + locationHash + ".json");
-					items.push("<a class='game-item current-game-item' href='#" + value.json + "' title='" + value.title + "' data-logo='" + encodeURI(value.image) + "'>");
+				if(value_game.mode === mode && folder === levelFolder && value.level === lvl) {
+					items.push("<div class='levels-item level current-levels-item' title='" + value.name + "'>" + value.name + "</div>");
+					document.title = " [" + value_game.name + "] " + value.name + " - " + baseTitle;
 				} else {
-					items.push("<a class='game-item' href='#" + value.json + "' title='" + value.title + "' data-logo='" + encodeURI(value.image) + "'>");
+					items.push("<a class='levels-item level' href='index.html?mode=" + value_game.mode + "&folder=" + levelFolder + "&lvl=" + value.level + "' title='" + value.name + "'>" + value.name + "</a>");
 				}
-				items.push("<div class='game-item-logo' style='background-image: url(\"" + encodeURI(value.image) + "\");' alt='" + value.title + "'></div>");
-				items.push("<div class='game-item-title'>" + value.title + "</div></a>");
+				totalEm += 2;
 			});
 		});
-		if(!isLoading) {
-			$("#btn-home").addClass("current-game-item");
-			clickSoundtrack(null);
-		}
 		api.getContentPane().append(items.join(""));
+		$('#sidebar-levels-content').append(sidebarItems.join(""));
+		sidebarUpdateArrows($('#sidebar-levels'));
 		// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
 		setTimeout(function(){
 			api.reinitialise();
 		}, 100);
 	});
+}
+
+function setLevelsSidebarSlider(pos) {
+	if(levelsJSON != null && levelsJSON.hasOwnProperty("games") && $(".levels-item.game").length > 0) {
+		// Find which section you're scrolling in
+		let i = 0;
+		let highlight_i = 0;
+		let allow_margin = 50;
+		for(i = 0; i < levelsJSON.games.length; i++) {
+			let gameRef = $(".levels-item.game").eq(i);
+			if(pos + allow_margin >= gameRef.position().top) {
+				highlight_i = i;
+			} else {
+				break;
+			}
+		}
+		// Add class
+		//let butt = $(".sidebar-button").eq(highlight_i);
+		//let buttPos = butt.position().top;
+		//$('#sidebar-soundtrack-slider').css('top',buttPos + 'px');
+		$('#sidebar-levels-slider').css('top',(highlight_i * 4) + 'em');
+		/*if(!butt.hasClass('sidebar-button-active')) {
+			$(".sidebar-button").removeClass('sidebar-button-active');
+			butt.addClass('sidebar-button-active');
+		}*/
+	}
 }
 
 function sidebarUpdateArrows(sidebar_content) {
@@ -453,7 +408,7 @@ function sendPerso() {
 				animationSpeed: $.isNumeric(animationSpeed) ? animationSpeed : currentSO.perso.animationSpeed
 			}
 		}
-		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+		sendMessage(jsonObj);
 	}
 }
 function setObjectTransform() {
@@ -482,7 +437,7 @@ function setObjectTransform() {
 					scale:    [sclX, sclY, sclZ]
 				}
 			}
-			gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+			sendMessage(jsonObj);
 		}
 	}
 }
@@ -496,7 +451,7 @@ function setSelectionPerso(perso) {
 			view: true
 		}
 	}
-	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	sendMessage(jsonObj);
 }
 function setSelection(so) {
 	let jsonObj = {
@@ -506,7 +461,7 @@ function setSelection(so) {
 			view: true
 		}
 	}
-	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	sendMessage(jsonObj);
 }
 function clearSelection() {
 	description_column.addClass('invisible');
@@ -517,7 +472,7 @@ function clearSelection() {
 			offset: "null"
 		}
 	}
-	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	sendMessage(jsonObj);
 }
 function handleMessage_selection(msg) {
 	if(msg.selectionType === "superobject") {
@@ -584,7 +539,7 @@ function sendSettings() {
 			playTextureAnimations: $("#btn-playTextureAnimations").hasClass("selected")
 		}
 	}
-	gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
+	sendMessage(jsonObj);
 }
 
 // MESSAGE
@@ -677,9 +632,36 @@ function showDialogue(image, message, style, share, covers) {
 }
 
 function hideDialogue() {
-	$('#popup-overlay').addClass('hidden-overlay');
 	$('#dialogue-popup').addClass('hidden-popup');
+	if(gameInstance != null) {
+		$('#popup-overlay').addClass('hidden-overlay');
+		$('#levelselect-popup').addClass('hidden-popup');
+		selectButton($('#btn-levelselect'), false);
+	}
 	dialogueMsg = null;
+}
+
+function startGame() {
+	gameInstance = UnityLoader.instantiate("gameContainer", "%UNITY_WEBGL_BUILD_URL%", {onProgress: UnityProgress});
+}
+
+function showLevelSelect() {
+	$('#popup-overlay').removeClass('hidden-overlay');
+	$("#levelselect-popup").removeClass('hidden-popup');
+	selectButton($('#btn-levelselect'), true);
+}
+
+function init() {
+	initContent();
+	let url = new URL(window.location.href);
+	mode = url.searchParams.get("mode");
+	lvl = url.searchParams.get("lvl");
+	folder = url.searchParams.get("folder");
+	if(mode != null && lvl != null && folder != null) {
+		startGame();
+	} else {
+		showLevelSelect();
+	}
 }
 
 
@@ -744,6 +726,11 @@ $(function() {
 		return false;
 	});
 	
+	$(document).on('click', "#btn-levelselect", function() {
+		showLevelSelect();
+		return false;
+	});
+	
 	$(document).on('click', "#btn-lighting", function() {
 		if($(this).hasClass("selected")) {
 			$(".lighting-settings").addClass("disabled-button");
@@ -786,7 +773,7 @@ $(function() {
 		return false;
 	});
 	$(document).on('focusin', ".input-typing", function() {
-		if(!inputHasFocus) {
+		if(!inputHasFocus && gameInstance != null) {
 			for (var i in gameInstance.Module.getJSEvents().eventHandlers) {
 				var event = gameInstance.Module.getJSEvents().eventHandlers[i];
 				if (event.eventTypeString == 'keydown' || event.eventTypeString == 'keypress' || event.eventTypeString == 'keyup') {
@@ -797,7 +784,7 @@ $(function() {
 		inputHasFocus = true;
 	});
 	$(document).on('focusout', ".input-typing", function() {
-		if(inputHasFocus && !$(".input-typing").is(":focus")) {
+		if(inputHasFocus && !$(".input-typing").is(":focus") && gameInstance != null) {
 			for (var i in gameInstance.Module.getJSEvents().eventHandlers) {
 				var event = gameInstance.Module.getJSEvents().eventHandlers[i];
 				if (event.eventTypeString == 'keydown' || event.eventTypeString == 'keypress' || event.eventTypeString == 'keyup') {
@@ -817,61 +804,6 @@ $(function() {
 		return false;
 	});
 	
-	
-	
-	$(document).on('click', "a.logo-item", function() {
-		let hash = jQuery(this).attr("href").substr(1);
-		clickSoundtrack("./json/" + hash + ".json");
-		return false;
-	});
-	
-	$(document).on('click', "a.game-item", function() {
-		let hash = jQuery(this).attr("href").substr(1);
-		$(".current-game-item").removeClass("current-game-item");
-		jQuery(this).addClass("current-game-item");
-		clickSoundtrack("./json/" + hash + ".json");
-		return false;
-	});
-	
-	$(document).on('click', ".song-item", function() {
-		if(currentJSON != null) {
-			let songItem = jQuery(this);
-			let songsJSON = [getSongJSON(songItem)];
-			addSongsToPlaylist(songsJSON);
-			//mobileTab(2);
-		}
-		return false;
-	});
-	
-	$(document).on('click', ".song-button-play", function() {
-		if(currentJSON != null) {
-			let songItem = $(this).parent().parent();
-			let songsJSON = [getSongJSON(songItem)];
-			mobileTab(2);
-			addSongsToPlaylist(songsJSON);
-			playIndex(playlistJSON.length-1);
-		}
-		return false;
-	});
-	
-	$(document).on('click', ".song-button-download", function() {
-		if(currentJSON != null) {
-			let songItem = $(this).parent().parent();
-			let songJSON = getSongJSON(songItem);
-			downloadSong(songJSON,false);
-		}
-		return false;
-	});
-	$(document).on('click', ".song-button-info", function() {
-		if(currentJSON != null) {
-			let songItem = $(this).parent().parent();
-			let ind = songItem.index(".song-item");
-			let songJSON = getSongJSON(songItem);
-			showSongDialogue(songJSON, ind);
-		}
-		return false;
-	});
-	
 	$(document).on('click', "#popup-overlay", function() {
 		hideDialogue();
 		return false;
@@ -880,26 +812,13 @@ $(function() {
 		skipDialogue();
 		return false;
 	});
-	$(document).on('click', ".style-item", function() {
-		let title = $(this).find(".style-item-text").text();
-		setActiveStyleSheet(title);
-		$(".current-style-item").removeClass("current-style-item");
-		$(this).addClass("current-style-item");
-		return false;
-	});
-	
 	
 	$(document).on('click', ".sidebar-button", function() {
-		if(currentJSON != null) {
-			let butt = jQuery(this);
-			let buttIndex = $(".sidebar-button").index(butt);
-			if(currentJSON != null && currentJSON.hasOwnProperty("icons") && currentJSON.icons.length > buttIndex) {
-				let trackNum = currentJSON.icons[buttIndex].track-1;
-				let trackRef = $(".song-item").eq(trackNum);
-				let api = ost_content.data('jsp');
-				api.scrollToY(trackRef.position().top, true);
-			}
-		}
+		let butt = jQuery(this);
+		let buttIndex = $(".sidebar-button").index(butt);
+		let gameRef = $(".levels-item.game").eq(buttIndex);
+		let api = $("#content-levels").data('jsp');
+		api.scrollToY(gameRef.position().top, true);
 		return false;
 	});
 	
@@ -948,6 +867,13 @@ $(function() {
 	   sidebarScrollInterval = false;
 	});
 	
+	$('#content-levels').bind('jsp-scroll-y', function(event, scrollPositionY, isAtTop, isAtBottom) {
+		waitForFinalEvent(function(){
+				setLevelsSidebarSlider(scrollPositionY);
+			}, 20, "scrolly scrolly");
+		}
+	)
+	
 	let pane = $('.column-content-scroll');
 	let settings = {
 		horizontalGutter: 0,
@@ -955,7 +881,8 @@ $(function() {
 		animateEase: "swing"
 	};
 	pane.jScrollPane(settings);
-	//initContent();
+	
+	init();
 	
 });
 

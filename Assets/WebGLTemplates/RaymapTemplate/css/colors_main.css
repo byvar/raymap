@@ -48,7 +48,8 @@ body {
 	background-color: rgba(1,33,45,0.7);
 }*/
 
-.objects-item {
+.objects-item,
+.levels-item {
 	color: #9ed9a0;
 }
 
@@ -56,9 +57,14 @@ body {
 	color: #19c8c3;
 	background-color: rgba(3,61,82,0.7);
 }
+.current-levels-item {
+	color: #19c8c3;
+	background-color: rgba(3,61,82,1);
+}
 
 .objects-item.object-world,
-.objects-item.object-sector {
+.objects-item.object-sector,
+.levels-item.game {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
@@ -71,7 +77,8 @@ body {
 	background-color: rgba(1,33,45,1);
 }
 .objects-item.object-perso:hover,
-.objects-item.object-IPO:hover {
+.objects-item.object-IPO:hover,
+.levels-item.level:hover {
 	background-color: rgba(3,61,82,1);
 }
 
@@ -236,11 +243,8 @@ input[type=range]:focus::-ms-fill-upper {
 	box-shadow: rgba(0,0,0,0.4) 0 0 10px;
     background-color: rgba(3,61,82,1);
 }
-#config-popup {
+#levelselect-popup {
     background-color: rgba(6,86,109,1);
-}
-.config-header {
-	background-color: rgba(3,61,82,1);
 }
 .style-item.current-style-item {
 	background-color: rgba(3,61,82,0.7);
