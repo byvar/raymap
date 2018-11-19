@@ -14,6 +14,7 @@ public class ScriptComponent : MonoBehaviour {
     public string TranslatedScript {
         get {
             if ((forceUpdateScript || translatedScript == null) && translation != null) {
+				translation.printAddresses = showOffset;
                 translatedScript = translation.ToString();
                 forceUpdateScript = false;
                 //translation = null;

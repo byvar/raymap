@@ -171,6 +171,73 @@ public class WebCommunicator : MonoBehaviour {
         }
         return persoJSON;
     }
+	private JSONObject GetBrainJSON(Perso perso) {
+		JSONObject brainJSON = new JSONObject();
+		PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+		if (perso.brain != null && perso.brain.mind != null && perso.brain.mind.AI_model != null) {
+			if (perso.brain.mind.AI_model.behaviors_normal != null && perso.brain.mind.AI_model.behaviors_normal.Length > 0) {
+				JSONArray ruleBehaviorsJSON = new JSONArray();
+				Behavior[] ruleBehaviors = perso.brain.mind.AI_model.behaviors_normal;
+				foreach (Behavior behavior in ruleBehaviors) {
+					ruleBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior));
+				}
+				brainJSON["ruleBehaviors"] = ruleBehaviorsJSON;
+			}
+			if (perso.brain.mind.AI_model.behaviors_reflex != null && perso.brain.mind.AI_model.behaviors_reflex.Length > 0) {
+				JSONArray reflexBehaviorsJSON = new JSONArray();
+				Behavior[] reflexBehaviors = perso.brain.mind.AI_model.behaviors_reflex;
+				foreach (Behavior behavior in reflexBehaviors) {
+					reflexBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior));
+				}
+				brainJSON["reflexBehaviors"] = reflexBehaviorsJSON;
+			}
+			if (perso.brain.mind.AI_model.macros != null && perso.brain.mind.AI_model.macros.Length > 0) {
+				JSONArray macrosJSON = new JSONArray();
+				Macro[] macros = perso.brain.mind.AI_model.macros;
+				foreach (Macro macro in macros) {
+					macrosJSON.Add(GetBehaviorJSON(perso, macro));
+				}
+				brainJSON["macros"] = macrosJSON;
+			}
+		}
+
+		return brainJSON;
+	}
+	private JSONObject GetBehaviorJSON(Perso perso, BehaviorOrMacro behavior) {
+		JSONObject behaviorJSON = new JSONObject();
+		string name;
+		if (behavior is Macro) {
+			Macro m = behavior as Macro;
+			name = m.name;
+			behaviorJSON["script"] = GetScriptJSON(perso, m.script);
+			behaviorJSON["type"] = "Macro";
+		} else {
+			Behavior b = behavior as Behavior;
+			name = b.name;
+			if (name.Contains("^CreateComport:")) {
+				name = name.Substring(name.IndexOf("^CreateComport") + 15);
+			}
+			behaviorJSON["name"] = name;
+			behaviorJSON["type"] = b.type.ToString();
+			JSONArray scripts = new JSONArray();
+			foreach (Script script in b.scripts) {
+				scripts.Add(GetScriptJSON(perso, script));
+			}
+			behaviorJSON["scripts"] = scripts;
+			if (b.firstScript != null) {
+				behaviorJSON["firstScript"] = GetScriptJSON(perso, b.firstScript);
+			}
+		}
+
+		behaviorJSON["name"] = name;
+		return behaviorJSON;
+	}
+	private JSONObject GetScriptJSON(Perso perso, Script script) {
+		JSONObject scriptJSON = new JSONObject();
+		TranslatedScript ts = new TranslatedScript(script, perso);
+		scriptJSON["translation"] = ts.ToString();
+		return scriptJSON;
+	}
     private JSONObject GetAlwaysJSON() {
         MapLoader l = MapLoader.Loader;
         JSONObject alwaysJSON = new JSONObject();

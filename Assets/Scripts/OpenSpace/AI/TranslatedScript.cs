@@ -3,26 +3,22 @@ using OpenSpace.Input;
 using System;
 using System.Collections.Generic;
 
-namespace OpenSpace.AI
-{
-    public class TranslatedScript
-    {
+namespace OpenSpace.AI {
+    public class TranslatedScript {
         public Script originalScript;
         public Node[] nodes;
 
         public Perso perso;
         public bool printAddresses = false;
 
-        public class Node
-        {
+        public class Node {
             public int index;
             public int indent;
             public ScriptNode scriptNode;
             public List<Node> children;
             public TranslatedScript ts;
 
-            public Node(int index, int indent, ScriptNode scriptNode, TranslatedScript ts)
-            {
+            public Node(int index, int indent, ScriptNode scriptNode, TranslatedScript ts) {
                 this.index = index;
                 this.indent = indent;
                 this.scriptNode = scriptNode;
