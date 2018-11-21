@@ -88,7 +88,7 @@ namespace OpenSpace.FileFormat {
 			if (FileSystem.FileExists(path)) {
 				yield return c.StartCoroutine(Load(FileSystem.GetFileReadStream(path), false));
 			} else if (dat != null) {
-				yield return c.StartCoroutine(Load(dat));
+				yield return c.StartCoroutine(LoadFromDAT());
 			}
 		}
 
@@ -124,7 +124,7 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        private IEnumerator Load(DAT dat) {
+        private IEnumerator LoadFromDAT() {
             Reader reader = dat.reader;
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 			Controller c = MapLoader.Loader.controller;
@@ -139,7 +139,7 @@ namespace OpenSpace.FileFormat {
             RelocationTableReference rtref = new RelocationTableReference((byte)levelIndex, (byte)type);
             //R3Loader.Loader.print("RtRef Pre  (" + rtref.levelId + "," + rtref.relocationType + ")");
             uint mask = dat.GetMask(rtref);
-			if (httpStream != null) yield return c.StartCoroutine(dat.GetOffset(rtref));
+			yield return c.StartCoroutine(dat.GetOffset(rtref));
 			uint offset = dat.lastOffset;
             //R3Loader.Loader.print("RtRef Post (" + rtref.levelId + "," + rtref.relocationType + ")");
             /*dat.reader.BaseStream.Seek(offset, SeekOrigin.Begin);

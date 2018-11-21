@@ -171,7 +171,7 @@ public class WebCommunicator : MonoBehaviour {
         }
         return persoJSON;
     }
-	private JSONObject GetBrainJSON(Perso perso) {
+	private JSONObject GetBrainJSON(Perso perso, bool includeScriptContents = false) {
 		JSONObject brainJSON = new JSONObject();
 		PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
 		if (perso.brain != null && perso.brain.mind != null && perso.brain.mind.AI_model != null) {
@@ -179,7 +179,7 @@ public class WebCommunicator : MonoBehaviour {
 				JSONArray ruleBehaviorsJSON = new JSONArray();
 				Behavior[] ruleBehaviors = perso.brain.mind.AI_model.behaviors_normal;
 				foreach (Behavior behavior in ruleBehaviors) {
-					ruleBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior));
+					ruleBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior, includeScriptContents));
 				}
 				brainJSON["ruleBehaviors"] = ruleBehaviorsJSON;
 			}
@@ -187,7 +187,7 @@ public class WebCommunicator : MonoBehaviour {
 				JSONArray reflexBehaviorsJSON = new JSONArray();
 				Behavior[] reflexBehaviors = perso.brain.mind.AI_model.behaviors_reflex;
 				foreach (Behavior behavior in reflexBehaviors) {
-					reflexBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior));
+					reflexBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior, includeScriptContents));
 				}
 				brainJSON["reflexBehaviors"] = reflexBehaviorsJSON;
 			}
@@ -195,7 +195,7 @@ public class WebCommunicator : MonoBehaviour {
 				JSONArray macrosJSON = new JSONArray();
 				Macro[] macros = perso.brain.mind.AI_model.macros;
 				foreach (Macro macro in macros) {
-					macrosJSON.Add(GetBehaviorJSON(perso, macro));
+					macrosJSON.Add(GetBehaviorJSON(perso, macro, includeScriptContents));
 				}
 				brainJSON["macros"] = macrosJSON;
 			}
@@ -203,13 +203,13 @@ public class WebCommunicator : MonoBehaviour {
 
 		return brainJSON;
 	}
-	private JSONObject GetBehaviorJSON(Perso perso, BehaviorOrMacro behavior) {
+	private JSONObject GetBehaviorJSON(Perso perso, BehaviorOrMacro behavior, bool includeScriptContents) {
 		JSONObject behaviorJSON = new JSONObject();
 		string name;
 		if (behavior is Macro) {
 			Macro m = behavior as Macro;
 			name = m.name;
-			behaviorJSON["script"] = GetScriptJSON(perso, m.script);
+			behaviorJSON["script"] = GetScriptJSON(perso, m.script, includeScriptContents);
 			behaviorJSON["type"] = "Macro";
 		} else {
 			Behavior b = behavior as Behavior;
@@ -221,21 +221,26 @@ public class WebCommunicator : MonoBehaviour {
 			behaviorJSON["type"] = b.type.ToString();
 			JSONArray scripts = new JSONArray();
 			foreach (Script script in b.scripts) {
-				scripts.Add(GetScriptJSON(perso, script));
+				scripts.Add(GetScriptJSON(perso, script, includeScriptContents));
 			}
 			behaviorJSON["scripts"] = scripts;
 			if (b.firstScript != null) {
-				behaviorJSON["firstScript"] = GetScriptJSON(perso, b.firstScript);
+				behaviorJSON["firstScript"] = GetScriptJSON(perso, b.firstScript, includeScriptContents);
 			}
 		}
 
 		behaviorJSON["name"] = name;
 		return behaviorJSON;
 	}
-	private JSONObject GetScriptJSON(Perso perso, Script script) {
+	private JSONObject GetScriptJSON(Perso perso, Script script, bool includeScriptContents) {
 		JSONObject scriptJSON = new JSONObject();
-		TranslatedScript ts = new TranslatedScript(script, perso);
-		scriptJSON["translation"] = ts.ToString();
+		scriptJSON["offset"] = script.offset.ToString();
+		scriptJSON["type"] = "script";
+
+		if (includeScriptContents) {
+			TranslatedScript ts = new TranslatedScript(script, perso);
+			scriptJSON["translation"] = ts.ToString();
+		}
 		return scriptJSON;
 	}
     private JSONObject GetAlwaysJSON() {
@@ -264,6 +269,7 @@ public class WebCommunicator : MonoBehaviour {
         selectionJSON["selectionType"] = selectionIsAlways ? "always" : "superobject";
         if (selectionIsAlways) {
             selectionJSON["selection"] = GetPersoJSON(selector.selectedPerso.perso);
+			selectionJSON["selection"]["brain"] = GetBrainJSON(selector.selectedPerso.perso);
 			selectionJSON["selection"]["name"] = selector.selectedPerso.name;
 			selectionJSON["selection"]["type"] = "Always";
 			selectionJSON["selection"]["position"] = selector.selectedPerso.transform.localPosition;
@@ -271,7 +277,8 @@ public class WebCommunicator : MonoBehaviour {
 			selectionJSON["selection"]["scale"] = selector.selectedPerso.transform.localScale;
 		} else {
             selectionJSON["selection"] = GetSuperObjectJSON(selector.selectedPerso.perso.SuperObject);
-        }
+			selectionJSON["selection"]["perso"]["brain"] = GetBrainJSON(selector.selectedPerso.perso);
+		}
         return selectionJSON;
     }
     private JSONObject GetHighlightJSON() {
@@ -298,8 +305,11 @@ public class WebCommunicator : MonoBehaviour {
         if (msg["selection"] != null) {
             ParseSelectionJSON(msg["selection"]);
         }
+		if (msg["request"] != null) {
+			ParseRequestJSON(msg["request"]);
+		}
     }
-    public void ParseSelectionJSON(JSONNode msg) {
+    private void ParseSelectionJSON(JSONNode msg) {
         MapLoader l = MapLoader.Loader;
         Perso perso = null;
 		SuperObject so = null;
@@ -320,7 +330,7 @@ public class WebCommunicator : MonoBehaviour {
             selector.Deselect();
         }
 	}
-	public void ParseSuperObjectJSON(JSONNode msg) {
+	private void ParseSuperObjectJSON(JSONNode msg) {
 		MapLoader l = MapLoader.Loader;
 		SuperObject so = null;
 		if (msg["type"] != null && msg["type"] == "Always") {
@@ -342,7 +352,7 @@ public class WebCommunicator : MonoBehaviour {
 			}
 		}
 	}
-	public void ParsePersoJSON(JSONNode msg) {
+	private void ParsePersoJSON(JSONNode msg) {
         MapLoader l = MapLoader.Loader;
         Perso perso = null;
         if (msg["offset"] != null) {
@@ -363,7 +373,7 @@ public class WebCommunicator : MonoBehaviour {
 			if (msg["autoNextState"] != null) pb.autoNextState = msg["autoNextState"].AsBool;
         }
     }
-    public void ParseSettingsJSON(JSONNode msg) {
+    private void ParseSettingsJSON(JSONNode msg) {
         MapLoader l = MapLoader.Loader;
         if (msg["viewCollision"] != null) controller.viewCollision = msg["viewCollision"].AsBool;
         if (msg["luminosity"] != null) controller.lightManager.luminosity = msg["luminosity"].AsFloat;
@@ -375,5 +385,43 @@ public class WebCommunicator : MonoBehaviour {
 		if (msg["playAnimations"] != null) controller.playAnimations = msg["playAnimations"].AsBool;
 		if (msg["playTextureAnimations"] != null) controller.playTextureAnimations = msg["playTextureAnimations"].AsBool;
 		if (msg["showPersos"] != null) controller.showPersos = msg["showPersos"].AsBool;
+	}
+	private void ParseRequestJSON(JSONNode msg) {
+		if (msg["type"] != null) {
+			switch (msg["type"].ToString()) {
+				case "script":
+					Script s = GetScriptFromRequest(msg);
+					if (s != null) Send(GetScriptJSON(selector.selectedPerso.perso, s, true));
+					break;
+			}
+		}
+	}
+	private Script GetScriptFromRequest(JSONNode msg) {
+		if (selector.selectedPerso == null || selector.selectedPerso.perso.brain == null) return null;
+		Brain b = selector.selectedPerso.perso.brain;
+		string offset = msg["scriptOffset"];
+		switch (msg["scriptLocation"].ToString()) {
+			case "ruleBehaviors":
+				if (b.mind == null || b.mind.AI_model == null || b.mind.AI_model.behaviors_normal == null) return null;
+				foreach (Behavior be in b.mind.AI_model.behaviors_normal) {
+					if (be.firstScript != null && be.firstScript.offset.ToString() == offset) return be.firstScript;
+					foreach (Script s in be.scripts) if (s.offset.ToString() == offset) return s;
+				}
+				break;
+			case "reflexBehaviors":
+				if (b.mind == null || b.mind.AI_model == null || b.mind.AI_model.behaviors_reflex == null) return null;
+				foreach (Behavior be in b.mind.AI_model.behaviors_reflex) {
+					if (be.firstScript != null && be.firstScript.offset.ToString() == offset) return be.firstScript;
+					foreach (Script s in be.scripts) if (s.offset.ToString() == offset) return s;
+				}
+				break;
+			case "macros":
+				if (b.mind == null || b.mind.AI_model == null || b.mind.AI_model.macros == null) return null;
+				foreach (Macro m in b.mind.AI_model.macros) {
+					if (m.script != null && m.script.offset.ToString() == offset) return m.script;
+				}
+				break;
+		}
+		return null;
 	}
 }

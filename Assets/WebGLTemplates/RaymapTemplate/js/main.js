@@ -642,7 +642,7 @@ function hideDialogue() {
 }
 
 function startGame() {
-	gameInstance = UnityLoader.instantiate("gameContainer", "%UNITY_WEBGL_BUILD_URL%", {onProgress: UnityProgress});
+	gameInstance = UnityLoader.instantiate("gameContainer", "Build/WebGL.json", {onProgress: UnityProgress});
 }
 
 function showLevelSelect() {
