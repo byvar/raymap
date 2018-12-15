@@ -685,7 +685,7 @@ public class PersoBehaviour : MonoBehaviour {
 						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
 					}
 					currentActivePO[i] = poNum;
-					physicalObject.Gao.SetActive(true);
+					if(physicalObject != null) physicalObject.Gao.SetActive(true);
 				}
 				if(!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
 				channelObjects[i].transform.localPosition = vector * positionMultiplier;
