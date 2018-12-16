@@ -383,6 +383,32 @@ function showObjectDescription(so) {
 		selectButton($("#btn-autoNextState"), so.perso.autoNextState);
 		$('#animationSpeed').val(so.perso.animationSpeed);
 		
+		// Scripts
+		$("#content-behaviors").empty();
+		if(so.perso.hasOwnProperty("brain")) {
+			let allBehaviors = [];
+			let brain = so.perso.brain;
+			if(brain.hasOwnProperty("ruleBehaviors") && brain.ruleBehaviors.length > 0) {
+				allBehaviors.push("<div class='behaviors-item category'>Rule behaviors</div>");
+				$.each(brain.ruleBehaviors, function (idx, val) {
+					allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+				});
+			}
+			if(brain.hasOwnProperty("reflexBehaviors") && brain.reflexBehaviors.length > 0) {
+				allBehaviors.push("<div class='behaviors-item category'>Reflex behaviors</div>");
+				$.each(brain.reflexBehaviors, function (idx, val) {
+					allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+				});
+			}
+			if(brain.hasOwnProperty("macros") && brain.macros.length > 0) {
+				allBehaviors.push("<div class='behaviors-item category'>Macros</div>");
+				$.each(brain.macros, function (idx, val) {
+					allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+				});
+			}
+			$("#content-behaviors").append(allBehaviors.join(""));
+		}
+		
 	} else {
 		$('.perso-description').addClass('invisible');
 	}

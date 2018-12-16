@@ -96,7 +96,7 @@ namespace OpenSpace.AI {
 
                                 default:
                                     if (firstChildNode!=null)
-                                        return prefix + scriptNode.ToString(perso) + "("+string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString()))+")";
+                                        return prefix + scriptNode.ToString(perso) + "("+string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString()))+")";
                                     else
                                         return prefix + scriptNode.ToString(perso)+"()";
 
@@ -115,11 +115,11 @@ namespace OpenSpace.AI {
                                 case "Func_TernInfEq":
                                 case "Func_TernSupEq":
                                     switch (function) {
-                                        case "Func_TernInf":   ternaryCheck = "<"; break;
-                                        case "Func_TernSup":   ternaryCheck = ">"; break;
-                                        case "Func_TernEq":    ternaryCheck = "=="; break;
-                                        case "Func_TernInfEq": ternaryCheck = "<="; break;
-                                        case "Func_TernSupEq": ternaryCheck = ">="; break;
+                                        case "Func_TernInf":   ternaryCheck = " < "; break;
+                                        case "Func_TernSup":   ternaryCheck = " > "; break;
+                                        case "Func_TernEq":    ternaryCheck = " == "; break;
+                                        case "Func_TernInfEq": ternaryCheck = " <= "; break;
+                                        case "Func_TernSupEq": ternaryCheck = " >= "; break;
                                     }
                                     if (this.children.Count >= 4)
                                         return prefix + "((" + this.children[0] + ternaryCheck + this.children[1] + ") ? " + this.children[2] + " : " + this.children[3] + ")";
@@ -131,7 +131,7 @@ namespace OpenSpace.AI {
 
                                 default:
                                     string func = scriptNode.ToString(perso);
-                                    return prefix + func + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                    return prefix + func + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             }
 
                             
@@ -139,13 +139,13 @@ namespace OpenSpace.AI {
                         case ScriptNode.NodeType.Procedure:
                             string procedure = param < aiTypes.procedureTable.Length ? aiTypes.procedureTable[param] : "";
                             switch (procedure) {
-                                case "Proc_Loop":    return prefix + "for(int i=0;i<" + firstChildNode + ";i++)\n{";
+                                case "Proc_Loop":    return prefix + "for(int i = 0; i < " + firstChildNode + "; i++)\n{";
                                 case "Proc_EndLoop": return prefix + "}\n";
                                 case "Proc_Break":   return prefix + "break;\n";
 
                                 default:
                                     string proc = scriptNode.ToString(perso);
-                                    return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
+                                    return prefix + proc + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                             }
 
@@ -155,17 +155,17 @@ namespace OpenSpace.AI {
 
                             switch (op) {
                                 // scalar:
-                                case "Operator_Plus": return "(" + firstChildNode + (children[1].scriptNode.param>=0 ? "+" : "") + secondChildNode + ")";
+                                case "Operator_Plus": return "(" + firstChildNode + (children[1].scriptNode.param>=0 ? " + " : "") + secondChildNode + ")";
                                 case "Operator_Minus":
                                 case "Operator_UnaryMinus":
                                     if (children.Count > 1) {
-                                        return "(" + firstChildNode + "-" + secondChildNode + ")";
+                                        return "(" + firstChildNode + " - " + secondChildNode + ")";
                                     } else {
                                         return "-" + firstChildNode;
                                     }
-                                case "Operator_Mul": return "(" + firstChildNode + "*" + secondChildNode + ")";
-                                case "Operator_Div": return "(" + firstChildNode + "/" + secondChildNode + ")";
-                                case "Operator_Mod": return "(" + firstChildNode + "%" + secondChildNode + ")";
+                                case "Operator_Mul": return "(" + firstChildNode + " * " + secondChildNode + ")";
+                                case "Operator_Div": return "(" + firstChildNode + " / " + secondChildNode + ")";
+                                case "Operator_Mod": return "(" + firstChildNode + " % " + secondChildNode + ")";
                                 // affect:
                                 case "Operator_PlusAffect":
                                 case "Operator_PlusPlusAffect":
@@ -173,9 +173,9 @@ namespace OpenSpace.AI {
                                 case "Operator_MinusAffect":
                                 case "Operator_MinusMinusAffect":
                                     return children.Count > 1 ? (firstChildNode + " -= " + secondChildNode + ";") : firstChildNode + "--" + ";";
-                                case "Operator_MulAffect": return firstChildNode + "*=" + secondChildNode + ";";
-                                case "Operator_DivAffect": return firstChildNode + "/=" + secondChildNode + ";";
-                                case "Operator_Affect": return firstChildNode + "=" + secondChildNode + ";";
+                                case "Operator_MulAffect": return firstChildNode + " *= " + secondChildNode + ";";
+                                case "Operator_DivAffect": return firstChildNode + " /= " + secondChildNode + ";";
+                                case "Operator_Affect": return firstChildNode + " = " + secondChildNode + ";";
                                 case "Operator_Dot": // dot operator
                                     persoPtr = this.children[0].scriptNode.param_ptr;
                                     if (persoPtr != null) {
@@ -192,14 +192,14 @@ namespace OpenSpace.AI {
                                 case ".X": return firstChildNode + ".x"; // vector
                                 case ".Y": return firstChildNode + ".y"; // vector
                                 case ".Z": return firstChildNode + ".z"; // vector
-                                case "Operator_VectorPlusVector": return firstChildNode + "+" + secondChildNode;
-                                case "Operator_VectorMinusVector": return firstChildNode + "-" + secondChildNode;
-                                case "Operator_VectorMulScalar": return firstChildNode + "*" + secondChildNode;
-                                case "Operator_VectorDivScalar": return firstChildNode + "/" + secondChildNode;
+                                case "Operator_VectorPlusVector": return firstChildNode + " + " + secondChildNode;
+                                case "Operator_VectorMinusVector": return firstChildNode + " - " + secondChildNode;
+                                case "Operator_VectorMulScalar": return firstChildNode + " * " + secondChildNode;
+                                case "Operator_VectorDivScalar": return firstChildNode + " / " + secondChildNode;
                                 case "Operator_VectorUnaryMinus": return "-"+firstChildNode;
-                                case ".X:=": return firstChildNode + ".x=" + secondChildNode; // vector
-                                case ".Y:=": return firstChildNode + ".y=" + secondChildNode; // vector
-                                case ".Z:=": return firstChildNode + ".z=" + secondChildNode; // vector
+                                case ".X:=": return firstChildNode + ".x = " + secondChildNode; // vector
+                                case ".Y:=": return firstChildNode + ".y = " + secondChildNode; // vector
+                                case ".Z:=": return firstChildNode + ".z = " + secondChildNode; // vector
                                 case "Operator_Ultra": // Ultra operator (execute code for different object)
                                     return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
                                 case "Operator_ModelCast": return "((" + firstChildNode + ")(" + secondChildNode + ".brain.mind.aiModel))";
@@ -207,23 +207,23 @@ namespace OpenSpace.AI {
 
                                 default:
                                     string proc = "("+scriptNode.param+")"+ scriptNode.ToString(perso);
-                                    return prefix + proc + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
+                                    return prefix + proc + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
                             }
 
                         case ScriptNode.NodeType.Field:
                             if (firstChildNode != null)
-                                return prefix + scriptNode.ToString(perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                return prefix + scriptNode.ToString(perso) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             else
                                 return prefix + scriptNode.ToString(perso);
 
                         case ScriptNode.NodeType.Vector:
                         case ScriptNode.NodeType.ConstantVector:
 
-                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
 
                         case ScriptNode.NodeType.MetaAction:
 
-                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(",", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
+                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                         default:
                             return prefix + scriptNode.ToString(perso);

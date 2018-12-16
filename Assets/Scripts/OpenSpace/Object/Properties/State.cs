@@ -44,7 +44,22 @@ namespace OpenSpace.Object.Properties {
             get { return off_state_prev; }
         }
 
-        public State(Pointer offset, Family family, int index) {
+		public string ShortName {
+			get {
+				string shortName = "";
+				if (name != null) {
+					shortName = name;
+					if (shortName.StartsWith(family.name + " - ")) {
+						shortName = shortName.Substring((family.name + " - ").Length);
+					}
+					shortName = "[\"" + shortName + "\"]";
+				}
+				shortName = family.name + ".Action[" + index + "]" + shortName;
+				return shortName;
+			}
+		}
+
+		public State(Pointer offset, Family family, int index) {
             this.offset = offset;
             this.family = family;
             this.index = index;

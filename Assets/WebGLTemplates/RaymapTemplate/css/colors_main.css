@@ -49,7 +49,8 @@ body {
 }*/
 
 .objects-item,
-.levels-item {
+.levels-item,
+.behaviors-item {
 	color: #9ed9a0;
 }
 
@@ -64,7 +65,8 @@ body {
 
 .objects-item.object-world,
 .objects-item.object-sector,
-.levels-item.game {
+.levels-item.game,
+.behaviors-item.category {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
@@ -78,7 +80,8 @@ body {
 }
 .objects-item.object-perso:hover,
 .objects-item.object-IPO:hover,
-.levels-item.level:hover {
+.levels-item.level:hover,
+.behaviors-item.behavior:hover {
 	background-color: rgba(3,61,82,1);
 }
 

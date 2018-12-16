@@ -317,7 +317,10 @@ namespace OpenSpace.Loader {
             loadingState = "Filling in cross-references";
             yield return null;
             ReadCrossReferences(reader);
-
+			loadingState = "Loading behavior copies";
+			yield return null;
+			ReadBehaviorCopies(reader);
+			yield return null;
             // Parse transformation matrices and other settings for fix characters
             /*if (off_mainChar != null && off_matrix_mainChar != null) {
                 SuperObject so = SuperObject.FromOffset(off_mainChar);
@@ -349,7 +352,8 @@ namespace OpenSpace.Loader {
 
         private void ReadLog(Stream logStream) {
             string logPattern = @"^0x(?<offset>[a-fA-F0-9]+?) : \((?<type>[^\)]+?)\)(?<name>.*?)    0x(?<offset2>[a-fA-F0-9]+?)$";
-            DCDAT file = files_array[0] as DCDAT;
+			string comportNamePattern = @"^(?<family>[^\\]+?)\\(?<model>[^\\]+?)\\(?<model2>[^\\]+?)\.(?<type>...?)\^.*$";
+			DCDAT file = files_array[0] as DCDAT;
             using (StreamReader sr = new StreamReader(logStream)) {
                 while (sr.Peek() >= 0) {
                     string line = sr.ReadLine().Trim();
@@ -365,6 +369,39 @@ namespace OpenSpace.Loader {
                         switch (type) {
                             case "eST_Comport":
                                 Behavior b = Behavior.FromOffset(offset);
+								if (b == null) {
+									Match comportMatch = Regex.Match(name, comportNamePattern, RegexOptions.IgnoreCase);
+									if (comportMatch.Success) {
+										string modelName = comportMatch.Groups["model"].Value;
+										AIModel aiModel = aiModels.FirstOrDefault(ai => ai.name == modelName);
+										Reader reader = files_array[Mem.Fix].reader;
+										Pointer.DoAt(ref reader, offset, () => {
+											Behavior newB = Behavior.Read(reader, offset);
+											if (aiModel != null && newB != null) {
+												switch (comportMatch.Groups["type"].Value) {
+													case "rul":
+														foreach (Behavior originalBehavior in aiModel.behaviors_normal) {
+															if (newB.ContentEquals(originalBehavior)) {
+																originalBehavior.copies.Add(newB.offset);
+																b = originalBehavior;
+																break;
+															}
+														}
+														break;
+													case "rfx":
+														foreach (Behavior originalBehavior in aiModel.behaviors_reflex) {
+															if (newB.ContentEquals(originalBehavior)) {
+																originalBehavior.copies.Add(newB.offset);
+																b = originalBehavior;
+																break;
+															}
+														}
+														break;
+												}
+											}
+										});
+									}
+								}
                                 if (b != null) b.name = name;
                                 /*if (name.Contains("piranha\\MIC_PiranhaSauteurVisible\\MIC_PiranhaSauteurVisible")) {
                                     print("Offset: " + offset + " - " + b);
@@ -393,6 +430,82 @@ namespace OpenSpace.Loader {
                     }
                 }
             }
-        }  
-    }
+        }
+
+		#region Behavior copies
+		private void ReadBehaviorCopies(Reader reader) {
+			// DC has loose behaviors that are copies of existing behaviors
+			foreach (AIModel ai in aiModels) {
+				if (ai.behaviors_normal != null) {
+					for (int i = 0; i < ai.behaviors_normal.Length; i++) {
+						if (ai.behaviors_normal[i].scripts != null) {
+							for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
+								List<ScriptNode> nodes = ai.behaviors_normal[i].scripts[j].scriptNodes;
+								foreach (ScriptNode node in nodes) {
+									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
+										Behavior b = Behavior.FromOffset(node.param_ptr);
+										if (b == null) {
+											Pointer.DoAt(ref reader, node.param_ptr, () => {
+												ReadBehaviorCopy(reader, node.param_ptr, ai);
+											});
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				if (ai.behaviors_reflex != null) {
+					for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
+						if (ai.behaviors_reflex[i].scripts != null) {
+							for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
+								List<ScriptNode> nodes = ai.behaviors_reflex[i].scripts[j].scriptNodes;
+								foreach (ScriptNode node in nodes) {
+									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
+										Behavior b = Behavior.FromOffset(node.param_ptr);
+										if (b == null) {
+											Pointer.DoAt(ref reader, node.param_ptr, () => {
+												ReadBehaviorCopy(reader, node.param_ptr, ai);
+											});
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		private void ReadBehaviorCopy(Reader reader, Pointer offset, AIModel ai) {
+			Behavior b = Behavior.Read(reader, offset);
+			if (b != null) {
+				foreach (Behavior originalBehavior in ai.behaviors_normal) {
+					if (b.ContentEquals(originalBehavior)) {
+						originalBehavior.copies.Add(b.offset);
+						b = null;
+						break;
+					}
+				}
+			}
+			if (b != null) {
+				foreach (Behavior originalBehavior in ai.behaviors_reflex) {
+					if (b.ContentEquals(originalBehavior)) {
+						originalBehavior.copies.Add(b.offset);
+						b = null;
+						break;
+					}
+				}
+			}
+			if (b != null) {
+				foreach (Behavior originalBehavior in behaviors) {
+					if (b.ContentEquals(originalBehavior)) {
+						originalBehavior.copies.Add(b.offset);
+						b = null;
+						break;
+					}
+				}
+			}
+		}
+		#endregion
+	}
 }

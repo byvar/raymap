@@ -159,7 +159,8 @@ a:focus {
 }
 
 .objects-item,
-.levels-item {
+.levels-item,
+.behaviors-item {
 	font-size: 0.9em;
 	display: block;
 	width: 100%;
@@ -194,7 +195,8 @@ a:focus {
     -ms-user-select: none;
     user-select: none;
 }
-.objects-item.object-perso {
+.objects-item.object-perso,
+.behaviors-item.behavior {
 	padding: 0 0.5em 0 0.5em;
 	cursor: pointer;
 }
@@ -217,7 +219,8 @@ a:focus {
 }
 
 .objects-item.object-world,
-.levels-item.game {
+.levels-item.game,
+.behaviors-item.category {
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;

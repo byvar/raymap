@@ -10,7 +10,7 @@ namespace OpenSpace {
         public enum Mode {
             Rayman3PC, Rayman3GC,
             RaymanArenaPC, RaymanArenaGC,
-            Rayman2PC, Rayman2DC, Rayman2IOS,
+            Rayman2PC, Rayman2DC, Rayman2IOS, Rayman2PS1,
             Rayman2PCDemo2, Rayman2PCDemo1,
             DonaldDuckPC,
             TonicTroublePC, TonicTroubleSEPC,
@@ -25,7 +25,7 @@ namespace OpenSpace {
             R3 = 3
         };
         public enum Game { R3, RA, R2, TT, TTSE, R2Demo, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
-        public enum Platform { PC, iOS, GC, DC };
+        public enum Platform { PC, iOS, GC, DC, PS1 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
         
@@ -59,6 +59,7 @@ namespace OpenSpace {
                 case Mode.Rayman2IOS: s = Settings.R2IOS; break;
                 case Mode.Rayman2DC: s = Settings.R2DC; break;
                 case Mode.Rayman2PC: s = Settings.R2PC; break;
+				case Mode.Rayman2PS1: s = Settings.R2PS1; break;
                 case Mode.Rayman2PCDemo1: s = Settings.R2PCDemo1; break;
                 case Mode.Rayman2PCDemo2: s = Settings.R2PCDemo2; break;
                 case Mode.Rayman3GC: s = Settings.R3GC; break;
@@ -260,7 +261,20 @@ namespace OpenSpace {
             saturate = true
         };
 
-        public static Settings DDPC = new Settings() {
+		public static Settings R2PS1 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.R2,
+			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+
+		public static Settings DDPC = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.DD,
             platform = Platform.PC,

@@ -12,28 +12,42 @@ namespace OpenSpace.AI {
         public string name = null;
         public Pointer off_script;
         public Pointer off_script2;
-        public Script script;
+		public Script script;
 
-        public int number;
 
-        public Macro(Pointer offset) {
+		public string ShortName {
+			get {
+				string shortName = "";
+				if (name != null) {
+					shortName = name;
+					if (shortName.Contains("^CreateMacro:")) {
+						shortName = shortName.Substring(shortName.LastIndexOf("^CreateMacro:") + 13);
+					}
+					shortName = "[\"" + shortName + "\"]";
+				}
+				shortName = aiModel.name + ".Macro[" + index + "]" + shortName;
+				return shortName;
+			}
+		}
+		public AIModel aiModel;
+		public int index;
+
+		public Macro(Pointer offset) {
             this.offset = offset;
         }
 
-        public static Macro Read(Reader reader, Pointer offset, AIModel model, int number) {
+        public static Macro Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             Macro m = new Macro(offset);
-            m.aiModel = model;
-            m.number = number;
 
-            if (Settings.s.hasNames) {
-                m.name = reader.ReadString(0x100);
-            } else {
-                m.name = "Macro " + number;
-            }
+			if (Settings.s.hasNames) {
+				m.name = reader.ReadString(0x100);
+			}
 
             m.off_script = Pointer.Read(reader);
             m.off_script2 = Pointer.Read(reader);
+
+			l.macros.Add(m);
             //if (m.name != null) l.print(m.name);
 
             if (m.off_script != null) {
@@ -44,5 +58,22 @@ namespace OpenSpace.AI {
                 
             return m;
         }
-    }
+
+		public static Macro FromOffset(Pointer offset) {
+			if (offset == null) return null;
+			MapLoader l = MapLoader.Loader;
+			return l.macros.FirstOrDefault(m => m.offset == offset);
+		}
+
+		public static Macro FromOffsetOrRead(Pointer offset, Reader reader) {
+			if (offset == null) return null;
+			Macro m = FromOffset(offset);
+			if (m == null) {
+				Pointer.DoAt(ref reader, offset, () => {
+					m = Macro.Read(reader, offset);
+				});
+			}
+			return m;
+		}
+	}
 }

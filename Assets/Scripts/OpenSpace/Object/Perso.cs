@@ -167,7 +167,7 @@ namespace OpenSpace.Object {
                                             ol.unknownFamilyName = p.p3dData.family.name;
                                             ol.AddToFamilyLists();
                                         }
-                                    }
+									}
                                 }
                             }
                         }

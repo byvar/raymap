@@ -6,12 +6,13 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class Behavior : BehaviorOrMacro {
-
-        public enum BehaviorType {
-            Normal, Reflex
-        }
+		public enum BehaviorType {
+			Rule,
+			Reflex
+		}
 
         public Pointer offset;
+		public List<Pointer> copies;
 
         public string name = null;
         public Pointer off_scripts;
@@ -20,20 +21,62 @@ namespace OpenSpace.AI {
         public Script[] scripts;
         public Script firstScript;
 
-        public BehaviorType type;
-        public int number;
 
-        public Behavior(Pointer offset) {
+		public string ShortName {
+			get {
+				string shortName = "";
+				if (name != null) {
+					shortName = name;
+					//string comportNamePattern = @"^(?<family>[^\\]+?)\\(?<model>[^\\]+?)\\(?<model2>[^\\]+?)\.(?<type>...?)\^CreateIntelligence\^CreateComport:(?<name>.*?)$";
+					if (shortName.Contains("^CreateComport:")) {
+						shortName = shortName.Substring(shortName.LastIndexOf("^CreateComport:") + 15);
+					}
+					shortName = "[\"" + shortName + "\"]";
+				}
+				shortName = aiModel.name + "." + type.ToString() + "[" + index +  "]" + shortName;
+				return shortName;
+			}
+		}
+		public AIModel aiModel;
+		public BehaviorType type;
+		public int index;
+
+		public Behavior(Pointer offset) {
             this.offset = offset;
+			copies = new List<Pointer>();
         }
 
         public static Behavior FromOffset(Pointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
-            return l.behaviors.FirstOrDefault(f => f.offset == offset);
+            return l.behaviors.FirstOrDefault(b => (b.offset == offset) || (Settings.s.platform == Settings.Platform.DC && b.copies.Contains(offset)));
         }
 
-        /*public static Behavior FromOffsetOrRead(Pointer offset, Reader reader, AIModel aiModel, BehaviorType type, int number) {
+		public static Behavior FromOffsetOrRead(Pointer offset, Reader reader) {
+			if (offset == null) return null;
+			Behavior b = FromOffset(offset);
+			if (b == null) {
+				Pointer.DoAt(ref reader, offset, () => {
+					b = Behavior.Read(reader, offset);
+				});
+			}
+			return b;
+		}
+
+		public bool ContentEquals(Behavior b) {
+			if (firstScript != null) {
+				if (b.firstScript == null || !firstScript.ContentEquals(b.firstScript)) return false;
+			} else if (b.firstScript != null) return false;
+			if (scripts.Length != b.scripts.Length) return false;
+			for (int i = 0; i < scripts.Length; i++) {
+				if (scripts[i] != null) {
+					if (b.scripts[i] == null || !scripts[i].ContentEquals(b.scripts[i])) return false;
+				} else if (b.scripts[i] != null) return false;
+			}
+			return true;
+		}
+
+		/*public static Behavior FromOffsetOrRead(Pointer offset, Reader reader, AIModel aiModel, BehaviorType type, int number) {
             if (offset == null) return null;
             Behavior b = FromOffset(offset);
             if (b == null) {
@@ -44,18 +87,12 @@ namespace OpenSpace.AI {
             return b;
         }*/
 
-        public static Behavior Read(Reader reader, Pointer offset, AIModel aiModel, BehaviorType type, int number) {
+		public static Behavior Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             Behavior behavior = new Behavior(offset);
 
-            behavior.aiModel = aiModel;
-            behavior.type = type;
-            behavior.number = number;
-
             if (Settings.s.hasNames) {
                 behavior.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
-            } else {
-                behavior.name = behavior.type.ToString() + "Behaviour #" + number + " @"+offset;
             }
             behavior.off_scripts = Pointer.Read(reader);
             behavior.off_firstScript = Pointer.Read(reader);
@@ -82,9 +119,8 @@ namespace OpenSpace.AI {
             return behavior;
         }
 
-        public override string ToString()
-        {
-            return "(" + this.aiModel.name + ") " + this.name;
+        public override string ToString() {
+			return ShortName;
         }
     }
 }

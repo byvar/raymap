@@ -208,17 +208,14 @@ public class WebCommunicator : MonoBehaviour {
 		string name;
 		if (behavior is Macro) {
 			Macro m = behavior as Macro;
-			name = m.name;
+			name = m.ShortName;
+			if (name.Contains("^CreateMacro:")) {
+				name = name.Substring(name.IndexOf("^CreateMacro:") + 13);
+			}
 			behaviorJSON["script"] = GetScriptJSON(perso, m.script, includeScriptContents);
-			behaviorJSON["type"] = "Macro";
 		} else {
 			Behavior b = behavior as Behavior;
-			name = b.name;
-			if (name.Contains("^CreateComport:")) {
-				name = name.Substring(name.IndexOf("^CreateComport") + 15);
-			}
-			behaviorJSON["name"] = name;
-			behaviorJSON["type"] = b.type.ToString();
+			name = b.ShortName;
 			JSONArray scripts = new JSONArray();
 			foreach (Script script in b.scripts) {
 				scripts.Add(GetScriptJSON(perso, script, includeScriptContents));

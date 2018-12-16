@@ -57,10 +57,10 @@ namespace OpenSpace.AI {
                 if (sn.nodeType == NodeType.WayPointRef) {
                     WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);
                 } else if (sn.nodeType == NodeType.String) {
-                    Pointer off_currentNode = Pointer.Goto(ref reader, sn.param_ptr);
-                    string str = reader.ReadNullDelimitedString();
-                    l.strings[sn.param_ptr] = str;
-                    Pointer.Goto(ref reader, off_currentNode);
+					Pointer.DoAt(ref reader, sn.param_ptr, () => {
+						string str = reader.ReadNullDelimitedString();
+						l.strings[sn.param_ptr] = str;
+					});
                 } else if (sn.nodeType == NodeType.ObjectTableRef) {
                     // In R2 some objects have object tables that aren't listed normally, but are referenced through scripts.
                 } else if (sn.nodeType == NodeType.Button) {
@@ -69,6 +69,13 @@ namespace OpenSpace.AI {
             }
             return sn;
         }
+
+		public bool ContentEquals(ScriptNode sn) {
+			if (sn == null) return false;
+			if (param != sn.param || param_ptr != sn.param_ptr) return false;
+			if (type != sn.type || indent != sn.indent) return false;
+			return true;
+		}
 
         public string ToString(Perso perso, bool advanced = false) {
             MapLoader l = MapLoader.Loader;
@@ -162,10 +169,9 @@ namespace OpenSpace.AI {
                     return "getPersoByName(\"" + argPerso.namePerso + "\")";
                 case ScriptNode.NodeType.ActionRef:
                     State state = State.FromOffset(param_ptr);
-                    string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.name;
-                    int stateIndex = state.index;
-                    if (advanced) return "ActionRef: " + param_ptr + " [" + stateIndex + "](" + stateName + ")";
-                    return "action[" + stateIndex + "]";
+                    string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.ShortName;
+                    if (advanced) return "ActionRef: " + param_ptr + " " + stateName;
+					return stateName;
                 case ScriptNode.NodeType.SuperObjectRef:
                     return "SuperObjectRef: " + param_ptr;
                 case ScriptNode.NodeType.WayPointRef:
@@ -175,13 +181,15 @@ namespace OpenSpace.AI {
                     if (advanced) return "TextRef: " + param + " (" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + ")";
                     return "TextRef: " + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0); // Preview in english
                 case ScriptNode.NodeType.ComportRef:
-                    Behavior comportRef = script.behaviorOrMacro.aiModel.GetBehaviorByOffset(param_ptr);
+					Behavior comportRef = Behavior.FromOffset(param_ptr);
+
                     if (comportRef == null) {
                         if (advanced) return "ComportRef: " + param_ptr + " (null)";
                         return "null";
                     } else {
-                        string type = comportRef.type == Behavior.BehaviorType.Normal ? "normalBehavior" : "reflexBehavior";
-                        return type + "[" + comportRef.number + "]";
+						return comportRef.ShortName;
+                        //string type = comportRef.type == Behavior.BehaviorType.Normal ? "normalBehavior" : "reflexBehavior";
+                        //return type + "[" + script.behaviorOrMacro.aiModel.GetBehaviorIndex(comportRef) + "]";
                     }
                 case ScriptNode.NodeType.SoundEventRef:
                     return "SoundEventRef: " + param_ptr;
@@ -205,11 +213,11 @@ namespace OpenSpace.AI {
                     return "Caps: " + "0x" + (param).ToString("x8");
                 case ScriptNode.NodeType.SubRoutine:
                     if (advanced) return "Eval SubRoutine: " + param_ptr;
-                    Macro macro = script.behaviorOrMacro.aiModel.GetMacroByOffset(param_ptr);
+                    Macro macro = Macro.FromOffset(param_ptr);
                     if (macro == null) {
                         return "null";
                     }
-                    return "evalMacro(" + macro.number + ");";
+                    return "evalMacro(" + macro.ShortName + ");";
                 case ScriptNode.NodeType.Null:
                     return "null";
                 case ScriptNode.NodeType.GraphRef:

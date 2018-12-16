@@ -37,6 +37,17 @@ namespace OpenSpace.AI {
             return s;
         }
 
+		public bool ContentEquals(Script s) {
+			if (scriptNodes.Count != s.scriptNodes.Count) return false;
+			for (int i = 0; i < scriptNodes.Count; i++) {
+				if (scriptNodes[i] != null) {
+					if (s.scriptNodes[i] == null) return false;
+					if (!scriptNodes[i].ContentEquals(s.scriptNodes[i])) return false;
+				} else if (s.scriptNodes[i] != null) return false;
+			}
+			return true;
+		}
+
         public void print(Perso perso) {
             // TODO: Use perso to print states, etc.
             MapLoader l = MapLoader.Loader;

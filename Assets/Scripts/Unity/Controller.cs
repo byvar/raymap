@@ -123,6 +123,8 @@ public class Controller : MonoBehaviour {
 				mode = Settings.Mode.Rayman2DC; break;
 			case "r2_ios":
 				mode = Settings.Mode.Rayman2IOS; break;
+			case "r2_ps1":
+				mode = Settings.Mode.Rayman2PS1; break;
 			case "dd_pc":
 				mode = Settings.Mode.DonaldDuckPC; break;
 			case "tt_pc":
@@ -294,11 +296,7 @@ public class Controller : MonoBehaviour {
 							Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
 							int iter = 0;
 							foreach (Behavior behavior in normalBehaviors) {
-								string name = behavior.name;
-								if (name.Contains("^CreateComport:")) {
-									name = name.Substring(name.IndexOf("^CreateComport") + 15);
-								}
-								GameObject behaviorGao = new GameObject(name);
+								GameObject behaviorGao = new GameObject(behavior.ShortName);
 								behaviorGao.transform.parent = intelParent.transform;
 								foreach (Script script in behavior.scripts) {
 									GameObject scriptGao = new GameObject("Script");
@@ -325,11 +323,7 @@ public class Controller : MonoBehaviour {
 							Behavior[] reflexBehaviors = p.brain.mind.AI_model.behaviors_reflex;
 							int iter = 0;
 							foreach (Behavior behavior in reflexBehaviors) {
-								string name = behavior.name;
-								if (name.Contains("^CreateComport:")) {
-									name = name.Substring(name.IndexOf("^CreateComport:") + 15);
-								}
-								GameObject behaviorGao = new GameObject(name);
+								GameObject behaviorGao = new GameObject(behavior.ShortName);
 								behaviorGao.transform.parent = reflexParent.transform;
 								foreach (Script script in behavior.scripts) {
 									GameObject scriptGao = new GameObject("Script");
@@ -354,7 +348,7 @@ public class Controller : MonoBehaviour {
 							int iter = 0;
 
 							foreach (Macro macro in macros) {
-								GameObject behaviorGao = new GameObject(macro.name);
+								GameObject behaviorGao = new GameObject(macro.ShortName);
 								behaviorGao.transform.parent = macroParent.transform;
 								ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
 								scriptComponent.SetScript(macro.script, p);

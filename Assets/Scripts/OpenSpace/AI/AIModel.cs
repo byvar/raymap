@@ -48,8 +48,12 @@ namespace OpenSpace.AI {
                 if (num_entries > 0 && off_entries != null) {
                     Pointer.Goto(ref reader, off_entries);
                     for (int i = 0; i < num_entries; i++) {
-                        ai.behaviors_normal[i] = Behavior.Read(reader, Pointer.Current(reader), ai, Behavior.BehaviorType.Normal, i);
-                    }
+                        ai.behaviors_normal[i] = Behavior.Read(reader, Pointer.Current(reader));
+						ai.behaviors_normal[i].type = Behavior.BehaviorType.Rule;
+						ai.behaviors_normal[i].aiModel = ai;
+						ai.behaviors_normal[i].index = i;
+
+					}
                 }
             }
             if (ai.off_behaviors_reflex != null) {
@@ -60,8 +64,11 @@ namespace OpenSpace.AI {
                 if (num_entries > 0 && off_entries != null) {
                     Pointer.Goto(ref reader, off_entries);
                     for (int i = 0; i < num_entries; i++) {
-                        ai.behaviors_reflex[i] = Behavior.Read(reader, Pointer.Current(reader), ai, Behavior.BehaviorType.Reflex, i);
-                    }
+                        ai.behaviors_reflex[i] = Behavior.Read(reader, Pointer.Current(reader));
+						ai.behaviors_reflex[i].type = Behavior.BehaviorType.Reflex;
+						ai.behaviors_reflex[i].aiModel = ai;
+						ai.behaviors_reflex[i].index = i;
+					}
                 }
             }
 
@@ -81,8 +88,10 @@ namespace OpenSpace.AI {
                 if (num_entries > 0 && off_entries != null) {
                     Pointer.Goto(ref reader, off_entries);
                     for (int i = 0; i < num_entries; i++) {
-                        ai.macros[i] = Macro.Read(reader, Pointer.Current(reader), ai, i);
-                    }
+                        ai.macros[i] = Macro.Read(reader, Pointer.Current(reader));
+						ai.macros[i].aiModel = ai;
+						ai.macros[i].index = i;
+					}
                 }
             }
             //l.aiModels.Add(ai);
@@ -134,6 +143,22 @@ namespace OpenSpace.AI {
             }
             return null;
         }
+
+		public int GetBehaviorIndex(Behavior behavior) {
+			if (behavior == null) return -1;
+			// Look in both behavior lists
+			if (behaviors_normal != null) {
+				for (int i = 0; i < behaviors_normal.Length; i++) {
+					if (behavior == behaviors_normal[i]) return i;
+				}
+			}
+			if (behaviors_reflex != null) {
+				for (int i = 0; i < behaviors_reflex.Length; i++) {
+					if (behavior == behaviors_reflex[i]) return i;
+				}
+			}
+			return -1;
+		}
 
         public Macro GetMacroByOffset(Pointer offset)
         {

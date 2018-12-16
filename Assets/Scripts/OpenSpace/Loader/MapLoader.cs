@@ -68,6 +68,7 @@ namespace OpenSpace {
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
         public List<AIModel> aiModels = new List<AIModel>();
         public List<Behavior> behaviors = new List<Behavior>();
+		public List<Macro> macros = new List<Macro>();
         public List<Perso> persos = new List<Perso>();
         public List<State> states = new List<State>();
         public List<Graph> graphs = new List<Graph>();
@@ -117,11 +118,17 @@ namespace OpenSpace {
                 if (loader == null) {
                     if (Settings.s == null) return null;
                     if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                        if (Settings.s.platform == Settings.Platform.DC) {
-                            loader = new R2DCLoader();
-                        } else {
-                            loader = new R2Loader();
-                        }
+						switch (Settings.s.platform) {
+							case Settings.Platform.DC:
+								loader = new R2DCLoader();
+								break;
+							case Settings.Platform.PS1:
+								loader = new R2PS1Loader();
+								break;
+							default:
+								loader = new R2Loader();
+								break;
+						}
                     } else {
                         loader = new R3Loader();
                     }

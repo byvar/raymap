@@ -4,6 +4,7 @@ using UnityEditor;
 using OpenSpace.AI;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 [CustomEditor(typeof(MindComponent))]
 public class MindEditor : Editor {
@@ -17,7 +18,7 @@ public class MindEditor : Editor {
 
         GUILayout.BeginHorizontal();
         if (aiModel.behaviors_normal != null && aiModel.behaviors_normal.Length>0) {
-            int activeNormalComportIndex = intelligenceNormal.comport != null ? intelligenceNormal.comport.number + 1 : 0;
+            int activeNormalComportIndex = intelligenceNormal.comport != null ? intelligenceNormal.comport.index + 1 : 0;
             List<string> normalComportStrings = aiModel.behaviors_normal.Select(b => b.ToString()).ToList();
             normalComportStrings.Insert(0, "<null>");
 
@@ -35,7 +36,7 @@ public class MindEditor : Editor {
 
         GUILayout.BeginHorizontal();
         if (aiModel.behaviors_reflex != null && aiModel.behaviors_reflex.Length > 0) {
-            int activeReflexComportIndex = intelligenceReflex.comport != null ? intelligenceReflex.comport.number + 1 : 0;
+            int activeReflexComportIndex = intelligenceReflex.comport != null ? intelligenceReflex.comport.index + 1 : 0;
             List<string> reflexComportStrings = aiModel.behaviors_reflex.Select(b => b.ToString()).ToList();
             reflexComportStrings.Insert(0, "<null>");
 
