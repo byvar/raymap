@@ -35,7 +35,8 @@ public class Controller : MonoBehaviour {
 	bool playAnimations_ = true; public bool playAnimations = true;
 	bool playTextureAnimations_ = true; public bool playTextureAnimations = true;
 	bool showPersos_ = true; public bool showPersos = true;
-
+    bool livePreview_ = false; public bool livePreview = false;
+    float livePreviewUpdateCounter = 0;
 
 	private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
@@ -245,18 +246,33 @@ public class Controller : MonoBehaviour {
 				updatedSettings = true;
 				UpdateShowPersos();
 			}
-			if (playAnimations != playAnimations_ || playTextureAnimations != playTextureAnimations_) {
+            if (livePreview != livePreview_) {
+                livePreview_ = livePreview;
+                updatedSettings = true;
+            }
+            if (playAnimations != playAnimations_ || playTextureAnimations != playTextureAnimations_) {
 				playTextureAnimations_ = playTextureAnimations;
 				playAnimations_ = playAnimations;
 				updatedSettings = true;
 			}
+
+
 		}
 		if (updatedSettings) {
 			communicator.SendSettings();
 		}
-	}
 
-	public IEnumerator InitPersos() {
+        if (livePreview) {
+
+            livePreviewUpdateCounter += Time.deltaTime;
+            if (livePreviewUpdateCounter > 1.0f / 60.0f) {
+                UpdateLivePreview();
+                livePreviewUpdateCounter = 0.0f;
+            }
+        }
+    }
+
+    public IEnumerator InitPersos() {
 		if (loader != null) {
 			for (int i = 0; i < loader.persos.Count; i++) {
 				detailedState = "Initializing persos: " + i + "/" + loader.persos.Count;
@@ -525,7 +541,55 @@ public class Controller : MonoBehaviour {
 		}
 	}
 
-	public void SaveChanges() {
+    public void UpdateLivePreview()
+    {
+        Reader reader = MapLoader.Loader.livePreviewReader;
+
+        foreach (SuperObject spo in MapLoader.Loader.superObjects) {
+
+            if (!(spo.data is Perso)) {
+                continue;
+            }
+
+            Pointer.Goto(ref reader, spo.off_matrix);
+            spo.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, spo.off_matrix);
+            if (spo.data != null && spo.data.Gao != null) {
+                spo.data.Gao.transform.localPosition = spo.matrix.GetPosition(convertAxes: true);
+                spo.data.Gao.transform.localRotation = spo.matrix.GetRotation(convertAxes: true);
+                spo.data.Gao.transform.localScale = spo.matrix.GetScale(convertAxes: true);
+
+                if (spo.data is Perso) {
+                    Perso perso = (Perso)spo.data;
+
+                    PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+                    if (pb!=null) {
+
+                        Pointer.Goto(ref reader, perso.p3dData.offset);
+                        perso.p3dData.UpdateCurrentState(reader);
+
+                        // State offset changed?
+                        pb.SetState(perso.p3dData.stateCurrent);
+                    }
+                }
+            }
+        }
+
+        Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
+        if (camera != null) {
+
+            SuperObject cameraSO = camera.SuperObject;
+            Pointer.Goto(ref reader, cameraSO.off_matrix);
+            cameraSO.matrix = Matrix.Read(reader, cameraSO.off_matrix);
+            camera.Gao.transform.localPosition = cameraSO.matrix.GetPosition(convertAxes: true);
+            camera.Gao.transform.localRotation = cameraSO.matrix.GetRotation(convertAxes: true);
+            camera.Gao.transform.localScale = cameraSO.matrix.GetScale(convertAxes: true);
+
+            Camera.main.transform.position = camera.Gao.transform.position;
+            Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0, 180, 0);
+        }
+    }
+
+    public void SaveChanges() {
 		if (loader != null) loader.Save();
 	}
 

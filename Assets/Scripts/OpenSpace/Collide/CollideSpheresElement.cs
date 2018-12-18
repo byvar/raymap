@@ -12,6 +12,7 @@ namespace OpenSpace.Collide {
             public ushort centerPoint;
 
             public GameMaterial gameMaterial;
+            public Pointer debug_radiusAddress;
         }
 
 
@@ -42,7 +43,7 @@ namespace OpenSpace.Collide {
         private void CreateUnityMesh() {
             for (uint i = 0; i < num_spheres; i++) {
                 GameObject sphere_gao = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere_gao.name = "Collide Spheres @ " + offset + " - " + i;
+                sphere_gao.name = "Collide Spheres @ " + offset + " - " + i + " radius @ "+spheres[i].debug_radiusAddress;
                 sphere_gao.transform.SetParent(gao.transform);
                 MeshFilter mf = sphere_gao.GetComponent<MeshFilter>();
                 MeshRenderer mr = sphere_gao.GetComponent<MeshRenderer>();
@@ -91,6 +92,7 @@ namespace OpenSpace.Collide {
                 for (uint i = 0; i < s.num_spheres; i++) {
                     s.spheres[i] = new IndexedSphere();
                     if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+                        s.spheres[i].debug_radiusAddress = Pointer.Current(reader);
                         s.spheres[i].radius = reader.ReadSingle();
                         s.spheres[i].off_material = Pointer.Read(reader);
                         s.spheres[i].centerPoint = reader.ReadUInt16();
@@ -98,6 +100,7 @@ namespace OpenSpace.Collide {
                     } else {
                         s.spheres[i].centerPoint = reader.ReadUInt16();
                         reader.ReadUInt16();
+                        s.spheres[i].debug_radiusAddress = Pointer.Current(reader);
                         s.spheres[i].radius = reader.ReadSingle();
                         s.spheres[i].off_material = Pointer.Read(reader);
                     }

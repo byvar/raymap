@@ -38,10 +38,20 @@ namespace OpenSpace.Object.Properties {
             return d;
         }
 
+        public void UpdateCurrentState(Reader reader)
+        {
+            MapLoader l = MapLoader.Loader;
+
+            off_stateInitial = Pointer.Read(reader);
+            off_stateCurrent = Pointer.Read(reader);
+            off_state2 = Pointer.Read(reader);
+            stateCurrent = State.FromOffset(family, off_stateCurrent);
+        }
+
         public void Write(Writer writer) {
             Pointer.Write(writer, off_stateInitial);
             Pointer.Write(writer, off_stateCurrent);
-            Pointer.Write(writer, off_stateCurrent);
+            Pointer.Write(writer, off_state2);
             Pointer.Write(writer, off_objectList);
         }
     }

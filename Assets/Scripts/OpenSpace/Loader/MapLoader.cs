@@ -111,7 +111,9 @@ namespace OpenSpace {
             public const int LvlKeyFrames = 6;
         }
         public int[] loadOrder = new int[] { Mem.Fix, Mem.Transit, Mem.Lvl, Mem.VertexBuffer, Mem.FixKeyFrames, Mem.LvlKeyFrames };
-        
+
+        public Reader livePreviewReader;
+
         private static MapLoader loader = null;
         public static MapLoader Loader {
             get {
@@ -313,6 +315,8 @@ namespace OpenSpace {
             ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);
+
+            livePreviewReader = reader;
         }
         #endregion
 

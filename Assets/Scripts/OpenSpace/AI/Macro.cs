@@ -7,8 +7,6 @@ using UnityEngine;
 namespace OpenSpace.AI {
     public class Macro : BehaviorOrMacro
     {
-        public Pointer offset;
-
         public string name = null;
         public Pointer off_script;
         public Pointer off_script2;

@@ -11,7 +11,6 @@ namespace OpenSpace.AI {
 			Reflex
 		}
 
-        public Pointer offset;
 		public List<Pointer> copies;
 
         public string name = null;

@@ -7,6 +7,7 @@ public class ScriptComponent : MonoBehaviour {
     private Script script;
     private Perso perso;
     public string offset;
+    public string comportOffset;
     public bool showOffset = false;
 
     private TranslatedScript translation = null;
@@ -31,6 +32,9 @@ public class ScriptComponent : MonoBehaviour {
             translation.printAddresses = showOffset;
             //translatedScript = translation.ToString();
             offset = script.offset.ToString();
+            if (script.behaviorOrMacro != null) {
+                comportOffset = script.behaviorOrMacro.offset.ToString();
+            }
         }
     }
 

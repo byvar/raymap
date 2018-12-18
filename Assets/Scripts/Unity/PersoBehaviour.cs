@@ -308,12 +308,8 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    public void SetState(int index) {
-        if (index < 0 || index >= perso.p3dData.family.states.Count) return;
-        stateIndex = index;
-        currentState = index;
-        state = perso.p3dData.family.states[index];
-
+    public void SetState(State state)
+    {
         // Set animation
         MapLoader l = MapLoader.Loader;
         ushort anim_index = 0;
@@ -343,6 +339,15 @@ public class PersoBehaviour : MonoBehaviour {
         } else {
             a3d = null;
         }
+    }
+
+    public void SetState(int index) {
+        if (index < 0 || index >= perso.p3dData.family.states.Count) return;
+        stateIndex = index;
+        currentState = index;
+        state = perso.p3dData.family.states[index];
+
+        SetState(state);
     }
 
     // Update is called once per frame

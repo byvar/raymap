@@ -70,11 +70,16 @@ namespace OpenSpace.Object {
             this.superObject = so;
         }
 
-        public static Perso Read(Reader reader, Pointer offset, SuperObject so) {
+        public static Perso Read(Reader reader, Pointer offset, SuperObject so, Perso existingPerso = null) {
             MapLoader l = MapLoader.Loader;
             //l.print("Offset: " + offset);
-            Perso p = new Perso(offset, so);
-            l.persos.Add(p);
+            Perso p = null;
+            if (existingPerso == null) {
+                p = new Perso(offset, so);
+                l.persos.Add(p);
+            } else {
+                p = existingPerso;
+            }
             p.off_3dData = Pointer.Read(reader); // 0x0
             p.off_stdGame = Pointer.Read(reader); // 4 Standard Game info
             p.off_dynam = Pointer.Read(reader); // 0x8 Dynam
