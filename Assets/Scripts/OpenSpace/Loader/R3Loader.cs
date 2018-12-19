@@ -120,7 +120,7 @@ namespace OpenSpace.Loader {
             } finally {
                 for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
-                        files_array[i].Dispose();
+						if (!(files_array[i] is MemoryFile)) files_array[i].Dispose();
                     }
                 }
                 if (cnt != null) cnt.Dispose();

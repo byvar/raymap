@@ -248,7 +248,7 @@ public class Controller : MonoBehaviour {
 			}
             if (livePreview != livePreview_) {
                 livePreview_ = livePreview;
-                updatedSettings = true;
+                //updatedSettings = true;
             }
             if (playAnimations != playAnimations_ || playTextureAnimations != playTextureAnimations_) {
 				playTextureAnimations_ = playTextureAnimations;
@@ -263,7 +263,6 @@ public class Controller : MonoBehaviour {
 		}
 
         if (livePreview) {
-
             livePreviewUpdateCounter += Time.deltaTime;
             if (livePreviewUpdateCounter > 1.0f / 60.0f) {
                 UpdateLivePreview();
@@ -541,34 +540,36 @@ public class Controller : MonoBehaviour {
 		}
 	}
 
-    public void UpdateLivePreview()
-    {
+    public void UpdateLivePreview() {
         Reader reader = MapLoader.Loader.livePreviewReader;
 
-        foreach (SuperObject spo in MapLoader.Loader.superObjects) {
+        foreach (SuperObject so in MapLoader.Loader.superObjects) {
 
-            if (!(spo.data is Perso)) {
+            if (!(so.data is Perso)) {
                 continue;
             }
 
-            Pointer.Goto(ref reader, spo.off_matrix);
-            spo.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, spo.off_matrix);
-            if (spo.data != null && spo.data.Gao != null) {
-                spo.data.Gao.transform.localPosition = spo.matrix.GetPosition(convertAxes: true);
-                spo.data.Gao.transform.localRotation = spo.matrix.GetRotation(convertAxes: true);
-                spo.data.Gao.transform.localScale = spo.matrix.GetScale(convertAxes: true);
+            Pointer.Goto(ref reader, so.off_matrix);
+            so.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, so.off_matrix);
+            if (so.data != null && so.data.Gao != null) {
+                so.data.Gao.transform.localPosition = so.matrix.GetPosition(convertAxes: true);
+                so.data.Gao.transform.localRotation = so.matrix.GetRotation(convertAxes: true);
+                so.data.Gao.transform.localScale = so.matrix.GetScale(convertAxes: true);
 
-                if (spo.data is Perso) {
-                    Perso perso = (Perso)spo.data;
+                if (so.data is Perso) {
+                    Perso perso = (Perso)so.data;
 
                     PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
-                    if (pb!=null) {
+                    if (pb != null) {
 
                         Pointer.Goto(ref reader, perso.p3dData.offset);
                         perso.p3dData.UpdateCurrentState(reader);
 
-                        // State offset changed?
-                        pb.SetState(perso.p3dData.stateCurrent);
+						// State offset changed?
+						if (perso.p3dData.stateCurrent != null) {
+							pb.SetState(perso.p3dData.stateCurrent.index);
+							pb.autoNextState = true;
+						}
                     }
                 }
             }
