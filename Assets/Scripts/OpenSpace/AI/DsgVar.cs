@@ -152,8 +152,13 @@ namespace OpenSpace.AI {
                         returnValue = Pointer.Read(reader);
 
                         break;
+					case DsgVarInfoEntry.DsgVarType.Array11:
+					case DsgVarInfoEntry.DsgVarType.Array9:
+					case DsgVarInfoEntry.DsgVarType.Array6:
+						MapLoader.Loader.print(infoEntry.type);
+						returnValue = reader.ReadInt32(); break;
 
-                    default:
+					default:
                         returnValue = reader.ReadInt32(); break;
                 }
 

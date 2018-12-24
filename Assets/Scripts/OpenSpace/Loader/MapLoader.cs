@@ -16,6 +16,7 @@ using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
 using OpenSpace.Loader;
+using OpenSpace.Cinematics;
 
 namespace OpenSpace {
     public class MapLoader {
@@ -58,6 +59,7 @@ namespace OpenSpace {
         public SuperObject dynamicWorld;
         public SuperObject inactiveDynamicWorld;
         public SuperObject fatherSector;
+		public CinematicsManager cinematicsManager;
 
         public List<SuperObject> superObjects = new List<SuperObject>();
         public List<VisualMaterial> visualMaterials = new List<VisualMaterial>();

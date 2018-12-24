@@ -2881,16 +2881,16 @@ namespace OpenSpace.AI {
                 DsgVarInfoEntry.DsgVarType.Text,
                 DsgVarInfoEntry.DsgVarType.SuperObject,
                 DsgVarInfoEntry.DsgVarType.SOLinks,
-                DsgVarInfoEntry.DsgVarType.PersoArray,
-                DsgVarInfoEntry.DsgVarType.VectorArray,
-                DsgVarInfoEntry.DsgVarType.FloatArray,
                 DsgVarInfoEntry.DsgVarType.IntegerArray,
+                DsgVarInfoEntry.DsgVarType.FloatArray,
+                DsgVarInfoEntry.DsgVarType.VectorArray,
+                DsgVarInfoEntry.DsgVarType.PersoArray,
                 DsgVarInfoEntry.DsgVarType.WayPointArray,
+                DsgVarInfoEntry.DsgVarType.Array6,
                 DsgVarInfoEntry.DsgVarType.TextArray,
-                DsgVarInfoEntry.DsgVarType.Array7,
-                DsgVarInfoEntry.DsgVarType.Array8,
+                DsgVarInfoEntry.DsgVarType.SuperObjectArray,
                 DsgVarInfoEntry.DsgVarType.Array9,
-                DsgVarInfoEntry.DsgVarType.Array10,
+                DsgVarInfoEntry.DsgVarType.SoundEventArray,
                 DsgVarInfoEntry.DsgVarType.Array11
             },
             #endregion
@@ -2923,24 +2923,24 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.PersoRef,
                 ScriptNode.NodeType.ActionRef,
                 ScriptNode.NodeType.SuperObjectRef, // 25
-                ScriptNode.NodeType.WayPointRef,
+                ScriptNode.NodeType.Unknown,
+				ScriptNode.NodeType.WayPointRef,
                 ScriptNode.NodeType.TextRef,
                 ScriptNode.NodeType.ComportRef,
-                ScriptNode.NodeType.ModuleRef,
-                ScriptNode.NodeType.SoundEventRef, // 30
+				ScriptNode.NodeType.ModuleRef, // 30
+				ScriptNode.NodeType.SoundEventRef,
                 ScriptNode.NodeType.ObjectTableRef,
                 ScriptNode.NodeType.GameMaterialRef,
-                ScriptNode.NodeType.ParticleGenerator,
                 ScriptNode.NodeType.VisualMaterial,
-                ScriptNode.NodeType.ModelRef, // 35
-                ScriptNode.NodeType.DataType42,
-                ScriptNode.NodeType.CustomBits,
+				ScriptNode.NodeType.ParticleGenerator, // 35
+				ScriptNode.NodeType.ModelRef,
+				ScriptNode.NodeType.ModelRef, // different type though
+				ScriptNode.NodeType.CustomBits,
                 ScriptNode.NodeType.Caps,
-                ScriptNode.NodeType.SubRoutine,
-                ScriptNode.NodeType.Null, // 40
-                ScriptNode.NodeType.Unknown,
-                ScriptNode.NodeType.Unknown,
-                ScriptNode.NodeType.Unknown,
+				ScriptNode.NodeType.Unknown, // 40
+				ScriptNode.NodeType.SubRoutine,
+                ScriptNode.NodeType.Null,
+				ScriptNode.NodeType.Null,
                 ScriptNode.NodeType.GraphRef
             }
             #endregion

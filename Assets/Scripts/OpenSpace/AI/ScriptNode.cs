@@ -128,8 +128,8 @@ namespace OpenSpace.AI {
                     }
                     return "dsgVar_" + param;
                 case ScriptNode.NodeType.Constant:
-                    if (advanced) return "Constant: " + param;
-                    return param.ToString();
+                    if (advanced) return "Constant: " + BitConverter.ToInt32(BitConverter.GetBytes(param), 0);
+                    return BitConverter.ToInt32(BitConverter.GetBytes(param), 0).ToString();
                 case ScriptNode.NodeType.Real:
                     if (advanced) return "Real: " + BitConverter.ToSingle(BitConverter.GetBytes(param), 0);
                     return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString();

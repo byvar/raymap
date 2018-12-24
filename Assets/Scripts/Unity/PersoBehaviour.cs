@@ -101,7 +101,8 @@ public class PersoBehaviour : MonoBehaviour {
         loaded = true;
     }
 
-    public void PrintDsgVar() {
+	#region Print debug info
+	public void PrintDsgVar() {
         if (loaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
 
@@ -307,8 +308,9 @@ public class PersoBehaviour : MonoBehaviour {
             }
         }
     }
+	#endregion
 
-    public void SetState(int index) {
+	public void SetState(int index) {
 		if (index < 0 || index >= perso.p3dData.family.states.Count) return;
 		stateIndex = index;
 		currentState = index;

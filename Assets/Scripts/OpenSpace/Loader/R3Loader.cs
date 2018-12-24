@@ -15,6 +15,7 @@ using System.Linq;
 using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
+using OpenSpace.Cinematics;
 
 namespace OpenSpace.Loader {
     public class R3Loader : MapLoader {
@@ -462,10 +463,15 @@ namespace OpenSpace.Loader {
             yield return null;
             ReadAlways(reader);
 
-            // off_current should be after the dynamic SO list positions.
 
-            // Parse transformation matrices and other settings(state? :o) for fix characters
-            loadingState = "Loading settings for persos in fix";
+			Pointer.DoAt(ref reader, off_cineManager, () => {
+				cinematicsManager = CinematicsManager.Read(reader, off_cineManager);
+			});
+
+			// off_current should be after the dynamic SO list positions.
+
+			// Parse transformation matrices and other settings(state? :o) for fix characters
+			loadingState = "Loading settings for persos in fix";
             yield return null;
             uint num_perso_with_settings_in_fix = (uint)persoInFix.Length;
             if (Settings.s.game == Settings.Game.R3) num_perso_with_settings_in_fix = reader.ReadUInt32();

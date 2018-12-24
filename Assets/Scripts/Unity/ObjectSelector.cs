@@ -1,10 +1,6 @@
 using OpenSpace.Object;
 using UnityEngine;
 
-// Very simple smooth mouselook modifier for the MainCamera in Unity
-// by Francis R. Griffiths-Keam - www.runningdimensions.com
-// http://forum.unity3d.com/threads/a-free-simple-smooth-mouselook.73117/
-
 
 public class ObjectSelector : MonoBehaviour {
     public Controller controller;
