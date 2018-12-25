@@ -70,7 +70,8 @@ body {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
-.objects-item.object-sector:hover {
+.objects-item.object-sector:hover,
+.behaviors-item.category:hover {
 	background-color: rgba(1,33,45,1);
 }
 .objects-item.object-world.current-objects-item,
@@ -246,7 +247,8 @@ input[type=range]:focus::-ms-fill-upper {
 	box-shadow: rgba(0,0,0,0.4) 0 0 10px;
     background-color: rgba(3,61,82,1);
 }
-#levelselect-popup {
+#levelselect-popup,
+#script-popup {
     background-color: rgba(6,86,109,1);
 }
 .style-item.current-style-item {

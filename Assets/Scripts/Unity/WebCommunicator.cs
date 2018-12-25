@@ -209,10 +209,8 @@ public class WebCommunicator : MonoBehaviour {
 		if (behavior is Macro) {
 			Macro m = behavior as Macro;
 			name = m.ShortName;
-			if (name.Contains("^CreateMacro:")) {
-				name = name.Substring(name.IndexOf("^CreateMacro:") + 13);
-			}
 			behaviorJSON["script"] = GetScriptJSON(perso, m.script, includeScriptContents);
+			behaviorJSON["type"] = "Macro";
 		} else {
 			Behavior b = behavior as Behavior;
 			name = b.ShortName;
@@ -221,6 +219,7 @@ public class WebCommunicator : MonoBehaviour {
 				scripts.Add(GetScriptJSON(perso, script, includeScriptContents));
 			}
 			behaviorJSON["scripts"] = scripts;
+			behaviorJSON["type"] = b.type.ToString();
 			if (b.firstScript != null) {
 				behaviorJSON["firstScript"] = GetScriptJSON(perso, b.firstScript, includeScriptContents);
 			}
@@ -385,7 +384,7 @@ public class WebCommunicator : MonoBehaviour {
 	}
 	private void ParseRequestJSON(JSONNode msg) {
 		if (msg["type"] != null) {
-			switch (msg["type"].ToString()) {
+			switch ((string)msg["type"]) {
 				case "script":
 					Script s = GetScriptFromRequest(msg);
 					if (s != null) Send(GetScriptJSON(selector.selectedPerso.perso, s, true));
@@ -394,27 +393,34 @@ public class WebCommunicator : MonoBehaviour {
 		}
 	}
 	private Script GetScriptFromRequest(JSONNode msg) {
-		if (selector.selectedPerso == null || selector.selectedPerso.perso.brain == null) return null;
-		Brain b = selector.selectedPerso.perso.brain;
+		if (selector.selectedPerso == null
+			|| selector.selectedPerso.perso.brain == null
+			|| selector.selectedPerso.perso.brain.mind == null
+			|| selector.selectedPerso.perso.brain.mind.AI_model == null) return null;
+		AIModel ai = selector.selectedPerso.perso.brain.mind.AI_model;
 		string offset = msg["scriptOffset"];
-		switch (msg["scriptLocation"].ToString()) {
-			case "ruleBehaviors":
-				if (b.mind == null || b.mind.AI_model == null || b.mind.AI_model.behaviors_normal == null) return null;
-				foreach (Behavior be in b.mind.AI_model.behaviors_normal) {
+		switch ((string)msg["behaviorType"]) {
+			case "Rule":
+				if (ai.behaviors_normal == null) return null;
+				foreach (Behavior be in ai.behaviors_normal) {
 					if (be.firstScript != null && be.firstScript.offset.ToString() == offset) return be.firstScript;
-					foreach (Script s in be.scripts) if (s.offset.ToString() == offset) return s;
+					foreach (Script s in be.scripts) {
+						if (s.offset.ToString() == offset) return s;
+					}
 				}
 				break;
-			case "reflexBehaviors":
-				if (b.mind == null || b.mind.AI_model == null || b.mind.AI_model.behaviors_reflex == null) return null;
-				foreach (Behavior be in b.mind.AI_model.behaviors_reflex) {
+			case "Reflex":
+				if (ai.behaviors_reflex == null) return null;
+				foreach (Behavior be in ai.behaviors_reflex) {
 					if (be.firstScript != null && be.firstScript.offset.ToString() == offset) return be.firstScript;
-					foreach (Script s in be.scripts) if (s.offset.ToString() == offset) return s;
+					foreach (Script s in be.scripts) {
+						if (s.offset.ToString() == offset) return s;
+					}
 				}
 				break;
-			case "macros":
-				if (b.mind == null || b.mind.AI_model == null || b.mind.AI_model.macros == null) return null;
-				foreach (Macro m in b.mind.AI_model.macros) {
+			case "Macro":
+				if (ai.macros == null) return null;
+				foreach (Macro m in ai.macros) {
 					if (m.script != null && m.script.offset.ToString() == offset) return m.script;
 				}
 				break;

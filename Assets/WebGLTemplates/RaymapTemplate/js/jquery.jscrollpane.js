@@ -208,8 +208,8 @@
 				if (!(isScrollableH || isScrollableV)) {
 					elem.removeClass('jspScrollable');
 					pane.css({
-            top: 0,
-            left: 0,
+						top: 0,
+						left: 0,
 						width: '100%'
 					});
 					removeMousewheel();
@@ -474,7 +474,8 @@
 				}
 				// reflow content
 				if (isScrollableH) {
-					pane.width((container.outerWidth() - originalPaddingTotalWidth) + 'px');
+					pane.css('width', 'auto');
+					//pane.width((container.outerWidth() - originalPaddingTotalWidth) + 'px');
 				}
 				contentHeight = pane.outerHeight();
 				percentInViewV = contentHeight / paneHeight;
@@ -1269,69 +1270,71 @@
 					}
 				);
 				var verticalDragOffset = 0;
-				verticalDrag.unbind('touchstart.jsp touchmove.jsp touchend.jsp click.jsp-touchclick').bind(
-					'touchstart.jsp',
-					function(e)
-					{
-						var touch = e.originalEvent.touches[0];
-						startX = contentPositionX();
-						startY = contentPositionY();
-						touchStartX = touch.pageX;
-						touchStartY = touch.pageY;
-						verticalDragOffset = touchStartY - verticalDrag.position().top;
-						moved = false;
-						movingDrag = true;
-						if($(".ui-sortable-helper").length) movingDrag = false;
-					}
-				).bind(
-					'touchmove.jsp',
-					function(ev)
-					{
-						if($(".ui-sortable-helper").length) {
-							movingDrag = false;
-							jsp.scrollTo(startX, startY);
-							return;
-						}
-						if(!movingDrag) {
-							return;
-						}
-
-						var touchPos = ev.originalEvent.touches[0],
-							dX = horizontalDragPosition, dY = verticalDragPosition;
-							
-						//var diffX = startX + touchStartX - touchPos.pageX;
-						//var diffY = startY + touchStartY - touchPos.pageY;
-						
-						positionDragY(touchPos.pageY - verticalDragOffset, false);
-
-						//jsp.scrollTo(startX + touchStartX - touchPos.pageX, startY + touchStartY - touchPos.pageY);
-
-						//moved = moved || Math.abs(touchStartX - touchPos.pageX) > 5 || Math.abs(touchStartY - touchPos.pageY) > 5;
-						moved = moved || Math.abs(touchStartY - touchPos.pageY) > 5;
-
-						
-						// return true if there was no movement so rest of screen can scroll
-						return dX == horizontalDragPosition && dY == verticalDragPosition;
-					}
-				).bind(
-					'touchend.jsp',
-					function(e)
-					{
-						movingDrag = false;
-						/*if(moved) {
-							return false;
-						}*/
-					}
-				).bind(
-					'click.jsp-touchclick',
-					function(e)
-					{
-						if(moved) {
+				if(verticalDrag != null) {
+					verticalDrag.unbind('touchstart.jsp touchmove.jsp touchend.jsp click.jsp-touchclick').bind(
+						'touchstart.jsp',
+						function(e)
+						{
+							var touch = e.originalEvent.touches[0];
+							startX = contentPositionX();
+							startY = contentPositionY();
+							touchStartX = touch.pageX;
+							touchStartY = touch.pageY;
+							verticalDragOffset = touchStartY - verticalDrag.position().top;
 							moved = false;
-							return false;
+							movingDrag = true;
+							if($(".ui-sortable-helper").length) movingDrag = false;
 						}
-					}
-				);
+					).bind(
+						'touchmove.jsp',
+						function(ev)
+						{
+							if($(".ui-sortable-helper").length) {
+								movingDrag = false;
+								jsp.scrollTo(startX, startY);
+								return;
+							}
+							if(!movingDrag) {
+								return;
+							}
+
+							var touchPos = ev.originalEvent.touches[0],
+								dX = horizontalDragPosition, dY = verticalDragPosition;
+								
+							//var diffX = startX + touchStartX - touchPos.pageX;
+							//var diffY = startY + touchStartY - touchPos.pageY;
+							
+							positionDragY(touchPos.pageY - verticalDragOffset, false);
+
+							//jsp.scrollTo(startX + touchStartX - touchPos.pageX, startY + touchStartY - touchPos.pageY);
+
+							//moved = moved || Math.abs(touchStartX - touchPos.pageX) > 5 || Math.abs(touchStartY - touchPos.pageY) > 5;
+							moved = moved || Math.abs(touchStartY - touchPos.pageY) > 5;
+
+							
+							// return true if there was no movement so rest of screen can scroll
+							return dX == horizontalDragPosition && dY == verticalDragPosition;
+						}
+					).bind(
+						'touchend.jsp',
+						function(e)
+						{
+							movingDrag = false;
+							/*if(moved) {
+								return false;
+							}*/
+						}
+					).bind(
+						'click.jsp-touchclick',
+						function(e)
+						{
+							if(moved) {
+								moved = false;
+								return false;
+							}
+						}
+					);
+				}
 			}
 
 			function destroy(){

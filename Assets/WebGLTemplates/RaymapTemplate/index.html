@@ -30,6 +30,7 @@
 		<link rel="stylesheet" type="text/css" href="css/source-sans-pro.css" />
         <link rel="stylesheet" type="text/css" href="css/icomoon.css" />
 		<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css" media="all" />
+		<link rel="stylesheet" type="text/css" href="css/highlight.css">
 		<link rel="stylesheet" type="text/css" href="css/main.css?1" />
 		
 		<!-- colors -->
@@ -45,6 +46,7 @@
 		<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
 		<script type="text/javascript" src="js/modernizr.custom.js"></script>
 		<script type="text/javascript" src="js/jquery.mobile.custom.min.js"></script>
+		<script type="text/javascript" src="highlight/highlight.pack.js"></script>
 		<script type="text/javascript" src="js/main.js?1"></script>
 		
 		<link rel="icon" type="image/png" href="img/favicon/favicon-32x32.png" sizes="32x32" />
@@ -69,7 +71,7 @@
 						</div></div>
 					</div>
 					<div class="column column-description invisible">
-						<div class="column-header"><span id="header-objects-text">Current object</span>
+						<div class="column-header"><span id="header-description-text">Current object</span>
 							<div class="header-buttons-right"><div id="btn-close-description" class="header-button disabled-button" title="Close object description panel"><i class="icon-times"></i></div></div>
 						</div>
 						<div id="content-description" class="column-content column-content-scroll">
@@ -99,13 +101,13 @@
 								<div class="field flexible"><input id="animationSpeed" class="input-typing" type="number" step="any" name="x" placeholder="0" min="0"></input></div>
 								<div id="btn-playAnimation" class="field header-button" title="Play animation"><i class="icon-media-play1"></i></div>
 							</div>
-							<div id="content-behaviors" class="perso-description invisible">
+							<div id="content-brain" class="perso-description invisible">
 							</div>
 						</div>
 						<div class="column-footer"></div>
 					</div>
 					<div class="column column-unity">
-						<div class="column-header"><span id="header-objects-text">Raymap</span></div>
+						<div class="column-header"><span id="header-unity-text">Raymap</span></div>
 						<div id="gameContainer" class="column-content"></div>
 						<div class="column-footer">
 							<div class="header-buttons-left">
@@ -128,6 +130,13 @@
 				<div class='name-family'>family</div><div class='name-model'>model</div><div class='name-instance'>instance</div>
 			</div>
 			<div id="dialogue-popup" class="hidden-popup"><div id="dialogue-image"></div><div id="dialogue-content"></div></div>
+			<div id="script-popup" class="hidden-popup">
+				<div class="column-header"><span id="header-script-text">Script</span>
+					<div class="header-buttons-right"><div id="btn-prev-script" class="header-button disabled-button" title="Previous script"><i class="icon-chevron-left"></i></div><div id="btn-next-script" class="header-button disabled-button" title="Next script"><i class="icon-chevron-right"></i></div></div>
+				</div>
+				<div id="content-script" class="column-content column-content-scroll"><pre><code id="content-script-code" class="cs"></code></pre></div>
+				<div class="column-footer"></div>
+			</div>
 			<div id="levelselect-popup" class="hidden-popup">
 				<div class="column-header">Level selection</div>
 				<div id="sidebar-levels" class="column-sidebar hidden-sidebar">

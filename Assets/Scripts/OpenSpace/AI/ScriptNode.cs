@@ -4,6 +4,7 @@ using OpenSpace.Object.Properties;
 using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -84,55 +85,58 @@ namespace OpenSpace.AI {
             AITypes aiTypes = Settings.s.aiTypes;
 
             Vector3 vector3 = new Vector3 { x = 0, y = 0, z = 0 };
-            switch (nodeType) {
-                case ScriptNode.NodeType.KeyWord: // KeyWordFunctionPtr
-                    if (param < aiTypes.keywordTable.Length) { return aiTypes.keywordTable[param]; }
-                    return "Unknown Keyword (" + param + ")";
-                case ScriptNode.NodeType.Condition: // GetConditionFunctionPtr
-                    if (param < aiTypes.conditionTable.Length) { return aiTypes.conditionTable[param]; }
-                    return "Unknown Condition (" + param + ")";
-                case ScriptNode.NodeType.Operator: // GetOperatorFunctionPtr
-                    if (advanced) {
-                        if (param < aiTypes.operatorTable.Length) { return aiTypes.operatorTable[param] + " (" + param + ")"; }
-                    }
-                    if (param < aiTypes.operatorTable.Length) { return aiTypes.operatorTable[param]; }
-                    return "Unknown Operator (" + param + ")";
-                case ScriptNode.NodeType.Function: // GetFunctionFunctionPtr
-                    if (param < aiTypes.functionTable.Length) { return aiTypes.functionTable[param]; }
-                    return "Unknown Function (" + param + ")";
-                case ScriptNode.NodeType.Procedure: // ProcedureFunctionReturn
-                    if (param < aiTypes.procedureTable.Length) { return aiTypes.procedureTable[param]; }
-                    return "Unknown Procedure (" + param + ")";
-                case ScriptNode.NodeType.MetaAction: // meta action
-                    if (param < aiTypes.metaActionTable.Length) { return aiTypes.metaActionTable[param]; }
-                    return "Unknown Meta Action (" + param + ")";
-                case ScriptNode.NodeType.BeginMacro:
-                    return "Begin Macro";
-                case ScriptNode.NodeType.EndMacro:
-                    return "End Macro";
-                case ScriptNode.NodeType.Field:
-                    if (param < aiTypes.fieldTable.Length) { return aiTypes.fieldTable[param]; }
-                    return "Unknown Field (" + param + ")";
-                case ScriptNode.NodeType.DsgVarRef: // Dsg Var
-                    if (perso != null && perso.brain != null && perso.brain.mind != null) {
-                        Mind mind = perso.brain.mind;
-                        if (mind.dsgMem != null && mind.dsgMem.dsgVar != null) {
-                            if (param < mind.dsgMem.dsgVar.dsgVarInfos.Length) {
-                                return mind.dsgMem.dsgVar.dsgVarInfos[param].NiceVariableName;
-                            }
-                        } else if (mind.AI_model != null && mind.AI_model.dsgVar != null) {
-                            if (param < mind.AI_model.dsgVar.dsgVarInfos.Length) {
-                                return mind.AI_model.dsgVar.dsgVarInfos[param].NiceVariableName;
-                            }
-                        }
-                    }
-                    return "dsgVar_" + param;
-                case ScriptNode.NodeType.Constant:
-                    if (advanced) return "Constant: " + BitConverter.ToInt32(BitConverter.GetBytes(param), 0);
-                    return BitConverter.ToInt32(BitConverter.GetBytes(param), 0).ToString();
-                case ScriptNode.NodeType.Real:
-                    if (advanced) return "Real: " + BitConverter.ToSingle(BitConverter.GetBytes(param), 0);
-                    return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString();
+			switch (nodeType) {
+				case ScriptNode.NodeType.KeyWord: // KeyWordFunctionPtr
+					if (param < aiTypes.keywordTable.Length) { return aiTypes.keywordTable[param]; }
+					return "Unknown Keyword (" + param + ")";
+				case ScriptNode.NodeType.Condition: // GetConditionFunctionPtr
+					if (param < aiTypes.conditionTable.Length) { return aiTypes.conditionTable[param]; }
+					return "Unknown Condition (" + param + ")";
+				case ScriptNode.NodeType.Operator: // GetOperatorFunctionPtr
+					if (advanced) {
+						if (param < aiTypes.operatorTable.Length) { return aiTypes.operatorTable[param] + " (" + param + ")"; }
+					}
+					if (param < aiTypes.operatorTable.Length) { return aiTypes.operatorTable[param]; }
+					return "Unknown Operator (" + param + ")";
+				case ScriptNode.NodeType.Function: // GetFunctionFunctionPtr
+					if (param < aiTypes.functionTable.Length) { return aiTypes.functionTable[param]; }
+					return "Unknown Function (" + param + ")";
+				case ScriptNode.NodeType.Procedure: // ProcedureFunctionReturn
+					if (param < aiTypes.procedureTable.Length) { return aiTypes.procedureTable[param]; }
+					return "Unknown Procedure (" + param + ")";
+				case ScriptNode.NodeType.MetaAction: // meta action
+					if (param < aiTypes.metaActionTable.Length) { return aiTypes.metaActionTable[param]; }
+					return "Unknown Meta Action (" + param + ")";
+				case ScriptNode.NodeType.BeginMacro:
+					return "Begin Macro";
+				case ScriptNode.NodeType.EndMacro:
+					return "End Macro";
+				case ScriptNode.NodeType.Field:
+					if (param < aiTypes.fieldTable.Length) { return aiTypes.fieldTable[param]; }
+					return "Unknown Field (" + param + ")";
+				case ScriptNode.NodeType.DsgVarRef: // Dsg Var
+					if (perso != null && perso.brain != null && perso.brain.mind != null) {
+						Mind mind = perso.brain.mind;
+						if (mind.dsgMem != null && mind.dsgMem.dsgVar != null) {
+							if (param < mind.dsgMem.dsgVar.dsgVarInfos.Length) {
+								return mind.dsgMem.dsgVar.dsgVarInfos[param].NiceVariableName;
+							}
+						} else if (mind.AI_model != null && mind.AI_model.dsgVar != null) {
+							if (param < mind.AI_model.dsgVar.dsgVarInfos.Length) {
+								return mind.AI_model.dsgVar.dsgVarInfos[param].NiceVariableName;
+							}
+						}
+					}
+					return "dsgVar_" + param;
+				case ScriptNode.NodeType.Constant:
+					if (advanced) return "Constant: " + BitConverter.ToInt32(BitConverter.GetBytes(param), 0);
+					return BitConverter.ToInt32(BitConverter.GetBytes(param), 0).ToString();
+				case ScriptNode.NodeType.Real:
+					NumberFormatInfo nfi = new NumberFormatInfo() {
+						NumberDecimalSeparator = "."
+					};
+					if (advanced) return "Real: " + BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString(nfi);
+                    return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString(nfi);
                 case ScriptNode.NodeType.Button: // Button/entryaction
                     EntryAction ea = EntryAction.FromOffset(param_ptr);
                     string eaName = ea == null ? "ERR_ENTRYACTION_NOTFOUND" : (advanced ? ea.ToString() : ea.ToBasicString());
