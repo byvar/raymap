@@ -173,9 +173,10 @@ namespace OpenSpace.FileFormat {
                     //l.print(isCompressed + " - " + compressedSize + " - " + decompressedSize);
                     byte[] compressedData = reader.ReadBytes((int)compressedSize);
                     byte[] uncompressedData = null;
-                    uint diff = 0;
+                    int diff = 0;
+
                     if (isCompressed != 0) {
-                        diff = decompressedSize - compressedSize;
+                        diff = (int)decompressedSize - (int)compressedSize;
 
                         /*LZOCompressor lzo = new LZOCompressor();
                         uncompressedData = lzo.Decompress(compressedData);

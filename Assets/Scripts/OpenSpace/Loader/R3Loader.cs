@@ -207,7 +207,10 @@ namespace OpenSpace.Loader {
             loadingState = "Loading input structure";
             yield return null;
             inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-            if (Settings.s.platform == Settings.Platform.PC) {
+			foreach (EntryAction ea in inputStruct.entryActions) {
+				print(ea.ToString());
+			}
+			if (Settings.s.platform == Settings.Platform.PC) {
                 Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
                 ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
             }

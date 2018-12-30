@@ -51,7 +51,36 @@ namespace OpenSpace {
             if (typeof(ILinkedListEntry).IsAssignableFrom(typeof(T))) customEntries = true;
         }
 
-        public static LinkedList<T> ReadHeader(Reader reader, Pointer offset, Type type = Type.Default) {
+		public LinkedList(Pointer offset, Pointer off_head, Pointer off_tail, uint num_elements, Type type = Type.Default) : this(offset) {
+			this.off_head = off_head;
+			this.off_tail = off_tail;
+			this.num_elements = num_elements;
+			list = new T[num_elements];
+
+			if (type == Type.Default) {
+				type = Settings.s.linkedListType;
+				if (type == Type.Minimize) {
+					type = Type.Single;
+				}
+			} else if (type == Type.Minimize) {
+				/* Minimize works as follows. A linkedlist with type minimize is a default one,
+                but if the default type is also Minimize (RA GC, R2 DC) then it is a SingleNoElementPointers list (i.e. optimized to an array).
+                If the list itself does not specify the minimize type, it is read as a default one,
+                but if the default type is Minimize then it becomes a Single list (i.e. not an array, but no previous pointers).
+                */
+				type = Settings.s.linkedListType;
+				if (type == Type.Minimize) {
+					type = Type.SingleNoElementPointers;
+				}
+			}
+			this.type = type;
+
+		}
+
+		public LinkedList(Pointer offset, Pointer off_head, uint num_elements, Type type = Type.Default) : this(offset, off_head, null, num_elements, type) {}
+
+
+		public static LinkedList<T> ReadHeader(Reader reader, Pointer offset, Type type = Type.Default) {
             MapLoader l = MapLoader.Loader;
             LinkedList<T> li = new LinkedList<T>(offset);
             li.type = type;

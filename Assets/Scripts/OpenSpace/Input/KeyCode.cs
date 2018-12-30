@@ -2,7 +2,58 @@
 using UnityEditor;
 
 namespace OpenSpace.Input {
-    public enum KeyCode { // AZERTY because UbiSoft is le french
+	public enum JoypadKeyCode {
+		Shoot = 0xA,
+		Jump = 0xB,
+		Triangle = 0xC,
+		Circle = 0xD,
+		Cross = 0xE,
+		Square = 0xF,
+		L2 = 0x10,
+		R2 = 0x11,
+		L1 = 0x12,
+		R1 = 0x13,
+		Select = 0x14,
+		Unknown = 0x15,
+		TakePicture = 0x16,
+		Start = 0x17,
+		DPadUp = 0x18,
+		DPadRight = 0x19,
+		DPadDown = 0x1A,
+		DPadLeft = 0x1B
+	}
+	public enum DreamcastKeyCode {
+		C = 0x10,
+		B = 0x11,
+		A = 0x12,
+		Start = 0x13,
+		DPadUp = 0x14,
+		DPadDown = 0x15,
+		DPadLeft = 0x16,
+		DPadRight = 0x17,
+		Z = 0x18,
+		Y = 0x19,
+		X = 0x1A,
+		R = 0x20,
+		L = 0x21
+	}
+	public enum GameCubeKeyCode {
+		DPadLeft = 0x0C,
+		DPadRight = 0x0D,
+		DPadDown = 0x0E,
+		DPadUp = 0x0F,
+		Z = 0x10,
+		R = 0x11,
+		L = 0x12,
+		C = 0x13,
+		A = 0x14,
+		B = 0x15,
+		X = 0x16,
+		Y = 0x17,
+		Start = 0x18,
+	}
+
+	public enum KeyCode { // AZERTY because UbiSoft is le french
         _UNDEFINED = 0x00,
         Escape = 0x01,
         One = 0x02,

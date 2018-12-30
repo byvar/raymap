@@ -7,8 +7,8 @@ namespace OpenSpace.Input {
         public Pointer offset;
 
         public ushort indexOrKeyCode;
-        public byte field_2;
-        public byte field_3;
+		public int valueAsInt;
+		public Pointer valueAsPointer;
         
         public KeyWord[] subkeywords;
         public bool isFunction = false;
@@ -30,7 +30,7 @@ namespace OpenSpace.Input {
         }
 
         public static KeyWord Read(Reader reader, Pointer offset, bool isFunction=true) {
-            KeyWord keyWord = new KeyWord(offset);
+            KeyWord keyword = new KeyWord(offset);
 
             // Read 20 in total for R2iOS
             if (Settings.s.hasExtraInputData) {
@@ -38,14 +38,16 @@ namespace OpenSpace.Input {
                 reader.ReadInt32();
                 reader.ReadInt32();
             }
-            
-            keyWord.indexOrKeyCode = reader.ReadUInt16();
-            keyWord.field_2 = reader.ReadByte();
-            keyWord.field_3 = reader.ReadByte();
-            reader.ReadInt32();
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadInt32();
 
-            if (isFunction && Settings.s.game != Settings.Game.TTSE) {
+			Pointer off_value = Pointer.Current(reader);
+            keyword.indexOrKeyCode = reader.ReadUInt16();
+			Pointer.Goto(ref reader, off_value);
+			keyword.valueAsInt = reader.ReadInt32();
+			keyword.valueAsPointer = Pointer.GetPointerAtOffset(off_value);
+			if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadInt32();
+			reader.ReadInt32();
+
+            /*if (isFunction && Settings.s.game != Settings.Game.TTSE) {
                 keyWord.isFunction = true;
                 switch (keyWord.FunctionType) {
                     case InputFunctions.FunctionType.Not:
@@ -78,11 +80,19 @@ namespace OpenSpace.Input {
                             }
                         }
                         break;
-                }
+					case InputFunctions.FunctionType.JoystickPressed:
+					case InputFunctions.FunctionType.JoystickReleased:
+					case InputFunctions.FunctionType.JoystickJustPressed:
+					case InputFunctions.FunctionType.JoystickJustReleased:
+						keyWord.subkeywords = new KeyWord[2];
+						keyWord.subkeywords[0] = KeyWord.Read(reader, Pointer.Current(reader));
+						keyWord.subkeywords[1] = KeyWord.Read(reader, Pointer.Current(reader));
+						break;
+				}
             } else {
-            }
+            }*/
 
-            return keyWord;
+            return keyword;
         }
 
         public int FillInSubKeywords(LinkedList<KeyWord> keywords, int thisIndex) {
@@ -129,7 +139,41 @@ namespace OpenSpace.Input {
                         }
                     }
                     break;
-            }
+				case InputFunctions.FunctionType.JoystickPressed:
+				case InputFunctions.FunctionType.JoystickReleased:
+				case InputFunctions.FunctionType.JoystickJustPressed:
+				case InputFunctions.FunctionType.JoystickJustReleased:
+				case InputFunctions.FunctionType.JoystickOrPadPressed:
+				case InputFunctions.FunctionType.JoystickOrPadReleased:
+				case InputFunctions.FunctionType.JoystickOrPadJustPressed:
+				case InputFunctions.FunctionType.JoystickOrPadJustReleased:
+					subkeywords = new KeyWord[2];
+					subkeywords[0] = keywords[thisIndex + keywordsRead];
+					keywordsRead += 1;
+					subkeywords[1] = keywords[thisIndex + keywordsRead];
+					keywordsRead += 1;
+					break;
+				case InputFunctions.FunctionType.JoystickAxeValue:
+					subkeywords = new KeyWord[4];
+					subkeywords[0] = keywords[thisIndex + keywordsRead];
+					keywordsRead += 1;
+					subkeywords[1] = keywords[thisIndex + keywordsRead];
+					keywordsRead += 1;
+					subkeywords[2] = keywords[thisIndex + keywordsRead];
+					keywordsRead += 1;
+					subkeywords[3] = keywords[thisIndex + keywordsRead];
+					keywordsRead += 1;
+					break;
+				case InputFunctions.FunctionType.ActionValidated:
+				case InputFunctions.FunctionType.ActionInvalidated:
+				case InputFunctions.FunctionType.ActionJustValidated:
+				case InputFunctions.FunctionType.ActionJustInvalidated:
+					subkeywords = new KeyWord[1];
+					subkeywords[0] = keywords[thisIndex + keywordsRead];
+					keywordsRead += 1;
+					break;
+
+			}
             return keywordsRead;
         }
 
@@ -155,7 +199,36 @@ namespace OpenSpace.Input {
                             sequence += Enum.GetName(typeof(KeyCode), subkeywords[i].indexOrKeyCode);
                         }
                         return "Sequence: " + sequence;
-                    default:
+					case InputFunctions.FunctionType.JoystickPressed:
+					case InputFunctions.FunctionType.JoystickReleased:
+					case InputFunctions.FunctionType.JoystickJustPressed:
+					case InputFunctions.FunctionType.JoystickJustReleased:
+					case InputFunctions.FunctionType.JoystickOrPadPressed:
+					case InputFunctions.FunctionType.JoystickOrPadReleased:
+					case InputFunctions.FunctionType.JoystickOrPadJustPressed:
+					case InputFunctions.FunctionType.JoystickOrPadJustReleased:
+						if (Settings.s.platform == Settings.Platform.GC) {
+							return FunctionType + "(" + Enum.GetName(typeof(GameCubeKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+						} else if(Settings.s.platform == Settings.Platform.DC) {
+							return FunctionType + "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+						} else {
+							return FunctionType + "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+						}
+					case InputFunctions.FunctionType.JoystickAxeValue:
+						return FunctionType + "("
+							+ (subkeywords[1].indexOrKeyCode == 4 ? "X" : "Y")
+							+ ", " + subkeywords[2].valueAsInt
+							+ ", " + subkeywords[3].valueAsInt
+							+ (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+					case InputFunctions.FunctionType.ActionValidated:
+					case InputFunctions.FunctionType.ActionInvalidated:
+					case InputFunctions.FunctionType.ActionJustValidated:
+					case InputFunctions.FunctionType.ActionJustInvalidated:
+						Pointer off_action = subkeywords[0].valueAsPointer;
+						if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) return FunctionType + "()";
+						EntryAction action = EntryAction.FromOffset(off_action);
+						return FunctionType + "(" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + ")";
+					default:
                         return FunctionType.ToString();
                 }
             } else {

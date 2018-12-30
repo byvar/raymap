@@ -45,7 +45,7 @@ namespace OpenSpace.Input {
             SequencePad,
             SequencePadEnd
         }
-
+		
         public static FunctionType[] functionTypesSE = new FunctionType[] {
             FunctionType.Unknown,
             FunctionType.And,
@@ -120,10 +120,77 @@ namespace OpenSpace.Input {
             FunctionType.SequencePadEnd
         };
 
-        public static FunctionType GetFunctionType(uint index) {
+		public static FunctionType[] functionTypesDC = new FunctionType[] {
+			FunctionType.Unknown,
+			FunctionType.And,
+			FunctionType.Or,
+			FunctionType.Not,
+			FunctionType.KeyJustPressed,
+			FunctionType.KeyJustReleased,
+			FunctionType.KeyPressed,
+			FunctionType.KeyReleased,
+			FunctionType.ActionJustValidated,
+			FunctionType.ActionJustInvalidated,
+			FunctionType.ActionValidated,
+			FunctionType.ActionInvalidated,
+			FunctionType.PadJustPressed,
+			FunctionType.PadJustReleased,
+			FunctionType.PadPressed,
+			FunctionType.PadReleased,
+			FunctionType.JoystickAxeValue,
+			FunctionType.JoystickJustPressed,
+			FunctionType.JoystickJustReleased,
+			FunctionType.JoystickPressed,
+			FunctionType.JoystickReleased,
+			FunctionType.JoystickOrPadJustPressed,
+			FunctionType.JoystickOrPadJustReleased,
+			FunctionType.JoystickOrPadPressed,
+			FunctionType.JoystickOrPadReleased,
+			FunctionType.Sequence,
+			FunctionType.SequenceKey,
+			FunctionType.SequenceKeyEnd,
+			FunctionType.SequencePad,
+			FunctionType.SequencePadEnd,
+		};
+
+		public static FunctionType[] functionTypesGC = new FunctionType[] {
+			FunctionType.Unknown,
+			FunctionType.And,
+			FunctionType.Or,
+			FunctionType.Not,
+			FunctionType.ActionJustValidated,
+			FunctionType.ActionJustInvalidated,
+			FunctionType.ActionValidated,
+			FunctionType.ActionInvalidated,
+			FunctionType.PadJustPressed,
+			FunctionType.PadJustReleased,
+			FunctionType.PadPressed,
+			FunctionType.PadReleased,
+			FunctionType.JoystickAxeValue,
+			FunctionType.JoystickAngularValue,
+			FunctionType.JoystickTrueNormValue,
+			FunctionType.JoystickCorrectedNormValue,
+			FunctionType.JoystickJustPressed,
+			FunctionType.JoystickJustReleased,
+			FunctionType.JoystickPressed,
+			FunctionType.JoystickReleased,
+			FunctionType.JoystickOrPadJustPressed,
+			FunctionType.JoystickOrPadJustReleased,
+			FunctionType.JoystickOrPadPressed,
+			FunctionType.JoystickOrPadReleased,
+			FunctionType.Sequence,
+			FunctionType.SequenceKey,
+			FunctionType.SequenceKeyEnd,
+			FunctionType.SequencePad,
+			FunctionType.SequencePadEnd,
+		};
+
+		public static FunctionType GetFunctionType(uint index) {
             try {
-                if (Settings.s.game == Settings.Game.TTSE) return functionTypesSE[index];
+				if (Settings.s.game == Settings.Game.TTSE) return functionTypesSE[index];
                 if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) return functionTypesHype[index];
+				if (Settings.s.platform == Settings.Platform.GC) return functionTypesGC[index];
+				if (Settings.s.platform == Settings.Platform.DC) return functionTypesDC[index];
                 return (FunctionType)(index);
             } catch (Exception) {
                 return FunctionType.Unknown;
