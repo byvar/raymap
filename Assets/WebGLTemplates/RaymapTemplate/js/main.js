@@ -532,6 +532,32 @@ function showObjectDescription(so) {
 				});
 				allBehaviors.push("</div>");
 			}
+			if(brain.hasOwnProperty("dsgVars") && brain.dsgVars.length > 0) {
+				allBehaviors.push("<div class='behaviors-item category' data-collapse='dsgvars-collapse'><div class='collapse-sign'>+</div>DSG Variables</div><div id='dsgvars-collapse' style='display: none;'>");
+				$.each(brain.dsgVars, function (idx, dsg) {
+					let dsgString = "<div class='dsgvars-item dsgvar'><div class='dsgvar-name'>" + dsg.name + "</div><div class='dsgvar-value "
+					if(dsg.hasOwnProperty("value")) {
+						if(dsg.type === 'Perso') {
+							dsgString += " perso' data-offset='" + dsg.value.offset + "'>" + dsg.value.nameInstance;
+						} else if(dsg.type === 'SuperObject') {
+							if(dsg.value.type === 'Perso') {
+								dsgString += " perso' data-offset='" + dsg.value.perso.offset + "'>" + dsg.value.perso.nameInstance;
+							} else {
+								dsgString += " superObject' data-offset='" + dsg.value.offset + "'>" +dsg.value.name;
+							}
+						} else if(dsg.type === 'Vector') {
+							dsgString += " vector'>" + dsg.value[0] + ", " + dsg.value[1] + ", " + dsg.value[2];
+						} else {
+							dsgString += " main'>" +dsg.value;
+						}
+					} else {
+						dsgString += " null'>"
+					}
+					dsgString += "</div></div>"
+					allBehaviors.push(dsgString);
+				});
+				allBehaviors.push("</div>");
+			}
 			$("#content-brain").append(allBehaviors.join(""));
 		}
 		

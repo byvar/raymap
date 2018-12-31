@@ -50,7 +50,8 @@ body {
 
 .objects-item,
 .levels-item,
-.behaviors-item {
+.behaviors-item,
+.dsgvars-item {
 	color: #9ed9a0;
 }
 
@@ -82,7 +83,8 @@ body {
 .objects-item.object-perso:hover,
 .objects-item.object-IPO:hover,
 .levels-item.level:hover,
-.behaviors-item.behavior:hover {
+.behaviors-item.behavior:hover
+.dsgvars-item:hover {
 	background-color: rgba(3,61,82,1);
 }
 

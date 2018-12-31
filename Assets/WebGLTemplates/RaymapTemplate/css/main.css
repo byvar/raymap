@@ -160,7 +160,8 @@ a:focus {
 
 .objects-item,
 .levels-item,
-.behaviors-item {
+.behaviors-item,
+.dsgvars-item {
 	font-size: 0.9em;
 	display: block;
 	width: 100%;
@@ -207,6 +208,9 @@ a:focus {
 .levels-item.level.current-levels-item {
 	cursor: default;
 }
+.dsgvars-item {
+	padding: 0 0.5em 0 0.5em;
+}
 .objects-item.object-IPO,
 .objects-item.object-sector,
 .behaviors-item.category {
@@ -214,7 +218,8 @@ a:focus {
 }
 
 .objects-item > *,
-.behaviors-item > * {
+.behaviors-item > *,
+.dsgvars-item > * {
 	display: block;
 	padding: 0;
 	margin: 0;
@@ -271,7 +276,8 @@ a:focus {
 
 .objects-item > .name-family,
 #perso-tooltip > .name-family,
-#objectName > .name-family {
+#objectName > .name-family,
+.dsgvar-value > .name-family {
 	text-align: right;
 	display: inline-block;
 	font-weight: bold;
@@ -285,7 +291,8 @@ a:focus {
 }
 .objects-item > .name-model,
 #perso-tooltip > .name-model,
-#objectName > .name-model {
+#objectName > .name-model,
+.dsgvar-value > .name-model {
 	padding: 0 0.5em 0 0.5em;
 	text-align: center;
 	display: inline-block;
@@ -301,7 +308,8 @@ a:focus {
 }
 .objects-item > .name-instance,
 #perso-tooltip > .name-instance,
-#objectName > .name-instance {
+#objectName > .name-instance,
+.dsgvar-value > .name-instance {
 	text-align: left;
 	display: inline-block;
 	width: 40%;
@@ -328,6 +336,30 @@ a:focus {
 	text-align: left;
 	display: inline-block;
 	width: 65%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+.dsgvars-item > .dsgvar-name {
+	text-align: right;
+	display: inline-block;
+	padding-right: 1em;
+	/*font-weight: bold;*/
+	width: 30%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+.dsgvars-item > .dsgvar-value {
+	text-align: left;
+	display: inline-block;
+	width: 70%;
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
