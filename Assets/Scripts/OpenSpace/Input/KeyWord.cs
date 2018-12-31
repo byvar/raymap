@@ -198,7 +198,7 @@ namespace OpenSpace.Input {
                         for (int i = subkeywords.Length - 2; i > 1; i-=2) {
                             sequence += Enum.GetName(typeof(KeyCode), subkeywords[i].indexOrKeyCode);
                         }
-                        return "Sequence: " + sequence;
+                        return "Sequence(\"" + sequence + "\")";
 					case InputFunctions.FunctionType.JoystickPressed:
 					case InputFunctions.FunctionType.JoystickReleased:
 					case InputFunctions.FunctionType.JoystickJustPressed:
@@ -229,7 +229,7 @@ namespace OpenSpace.Input {
 						EntryAction action = EntryAction.FromOffset(off_action);
 						return FunctionType + "(" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + ")";
 					default:
-                        return FunctionType.ToString();
+                        return FunctionType.ToString() + "()";
                 }
             } else {
                 return "[" + indexOrKeyCode + "]<" + Enum.GetName(typeof(KeyCode), indexOrKeyCode) + ">";
