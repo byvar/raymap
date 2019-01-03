@@ -83,7 +83,7 @@ body {
 .objects-item.object-perso:hover,
 .objects-item.object-IPO:hover,
 .levels-item.level:hover,
-.behaviors-item.behavior:hover
+.behaviors-item.behavior:hover,
 .dsgvars-item:hover {
 	background-color: rgba(3,61,82,1);
 }

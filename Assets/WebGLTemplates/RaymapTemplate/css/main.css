@@ -348,7 +348,7 @@ a:focus {
 	display: inline-block;
 	padding-right: 1em;
 	/*font-weight: bold;*/
-	width: 30%;
+	width: 35%;
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
@@ -359,7 +359,7 @@ a:focus {
 .dsgvars-item > .dsgvar-value {
 	text-align: left;
 	display: inline-block;
-	width: 70%;
+	width: 65%;
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
