@@ -73,6 +73,8 @@ let gameInstance = null;
 let inputHasFocus = false;
 let mode, lvl, folder;
 
+let currentBehavior = null;
+let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
 let btn_close_description, stateSelector, objectListSelector, perso_tooltip;
 
@@ -126,6 +128,15 @@ function initContent() {
 			api.reinitialise();
 		}, 100);
 	});
+}
+
+function refreshScroll() {
+	waitForFinalEvent(function(){
+		$(".column-content-scroll").each( function(index) {
+			let api = $( this ).data('jsp');
+			api.reinitialise();
+		});
+	}, 3, "some unique string");
 }
 
 function setLevelsSidebarSlider(pos) {
@@ -335,6 +346,102 @@ function setAllJSON(jsonString) {
 	}
 }
 
+// SCRIPT
+function setBehavior(behaviorIndex) {
+	if(currentSO != null && currentSO.hasOwnProperty("perso") && currentSO.perso.hasOwnProperty("brain") && behaviorIndex >= 0) {
+		let allBehaviors = [];
+		let brain = currentSO.perso.brain;
+		if(brain.hasOwnProperty("ruleBehaviors") && brain.ruleBehaviors.length > 0) {
+			allBehaviors = allBehaviors.concat(brain.ruleBehaviors);
+		}
+		if(brain.hasOwnProperty("reflexBehaviors") && brain.reflexBehaviors.length > 0) {
+			allBehaviors = allBehaviors.concat(brain.reflexBehaviors);
+		}
+		if(brain.hasOwnProperty("macros") && brain.macros.length > 0) {
+			allBehaviors = allBehaviors.concat(brain.macros);
+		}
+		if(behaviorIndex < allBehaviors.length) {
+			currentBehavior = allBehaviors[behaviorIndex];
+			currentScriptIndex = 0;
+			$("#header-script-text").text(currentBehavior.name + ".Scripts[0]");
+			$("#content-script-code").text("");
+		}
+	}
+}
+
+function setScript(scriptIndex) {
+	if(currentBehavior != null) {
+		let scripts = [];
+		if(currentBehavior.hasOwnProperty("script")) {
+			scripts.push(currentBehavior.script);
+		}
+		if(currentBehavior.hasOwnProperty("firstScript")) {
+			scripts.push(currentBehavior.firstScript);
+		}
+		if(currentBehavior.hasOwnProperty("scripts")) {
+			scripts = scripts.concat(currentBehavior.scripts);
+		}
+		$("#content-script-code").text("");
+		let api = $("#content-script").data('jsp');
+		api.scrollTo(0,0, false);
+		refreshScroll();
+		if(scriptIndex < 0 || scriptIndex >= scripts.length) {
+			$('#btn-next-script').addClass('disabled-button');
+			$('#btn-prev-script').addClass('disabled-button');
+			currentScriptIndex = 0;
+		} else {
+			$('#btn-next-script').addClass('disabled-button');
+			$('#btn-prev-script').addClass('disabled-button');
+			currentScriptIndex = scriptIndex;
+			$("#header-script-text").text(currentBehavior.name + ".Scripts[" + scriptIndex + "]");
+			
+			let jsonObj = {
+				request: {
+					type: "script",
+					scriptOffset: scripts[scriptIndex].offset,
+					behaviorType: currentBehavior.type
+				}
+			};
+			sendMessage(jsonObj);
+		}
+	}
+}
+
+function handleMessage_script(msg) {
+	if(currentBehavior != null) {
+		let scripts = [];
+		if(msg.hasOwnProperty("translation")) {
+			$("#content-script-code").text(msg.translation);
+			hljs.highlightBlock($("#content-script-code").get(0));
+			let api = $("#content-script").data('jsp');
+			api.scrollTo(0,0, false);
+			/*waitForFinalEvent(function(){
+				hljs.highlightBlock($("#content-script-code").get(0));
+			}, 3, "highlight");*/
+			refreshScroll();
+		}
+		if(currentBehavior.hasOwnProperty("script")) {
+			scripts.push(currentBehavior.script);
+		}
+		if(currentBehavior.hasOwnProperty("firstScript")) {
+			scripts.push(currentBehavior.firstScript);
+		}
+		if(currentBehavior.hasOwnProperty("scripts")) {
+			scripts = scripts.concat(currentBehavior.scripts);
+		}
+		if(currentScriptIndex < scripts.length-1) {
+			$('#btn-next-script').removeClass('disabled-button');
+		} else {
+			$('#btn-next-script').addClass('disabled-button');
+		}
+		if(currentScriptIndex > 0) {
+			$('#btn-prev-script').removeClass('disabled-button');
+		} else {
+			$('#btn-prev-script').addClass('disabled-button');
+		}
+	}
+}
+
 // PERSO OBJECT DESCRIPTION
 function showObjectDescription(so) {
 	$('#posX').val(so.position[0]);
@@ -384,29 +491,74 @@ function showObjectDescription(so) {
 		$('#animationSpeed').val(so.perso.animationSpeed);
 		
 		// Scripts
-		$("#content-behaviors").empty();
+		$("#content-brain").empty();
 		if(so.perso.hasOwnProperty("brain")) {
 			let allBehaviors = [];
 			let brain = so.perso.brain;
+			let reg = /^.*\.(.*?)\[(\d*?)\](?:\[\"(.*?)\"\])?$/;
 			if(brain.hasOwnProperty("ruleBehaviors") && brain.ruleBehaviors.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category'>Rule behaviors</div>");
+				allBehaviors.push("<div class='behaviors-item category' data-collapse='behaviors-rule-collapse'><div class='collapse-sign'>+</div>Rule behaviors</div><div id='behaviors-rule-collapse' style='display: none;'>");
 				$.each(brain.ruleBehaviors, function (idx, val) {
-					allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+					let match = reg.exec(val.name);
+					if (match != null) {
+						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
+					} else {
+						allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+					}
 				});
+				allBehaviors.push("</div>");
 			}
 			if(brain.hasOwnProperty("reflexBehaviors") && brain.reflexBehaviors.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category'>Reflex behaviors</div>");
+				allBehaviors.push("<div class='behaviors-item category' data-collapse='behaviors-reflex-collapse'><div class='collapse-sign'>+</div>Reflex behaviors</div><div id='behaviors-reflex-collapse' style='display: none;'>");
 				$.each(brain.reflexBehaviors, function (idx, val) {
-					allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+					let match = reg.exec(val.name);
+					if (match != null) {
+						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
+					} else {
+						allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+					}
 				});
+				allBehaviors.push("</div>");
 			}
 			if(brain.hasOwnProperty("macros") && brain.macros.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category'>Macros</div>");
+				allBehaviors.push("<div class='behaviors-item category' data-collapse='macros-collapse'><div class='collapse-sign'>+</div>Macros</div><div id='macros-collapse' style='display: none;'>");
 				$.each(brain.macros, function (idx, val) {
-					allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+					let match = reg.exec(val.name);
+					if (match != null) {
+						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
+					} else {
+						allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+					}
 				});
+				allBehaviors.push("</div>");
 			}
-			$("#content-behaviors").append(allBehaviors.join(""));
+			if(brain.hasOwnProperty("dsgVars") && brain.dsgVars.length > 0) {
+				allBehaviors.push("<div class='behaviors-item category' data-collapse='dsgvars-collapse'><div class='collapse-sign'>+</div>DSG Variables</div><div id='dsgvars-collapse' style='display: none;'>");
+				$.each(brain.dsgVars, function (idx, dsg) {
+					let dsgString = "<div class='dsgvars-item dsgvar'><div class='dsgvar-name'>" + dsg.name + "</div><div class='dsgvar-value "
+					if(dsg.hasOwnProperty("value")) {
+						if(dsg.type === 'Perso') {
+							dsgString += " perso' data-offset='" + dsg.value.offset + "'>" + dsg.value.nameInstance;
+						} else if(dsg.type === 'SuperObject') {
+							if(dsg.value.type === 'Perso') {
+								dsgString += " perso' data-offset='" + dsg.value.perso.offset + "'>" + dsg.value.perso.nameInstance;
+							} else {
+								dsgString += " superObject' data-offset='" + dsg.value.offset + "'>" +dsg.value.name;
+							}
+						} else if(dsg.type === 'Vector') {
+							dsgString += " vector'>" + dsg.value[0] + ", " + dsg.value[1] + ", " + dsg.value[2];
+						} else {
+							dsgString += " main'>" +dsg.value;
+						}
+					} else {
+						dsgString += " null'>"
+					}
+					dsgString += "</div></div>"
+					allBehaviors.push(dsgString);
+				});
+				allBehaviors.push("</div>");
+			}
+			$("#content-brain").append(allBehaviors.join(""));
 		}
 		
 	} else {
@@ -572,16 +724,18 @@ function sendSettings() {
 function handleMessage(jsonString) {
 	let msg = $.parseJSON(jsonString);
 	if(msg != null && msg.hasOwnProperty("type")) {
-		switch(msg.type){
+		switch(msg.type) {
 			case "highlight":
 				handleMessage_highlight(msg); break;
 			case "selection":
 				handleMessage_selection(msg); break;
 			case "settings":
 				handleMessage_settings(msg); break;
+			case "script":
+				handleMessage_script(msg); break;
 			default:
 				console.log('default');break;
-			}
+		}
 	}
 }
 
@@ -662,6 +816,7 @@ function hideDialogue() {
 	if(gameInstance != null) {
 		$('#popup-overlay').addClass('hidden-overlay');
 		$('#levelselect-popup').addClass('hidden-popup');
+		$('#script-popup').addClass('hidden-popup');
 		selectButton($('#btn-levelselect'), false);
 	}
 	dialogueMsg = null;
@@ -675,6 +830,11 @@ function showLevelSelect() {
 	$('#popup-overlay').removeClass('hidden-overlay');
 	$("#levelselect-popup").removeClass('hidden-popup');
 	selectButton($('#btn-levelselect'), true);
+}
+
+function showScript() {
+	$('#popup-overlay').removeClass('hidden-overlay');
+	$("#script-popup").removeClass('hidden-popup');
 }
 
 function init() {
@@ -838,6 +998,36 @@ $(function() {
 		skipDialogue();
 		return false;
 	});
+	$(document).on('click', ".behaviors-item.category", function() {
+		let collapse_id = $(this).attr('data-collapse');
+		let collapse = $("#"+collapse_id);
+		if(collapse.is(":hidden")) {
+			collapse.show("fast", refreshScroll);
+			$(this).find(".collapse-sign").text("-");
+		} else {
+			collapse.hide("fast", refreshScroll);
+			$(this).find(".collapse-sign").text("+");
+		}
+		return false;
+	});
+	
+	$(document).on('click', ".behaviors-item.behavior", function() {
+		let index = $(".behaviors-item.behavior").index(this);
+		setBehavior(index);
+		setScript(0);
+		showScript();
+		return false;
+	});
+	
+	$(document).on('click', "#btn-next-script", function() {
+		setScript(currentScriptIndex+1);
+		return false;
+	});
+	
+	$(document).on('click', "#btn-prev-script", function() {
+		setScript(currentScriptIndex-1);
+		return false;
+	});
 	
 	$(document).on('click', ".sidebar-button", function() {
 		let butt = jQuery(this);
@@ -912,12 +1102,4 @@ $(function() {
 	
 });
 
-$( window ).resize(function() {
-	waitForFinalEvent(function(){
-		
-		$(".column-content-scroll").each( function(index) {
-			let api = $( this ).data('jsp');
-			api.reinitialise();
-		});
-	}, 3, "some unique string");
-});
+$( window ).resize(refreshScroll);

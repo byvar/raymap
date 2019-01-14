@@ -105,7 +105,10 @@ namespace OpenSpace.Loader {
             Pointer off_inputStructure = Pointer.Read(reader);
             Pointer.DoAt(ref reader, off_inputStructure, () => {
                 inputStruct = InputStructure.Read(reader, off_inputStructure);
-            });
+				foreach (EntryAction ea in inputStruct.entryActions) {
+					print(ea.ToString());
+				}
+			});
 
             yield return null;
             Pointer.Read(reader);
@@ -478,7 +481,7 @@ namespace OpenSpace.Loader {
 		}
 		private void ReadBehaviorCopy(Reader reader, Pointer offset, AIModel ai) {
 			Behavior b = Behavior.Read(reader, offset);
-			if (b != null) {
+			if (b != null && ai != null && ai.behaviors_normal != null) {
 				foreach (Behavior originalBehavior in ai.behaviors_normal) {
 					if (b.ContentEquals(originalBehavior)) {
 						originalBehavior.copies.Add(b.offset);
@@ -487,7 +490,7 @@ namespace OpenSpace.Loader {
 					}
 				}
 			}
-			if (b != null && ai.behaviors_reflex != null) {
+			if (b != null && ai != null && ai.behaviors_reflex != null) {
 				foreach (Behavior originalBehavior in ai.behaviors_reflex) {
 					if (b.ContentEquals(originalBehavior)) {
 						originalBehavior.copies.Add(b.offset);
@@ -496,7 +499,7 @@ namespace OpenSpace.Loader {
 					}
 				}
 			}
-			if (b != null) {
+			if (b != null && behaviors != null) {
 				foreach (Behavior originalBehavior in behaviors) {
 					if (b.ContentEquals(originalBehavior)) {
 						originalBehavior.copies.Add(b.offset);

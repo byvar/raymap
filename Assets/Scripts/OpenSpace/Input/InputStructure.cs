@@ -54,8 +54,8 @@ namespace OpenSpace.Input {
                 Pointer off_current = Pointer.Goto(ref reader, input.off_entryActions);
                 for (int i = 0; i < input.num_entryActions; i++) {
                     input.entryActions.Add(EntryAction.Read(reader, Pointer.Current(reader)));
-                }
-                Pointer.Goto(ref reader, off_current);
+				}
+				Pointer.Goto(ref reader, off_current);
             }
 
             return input;

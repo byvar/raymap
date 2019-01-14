@@ -35,8 +35,8 @@ public class CameraComponent : MonoBehaviour {
         PersoBehaviour pb = gao.GetComponent<PersoBehaviour>();
         if (pb != null) {
             //print(pb.perso.SuperObject.boundingVolume.Center + " - " + pb.perso.SuperObject.boundingVolume.Size);
-            center = pb.perso.SuperObject != null ? (pb.transform.position + pb.perso.SuperObject.boundingVolume.Center) : pb.transform.position;
-            size = pb.perso.SuperObject != null ? Vector3.Scale(pb.perso.SuperObject.boundingVolume.Size, pb.transform.lossyScale) : pb.transform.lossyScale;
+            center = (pb.perso.SuperObject != null && pb.perso.SuperObject.boundingVolume != null) ? (pb.transform.position + pb.perso.SuperObject.boundingVolume.Center) : pb.transform.position;
+            size = (pb.perso.SuperObject != null && pb.perso.SuperObject.boundingVolume != null) ? Vector3.Scale(pb.perso.SuperObject.boundingVolume.Size, pb.transform.lossyScale) : pb.transform.lossyScale;
         } else {
             SuperObjectComponent sc = gao.GetComponent<SuperObjectComponent>();
             if (sc != null) {

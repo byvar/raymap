@@ -392,7 +392,10 @@ namespace OpenSpace.Loader {
                 ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 
                 inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-                print("Num entractions: " + inputStruct.num_entryActions);
+				foreach (EntryAction ea in inputStruct.entryActions) {
+					print(ea.ToString());
+				}
+				print("Num entractions: " + inputStruct.num_entryActions);
                 print("Off entryactions: " + inputStruct.off_entryActions);
                 Pointer off_IPT_entryElementList = Pointer.Read(reader);
                 print("Off entryelements: " + off_IPT_entryElementList);

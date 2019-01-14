@@ -77,13 +77,14 @@ namespace OpenSpace.AI {
             IntegerArray,
             WayPointArray,
             TextArray,
-            Array7,
-            Array8,
+            TextRefArray,
+            Array6,
             Array9,
-            Array10,
+            SoundEventArray,
             Array11,
             Way, // TT SE only
-            ActionArray // Hype
-        }
+            ActionArray, // Hype
+			SuperObjectArray
+		}
     }
 }

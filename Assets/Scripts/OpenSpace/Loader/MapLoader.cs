@@ -16,6 +16,7 @@ using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
 using OpenSpace.Loader;
+using OpenSpace.Cinematics;
 
 namespace OpenSpace {
     public class MapLoader {
@@ -58,6 +59,7 @@ namespace OpenSpace {
         public SuperObject dynamicWorld;
         public SuperObject inactiveDynamicWorld;
         public SuperObject fatherSector;
+		public CinematicsManager cinematicsManager;
 
         public List<SuperObject> superObjects = new List<SuperObject>();
         public List<VisualMaterial> visualMaterials = new List<VisualMaterial>();
@@ -306,8 +308,11 @@ namespace OpenSpace {
 
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["inputStructure"], mem));
             inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+			foreach (EntryAction ea in inputStruct.entryActions) {
+				print(ea.ToString());
+			}
 
-            Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["fontStructure"], mem));
+			Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["fontStructure"], mem));
             fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
 
             // Parse actual world & always structure
@@ -601,6 +606,7 @@ MonoBehaviour.print(str);
             } else if (Settings.s.platform == Settings.Platform.iOS) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
+					if (textures[i] == null) continue;
 					loadingState = "Loading level textures: " + (i - num_textures_fix + 1) + "/" + (num_textures_total - num_textures_fix);
 					yield return null;
 					string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";

@@ -160,7 +160,8 @@ a:focus {
 
 .objects-item,
 .levels-item,
-.behaviors-item {
+.behaviors-item,
+.dsgvars-item {
 	font-size: 0.9em;
 	display: block;
 	width: 100%;
@@ -207,17 +208,25 @@ a:focus {
 .levels-item.level.current-levels-item {
 	cursor: default;
 }
+.dsgvars-item {
+	padding: 0 0.5em 0 0.5em;
+}
 .objects-item.object-IPO,
-.objects-item.object-sector {
+.objects-item.object-sector,
+.behaviors-item.category {
 	cursor: pointer;
 }
 
-.objects-item > * {
+.objects-item > *,
+.behaviors-item > *,
+.dsgvars-item > * {
 	display: block;
 	padding: 0;
 	margin: 0;
 }
-
+#content-brain {
+	margin-top: 1em;
+}
 .objects-item.object-world,
 .levels-item.game,
 .behaviors-item.category {
@@ -228,6 +237,10 @@ a:focus {
 	padding: 0 3em 0 3em;
 	height: 3em;
 	line-height: 3em;
+}
+.behaviors-item.category > .collapse-sign {
+	display: inline-block;
+	width: 2em;
 }
 .levels-item.game {
 	padding: 0 4.5em 0 4.5em;
@@ -263,7 +276,8 @@ a:focus {
 
 .objects-item > .name-family,
 #perso-tooltip > .name-family,
-#objectName > .name-family {
+#objectName > .name-family,
+.dsgvar-value > .name-family {
 	text-align: right;
 	display: inline-block;
 	font-weight: bold;
@@ -277,7 +291,8 @@ a:focus {
 }
 .objects-item > .name-model,
 #perso-tooltip > .name-model,
-#objectName > .name-model {
+#objectName > .name-model,
+.dsgvar-value > .name-model {
 	padding: 0 0.5em 0 0.5em;
 	text-align: center;
 	display: inline-block;
@@ -293,10 +308,58 @@ a:focus {
 }
 .objects-item > .name-instance,
 #perso-tooltip > .name-instance,
-#objectName > .name-instance {
+#objectName > .name-instance,
+.dsgvar-value > .name-instance {
 	text-align: left;
 	display: inline-block;
 	width: 40%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+.behaviors-item > .behavior-number {
+	text-align: center;
+	display: inline-block;
+	/*font-weight: bold;*/
+	width: 35%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+.behaviors-item > .behavior-name {
+	text-align: left;
+	display: inline-block;
+	width: 65%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+.dsgvars-item > .dsgvar-name {
+	text-align: right;
+	display: inline-block;
+	padding-right: 1em;
+	/*font-weight: bold;*/
+	width: 35%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+.dsgvars-item > .dsgvar-value {
+	text-align: left;
+	display: inline-block;
+	width: 65%;
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
@@ -326,7 +389,6 @@ a:focus {
 #perso-tooltip.hidden-tooltip {
     display: none;
 }
-
 
 
 /* ============================== OBJECT DESCRIPTION ============================== */
@@ -1050,7 +1112,8 @@ input[type=range]::-ms-fill-upper {
 #notification-popup.hidden-popup {
 	bottom: -9em;
 }
-#levelselect-popup {
+#levelselect-popup,
+#script-popup {
 	position: absolute;
 	bottom: 50%;
 	left: 50%;
@@ -1066,16 +1129,34 @@ input[type=range]::-ms-fill-upper {
 	line-height: 1.5em;
 	box-sizing: border-box;
 	overflow: hidden;
-	text-align: center;
 	
 }
-#levelselect-popup.hidden-popup {
+#script-popup {
+	max-width: 80em;
+}
+#levelselect-popup.hidden-popup,
+#script-popup.hidden-popup {
 	pointer-events: none;
 	bottom: -50%;
 }
 #content-levels {
 	overflow-y: auto;
 }
+#content-script {
+	text-align: left;
+	padding: 0em 1em 0em 1em;
+}
+#content-script-code {
+	text-align: left;
+	white-space: pre;
+	padding-right: 2em;
+	box-sizing: border-box;
+}
+#header-script-text {
+	font-family: Consolas, monaco, monospace;
+	font-size: 0.7em;
+}
+
 
 
 /* ============================== MOBILE ONLY ============================== */

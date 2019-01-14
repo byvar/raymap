@@ -40,6 +40,7 @@ public class Controller : MonoBehaviour {
 
 	private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
+	private CinematicSwitcher cinematicSwitcher = null;
 
 	public enum State {
 		None,
@@ -190,6 +191,11 @@ public class Controller : MonoBehaviour {
 		InitCamera();
 		/*if (viewCollision)*/
 		UpdateViewCollision();
+		if (loader.cinematicsManager != null) {
+			detailedState = "Initializing cinematics";
+			yield return null;
+			InitCinematics();
+		}
 		detailedState = "Finished";
 		state = State.Finished;
 		loadingScreen.Active = false;
@@ -537,6 +543,13 @@ public class Controller : MonoBehaviour {
 		foreach (WayPoint wayPoint in isolateWaypoints) {
 			wayPoint.Gao.name = "Isolate WayPoint";
 			wayPoint.Gao.transform.SetParent(isolateWaypointRoot.transform);
+		}
+	}
+
+	public void InitCinematics() {
+		if (loader.cinematicsManager != null && loader.cinematicsManager.cinematics.Count > 0) {
+			cinematicSwitcher = new GameObject("Cinematic Switcher").AddComponent<CinematicSwitcher>();
+			cinematicSwitcher.Init();
 		}
 	}
 
