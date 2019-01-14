@@ -549,6 +549,9 @@ public class Controller : MonoBehaviour {
                 continue;
             }
 
+            if (so.off_matrix==null) {
+                continue;
+            }
             Pointer.Goto(ref reader, so.off_matrix);
             so.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, so.off_matrix);
             if (so.data != null && so.data.Gao != null) {

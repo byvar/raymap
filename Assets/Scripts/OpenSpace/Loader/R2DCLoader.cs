@@ -487,7 +487,7 @@ namespace OpenSpace.Loader {
 					}
 				}
 			}
-			if (b != null) {
+			if (b != null && ai.behaviors_reflex != null) {
 				foreach (Behavior originalBehavior in ai.behaviors_reflex) {
 					if (b.ContentEquals(originalBehavior)) {
 						originalBehavior.copies.Add(b.offset);
