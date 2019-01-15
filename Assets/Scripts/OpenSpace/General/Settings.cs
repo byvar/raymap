@@ -28,6 +28,8 @@ namespace OpenSpace {
         public enum Platform { PC, iOS, GC, DC, PS1 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
+		public enum Caps { All, AllExceptExtension, Normal, None };
+		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB };
         
         public EngineVersion engineVersion;
         public Game game;
@@ -49,6 +51,7 @@ namespace OpenSpace {
         public float textureAnimationSpeedModifier = 1f;
         public float luminosity = 0.5f;
         public bool saturate = true;
+		public Dictionary<CapsType, Caps> caps = new Dictionary<CapsType, Caps>();
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -244,7 +247,10 @@ namespace OpenSpace {
             luminosity = 0.5f,
             saturate = true,
             aiTypes = AITypes.R2,
-            hasExtraInputData = false
+            hasExtraInputData = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			}
         };
 
         public static Settings R2IOS = new Settings() {
@@ -258,8 +264,11 @@ namespace OpenSpace {
             aiTypes = AITypes.R2,
             hasExtraInputData = true,
             luminosity = 0.5f,
-            saturate = true
-        };
+            saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			}
+		};
 
 		public static Settings R2PS1 = new Settings() {
 			engineVersion = EngineVersion.R2,
@@ -284,36 +293,47 @@ namespace OpenSpace {
             aiTypes = AITypes.R2,
             encryption = Encryption.ReadInit,
             luminosity = 0.5f,
-            saturate = true
+            saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.FixRelocation, Caps.AllExceptExtension }
+			}
         };
 
-        public static Settings TTPC = new Settings() {
-            engineVersion = EngineVersion.TT,
-            game = Game.TT,
-            platform = Platform.PC,
-            endian = Endian.Little,
-            linkedListType = LinkedListType.Double,
-            numEntryActions = 1,
-            aiTypes = AITypes.TTSE,
-            encryption = Encryption.Window,
-            encryptPointerFiles = true,
-            hasLinkedListHeaderPointers = true,
-            luminosity = 1f,
-            saturate = true
+		public static Settings TTPC = new Settings() {
+			engineVersion = EngineVersion.TT,
+			game = Game.TT,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			numEntryActions = 1,
+			aiTypes = AITypes.TTSE,
+			encryption = Encryption.Window,
+			encryptPointerFiles = true,
+			hasLinkedListHeaderPointers = true,
+			luminosity = 1f,
+			saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.FixRelocation, Caps.None },
+				{ CapsType.DSB, Caps.None }
+			}
         };
 
-        public static Settings TTSEPC = new Settings() {
-            engineVersion = EngineVersion.TT,
-            game = Game.TTSE,
-            platform = Platform.PC,
-            endian = Endian.Little,
-            linkedListType = LinkedListType.Double,
-            numEntryActions = 1,
-            aiTypes = AITypes.TTSE,
-            hasLinkedListHeaderPointers = true,
-            luminosity = 0.5f,
-            saturate = true
-        };
+		public static Settings TTSEPC = new Settings() {
+			engineVersion = EngineVersion.TT,
+			game = Game.TTSE,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			numEntryActions = 1,
+			aiTypes = AITypes.TTSE,
+			hasLinkedListHeaderPointers = true,
+			luminosity = 0.5f,
+			saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			}
+		};
 
         public static Settings PlaymobilHypePC = new Settings() {
             engineVersion = EngineVersion.Montreal,
@@ -326,8 +346,11 @@ namespace OpenSpace {
             hasLinkedListHeaderPointers = true,
             snaCompression = true,
             luminosity = 0.5f,
-            saturate = true
-        };
+            saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.FixLvl, Caps.None }
+			}
+		};
 
         public static Settings PlaymobilAlexPC = new Settings() {
             engineVersion = EngineVersion.Montreal,
@@ -340,8 +363,11 @@ namespace OpenSpace {
             hasLinkedListHeaderPointers = true,
             snaCompression = true,
             luminosity = 0.5f,
-            saturate = true
-        };
+            saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			}
+		};
 
         public static Settings PlaymobilLauraPC = new Settings() {
             engineVersion = EngineVersion.Montreal,
@@ -354,7 +380,14 @@ namespace OpenSpace {
             hasLinkedListHeaderPointers = true,
             snaCompression = false,
             luminosity = 0.5f,
-            saturate = true
+            saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.FixRelocation, Caps.None },
+				{ CapsType.LangFix, Caps.None },
+				{ CapsType.LangLevelFile, Caps.None },
+				{ CapsType.LangLevelFolder, Caps.None }
+			}
         };
     }
 }

@@ -59,7 +59,7 @@ let support = Modernizr.csstransitions;
 
 // GLOBAL VARIABLES
 let baseURL = "./"
-let baseURL_local = "https://getramone.com/raymap/"
+let baseURL_local = "https://maps.raym.app/"
 let gameLoading = true;
 let currentJSON = null;
 let levelsJSON = null;

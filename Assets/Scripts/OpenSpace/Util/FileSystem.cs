@@ -26,10 +26,11 @@ namespace OpenSpace {
 		private static Dictionary<string, byte[]> virtualFiles = new Dictionary<string, byte[]>();
 		private static Dictionary<string, BigFileEntry> virtualBigFiles = new Dictionary<string, BigFileEntry>();
 		private static Dictionary<string, bool> existingDirectories = new Dictionary<string, bool>();
-        public static string serverAddress = "https://getramone.com/raymap/data/";
+        public static string serverAddress = "https://raym.app/maps/data/";
 
         public static bool DirectoryExists(string path) {
-            if (FileSystem.mode == FileSystem.Mode.Web) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {
+			if (path == null || path.Trim() == "") return false;
+			if (FileSystem.mode == FileSystem.Mode.Web) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {
 				if (existingDirectories.ContainsKey(path) && existingDirectories[path] == true) return true;
 				return false;
 			} else {
@@ -38,6 +39,7 @@ namespace OpenSpace {
         }
 
         public static bool FileExists(string path) {
+			if (path == null || path.Trim() == "") return false;
             if (FileSystem.mode == FileSystem.Mode.Web) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {
                 return ((virtualFiles.ContainsKey(path) && virtualFiles[path] != null) || (virtualBigFiles.ContainsKey(path)));
             } else {
@@ -53,7 +55,8 @@ namespace OpenSpace {
 		}
 
 		public static Stream GetFileReadStream(string path) {
-            if (FileSystem.mode == FileSystem.Mode.Web) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {
+			if (path == null || path.Trim() == "") return null;
+			if (FileSystem.mode == FileSystem.Mode.Web) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {
 				if (virtualFiles.ContainsKey(path)) {
 					return new MemoryStream(virtualFiles[path]);
 				} else if (virtualBigFiles.ContainsKey(path)) {

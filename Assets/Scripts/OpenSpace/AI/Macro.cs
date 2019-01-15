@@ -46,13 +46,11 @@ namespace OpenSpace.AI {
             m.off_script2 = Pointer.Read(reader);
 
 			l.macros.Add(m);
-            //if (m.name != null) l.print(m.name);
+			//if (m.name != null) l.print(m.name);
 
-            if (m.off_script != null) {
-                Pointer off_current = Pointer.Goto(ref reader, m.off_script);
-                m.script = Script.Read(reader, Pointer.Current(reader), m);
-                Pointer.Goto(ref reader, off_current);
-            }
+			Pointer.DoAt(ref reader, m.off_script, () => {
+				m.script = Script.Read(reader, Pointer.Current(reader), m);
+			});
                 
             return m;
         }

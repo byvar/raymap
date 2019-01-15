@@ -234,16 +234,18 @@ public class WebCommunicator : MonoBehaviour {
 			case DsgVarInfoEntry.DsgVarType.Text: dsgObj["value"] = dsg.valueAsString; break;
 			case DsgVarInfoEntry.DsgVarType.Vector: dsgObj["value"] = dsg.valueAsVector; break;
 			case DsgVarInfoEntry.DsgVarType.Perso:
-				SuperObject so = SuperObject.FromOffset(dsg.entry.value as Pointer);
-				if (so.type == SuperObject.Type.Perso && so.data != null) {
-					Perso p = so.data as Perso;
-					if (p != null) {
-						JSONObject persoJSON = new JSONObject();
-						persoJSON["offset"] = p.offset.ToString();
-						persoJSON["nameFamily"] = p.nameFamily;
-						persoJSON["nameModel"] = p.nameModel;
-						persoJSON["nameInstance"] = p.namePerso;
-						dsgObj["value"] = persoJSON;
+				if (dsg.entry.value != null) {
+					SuperObject so = SuperObject.FromOffset(dsg.entry.value as Pointer);
+					if (so != null && so.type == SuperObject.Type.Perso && so.data != null) {
+						Perso p = so.data as Perso;
+						if (p != null) {
+							JSONObject persoJSON = new JSONObject();
+							persoJSON["offset"] = p.offset.ToString();
+							persoJSON["nameFamily"] = p.nameFamily;
+							persoJSON["nameModel"] = p.nameModel;
+							persoJSON["nameInstance"] = p.namePerso;
+							dsgObj["value"] = persoJSON;
+						}
 					}
 				}
 				break;
@@ -277,14 +279,19 @@ public class WebCommunicator : MonoBehaviour {
 		if (behavior is Macro) {
 			Macro m = behavior as Macro;
 			name = m.ShortName;
-			behaviorJSON["script"] = GetScriptJSON(perso, m.script, includeScriptContents);
+			if (m.script == null) name += " (null)";
+			if (m.script != null) {
+				behaviorJSON["script"] = GetScriptJSON(perso, m.script, includeScriptContents);
+			}
 			behaviorJSON["type"] = "Macro";
 		} else {
 			Behavior b = behavior as Behavior;
 			name = b.ShortName;
 			JSONArray scripts = new JSONArray();
 			foreach (Script script in b.scripts) {
-				scripts.Add(GetScriptJSON(perso, script, includeScriptContents));
+				if (script != null) {
+					scripts.Add(GetScriptJSON(perso, script, includeScriptContents));
+				}
 			}
 			behaviorJSON["scripts"] = scripts;
 			behaviorJSON["type"] = b.type.ToString();

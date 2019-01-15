@@ -61,7 +61,7 @@ namespace OpenSpace.FileFormat {
 			this.name = name;
 			this.type = type;
 			this.dat = dat;
-            string newPath = path;
+			/*string newPath = path;
             switch (type) {
                 case RelocationType.RTB:
                     newPath = Path.ChangeExtension(path, "rtb"); break;
@@ -80,7 +80,8 @@ namespace OpenSpace.FileFormat {
                 case RelocationType.RTV:
                     newPath = Path.ChangeExtension(path, "rtv"); break;
             }
-            this.path = newPath;
+            this.path = newPath;*/
+			this.path = path;
         }
 
 		public IEnumerator Init() {

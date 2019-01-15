@@ -375,8 +375,8 @@ MonoBehaviour.print(str);
 		protected IEnumerator CreateCNT() {
             if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.platform != Settings.Platform.DC) {
                 List<string> cntPaths = new List<string>();
-                if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileTextures);
-                if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + gameDsb.bigfileVignettes);
+                if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileTextures, Settings.CapsType.All));
+                if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileVignettes, Settings.CapsType.All));
                 if (cntPaths.Count > 0) {
 					foreach (string path in cntPaths) {
 						yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
@@ -715,6 +715,28 @@ MonoBehaviour.print(str);
 				yield return controller.StartCoroutine(FileSystem.InitBigFile(path, cacheLength));
 				loadingState = state;
 				yield return null;
+			}
+		}
+
+		public string ConvertCase(string path, Settings.CapsType capsType) {
+			Settings.Caps caps = Settings.Caps.Normal;
+			if (Settings.s.caps != null && Settings.s.caps.ContainsKey(capsType)) {
+				caps = Settings.s.caps[capsType];
+			} else if (Settings.s.caps != null && Settings.s.caps.ContainsKey(Settings.CapsType.All)) {
+				caps = Settings.s.caps[Settings.CapsType.All];
+			}
+			switch (caps) {
+				case Settings.Caps.All:
+					return path.ToUpper();
+				case Settings.Caps.None:
+					return path.ToLower();
+				case Settings.Caps.AllExceptExtension:
+					if (path.LastIndexOf('.') > 0) {
+						string pathWithoutExtension = path.Substring(0, path.LastIndexOf('.'));
+						return pathWithoutExtension + "." + path.Substring(path.LastIndexOf('.'));
+					} else return path.ToUpper();
+				default:
+					return path;
 			}
 		}
 	}
