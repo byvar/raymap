@@ -131,6 +131,8 @@ public class Controller : MonoBehaviour {
 				mode = Settings.Mode.DonaldDuckPC; break;
 			case "tt_pc":
 				mode = Settings.Mode.TonicTroublePC; break;
+			case "ttse_pc":
+				mode = Settings.Mode.TonicTroubleSEPC; break;
 			case "r2_demo1_pc":
 				mode = Settings.Mode.Rayman2PCDemo1; break;
 			case "r2_demo2_pc":
