@@ -7,6 +7,7 @@ namespace OpenSpace.Waypoints {
 
         public Pointer offset;
         public Vector3 position;
+        public float radius;
 
         public List<GraphNode> containingGraphNodes;
 
@@ -19,9 +20,21 @@ namespace OpenSpace.Waypoints {
             }
         }
         private void InitGameObject() {
-            gao = new GameObject("WayPoint");
+            gao = new GameObject("WayPoint ("+this.offset+")");
             gao.transform.position = new Vector3(position.x, position.z, position.y);
             WaypointBehaviour wpBehaviour = gao.AddComponent<WaypointBehaviour>();
+
+            if (radius > 1) {
+                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sphere.transform.position = new Vector3(position.x, position.z, position.y);
+                sphere.transform.localScale = new Vector3(radius * 2, radius * 2, radius * 2);
+                sphere.transform.parent = gao.transform;
+                // No collider necessary
+                GameObject.Destroy(sphere.GetComponent<SphereCollider>());
+                MeshRenderer sphereRenderer = sphere.GetComponent<MeshRenderer>();
+                sphereRenderer.material = MapLoader.Loader.collideTransparentMaterial;
+                sphereRenderer.material.color = new Color(0.7f, 0f, 0.7f, 0.5f);
+            }
         }
         // ^ for isolate waypoints
 
@@ -54,7 +67,9 @@ namespace OpenSpace.Waypoints {
             float x = reader.ReadSingle();
             float y = reader.ReadSingle();
             float z = reader.ReadSingle();
+            float radius = reader.ReadSingle();
             wp.position = new Vector3(x, y, z);
+            wp.radius = radius;
 
             return wp;
         }

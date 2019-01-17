@@ -527,7 +527,7 @@ public class Controller : MonoBehaviour {
 
 			for (int i = 0; i < graph.nodes.Count; i++) {
 				GraphNode node = graph.nodes[i];
-				node.Gao.name = "GraphNode[" + i + "].WayPoint";
+				node.Gao.name = "GraphNode[" + i + "].WayPoint ("+node.wayPoint.offset+")";
 				if (i == 0) {
 					go_graph.transform.position = graph.nodes[i].Gao.transform.position;
 				}

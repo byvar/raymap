@@ -36,7 +36,25 @@ namespace OpenSpace.AI {
 				return shortName;
 			}
 		}
-		public AIModel aiModel;
+
+        public string VeryShortName
+        {
+            get
+            {
+                string shortName = "";
+                if (name != null) {
+                    shortName = name;
+                    //string comportNamePattern = @"^(?<family>[^\\]+?)\\(?<model>[^\\]+?)\\(?<model2>[^\\]+?)\.(?<type>...?)\^CreateIntelligence\^CreateComport:(?<name>.*?)$";
+                    if (shortName.Contains("^CreateComport:")) {
+                        shortName = shortName.Substring(shortName.LastIndexOf("^CreateComport:") + 15);
+                    }
+                    shortName = "[\"" + shortName + "\"]";
+                }
+                return shortName;
+            }
+        }
+
+        public AIModel aiModel;
 		public BehaviorType type;
 		public int index;
 

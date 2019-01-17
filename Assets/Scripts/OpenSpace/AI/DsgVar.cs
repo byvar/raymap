@@ -136,7 +136,7 @@ namespace OpenSpace.AI {
                         Pointer off_waypoint = Pointer.Read(reader);
                         if (off_waypoint != null) {
                             WayPoint wayPoint = WayPoint.FromOffsetOrRead(off_waypoint, reader);
-                            returnValue = "WayPoint " + off_waypoint;
+                            returnValue = wayPoint;
                         }
 
                         break;

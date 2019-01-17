@@ -15,11 +15,15 @@ namespace OpenSpace.Waypoints {
 
         public Pointer off_arcList;
 
-        private GameObject gao = null;
-        public GameObject Gao {
-            get {
-                if (gao == null) InitGameObject();
-                return gao;
+        public GameObject Gao
+        {
+            get
+            {
+                if (wayPoint == null) return null;
+                WaypointBehaviour wpBehaviour = wayPoint.Gao.GetComponent<WaypointBehaviour>();
+                if (wpBehaviour==null) return null;
+                wpBehaviour.node = this;
+                return wayPoint.Gao;
             }
         }
 
@@ -33,13 +37,6 @@ namespace OpenSpace.Waypoints {
             get {
                 return off_prevNode;
             }
-        }
-
-        private void InitGameObject() {
-            gao = new GameObject("WayPoint");
-            gao.transform.position = new Vector3(wayPoint.position.x, wayPoint.position.z, wayPoint.position.y);
-            WaypointBehaviour wpBehaviour = gao.AddComponent<WaypointBehaviour>();
-            wpBehaviour.node = this;
         }
 
         public GraphNode(Pointer offset) {

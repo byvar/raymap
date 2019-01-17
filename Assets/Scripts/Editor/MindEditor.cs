@@ -52,5 +52,6 @@ public class MindEditor : Editor {
         }
         GUILayout.EndHorizontal();
 
+        EditorGUILayout.TextArea(c.transitionExport.ToString(), GUILayout.Width(50f));
     }
 }
