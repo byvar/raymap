@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon/icomoon.eot?9trkv6');
-  src:  url('../fonts/icomoon/icomoon.eot?9trkv6#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon/icomoon.ttf?9trkv6') format('truetype'),
-    url('../fonts/icomoon/icomoon.woff?9trkv6') format('woff'),
-    url('../fonts/icomoon/icomoon.svg?9trkv6#icomoon') format('svg');
+  src:  url('../fonts/icomoon/icomoon.eot?r0igg8');
+  src:  url('../fonts/icomoon/icomoon.eot?r0igg8#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?r0igg8') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?r0igg8') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?r0igg8#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -135,8 +135,20 @@
 .icon-play3:before {
   content: "\ea1c";
 }
+.icon-chevron-down1:before {
+  content: "\e923";
+}
+.icon-chevron-up1:before {
+  content: "\e924";
+}
 .icon-lightbulb-o:before {
   content: "\e921";
+}
+.icon-chevron-down:before {
+  content: "\e919";
+}
+.icon-chevron-up:before {
+  content: "\e91b";
 }
 .icon-light-bulb:before {
   content: "\e922";

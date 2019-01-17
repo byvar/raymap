@@ -642,14 +642,14 @@ canvas + * {
 	top: 0px;
 }
 .sidebar-arrow-up:before {
-    content: "\f077";
+    content: "\e924";
 }
 
 .sidebar-arrow-down {
 	bottom: 0px;
 }
 .sidebar-arrow-down:before {
-	content: "\f078";
+	content: "\e923";
 }
 
 .sidebar-arrow-disabled {

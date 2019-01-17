@@ -122,7 +122,7 @@ function initContent() {
 		});
 		api.getContentPane().append(items.join(""));
 		$('#sidebar-levels-content').append(sidebarItems.join(""));
-		sidebarUpdateArrows($('#sidebar-levels'));
+		sidebarUpdateArrows($(".column-sidebar-content"));
 		// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
 		setTimeout(function(){
 			api.reinitialise();
@@ -136,6 +136,7 @@ function refreshScroll() {
 			let api = $( this ).data('jsp');
 			api.reinitialise();
 		});
+		sidebarUpdateArrows($(".column-sidebar-content"));
 	}, 3, "some unique string");
 }
 
