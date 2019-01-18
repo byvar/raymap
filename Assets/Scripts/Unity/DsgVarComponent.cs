@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System;
 using UnityEditor;
 using System.Linq;
+using OpenSpace.Waypoints;
 
 namespace OpenSpace
 {
@@ -32,6 +33,7 @@ namespace OpenSpace
             public float valueAsFloat;
             public Vector3 valueAsVector;
             public GameObject valueAsSuperObjectGao;
+            public GameObject valueAsWaypointGao;
             public GameObject valueAsPersoGao;
             public string valueAsString;
 
@@ -46,6 +48,7 @@ namespace OpenSpace
             public Vector3 valueAsVector_initial;
             public GameObject valueAsSuperObjectGao_initial;
             public GameObject valueAsPersoGao_initial;
+            public GameObject valueAsWaypointGao_initial;
             public string valueAsString_initial;
 
             public DsgVarEditableEntry(int number, DsgVarInfoEntry entry)
@@ -82,6 +85,19 @@ namespace OpenSpace
                             }
                         }
                         break;
+                    case DsgVarInfoEntry.DsgVarType.Waypoint:
+
+                        if (entry.value != null) {
+                            WayPoint wp = null;
+                            if (entry.value is WayPoint) {
+                                wp = (WayPoint)entry.value;
+                            }
+                            
+                            if (wp != null) {
+                                this.valueAsWaypointGao = wp.Gao;
+                            }
+                        }
+                        break;
 
                 }
 
@@ -113,6 +129,19 @@ namespace OpenSpace
                                 }
                             }
                         break;
+                        case DsgVarInfoEntry.DsgVarType.Waypoint:
+
+                            if (entry.initialValue != null) {
+                                WayPoint wp = null;
+                                if (entry.initialValue is WayPoint) {
+                                    wp = (WayPoint)entry.initialValue;
+                                }
+
+                                if (wp != null) {
+                                    this.valueAsWaypointGao_initial = wp.Gao;
+                                }
+                            }
+                            break;
                     }
                 }
             }

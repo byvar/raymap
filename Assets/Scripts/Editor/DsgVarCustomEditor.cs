@@ -77,6 +77,14 @@ public class DsgVarCustomEditor : Editor
                     dsgVarEntry.valueAsSuperObjectGao = selectedGao;
                 }
                 break;
+            case DsgVarInfoEntry.DsgVarType.Waypoint:
+                GameObject currentWaypointGao = dsgVarEntry.valueAsWaypointGao != null ? dsgVarEntry.valueAsWaypointGao : null;
+                GameObject selectedWaypointGao = ((GameObject)EditorGUILayout.ObjectField(currentWaypointGao, typeof(GameObject), true));
+
+                if (selectedWaypointGao != null) {
+                    dsgVarEntry.valueAsWaypointGao = selectedWaypointGao;
+                }
+                break;
 
 
         }

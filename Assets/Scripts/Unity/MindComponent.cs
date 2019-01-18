@@ -3,11 +3,15 @@ using System.Collections;
 using OpenSpace.AI;
 using OpenSpace.Object;
 using OpenSpace;
+using Assets.Scripts.OpenSpace.AI;
 
 public class MindComponent : MonoBehaviour {
 
     public Perso perso;
     public Mind mind;
+    
+    // Behaviour/State transition overview
+    public TransitionExport transitionExport = null;
 
     public bool writeReflexComport;
     public bool writeNormalComport;
@@ -16,6 +20,7 @@ public class MindComponent : MonoBehaviour {
     {
         this.perso = perso;
         this.mind = mind;
+        this.transitionExport = new TransitionExport(perso);
     }
 
     public void Write(Writer writer)
