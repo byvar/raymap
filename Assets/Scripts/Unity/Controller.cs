@@ -127,6 +127,8 @@ public class Controller : MonoBehaviour {
 				mode = Settings.Mode.Rayman2IOS; break;
 			case "r2_ps1":
 				mode = Settings.Mode.Rayman2PS1; break;
+			case "r2_ps2":
+				mode = Settings.Mode.Rayman2PS2; break;
 			case "dd_pc":
 				mode = Settings.Mode.DonaldDuckPC; break;
 			case "tt_pc":
