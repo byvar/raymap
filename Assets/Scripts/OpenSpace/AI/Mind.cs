@@ -61,5 +61,28 @@ namespace OpenSpace.AI {
             }
             return m;
         }
+
+        public void UpdateCurrentBehaviors(Reader reader)
+        {
+            off_AI_model = Pointer.Read(reader);
+            off_intelligence_normal = Pointer.Read(reader);
+            off_intelligence_reflex = Pointer.Read(reader);
+            off_dsgMem = Pointer.Read(reader);
+
+            if (off_dsgMem != null) {
+                Pointer.Goto(ref reader, off_dsgMem);
+                dsgMem = DsgMem.Read(reader, off_dsgMem);
+            }
+
+            if (off_intelligence_normal != null) {
+                Pointer.Goto(ref reader, off_intelligence_normal);
+                intelligenceNormal = Intelligence.Read(reader, off_intelligence_normal);
+            }
+
+            if (off_intelligence_reflex != null) {
+                Pointer.Goto(ref reader, off_intelligence_reflex);
+                intelligenceReflex = Intelligence.Read(reader, off_intelligence_reflex);
+            }
+        }
     }
 }

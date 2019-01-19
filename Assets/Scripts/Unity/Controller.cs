@@ -589,6 +589,19 @@ public class Controller : MonoBehaviour {
 							pb.autoNextState = true;
 						}
                     }
+
+
+                    MindComponent mc = perso.Gao.GetComponent<MindComponent>();
+                    if (mc != null) {
+                        Mind mind = mc.mind;
+                        Pointer.Goto(ref reader, mind.offset);
+                        mind.UpdateCurrentBehaviors(reader);
+                    }
+
+                    DsgVarComponent dsgVarComponent = perso.Gao.GetComponent<DsgVarComponent>();
+                    if (dsgVarComponent != null) {
+                        dsgVarComponent.SetPerso(perso);
+                    }
                 }
             }
         }

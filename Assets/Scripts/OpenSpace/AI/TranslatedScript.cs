@@ -10,6 +10,7 @@ namespace OpenSpace.AI {
 
         public Perso perso;
         public bool printAddresses = false;
+        public bool expandMacros = false;
 
         public class Node {
             public int index;
@@ -25,7 +26,6 @@ namespace OpenSpace.AI {
                 this.children = new List<Node>();
                 this.ts = ts;
             }
-
 
             public override string ToString()
             {
@@ -224,6 +224,24 @@ namespace OpenSpace.AI {
                         case ScriptNode.NodeType.MetaAction:
 
                             return prefix + scriptNode.ToString(perso) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
+
+                        case ScriptNode.NodeType.SubRoutine:
+
+                            if (ts.expandMacros) {
+
+                                Macro macro = Macro.FromOffset(scriptNode.param_ptr);
+
+                                if (macro != null) {
+                                    string macroString = "// evalMacro(" + macro.ShortName + ");";
+                                    macroString += Environment.NewLine;
+                                    TranslatedScript macroScript = new TranslatedScript(macro.script, perso);
+                                    macroString += macroScript.ToString();
+                                    macroString += Environment.NewLine + "// end macro";
+                                    return macroString;
+                                }
+                            }
+
+                            return prefix + scriptNode.ToString(perso);
 
                         default:
                             return prefix + scriptNode.ToString(perso);
