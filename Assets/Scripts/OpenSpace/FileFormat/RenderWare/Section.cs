@@ -26,6 +26,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 		}
 		
 		public static Section Read(Reader reader, SectionRead specialRead = null) {
+			MapLoader l = MapLoader.Loader;
 			Type type = (Type)reader.ReadUInt32();
 			uint size = reader.ReadUInt32();
 			uint version = reader.ReadUInt32();
@@ -86,6 +87,11 @@ namespace OpenSpace.FileFormat.RenderWare {
 					}); // Info Struct
 					sec.ReadChild(reader); // Frame list
 					sec.ReadChild(reader); // Geometry list
+					for (int i = 0; i < numAtomics; i++) {
+						sec.ReadChild(reader);
+					}
+					sec.ReadChild(reader); // Extension
+					//l.print("Clump size: " + reader.BaseStream.Position);
 					break;
 				case Type.FrameList:
 					uint numFrames = 0;
@@ -120,6 +126,11 @@ namespace OpenSpace.FileFormat.RenderWare {
 						v["geometry"] = Geometry.Read(reader);
 					}); // Info Struct
 					sec.ReadChild(reader); // Material list
+					sec.ReadChild(reader, (s,v) => {
+						if (s.size > 0) {
+							s.ReadChild(reader); // Bin Mesh
+						}
+					}); // Extension
 					break;
 				case Type.MaterialList:
 					uint numMaterials = 0;
@@ -134,9 +145,48 @@ namespace OpenSpace.FileFormat.RenderWare {
 						v["numMaterials"] = numMaterials;
 						v["numUniqueMaterials"] = numUniqueMaterials;
 						v["materialIndices"] = materialIndices;
-					});
+					}); // Info struct
+					for (int i = 0; i < numUniqueMaterials; i++) {
+						sec.ReadChild(reader); // Material
+					}
 					break;
 				case Type.Material:
+					bool isTextured = false;
+					 sec.ReadChild(reader, (s,v) => {
+						Material mat = Material.Read(reader);
+						v["material"] = mat;
+						isTextured = mat.isTextured;
+					}); // Material struct
+					if (isTextured) {
+						sec.ReadChild(reader);
+					}
+					sec.ReadChild(reader); // Extension
+					if (sec.children.Last().data != null && sec.children.Last().data.Length > 0) {
+						l.print("Check material extension ending at " + reader.BaseStream.Position + "!");
+					}
+					break;
+				case Type.Texture:
+					sec.ReadChild(reader, (s, v) => {
+						v["texture"] = MaterialTexture.Read(reader);
+					}); // Info struct
+					sec.ReadChild(reader); // Texture name
+					sec.ReadChild(reader); // Alpha name
+					sec.ReadChild(reader); // Extension
+					if (sec.children.Last().data != null && sec.children.Last().data.Length > 0) {
+						l.print("Check texturematerial extension ending at " + reader.BaseStream.Position + "!");
+					}
+					break;
+				case Type.BinMeshPlg:
+					sec.variables["binMesh"] = BinMesh.Read(reader);
+					break;
+				case Type.Atomic:
+					sec.ReadChild(reader, (s, v) => {
+						s.variables["frameIndex"] = reader.ReadUInt32();
+						s.variables["geometryIndex"] = reader.ReadUInt32();
+						s.variables["flags"] = reader.ReadUInt32();
+						s.variables["unused"] = reader.ReadUInt32();
+					}); // Struct
+					sec.ReadChild(reader); // Extension
 					break;
 				default:
 					if(specialRead == null) sec.data = reader.ReadBytes((int)size);

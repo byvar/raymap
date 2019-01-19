@@ -55,6 +55,7 @@ namespace OpenSpace.Loader {
 				}
 
 				TextureDictionary rw3 = new TextureDictionary(paths["lvl.rw3.0"]);
+				MeshFile ato = new MeshFile(paths["lvl.ato.0"]);
 				//TextureDictionary lm30 = new TextureDictionary(paths["lvl.lm3.0"]);
 
 				// FIX

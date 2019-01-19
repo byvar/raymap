@@ -69,6 +69,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 			if (g.numTexSets == 0) {
 				g.numTexSets = (uint)(g.format.HasFlag(GeometryFormat.TEXTURED2) ? 2 : (g.format.HasFlag(GeometryFormat.TEXTURED) ? 1 : 0));
 			}
+			g.uvs = new Vector2[g.numTexSets][];
 			if (!g.format.HasFlag(GeometryFormat.NATIVE)) {
 				if (g.format.HasFlag(GeometryFormat.PRELIT)) {
 					l.print("Unsupported: GeometryFormat Prelit");
