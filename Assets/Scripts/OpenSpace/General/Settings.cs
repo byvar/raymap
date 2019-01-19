@@ -12,7 +12,7 @@ namespace OpenSpace {
             RaymanArenaPC, RaymanArenaGC,
             Rayman2PC, Rayman2DC, Rayman2IOS, Rayman2PS1, Rayman2PS2,
             Rayman2PCDemo2, Rayman2PCDemo1,
-            DonaldDuckPC,
+            DonaldDuckPC, DonaldDuckDC,
             TonicTroublePC, TonicTroubleSEPC,
             PlaymobilHypePC, PlaymobilAlexPC, PlaymobilLauraPC
         };
@@ -71,6 +71,7 @@ namespace OpenSpace {
                 case Mode.RaymanArenaGC: s = Settings.RAGC; break;
                 case Mode.RaymanArenaPC: s = Settings.RAPC; break;
                 case Mode.DonaldDuckPC: s = Settings.DDPC; break;
+				case Mode.DonaldDuckDC: s = Settings.DDDC; break;
                 case Mode.TonicTroublePC: s = Settings.TTPC; break;
                 case Mode.TonicTroubleSEPC: s = Settings.TTSEPC; break;
                 case Mode.PlaymobilHypePC: s = Settings.PlaymobilHypePC; break;
@@ -316,6 +317,23 @@ namespace OpenSpace {
 				{ CapsType.FixRelocation, Caps.AllExceptExtension }
 			}
         };
+
+		public static Settings DDDC = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.DD,
+			platform = Platform.DC,
+			endian = Endian.Little,
+			numEntryActions = 43,
+			linkedListType = LinkedListType.Minimize,
+			encryption = Encryption.None,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			hasExtraInputData = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			}
+		};
 
 		public static Settings TTPC = new Settings() {
 			engineVersion = EngineVersion.TT,

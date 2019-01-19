@@ -49,27 +49,52 @@ namespace OpenSpace.Loader {
 
                 yield return controller.StartCoroutine(LoadDreamcast());
 
-                string logPathTexFix = gameDataBinFolder + "TEXTURE_FIX.LOG";
-                string logPathTexLvl = gameDataBinFolder + lvlName + "/TEXTURE_" + lvlName + ".LOG";
-                string logPathInfo = gameDataBinFolder + lvlName + "/INFO.LOG";
-                /*yield return controller.StartCoroutine(PrepareFile(logPathTexFix));
-                yield return controller.StartCoroutine(PrepareFile(logPathTexLvl));*/
-                yield return controller.StartCoroutine(PrepareFile(logPathInfo));
-                if (FileSystem.FileExists(logPathInfo)) {
-                    ReadLog(FileSystem.GetFileReadStream(logPathInfo));
-                    yield return null;
-                }
+				if (Settings.s.game == Settings.Game.R2) {
+					string logPathTexFix = gameDataBinFolder + "TEXTURE_FIX.LOG";
+					string logPathTexLvl = gameDataBinFolder + lvlName + "/TEXTURE_" + lvlName + ".LOG";
+					string logPathInfo = gameDataBinFolder + lvlName + "/INFO.LOG";
+					/*yield return controller.StartCoroutine(PrepareFile(logPathTexFix));
+					yield return controller.StartCoroutine(PrepareFile(logPathTexLvl));*/
+					yield return controller.StartCoroutine(PrepareFile(logPathInfo));
+					if (FileSystem.FileExists(logPathInfo)) {
+						ReadLog(FileSystem.GetFileReadStream(logPathInfo));
+						yield return null;
+					}
+					/*if (FileSystem.FileExists(logPathTexFix)) {
+						ReadLog(logPathTexFix);
+						yield return null;
+					}
+					if (FileSystem.FileExists(logPathTexLvl)) {
+						ReadLog(logPathTexLvl);
+						yield return null;
+					}*/
+				} else if (Settings.s.game == Settings.Game.DD) {
+					string backgroundPath = gameDataBinFolder + ConvertCase(lvlName, Settings.CapsType.LevelFolder) + "/FOND.PVR";
+					yield return controller.StartCoroutine(PrepareFile(backgroundPath));
+					if (FileSystem.FileExists(backgroundPath)) {
+						TEX backgroundTexFile = new TEX(backgroundPath, compressed: false);
+						globals.backgroundGameMaterial = new GameMaterial(null) {
+							visualMaterial = new VisualMaterial(null) {
+								textures = new List<VisualMaterialTexture>() {
+									new VisualMaterialTexture() {
+										texture = new TextureInfo(null) {
+											width = (ushort)backgroundTexFile.textures[0].width,
+											height = (ushort)backgroundTexFile.textures[0].height,
+											Texture = backgroundTexFile.textures[0]
+										}
+									}
+								},
+								ambientCoef = new Vector4(1,1,1,1),
+								diffuseCoef = new Vector4(1,1,1,1),
+								specularCoef = new Vector4(1,1,1,1),
+								num_textures = 1,
+								receivedHints = VisualMaterial.Hint.Billboard
+							}
+						};
+					}
+				}
 
-                /*if (FileSystem.FileExists(logPathTexFix)) {
-                    ReadLog(logPathTexFix);
-                    yield return null;
-                }
-                if (FileSystem.FileExists(logPathTexLvl)) {
-                    ReadLog(logPathTexLvl);
-                    yield return null;
-                }*/
-
-                fixDAT.Dispose();
+				fixDAT.Dispose();
                 lvlDAT.Dispose();
             } finally {
                 for (int i = 0; i < files_array.Length; i++) {
