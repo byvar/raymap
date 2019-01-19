@@ -123,15 +123,10 @@ namespace OpenSpace {
                     if (Settings.s == null) return null;
                     if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 						switch (Settings.s.platform) {
-							case Settings.Platform.DC:
-								loader = new R2DCLoader();
-								break;
-							case Settings.Platform.PS1:
-								loader = new R2PS1Loader();
-								break;
-							default:
-								loader = new R2Loader();
-								break;
+							case Settings.Platform.DC: loader = new R2DCLoader(); break;
+							case Settings.Platform.PS2: loader = new R2PS2Loader(); break;
+							case Settings.Platform.PS1: loader = new R2PS1Loader(); break;
+							default: loader = new R2Loader(); break;
 						}
                     } else {
                         loader = new R3Loader();
@@ -373,16 +368,20 @@ MonoBehaviour.print(str);
         }
 
 		protected IEnumerator CreateCNT() {
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.platform != Settings.Platform.DC) {
-                List<string> cntPaths = new List<string>();
-                if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileTextures, Settings.CapsType.All));
-                if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileVignettes, Settings.CapsType.All));
-                if (cntPaths.Count > 0) {
-					foreach (string path in cntPaths) {
-						yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+				if (Settings.s.platform != Settings.Platform.DC &&
+					Settings.s.platform != Settings.Platform.PS1 &&
+					Settings.s.platform != Settings.Platform.PS2) {
+					List<string> cntPaths = new List<string>();
+					if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileTextures, Settings.CapsType.All));
+					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileVignettes, Settings.CapsType.All));
+					if (cntPaths.Count > 0) {
+						foreach (string path in cntPaths) {
+							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+						}
+						cnt = new CNT(cntPaths.ToArray());
 					}
-                    cnt = new CNT(cntPaths.ToArray());
-                }
+				}
             } else {
                 if (Settings.s.platform == Settings.Platform.PC) {
                     if (Settings.s.game == Settings.Game.R3) {
@@ -732,8 +731,8 @@ MonoBehaviour.print(str);
 					return path.ToLower();
 				case Settings.Caps.AllExceptExtension:
 					if (path.LastIndexOf('.') > 0) {
-						string pathWithoutExtension = path.Substring(0, path.LastIndexOf('.'));
-						return pathWithoutExtension + "." + path.Substring(path.LastIndexOf('.'));
+						string pathWithoutExtension = path.Substring(0, path.LastIndexOf('.')).ToUpper();
+						return pathWithoutExtension + path.Substring(path.LastIndexOf('.'));
 					} else return path.ToUpper();
 				default:
 					return path;

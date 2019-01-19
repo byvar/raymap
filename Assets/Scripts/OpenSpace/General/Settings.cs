@@ -10,7 +10,7 @@ namespace OpenSpace {
         public enum Mode {
             Rayman3PC, Rayman3GC,
             RaymanArenaPC, RaymanArenaGC,
-            Rayman2PC, Rayman2DC, Rayman2IOS, Rayman2PS1,
+            Rayman2PC, Rayman2DC, Rayman2IOS, Rayman2PS1, Rayman2PS2,
             Rayman2PCDemo2, Rayman2PCDemo1,
             DonaldDuckPC,
             TonicTroublePC, TonicTroubleSEPC,
@@ -25,7 +25,7 @@ namespace OpenSpace {
             R3 = 3
         };
         public enum Game { R3, RA, R2, TT, TTSE, R2Demo, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
-        public enum Platform { PC, iOS, GC, DC, PS1 };
+        public enum Platform { PC, iOS, GC, DC, PS1, PS2 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
@@ -63,6 +63,7 @@ namespace OpenSpace {
                 case Mode.Rayman2DC: s = Settings.R2DC; break;
                 case Mode.Rayman2PC: s = Settings.R2PC; break;
 				case Mode.Rayman2PS1: s = Settings.R2PS1; break;
+				case Mode.Rayman2PS2: s = Settings.R2PS2; break;
                 case Mode.Rayman2PCDemo1: s = Settings.R2PCDemo1; break;
                 case Mode.Rayman2PCDemo2: s = Settings.R2PCDemo2; break;
                 case Mode.Rayman3GC: s = Settings.R3GC; break;
@@ -253,7 +254,24 @@ namespace OpenSpace {
 			}
         };
 
-        public static Settings R2IOS = new Settings() {
+		public static Settings R2PS2 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.R2,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			numEntryActions = 43,
+			linkedListType = LinkedListType.Minimize,
+			encryption = Encryption.None,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			hasExtraInputData = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.None }
+			}
+		};
+
+		public static Settings R2IOS = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.iOS,
@@ -288,7 +306,7 @@ namespace OpenSpace {
             game = Game.DD,
             platform = Platform.PC,
             endian = Endian.Little,
-            numEntryActions = 44,
+            numEntryActions = 44, // 43 for demo
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R2,
             encryption = Encryption.ReadInit,

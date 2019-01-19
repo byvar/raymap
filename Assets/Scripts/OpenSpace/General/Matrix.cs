@@ -309,6 +309,17 @@ namespace OpenSpace {
             return mat;
         }
 
+		public static Matrix ReadRenderware(Reader reader) {
+			MapLoader l = MapLoader.Loader;
+			UInt32 type = reader.ReadUInt32(); // 0x02: always at the start of a transformation matrix
+			Matrix mat = new Matrix(null, type, new Matrix4x4(), Vector4.one);
+			mat.m.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+			mat.m.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+			mat.m.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
+			mat.m.SetColumn(3, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f)); // position
+			return mat;
+		}
+
         // For writing
         public void SetTRS(Vector3 pos, Quaternion rot, Vector3 scale, bool convertAxes = false, bool setVec = false) {
             if (convertAxes) {
