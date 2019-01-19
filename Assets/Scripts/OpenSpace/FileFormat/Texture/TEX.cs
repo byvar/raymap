@@ -14,22 +14,30 @@ namespace OpenSpace.FileFormat.Texture {
         }
 
         public Texture2D[] textures = null;
-        public TEX(string path) {
-            Stream fs = FileSystem.GetFileReadStream(path);
-            using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
-                reader.ReadUInt32(); // "LZSS"
-                List<Texture2D> texturesList = new List<Texture2D>();
-                while (reader.BaseStream.Position < reader.BaseStream.Length) {
-                    uint zsize = reader.ReadUInt32() - 4;
-                    byte[] compressed = reader.ReadBytes((int)zsize);
-                    byte[] decompressed = DecompressLZSS(compressed);
-                    PvrTexture pvr = new PvrTexture(decompressed);
-                    texturesList.Add(pvr.ToTexture2D());
-                }
-                textures = texturesList.ToArray();
-                count = (uint)textures.Length;
-            }
-        }
+
+		public TEX(string path, bool compressed = true) {
+			Stream fs = FileSystem.GetFileReadStream(path);
+			using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
+				if (compressed) {
+					reader.ReadUInt32(); // "LZSS"
+					List<Texture2D> texturesList = new List<Texture2D>();
+					while (reader.BaseStream.Position < reader.BaseStream.Length) {
+						uint zsize = reader.ReadUInt32() - 4;
+						byte[] compressedData = reader.ReadBytes((int)zsize);
+						byte[] decompressedData = DecompressLZSS(compressedData);
+						PvrTexture pvr = new PvrTexture(decompressedData);
+						texturesList.Add(pvr.ToTexture2D());
+					}
+					textures = texturesList.ToArray();
+					count = (uint)textures.Length;
+				} else {
+					textures = new Texture2D[1];
+					PvrTexture pvr = new PvrTexture(reader.ReadBytes((int)fs.Length));
+					textures[0] = pvr.ToTexture2D();
+					count = 1;
+				}
+			}
+		}
 
         private byte[] DecompressLZSS(byte[] compressed) {
             byte[] decompressed = new byte[compressed.Length * 128];

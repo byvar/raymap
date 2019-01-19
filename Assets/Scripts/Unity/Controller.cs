@@ -131,6 +131,8 @@ public class Controller : MonoBehaviour {
 				mode = Settings.Mode.Rayman2PS2; break;
 			case "dd_pc":
 				mode = Settings.Mode.DonaldDuckPC; break;
+			case "dd_dc":
+				mode = Settings.Mode.DonaldDuckDC; break;
 			case "tt_pc":
 				mode = Settings.Mode.TonicTroublePC; break;
 			case "ttse_pc":

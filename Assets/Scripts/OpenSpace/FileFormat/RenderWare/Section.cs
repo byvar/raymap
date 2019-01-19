@@ -116,6 +116,27 @@ namespace OpenSpace.FileFormat.RenderWare {
 					}
 					break;
 				case Type.Geometry:
+					sec.ReadChild(reader, (s, v) => {
+						v["geometry"] = Geometry.Read(reader);
+					}); // Info Struct
+					sec.ReadChild(reader); // Material list
+					break;
+				case Type.MaterialList:
+					uint numMaterials = 0;
+					uint numUniqueMaterials = 0;
+					sec.ReadChild(reader, (s, v) => {
+						numMaterials = reader.ReadUInt32();
+						int[] materialIndices = new int[numMaterials];
+						for (int i = 0; i < numMaterials; i++) {
+							materialIndices[i] = reader.ReadInt32();
+							if (materialIndices[i] == -1) numUniqueMaterials++;
+						}
+						v["numMaterials"] = numMaterials;
+						v["numUniqueMaterials"] = numUniqueMaterials;
+						v["materialIndices"] = materialIndices;
+					});
+					break;
+				case Type.Material:
 					break;
 				default:
 					if(specialRead == null) sec.data = reader.ReadBytes((int)size);
