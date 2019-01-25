@@ -716,7 +716,7 @@ MonoBehaviour.print(str);
             JSON_ComportData comportData = JsonUtility.FromJson<JSON_ComportData>(dataAsJson);
             foreach(AIModel aiModel in aiModels) {
                 if (aiModel.name!=null && aiModel.name!="") {
-                    JSON_AIModel jsonAiModel = comportData.aiModels.Find(p => p.name == aiModel.name);
+                    JSON_AIModel jsonAiModel = comportData.aiModels.Find(p => p.name.ToLower() == aiModel.name.ToLower());
 
                     if (jsonAiModel!=null) {
 
