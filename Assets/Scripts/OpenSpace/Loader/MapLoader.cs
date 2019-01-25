@@ -316,6 +316,10 @@ namespace OpenSpace {
             ReadAlways(reader);
             ReadCrossReferences(reader);
 
+            if (Settings.s.game == Settings.Game.R2) {
+                ReadAndFillComportNames();
+            }
+
             livePreviewReader = reader;
         }
         #endregion
@@ -689,6 +693,53 @@ MonoBehaviour.print(str);
         public void ReadCrossReferences(Reader reader) {
             for (int i = 0; i < sectors.Count; i++) {
                 sectors[i].ProcessPointers(reader);
+            }
+        }
+
+        [System.Serializable]
+        public class JSON_AIModel {
+            public string name;
+            public List<string> rules = new List<string>();
+            public List<string> reflexes = new List<string>();
+        }
+
+        [System.Serializable]
+        public class JSON_ComportData {
+            public List<JSON_AIModel> aiModels;
+        }
+
+        // Comport names are read from a JSON that contains the Dreamcast comport names
+        public void ReadAndFillComportNames()
+        {
+            string filePath = Path.Combine(Application.streamingAssetsPath, "R2DC_Comports.json");
+            string dataAsJson = File.ReadAllText(filePath);
+            JSON_ComportData comportData = JsonUtility.FromJson<JSON_ComportData>(dataAsJson);
+            foreach(AIModel aiModel in aiModels) {
+                if (aiModel.name!=null && aiModel.name!="") {
+                    JSON_AIModel jsonAiModel = comportData.aiModels.Find(p => p.name == aiModel.name);
+
+                    if (jsonAiModel!=null) {
+
+                        if (aiModel.behaviors_normal != null) {
+                            for (int i = 0; i < aiModel.behaviors_normal.Length; i++) {
+                                Behavior b = aiModel.behaviors_normal[i];
+                                if (b != null && jsonAiModel.rules.Count > i && jsonAiModel.rules[i] != null) {
+                                    b.name = jsonAiModel.rules[i];
+                                }
+                            }
+                        }
+
+                        if (aiModel.behaviors_reflex != null) {
+                            for (int i = 0; i < aiModel.behaviors_reflex.Length; i++) {
+                                Behavior b = aiModel.behaviors_reflex[i];
+                                if (b != null && jsonAiModel.reflexes.Count > i && jsonAiModel.reflexes[i] != null) {
+                                    b.name = jsonAiModel.reflexes[i];
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
         }
 
