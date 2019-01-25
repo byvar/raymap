@@ -1,4 +1,7 @@
 # Raymap
+
+You can find the web version of Raymap on <https://raym.app/>
+
 Map viewer/editor for OpenSpace games, including:
 * Laura's Happy Adventures (PC)
 * Alex Builds his Farm (PC)
