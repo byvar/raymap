@@ -153,6 +153,8 @@ namespace OpenSpace.Object {
                 }
             });
 
+            int index = 0;
+
             // Parse collide set
             Pointer.DoAt(ref reader, po.off_collideSet, () => {
                 uint u1 = reader.ReadUInt32(); // 0
@@ -165,7 +167,7 @@ namespace OpenSpace.Object {
                 Pointer off_zdr = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_zdr, () => {
                     //R3Loader.Loader.print("Collide mesh offset: " + off_mesh);
-                    po.collideMesh = CollideMeshObject.Read(reader, off_zdr);
+                    po.collideMesh = CollideMeshObject.Read(reader, off_zdr, null, index++);
                     po.collideMesh.gao.transform.parent = po.Gao.transform;
                 });
                 //R3Loader.Loader.print("Collide set: " + po.off_collideSet + " - vol: " + po.off_visualBoundingVolume);

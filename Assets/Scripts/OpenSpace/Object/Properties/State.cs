@@ -25,6 +25,7 @@ namespace OpenSpace.Object.Properties {
         public AnimationReference anim_ref = null;
         public AnimationMontreal anim_refMontreal = null;
         public MechanicsIDCard mechanicsIDCard;
+        public byte customStateBits;
 
         public Pointer NextEntry {
             get {
@@ -66,7 +67,7 @@ namespace OpenSpace.Object.Properties {
         }
 
         public override string ToString() {
-            string result = name != null ? name : ("State #"+index+" @ " + offset);
+            string result = name != null ? name : ("State #"+index+" "+ Convert.ToString(customStateBits, 2).PadLeft(8, '0')+" @ " + offset);
             if (cine_name != null) result += " | " + cine_name;
             if (cine_mapname != null) result += " (" + cine_mapname + ") ";
             return result;
@@ -102,7 +103,7 @@ namespace OpenSpace.Object.Properties {
                 reader.ReadByte();
                 s.speed = reader.ReadByte();
                 reader.ReadByte();
-                reader.ReadByte();
+                s.customStateBits = reader.ReadByte();
             }
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);

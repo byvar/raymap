@@ -7,6 +7,7 @@ namespace OpenSpace.Collide
         public Pointer offset;
         public Pointer nextElement;
         public ushort index;
+        public CollSet.PrivilegedActivationStatus activationStatus = CollSet.PrivilegedActivationStatus.Neutral;
 
         public Pointer NextEntry {
             get { return nextElement; }
@@ -20,7 +21,7 @@ namespace OpenSpace.Collide
             this.offset = offset;
         }
 
-        public static CollideElement Read(Reader reader, Pointer offset) {
+        public static CollideElement Read(Reader reader, Pointer offset, CollSet collset, CollideMeshObject.Type type) {
             CollideElement element = new CollideElement(offset);
 
             if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
@@ -28,6 +29,7 @@ namespace OpenSpace.Collide
             }
             element.index = reader.ReadUInt16();
             reader.ReadUInt16();
+            element.activationStatus = collset.GetPrivilegedActionZoneStatus(type, element.index);
             return element;
         }
     }

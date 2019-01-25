@@ -36,6 +36,8 @@ namespace OpenSpace.Collide {
         public ushort[] subblock_types = null;
         public ICollideGeometricElement[] subblocks = null;
 
+        public int index;
+        public CollSet collset;
 
         public CollideMeshObject(Pointer offset, Type type = Type.Default) {
             this.offset = offset;
@@ -43,6 +45,14 @@ namespace OpenSpace.Collide {
         }
 
         public void SetVisualsActive(bool active) {
+
+            if (collset != null) {
+                // Hide elements that are forced to be inactive
+                if (collset.GetPrivilegedActionZoneStatus(type, index) == CollSet.PrivilegedActivationStatus.ForceInactive) {
+                    active = false;
+                }
+            }
+
             Renderer[] renderers = gao.GetComponentsInChildren<Renderer>(includeInactive: true);
             foreach (Renderer ren in renderers) {
                 ren.enabled = active;
@@ -58,9 +68,11 @@ namespace OpenSpace.Collide {
             }*/
         }
 
-        public static CollideMeshObject Read(Reader reader, Pointer offset, Type type = Type.Default) {
+        public static CollideMeshObject Read(Reader reader, Pointer offset, CollSet collset, int index, Type type = Type.Default) {
             MapLoader l = MapLoader.Loader;
             CollideMeshObject m = new CollideMeshObject(offset, type);
+            m.index = index;
+            m.collset = collset;
             //l.print("Mesh obj: " + offset);
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 m.num_vertices = reader.ReadUInt16();
@@ -125,7 +137,7 @@ namespace OpenSpace.Collide {
             for (uint i = 0; i < m.num_subblocks; i++) {
                 m.subblock_types[i] = reader.ReadUInt16();
             }
-            m.gao = new GameObject("Collide Set @ " + offset);
+            m.gao = new GameObject("Collide Set "+type+" #"+index+" @ " + offset);
             m.gao.tag = "Collide";
             m.gao.layer = LayerMask.NameToLayer("Collide");
             for (uint i = 0; i < m.num_subblocks; i++) {
@@ -159,6 +171,7 @@ namespace OpenSpace.Collide {
                         break;
                 }
             }
+
             for (uint i = 0; i < m.num_subblocks; i++) {
                 if (m.subblocks[i] != null) {
                     GameObject child = m.subblocks[i].Gao;

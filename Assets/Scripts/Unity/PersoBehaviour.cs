@@ -60,8 +60,11 @@ public class PersoBehaviour : MonoBehaviour {
 		}
 	}
 
-	// Brain clearance
-	public bool clearTheBrain = false;
+    // Brain clearance
+    public bool clearTheBrain = false;
+
+    private bool showTooFarLimit = false;
+    private GameObject tooFarLimitDiamond = null;
 
     // Use this for initialization
     void Start() {
@@ -97,12 +100,40 @@ public class PersoBehaviour : MonoBehaviour {
                     SetState(0);
                 }
             }
+
+            this.tooFarLimitDiamond = new GameObject("TooFarLimit");
+            this.tooFarLimitDiamond.transform.SetParent(this.perso.Gao.transform);
+            float diameter = this.perso.stdGame.tooFarLimit;
+            this.tooFarLimitDiamond.transform.localScale = new Vector3(diameter, diameter, diameter);
+            this.tooFarLimitDiamond.transform.localPosition = new Vector3(0, 0, 0);
+            this.tooFarLimitDiamond.transform.rotation = Quaternion.Euler(0, 0, 0);
+            MeshRenderer meshRenderer = this.tooFarLimitDiamond.AddComponent<MeshRenderer>();
+            MeshFilter meshFilter = this.tooFarLimitDiamond.AddComponent<MeshFilter>();
+            meshFilter.mesh = Resources.Load<Mesh>("diamond");
+            meshRenderer.material = MapLoader.Loader.collideTransparentMaterial;
+            meshRenderer.material.color = new Color(1, 0.5f, 0, 0.5f);
+            this.tooFarLimitDiamond.SetActive(false);
         }
         loaded = true;
     }
 
-	#region Print debug info
-	public void PrintDsgVar() {
+
+    internal void OnSelect()
+    {
+        if (tooFarLimitDiamond!=null) {
+            tooFarLimitDiamond.SetActive(true);
+        }
+    }
+
+    internal void OnDeselect()
+    {
+        if (tooFarLimitDiamond != null) {
+            tooFarLimitDiamond.SetActive(false);
+        }
+    }
+
+    #region Print debug info
+    public void PrintDsgVar() {
         if (loaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
 
@@ -412,6 +443,10 @@ public class PersoBehaviour : MonoBehaviour {
                 }
             }
         }
+
+        float diameter = this.perso.stdGame.tooFarLimit;
+        this.tooFarLimitDiamond.transform.localScale = new Vector3(diameter, diameter, diameter);
+        this.tooFarLimitDiamond.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
     void DeinitAnimation() {

@@ -10,6 +10,7 @@ using OpenSpace.AI;
 using OpenSpace.Collide;
 using System.Collections;
 using OpenSpace.Waypoints;
+using OpenSpace.Object.Properties;
 
 public class Controller : MonoBehaviour {
 	public Settings.Mode mode = Settings.Mode.Rayman3PC;
@@ -506,6 +507,7 @@ public class Controller : MonoBehaviour {
 							//col.gao.SetActive(viewCollision);
 						}
 				}
+
 			}
 			foreach (SuperObject so in loader.superObjects) {
 				if (so.Gao != null) {
@@ -605,6 +607,14 @@ public class Controller : MonoBehaviour {
                     DsgVarComponent dsgVarComponent = perso.Gao.GetComponent<DsgVarComponent>();
                     if (dsgVarComponent != null) {
                         dsgVarComponent.SetPerso(perso);
+                    }
+
+                    CustomBitsComponent customBitsComponent = perso.Gao.GetComponent<CustomBitsComponent>();
+                    if (customBitsComponent != null) {
+                        Pointer.Goto(ref reader, perso.off_stdGame);
+                        perso.stdGame = StandardGame.Read(reader, perso.off_stdGame);
+                        customBitsComponent.stdGame = perso.stdGame;
+                        customBitsComponent.Init();
                     }
                 }
             }
