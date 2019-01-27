@@ -56,7 +56,17 @@ public class ObjectSelector : MonoBehaviour {
     public void Select(PersoBehaviour pb, bool view = false) {
         //print(pb.name);
         if (selectedPerso != pb || view) {
+            
+            // Deselect old selected perso
+            if (selectedPerso != null) {
+                selectedPerso.OnDeselect();
+            }
             selectedPerso = pb;
+            
+            // Select freshly selected perso
+            if (selectedPerso != null) {
+                selectedPerso.OnSelect();
+            }
             cam.JumpTo(pb.gameObject);
         }
     }
@@ -66,6 +76,9 @@ public class ObjectSelector : MonoBehaviour {
 	}
 
     public void Deselect() {
+        if (selectedPerso != null) {
+            selectedPerso.OnDeselect();
+        }
         selectedPerso = null;
     }
 

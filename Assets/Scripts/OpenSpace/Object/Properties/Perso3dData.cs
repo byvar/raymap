@@ -13,6 +13,8 @@ namespace OpenSpace.Object.Properties {
         public Pointer off_objectListInitial;
         public Pointer off_family;
 
+        public Pointer off_morphList;
+
         public Family family = null;
         public ObjectList objectList = null;
         public State stateCurrent = null;
@@ -33,7 +35,10 @@ namespace OpenSpace.Object.Properties {
             d.off_objectListInitial = Pointer.Read(reader);
             d.off_family = Pointer.Read(reader);
             d.family = Family.FromOffset(d.off_family);
-            d.stateCurrent = State.FromOffset(d.family, d.off_stateCurrent);
+            d.stateCurrent = State.FromOffset(d.family, d.off_stateCurrent); // 0x1C
+
+            //reader.ReadBytes(0x98); //0x20 - 0xB7
+            //d.off_morphList = Pointer.Read(reader); // 0xB8, first morph list element
 
             return d;
         }

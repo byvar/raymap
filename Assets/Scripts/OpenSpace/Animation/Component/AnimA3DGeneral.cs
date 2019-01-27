@@ -25,7 +25,7 @@ namespace OpenSpace.Animation.Component {
         public ushort subtractFramesForSpeed;
         public ushort unk_1E;
         public ushort speed2;
-        public ushort unk_22;
+        public ushort unk_22_morphs;
         public ushort start_vectors2;
         public ushort start_quaternions2;
         public ushort num_morphData;
@@ -76,7 +76,7 @@ namespace OpenSpace.Animation.Component {
                 a3d.subtractFramesForSpeed = reader.ReadUInt16();
                 a3d.unk_1E = reader.ReadUInt16(); // only frames again?
                 a3d.speed2 = reader.ReadUInt16(); // field0 again?
-                a3d.unk_22 = reader.ReadUInt16();
+                a3d.unk_22_morphs = reader.ReadUInt16(); // morph count ? (GAM_fn_p_stGetMorphData)
                 a3d.start_vectors2 = reader.ReadUInt16();
                 a3d.start_quaternions2 = reader.ReadUInt16();
                 a3d.num_morphData = reader.ReadUInt16();
@@ -122,7 +122,7 @@ namespace OpenSpace.Animation.Component {
                 a3d.subtractFramesForSpeed = reader.ReadUInt16();
                 a3d.unk_1E = reader.ReadUInt16();
                 a3d.speed2 = reader.ReadUInt16();
-                a3d.unk_22 = reader.ReadUInt16();
+                a3d.unk_22_morphs = reader.ReadUInt16();
                 a3d.start_vectors2 = reader.ReadUInt16();
                 a3d.start_quaternions2 = reader.ReadUInt16();
                 a3d.num_morphData = reader.ReadUInt16();

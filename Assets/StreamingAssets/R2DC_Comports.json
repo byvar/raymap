@@ -1,0 +1,5865 @@
+{
+  "aiModels": [
+    {
+      "name": "Alw_Explosion_model",
+      "rules": [
+        "SUN_Flash_init",
+        "OLD_c_boom",
+        "CHR_wait_until_dead",
+        "SUN_c_boo_paf"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ELR_mLaveBloup",
+      "rules": [
+        "ELR_C_LaveBloup_00_Init",
+        "ELR_C_LaveBloup_01_Normal2"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelAstro_00",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Obus_Complexe",
+      "rules": [
+        "MIC_ObusC_INIT",
+        "MIC_ObusC_TombeAuSol",
+        "MIC_ObusC_Surveille",
+        "MIC_ObusC_Fatigue",
+        "MIC_ObusC_Attaque",
+        "MIC_ObusC_LeRodeo",
+        "MIC_ObusC_FinDuRodeo",
+        "MIC_ObusC_ReInit",
+        "MIC_ObusC_AttendGenerateur",
+        "MIC_ObusC_FinALaZorro",
+        "MIC_ObusC_FinAttaque",
+        "MIC_ObusC_Destruction",
+        "MIC_ObusC_Plane",
+        "MIC_ObusC_Delai",
+        "MIC_ObusC_Crash",
+        "MIC_ObusC_AuSol",
+        "MIC_ObusC_ChuteLibre",
+        "MIC_ObusC_DebutRodeo",
+        "MIC_ObusC_Vide",
+        "MIC_ObusC_Destruction_Suite",
+        "MIC_ObusC_SynchroAvecRay"
+      ],
+      "reflexes": [
+        "MIC_ObusC_RSansReseau",
+        "MIC_ObusC_RAvecReseau",
+        "MIC_ObusC_RVide"
+      ]
+    },
+    {
+      "name": "CHR_lums_basic",
+      "rules": [
+        "CHR_basic_init",
+        "CHR_basic_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_FinDeMap_Simple",
+      "rules": [
+        "MIC_FDM_INIT",
+        "MIC_FDM_ChargeMap",
+        "MIC_FDM_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_porte",
+      "rules": [
+        "OLD_porte_init",
+        "OLD_porte_normal",
+        "OLD_porte_flag",
+        "OLD_porte_ouverte",
+        "MIC_porte_kunkou",
+        "FRG_Porte_CB28"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CHR_tronc_pic",
+      "rules": [
+        "CHR_tronc_pic_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_SbireNinja",
+      "rules": [
+        "MIC_Ninja_INIT",
+        "MIC_ninja_PrepareAttak",
+        "MIC_Ninja_Retombe",
+        "MIC_Ninja_Tape",
+        "MIC_Ninja_Saute",
+        "MIC_Ninja_Tire",
+        "MIC_Ninja_Delai",
+        "MIC_Ninja_Mort",
+        "MIC_Ninja_PrepareSaut",
+        "MIC_Ninja_Reinit",
+        "MIC_Ninja_YoupiRay",
+        "MIC_Ninja_YoupiFin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GenNFumees",
+      "rules": [
+        "MIC_GNF_INIT",
+        "MIC_GNF_Fume"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_MegaShoot",
+      "rules": [
+        "ARG_MS_init",
+        "ARG_MS_detect"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Cam_Oriente",
+      "rules": [
+        "SUN_Cam_Bloc_Init",
+        "SUN_Cam_Bloc_Normal",
+        "SUN_Cam_Oriente_Tunnel",
+        "DS1_Cam_Oriente_NoLeft_NoRight"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "FRG_Generateur",
+      "rules": [
+        "STN_generateur_init",
+        "MRC_generateur_Inactif",
+        "MRC_generateur_Actif"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_EtatAOJ",
+      "rules": [
+        "SDZ_Etat_0_Init",
+        "SDZ_Etat_1_Resume",
+        "SDZ_Etat_2_FadeIn",
+        "SDZ_Etat_3_Attente",
+        "SDZ_Etat_4_FadeOut",
+        "SDZ_Etat_5_Pause"
+      ],
+      "reflexes": [
+        "DS1_EtatRfx_0_JeBulle",
+        "DS1_EtatRfx_1_FollowRayman"
+      ]
+    },
+    {
+      "name": "MIC_CameraCinoche",
+      "rules": [
+        "MIC_Cinoche_INIT",
+        "MIC_Cinoche_Detect_Zone",
+        "MIC_Cinoche_Detect_CB28",
+        "MIC_Cinoche_Detect_EtatRay",
+        "MIC_Cinoche_CestParti",
+        "MIC_Cinoche_JeFilme",
+        "MIC_Cinoche_Fini",
+        "MIC_Cinoche_Pause"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_RetientRay",
+      "rules": [
+        "MIC_RR_INIT",
+        "MIC_RR_Boucle"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_BouclantGlobal",
+      "rules": [
+        "DS1_BouclantMarais",
+        "DS1_BouclantCave",
+        "DS1_BouclantLaser",
+        "DS1_BouclantLaveDure",
+        "DS1_BouclantLaveFall",
+        "DS1_BouclantLaveLiq",
+        "DS1_BouclantLaveSem",
+        "DS1_BouclantOrage",
+        "DS1_BouclantCascade",
+        "DS1_BouclantEgout",
+        "DS1_BouclantForet",
+        "DS1_BouclantForet2",
+        "DS1_BouclantRiviere",
+        "DS1_BouclantRiviere2",
+        "DS1_BouclantVent",
+        "DS1_BouclantKaka",
+        "DS1_BouclantAlarm",
+        "DS1_BouclanTekno",
+        "DS1_BouclantFrottePierre",
+        "DS1_InitSoundBigShip",
+        "DS1_BouclantPluie"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_interrupteur",
+      "rules": [
+        "STN_Switch_init",
+        "STN_Switch_check",
+        "STN_Switch_glisse",
+        "STN_Switch_retour",
+        "STN_Switch_activate",
+        "STN_Switch_target"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Alw_Lums_Model",
+      "rules": [
+        "STH_lum_init",
+        "FRG_Lum_Rien",
+        "STN_Lums_vert_catch",
+        "STN_Lums_vert_go",
+        "STH_lum_virevolte",
+        "STH_lum_deplacement"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YLT_RaymanModel",
+      "rules": [
+        "YLT_Init",
+        "YLT_Attente",
+        "YLT_SautReception",
+        "YLT_SautMontee",
+        "YLT_Helico",
+        "BNT_Nage",
+        "YLT_BlocMode",
+        "BNT_Grappin",
+        "YLT_GiBlocMode",
+        "YLT_Reinit",
+        "YLT_Desactive",
+        "YLT_EntreDeux",
+        "YLT_EntreDeuxAvance",
+        "YLT_EntreDeuxRecul",
+        "CHG_RaymanPaf",
+        "CHG_RayPafAir",
+        "CHG_RayPafEau",
+        "CHG_RayPafEcrase",
+        "YLT_PafSol",
+        "YLT_TonneauFuseeComport",
+        "YLT_Vide",
+        "BNT_RayPafAttendLaMort",
+        "YLT_PafGi",
+        "YLT_ChuteInfinie",
+        "YLT_SautImpulsion",
+        "BNT_DansLeSiegeRusse",
+        "YLT_SautSommet",
+        "YLT_Varappe",
+        "BNT_TonneauAttente",
+        "BNT_TonneauMarcheAvant",
+        "YLT_GiAttente",
+        "YLT_GiMarche",
+        "BNT_AccrocheAuBord",
+        "BNT_AccrocheRemonte",
+        "BNT_NagePlonge",
+        "BNT_NageSaute",
+        "BNT_WalkRunComport",
+        "BNT_AccrocheTentatives",
+        "BNT_NewPatin",
+        "BNT_PafElectrique",
+        "BNT_Atterrissage",
+        "BNT_Basket",
+        "BNT_TransePolochusComport",
+        "BNT_FadeDeLaMort",
+        "BNT_FadeDeLaMortBis",
+        "BNT_InitSuiteEtFin",
+        "IKI_AttenteGrimace"
+      ],
+      "reflexes": [
+        "BNT_ReflexeMort",
+        "YLT_AucunReflexe",
+        "YLT_SautDetecteSol",
+        "YLT_ReflexeAttente",
+        "YLT_SautCourant",
+        "JAC_GiReflexe",
+        "BNT_ReflexeNage",
+        "BNT_ReflexeGrappin",
+        "CHG_VarREflexe",
+        "FRD_Entr2Reflexe",
+        "BNT_TonneauFuseeReflexe",
+        "BNT_ReflexeDansLeSiegeRusse",
+        "BNT_ReflexeTonneauPorte",
+        "YLT_ReinitReflexe",
+        "BNT_ReflexePatin",
+        "BNT_SautImpulsionReflexe"
+      ]
+    },
+    {
+      "name": "StdCam",
+      "rules": [
+        "CHR_Mario",
+        "CHR_MarioGrappin",
+        "CHR_Look",
+        "CHR_MarioVarappe",
+        "CHR_Infini",
+        "BNT_Immobilisee",
+        "CHR_MarioHelico",
+        "CHR_MarioGI",
+        "CHR_Libre",
+        "CHR_MarioNage",
+        "DS1_MarioGlisse"
+      ],
+      "reflexes": [
+        "CHR_Reflexe"
+      ]
+    },
+    {
+      "name": "GlobalActorModel",
+      "rules": [
+        "CHG_GlobalActorInit",
+        "CHG_GlobalActorLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_GenMenuMap",
+      "rules": [
+        "YAM_MapInit",
+        "YAM_MapAttenteActivation",
+        "YAM_MapDesactivation",
+        "YAM_MapMenuChangeValeur",
+        "YAM_MapMenuLangue",
+        "YAM_MapMenuLoad",
+        "YAM_MapMenuOptions",
+        "YAM_MapMenuPrincipal",
+        "YAM_MapMenuSound",
+        "YAM_MapMenuVideo",
+        "YAM_MapLivrePolochus",
+        "YAM_MapInit2",
+        "YAM_MapInitLivre",
+        "YAM_MapMenuFinLoad",
+        "MCK_MenuChangeValeurLuminosite",
+        "MCK_MenuResolution",
+        "MCK_Avertissement",
+        "MCK_MenuControl",
+        "MCK_MenuCalibration",
+        "MCK_MenuCalibration2",
+        "MCK_MenuYesNo",
+        "MCK_CheatChangeMap",
+        "MCK_MenuFinNoLoad",
+        "NIK_C_Try60Hz",
+        "NIK_C_Valid60Hz",
+        "NIK_C_Indique4_3_OU_16_9",
+        "NIK_C_CentrageEcran",
+        "NIK_C_Confirm_LOAD_Pour_Ecrasement"
+      ],
+      "reflexes": [
+        "YAM_MapNeRienFaire",
+        "YAM_MapGestionModifValeur",
+        "YAM_MapGestionMenuStandard",
+        "MCK_MapGestionModifValeurLum",
+        "MCK_MapGestionMultiPage",
+        "MCK_MapGestionMenuYesNo",
+        "NIK_R_LitPad",
+        "NIK_JFF_LITPAD"
+      ]
+    },
+    {
+      "name": "ARG_IconeGestionnaire",
+      "rules": [
+        "ARG_IG_init",
+        "ARG_IG_main",
+        "ARG_IG_VieMaxPlus"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Alw_Projectile_Rayman_model",
+      "rules": [
+        "YLT_PoingInit",
+        "YLT_Shoot",
+        "BNT_PoingGrappin",
+        "BNT_PoingGrappinInit",
+        "FRD_GrappinBisInit",
+        "FRD_GrappinBisOnMeTire",
+        "FRD_GrappinBisTireObjet",
+        "FRD_GrappinBisFin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CHG_TexteMenu",
+      "rules": [
+        "FRH_text_init",
+        "DS1_text_fadein",
+        "DS1_text_fadeout",
+        "STN_Texte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_FondMenu",
+      "rules": [
+        "DS1_FondMenu1Standard"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_LumsCurseur",
+      "rules": [
+        "YAM_LumsCurseur1Standard",
+        "YAM_LumsCurseur0Init"
+      ],
+      "reflexes": [
+        "YAM_LumsCurseur0Deformation"
+      ]
+    },
+    {
+      "name": "Alw_Faisceau_Model",
+      "rules": [
+        "OLD_faisceau_init",
+        "OLD_faisceau_normal",
+        "OLD_faisceau_fin",
+        "OLD_faisceau_accessoire"
+      ],
+      "reflexes": [
+        "OLD_faisceau_temp",
+        "OLD_reflexe_vide"
+      ]
+    },
+    {
+      "name": "DS1_OneShot",
+      "rules": [
+        "DS1_InitSoundOiseau2",
+        "DS1_StartOiseau2",
+        "DS1_InitSoundOiseau1",
+        "DS1_StartOiseau1",
+        "DS1_InitSoundOiseau4",
+        "DS1_StartOiseau4",
+        "DS1_InitSoundOiseau3",
+        "DS1_StartOiseau3",
+        "DS1_InitSoundCrapeau",
+        "DS1_StartCrapaud",
+        "DS1_InitSoundBulles",
+        "DS1_InitSoundCave2",
+        "DS1_InitSoundSonar",
+        "DS1_StartSonar",
+        "DS1_InitSoundGroutgrot",
+        "DS1_StartGroutgrot",
+        "DS1_InitSoundBeurk",
+        "DS1_InitSoundMouette",
+        "DS1_StartMouette",
+        "DS1_InitSoundVagues",
+        "DS1_StartVagues",
+        "DS1_InitSoundUnderB",
+        "DS1_StartUnderB",
+        "DS1_StartBeurk",
+        "DS1_StartBulles",
+        "DS1_StartCave2",
+        "DS1_InitSoundOiseau5",
+        "DS1_StartOiseau5",
+        "DS1_InitSoundHibou",
+        "DS1_StartHibou",
+        "DS1_InitSoundPtitBul",
+        "DS1_StartSoundPtitBul",
+        "DS1_InitSoundOrage",
+        "DS1_StartOrage",
+        "DS1_InitSoundEpave",
+        "DS1_StartEpave",
+        "DS1_InitSoundPeurIntro",
+        "DS1_StartPeurIntro"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelAstro_10",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Tir_Starwars",
+      "rules": [
+        "MIC_TSW_INIT",
+        "MIC_TSW_Tire",
+        "MIC_TSW_FinDuTir",
+        "MIC_TSW_Delai"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_SerieRouge",
+      "rules": [
+        "ARG_LR_Init",
+        "ARG_LR_WaitRM"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_SerieLums",
+      "rules": [
+        "ARG_SR_Init",
+        "ARG_SR_PrepareLums",
+        "ARG_SR_AttendSignal",
+        "ARG_SR_DecompteTemps"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_EclaboussuresObus",
+      "rules": [
+        "MIC_Eclab_INIT",
+        "MIC_Eclab_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Rayseau",
+      "rules": [
+        "ARG_Init",
+        "ARG_ChoixMoyenTransport",
+        "ARG_ChoixDestination",
+        "ARG_VaAuWaypoint",
+        "ARG_VaEnSautant",
+        "ARG_RmEnSaut",
+        "ARG_Atterrit",
+        "ARG_RmTombe",
+        "ARG_RmFini",
+        "ARG_VaEnGlissant",
+        "ARG_AttendSol",
+        "ARG_VaAspire",
+        "ARG_VaEnNageant",
+        "DS1_Pause"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelBall",
+      "rules": [
+        "YLT_InitLevel",
+        "MIC_LBall_Loop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_francesco",
+      "rules": [
+        "OLD_franc_init",
+        "OLD_franc_voyage",
+        "ARG_Franc_Attend"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_DebutDeMap",
+      "rules": [
+        "ARG_Deb_Init",
+        "ARG_Deb_Attend",
+        "ARG_Deb_Vide",
+        "ARG_GoToRezo",
+        "ARG_SkipRezo",
+        "ARG_Seconde_Entree"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Alw_Plouf_Model",
+      "rules": [
+        "SUN_Plouf_Init",
+        "SUN_Alw_Sillage",
+        "SUN_Alw_Gerbe",
+        "FRH_rond_seul",
+        "FRH_rond_multiple"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Ray_Bast10",
+      "rules": [
+        "MOM_Ray_Bast10_init",
+        "MOM_Ray_Bast10_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelBast_09",
+      "rules": [
+        "YLT_InitLevel",
+        "YGE_Fade",
+        "YGE_Fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_cam_pluie",
+      "rules": [
+        "STN_pluie_init",
+        "VIM_pluie_fixe",
+        "VIM_pluie_oriente"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Sofkipleu",
+      "rules": [
+        "STN_Sofkipleu_init",
+        "STN_Sofkipleu_detect_in",
+        "STN_Sofkipleu_fade_in",
+        "STN_Sofkipleu_detect_out",
+        "STN_Sofkipleu_fade_out"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_pirate_sbire_cine_2",
+      "rules": [
+        "MOM_sbire_init",
+        "MOM_sbire_THX_move"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "THX_BlaBla",
+      "rules": [
+        "SUN_Blabla_Init",
+        "SUN_Blabla_Relax",
+        "SUN_Blabla_THX"
+      ],
+      "reflexes": [
+        "SUN_Blabla_RFX"
+      ]
+    },
+    {
+      "name": "OLD_THX",
+      "rules": [
+        "SUN_thx_init",
+        "SUN_thx_fin",
+        "SUN_thx_attend",
+        "SUN_thx_parle",
+        "SUN_thx_rencontre",
+        "SUN_Thx_Cine",
+        "SUN_Thx_Rien",
+        "SUN_Thx_Sans_THX",
+        "SUN_THX_Attendbouton"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_porteCine_bast10",
+      "rules": [
+        "MOM_porteCine_init",
+        "MOM_porteCine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "FRH_sbire_gnak",
+      "rules": [
+        "FRH_gn_init",
+        "FRH_gn_deplace_init",
+        "FRH_gn_deplace_capa",
+        "FRH_gn_deplace_impossible",
+        "FRH_gn_deplace_next",
+        "FRH_gn_choix_action",
+        "FRH_gn_crochet",
+        "FRH_gn_saute",
+        "FRH_gn_shoot",
+        "FRH_gn_insert",
+        "FRH_gn_mort",
+        "FRH_gn_to_lance",
+        "FRH_gn_to_tourne",
+        "FRH_gn_to_surveil",
+        "FRH_gn_courir",
+        "FRH_gn_avant_detection",
+        "FRH_gn_chute_inf"
+      ],
+      "reflexes": [
+        "FRH_sol_collision",
+        "FRH_sol_rien",
+        "FRH_sol_saut",
+        "FRH_sol_courir"
+      ]
+    },
+    {
+      "name": "LevelBast_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CHR_Porte",
+      "rules": [
+        "CHR_InitPorte",
+        "CHR_AttendGenere",
+        "ARG_FiniPorte",
+        "ARG_Aspiration",
+        "ARG_Init_OnlyCB28",
+        "ARG_OnlyCB28_Main",
+        "DS1_DialOne",
+        "DS1_Dial_Next",
+        "DS1_dial_ok",
+        "DS1_ApparitionTexte",
+        "DS1_ByePorte",
+        "DS1_PorteGlob20"
+      ],
+      "reflexes": [
+        "DS1_RfxVide",
+        "DS1_RfxCadre"
+      ]
+    },
+    {
+      "name": "OLP_PlotKiTombe",
+      "rules": [
+        "MIC_Plot_INIT",
+        "MIC_Plot_SEnfonce",
+        "MIC_Plot_Interrupteur_On",
+        "MIC_Plot_Aller",
+        "MIC_Plot_Retour",
+        "MIC_Plot_Interrupteur_Off"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_PosCam_Smooth",
+      "rules": [
+        "SUN_CamSmooth_Init",
+        "SUN_CamSmooth_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Switch_Auto",
+      "rules": [
+        "OLP_Init_Switch",
+        "OLP_Attente_switch",
+        "OLP_MI_switch"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_PosCam_Cut",
+      "rules": [
+        "SUN_CamCut_Init",
+        "SUN_CamCut_Normal",
+        "SUN_CamCut_Dedans",
+        "CHR_RetourNormal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GorilleGardien",
+      "rules": [
+        "MIC_Gege_INIT",
+        "MIC_Gege_Surveille",
+        "MIC_Gege_Charge",
+        "MIC_Gege_Repart",
+        "MIC_Gege_TourneSurPlace",
+        "MIC_Gege_Chute",
+        "MIC_Gege_Pietine",
+        "MIC_Gege_Prune",
+        "MIC_Gege_Electrique",
+        "MIC_Gege_Pause",
+        "MIC_Gege_RepartReseau",
+        "MIC_Gege_Delai",
+        "MIC_Gege_OnMeTaquine",
+        "MIC_Gege_PasCompris"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "BNT_EnferDeDante",
+      "rules": [
+        "BNT_Comport_InitDante",
+        "MIC_Comport_Flamme"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CHR_CheckP",
+      "rules": [
+        "CHR_check_init",
+        "CHR_check_test",
+        "CHR_check_actif",
+        "STN_check_boucleAOJ",
+        "STN_check_debutAOJ",
+        "STN_check_finAOJ"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "VCT_GenPrune",
+      "rules": [
+        "VCT_GenPrune_AttenteSansPrune",
+        "VCT_GenPrune_AttenteAvecPrune"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_SBIRE_shoot_sol",
+      "rules": [
+        "SUN_SB_shoot_init",
+        "SUN_SB_shoot_attentesol_av_detection",
+        "SUN_SB_shoot_attaq_enjoue",
+        "SUN_SB_shoot_attaq_shoot",
+        "SUN_SB_shoot_Cpaf",
+        "SUN_SB_shoot_CParachute",
+        "SUN_SB_shoot_Cattend",
+        "SUN_SB_shoot_mort",
+        "SUN_SB_shoot_insert",
+        "SUN_SB_shoot_crochet",
+        "SUN_SB_shoot_chute",
+        "SUN_SB_shoot_saut_impul",
+        "SUN_SB_Shoot_saut_go",
+        "SUN_SB_shoot_chute_oriente",
+        "OLD_SB_shoot_Sleeping",
+        "FRH_SB_shoot_reveil"
+      ],
+      "reflexes": [
+        "SUN_SB_shoot_Rsol",
+        "SUN_SB_shoot_Rrien",
+        "SUN_SB_shoot_Rchute"
+      ]
+    },
+    {
+      "name": "STN_SaveSwitch",
+      "rules": [
+        "STN_SaveSwitch_init",
+        "STN_SaveSwitch_check",
+        "DS1_TempsMusique"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "JEZ_lumiere",
+      "rules": [
+        "JEZ_MIC_Loupiottes_INIT",
+        "JEZ_MIC_Loupiottes_Surveille",
+        "DS1_PasseLaPommade",
+        "DS1_CestFini",
+        "DS1_VerificationGenerale",
+        "DS1_NextStep",
+        "DS1_WaitForSchmurchz"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_fleche_helpeuse",
+      "rules": [
+        "MIC_FlecheH_INIT",
+        "MIC_FlecheH_Allumee",
+        "MIC_FlecheH_Eteinte",
+        "MIC_FlecheH_Allumee_Etat",
+        "MIC_FlecheH_Eteinte_Etat"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_teleport",
+      "rules": [
+        "STH_teleport_init",
+        "ARG_Teleport_Tableau",
+        "STH_teleport_detect",
+        "STH_teleport_attente",
+        "STH_teleport_intermediaire",
+        "SUN_PirouliPiroula"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_SteleAOJ",
+      "rules": [
+        "SDZ_Stele_0_Init",
+        "SDZ_Stele_1_Resume",
+        "SDZ_Stele_2_Resume_FadeIn",
+        "SDZ_Stele_3_Resume_Attente",
+        "SDZ_Stele_4_Resume_FadeOut",
+        "SDZ_Stele_5_Attente",
+        "SDZ_Stele_6_Resume_AttenteBouton"
+      ],
+      "reflexes": [
+        "SDZ_0_Je_Bulle",
+        "SDZ_1_Je_Filme",
+        "DS1_2_FollowRayman"
+      ]
+    },
+    {
+      "name": "YAM_PastilleVersLaMapMonde",
+      "rules": [
+        "YAM_Pastille1Normal",
+        "YAM_Pastille2Active",
+        "ARG_Aspirale",
+        "ARG_Apparition",
+        "ARG_PastilleAttendSol",
+        "ARG_WaitChangeMap",
+        "DS1_Inerte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "JCP_dead_perso",
+      "rules": [
+        "JCP_init_dead",
+        "YLT_Wait"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GenCamera",
+      "rules": [
+        "MIC_GenCamera_INIT",
+        "MIC_GenCamera_Attend",
+        "MIC_GenCamera_Filme",
+        "MIC_GenCamera_AttendCB28",
+        "MIC_GenCamera_FilmeCb28"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVN_DebutDeMap",
+      "rules": [
+        "IVN_Deb_Init",
+        "IVN_Deb_Attend",
+        "IVN_Deb_Vide",
+        "IVN_GoToRezo"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_SonBast10",
+      "rules": [
+        "DS1_CrapeauB10_Init",
+        "DS1_CrapaudB10_Start",
+        "DS1_BebetesB10_Init",
+        "DS1_BebetesB10_Start",
+        "DS1_HibouB10_Init",
+        "DS1_HibouB10_Start",
+        "DS1_VentBouclantB10",
+        "DS1_NuitAmbianceB10",
+        "DS1_OrageDebutB10",
+        "DS1_FlammecheB10",
+        "DS1_SonMoulinB10_Init",
+        "DS1_SurfaceSonMoulinB10",
+        "DS1_TestFinSonMoulinB10"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_ptitchampi",
+      "rules": [
+        "OLD_champi_init",
+        "OLD_champi_normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Papillon",
+      "rules": [
+        "ARG_Pinit",
+        "ARG_PattendRM",
+        "ARG_Pdecolle"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_kipik",
+      "rules": [
+        "STN_kipik_init",
+        "STN_kipik_pozzz",
+        "STN_kipik_bouzzz",
+        "STN_kipik_kassoszzz"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_controleSC",
+      "rules": [
+        "STH_controleSC_init",
+        "STH_controleSC_main",
+        "STH_controleSC_Suivant",
+        "STH_controleSC_comptage"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVN_poisson_drole",
+      "rules": [
+        "IVN_drole_init",
+        "IVN_drole_normal2",
+        "IVN_drole_retour",
+        "IVN_drole_normal3"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_NageDevantRM",
+      "rules": [
+        "ARG_P01_init",
+        "ARG_P02_CheckPos",
+        "ARG_P03_Go",
+        "ARG_P04_Fuit",
+        "ARG_P05_Retour",
+        "ARG_P06_Saute",
+        "ARG_P07_AttenteRandom"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "JEZ_LeMoulin",
+      "rules": [
+        "JEZ_moulin_init",
+        "JEZ_moulin_tourne"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "JEZ_plateHelice",
+      "rules": [
+        "JEZ_platehelice_init",
+        "JEZ_platehelice_detecte",
+        "JEZ_platehelice_up",
+        "JEZ_platehelice_turndown",
+        "JEZ_platehelice_turnup",
+        "JEZ_platehelice_down",
+        "DS1_DetecteRay",
+        "DS1_DemarreVoyage",
+        "DS1_JyVais",
+        "DS1_JeSuisArrive",
+        "DS1_JeMeRetourne",
+        "DS1_JeReparsDanslAutreSens",
+        "DS1_ImBack",
+        "DS1_JeMeRemetAlEndroit"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_alw_tonneau_model",
+      "rules": [
+        "OLD_alw_tonneau_init",
+        "OLD_alw_tonneau_vol"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "BNT_ThePrune",
+      "rules": [
+        "BNT_PruneInit",
+        "BNT_PruneColleEtReste",
+        "BNT_PrunePortee",
+        "BNT_Comport_PruneQuiFlotte",
+        "DS1_PruneEnchutePlum",
+        "DS1_PruneEnChuteLearn",
+        "DS1_PruneQuiFlotteRayDessus",
+        "DS1_JeDisparais",
+        "DS1_PruneChuteMineBast",
+        "DS1_PruneEnChutePlum10"
+      ],
+      "reflexes": [
+        "BNT_Reflex_PruneVide",
+        "BNT_Reflex_PruneQuiFlotte",
+        "BNT_Reflex_PrunePortee",
+        "DS1_Rfx_PruneEnChuteBast",
+        "DS1_Rfx_PruneEnChutePlum",
+        "DS1_Rfx_PruneEnChuteMine",
+        "DS1_Rfx_PruneEnChuteLearn",
+        "DS1_Rfx_PrunePlumAccrochablePasPrunable"
+      ]
+    },
+    {
+      "name": "SUN_basic",
+      "rules": [
+        "SUN_init",
+        "FRH_Mic_target",
+        "OLD_tournant",
+        "OLD_tete_chercheuse",
+        "OLD_toutdroit_en_tournant",
+        "OLD_toutdroit"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelBast_20",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_PorteLaser_Switch",
+      "rules": [
+        "OLP_Init_PorteLaser",
+        "OLP_Fermeture",
+        "OLP_Ouverture",
+        "OLP_Fermee",
+        "OLP_Ouverte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CEB_porte_bois",
+      "rules": [
+        "CEB_init",
+        "CEB_attente_eclatement",
+        "CEB_eclatement_porte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_sparadrap_metal",
+      "rules": [
+        "STN_Sparametal_init",
+        "STN_Sparametal_detection",
+        "STN_Sparametal_explose"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Tono_Generator",
+      "rules": [
+        "SUN_Trap_Init",
+        "SUN_Trap_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "BNT_TonneauFusee",
+      "rules": [
+        "BNT_Init",
+        "BNT_EnChuteLibre",
+        "BNT_TonneauDragsterAerien",
+        "BNT_TonneauPorte",
+        "SUN_permiere_chute",
+        "MIC_Tono_Ramassable",
+        "MIC_Init_Generateur",
+        "MIC_Tono_Type1_Fin",
+        "MIC_Tono_Type1_Debut"
+      ],
+      "reflexes": [
+        "BNT_ReflexeTonneauRamassable",
+        "BNT_ReflexeTonneauRamasse",
+        "BNT_ReflexeTonneauFusee",
+        "MIC_ReflexeTonneauVide",
+        "DS1_ReflexeTonneauParTerre",
+        "DS1_RaymanMeRamasse"
+      ]
+    },
+    {
+      "name": "ARG_CageLums",
+      "rules": [
+        "ARG_CageInit",
+        "ARG_AttendOuverture",
+        "ARG_GenereLums",
+        "ARG_FiniDePondre",
+        "ARG_PafEnLair",
+        "ARG_Unseen",
+        "ARG_PutainCestBuggeLesMacros",
+        "DS1_EmploiTempsCetaitBien"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_BancDePiranhas_NoCollision",
+      "rules": [
+        "MIC_BancPir_NC_INIT",
+        "MIC_BancPir_NC_Surveille",
+        "MIC_BancPir_NC_Fini"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_sparadrap",
+      "rules": [
+        "MIC_Sparadrap_INIT",
+        "MIC_Sparadrap_AttendPaf",
+        "MIC_Sparadrap_Zouip",
+        "MIC_Sparadrap_RemetLaZique"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_PiranhaSauteurVisible",
+      "rules": [
+        "MIC_PSV_INIT",
+        "MIC_PSV_Synchro",
+        "MIC_PSV_SautDebut",
+        "MIC_PSV_SautTop",
+        "MIC_PSV_SautPlouf",
+        "MIC_PSV_SautFin",
+        "MIC_PSV_Delai",
+        "MIC_PSV_Tourne",
+        "MIC_PSV_AvantSaut",
+        "MIC_PSV_FaisDodo",
+        "MIC_PSV_Paf",
+        "MIC_PSV_Fini"
+      ],
+      "reflexes": [
+        "MIC_PSV_MangeDuPaf",
+        "MIC_PSV_RRien"
+      ]
+    },
+    {
+      "name": "MIC_BoiteDisco",
+      "rules": [
+        "MIC_BoiteDisco_INIT",
+        "MIC_BoiteDisco_Tourne",
+        "MIC_BoiteDisco_Off"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "GRP_Trampoline",
+      "rules": [
+        "GRP_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_pontlevis",
+      "rules": [
+        "STN_pontlevis_init",
+        "STN_pontlevis_open",
+        "STN_pontlevis_close",
+        "JAC_pontlevis_Attends_Fermeture",
+        "JAC_pontlevis_Attends_Ouverture"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Inverseur",
+      "rules": [
+        "OLP_Init_Inverseur",
+        "OLP_1_Sbire",
+        "OLP_2_Sbires",
+        "OLP_Rien"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_RegleurInertie",
+      "rules": [
+        "DS1_RegleurInertie_Init",
+        "DS1_Inertie_TestPresenceRayman",
+        "DS1_Inertie_RaymanOut"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_MurfyAOJ",
+      "rules": [
+        "SDZ_AOJ_0_Init",
+        "SDZ_AOJ_1_Attente",
+        "SDZ_AOJ_2_Approche",
+        "SDZ_AOJ_3_Parle",
+        "SDZ_AOJ_4_Sortie",
+        "SDZ_AOJ_5_Resume",
+        "SDZ_AOJ_6_Resume_FadeIn",
+        "SDZ_AOJ_7_Resume_Attente",
+        "SDZ_AOJ_8_Resume_FadeOut",
+        "SDZ_AOJ_9_Tourne",
+        "SDZ_AOJ_A_ParleAttendBouton"
+      ],
+      "reflexes": [
+        "SDZ_AOJ_0_JeBulle",
+        "SDZ_AOJ_1_JeCommenceAFilmer",
+        "SDZ_AOJ_2_JeFilme",
+        "SDZ_AOJ_3_NoReflex"
+      ]
+    },
+    {
+      "name": "OLP_IA_bzzz_IA",
+      "rules": [
+        "OLP_Ini_IA_bzzz_IA",
+        "OLP_A_toi"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_DetruitCamera",
+      "rules": [
+        "OLP_Init_DetruitCamera",
+        "OLP_Attente_DetruitCamera"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Gendoor_Detruit_Tonneau_R40",
+      "rules": [
+        "OLP_Init_Detruit_Tonneau",
+        "OLP_VasyDetruit"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVN_Simple_Granouil",
+      "rules": [
+        "IVN_init_granouil",
+        "IVN_saut_granouil",
+        "IVN_attente_granouil",
+        "DS1_init_CB_granouil"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_fumee_toxique",
+      "rules": [
+        "OLD_fumee_toxiq_init",
+        "OLD_fumee_toxiq_simple",
+        "OLD_fumee_toxiq_multiple"
+      ],
+      "reflexes": [
+        "OLD_fumee_tox_Rrien",
+        "OLD_fumee_tox_R_collision"
+      ]
+    },
+    {
+      "name": "STH_petitspiranha_deco",
+      "rules": [
+        "STH_piti_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Alw_Feu_model",
+      "rules": [
+        "SUN_Alw_Feu_Init",
+        "SUN_Alw_Feu_Boule",
+        "SUN_Alw_Feu_Jet",
+        "OLD_alw_feu_boule_queue",
+        "OLD_alw_feu_croix_feu",
+        "DS1_Alw_Feu_Jet_temps",
+        "CHR_basic_flamme",
+        "OLD_feu_boule_no_ZdEM",
+        "OLD_feu_boule_boss"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelBast_22",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_bombginreita",
+      "rules": [
+        "STN_bombginreita_init",
+        "STN_bombginreita_genere",
+        "STN_bombginreita_detecte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Nuages_Generateur_Model",
+      "rules": [
+        "OLP_Nuages_Generateur_init",
+        "OLP_Nuages_Generateur_normal",
+        "OLP_Nuages_Generateur_action",
+        "OLP_Nuages_Generateur_creation",
+        "DS1_Nuages_par_intermittence"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVP_Foudre",
+      "rules": [
+        "DS1_arc_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "FRD_EntreDeux",
+      "rules": [
+        "FRD_TesteCollisionCorridor",
+        "FRD_TesteSortieCorridor"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_missileCine",
+      "rules": [
+        "MOM_missileCine_init",
+        "MOM_missileCine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_LanceBanane",
+      "rules": [
+        "MIC_LB_INIT",
+        "MIC_LB_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Ly_Cine",
+      "rules": [
+        "SDZ_LyCine_Init",
+        "SDZ_LyCine_Vol",
+        "SDZ_LyCine_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_RayDum",
+      "rules": [
+        "SDZ_Dum_0_Init",
+        "SDZ_Dum_1_THX",
+        "SDZ_Dum_2_Course",
+        "SDZ_R40Dum_0_Init",
+        "SDZ_R40Dum_1_THX",
+        "SDZ_Dum_1_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Lums_Cinema",
+      "rules": [
+        "SUN_Lums_Init",
+        "SUN_Lums_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_FX_Bast20",
+      "rules": [
+        "SDZ_FX_0_Init",
+        "SDZ_FX_1_Normal",
+        "DS1_FX_2_THX",
+        "SDZ_FX_3_WaitBoom"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Timing_Active_Aide",
+      "rules": [
+        "OLP_Init_Timing_Active",
+        "OLP_Compte_Active",
+        "OLP_En_Marche"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "BNT_grappinable",
+      "rules": [
+        "PHL_Lums_Init",
+        "ARG_Type2_ParcoursBoucle",
+        "ARG_Type3",
+        "JCP_type_lums_v",
+        "JCP_vers_wp_rm",
+        "JCP_retourne",
+        "CHR_vers_wp_init",
+        "PHL_Attends_a_dest",
+        "ARG_Type1_Immobile",
+        "ARG_LibereDeLaCage",
+        "ARG_Libre"
+      ],
+      "reflexes": [
+        "PHL_Rfx_Recuperation",
+        "ARG_Rfx_EnGrappin",
+        "ARG_Rfx_NonAccrochable",
+        "DS1_Rfx_None"
+      ]
+    },
+    {
+      "name": "Alw_Bombe_Model",
+      "rules": [
+        "SUN_Bmb_Heli_Init",
+        "SUN_Bmb_Heli_Detec",
+        "OLD_bmb_heli_vol2",
+        "YLT_Vol",
+        "YLT_Vibre",
+        "YLT_DetruitBomb"
+      ],
+      "reflexes": [
+        "IVN_teste_collision_avec_parois",
+        "IVN_bombe_vide"
+      ]
+    },
+    {
+      "name": "LevelBatam_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_batam_cine",
+      "rules": [
+        "MOM_bateauAmiralCine_init",
+        "MOM_bateauAmiralCine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Pir_Barbu_Cinema",
+      "rules": [
+        "SUN_Pir_Barb_Cine_Init",
+        "SUN_Pir_Barb_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Pir_Chaise_Cine",
+      "rules": [
+        "MOM_pirChaise_Cine_init",
+        "MOM_pirChaise_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Pir_Lun_Cinema",
+      "rules": [
+        "SUN_Pir_Lun_Cine_Init",
+        "SUN_Pir_Lun_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Nef_Cine_THX",
+      "rules": [
+        "NIK_Nef_Cine_init",
+        "NIK_Nef_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Ray_bat10",
+      "rules": [
+        "MOM_Ray_bat10_init",
+        "MOM_Ray_bat10_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_GenCompteurCine",
+      "rules": [
+        "YAM_GenCompteurCine0Init",
+        "YAM_GencompteurCine1Cine",
+        "YAM_GenCompteurCine2CineFin",
+        "MOM_GenCompteurCine2CineFin2"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_CamAnim_THX",
+      "rules": [
+        "SUN_CamAnim_Init",
+        "SUN_CamAnim_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_GEN_NIK",
+      "rules": [
+        "NIK_Batam_10",
+        "NIK_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Porte_Cine",
+      "rules": [
+        "SDZ_Porte_0_Init",
+        "SDZ_Porte_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelBatam_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "THX_Spielberg",
+      "rules": [
+        "SDZ_THX2_init",
+        "SDZ_THX2_fin",
+        "SDZ_THX2_attendWP",
+        "SDZ_THX2_parle",
+        "SDZ_THX2_AttendCB28",
+        "SDZ_THX2_Sans_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_SpecialFX",
+      "rules": [
+        "SDZ_sfx_0Init",
+        "SDZ_sfx_1Normal",
+        "SDZ_sfx_3Bulle"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_General_Cine",
+      "rules": [
+        "SDZ_General_0Init",
+        "SDZ_General_1Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Coffre_Cine",
+      "rules": [
+        "SDZ_Coffre_0_Init",
+        "SDZ_Coffre_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Rhoppy",
+      "rules": [
+        "SDZ_Rhop_0_Init",
+        "SDZ_Rhop_1_THX"
+      ],
+      "reflexes": [
+        "SDZ_RhopRfx_0_Init",
+        "SDZ_RhopRfx_1_Flammes"
+      ]
+    },
+    {
+      "name": "IVN_simple_bat",
+      "rules": [
+        "IVN_chov_base",
+        "IVN_chov_tombe",
+        "IVN_chov_vol",
+        "DS1_chov_init_cb"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YLT_Actor_Model1",
+      "rules": [
+        "YLT_pl_explo_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelboat01",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_helice",
+      "rules": [
+        "OLD_helice_init",
+        "OLD_helice_tourne"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ECO_au_revoir_rayman",
+      "rules": [
+        "ECO_init",
+        "ECO_transparence",
+        "ECO_suspense",
+        "ECO_changemap",
+        "ECO_transparence_bis"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelboat02",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "FRH_tremplin",
+      "rules": [
+        "FRH_tr_init",
+        "FRH_tr_move"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Barriere_Laser",
+      "rules": [
+        "SUN_BarriereLaser_Init",
+        "SUN_BarriereLaser_Normal",
+        "SUN_BarriereLaser_Inter"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Wind",
+      "rules": [
+        "SDZ_Wind_0_Init",
+        "SDZ_Wind_1_Normal",
+        "SDZ_Wind_2_Souffle"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Alw_Fumee_model",
+      "rules": [
+        "SUN_Nuage_init",
+        "SUN_pluie",
+        "SUN_fumee_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_alphabet",
+      "rules": [
+        "OLD_alphab_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelbonux",
+      "rules": [
+        "YLT_InitLevel",
+        "MIC_World_Titre",
+        "MIC_World_Infos",
+        "MIC_World_TesteFin",
+        "MIC_World_Fin",
+        "MIC_World_Recompenses",
+        "MIC_World_AjouteVie",
+        "MIC_World_AjouteShoot",
+        "MIC_World_AfficheRay",
+        "MIC_World_ToTheMapMonde",
+        "MIC_World_SansInfos",
+        "MIC_World_Bravo",
+        "MIC_World_Menu",
+        "MIC_World_RelacheStartBordel"
+      ],
+      "reflexes": [
+        "MIC_World_RInit",
+        "MIC_World_RNormal",
+        "MIC_World_RAntiStart"
+      ]
+    },
+    {
+      "name": "MIC_Bebe_Bonux",
+      "rules": [
+        "MIC_bbb_INIT",
+        "MIC_bbCourse_Avance",
+        "MIC_bbCourse_Saut",
+        "MIC_bbCourse_NouvoWp",
+        "MIC_bbCourse_Coule",
+        "MIC_bbCourse_FaitCoucou",
+        "MIC_bbCourse_Fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_CameraCircuit",
+      "rules": [
+        "MIC_CC_INIT",
+        "MIC_CC_NouvoWp",
+        "MIC_CC_Oriente",
+        "MIC_CC_FixeSuivi",
+        "MIC_CC_Fixe",
+        "MIC_CC_DeuxActeurs",
+        "MIC_CC_Classique"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_LunetteBonux",
+      "rules": [
+        "MIC_Spex_INIT",
+        "MIC_Spex_NouvoWp",
+        "MIC_Spex_Avance",
+        "MIC_Spex_Saut",
+        "MIC_Spex_Bomber",
+        "MIC_Spex_Trebuche",
+        "MIC_Spex_Fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_LudiBonux",
+      "rules": [
+        "MIC_Ludi_INIT",
+        "MIC_Ludi_DonneKado",
+        "MIC_Ludi_SeSauve",
+        "MIC_Ludi_Delai"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_bebe_globox",
+      "rules": [
+        "OLD_bb_globox_init",
+        "OLD_bb_globox_normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "levelCask_10",
+      "rules": [
+        "ZOR_INITLevel",
+        "ZOR_LevelLoop",
+        "ZOR_ZeBest"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Cam_AxeForce",
+      "rules": [
+        "SUN_AxeForce_Init",
+        "SUN_AxeForce_Axe",
+        "SUN_Axeforce_Nebulus",
+        "OLD_axeforce_nebulus_targetcible"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GerbeTonneau",
+      "rules": [
+        "MIC_GerbeTonneau_INIT",
+        "MIC_GerbeTonneau_Teste",
+        "MIC_GerbeTonneau_Fini"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_ZigouillateurNPersos",
+      "rules": [
+        "MIC_ZNP_INIT",
+        "MIC_ZNP_Zigouille",
+        "MIC_ZNP_Distance",
+        "MIC_ZNP_CB28",
+        "MIC_ZNP_Etat",
+        "MIC_ZNP_Destruction"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_ActivateurMultiple",
+      "rules": [
+        "MIC_ActivMul_INIT",
+        "MIC_ActivMul_SurveilleDistance",
+        "MIC_ActivMul_SurveilleEtatRay",
+        "MIC_ActivMul_SurveilleCB28"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "GRP_GratificationAnim",
+      "rules": [
+        "MIC_INIT",
+        "GRP_FinSon",
+        "MIC_Fini",
+        "MIC_Detection_CB28",
+        "MIC_Detection_Distance",
+        "GRP_Detection_Mort",
+        "DS1_RayDanseAuSol",
+        "DS1_YeahYeahYeah",
+        "DS1_FreeStyle"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_planches",
+      "rules": [
+        "STN_planche_init",
+        "STN_planche_crack",
+        "STN_planche_detruite_poutre",
+        "STN_planche_explose",
+        "STN_planche_suivante",
+        "STN_planche_tremble",
+        "STN_planche_tremble_init",
+        "STN_planche_detruite_non_poutre",
+        "STN_planche_switch"
+      ],
+      "reflexes": [
+        "IVN_planche_rfx_void",
+        "IVN_planche_rfx_rumble"
+      ]
+    },
+    {
+      "name": "LevelCask_30",
+      "rules": [
+        "YLT_InitLevel",
+        "DS1_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_StarTrek",
+      "rules": [
+        "MIC_StarTrek_INIT",
+        "MIC_StarTrek_SurveilleSpok",
+        "MIC_StarTrek_Interrupteur"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GrilleInterruptee",
+      "rules": [
+        "MIC_GrilleInt_INIT",
+        "MIC_GrilleInt_Attend",
+        "MIC_GrilleInt_Monte",
+        "MIC_GrilleInt_Descend",
+        "ARG_GrilleInt_Pause"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Killeur",
+      "rules": [
+        "MIC_Killeur_INIT",
+        "MIC_Killeur_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_batokipass",
+      "rules": [
+        "STN_batokipass_init",
+        "STN_batokipass_chemin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Ptizetre",
+      "rules": [
+        "ARG_PTinit",
+        "ARG_PTattend",
+        "ARG_PTsortcage",
+        "ARG_PTvaWp",
+        "ARG_PThello",
+        "ARG_PTsautmonte",
+        "ARG_PTsautdescend",
+        "ARG_PTprepare",
+        "DS1_PTdanse",
+        "ARG_PTsautFinalmonte",
+        "ARG_PTsautFinaldescend",
+        "ARG_PTouvrePorte",
+        "DS1_PTdanseFin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_varappe",
+      "rules": [
+        "STN_varap_init",
+        "STN_varap_detecte",
+        "STN_varap_tremble_init",
+        "STN_varap_chute",
+        "STN_varap_detruit",
+        "STN_varap_tremble"
+      ],
+      "reflexes": [
+        "DS1_Varape_Rumble_Rfx",
+        "DS1_Varape_Rfx_vide"
+      ]
+    },
+    {
+      "name": "Alw_Projectile_model",
+      "rules": [
+        "CHR_init",
+        "CHR_go",
+        "DS1_GoSpecialNav",
+        "JAC_mort"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelChase_10",
+      "rules": [
+        "YLT_InitLevel",
+        "DS1_Leveloop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_bato",
+      "rules": [
+        "STN_bato_init",
+        "STN_bato_vitesse_ray",
+        "STN_bato_vitesse_fixe",
+        "STN_bato_fantome"
+      ],
+      "reflexes": [
+        "STN_bato_commande"
+      ]
+    },
+    {
+      "name": "STN_genbato",
+      "rules": [
+        "STN_genbato_init",
+        "STN_genbato_bombe",
+        "STN_genbato_boulet",
+        "STN_genbato_menu",
+        "STN_genbato_suivant",
+        "STN_genbato_surprise",
+        "STN_genbato_vitesse",
+        "STN_genbato_boul_ray",
+        "STN_genbato_fantome"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_pouletzombie",
+      "rules": [
+        "OLD_poulzomb_init",
+        "OLD_poulzomb_voyage",
+        "OLD_poulzomb_mort",
+        "OLD_poulzomb_visible",
+        "OLD_pz_sort",
+        "OLD_pz_traverse",
+        "OLD_pz_init",
+        "SUN_poulzomb_retour",
+        "DS1_Poulet_Depart_Reseau"
+      ],
+      "reflexes": [
+        "OLD_poulzomb_reflex",
+        "OLD_poulzomb_Rrien"
+      ]
+    },
+    {
+      "name": "DS1_PastilleAPeage",
+      "rules": [
+        "DS1_Aspirale",
+        "DS1_PastilleInit",
+        "DS1_PastilleInerte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_ZyvaEnvoieTesLums",
+      "rules": [
+        "DS1_InitCompteur",
+        "DS1_compteur_attente",
+        "DS1_compteur_Reattente",
+        "DS1_compteur_attente_Nego10",
+        "SDZ_CompteurFadeIn",
+        "SDZ_CompteurAttenteBouton",
+        "SDZ_CompteurFadeOut"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Ly_Potiche",
+      "rules": [
+        "DS1_Init_Potiche",
+        "DS1_Ly_Potiche_OnduleTonCorps"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_tonneau_reseau",
+      "rules": [
+        "OLD_ton_reseau_arret",
+        "OLD_ton_reseau_init",
+        "OLD_ton_reseau_voyage",
+        "OLD_ton_reseau_chute",
+        "STN_ton_reseau_coule",
+        "DS1_ton_reseau_monte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_ponton",
+      "rules": [
+        "OLD_ponton_init",
+        "OLD_ponton_normal",
+        "GRP_WaitPourRepositionnement",
+        "IVN_ponton_void"
+      ],
+      "reflexes": [
+        "IVN_ponton_rfx_void",
+        "IVN_ponton_rfx_rumble"
+      ]
+    },
+    {
+      "name": "MIC_PasserelleMarais",
+      "rules": [
+        "MIC_Pass_INIT",
+        "MIC_Pass_Tombe",
+        "STN_Pass_tremble",
+        "MIC_Pass_Tzoing",
+        "MIC_pass_detruit",
+        "STN_pass_attend"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_bato_boulet",
+      "rules": [
+        "STN_boulet_init",
+        "STN_boulet_tir",
+        "STN_boulet_boum"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_boulet_surprise",
+      "rules": [
+        "STN_boulet_surprise_init",
+        "STN_boulet_surprise_tir",
+        "STN_boulet_surprise_boum"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Missile_direct",
+      "rules": [
+        "DS1_Missile_direct_init",
+        "DS1_missile_direct_attaque"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Missile_Chrono",
+      "rules": [
+        "DS1_Missile_Chrono_Init",
+        "DS1_missile_chrono_attaque"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelChase_22",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_SimpleSbire",
+      "rules": [
+        "ARG_Init",
+        "ARG_Tirs",
+        "ARG_AttendRM",
+        "ARG_Paf",
+        "ARG_Meurt",
+        "DS1_Poing"
+      ],
+      "reflexes": [
+        "ARG_Rvide",
+        "ARG_Rpoing"
+      ]
+    },
+    {
+      "name": "ARG_Gen_Tono_Roule",
+      "rules": [
+        "ARG_GTR_Init",
+        "ARG_GTR_Attend",
+        "ARG_GTR_Go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Damocles",
+      "rules": [
+        "SUN_Damocles_Init",
+        "SUN_Damocles_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Tonneau_DonkeyKong",
+      "rules": [
+        "ARG_TDK_Init",
+        "ARG_TDK_main",
+        "ARG_TDK_Prepare",
+        "ARG_TDK_AttendWP"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelEarth_10",
+      "rules": [
+        "CHG_WorldLoop",
+        "BNT_InitGameWorld"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Chenille_Reseau",
+      "rules": [
+        "ARG_Initial",
+        "ARG_Principal",
+        "ARG_MarcheOuCreve",
+        "ARG_SautDeb",
+        "ARG_Marche",
+        "ARG_Attaque",
+        "ARG_Restart"
+      ],
+      "reflexes": [
+        "ARG_Rfx_Inoffensive",
+        "ARG_Rfx_Mechante",
+        "ARG_Rfx_NonVisible"
+      ]
+    },
+    {
+      "name": "MIC_PiranhaHaineux",
+      "rules": [
+        "MIC_PirHar_INIT",
+        "MIC_PirHar_Debut",
+        "MIC_PirHar_Saute",
+        "MIC_PirHar_Explose"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_SBIRE_alarme",
+      "rules": [
+        "OLD_SBIRE_alarme_init",
+        "OLD_SBIRE_alarme_Cpaf",
+        "OLD_SBIRE_alarme_mort",
+        "OLD_SBIRE_alarme_init_chemin",
+        "OLD_SBIRE_alarme_recherche",
+        "OLD_SBIRE_alarme_balade",
+        "OLD_SBIRE_alarme_saut",
+        "OLD_SBIRE_alarme_attente",
+        "OLD_SBIRE_alarme_surRM",
+        "OLD_SBIRE_alarme_crochet",
+        "OLD_SBIRE_alarme_choix_arme",
+        "OLD_SBIRE_alarme_shoot",
+        "OLD_SBIRE_alarme_en_joue",
+        "OLD_SBIRE_alarme_sleeping",
+        "FRH_SBIRE_alarme_returnWP",
+        "FRH_SBIRE_alarme_att_RM",
+        "DS1_SBIRE_alarme_wait",
+        "DS1_Sbire_Alarme_changement",
+        "DS1_SBIRE_alarme_Cpaf_air"
+      ],
+      "reflexes": [
+        "OLD_SBIRE_alarme_Rsol",
+        "OLD_SBIRE_alarme_Rrien"
+      ]
+    },
+    {
+      "name": "MIC_OctusDiabolus",
+      "rules": [
+        "MIC_OD_INIT",
+        "MIC_OD_Ptoing"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_MaturinDesMarais",
+      "rules": [
+        "MIC_Maturin_INIT",
+        "MIC_Maturin_Sortie",
+        "MIC_Maturin_Slurp",
+        "MIC_Maturin_Bouffe"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelEarth_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "ZOR_PlateForme"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Cam_Suivi",
+      "rules": [
+        "SUN_Suivi_init",
+        "SUN_suivi_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_BouchaFeu",
+      "rules": [
+        "SUN_BouchaFeu_Init",
+        "SUN_BouchaFeu_Cycle",
+        "SUN_BouchaFeu_Inter"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Interrupteurs",
+      "rules": [
+        "SUN_INT_Rich_Init",
+        "SUN_INT_Rich_Minut",
+        "SUN_INT_Rich_Normal",
+        "SUN_INTER_Init",
+        "SUN_INT_Pov_Init",
+        "SUN_INT_Pov_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Mur_Ronce",
+      "rules": [
+        "SUN_Mur_Init",
+        "SUN_Mur_Attente",
+        "SUN_Mur_Inactif"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVP_ActiveTunnel",
+      "rules": [
+        "IVP_Init_tunnel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVP_Plateforme",
+      "rules": [
+        "IVP_init",
+        "IVP_voyage",
+        "IVP_disparait",
+        "IVP_arret",
+        "IVP_apparait",
+        "ARG_AttendStart",
+        "DS1_Restart",
+        "DS1_Voyage_Seul",
+        "DS1_WaitAndSee"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_mur_a_eclater",
+      "rules": [
+        "OLD_mur_init",
+        "OLD_mur_coup1",
+        "OLD_mur_coup2",
+        "OLD_mur_coup3",
+        "DS1_WaitForImpact"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Porte_Simple",
+      "rules": [
+        "SUN_PorteS_Init",
+        "SUN_PorteS_Normal",
+        "SUN_PorteS_Ouverte",
+        "SUN_PorteS_Ferme",
+        "DS1_PorteS_Monte",
+        "DS1_Porte_TempoSommet"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_PLF_Plate",
+      "rules": [
+        "SUN_PLF_Plate_Init",
+        "SUN_PLF_Plate_Normal",
+        "SUN_PLF_Plate_Avance",
+        "SUN_PLF_Plate_Retour",
+        "SUN_PLF_Plate_Normal2",
+        "SUN_PLF_Plate_Avance2",
+        "SUN_PLF_Plate_Retour2",
+        "IVP_avance",
+        "IVP_recule",
+        "IVP_normal",
+        "IVP_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_PLF_Pilier",
+      "rules": [
+        "SUN_PLF_Pilier_Init",
+        "SUN_PLF_Pilier_Normal",
+        "SUN_PLF_Pilier_Tombe",
+        "SUN_PLF_Pilier_Tombe2",
+        "SUN_PLF_Pilier_Tombe3",
+        "SUN_PLF_Pilier_Monte3",
+        "IVP_remonte",
+        "DS1_Tombe2_testRemonte",
+        "DS1_Tombe_TestFinal",
+        "DS1_SUN_PLF_Pilier_Test_Monte3"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_PtiteRonce",
+      "rules": [
+        "SUN_Ronce_Init",
+        "SUN_Ronce_Sortie",
+        "SUN_Ronce_Normal",
+        "DS1_JaiPrisGras",
+        "SUN_Ronce_Attente",
+        "SUN_Ronce_Attente2"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelEarth_30",
+      "rules": [
+        "YLT_InitLevel",
+        "ZOR_LevelLoop",
+        "ZOR_ModeLook"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Spoutz_generator",
+      "rules": [
+        "STN_spoutz_generator_init",
+        "STN_spoutz_generator_detecte",
+        "STN_spoutz_generator_genere",
+        "STN_spoutz_generator_interrupteur",
+        "STN_spoutz_generator_zone"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_coulee_lave",
+      "rules": [
+        "OLD_coul_lav_init",
+        "OLD_coul_lav_normal",
+        "ODA_coul_lav_testcollision"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_MurKiBouge",
+      "rules": [
+        "MIC_MKB_INIT",
+        "MIC_MKB_Dehors",
+        "MIC_MKB_Rentre",
+        "MIC_MKB_Dedans",
+        "MIC_MKB_Sort"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Porte_Terre",
+      "rules": [
+        "SUN_Porte_Init",
+        "SUN_Porte_Normal",
+        "SUN_Porte_Ouvre",
+        "DS1_Porte_Attend",
+        "DS1_Porte_TempoOuverte"
+      ],
+      "reflexes": [
+        "DS1_Test_Interrupteur"
+      ]
+    },
+    {
+      "name": "OLD_tterre_colon_pivot",
+      "rules": [
+        "OLD_t_colon_pivot_init",
+        "SUN_t_colon_pivot_normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_t_petite_colon",
+      "rules": [
+        "OLD_t_petit_colon_init",
+        "OLD_t_petit_colon_normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_flaque_plouf_lave",
+      "rules": [
+        "OLD_plouf_lave_init",
+        "OLD_plouf_lave_fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_kapoueh",
+      "rules": [
+        "STN_kapoueh_init",
+        "STN_kapoueh_detecte",
+        "STN_kapoueh_fonce"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "levelEnd_10",
+      "rules": [
+        "CHG_WorldLoop",
+        "BNT_InitGameWorld"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_RayPlik",
+      "rules": [
+        "SDZ_Dum_0_Init",
+        "SDZ_Dum_1_THX",
+        "SDZ_Dum_2_Fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Interrupteur_Modele1",
+      "rules": [
+        "OLP_Init_Interrupteur",
+        "OLP_Debut_Interrupteur",
+        "OLP_Temps_Interrupteur",
+        "CEB_interrupteur_simple",
+        "ARG_UneSeuleFois_init",
+        "ARG_ShootParDevant",
+        "ARG_ShootDerriere"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_mas_broken",
+      "rules": [
+        "OLD_mas_init",
+        "OLD_mas_tombe",
+        "OLD_mas_parterre",
+        "OLP_AttendTombe"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Tremble",
+      "rules": [
+        "ARG_Init",
+        "ARG_AttendSignal",
+        "ARG_Tremblement"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_PlanteMorph_Modele1",
+      "rules": [
+        "OLP_Init_PlanteMorph",
+        "OLP_Debut_PlanteMorph",
+        "ARG_vide",
+        "ARG_AttenteSynchro"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_FlammeGlobosk",
+      "rules": [
+        "MIC_FlamG_INIT",
+        "MIC_FlamG_AttendGlobosk",
+        "MIC_FlamG_JeVaisMEtteindre",
+        "MIC_FlamG_Disparait"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_AttaqueGlobox",
+      "rules": [
+        "ARG_Init",
+        "ARG_RegardeSiPeur",
+        "ARG_RegardeSiPasPeur"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_SansVie",
+      "rules": [
+        "ARG_Init",
+        "ARG_Fightingable",
+        "ARG_SpecialFleche",
+        "ARG_SpecialSortie2",
+        "DS1_FightingableType0",
+        "DS1_SpecialFlecheSuite",
+        "DS1_SpecialSortie2Suite",
+        "DS1_Billy_Bob"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Fast_Globox",
+      "rules": [
+        "ARG_Ginit",
+        "ARG_GqueFaire",
+        "ARG_Gjoue",
+        "ARG_GvaAuWP",
+        "ARG_GpoursuitRM",
+        "ARG_Gdanse",
+        "ARG_GsautDebut",
+        "ARG_GsautMilieu",
+        "ARG_GsautFin",
+        "ARG_GtourneVersWP",
+        "ARG_Gfuit",
+        "ARG_Gpeur",
+        "ARG_GfuitAuWp",
+        "ARG_GpretAsauter",
+        "ARG_Ginit_Entree2",
+        "ARG_GattendRaymond",
+        "JAC_GAttendUnPeu"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Grille_Cage",
+      "rules": [
+        "SUN_Grille_Init",
+        "SUN_Grille_Normal",
+        "ARG_Grille_Montee",
+        "ARG_Grille_Monte",
+        "ARG_Grille_Descend"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "JEZ_PorteLaser",
+      "rules": [
+        "JEZ_Porte_Laser_init",
+        "CHR_PL_Ouvert",
+        "CHR_PL_Ferme",
+        "CHR_PL_Fermeture",
+        "CHR_PL_Ouverture",
+        "CHR_PL_Nothing",
+        "GRP_SansComp"
+      ],
+      "reflexes": [
+        "CHR_PL_Rfx_CheckNuage",
+        "CHR_PL_Rfx_CreeNuage",
+        "CHR_PL_NoRfx",
+        "ARG_PL_Rfx_AttenteFoudre"
+      ]
+    },
+    {
+      "name": "GRP_Fin_Glob_10",
+      "rules": [
+        "GRP_CestLaFin",
+        "DS1_Teleportation",
+        "DS1_Cinematique"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelglob_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_CheckPointAccessoire",
+      "rules": [
+        "MIC_CheckAcc_INIT",
+        "MIC_CheckAcc_Deplace"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Glob_Cine",
+      "rules": [
+        "SDZ_Glob10_0_Init",
+        "SDZ_Glob10_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_PlateForme_Fleur",
+      "rules": [
+        "OLP_Fleur_Init",
+        "OLP_Fleur_Desactivee",
+        "OLP_Fleur_Monte",
+        "OLP_Fleur_Tombe",
+        "OLP_Fleur_Debut",
+        "OLP_Fleur_Avance",
+        "OLP_Fleur_Stop",
+        "OLP_Fleur_Recule"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CHR_BuissonCacheur",
+      "rules": [
+        "OLP_Buisson_Init",
+        "ARG_DistanceRM",
+        "PHL_Buisson_Wait",
+        "ARG_Appear",
+        "ARG_ControleMario",
+        "ARG_Cpt_Vide",
+        "ARG_Pousse",
+        "DS1_DistanceRayBis",
+        "ARG_Saute",
+        "DS1_SpecialRevisite"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "GRP_Assaut_Nef",
+      "rules": [
+        "GRP_Passage",
+        "GRP_FinAssaut",
+        "GRP_attend_Destruction",
+        "GRP_Vide",
+        "GRP_Initialisation",
+        "GRP_AttendDetection",
+        "DS1_Gratification"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelGlob_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "BNT_Revisite"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Globox_Cinema",
+      "rules": [
+        "SUN_Glo_Cine_Init",
+        "SUN_Glo_Cine_THX",
+        "SUN_Glo_Cine_AideJoueur"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Ray_Glob20",
+      "rules": [
+        "NIK_Ray_Glob20_Init",
+        "NIK_Ray_Glob20_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_SpotAuSol",
+      "rules": [
+        "ARG_Spotinit",
+        "ARG_SpotMain",
+        "ARG_SpotSuitRM"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelGlob_30",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "ARG_AttendContact",
+        "ARG_SynchroMusique"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Araignee",
+      "rules": [
+        "ARG_Init",
+        "ARG_Rezo_OuEstRayman",
+        "ARG_Rezo_Marche",
+        "ARG_Attaque",
+        "ARG_SautSpider",
+        "ARG_SautFinSpider",
+        "ARG_Rezo_Marche_DansWp",
+        "ARG_SpiderVide",
+        "ARG_SautReceptionSubroutine"
+      ],
+      "reflexes": [
+        "ARG_Vide",
+        "ARG_Paf"
+      ]
+    },
+    {
+      "name": "ARG_Transparence_Light",
+      "rules": [
+        "ARG_TL_init",
+        "ARG_TL_detect",
+        "ARG_TL_actif"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelhelic_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_GenWind_Mod",
+      "rules": [
+        "SUN_GenWind_Init",
+        "SUN_GenWind_Normal",
+        "SUN_GenWind_Sphere",
+        "SUN_GenWind_Tourbillon",
+        "SUN_GenWind_Boite",
+        "SUN_GenWind_Vertical",
+        "SUN_GenWind_Bloquant",
+        "SUN_GenWind_Rien"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Pyramide_Feu",
+      "rules": [
+        "SUN_Pyramid_Init",
+        "SUN_Pyramid_Normal",
+        "SUN_Pyramid_Crache",
+        "SUN_Pyramid_Tourne1",
+        "SUN_Pyramid_Tourne2",
+        "SUN_Pyramid_Tourne3"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Portaykl_ginreita",
+      "rules": [
+        "STN_ginreita_init",
+        "STN_ginreita_genere",
+        "STN_genreita_doc"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_viseur",
+      "rules": [
+        "STN_viseur_init",
+        "STN_viseur_oriente"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_dogcam",
+      "rules": [
+        "STN_dogcam_init",
+        "STN_dogcam_boucle",
+        "STN_dogcam_detect"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Ray_Helic10",
+      "rules": [
+        "SDZ_Dum_0_Init",
+        "SDZ_Dum_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Porte_Helic20_Cine",
+      "rules": [
+        "SDZ_Matos_0_Init",
+        "SDZ_Matos_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_RayZin",
+      "rules": [
+        "SDZ_Dum_1_THX",
+        "SDZ_Dum_0_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_garde_tfeu_cine",
+      "rules": [
+        "SDZ_Feu_0_Init",
+        "SDZ_Feu_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelhelic_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_NoFreeLookBordel",
+      "rules": [
+        "MIC_NFLB_INIT"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelHelic_30",
+      "rules": [
+        "YLT_InitLevel",
+        "STN_Level_boucleAOJ",
+        "STN_Level_check_Toiles",
+        "STN_Level_check_Stalac",
+        "STN_Level_check_Gardfeu",
+        "STN_Level_debutAOJ",
+        "STN_Level_finAOJ",
+        "STN_Level_check_Raytime",
+        "STN_Level_attend_cine"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_fayagwod",
+      "rules": [
+        "STN_Fayagwod_init",
+        "STN_Fayagwod_move",
+        "STN_Fayagwod_wall",
+        "STN_Fayagwod_shoot",
+        "STN_Fayagwod_stalac",
+        "STN_Fayagwod_tornado",
+        "STN_Fayagwod_dead"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Railcam",
+      "rules": [
+        "STN_Railcam_init",
+        "STN_Railcam_detect",
+        "STN_Railcam_work"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_pied_jack_on",
+      "rules": [
+        "STN_piejacon_init",
+        "STN_piejacon_wait",
+        "STN_piejacon_chute",
+        "STN_piejacon_PAF",
+        "STN_piejacon_vise",
+        "STN_piejacon_the_end"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Ray_Helic30",
+      "rules": [
+        "NIK_Ray_Helic30_Init",
+        "NIK_Ray_Helic30_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Cam_Distance",
+      "rules": [
+        "SUN_CamDist_Init",
+        "SUN_CamDist_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelile_10",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_MenhirSauteur",
+      "rules": [
+        "MIC_MenSau_INIT",
+        "MIC_MenSau_AttendSecousse",
+        "MIC_MenSau_Saute",
+        "MIC_MenSau_Attente",
+        "MIC_MenSau_Vole"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GenNInterrupteurs",
+      "rules": [
+        "MIC_GenNI_INIT",
+        "MIC_GenNI_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GoretsEnPrison",
+      "rules": [
+        "MIC_GoPri_INIT",
+        "MIC_GoPri_Attente",
+        "MIC_GoPri_Evasion",
+        "MIC_Gopri_Panique"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_CaisseFlottante",
+      "rules": [
+        "MIC_CaisseFlot_INIT",
+        "MIC_CaisseFlot_Flotte",
+        "MIC_Caisse_AttendSecousse",
+        "MIC_Caisse_Saute",
+        "MIC_Caisse_Attente",
+        "MIC_Caisse_SauteAuPif"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_SuperPoussin",
+      "rules": [
+        "MIC_SuPo_INIT",
+        "MIC_Supo_Promenade_Tourne",
+        "MIC_SuPo_Promenade_Pause",
+        "MIC_SuPo_Promenade_Avance",
+        "MIC_SuPo_Promenade_Saute",
+        "MIC_SuPo_Poursuite_Avance",
+        "MIC_SuPo_Promenade_EarthQuake",
+        "MIC_SuPo_Poursuite_Debut",
+        "MIC_SuPo_Poursuite_Pause",
+        "MIC_SuPo_Poursuite_RetourAuCentre"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVN_nef_cine_intro",
+      "rules": [
+        "IVN_nef_forward_forward",
+        "IVN_nef_forward_stop",
+        "IVN_nef_void",
+        "IVN_nef_roll_left",
+        "IVN_nef_roll_right",
+        "IVN_nef_roll_stop",
+        "IVN_nef_roll_stab",
+        "IVN_nef_init",
+        "IVN_nef_roll_stab_smooth",
+        "IVN_nef_inc_coeff",
+        "IVN_nef_dec_coeff",
+        "IVN_nef_pitch_backward",
+        "IVN_nef_pitch_forward",
+        "IVN_nef_pitch_stab",
+        "IVN_nef_pitch_stab_smooth",
+        "IVN_nef_pitch_stop",
+        "MOM_suitReseau_init",
+        "MOM_suitReseau_idle"
+      ],
+      "reflexes": [
+        "IVN_nef_main_loop",
+        "IVN_nef_init_ref"
+      ]
+    },
+    {
+      "name": "LevelJail_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVN_incline_cam_dans_cine",
+      "rules": [
+        "IVN_00_init",
+        "IVN_01_roll_left",
+        "IVN_02_roll_right",
+        "IVN_03_reset",
+        "IVN_04_stop",
+        "IVN_05_reset_smooth",
+        "IVN_06_void"
+      ],
+      "reflexes": [
+        "IVN_main_loop",
+        "MOM_gen_cin_rfx_init"
+      ]
+    },
+    {
+      "name": "MOM_eboulisMod",
+      "rules": [
+        "MOM_eboulis_init",
+        "MOM_eboulis_normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_ray2tgeMod",
+      "rules": [
+        "MOM_logo_init",
+        "MOM_logo_affiche",
+        "MOM_Logo_Fadein",
+        "MOM_Logo_FadeOut"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Ray_Logos",
+      "rules": [
+        "SUN_Logos_Init",
+        "SUN_Logos_Fadein",
+        "SUN_Logos_FadeOut",
+        "SUN_Logos_Affiche"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_Helice01",
+      "rules": [
+        "SUN_Init",
+        "SUN_Tourne"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Leveljail_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Barriere_Laser_Cine",
+      "rules": [
+        "SUN_BarrLaser_Cine_Init",
+        "SUN_BarrLaser_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_RayDummy_Intro",
+      "rules": [
+        "SUN_DumIntro_Init",
+        "SUN_DumIntro_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Grille_Cine",
+      "rules": [
+        "SUN_Grille_Init",
+        "SUN_Grille_Loop",
+        "SUN_Grille_Paf"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Sbire_Glob_Cine",
+      "rules": [
+        "SUN_SbireG_Init",
+        "SUN_SbireG_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Papillon",
+      "rules": [
+        "SUN_Popoi_Init",
+        "SUN_Popoi_Cherche",
+        "SUN_Popoi_balade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_3B_Globox_Cine",
+      "rules": [
+        "SUN_3B_Gbx_Init",
+        "SUN_3B_Gbx_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Ray_Learn60",
+      "rules": [
+        "SDZ_Dum_0_Init",
+        "SDZ_Dum_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_LeverDuJour",
+      "rules": [
+        "MIC_LDJ_INIT",
+        "MIC_LDJ_IlVaBientotArriver"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_FinLearn10",
+      "rules": [
+        "SDZ_Nego_0_Init",
+        "SDZ_Nego_1_Normal",
+        "SDZ_Nego_2_Attente_Distance",
+        "SDZ_Nego_3_Attente_Cage",
+        "SDZ_Nego_4_Fin"
+      ],
+      "reflexes": [
+        "DS1_Desactivator",
+        "DS1_JeGlande"
+      ]
+    },
+    {
+      "name": "YAM_GenPoloc",
+      "rules": [
+        "YAM_GenPoloc0Init",
+        "YAM_GenPoloc1Go",
+        "JCP_GenPoloc1Murfy",
+        "JCP_GenPoloc1AttendCage",
+        "JCP_GenPoloc2Fin",
+        "JCP_GenPoloc1Rayseau"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Transparence",
+      "rules": [
+        "ARG_Trans_Init",
+        "ARG_Trans_Detection",
+        "ARG_Trans_Actif",
+        "ARG_Trans_Actif_RM"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_TargetCam",
+      "rules": [
+        "STH_target_init"
+      ],
+      "reflexes": [
+        "STH_targe_vide",
+        "STH_target_ago"
+      ]
+    },
+    {
+      "name": "LevelLearn_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "JCP_LevelLoop2",
+        "JCP_LevelLoop3",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Pitizetre_Cine",
+      "rules": [
+        "SDZ_Pitz_0_Init",
+        "SDZ_Pitz_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Poisson_Rigol_M",
+      "rules": [
+        "SUN_Poi_Rigol_Init",
+        "SUN_Poi_Rigol_Lum",
+        "SUN_Poi_Rigol_Normal",
+        "SUN_Poi_Rigol_Normal2",
+        "SUN_Poi_Rigol_Normal3",
+        "SUN_Poi_Rigol_retour"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_pti",
+      "rules": [
+        "FRH_sou_init",
+        "FRH_sou_marche"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_OneShotCondition",
+      "rules": [
+        "DS1_Init_Sound_Oiseau2",
+        "DS1_Start_Oiseau2",
+        "DS1_Init_Sound_Mouette",
+        "DS1_Start_Sound_Mouette",
+        "DS1_Init_Sound_Sonar",
+        "DS1_Start_Sound_Sonar",
+        "DS1_Init_Sound_Vagues",
+        "DS1_Start_Sound_Vagues",
+        "DS1_Init_Sound_UnderB",
+        "DS1_Start_Sound_UnderB",
+        "DS1_Test_ActivRaymanSonar",
+        "DS1_Test_ActivRaymanUnderB"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_SwitchBouclant",
+      "rules": [
+        "DS1_InitSonCascade",
+        "DS1_TestSurfaceSonCascade",
+        "DS1_TestFinSonCascade",
+        "DS1_InitSonUnderW",
+        "DS1_Test_ActivRaymanUnderW",
+        "DS1_Test_SurfaceSonUnderW",
+        "DS1_InitSonSwitchVent",
+        "DS1_TestSurfaceSonVent",
+        "DS1_Test_FinSonUnderW",
+        "DS1_InitSonSwitchForet",
+        "DS1_TestSurfaceSonForet",
+        "DS1_TestFinSonSwitchForet",
+        "DS1_TestFinSonSwitchVent"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "PHL_Actor_Model2",
+      "rules": [
+        "PHL_Champ_Komport",
+        "PHL_Champ_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelLearn_30",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelLearn_31",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ELR_mPrisme",
+      "rules": [
+        "ELR_C_Prisme_00_Init",
+        "ELR_C_Prisme_01Detection",
+        "ELR_C_Prisme_02Ramasse"
+      ],
+      "reflexes": [
+        "ELR_R_Prisme_00Init",
+        "ELR_R_Prisme_01_Normal"
+      ]
+    },
+    {
+      "name": "BNT_BancDePetitsPiranhasTeigneux",
+      "rules": [
+        "MIC_BancPir_Init",
+        "MIC_BancPir_MiaMiam"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Barriere_Elec",
+      "rules": [
+        "SUN_Barriere_Elec_Init",
+        "SUN_Barriere_Elec_Normal",
+        "SUN_Barriere_Elec_INTER"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelLearn_40",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "STN_FinMap",
+        "STN_Youpi"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_GestionPaireInterrupteur",
+      "rules": [
+        "DS1_GestionInterrupteur_Init",
+        "DS1_CheckLumieres",
+        "DS1_CheckLumieres_with_lums"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "IVN_Sbire_Bombe",
+      "rules": [
+        "IVN_gn_init",
+        "IVN_gn_deplace_init",
+        "IVN_gn_deplace_capa",
+        "IVN_gn_deplace_impossible",
+        "IVN_gn_deplace_next",
+        "IVN_gn_choix_action",
+        "IVN_gn_crochet",
+        "IVN_gn_saute",
+        "IVN_gn_shoot",
+        "IVN_gn_insert",
+        "IVN_gn_mort",
+        "IVN_gn_to_lance",
+        "IVN_gn_to_tourne",
+        "IVN_gn_to_surveil",
+        "IVN_gn_courir",
+        "IVN_gn_avant_detection",
+        "IVN_gn_chute_inf"
+      ],
+      "reflexes": [
+        "IVN_sol_collision",
+        "IVN_sol_rien",
+        "IVN_sol_saut",
+        "IVN_sol_courir"
+      ]
+    },
+    {
+      "name": "STN_stilwil",
+      "rules": [
+        "STN_stilwil_init",
+        "STN_stilwil_turn",
+        "STN_stilwil_turn_relatif"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelLearn_60",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Vent_Vertical",
+      "rules": [
+        "OLP_Init_Vent",
+        "OLP_En_Fonction"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GenSalleMagique",
+      "rules": [
+        "MIC_SalleM_INIT",
+        "MIC_SalleM_WizPof"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelLiber_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_ToutLeMondeIlEstLibre",
+      "rules": [
+        "SUN_OnEstLibres_Init",
+        "SUN_OnEstLibres_THX"
+      ],
+      "reflexes": [
+        "SUN_BrisonsNosChaines"
+      ]
+    },
+    {
+      "name": "SUN_FautFilmerToutCa",
+      "rules": [
+        "SUN_VasyMetsLaK7_Init",
+        "SUN_VasyMetsLaK7_THX"
+      ],
+      "reflexes": [
+        "SUN_EnleveLeCache_Init",
+        "SUN_EnleveLeCache_THX"
+      ]
+    },
+    {
+      "name": "SUN_check_point",
+      "rules": [
+        "OLD_chkp_init",
+        "OLD_chkp_vide"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelLy_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "GRP_world_vide"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_fee_ly",
+      "rules": [
+        "OLD_ly_init",
+        "ARG_Init_Special_JCP",
+        "MTR_ly_Init",
+        "MTR_ly_Attente_Depart",
+        "MTR_ly_Ballade",
+        "MTR_ly_Saut",
+        "MTR_ly_Recherche",
+        "MTR_ly_Tourne",
+        "MTR_ly_Attente_RM",
+        "MTR_ly_Init_Chemin",
+        "MTR_ly_Nage",
+        "MTR_Ly_Sort_Eau",
+        "MTR_ly_Attente",
+        "MTR_ly_Attente_sur_PF"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "GRP_HorsLimite",
+      "rules": [
+        "GRP_MoyenDeDetection",
+        "GRP_DetectionZone",
+        "GRP_DetectionHauteur",
+        "GRP_OnRepart",
+        "DS1_DeuxiemePartie",
+        "DS1_AttenteMegaShoot"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "GRP_TimerCourse",
+      "rules": [
+        "GRP_Init",
+        "GRP_GestionTemps",
+        "GRP_ByeBye",
+        "GRP_AttendFinMadeIt",
+        "DS1_RetourMapMonde",
+        "DS1_GestionAffichage",
+        "DS1_RetourAffichage",
+        "DS1_Vide"
+      ],
+      "reflexes": [
+        "DS1_LivrePoloc",
+        "DS1_Tempo",
+        "DS1_BruitagInterdiction"
+      ]
+    },
+    {
+      "name": "GRP_CestFini",
+      "rules": [
+        "GRP_Init",
+        "GRP_FinCourse"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Affichage",
+      "rules": [
+        "DS1_Initialisation",
+        "DS1_Affiche",
+        "DS1_PrepareTexte",
+        "DS1_Bye",
+        "DS1_Disparition",
+        "DS1_AttendBouton",
+        "DS1_PourMapsCourse",
+        "DS1_GestionPage"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "GRP_Toile_Trampoline",
+      "rules": [
+        "GRP_Touche_Toile"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CHR_Apparition",
+      "rules": [],
+      "reflexes": [
+        "CHR_Apparition_Init"
+      ]
+    },
+    {
+      "name": "LevelLy_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "GRP_World_Vide"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "GRP_Generateur_Nenuphar",
+      "rules": [
+        "GRP_Initialisation",
+        "DS1_GenerationInfinie"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_nenuphar",
+      "rules": [
+        "OLD_nenu_init",
+        "OLD_nenu_reseau"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_RayMonde",
+      "rules": [
+        "YAM_C_RayMonde0Init",
+        "YAM_C_RayMonde2VaAuWpt",
+        "YAM_C_RayMonde3Retournement",
+        "YAM_C_RayMonde1Arret",
+        "YAM_C_RayMonde0Chute"
+      ],
+      "reflexes": [
+        "YAM_R_RayMonde0Attend",
+        "YAM_R_RayMonde1Cours",
+        "YAM_R_RayMonde2Saute",
+        "YAM_R_RayMonde3Glisse",
+        "YAM_R_RayMonde0Chute"
+      ]
+    },
+    {
+      "name": "LevelMapmonde2",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_GenInitMapmonde",
+      "rules": [
+        "YAM_C_GenInitMapmonde0Init",
+        "YAM_C_GenInitMapmonde1TraiteLevel",
+        "YAM_C_GenInitMapmonde2DessineChemin",
+        "YAM_C_GenInitMapmonde3Standard",
+        "YAM_C_GenInitMapmonde4Zoom",
+        "YAM_C_GenInitMapmonde5Fin",
+        "NIK_JEFF_OnAttendLeMenu"
+      ],
+      "reflexes": [
+        "YAM_R_GenInitMapmonde0Noir",
+        "YAM_R_GenInitMapmonde1Normal"
+      ]
+    },
+    {
+      "name": "YAM_PastilleMapmonde2",
+      "rules": [
+        "YAM_C_PastilleMapmonde0Init",
+        "YAM_C_PastilleMapmonde1Visible",
+        "YAM_C_PastilleMapmonde2Invisible"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_GenAutoSave",
+      "rules": [
+        "NIK_C_Init",
+        "NIK_C_Loop_SaveOK",
+        "NIK_C_Loop_NogameSave",
+        "NIK_C_Loop_VMSIOError",
+        "NIK_C_Write_Message"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Gen_EcranStart",
+      "rules": [
+        "NIK_C_Init",
+        "NIK_C_AfficheMenuStart",
+        "NIK_C_GotoMenu3D"
+      ],
+      "reflexes": [
+        "NIK_R_CheatCode",
+        "NIK_R_NeRienFaire"
+      ]
+    },
+    {
+      "name": "Levelmenu",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_Baleine",
+      "rules": [
+        "YAM_Baleine1Avance",
+        "YAM_Baleine0Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_PtizetreMenu",
+      "rules": [
+        "YAM_PtitZetreMenu1Normal",
+        "YAM_PtitZetreMenu0Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Krab",
+      "rules": [
+        "MIC_Krab_INIT",
+        "MIC_Krab_Bouge",
+        "MIC_Krab_Tourne"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAM_GenMenuSimple",
+      "rules": [
+        "YAM_C_GenMenuSimple_Apparition",
+        "YAM_C_GenMenuSimple_Disparition",
+        "YAM_C_GenMenuSimple_MenuPrincipal",
+        "YAM_C_GenMenuSimple_Init",
+        "NIK_C_GenMenusimple_MenuOptions",
+        "NIK_C_GenMenuSimple_MenuSon",
+        "NIK_C_GenMenuSimple_MenuLangue",
+        "NIK_C_GenMenuSimple_MenuVideo",
+        "NIK_C_GenMenuSimple_MenuCharger",
+        "NIK_C_GenMenuSimple_MenuNew",
+        "NIK_C_GenMenuSimple_Try60Hz",
+        "NIK_C_GenMenuSimple_Valide60Hz",
+        "NIK_C_GenMenuSimple_Indique4_3_ou_16_9",
+        "NIK_C_GenMenuSimple_ChangeMap",
+        "NIK_C_SelectVMS",
+        "NIK_C_Void",
+        "NIK_C_Centrage_Ecran",
+        "NIK_C_WarningRewriteNewGame",
+        "NIK_C_ConfirmCreateGame",
+        "NIK_C_Confirm_LoadGame",
+        "NIK_C_Load_Options",
+        "NIK_C_Load_Mode16_9",
+        "NIK_C_Load_Mode_60h",
+        "NIK_C_Load_RumblePack",
+        "NIK_C_GenMenuSimple_MenuEraseASlot",
+        "NIK_C_Interruption_Option",
+        "NIK_C_OtpionLoad_Try60hz",
+        "NIK_C_OtpionLoad_Valid60Hz",
+        "NIK_C_OptionLoad_Indique4_3_ou_16_9",
+        "NIK_C_VMSFULL_RM_Warningerase",
+        "NIK_JFF_WAIT_RUMBLE1",
+        "NIK_JFF_RumbleError",
+        "NIK_JFF_WAIT_RUMBLE2",
+        "NIK_JFF_RumbleError2",
+        "NIK_JFF_OptionCorrupt",
+        "NIK_JFF_VMS_Corrupt",
+        "NIK_JFF_VMS_CorruptLoad",
+        "NIK_JFF_OptionOk"
+      ],
+      "reflexes": [
+        "YAM_R_GenMenuSimple_Standard",
+        "YAM_R_GenMenuSimple_NeRienFaire",
+        "YAM_R_GenMenuSimple_Jauge",
+        "YAM_R_GenMenuSimple_Switch",
+        "YAM_R_GenMenuSimple_Slot",
+        "NIK_R_GenMenuSimple_YesNo",
+        "NIK_R_GenMenuSimple_LitPad",
+        "NIK_JFF_R_GenMenuSimple_LitPadSansCadre"
+      ]
+    },
+    {
+      "name": "YAM_GenCibleCamera",
+      "rules": [
+        "YAM_GenCibleCamera0Init",
+        "YAM_GenCibleCamera1Normal"
+      ],
+      "reflexes": [
+        "YAM_GenCibleCamera1ScruteMenu",
+        "YAM_GenCibleCamera0NeRienFaire"
+      ]
+    },
+    {
+      "name": "ARG_Martin_Pecheur",
+      "rules": [
+        "ARG_MP01_init",
+        "ARG_MP02_vol",
+        "ARG_MP03_VersWp",
+        "ARG_MP04_EviteMur",
+        "ARG_MP05_Redresse",
+        "ARG_MP06_Plonge",
+        "ARG_MP07_Remonte"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Popolipoi_Menu_DC",
+      "rules": [
+        "NIK_C_Init",
+        "NIK_C_Vol",
+        "NIK_C_Wait"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelmine_10",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Nef_ARaymond",
+      "rules": [
+        "MIC_NefARem_INIT",
+        "MIC_NefARem_Vol",
+        "MIC_NefARem_Accoste",
+        "MIC_NefARem_AQuai",
+        "MIC_NefARem_Destruction",
+        "MIC_NefARem_Paf",
+        "MIC_NefARem_DemiTOur",
+        "MIC_NefARem_Fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_QuaiPourNef",
+      "rules": [
+        "MIC_QPN_INIT",
+        "MIC_QPN_Surveille",
+        "MIC_QPN_Approche",
+        "MIC_QPN_AttendBbGlob",
+        "MIC_QPN_GenereGorets",
+        "MIC_QPN_Delai",
+        "MIC_QPN_EnVeille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_bastion_cassable",
+      "rules": [
+        "MIC_Bast_INIT",
+        "MIC_Bast_Surveille",
+        "MIC_Bast_Chute",
+        "MIC_Bast_Disparait"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_TesteNefPleine",
+      "rules": [
+        "MIC_TNP_INIT",
+        "MIC_TNP_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Ray_Mines10_model",
+      "rules": [
+        "MOM_Ray_Mines10_init",
+        "MOM_Ray_Mines10_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_mines10F",
+      "rules": [
+        "MOM_Gen_detectPerso_init",
+        "MOM_Gen_detectPerso_thx"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Globette_Cine_Mod",
+      "rules": [
+        "MOM_Globette_M10_init",
+        "MOM_Globette_M10_thx"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Collision",
+      "rules": [
+        "MOM_collision_init",
+        "MOM_collision_THX",
+        "MOM_AttenteFInTHX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GoretsMineurs",
+      "rules": [
+        "MIC_GoMin_INIT",
+        "MIC_GoMin_VersLaNef"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelmorb_00",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "ARG_Cinema",
+        "ARG_PrepareCine",
+        "ARG_LoopDansTour",
+        "ARG_Fin",
+        "ARG_FinLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Vase_Flotte",
+      "rules": [
+        "ARG_TVinit",
+        "ARG_TVwait",
+        "ARG_TVmonte",
+        "ARG_TVrien",
+        "DS1_mONTE2"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_BrasJano",
+      "rules": [
+        "ARG_BJ_Init",
+        "ARG_BJ_Sort",
+        "ARG_BJ_Attrappe",
+        "ARG_BJ_Rentre",
+        "ARG_BJ_Paf",
+        "ARG_BJ_FauxRM"
+      ],
+      "reflexes": [
+        "ARG_RBJ_Vide",
+        "ARG_RBJ_CheckTout",
+        "ARG_RBJ_CheckPoing"
+      ]
+    },
+    {
+      "name": "OLD_SBIRE_lance",
+      "rules": [
+        "OLD_SBIRE_lance_init",
+        "OLD_SBIRE_lance_mort",
+        "OLD_SBIRE_lance_lance",
+        "OLD_SBIRE_lance_tourne",
+        "MIC_SBIRE_lance_Surveille",
+        "MIC_SBIRE_lance_Delai"
+      ],
+      "reflexes": [
+        "OLD_SBIRE_lance_Rsol",
+        "OLD_SBIRE_lance_Rrien"
+      ]
+    },
+    {
+      "name": "SUN_engrenage",
+      "rules": [
+        "SUN_eng_init",
+        "SUN_eng_test"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_grillio",
+      "rules": [
+        "CHR_gri_init",
+        "CHR_gri_bouge",
+        "MIC_gri_Surveille",
+        "MIC_gri_Chute",
+        "STN_gri_attente",
+        "STN_gri_descend"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelmorb_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Change_Map",
+      "rules": [
+        "DS1_Change_Map_Init",
+        "DS1_Change_Map_Teleport"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "XAP_World_SM1",
+      "rules": [
+        "XAP_Init_Level"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "XAP_World_SM2",
+      "rules": [
+        "XAP_Init_Level",
+        "XAP_Level_loop",
+        "XAP_FadePoulet",
+        "XAP_FadePoulet2"
+      ],
+      "reflexes": [
+        "XAP_check"
+      ]
+    },
+    {
+      "name": "XAP_World_SM3",
+      "rules": [
+        "XAP_Init_Level"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_SauveCB28",
+      "rules": [
+        "MIC_SCB28_INIT",
+        "MIC_SCB28_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "XAP_Figntable",
+      "rules": [
+        "XAP_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_tonneau_vase",
+      "rules": [
+        "OLD_ton_vase_pilier_init",
+        "OLD_ton_vase_pilier_monte3",
+        "OLD_ton_vase_pilier_normal",
+        "OLD_ton_vase_pilier_tombe",
+        "OLD_ton_vase_pilier_tombe2",
+        "OLD_ton_vase_pilier_tombe3",
+        "OLD_ton_vase_pilier_tombe4"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelMorb_20",
+      "rules": [
+        "YLT_InitLevel",
+        "STN_Level_finAOJ",
+        "STN_Level_boucleAOJ",
+        "STN_Level_debutAOJ",
+        "STN_Level_check_Clark",
+        "STN_Level_Check_Switch",
+        "STN_Level_check_Chute",
+        "STN_Level_check_Boite",
+        "ARG_NeFaitRien"
+      ],
+      "reflexes": [
+        "ARG_DefaultReflex",
+        "ARG_NullReflex",
+        "ARG_MusicReflex"
+      ]
+    },
+    {
+      "name": "SUN_Clarky",
+      "rules": [
+        "SUN_Clark_Init",
+        "SUN_Clark_SuitRay",
+        "SUN_Clark_Attente1",
+        "SUN_Clark_saut",
+        "SUN_Clark_Boum",
+        "SUN_Clark_ChopeRay",
+        "SUN_Clark_Course",
+        "STN_Clark_JetteRay",
+        "STN_Clark_AuSol"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Cine_Ray_Clark",
+      "rules": [
+        "SUN_CineClark_Init",
+        "SUN_CineClark_Detec",
+        "SUN_CineClark_Apex",
+        "SUN_CineClark_Plan01",
+        "SUN_CineClark_Plan02",
+        "SUN_CineClark_Plan03",
+        "SUN_CineClark_Plan04",
+        "SUN_CineClark_Plan05",
+        "SUN_CineClark_Plan06",
+        "SUN_CineClark_Plan07",
+        "SUN_CineClark_Plan08",
+        "SUN_CineClark_Plan09",
+        "SUN_CineClark_Plan10",
+        "SUN_CineClark_Plan11",
+        "SUN_CineClark_Plan12",
+        "SUN_CineClark_Plan13",
+        "SUN_CineClark_Plan09b",
+        "SUN_Cineclark_Fin",
+        "SUN_CineClark_Plan14",
+        "SUN_CineClark_Chemin",
+        "SUN_CineClark_Plan2_1",
+        "SUN_CineClark_Plan2_2",
+        "SUN_CineClark_Plan2_4",
+        "XAP_CineClark_Rien",
+        "SUN_CineClark_Plan2_5",
+        "SUN_CineClark_Plan2_3",
+        "SUN_CineClark_Plan2_6"
+      ],
+      "reflexes": [
+        "YGE_CineClark_Skip"
+      ]
+    },
+    {
+      "name": "XAP_Check_Inter",
+      "rules": [
+        "XAP_Check_Init",
+        "XAP_Check_check",
+        "XAP_fin_son"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Offset_Perso",
+      "rules": [
+        "DS1_Offset_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_cible",
+      "rules": [
+        "STH_cible_init",
+        "STH_cible_main",
+        "STH_cible_main2",
+        "STH_cible_main3"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_RayDum_Clark",
+      "rules": [
+        "SUN_Ray_Morb20_Init",
+        "SUN_Ray_Morb20_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelNave_10",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_filetGI",
+      "rules": [
+        "STN_filet_init",
+        "STN_filet_detecte",
+        "STN_filet_detruit",
+        "STN_filet_tremble"
+      ],
+      "reflexes": [
+        "DS1_Filet_Rumble_Rfx",
+        "DS1_Filet_Rfx_Vide"
+      ]
+    },
+    {
+      "name": "STN_pitibastion",
+      "rules": [
+        "STN_pitibastion_init",
+        "STN_pitibastion_detecte",
+        "STN_pitibastion_tremble",
+        "STN_pitibastion_chute",
+        "STN_pitibastion_detruit",
+        "STN_pitibastion_ecroule",
+        "YLT_PetiteChute"
+      ],
+      "reflexes": [
+        "DS1_bast_rumble_rfx",
+        "DS1_bast_rfx_vide"
+      ]
+    },
+    {
+      "name": "STN_pont",
+      "rules": [
+        "STN_pont_init",
+        "STN_pont_detection",
+        "STN_pont_nocpt",
+        "STN_pont_tourne",
+        "STN_pont_detruit",
+        "STN_pont_ecroule",
+        "STN_pont_tremble",
+        "STN_pont_tremble_init",
+        "STN_pont_detecte_rayman"
+      ],
+      "reflexes": [
+        "DS1_pont_rumble_rfx",
+        "DS1_pont_rfx_vide"
+      ]
+    },
+    {
+      "name": "LevelNave_15",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_WaterQuiMonte",
+      "rules": [
+        "DS1_Flood_Init",
+        "DS1_Flood_Main",
+        "DS1_Flood_Stop",
+        "DS1_Flood_detect"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_grue_tour",
+      "rules": [
+        "STH_grue_tour_init",
+        "STH_grue_tour_fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GenTuePirateALeau",
+      "rules": [
+        "MIC_TPAL_INIT",
+        "MIC_TPAL_AttendPersoValide",
+        "MIC_TPAL_TesteLePerso"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_28",
+      "rules": [
+        "STH_28_init",
+        "STH_28_Main"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_generateur_boulets",
+      "rules": [
+        "STH_generateur_init",
+        "STH_generateur_bombardeRM",
+        "DS1_TirReprend"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelNave_20",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_vie_eternelle",
+      "rules": [
+        "STH_vie_init",
+        "STH_vie_main"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelnego_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Ray_Nego",
+      "rules": [
+        "NIK_Ray_Nego_Init",
+        "NIK_Ray_Nego_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Porte_Ptizetre",
+      "rules": [
+        "NIK_Porte_Ptizetre_Init",
+        "NIK_Porte_Ptizetre_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Ptizetre_nego_cine",
+      "rules": [
+        "NIK_Ptizetre_Nego_Cine_Init",
+        "NIK_Ptizetre_Nego_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelPlum_00",
+      "rules": [
+        "YLT_InitLevel",
+        "DS1_Level_loop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_MonstroPlante",
+      "rules": [
+        "MIC_MP_INIT",
+        "MIC_MP_Cache",
+        "MIC_MP_SeMontre",
+        "MIC_MP_Deplacement",
+        "MIC_MP_Approche",
+        "MIC_MP_Fuite",
+        "MIC_MP_SeCache",
+        "MIC_MP_Argh_Damned",
+        "MIC_MP_Montee",
+        "MIC_MP_Descente",
+        "MIC_MP_Youpi",
+        "MIC_MP_YoupiFin"
+      ],
+      "reflexes": [
+        "MIC_MP_RVide",
+        "MIC_MP_RPaf",
+        "MIC_MP_RRien"
+      ]
+    },
+    {
+      "name": "CHR_inter",
+      "rules": [
+        "CHR_inter_init",
+        "CHR_inter_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_RadarTournant",
+      "rules": [
+        "MIC_Radar_INIT"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAL_plum00_2eSM",
+      "rules": [
+        "YAL_simulworld"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAL_plum00_1ereSM",
+      "rules": [
+        "YAL_simulworld"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_DalleCassee",
+      "rules": [
+        "MIC_Dalle_INIT",
+        "MIC_Dalle_Surveille",
+        "MIC_Dalle_Chute"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAL_Plum10_3eSM",
+      "rules": [
+        "YAL_simulworld"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_magie_simple",
+      "rules": [
+        "SUN_magie_init",
+        "SUN_magie_CB",
+        "SUN_Magie_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ZOR_PyramideCrachante",
+      "rules": [
+        "ZOR_INITPyrCrach",
+        "ZOR_PyrAttenteGendoor",
+        "ZOR_RIENPyr",
+        "ZOR_PyrChoixProjectile",
+        "ARG_Rotation",
+        "ARG_FlammeON",
+        "ARG_FlammeOFF",
+        "DS1_RetourFlammes"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_magic_key",
+      "rules": [
+        "SUN_MC_init",
+        "SUN_MC_attente_activation",
+        "SUN_MC_go_air",
+        "SUN_MC_porte",
+        "SUN_MC_go_sol"
+      ],
+      "reflexes": [
+        "SUN_avant_porting",
+        "SUN_pendant_porting",
+        "SUN_rien"
+      ]
+    },
+    {
+      "name": "LevelPlum_10",
+      "rules": [
+        "YLT_InitLevel",
+        "XAP_Level_Loop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Aimant",
+      "rules": [
+        "STN_Aimant_init",
+        "STN_Aimant_detect_in",
+        "STN_Aimant_attire",
+        "STN_Aimant_detect_out",
+        "STN_Aimant_magic_check",
+        "STN_Aimant_magic_control",
+        "YAL_aimantbis_attire",
+        "STN_Aimant_magic_direct"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_tour_nique",
+      "rules": [
+        "STN_tourniquet_init",
+        "STN_tourniquet_detect_up",
+        "STN_tourniquet_turn_up",
+        "STN_tourniquet_detect_closed"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_GeantVert",
+      "rules": [
+        "MIC_Colosse_INIT",
+        "MIC_Colosse_Avance",
+        "MIC_Colosse_AttendFils",
+        "MIC_Colosse_AttendInterrupteur",
+        "MIC_Colosse_MarcheDebut",
+        "MIC_Colosse_Tremble"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YAL_Plum10_2eSM",
+      "rules": [
+        "YAL_Simulworld",
+        "DS1_SimulLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ALG_Plum10_4eSM",
+      "rules": [
+        "ALG_Simulworld"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ALG_Plum10_1ereSM",
+      "rules": [
+        "ALG_Simulworld"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_TeleportKiCroyaitPrendre",
+      "rules": [
+        "MIC_TPKCP_INIT",
+        "MIC_TPKCP_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Desactivateur",
+      "rules": [
+        "MIC_Zig_INIT",
+        "MIC_Zig_Attente"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "XAP_Apparition",
+      "rules": [
+        "XAP_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "XAP_Plum_teleport",
+      "rules": [
+        "XAP_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Plum_Teleport2",
+      "rules": [
+        "DS1_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Plum_Teleport3",
+      "rules": [
+        "DS1_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_TeteDuGeantVert",
+      "rules": [
+        "MIC_TGV_INIT",
+        "MIC_TGV_Dessus",
+        "MIC_TGV_AttendCam"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ZOR_CracheLave",
+      "rules": [
+        "ZOR_INITCracheLave",
+        "ZOR_RIENCracheLave",
+        "ZOR_FINCracheLave",
+        "VCT_JeFaisMal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelplum_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "BNT_StalagBase_Model",
+      "rules": [
+        "MIC_StalakBase_INIT",
+        "MIC_StalakBase_Attend"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_FireWorm",
+      "rules": [
+        "MIC_FireW_INIT",
+        "MIC_FireW_Surveille",
+        "MIC_FireW_Attak_Rampe",
+        "MIC_FireW_Attak_Saute"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Rafteuse",
+      "rules": [
+        "MIC_Raft_INIT",
+        "MIC_Raft_Avance",
+        "MIC_Raft_AttendRM"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Colonne",
+      "rules": [
+        "MIC_Colon_INIT",
+        "MIC_Colon_Tombe",
+        "MIC_Colon_Surveille",
+        "MIC_Colon_VireSparadrap"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "BNT_StalagPF_Model",
+      "rules": [
+        "MIC_PFStal_INIT",
+        "MIC_PFStal_Attente",
+        "MIC_PFStal_Tombe",
+        "MIC_PFStal_FlotteSurPlace",
+        "MIC_PFStal_Flotte",
+        "MIC_PFStal_Coule",
+        "JCP_PFStal_FlotteSurPlaceAvecChrono"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelPoloc_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Cine_Poloc",
+      "rules": [
+        "NIK_Cine_Poloc_Init",
+        "NIK_Cine_Poloc_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelPoloc_20",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelPoloc_30",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_cine_poloc2",
+      "rules": [
+        "NIK_Cine_Poloc2_Init",
+        "NIK_Cine_Poloc2_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelPoloc_40",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "NIK_Gen_Raycap",
+      "rules": [
+        "NIK_0_Init",
+        "NIK_1_InitAffiche",
+        "NIK_2_Affiche",
+        "NIK_3_FinAffiche"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelRaycap",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_gen_sound",
+      "rules": [
+        "DS1_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelRhop_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_shoot_zde",
+      "rules": [
+        "OLD_shoot_zde_init",
+        "OLD_shoot_zde_base"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_shoot_laser_rouge",
+      "rules": [
+        "OLD_shoot_cible_init",
+        "OLD_shoot_cible_normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_boule_energie",
+      "rules": [
+        "OLD_b_energ_init",
+        "OLD_b_energ_wait",
+        "OLD_b_energ_suit",
+        "FRH_b_energ_rnd"
+      ],
+      "reflexes": [
+        "FRH_cb31",
+        "FRH_cbfin"
+      ]
+    },
+    {
+      "name": "FRH_ouestu",
+      "rules": [
+        "FRH_ou_init",
+        "FRH_ou_cbit"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_teleport",
+      "rules": [
+        "DS1_teleport_init",
+        "old_teleport_fade_out",
+        "old_teleport_fade_in",
+        "DS1_zob"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "FRH_Plaque_lave",
+      "rules": [
+        "FRH_plk_init",
+        "FRH_plk_go",
+        "FRH_plk_monte",
+        "FRH_plk_descent",
+        "DS1_plk_wait"
+      ],
+      "reflexes": [
+        "FRH_RM_dead"
+      ]
+    },
+    {
+      "name": "SUN_Grille_Rhop_Cine",
+      "rules": [
+        "SUN_gril_init",
+        "SUN_gril_THX",
+        "SUN_gril_Combat",
+        "DS1_gril_chute",
+        "DS1_gril_init2"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Boulet_Cine",
+      "rules": [
+        "SUN_Bou_Cine_Init",
+        "SUN_Bou_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_RayRhop",
+      "rules": [
+        "SUN_RayRhop_Init",
+        "SUN_RayRhop_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Rhop_Cinema",
+      "rules": [
+        "SUN_Rh_Cine_Init",
+        "SUN_Rh_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Tuyo_ASC_Cine",
+      "rules": [
+        "SUN_Tuyo_Cine_Init",
+        "SUN_Tuyo_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Obus_Rhop",
+      "rules": [
+        "SUN_Obus_Init",
+        "SUN_Obus_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_LY_Rhop",
+      "rules": [
+        "SUN_LY_Rhop_Init",
+        "SUN_LY_Rhop_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Lums_Rhop",
+      "rules": [
+        "SUN_Lums_Init",
+        "SUN_Lums_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Batam_Rhop",
+      "rules": [
+        "SUN_Batam_Init",
+        "SUN_Batam_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Flash_Cine",
+      "rules": [
+        "SUN_Flash_Init",
+        "SUN_Flash_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Nuage_cine",
+      "rules": [
+        "SUN_Nuage_Init",
+        "SUN_Nuage_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Debris_Cine",
+      "rules": [
+        "SUN_Debris_Init",
+        "SUN_Debris_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Reactivator2000",
+      "rules": [],
+      "reflexes": [
+        "SUN_Reac2000_Init",
+        "SUN_Reac2000_Phase1",
+        "DS1_Reac2000_phase2"
+      ]
+    },
+    {
+      "name": "SUN_Interieur_Rhop_Cine",
+      "rules": [
+        "SUN_IntRhop_Cine_Init",
+        "SUN_IntRhop_Cine_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Rhop_MK1",
+      "rules": [
+        "OLD_Rhop_Init",
+        "OLD_Rhop_Bombes",
+        "OLD_Rhop_Marchatak",
+        "OLD_Rhop_SautDeb",
+        "OLD_Rhop_Saut",
+        "DS1_2rhop_init_phase2_sanscine",
+        "OLD_2rhop_vrille_accroche",
+        "OLD_2rhop_accroche",
+        "OLD_2rhop_paf_accro",
+        "OLD_2rhop_vol",
+        "OLD_rhop_vide",
+        "OLD_2rhop_mort",
+        "OLD_rhop_marche",
+        "OLD_rhop_trebuche",
+        "OLD_2rhop_paf_accr_sol",
+        "OLD_rhop_tourne_wp_central",
+        "OLD_rhop_va_au_wp",
+        "OLD_rhop_esquive",
+        "OLD_rhop_lancer_bombes",
+        "OLD_Rhop_init2",
+        "FRH_2rhop_tir1",
+        "FRH_2rhop_tir2",
+        "FRH_2rhop_sautsimple",
+        "DS1_2rhop_init_phase2_aveccine",
+        "DS1_rhop_trebuche2"
+      ],
+      "reflexes": [
+        "OLD_rhop_accro_aie",
+        "OLD_rhop_ref_vide",
+        "OLD_rhop_shake",
+        "FRH_rhop_sol_kill"
+      ]
+    },
+    {
+      "name": "FRH_AreYouTalkingtome",
+      "rules": [
+        "FRH_talk_init",
+        "FRH_talk_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelRodeo_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "OLP_Attente"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Detruit_Missile",
+      "rules": [
+        "OLP_Init_Detruit_Missile",
+        "OLP_Attente_Du_Missile"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_Grille",
+      "rules": [
+        "OLP_Grille_Init",
+        "OLP_Ouverture_Grille",
+        "OLP_Attend_Switch",
+        "OLP_Grille_Fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_murfyCine",
+      "rules": [
+        "MOM_murfy_init",
+        "MOM_THX_behaviour"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_BouclantCinematique",
+      "rules": [
+        "DS1_InitBruitMissileCine",
+        "DS1_StartBruitMissileCine",
+        "DS1_TestFinMissileCine",
+        "DS1_InitAmbianceCinematiqueCascade",
+        "DS1_StartAmbianceCascade",
+        "DS1_TestFinFausseCascade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_RayDum_encoreR10",
+      "rules": [
+        "MOM_RayDum_rodeo10_init",
+        "MOM_RayDum_rodeo10_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLP_DetruitPerso_A_Sa_Hauteur",
+      "rules": [
+        "OLP_Init_Destructeur_Perso",
+        "OLP_Attend_Perso_Valide",
+        "OLP_Test_Perso"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelRodeo_40",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "JEZ_SlashRonce",
+      "rules": [
+        "JEZ_PtiteRonce_INIT",
+        "JEZ_PtiteRonce_SLASH",
+        "MIC_PtiteRonce_Tempo"
+      ],
+      "reflexes": [
+        "JEZ_Slash_PafLaTronche"
+      ]
+    },
+    {
+      "name": "STN_Clarck_Eolog",
+      "rules": [
+        "STN_Clarck_init",
+        "STN_Clarck_way",
+        "STN_Clarck_run",
+        "STN_Clarck_walk",
+        "STN_Clarck_wait",
+        "STN_Clarck_follow"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_murMUR",
+      "rules": [
+        "STN_murMUR_init",
+        "STN_murMUR_check"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_ClarkDum",
+      "rules": [
+        "SDZ_ClarkDum_0_Init",
+        "SDZ_ClarkDum_1_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_FX_Rodeo40",
+      "rules": [
+        "SDZ_FX_0_Init",
+        "SDZ_FX_1_Normal",
+        "SDZ_FX_2_CheatCode",
+        "SDZ_FX_3_Anim"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelRodeo_60",
+      "rules": [
+        "YLT_InitLevel"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Jokari",
+      "rules": [
+        "SUN_Menhir_Init",
+        "MIC_Menhir_Surveille",
+        "MIC_Menhir_Sortie"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_MenhirBourre",
+      "rules": [
+        "MIC_MenBour_INIT",
+        "MIC_MenBour_JePenche",
+        "MIC_MenBour_DoncJeChute",
+        "MIC_MenBour_Boing"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_ObusR60_Cine",
+      "rules": [
+        "SUN_ObusR60_Init",
+        "SUN_ObusR60_THX"
+      ],
+      "reflexes": [
+        "DS1_Obus_R60_Rfx"
+      ]
+    },
+    {
+      "name": "SUN_GenSound_R60",
+      "rules": [
+        "SUN_SoundR60_Init",
+        "SUN_SoundR60_Loop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SUN_Cam_R60_cine",
+      "rules": [
+        "SUN_CamAnimR60_Init",
+        "SUN_CamAnimR60_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelseat_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "YGE_Fade"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "BNT_SupportDuSiege",
+      "rules": [
+        "BNT_SupportDuSiegeInit",
+        "BNT_SupportDuSiegeBoucle",
+        "BNT_SupportDuSiegeAttendLaFin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "VIM_Gen_Siege_Russe",
+      "rules": [
+        "VIM_gen_siege_init",
+        "VIM_gen_siege_boucle"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_PirateGorilleCine",
+      "rules": [
+        "SDZ_pgCine_Init",
+        "SDZ_pgCine_SurSiege",
+        "SDZ_pgCine_Chute",
+        "SDZ_pgCine_SurTerre",
+        "SDZ_pgCine_KillMe"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Ray_Seat10",
+      "rules": [
+        "SDZ_Dum_0_Init",
+        "SDZ_Dum_1_Normal"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "VIM_Le_Gorille_tu_ecrases_hein",
+      "rules": [
+        "VIM_gor_init",
+        "VIM_gor_vade_retro"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "YLT_SiegeRusse",
+      "rules": [
+        "BNT_ChaiseRusseInit",
+        "BNT_ChaiseRusseBoucle",
+        "BNT_AttendPourJeterRM",
+        "BNT_ChaiseRusseAttendFinDeCinematique",
+        "BNT_AttendLaMortDeRM"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Kapoum",
+      "rules": [
+        "STN_Kapoum_init",
+        "STN_Kapoum_detecte",
+        "STN_Kapoum_recule",
+        "STN_Kapoum_Tir"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_tonogear",
+      "rules": [
+        "STN_tonogear_init",
+        "STN_tonogear_chemin",
+        "STN_tonogear_alarme",
+        "STN_tonogear_fire",
+        "STN_tonogear_fireray",
+        "STN_Tonogear_fixe",
+        "STN_tonogear_boulet",
+        "STN_tonogear_laser"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelSeat_11",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "VIM_Cine_fin_seat_10",
+      "rules": [
+        "VIM_cine_init",
+        "VIM_cine_cine",
+        "VIM_cine_fin",
+        "VIM_cine_detection",
+        "SDZ_cine_aveccadre",
+        "SDZ_cine_aveccadre2",
+        "SDZ_cine_aveccadre3"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "ARG_Cam_Tunnel_XY",
+      "rules": [
+        "ARG_Cam_Init",
+        "ARG_Cam_Attend_Rm",
+        "ARG_Cam_XY"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "VIM_Detect_n_persos",
+      "rules": [
+        "VIM_n_perso_init",
+        "VIM_n_perso_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_boulet_moutarde",
+      "rules": [
+        "STN_boulet_moutarde_init",
+        "STN_boulet_moutarde_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelSki_10",
+      "rules": [
+        "YLT_InitLevel",
+        "MIC_ActivePastille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_PtiPiranhaSolo",
+      "rules": [
+        "MIC_PtiPiSolo_INIT"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_NewSerpentSki",
+      "rules": [
+        "MIC_NSP_INIT",
+        "MIC_NSP_PrepareSki",
+        "MIC_NSP_AttendRayman",
+        "MIC_NSP_Ski",
+        "MIC_NSP_Arret",
+        "MIC_NSP_RuptureFaisceau"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_NewRaymanSki",
+      "rules": [
+        "MIC_NRS_Init",
+        "MIC_NRS_SautDebut",
+        "MIC_NRS_SautDescente",
+        "MIC_NRS_SkiNormal",
+        "MIC_NRS_Tremplin",
+        "MIC_NRS_Paf",
+        "MIC_NRS_PafFin",
+        "MIC_NRS_Couche",
+        "MIC_NRS_ElanFinal",
+        "MIC_NRS_SousLeau",
+        "MIC_NRS_Destruction",
+        "MIC_NRS_Coule",
+        "MIC_NRS_PrepareSortie",
+        "MIC_NRS_Sortie"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_PouletFantome",
+      "rules": [
+        "MIC_PouFan_INIT",
+        "MIC_PouFan_Cache",
+        "MIC_PouFan_Vol"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Serpent_Ski_THX",
+      "rules": [
+        "MOM_SerpSki_Init",
+        "MOM_SerpSki_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_JanoC_Vulca12",
+      "rules": [
+        "MOM_JanoC_Vulca12_init",
+        "MOM_JanoC_Vulca12_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_SuperCage",
+      "rules": [
+        "MIC_Blinder_INIT",
+        "MIC_Blinder_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_CamNoCol",
+      "rules": [
+        "MIC_CNC_INIT",
+        "MIC_CNC_Surveille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Jano3",
+      "rules": [
+        "MOM_Jano3_init",
+        "MOM_Jano3_biloSta"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_ski10",
+      "rules": [
+        "MOM_ski10_init",
+        "MOM_ski10_biloSta"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "levelSki_60",
+      "rules": [
+        "YLT_InitLevel",
+        "MIC_Ski60_TesteFin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_BombeQuiTombe",
+      "rules": [
+        "MIC_BombeQT_INIT",
+        "MIC_BombeQT_Tombe",
+        "MIC_BombeQT_Attente"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_ray_ski60",
+      "rules": [
+        "MOM_ray_ski60_init",
+        "MOM_ray_ski60_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Tremplin",
+      "rules": [
+        "MIC_Tremplin_INIT",
+        "MIC_Tremplin_Coule",
+        "JAC_Tremplin_monte",
+        "JAC_Tremplin_descend"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_Staffman",
+      "rules": [
+        "DS1_staff_init",
+        "DS1_staff_type1",
+        "DS1_staff_type0"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_staff_pirate",
+      "rules": [
+        "DS1_stpir_init",
+        "DS1_stpir_waitorcheat",
+        "DS1_stpir_gowp",
+        "DS1_ActiveCheat2"
+      ],
+      "reflexes": [
+        "DS1_ref_cheat",
+        "DS1_ref_vide"
+      ]
+    },
+    {
+      "name": "DS1_Goldorak",
+      "rules": [
+        "DS1_gol_init",
+        "DS1_gol_go"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "DS1_lamort",
+      "rules": [
+        "DS1_kitu_init",
+        "DS1_kitu_fade",
+        "DS1_kitu_wait"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelstaff_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop",
+        "DS1_wait",
+        "DS1_end"
+      ],
+      "reflexes": [
+        "DS1_cheat_world"
+      ]
+    },
+    {
+      "name": "DS1_go",
+      "rules": [
+        "DS1_go_init",
+        "DS1_go_go",
+        "DS1_go_fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_JFF2000",
+      "rules": [
+        "MIC_jff_init",
+        "MIC_jff_intro",
+        "MIC_jff_go",
+        "MIC_jff_end",
+        "MIC_jff_jump"
+      ],
+      "reflexes": [
+        "MIC_jff_rien",
+        "MIC_jff_generator"
+      ]
+    },
+    {
+      "name": "MIC_AGO2000",
+      "rules": [
+        "MIC_ship_init",
+        "MIC_dec_go",
+        "MIC_tir_go",
+        "MIC_en1_go",
+        "MIC_en1_paf",
+        "MIC_bul_enn_go",
+        "MIC_en4_go",
+        "MIC_en5_go",
+        "MIC_en6_go",
+        "MIC_flash",
+        "DS1_power_up",
+        "DS1_en9_go"
+      ],
+      "reflexes": [
+        "MIC_ref_vide"
+      ]
+    },
+    {
+      "name": "Levelvulca_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_janold",
+      "rules": [
+        "OLD_ja_init",
+        "OLD_ja_mort",
+        "OLD_ja_enfoui",
+        "OLD_ja_MAIN",
+        "OLD_ja_tourne_wp",
+        "OLD_ja_tourne_rm",
+        "OLD_ja_boule_feu",
+        "OLD_ja_attend",
+        "OLD_ja_declencheur",
+        "OLD_ja_cherch_wp",
+        "OLD_ja_init2",
+        "OLD_ja_vide",
+        "OLD_ja_attrap",
+        "old_ja_fin",
+        "old_ja_out",
+        "old_ja_enfoui2"
+      ],
+      "reflexes": [
+        "OLD_ja_r_zde",
+        "OLD_ja_r_vide",
+        "OLD_ja_r_fumee",
+        "old_ja_r_cam",
+        "old_ja_r_zde_wait"
+      ]
+    },
+    {
+      "name": "OLD_interupt_acteurs",
+      "rules": [
+        "OLD_inter_init",
+        "OLD_inter_surveille",
+        "DS1_TempoVeille"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_vlc_platform",
+      "rules": [
+        "NFP_vlcpf_init",
+        "OLD_vlcpf_active"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_jano_bras",
+      "rules": [
+        "OLD_jan_bras_init",
+        "OLD_jan_bras_main",
+        "OLD_jan_bras_mort_rm",
+        "OLD_jan_bras_porte_rm",
+        "old_jan_bras_vide",
+        "old_jan_bras_attend",
+        "DS1_JeFaisLaGueuleApresUnPaf"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_Main_PF",
+      "rules": [
+        "OLD_MPF_init",
+        "OLD_MPF_deplace",
+        "OLD_MPF_waitRM",
+        "OLD_MPF_vide",
+        "SDZ_MPF_AttenteRM",
+        "SDZ_MPF_Up",
+        "SDZ_MPF_Down"
+      ],
+      "reflexes": [
+        "OLD_ref_rien",
+        "OLD_ref_suivre"
+      ]
+    },
+    {
+      "name": "OLD_murs_entre2",
+      "rules": [
+        "OLD_mur_entre2_init",
+        "OLD_mur_entre2_ouvert",
+        "OLD_mur_entre2_souvre"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "FRH_porte",
+      "rules": [
+        "FRH_po_init",
+        "FRH_po_ouvert",
+        "FRH_po_ferme"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_crystaux",
+      "rules": [
+        "OLD_cristaux_init",
+        "OLD_cristaux_attent"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_pf_tournante",
+      "rules": [
+        "OLD_pf_tournante_init",
+        "OLD_pf_tournante_main"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_pf_volcan",
+      "rules": [
+        "OLD_pf_volcan_init",
+        "OLD_pf_volcan_chute",
+        "OLD_pf_volcan_glisse",
+        "OLD_pf_volcan_retourn",
+        "OLD_pf_volcan_init2"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_crane",
+      "rules": [
+        "OLD_crane_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_mv_colonne",
+      "rules": [
+        "OLD_mv_colon_init",
+        "OLD_mv_colon_enfonc",
+        "XAP_Fin"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_crane_shoot",
+      "rules": [
+        "OLD_crane_shoot_init",
+        "OLD_crane_shoot_go",
+        "OLD_crane_shoot_fixe",
+        "OLD_crane_shoot_delete",
+        "OLD_crane_shoot_lance",
+        "OLD_crane_shoot_tombe",
+        "OLD_crane_shoot_tourne",
+        "SDZ_crane_shoot_vibration"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelvulca_20",
+      "rules": [
+        "YLT_InitLevel",
+        "DS1_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "OLD_bouche_jano",
+      "rules": [
+        "OLD_bouche_init",
+        "OLD_bouche_main",
+        "OLD_bouche_wait",
+        "OLD_bouche_mort",
+        "DS1_bouche_attend",
+        "MIC_bouche_croque",
+        "DS1_TryAgain",
+        "DS1_Bouche_ComportementVide"
+      ],
+      "reflexes": [
+        "DS1_SelfDestruction",
+        "DS1_SansReflexes"
+      ]
+    },
+    {
+      "name": "OLD_jano_boss",
+      "rules": [
+        "OLD_jan_boss_init",
+        "OLD_jan_boss_boule_feu",
+        "OLD_jan_boss_attend",
+        "OLD_jan_boss_saut",
+        "OLD_jan_boss_rotation",
+        "OLD_jan_boss_reception",
+        "OLD_jan_boss_rot_rm",
+        "OLD_jan_boss_vide",
+        "OLD_jan_boss_marche",
+        "OLD_jan_boss_crane",
+        "OLD_jan_boss_attend_crane",
+        "OLD_jan_boss_main1",
+        "OLD_jan_boss_main2",
+        "OLD_jan_boss_main3",
+        "OLD_jan_boss_main4",
+        "OLD_jan_boss_main5",
+        "OLD_jan_boss_main6",
+        "OLD_jan_boss_main7",
+        "OLD_jan_boss_main8",
+        "OLD_jan_boss_main9",
+        "OLD_jan_boss_main10",
+        "OLD_jan_boss_main11",
+        "OLD_jan_boss_main_fin",
+        "DS1_jan_boss_main67"
+      ],
+      "reflexes": [
+        "OLD_jan_boss_r_vide",
+        "OLD_jano_boss_r_fumee"
+      ]
+    },
+    {
+      "name": "MOM_Ray_Vulca12_model",
+      "rules": [
+        "MOM_Ray_Vulca12_init",
+        "MOM_Ray_Vulca12_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "SDZ_Choix",
+      "rules": [
+        "SDZ_Choix_0_Init",
+        "SDZ_Choix_1_Attente",
+        "SDZ_Choix_2_FadeIn",
+        "SDZ_Choix_3_Choix",
+        "SDZ_Choix_4_FadeOut"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelWater_10",
+      "rules": [
+        "YLT_InitLevel",
+        "DS1_Loop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Porto",
+      "rules": [
+        "STN_Porto_init",
+        "STN_Porto_check_switch1",
+        "STN_Porto_check_switch2",
+        "STN_Porto_tremble",
+        "STN_Porto_ouvre_toi",
+        "STH_DejaOuvert"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STH_trigger",
+      "rules": [
+        "STH_trigger_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelwater_20",
+      "rules": [
+        "YLT_InitLevel",
+        "STN_Level_boucleAOJ",
+        "STN_Level_Attente_Gwod",
+        "STN_Level_debutAOJ",
+        "STN_Level_finAOJ",
+        "STH_AGOneigeenboucle"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Porto",
+      "rules": [
+        "MIC_porto_INIT",
+        "MIC_porto_Surveille",
+        "MIC_porto_interrupteur"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_ouodeugwod",
+      "rules": [
+        "STN_ouodeugwod_init",
+        "STN_ouodeugwod_dead",
+        "STN_ouodeugwod_move",
+        "STN_ouodeugwod_shoot",
+        "STN_ouodeugwod_happy",
+        "STN_ouodeugwod_titre_debut",
+        "STN_ouodeugwod_titre_boucle",
+        "STN_ouodeugwod_titre_fin",
+        "DS1_PanDansLaGueule"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MOM_Ray_Water20",
+      "rules": [
+        "MOM_Ray_water20_init",
+        "MOM_Ray_Water20_THX"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Aglagla",
+      "rules": [
+        "STN_Aglagla_chute",
+        "STN_Aglagla_init",
+        "STN_Aglagla_PAF",
+        "STN_Aglagla_the_end",
+        "STN_Aglagla_vise",
+        "STN_Aglagla_wait"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_direction",
+      "rules": [
+        "STN_direction_init",
+        "STN_direction_fade",
+        "STN_direction_switch"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_Stalac_shoot",
+      "rules": [
+        "STN_Stalac_Shoot_init",
+        "STN_Stalac_Shoot_lums",
+        "STN_Stalac_Shoot_fire"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelWhale_00",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_Piranha_NiakVarappe",
+      "rules": [
+        "MIC_Piranha_NV_INIT",
+        "MIC_Piranha_NV_Surveille",
+        "MIC_Piranha_NV_Attak",
+        "MIC_Piranha_NV_Delai",
+        "MIC_Piranha_NV_Rebond"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "STN_kisscoule",
+      "rules": [
+        "STN_kisscoule_init",
+        "STN_kisscoule_waypoint1",
+        "STN_kisscoule_waypoint2",
+        "STN_kisscoule_waypoint3",
+        "STN_kisscoule_goway2",
+        "STN_kisscoule_goway3",
+        "STN_kisscoule_goway1"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "XAP_Plouf",
+      "rules": [
+        "XAP_Plouf_init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "XAP_TonoGear_light",
+      "rules": [
+        "XAP_Tonolight_init",
+        "XAP_alarme",
+        "XAP_Tonolight_chemin",
+        "XAP_Tonolight_fire",
+        "XAP_Tonolight_fire_Ray",
+        "XAP_Tonolight_fixe",
+        "XAP_Tonolight_Laser"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "MIC_LumsBulle",
+      "rules": [
+        "MIC_Lums_Bulle_Init",
+        "MIC_Lums_Bulle_Main"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "Levelwhale_05",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "CHR_Baleine_a_bulles",
+      "rules": [
+        "CHR_Baleine_Init",
+        "PHL_Baleine_Wait",
+        "PHL_Baleine_Suit_Reseau",
+        "PHL_Baleine_Fin_Reseau"
+      ],
+      "reflexes": [
+        "MIC_PHL_Baleine_RInit",
+        "MIC_Baleine_RBubulles"
+      ]
+    },
+    {
+      "name": "MIC_PiranhaGobeBulle",
+      "rules": [
+        "MIC_PiranhaGB_INIT",
+        "MIC_PiranhaGB_AttendBulle",
+        "MIC_PiranhaGB_ChasseBulle",
+        "MIC_PiranhaGB_pause",
+        "MIC_PiranhaGB_RelacheLesBulles"
+      ],
+      "reflexes": [
+        "MIC_PiranhaGB_RFaisBobo"
+      ]
+    },
+    {
+      "name": "PHL_Baleine_Bouillon",
+      "rules": [
+        "PHL_Bouillon2Baleine_Init"
+      ],
+      "reflexes": []
+    },
+    {
+      "name": "LevelWhale_10",
+      "rules": [
+        "YLT_InitLevel",
+        "YLT_LevelLoop"
+      ],
+      "reflexes": []
+    }
+  ]
+}

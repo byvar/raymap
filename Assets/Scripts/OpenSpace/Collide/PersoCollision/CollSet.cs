@@ -20,10 +20,10 @@ namespace OpenSpace.Collide {
         public Pointer off_zones_zdm;
         public Pointer off_zones_zdr;
 
-        public uint privilegedActivationZDD;
-        public uint privilegedActivationZDE;
-        public uint privilegedActivationZDM;
-        public uint privilegedActivationZDR;
+        public int privilegedActivationsZDD; // consists of 16 bit pairs that describe the state of a zone, 00 = neutral, 01 = force active, 10 = force inactive
+        public int privilegedActivationsZDE; // ..
+        public int privilegedActivationsZDM; // ..
+        public int privilegedActivationsZDR; // access these using GetPrivilegedActionZoneStatus
 
         // Generated
         public LinkedList<CollideMeshObject> zdd;
@@ -41,14 +41,37 @@ namespace OpenSpace.Collide {
             this.offset = offset;
         }
 
-        private static LinkedList<CollideMeshObject> ParseZdxList(Reader reader, Pointer offset, CollideMeshObject.Type type) {
+        public enum PrivilegedActivationStatus {
+            Neutral = 0,
+            ForceActive = 1,
+            ForceInactive = 2
+        }
+
+        public PrivilegedActivationStatus GetPrivilegedActionZoneStatus(CollideMeshObject.Type type, int index)
+        {
+            int activations = 0;
+            switch(type) {
+                case CollideMeshObject.Type.ZDD: activations = privilegedActivationsZDD; break;
+                case CollideMeshObject.Type.ZDE: activations = privilegedActivationsZDE; break;
+                case CollideMeshObject.Type.ZDM: activations = privilegedActivationsZDM; break;
+                case CollideMeshObject.Type.ZDR: activations = privilegedActivationsZDR; break;
+            }
+            int offset = index * 2;
+            int value = ((1 << 2) - 1) & (activations >> (offset)); // extract 2 bits from offset
+            return (PrivilegedActivationStatus)value;
+        }
+
+        private static LinkedList<CollideMeshObject> ParseZdxList(Reader reader, Pointer offset, CollSet collset, CollideMeshObject.Type type) {
             MapLoader l = MapLoader.Loader;
             LinkedList<CollideMeshObject> zdxList = null;
+
+            int index = 0;
+
             Pointer.DoAt(ref reader, offset, () => {
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
                 zdxList = LinkedList<CollideMeshObject>.Read(ref reader, offset,
                     (off_element) => {
-                        return CollideMeshObject.Read(reader, off_element, type: type);
+                        return CollideMeshObject.Read(reader, off_element, collset, index++, type: type);
                     },
                     flags: LinkedList.Flags.ReadAtPointer
                         | (Settings.s.hasLinkedListHeaderPointers ?
@@ -60,14 +83,14 @@ namespace OpenSpace.Collide {
             return zdxList;
         }
 
-        private static LinkedList<CollideElement> ParseZdxZoneList(Reader reader, Pointer offset, CollideMeshObject.Type type) {
+        private static LinkedList<CollideElement> ParseZdxZoneList(Reader reader, Pointer offset, CollSet collset, CollideMeshObject.Type type) {
             MapLoader l = MapLoader.Loader;
             LinkedList<CollideElement> zdxZoneList = null;
             Pointer.DoAt(ref reader, offset, () => {
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
                 zdxZoneList = LinkedList<CollideElement>.Read(ref reader, offset,
                     (off_element) => {
-                        return CollideElement.Read(reader, off_element);
+                        return CollideElement.Read(reader, off_element, collset, type);
                     },
                     flags: LinkedList.Flags.NoPreviousPointersForDouble,
                     type: LinkedList.Type.Minimize
@@ -96,15 +119,15 @@ namespace OpenSpace.Collide {
             c.off_zones_zdr = Pointer.Read(reader);
             c.off_zones_zdm = Pointer.Read(reader);
 
-            c.privilegedActivationZDD = reader.ReadUInt32();
-            c.privilegedActivationZDE = reader.ReadUInt32();
-            c.privilegedActivationZDM = reader.ReadUInt32();
-            c.privilegedActivationZDR = reader.ReadUInt32();
+            c.privilegedActivationsZDD = reader.ReadInt32();
+            c.privilegedActivationsZDE = reader.ReadInt32();
+            c.privilegedActivationsZDM = reader.ReadInt32();
+            c.privilegedActivationsZDR = reader.ReadInt32();
 
-            c.zdd = ParseZdxList(reader, c.off_zdd, CollideMeshObject.Type.ZDD);
-            c.zde = ParseZdxList(reader, c.off_zde, CollideMeshObject.Type.ZDE);
-            c.zdm = ParseZdxList(reader, c.off_zdm, CollideMeshObject.Type.ZDM);
-            c.zdr = ParseZdxList(reader, c.off_zdr, CollideMeshObject.Type.ZDR);
+            c.zdd = ParseZdxList(reader, c.off_zdd, c, CollideMeshObject.Type.ZDD);
+            c.zde = ParseZdxList(reader, c.off_zde, c, CollideMeshObject.Type.ZDE);
+            c.zdm = ParseZdxList(reader, c.off_zdm, c, CollideMeshObject.Type.ZDM);
+            c.zdr = ParseZdxList(reader, c.off_zdr, c, CollideMeshObject.Type.ZDR);
             if (c.zdd != null) foreach (CollideMeshObject col in c.zdd) {
                     if (col == null) continue;
                     col.gao.transform.SetParent(perso.Gao.transform);
@@ -121,10 +144,10 @@ namespace OpenSpace.Collide {
                     if (col == null) continue;
                     col.gao.transform.SetParent(perso.Gao.transform);
                 }
-            c.zddZones = ParseZdxZoneList(reader, c.off_zones_zdd, CollideMeshObject.Type.ZDD);
-            c.zdeZones = ParseZdxZoneList(reader, c.off_zones_zde, CollideMeshObject.Type.ZDE);
-            c.zdmZones = ParseZdxZoneList(reader, c.off_zones_zdm, CollideMeshObject.Type.ZDM);
-            c.zdrZones = ParseZdxZoneList(reader, c.off_zones_zdr, CollideMeshObject.Type.ZDR);
+            c.zddZones = ParseZdxZoneList(reader, c.off_zones_zdd, c, CollideMeshObject.Type.ZDD);
+            c.zdeZones = ParseZdxZoneList(reader, c.off_zones_zde, c, CollideMeshObject.Type.ZDE);
+            c.zdmZones = ParseZdxZoneList(reader, c.off_zones_zdm, c, CollideMeshObject.Type.ZDM);
+            c.zdrZones = ParseZdxZoneList(reader, c.off_zones_zdr, c, CollideMeshObject.Type.ZDR);
 
             return c;
         }

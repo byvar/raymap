@@ -1,4 +1,7 @@
 # Raymap
+
+You can find the web version of Raymap on <https://raym.app/>
+
 Map viewer/editor for OpenSpace games, including:
 * Laura's Happy Adventures (PC)
 * Alex Builds his Farm (PC)
@@ -9,6 +12,7 @@ Map viewer/editor for OpenSpace games, including:
 * Tonic Trouble (PC)
 * Rayman 2 (PC)
 * Rayman 2 (DC)
+* Rayman 2: Revolution (PS2)
 * Rayman Arena (PC)
 * Rayman Arena (GC)
 * Rayman 3 (PC)

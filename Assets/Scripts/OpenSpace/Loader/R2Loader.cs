@@ -800,6 +800,11 @@ namespace OpenSpace.Loader {
             loadingState = "Filling in cross-references";
             yield return null;
             ReadCrossReferences(reader);
+
+            if (Settings.s.game == Settings.Game.R2) {
+                loadingState = "Filling in comport names";
+                ReadAndFillComportNames();
+            }
         }
         #endregion
         

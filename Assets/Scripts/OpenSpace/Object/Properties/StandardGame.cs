@@ -10,11 +10,12 @@ namespace OpenSpace.Object.Properties {
         public int customBits;
         public int aiCustomBits;
         public byte isAPlatform;
-        public byte unk;
+        public byte updateCheckByte;
         public byte transparencyZoneMin;
         public byte transparencyZoneMax;
         public int customBitsInitial;
         public int aiCustomBitsInitial;
+        public float tooFarLimit;
 
         public StandardGame(Pointer offset) {
             this.offset = offset;
@@ -24,7 +25,6 @@ namespace OpenSpace.Object.Properties {
             MapLoader l = MapLoader.Loader;
             //l.print(offset);
             StandardGame stdGame = new StandardGame(offset);
-
 
 			if (Settings.s.game != Settings.Game.R2Revolution) {
 				stdGame.objectTypes[0] = reader.ReadUInt32();
@@ -45,18 +45,27 @@ namespace OpenSpace.Object.Properties {
 						reader.ReadBytes(0x14); // 0x10 - 0x23
 					}
 					stdGame.customBits = reader.ReadInt32(); // 0x24 custom bits
-					stdGame.isAPlatform = reader.ReadByte();
-					stdGame.unk = reader.ReadByte();
-					stdGame.transparencyZoneMin = reader.ReadByte();
-					stdGame.transparencyZoneMax = reader.ReadByte();
-					stdGame.customBitsInitial = reader.ReadInt32();
+					stdGame.isAPlatform = reader.ReadByte(); // 0x28
+					stdGame.updateCheckByte = reader.ReadByte(); // 0x29
+					stdGame.transparencyZoneMin = reader.ReadByte(); // 0x2A
+					stdGame.transparencyZoneMax = reader.ReadByte(); // 0x2B
+					stdGame.customBitsInitial = reader.ReadInt32(); // 0x2C
+					reader.ReadByte(); // 0x30
+					reader.ReadByte(); // 0x31
+					reader.ReadByte(); // 0x32
+					stdGame.tooFarLimit = (float)reader.ReadByte(); // 0x33 - Objects are only activated within this radius
+					reader.ReadInt32(); // 0x34
+					reader.ReadInt32(); // 0x38
+					reader.ReadInt32(); // 0x3C
+					reader.ReadByte(); // 0x40
+					byte activationBits = reader.ReadByte(); // 0x41, referenced in fn_vTreatDynamicHierarchy, used to determine if object is handled (treated)
 
 				} else {
 					reader.ReadBytes(0x10); // 0x10 - 0x1F
 					stdGame.customBits = reader.ReadInt32(); // 0x20 custom bits
 					stdGame.aiCustomBits = reader.ReadInt32(); // 0x24 AI custom bits
 					stdGame.isAPlatform = reader.ReadByte();
-					stdGame.unk = reader.ReadByte();
+					stdGame.updateCheckByte = reader.ReadByte();
 					stdGame.transparencyZoneMin = reader.ReadByte();
 					stdGame.transparencyZoneMax = reader.ReadByte();
 					stdGame.customBitsInitial = reader.ReadInt32();
@@ -99,12 +108,22 @@ namespace OpenSpace.Object.Properties {
             }
         }
 
+        public bool ConsideredOnScreen()
+        {
+            return (updateCheckByte & (1 << 5)) != 0;
+        }
+
+        public bool ConsideredTooFarAway()
+        {
+            return (updateCheckByte & (1 << 7)) != 0;
+        }
+
         public void Write(Writer writer) {
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 Pointer.Goto(ref writer, Pointer.Current(writer) + 0x24);
                 writer.Write(customBits);
                 writer.Write(isAPlatform);
-                writer.Write(unk);
+                writer.Write(updateCheckByte);
                 writer.Write(transparencyZoneMin);
                 writer.Write(transparencyZoneMax);
                 writer.Write(customBitsInitial);
@@ -113,7 +132,7 @@ namespace OpenSpace.Object.Properties {
                 writer.Write(customBits);
                 writer.Write(aiCustomBits);
                 writer.Write(isAPlatform);
-                writer.Write(unk);
+                writer.Write(updateCheckByte);
                 writer.Write(transparencyZoneMin);
                 writer.Write(transparencyZoneMax);
                 writer.Write(customBitsInitial);

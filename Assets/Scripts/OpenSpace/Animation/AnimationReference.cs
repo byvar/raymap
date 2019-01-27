@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation {
-    public class AnimationReference {
+    public class AnimationReference { // Also known as Anim3d
         public Pointer offset;
         public string name = null;
         public ushort num_onlyFrames;
@@ -20,6 +20,7 @@ namespace OpenSpace.Animation {
         public ushort anim_index; // Index of animation within bank
         public byte num_events;
         public byte transition;
+        public AnimMorphData[,] morphDataArray; // [channel][frame]
 
         public Pointer off_a3d = null;
         public AnimA3DGeneral a3d = null;
@@ -31,6 +32,7 @@ namespace OpenSpace.Animation {
         public static AnimationReference Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             AnimationReference ar = new AnimationReference(offset);
+			
 			if (Settings.s.game == Settings.Game.R2Revolution) {
 				ar.off_a3d = Pointer.Read(reader);
 				reader.ReadUInt32();
@@ -56,7 +58,7 @@ namespace OpenSpace.Animation {
 					ar.y = reader.ReadSingle();
 					ar.z = reader.ReadSingle();
 				}
-				ar.off_morphData = Pointer.Read(reader);
+				ar.off_morphData = Pointer.Read(reader); // Runtime only?
 				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -73,6 +75,7 @@ namespace OpenSpace.Animation {
             Pointer.DoAt(ref reader, ar.off_a3d, () => {
                 ar.a3d = AnimA3DGeneral.ReadFull(reader, ar.off_a3d);
             });
+
             return ar;
         }
 

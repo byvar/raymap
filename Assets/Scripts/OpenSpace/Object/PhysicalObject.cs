@@ -163,11 +163,13 @@ namespace OpenSpace.Object {
                 }
             });
 
+            int index = 0;
+
             // Parse collide set
             Pointer.DoAt(ref reader, po.off_collideSet, () => {
 				if (Settings.s.game == Settings.Game.R2Revolution) {
 					// Read collide mesh object here directly
-					po.collideMesh = CollideMeshObject.Read(reader, po.off_collideSet);
+					po.collideMesh = CollideMeshObject.Read(reader, po.off_collideSet, null, index++);
 					po.collideMesh.gao.transform.parent = po.Gao.transform;
 				} else {
 					// Read collide set containing collide mesh
@@ -176,7 +178,7 @@ namespace OpenSpace.Object {
 					uint u3 = reader.ReadUInt32(); // 0
 					Pointer off_zdr = Pointer.Read(reader);
 					Pointer.DoAt(ref reader, off_zdr, () => {
-						po.collideMesh = CollideMeshObject.Read(reader, off_zdr);
+						po.collideMesh = CollideMeshObject.Read(reader, off_zdr, null, index++);
 						po.collideMesh.gao.transform.parent = po.Gao.transform;
 					});
 				}

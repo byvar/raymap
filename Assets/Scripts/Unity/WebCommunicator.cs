@@ -122,12 +122,16 @@ public class WebCommunicator : MonoBehaviour {
     }
     private JSONObject GetSuperObjectJSON(SuperObject so) {
         JSONObject soJSON = new JSONObject();
-        soJSON["name"] = so.Gao.name;
+        if (so.Gao != null) {
+            soJSON["name"] = so.Gao.name;
+        }
         soJSON["type"] = so.type.ToString();
         soJSON["offset"] = so.offset.ToString();
-        soJSON["position"] = so.Gao.transform.localPosition;
-        soJSON["rotation"] = so.Gao.transform.localEulerAngles;
-        soJSON["scale"] = so.Gao.transform.localScale;
+        if (so.Gao != null) {
+            soJSON["position"] = so.Gao.transform.localPosition;
+            soJSON["rotation"] = so.Gao.transform.localEulerAngles;
+            soJSON["scale"] = so.Gao.transform.localScale;
+        }
         if (so.type == SuperObject.Type.Perso) {
             soJSON["perso"] = GetPersoJSON((Perso)so.data);
         }

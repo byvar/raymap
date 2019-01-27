@@ -235,6 +235,7 @@ namespace OpenSpace.AI {
                                     string macroString = "// evalMacro(" + macro.ShortName + ");";
                                     macroString += Environment.NewLine;
                                     TranslatedScript macroScript = new TranslatedScript(macro.script, perso);
+                                    macroScript.expandMacros = true;
                                     macroString += macroScript.ToString();
                                     macroString += Environment.NewLine + "// end macro";
                                     return macroString;

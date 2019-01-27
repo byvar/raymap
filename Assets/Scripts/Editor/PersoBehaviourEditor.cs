@@ -3,6 +3,8 @@ using System.Collections;
 using UnityEditor;
 using OpenSpace.AI;
 using System.Collections.Generic;
+using System;
+using OpenSpace.Animation.Component;
 
 [CustomEditor(typeof(PersoBehaviour))]
 public class PersoBehaviourEditor : Editor {
@@ -18,6 +20,26 @@ public class PersoBehaviourEditor : Editor {
             GUILayout.Label("S1: " + pb.perso.p3dData.off_stateCurrent);
             GUILayout.Label("S2: " + pb.perso.p3dData.off_state2);
         }*/
+
+        GUILayout.BeginVertical();
+        byte updateCheckByte = pb.perso.stdGame.updateCheckByte;
+        GUILayout.Label("StdGame.UpdateByte: " + Convert.ToString(updateCheckByte, 2).PadLeft(8, '0'));
+        bool consideredOnScreen = (updateCheckByte & (1 << 5)) != 0;
+        bool consideredTooFarAway = (updateCheckByte & (1 << 7)) != 0;
+        GUILayout.Label("Considered on screen (bit 5): " + consideredOnScreen);
+        GUILayout.Label("Considered too far away (bit 7): " + consideredTooFarAway);
+        GUILayout.Label("State custom bits: " + Convert.ToString(pb.state.customStateBits, 2).PadLeft(8, '0'));
+
+        if (pb.a3d != null) {
+            for (int i = 0; i < pb.a3d.num_channels; i++) {
+                AnimMorphData currentMorphData = pb.morphDataArray[i, pb.currentFrame];
+
+                if (currentMorphData != null) {
+                    GUILayout.Label("MorphData[" + i + "," + pb.currentFrame + "]: Morph to " + currentMorphData.objectIndexTo + ", progress " + currentMorphData.morphProgress);
+                }
+            }
+        }
+        GUILayout.EndVertical();
 
         GUILayout.BeginHorizontal();
         GUI.enabled = pb.stateIndex > 0;
