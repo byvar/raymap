@@ -768,7 +768,15 @@ public class PersoBehaviour : MonoBehaviour {
                                         MorphMemory morphMemory = childElement.gameObject.GetComponent<MorphMemory>();
 
                                         MeshFilter meshFilter1 = childElement.gameObject.GetComponent<MeshFilter>();
+
+                                        if (meshFilter1 == null) {
+                                            continue;
+                                        }
                                         MeshFilter meshFilter2 = morphToPO.Gao.transform.GetChild(count_childObject).GetChild(count_childElement).GetComponent<MeshFilter>();
+
+                                        if (meshFilter2 == null) {
+                                            continue;
+                                        }
 
                                         if (morphMemory == null) {
                                             morphFromVerts = meshFilter1.mesh.vertices;
@@ -786,7 +794,7 @@ public class PersoBehaviour : MonoBehaviour {
                                                 morphFromVerts[vi] = morphFromVerts[vi] + (morphToVerts[vi] - morphFromVerts[vi]) * morphData.morphProgressFloat;
                                             }
                                         } else {
-                                            Debug.LogWarning("Vertex array size of morph target does not match source! soure.poNum = " + poNum+" -> target.poNum = " + morphData.objectIndexTo);
+                                            Debug.LogWarning("Vertex array size of morph target does not match source! "+morphData.byte3+","+ morphData.byte5 + "," + morphData.byte6 + "," + morphData.byte7 + ", soure.poNum = " + poNum+" -> target.poNum = " + morphData.objectIndexTo);
                                         }
 
                                         meshFilter1.mesh.vertices = morphFromVerts;
