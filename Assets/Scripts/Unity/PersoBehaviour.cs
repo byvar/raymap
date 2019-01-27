@@ -1,4 +1,5 @@
-﻿using OpenSpace;
+﻿using Assets.Scripts;
+using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Animation;
 using OpenSpace.Animation.Component;
@@ -44,6 +45,7 @@ public class PersoBehaviour : MonoBehaviour {
     private GameObject[] channelObjects = null;
 	private int[] currentActivePO = null;
 	private bool[] channelParents = null;
+    public AnimMorphData[,] morphDataArray;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	bool hasBones = false; // We can optimize a tiny bit if this object doesn't have bones
 	private bool isAlways = false;
@@ -547,6 +549,18 @@ public class PersoBehaviour : MonoBehaviour {
 				} else {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
 				}
+
+                morphDataArray = new AnimMorphData[a3d.num_channels, a3d.num_onlyFrames];
+                // Iterate over morph data to find the correct channel and keyframe
+                for (int i = 0; i < a3d.num_morphData; i++) {
+                    AnimMorphData m = a3d.morphData[a3d.start_morphData+i];
+                    if (m != null) {
+                        int channelIndex = this.GetChannelByID(m.channel)[0];
+                        if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
+                            morphDataArray[channelIndex, m.frame] = m;
+                        }
+                    }
+                }
             }
             loaded = true;
         }
@@ -728,6 +742,64 @@ public class PersoBehaviour : MonoBehaviour {
 				channelObjects[i].transform.localPosition = vector * positionMultiplier;
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
+
+                if (i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
+                    AnimMorphData morphData = morphDataArray[i, currentFrame];
+                    
+                    if (morphData!=null) {
+
+                        if (channelObjects[i].transform.childCount > 0 && channelObjects[i].transform.GetChild(0).childCount > 0) {
+                            Transform meshTransform = channelObjects[i].transform.GetChild(0).GetChild(0).transform;
+                            foreach (Transform childTransform in meshTransform) {
+
+                                PhysicalObject morphFromPO = physicalObject;
+                                PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
+                                //morphPO.
+
+                                Vector3[] morphFromVerts = null;
+                                Vector3[] morphToVerts = null;
+
+                                int count_childObject = 0;
+                                int count_childElement = 0;
+
+                                foreach (Transform childObject in morphFromPO.Gao.transform) {
+                                    foreach (Transform childElement in childObject) {
+
+                                        MorphMemory morphMemory = childElement.gameObject.GetComponent<MorphMemory>();
+
+                                        MeshFilter meshFilter1 = childElement.gameObject.GetComponent<MeshFilter>();
+                                        MeshFilter meshFilter2 = morphToPO.Gao.transform.GetChild(count_childObject).GetChild(count_childElement).GetComponent<MeshFilter>();
+
+                                        if (morphMemory == null) {
+                                            morphFromVerts = meshFilter1.mesh.vertices;
+                                            morphMemory = childElement.gameObject.AddComponent<MorphMemory>(); // Use a component in the game object to store original vertices :)
+                                            morphMemory.originalVerts = morphFromVerts;
+                                            morphMemory.objectIndex = poNum;
+                                        }
+
+                                        morphFromVerts = morphMemory.originalVerts;
+                                        morphToVerts = meshFilter2.mesh.vertices;
+
+                                        if (morphToVerts.Length == morphFromVerts.Length) {
+
+                                            for (int vi = 0; vi < morphFromVerts.Length; vi++) {
+                                                morphFromVerts[vi] = morphFromVerts[vi] + (morphToVerts[vi] - morphFromVerts[vi]) * morphData.morphProgressFloat;
+                                            }
+                                        } else {
+                                            Debug.LogWarning("Vertex array size of morph target does not match source! soure.poNum = " + poNum+" -> target.poNum = " + morphData.objectIndexTo);
+                                        }
+
+                                        meshFilter1.mesh.vertices = morphFromVerts;
+
+                                        count_childElement++;
+                                    }
+                                    count_childObject++;
+                                }
+
+                            }
+                        }
+                    }
+                }
             }
 			if (hasBones) {
 				for (int i = 0; i < a3d.num_channels; i++) {

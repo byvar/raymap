@@ -549,7 +549,7 @@ public class Controller : MonoBehaviour {
 			isolateWaypointRoot.SetActive(false);
 		}
 		foreach (WayPoint wayPoint in isolateWaypoints) {
-			wayPoint.Gao.name = "Isolate WayPoint";
+			wayPoint.Gao.name = "Isolate WayPoint @"+wayPoint.offset;
 			wayPoint.Gao.transform.SetParent(isolateWaypointRoot.transform);
 		}
 	}
