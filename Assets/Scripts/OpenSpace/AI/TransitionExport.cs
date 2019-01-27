@@ -168,7 +168,7 @@ namespace Assets.Scripts.OpenSpace.AI {
                         }
                     }
 
-                    if (procedureType == "Proc_ChangeMyComportAndMyReflex" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure") {
+                    if (nextNextNode != null && (procedureType == "Proc_ChangeMyComportAndMyReflex" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure")) {
                         Behavior transitionBehavior = Behavior.FromOffset(nextNextNode.param_ptr);
                         if (transitionBehavior != null && !transitionToIndices.Contains(transitionBehavior.index)) {
                             transitionToIndices.Add(transitionBehavior.index);

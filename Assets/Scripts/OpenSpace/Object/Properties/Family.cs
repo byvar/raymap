@@ -55,18 +55,26 @@ namespace OpenSpace.Object.Properties {
             return -1;
         }
 
-        public void AddNewPhysicalList(ObjectList ol) {
-            if(!objectLists.Contains(ol)) objectLists.Add(ol);
+        public void AddNewPhysicalList(ObjectList ol, bool alreadyAdded = false) {
+			if (ol == null) return;
+			if (ol.containingFamilies.Count == 0) {
+				ol.Gao.transform.SetParent(Gao.transform);
+			}
+			if (!ol.containingFamilies.Contains(this)) ol.containingFamilies.Add(this);
+			if (!alreadyAdded && !objectLists.Contains(ol)) objectLists.Add(ol);
         }
 
         public static Family Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
+			//l.print("Family " + offset);
             Family f = new Family(offset);
             f.off_family_next = Pointer.Read(reader);
             f.off_family_prev = Pointer.Read(reader);
             f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
-            f.family_index = reader.ReadUInt32();
-            f.name = l.objectTypes[0][f.family_index].name;
+			if (Settings.s.hasObjectTypes) {
+				f.family_index = reader.ReadUInt32();
+				f.name = l.objectTypes[0][f.family_index].name;
+			}
             //l.print("(" + f.family_index + ") " + f.name + " - " + offset);
             int stateIndex = 0;
             f.states = LinkedList<State>.Read(ref reader, Pointer.Current(reader), (off_element) => {
@@ -78,8 +86,12 @@ namespace OpenSpace.Object.Properties {
                 // (0x10 blocks: next, prev, list end, a3d pointer)
                 f.preloadAnim = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             }
-            f.off_physical_list_default = Pointer.Read(reader); // Default objects table
-            f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader));
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+			} else {
+				f.off_physical_list_default = Pointer.Read(reader); // Default objects table
+				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader));
+			}
             if (f.objectLists.off_head == f.objectLists.off_tail && f.objectLists.Count > 1) f.objectLists.Count = 1; // Correction for Rayman 2
             f.off_bounding_volume = Pointer.Read(reader);
             if (Settings.s.game == Settings.Game.R3) {
@@ -107,10 +119,11 @@ namespace OpenSpace.Object.Properties {
             //l.print(f.name + " - Anim bank: " + f.animBank + " - id: " + l.objectTypes[0][f.family_index].id);
             f.objectLists.ReadEntries(ref reader, (off_list) => {
                 ObjectList ol = ObjectList.FromOffsetOrRead(off_list, reader);
-                if (ol.containingFamilies.Count == 0) {
+				f.AddNewPhysicalList(ol, alreadyAdded: true);
+                /*if (ol.containingFamilies.Count == 0) {
                     ol.Gao.transform.SetParent(f.Gao.transform);
                 }
-                if(!ol.containingFamilies.Contains(f)) ol.containingFamilies.Add(f);
+                if(!ol.containingFamilies.Contains(f)) ol.containingFamilies.Add(f);*/
                 return ol;
             });
 

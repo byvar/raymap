@@ -67,6 +67,7 @@ namespace OpenSpace.Object.Properties {
 
         public static ObjectList Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
+			//l.print("ObjectList " + offset);
             ObjectList ol = new ObjectList(offset);
             if(Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Read(reader);
             if (Settings.s.hasLinkedListHeaderPointers) {
@@ -182,11 +183,11 @@ namespace OpenSpace.Object.Properties {
             ObjectList brother = FindBrother();
             if (brother != null && brother.containingFamilies.Count > 0) {
                 Family f = brother.containingFamilies.First();
-                foreach (ObjectListEntry ole in this) {
+				/*foreach (ObjectListEntry ole in this) {
                     if (ole.po != null && ole.po.Gao != null) {
                         ole.po.Gao.transform.SetParent(f.Gao.transform);
                     }
-                }
+                }*/
                 foreach (Family fam in brother.containingFamilies) {
                     fam.AddNewPhysicalList(this);
                 }

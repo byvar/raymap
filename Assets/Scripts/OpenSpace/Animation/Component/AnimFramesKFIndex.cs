@@ -12,7 +12,9 @@ namespace OpenSpace.Animation.Component {
 
         public static AnimFramesKFIndex Read(Reader reader) {
             AnimFramesKFIndex kfi = new AnimFramesKFIndex();
-            if (Settings.s.engineVersion == Settings.EngineVersion.TT || Settings.s.game == Settings.Game.R2Demo) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.TT || 
+				Settings.s.game == Settings.Game.R2Demo || 
+				Settings.s.game == Settings.Game.R2Revolution) {
                 kfi.kf = reader.ReadUInt16();
             } else {
                 kfi.kf = reader.ReadUInt32();
@@ -22,7 +24,9 @@ namespace OpenSpace.Animation.Component {
 
         public static int Size {
             get {
-                if (Settings.s.engineVersion == Settings.EngineVersion.TT || Settings.s.game == Settings.Game.R2Demo) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.TT || 
+					Settings.s.game == Settings.Game.R2Demo ||
+					Settings.s.game == Settings.Game.R2Revolution) {
                     return 2;
                 } else return 4;
             }
@@ -30,11 +34,14 @@ namespace OpenSpace.Animation.Component {
 
         public static bool Aligned {
             get {
-                if (Settings.s.engineVersion > Settings.EngineVersion.TT && Settings.s.game != Settings.Game.R2Demo) {
-                    return true;
-                } else {
-                    return false;
-                }
+
+				if (Settings.s.engineVersion == Settings.EngineVersion.TT ||
+					Settings.s.game == Settings.Game.R2Demo ||
+					Settings.s.game == Settings.Game.R2Revolution) {
+					return false;
+				} else {
+					return true;
+				}
             }
         }
     }

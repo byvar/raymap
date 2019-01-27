@@ -17,9 +17,15 @@ using OpenSpace.Object.Properties;
 using System.Collections;
 using System.Text.RegularExpressions;
 using OpenSpace.FileFormat.RenderWare;
+using System.Text;
 
 namespace OpenSpace.Loader {
     public class R2PS2Loader : MapLoader {
+		public List<TextureDictionary> txds = new List<TextureDictionary>();
+		public MeshFile ato;
+		public uint meshesRead = 0;
+		public Pointer[] off_lightmapUV;
+
         public override IEnumerator Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
@@ -53,9 +59,23 @@ namespace OpenSpace.Loader {
 				foreach (KeyValuePair<string, string> path in paths) {
 					if (path.Value != null) yield return controller.StartCoroutine(PrepareFile(path.Value));
 				}
+				
+				txds.Add(new TextureDictionary(paths["lvl.rw3.0"]));
+				if (FileSystem.FileExists(paths["lvl.lm3.0"])) {
+					txds.Add(new TextureDictionary(paths["lvl.lm3.0"]));
+				}
+				if (FileSystem.FileExists(paths["lvl.lm3.1"])) {
+					txds.Add(new TextureDictionary(paths["lvl.lm3.1"]));
+				}
+				ato = new MeshFile(paths["lvl.ato.0"]);
 
-				TextureDictionary rw3 = new TextureDictionary(paths["lvl.rw3.0"]);
-				MeshFile ato = new MeshFile(paths["lvl.ato.0"]);
+				LVL fix = new LVL(lvlName, paths["fix.lv2"], 0);
+				LVL lvl = new LVL(lvlName, paths["lvl.lv2"], 1);
+				files_array[0] = fix;
+				files_array[1] = lvl;
+				fix.ReadPTR(paths["fix.pt2"]);
+				lvl.ReadPTR(paths["lvl.pt2"]);
+				yield return controller.StartCoroutine(LoadPS2());
 				//TextureDictionary lm30 = new TextureDictionary(paths["lvl.lm3.0"]);
 
 				// FIX
@@ -100,8 +120,8 @@ namespace OpenSpace.Loader {
             InitModdables();
         }
 
-        #region Dreamcast
-        public IEnumerator LoadDreamcast() {
+        #region PS2
+        public IEnumerator LoadPS2() {
             textures = new TextureInfo[0];
 
             loadingState = "Loading fixed memory";
@@ -109,7 +129,7 @@ namespace OpenSpace.Loader {
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
             Pointer off_base_fix = Pointer.Current(reader);
-            uint base_language = reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
+            /*uint base_language = reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
             reader.ReadUInt32();
             uint num_text_language = reader.ReadUInt32();
             reader.ReadUInt16();
@@ -199,104 +219,135 @@ namespace OpenSpace.Loader {
                         textures[i].Texture = tex.textures[i];
                     }
                 }
-            });
+            });*/
             loadingState = "Loading level memory";
             yield return null;
             files_array[Mem.Lvl].GotoHeader();
             reader = files_array[Mem.Lvl].reader;
-
-            // Animation stuff
-            Pointer off_animationBank = Pointer.Current(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            reader.ReadUInt32();
-            Pointer.Read(reader);
+			string build = reader.ReadString(0x20);
+			reader.ReadUInt32();
+			reader.ReadUInt32(); // 0xc
+			reader.ReadUInt32(); // 0
+			Pointer.Read(reader);
+			Pointer.Read(reader);
 
             // Globals
             globals.off_actualWorld = Pointer.Read(reader);
             globals.off_dynamicWorld = Pointer.Read(reader);
-            globals.off_inactiveDynamicWorld = Pointer.Read(reader);
             globals.off_fatherSector = Pointer.Read(reader);
-            reader.ReadUInt32();
-            Pointer off_always = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_always, () => {
-                globals.num_always = reader.ReadUInt32();
-                globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-                globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
-                globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-            });
-            Pointer.Read(reader);
-            Pointer off_objectTypes = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_objectTypes, () => {
-                // Fill in pointers for the object type tables and read them
-                objectTypes = new ObjectType[3][];
-                for (uint i = 0; i < 3; i++) {
-                    Pointer off_names_header = Pointer.Current(reader);
-                    Pointer off_names_first = Pointer.Read(reader);
-                    Pointer off_names_last = Pointer.Read(reader);
-                    uint num_names = reader.ReadUInt32();
+            globals.num_always = reader.ReadUInt32();
+            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+			//globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
+			Pointer.Read(reader); // format: (0x4 number, number * 0x4: null)
+			globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+			Pointer.Read(reader);
+			Pointer.Read(reader);
+			Pointer.Read(reader);
+			Pointer.Read(reader);
+			Pointer.Read(reader);
 
-                    FillLinkedListPointers(reader, off_names_last, off_names_header);
-                    ReadObjectNamesTable(reader, off_names_first, num_names, i);
-                }
-            });
-            Pointer.Read(reader);
-            Pointer off_mainChar = Pointer.Read(reader);
-            reader.ReadUInt32();
-            uint num_persoInFixPointers = reader.ReadUInt32();
-            Pointer off_persoInFixPointers = Pointer.Read(reader);
-
-            //Pointer[] persoInFixPointers = new Pointer[num_persoInFixPointers];
-            Pointer.DoAt(ref reader, off_persoInFixPointers, () => {
-                for (int i = 0; i < num_persoInFixPointers; i++) {
-                    Pointer off_perso = Pointer.Read(reader);
-                    Pointer off_so = Pointer.Read(reader);
-                    byte[] unk = reader.ReadBytes(4);
-                    Pointer off_matrix = Pointer.Current(reader); // It's better to change the pointer instead of the data as that is reused in some places
-                    byte[] matrixData = reader.ReadBytes(0x68);
-                    byte[] soFlags = reader.ReadBytes(4);
-                    byte[] brothersAndParent = reader.ReadBytes(12);
-
-                    Pointer.DoAt(ref reader, off_perso, () => {
-                        reader.ReadUInt32();
-                        Pointer off_stdGame = Pointer.Read(reader);
-                        if (off_stdGame != null && off_so != null) {
-                            ((DCDAT)off_stdGame.file).OverwriteData(off_stdGame.FileOffset + 0xC, off_so.offset);
-                        }
-                    });
-                    if (off_so != null) {
-                        ((DCDAT)off_so.file).OverwriteData(off_so.FileOffset + 0x14, brothersAndParent);
-                        ((DCDAT)off_so.file).OverwriteData(off_so.FileOffset + 0x20, off_matrix.offset);
-                        ((DCDAT)off_so.file).OverwriteData(off_so.FileOffset + 0x30, soFlags);
-                    }
-                }
-            });
-
-            yield return null;
-            Pointer.Read(reader); // contains a pointer to the camera SO
-            Pointer off_cameras = Pointer.Read(reader); // Double linkedlist of cameras
-            Pointer off_families = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_families, () => {
-                families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
-                families.FillPointers(reader, families.off_tail, families.off_head);
-            });
-            Pointer.Read(reader); // At this pointer: a double linkedlist of fix perso's with headers (soptr, next, prev, hdr)
+			LinkedList<Perso> cameras = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+			families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+			LinkedList<Perso> mainChars = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
             Pointer.Read(reader); // Rayman
             reader.ReadUInt32();
-            Pointer.Read(reader); // Camera
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            globals.off_camera = Pointer.Read(reader); // Camera
+			Pointer.Read(reader);
+			Pointer.Read(reader);
+			Pointer.Read(reader);
 
-            loadingState = "Loading level textures";
+			uint numMeshes = (uint)files_array[Mem.Lvl].extraData["numMeshes"];
+			uint numMaterials = (uint)files_array[Mem.Lvl].extraData["numMaterials"];
+			uint numTextures = (uint)files_array[Mem.Lvl].extraData["numTextures"];
+			uint numLightmappedObjects = (uint)files_array[Mem.Lvl].extraData["numLightmappedObjects"];
+			//print("numTextures " + numTextures + " - " + txds[0].Count + " - " + numMeshes + " - " + ato.numAtomics + " - " + numLightmappedObjects);
+
+
+			textures = new TextureInfo[numTextures];
+			Pointer[] off_meshes = new Pointer[numMeshes];
+			Pointer[] off_materials = new Pointer[numMaterials];
+			for (int i = 0; i < numMeshes; i++) {
+				off_meshes[i] = Pointer.Read(reader);
+			}
+			for (int i = 0; i < numMaterials; i++) {
+				off_materials[i] = Pointer.Read(reader);
+			}
+			for (int i = 0; i < numTextures; i++) {
+				Pointer off_textureInfo = Pointer.Read(reader);
+				int texture_index = reader.ReadInt32();
+				Pointer.DoAt(ref reader, off_textureInfo, () => {
+					textures[i] = TextureInfo.Read(reader, off_textureInfo);
+					textures[i].Texture = txds[0].Lookup(texture_index.ToString("D3"));
+					//textures[i].Texture = txds[0].textures[txds[0].Count - 1 - texture_index];
+				});
+			}
+			Pointer.Read(reader);
+			reader.ReadUInt32();
+			reader.ReadUInt32();
+			Pointer.Read(reader);
+			uint num_unk = reader.ReadUInt32();
+			for (int i = 0; i < num_unk; i++) {
+				Pointer.Read(reader);
+			}
+			uint num_unk2 = reader.ReadUInt32();
+			for (int i = 0; i < num_unk2; i++) {
+				Pointer.Read(reader);
+			}
+			Pointer.Read(reader);
+			reader.ReadSingle(); // a bounding volume most likely
+			reader.ReadSingle();
+			reader.ReadSingle();
+			reader.ReadSingle();
+			reader.ReadSingle();
+			reader.ReadSingle();
+			Pointer.Read(reader);
+			reader.ReadUInt32(); // 2?
+			uint num_poTable = reader.ReadUInt32();
+			Pointer off_poTable = Pointer.Read(reader);
+			reader.ReadUInt32(); // 1. 10x 0
+			reader.ReadUInt32(); // 2
+			reader.ReadUInt32(); // 3
+			reader.ReadUInt32(); // 4
+			reader.ReadUInt32(); // 5
+			reader.ReadUInt32(); // 6
+			reader.ReadUInt32(); // 7
+			reader.ReadUInt32(); // 8
+			reader.ReadUInt32(); // 9
+			reader.ReadUInt32(); // 10
+			uint num_unk3 = reader.ReadUInt32();
+			for (int i = 0; i < num_unk3; i++) {
+				reader.ReadBytes(0x20);
+			}
+			for (int i = 0; i < num_unk3; i++) {
+				reader.ReadByte();
+			}
+			reader.Align(0x4);
+			Pointer off_lmMaterial = Pointer.Read(reader);
+			off_lightmapUV = new Pointer[numLightmappedObjects];
+			for (int i = 0; i < numLightmappedObjects; i++) {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				off_lightmapUV[i] = Pointer.Read(reader);
+			}
+
+
+
+			for (int i = 0; i < numMaterials; i++) {
+				Pointer.DoAt(ref reader, off_materials[i], () => {
+					visualMaterials.Add(VisualMaterial.Read(reader, off_materials[i]));
+				});
+			}
+			for (int i = 0; i < numMeshes; i++) {
+				Pointer.DoAt(ref reader, off_meshes[i], () => {
+					MeshObject mesh = MeshObject.Read(reader, off_meshes[i]);
+					meshObjects.Add(mesh);
+					//print("Mesh " + i + ": " + mesh.num_vertices + " - " + mesh.subblock_types[0] + " - " + mesh.num_subblocks);
+				});
+			}
+
+
+			/*loadingState = "Loading level textures";
             yield return null;
             uint num_textures_lvl = reader.ReadUInt32();
             uint num_textures_total = num_textures_fix + num_textures_lvl;
@@ -316,18 +367,19 @@ namespace OpenSpace.Loader {
                         textures[num_textures_fix + i].Texture = tex.textures[i];
                     }
                 }
-            });
+            });*/
 
-            loadingState = "Loading families";
+			loadingState = "Loading families";
             yield return null;
             ReadFamilies(reader);
-            loadingState = "Loading animation banks";
+			//print("Families: " + families.Count);
+            /*loadingState = "Loading animation banks";
             yield return null;
             Pointer.DoAt(ref reader, off_animationBank, () => {
                 animationBanks = new AnimationBank[2];
                 animationBanks[0] = AnimationBank.ReadDreamcast(reader, off_animationBank, off_events_fix, num_events_fix);
                 animationBanks[1] = animationBanks[0];
-            });
+            });*/
             loadingState = "Loading superobject hierarchy";
             yield return null;
             ReadSuperObjects(reader);
@@ -339,8 +391,8 @@ namespace OpenSpace.Loader {
             ReadCrossReferences(reader);
 			loadingState = "Loading behavior copies";
 			yield return null;
-			ReadBehaviorCopies(reader);
-			yield return null;
+			/*ReadBehaviorCopies(reader);
+			yield return null;*/
             // Parse transformation matrices and other settings for fix characters
             /*if (off_mainChar != null && off_matrix_mainChar != null) {
                 SuperObject so = SuperObject.FromOffset(off_mainChar);
@@ -368,164 +420,18 @@ namespace OpenSpace.Loader {
                 });
             }*/
         }
-        #endregion
-
-        private void ReadLog(Stream logStream) {
-            string logPattern = @"^0x(?<offset>[a-fA-F0-9]+?) : \((?<type>[^\)]+?)\)(?<name>.*?)    0x(?<offset2>[a-fA-F0-9]+?)$";
-			string comportNamePattern = @"^(?<family>[^\\]+?)\\(?<model>[^\\]+?)\\(?<model2>[^\\]+?)\.(?<type>...?)\^.*$";
-			DCDAT file = files_array[0] as DCDAT;
-            using (StreamReader sr = new StreamReader(logStream)) {
-                while (sr.Peek() >= 0) {
-                    string line = sr.ReadLine().Trim();
-                    Match logMatch = Regex.Match(line, logPattern, RegexOptions.IgnoreCase);
-                    if (logMatch.Success) {
-                        string offsetStr = logMatch.Groups["offset"].Value;
-                        string type = logMatch.Groups["type"].Value;
-                        string name = logMatch.Groups["name"].Value;
-                        string offset2Str = logMatch.Groups["offset2"].Value;
-                        if (offsetStr.Length < 8) offsetStr = new String('0', offsetStr.Length - 8) + offsetStr;
-                        uint offsetUint = Convert.ToUInt32(offsetStr, 16);
-                        Pointer offset = file.GetUnsafePointer(offsetUint);
-                        switch (type) {
-                            case "eST_Comport":
-                                Behavior b = Behavior.FromOffset(offset);
-								if (b == null) {
-									Match comportMatch = Regex.Match(name, comportNamePattern, RegexOptions.IgnoreCase);
-									if (comportMatch.Success) {
-										string modelName = comportMatch.Groups["model"].Value;
-										AIModel aiModel = aiModels.FirstOrDefault(ai => ai.name == modelName);
-										Reader reader = files_array[Mem.Fix].reader;
-										Pointer.DoAt(ref reader, offset, () => {
-											Behavior newB = Behavior.Read(reader, offset);
-											if (aiModel != null && newB != null) {
-												switch (comportMatch.Groups["type"].Value) {
-													case "rul":
-														foreach (Behavior originalBehavior in aiModel.behaviors_normal) {
-															if (newB.ContentEquals(originalBehavior)) {
-																originalBehavior.copies.Add(newB.offset);
-																b = originalBehavior;
-																break;
-															}
-														}
-														break;
-													case "rfx":
-														foreach (Behavior originalBehavior in aiModel.behaviors_reflex) {
-															if (newB.ContentEquals(originalBehavior)) {
-																originalBehavior.copies.Add(newB.offset);
-																b = originalBehavior;
-																break;
-															}
-														}
-														break;
-												}
-											}
-										});
-									}
-								}
-                                if (b != null) b.name = name;
-                                /*if (name.Contains("piranha\\MIC_PiranhaSauteurVisible\\MIC_PiranhaSauteurVisible")) {
-                                    print("Offset: " + offset + " - " + b);
-                                }*/
-                                break;
-                            case "eST_State":
-                                State state = State.FromOffset(offset);
-                                if (state != null) state.name = name;
-                                break;
-                            case "eST_Anim3d":
-                                AnimationReference ar = AnimationReference.FromOffset(offset);
-                                if (ar != null) ar.name = name;
-                                break;
-                            case "eST_Graph":
-                                Graph g = Graph.FromOffset(offset);
-                                if (g != null) g.name = name;
-                                break;
-                            case "eST_Sector":
-                                Sector s = Sector.FromOffset(offset);
-                                if (s != null) {
-                                    s.name = name;
-                                    s.Gao.name = name;
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
-		#region Behavior copies
-		private void ReadBehaviorCopies(Reader reader) {
-			// DC has loose behaviors that are copies of existing behaviors
-			foreach (AIModel ai in aiModels) {
-				if (ai.behaviors_normal != null) {
-					for (int i = 0; i < ai.behaviors_normal.Length; i++) {
-						if (ai.behaviors_normal[i].scripts != null) {
-							for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
-								List<ScriptNode> nodes = ai.behaviors_normal[i].scripts[j].scriptNodes;
-								foreach (ScriptNode node in nodes) {
-									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
-										Behavior b = Behavior.FromOffset(node.param_ptr);
-										if (b == null) {
-											Pointer.DoAt(ref reader, node.param_ptr, () => {
-												ReadBehaviorCopy(reader, node.param_ptr, ai);
-											});
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				if (ai.behaviors_reflex != null) {
-					for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
-						if (ai.behaviors_reflex[i].scripts != null) {
-							for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
-								List<ScriptNode> nodes = ai.behaviors_reflex[i].scripts[j].scriptNodes;
-								foreach (ScriptNode node in nodes) {
-									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
-										Behavior b = Behavior.FromOffset(node.param_ptr);
-										if (b == null) {
-											Pointer.DoAt(ref reader, node.param_ptr, () => {
-												ReadBehaviorCopy(reader, node.param_ptr, ai);
-											});
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		private void ReadBehaviorCopy(Reader reader, Pointer offset, AIModel ai) {
-			Behavior b = Behavior.Read(reader, offset);
-			if (b != null && ai != null && ai.behaviors_normal != null) {
-				foreach (Behavior originalBehavior in ai.behaviors_normal) {
-					if (b.ContentEquals(originalBehavior)) {
-						originalBehavior.copies.Add(b.offset);
-						b = null;
-						break;
-					}
-				}
-			}
-			if (b != null && ai != null && ai.behaviors_reflex != null) {
-				foreach (Behavior originalBehavior in ai.behaviors_reflex) {
-					if (b.ContentEquals(originalBehavior)) {
-						originalBehavior.copies.Add(b.offset);
-						b = null;
-						break;
-					}
-				}
-			}
-			if (b != null && behaviors != null) {
-				foreach (Behavior originalBehavior in behaviors) {
-					if (b.ContentEquals(originalBehavior)) {
-						originalBehavior.copies.Add(b.offset);
-						b = null;
-						break;
-					}
-				}
-			}
-		}
 		#endregion
+
+		public Texture2D GetLightmap(string name) {
+			for (int i = 1; i < txds.Count; i++) {
+				Texture2D tex = txds[i].Lookup(name);
+				if (tex != null) {
+					tex.filterMode = FilterMode.Bilinear;
+					tex.wrapMode = TextureWrapMode.Clamp;
+					return tex;
+				}
+			}
+			return null;
+		}
 	}
 }

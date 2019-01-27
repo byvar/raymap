@@ -109,6 +109,7 @@ public class WebCommunicator : MonoBehaviour {
 		settingsJSON["viewGraphs"] = controller.viewGraphs;
 		settingsJSON["viewInvisible"] = controller.viewInvisible;
 		settingsJSON["enableLighting"] = controller.lightManager.enableLighting;
+		settingsJSON["enableFog"] = controller.lightManager.enableFog;
 		settingsJSON["luminosity"] = controller.lightManager.luminosity;
         settingsJSON["saturate"] = controller.lightManager.saturate;
         settingsJSON["displayInactive"] = controller.sectorManager.displayInactiveSectors;
@@ -451,7 +452,8 @@ public class WebCommunicator : MonoBehaviour {
         if (msg["saturate"] != null) controller.lightManager.saturate = msg["saturate"].AsBool;
         if (msg["viewGraphs"] != null) controller.viewGraphs = msg["viewGraphs"].AsBool;
         if (msg["enableLighting"] != null) controller.lightManager.enableLighting = msg["enableLighting"].AsBool;
-        if (msg["viewInvisible"] != null) controller.viewInvisible = msg["viewInvisible"].AsBool;
+		if (msg["enableFog"] != null) controller.lightManager.enableFog = msg["enableFog"].AsBool;
+		if (msg["viewInvisible"] != null) controller.viewInvisible = msg["viewInvisible"].AsBool;
         if (msg["displayInactive"] != null) controller.sectorManager.displayInactiveSectors = msg["displayInactive"].AsBool;
 		if (msg["playAnimations"] != null) controller.playAnimations = msg["playAnimations"].AsBool;
 		if (msg["playTextureAnimations"] != null) controller.playTextureAnimations = msg["playTextureAnimations"].AsBool;

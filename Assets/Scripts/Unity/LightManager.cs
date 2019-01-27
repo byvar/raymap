@@ -24,10 +24,10 @@ public class LightManager : MonoBehaviour {
     private bool _saturate = true;
     public bool useDefaultSettings = true;
 
-    public bool enableLighting = true;
-    private bool _enableLighting = true;
+    public bool enableLighting = true; private bool _enableLighting = true;
+	public bool enableFog = true; private bool _enableFog = true;
 
-    public bool IsLoaded {
+	public bool IsLoaded {
         get { return loaded; }
     }
 
@@ -52,12 +52,20 @@ public class LightManager : MonoBehaviour {
             if (Input.GetKeyDown(KeyCode.L)) {
                 enableLighting = !enableLighting;
 			}
+			if (Input.GetKeyDown(KeyCode.F)) {
+				enableFog = !enableFog;
+			}
 			if (_enableLighting != enableLighting) {
 				_enableLighting = enableLighting;
                 Shader.SetGlobalFloat("_DisableLighting", enableLighting ? 0f : 1f);
 				controller.communicator.SendSettings();
 			}
-            if (_luminosity != luminosity) {
+			if (_enableFog != enableFog) {
+				_enableFog = enableFog;
+				Shader.SetGlobalFloat("_DisableFog", enableFog ? 0f : 1f);
+				controller.communicator.SendSettings();
+			}
+			if (_luminosity != luminosity) {
                 _luminosity = luminosity;
                 Shader.SetGlobalFloat("_Luminosity", luminosity);
             }

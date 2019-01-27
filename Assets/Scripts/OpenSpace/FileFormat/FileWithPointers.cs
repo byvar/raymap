@@ -11,6 +11,7 @@ namespace OpenSpace.FileFormat {
         public Reader reader;
         public Writer writer;
         public Dictionary<uint, Pointer> pointers = new Dictionary<uint, Pointer>();
+		public Dictionary<string, object> extraData = new Dictionary<string, object>();
         public long baseOffset; // Base offset within file
         public long headerOffset = 0;
         public bool allowUnsafePointers = false;

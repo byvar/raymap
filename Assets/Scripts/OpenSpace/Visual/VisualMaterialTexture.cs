@@ -21,6 +21,10 @@ namespace OpenSpace.Visual {
         6: LM
         7: Overlight
 
+		Custom for Renderware support:
+		50 = lightmap r
+		51 = lightmap g
+		52 = lightmap b
         */
 
 

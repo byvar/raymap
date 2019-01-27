@@ -55,7 +55,19 @@ namespace OpenSpace.Visual {
             None = 0,
             Environment = 1,
             Perso = 2
-        };
+        }
+
+		public enum LightType {
+			Unknown = 0,
+			Parallel = 1,
+			Spherical = 2,
+			Hotspot = 3, // R2: Cone
+			Ambient = 4,
+			ParallelOtherType = 5, // also seems to be the one with exterMinPos & exterMaxPos, so not spherical
+			Fog = 6, // Also background color
+			ParallelInASphere = 7,
+			SphereOtherType = 8 // ignores persos?
+		}
 
         private LightBehaviour light;
         public LightBehaviour Light {
@@ -136,39 +148,43 @@ namespace OpenSpace.Visual {
             LightInfo l = new LightInfo(offset);
             l.turnedOn = reader.ReadByte();
             l.castShadows = reader.ReadByte();
-            l.giroPhare = reader.ReadByte();
-            l.pulse = reader.ReadByte();
-            if(Settings.s.platform != Settings.Platform.DC) reader.ReadUInt32();
-            l.type = reader.ReadUInt16();
-            reader.ReadUInt16();
-            l.far = reader.ReadSingle();
-            l.near = reader.ReadSingle();
-            l.littleAlpha_fogInfinite = reader.ReadSingle();
-            l.bigAlpha_fogBlendNear = reader.ReadSingle();
-            l.giroStep = reader.ReadSingle();
-            l.pulseStep = reader.ReadSingle();
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                l.pulseMaxRange = reader.ReadSingle();
-                l.giroAngle = reader.ReadSingle();
-                reader.ReadSingle();
-            }
-            if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
-            l.transMatrix = Matrix.Read(reader, Pointer.Current(reader));
-            if (Settings.s.platform != Settings.Platform.DC) {
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				l.type = reader.ReadUInt16();
+			} else {
+				l.giroPhare = reader.ReadByte();
+				l.pulse = reader.ReadByte();
+				if (Settings.s.platform != Settings.Platform.DC) reader.ReadUInt32();
+				l.type = reader.ReadUInt16();
+				reader.ReadUInt16();
+			}
+			l.far = reader.ReadSingle();
+			l.near = reader.ReadSingle();
+			l.littleAlpha_fogInfinite = reader.ReadSingle();
+			l.bigAlpha_fogBlendNear = reader.ReadSingle();
+			l.giroStep = reader.ReadSingle();
+			l.pulseStep = reader.ReadSingle();
+			if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+				l.pulseMaxRange = reader.ReadSingle();
+				l.giroAngle = reader.ReadSingle();
+				reader.ReadSingle();
+			}
+			if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
+			l.transMatrix = Matrix.Read(reader, Pointer.Current(reader));
+			if (Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.R2Revolution) {
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
             }
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
-                if (Settings.s.platform != Settings.Platform.DC) {
-                    reader.ReadUInt32(); // 0
-                    reader.ReadUInt32(); // 0
-                } else {
-                    reader.ReadSingle();
-                }
+                if (Settings.s.platform == Settings.Platform.DC) {
+					reader.ReadSingle();
+                } else if(Settings.s.game != Settings.Game.R2Revolution) {
+					reader.ReadUInt32(); // 0
+					reader.ReadUInt32(); // 0
+				}
                 l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                     l.shadowIntensity = reader.ReadSingle(); // 0
                 }
                 l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
@@ -184,7 +200,9 @@ namespace OpenSpace.Visual {
                 l.intensityMin_fogBlendFar = reader.ReadSingle();
                 l.intensityMax = reader.ReadSingle();
                 l.background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3) l.createsShadowsOrNot = reader.ReadUInt32();
+				if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
+					l.createsShadowsOrNot = reader.ReadUInt32();
+				}
             } else {
                 l.paintingLightFlag = (byte)reader.ReadUInt32();
                 reader.ReadUInt32();

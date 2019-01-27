@@ -32,15 +32,52 @@ namespace OpenSpace.FileFormat {
                     reader.BaseStream.Seek(ptr_ptr + baseOffset, SeekOrigin.Begin);
                     uint ptr = reader.ReadUInt32();
                     pointers[ptr_ptr] = new Pointer(ptr, GetFileWithID(file));
-                }
-                long num_fillInPtrs = (totalSize - ptrStream.Position) / 16;
-                for (uint j = 0; j < num_fillInPtrs; j++) {
-                    uint ptr_ptr = ptrReader.ReadUInt32(); // the address the pointer should be located at
-                    int src_file = ptrReader.ReadInt32(); // the file the pointer should be located in
-                    uint ptr = ptrReader.ReadUInt32();
-                    int target_file = ptrReader.ReadInt32();
-                    GetFileWithID(src_file).pointers[ptr_ptr] = new Pointer(ptr, GetFileWithID(target_file)); // can overwrite if necessary
-                }
+				}
+				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+					// Revolution
+					ushort num_specialBlocks = ptrReader.ReadUInt16();
+					for (uint j = 0; j < num_specialBlocks; j++) {
+						ptrReader.ReadUInt16();
+					}
+					extraData["numLevels"] = ptrReader.ReadByte();
+					if (fileID == MapLoader.Mem.Fix) {
+						// Level list
+						string[] levels = new string[(byte)extraData["numLevels"]];
+						for (int i = 0; i < levels.Length; i++) {
+							levels[i] = ptrReader.ReadString(0x1E);
+						}
+						extraData["levels"] = levels;
+					} else if(fileID == MapLoader.Mem.Lvl) {
+						// Level data
+						ptrReader.ReadByte();
+						ptrReader.ReadUInt32();
+						ptrReader.ReadUInt32();
+						ptrReader.ReadUInt32();
+						extraData["numMeshes"] = ptrReader.ReadUInt32();
+						extraData["numMaterials"] = ptrReader.ReadUInt32();
+						extraData["numTextures"] = ptrReader.ReadUInt32();
+						ptrReader.ReadUInt32();
+						ptrReader.ReadUInt32();
+						extraData["levelIndex"] = ptrReader.ReadUInt32();
+						uint num_specialPtrs = ptrReader.ReadUInt32();
+						for (uint j = 0; j < num_specialPtrs; j++) {
+							ptrReader.ReadUInt32(); // points to a struct of size 0x4 that looks like { 0600 3E00 }
+						}
+						ptrReader.ReadUInt32();
+						extraData["numLightmappedObjects"] = ptrReader.ReadUInt32();
+					}
+					ptrReader.ReadByte();
+				} else {
+					// Rayman 3
+					long num_fillInPtrs = (totalSize - ptrStream.Position) / 16;
+					for (uint j = 0; j < num_fillInPtrs; j++) {
+						uint ptr_ptr = ptrReader.ReadUInt32(); // the address the pointer should be located at
+						int src_file = ptrReader.ReadInt32(); // the file the pointer should be located in
+						uint ptr = ptrReader.ReadUInt32();
+						int target_file = ptrReader.ReadInt32();
+						GetFileWithID(src_file).pointers[ptr_ptr] = new Pointer(ptr, GetFileWithID(target_file)); // can overwrite if necessary
+					}
+				}
             }
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
             ptrStream.Close();

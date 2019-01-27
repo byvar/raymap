@@ -49,7 +49,7 @@ namespace OpenSpace.AI {
 			//if (m.name != null) l.print(m.name);
 
 			Pointer.DoAt(ref reader, m.off_script, () => {
-				m.script = Script.Read(reader, Pointer.Current(reader), m);
+				m.script = Script.Read(reader, Pointer.Current(reader), m, single: true);
 			});
                 
             return m;

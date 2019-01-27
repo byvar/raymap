@@ -66,40 +66,40 @@ namespace OpenSpace.Visual {
             set {
                 texture = value;
                 if (texture != null) {
-                    if (!IsRepeatU) {
-                        texture.wrapModeU = TextureWrapMode.Clamp;
-                    }
-                    if (!IsRepeatV) {
-                        texture.wrapModeV = TextureWrapMode.Clamp;
-                    }
-                    if (IsMirrorX) {
-                        texture.wrapModeU = TextureWrapMode.Mirror;
-                    }
-                    if (IsMirrorY) {
-                        if (Settings.s.platform == Settings.Platform.DC) {
-                            Texture2D flipped = new Texture2D(texture.width, texture.height);
+					if (!IsRepeatU) {
+						texture.wrapModeU = TextureWrapMode.Clamp;
+					}
+					if (!IsRepeatV) {
+						texture.wrapModeV = TextureWrapMode.Clamp;
+					}
+					if (IsMirrorX && Settings.s.game != Settings.Game.R2Revolution) {
+						texture.wrapModeU = TextureWrapMode.Mirror;
+					}
+					if (IsMirrorY && Settings.s.game != Settings.Game.R2Revolution) {
+						if (Settings.s.platform == Settings.Platform.DC) {
+							Texture2D flipped = new Texture2D(texture.width, texture.height);
 
-                            int w = texture.width;
-                            int h = texture.height;
+							int w = texture.width;
+							int h = texture.height;
 
 
-                            for (int x = 0; x < w; x++) {
-                                for (int y = 0; y < h; y++) {
-                                    flipped.SetPixel(x, h - y - 1, texture.GetPixel(x, y));
-                                }
-                            }
-                            flipped.Apply();
-                            texture = flipped;
+							for (int x = 0; x < w; x++) {
+								for (int y = 0; y < h; y++) {
+									flipped.SetPixel(x, h - y - 1, texture.GetPixel(x, y));
+								}
+							}
+							flipped.Apply();
+							texture = flipped;
 
-                            if (!IsRepeatU) {
-                                texture.wrapModeU = TextureWrapMode.Clamp;
-                            }
-                            if (IsMirrorX) {
-                                texture.wrapModeU = TextureWrapMode.Mirror;
-                            }
-                        }
-                        texture.wrapModeV = TextureWrapMode.Mirror;
-                    }
+							if (!IsRepeatU) {
+								texture.wrapModeU = TextureWrapMode.Clamp;
+							}
+							if (IsMirrorX) {
+								texture.wrapModeU = TextureWrapMode.Mirror;
+							}
+						}
+						texture.wrapModeV = TextureWrapMode.Mirror;
+					}
                     if ((flags & 0x902) != 0 && Settings.s.engineVersion < Settings.EngineVersion.R3) {
                         byte[] alphaMaskBytes = BitConverter.GetBytes(alphaMask);
                         SetTextureAlpha(alphaMaskBytes[0] / 255f, alphaMaskBytes[1] / 255f, alphaMaskBytes[2] / 255f);
@@ -178,7 +178,20 @@ namespace OpenSpace.Visual {
         public static TextureInfo Read(Reader reader, Pointer offset) {
             TextureInfo tex = new TextureInfo(offset);
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                if (Settings.s.platform == Settings.Platform.DC) {
+				if (Settings.s.game == Settings.Game.R2Revolution) {
+					reader.ReadUInt32();
+					tex.flags = reader.ReadUInt16();
+					tex.flagsByte = reader.ReadByte();
+					reader.ReadByte();
+					tex.height_ = reader.ReadUInt16();
+					tex.width_ = reader.ReadUInt16();
+					tex.height = reader.ReadUInt16();
+					tex.width = reader.ReadUInt16();
+					reader.ReadByte();
+					reader.ReadByte();
+					reader.ReadByte();
+					reader.ReadByte();
+				} else if (Settings.s.platform == Settings.Platform.DC) {
                     reader.ReadUInt32();
                     tex.flags = reader.ReadUInt32();
                     reader.ReadUInt32();

@@ -14,7 +14,8 @@ namespace OpenSpace.Object {
             IPO,
             IPO_2,
             Perso,
-            Sector
+            Sector,
+			PO
         }
 
         public Pointer offset;
@@ -101,7 +102,11 @@ namespace OpenSpace.Object {
                     Pointer.Goto(ref reader, so.off_data);
                     so.data = IPO.Read(reader, so.off_data, so);
                     break;
-                case Type.Perso:
+				case Type.PO:
+					Pointer.Goto(ref reader, so.off_data);
+					so.data = PhysicalObject.Read(reader, so.off_data, so);
+					break;
+				case Type.Perso:
                     Pointer.Goto(ref reader, so.off_data);
                     so.data = Perso.Read(reader, so.off_data, so);
                     break;
@@ -187,6 +192,7 @@ namespace OpenSpace.Object {
                     case 0x1: type = Type.World; break;
                     case 0x2: type = Type.Perso; break;
                     case 0x4: type = Type.Sector; break;
+					case 0x8: type = Type.PO; break;
                     case 0x20: type = Type.IPO; break;
                     case 0x40: type = Type.IPO_2; break;
                 }

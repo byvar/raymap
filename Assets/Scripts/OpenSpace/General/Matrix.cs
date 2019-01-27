@@ -13,9 +13,9 @@ namespace OpenSpace {
         public UInt32 type;
         public Matrix4x4 m;
         public Matrix4x4? scaleMatrix;
-        public Vector4 v;
+        public Vector4? v;
 
-        public Matrix(Pointer offset, uint type, Matrix4x4 matrix, Vector4 vec) {
+        public Matrix(Pointer offset, uint type, Matrix4x4 matrix, Vector4? vec) {
             this.offset = offset;
             this.type = type;
             this.m = matrix;
@@ -41,13 +41,19 @@ namespace OpenSpace {
         }
         
         public Vector3 GetScale(bool convertAxes = false) {
-            if (scaleMatrix.HasValue) {
-                if (convertAxes) {
-                    return new Vector3(scaleMatrix.Value.GetColumn(0).magnitude, scaleMatrix.Value.GetColumn(2).magnitude, scaleMatrix.Value.GetColumn(1).magnitude);
-                } else {
-                    return new Vector3(scaleMatrix.Value.GetColumn(0).magnitude, scaleMatrix.Value.GetColumn(1).magnitude, scaleMatrix.Value.GetColumn(2).magnitude);
-                }
-            } else {
+			if (scaleMatrix.HasValue) {
+				if (convertAxes) {
+					return new Vector3(scaleMatrix.Value.GetColumn(0).magnitude, scaleMatrix.Value.GetColumn(2).magnitude, scaleMatrix.Value.GetColumn(1).magnitude);
+				} else {
+					return new Vector3(scaleMatrix.Value.GetColumn(0).magnitude, scaleMatrix.Value.GetColumn(1).magnitude, scaleMatrix.Value.GetColumn(2).magnitude);
+				}
+			} else if (v.HasValue) {
+				if (convertAxes) {
+					return new Vector3(v.Value.x, v.Value.z, v.Value.y);
+				} else {
+					return new Vector3(v.Value.x, v.Value.y, v.Value.z);
+				}
+			} else {
                 if (convertAxes) {
                     return new Vector3(m.GetColumn(0).magnitude, m.GetColumn(2).magnitude, m.GetColumn(1).magnitude);
                 } else {
@@ -117,35 +123,58 @@ namespace OpenSpace {
         }
 
         public Quaternion GetRotation(bool convertAxes = false) {
-            float tr = m.m00 + m.m11 + m.m22;
-            Quaternion q = new Quaternion();
-            if (tr > 0) {
-                float S = Mathf.Sqrt(tr + 1.0f) * 2; // S=4*qw 
-                q.w = 0.25f * S;
-                q.x = (m.m21 - m.m12) / S;
-                q.y = (m.m02 - m.m20) / S;
-                q.z = (m.m10 - m.m01) / S;
-            } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) {
-                float S = Mathf.Sqrt(1.0f + m.m00 - m.m11 - m.m22) * 2; // S=4*qx 
-                q.w = (m.m21 - m.m12) / S;
-                q.x = 0.25f * S;
-                q.y = (m.m01 + m.m10) / S;
-                q.z = (m.m02 + m.m20) / S;
-            } else if (m.m11 > m.m22) {
-                float S = Mathf.Sqrt(1.0f + m.m11 - m.m00 - m.m22) * 2; // S=4*qy
-                q.w = (m.m02 - m.m20) / S;
-                q.x = (m.m01 + m.m10) / S;
-                q.y = 0.25f * S;
-                q.z = (m.m12 + m.m21) / S;
-            } else {
-                float S = Mathf.Sqrt(1.0f + m.m22 - m.m00 - m.m11) * 2; // S=4*qz
-                q.w = (m.m10 - m.m01) / S;
-                q.x = (m.m02 + m.m20) / S;
-                q.y = (m.m12 + m.m21) / S;
-                q.z = 0.25f * S;
-            }
+			float m00, m01, m02, m10, m11, m12, m20, m21, m22;
+			if (v.HasValue && v.Value.x != 0 && v.Value.y != 0 && v.Value.z != 0) {
+				m00 = m.m00 / v.Value.x;
+				m01 = m.m01 / v.Value.y;
+				m02 = m.m02 / v.Value.z;
+				m10 = m.m10 / v.Value.x;
+				m11 = m.m11 / v.Value.y;
+				m12 = m.m12 / v.Value.z;
+				m20 = m.m20 / v.Value.x;
+				m21 = m.m21 / v.Value.y;
+				m22 = m.m22 / v.Value.z;
+			} else {
+				m00 = m.m00;
+				m01 = m.m01;
+				m02 = m.m02;
+				m10 = m.m10;
+				m11 = m.m11;
+				m12 = m.m12;
+				m20 = m.m20;
+				m21 = m.m21;
+				m22 = m.m22;
+			}
 
-            /*Vector3 s = GetScale();
+			float tr = m00 + m11 + m22;
+            Quaternion q = new Quaternion();
+			if (tr > 0) {
+				float S = Mathf.Sqrt(tr + 1.0f) * 2; // S=4*qw 
+				q.w = 0.25f * S;
+				q.x = (m21 - m12) / S;
+				q.y = (m02 - m20) / S;
+				q.z = (m10 - m01) / S;
+			} else if ((m00 > m11) && (m00 > m22)) {
+				float S = Mathf.Sqrt(1.0f + m00 - m11 - m22) * 2; // S=4*qx 
+				q.w = (m21 - m12) / S;
+				q.x = 0.25f * S;
+				q.y = (m01 + m10) / S;
+				q.z = (m02 + m20) / S;
+			} else if (m11 > m22) {
+				float S = Mathf.Sqrt(1.0f + m11 - m00 - m22) * 2; // S=4*qy
+				q.w = (m02 - m20) / S;
+				q.x = (m01 + m10) / S;
+				q.y = 0.25f * S;
+				q.z = (m12 + m21) / S;
+			} else {
+				float S = Mathf.Sqrt(1.0f + m22 - m00 - m11) * 2; // S=4*qz
+				q.w = (m10 - m01) / S;
+				q.x = (m02 + m20) / S;
+				q.y = (m12 + m21) / S;
+				q.z = 0.25f * S;
+			}
+
+			/*Vector3 s = GetScale();
 
             // Normalize Scale from Matrix4x4
             float m00 = m[0, 0] / s.x;
@@ -174,7 +203,7 @@ namespace OpenSpace {
             q.y /= qMagnitude;
             q.z /= qMagnitude;*/
 
-            if (convertAxes) {
+			if (convertAxes) {
                 q = new Quaternion(q.x, q.z, q.y, -q.w);
                 //q = q * Quaternion.Euler(new Vector3(0f, 0f, 0f));
                 //Vector3 tempRot = q.eulerAngles;
@@ -196,9 +225,10 @@ namespace OpenSpace {
 
         public static Matrix Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
-            UInt32 type = reader.ReadUInt32(); // 0x02: always at the start of a transformation matrix
-            Matrix mat = new Matrix(offset, type, new Matrix4x4(), Vector4.one);
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			//l.print("MATRIX " + offset);
+            UInt32 type = Settings.s.game != Settings.Game.R2Revolution ? reader.ReadUInt32() : 0; // 0x02: always at the start of a transformation matrix
+            Matrix mat = new Matrix(offset, type, new Matrix4x4(), null);
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.R2Revolution) {
                 Vector3 pos = Vector3.zero;
 
                 if (Settings.s.platform != Settings.Platform.DC) {
@@ -233,8 +263,18 @@ namespace OpenSpace {
                 mat.m.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
                 mat.m.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
                 mat.m.SetColumn(3, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
-                mat.v = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            }
+				mat.v = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				/*mat.SetScaleMatrix(new Matrix4x4(
+					new Vector4(v.x, 0, 0, 0), 
+					new Vector4(0,v.y, 0, 0), 
+					new Vector4(0, 0, v.z, 0), 
+					new Vector4(0, 0, 0, v.w)));*/
+
+			}
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				mat.type = reader.ReadUInt32();
+				// There's 0x8c more?
+			}
             return mat;
         }
 
@@ -330,7 +370,7 @@ namespace OpenSpace {
             }
             m.SetTRS(pos, rot, scale);
             if (setVec) {
-                v = new Vector4(1f * scale.x, 1f * scale.y, 1f * scale.z, v.w);
+                v = new Vector4(1f * scale.x, 1f * scale.y, 1f * scale.z, v.HasValue ? v.Value.w : 1f);
             }
         }
 
@@ -359,9 +399,11 @@ namespace OpenSpace {
                         writer.Write(col[j]);
                     }
                 }
-                for (int j = 0; j < 4; j++) {
-                    writer.Write(v[j]);
-                }
+				if (v.HasValue) {
+					for (int j = 0; j < 4; j++) {
+						writer.Write(v.Value[j]);
+					}
+				}
             }
         }
     }

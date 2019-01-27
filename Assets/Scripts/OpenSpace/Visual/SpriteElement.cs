@@ -62,28 +62,36 @@ namespace OpenSpace.Visual {
                 BoxCollider bc = spr_gao.AddComponent<BoxCollider>();
                 bc.size = new Vector3(0, sprites[i].info_scale.y * 2, sprites[i].info_scale.x * 2);
                 spr_gao.layer = LayerMask.NameToLayer("Visual");
-                if (sprites[i].visualMaterial != null) {
-                    if (sprites[i].visualMaterial.textures != null && sprites[i].visualMaterial.textures.Count > 0) {
-                        TextureInfo mainTex = sprites[i].visualMaterial.textures[0].texture;
-                        
-                        if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
-                        if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
-                    }
-                    //Material unityMat = sprites[i].visualMaterial.MaterialBillboard;
-                    Material unityMat = sprites[i].visualMaterial.GetMaterial(VisualMaterial.Hint.Billboard);
-                    bool receiveShadows = (sprites[i].visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
-                    //if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
-                    //if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
-                    mr.sharedMaterial = unityMat;
-                    /*mr.material.SetFloat("_ScaleX", sprites[i].info_scale.x);
+				if (sprites[i].visualMaterial != null) {
+					if (Settings.s.game != Settings.Game.R2Revolution &&
+						sprites[i].visualMaterial.textures != null &&
+						sprites[i].visualMaterial.textures.Count > 0) {
+						TextureInfo mainTex = sprites[i].visualMaterial.textures[0].texture;
+
+						if (mainTex != null && mainTex.IsMirrorX) mirrorX = true;
+						if (mainTex != null && mainTex.IsMirrorY) mirrorY = true;
+					}
+					//Material unityMat = sprites[i].visualMaterial.MaterialBillboard;
+					Material unityMat = sprites[i].visualMaterial.GetMaterial(VisualMaterial.Hint.Billboard);
+					bool receiveShadows = (sprites[i].visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
+					//if (num_uvMaps > 1) unityMat.SetFloat("_UVSec", 50f);
+					//if (r3mat.Material.GetColor("_EmissionColor") != Color.black) print("Mesh with emission: " + name);
+					mr.sharedMaterial = unityMat;
+					/*mr.material.SetFloat("_ScaleX", sprites[i].info_scale.x);
                     mr.material.SetFloat("_ScaleY", sprites[i].info_scale.y);*/
-                    if (!receiveShadows) mr.receiveShadows = false;
-                    if (sprites[i].visualMaterial.animTextures.Count > 0) {
-                        MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
-                        mtmat.visMat = sprites[i].visualMaterial;
-                        mtmat.mat = mr.sharedMaterial;
-                    }
-                }
+					if (!receiveShadows) mr.receiveShadows = false;
+					if (sprites[i].visualMaterial.animTextures.Count > 0) {
+						MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
+						mtmat.visMat = sprites[i].visualMaterial;
+						mtmat.mat = mr.sharedMaterial;
+					}
+				} else {
+					Material transMat = new Material(MapLoader.Loader.baseTransparentMaterial);
+					Texture2D tex = new Texture2D(1, 1);
+					tex.SetPixel(0, 0, new Color(0, 0, 0, 0));
+					transMat.SetTexture("_Tex0", tex);
+					mr.sharedMaterial = transMat;
+				}
 				if (sprites[i].meshUnity == null) {
 					sprites[i].meshUnity = new Mesh();
 					Vector3[] vertices = new Vector3[4];
@@ -118,6 +126,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             SpriteElement s = new SpriteElement(offset, m);
             s.name = "Sprite @ pos " + offset;
+			//l.print(s.name);
             
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 if (Settings.s.platform == Settings.Platform.DC) {
@@ -127,15 +136,30 @@ namespace OpenSpace.Visual {
                     s.off_sprites = Pointer.Read(reader);
                     s.num_sprites = reader.ReadUInt16();
                     reader.ReadInt16(); // -1
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
+					if (Settings.s.game != Settings.Game.R2Revolution) {
+						reader.ReadUInt32();
+						reader.ReadUInt32();
+					}
                 }
             } else {
                 s.num_sprites = (ushort)reader.ReadUInt32();
                 s.off_sprites = Pointer.Read(reader);
                 reader.ReadUInt32();
             }
-            if (Settings.s.platform == Settings.Platform.DC) {
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				Pointer.DoAt(ref reader, s.off_sprites, () => {
+					s.sprites = new IndexedSprite[s.num_sprites];
+					for (uint i = 0; i < s.num_sprites; i++) {
+						s.sprites[i] = new IndexedSprite();
+						uint type = reader.ReadUInt32();
+						s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						s.sprites[i].off_material = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+						if (s.sprites[i].off_material != null) {
+							s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
+						}
+					}
+				});
+			} else if (Settings.s.platform == Settings.Platform.DC) {
                 s.sprites = new IndexedSprite[1];
                 s.sprites[0] = new IndexedSprite();
                 s.sprites[0].off_material = Pointer.Read(reader);
@@ -155,9 +179,9 @@ namespace OpenSpace.Visual {
                     s.sprites = new IndexedSprite[s.num_sprites];
                     for (uint i = 0; i < s.num_sprites; i++) {
                         s.sprites[i] = new IndexedSprite();
-                        if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) reader.ReadUInt32();
-                        s.sprites[i].off_info = Pointer.Read(reader);
-                        s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) reader.ReadUInt32();
+						s.sprites[i].off_info = Pointer.Read(reader);
+						s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
                         if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                             s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());

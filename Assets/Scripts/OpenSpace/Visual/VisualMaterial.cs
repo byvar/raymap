@@ -174,12 +174,49 @@ namespace OpenSpace.Visual {
             VisualMaterial m = new VisualMaterial(offset);
             // Material struct = 0x188
             m.flags = reader.ReadUInt32(); // After this: 0x4
-            if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
-            m.ambientCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            m.diffuseCoef  = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            m.color        = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			if (Settings.s.game != Settings.Game.R2Revolution) {
+				if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
+				m.ambientCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
+			} else {
+				// Fill in light info for Revolution
+				m.ambientCoef = new Vector4(0,0,0,1f);
+				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				//m.diffuseCoef = new Vector4(1, 1, 1, 1);
+				reader.ReadInt32(); // current refresh number for scrolling/animated textures
+				m.off_animTextures_first = Pointer.Read(reader);
+				m.off_animTextures_current = Pointer.Read(reader); 
+				reader.ReadInt32();
+				m.num_animTextures = reader.ReadUInt16();
+				reader.ReadUInt16(); // 0x70
+			}
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				m.num_textures = 1;
+				VisualMaterialTexture t = new VisualMaterialTexture();
+				t.offset = Pointer.Current(reader);
+				t.off_texture = Pointer.Read(reader); // 0x4c
+				t.texture = TextureInfo.FromOffset(t.off_texture);
+				t.scrollMode = reader.ReadUInt32();
+				t.scrollX = reader.ReadSingle();
+				t.scrollY = reader.ReadSingle();
+				t.currentScrollX = reader.ReadSingle();
+				t.currentScrollY = reader.ReadSingle();
+				m.textures.Add(t);
+				/*reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
+				m.off_animTextures_first = Pointer.Read(reader); // 0x68
+				m.off_animTextures_current = Pointer.Read(reader); // 0x6c
+				m.num_animTextures = reader.ReadUInt16();
+				reader.ReadUInt16(); // 0x70
+				reader.ReadUInt32();
+				reader.ReadByte();
+				reader.ReadByte();
+				m.properties = reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadUInt32();
+				reader.ReadUInt32();*/
+			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 m.num_textures = 1;
                 reader.ReadUInt32(); // 0x48
                 VisualMaterialTexture t = new VisualMaterialTexture();
@@ -210,12 +247,11 @@ namespace OpenSpace.Visual {
                     t.scrollY = reader.ReadSingle(); // 0x5c
                     t.scrollMode = reader.ReadUInt32(); //0x60
                     m.textures.Add(t);
-
-                    reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
-                    m.off_animTextures_first = Pointer.Read(reader); // 0x68
-                    m.off_animTextures_current = Pointer.Read(reader); // 0x6c
-                    m.num_animTextures = reader.ReadUInt16();
-                    reader.ReadUInt16(); // 0x70
+					reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
+					m.off_animTextures_first = Pointer.Read(reader); // 0x68
+					m.off_animTextures_current = Pointer.Read(reader); // 0x6c
+					m.num_animTextures = reader.ReadUInt16();
+					reader.ReadUInt16(); // 0x70
                 }
                 reader.ReadUInt32(); // 0x74
                 m.properties = reader.ReadByte(); // whole byte for texture scroll lock in R2, no bitmasks
@@ -307,5 +343,19 @@ namespace OpenSpace.Visual {
             }
             return null;
         }
-    }
+
+
+		// Call after clone
+		public void Reset() {
+			material = null;
+			materialBillboard = null;
+		}
+		public VisualMaterial Clone() {
+			VisualMaterial vm = (VisualMaterial)MemberwiseClone();
+			vm.textures = new List<VisualMaterialTexture>(textures);
+			vm.animTextures = new List<AnimatedTexture>(animTextures);
+			vm.Reset();
+			return vm;
+		}
+	}
 }

@@ -49,13 +49,14 @@ float _Luminosity = 0.5;
 float _Saturate = 1.0;
 float _DisableLighting = 0;
 float _DisableLightingLocal = 0;
+float _DisableFog = 0;
 
 struct v2f {
 	float4 pos : SV_POSITION;
-	float3 uv1 : TEXCOORD0; // The first UV coordinate.
-	float3 uv2 : TEXCOORD1; // The second UV coordinate.
-	float3 uv3 : TEXCOORD2; // The second UV coordinate.
-	float3 uv4 : TEXCOORD3; // The second UV coordinate.
+	float4 uv1 : TEXCOORD0; // The first UV coordinate.
+	float4 uv2 : TEXCOORD1; // The second UV coordinate.
+	float4 uv3 : TEXCOORD2; // The second UV coordinate.
+	float4 uv4 : TEXCOORD3; // The second UV coordinate.
 	float4 diffuseColor : TEXCOORD4;
 	float3 normal : TEXCOORD5;
 	float3 multipliedPosition : TEXCOORD6;
@@ -207,62 +208,26 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_TRANSFER_INSTANCE_ID(v, o);
-	o.uv1 = float3(TRANSFORM_TEX(TransformUV( v.texcoord.xy, _Tex0Params, _Tex0Params2), _Tex0),  v.texcoord.z);
-	o.uv2 = float3(TRANSFORM_TEX(TransformUV(v.texcoord1.xy, _Tex1Params, _Tex1Params2), _Tex1), v.texcoord1.z);
-	o.uv3 = float3(TRANSFORM_TEX(TransformUV(v.texcoord2.xy, _Tex2Params, _Tex2Params2), _Tex2), v.texcoord2.z);
-	o.uv4 = float3(TRANSFORM_TEX(TransformUV(v.texcoord3.xy, _Tex3Params, _Tex3Params2), _Tex3), v.texcoord3.z);
+	o.uv1 = float4(TRANSFORM_TEX(TransformUV( v.texcoord.xy, _Tex0Params, _Tex0Params2), _Tex0),  v.texcoord.z, v.texcoord.w);
+	o.uv2 = float4(TRANSFORM_TEX(TransformUV(v.texcoord1.xy, _Tex1Params, _Tex1Params2), _Tex1), v.texcoord1.z, v.texcoord1.w);
+	o.uv3 = float4(TRANSFORM_TEX(TransformUV(v.texcoord2.xy, _Tex2Params, _Tex2Params2), _Tex2), v.texcoord2.z, v.texcoord2.w);
+	o.uv4 = float4(TRANSFORM_TEX(TransformUV(v.texcoord3.xy, _Tex3Params, _Tex3Params2), _Tex3), v.texcoord3.z, v.texcoord3.w);
 
 	float4x4 modelMatrix = unity_ObjectToWorld;
 	float4x4 modelMatrixInverse = unity_WorldToObject;
 	float3 normalDirection, multipliedPosition;
-	/*if (_Billboard == 1.0) {
-		// Billboard / LookAt as it is called in the engine
-				float2 worldScale = float2(
-					length(float3(unity_ObjectToWorld[0].x, unity_ObjectToWorld[1].x, unity_ObjectToWorld[2].x)), // scale x axis
-					length(float3(unity_ObjectToWorld[0].y, unity_ObjectToWorld[1].y, unity_ObjectToWorld[2].y)) // scale y axis
-					);
 
-				o.pos = mul(UNITY_MATRIX_P,
-					float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0)
-					+ scaledVertex);
-		float4 viewSpaceCenter = float4(UnityObjectToViewPos(float3(0.0, 0.0, 0.0)), 1.0);
-		float4 scaledVertex = float4(v.vertex.z, v.vertex.y, 0.0, 0.0) * float4(worldScale.x, worldScale.y, 1.0, 1.0);
-		//float4 objectCenter = mul(modelMatrix, float4(0, 0, 0, 1.0));
-		//float4 worldVertex = mul(modelMatrix, v.vertex) - objectCenter;
-		//float4 viewSpaceVertex = viewSpaceCenter + float4(-worldVertex.z, worldVertex.y, 0, 0);
-		//float4 scaledVertex = float4(mul((float3x3)unity_ObjectToWorld, IN.vertex.xyz).x, mul((float3x3)unity_ObjectToWorld, IN.vertex.xyz).y, 0.0, 1.0);
-		viewSpaceVertex = viewSpaceCenter + scaledVertex;
-		o.pos = mul(UNITY_MATRIX_P, viewSpaceVertex);
-		//float4 viewSpaceNormal = viewSpaceVertex + float4(0.0, 0.0, -1.0, 0.0);
-		//normalDirection = normalize(mul(float4(mul(UNITY_MATRIX_I_V, viewSpaceNormal).xyz, 0.0), modelMatrixInverse).xyz); // Normal in object space
-		multipliedPosition = mul(UNITY_MATRIX_I_V, viewSpaceVertex).xyz; // Vertex in world space
-	} else {*/
 	o.pos = UnityObjectToClipPos(v.vertex);
 	multipliedPosition = mul(modelMatrix, v.vertex).xyz; // Vertex in world space
 	normalDirection = normalize(mul(float4(v.normal, 0.0), modelMatrixInverse).xyz); // Normal in object space
 
-	//}
-	//float3 viewDirection = normalize(_WorldSpaceCameraPos - mul(modelMatrix, v.vertex).xyz);
 	float3 lightDirection;
 	float attenuation;
 
 	float alpha = 1.0;
-	//float3 colRgb = _Color.rgb * _Color.w + float3(1.0, 1.0, 1.0) * (1.0 - _Color.w);
 
 	float3 ambientLighting = 0.0;
-	/*if (isAdd == 0.0) {
-		ambientLighting = _SectorAmbient.rgb * _AmbientCoef.w;
-		ambientLighting = ambientLighting + _AmbientCoef.xyz * colRgb;
 
-		//ambientLighting = _SectorAmbient.rgb * _AmbientCoef.w;
-		//ambientLighting = ambientLighting + _AmbientCoef.xyz * colRgb;
-		
-		//ambientLighting = UNITY_LIGHTMODEL_AMBIENT.rgb * colRgb * _AmbientCoef.xyz * _AmbientCoef.w;
-		//ambientLighting = ambientLighting + colRgb * (1.0 - _AmbientCoef.w);
-		
-		//UNITY_LIGHTMODEL_AMBIENT.rgb * colRgb * _AmbientCoef.xyz * (1.0-(_SpecularCoef.w/100.0));
-		//ambientLighting = ambientLighting + colRgb * (_SpecularCoef.w/100.0);
-	}*/
 	float3 diffuseReflection = float3(0.0, 0.0, 0.0);
 	if (isLight == 0.0) {
 		//if (isAdd == 1.0) {
@@ -287,30 +252,18 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 		diffuseReflection = diffuseReflection + lightCol.xyz;
 		alpha = lightCol.w;
 	}
-	/*} else {
-		for (int i = 0; i < 4; i++) {
-			float4 lightPosition = float4(unity_4LightPosX0[i], unity_4LightPosY0[i], unity_4LightPosZ0[i], 1.0);
-			float3 difference = lightPosition.xyz - o.pos.xyz;
-			float squaredDistance = dot(difference, difference);
-			attenuation = 1.0 / (1.0 + unity_4LightAtten0[i] * squaredDistance);
-			lightDirection = normalize(difference);
-
-			diffuseReflection = diffuseReflection + attenuation * unity_LightColor[i].rgb
-				* colRgb
-				* _DiffuseCoef.xyz //* _DiffuseCoef.w
-				* max(0.0, dot(normalDirection, lightDirection));
-		}
-	}*/
 	o.normal = normalDirection;
 	o.multipliedPosition = multipliedPosition;
 	o.diffuseColor = float4(ambientLighting + diffuseReflection, alpha);
+	if (_Tex2Params.x == 60) {
+		// Prelit
+		o.diffuseColor = o.diffuseColor * v.texcoord2; // RGBA, so both need to be vector4
+	}
 	if (_SectorFog.w != 0) o.fogViewPos = UnityObjectToViewPos(v.vertex).xyz;
-	//o.specularColor = specularReflection;
-	//UNITY_TRANSFER_FOG(o, o.pos);
 	return o;
 }
 
-float4 TextureOp(float4 color_in, float4 diffuseColor, sampler2D tex, float3 uv, float4 tex_params, float4 tex_params_2, float index) {
+float4 TextureOp(float4 color_in, float4 diffuseColor, sampler2D tex, float4 uv, float4 tex_params, float4 tex_params_2, float index) {
 	float4 texColor = tex2D(tex, uv.xy);
 	//if (tex_params.w == 1 && index > 0) return color_in; // Mirrors are not supported yet
 	if (tex_params.x == 1 && index > 0) {
@@ -323,19 +276,41 @@ float4 TextureOp(float4 color_in, float4 diffuseColor, sampler2D tex, float3 uv,
 	/*else if (tex_params.x == 3) {
 		// Transparent
 		return lerp(color_in, diffuseColor * float4(texColor.xyz, 1), uv.z);
-	}*/ else {
+	}*/ else if(tex_params.x != 50 && tex_params.x != 51 && tex_params.x != 52) {
 		return lerp(color_in, diffuseColor * texColor, uv.z);
 		//color_out.a = color_out.a = color_out.a * i.diffuseColor.w;
 		//return diffuseColor * color_out;
+	} else {
+		// Lightmap (custom)
+		return color_in + float4(texColor.xyz, 0);
+		/*if (tex_params.x == 50) {
+			return color_in + float4(texColor.x, 0, 0, 0);
+		} else if (tex_params.x == 51) {
+			return color_in + float4(0, texColor.y, 0, 0);
+		} else {
+			return color_in + float4(0, 0, texColor.z, 0);
+		}*/
 	}
 }
 
 float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 	UNITY_SETUP_INSTANCE_ID(i);
 	float4 c = float4(0.0, 0.0, 0.0, 0.0);
+	if (_NumTextures > 1 && _Tex1Params.x == 50 && _DisableLighting != 1.0 && _DisableLightingLocal != 1.0) {
+		float4 diffuseReflection = float4(_Luminosity - 0.5, _Luminosity - 0.5, _Luminosity - 0.5, 1);
+		diffuseReflection = TextureOp(diffuseReflection, i.diffuseColor, _Tex1, i.uv2, _Tex1Params, _Tex1Params2, 1);
+
+		if (_Saturate == 1.0) {
+			diffuseReflection.x = saturate(diffuseReflection.x);
+			diffuseReflection.y = saturate(diffuseReflection.y);
+			diffuseReflection.z = saturate(diffuseReflection.z);
+			diffuseReflection.w = saturate(diffuseReflection.w);
+		}
+		i.diffuseColor = diffuseReflection;
+	}
 	if (_NumTextures > 0) {
 		c = TextureOp(c, i.diffuseColor, _Tex0, i.uv1, _Tex0Params, _Tex0Params2, 0);
-		if (_NumTextures > 1) {
+		if (_NumTextures > 1 && _Tex1Params.x != 50) {
 			c = TextureOp(c, i.diffuseColor, _Tex1, i.uv2, _Tex1Params, _Tex1Params2, 1);
 			if (_NumTextures > 2) {
 				c = TextureOp(c, i.diffuseColor, _Tex2, i.uv3, _Tex2Params, _Tex2Params2, 2);
@@ -346,49 +321,33 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 		}
 	}
 
-	/*float blendfactor = i.uv2.z;
-	if (_Blend == 1) {
-		c = lerp(tex2D(_MainTex, uv1), tex2D(_MainTex2, uv2), blendfactor);
-	} else {
-		c = tex2D(_MainTex, uv1.xy);
-	}*/
-	//c.a = c.a * i.diffuseColor.w;
 	if (clipAlpha < 0) {
 		clip(clipAlpha * (c.a - 1.0));
 	} else {
 		clip(clipAlpha * (c.a - 0.999));
 	}
-	//c.rgb = c.rgb * (1 + (_EmissionColor.rgb * 2 * _EmissionColor.a));
-	//if (_ShadingMode == 0.0 || isAdd == 1.0) {
-		//c = float4(i.diffuseColor.xyz * c, c.a);
-	/*} else {
-		float3 colRgb = _Color.rgb * _Color.w + float3(1.0, 1.0, 1.0) * (1.0 - _Color.w);
-		float4 lightColor = ApplyStaticLights(colRgb, normalize(i.normal), i.multipliedPosition);
-		c = float4((i.diffuseColor.xyz + lightColor) * c, c.a * lightColor.w);
-		clip(clipAlpha * (c.a - 1.0));
-	}*/
-	// Add fog
-	float4 sectFog = UNITY_ACCESS_INSTANCED_PROP(Props, _SectorFog);
-	if (sectFog.w != 0) {
-		float4 sectFogParams = UNITY_ACCESS_INSTANCED_PROP(Props, _SectorFogParams);
-		float fog;
-		if (sectFogParams.x != sectFogParams.y) { // Blend near != Blend far
-			float fogz = length(i.fogViewPos);
-			fog = sectFogParams.x +
-				saturate((fogz - sectFogParams.z) / (sectFogParams.w - sectFogParams.z))
-				* (sectFogParams.y - sectFogParams.x);
-		} else {
-			fog = sectFogParams.y;
+
+	if (_DisableFog != 1.0) {
+		// Add fog
+		float4 sectFog = UNITY_ACCESS_INSTANCED_PROP(Props, _SectorFog);
+		if (sectFog.w != 0) {
+			float4 sectFogParams = UNITY_ACCESS_INSTANCED_PROP(Props, _SectorFogParams);
+			float fog;
+			if (sectFogParams.x != sectFogParams.y) { // Blend near != Blend far
+				float fogz = length(i.fogViewPos);
+				fog = sectFogParams.x +
+					saturate((fogz - sectFogParams.z) / (sectFogParams.w - sectFogParams.z))
+					* saturate(sectFogParams.y - sectFogParams.x); // Otherwise fog can cause increased brightness for values above 1f
+			} else {
+				fog = sectFogParams.y;
+			}
+			if (isAdd == 1.0) {
+				c.rgb = lerp(c.rgb, float3(0, 0, 0), fog * sectFog.w);
+			} else {
+				c.rgb = lerp(c.rgb, sectFog.xyz, fog * sectFog.w);
+			}
 		}
-		if (isAdd == 1.0) {
-			c.rgb = lerp(c.rgb, float3(0, 0, 0), fog * sectFog.w);
-		} else {
-			c.rgb = lerp(c.rgb, sectFog.xyz, fog * sectFog.w);
-		}
-		//c.rgb = lerp(c.rgb, _SectorFog.xyz, fog);
 	}
-	//UNITY_APPLY_FOG(i.fogCoord, c);
-	//return float4(i.specularColor + i.diffuseColor * c, c.a);
 	return c;
 }
 #endif // SHARED_GOURAUD

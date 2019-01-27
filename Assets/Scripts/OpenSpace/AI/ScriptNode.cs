@@ -53,7 +53,7 @@ namespace OpenSpace.AI {
             }
             sn.nodeType = NodeType.Unknown;
             if (Settings.s.aiTypes != null) sn.nodeType = Settings.s.aiTypes.GetNodeType(sn.type);
-
+			
             if (sn.param_ptr != null && sn.nodeType != NodeType.Unknown) {
 				if (sn.nodeType == NodeType.WayPointRef) {
 					WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);

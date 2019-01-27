@@ -192,7 +192,8 @@ public class SectorManager : MonoBehaviour {
 					}
 					rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
 					foreach (Renderer r in rs) {
-						if (r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend")) {
+						if (r.sharedMaterial != null &&
+							(r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend"))) {
 							MaterialPropertyBlock props = new MaterialPropertyBlock();
 							r.GetPropertyBlock(props);
 							if (fogColor.HasValue) props.SetVector("_SectorFog", fogColor.Value);

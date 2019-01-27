@@ -128,7 +128,7 @@ namespace OpenSpace.AI {
                 }
             });
             Pointer.DoAt(ref reader, behavior.off_firstScript, () => {
-                behavior.firstScript = Script.Read(reader, Pointer.Current(reader), behavior);
+                behavior.firstScript = Script.Read(reader, Pointer.Current(reader), behavior, single: true);
             });
 
             l.behaviors.Add(behavior);

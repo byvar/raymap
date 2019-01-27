@@ -324,27 +324,32 @@ public class PersoBehaviour : MonoBehaviour {
             anim_index = state.anim_ref.anim_index;
             bank_index = perso.p3dData.family.animBank;
         }
-        if (state.anim_refMontreal != null) {
-            a3d = null;
-            animationSpeed = state.speed;
-            //animationSpeed = state.speed;
-            InitAnimationMontreal(state.anim_refMontreal);
-            UpdateAnimation();
-        } else if (state.anim_ref != null
-            && l.animationBanks != null
-            && l.animationBanks.Length > bank_index
-            && l.animationBanks[bank_index] != null
-            && l.animationBanks[bank_index].animations != null
-            && l.animationBanks[bank_index].animations.Length > anim_index
-            && l.animationBanks[bank_index].animations[anim_index] != null) {
-            animMontreal = null;
-            animationSpeed = state.speed;
-            //animationSpeed = state.speed;
-            InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
-            UpdateAnimation();
-        } else {
-            a3d = null;
-        }
+		if (state.anim_refMontreal != null) {
+			a3d = null;
+			animationSpeed = state.speed;
+			//animationSpeed = state.speed;
+			InitAnimationMontreal(state.anim_refMontreal);
+			UpdateAnimation();
+		} else if (state.anim_ref != null
+			&& l.animationBanks != null
+			&& l.animationBanks.Length > bank_index
+			&& l.animationBanks[bank_index] != null
+			&& l.animationBanks[bank_index].animations != null
+			&& l.animationBanks[bank_index].animations.Length > anim_index
+			&& l.animationBanks[bank_index].animations[anim_index] != null) {
+			animMontreal = null;
+			animationSpeed = state.speed;
+			//animationSpeed = state.speed;
+			InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
+			UpdateAnimation();
+		} else if (state.anim_ref != null && state.anim_ref.a3d != null) {
+			animMontreal = null;
+			animationSpeed = state.speed;
+			InitAnimation(state.anim_ref.a3d);
+			UpdateAnimation();
+		} else {
+			a3d = null;
+		}
     }
 
     // Update is called once per frame

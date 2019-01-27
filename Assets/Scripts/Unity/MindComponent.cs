@@ -11,7 +11,15 @@ public class MindComponent : MonoBehaviour {
     public Mind mind;
     
     // Behaviour/State transition overview
-    public TransitionExport transitionExport = null;
+	private string transitionExport = null;
+	public string TransitionExport {
+		get {
+			if (transitionExport == null) {
+				transitionExport = new TransitionExport(perso).ToString();
+			}
+			return transitionExport;
+		}
+	}
 
     public bool writeReflexComport;
     public bool writeNormalComport;
@@ -20,7 +28,6 @@ public class MindComponent : MonoBehaviour {
     {
         this.perso = perso;
         this.mind = mind;
-        this.transitionExport = new TransitionExport(perso);
     }
 
     public void Write(Writer writer)

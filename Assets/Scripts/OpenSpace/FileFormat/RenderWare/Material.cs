@@ -25,6 +25,8 @@ namespace OpenSpace.FileFormat.RenderWare {
 			m.ambient = reader.ReadSingle();
 			m.specular = reader.ReadSingle();
 			m.diffuse = reader.ReadSingle();
+
+			//MapLoader.Loader.print(m.color.r + " - " + m.color.g + " - " + m.color.b + " - " + m.color.a + " - " + m.ambient + " - " + m.specular + " - " + m.diffuse);
 			return m;
 		}
 	}

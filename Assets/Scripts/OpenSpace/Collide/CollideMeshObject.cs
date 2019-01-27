@@ -60,16 +60,16 @@ namespace OpenSpace.Collide {
 
         public static CollideMeshObject Read(Reader reader, Pointer offset, Type type = Type.Default) {
             MapLoader l = MapLoader.Loader;
+			//l.print("CollideMesh " + offset);
             CollideMeshObject m = new CollideMeshObject(offset, type);
-            //l.print("Mesh obj: " + offset);
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();
-                reader.ReadUInt32();
+                if(Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32();
             }
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
             m.off_vertices = Pointer.Read(reader);
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.R2Revolution) {
                 m.off_normals = Pointer.Read(reader);
                 Pointer.Read(reader);
                 reader.ReadInt32();
@@ -77,19 +77,21 @@ namespace OpenSpace.Collide {
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();
             m.off_subblock_types = Pointer.Read(reader);
             m.off_subblocks = Pointer.Read(reader);
-            Pointer.Read(reader);
-            if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
-                reader.ReadInt32();
-                reader.ReadInt32();
-                reader.ReadInt32();
-                reader.ReadInt32();
-                m.num_vertices = reader.ReadUInt16();
-                m.num_subblocks = reader.ReadUInt16();
-            }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
-                reader.ReadInt32();
-                reader.ReadInt32();
-            }
+			if (Settings.s.game != Settings.Game.R2Revolution) {
+				Pointer.Read(reader);
+				if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
+					reader.ReadInt32();
+					reader.ReadInt32();
+					reader.ReadInt32();
+					reader.ReadInt32();
+					m.num_vertices = reader.ReadUInt16();
+					m.num_subblocks = reader.ReadUInt16();
+				}
+				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
+					reader.ReadInt32();
+					reader.ReadInt32();
+				}
+			}
             reader.ReadInt32();
             reader.ReadSingle();
             reader.ReadSingle();

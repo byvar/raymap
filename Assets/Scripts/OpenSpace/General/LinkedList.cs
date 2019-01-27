@@ -34,7 +34,12 @@ namespace OpenSpace {
 
         public int Count {
             get { return (int)num_elements; }
-            set { num_elements = (uint)value; }
+            set {
+				num_elements = (uint)value;
+				if (list.Length != num_elements) {
+					Array.Resize(ref list, (int)num_elements);
+				}
+			}
         }
 
         public bool IsReadOnly {
@@ -206,6 +211,7 @@ namespace OpenSpace {
         public void Add(T item) {
             Array.Resize(ref list, list.Length + 1);
             list[list.Length - 1] = item;
+			Count = Count + 1;
         }
 
         void ICollection<T>.Clear() {

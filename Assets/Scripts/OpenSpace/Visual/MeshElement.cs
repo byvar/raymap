@@ -42,6 +42,10 @@ namespace OpenSpace.Visual {
         public int[] disconnected_triangles_spe = null;
         public Vector3[] normals_spe = null;
 
+		// Revolution
+		public Color[] vertexColors = null;
+		public int lightmap_index = -1;
+
         private SkinnedMeshRenderer s_mr_main = null;
         private SkinnedMeshRenderer s_mr_spe = null;
         private Mesh mesh_main = null;
@@ -87,14 +91,20 @@ namespace OpenSpace.Visual {
             if (num_triangles_main > 0) {
                 Vector3[] new_vertices = new Vector3[num_mapping_entries];
                 Vector3[] new_normals = new Vector3[num_mapping_entries];
-                Vector3[][] new_uvs = new Vector3[num_textures][]; // Thanks to Unity we can only store the blend weights as a third component of the UVs
+                Vector4[][] new_uvs = new Vector4[num_textures + (vertexColors != null ? 1 : 0)][]; // Thanks to Unity we can only store the blend weights as a third component of the UVs
                 BoneWeight[] new_boneWeights = mesh.bones != null ? new BoneWeight[num_mapping_entries] : null;
                 for (int um = 0; um < num_textures; um++) {
-                    new_uvs[um] = new Vector3[num_mapping_entries];
+                    new_uvs[um] = new Vector4[num_mapping_entries];
                 }
+				if (vertexColors != null) {
+					new_uvs[num_textures] = new Vector4[num_mapping_entries];
+					for (int i = 0; i < num_mapping_entries; i++) {
+						new_uvs[num_textures][i] = new Vector4(vertexColors[i].r, vertexColors[i].g, vertexColors[i].b, vertexColors[i].a);
+					}
+				}
                 for (int j = 0; j < num_mapping_entries; j++) {
                     new_vertices[j] = mesh.vertices[mapping_vertices[j]];
-                    new_normals[j] = mesh.normals[mapping_vertices[j]];
+                    if(mesh.normals != null) new_normals[j] = mesh.normals[mapping_vertices[j]];
                     if (new_boneWeights != null) new_boneWeights[j] = mesh.bones.weights[mapping_vertices[j]];
                     for (int um = 0; um < num_textures; um++) {
                         uint uvMap = (uint)visualMaterial.textures[um].uvFunction % num_uvMaps;
@@ -144,13 +154,13 @@ namespace OpenSpace.Visual {
 				if (mesh_main == null) {
 					mesh_main = new Mesh();
 					mesh_main.vertices = new_vertices;
-					mesh_main.normals = new_normals;
+					if(mesh.normals != null) mesh_main.normals = new_normals;
 					mesh_main.triangles = triangles;
 					if (new_boneWeights != null) {
 						mesh_main.boneWeights = new_boneWeights;
 						mesh_main.bindposes = mesh.bones.bindPoses;
 					}
-					for (int i = 0; i < num_textures; i++) {
+					for (int i = 0; i < new_uvs.Length; i++) {
 						mesh_main.SetUVs(i, new_uvs[i].ToList());
 					}
 				}
@@ -186,8 +196,10 @@ namespace OpenSpace.Visual {
                 for (int um = 0; um < num_textures; um++) {
                     for (int j = 0; j < num_disconnected_triangles_spe * 3; j++) {
                         uint uvMap = (uint)visualMaterial.textures[um].uvFunction % num_uvMaps;
-                        new_uvs_spe[um][j] = uvs[mapping_uvs_spe[uvMap][j]];
-                        if (MapLoader.Loader.blockyMode && normals_spe != null) new_uvs_spe[um][j] = uvs[mapping_uvs_spe[uvMap][j-(j%3)]];
+						if (uvs != null) {
+							new_uvs_spe[um][j] = uvs[mapping_uvs_spe[uvMap][j]];
+							if (MapLoader.Loader.blockyMode && normals_spe != null) new_uvs_spe[um][j] = uvs[mapping_uvs_spe[uvMap][j - (j % 3)]];
+						}
                         new_uvs_spe[um][j].z = 1;
                         /*int i0 = reader.ReadInt16(), m0 = (j * 3) + 0; // Old index, mapped index
                         int i1 = reader.ReadInt16(), m1 = (j * 3) + 1;
@@ -202,13 +214,16 @@ namespace OpenSpace.Visual {
                     int i0 = disconnected_triangles_spe[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
                     int i1 = disconnected_triangles_spe[(j * 3) + 1], m1 = (j * 3) + 1;
                     int i2 = disconnected_triangles_spe[(j * 3) + 2], m2 = (j * 3) + 2;
+					if (i1 > mesh.vertices.Length) MapLoader.Loader.print(mesh.vertices.Length);
                     new_vertices_spe[m0] = mesh.vertices[i0];
                     new_vertices_spe[m1] = mesh.vertices[i1];
                     new_vertices_spe[m2] = mesh.vertices[i2];
-                    
-                    new_normals_spe[m0] = mesh.normals[i0];
-                    new_normals_spe[m1] = mesh.normals[i1];
-                    new_normals_spe[m2] = mesh.normals[i2];
+
+					if (mesh.normals != null) {
+						new_normals_spe[m0] = mesh.normals[i0];
+						new_normals_spe[m1] = mesh.normals[i1];
+						new_normals_spe[m2] = mesh.normals[i2];
+					}
                     if (MapLoader.Loader.blockyMode && normals_spe != null) {
                         new_normals_spe[m0] = normals_spe[j];
                         new_normals_spe[m1] = normals_spe[j];
@@ -283,6 +298,7 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
+				if (vertexColors != null & unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
                 /*if (num_uvMaps > 1) {
@@ -335,41 +351,46 @@ namespace OpenSpace.Visual {
             sm.name = "Submesh @ pos " + offset;
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                 sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
             } else {
                 sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
                 sm.visualMaterial = sm.gameMaterial.visualMaterial;
             }
-            /*if (sm.visualMaterial != null && sm.visualMaterial.textures.Count > 0 && sm.visualMaterial.textures[0].off_texture != null) {
+            if (sm.visualMaterial != null && sm.visualMaterial.textures.Count > 0 && sm.visualMaterial.textures[0].off_texture != null) {
                 sm.name += " - VisMatTex:" + sm.visualMaterial.textures[0].offset + " - TexInfo:" + sm.visualMaterial.textures[0].off_texture;
-            }*/
+            }
             if (sm.visualMaterial != null) {
                 sm.backfaceCulling = ((sm.visualMaterial.flags & VisualMaterial.flags_backfaceCulling) != 0) && !l.forceDisplayBackfaces;
             }
             sm.num_disconnected_triangles_spe = reader.ReadUInt16();
-            sm.num_uvs = reader.ReadUInt16();
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                sm.num_uvMaps = reader.ReadUInt16();
-                reader.ReadUInt16();
-            }
-            sm.off_disconnected_triangles_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_vertices
-            if (Settings.s.mode == Settings.Mode.Rayman3GC) reader.ReadUInt32();
-            sm.off_mapping_uvs_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
-            sm.off_weights_spe = Pointer.Read(reader); // 1 entry = 3 floats
-            sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-            } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-                reader.ReadUInt32();
-            }
-            if (Settings.s.game != Settings.Game.TTSE) {
-                sm.off_vertex_indices = Pointer.Read(reader);
-                sm.num_vertex_indices = reader.ReadUInt16();
-                reader.ReadInt16();
-                reader.ReadUInt32();
-            }
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				sm.lightmap_index = reader.ReadInt16();
+				sm.off_disconnected_triangles_spe = Pointer.Read(reader);
+			} else {
+				sm.num_uvs = reader.ReadUInt16();
+				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+					sm.num_uvMaps = reader.ReadUInt16();
+					reader.ReadUInt16();
+				}
+				sm.off_disconnected_triangles_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_vertices
+				if (Settings.s.mode == Settings.Mode.Rayman3GC) reader.ReadUInt32();
+				sm.off_mapping_uvs_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
+				sm.off_weights_spe = Pointer.Read(reader); // 1 entry = 3 floats
+				sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats
+				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+				} else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+					reader.ReadUInt32();
+				}
+				if (Settings.s.game != Settings.Game.TTSE) {
+					sm.off_vertex_indices = Pointer.Read(reader);
+					sm.num_vertex_indices = reader.ReadUInt16();
+					reader.ReadInt16();
+					reader.ReadUInt32();
+				}
+			}
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                 reader.ReadUInt16();
                 sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
@@ -425,27 +446,29 @@ namespace OpenSpace.Visual {
                 }
             }
 
-            // Read UVs
-            Pointer.Goto(ref reader, sm.off_uvs);
-            sm.uvs = new Vector2[sm.num_uvs];
-            for (int j = 0; j < sm.num_uvs; j++) {
-                sm.uvs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-            }
-            // Read triangle data
-            Pointer.Goto(ref reader, sm.off_connected_vertices);
-            //print("Creating triangles from connected vertices at " + String.Format("0x{0:X}", fs.Position));
-            sm.connected_vertices = new int[sm.num_connected_vertices];
-            for (int j = 0; j < sm.num_connected_vertices; j++) {
-                sm.connected_vertices[j] = reader.ReadInt16();
-            }
-            Pointer.Goto(ref reader, sm.off_disconnected_triangles);
-            sm.disconnected_triangles = new int[sm.num_disconnected_triangles * 3];
-            //print("Loading disconnected triangles at " + String.Format("0x{0:X}", fs.Position));
-            for (int j = 0; j < sm.num_disconnected_triangles; j++) {
-                sm.disconnected_triangles[(j * 3) + 0] = reader.ReadInt16();
-                sm.disconnected_triangles[(j * 3) + 1] = reader.ReadInt16();
-                sm.disconnected_triangles[(j * 3) + 2] = reader.ReadInt16();
-            }
+			// Read UVs
+			Pointer.DoAt(ref reader, sm.off_uvs, () => {
+				sm.uvs = new Vector2[sm.num_uvs];
+				for (int j = 0; j < sm.num_uvs; j++) {
+					sm.uvs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+				}
+			});
+			// Read triangle data
+			Pointer.DoAt(ref reader, sm.off_connected_vertices, () => {
+				sm.connected_vertices = new int[sm.num_connected_vertices];
+				for (int j = 0; j < sm.num_connected_vertices; j++) {
+					sm.connected_vertices[j] = reader.ReadInt16();
+				}
+			});
+			Pointer.DoAt(ref reader, sm.off_disconnected_triangles, () => {
+				sm.disconnected_triangles = new int[sm.num_disconnected_triangles * 3];
+				//print("Loading disconnected triangles at " + String.Format("0x{0:X}", fs.Position));
+				for (int j = 0; j < sm.num_disconnected_triangles; j++) {
+					sm.disconnected_triangles[(j * 3) + 0] = reader.ReadInt16();
+					sm.disconnected_triangles[(j * 3) + 1] = reader.ReadInt16();
+					sm.disconnected_triangles[(j * 3) + 2] = reader.ReadInt16();
+				}
+			});
             if (sm.num_disconnected_triangles_spe > 0) {
                 Pointer.Goto(ref reader, sm.off_disconnected_triangles_spe);
                 sm.disconnected_triangles_spe = new int[sm.num_disconnected_triangles_spe * 3];

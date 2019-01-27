@@ -16,6 +16,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 		public bool useMipLevels;
 
 		public static MaterialTexture Read(Reader reader) {
+			MapLoader.Loader.print("reading material texture");
 			MaterialTexture mt = new MaterialTexture();
 			mt.textureFilteringMode = reader.ReadByte();
 			mt.textureFiltering = (FilterMode)mt.textureFilteringMode;

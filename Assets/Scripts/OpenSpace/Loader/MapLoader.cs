@@ -65,6 +65,7 @@ namespace OpenSpace {
         public List<VisualMaterial> visualMaterials = new List<VisualMaterial>();
         public List<GameMaterial> gameMaterials = new List<GameMaterial>();
         public List<CollideMaterial> collideMaterials = new List<CollideMaterial>();
+		public List<MeshObject> meshObjects = new List<MeshObject>();
         public List<LightInfo> lights = new List<LightInfo>();
         public List<Sector> sectors = new List<Sector>();
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
@@ -660,9 +661,16 @@ MonoBehaviour.print(str);
             if (globals.spawnablePersos != null && globals.spawnablePersos.Count > 0) {
                 GameObject spawnableParent = new GameObject("Spawnable persos");
                 globals.spawnablePersos.ReadEntries(ref reader, (offset) => {
-                    uint index = reader.ReadUInt32();
-                    Pointer off_spawnable_perso = Pointer.Read(reader);
-                    Perso perso = null;
+					uint index;
+					Pointer off_spawnable_perso;
+					if (Settings.s.game == Settings.Game.R2Revolution) {
+						off_spawnable_perso = Pointer.Read(reader);
+						index = reader.ReadUInt32();
+					} else {
+						index = reader.ReadUInt32();
+						off_spawnable_perso = Pointer.Read(reader);
+					}
+					Perso perso = null;
                     Pointer.DoAt(ref reader, off_spawnable_perso, () => {
                         perso = Perso.Read(reader, off_spawnable_perso, null);
                         if (perso != null) {

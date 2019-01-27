@@ -24,7 +24,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, R2, TT, TTSE, R2Demo, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
+        public enum Game { R3, RA, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -36,6 +36,7 @@ namespace OpenSpace {
         public Platform platform;
         public Endian endian;
         public LinkedListType linkedListType;
+		public bool hasObjectTypes = true;
         public bool hasNames = false;
         public bool hasDeformations = false;
         public int numEntryActions = 0;
@@ -257,7 +258,7 @@ namespace OpenSpace {
 
 		public static Settings R2PS2 = new Settings() {
 			engineVersion = EngineVersion.R2,
-			game = Game.R2,
+			game = Game.R2Revolution,
 			platform = Platform.PS2,
 			endian = Endian.Little,
 			numEntryActions = 43,
@@ -265,8 +266,10 @@ namespace OpenSpace {
 			encryption = Encryption.None,
 			luminosity = 0.5f,
 			saturate = true,
-			aiTypes = AITypes.R2,
+			aiTypes = AITypes.Revolution,
+			//textureAnimationSpeedModifier = 2f,
 			hasExtraInputData = false,
+			hasObjectTypes = false,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.None }
 			}

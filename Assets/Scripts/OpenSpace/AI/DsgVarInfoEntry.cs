@@ -32,13 +32,21 @@ namespace OpenSpace.AI {
         public static DsgVarInfoEntry Read(Reader reader, Pointer offset, uint number) {
             MapLoader l = MapLoader.Loader;
             DsgVarInfoEntry d = new DsgVarInfoEntry(offset);
-            //l.print(offset);
-            d.offsetInBuffer = reader.ReadUInt32();
-            d.typeNumber = reader.ReadUInt32();
-            d.saveType = reader.ReadUInt32();
-            d.initType = reader.ReadUInt32();
+			//l.print(offset);
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				d.offsetInBuffer = reader.ReadUInt16();
+				reader.ReadUInt16();
+				d.typeNumber = reader.ReadByte();
+				d.saveType = reader.ReadByte();
+				d.initType = d.saveType;
+			} else {
+				d.offsetInBuffer = reader.ReadUInt32();
+				d.typeNumber = reader.ReadUInt32();
+				d.saveType = reader.ReadUInt32();
+				d.initType = reader.ReadUInt32();
+			}
 
-            d.number = number;
+			d.number = number;
 
             d.type = Settings.s.aiTypes.GetDsgVarType(d.typeNumber);
 

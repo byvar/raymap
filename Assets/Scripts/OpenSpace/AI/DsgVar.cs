@@ -26,6 +26,7 @@ namespace OpenSpace.AI {
 
         public static DsgVar Read(Reader reader, Pointer offset, DsgMem dsgMem=null) {
             MapLoader l = MapLoader.Loader;
+			//l.print("DsgVar " + offset);
             DsgVar dsgVar = new DsgVar(offset);
             dsgVar.off_dsgMemBuffer = Pointer.Read(reader);
             dsgVar.off_dsgVarInfo = Pointer.Read(reader);
@@ -39,11 +40,15 @@ namespace OpenSpace.AI {
             if (dsgMem==null
                && Settings.s.platform != Settings.Platform.GC
                && Settings.s.platform != Settings.Platform.DC
-               && Settings.s.engineVersion >= Settings.EngineVersion.R2) {
+			   && Settings.s.game != Settings.Game.R2Revolution
+			   && Settings.s.engineVersion >= Settings.EngineVersion.R2) {
                 dsgVar.something3 = reader.ReadUInt32();
             }
 
-            if (Settings.s.platform == Settings.Platform.GC
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				dsgVar.dsgMemBufferLength = reader.ReadUInt16();
+				dsgVar.amountOfInfos = reader.ReadUInt16();
+			} else if (Settings.s.platform == Settings.Platform.GC
                 || Settings.s.platform == Settings.Platform.DC
                 || Settings.s.engineVersion < Settings.EngineVersion.R2) {
                 dsgVar.dsgMemBufferLength = reader.ReadUInt32();
@@ -96,7 +101,8 @@ namespace OpenSpace.AI {
             Pointer original = Pointer.Goto(ref reader, buffer + infoEntry.offsetInBuffer);
             object returnValue = null;
 
-            try {
+
+			try {
 
                 switch (infoEntry.type) {
                     case DsgVarInfoEntry.DsgVarType.Boolean:
@@ -163,8 +169,9 @@ namespace OpenSpace.AI {
                 }
 
             } catch (Exception e) {
-                returnValue = "Exception: " + e.Message;
-            }
+				returnValue = "Exception: " + e.Message;
+				//returnValue = "Exception: " + e.Message + "\nBuffer: " + buffer + " - InfoEntry.Offset: " + infoEntry.offsetInBuffer + " - typeNumber: " + infoEntry.typeNumber + "\n" + e.StackTrace;
+			}
 
             Pointer.Goto(ref reader, original);
 

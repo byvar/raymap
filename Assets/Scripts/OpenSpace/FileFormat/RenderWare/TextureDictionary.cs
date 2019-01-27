@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using VrSharp.PvrTexture;
 
@@ -27,6 +29,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 					Section texNativeHeader = texNative.children[0];
 					Section texNativeInfo = texNative.children[3].children[0];
 					byte[] texNativeData = texNative.children[3].children[1].data;
+					string name = (string)texNative.children[1]["string"];
 					uint width = (uint)texNativeInfo.variables["width"];
 					uint height = (uint)texNativeInfo.variables["height"];
 					uint bpp = (uint)texNativeInfo.variables["bpp"];
@@ -36,10 +39,48 @@ namespace OpenSpace.FileFormat.RenderWare {
 					byte filterMode = (byte)texNativeHeader.variables["filterMode"];
 					byte addressingMode = (byte)texNativeHeader.variables["addressingMode"];
 					textures[i] = ParseTexture(texNativeData, width, height, bpp, textureDataSize, paletteDataSize, (FilterMode)filterMode, (AddressingMode)addressingMode, (RasterFormat)rasterFormat);
-					//Util.ByteArrayToFile(Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "/" + Path.GetFileNameWithoutExtension(path) + "_" + i + ".png", textures[i].EncodeToPNG());
+					//Util.ByteArrayToFile(Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "/" + name + ".png", textures[i].EncodeToPNG());
 					//Util.ByteArrayToFile(Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "/" + Path.GetFileNameWithoutExtension(path) + "_" + i + "_" + rasterFormat + ".dat", texNativeData);
 				}
 			}
+		}
+
+		/*public Texture2D Lookup(byte[] name, Type type) {
+			if (root != null && root.type == Section.Type.TextureDictionary) {
+				for (int i = 0; i < Count; i++) {
+					Section texNative = root.children[i + 1];
+					byte[] texName = type == Type.Texture ? texNative.children[1].data : texNative.children[2].data;
+					if (name.SequenceEqual(texName)) {
+						return textures[i];
+					}
+				}
+			}
+			return null;
+		}
+
+		public Texture2D Lookup(string name) {
+			int addLength = name.Length - (name.Length/4)*4;
+			byte[] bytes = new byte[name.Length + addLength];
+			for (int i = 0; i < name.Length; i++) {
+				bytes[i] = Convert.ToByte(name[i]);
+			}
+			for (int i = name.Length; i < name.Length + addLength; i++) {
+				bytes[i] = 0x0;
+			}
+			return Lookup(bytes, Type.Texture);
+		}*/
+
+		public Texture2D Lookup(string name, Type type = Type.Texture) {
+			if (root != null && root.type == Section.Type.TextureDictionary) {
+				for (int i = 0; i < Count; i++) {
+					Section texNative = root.children[i + 1];
+					string texName = type == Type.Texture ? (string)texNative.children[1]["string"] : (string)texNative.children[2]["string"];
+					if (name == texName) {
+						return textures[i];
+					}
+				}
+			}
+			return null;
 		}
 
 		private Texture2D ParseTexture(byte[] data, uint width, uint height, uint bpp, uint textureDataSize, uint paletteDataSize, FilterMode filterMode, AddressingMode addressingMode, RasterFormat rasterFormat) {
@@ -47,21 +88,21 @@ namespace OpenSpace.FileFormat.RenderWare {
 			Color[] pixels = new Color[width * height];
 			if (!rasterFormat.HasFlag(RasterFormat.FORMAT_EXT_PAL8)) {
 				// No palette
-				if (rasterFormat.HasFlag(RasterFormat.FORMAT_1555)) {
-					// Just RGBA
+				if (rasterFormat.HasFlag(RasterFormat.FORMAT_8888)) {
+					// Just RGBA 32bit
+					for (int i = 0; i < data.Length / 4; i++) {
+						pixels[i] = new Color(data[i * 4] / 255f, data[i * 4 + 1] / 255f, data[i * 4 + 2] / 255f, data[i * 4 + 3] / 255f);
+					}
+				} else if(rasterFormat.HasFlag(RasterFormat.FORMAT_1555)) {
+					// Just RGBA 5551
 					for (int i = 0; i < data.Length / 2; i++) {
 						ushort pixel = Util.ToUInt16(new byte[] { data[i * 2], data[i * 2 + 1] }, 0, Settings.s.IsLittleEndian);
 						uint alpha = extractBits(pixel, 1, 15);
 						uint blue = extractBits(pixel, 5, 10);
 						uint green = extractBits(pixel, 5, 5);
 						uint red = extractBits(pixel, 5, 0);
-
+						
 						pixels[i] = new Color(red / 31.0f, green / 31.0f, blue / 31.0f, alpha);
-					}
-				} else if (rasterFormat.HasFlag(RasterFormat.FORMAT_8888)) {
-					// Just RGBA 32bit
-					for (int i = 0; i < data.Length / 4; i++) {
-						pixels[i] = new Color(data[i * 4] / 255f, data[i * 4 + 1] / 255f, data[i * 4 + 2] / 255f, data[i * 4 + 3] / 255f);
 					}
 				} else {
 					MapLoader.Loader.print("(RenderWare) Unknown Texture Format: " + rasterFormat);
@@ -151,6 +192,11 @@ namespace OpenSpace.FileFormat.RenderWare {
 			WRAP_WRAP = 0x01,
 			WRAP_MIRROR = 0x02,
 			WRAP_CLAMP = 0x03
+		}
+
+		public enum Type {
+			Texture,
+			Alpha
 		}
 
 		static uint extractBits(int number, int count, int offset) {

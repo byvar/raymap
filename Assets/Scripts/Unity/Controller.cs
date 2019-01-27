@@ -184,14 +184,14 @@ public class Controller : MonoBehaviour {
 		detailedState = "Initializing sectors";
 		yield return null;
 		sectorManager.Init();
-		detailedState = "Initializing lights";
-		yield return null;
-		lightManager.Init();
 		detailedState = "Initializing graphs";
 		yield return null;
 		CreateGraphs();
 		detailedState = "Initializing persos";
 		yield return StartCoroutine(InitPersos());
+		detailedState = "Initializing lights";
+		yield return null;
+		lightManager.Init();
 		detailedState = "Initializing camera";
 		yield return null;
 		InitCamera();
@@ -415,6 +415,9 @@ public class Controller : MonoBehaviour {
 	public void InitCamera() {
 		if (loader != null) {
 			Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
+			if (camera == null && loader.globals != null) {
+				camera = loader.persos.FirstOrDefault(p => p != null && p.stdGame != null && p.stdGame.off_superobject == loader.globals.off_camera);
+			}
 			if (camera != null) {
 				Camera.main.transform.position = camera.Gao.transform.position;
 				Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0, 180, 0);

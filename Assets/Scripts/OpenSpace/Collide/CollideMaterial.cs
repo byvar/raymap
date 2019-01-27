@@ -54,15 +54,20 @@ namespace OpenSpace.Collide {
         public static CollideMaterial Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             CollideMaterial cm = new CollideMaterial(offset);
-            //l.print(offset);
+			//l.print(offset);
 
-            cm.type = reader.ReadUInt16();
-            cm.identifier = reader.ReadUInt16();
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                cm.direction = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                cm.coef = reader.ReadSingle();
-            }
-            cm.typeForAI = reader.ReadUInt32();
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				cm.type = reader.ReadUInt16();
+				cm.identifier = reader.ReadUInt16();
+			} else {
+				cm.type = reader.ReadUInt16();
+				cm.identifier = reader.ReadUInt16();
+				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+					cm.direction = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+					cm.coef = reader.ReadSingle();
+				}
+				cm.typeForAI = reader.ReadUInt32();
+			}
             return cm;
         }
 

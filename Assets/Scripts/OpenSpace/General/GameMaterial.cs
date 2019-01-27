@@ -27,20 +27,25 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             GameMaterial gm = new GameMaterial(offset);
 
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                gm.off_visualMaterial = Pointer.Read(reader);
-                gm.off_mechanicsMaterial = Pointer.Read(reader);
-            }
-            // Very ugly code incoming
-            gm.soundMaterial = reader.ReadUInt32();
-            gm.off_collideMaterial = Pointer.Read(reader, allowMinusOne: true);
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				gm.soundMaterial = reader.ReadUInt32();
+				gm.collideMaterial = CollideMaterial.Read(reader, Pointer.Current(reader));
+				// Maybe the first uint16 of collidematerial in Revolution is actually sound material, but eh
+			} else {
+				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+					gm.off_visualMaterial = Pointer.Read(reader);
+					gm.off_mechanicsMaterial = Pointer.Read(reader);
+				}
+				gm.soundMaterial = reader.ReadUInt32();
+				gm.off_collideMaterial = Pointer.Read(reader, allowMinusOne: true);
 
-            if (gm.off_visualMaterial != null) {
-                gm.visualMaterial = VisualMaterial.FromOffsetOrRead(gm.off_visualMaterial, reader);
-            }
-            if (gm.off_collideMaterial != null) {
-                gm.collideMaterial = CollideMaterial.FromOffsetOrRead(gm.off_collideMaterial, reader);
-            }
+				if (gm.off_visualMaterial != null) {
+					gm.visualMaterial = VisualMaterial.FromOffsetOrRead(gm.off_visualMaterial, reader);
+				}
+				if (gm.off_collideMaterial != null) {
+					gm.collideMaterial = CollideMaterial.FromOffsetOrRead(gm.off_collideMaterial, reader);
+				}
+			}
             return gm;
         }
 

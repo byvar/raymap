@@ -124,6 +124,7 @@ namespace OpenSpace.Object {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
             s.name = "Sector @ " + offset;
+			l.print(s.name);
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 if (Settings.s.game == Settings.Game.TTSE) reader.ReadUInt32(); // always 1 or 0. whether the sector is active or not?
                 Pointer off_collideObj = Pointer.Read(reader);
@@ -161,23 +162,25 @@ namespace OpenSpace.Object {
 
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
+				reader.ReadUInt32();
+				s.isSectorVirtual = reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
 
-                reader.ReadUInt32();
-                s.isSectorVirtual = reader.ReadByte();
-                reader.ReadByte();
-                reader.ReadByte();
-                reader.ReadByte();
-                if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
-                    s.off_skyMaterial = Pointer.Read(reader);
-                    s.skyMaterial = VisualMaterial.FromOffsetOrRead(s.off_skyMaterial, reader);
-                } else {
-                    reader.ReadUInt32();
-                }
-                reader.ReadByte();
-                if (Settings.s.hasNames) {
-                    s.name = reader.ReadString(0x104);
-                    l.print(s.name);
-                }
+				if (Settings.s.game != Settings.Game.R2Revolution) {
+					if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
+						s.off_skyMaterial = Pointer.Read(reader);
+						s.skyMaterial = VisualMaterial.FromOffsetOrRead(s.off_skyMaterial, reader);
+					} else {
+						reader.ReadUInt32();
+					}
+					reader.ReadByte();
+					if (Settings.s.hasNames) {
+						s.name = reader.ReadString(0x104);
+						l.print(s.name);
+					}
+				}
             } else {
                 if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                     reader.ReadUInt32();

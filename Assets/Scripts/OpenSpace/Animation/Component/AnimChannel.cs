@@ -21,7 +21,7 @@ namespace OpenSpace.Animation.Component {
             ch.id = reader.ReadInt16();
             ch.vector = reader.ReadUInt16();
             ch.numOfNTTO = reader.ReadUInt16();
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT && Settings.s.game != Settings.Game.R2Revolution) {
                 ch.framesKF = reader.ReadUInt32();
                 ch.keyframe = reader.ReadUInt32();
             } else {

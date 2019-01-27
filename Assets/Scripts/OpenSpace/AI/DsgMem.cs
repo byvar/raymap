@@ -20,7 +20,7 @@ namespace OpenSpace.AI {
 
         public static DsgMem Read(Reader reader, Pointer offset) {
             DsgMem dsgMem = new DsgMem(offset);
-            //MapLoader.Loader.print(offset);
+            //MapLoader.Loader.print("DsgMem " + offset);
             Pointer dsgVarPointer = Pointer.Read(reader);
             Pointer.DoAt(ref reader, dsgVarPointer, () => {
                 if (Settings.s.game == Settings.Game.R2Demo) {

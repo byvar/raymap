@@ -20,6 +20,7 @@ namespace OpenSpace
 
         public static Dynam Read(Reader reader, Pointer offset) {
             Dynam dynam = new Dynam(offset);
+			MapLoader.Loader.print("Dynam " + offset);
 
             dynam.off_dynamics = Pointer.Read(reader);
 

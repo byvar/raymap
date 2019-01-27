@@ -24,5 +24,7 @@ namespace OpenSpace {
 
         public Pointer off_backgroundGameMaterial = null; // Donald Duck only
         public GameMaterial backgroundGameMaterial = null;
+
+		public Pointer off_camera = null; // We use this to determine the camera object in Revolution, without names
     }
 }

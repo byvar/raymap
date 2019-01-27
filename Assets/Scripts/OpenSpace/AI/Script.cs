@@ -17,23 +17,34 @@ namespace OpenSpace.AI {
             this.offset = offset;
         }
 
-        public static Script Read(Reader reader, Pointer offset, BehaviorOrMacro behaviorOrMacro) {
+        public static Script Read(Reader reader, Pointer offset, BehaviorOrMacro behaviorOrMacro, bool single = false) {
             MapLoader l = MapLoader.Loader;
             Script s = new Script(offset);
 
             s.behaviorOrMacro = behaviorOrMacro;
 
-            s.off_script = Pointer.Read(reader);
-            //l.print(s.off_script);
-            Pointer.DoAt(ref reader, s.off_script, () => {
-                bool endReached = false;
-                while (!endReached) {
-                    ScriptNode sn = ScriptNode.Read(reader, Pointer.Current(reader), s);
-                    s.scriptNodes.Add(sn);
+			if (Settings.s.game == Settings.Game.R2Revolution && single) {
+				s.off_script = Pointer.Current(reader);
+				bool endReached = false;
+				while (!endReached) {
+					ScriptNode sn = ScriptNode.Read(reader, Pointer.Current(reader), s);
+					s.scriptNodes.Add(sn);
 
-                    if (sn.indent == 0) endReached = true;
-                }
-            });
+					if (sn.indent == 0) endReached = true;
+				}
+			} else {
+				s.off_script = Pointer.Read(reader);
+				//l.print(s.off_script);
+				Pointer.DoAt(ref reader, s.off_script, () => {
+					bool endReached = false;
+					while (!endReached) {
+						ScriptNode sn = ScriptNode.Read(reader, Pointer.Current(reader), s);
+						s.scriptNodes.Add(sn);
+
+						if (sn.indent == 0) endReached = true;
+					}
+				});
+			}
             return s;
         }
 

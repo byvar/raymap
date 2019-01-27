@@ -72,8 +72,8 @@ namespace OpenSpace.Object {
 
         public static Perso Read(Reader reader, Pointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
-            //l.print("Offset: " + offset);
             Perso p = new Perso(offset, so);
+			//l.print("Perso " + offset);
 			l.persos.Add(p);
             p.off_3dData = Pointer.Read(reader); // 0x0
             p.off_stdGame = Pointer.Read(reader); // 4 Standard Game info
@@ -103,17 +103,23 @@ namespace OpenSpace.Object {
             if (p.off_stdGame != null) {
                 Pointer off_current = Pointer.Goto(ref reader, p.off_stdGame);
                 p.stdGame = StandardGame.Read(reader, p.off_stdGame);
-                p.nameFamily = p.stdGame.GetName(0);
-                p.nameModel = p.stdGame.GetName(1);
-                p.namePerso = p.stdGame.GetName(2);
+				if (Settings.s.hasObjectTypes) {
+					p.nameFamily = p.stdGame.GetName(0);
+					p.nameModel = p.stdGame.GetName(1);
+					p.namePerso = p.stdGame.GetName(2);
+				} else {
+					p.nameFamily = "Family" + p.stdGame.objectTypes[0];
+					p.nameModel = "Model" + p.stdGame.objectTypes[1];
+					p.namePerso = "Instance" + p.stdGame.objectTypes[2];
+				}
 
                 Pointer.Goto(ref reader, off_current);
             }
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset);
-            if (p.off_dynam != null && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                Pointer off_current = Pointer.Goto(ref reader, p.off_dynam);
-                p.dynam = Dynam.Read(reader, p.off_dynam);
-                Pointer.Goto(ref reader, off_current);
+            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal && Settings.s.game != Settings.Game.R2Revolution) {
+				Pointer.DoAt(ref reader, p.off_dynam, () => {
+					p.dynam = Dynam.Read(reader, p.off_dynam);
+				});
             }
 
             Pointer.DoAt(ref reader, p.off_brain, () => {
@@ -147,11 +153,21 @@ namespace OpenSpace.Object {
             }*/
             if (p.p3dData != null && p.p3dData.family != null) {
                 if (p.p3dData.off_objectList != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_objectList) == -1) {
-                    p.p3dData.family.AddNewPhysicalList(ObjectList.FromOffsetOrRead(p.p3dData.off_objectList, reader));
-                }
+					ObjectList ol = ObjectList.FromOffsetOrRead(p.p3dData.off_objectList, reader);
+					p.p3dData.family.AddNewPhysicalList(ol);
+					/*if (ol != null) {
+						p.p3dData.family.AddNewPhysicalList(ol);
+						ol.Gao.transform.SetParent(p.p3dData.family.Gao.transform);
+					}*/
+				}
                 if (p.p3dData.off_objectListInitial != null && p.p3dData.family.GetIndexOfPhysicalList(p.p3dData.off_objectListInitial) == -1) {
-                    p.p3dData.family.AddNewPhysicalList(ObjectList.FromOffsetOrRead(p.p3dData.off_objectListInitial, reader));
-                }
+					ObjectList ol = ObjectList.FromOffsetOrRead(p.p3dData.off_objectListInitial, reader);
+					p.p3dData.family.AddNewPhysicalList(ol);
+					/*if (ol != null) {
+						p.p3dData.family.AddNewPhysicalList(ol);
+						ol.Gao.transform.SetParent(p.p3dData.family.Gao.transform);
+					}*/
+				}
                 if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null
                     && !(Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
                                                                                                           // Add physical objects tables hidden in scripts

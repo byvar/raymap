@@ -20,6 +20,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 		public Vector2[][] uvs;
 		public Triangle[] triangles;
 		public MorphTarget[] morphTargets;
+		public Color[] vertexColors;
 
 		[Flags]
 		public enum GeometryFormat {
@@ -62,6 +63,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 			g.numTriangles = reader.ReadUInt32();
 			g.numVertices = reader.ReadUInt32();
 			g.numMorphTargets = reader.ReadUInt32();
+			if (g.numMorphTargets > 1 || g.numMorphTargets < 1) l.print(g.numMorphTargets);
 			g.ambient = reader.ReadSingle();
 			g.specular = reader.ReadSingle();
 			g.diffuse = reader.ReadSingle();
@@ -72,7 +74,11 @@ namespace OpenSpace.FileFormat.RenderWare {
 			g.uvs = new Vector2[g.numTexSets][];
 			if (!g.format.HasFlag(GeometryFormat.NATIVE)) {
 				if (g.format.HasFlag(GeometryFormat.PRELIT)) {
-					l.print("Unsupported: GeometryFormat Prelit");
+					//Debug.LogWarning("PRELIT");
+					g.vertexColors = new Color[g.numVertices];
+					for (int i = 0; i < g.numVertices; i++) {
+						g.vertexColors[i] = new Color(reader.ReadByte() / 255f, reader.ReadByte() / 255f, reader.ReadByte() / 255f, reader.ReadByte() / 255f);
+					}
 				}
 				if (g.format.HasFlag(GeometryFormat.TEXTURED) || g.format.HasFlag(GeometryFormat.TEXTURED2)) {
 					for (int i = 0; i < g.numTexSets; i++) {
@@ -104,13 +110,19 @@ namespace OpenSpace.FileFormat.RenderWare {
 				if (g.morphTargets[i].hasVertices) {
 					g.morphTargets[i].vertices = new Vector3[g.numVertices];
 					for (int j = 0; j < g.numVertices; j++) {
-						g.morphTargets[i].vertices[j] = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						float x = reader.ReadSingle();
+						float z = reader.ReadSingle();
+						float y = reader.ReadSingle();
+						g.morphTargets[i].vertices[j] = new Vector3(x,y,z);
 					}
 				}
 				if (g.morphTargets[i].hasNormals) {
 					g.morphTargets[i].normals = new Vector3[g.numVertices];
 					for (int j = 0; j < g.numVertices; j++) {
-						g.morphTargets[i].normals[j] = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						float x = reader.ReadSingle();
+						float z = reader.ReadSingle();
+						float y = reader.ReadSingle();
+						g.morphTargets[i].normals[j] = new Vector3(x, y, z);
 					}
 				}
 			}

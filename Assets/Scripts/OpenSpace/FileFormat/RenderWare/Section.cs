@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,16 @@ namespace OpenSpace.FileFormat.RenderWare {
 		public List<Section> children = new List<Section>();
 		public Dictionary<string, object> variables = new Dictionary<string, object>();
 		public byte[] data;
+
+		public object this[string key] {
+			get { return variables[key]; }
+			set { variables[key] = value; }
+		}
+
+		public Section this[int key] {
+			get { return children[key]; }
+			set { children[key] = value; }
+		}
 
 		public Section(Type type, uint size, uint version) {
 			this.type = type;
@@ -31,14 +42,18 @@ namespace OpenSpace.FileFormat.RenderWare {
 			uint size = reader.ReadUInt32();
 			uint version = reader.ReadUInt32();
 			Section sec = new Section(type, size, version);
-			if(specialRead != null) specialRead(sec, sec.variables);
+			if(specialRead != null) specialRead(sec);
 			switch (sec.type) {
+				case Type.String:
+					sec.data = reader.ReadBytes((int)size);
+					sec["string"] = System.Text.Encoding.UTF8.GetString(sec.data).TrimEnd('\0');
+					break;
 				case Type.TextureDictionary:
 					ushort numTextures = 0;
-					sec.ReadChild(reader, (s,v) => {
+					sec.ReadChild(reader, (s) => {
 						numTextures = reader.ReadUInt16();
-						v["numTextures"] = numTextures;
-						v["unk"] = reader.ReadUInt16();
+						s["numTextures"] = numTextures;
+						s["unk"] = reader.ReadUInt16();
 					}); // Info Struct
 					for (uint i = 0; i < numTextures; i++) {
 						sec.ReadChild(reader); // TextureNative
@@ -46,20 +61,20 @@ namespace OpenSpace.FileFormat.RenderWare {
 					sec.ReadChild(reader); // Extension
 					break;
 				case Type.TextureNative:
-					sec.ReadChild(reader, (s,v) => {
-						v["platform"] = reader.ReadUInt32();
-						v["filterMode"] = reader.ReadByte();
-						v["addressingMode"] = reader.ReadByte();
+					sec.ReadChild(reader, (s) => {
+						s["platform"] = reader.ReadUInt32();
+						s["filterMode"] = reader.ReadByte();
+						s["addressingMode"] = reader.ReadByte();
 						reader.ReadUInt16(); // padding
 					}); // Info Struct
 					sec.ReadChild(reader); // Texture name
 					sec.ReadChild(reader); // Alpha name
-					sec.ReadChild(reader, (st,vt) => {
-						st.ReadChild(reader, (s, v) => {
-							v["width"] = reader.ReadUInt32();
-							v["height"] = reader.ReadUInt32();
-							v["bpp"] = reader.ReadUInt32();
-							v["rasterFormat"] = reader.ReadUInt32();
+					sec.ReadChild(reader, (st) => {
+						st.ReadChild(reader, (s) => {
+							s["width"] = reader.ReadUInt32();
+							s["height"] = reader.ReadUInt32();
+							s["bpp"] = reader.ReadUInt32();
+							s["rasterFormat"] = reader.ReadUInt32();
 							reader.ReadUInt32(); // PS2 TEX0 GS register
 							reader.ReadUInt32(); // PS2 TEX0 GS register
 							reader.ReadUInt32(); // PS2 TEX1 GS register
@@ -68,22 +83,22 @@ namespace OpenSpace.FileFormat.RenderWare {
 							reader.ReadUInt32(); // PS2 MIPTBP1 GS register
 							reader.ReadUInt32(); // PS2 MIPTBP2 GS register
 							reader.ReadUInt32(); // PS2 MIPTBP2 GS register
-							v["textureDataSize"] = reader.ReadUInt32();
-							v["paletteDataSize"] = reader.ReadUInt32();
-							v["gpuDataAlignedSize"] = reader.ReadUInt32();
-							v["skyMipmapVal"] = reader.ReadUInt32();
+							s["textureDataSize"] = reader.ReadUInt32();
+							s["paletteDataSize"] = reader.ReadUInt32();
+							s["gpuDataAlignedSize"] = reader.ReadUInt32();
+							s["skyMipmapVal"] = reader.ReadUInt32();
 						}); // Texture - info struct
 						st.ReadChild(reader); // Texture - data
 					}); // Texture
-					sec.ReadChild(reader, (se, ve) => {
+					sec.ReadChild(reader, (se) => {
 						se.ReadChild(reader); // Extension - sky mipmap val - 4 bytes unknown
 					}); // Extension
 					break;
 				case Type.Clump:
 					uint numAtomics = 0;
-					sec.ReadChild(reader, (s, v) => {
+					sec.ReadChild(reader, (s) => {
 						numAtomics = reader.ReadUInt32();
-						v["numAtomics"] = numAtomics;
+						s["numAtomics"] = numAtomics;
 					}); // Info Struct
 					sec.ReadChild(reader); // Frame list
 					sec.ReadChild(reader); // Geometry list
@@ -95,9 +110,9 @@ namespace OpenSpace.FileFormat.RenderWare {
 					break;
 				case Type.FrameList:
 					uint numFrames = 0;
-					sec.ReadChild(reader, (s, v) => {
+					sec.ReadChild(reader, (s) => {
 						numFrames = reader.ReadUInt32();
-						v["numFrames"] = numFrames;
+						s["numFrames"] = numFrames;
 						Frame[] frames = new Frame[numFrames];
 						for (int i = 0; i < numFrames; i++) {
 							frames[i] = new Frame();
@@ -105,7 +120,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 							frames[i].index = reader.ReadInt32();
 							frames[i].flags = reader.ReadUInt32();
 						}
-						v["frames"] = frames;
+						s["frames"] = frames;
 					}); // Info Struct
 					for (int i = 0; i < numFrames; i++) {
 						sec.ReadChild(reader); // Extension
@@ -113,20 +128,20 @@ namespace OpenSpace.FileFormat.RenderWare {
 					break;
 				case Type.GeometryList:
 					uint numMeshes = 0;
-					sec.ReadChild(reader, (s, v) => {
+					sec.ReadChild(reader, (s) => {
 						numMeshes = reader.ReadUInt32();
-						v["numMeshes"] = numMeshes;
+						s["numMeshes"] = numMeshes;
 					}); // Info Struct
 					for (int i = 0; i < numMeshes; i++) {
 						sec.ReadChild(reader); // Geometry
 					}
 					break;
 				case Type.Geometry:
-					sec.ReadChild(reader, (s, v) => {
-						v["geometry"] = Geometry.Read(reader);
+					sec.ReadChild(reader, (s) => {
+						s["geometry"] = Geometry.Read(reader);
 					}); // Info Struct
 					sec.ReadChild(reader); // Material list
-					sec.ReadChild(reader, (s,v) => {
+					sec.ReadChild(reader, (s) => {
 						if (s.size > 0) {
 							s.ReadChild(reader); // Bin Mesh
 						}
@@ -135,16 +150,16 @@ namespace OpenSpace.FileFormat.RenderWare {
 				case Type.MaterialList:
 					uint numMaterials = 0;
 					uint numUniqueMaterials = 0;
-					sec.ReadChild(reader, (s, v) => {
+					sec.ReadChild(reader, (s) => {
 						numMaterials = reader.ReadUInt32();
 						int[] materialIndices = new int[numMaterials];
 						for (int i = 0; i < numMaterials; i++) {
 							materialIndices[i] = reader.ReadInt32();
 							if (materialIndices[i] == -1) numUniqueMaterials++;
 						}
-						v["numMaterials"] = numMaterials;
-						v["numUniqueMaterials"] = numUniqueMaterials;
-						v["materialIndices"] = materialIndices;
+						s["numMaterials"] = numMaterials;
+						s["numUniqueMaterials"] = numUniqueMaterials;
+						s["materialIndices"] = materialIndices;
 					}); // Info struct
 					for (int i = 0; i < numUniqueMaterials; i++) {
 						sec.ReadChild(reader); // Material
@@ -152,9 +167,9 @@ namespace OpenSpace.FileFormat.RenderWare {
 					break;
 				case Type.Material:
 					bool isTextured = false;
-					 sec.ReadChild(reader, (s,v) => {
+					 sec.ReadChild(reader, (s) => {
 						Material mat = Material.Read(reader);
-						v["material"] = mat;
+						s["material"] = mat;
 						isTextured = mat.isTextured;
 					}); // Material struct
 					if (isTextured) {
@@ -166,8 +181,8 @@ namespace OpenSpace.FileFormat.RenderWare {
 					}
 					break;
 				case Type.Texture:
-					sec.ReadChild(reader, (s, v) => {
-						v["texture"] = MaterialTexture.Read(reader);
+					sec.ReadChild(reader, (s) => {
+						s["texture"] = MaterialTexture.Read(reader);
 					}); // Info struct
 					sec.ReadChild(reader); // Texture name
 					sec.ReadChild(reader); // Alpha name
@@ -177,14 +192,14 @@ namespace OpenSpace.FileFormat.RenderWare {
 					}
 					break;
 				case Type.BinMeshPlg:
-					sec.variables["binMesh"] = BinMesh.Read(reader);
+					sec["binMesh"] = BinMesh.Read(reader);
 					break;
 				case Type.Atomic:
-					sec.ReadChild(reader, (s, v) => {
-						s.variables["frameIndex"] = reader.ReadUInt32();
-						s.variables["geometryIndex"] = reader.ReadUInt32();
-						s.variables["flags"] = reader.ReadUInt32();
-						s.variables["unused"] = reader.ReadUInt32();
+					sec.ReadChild(reader, (s) => {
+						s["frameIndex"] = reader.ReadUInt32();
+						s["geometryIndex"] = reader.ReadUInt32();
+						s["flags"] = reader.ReadUInt32();
+						s["unused"] = reader.ReadUInt32();
 					}); // Struct
 					sec.ReadChild(reader); // Extension
 					break;
@@ -196,7 +211,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 			return sec;
 		}
 
-		public delegate void SectionRead(Section section, Dictionary<string, object> v);
+		public delegate void SectionRead(Section section);
 
 		public enum Type {
 			Struct = 1,

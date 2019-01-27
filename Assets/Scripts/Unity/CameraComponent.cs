@@ -144,9 +144,9 @@ public class CameraComponent : MonoBehaviour {
 			if (Input.GetAxis("Horizontal") != 0) {
 				transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
 			}
-			if (Input.GetKey(KeyCode.R)) {
+			if (Input.GetKey(KeyCode.Keypad8)) {
 				transform.Translate(Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
-			} else if (Input.GetKey(KeyCode.F)) {
+			} else if (Input.GetKey(KeyCode.Keypad2)) {
 				transform.Translate(-Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
 			}
 			if (Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.KeypadPlus)) {

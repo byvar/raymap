@@ -5,7 +5,7 @@ namespace OpenSpace.Object.Properties {
     public class StandardGame {
         public Pointer offset;
         public uint[] objectTypes = new uint[3];
-        public Pointer superObject;
+        public Pointer off_superobject;
 
         public int customBits;
         public int aiCustomBits;
@@ -24,41 +24,68 @@ namespace OpenSpace.Object.Properties {
             MapLoader l = MapLoader.Loader;
             //l.print(offset);
             StandardGame stdGame = new StandardGame(offset);
-            stdGame.objectTypes[0] = reader.ReadUInt32();
-            stdGame.objectTypes[1] = reader.ReadUInt32();
-            stdGame.objectTypes[2] = reader.ReadUInt32();
-            stdGame.superObject = Pointer.Read(reader); // 0xC SuperObject from Perso probably
 
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                if (Settings.s.platform == Settings.Platform.DC) {
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadByte();
-                    reader.ReadByte();
-                    reader.ReadByte();
-                    reader.ReadByte();
-                } else {
-                    reader.ReadBytes(0x14); // 0x10 - 0x23
-                }
-                stdGame.customBits = reader.ReadInt32(); // 0x24 custom bits
-                stdGame.isAPlatform = reader.ReadByte();
-                stdGame.unk = reader.ReadByte();
-                stdGame.transparencyZoneMin = reader.ReadByte();
-                stdGame.transparencyZoneMax = reader.ReadByte();
-                stdGame.customBitsInitial = reader.ReadInt32();
 
-            } else {
-                reader.ReadBytes(0x10); // 0x10 - 0x1F
-                stdGame.customBits = reader.ReadInt32(); // 0x20 custom bits
-                stdGame.aiCustomBits = reader.ReadInt32(); // 0x24 AI custom bits
-                stdGame.isAPlatform = reader.ReadByte();
-                stdGame.unk = reader.ReadByte();
-                stdGame.transparencyZoneMin = reader.ReadByte();
-                stdGame.transparencyZoneMax = reader.ReadByte();
-                stdGame.customBitsInitial = reader.ReadInt32();
-                stdGame.aiCustomBitsInitial = reader.ReadInt32();
-            }
+			if (Settings.s.game != Settings.Game.R2Revolution) {
+				stdGame.objectTypes[0] = reader.ReadUInt32();
+				stdGame.objectTypes[1] = reader.ReadUInt32();
+				stdGame.objectTypes[2] = reader.ReadUInt32();
+				stdGame.off_superobject = Pointer.Read(reader); // 0xC SuperObject from Perso probably
+
+				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+					if (Settings.s.platform == Settings.Platform.DC) {
+						reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadByte();
+						reader.ReadByte();
+						reader.ReadByte();
+						reader.ReadByte();
+					} else {
+						reader.ReadBytes(0x14); // 0x10 - 0x23
+					}
+					stdGame.customBits = reader.ReadInt32(); // 0x24 custom bits
+					stdGame.isAPlatform = reader.ReadByte();
+					stdGame.unk = reader.ReadByte();
+					stdGame.transparencyZoneMin = reader.ReadByte();
+					stdGame.transparencyZoneMax = reader.ReadByte();
+					stdGame.customBitsInitial = reader.ReadInt32();
+
+				} else {
+					reader.ReadBytes(0x10); // 0x10 - 0x1F
+					stdGame.customBits = reader.ReadInt32(); // 0x20 custom bits
+					stdGame.aiCustomBits = reader.ReadInt32(); // 0x24 AI custom bits
+					stdGame.isAPlatform = reader.ReadByte();
+					stdGame.unk = reader.ReadByte();
+					stdGame.transparencyZoneMin = reader.ReadByte();
+					stdGame.transparencyZoneMax = reader.ReadByte();
+					stdGame.customBitsInitial = reader.ReadInt32();
+					stdGame.aiCustomBitsInitial = reader.ReadInt32();
+				}
+			} else {
+				// Revolution
+				reader.ReadInt32();
+				reader.ReadInt32();
+				reader.ReadInt32();
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+				stdGame.objectTypes[0] = reader.ReadUInt16();
+				stdGame.objectTypes[1] = reader.ReadUInt16();
+				stdGame.objectTypes[2] = reader.ReadUInt16();
+				reader.ReadUInt16();
+				stdGame.off_superobject = Pointer.Read(reader);
+				reader.ReadBytes(0xC);
+				stdGame.isAPlatform = reader.ReadByte();
+				stdGame.unk = reader.ReadByte();
+				stdGame.transparencyZoneMin = reader.ReadByte();
+				stdGame.transparencyZoneMax = reader.ReadByte();
+				stdGame.customBits = reader.ReadInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32(); // a pointer?
+				stdGame.customBitsInitial = reader.ReadInt32();
+			}
 
             return stdGame;
         }
