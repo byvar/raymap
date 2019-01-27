@@ -124,7 +124,7 @@ namespace OpenSpace.Object {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
             s.name = "Sector @ " + offset;
-			l.print(s.name);
+			//l.print(s.name);
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 if (Settings.s.game == Settings.Game.TTSE) reader.ReadUInt32(); // always 1 or 0. whether the sector is active or not?
                 Pointer off_collideObj = Pointer.Read(reader);

@@ -409,8 +409,13 @@ public class PersoBehaviour : MonoBehaviour {
                 }
                 forceAnimUpdate = true;
                 SetState(currentState);
-            }
-        }
+			}
+			if (tooFarLimitDiamond != null) {
+				float diameter = this.perso.stdGame.tooFarLimit;
+				this.tooFarLimitDiamond.transform.localScale = new Vector3(diameter, diameter, diameter);
+				this.tooFarLimitDiamond.transform.rotation = Quaternion.Euler(0, 0, 0);
+			}
+		}
         bool sectorActive = false, insideSectors = false;
         if (sector == null || isAlways || sector.Loaded) sectorActive = true;
         if (sector == null || isAlways || controller.sectorManager.activeSectors.Count > 0) insideSectors = true;
@@ -450,10 +455,6 @@ public class PersoBehaviour : MonoBehaviour {
                 }
             }
         }
-
-        float diameter = this.perso.stdGame.tooFarLimit;
-        this.tooFarLimitDiamond.transform.localScale = new Vector3(diameter, diameter, diameter);
-        this.tooFarLimitDiamond.transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
     void DeinitAnimation() {
@@ -560,7 +561,8 @@ public class PersoBehaviour : MonoBehaviour {
                 for (int i = 0; i < a3d.num_morphData; i++) {
                     AnimMorphData m = a3d.morphData[a3d.start_morphData+i];
                     if (m != null) {
-                        int channelIndex = this.GetChannelByID(m.channel)[0];
+						//print(m.channel + " - " + m.frame + " - " + m.morphProgress + " - " + m.objectIndexTo + " - " + m.byte5 + " - " + m.byte6 + " - " + m.byte7);
+						int channelIndex = this.GetChannelByID(m.channel)[0];
                         if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
                             morphDataArray[channelIndex, m.frame] = m;
                         }
@@ -764,51 +766,39 @@ public class PersoBehaviour : MonoBehaviour {
                                 Vector3[] morphFromVerts = null;
                                 Vector3[] morphToVerts = null;
 
-                                int count_childObject = 0;
-                                int count_childElement = 0;
+								for (int j = 0; j < morphFromPO.visualSet.Length; j++) {
+									IGeometricObject obj = morphFromPO.visualSet[j].obj;
+									if (obj == null || obj as MeshObject == null) continue;
+									MeshObject fromM = obj as MeshObject;
+									for (int k = 0; k < fromM.num_subblocks; k++) {
+										if (fromM.subblocks[k] == null) continue;
+										GameObject fromEl = fromM.subblocks[k].Gao;
+										if (fromEl == null) continue;
+										MorphMemory morphMemory = fromEl.GetComponent<MorphMemory>();
+										MeshFilter meshFilter1 = fromEl.GetComponent<MeshFilter>();
+										if (meshFilter1 == null) continue;
+										//print(morphFromPO.Gao.transform.name + " - " + morphToPO.Gao.transform.name + " - " + morphData.channel + " - " + morphData.frame + " - " + morphData.morphProgress + " - " + morphData.objectIndexTo + " - " + morphData.byte5 + " - " + morphData.byte6 + " - " + morphData.byte7);
+										MeshFilter meshFilter2 = ((MeshObject)morphToPO.visualSet[j].obj).subblocks[k].Gao.GetComponent<MeshFilter>();
+										if (meshFilter2 == null) continue;
+										if (morphMemory == null) {
+											morphFromVerts = meshFilter1.mesh.vertices;
+											morphMemory = fromEl.AddComponent<MorphMemory>(); // Use a component in the game object to store original vertices :)
+											morphMemory.originalVerts = morphFromVerts;
+											morphMemory.objectIndex = poNum;
+										}
+										morphFromVerts = morphMemory.originalVerts;
+										morphToVerts = meshFilter2.mesh.vertices;
+										if (morphToVerts.Length == morphFromVerts.Length) {
 
-                                foreach (Transform childObject in morphFromPO.Gao.transform) {
-                                    foreach (Transform childElement in childObject) {
-
-                                        MorphMemory morphMemory = childElement.gameObject.GetComponent<MorphMemory>();
-
-                                        MeshFilter meshFilter1 = childElement.gameObject.GetComponent<MeshFilter>();
-
-                                        if (meshFilter1 == null) {
-                                            continue;
-                                        }
-                                        MeshFilter meshFilter2 = morphToPO.Gao.transform.GetChild(count_childObject).GetChild(count_childElement).GetComponent<MeshFilter>();
-
-                                        if (meshFilter2 == null) {
-                                            continue;
-                                        }
-
-                                        if (morphMemory == null) {
-                                            morphFromVerts = meshFilter1.mesh.vertices;
-                                            morphMemory = childElement.gameObject.AddComponent<MorphMemory>(); // Use a component in the game object to store original vertices :)
-                                            morphMemory.originalVerts = morphFromVerts;
-                                            morphMemory.objectIndex = poNum;
-                                        }
-
-                                        morphFromVerts = morphMemory.originalVerts;
-                                        morphToVerts = meshFilter2.mesh.vertices;
-
-                                        if (morphToVerts.Length == morphFromVerts.Length) {
-
-                                            for (int vi = 0; vi < morphFromVerts.Length; vi++) {
-                                                morphFromVerts[vi] = morphFromVerts[vi] + (morphToVerts[vi] - morphFromVerts[vi]) * morphData.morphProgressFloat;
-                                            }
-                                        } else {
-                                            Debug.LogWarning("Vertex array size of morph target does not match source! "+morphData.byte3+","+ morphData.byte5 + "," + morphData.byte6 + "," + morphData.byte7 + ", soure.poNum = " + poNum+" -> target.poNum = " + morphData.objectIndexTo);
-                                        }
-
-                                        meshFilter1.mesh.vertices = morphFromVerts;
-
-                                        count_childElement++;
-                                    }
-                                    count_childObject++;
-                                }
-
+											for (int vi = 0; vi < morphFromVerts.Length; vi++) {
+												morphFromVerts[vi] = morphFromVerts[vi] + (morphToVerts[vi] - morphFromVerts[vi]) * morphData.morphProgressFloat;
+											}
+										} else {
+											Debug.LogWarning("Vertex array size of morph target does not match source! " + morphData.byte5 + "," + morphData.byte6 + "," + morphData.byte7 + ", soure.poNum = " + poNum + " -> target.poNum = " + morphData.objectIndexTo);
+										}
+										meshFilter1.mesh.vertices = morphFromVerts;
+									}
+								}
                             }
                         }
                     }

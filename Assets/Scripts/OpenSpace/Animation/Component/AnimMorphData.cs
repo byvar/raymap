@@ -9,8 +9,7 @@ namespace OpenSpace.Animation.Component {
 
         public byte objectIndexTo;
         public byte morphProgress;
-        public byte channel;
-        public byte byte3;
+		public short channel;
         public byte frame;
         public byte byte5;
         public byte byte6;
@@ -30,8 +29,7 @@ namespace OpenSpace.Animation.Component {
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 m.objectIndexTo = reader.ReadByte(); // object index to morph to
                 m.morphProgress = reader.ReadByte(); // 0-100, at 100 the morph is over.
-                m.channel = reader.ReadByte(); // the channel for which this morph data is relevant
-                m.byte3 = reader.ReadByte();
+                m.channel = reader.ReadInt16(); // the channel for which this morph data is relevant
                 m.frame = reader.ReadByte(); // the frame for which this morph data is relevant
                 m.byte5 = reader.ReadByte();
                 m.byte6 = reader.ReadByte();

@@ -87,7 +87,7 @@ namespace OpenSpace.Object.Properties {
 				stdGame.off_superobject = Pointer.Read(reader);
 				reader.ReadBytes(0xC);
 				stdGame.isAPlatform = reader.ReadByte();
-				stdGame.unk = reader.ReadByte();
+				stdGame.updateCheckByte = reader.ReadByte();
 				stdGame.transparencyZoneMin = reader.ReadByte();
 				stdGame.transparencyZoneMax = reader.ReadByte();
 				stdGame.customBits = reader.ReadInt32();
