@@ -254,6 +254,7 @@ namespace OpenSpace.Animation.Component {
 					if (AnimEvent.Aligned) reader.AutoAlign(4);
 					for (uint k = 0; k < a3d.events.Length; k++) a3d.events[k] = AnimEvent.Read(reader);
 					if (AnimMorphData.Aligned) reader.AutoAlign(4);
+					//if (a3d.num_morphData > 0) MapLoader.Loader.print("MorphData " + a3d.num_morphData + ": " + Pointer.Current(reader));
 					for (uint k = 0; k < a3d.morphData.Length; k++) a3d.morphData[k] = AnimMorphData.Read(reader);
 				}
 				/*MapLoader.Loader.print("A3D: " + offset + " - " + Pointer.Current(reader)

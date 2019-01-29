@@ -7,11 +7,10 @@ using UnityEngine;
 namespace OpenSpace.Animation.Component {
     public class AnimMorphData {
 
-        public byte objectIndexTo;
+        public ushort objectIndexTo;
         public byte morphProgress;
 		public short channel;
-        public byte frame;
-        public byte byte5;
+        public ushort frame;
         public byte byte6;
         public byte byte7;
         public float morphProgressFloat
@@ -30,13 +29,22 @@ namespace OpenSpace.Animation.Component {
                 m.objectIndexTo = reader.ReadByte(); // object index to morph to
                 m.morphProgress = reader.ReadByte(); // 0-100, at 100 the morph is over.
                 m.channel = reader.ReadInt16(); // the channel for which this morph data is relevant
-                m.frame = reader.ReadByte(); // the frame for which this morph data is relevant
-                m.byte5 = reader.ReadByte();
+                m.frame = reader.ReadUInt16(); // the frame for which this morph data is relevant
                 m.byte6 = reader.ReadByte();
                 m.byte7 = reader.ReadByte();
             } else {
-                reader.ReadBytes(0x26); // Haven't deciphered this yet
-            }
+				m.channel = reader.ReadInt16(); // the channel for which this morph data is relevant
+				m.frame = reader.ReadUInt16(); // the frame for which this morph data is relevant
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+				m.objectIndexTo = reader.ReadUInt16(); // 5
+				reader.ReadUInt16();
+				reader.ReadBytes(0x10); // Haven't deciphered this yet
+				m.morphProgress = reader.ReadByte();
+				reader.ReadBytes(0x9);
+			}
             return m;
         }
 

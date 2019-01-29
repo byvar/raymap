@@ -755,39 +755,41 @@ public class PersoBehaviour : MonoBehaviour {
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
 
-                if (morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
+                if (physicalObject != null && a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
                     AnimMorphData morphData = morphDataArray[i, currentFrame];
-                    
-                    if (morphData!=null) {
 
-                        if (channelObjects[i].transform.childCount > 0 && channelObjects[i].transform.GetChild(0).childCount > 0) {
-                            Transform meshTransform = channelObjects[i].transform.GetChild(0).GetChild(0).transform;
-                            foreach (Transform childTransform in meshTransform) {
+					if (morphData != null) {
+						PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
+						Vector3[] morphVerts = null;
 
-                                PhysicalObject morphFromPO = physicalObject;
-                                PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
-								
-                                Vector3[] morphVerts = null;
-
-								for (int j = 0; j < morphFromPO.visualSet.Length; j++) {
-									IGeometricObject obj = morphFromPO.visualSet[j].obj;
-									if (obj == null || obj as MeshObject == null) continue;
-									MeshObject fromM = obj as MeshObject;
-									MeshObject toM = morphToPO.visualSet[j].obj as MeshObject;
-									if (toM == null) continue;
-									morphVerts = new Vector3[toM.vertices.Length];
-									for (int vi = 0; vi < fromM.vertices.Length; vi++) {
-										morphVerts[vi] = Vector3.LerpUnclamped(fromM.vertices[vi], toM.vertices[vi],morphData.morphProgressFloat);
-									}
-									for (int k = 0; k < fromM.num_subblocks; k++) {
-										if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
-										MeshElement el = (MeshElement)fromM.subblocks[k];
-										if (el != null) el.UpdateMeshVertices(morphVerts);
-									}
-								}
-                            }
-                        }
-                    }
+						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
+							IGeometricObject obj = physicalObject.visualSet[j].obj;
+							if (obj == null || obj as MeshObject == null) continue;
+							MeshObject fromM = obj as MeshObject;
+							MeshObject toM = morphToPO.visualSet[j].obj as MeshObject;
+							if (toM == null) continue;
+							morphVerts = new Vector3[toM.vertices.Length];
+							for (int vi = 0; vi < fromM.vertices.Length; vi++) {
+								morphVerts[vi] = Vector3.LerpUnclamped(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
+							}
+							for (int k = 0; k < fromM.num_subblocks; k++) {
+								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
+								MeshElement el = (MeshElement)fromM.subblocks[k];
+								if (el != null) el.UpdateMeshVertices(morphVerts);
+							}
+						}
+					} else {
+						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
+							IGeometricObject obj = physicalObject.visualSet[j].obj;
+							if (obj == null || obj as MeshObject == null) continue;
+							MeshObject fromM = obj as MeshObject;
+							for (int k = 0; k < fromM.num_subblocks; k++) {
+								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
+								MeshElement el = (MeshElement)fromM.subblocks[k];
+								if (el != null) el.ResetVertices();
+							}
+						}
+					}
                 }
             }
 			if (hasBones) {
