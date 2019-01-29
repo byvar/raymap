@@ -16,21 +16,34 @@ namespace OpenSpace.Animation.Component {
 
         public static AnimEvent Read(Reader reader) {
             AnimEvent e = new AnimEvent();
-            if (Settings.s.platform != Settings.Platform.DC) {
-                e.unk0 = reader.ReadUInt32();
-                e.unk4 = reader.ReadUInt16();
-            }
-            e.unk6 = reader.ReadUInt16();
-            e.unk8 = reader.ReadUInt16();
-            e.unkA = reader.ReadUInt16();
+			if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+				e.unk0 = reader.ReadUInt32();
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+			} else {
+				if (Settings.s.platform != Settings.Platform.DC) {
+					e.unk0 = reader.ReadUInt32();
+					e.unk4 = reader.ReadUInt16();
+				}
+				e.unk6 = reader.ReadUInt16();
+				e.unk8 = reader.ReadUInt16();
+				e.unkA = reader.ReadUInt16();
+			}
             return e;
         }
 
         public static int Size {
             get {
-                if (Settings.s.platform == Settings.Platform.DC) {
-                    return 6;
-                }
+				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+					return 20; // 0x14
+				} else if (Settings.s.platform == Settings.Platform.DC) {
+					return 6;
+				}
                 return 12;
             }
         }

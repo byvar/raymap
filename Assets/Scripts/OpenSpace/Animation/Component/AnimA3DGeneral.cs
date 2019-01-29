@@ -169,7 +169,6 @@ namespace OpenSpace.Animation.Component {
 				reader.ReadUInt16();
 				reader.ReadUInt16();
 				a3d.num_morphData = reader.ReadUInt16();
-				//if (off_morphData != null) l.print("Animation " + a3d.offset);
 
 				a3d.vectors = new AnimVector[a3d.num_vectors];
 				a3d.quaternions = new AnimQuaternion[a3d.num_quaternions];
@@ -251,10 +250,12 @@ namespace OpenSpace.Animation.Component {
 				for (uint k = 0; k < a3d.framesKFIndex.Length; k++) a3d.framesKFIndex[k] = AnimFramesKFIndex.Read(reader);
 				if (AnimKeyframe.Aligned) reader.AutoAlign(4);
 				for (uint k = 0; k < a3d.keyframes.Length; k++) a3d.keyframes[k] = AnimKeyframe.Read(reader);
-				if (AnimEvent.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.events.Length; k++) a3d.events[k] = AnimEvent.Read(reader);
-				if (AnimMorphData.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.morphData.Length; k++) a3d.morphData[k] = AnimMorphData.Read(reader);
+				if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+					if (AnimEvent.Aligned) reader.AutoAlign(4);
+					for (uint k = 0; k < a3d.events.Length; k++) a3d.events[k] = AnimEvent.Read(reader);
+					if (AnimMorphData.Aligned) reader.AutoAlign(4);
+					for (uint k = 0; k < a3d.morphData.Length; k++) a3d.morphData[k] = AnimMorphData.Read(reader);
+				}
 				/*MapLoader.Loader.print("A3D: " + offset + " - " + Pointer.Current(reader)
 					+ " - NN:" + a3d.num_numNTTO
 					+ " - CH:" + a3d.num_channels
