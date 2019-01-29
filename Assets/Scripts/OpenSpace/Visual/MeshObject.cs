@@ -20,6 +20,7 @@ namespace OpenSpace.Visual {
         public Pointer off_materials;
         public Pointer off_subblock_types;
         public Pointer off_subblocks;
+		public Pointer off_mapping; // Revolution only
         public uint lookAtMode;
         public ushort num_vertices;
         public ushort num_subblocks;
@@ -28,6 +29,7 @@ namespace OpenSpace.Visual {
         public Vector3[] normals = null;
         public float[][] blendWeights = null;
         public ushort[] subblock_types = null;
+		public int[][] mapping = null;
         public IGeometricElement[] subblocks = null;
         public DeformSet bones = null;
         
@@ -88,11 +90,11 @@ namespace OpenSpace.Visual {
 				reader.ReadSingle();
 				reader.ReadSingle();
 				reader.ReadSingle();
-				Pointer.Read(reader);
+				m.off_mapping = Pointer.Read(reader);
 				m.num_vertices = reader.ReadUInt16();
 				m.num_subblocks = reader.ReadUInt16();
 				m.off_vertices = Pointer.Read(reader);
-				uint flags2 = reader.ReadUInt32();
+				m.off_normals = Pointer.Read(reader);
 				m.lookAtMode = flags & 3;
 			} else {
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
@@ -180,6 +182,29 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
             });
+			Pointer.DoAt(ref reader, m.off_mapping, () => {
+				// Revolution only
+				reader.ReadUInt32();
+				Pointer.Read(reader);
+				Pointer off_mappingBlocks = Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				ushort num_mappingBlocks = reader.ReadUInt16();
+				reader.ReadUInt16();
+				Pointer.DoAt(ref reader, off_mappingBlocks, () => {
+					m.mapping = new int[num_mappingBlocks][];
+					for (int i = 0; i < num_mappingBlocks; i++) {
+						Pointer off_mapping = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, off_mapping, () => {
+							m.mapping[i] = new int[m.num_vertices];
+							for (int j = 0; j < m.num_vertices; j++) {
+								m.mapping[i][j] = reader.ReadUInt16();
+								if (m.mapping[i][j] >= m.num_vertices) l.print(m.offset);
+							}
+						});
+					}
+				});
+			});
             // Read subblock types & initialize arrays
             Pointer.Goto(ref reader, m.off_subblock_types);
             m.subblock_types = new ushort[m.num_subblocks];
@@ -237,34 +262,48 @@ namespace OpenSpace.Visual {
 				}
 				if (meshObjects.Count > 0) {
 					int currentSubblock = 0;
-					m.num_vertices = (ushort)meshObjects.Sum(mesh => mesh.num_vertices);
-					m.vertices = new Vector3[m.num_vertices];
-					m.normals = new Vector3[m.num_vertices];
 					int curNumVertices = 0;
+					bool tryMapping = true;
+					if (m.vertices == null) {
+						m.num_vertices = (ushort)meshObjects.Sum(mesh => mesh.num_vertices);
+						m.vertices = new Vector3[m.num_vertices];
+						m.normals = new Vector3[m.num_vertices];
+						tryMapping = false;
+					}
 					for (int i = 0; i < meshObjects.Count; i++) {
 						MeshObject mo = meshObjects[i];
-						Array.Copy(mo.vertices, 0, m.vertices, curNumVertices, mo.num_vertices);
-						if (mo.normals != null) {
-							Array.Copy(mo.normals, 0, m.normals, curNumVertices, mo.num_vertices);
-						}
 						while (currentSubblock < m.num_subblocks && m.subblock_types[currentSubblock] != 1) {
 							currentSubblock++;
 						}
 						MeshElement me = (MeshElement)m.subblocks[currentSubblock];
 						MeshElement moe = ((MeshElement)mo.subblocks[0]);
-						me.disconnected_triangles_spe = null;
-						me.num_disconnected_triangles_spe = 0;
+						if (!tryMapping) {
+							Array.Copy(mo.vertices, 0, m.vertices, curNumVertices, mo.num_vertices);
+							if (mo.normals != null) {
+								Array.Copy(mo.normals, 0, m.normals, curNumVertices, mo.num_vertices);
+							}
+							me.mapping_vertices = Enumerable.Range(curNumVertices, mo.num_vertices).ToArray();
+							curNumVertices += mo.num_vertices;
+						} else {
+							me.mapping_vertices = new int[moe.num_mapping_entries];
+							for (int j = 0; j < mo.vertices.Length; j++) {
+								me.mapping_vertices[j] = Array.IndexOf(m.vertices, mo.vertices[j]);
+								if (me.mapping_vertices[j] == -1 || me.mapping_vertices[j] != Array.IndexOf(m.vertices, mo.vertices[j])) {
+									Debug.LogError("Failed matching vertices between Renderware and OpenSpace");
+								}
+							}
+						}
 						me.disconnected_triangles = moe.disconnected_triangles;
 						me.num_disconnected_triangles = moe.num_disconnected_triangles;
+						me.disconnected_triangles_spe = null;
+						me.num_disconnected_triangles_spe = 0;
 						me.num_uvMaps = moe.num_uvMaps;
 						me.num_uvs = moe.num_uvs;
 						me.uvs = moe.uvs;
 						me.mapping_uvs = moe.mapping_uvs;
 						me.num_mapping_entries = moe.num_mapping_entries;
-						me.mapping_vertices = Enumerable.Range(curNumVertices, mo.num_vertices).ToArray();
 						me.vertexColors = moe.vertexColors;
 						currentSubblock++;
-						curNumVertices += mo.num_vertices;
 						if (me.lightmap_index != -1) {
 							R2PS2Loader ps2l = ((R2PS2Loader)l);
 							string id_r = me.lightmap_index.ToString("D3") + "." + 0;

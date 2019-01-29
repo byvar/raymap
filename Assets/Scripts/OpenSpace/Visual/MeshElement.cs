@@ -345,6 +345,31 @@ namespace OpenSpace.Visual {
             }
         }
 
+		public void UpdateMeshVertices(Vector3[] vertices) {
+			if (mesh_main != null) {
+				Vector3[] new_vertices = mesh_main.vertices;
+				for (int j = 0; j < num_mapping_entries; j++) {
+					new_vertices[j] = vertices[mapping_vertices[j]];
+				}
+				mesh_main.vertices = new_vertices;
+			}
+			if (mesh_spe != null) {
+				Vector3[] new_vertices_spe = mesh_spe.vertices;
+				for (int j = 0; j < num_disconnected_triangles_spe; j++) {
+					int i0 = disconnected_triangles_spe[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
+					int i1 = disconnected_triangles_spe[(j * 3) + 1], m1 = (j * 3) + 1;
+					int i2 = disconnected_triangles_spe[(j * 3) + 2], m2 = (j * 3) + 2;
+					new_vertices_spe[m0] = vertices[i0];
+					new_vertices_spe[m1] = vertices[i1];
+					new_vertices_spe[m2] = vertices[i2];
+				}
+				mesh_spe.vertices = new_vertices_spe;
+			}
+		}
+		public void ResetVertices() {
+			UpdateMeshVertices(mesh.vertices);
+		}
+
         public static MeshElement Read(Reader reader, Pointer offset, MeshObject m) {
             MapLoader l = MapLoader.Loader;
             MeshElement sm = new MeshElement(offset, m);

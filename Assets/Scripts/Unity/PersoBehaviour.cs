@@ -581,18 +581,23 @@ public class PersoBehaviour : MonoBehaviour {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
 				}
 
-                morphDataArray = new AnimMorphData[a3d.num_channels, a3d.num_onlyFrames];
-                // Iterate over morph data to find the correct channel and keyframe
-                for (int i = 0; i < a3d.num_morphData; i++) {
-                    AnimMorphData m = a3d.morphData[a3d.start_morphData+i];
-                    if (m != null) {
-						//print(m.channel + " - " + m.frame + " - " + m.morphProgress + " - " + m.objectIndexTo + " - " + m.byte5 + " - " + m.byte6 + " - " + m.byte7);
-						int channelIndex = this.GetChannelByID(m.channel)[0];
-                        if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
-                            morphDataArray[channelIndex, m.frame] = m;
-                        }
-                    }
-                }
+				if (a3d.num_morphData > 0 && a3d.morphData != null) {
+					morphDataArray = new AnimMorphData[a3d.num_channels, a3d.num_onlyFrames];
+					// Iterate over morph data to find the correct channel and keyframe
+					for (int i = 0; i < a3d.num_morphData; i++) {
+						AnimMorphData m = a3d.morphData[a3d.start_morphData + i];
+						if (m != null) {
+							/*print("F:" + a3d.num_onlyFrames + " - C:" + a3d.num_channels + " - CF" + (a3d.num_onlyFrames * a3d.num_channels) + " - " +
+								m.channel + " - " + m.frame + " - " + m.morphProgress + " - " + m.objectIndexTo + " - " + m.byte5 + " - " + m.byte6 + " - " + m.byte7);*/
+							int channelIndex = this.GetChannelByID(m.channel)[0];
+							if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
+								morphDataArray[channelIndex, m.frame] = m;
+							}
+						}
+					}
+				} else {
+					morphDataArray = null;
+				}
             }
             loaded = true;
         }
@@ -775,7 +780,7 @@ public class PersoBehaviour : MonoBehaviour {
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
 
-                if (i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
+                if (morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
                     AnimMorphData morphData = morphDataArray[i, currentFrame];
                     
                     if (morphData!=null) {
@@ -786,42 +791,23 @@ public class PersoBehaviour : MonoBehaviour {
 
                                 PhysicalObject morphFromPO = physicalObject;
                                 PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
-                                //morphPO.
-
-                                Vector3[] morphFromVerts = null;
-                                Vector3[] morphToVerts = null;
+								
+                                Vector3[] morphVerts = null;
 
 								for (int j = 0; j < morphFromPO.visualSet.Length; j++) {
 									IGeometricObject obj = morphFromPO.visualSet[j].obj;
 									if (obj == null || obj as MeshObject == null) continue;
 									MeshObject fromM = obj as MeshObject;
+									MeshObject toM = morphToPO.visualSet[j].obj as MeshObject;
+									if (toM == null) continue;
+									morphVerts = new Vector3[toM.vertices.Length];
+									for (int vi = 0; vi < fromM.vertices.Length; vi++) {
+										morphVerts[vi] = Vector3.LerpUnclamped(fromM.vertices[vi], toM.vertices[vi],morphData.morphProgressFloat);
+									}
 									for (int k = 0; k < fromM.num_subblocks; k++) {
-										if (fromM.subblocks[k] == null) continue;
-										GameObject fromEl = fromM.subblocks[k].Gao;
-										if (fromEl == null) continue;
-										MorphMemory morphMemory = fromEl.GetComponent<MorphMemory>();
-										MeshFilter meshFilter1 = fromEl.GetComponent<MeshFilter>();
-										if (meshFilter1 == null) continue;
-										//print(morphFromPO.Gao.transform.name + " - " + morphToPO.Gao.transform.name + " - " + morphData.channel + " - " + morphData.frame + " - " + morphData.morphProgress + " - " + morphData.objectIndexTo + " - " + morphData.byte5 + " - " + morphData.byte6 + " - " + morphData.byte7);
-										MeshFilter meshFilter2 = ((MeshObject)morphToPO.visualSet[j].obj).subblocks[k].Gao.GetComponent<MeshFilter>();
-										if (meshFilter2 == null) continue;
-										if (morphMemory == null) {
-											morphFromVerts = meshFilter1.mesh.vertices;
-											morphMemory = fromEl.AddComponent<MorphMemory>(); // Use a component in the game object to store original vertices :)
-											morphMemory.originalVerts = morphFromVerts;
-											morphMemory.objectIndex = poNum;
-										}
-										morphFromVerts = morphMemory.originalVerts;
-										morphToVerts = meshFilter2.mesh.vertices;
-										if (morphToVerts.Length == morphFromVerts.Length) {
-
-											for (int vi = 0; vi < morphFromVerts.Length; vi++) {
-												morphFromVerts[vi] = morphFromVerts[vi] + (morphToVerts[vi] - morphFromVerts[vi]) * morphData.morphProgressFloat;
-											}
-										} else {
-											Debug.LogWarning("Vertex array size of morph target does not match source! " + morphData.byte5 + "," + morphData.byte6 + "," + morphData.byte7 + ", soure.poNum = " + poNum + " -> target.poNum = " + morphData.objectIndexTo);
-										}
-										meshFilter1.mesh.vertices = morphFromVerts;
+										if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
+										MeshElement el = (MeshElement)fromM.subblocks[k];
+										if (el != null) el.UpdateMeshVertices(morphVerts);
 									}
 								}
                             }
