@@ -237,6 +237,9 @@ public class PersoBehaviour : MonoBehaviour {
             {
                 AIModel ai = perso.brain.mind.AI_model;
 
+                List<string> ruleStatesInitializer = new List<string>();
+                List<string> reflexStatesInitializer = new List<string>();
+
                 if (ai.behaviors_normal != null)
                 {
                     MapLoader.Loader.print("Normal behaviours");
@@ -244,11 +247,15 @@ public class PersoBehaviour : MonoBehaviour {
                     {
                         if (ai.behaviors_normal[i].scripts != null)
                         {
+                            string combinedScript = "private IEnumerator Rule_"+i+"_"+ai.behaviors_normal[i].name+"() {"+Environment.NewLine;
+                            ruleStatesInitializer.Add("Rule_" + i + "_" + ai.behaviors_normal[i].name);
                             for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++)
                             {
                                 TranslatedScript ts = new TranslatedScript(perso.brain.mind.AI_model.behaviors_normal[i].scripts[j], perso);
-                                MapLoader.Loader.print(ts.ToString());
+                                combinedScript += "// Script "+j+Environment.NewLine+ts.ToString()+Environment.NewLine;
                             }
+                            combinedScript += "yield return null;"+Environment.NewLine+"}";
+                            MapLoader.Loader.print(combinedScript);
                         }
                     }
                 }
@@ -259,11 +266,15 @@ public class PersoBehaviour : MonoBehaviour {
                     {
                         if (ai.behaviors_reflex[i].scripts != null)
                         {
+                            string combinedScript = "private IEnumerator Reflex_" + i + "_" + ai.behaviors_reflex[i].name + "() {" + Environment.NewLine;
                             for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++)
                             {
+                                reflexStatesInitializer.Add("Reflex_" + i + "_" + ai.behaviors_reflex[i].name);
                                 TranslatedScript ts = new TranslatedScript(perso.brain.mind.AI_model.behaviors_reflex[i].scripts[j], perso);
-                                MapLoader.Loader.print(ts.ToString());
+                                combinedScript += "// Script " + j + Environment.NewLine + ts.ToString() + Environment.NewLine;
                             }
+                            combinedScript += "yield return null;" + Environment.NewLine + "}";
+                            MapLoader.Loader.print(combinedScript);
                         }
                     }
                 }
@@ -274,11 +285,25 @@ public class PersoBehaviour : MonoBehaviour {
                     {
                         if (ai.macros[i].script != null)
                         {
+                            string combinedScript = "private IEnumerator Macro_" + i + "() {" + Environment.NewLine;
                             TranslatedScript ts = new TranslatedScript(perso.brain.mind.AI_model.macros[i].script, perso);
-                            MapLoader.Loader.print(ts.ToString());
+                            combinedScript += ts.ToString() + Environment.NewLine;
+                            combinedScript += "yield return null;" + Environment.NewLine + "}";
+                            MapLoader.Loader.print(combinedScript);
                         }
                     }
                 }
+
+                // TODO: replace evalMacro calls by replacing regex "evalMacro\([a-zA-Z0-9]*\.Macro\[([0-9]+)\]\)" to "return yield Macro_$1()"
+
+                string startString = "protected override void Start() {" + Environment.NewLine + "base.Start();" + Environment.NewLine + Environment.NewLine;
+                startString += "// Rules" + Environment.NewLine;
+                ruleStatesInitializer.ForEach((s) => { startString += "sm.AddRuleState(State.Create(\"" + s + "\", " + s + "));" + Environment.NewLine; });
+                startString += Environment.NewLine + "// Reflexes " + Environment.NewLine;
+                reflexStatesInitializer.ForEach((s) => { startString += "sm.AddReflexState(State.Create(\"" + s + "\", " + s + "));" + Environment.NewLine; });
+                startString += Environment.NewLine+"sm.ChangeActiveRuleState(0);" + Environment.NewLine + "sm.ChangeActiveReflexState(0);" + Environment.NewLine + "}";
+
+                MapLoader.Loader.print(startString);
             }
         }
     }
