@@ -76,14 +76,15 @@ namespace OpenSpace.Object.Properties {
 				reader.ReadInt32();
 				reader.ReadInt32();
 				reader.ReadInt32();
+				/*reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
-				reader.ReadByte();
-				reader.ReadByte();
+				reader.ReadByte();*/
+				reader.ReadUInt16();
 				stdGame.objectTypes[0] = reader.ReadUInt16();
 				stdGame.objectTypes[1] = reader.ReadUInt16();
 				stdGame.objectTypes[2] = reader.ReadUInt16();
-				reader.ReadUInt16();
+				reader.ReadUInt32();
 				stdGame.off_superobject = Pointer.Read(reader);
 				reader.ReadBytes(0xC);
 				stdGame.isAPlatform = reader.ReadByte();
