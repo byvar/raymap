@@ -48,6 +48,8 @@ namespace OpenSpace.Visual {
 
         private SkinnedMeshRenderer s_mr_main = null;
         private SkinnedMeshRenderer s_mr_spe = null;
+		private Renderer mr_main = null;
+		private Renderer mr_spe = null;
         private Mesh mesh_main = null;
         private Mesh mesh_spe = null;
 
@@ -83,8 +85,7 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 num_textures = visualMaterial.num_textures;
             }
-
-            Renderer mr_main = null, mr_spe = null;
+			
             long num_triangles_main = ((num_connected_vertices > 2 ? num_connected_vertices - 2 : 0) + num_disconnected_triangles) * (backfaceCulling ? 1 : 2);
             uint triangle_size = 3 * (uint)(backfaceCulling ? 1 : 2);
             uint triangles_index = 0;
@@ -154,7 +155,7 @@ namespace OpenSpace.Visual {
 				if (mesh_main == null) {
 					mesh_main = new Mesh();
 					mesh_main.vertices = new_vertices;
-					if(mesh.normals != null) mesh_main.normals = new_normals;
+					if (mesh.normals != null) mesh_main.normals = new_normals;
 					mesh_main.triangles = triangles;
 					if (new_boneWeights != null) {
 						mesh_main.boneWeights = new_boneWeights;
@@ -163,6 +164,8 @@ namespace OpenSpace.Visual {
 					for (int i = 0; i < new_uvs.Length; i++) {
 						mesh_main.SetUVs(i, new_uvs[i].ToList());
 					}
+				} else {
+					mesh_main = CopyMesh(mesh_main);
 				}
 				if (new_boneWeights != null) {
                     mr_main = gao.AddComponent<SkinnedMeshRenderer>();
@@ -272,9 +275,11 @@ namespace OpenSpace.Visual {
 					for (int i = 0; i < num_textures; i++) {
 						mesh_spe.SetUVs(i, new_uvs_spe[i].ToList());
 					}
+				} else {
+					mesh_spe = CopyMesh(mesh_spe);
 				}
-                //mesh.SetUVs(0, new_uvs_spe.ToList());
-                /*mesh.uv = new_uvs_spe;*/
+				//mesh.SetUVs(0, new_uvs_spe.ToList());
+				/*mesh.uv = new_uvs_spe;*/
 				if (new_boneWeights_spe != null) {
                     mr_spe = gao_spe.AddComponent<SkinnedMeshRenderer>();
                     s_mr_spe = (SkinnedMeshRenderer)mr_spe;
@@ -535,6 +540,8 @@ namespace OpenSpace.Visual {
             gao = null;
             s_mr_main = null;
             s_mr_spe = null;
+			mr_main = null;
+			mr_spe = null;
 			if (mesh.bones != null) {
 				mesh_main = null;
 				mesh_spe = null;

@@ -30,7 +30,8 @@ public class PersoBehaviourEditor : Editor {
         GUILayout.Label("Considered too far away (bit 7): " + consideredTooFarAway);
         GUILayout.Label("State custom bits: " + Convert.ToString(pb.state.customStateBits, 2).PadLeft(8, '0'));
 
-        if (pb.a3d != null) {
+		/* // Only enable when working on morph data, it prevents from using the buttons properly otherwise
+        if (pb.a3d != null && pb.morphDataArray != null) {
             for (int i = 0; i < pb.a3d.num_channels; i++) {
                 AnimMorphData currentMorphData = pb.morphDataArray[i, pb.currentFrame];
 
@@ -38,7 +39,7 @@ public class PersoBehaviourEditor : Editor {
                     GUILayout.Label("MorphData[" + i + "," + pb.currentFrame + "]: Morph to " + currentMorphData.objectIndexTo + ", progress " + currentMorphData.morphProgress);
                 }
             }
-        }
+        }*/
         GUILayout.EndVertical();
 
         GUILayout.BeginHorizontal();
