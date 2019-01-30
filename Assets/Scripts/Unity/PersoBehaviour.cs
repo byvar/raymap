@@ -294,7 +294,9 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
 
-                // TODO: replace evalMacro calls by replacing regex "evalMacro\([a-zA-Z0-9]*\.Macro\[([0-9]+)\]\)" to "return yield Macro_$1()"
+                // TODO: replace evalMacro calls by replacing regex "evalMacro\([a-zA-Z0-9_]*\.Macro\[([0-9]+)\]\)" to "yield return Macro_$1()"
+                // TODO: replace Proc_ChangeMyComport\([a-zA-Z0-9_]+\.Rule\[[0-9]+\]\[\"([^"]+)\"\]\)     with     sm.ChangeActiveRuleState("$1")
+                // TODO: replace Cond_IsValidObject\(([^\)]+)\)    with $1 != null
 
                 string startString = "protected override void Start() {" + Environment.NewLine + "base.Start();" + Environment.NewLine + Environment.NewLine;
                 startString += "// Rules" + Environment.NewLine;
