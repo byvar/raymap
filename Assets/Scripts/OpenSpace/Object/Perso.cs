@@ -111,6 +111,13 @@ namespace OpenSpace.Object {
 					p.nameFamily = "Family" + p.stdGame.objectTypes[0];
 					p.nameModel = "Model" + p.stdGame.objectTypes[1];
 					p.namePerso = "Instance" + p.stdGame.objectTypes[2];
+					if (p.p3dData != null && p.p3dData.family != null && p.p3dData.family.name == null) {
+						p.p3dData.family.name = p.nameFamily;
+						p.p3dData.family.family_index = p.stdGame.objectTypes[0];
+						if (p.p3dData.family.Gao != null) {
+							p.p3dData.family.Gao.name = "[Family] " + p.nameFamily;
+						}
+					}
 				}
 
                 Pointer.Goto(ref reader, off_current);

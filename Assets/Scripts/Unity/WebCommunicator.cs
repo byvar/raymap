@@ -144,7 +144,7 @@ public class WebCommunicator : MonoBehaviour {
     }
     private JSONObject GetFamilyJSON(Family f) {
         JSONObject familyJSON = new JSONObject();
-        familyJSON["name"] = f.name;
+        familyJSON["name"] = f.name != null ? f.name : "Family";
         familyJSON["index"] = f.family_index;
         JSONArray states = new JSONArray();
         for (int i = 0; i < f.states.Count; i++) {

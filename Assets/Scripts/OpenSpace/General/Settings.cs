@@ -261,7 +261,7 @@ namespace OpenSpace {
 			game = Game.R2Revolution,
 			platform = Platform.PS2,
 			endian = Endian.Little,
-			numEntryActions = 43,
+			numEntryActions = 42,
 			linkedListType = LinkedListType.Minimize,
 			encryption = Encryption.None,
 			luminosity = 0.5f,
