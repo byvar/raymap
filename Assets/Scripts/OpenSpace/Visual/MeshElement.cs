@@ -349,6 +349,30 @@ namespace OpenSpace.Visual {
                 }
             }
         }
+		public void MorphVertices(MeshElement el, float lerp) {
+			// Use UpdateMeshVertices if possible! Only use this for special cases
+			if (mesh_main != null) {
+				Vector3[] new_vertices = mesh_main.vertices;
+				for (int j = 0; j < num_mapping_entries; j++) {
+					Vector3 from = mesh.vertices[mapping_vertices[j]];
+					Vector3 to = el.mesh.vertices[el.mapping_vertices[j]];
+					new_vertices[j] = Vector3.LerpUnclamped(from, to, lerp);
+				}
+				mesh_main.vertices = new_vertices;
+			}
+			if (mesh_spe != null) {
+				Vector3[] new_vertices_spe = mesh_spe.vertices;
+				for (int j = 0; j < num_disconnected_triangles_spe; j++) {
+					int i0 = disconnected_triangles_spe[(j * 3) + 0], o0 = el.disconnected_triangles_spe[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
+					int i1 = disconnected_triangles_spe[(j * 3) + 1], o1 = el.disconnected_triangles_spe[(j * 3) + 1], m1 = (j * 3) + 1;
+					int i2 = disconnected_triangles_spe[(j * 3) + 2], o2 = el.disconnected_triangles_spe[(j * 3) + 2], m2 = (j * 3) + 2;
+					new_vertices_spe[m0] = Vector3.LerpUnclamped(mesh.vertices[i0], el.mesh.vertices[o0], lerp);
+					new_vertices_spe[m1] = Vector3.LerpUnclamped(mesh.vertices[i1], el.mesh.vertices[o1], lerp);
+					new_vertices_spe[m2] = Vector3.LerpUnclamped(mesh.vertices[i2], el.mesh.vertices[o2], lerp);
+				}
+				mesh_spe.vertices = new_vertices_spe;
+			}
+		}
 
 		public void UpdateMeshVertices(Vector3[] vertices) {
 			if (mesh_main != null) {
