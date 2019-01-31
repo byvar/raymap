@@ -47,7 +47,7 @@ public class PersoBehaviour : MonoBehaviour {
 	private bool[] channelParents = null;
     public AnimMorphData[,] morphDataArray;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
-	private PhysicalObject[] tempChannelPOs = null;
+	private Dictionary<ushort, PhysicalObject>[] fullMorphPOs = null;
 	bool hasBones = false; // We can optimize a tiny bit if this object doesn't have bones
 	private bool isAlways = false;
 	public bool IsAlways {
@@ -476,11 +476,16 @@ public class PersoBehaviour : MonoBehaviour {
             }
             channelObjects = null;
         }
-		if (tempChannelPOs != null) {
-			for (int i = 0; i < tempChannelPOs.Length; i++) {
-				if (tempChannelPOs[i] != null) Destroy(tempChannelPOs[i].Gao);
+		if (fullMorphPOs != null) {
+			for (int i = 0; i < fullMorphPOs.Length; i++) {
+				if (fullMorphPOs[i] != null) {
+					foreach (PhysicalObject po in fullMorphPOs[i].Values) {
+						Destroy(po.Gao);
+					}
+					fullMorphPOs[i].Clear();
+				}
 			}
-			tempChannelPOs = null;
+			fullMorphPOs = null;
 		}
         channelIDDictionary.Clear();
 		hasBones = false;
@@ -498,7 +503,7 @@ public class PersoBehaviour : MonoBehaviour {
                 // Init channels & subobjects
                 subObjects = new PhysicalObject[a3d.num_channels][];
                 channelObjects = new GameObject[a3d.num_channels];
-				tempChannelPOs = new PhysicalObject[a3d.num_channels];
+				if (a3d.num_morphData > 0) fullMorphPOs = new Dictionary<ushort, PhysicalObject>[a3d.num_channels];
 				currentActivePO = new int[a3d.num_channels];
 				channelParents = new bool[a3d.num_channels];
                 for (int i = 0; i < a3d.num_channels; i++) {
@@ -575,6 +580,28 @@ public class PersoBehaviour : MonoBehaviour {
 							int channelIndex = this.GetChannelByID(m.channel)[0];
 							if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
 								morphDataArray[channelIndex, m.frame] = m;
+								if (m.morphProgress == 100 && perso.p3dData.objectList != null && perso.p3dData.objectList.Count > m.objectIndexTo) {
+									if (fullMorphPOs[channelIndex] == null) fullMorphPOs[channelIndex] = new Dictionary<ushort, PhysicalObject>();
+									if (!fullMorphPOs[channelIndex].ContainsKey(m.objectIndexTo)) {
+										PhysicalObject o = perso.p3dData.objectList[m.objectIndexTo].po;
+										if (o != null) {
+											PhysicalObject c = o.Clone();
+											c.Gao.transform.localScale = c.scaleMultiplier.HasValue ? c.scaleMultiplier.Value : Vector3.one;
+											c.Gao.transform.parent = channelObjects[channelIndex].transform;
+											c.Gao.name = "[Morph] " + c.Gao.name;
+											if (Settings.s.hasDeformations && c.Bones != null) hasBones = true;
+											foreach (VisualSetLOD l in c.visualSet) {
+												if (l.obj != null) {
+													GameObject gao = l.obj.Gao;
+													if (gao != null) gao.SetActive(!controller.viewCollision);
+												}
+											}
+											if (c.collideMesh != null) c.collideMesh.SetVisualsActive(controller.viewCollision);
+											c.Gao.SetActive(false);
+											fullMorphPOs[channelIndex][m.objectIndexTo] = c;
+										}
+									}
+								}
 							}
 						}
 					}
@@ -752,9 +779,10 @@ public class PersoBehaviour : MonoBehaviour {
                 float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
 				
 				if (poNum != currentActivePO[i]) {
-					if (currentActivePO[i] == -2 && tempChannelPOs[i] != null) {
-						Destroy(tempChannelPOs[i].Gao);
-						tempChannelPOs[i] = null;
+					if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
+						foreach (PhysicalObject morphPO in fullMorphPOs[i].Values) {
+							if (morphPO.Gao.activeSelf) morphPO.Gao.SetActive(false);
+						}
 					}
 					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
 						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
@@ -770,7 +798,7 @@ public class PersoBehaviour : MonoBehaviour {
                 if (physicalObject != null && a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
                     AnimMorphData morphData = morphDataArray[i, currentFrame];
 
-					if (morphData != null && morphData.morphProgress != 0) {
+					if (morphData != null && morphData.morphProgress != 0 && morphData.morphProgress != 100) {
 						PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
 						Vector3[] morphVerts = null;
 
@@ -782,61 +810,27 @@ public class PersoBehaviour : MonoBehaviour {
 							if (toM == null) continue;
 							if (fromM.vertices.Length != toM.vertices.Length) {
 								// For those special cases like the mistake in the Clark cinematic
-								if (morphData.morphProgress == 100) {
-									physicalObject.Gao.SetActive(false);
-									// Just use a clone of the PO
-									tempChannelPOs[i] = morphToPO.Clone();
-									tempChannelPOs[i].Gao.transform.localScale =
-										tempChannelPOs[i].scaleMultiplier.HasValue ? tempChannelPOs[i].scaleMultiplier.Value : Vector3.one;
-									tempChannelPOs[i].Gao.transform.parent = channelObjects[i].transform;
-									tempChannelPOs[i].Gao.transform.localPosition = Vector3.zero;
-									tempChannelPOs[i].Gao.transform.localRotation = Quaternion.identity;
-									currentActivePO[i] = -2;
-								} else {
-									/*bool tryMorph = true;
-									for (int k = 0; k < fromM.subblocks.Length; k++) {
-										if (fromM.subblock_types[k] != toM.subblock_types[k]) {
-											tryMorph = false;
-											break;
-										}
-										if (fromM.subblock_types[k] == 1) {
-											MeshElement fromEl = fromM.subblocks[k] as MeshElement;
-											MeshElement toEl = toM.subblocks[k] as MeshElement;
-											if (fromEl.num_disconnected_triangles_spe != toEl.num_disconnected_triangles_spe || fromEl.num_disconnected_triangles != toEl.num_disconnected_triangles) {
-												tryMorph = false;
-												break;
-											}
-										}
-									}
-									if (tryMorph) {
-										for (int k = 0; k < fromM.subblocks.Length; k++) {
-											if (fromM.subblock_types[k] != 1) continue;
-											MeshElement fromEl = fromM.subblocks[k] as MeshElement;
-											MeshElement toEl = toM.subblocks[k] as MeshElement;
-											fromEl.MorphVertices(toEl, morphData.morphProgressFloat);
-										}
-									}*/
-								}
-								/*for (int k = 0; k < fromM.subblocks.Length; k++) {
-									print(((MeshElement)fromM.subblocks[k]).num_disconnected_triangles_spe + " - " + ((MeshElement)toM.subblocks[k]).num_disconnected_triangles_spe);
-								}
-								print("Vertices: " + fromM.vertices.Length + " - " + toM.vertices.Length + " - " + fromM.subblocks.Length + " - " + toM.subblocks.Length);
-								print("F:" + a3d.num_onlyFrames + " - C:" + a3d.num_channels + " - " +
-								morphData.channel + " - " + morphData.frame + " - " + morphData.morphProgress + " - " + morphData.objectIndexTo + " - " + morphData.byte6 + " - " + morphData.byte7);
-								continue;*/
-							} else {
-								int numVertices = fromM.vertices.Length;
-								morphVerts = new Vector3[numVertices];
-								for (int vi = 0; vi < numVertices; vi++) {
-									morphVerts[vi] = Vector3.Lerp(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
-								}
-								for (int k = 0; k < fromM.num_subblocks; k++) {
-									if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
-									MeshElement el = (MeshElement)fromM.subblocks[k];
-									if (el != null) el.UpdateMeshVertices(morphVerts);
-								}
+								continue;
+							}
+							int numVertices = fromM.vertices.Length;
+							morphVerts = new Vector3[numVertices];
+							for (int vi = 0; vi < numVertices; vi++) {
+								morphVerts[vi] = Vector3.Lerp(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
+							}
+							for (int k = 0; k < fromM.num_subblocks; k++) {
+								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
+								MeshElement el = (MeshElement)fromM.subblocks[k];
+								if (el != null) el.UpdateMeshVertices(morphVerts);
 							}
 						}
+					} else if (morphData != null && morphData.morphProgress == 100) {
+						physicalObject.Gao.SetActive(false);
+						PhysicalObject c = fullMorphPOs[i][morphData.objectIndexTo];
+						c.Gao.transform.localScale = c.scaleMultiplier.HasValue ? c.scaleMultiplier.Value : Vector3.one;
+						c.Gao.transform.localPosition = Vector3.zero;
+						c.Gao.transform.localRotation = Quaternion.identity;
+						c.Gao.SetActive(true);
+						currentActivePO[i] = -2;
 					} else {
 						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
 							IGeometricObject obj = physicalObject.visualSet[j].obj;
