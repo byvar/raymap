@@ -86,7 +86,7 @@ function sendMessage(jsonObj) {
 }
 
 function initContent() {
-	$.getJSON( "json/content.json", function( data ) {
+	$.getJSON( "json/content.json?1", function( data ) {
 		$('#sidebar-levels').removeClass('hidden-sidebar');
 		$('.sidebar-button').remove();
 		$('#sidebar-levels-slider').css('top','0px');
@@ -112,10 +112,10 @@ function initContent() {
 				let levelFolder = value.hasOwnProperty("folder") ? value.folder : value_game.folder;
 				//items.push("<a class='logo-item' href='#" + value.json + "' title='" + value.title + "'><img src='" + encodeURI(value.image) + "' alt='" + value.title + "'></a>");
 				if(value_game.mode === mode && folder === levelFolder && value.level === lvl) {
-					items.push("<div class='levels-item level current-levels-item' title='" + value.name + "'>" + value.name + "</div>");
+					items.push("<div class='levels-item level current-levels-item' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></div>");
 					document.title = " [" + value_game.name + "] " + value.name + " - " + baseTitle;
 				} else {
-					items.push("<a class='levels-item level' href='index.html?mode=" + value_game.mode + "&folder=" + levelFolder + "&lvl=" + value.level + "' title='" + value.name + "'>" + value.name + "</a>");
+					items.push("<a class='levels-item level' href='index.html?mode=" + value_game.mode + "&folder=" + levelFolder + "&lvl=" + value.level + "' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></a>");
 				}
 				totalEm += 2;
 			});
@@ -305,6 +305,7 @@ function handleMessage_settings(msg) {
 		}
 		selectButton($("#btn-lighting"), msg.settings.enableLighting);
 		selectButton($("#btn-saturate"), !msg.settings.saturate);
+		selectButton($("#btn-fog"), msg.settings.enableFog);
 		selectButton($("#btn-viewCollision"), msg.settings.viewCollision);
 		selectButton($("#btn-viewGraphs"), msg.settings.viewGraphs);
 		selectButton($("#btn-viewInvisible"), msg.settings.viewInvisible);
@@ -707,6 +708,7 @@ function sendSettings() {
 	let jsonObj = {
 		settings: {
 			enableLighting: $("#btn-lighting").hasClass("selected"),
+			enableFog: $("#btn-fog").hasClass("selected"),
 			luminosity: $("#range-luminosity").val(),
 			saturate: !$("#btn-saturate").hasClass("selected"),
 			viewCollision: $("#btn-viewCollision").hasClass("selected"),

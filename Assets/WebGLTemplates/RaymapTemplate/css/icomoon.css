@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon/icomoon.eot?r0igg8');
-  src:  url('../fonts/icomoon/icomoon.eot?r0igg8#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon/icomoon.ttf?r0igg8') format('truetype'),
-    url('../fonts/icomoon/icomoon.woff?r0igg8') format('woff'),
-    url('../fonts/icomoon/icomoon.svg?r0igg8#icomoon') format('svg');
+  src:  url('../fonts/icomoon/icomoon.eot?wjn6pc');
+  src:  url('../fonts/icomoon/icomoon.eot?wjn6pc#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?wjn6pc') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?wjn6pc') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?wjn6pc#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -108,16 +108,34 @@
 .icon-lightbulb_outline:before {
   content: "\e91d";
 }
+.icon-windy:before {
+  content: "\e927";
+}
+.icon-weather:before {
+  content: "\e927";
+}
+.icon-weather3:before {
+  content: "\e926";
+}
+.icon-windy1:before {
+  content: "\e925";
+}
+.icon-cloud:before {
+  content: "\e925";
+}
+.icon-weather1:before {
+  content: "\e925";
+}
 .icon-sun:before {
   content: "\e91e";
 }
-.icon-weather:before {
+.icon-weather11:before {
   content: "\e91e";
 }
 .icon-sun1:before {
   content: "\e91f";
 }
-.icon-weather1:before {
+.icon-weather111:before {
   content: "\e91f";
 }
 .icon-sun2:before {
