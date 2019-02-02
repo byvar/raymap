@@ -59,16 +59,24 @@ namespace OpenSpace.Loader {
 				foreach (KeyValuePair<string, string> path in paths) {
 					if (path.Value != null) yield return controller.StartCoroutine(PrepareFile(path.Value));
 				}
-				
+
+				loadingState = "Loading textures";
+				yield return null;
 				txds.Add(new TextureDictionary(paths["lvl.rw3.0"]));
+				loadingState = "Loading lightmaps";
+				yield return null;
 				if (FileSystem.FileExists(paths["lvl.lm3.0"])) {
 					txds.Add(new TextureDictionary(paths["lvl.lm3.0"]));
 				}
 				if (FileSystem.FileExists(paths["lvl.lm3.1"])) {
 					txds.Add(new TextureDictionary(paths["lvl.lm3.1"]));
 				}
+				loadingState = "Loading geometry";
+				yield return null;
 				ato = new MeshFile(paths["lvl.ato.0"]);
 
+				loadingState = "Loading level files";
+				yield return null;
 				LVL fix = new LVL(lvlName, paths["fix.lv2"], 0);
 				LVL lvl = new LVL(lvlName, paths["lvl.lv2"], 1);
 				files_array[0] = fix;
@@ -76,38 +84,6 @@ namespace OpenSpace.Loader {
 				fix.ReadPTR(paths["fix.pt2"]);
 				lvl.ReadPTR(paths["lvl.pt2"]);
 				yield return controller.StartCoroutine(LoadPS2());
-				//TextureDictionary lm30 = new TextureDictionary(paths["lvl.lm3.0"]);
-
-				// FIX
-				/*string fixDATPath = gameDataBinFolder + "FIX.DAT";
-                tplPaths[0] = gameDataBinFolder + "FIX.TEX";
-                yield return controller.StartCoroutine(PrepareFile(fixDATPath));
-                yield return controller.StartCoroutine(PrepareFile(tplPaths[0]));
-                DCDAT fixDAT = new DCDAT("fix", fixDATPath, 0);
-
-                // LEVEL
-                string lvlDATPath = gameDataBinFolder + lvlName + "/" + lvlName + ".DAT";
-                tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".TEX";
-                yield return controller.StartCoroutine(PrepareFile(lvlDATPath));
-                yield return controller.StartCoroutine(PrepareFile(tplPaths[1]));
-                DCDAT lvlDAT = new DCDAT(lvlName, lvlDATPath, 1);
-
-                files_array[0] = fixDAT;
-                files_array[1] = lvlDAT;
-
-                yield return controller.StartCoroutine(LoadDreamcast());
-
-                string logPathTexFix = gameDataBinFolder + "TEXTURE_FIX.LOG";
-                string logPathTexLvl = gameDataBinFolder + lvlName + "/TEXTURE_" + lvlName + ".LOG";
-                string logPathInfo = gameDataBinFolder + lvlName + "/INFO.LOG";
-                yield return controller.StartCoroutine(PrepareFile(logPathInfo));
-                if (FileSystem.FileExists(logPathInfo)) {
-                    ReadLog(FileSystem.GetFileReadStream(logPathInfo));
-                    yield return null;
-                }
-
-                fixDAT.Dispose();
-                lvlDAT.Dispose();*/
 			} finally {
                 for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
@@ -129,7 +105,30 @@ namespace OpenSpace.Loader {
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
             Pointer off_base_fix = Pointer.Current(reader);
-            /*uint base_language = reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
+
+			loadingState = "Loading input struct";
+			yield return null;
+			for (int i = 0; i < Settings.s.numEntryActions; i++) {
+				Pointer.Read(reader); // 3DOS_EntryActions
+			}
+
+			inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+			foreach (EntryAction ea in inputStruct.entryActions) {
+				print(ea.ToString());
+			}
+			fontStruct = FontStructure.Read(reader,Pointer.Current(reader));
+
+			/*
+            Pointer off_inputStructure = Pointer.Read(reader);
+            Pointer.DoAt(ref reader, off_inputStructure, () => {
+                inputStruct = InputStructure.Read(reader, off_inputStructure);
+				foreach (EntryAction ea in inputStruct.entryActions) {
+					print(ea.ToString());
+				}
+			});*/
+
+
+			/*uint base_language = reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
             reader.ReadUInt32();
             uint num_text_language = reader.ReadUInt32();
             reader.ReadUInt16();
@@ -220,7 +219,7 @@ namespace OpenSpace.Loader {
                     }
                 }
             });*/
-            loadingState = "Loading level memory";
+			loadingState = "Loading level memory";
             yield return null;
             files_array[Mem.Lvl].GotoHeader();
             reader = files_array[Mem.Lvl].reader;
@@ -346,40 +345,10 @@ namespace OpenSpace.Loader {
 				});
 			}
 
-
-			/*loadingState = "Loading level textures";
-            yield return null;
-            uint num_textures_lvl = reader.ReadUInt32();
-            uint num_textures_total = num_textures_fix + num_textures_lvl;
-            Pointer off_textures_lvl = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_textures_lvl, () => {
-                Array.Resize(ref textures, (int)num_textures_total);
-                for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                    Pointer off_texture = Pointer.Read(reader);
-                    textures[i] = null;
-                    Pointer.DoAt(ref reader, off_texture, () => {
-                        textures[i] = TextureInfo.Read(reader, off_texture);
-                    });
-                }
-                TEX tex = new TEX(tplPaths[1]);
-                for (uint i = 0; i < num_textures_lvl; i++) {
-                    if (textures[num_textures_fix + i] != null && tex.Count > i) {
-                        textures[num_textures_fix + i].Texture = tex.textures[i];
-                    }
-                }
-            });*/
-
 			loadingState = "Loading families";
             yield return null;
             ReadFamilies(reader);
 			//print("Families: " + families.Count);
-            /*loadingState = "Loading animation banks";
-            yield return null;
-            Pointer.DoAt(ref reader, off_animationBank, () => {
-                animationBanks = new AnimationBank[2];
-                animationBanks[0] = AnimationBank.ReadDreamcast(reader, off_animationBank, off_events_fix, num_events_fix);
-                animationBanks[1] = animationBanks[0];
-            });*/
             loadingState = "Loading superobject hierarchy";
             yield return null;
             ReadSuperObjects(reader);
@@ -389,36 +358,7 @@ namespace OpenSpace.Loader {
             loadingState = "Filling in cross-references";
             yield return null;
             ReadCrossReferences(reader);
-			loadingState = "Loading behavior copies";
 			yield return null;
-			/*ReadBehaviorCopies(reader);
-			yield return null;*/
-            // Parse transformation matrices and other settings for fix characters
-            /*if (off_mainChar != null && off_matrix_mainChar != null) {
-                SuperObject so = SuperObject.FromOffset(off_mainChar);
-                Pointer.DoAt(ref reader, off_matrix_mainChar, () => {
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    reader.ReadUInt32();
-                    Pointer off_matrix = Pointer.Current(reader);
-                    Matrix mat = Matrix.Read(reader, off_matrix);
-                    if (so != null) {
-                        so.off_matrix = off_matrix;
-                        so.matrix = mat;
-                        if (so.Gao != null) {
-                            so.Gao.transform.localPosition = mat.GetPosition(convertAxes: true);
-                            so.Gao.transform.localRotation = mat.GetRotation(convertAxes: true);
-                            so.Gao.transform.localScale = mat.GetScale(convertAxes: true);
-                        }
-                    }
-                });
-            }*/
         }
 		#endregion
 

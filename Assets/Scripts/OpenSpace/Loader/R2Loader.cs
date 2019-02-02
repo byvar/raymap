@@ -45,6 +45,11 @@ namespace OpenSpace.Loader {
 
 				yield return controller.StartCoroutine(CreateCNT());
 
+				if (Settings.s.game == Settings.Game.R2) {
+					string comportsPath = gameDataBinFolder + "R2DC_Comports.json";
+					yield return controller.StartCoroutine(PrepareFile(comportsPath));
+				}
+
 				if (lvlName.EndsWith(".exe")) {
                     if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
                     Settings.s.loadFromMemory = true;
@@ -801,11 +806,17 @@ namespace OpenSpace.Loader {
             yield return null;
             ReadCrossReferences(reader);
 
-            if (Settings.s.game == Settings.Game.R2) {
-                loadingState = "Filling in comport names";
-                ReadAndFillComportNames();
-            }
-        }
+			// TODO: Make more generic
+			if (Settings.s.game == Settings.Game.R2) {
+				loadingState = "Filling in comport names";
+				yield return null;
+				string path = gameDataBinFolder + "R2DC_Comports.json";
+				Stream stream = FileSystem.GetFileReadStream(path);
+				if (stream != null) {
+					ReadAndFillComportNames(stream);
+				}
+			}
+		}
         #endregion
         
     }

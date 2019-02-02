@@ -47,6 +47,7 @@ public class PersoBehaviour : MonoBehaviour {
 	private bool[] channelParents = null;
     public AnimMorphData[,] morphDataArray;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
+	private Dictionary<ushort, PhysicalObject>[] fullMorphPOs = null;
 	bool hasBones = false; // We can optimize a tiny bit if this object doesn't have bones
 	private bool isAlways = false;
 	public bool IsAlways {
@@ -64,9 +65,7 @@ public class PersoBehaviour : MonoBehaviour {
 
     // Brain clearance
     public bool clearTheBrain = false;
-
-    private bool showTooFarLimit = false;
-    private GameObject tooFarLimitDiamond = null;
+	
 
     // Use this for initialization
     void Start() {
@@ -102,36 +101,8 @@ public class PersoBehaviour : MonoBehaviour {
                     SetState(0);
                 }
             }
-
-            this.tooFarLimitDiamond = new GameObject("TooFarLimit");
-            this.tooFarLimitDiamond.transform.SetParent(this.perso.Gao.transform);
-            float diameter = this.perso.stdGame.tooFarLimit;
-            this.tooFarLimitDiamond.transform.localScale = new Vector3(diameter, diameter, diameter);
-            this.tooFarLimitDiamond.transform.localPosition = new Vector3(0, 0, 0);
-            this.tooFarLimitDiamond.transform.rotation = Quaternion.Euler(0, 0, 0);
-            MeshRenderer meshRenderer = this.tooFarLimitDiamond.AddComponent<MeshRenderer>();
-            MeshFilter meshFilter = this.tooFarLimitDiamond.AddComponent<MeshFilter>();
-            meshFilter.mesh = Resources.Load<Mesh>("diamond");
-            meshRenderer.material = MapLoader.Loader.collideTransparentMaterial;
-            meshRenderer.material.color = new Color(1, 0.5f, 0, 0.5f);
-            this.tooFarLimitDiamond.SetActive(false);
         }
         loaded = true;
-    }
-
-
-    internal void OnSelect()
-    {
-        if (tooFarLimitDiamond!=null) {
-            tooFarLimitDiamond.SetActive(true);
-        }
-    }
-
-    internal void OnDeselect()
-    {
-        if (tooFarLimitDiamond != null) {
-            tooFarLimitDiamond.SetActive(false);
-        }
     }
 
     #region Print debug info
@@ -437,11 +408,6 @@ public class PersoBehaviour : MonoBehaviour {
                 forceAnimUpdate = true;
                 SetState(currentState);
 			}
-			if (tooFarLimitDiamond != null) {
-				float diameter = this.perso.stdGame.tooFarLimit;
-				this.tooFarLimitDiamond.transform.localScale = new Vector3(diameter, diameter, diameter);
-				this.tooFarLimitDiamond.transform.rotation = Quaternion.Euler(0, 0, 0);
-			}
 		}
         bool sectorActive = false, insideSectors = false;
         if (sector == null || isAlways || sector.Loaded) sectorActive = true;
@@ -502,6 +468,17 @@ public class PersoBehaviour : MonoBehaviour {
             }
             channelObjects = null;
         }
+		if (fullMorphPOs != null) {
+			for (int i = 0; i < fullMorphPOs.Length; i++) {
+				if (fullMorphPOs[i] != null) {
+					foreach (PhysicalObject po in fullMorphPOs[i].Values) {
+						Destroy(po.Gao);
+					}
+					fullMorphPOs[i].Clear();
+				}
+			}
+			fullMorphPOs = null;
+		}
         channelIDDictionary.Clear();
 		hasBones = false;
     }
@@ -518,6 +495,7 @@ public class PersoBehaviour : MonoBehaviour {
                 // Init channels & subobjects
                 subObjects = new PhysicalObject[a3d.num_channels][];
                 channelObjects = new GameObject[a3d.num_channels];
+				if (a3d.num_morphData > 0) fullMorphPOs = new Dictionary<ushort, PhysicalObject>[a3d.num_channels];
 				currentActivePO = new int[a3d.num_channels];
 				channelParents = new bool[a3d.num_channels];
                 for (int i = 0; i < a3d.num_channels; i++) {
@@ -577,13 +555,8 @@ public class PersoBehaviour : MonoBehaviour {
                         }
                     }
                 }
-				if (!isAlways) {
-					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
-				} else {
-					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
-				}
 
-				if (a3d.num_morphData > 0 && a3d.morphData != null) {
+				if (a3d.num_morphData > 0 && a3d.morphData != null && Settings.s.engineVersion < Settings.EngineVersion.R3) {
 					morphDataArray = new AnimMorphData[a3d.num_channels, a3d.num_onlyFrames];
 					// Iterate over morph data to find the correct channel and keyframe
 					for (int i = 0; i < a3d.num_morphData; i++) {
@@ -594,13 +567,42 @@ public class PersoBehaviour : MonoBehaviour {
 							int channelIndex = this.GetChannelByID(m.channel)[0];
 							if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
 								morphDataArray[channelIndex, m.frame] = m;
+								if (m.morphProgress == 100 && perso.p3dData.objectList != null && perso.p3dData.objectList.Count > m.objectIndexTo) {
+									if (fullMorphPOs[channelIndex] == null) fullMorphPOs[channelIndex] = new Dictionary<ushort, PhysicalObject>();
+									if (!fullMorphPOs[channelIndex].ContainsKey(m.objectIndexTo)) {
+										PhysicalObject o = perso.p3dData.objectList[m.objectIndexTo].po;
+										if (o != null) {
+											PhysicalObject c = o.Clone();
+											c.Gao.transform.localScale = c.scaleMultiplier.HasValue ? c.scaleMultiplier.Value : Vector3.one;
+											c.Gao.transform.parent = channelObjects[channelIndex].transform;
+											c.Gao.name = "[Morph] " + c.Gao.name;
+											if (Settings.s.hasDeformations && c.Bones != null) hasBones = true;
+											foreach (VisualSetLOD l in c.visualSet) {
+												if (l.obj != null) {
+													GameObject gao = l.obj.Gao;
+													if (gao != null) gao.SetActive(!controller.viewCollision);
+												}
+											}
+											if (c.collideMesh != null) c.collideMesh.SetVisualsActive(controller.viewCollision);
+											c.Gao.SetActive(false);
+											fullMorphPOs[channelIndex][m.objectIndexTo] = c;
+										}
+									}
+								}
 							}
 						}
 					}
 				} else {
 					morphDataArray = null;
 				}
-            }
+
+				// Keep lighting last so that it is applied to all new sub objects
+				if (!isAlways) {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
+				} else {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
+				}
+			}
             loaded = true;
         }
     }
@@ -771,6 +773,11 @@ public class PersoBehaviour : MonoBehaviour {
                 float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
 				
 				if (poNum != currentActivePO[i]) {
+					if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
+						foreach (PhysicalObject morphPO in fullMorphPOs[i].Values) {
+							if (morphPO.Gao.activeSelf) morphPO.Gao.SetActive(false);
+						}
+					}
 					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
 						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
 					}
@@ -785,7 +792,7 @@ public class PersoBehaviour : MonoBehaviour {
                 if (physicalObject != null && a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
                     AnimMorphData morphData = morphDataArray[i, currentFrame];
 
-					if (morphData != null) {
+					if (morphData != null && morphData.morphProgress != 0 && morphData.morphProgress != 100) {
 						PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
 						Vector3[] morphVerts = null;
 
@@ -795,9 +802,14 @@ public class PersoBehaviour : MonoBehaviour {
 							MeshObject fromM = obj as MeshObject;
 							MeshObject toM = morphToPO.visualSet[j].obj as MeshObject;
 							if (toM == null) continue;
-							morphVerts = new Vector3[toM.vertices.Length];
-							for (int vi = 0; vi < fromM.vertices.Length; vi++) {
-								morphVerts[vi] = Vector3.LerpUnclamped(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
+							if (fromM.vertices.Length != toM.vertices.Length) {
+								// For those special cases like the mistake in the Clark cinematic
+								continue;
+							}
+							int numVertices = fromM.vertices.Length;
+							morphVerts = new Vector3[numVertices];
+							for (int vi = 0; vi < numVertices; vi++) {
+								morphVerts[vi] = Vector3.Lerp(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
 							}
 							for (int k = 0; k < fromM.num_subblocks; k++) {
 								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
@@ -805,6 +817,14 @@ public class PersoBehaviour : MonoBehaviour {
 								if (el != null) el.UpdateMeshVertices(morphVerts);
 							}
 						}
+					} else if (morphData != null && morphData.morphProgress == 100) {
+						physicalObject.Gao.SetActive(false);
+						PhysicalObject c = fullMorphPOs[i][morphData.objectIndexTo];
+						c.Gao.transform.localScale = c.scaleMultiplier.HasValue ? c.scaleMultiplier.Value : Vector3.one;
+						c.Gao.transform.localPosition = Vector3.zero;
+						c.Gao.transform.localRotation = Quaternion.identity;
+						c.Gao.SetActive(true);
+						currentActivePO[i] = -2;
 					} else {
 						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
 							IGeometricObject obj = physicalObject.visualSet[j].obj;

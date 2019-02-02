@@ -7,6 +7,7 @@ public class ObjectSelector : MonoBehaviour {
     public CameraComponent cam;
     public PersoBehaviour highlightedPerso = null;
     public PersoBehaviour selectedPerso = null;
+	private GameObject tooFarLimitDiamond = null;
 
     private void HandleCollision() {
         int layerMask = 0;
@@ -56,17 +57,7 @@ public class ObjectSelector : MonoBehaviour {
     public void Select(PersoBehaviour pb, bool view = false) {
         //print(pb.name);
         if (selectedPerso != pb || view) {
-            
-            // Deselect old selected perso
-            if (selectedPerso != null) {
-                selectedPerso.OnDeselect();
-            }
             selectedPerso = pb;
-            
-            // Select freshly selected perso
-            if (selectedPerso != null) {
-                selectedPerso.OnSelect();
-            }
             cam.JumpTo(pb.gameObject);
         }
     }
@@ -76,9 +67,6 @@ public class ObjectSelector : MonoBehaviour {
 	}
 
     public void Deselect() {
-        if (selectedPerso != null) {
-            selectedPerso.OnDeselect();
-        }
         selectedPerso = null;
     }
 
@@ -88,5 +76,32 @@ public class ObjectSelector : MonoBehaviour {
 		if (!cam.mouseLookEnabled
 			&& controller.LoadState == Controller.State.Finished
 			&& screenRect.Contains(Input.mousePosition)) HandleCollision();
-    }
+		if (controller.LoadState == Controller.State.Finished) UpdateTooFarLimit();
+	}
+
+	void UpdateTooFarLimit() {
+		if (tooFarLimitDiamond == null) InitTooFarLimit();
+		if (selectedPerso != null && controller.viewCollision && selectedPerso.perso != null
+			&& selectedPerso.perso.stdGame != null && selectedPerso.perso.stdGame.tooFarLimit > 0) {
+			if (!tooFarLimitDiamond.activeSelf) tooFarLimitDiamond.SetActive(true);
+			tooFarLimitDiamond.transform.localScale = Vector3.one * selectedPerso.perso.stdGame.tooFarLimit;
+			tooFarLimitDiamond.transform.localRotation = Quaternion.identity;
+			tooFarLimitDiamond.transform.position = selectedPerso.transform.position;
+		} else {
+			if (tooFarLimitDiamond.activeSelf) tooFarLimitDiamond.SetActive(false);
+		}
+	}
+
+	void InitTooFarLimit() {
+		tooFarLimitDiamond = new GameObject("TooFarLimit");
+		tooFarLimitDiamond.transform.localScale = Vector3.one;
+		tooFarLimitDiamond.transform.localPosition = Vector3.zero;
+		tooFarLimitDiamond.transform.localRotation = Quaternion.identity;
+		MeshRenderer meshRenderer = tooFarLimitDiamond.AddComponent<MeshRenderer>();
+		MeshFilter meshFilter = tooFarLimitDiamond.AddComponent<MeshFilter>();
+		meshFilter.mesh = Resources.Load<Mesh>("diamond");
+		meshRenderer.material = controller.collideTransparentMaterial;
+		meshRenderer.material.color = new Color(1, 0.5f, 0, 0.5f);
+		tooFarLimitDiamond.SetActive(false);
+	}
 }

@@ -22,6 +22,24 @@ namespace OpenSpace.Input {
 		DPadDown = 0x1A,
 		DPadLeft = 0x1B
 	}
+	public enum PS2KeyCode {
+		Select = 0x1A,
+		L3 = 0x1B,
+		R3 = 0x1C,
+		Start = 0x1D,
+		DPadUp = 0x1E,
+		DPadRight = 0x1F,
+		DPadDown = 0x20,
+		DPadLeft = 0x21,
+		L2 = 0x22,
+		R2 = 0x23,
+		L1 = 0x24,
+		R1 = 0x25,
+		Triangle = 0x26,
+		Circle = 0x27,
+		Cross = 0x28,
+		Square = 0x29
+	}
 	public enum DreamcastKeyCode {
 		C = 0x10,
 		B = 0x11,

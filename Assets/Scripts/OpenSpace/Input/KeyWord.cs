@@ -45,7 +45,7 @@ namespace OpenSpace.Input {
 			keyword.valueAsInt = reader.ReadInt32();
 			keyword.valueAsPointer = Pointer.GetPointerAtOffset(off_value);
 			if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadInt32();
-			reader.ReadInt32();
+			if(Settings.s.game != Settings.Game.R2Revolution) reader.ReadInt32();
 
             /*if (isFunction && Settings.s.game != Settings.Game.TTSE) {
                 keyWord.isFunction = true;
@@ -211,6 +211,8 @@ namespace OpenSpace.Input {
 							return FunctionType + "(" + Enum.GetName(typeof(GameCubeKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
 						} else if(Settings.s.platform == Settings.Platform.DC) {
 							return FunctionType + "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+						} else if (Settings.s.platform == Settings.Platform.PS2) {
+							return FunctionType + "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
 						} else {
 							return FunctionType + "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
 						}

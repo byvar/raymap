@@ -317,8 +317,13 @@ namespace OpenSpace {
             ReadAlways(reader);
             ReadCrossReferences(reader);
 
+			// TODO: Make more generic
             if (Settings.s.game == Settings.Game.R2) {
-                ReadAndFillComportNames();
+				string path = gameDataBinFolder + "R2DC_Comports.json";
+				Stream stream = FileSystem.GetFileReadStream(path);
+				if (stream != null) {
+					ReadAndFillComportNames(stream);
+				}
             }
 
             livePreviewReader = reader;
@@ -717,17 +722,14 @@ MonoBehaviour.print(str);
         }
 
         // Comport names are read from a JSON that contains the Dreamcast comport names
-        public void ReadAndFillComportNames()
-        {
-            string filePath = Path.Combine(Application.streamingAssetsPath, "R2DC_Comports.json");
-            string dataAsJson = File.ReadAllText(filePath);
-            JSON_ComportData comportData = JsonUtility.FromJson<JSON_ComportData>(dataAsJson);
+        public void ReadAndFillComportNames(Stream stream) {
+			string dataAsJson = new StreamReader(stream).ReadToEnd();
+			JSON_ComportData comportData = JsonUtility.FromJson<JSON_ComportData>(dataAsJson);
             foreach(AIModel aiModel in aiModels) {
                 if (aiModel.name!=null && aiModel.name!="") {
                     JSON_AIModel jsonAiModel = comportData.aiModels.Find(p => p.name.ToLower() == aiModel.name.ToLower());
 
                     if (jsonAiModel!=null) {
-
                         if (aiModel.behaviors_normal != null) {
                             for (int i = 0; i < aiModel.behaviors_normal.Length; i++) {
                                 Behavior b = aiModel.behaviors_normal[i];
@@ -736,7 +738,6 @@ MonoBehaviour.print(str);
                                 }
                             }
                         }
-
                         if (aiModel.behaviors_reflex != null) {
                             for (int i = 0; i < aiModel.behaviors_reflex.Length; i++) {
                                 Behavior b = aiModel.behaviors_reflex[i];

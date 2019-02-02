@@ -205,6 +205,30 @@ a:focus {
 	padding: 0 2.5em 0 2.5em;
 	cursor: pointer;
 }
+.levels-item.level > .name {
+	text-align: left;
+	display: inline-block;
+	width: 70%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
+.levels-item.level > .internal-name {
+	font-family: Consolas, monaco, monospace;
+	font-size: 0.85em;
+	text-align: right;
+	display: inline-block;
+	width: 30%;
+	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+	flex: 1 1 auto;
+}
 .levels-item.level.current-levels-item {
 	cursor: default;
 }
@@ -1155,6 +1179,12 @@ input[type=range]::-ms-fill-upper {
 #header-script-text {
 	font-family: Consolas, monaco, monospace;
 	font-size: 0.7em;
+}
+
+/* ICOMOON CORRECTIONS */
+#btn-fog > * {
+	vertical-align: text-bottom;
+	line-height: 1.3em;
 }
 
 

@@ -30,48 +30,84 @@ namespace OpenSpace.Text {
             FontStructure f = new FontStructure(offset);
 
             f.field0 = reader.ReadUInt32();
-            if(Settings.s.platform != Settings.Platform.DC) f.field4 = reader.ReadUInt32();
-            f.num_languages = reader.ReadUInt16();
-            reader.ReadUInt16();
-            f.off_text_languages = Pointer.Read(reader);
-            f.off_text_misc = Pointer.Read(reader);
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				f.num_languages = reader.ReadUInt16();
+				f.languages = new TextTable[f.num_languages];
+				f.languages[0].num_entries = reader.ReadUInt16();
+				f.languages[0].entries = new string[f.languages[0].num_entries];
+				reader.ReadUInt32();
+				f.off_text_misc = Pointer.Read(reader);
+				f.off_text_languages = Pointer.Read(reader);
 
-            // Read language table
-            f.languages = new TextTable[f.num_languages];
-            Pointer.DoAt(ref reader, f.off_text_languages, () => {
-                //f.languages = new TextTable[f.num_languages];
-                for (int i = 0; i < f.num_languages; i++) {
-                    f.languages[i].off_textTable = Pointer.Read(reader);
-                    f.languages[i].num_entries_max = reader.ReadUInt16();
-                    f.languages[i].num_entries = reader.ReadUInt16();
-                    f.languages[i].entries = new string[f.languages[i].num_entries];
-                    Pointer.DoAt(ref reader, f.languages[i].off_textTable, () => {
-                        for (int j = 0; j < f.languages[i].num_entries; j++) {
-                            Pointer off_text = Pointer.Read(reader);
-                            Pointer.DoAt(ref reader, off_text, () => {
-                                f.languages[i].entries[j] = reader.ReadNullDelimitedString();
-                            });
-                        }
-                    });
-                }
-            });
+				// Read misc table, kinda hacky since there is no amount of entries listed
+				Pointer.DoAt(ref reader, f.off_text_misc, () => {
+					Pointer off_entry1 = Pointer.Read(reader);
+					f.misc.num_entries = (ushort)((off_entry1.offset - f.off_text_misc.offset) / 4);
+					Pointer.Goto(ref reader, f.off_text_misc);
+					f.misc.entries = new string[f.misc.num_entries];
+					for (int j = 0; j < f.misc.num_entries; j++) {
+						Pointer off_text = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, off_text, () => {
+							f.misc.entries[j] = reader.ReadNullDelimitedString();
+						});
+					}
+				});
+				// Read only first language.
+				// Interestingly, other languages are stored in the menu level file.
+				// When you select another language, it replaces the fix table by the one in the menu file
+				// This saves fix memory since not all languages have to remain loaded throughout the whole game.
+				Pointer.DoAt(ref reader, f.off_text_languages, () => {
+					for (int j = 0; j < f.languages[0].num_entries; j++) {
+						Pointer off_text = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, off_text, () => {
+							f.languages[0].entries[j] = reader.ReadNullDelimitedString();
+						});
+					}
+				});
+			} else {
+				if (Settings.s.platform != Settings.Platform.DC) f.field4 = reader.ReadUInt32();
+				f.num_languages = reader.ReadUInt16();
+				reader.ReadUInt16();
+				f.off_text_languages = Pointer.Read(reader);
+				f.off_text_misc = Pointer.Read(reader);
 
-            // Read misc table
-            Pointer.DoAt(ref reader, f.off_text_misc, () => {
-                f.misc.off_textTable = Pointer.Read(reader);
-                f.misc.num_entries_max = reader.ReadUInt16();
-                f.misc.num_entries = reader.ReadUInt16();
-                f.misc.entries = new string[f.misc.num_entries];
+				// Read language table
+				f.languages = new TextTable[f.num_languages];
+				Pointer.DoAt(ref reader, f.off_text_languages, () => {
+					//f.languages = new TextTable[f.num_languages];
+					for (int i = 0; i < f.num_languages; i++) {
+						f.languages[i].off_textTable = Pointer.Read(reader);
+						f.languages[i].num_entries_max = reader.ReadUInt16();
+						f.languages[i].num_entries = reader.ReadUInt16();
+						f.languages[i].entries = new string[f.languages[i].num_entries];
+						Pointer.DoAt(ref reader, f.languages[i].off_textTable, () => {
+							for (int j = 0; j < f.languages[i].num_entries; j++) {
+								Pointer off_text = Pointer.Read(reader);
+								Pointer.DoAt(ref reader, off_text, () => {
+									f.languages[i].entries[j] = reader.ReadNullDelimitedString();
+								});
+							}
+						});
+					}
+				});
 
-                Pointer.DoAt(ref reader, f.misc.off_textTable, () => {
-                    for (int j = 0; j < f.misc.num_entries; j++) {
-                        Pointer off_text = Pointer.Read(reader);
-                        Pointer.DoAt(ref reader, off_text, () => {
-                            f.misc.entries[j] = reader.ReadNullDelimitedString();
-                        });
-                    }
-                });
-            });
+				// Read misc table
+				Pointer.DoAt(ref reader, f.off_text_misc, () => {
+					f.misc.off_textTable = Pointer.Read(reader);
+					f.misc.num_entries_max = reader.ReadUInt16();
+					f.misc.num_entries = reader.ReadUInt16();
+					f.misc.entries = new string[f.misc.num_entries];
+
+					Pointer.DoAt(ref reader, f.misc.off_textTable, () => {
+						for (int j = 0; j < f.misc.num_entries; j++) {
+							Pointer off_text = Pointer.Read(reader);
+							Pointer.DoAt(ref reader, off_text, () => {
+								f.misc.entries[j] = reader.ReadNullDelimitedString();
+							});
+						}
+					});
+				});
+			}
 
             return f;
         }
