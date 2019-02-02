@@ -320,6 +320,10 @@ namespace OpenSpace {
 			// TODO: Make more generic
             if (Settings.s.game == Settings.Game.R2) {
 				string path = gameDataBinFolder + "R2DC_Comports.json";
+                if (!FileSystem.FileExists(path)) {
+                    path = "Assets/StreamingAssets/R2DC_Comports.json"; // Offline, the json doesn't exist, so grab it from StreamingAssets
+                }
+
 				Stream stream = FileSystem.GetFileReadStream(path);
 				if (stream != null) {
 					ReadAndFillComportNames(stream);
