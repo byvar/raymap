@@ -528,11 +528,6 @@ public class PersoBehaviour : MonoBehaviour {
                         }
                     }
                 }
-				if (!isAlways) {
-					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
-				} else {
-					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
-				}
 
 				if (a3d.num_morphData > 0 && a3d.morphData != null && Settings.s.engineVersion < Settings.EngineVersion.R3) {
 					morphDataArray = new AnimMorphData[a3d.num_channels, a3d.num_onlyFrames];
@@ -573,7 +568,14 @@ public class PersoBehaviour : MonoBehaviour {
 				} else {
 					morphDataArray = null;
 				}
-            }
+
+				// Keep lighting last so that it is applied to all new sub objects
+				if (!isAlways) {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
+				} else {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
+				}
+			}
             loaded = true;
         }
     }
