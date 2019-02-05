@@ -53,6 +53,25 @@ namespace OpenSpace.AI {
             return d;
         }
 
+        public static DsgVarType GetDsgVarTypeFromArrayType(DsgVarType arrayType)
+        {
+            switch(arrayType) {
+                
+                case DsgVarType.ActionArray: return DsgVarType.Action;
+                case DsgVarType.FloatArray: return DsgVarType.Float;
+                case DsgVarType.IntegerArray: return DsgVarType.Int;
+                case DsgVarType.PersoArray: return DsgVarType.Perso;
+                case DsgVarType.SoundEventArray: return DsgVarType.SoundEvent;
+                case DsgVarType.SuperObjectArray: return DsgVarType.SuperObject;
+                case DsgVarType.TextArray: return DsgVarType.Text;
+                case DsgVarType.TextRefArray: return DsgVarType.None;
+                case DsgVarType.VectorArray: return DsgVarType.Vector;
+                case DsgVarType.WayPointArray: return DsgVarType.Waypoint;
+            }
+
+            return DsgVarType.None;
+        }
+
         public enum DsgVarType {
             None,
             Boolean,
@@ -72,7 +91,7 @@ namespace OpenSpace.AI {
             SoundEvent,
             Light,
             GameMaterial,
-            VisualMaterial,
+            VisualMaterial, // Also an array?
             Perso,
             Waypoint,
             Graph,

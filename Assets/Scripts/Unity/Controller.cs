@@ -619,6 +619,15 @@ public class Controller : MonoBehaviour {
                         customBitsComponent.stdGame = perso.stdGame;
                         customBitsComponent.Init();
                     }
+
+                    DynamicsMechanicsComponent dnComponent = perso.Gao.GetComponent<DynamicsMechanicsComponent>();
+                    if (dnComponent!=null) {
+                        Pointer.DoAt(ref reader, perso.off_dynam, () => {
+                            perso.dynam = Dynam.Read(reader, perso.off_dynam);
+                        });
+
+                        dnComponent.SetDynamics(perso.dynam.dynamics);
+                    }
                 }
             }
         }

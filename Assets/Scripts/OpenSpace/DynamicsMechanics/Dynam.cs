@@ -24,8 +24,12 @@ namespace OpenSpace
 
             dynam.off_dynamics = Pointer.Read(reader);
 
-            Pointer.Goto(ref reader, dynam.off_dynamics);
-            dynam.dynamics = Dynamics.Read(reader, dynam.off_dynamics);
+            if (dynam.off_dynamics != null) {
+
+                Pointer.Goto(ref reader, dynam.off_dynamics);
+                dynam.dynamics = Dynamics.Read(reader, dynam.off_dynamics);
+
+            }
 
             return dynam;
         }

@@ -98,13 +98,17 @@ namespace OpenSpace.AI {
 
         public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry infoEntry, Pointer buffer)
         {
-            Pointer original = Pointer.Goto(ref reader, buffer + infoEntry.offsetInBuffer);
-            object returnValue = null;
+            return ReadValueFromBuffer(reader, infoEntry.type, infoEntry.offsetInBuffer, infoEntry.number, buffer, infoEntry);
+        }
 
+        public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry.DsgVarType type, uint offsetInBuffer, uint number, Pointer buffer, DsgVarInfoEntry entry = null)
+        {
+            Pointer original = Pointer.Goto(ref reader, buffer + offsetInBuffer);
+            object returnValue = null;
 
 			try {
 
-                switch (infoEntry.type) {
+                switch (type) {
                     case DsgVarInfoEntry.DsgVarType.Boolean:
                         returnValue = reader.ReadBoolean(); break;
                     case DsgVarInfoEntry.DsgVarType.Byte:
@@ -161,10 +165,25 @@ namespace OpenSpace.AI {
 					case DsgVarInfoEntry.DsgVarType.Array11:
 					case DsgVarInfoEntry.DsgVarType.Array9:
 					case DsgVarInfoEntry.DsgVarType.Array6:
-						MapLoader.Loader.print(infoEntry.type);
+						MapLoader.Loader.print(type);
 						returnValue = reader.ReadInt32(); break;
 
-					default:
+                    case DsgVarInfoEntry.DsgVarType.ActionArray:
+                    case DsgVarInfoEntry.DsgVarType.FloatArray:
+                    case DsgVarInfoEntry.DsgVarType.IntegerArray:
+                    case DsgVarInfoEntry.DsgVarType.PersoArray:
+                    case DsgVarInfoEntry.DsgVarType.SoundEventArray:
+                    case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
+                    case DsgVarInfoEntry.DsgVarType.TextArray:
+                    case DsgVarInfoEntry.DsgVarType.TextRefArray:
+                    case DsgVarInfoEntry.DsgVarType.VectorArray:
+                    case DsgVarInfoEntry.DsgVarType.WayPointArray:
+
+                        returnValue = ReadArray(reader, entry, buffer);
+
+                        break;
+
+                    default:
                         returnValue = reader.ReadInt32(); break;
                 }
 
@@ -191,6 +210,42 @@ namespace OpenSpace.AI {
         public object ReadValueFromDsgVarBuffer(Reader reader, DsgVarInfoEntry infoEntry, DsgVar dsgVar)
         {
             return ReadValueFromBuffer(reader, infoEntry, dsgVar.off_dsgMemBuffer);
+        }
+
+        public object[] ReadArray(Reader reader, DsgVarInfoEntry entry, Pointer buffer)
+        {
+            uint o = entry.number * 16;
+
+            Pointer.Goto(ref reader, off_dsgVarInfo + o);
+            int a = reader.ReadInt32();
+
+            Pointer byteAddress = off_dsgMemBuffer + 4 + a;
+
+            Pointer.Goto(ref reader, byteAddress);
+            byte arraySize = reader.ReadByte();
+
+            //this.
+
+            /*Pointer.Goto(ref reader, this.off_dsgMemBuffer + 4);
+            Pointer bufferStartAddress = Pointer.Read(reader);
+
+            Pointer.Goto(ref reader, bufferStartAddress + infoEntry.offsetInBuffer);
+            uint offset = reader.ReadUInt32();
+            Pointer.Goto(ref reader, this.off_dsgMemBuffer + 4 + offset);
+            uint arraySize = reader.ReadByte();
+            */
+            object[] resultList = new object[arraySize];
+
+            DsgVarInfoEntry.DsgVarType itemType = DsgVarInfoEntry.GetDsgVarTypeFromArrayType(entry.type);
+
+            for (uint i = 0; i < arraySize; i++) {
+                if (itemType==DsgVarInfoEntry.DsgVarType.Vector)
+                    resultList[i] = ReadValueFromBuffer(reader, itemType, 8 + i * 12, i, buffer);
+                else
+                    resultList[i] = ReadValueFromBuffer(reader, itemType, 8 + i * 4, i, buffer);
+            }
+
+            return resultList;
         }
     }
 }

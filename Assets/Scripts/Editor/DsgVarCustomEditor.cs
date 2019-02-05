@@ -98,7 +98,33 @@ public class DsgVarCustomEditor : Editor {
                     dsgVarEntry.valueAsWaypointGao = selectedWaypointGao;
                 }
                 break;
+            case DsgVarInfoEntry.DsgVarType.ActionArray:
+            case DsgVarInfoEntry.DsgVarType.FloatArray:
+            case DsgVarInfoEntry.DsgVarType.IntegerArray:
+            case DsgVarInfoEntry.DsgVarType.PersoArray:
+            case DsgVarInfoEntry.DsgVarType.SoundEventArray:
+            case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
+            case DsgVarInfoEntry.DsgVarType.TextArray:
+            case DsgVarInfoEntry.DsgVarType.TextRefArray:
+            case DsgVarInfoEntry.DsgVarType.VectorArray:
+            case DsgVarInfoEntry.DsgVarType.WayPointArray:
 
+                if (dsgVarEntry.entry.value.GetType().IsArray) {
+                    object[] array = (object[])dsgVarEntry.entry.value;
+
+                    GUILayout.BeginVertical();
+                    for (int i = 0; i < array.Length; i++) {
+
+                        if (array[i] != null) {
+                            GUILayout.TextField(array[i].ToString());
+                        }
+
+                    }
+                    GUILayout.EndVertical();
+                }
+                
+
+                break;
 
         }
 
