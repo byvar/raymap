@@ -48,6 +48,19 @@ public class DsgVarCustomEditor : Editor {
             MapLoader.Loader.print(printResult);
         }
 
+        if (GUILayout.Button("Print dsgvar value offsets")) {
+
+            string printResult = "";
+
+            DsgMem dsgMem = c.dsgMem;
+            foreach (DsgVarComponent.DsgVarEditableEntry dsgVarEntry in c.editableEntries) {
+                Pointer offsetOfValue = (dsgMem.memBuffer + dsgVarEntry.entry.offsetInBuffer);
+                printResult += dsgVarEntry.entry.NiceVariableName + " " + offsetOfValue +Environment.NewLine;
+            }
+
+            MapLoader.Loader.print(printResult);
+        }
+
         GUILayout.EndVertical();
     }
 
