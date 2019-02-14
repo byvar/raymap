@@ -163,22 +163,20 @@ namespace OpenSpace.Object {
                 }
             });
 
-            int index = 0;
-
             // Parse collide set
             Pointer.DoAt(ref reader, po.off_collideSet, () => {
 				if (Settings.s.game == Settings.Game.R2Revolution) {
 					// Read collide mesh object here directly
-					po.collideMesh = CollideMeshObject.Read(reader, po.off_collideSet, null, index++);
+					po.collideMesh = CollideMeshObject.Read(reader, po.off_collideSet);
 					po.collideMesh.gao.transform.parent = po.Gao.transform;
 				} else {
 					// Read collide set containing collide mesh
-					uint u1 = reader.ReadUInt32(); // 0
-					uint u2 = reader.ReadUInt32(); // 0
-					uint u3 = reader.ReadUInt32(); // 0
+					uint u1 = reader.ReadUInt32(); // 0, zdm
+					uint u2 = reader.ReadUInt32(); // 0, zdd
+					uint u3 = reader.ReadUInt32(); // 0, zde
 					Pointer off_zdr = Pointer.Read(reader);
 					Pointer.DoAt(ref reader, off_zdr, () => {
-						po.collideMesh = CollideMeshObject.Read(reader, off_zdr, null, index++);
+						po.collideMesh = CollideMeshObject.Read(reader, off_zdr);
 						po.collideMesh.gao.transform.parent = po.Gao.transform;
 					});
 				}
@@ -216,12 +214,24 @@ namespace OpenSpace.Object {
                 po.collideMesh = collideMesh.Clone();
                 po.collideMesh.gao.transform.parent = po.Gao.transform;
             }
-            MapLoader.Loader.physicalObjects.Add(po);
             return po;
         }
 
         public void Destroy() {
-            if (gao != null) GameObject.Destroy(gao);
+			//MapLoader.Loader.physicalObjects.Remove(this);
+			if (visualSet != null) visualSet = null;
+			if (collideMesh != null) collideMesh = null;
+			if (gao != null) GameObject.Destroy(gao);
         }
+
+		public void UpdateViewCollision(bool viewCollision) {
+			foreach (VisualSetLOD l in visualSet) {
+				if (l.obj != null) {
+					GameObject gao = l.obj.Gao;
+					if (gao != null) gao.SetActive(!viewCollision);
+				}
+			}
+			if (collideMesh != null) collideMesh.SetVisualsActive(viewCollision);
+		}
     }
 }

@@ -4,6 +4,7 @@ using OpenSpace.AI;
 using OpenSpace.Animation;
 using OpenSpace.Animation.Component;
 using OpenSpace.Animation.ComponentMontreal;
+using OpenSpace.Collide;
 using OpenSpace.Object;
 using OpenSpace.Object.Properties;
 using OpenSpace.Visual;
@@ -341,11 +342,61 @@ public class PersoBehaviour : MonoBehaviour {
     }
 	#endregion
 
+	public void UpdateViewCollision(bool viewCollision) {
+		if (perso.collset != null) {
+			CollSet c = perso.collset;
+			foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<CollideMeshObject>> entry in c.zdxList) {
+				if (entry.Value != null) {
+					for (int i = 0; i < entry.Value.Count; i++) {
+						CollideMeshObject col = entry.Value[i];
+						if (col == null) continue;
+						//if (c.GetPrivilegedActionZoneStatus(entry.Key, i) != CollSet.PrivilegedActivationStatus.ForceActive) {
+							col.SetVisualsActive(false);
+						//}
+					}
+				}
+			}
+			if (viewCollision) {
+				foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<CollideActivation>> entry in c.activationList) {
+					if (entry.Value != null && entry.Value.Count == perso.p3dData.family.states.Count) {
+						CollideActivation ca = entry.Value[stateIndex];
+						if (ca.activationZone != null) {
+							foreach (CollideActivationZone caz in ca.activationZone) {
+								if (c.zdxList[entry.Key][caz.zdxIndex] == null) continue;
+								//if (c.GetPrivilegedActionZoneStatus(entry.Key, (int)caz.zdxIndex) != CollSet.PrivilegedActivationStatus.ForceInactive) {
+									c.zdxList[entry.Key][caz.zdxIndex].SetVisualsActive(true);
+								//}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (subObjects != null) {
+			for (int i = 0; i < subObjects.Length; i++) {
+				if (subObjects[i] == null) continue;
+				for (int j = 0; j < subObjects[i].Length; j++) {
+					if (subObjects[i][j] != null) subObjects[i][j].UpdateViewCollision(viewCollision);
+				}
+			}
+		}
+		if (fullMorphPOs != null) {
+			for (int i = 0; i < fullMorphPOs.Length; i++) {
+				if (fullMorphPOs[i] != null) {
+					foreach (PhysicalObject po in fullMorphPOs[i].Values) {
+						if(po != null) po.UpdateViewCollision(viewCollision);
+					}
+				}
+			}
+		}
+	}
+
 	public void SetState(int index) {
 		if (index < 0 || index >= perso.p3dData.family.states.Count) return;
 		stateIndex = index;
 		currentState = index;
 		state = perso.p3dData.family.states[index];
+		UpdateViewCollision(controller.viewCollision);
 
 		// Set animation
 		MapLoader l = MapLoader.Loader;
@@ -457,14 +508,18 @@ public class PersoBehaviour : MonoBehaviour {
             for (int i = 0; i < subObjects.Length; i++) {
                 if (subObjects[i] == null) continue;
                 for (int j = 0; j < subObjects[i].Length; j++) {
-                    if (subObjects[i][j] != null) subObjects[i][j].Destroy();
+					if (subObjects[i][j] != null) {
+						subObjects[i][j].Destroy();
+					}
                 }
             }
             subObjects = null;
         }
         if (channelObjects != null) {
             for (int i = 0; i < channelObjects.Length; i++) {
-                if (channelObjects[i] != null) Destroy(channelObjects[i]);
+				if (channelObjects[i] != null) {
+					Destroy(channelObjects[i]);
+				}
             }
             channelObjects = null;
         }
@@ -472,7 +527,7 @@ public class PersoBehaviour : MonoBehaviour {
 			for (int i = 0; i < fullMorphPOs.Length; i++) {
 				if (fullMorphPOs[i] != null) {
 					foreach (PhysicalObject po in fullMorphPOs[i].Values) {
-						Destroy(po.Gao);
+						po.Destroy();
 					}
 					fullMorphPOs[i].Clear();
 				}
