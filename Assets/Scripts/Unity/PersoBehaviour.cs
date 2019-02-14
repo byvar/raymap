@@ -350,9 +350,9 @@ public class PersoBehaviour : MonoBehaviour {
 					for (int i = 0; i < entry.Value.Count; i++) {
 						CollideMeshObject col = entry.Value[i];
 						if (col == null) continue;
-						//if (c.GetPrivilegedActionZoneStatus(entry.Key, i) != CollSet.PrivilegedActivationStatus.ForceActive) {
+						if (c.GetPrivilegedActionZoneStatus(entry.Key, i) != CollSet.PrivilegedActivationStatus.ForceActive) {
 							col.SetVisualsActive(false);
-						//}
+						}
 					}
 				}
 			}
@@ -363,9 +363,9 @@ public class PersoBehaviour : MonoBehaviour {
 						if (ca.activationZone != null) {
 							foreach (CollideActivationZone caz in ca.activationZone) {
 								if (c.zdxList[entry.Key][caz.zdxIndex] == null) continue;
-								//if (c.GetPrivilegedActionZoneStatus(entry.Key, (int)caz.zdxIndex) != CollSet.PrivilegedActivationStatus.ForceInactive) {
+								if (c.GetPrivilegedActionZoneStatus(entry.Key, (int)caz.zdxIndex) != CollSet.PrivilegedActivationStatus.ForceInactive) {
 									c.zdxList[entry.Key][caz.zdxIndex].SetVisualsActive(true);
-								//}
+								}
 							}
 						}
 					}

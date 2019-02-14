@@ -103,8 +103,10 @@ namespace OpenSpace.Object {
                     so.data = IPO.Read(reader, so.off_data, so);
                     break;
 				case Type.PO:
-					Pointer.Goto(ref reader, so.off_data);
-					so.data = PhysicalObject.Read(reader, so.off_data, so);
+					if (!Settings.s.loadFromMemory) {
+						Pointer.Goto(ref reader, so.off_data);
+						so.data = PhysicalObject.Read(reader, so.off_data, so);
+					}
 					break;
 				case Type.Perso:
                     Pointer.Goto(ref reader, so.off_data);
