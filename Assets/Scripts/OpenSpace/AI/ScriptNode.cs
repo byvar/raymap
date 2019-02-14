@@ -173,7 +173,7 @@ namespace OpenSpace.AI {
 					}
                 case ScriptNode.NodeType.PersoRef:
                     Perso argPerso = Perso.FromOffset(param_ptr);
-                    if (argPerso != null && argPerso.offset == perso.offset) {
+                    if (argPerso != null && perso!=null && argPerso.offset == perso.offset) {
                         if (advanced) return "PersoRef: this";
                         return "this";
                     }

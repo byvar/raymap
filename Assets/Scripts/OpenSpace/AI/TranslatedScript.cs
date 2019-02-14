@@ -2,6 +2,7 @@
 using OpenSpace.Input;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace OpenSpace.AI {
     public class TranslatedScript {
@@ -278,6 +279,31 @@ namespace OpenSpace.AI {
             Node rootNode = new Node(0, 0, null, this);
             nodes[0] = rootNode;
             AssignNodeChildren(nodes, nodes[0]);
+        }
+        
+        public string ToCSharpString()
+        {
+            string str = this.ToString();
+
+            Regex macroRegex = new Regex("evalMacro\\([a-zA-Z0-9_]*\\.Macro\\[([0-9]+)\\]\\)");
+            str = macroRegex.Replace(str, "await Macro_${1}()");
+
+            Regex ruleChangeRegex = new Regex("Proc_ChangeMyComport\\([a-zA-Z0-9_]+\\.Rule\\[[0-9]+\\]\\[\\\"([^\"]+)\\\"\\]\\)");
+            str = ruleChangeRegex.Replace(str, "smRule.SetState($1)");
+
+            Regex reflexChangeRegex = new Regex("Proc_ChangeMyComportReflex\\([a-zA-Z0-9_]+\\.Rule\\[[0-9]+\\]\\[\\\"([^\"]+)\\\"\\]\\)");
+            str = reflexChangeRegex.Replace(str, "smReflex.SetState($1)");
+
+            Regex ruleAndReflexChangeRegex = new Regex("Proc_ChangeMyComportAndMyReflex\\([a-zA-Z0-9_]+\\.Rule\\[[0-9]+\\]\\[\"([^ \"]+)\"\\], [a - zA - Z0 - 9_] +\\.Reflex\\[[0 - 9] +\\]\\[\"([^\"]+)\"\\]\\)");
+            str = ruleAndReflexChangeRegex.Replace(str, "smRule.SetState($1);"+Environment.NewLine+"smReflex.SetState($2)");
+
+            // TODO: ChangeMyComportAndMyReflex and ChangeComport for other objects.
+
+            /*"Proc_ChangeMyComport",
+                "Proc_ChangeMyComportReflex", // 70
+                "Proc_ChangeMyComportAndMyReflex",*/
+
+            return str;
         }
 
         public override string ToString() {

@@ -34,13 +34,27 @@ public class GrabLocationDisplayScript : MonoBehaviour
             DsgVarComponent dsgVarComponent = raymanGAO.GetComponent<DsgVarComponent>();
             if (dsgVarComponent != null) {
 
-                DsgVarInfoEntry vector38Entry = dsgVarComponent.dsgVarEntries[38];
-                DsgVarInfoEntry vector40Entry = dsgVarComponent.dsgVarEntries[40];
+                DsgVarInfoEntry vector38Entry = null;
+                DsgVarInfoEntry vector40Entry = null;
+
+                if (Settings.s.game == Settings.Game.R2) {
+                    vector38Entry = dsgVarComponent.dsgVarEntries[38];
+                    vector40Entry = dsgVarComponent.dsgVarEntries[40];
+                } else if (Settings.s.game == Settings.Game.R3) {
+                    return;
+                    vector38Entry = dsgVarComponent.dsgVarEntries[38];
+                    vector40Entry = dsgVarComponent.dsgVarEntries[40];
+                }
+
                 Vector3 vector38_xzy = (Vector3)vector38Entry.value;
                 Vector3 vector40_xzy = (Vector3)vector40Entry.value;
 
                 Vector3 vector38 = new Vector3(vector38_xzy.x, vector38_xzy.z, vector38_xzy.y);
                 Vector3 vector40 = new Vector3(vector40_xzy.x, vector40_xzy.z, vector40_xzy.y);
+
+                Vector3 raymanVec = raymanGAO.transform.position;
+                Vector3 dir = (vector40) - (raymanVec);
+                Vector3 dirFlat = new Vector3(dir.x, 0, dir.z);
 
                 for (float i = -0.05f; i <= 0.05f; i+=0.02f) {
                     for (float j = -0.05f; j <= 0.05f; j += 0.02f) {
@@ -58,6 +72,10 @@ public class GrabLocationDisplayScript : MonoBehaviour
                         Debug.DrawRay(vector40 + o, new Vector3(1f, 0, 0), Color.blue);
                         Debug.DrawRay(vector40 + o, new Vector3(0f, 0, -1f), Color.blue);
                         Debug.DrawRay(vector40 + o, new Vector3(0f, 0, 1f), Color.blue);
+
+                        
+                        Debug.DrawRay(raymanVec + o, dir, Color.blue);
+                        Debug.DrawRay(raymanVec + o, dirFlat, Color.blue);
                     }
                 }
             }

@@ -186,21 +186,26 @@ namespace OpenSpace
             }
         }
 
+        public void SetDsgMem(DsgMem dsgMem)
+        {
+            this.dsgMem = dsgMem;
+            this.dsgVar = dsgMem.dsgVar;
+            this.dsgVarEntries = this.dsgVar.dsgVarInfos;
+            this.editableEntries = new DsgVarEditableEntry[this.dsgVarEntries.Length];
+
+            int i = 0;
+            foreach (DsgVarInfoEntry entry in this.dsgVarEntries) {
+                DsgVarEditableEntry editableEntry = new DsgVarEditableEntry(i, entry);
+                editableEntries[i] = editableEntry;
+                i++;
+            }
+        }
+
         public void SetPerso(Perso perso)
         {
             this.perso = perso;
             if (perso != null && perso.brain != null && perso.brain.mind != null && perso.brain.mind.dsgMem != null && perso.brain.mind.dsgMem.dsgVar != null) {
-                this.dsgMem = perso.brain.mind.dsgMem;
-                this.dsgVar = perso.brain.mind.dsgMem.dsgVar;
-                this.dsgVarEntries = this.dsgVar.dsgVarInfos;
-                this.editableEntries = new DsgVarEditableEntry[this.dsgVarEntries.Length];
-
-                int i = 0;
-                foreach(DsgVarInfoEntry entry in this.dsgVarEntries) {
-                    DsgVarEditableEntry editableEntry = new DsgVarEditableEntry(i, entry);
-                    editableEntries[i] = editableEntry;
-                    i++;
-                }
+                SetDsgMem(perso.brain.mind.dsgMem);
             }
         }
     }

@@ -39,6 +39,10 @@ public class Controller : MonoBehaviour {
     bool livePreview_ = false; public bool livePreview = false;
     float livePreviewUpdateCounter = 0;
 
+    // Exporting
+    public string exportPath = ".\\exports\\";
+    //
+
 	private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
 	private CinematicSwitcher cinematicSwitcher = null;
