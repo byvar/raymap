@@ -811,7 +811,12 @@ namespace OpenSpace.Loader {
 				loadingState = "Filling in comport names";
 				yield return null;
 				string path = gameDataBinFolder + "R2DC_Comports.json";
-				Stream stream = FileSystem.GetFileReadStream(path);
+
+                if (!FileSystem.FileExists(path)) {
+                    path = "Assets/StreamingAssets/R2DC_Comports.json"; // Offline, the json doesn't exist, so grab it from StreamingAssets
+                }
+
+                Stream stream = FileSystem.GetFileReadStream(path);
 				if (stream != null) {
 					ReadAndFillComportNames(stream);
 				}
