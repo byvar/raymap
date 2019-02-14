@@ -8,7 +8,7 @@ namespace OpenSpace.Collide
         public Pointer nextElement;
 		public Pointer off_activationZone;
 		public LinkedList<CollideActivationZone> activationZone;
-        public uint index;
+        public ushort index;
 
         public Pointer NextEntry {
             get { return nextElement; }
@@ -38,8 +38,12 @@ namespace OpenSpace.Collide
 						type: LinkedList.Type.Minimize
 					);
 			});
-			a.index = reader.ReadUInt32();
-            return a;
+			a.index = reader.ReadUInt16();
+			reader.ReadUInt16();
+			if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
+				a.nextElement = Pointer.Current(reader);
+			}
+			return a;
         }
     }
 }

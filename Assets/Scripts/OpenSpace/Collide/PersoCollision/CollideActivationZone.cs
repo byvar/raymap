@@ -27,7 +27,9 @@ namespace OpenSpace.Collide
 				e.nextElement = Pointer.Read(reader);
 			}
 			e.zdxIndex = reader.ReadUInt16();
-			reader.ReadUInt16();
+			if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
+				e.nextElement = Pointer.Current(reader);
+			}
 			return e;
         }
     }
