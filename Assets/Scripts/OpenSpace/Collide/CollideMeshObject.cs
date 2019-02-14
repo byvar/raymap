@@ -10,16 +10,9 @@ namespace OpenSpace.Collide {
     /// Mesh data (both static and dynamic)
     /// </summary>
     public class CollideMeshObject {
-        public enum Type {
-            Default,
-            ZDD,
-            ZDE,
-            ZDR,
-            ZDM
-        }
         public PhysicalObject po;
         public Pointer offset;
-        public Type type;
+        public CollideType type;
 
         public GameObject gao = null;
 
@@ -36,23 +29,13 @@ namespace OpenSpace.Collide {
         public ushort[] subblock_types = null;
         public ICollideGeometricElement[] subblocks = null;
 
-        public int index;
-        public CollSet collset;
-
-        public CollideMeshObject(Pointer offset, Type type = Type.Default) {
+        public CollideMeshObject(Pointer offset, CollideType type = CollideType.None) {
             this.offset = offset;
             this.type = type;
         }
 
         public void SetVisualsActive(bool active) {
-
-            if (collset != null) {
-                // Hide elements that are forced to be inactive
-                if (collset.GetPrivilegedActionZoneStatus(type, index) == CollSet.PrivilegedActivationStatus.ForceInactive) {
-                    active = false;
-                }
-            }
-
+			if (gao == null) return;
             Renderer[] renderers = gao.GetComponentsInChildren<Renderer>(includeInactive: true);
             foreach (Renderer ren in renderers) {
                 ren.enabled = active;
@@ -68,12 +51,10 @@ namespace OpenSpace.Collide {
             }*/
         }
 
-        public static CollideMeshObject Read(Reader reader, Pointer offset, CollSet collset, int index, Type type = Type.Default) {
+        public static CollideMeshObject Read(Reader reader, Pointer offset, CollideType type = CollideType.None) {
             MapLoader l = MapLoader.Loader;
 			//l.print("CollideMesh " + offset);
             CollideMeshObject m = new CollideMeshObject(offset, type);
-            m.index = index;
-            m.collset = collset;
             //l.print("Mesh obj: " + offset);
             if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                 m.num_vertices = reader.ReadUInt16();
@@ -140,7 +121,7 @@ namespace OpenSpace.Collide {
             for (uint i = 0; i < m.num_subblocks; i++) {
                 m.subblock_types[i] = reader.ReadUInt16();
             }
-            m.gao = new GameObject("Collide Set "+type+" #"+index+" @ " + offset);
+            m.gao = new GameObject("Collide Set "+ (type != CollideType.None ? type + " " : "") +"@ " + offset);
             m.gao.tag = "Collide";
             m.gao.layer = LayerMask.NameToLayer("Collide");
             for (uint i = 0; i < m.num_subblocks; i++) {

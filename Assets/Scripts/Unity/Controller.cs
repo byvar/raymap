@@ -477,40 +477,13 @@ public class Controller : MonoBehaviour {
 		if (loader != null) {
 			viewCollision_ = viewCollision;
 			foreach (PhysicalObject po in loader.physicalObjects) {
-				foreach (VisualSetLOD l in po.visualSet) {
-					if (l.obj != null) {
-						GameObject gao = l.obj.Gao;
-						if (gao != null) gao.SetActive(!viewCollision);
-					}
-				}
-				if (po.collideMesh != null) po.collideMesh.SetVisualsActive(viewCollision);
-				//if (po.collideMesh != null) po.collideMesh.gao.SetActive(viewCollision);
+				if (po != null) po.UpdateViewCollision(viewCollision);
 			}
 			foreach (Perso perso in loader.persos) {
-				if (perso.collset != null) {
-					CollSet c = perso.collset;
-					if (c.zdd != null) foreach (CollideMeshObject col in c.zdd) {
-							if (col == null) continue;
-							col.SetVisualsActive(viewCollision);
-							//col.gao.SetActive(viewCollision);
-						}
-					if (c.zde != null) foreach (CollideMeshObject col in c.zde) {
-							if (col == null) continue;
-							col.SetVisualsActive(viewCollision);
-							//col.gao.SetActive(viewCollision);
-						}
-					if (c.zdm != null) foreach (CollideMeshObject col in c.zdm) {
-							if (col == null) continue;
-							col.SetVisualsActive(viewCollision);
-							//col.gao.SetActive(viewCollision);
-						}
-					if (c.zdr != null) foreach (CollideMeshObject col in c.zdr) {
-							if (col == null) continue;
-							col.SetVisualsActive(viewCollision);
-							//col.gao.SetActive(viewCollision);
-						}
+				if (perso != null && perso.Gao != null) {
+					PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
+					pb.UpdateViewCollision(viewCollision);
 				}
-
 			}
 			foreach (SuperObject so in loader.superObjects) {
 				if (so.Gao != null) {
