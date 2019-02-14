@@ -350,7 +350,9 @@ public class PersoBehaviour : MonoBehaviour {
 					for (int i = 0; i < entry.Value.Count; i++) {
 						CollideMeshObject col = entry.Value[i];
 						if (col == null) continue;
-						if (c.GetPrivilegedActionZoneStatus(entry.Key, i) != CollSet.PrivilegedActivationStatus.ForceActive) {
+						if (viewCollision && c.GetPrivilegedActionZoneStatus(entry.Key, i) == CollSet.PrivilegedActivationStatus.ForceActive) {
+							col.SetVisualsActive(true);
+						} else {
 							col.SetVisualsActive(false);
 						}
 					}
