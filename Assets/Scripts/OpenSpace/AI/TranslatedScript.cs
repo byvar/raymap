@@ -12,6 +12,7 @@ namespace OpenSpace.AI {
         public Perso perso;
         public bool printAddresses = false;
         public bool expandMacros = false;
+        public bool expandEntryActions = true;
 
         public class Node {
             public int index;
@@ -181,12 +182,12 @@ namespace OpenSpace.AI {
                                     persoPtr = this.children[0].scriptNode.param_ptr;
                                     if (persoPtr != null) {
                                         Perso firstNodePerso = Perso.FromOffset(persoPtr);
-                                        if (firstNodePerso != null) {
+                                        /*if (firstNodePerso != null) {
                                             string secondChildNodeWithDifferentContext = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString(firstNodePerso) : "null";
                                             return firstChildNode + "." + secondChildNodeWithDifferentContext;
-                                        } else {
+                                        } else {*/
                                             return firstChildNode + "." + this.children[1].ToString(null);
-                                        }
+                                        //}
                                     }
 
                                     return firstChildNode + "." + secondChildNode;
@@ -203,7 +204,7 @@ namespace OpenSpace.AI {
                                 case ".Z:=": return firstChildNode + ".z = " + secondChildNode; // vector
                                 case "Operator_Ultra": // Ultra operator (execute code for different object)
                                     return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
-                                case "Operator_ModelCast": return "((" + firstChildNode + ")(" + secondChildNode + ".brain.mind.aiModel))";
+                                case "Operator_ModelCast": return "((" + firstChildNode + ")(" + secondChildNode + "))";
                                 case "Operator_Array": return firstChildNode + "[" + secondChildNode + "]";
 
                                 default:
@@ -246,7 +247,7 @@ namespace OpenSpace.AI {
                             return prefix + scriptNode.ToString(perso);
 
                         default:
-                            return prefix + scriptNode.ToString(perso);
+                            return prefix + scriptNode.ToString(perso, expandEntryActions: ts.expandEntryActions);
                     }
                 }
                 else // Root node returns all children concatenated
@@ -281,27 +282,47 @@ namespace OpenSpace.AI {
             AssignNodeChildren(nodes, nodes[0]);
         }
         
-        public string ToCSharpString()
+        public string ToCSharpString_R2()
         {
             string str = this.ToString();
 
             Regex macroRegex = new Regex("evalMacro\\([a-zA-Z0-9_]*\\.Macro\\[([0-9]+)\\]\\)");
             str = macroRegex.Replace(str, "await Macro_${1}()");
 
-            Regex ruleChangeRegex = new Regex("Proc_ChangeMyComport\\([a-zA-Z0-9_]+\\.Rule\\[[0-9]+\\]\\[\\\"([^\"]+)\\\"\\]\\)");
-            str = ruleChangeRegex.Replace(str, "smRule.SetState($1)");
+            Regex myRuleChangeRegex = new Regex("Proc_ChangeMyComport\\([a-zA-Z0-9_]+\\.Rule\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"\\]\\)");
+            str = myRuleChangeRegex.Replace(str, "smRule.SetState(Rule_$1_$2)");
 
-            Regex reflexChangeRegex = new Regex("Proc_ChangeMyComportReflex\\([a-zA-Z0-9_]+\\.Rule\\[[0-9]+\\]\\[\\\"([^\"]+)\\\"\\]\\)");
-            str = reflexChangeRegex.Replace(str, "smReflex.SetState($1)");
+            Regex myReflexChangeRegex = new Regex("Proc_ChangeMyComportReflex\\([a-zA-Z0-9_]+\\.Reflex\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"\\]\\)");
+            str = myReflexChangeRegex.Replace(str, "smReflex.SetState(Reflex_$1_$2)");
 
-            Regex ruleAndReflexChangeRegex = new Regex("Proc_ChangeMyComportAndMyReflex\\([a-zA-Z0-9_]+\\.Rule\\[[0-9]+\\]\\[\"([^ \"]+)\"\\], [a - zA - Z0 - 9_] +\\.Reflex\\[[0 - 9] +\\]\\[\"([^\"]+)\"\\]\\)");
-            str = ruleAndReflexChangeRegex.Replace(str, "smRule.SetState($1);"+Environment.NewLine+"smReflex.SetState($2)");
+            Regex myRuleAndReflexChangeRegex = new Regex("Proc_ChangeMyComportAndMyReflex\\([a-zA-Z0-9_]+\\.Rule\\[([0-9]+)\\]\\[\"([^\"]+)\"\\], [a-zA-Z0-9_]+\\.Reflex\\[([0-9]+)\\]\\[\"([^\"]+)\"\\]\\)");
+            str = myRuleAndReflexChangeRegex.Replace(str, "smRule.SetState(Rule_$1_$2);"+Environment.NewLine+"smReflex.SetState(Reflex_$3_$4)");
 
-            // TODO: ChangeMyComportAndMyReflex and ChangeComport for other objects.
+            Regex ruleChangeRegex = new Regex("Proc_ChangeComport\\(([^,]+), ([^.]+).Rule\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);");
+            str = ruleChangeRegex.Replace(str, "Proc_ChangeComport($1, $2.Rule_$3_$4);");
 
-            /*"Proc_ChangeMyComport",
-                "Proc_ChangeMyComportReflex", // 70
-                "Proc_ChangeMyComportAndMyReflex",*/
+            Regex reflexChangeRegex = new Regex("Proc_ChangeComportReflex\\(([^,]+), ([^.]+).Reflex\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);");
+            str = reflexChangeRegex.Replace(str, "Proc_ChangeComportReflex($1, $2.Rule_$3_$4);");
+
+            foreach (string metaAction in AITypes.R2.metaActionTable) {
+                str = str.Replace(metaAction, "await "+metaAction);
+            }
+
+            Regex generateObjectRegex = new Regex("Func_GenerateObject\\(\\(\\(([^)]+)\\)[^,]+, ([^)]+)\\)");
+            str = generateObjectRegex.Replace(str, "Func_GenerateObject(typeof($1), $2)");
+
+            str = str.Replace(" Me", " this");
+            str = str.Replace("(Me", "(this");
+
+            str = str.Replace(" (1)", " (true)");
+            str = str.Replace("((1)", "((true)");
+            str = str.Replace(" (0)", " (false)");
+            str = str.Replace("((0)", "((false)");
+
+            str = str.Replace("Nobody", "null");
+
+            Regex soundEventRegex = new Regex("SoundEvent\\(([0-9]+)\\)");
+            str = soundEventRegex.Replace(str, "SoundEvent.GetByID($1)");   
 
             return str;
         }

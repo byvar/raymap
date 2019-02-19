@@ -78,7 +78,7 @@ namespace OpenSpace.AI {
 			return true;
 		}
 
-        public string ToString(Perso perso, bool advanced = false) {
+        public string ToString(Perso perso, bool advanced = false, bool expandEntryActions = true) {
             MapLoader l = MapLoader.Loader;
             short mask = 0;
 
@@ -136,11 +136,15 @@ namespace OpenSpace.AI {
 						NumberDecimalSeparator = "."
 					};
 					if (advanced) return "Real: " + BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString(nfi);
-                    return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString(nfi);
+                    return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString(nfi)+"f";
                 case ScriptNode.NodeType.Button: // Button/entryaction
                     EntryAction ea = EntryAction.FromOffset(param_ptr);
                     string eaName = ea == null ? "ERR_ENTRYACTION_NOTFOUND" : (advanced ? ea.ToString() : ea.ToBasicString());
                     if (advanced) return "Button: " + eaName + "(" + param_ptr + ")";
+
+                    if (!expandEntryActions && ea!=null) {
+                        return "\""+ea.ExportName+"\"";
+                    }
                     return eaName;
                 case ScriptNode.NodeType.ConstantVector:
                     return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
@@ -179,6 +183,11 @@ namespace OpenSpace.AI {
                     }
                     string persoName = argPerso == null ? "ERR_PERSO_NOTFOUND" : argPerso.fullName;
                     if (advanced) return "PersoRef: " + param_ptr + " (" + persoName + ")";
+                    if (argPerso?.brain?.mind?.AI_model!=null ) {
+                        AIModel aiModel = argPerso.brain.mind.AI_model;
+                        // Make sure to add a cast in case the AI Model is accessed
+                        return "(("+aiModel.name+")GetPerso(\"" + argPerso.namePerso + "\"))";
+                    }
                     return "GetPerso(\"" + argPerso.namePerso + "\")";
                 case ScriptNode.NodeType.ActionRef:
                     State state = State.FromOffset(param_ptr);
