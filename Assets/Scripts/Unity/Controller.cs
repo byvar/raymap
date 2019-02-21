@@ -11,6 +11,7 @@ using OpenSpace.Collide;
 using System.Collections;
 using OpenSpace.Waypoints;
 using OpenSpace.Object.Properties;
+using OpenSpace.Exporter;
 
 public class Controller : MonoBehaviour {
 	public Settings.Mode mode = Settings.Mode.Rayman3PC;
@@ -41,9 +42,10 @@ public class Controller : MonoBehaviour {
 
     // Exporting
     public string exportPath = ".\\exports\\";
+    public bool exportAfterLoad; // If set to true, exports the map after loading is finished and quits Raymap.
     //
 
-	private GameObject graphRoot = null;
+    private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
 	private CinematicSwitcher cinematicSwitcher = null;
 
@@ -66,6 +68,8 @@ public class Controller : MonoBehaviour {
 		// Read command line arguments
 		string[] args = System.Environment.GetCommandLineArgs();
 		string modeString = "";
+        string exportFolder = "";
+
 		for (int i = 0; i < args.Length; i++) {
 			switch (args[i]) {
 				case "--lvl":
@@ -85,7 +89,11 @@ public class Controller : MonoBehaviour {
 					modeString = args[i + 1];
 					i++;
 					break;
-			}
+                case "--export":
+                    exportFolder = args[i + 1];
+                    i++;
+                    break;
+            }
 		}
 		Application.logMessageReceived += Log;
 
@@ -168,6 +176,11 @@ public class Controller : MonoBehaviour {
 		loader.collideTransparentMaterial = collideTransparentMaterial;
 		loader.baseLightMaterial = baseLightMaterial;
 
+        if (exportFolder!="") {
+            this.exportPath = exportFolder;
+            exportAfterLoad = true;
+        }
+
 		StartCoroutine(Init());
 	}
 
@@ -210,6 +223,13 @@ public class Controller : MonoBehaviour {
 		detailedState = "Finished";
 		state = State.Finished;
 		loadingScreen.Active = false;
+
+        if (exportAfterLoad) {
+            Exporter e = new Exporter(this.loader, exportPath);
+            e.Export();
+
+            Application.Quit();
+        }
 	}
 
 	// Update is called once per frame
@@ -515,7 +535,10 @@ public class Controller : MonoBehaviour {
 
 			for (int i = 0; i < graph.nodes.Count; i++) {
 				GraphNode node = graph.nodes[i];
-				node.Gao.name = "GraphNode[" + i + "].WayPoint ("+node.wayPoint.offset+")";
+                if (node.Gao == null) {
+                    continue;
+                }
+				node.Gao.name = "GraphNode[" + i + "].WayPoint ("+node?.wayPoint?.offset+")";
 				if (i == 0) {
 					go_graph.transform.position = graph.nodes[i].Gao.transform.position;
 				}

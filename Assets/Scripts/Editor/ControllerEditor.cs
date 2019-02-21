@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
-using Assets.Scripts.OpenSpace.Exporter;
+using OpenSpace.Exporter;
 using OpenSpace;
 
 [CustomEditor(typeof(Controller))]

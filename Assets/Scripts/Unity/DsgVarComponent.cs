@@ -68,7 +68,7 @@ namespace OpenSpace
                     case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector     = (Vector3) entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsString     = (string)  entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Perso:
-                        if (entry.value != null) {
+                        if (entry.value != null && entry.value is Pointer) {
                             Perso perso = MapLoader.Loader.persos.FirstOrDefault(p => (p.SuperObject!=null && p.SuperObject.offset == (Pointer)entry.value)); // find perso that belongs to the superobject
                             if (perso!=null) {
                                 this.valueAsPersoGao = perso.Gao;

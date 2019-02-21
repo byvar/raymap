@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.OpenSpace.Exporter {
+namespace OpenSpace.Exporter {
     abstract class EntryActionExporter {
 
         public static string EntryActionToCSharpClass(EntryAction action)
@@ -77,17 +77,17 @@ namespace Assets.Scripts.OpenSpace.Exporter {
 
             // Joystick
             Regex regexJoystickAxeValue = new Regex("JoystickAxeValue\\(([XY]), ([\\-0-9]+), ([\\-0-9]+)\\)");
-            str = regexJoystickAxeValue.Replace(str, "GlobalController.InputManager.JoystickAxeValue(\"$1\", $2, $3)");
+            str = regexJoystickAxeValue.Replace(str, "Controller.InputManager.JoystickAxeValue(\"$1\", $2, $3)");
 
             Regex regexJoystickPressed = new Regex("JoystickOrPadPressed\\(([^)]+)\\)");
             str = regexJoystickPressed.Replace(str, "UnityEngine.Input.GetButton(\"$1\")");
 
             // ActionValidated
-            Regex regexActionValidated = new Regex("ActionValidated\\{EntryAction\\((\\\"[^\\\"]+\\\"), ([^\\}]+)\\}");
-            str = regexActionValidated.Replace(str, "GlobalController.InputManager.IsActionValidated($1)");
+            Regex regexActionValidated = new Regex("ActionValidated\\{EntryAction\\{(\\\"[^\\\"]+\\\"), ([^\\}]+)[\\}]+");
+            str = regexActionValidated.Replace(str, "Controller.InputManager.IsActionValidated($1)");
 
             // Sequences
-            str = str.Replace("Sequence", "GlobalController.InputManager.CheckSequence");
+            str = str.Replace("Sequence", "Controller.InputManager.CheckSequence");
 
             return str;
         }

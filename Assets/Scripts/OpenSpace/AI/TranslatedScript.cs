@@ -12,7 +12,13 @@ namespace OpenSpace.AI {
         public Perso perso;
         public bool printAddresses = false;
         public bool expandMacros = false;
-        public bool expandEntryActions = true;
+
+        public class TranslationSettings {
+            public bool expandEntryActions = false;
+            public bool expandStrings = true;
+        }
+
+        public TranslationSettings settings = new TranslationSettings();
 
         public class Node {
             public int index;
@@ -35,59 +41,55 @@ namespace OpenSpace.AI {
             }
 
             public string ToString(Perso perso) {
-                if (scriptNode != null)
-                {
-                    string firstChildNode  = (this.children.Count > 0 && this.children[0] != null) ? this.children[0].ToString() : "null";
+                if (scriptNode != null) {
+                    string firstChildNode = (this.children.Count > 0 && this.children[0] != null) ? this.children[0].ToString() : "null";
                     string secondChildNode = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString() : "null";
-                    string prefix = (ts.printAddresses ? "{" + scriptNode.offset.ToString()  + "}" : "");
+                    string prefix = (ts.printAddresses ? "{" + scriptNode.offset.ToString() + "}" : "");
 
                     AITypes aiTypes = Settings.s.aiTypes;
                     uint param = scriptNode.param;
 
-                    switch (scriptNode.nodeType)
-                    {
+                    switch (scriptNode.nodeType) {
                         case ScriptNode.NodeType.KeyWord:
                             string keyword = param < aiTypes.keywordTable.Length ? aiTypes.keywordTable[param] : "";
-                            switch (keyword)
-                            {
+                            switch (keyword) {
                                 // If keywords
-                                case "If":       return prefix + "if ({condition})".Replace("{condition}", firstChildNode);
-                                case "IfNot":    return prefix + "if (!({condition}))".Replace("{condition}", firstChildNode);
-                                case "If2":      return prefix + "if (globalRandomizer % 2 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If4":      return prefix + "if (globalRandomizer % 4 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If8":      return prefix + "if (globalRandomizer % 8 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If16":     return prefix + "if (globalRandomizer % 16 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If32":     return prefix + "if (globalRandomizer % 32 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "If64":     return prefix + "if (globalRandomizer % 64 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfNot2":   return prefix + "if (globalRandomizer % 2 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfNot4":   return prefix + "if (globalRandomizer % 4 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfNot8":   return prefix + "if (globalRandomizer % 8 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfNot16":  return prefix + "if (globalRandomizer % 16 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfNot32":  return prefix + "if (globalRandomizer % 32 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfNot64":  return prefix + "if (globalRandomizer % 64 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
-                                case "IfDebug":  return prefix + "if (debug && {condition})".Replace("{condition}", firstChildNode);
+                                case "If": return prefix + "if ({condition})".Replace("{condition}", firstChildNode);
+                                case "IfNot": return prefix + "if (!({condition}))".Replace("{condition}", firstChildNode);
+                                case "If2": return prefix + "if (globalRandomizer % 2 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If4": return prefix + "if (globalRandomizer % 4 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If8": return prefix + "if (globalRandomizer % 8 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If16": return prefix + "if (globalRandomizer % 16 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If32": return prefix + "if (globalRandomizer % 32 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "If64": return prefix + "if (globalRandomizer % 64 == 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot2": return prefix + "if (globalRandomizer % 2 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot4": return prefix + "if (globalRandomizer % 4 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot8": return prefix + "if (globalRandomizer % 8 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot16": return prefix + "if (globalRandomizer % 16 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot32": return prefix + "if (globalRandomizer % 32 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfNot64": return prefix + "if (globalRandomizer % 64 != 0 && ({condition}))".Replace("{condition}", firstChildNode);
+                                case "IfDebug": return prefix + "if (debug && {condition})".Replace("{condition}", firstChildNode);
                                 case "IfNotU64": return prefix + "if (!u64)\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Then
-                                case "Then":     return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
+                                case "Then": return prefix + "{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
                                 // Else
-                                case "Else":     return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
-                                default:         return prefix + scriptNode.ToString(perso);
+                                case "Else": return prefix + "else\n{\n{childNodes}\n}\n".Replace("{childNodes}", string.Join("\n", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())));
+                                default: return prefix + scriptNode.ToString(perso, ts.settings);
                             }
                         case ScriptNode.NodeType.Condition:
                             string cond = param < aiTypes.conditionTable.Length ? aiTypes.conditionTable[param] : "";
-                            switch (cond)
-                            {
+                            switch (cond) {
                                 // Boolean conditions:
-                                case "Cond_And":            return prefix + firstChildNode + " && " + secondChildNode;
-                                case "Cond_Or":             return prefix + firstChildNode + " || " + secondChildNode;
-                                case "Cond_Not":            return prefix + "!" + "(" + firstChildNode + ")";
-                                case "Cond_XOR":            return prefix + firstChildNode + " != " + secondChildNode; // XOR
+                                case "Cond_And": return prefix + firstChildNode + " && " + secondChildNode;
+                                case "Cond_Or": return prefix + firstChildNode + " || " + secondChildNode;
+                                case "Cond_Not": return prefix + "!" + "(" + firstChildNode + ")";
+                                case "Cond_XOR": return prefix + firstChildNode + " != " + secondChildNode; // XOR
                                 // Real (float) comparisons:
-                                case "Cond_Equal":          return prefix + firstChildNode + " == " + secondChildNode;
-                                case "Cond_Different":      return prefix + firstChildNode + " != " + secondChildNode;
-                                case "Cond_Lesser":         return prefix + firstChildNode + " < " + secondChildNode;
-                                case "Cond_Greater":        return prefix + firstChildNode + " > " + secondChildNode;
-                                case "Cond_LesserOrEqual":  return prefix + firstChildNode + " <= " + secondChildNode;
+                                case "Cond_Equal": return prefix + firstChildNode + " == " + secondChildNode;
+                                case "Cond_Different": return prefix + firstChildNode + " != " + secondChildNode;
+                                case "Cond_Lesser": return prefix + firstChildNode + " < " + secondChildNode;
+                                case "Cond_Greater": return prefix + firstChildNode + " > " + secondChildNode;
+                                case "Cond_LesserOrEqual": return prefix + firstChildNode + " <= " + secondChildNode;
                                 case "Cond_GreaterOrEqual": return prefix + firstChildNode + " >= " + secondChildNode;
                                 // Button condition:
                                 /*case 44:
@@ -97,10 +99,10 @@ namespace OpenSpace.AI {
                                     return prefix + firstChildNode;*/
 
                                 default:
-                                    if (firstChildNode!=null)
-                                        return prefix + scriptNode.ToString(perso) + "("+string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString()))+")";
+                                    if (firstChildNode != null)
+                                        return prefix + scriptNode.ToString(perso, ts.settings) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                                     else
-                                        return prefix + scriptNode.ToString(perso)+"()";
+                                        return prefix + scriptNode.ToString(perso, ts.settings) + "()";
 
 
                             }
@@ -117,9 +119,9 @@ namespace OpenSpace.AI {
                                 case "Func_TernInfEq":
                                 case "Func_TernSupEq":
                                     switch (function) {
-                                        case "Func_TernInf":   ternaryCheck = " < "; break;
-                                        case "Func_TernSup":   ternaryCheck = " > "; break;
-                                        case "Func_TernEq":    ternaryCheck = " == "; break;
+                                        case "Func_TernInf": ternaryCheck = " < "; break;
+                                        case "Func_TernSup": ternaryCheck = " > "; break;
+                                        case "Func_TernEq": ternaryCheck = " == "; break;
                                         case "Func_TernInfEq": ternaryCheck = " <= "; break;
                                         case "Func_TernSupEq": ternaryCheck = " >= "; break;
                                     }
@@ -129,24 +131,24 @@ namespace OpenSpace.AI {
                                         return "ERROR";
 
                                 case "Func_TernOp": // conditional ternary operator (cond ? true : false)
-                                    return prefix + "((" + this.children[0] + ") ? " + this.children[1] + " : " + this.children [2]+")";
+                                    return prefix + "((" + this.children[0] + ") ? " + this.children[1] + " : " + this.children[2] + ")";
 
                                 default:
-                                    string func = scriptNode.ToString(perso);
+                                    string func = scriptNode.ToString(perso, ts.settings);
                                     return prefix + func + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             }
 
-                            
+
 
                         case ScriptNode.NodeType.Procedure:
                             string procedure = param < aiTypes.procedureTable.Length ? aiTypes.procedureTable[param] : "";
                             switch (procedure) {
-                                case "Proc_Loop":    return prefix + "for(int i = 0; i < " + firstChildNode + "; i++)\n{";
+                                case "Proc_Loop": return prefix + "for(int i = 0; i < " + firstChildNode + "; i++)\n{";
                                 case "Proc_EndLoop": return prefix + "}\n";
-                                case "Proc_Break":   return prefix + "break;\n";
+                                case "Proc_Break": return prefix + "break;\n";
 
                                 default:
-                                    string proc = scriptNode.ToString(perso);
+                                    string proc = scriptNode.ToString(perso, ts.settings);
                                     return prefix + proc + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                             }
@@ -157,7 +159,7 @@ namespace OpenSpace.AI {
 
                             switch (op) {
                                 // scalar:
-                                case "Operator_Plus": return "(" + firstChildNode + (children[1].scriptNode.param>=0 ? " + " : "") + secondChildNode + ")";
+                                case "Operator_Plus": return "(" + firstChildNode + (children[1].scriptNode.param >= 0 ? " + " : "") + secondChildNode + ")";
                                 case "Operator_Minus":
                                 case "Operator_UnaryMinus":
                                     if (children.Count > 1) {
@@ -186,7 +188,7 @@ namespace OpenSpace.AI {
                                             string secondChildNodeWithDifferentContext = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString(firstNodePerso) : "null";
                                             return firstChildNode + "." + secondChildNodeWithDifferentContext;
                                         } else {*/
-                                            return firstChildNode + "." + this.children[1].ToString(null);
+                                        return firstChildNode + "." + this.children[1].ToString(null);
                                         //}
                                     }
 
@@ -198,34 +200,34 @@ namespace OpenSpace.AI {
                                 case "Operator_VectorMinusVector": return firstChildNode + " - " + secondChildNode;
                                 case "Operator_VectorMulScalar": return firstChildNode + " * " + secondChildNode;
                                 case "Operator_VectorDivScalar": return firstChildNode + " / " + secondChildNode;
-                                case "Operator_VectorUnaryMinus": return "-"+firstChildNode;
-                                case ".X:=": return firstChildNode + ".x = " + secondChildNode; // vector
-                                case ".Y:=": return firstChildNode + ".y = " + secondChildNode; // vector
-                                case ".Z:=": return firstChildNode + ".z = " + secondChildNode; // vector
+                                case "Operator_VectorUnaryMinus": return "-" + firstChildNode;
+                                case ".X:=": return firstChildNode + ".x = " + secondChildNode + ";"; // vector
+                                case ".Y:=": return firstChildNode + ".y = " + secondChildNode + ";"; // vector
+                                case ".Z:=": return firstChildNode + ".z = " + secondChildNode + ";"; // vector
                                 case "Operator_Ultra": // Ultra operator (execute code for different object)
                                     return firstChildNode + ".{code}".Replace("{code}", secondChildNode);
                                 case "Operator_ModelCast": return "((" + firstChildNode + ")(" + secondChildNode + "))";
                                 case "Operator_Array": return firstChildNode + "[" + secondChildNode + "]";
 
                                 default:
-                                    string proc = "("+scriptNode.param+")"+ scriptNode.ToString(perso);
+                                    string proc = "(" + scriptNode.param + ")" + scriptNode.ToString(perso, ts.settings);
                                     return prefix + proc + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
                             }
 
                         case ScriptNode.NodeType.Field:
                             if (firstChildNode != null)
-                                return prefix + scriptNode.ToString(perso) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                return prefix + scriptNode.ToString(perso, ts.settings) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             else
-                                return prefix + scriptNode.ToString(perso);
+                                return prefix + scriptNode.ToString(perso, ts.settings);
 
                         case ScriptNode.NodeType.Vector:
                         case ScriptNode.NodeType.ConstantVector:
 
-                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                            return prefix + scriptNode.ToString(perso, ts.settings) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
 
                         case ScriptNode.NodeType.MetaAction:
 
-                            return prefix + scriptNode.ToString(perso) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
+                            return prefix + scriptNode.ToString(perso, ts.settings) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                         case ScriptNode.NodeType.SubRoutine:
 
@@ -244,17 +246,15 @@ namespace OpenSpace.AI {
                                 }
                             }
 
-                            return prefix + scriptNode.ToString(perso);
+                            return prefix + scriptNode.ToString(perso, ts.settings);
 
                         default:
-                            return prefix + scriptNode.ToString(perso, expandEntryActions: ts.expandEntryActions);
+                            return prefix + scriptNode.ToString(perso, ts.settings);
                     }
-                }
-                else // Root node returns all children concatenated
-                {
+                } else // Root node returns all children concatenated
+                  {
                     string result = "";
-                    foreach(Node child in this.children)
-                    {
+                    foreach (Node child in this.children) {
                         result += child.ToString() + '\n';
                     }
                     return result;
@@ -264,15 +264,14 @@ namespace OpenSpace.AI {
 
         public TranslatedScript(Script originalScript, Perso perso)
         {
-            if(originalScript==null) {
+            if (originalScript == null) {
                 return;
             }
             this.originalScript = originalScript;
             this.perso = perso;
             nodes = new Node[originalScript.scriptNodes.Count + 1];
             int index = 1;
-            foreach(ScriptNode scriptNode in originalScript.scriptNodes)
-            {
+            foreach (ScriptNode scriptNode in originalScript.scriptNodes) {
                 nodes[index] = new Node(index, scriptNode.indent, scriptNode, this);
                 index++;
             }
@@ -281,34 +280,31 @@ namespace OpenSpace.AI {
             nodes[0] = rootNode;
             AssignNodeChildren(nodes, nodes[0]);
         }
+
+        // Ugly regexes
+        static Regex macroRegex = new Regex("evalMacro\\([a-zA-Z0-9_]*\\.Macro\\[([0-9]+)\\]\\)", RegexOptions.Compiled);
+        static Regex myRuleChangeRegex = new Regex("Proc_ChangeMyComport\\([a-zA-Z0-9_]+\\.Rule\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"\\]\\)", RegexOptions.Compiled);
+        static Regex myReflexChangeRegex = new Regex("Proc_ChangeMyComportReflex\\([a-zA-Z0-9_]+\\.Reflex\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"\\]\\)", RegexOptions.Compiled);
+        static Regex myRuleAndReflexChangeRegex = new Regex("Proc_ChangeMyComportAndMyReflex\\([a-zA-Z0-9_]+\\.Rule\\[([0-9]+)\\]\\[\"([^\"]+)\"\\], [a-zA-Z0-9_]+\\.Reflex\\[([0-9]+)\\]\\[\"([^\"]+)\"\\]\\)", RegexOptions.Compiled);
+        static Regex ruleChangeRegex = new Regex("Proc_ChangeComport\\(([^,]+), ([^.]+).Rule\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);", RegexOptions.Compiled);
+        static Regex reflexChangeRegex = new Regex("Proc_ChangeComportReflex\\(([^,]+), ([^.]+).Reflex\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);", RegexOptions.Compiled);
+        static Regex generateObjectRegex = new Regex("Func_GenerateObject\\(\\(\\(([^)]+)\\)[^,]+, ([^)]+)\\)", RegexOptions.Compiled);
         
         public string ToCSharpString_R2()
         {
             string str = this.ToString();
 
-            Regex macroRegex = new Regex("evalMacro\\([a-zA-Z0-9_]*\\.Macro\\[([0-9]+)\\]\\)");
             str = macroRegex.Replace(str, "await Macro_${1}()");
-
-            Regex myRuleChangeRegex = new Regex("Proc_ChangeMyComport\\([a-zA-Z0-9_]+\\.Rule\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"\\]\\)");
             str = myRuleChangeRegex.Replace(str, "smRule.SetState(Rule_$1_$2)");
-
-            Regex myReflexChangeRegex = new Regex("Proc_ChangeMyComportReflex\\([a-zA-Z0-9_]+\\.Reflex\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"\\]\\)");
             str = myReflexChangeRegex.Replace(str, "smReflex.SetState(Reflex_$1_$2)");
-
-            Regex myRuleAndReflexChangeRegex = new Regex("Proc_ChangeMyComportAndMyReflex\\([a-zA-Z0-9_]+\\.Rule\\[([0-9]+)\\]\\[\"([^\"]+)\"\\], [a-zA-Z0-9_]+\\.Reflex\\[([0-9]+)\\]\\[\"([^\"]+)\"\\]\\)");
             str = myRuleAndReflexChangeRegex.Replace(str, "smRule.SetState(Rule_$1_$2);"+Environment.NewLine+"smReflex.SetState(Reflex_$3_$4)");
-
-            Regex ruleChangeRegex = new Regex("Proc_ChangeComport\\(([^,]+), ([^.]+).Rule\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);");
             str = ruleChangeRegex.Replace(str, "Proc_ChangeComport($1, $2.Rule_$3_$4);");
-
-            Regex reflexChangeRegex = new Regex("Proc_ChangeComportReflex\\(([^,]+), ([^.]+).Reflex\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);");
             str = reflexChangeRegex.Replace(str, "Proc_ChangeComportReflex($1, $2.Rule_$3_$4);");
 
             foreach (string metaAction in AITypes.R2.metaActionTable) {
                 str = str.Replace(metaAction, "await "+metaAction);
             }
 
-            Regex generateObjectRegex = new Regex("Func_GenerateObject\\(\\(\\(([^)]+)\\)[^,]+, ([^)]+)\\)");
             str = generateObjectRegex.Replace(str, "Func_GenerateObject(typeof($1), $2)");
 
             str = str.Replace(" Me", " this");
@@ -320,9 +316,6 @@ namespace OpenSpace.AI {
             str = str.Replace("((0)", "((false)");
 
             str = str.Replace("Nobody", "null");
-
-            Regex soundEventRegex = new Regex("SoundEvent\\(([0-9]+)\\)");
-            str = soundEventRegex.Replace(str, "SoundEvent.GetByID($1)");   
 
             return str;
         }

@@ -1,6 +1,7 @@
 ﻿using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Input;
+using OpenSpace.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.OpenSpace.Exporter {
+namespace OpenSpace.Exporter {
     public class Exporter {
         private MapLoader loader;
         private string exportPath;
@@ -41,6 +42,7 @@ namespace Assets.Scripts.OpenSpace.Exporter {
 
             ExportAIModels(exportDirectoryAIModels);
             ExportEntryActions(exportDirectoryCommon);
+            ExportTextTable(exportDirectoryCommon);
         }
 
         private void ExportAIModels(string path)
@@ -89,6 +91,67 @@ namespace Assets.Scripts.OpenSpace.Exporter {
                 entryActionsFileStream.Write(fileContents);
                 entryActionsFileStream.Flush();
                 entryActionsFileStream.Close();
+            }
+        }
+
+        private static string EscapeStringForCSharp(string str)
+        {
+            if (str!=null)
+            str = str.Replace((char)0x85, '\0'); // For some reason there's a ... whitespace character used sometimes
+            return str;
+        }
+
+        private void ExportTextTable(string path)
+        {
+            string filePath = Path.Combine(path, "TextTable.cs");
+            if (File.Exists(filePath)) {
+                File.Delete(filePath);
+            }
+
+            string[] usingItems = new string[] { "UnityEngine", "OpenSpaceImplementation.Strings", "OpenSpaceImplementation" };
+            string usingBlock = string.Join(Environment.NewLine, usingItems.Select(i => "using " + i + ";"));
+
+            int numLanguages = loader.fontStruct.languages.Length;
+            int numTextsPerLanguage = 0;
+
+            List<string> textEntries = new List<string>();
+            int languageIndex = 0;
+
+            foreach(FontStructure.TextTable textTable in loader.fontStruct.languages) {
+                if (textTable.num_entries>numTextsPerLanguage) {
+                    numTextsPerLanguage = textTable.num_entries;
+                }
+
+                int entryIndex = 0;
+                foreach(string entry in textTable.entries) {
+                    textEntries.Add("SetString(" + languageIndex + ", "+(entryIndex++)+", \"" + EscapeStringForCSharp(entry) + "\");");
+                }
+
+                textEntries.Add(""); // Extra line break
+
+                languageIndex++;
+            }
+
+            string textManagerConstructor = "public StringManager() {" + Environment.NewLine +
+                "InitTable(" + loader.fontStruct.num_languages + ", " + loader.fontStruct.languages[0].num_entries_max + ");" + Environment.NewLine + Environment.NewLine +
+                string.Join(Environment.NewLine, textEntries) +
+                Environment.NewLine +
+                "}";
+
+            string content = "public class StringManager : OpenSpaceImplementation.Strings.StringManager {" + Environment.NewLine +
+                    textManagerConstructor +
+                    Environment.NewLine + 
+                "}";
+
+            string fileContents = usingBlock + Environment.NewLine + "namespace " + gameName + ".Text {" + Environment.NewLine +
+                content + Environment.NewLine +
+                "}";
+
+            using (StreamWriter fileStream = File.CreateText(filePath)) {
+
+                fileStream.Write(fileContents);
+                fileStream.Flush();
+                fileStream.Close();
             }
         }
     }

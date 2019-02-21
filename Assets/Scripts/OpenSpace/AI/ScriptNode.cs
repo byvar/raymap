@@ -78,7 +78,7 @@ namespace OpenSpace.AI {
 			return true;
 		}
 
-        public string ToString(Perso perso, bool advanced = false, bool expandEntryActions = true) {
+        public string ToString(Perso perso, TranslatedScript.TranslationSettings ts, bool advanced = false) {
             MapLoader l = MapLoader.Loader;
             short mask = 0;
 
@@ -139,10 +139,15 @@ namespace OpenSpace.AI {
                     return BitConverter.ToSingle(BitConverter.GetBytes(param), 0).ToString(nfi)+"f";
                 case ScriptNode.NodeType.Button: // Button/entryaction
                     EntryAction ea = EntryAction.FromOffset(param_ptr);
-                    string eaName = ea == null ? "ERR_ENTRYACTION_NOTFOUND" : (advanced ? ea.ToString() : ea.ToBasicString());
+
+                    if (ea == null) {
+                        return "ERR_ENTRYACTION_NOTFOUND";
+                    }
+
+                    string eaName = (advanced ? ea.ToString() : ea.ToBasicString());
                     if (advanced) return "Button: " + eaName + "(" + param_ptr + ")";
 
-                    if (!expandEntryActions && ea!=null) {
+                    if (!ts.expandEntryActions && ea!=null) {
                         return "\""+ea.ExportName+"\"";
                     }
                     return eaName;
@@ -173,7 +178,7 @@ namespace OpenSpace.AI {
 					if (f != null) {
 						return "GetFamily(\"" + f.name + "\")";
 					} else {
-						return "Family.FromOffset(" + param_ptr + ")";
+						return "Family.FromOffset(\"" + param_ptr + "\")";
 					}
                 case ScriptNode.NodeType.PersoRef:
                     Perso argPerso = Perso.FromOffset(param_ptr);
@@ -208,7 +213,11 @@ namespace OpenSpace.AI {
                 case ScriptNode.NodeType.TextRef:
                     if (l.fontStruct == null) return "TextRef";
                     if (advanced) return "TextRef: " + param + " (" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + ")";
-					return "\"" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + "\""; // Preview in english
+                    if (ts.expandStrings) {
+                        return "\"" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + "\""; // Preview in english
+                    } else {
+                        return "new TextReference(" + (int)param + ")";
+                    }
                 case ScriptNode.NodeType.ComportRef:
 					Behavior comportRef = Behavior.FromOffset(param_ptr);
 
@@ -222,18 +231,18 @@ namespace OpenSpace.AI {
                     }
                 case ScriptNode.NodeType.SoundEventRef:
                     if(advanced) return "SoundEventRef: " + (int)param;
-					return "SoundEvent(" + (int)param + ")";
+					return "SoundEvent.FromID(" + (int)param + ")";
                 case ScriptNode.NodeType.ObjectTableRef:
 					if (advanced) return "ObjectTableRef: " + param_ptr;
-					return "ObjectTable.FromOffset(" + param_ptr + ")";
+					return "ObjectTable.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.GameMaterialRef:
 					if (advanced) return "GameMaterialRef: " + param_ptr;
-					return "GameMaterial.FromOffset(" + param_ptr + ")";
+					return "GameMaterial.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.ParticleGenerator:
 					return "ParticleGenerator: " + "0x" + (param).ToString("x8");
                 case ScriptNode.NodeType.VisualMaterial:
 					if (advanced) return "VisualMaterial: " + param_ptr;
-					return "VisualMaterial.FromOffset(" + param_ptr + ")";
+					return "VisualMaterial.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.ModelRef: // ModelCast
                     if (advanced) return "AIModel: " + param_ptr;
                     AIModel model = AIModel.FromOffset(param_ptr);
@@ -258,7 +267,7 @@ namespace OpenSpace.AI {
                     return "null";
                 case ScriptNode.NodeType.GraphRef:
                     if(advanced) return "Graph: " + "0x" + (param).ToString("x8");
-					return "Graph.FromOffset(" + param_ptr + ")";
+					return "Graph.FromOffset(\"" + param_ptr + "\")";
 			}
 
             return "unknown";

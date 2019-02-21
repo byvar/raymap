@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.OpenSpace.Exporter {
+namespace OpenSpace.Exporter {
     abstract class AIModelExporter {
 
         public static string AIModelToCSharp_R2(string nameSpace, AIModel ai)
@@ -17,12 +17,18 @@ namespace Assets.Scripts.OpenSpace.Exporter {
 
             if (ai.dsgVar != null) {
                 foreach (DsgVarInfoEntry dsgVarEntry in ai.dsgVar.dsgVarInfos) {
-                    dsgVars += "public "+DsgVarUtil.DsgVarEntryToCSharpAssignment(dsgVarEntry) + Environment.NewLine;
+                    dsgVars += "public " + DsgVarUtil.DsgVarEntryToCSharpAssignment(dsgVarEntry) + Environment.NewLine;
                 }
             }
 
             List<string> ruleStatesInitializer = new List<string>();
             List<string> reflexStatesInitializer = new List<string>();
+
+            TranslatedScript.TranslationSettings translationSettings = new TranslatedScript.TranslationSettings()
+            {
+                expandEntryActions = false,
+                expandStrings = false
+            };
 
             string behaviorsNormal = "";
 
@@ -33,7 +39,7 @@ namespace Assets.Scripts.OpenSpace.Exporter {
                         ruleStatesInitializer.Add("Rule_" + i + "_" + ai.behaviors_normal[i].name);
                         for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
                             TranslatedScript ts = new TranslatedScript(ai.behaviors_normal[i].scripts[j], null);
-                            ts.expandEntryActions = false;
+                            ts.settings = translationSettings;
                             combinedScript += "// Script " + j + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
                         }
                         combinedScript += "}";
@@ -51,7 +57,7 @@ namespace Assets.Scripts.OpenSpace.Exporter {
                         for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
                             reflexStatesInitializer.Add("Reflex_" + i + "_" + ai.behaviors_reflex[i].name);
                             TranslatedScript ts = new TranslatedScript(ai.behaviors_reflex[i].scripts[j], null);
-                            ts.expandEntryActions = false;
+                            ts.settings = translationSettings;
                             combinedScript += "// Script " + j + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
                         }
                         combinedScript += "}";
@@ -67,7 +73,7 @@ namespace Assets.Scripts.OpenSpace.Exporter {
                     if (ai.macros[i].script != null) {
                         string combinedScript = "private async Task Macro_" + i + "() {" + Environment.NewLine;
                         TranslatedScript ts = new TranslatedScript(ai.macros[i].script, null);
-                        ts.expandEntryActions = false;
+                        ts.settings = translationSettings;
                         combinedScript += ts.ToCSharpString_R2() + Environment.NewLine + "}";
                         macros += combinedScript + Environment.NewLine;
                     }
@@ -88,7 +94,19 @@ namespace Assets.Scripts.OpenSpace.Exporter {
 
             startString += "}";
 
-            string[] usingItems = new string[]{ "UnityEngine", "System.Threading.Tasks", "System.Collections.Generic", "OpenSpaceImplementation"};
+            string[] usingItems = new string[]{
+                "UnityEngine",
+                "System.Threading.Tasks",
+                "System.Collections.Generic",
+                "OpenSpaceImplementation",
+                "OpenSpaceImplementation.AI",
+                "OpenSpaceImplementation.Materials",
+                "OpenSpaceImplementation.Input",
+                "OpenSpaceImplementation.Sound",
+                "OpenSpaceImplementation.Strings",
+                "OpenSpaceImplementation.Waypoints"
+            };
+
             string usingBlock = string.Join(Environment.NewLine, usingItems.Select(i => "using " + i + ";"));
 
             string[] resultItems = new string[] {
