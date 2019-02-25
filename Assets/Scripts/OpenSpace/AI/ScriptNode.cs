@@ -1,6 +1,9 @@
-﻿using OpenSpace.Input;
+﻿using Newtonsoft.Json;
+using OpenSpace.Exporter;
+using OpenSpace.Input;
 using OpenSpace.Object;
 using OpenSpace.Object.Properties;
+using OpenSpace.Visual;
 using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
@@ -66,7 +69,11 @@ namespace OpenSpace.AI {
 					// In R2 some objects have object tables that aren't listed normally, but are referenced through scripts.
 				} else if (sn.nodeType == NodeType.Button) {
 					EntryAction.FromOffsetOrRead(sn.param_ptr, reader);
-				}
+				} else if (sn.nodeType == NodeType.GameMaterialRef) {
+                    GameMaterial.FromOffsetOrRead(sn.param_ptr, reader);
+                } else if (sn.nodeType == NodeType.VisualMaterial) {
+                    VisualMaterial.FromOffsetOrRead(sn.param_ptr, reader);
+                }
             }
             return sn;
         }
@@ -87,7 +94,22 @@ namespace OpenSpace.AI {
             Vector3 vector3 = new Vector3 { x = 0, y = 0, z = 0 };
 			switch (nodeType) {
 				case ScriptNode.NodeType.KeyWord: // KeyWordFunctionPtr
-					if (param < aiTypes.keywordTable.Length) { return aiTypes.keywordTable[param]; }
+					if (param < aiTypes.keywordTable.Length) {
+
+                        if (ts.exportMode) {
+                            if (aiTypes.keywordTable[param] == "Me") {
+                                return "this";
+                            }
+                            if (aiTypes.keywordTable[param] == "MainActor") {
+                                return "Controller.MainActor";
+                            }
+                            if (aiTypes.keywordTable[param] == "Nobody" || aiTypes.keywordTable[param] == "NoInput" || aiTypes.keywordTable[param] == "Nowhere" || aiTypes.keywordTable[param] == "NoGraph" || aiTypes.keywordTable[param] == "NoAction" || aiTypes.keywordTable[param] == "CapsNull") {
+                                return "null";
+                            }
+                        }
+
+                        return aiTypes.keywordTable[param];
+                    }
 					return "UnknownKeyword_" + param;
 				case ScriptNode.NodeType.Condition: // GetConditionFunctionPtr
 					if (param < aiTypes.conditionTable.Length) { return aiTypes.conditionTable[param]; }
@@ -158,10 +180,13 @@ namespace OpenSpace.AI {
                 case ScriptNode.NodeType.Mask:
                     mask = (short)param; // TODO: as short
                     if(advanced) return "Mask: " + (mask).ToString("x4");
-					return "Mask(" + (mask).ToString("x4") + ")";
-				case ScriptNode.NodeType.ModuleRef:
+                    if (ts.exportMode) {
+                        return "\"" + (mask).ToString("x4") + "\"";
+                    }
+                    return "Mask(" + (mask).ToString("x4") + ")";
+                case ScriptNode.NodeType.ModuleRef:
                     if(advanced) return "ModuleRef: " + "0x" + (param).ToString("x8");
-					return "Module(" + (int)param + ")";
+					return "GetModule(" + (int)param + ")";
                 case ScriptNode.NodeType.DsgVarId:
                     if(advanced) return "DsgVarId: " + "0x" + (param).ToString("x8");
 					return "DsgVarId(" + param + ")";
@@ -198,6 +223,9 @@ namespace OpenSpace.AI {
                     State state = State.FromOffset(param_ptr);
                     string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.ShortName;
                     if (advanced) return "ActionRef: " + param_ptr + " " + stateName;
+                    if (ts.useStateIndex) {
+                        return "GetAction("+state.index.ToString()+")";
+                    }
 					return stateName;
                 case ScriptNode.NodeType.SuperObjectRef:
                     if(advanced) return "SuperObjectRef: " + param_ptr;
@@ -205,11 +233,11 @@ namespace OpenSpace.AI {
 					if (so != null) {
 						return "GetSuperObject(\"" + so.Gao.name + "\")";
 					} else {
-						return "SuperObject.FromOffset(" + param_ptr + ")";
+						return "SuperObject.FromOffset(\"" + param_ptr + "\")";
 					}
 				case ScriptNode.NodeType.WayPointRef:
                     if(advanced) return "WayPointRef: " + param_ptr;
-					return "WayPoint.FromOffset(" + param_ptr + ")";
+					return "WayPoint.FromOffset(\"" + param_ptr + "\")";
                 case ScriptNode.NodeType.TextRef:
                     if (l.fontStruct == null) return "TextRef";
                     if (advanced) return "TextRef: " + param + " (" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + ")";
@@ -231,18 +259,32 @@ namespace OpenSpace.AI {
                     }
                 case ScriptNode.NodeType.SoundEventRef:
                     if(advanced) return "SoundEventRef: " + (int)param;
-					return "SoundEvent.FromID(" + (int)param + ")";
+					return "SoundEvent.FromID(0x" + ((int)param).ToString("X8") + ")";
                 case ScriptNode.NodeType.ObjectTableRef:
 					if (advanced) return "ObjectTableRef: " + param_ptr;
 					return "ObjectTable.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.GameMaterialRef:
 					if (advanced) return "GameMaterialRef: " + param_ptr;
+                    if (ts.useHashIdentifiers) {
+                        string gmtJson = GameMaterial.FromOffset(param_ptr).ToJSON();
+
+                        string gmtHash = HashUtils.MD5Hash(gmtJson);
+                        return "GameMaterial.FromHash(\"" + gmtHash + "\")";
+                    }
 					return "GameMaterial.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.ParticleGenerator:
 					return "ParticleGenerator: " + "0x" + (param).ToString("x8");
                 case ScriptNode.NodeType.VisualMaterial:
 					if (advanced) return "VisualMaterial: " + param_ptr;
-					return "VisualMaterial.FromOffset(\"" + param_ptr + "\")";
+
+                    if (ts.useHashIdentifiers) {
+                        string vmtJson = VisualMaterial.FromOffset(param_ptr).ToJSON();
+
+                        string vmtHash = HashUtils.MD5Hash(vmtJson);
+                        return "VisualMaterial.FromHash(\"" + vmtHash + "\")";
+                    }
+
+                    return "VisualMaterial.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.ModelRef: // ModelCast
                     if (advanced) return "AIModel: " + param_ptr;
                     AIModel model = AIModel.FromOffset(param_ptr);
@@ -252,10 +294,16 @@ namespace OpenSpace.AI {
 					return "EvalDataType42(" + "0x" + (param).ToString("x8") + ")";
 				case ScriptNode.NodeType.CustomBits:
                     if(advanced) return "CustomBits: " + "0x" + (param).ToString("x8");
+                    if (ts.exportMode) {
+                        return "0x"+(param).ToString("x8");
+                    }
 					return "CustomBits(" + "0x" + (param).ToString("x8") + ")";
 				case ScriptNode.NodeType.Caps:
                     if(advanced) return "Caps: " + "0x" + (param).ToString("x8");
-					return "Caps(" + "0x" + (param).ToString("x8") + ")";
+                    if (ts.exportMode) {
+                        return "0x" + (param).ToString("x8");
+                    }
+                    return "Caps(" + "0x" + (param).ToString("x8") + ")";
 				case ScriptNode.NodeType.SubRoutine:
                     if (advanced) return "Eval SubRoutine: " + param_ptr;
                     Macro macro = Macro.FromOffset(param_ptr);

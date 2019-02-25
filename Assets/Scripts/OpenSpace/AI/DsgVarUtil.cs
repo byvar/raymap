@@ -60,7 +60,7 @@ namespace OpenSpace.AI {
                 case DsgVarInfoEntry.DsgVarType.Perso:
                     typeText = "Perso"; break;
                 case DsgVarInfoEntry.DsgVarType.Waypoint:
-                    typeText = "Waypoint"; break;
+                    typeText = "WayPoint"; break;
                 case DsgVarInfoEntry.DsgVarType.Graph:
                     typeText = "Graph"; break;
                 case DsgVarInfoEntry.DsgVarType.Text:
@@ -78,7 +78,7 @@ namespace OpenSpace.AI {
                 case DsgVarInfoEntry.DsgVarType.IntegerArray:
                     typeText = "List<DsgVarInt>"; break;
                 case DsgVarInfoEntry.DsgVarType.WayPointArray:
-                    typeText = "List<Waypoint>"; break;
+                    typeText = "List<WayPoint>"; break;
                 case DsgVarInfoEntry.DsgVarType.TextArray:
                     typeText = "List<DsgVarString>"; break;
                 case DsgVarInfoEntry.DsgVarType.TextRefArray:

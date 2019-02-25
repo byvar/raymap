@@ -27,7 +27,10 @@ namespace OpenSpace.Exporter {
             TranslatedScript.TranslationSettings translationSettings = new TranslatedScript.TranslationSettings()
             {
                 expandEntryActions = false,
-                expandStrings = false
+                expandStrings = false,
+                useStateIndex = true,
+                exportMode = true,
+                useHashIdentifiers = true
             };
 
             string behaviorsNormal = "";
@@ -35,7 +38,7 @@ namespace OpenSpace.Exporter {
             if (ai.behaviors_normal != null) {
                 for (int i = 0; i < ai.behaviors_normal.Length; i++) {
                     if (ai.behaviors_normal[i].scripts != null) {
-                        string combinedScript = "private async Task Rule_" + i + "_" + ai.behaviors_normal[i].name + "() {" + Environment.NewLine;
+                        string combinedScript = "public async Task Rule_" + i + "_" + ai.behaviors_normal[i].name + "() {" + Environment.NewLine;
                         ruleStatesInitializer.Add("Rule_" + i + "_" + ai.behaviors_normal[i].name);
                         for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
                             TranslatedScript ts = new TranslatedScript(ai.behaviors_normal[i].scripts[j], null);
@@ -53,7 +56,7 @@ namespace OpenSpace.Exporter {
             if (ai.behaviors_reflex != null) {
                 for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
                     if (ai.behaviors_reflex[i].scripts != null) {
-                        string combinedScript = "private async Task Reflex_" + i + "_" + ai.behaviors_reflex[i].name + "() {" + Environment.NewLine;
+                        string combinedScript = "public async Task Reflex_" + i + "_" + ai.behaviors_reflex[i].name + "() {" + Environment.NewLine;
                         for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
                             reflexStatesInitializer.Add("Reflex_" + i + "_" + ai.behaviors_reflex[i].name);
                             TranslatedScript ts = new TranslatedScript(ai.behaviors_reflex[i].scripts[j], null);
@@ -104,7 +107,8 @@ namespace OpenSpace.Exporter {
                 "OpenSpaceImplementation.Input",
                 "OpenSpaceImplementation.Sound",
                 "OpenSpaceImplementation.Strings",
-                "OpenSpaceImplementation.Waypoints"
+                "OpenSpaceImplementation.Waypoints",
+                "OpenSpaceImplementation.Animation"
             };
 
             string usingBlock = string.Join(Environment.NewLine, usingItems.Select(i => "using " + i + ";"));

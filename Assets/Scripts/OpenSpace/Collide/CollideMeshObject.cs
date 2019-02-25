@@ -1,4 +1,5 @@
-﻿using OpenSpace.Object;
+﻿using Newtonsoft.Json;
+using OpenSpace.Object;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +12,24 @@ namespace OpenSpace.Collide {
     /// </summary>
     public class CollideMeshObject {
         public PhysicalObject po;
+        [JsonIgnore]
         public Pointer offset;
         public CollideType type;
 
+        [JsonIgnore]
         public GameObject gao = null;
 
+        [JsonIgnore]
         public Pointer off_modelstart;
         public ushort num_vertices;
         public ushort num_subblocks;
+        [JsonIgnore]
         public Pointer off_vertices;
+        [JsonIgnore]
         public Pointer off_normals = null;
+        [JsonIgnore]
         public Pointer off_subblock_types;
+        [JsonIgnore]
         public Pointer off_subblocks;
 
         public Vector3[] vertices = null;

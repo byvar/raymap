@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,12 +10,14 @@ namespace OpenSpace.Visual {
     /// Texture definition
     /// </summary>
     public class TextureInfo {
+        [JsonIgnore]
         public Pointer offset;
         private Texture2D texture;
 
         public uint field0;
         public ushort field4;
         public ushort field6;
+        [JsonIgnore]
         public Pointer off_tempBuffer; // field8
         public uint fieldC;           //
         public uint field10;         //

@@ -1,4 +1,5 @@
-﻿using OpenSpace.Object;
+﻿using Newtonsoft.Json;
+using OpenSpace.Object;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,9 @@ using UnityEngine;
 
 namespace OpenSpace.Object.Properties {
     public struct ObjectListEntry {
+        [JsonIgnore]
         public Pointer off_scale;
+        [JsonIgnore]
         public Pointer off_po;
         public uint thirdvalue;
         public ushort unk0;

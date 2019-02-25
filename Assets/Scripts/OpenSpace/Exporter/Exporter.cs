@@ -1,13 +1,19 @@
-﻿using OpenSpace;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
+using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Input;
+using OpenSpace.Object.Properties;
 using OpenSpace.Text;
+using OpenSpace.Visual;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace OpenSpace.Exporter {
     public class Exporter {
@@ -29,6 +35,9 @@ namespace OpenSpace.Exporter {
             string exportDirectoryCommon = Path.Combine(this.exportPath, "Common");
 
             string exportDirectoryAIModels = Path.Combine(exportDirectoryCommon, "AIModels");
+            string exportDirectoryMaterialsCommon = Path.Combine(exportDirectoryCommon, "Materials");
+            string exportDirectoryTexturesCommon = Path.Combine(exportDirectoryCommon, "Textures");
+            string exportDirectoryFamiliesCommon = Path.Combine(exportDirectoryCommon, "Families");
 
             if (!Directory.Exists(exportDirectoryLevel)) {
                 Directory.CreateDirectory(exportDirectoryLevel);
@@ -39,10 +48,115 @@ namespace OpenSpace.Exporter {
             if (!Directory.Exists(exportDirectoryAIModels)) {
                 Directory.CreateDirectory(exportDirectoryAIModels);
             }
+            if (!Directory.Exists(exportDirectoryMaterialsCommon)) {
+                Directory.CreateDirectory(exportDirectoryMaterialsCommon);
+            }
+            if (!Directory.Exists(exportDirectoryTexturesCommon)) {
+                Directory.CreateDirectory(exportDirectoryTexturesCommon);
+            }
+            if (!Directory.Exists(exportDirectoryFamiliesCommon)) {
+                Directory.CreateDirectory(exportDirectoryFamiliesCommon);
+            }
 
+            ExportTextures(exportDirectoryTexturesCommon);
+            ExportMaterials(exportDirectoryMaterialsCommon, exportDirectoryLevel);
+            ExportFamilies(exportDirectoryFamiliesCommon);
             ExportAIModels(exportDirectoryAIModels);
             ExportEntryActions(exportDirectoryCommon);
             ExportTextTable(exportDirectoryCommon);
+        }
+
+        private void ExportTextures(string texturePath)
+        {
+            foreach(TextureInfo texture in loader.textures) {
+
+                if (texture==null) {
+                    continue;
+                }
+                string textureName = texture.name != null ? texture.name : texture.offset.offset.ToString("X8");
+                string path = Path.Combine(texturePath, texture.name + ".png");
+                if (!Directory.Exists(Path.GetDirectoryName(path))) {
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+                }
+
+                if (File.Exists(path)) {
+                    File.Delete(path);
+                }
+
+                using (FileStream fileStream = File.Create(path)) {
+
+                    byte[] pngData = ImageConversion.EncodeToPNG(texture.Texture);
+                    fileStream.Write(pngData, 0, pngData.Length);
+                    fileStream.Flush();
+                    fileStream.Close();
+                }
+            }
+        }
+
+        private void ExportMaterials(string commonPath, string levelPath)
+        {
+            foreach (VisualMaterial vismat in loader.visualMaterials) {
+
+                string path = commonPath;
+
+                string contents = vismat.ToJSON();
+                string contentsHash = HashUtils.MD5Hash(contents); // Identify material by its hash
+
+                string matFileName = "VisualMaterial_" + contentsHash;
+
+                string matFilePath = Path.Combine(path, matFileName + ".json");
+                if (File.Exists(matFilePath)) {
+                    File.Delete(matFilePath);
+                }
+
+                using (StreamWriter fileStream = File.CreateText(matFilePath)) {
+
+                    fileStream.Write(contents);
+                    fileStream.Flush();
+                    fileStream.Close();
+                }
+            }
+
+            foreach (GameMaterial mat in loader.gameMaterials) {
+
+                string path = commonPath;
+
+                string contents = mat.ToJSON();
+                string contentsHash = HashUtils.MD5Hash(contents); // Identify material by its hash
+
+                string matFileName = "GameMaterial_" + contentsHash;
+
+                string matFilePath = Path.Combine(path, matFileName+".json");
+                if (File.Exists(matFilePath)) {
+                    File.Delete(matFilePath);
+                }
+
+                using (StreamWriter fileStream = File.CreateText(matFilePath)) {
+
+                    fileStream.Write(contents);
+                    fileStream.Flush();
+                    fileStream.Close();
+                }
+            }
+        }
+
+        private void ExportFamilies(string path)
+        {
+
+            foreach (Family fam in loader.families) {
+                
+                string filePath = Path.Combine(path, fam.name + ".json");
+                if (File.Exists(filePath)) {
+                    File.Delete(filePath);
+                }
+
+                using (StreamWriter aiModelFileStream = File.CreateText(filePath)) {
+
+                    aiModelFileStream.Write(fam.ToJSON());
+                    aiModelFileStream.Flush();
+                    aiModelFileStream.Close();
+                }
+            }
         }
 
         private void ExportAIModels(string path)
@@ -55,6 +169,7 @@ namespace OpenSpace.Exporter {
                 string filePath = Path.Combine(path, aiModel.name + ".cs");
                 if (File.Exists(filePath)) {
                     File.Delete(filePath);
+
                 }
 
                 using (StreamWriter aiModelFileStream = File.CreateText(filePath)) {

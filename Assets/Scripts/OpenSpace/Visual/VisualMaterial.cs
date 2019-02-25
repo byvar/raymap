@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OpenSpace.Exporter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +15,7 @@ namespace OpenSpace.Visual {
         public List<VisualMaterialTexture> textures;
         public List<AnimatedTexture> animTextures;
         public uint flags;
+        [JsonIgnore]
         public Pointer offset;
         public Vector4 ambientCoef;
         public Vector4 diffuseCoef;
@@ -19,7 +23,9 @@ namespace OpenSpace.Visual {
         public Vector4 color;
         public uint num_textures;
 
+        [JsonIgnore]
         public Pointer off_animTextures_first;
+        [JsonIgnore]
         public Pointer off_animTextures_current;
         public ushort num_animTextures;
 
@@ -113,6 +119,11 @@ namespace OpenSpace.Visual {
                     }*/
             }
             return material;
+        }
+
+        public string ToJSON()
+        {
+            return JsonConvert.SerializeObject(this);
         }
 
         public bool IsTransparent {
@@ -357,5 +368,27 @@ namespace OpenSpace.Visual {
 			vm.Reset();
 			return vm;
 		}
-	}
+
+
+        public class VisualMaterialReferenceJsonConverter : JsonConverter {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(VisualMaterial);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                VisualMaterial vmt = (VisualMaterial)value;
+                string hash = HashUtils.MD5Hash(JsonConvert.SerializeObject(vmt));
+
+                var jt = JToken.FromObject(hash);
+                jt.WriteTo(writer);
+            }
+        }
+    }
 }

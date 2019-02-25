@@ -1,4 +1,5 @@
-﻿using OpenSpace.Animation;
+﻿using Newtonsoft.Json;
+using OpenSpace.Animation;
 using OpenSpace.Collide;
 using OpenSpace.Visual;
 using System;
@@ -9,6 +10,7 @@ using UnityEngine;
 
 namespace OpenSpace {
     public class MechanicsIDCard {
+        [JsonIgnore]
         public Pointer offset;
         public uint type;
         public uint flags;

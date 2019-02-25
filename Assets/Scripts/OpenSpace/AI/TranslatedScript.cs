@@ -16,6 +16,9 @@ namespace OpenSpace.AI {
         public class TranslationSettings {
             public bool expandEntryActions = false;
             public bool expandStrings = true;
+            public bool useStateIndex = false;
+            public bool exportMode = false;
+            public bool useHashIdentifiers = false;
         }
 
         public TranslationSettings settings = new TranslationSettings();
@@ -125,13 +128,25 @@ namespace OpenSpace.AI {
                                         case "Func_TernInfEq": ternaryCheck = " <= "; break;
                                         case "Func_TernSupEq": ternaryCheck = " >= "; break;
                                     }
-                                    if (this.children.Count >= 4)
+                                    if (this.children.Count >= 4) {
                                         return prefix + "((" + this.children[0] + ternaryCheck + this.children[1] + ") ? " + this.children[2] + " : " + this.children[3] + ")";
-                                    else
+                                    } else {
                                         return "ERROR";
+                                    }
 
                                 case "Func_TernOp": // conditional ternary operator (cond ? true : false)
-                                    return prefix + "((" + this.children[0] + ") ? " + this.children[1] + " : " + this.children[2] + ")";
+
+                                    string childCast1 = "";
+                                    string childCast2 = "";
+
+                                    if (this.children[1].scriptNode.nodeType == ScriptNode.NodeType.DsgVarRef && this.children[2].scriptNode.nodeType == ScriptNode.NodeType.Real) {
+                                        childCast1 = "(float)";
+                                    }
+                                    if (this.children[2].scriptNode.nodeType == ScriptNode.NodeType.DsgVarRef && this.children[1].scriptNode.nodeType == ScriptNode.NodeType.Real) {
+                                        childCast2 = "(float)";
+                                    }
+
+                                    return prefix + "((" + this.children[0] + ") ? " + childCast1 + this.children[1] + " : " + childCast2 + this.children[2] + ")";
 
                                 default:
                                     string func = scriptNode.ToString(perso, ts.settings);
@@ -288,7 +303,7 @@ namespace OpenSpace.AI {
         static Regex myRuleAndReflexChangeRegex = new Regex("Proc_ChangeMyComportAndMyReflex\\([a-zA-Z0-9_]+\\.Rule\\[([0-9]+)\\]\\[\"([^\"]+)\"\\], [a-zA-Z0-9_]+\\.Reflex\\[([0-9]+)\\]\\[\"([^\"]+)\"\\]\\)", RegexOptions.Compiled);
         static Regex ruleChangeRegex = new Regex("Proc_ChangeComport\\(([^,]+), ([^.]+).Rule\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);", RegexOptions.Compiled);
         static Regex reflexChangeRegex = new Regex("Proc_ChangeComportReflex\\(([^,]+), ([^.]+).Reflex\\[([0-9]+)\\]\\[\\\"([^\"]+)\\\"]\\);", RegexOptions.Compiled);
-        static Regex generateObjectRegex = new Regex("Func_GenerateObject\\(\\(\\(([^)]+)\\)[^,]+, ([^)]+)\\)", RegexOptions.Compiled);
+        //static Regex generateObjectRegex = new Regex("Func_GenerateObject\\(\\(\\(([^)]+)\\)[^,]+, ([^)]+)\\)", RegexOptions.Compiled);
         
         public string ToCSharpString_R2()
         {
@@ -299,13 +314,13 @@ namespace OpenSpace.AI {
             str = myReflexChangeRegex.Replace(str, "smReflex.SetState(Reflex_$1_$2)");
             str = myRuleAndReflexChangeRegex.Replace(str, "smRule.SetState(Rule_$1_$2);"+Environment.NewLine+"smReflex.SetState(Reflex_$3_$4)");
             str = ruleChangeRegex.Replace(str, "Proc_ChangeComport($1, $2.Rule_$3_$4);");
-            str = reflexChangeRegex.Replace(str, "Proc_ChangeComportReflex($1, $2.Rule_$3_$4);");
+            str = reflexChangeRegex.Replace(str, "Proc_ChangeComportReflex($1, $2.Reflex_$3_$4);");
 
             foreach (string metaAction in AITypes.R2.metaActionTable) {
                 str = str.Replace(metaAction, "await "+metaAction);
             }
 
-            str = generateObjectRegex.Replace(str, "Func_GenerateObject(typeof($1), $2)");
+            //str = generateObjectRegex.Replace(str, "Func_GenerateObject($1, $2)");
 
             str = str.Replace(" Me", " this");
             str = str.Replace("(Me", "(this");

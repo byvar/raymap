@@ -5,20 +5,28 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using System.Collections;
+using Newtonsoft.Json;
 
 namespace OpenSpace.Object.Properties {
     public class ObjectList : ILinkedListEntry, IList<ObjectListEntry> {
+        [JsonIgnore]
         public Pointer offset;
+        [JsonIgnore]
         public Pointer off_objList_next = null;
+        [JsonIgnore]
         public Pointer off_objList_prev = null;
+        [JsonIgnore]
         public Pointer off_objList_hdr = null; // at this offset, start and end pointers appear again
 
+        [JsonIgnore]
         public Pointer off_objList_start;
+        [JsonIgnore]
         public Pointer off_objList_2;
         public ushort num_entries;
         public string unknownFamilyName;
 
         public ObjectListEntry[] entries;
+        [JsonIgnore]
         public List<Family> containingFamilies = new List<Family>();
 
         private GameObject gao;
