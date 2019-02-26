@@ -33,6 +33,7 @@ namespace OpenSpace.Visual {
         [JsonIgnore]
         public Pointer offset;
 
+        [JsonIgnore]
         public string name;
         [JsonIgnore]
         public Pointer off_sprites; // called IndexedSprites in the game code

@@ -6,6 +6,9 @@ using System.Text;
 using UnityEngine;
 using System.Collections;
 using Newtonsoft.Json;
+using OpenSpace.Exporter;
+using Newtonsoft.Json.Linq;
+using OpenSpace.Visual;
 
 namespace OpenSpace.Object.Properties {
     public class ObjectList : ILinkedListEntry, IList<ObjectListEntry> {
@@ -186,7 +189,7 @@ namespace OpenSpace.Object.Properties {
             return null;
         }
 
-        public void AddToFamilyLists() {
+        public void AddToFamilyLists(Perso perso) {
             if (containingFamilies.Count > 0) return;
             ObjectList brother = FindBrother();
             if (brother != null && brother.containingFamilies.Count > 0) {
@@ -200,8 +203,13 @@ namespace OpenSpace.Object.Properties {
                     fam.AddNewPhysicalList(this);
                 }
             } else {
-                MapLoader.Loader.AddUncategorizedObjectList(this);
-                Gao.name = "[" + unknownFamilyName + "] Uncategorized Object List @ " + offset.ToString();
+
+                if (Settings.s.linkUncategorizedObjectsToScriptFamily) {
+                    perso.p3dData.family.AddNewPhysicalList(this);
+                } else {
+                    MapLoader.Loader.AddUncategorizedObjectList(this);
+                    Gao.name = "[" + unknownFamilyName + "] Uncategorized Object List @ " + offset.ToString();
+                }
             }
         }
 
@@ -251,6 +259,36 @@ namespace OpenSpace.Object.Properties {
             } else {
                 return "[" + unknownFamilyName + "] Uncategorized Object List @ " + offset.ToString();
             }
+        }
+
+        public class ObjectListReferenceJsonConverter : JsonConverter {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(ObjectList);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                ObjectList objectList = (ObjectList)value;
+                string hash = HashUtils.MD5Hash(objectList.ToJSON());
+
+                var jt = JToken.FromObject(hash);
+                jt.WriteTo(writer);
+            }
+        }
+
+        public string ToJSON()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.Converters.Add(new GameMaterial.GameMaterialReferenceJsonConverter());
+            settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
+
+            return JsonConvert.SerializeObject(this, settings);
         }
     }
 }

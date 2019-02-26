@@ -188,7 +188,7 @@ namespace OpenSpace.Object {
                                         if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef) {
                                             ObjectList ol = ObjectList.FromOffsetOrRead(node.param_ptr, reader);
                                             ol.unknownFamilyName = p.p3dData.family.name;
-                                            ol.AddToFamilyLists();
+                                            ol.AddToFamilyLists(p);
                                         }
 									}
                                 }
@@ -204,7 +204,7 @@ namespace OpenSpace.Object {
                                         if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef) {
                                             ObjectList ol = ObjectList.FromOffsetOrRead(node.param_ptr, reader);
                                             ol.unknownFamilyName = p.p3dData.family.name;
-                                            ol.AddToFamilyLists();
+                                            ol.AddToFamilyLists(p);
                                         }
                                     }
                                 }
@@ -219,7 +219,7 @@ namespace OpenSpace.Object {
                                     if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ObjectTableRef) {
                                         ObjectList ol = ObjectList.FromOffsetOrRead(node.param_ptr, reader);
                                         ol.unknownFamilyName = p.p3dData.family.name;
-                                        ol.AddToFamilyLists();
+                                        ol.AddToFamilyLists(p);
                                     }
                                 }
                             }

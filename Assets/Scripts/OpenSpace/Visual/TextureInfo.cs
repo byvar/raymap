@@ -20,6 +20,7 @@ namespace OpenSpace.Visual {
         [JsonIgnore]
         public Pointer off_tempBuffer; // field8
         public uint fieldC;           //
+        [JsonIgnore] // pointer to opengl texture data probaly, not interesting for JSON
         public uint field10;         //
         public uint flags;          // field14
         public ushort height_;     // field18

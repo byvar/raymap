@@ -53,6 +53,7 @@ namespace OpenSpace {
         public float luminosity = 0.5f;
         public bool saturate = true;
 		public Dictionary<CapsType, Caps> caps = new Dictionary<CapsType, Caps>();
+        public bool linkUncategorizedObjectsToScriptFamily = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
@@ -183,6 +184,7 @@ namespace OpenSpace {
             luminosity = 0.5f,
             saturate = true,
             hasMemorySupport = true,
+            linkUncategorizedObjectsToScriptFamily = true,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x005013C8 },
                 { "dynamicWorld", 0x00500FD0 },

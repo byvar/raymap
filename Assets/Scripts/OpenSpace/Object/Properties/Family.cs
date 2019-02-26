@@ -172,6 +172,7 @@ namespace OpenSpace.Object.Properties {
             settings.TypeNameHandling = TypeNameHandling.All;
             settings.Converters.Add(new GameMaterial.GameMaterialReferenceJsonConverter());
             settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
+            settings.Converters.Add(new ObjectList.ObjectListReferenceJsonConverter());
 
             return JsonConvert.SerializeObject(this, settings);
         }

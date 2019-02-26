@@ -33,6 +33,7 @@ namespace OpenSpace.Visual {
         public uint lookAtMode;
         public ushort num_vertices;
         public ushort num_subblocks;
+        [JsonIgnore]
         public string name;
         public Vector3[] vertices = null;
         public Vector3[] normals = null;

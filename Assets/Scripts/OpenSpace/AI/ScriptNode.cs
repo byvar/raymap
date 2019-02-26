@@ -262,7 +262,15 @@ namespace OpenSpace.AI {
 					return "SoundEvent.FromID(0x" + ((int)param).ToString("X8") + ")";
                 case ScriptNode.NodeType.ObjectTableRef:
 					if (advanced) return "ObjectTableRef: " + param_ptr;
-					return "ObjectTable.FromOffset(\"" + param_ptr + "\")";
+
+                    if (ts.useHashIdentifiers) {
+                        string objectListJson = ObjectList.FromOffset(param_ptr).ToJSON();
+
+                        string objectListHash = HashUtils.MD5Hash(objectListJson);
+                        return "ObjectList.FromHash(\"" + objectListHash + "\")";
+                    }
+
+                    return "ObjectTable.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.GameMaterialRef:
 					if (advanced) return "GameMaterialRef: " + param_ptr;
                     if (ts.useHashIdentifiers) {

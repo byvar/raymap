@@ -54,6 +54,8 @@ namespace OpenSpace.Visual {
             Transparent = 1,
             Billboard = 2
         }
+
+        [JsonIgnore]
         public Hint receivedHints = Hint.None;
 
         public bool ScrollingEnabled {

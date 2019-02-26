@@ -15,6 +15,7 @@ namespace OpenSpace.Visual {
         [JsonIgnore]
         public Pointer offset;
 
+        [JsonIgnore]
         public string name;
         [JsonIgnore]
         public Pointer off_material;

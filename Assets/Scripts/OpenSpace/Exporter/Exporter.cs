@@ -64,6 +64,25 @@ namespace OpenSpace.Exporter {
             ExportAIModels(exportDirectoryAIModels);
             ExportEntryActions(exportDirectoryCommon);
             ExportTextTable(exportDirectoryCommon);
+            ExportScene(exportDirectoryLevel);
+        }
+
+        private void ExportScene(string path)
+        {
+            ExportableScene es = new ExportableScene(loader);
+            string sceneJSON = es.ToJSON();
+
+            string filePath = Path.Combine(path, "Scene_"+loader.lvlName + ".json");
+            if (File.Exists(filePath)) {
+                File.Delete(filePath);
+            }
+
+            using (StreamWriter sceneFileStream = File.CreateText(filePath)) {
+
+                sceneFileStream.Write(sceneJSON);
+                sceneFileStream.Flush();
+                sceneFileStream.Close();
+            }
         }
 
         private void ExportTextures(string texturePath)
@@ -142,10 +161,15 @@ namespace OpenSpace.Exporter {
 
         private void ExportFamilies(string path)
         {
-
             foreach (Family fam in loader.families) {
                 
-                string filePath = Path.Combine(path, fam.name + ".json");
+                string familyDirectory = Path.Combine(path, fam.name);
+
+                if (!Directory.Exists(familyDirectory)) {
+                    Directory.CreateDirectory(familyDirectory);
+                }
+
+                string filePath = Path.Combine(familyDirectory, "Family_"+fam.name+".json");
                 if (File.Exists(filePath)) {
                     File.Delete(filePath);
                 }
@@ -155,6 +179,23 @@ namespace OpenSpace.Exporter {
                     aiModelFileStream.Write(fam.ToJSON());
                     aiModelFileStream.Flush();
                     aiModelFileStream.Close();
+                }
+
+                foreach(ObjectList objectList in fam.objectLists) {
+                    string objectListJSON = objectList.ToJSON();
+                    string objectListHash = HashUtils.MD5Hash(objectListJSON);
+
+                    string objectListFilePath = Path.Combine(familyDirectory, "ObjectList_" + objectListHash + ".json");
+                    if (File.Exists(objectListFilePath)) {
+                        File.Delete(objectListFilePath);
+                    }
+
+                    using (StreamWriter aiModelFileStream = File.CreateText(objectListFilePath)) {
+
+                        aiModelFileStream.Write(objectListJSON);
+                        aiModelFileStream.Flush();
+                        aiModelFileStream.Close();
+                    }
                 }
             }
         }
