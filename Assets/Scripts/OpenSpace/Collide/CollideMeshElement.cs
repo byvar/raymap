@@ -7,26 +7,17 @@ using UnityEngine;
 
 namespace OpenSpace.Collide {
     public class CollideMeshElement : ICollideGeometricElement {
-        [JsonIgnore]
         public CollideMeshObject mesh;
-        [JsonIgnore]
         public Pointer offset;
-
-        [JsonIgnore]
+		
         public Pointer off_material;
-        [JsonIgnore]
         public Pointer off_triangles; // num_triangles * 3 * 0x2
-        [JsonIgnore]
         public Pointer off_mapping; // num_triangles * 3 * 0x2. Max: num_uvs-1
-        [JsonIgnore]
         public Pointer off_normals; // num_triangles * 3 * 0x4. 1 normal per face, kinda logical for collision I guess
-        [JsonIgnore]
         public Pointer off_uvs;
         public ushort num_triangles;
         public ushort num_mapping;
-        [JsonIgnore]
         public Pointer off_unk;
-        [JsonIgnore]
         public Pointer off_unk2;
         public ushort num_mapping_entries;
 
@@ -35,10 +26,8 @@ namespace OpenSpace.Collide {
         public Vector3[] normals = null;
         public int[] mapping = null;
         public Vector2[] uvs = null;
-
-        [JsonIgnore]
+		
         private GameObject gao = null;
-        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) {

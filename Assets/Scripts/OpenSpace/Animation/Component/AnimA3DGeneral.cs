@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
     public class AnimA3DGeneral {
-        [JsonIgnore]
         public Pointer offset;
 
         public ushort speed;

@@ -10,25 +10,19 @@ namespace OpenSpace.Collide {
         public class IndexedAlignedBox {
             public ushort minPoint;
             public ushort maxPoint;
-            [JsonIgnore]
             public Pointer off_material;
 
             public GameMaterial gameMaterial;
         }
 
-        [JsonIgnore]
-        public CollideMeshObject mesh;
-        [JsonIgnore]
+        [JsonIgnore] public CollideMeshObject mesh;
         public Pointer offset;
-
-        [JsonIgnore]
+		
         public Pointer off_boxes; // called IndexedSprites in the game code
         public ushort num_boxes;
         public IndexedAlignedBox[] boxes;
-
-        [JsonIgnore]
+		
         private GameObject gao = null;
-        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) {

@@ -9,28 +9,21 @@ namespace OpenSpace.Collide {
     public class CollideSpheresElement : ICollideGeometricElement {
         public class IndexedSphere {
             public float radius;
-            [JsonIgnore]
             public Pointer off_material;
             public ushort centerPoint;
 
             public GameMaterial gameMaterial;
-            [JsonIgnore]
             public Pointer debug_radiusAddress;
         }
 
-        [JsonIgnore]
-        public CollideMeshObject mesh;
-        [JsonIgnore]
+        [JsonIgnore] public CollideMeshObject mesh;
         public Pointer offset;
-
-        [JsonIgnore]
+		
         public Pointer off_spheres; // called IndexedSprites in the game code
         public ushort num_spheres;
         public IndexedSphere[] spheres;
-
-        [JsonIgnore]
+		
         private GameObject gao = null;
-        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) {

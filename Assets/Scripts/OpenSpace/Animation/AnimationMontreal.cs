@@ -8,15 +8,12 @@ using UnityEngine;
 
 namespace OpenSpace.Animation {
     public class AnimationMontreal {
-        [JsonIgnore]
         public Pointer offset;
-        [JsonIgnore]
         public Pointer off_frames = null;
         public byte num_frames;
         public byte speed;
         public byte num_channels;
         public byte unkbyte;
-        [JsonIgnore]
         public Pointer off_unk;
         public Matrix speedMatrix;
         public AnimFrameMontreal[] frames;

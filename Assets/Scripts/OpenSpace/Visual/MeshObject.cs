@@ -13,22 +13,14 @@ namespace OpenSpace.Visual {
     /// Mesh data (both static and dynamic)
     /// </summary>
     public class MeshObject : IGeometricObject {
-        [JsonIgnore]
         public Pointer offset;
-
-        [JsonIgnore]
+		
         public Pointer off_vertices;
-        [JsonIgnore]
         public Pointer off_normals;
-        [JsonIgnore]
         public Pointer off_blendWeights;
-        [JsonIgnore]
         public Pointer off_materials;
-        [JsonIgnore]
         public Pointer off_subblock_types;
-        [JsonIgnore]
         public Pointer off_subblocks;
-        [JsonIgnore]
         public Pointer off_mapping; // Revolution only
         public uint lookAtMode;
         public ushort num_vertices;
@@ -43,7 +35,6 @@ namespace OpenSpace.Visual {
         public DeformSet bones = null;
         
         private GameObject gao = null;
-        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) InitGameObject();

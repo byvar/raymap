@@ -10,13 +10,10 @@ namespace OpenSpace.Visual {
     /// Basically a submesh
     /// </summary>
     public class MeshElement : IGeometricElement {
-        [JsonIgnore]
-        public MeshObject mesh;
-        [JsonIgnore]
+        [JsonIgnore] public MeshObject mesh;
         public Pointer offset;
 
         public string name;
-        [JsonIgnore]
         public Pointer off_material;
         public GameMaterial gameMaterial;
         public VisualMaterial visualMaterial;
@@ -24,27 +21,18 @@ namespace OpenSpace.Visual {
         public ushort num_disconnected_triangles_spe;
         public ushort num_uvs;
         public ushort num_uvMaps;
-        [JsonIgnore]
         public Pointer off_disconnected_triangles_spe;
-        [JsonIgnore]
         public Pointer off_mapping_uvs_spe;
-        [JsonIgnore]
         public Pointer off_weights_spe;
-        [JsonIgnore]
         public Pointer off_uvs;
-        [JsonIgnore]
         public Pointer off_vertex_indices;
         public ushort num_vertex_indices;
         public ushort num_mapping_entries;
-        [JsonIgnore]
         public Pointer off_mapping_vertices;
-        [JsonIgnore]
         public Pointer off_mapping_uvs;
         public ushort num_connected_vertices;
         public ushort num_disconnected_triangles;
-        [JsonIgnore]
         public Pointer off_connected_vertices;
-        [JsonIgnore]
         public Pointer off_disconnected_triangles;
         public int[] mapping_vertices = null;
         public int[][] mapping_uvs = null;
@@ -59,20 +47,15 @@ namespace OpenSpace.Visual {
 		public Color[] vertexColors = null;
 		public int lightmap_index = -1;
 
-        [JsonIgnore]
         private SkinnedMeshRenderer s_mr_main = null;
-        [JsonIgnore]
         private SkinnedMeshRenderer s_mr_spe = null;
-        [JsonIgnore]
         private Renderer mr_main = null;
-        [JsonIgnore]
         private Renderer mr_spe = null;
         private Mesh mesh_main = null;
         private Mesh mesh_spe = null;
 
 
         private GameObject gao = null;
-        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) {

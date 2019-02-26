@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace OpenSpace.Collide {
     public class CollideMaterial {
-        [JsonIgnore]
         public Pointer offset;
 
         public ushort type;

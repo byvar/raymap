@@ -12,15 +12,11 @@ using UnityEngine;
 
 namespace OpenSpace {
     public class GameMaterial {
-        [JsonIgnore]
         public Pointer offset;
 
-        [JsonIgnore]
         public Pointer off_visualMaterial;
-        [JsonIgnore]
         public Pointer off_mechanicsMaterial;
         public uint soundMaterial;
-        [JsonIgnore]
         public Pointer off_collideMaterial;
 
         public VisualMaterial visualMaterial;
@@ -81,6 +77,7 @@ namespace OpenSpace {
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.All;
             settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
+			settings.ContractResolver = JsonIgnorePointersResolver.Instance;
 
             return JsonConvert.SerializeObject(this, settings);
         }

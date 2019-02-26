@@ -8,18 +8,14 @@ using UnityEngine;
 
 namespace OpenSpace.Visual {
     public class MeshModificationObject : IGeometricObject {
-        public PhysicalObject po;
-        [JsonIgnore]
+		[JsonIgnore] public PhysicalObject po;
         public Pointer offset;
-
-        [JsonIgnore]
+		
         public Pointer off_model;
         public uint num_properties;
-        [JsonIgnore]
         public Pointer off_properties;
 
-        [JsonIgnore]
-        public MeshObject mesh = null;
+        [JsonIgnore] public MeshObject mesh = null;
         public MeshModificationProperty[] properties;
 
 
