@@ -35,7 +35,9 @@ namespace OpenSpace.Collide {
         public PrivilegedActivationStatus GetPrivilegedActionZoneStatus(CollideType type, int index)
         {
             int activations = 0;
-			activations = privilegedActivations[type];
+			if (privilegedActivations.ContainsKey(type)) {
+				activations = privilegedActivations[type];
+			}
             int offset = index * 2;
             int value = ((1 << 2) - 1) & (activations >> (offset)); // extract 2 bits from offset
             return (PrivilegedActivationStatus)value;
@@ -61,10 +63,12 @@ namespace OpenSpace.Collide {
 			c.off_zones[CollideType.ZDM] = Pointer.Read(reader);
 			c.off_zones[CollideType.ZDR] = Pointer.Read(reader);
 
-			c.privilegedActivations[CollideType.ZDD] = reader.ReadInt32();
-			c.privilegedActivations[CollideType.ZDE] = reader.ReadInt32();
-			c.privilegedActivations[CollideType.ZDM] = reader.ReadInt32();
-			c.privilegedActivations[CollideType.ZDR] = reader.ReadInt32();
+			if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+				c.privilegedActivations[CollideType.ZDD] = reader.ReadInt32();
+				c.privilegedActivations[CollideType.ZDE] = reader.ReadInt32();
+				c.privilegedActivations[CollideType.ZDM] = reader.ReadInt32();
+				c.privilegedActivations[CollideType.ZDR] = reader.ReadInt32();
+			}
 
 			foreach (KeyValuePair<CollideType, Pointer> entry in c.off_zdxList) {
 				Pointer.DoAt(ref reader, entry.Value, () => {
@@ -90,7 +94,9 @@ namespace OpenSpace.Collide {
 						(off_element) => {
 							return CollideActivationZone.Read(reader, off_element);
 						},
-						flags: LinkedList.Flags.NoPreviousPointersForDouble,
+						flags: (Settings.s.hasLinkedListHeaderPointers ?
+								LinkedList.Flags.HasHeaderPointers :
+								LinkedList.Flags.NoPreviousPointersForDouble),
 						type: LinkedList.Type.Minimize
 					);
 				});
@@ -102,7 +108,9 @@ namespace OpenSpace.Collide {
 						(off_element) => {
 							return CollideActivation.Read(reader, off_element, c, entry.Key);
 						},
-						flags: LinkedList.Flags.NoPreviousPointersForDouble,
+						flags: (Settings.s.hasLinkedListHeaderPointers ?
+								LinkedList.Flags.HasHeaderPointers :
+								LinkedList.Flags.NoPreviousPointersForDouble),
 						type: LinkedList.Type.Minimize
 					);
 				});
