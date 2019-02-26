@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace OpenSpace.Visual {
     public class AnimatedTexture {
+        [JsonIgnore]
         public Pointer off_texture;
         public float time;
 		public float currentTime; // Used to update this texture

@@ -1,4 +1,5 @@
-﻿using OpenSpace.Animation;
+﻿using Newtonsoft.Json;
+using OpenSpace.Animation;
 using OpenSpace.Visual;
 using System;
 using System.Collections;
@@ -9,6 +10,7 @@ using UnityEngine;
 
 namespace OpenSpace.Collide {
     public class CollideMaterial {
+        [JsonIgnore]
         public Pointer offset;
 
         public ushort type;

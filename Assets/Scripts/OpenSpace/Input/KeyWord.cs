@@ -42,7 +42,14 @@ namespace OpenSpace.Input {
 			Pointer off_value = Pointer.Current(reader);
             keyword.indexOrKeyCode = reader.ReadUInt16();
 			Pointer.Goto(ref reader, off_value);
-			keyword.valueAsInt = reader.ReadInt32();
+
+            if (Settings.s == Settings.R2PC) {
+                keyword.valueAsInt = reader.ReadInt16();
+                reader.ReadInt16();
+            } else {
+                keyword.valueAsInt = reader.ReadInt32();
+            }
+
 			keyword.valueAsPointer = Pointer.GetPointerAtOffset(off_value);
 			if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadInt32();
 			if(Settings.s.game != Settings.Game.R2Revolution) reader.ReadInt32();
@@ -229,7 +236,7 @@ namespace OpenSpace.Input {
 						Pointer off_action = subkeywords[0].valueAsPointer;
 						if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) return FunctionType + "()";
 						EntryAction action = EntryAction.FromOffset(off_action);
-						return FunctionType + "(" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + ")";
+						return FunctionType + "{" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + "}";
 					default:
                         return FunctionType.ToString() + "()";
                 }

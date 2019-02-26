@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
     public class AnimA3DGeneral {
+        [JsonIgnore]
         public Pointer offset;
 
         public ushort speed;

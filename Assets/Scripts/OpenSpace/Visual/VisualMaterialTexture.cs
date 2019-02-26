@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,11 @@ namespace OpenSpace.Visual {
     /// Visual Material definition
     /// </summary>
     public class VisualMaterialTexture {
+        [JsonIgnore]
         public Pointer offset;
         public uint scrollMode; // R2
 
+        [JsonIgnore]
         public Pointer off_texture;
         public byte textureOp;
         /*
@@ -46,6 +49,7 @@ namespace OpenSpace.Visual {
         // Derived
         public TextureInfo texture;
         private Texture2D texture2D;
+
         public Texture2D Texture {
             get {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {

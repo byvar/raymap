@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,14 @@ using UnityEngine;
 
 namespace OpenSpace.Visual.Deform {
     public class DeformSet : IGeometricElement {
+        [JsonIgnore]
         public MeshObject mesh;
+        [JsonIgnore]
         public Pointer offset;
 
+        [JsonIgnore]
         public Pointer off_weights;
+        [JsonIgnore]
         public Pointer off_bones;
         public ushort num_weights;
         public byte num_bones;
@@ -21,6 +26,7 @@ namespace OpenSpace.Visual.Deform {
         public Transform[] bones;
         public Matrix4x4[] bindPoses;
 
+        [JsonIgnore]
         private GameObject gao = null;
         public GameObject Gao {
             get {

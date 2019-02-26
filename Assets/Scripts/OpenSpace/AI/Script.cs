@@ -60,6 +60,9 @@ namespace OpenSpace.AI {
 		}
 
         public void print(Perso perso) {
+
+            TranslatedScript.TranslationSettings settings = new TranslatedScript.TranslationSettings();
+
             // TODO: Use perso to print states, etc.
             MapLoader l = MapLoader.Loader;
             StringBuilder builder = new StringBuilder();
@@ -69,7 +72,7 @@ namespace OpenSpace.AI {
                     builder.Append("---- END OF SCRIPT ----");
                 } else {
                     builder.Append(new String(' ', (sn.indent - 1) * 4));
-                    builder.Append(sn.ToString(perso, advanced: true));
+                    builder.Append(sn.ToString(perso, settings, advanced: true));
                 }
                 builder.Append("\n");
             }

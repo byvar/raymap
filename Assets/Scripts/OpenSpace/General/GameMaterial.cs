@@ -1,5 +1,8 @@
-﻿using OpenSpace.Animation;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OpenSpace.Animation;
 using OpenSpace.Collide;
+using OpenSpace.Exporter;
 using OpenSpace.Visual;
 using System;
 using System.Collections.Generic;
@@ -9,11 +12,15 @@ using UnityEngine;
 
 namespace OpenSpace {
     public class GameMaterial {
+        [JsonIgnore]
         public Pointer offset;
 
+        [JsonIgnore]
         public Pointer off_visualMaterial;
+        [JsonIgnore]
         public Pointer off_mechanicsMaterial;
         public uint soundMaterial;
+        [JsonIgnore]
         public Pointer off_collideMaterial;
 
         public VisualMaterial visualMaterial;
@@ -67,6 +74,36 @@ namespace OpenSpace {
                 if (offset == l.gameMaterials[i].offset) return l.gameMaterials[i];
             }
             return null;
+        }
+
+        public string ToJSON()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.All;
+            settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
+
+            return JsonConvert.SerializeObject(this, settings);
+        }
+
+        public class GameMaterialReferenceJsonConverter : JsonConverter {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(GameMaterial);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                GameMaterial gmt = (GameMaterial)value;
+                string hash = HashUtils.MD5Hash(gmt.ToJSON());
+
+                var jt = JToken.FromObject(hash);
+                jt.WriteTo(writer);
+            }
         }
     }
 }

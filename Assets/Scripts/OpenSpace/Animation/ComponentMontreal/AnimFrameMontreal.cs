@@ -1,4 +1,5 @@
-﻿using OpenSpace.Animation.Component;
+﻿using Newtonsoft.Json;
+using OpenSpace.Animation.Component;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,17 @@ using UnityEngine;
 
 namespace OpenSpace.Animation.ComponentMontreal {
     public class AnimFrameMontreal {
+        [JsonIgnore]
         public Pointer offset;
+        [JsonIgnore]
         public AnimationMontreal anim;
+        [JsonIgnore]
         public Pointer off_channels;
+        [JsonIgnore]
         public Pointer off_mat;
+        [JsonIgnore]
         public Pointer off_vec;
+        [JsonIgnore]
         public Pointer off_hierarchies;
 
         public AnimChannelMontreal[] channels = null;

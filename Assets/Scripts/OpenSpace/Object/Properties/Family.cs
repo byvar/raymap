@@ -1,4 +1,6 @@
-﻿using OpenSpace.Object;
+﻿using Newtonsoft.Json;
+using OpenSpace.Object;
+using OpenSpace.Visual;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,23 +9,33 @@ using UnityEngine;
 
 namespace OpenSpace.Object.Properties {
     public class Family : ILinkedListEntry {
+
+        [JsonIgnore]
         public Pointer offset;
+        [JsonIgnore]
         public Pointer off_family_next;
+        [JsonIgnore]
         public Pointer off_family_prev;
+        [JsonIgnore]
         public Pointer off_family_hdr; // at this offset, start and end pointers appear again
         public uint family_index;
         public LinkedList<State> states;
         public LinkedList<int> preloadAnim; // int is just a placeholder type, change to actual type when I finally read it
+        [JsonIgnore]
         public Pointer off_physical_list_default;
         public LinkedList<ObjectList> objectLists;
+        [JsonIgnore]
         public Pointer off_bounding_volume;
+        [JsonIgnore]
         public Pointer off_vector4s;
         public uint num_vector4s;
         public byte animBank;
         public byte properties;
 
         public string name;
+        [JsonIgnore]
         private GameObject gao;
+        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) {
@@ -35,10 +47,12 @@ namespace OpenSpace.Object.Properties {
             }
         }
 
+        [JsonIgnore]
         public Pointer NextEntry {
             get { return off_family_next; }
         }
 
+        [JsonIgnore]
         public Pointer PreviousEntry {
             get { return off_family_prev; }
         }
@@ -150,6 +164,16 @@ namespace OpenSpace.Object.Properties {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.families.FirstOrDefault(f => f.offset == offset);
+        }
+
+        public string ToJSON()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.All;
+            settings.Converters.Add(new GameMaterial.GameMaterialReferenceJsonConverter());
+            settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
+
+            return JsonConvert.SerializeObject(this, settings);
         }
     }
 }

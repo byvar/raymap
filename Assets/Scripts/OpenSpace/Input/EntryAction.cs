@@ -30,6 +30,14 @@ namespace OpenSpace.Input {
             get { return off_entryAction_prev; }
         }
 
+        public string ExportName
+        {
+            get
+            {
+                return (name != null && name != "") ? name : "EntryAction_" + this.offset.offset;
+            }
+        }
+
         public EntryAction(Pointer offset) {
             this.offset = offset;
         }
@@ -102,10 +110,12 @@ namespace OpenSpace.Input {
         public string ToBasicString()
         {
 			//string result = "<NullEntryAction>";
-			string result = "EntryAction(";
+			string result = "EntryAction{";
 			if (name != null && name.Trim() != "") {
 				result += "\"" + name + "\", ";
-			}
+			} else {
+                result += "\"" + ExportName + "\", ";
+            }
 			if (name2 != null && name2.Trim() != "") {
 				result += "\"" + name2 + "\", ";
 			}
@@ -115,9 +125,9 @@ namespace OpenSpace.Input {
 			if (result.EndsWith("(")) {
 				result = "<NullEntryAction>";
 			} else if (result.EndsWith(", ")) {
-				result = result.Substring(0, result.Length - 2) + ")";
+				result = result.Substring(0, result.Length - 2) + "}";
 			} else {
-				result += ")";
+				result += "}";
 			}
             return result;
         }

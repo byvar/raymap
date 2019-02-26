@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using UnityEngine;
 
 namespace OpenSpace.Visual {
     public class IndexedSprite {
+        [JsonIgnore]
         public Pointer off_info;
         public Vector2 size;
         public Vector3 constraint;
@@ -15,24 +17,31 @@ namespace OpenSpace.Visual {
 
         public Vector2 info_scale;
         public Vector2 info_unknown;
+        [JsonIgnore]
         public Pointer off_material_pointer;
+        [JsonIgnore]
         public Pointer off_material;
         public GameMaterial gameMaterial;
         public VisualMaterial visualMaterial = null;
-		public Mesh meshUnity = null;
+        [JsonIgnore]
+        public Mesh meshUnity = null;
     }
 
     public class SpriteElement : IGeometricElement {
+        [JsonIgnore]
         public MeshObject mesh;
+        [JsonIgnore]
         public Pointer offset;
 
         public string name;
+        [JsonIgnore]
         public Pointer off_sprites; // called IndexedSprites in the game code
         public ushort num_sprites;
         public IndexedSprite[] sprites;
 
-
+        [JsonIgnore]
         private GameObject gao = null;
+        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) {

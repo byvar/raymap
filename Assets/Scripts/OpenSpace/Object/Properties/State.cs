@@ -1,4 +1,5 @@
-﻿using OpenSpace.Animation;
+﻿using Newtonsoft.Json;
+using OpenSpace.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,26 +8,37 @@ using UnityEngine;
 
 namespace OpenSpace.Object.Properties {
     public class State : ILinkedListEntry {
+
+        [JsonIgnore]
         public Pointer offset;
+        [JsonIgnore]
         public Family family;
         public int index = 0;
         public string name = null;
+        [JsonIgnore]
         public Pointer off_state_next;
+        [JsonIgnore]
         public Pointer off_state_prev;
+        [JsonIgnore]
         public Pointer off_anim_ref;
         public LinkedList<int> stateTransitions;
+        [JsonIgnore]
         public Pointer off_mechanicsIDCard = null;
+        [JsonIgnore]
         public Pointer off_cine_mapname = null;
+        [JsonIgnore]
         public Pointer off_cine_name = null;
         public string cine_mapname = null;
         public string cine_name = null;
         public byte speed;
+        [JsonIgnore]
         public Pointer off_state_auto; // Go to this state after a while if nothing changes
         public AnimationReference anim_ref = null;
         public AnimationMontreal anim_refMontreal = null;
         public MechanicsIDCard mechanicsIDCard;
         public byte customStateBits;
 
+        [JsonIgnore]
         public Pointer NextEntry {
             get {
                 if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
@@ -41,6 +53,7 @@ namespace OpenSpace.Object.Properties {
             }
         }
 
+        [JsonIgnore]
         public Pointer PreviousEntry {
             get { return off_state_prev; }
         }

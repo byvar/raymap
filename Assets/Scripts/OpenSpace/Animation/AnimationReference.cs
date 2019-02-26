@@ -1,4 +1,5 @@
-﻿using OpenSpace.Animation.Component;
+﻿using Newtonsoft.Json;
+using OpenSpace.Animation.Component;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,21 +8,25 @@ using UnityEngine;
 
 namespace OpenSpace.Animation {
     public class AnimationReference { // Also known as Anim3d
+        [JsonIgnore]
         public Pointer offset;
         public string name = null;
         public ushort num_onlyFrames;
         public byte speed;
         public byte num_channels;
+        [JsonIgnore]
         public Pointer off_events;
         public float x;
         public float y;
         public float z;
+        [JsonIgnore]
         public Pointer off_morphData;
         public ushort anim_index; // Index of animation within bank
         public byte num_events;
         public byte transition;
         public AnimMorphData[,] morphDataArray; // [channel][frame]
 
+        [JsonIgnore]
         public Pointer off_a3d = null;
         public AnimA3DGeneral a3d = null;
 
