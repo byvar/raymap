@@ -7,14 +7,10 @@ using UnityEngine;
 
 namespace OpenSpace.Visual.Deform {
     public class DeformSet : IGeometricElement {
-        [JsonIgnore]
-        public MeshObject mesh;
-        [JsonIgnore]
+        [JsonIgnore] public MeshObject mesh;
         public Pointer offset;
-
-        [JsonIgnore]
+		
         public Pointer off_weights;
-        [JsonIgnore]
         public Pointer off_bones;
         public ushort num_weights;
         public byte num_bones;
@@ -25,8 +21,7 @@ namespace OpenSpace.Visual.Deform {
         public BoneWeight[] weights;
         public Transform[] bones;
         public Matrix4x4[] bindPoses;
-
-        [JsonIgnore]
+		
         private GameObject gao = null;
         public GameObject Gao {
             get {

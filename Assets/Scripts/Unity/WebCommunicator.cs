@@ -42,8 +42,10 @@ public class WebCommunicator : MonoBehaviour {
             }
             if (selectedPerso_ != selector.selectedPerso) {
                 selectedPerso_ = selector.selectedPerso;
-				if (selectedPerso_ != null) selectedPersoStateIndex_ = selectedPerso_.stateIndex;
-                Send(GetSelectionJSON());
+				if (selectedPerso_ != null) {
+					selectedPersoStateIndex_ = selectedPerso_.stateIndex;
+					Send(GetSelectionJSON());
+				}
             }
 			if (selectedPerso_ != null && selectedPersoStateIndex_ != selectedPerso_.stateIndex) {
 				selectedPersoStateIndex_ = selectedPerso_.stateIndex;

@@ -8,9 +8,7 @@ using UnityEngine;
 
 namespace OpenSpace.Animation.ComponentMontreal {
     public class AnimChannelMontreal {
-        [JsonIgnore]
         public Pointer offset;
-        [JsonIgnore]
         public Pointer off_matrix;
         public uint isIdentity = 0;
         public byte objectIndex;

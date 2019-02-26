@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace OpenSpace {
     public class MechanicsIDCard {
-        [JsonIgnore]
         public Pointer offset;
         public uint type;
         public uint flags;

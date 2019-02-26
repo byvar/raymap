@@ -100,9 +100,8 @@ namespace OpenSpace.Object {
                 p.p3dData = Perso3dData.Read(reader, p.off_3dData);
             });
 
-            if (p.off_stdGame != null) {
-                Pointer off_current = Pointer.Goto(ref reader, p.off_stdGame);
-                p.stdGame = StandardGame.Read(reader, p.off_stdGame);
+			Pointer.DoAt(ref reader, p.off_stdGame, () => {
+				p.stdGame = StandardGame.Read(reader, p.off_stdGame);
 				if (Settings.s.hasObjectTypes) {
 					p.nameFamily = p.stdGame.GetName(0);
 					p.nameModel = p.stdGame.GetName(1);
@@ -119,9 +118,8 @@ namespace OpenSpace.Object {
 						}
 					}
 				}
-
-                Pointer.Goto(ref reader, off_current);
-            }
+			});
+			
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset);
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal && Settings.s.game != Settings.Game.R2Revolution) {
 				Pointer.DoAt(ref reader, p.off_dynam, () => {

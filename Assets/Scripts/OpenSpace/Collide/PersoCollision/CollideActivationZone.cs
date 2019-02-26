@@ -5,15 +5,17 @@ namespace OpenSpace.Collide
     public class CollideActivationZone : ILinkedListEntry
     {
         public Pointer offset;
-        public Pointer nextElement;
+        public Pointer off_next;
+		public Pointer off_prev;
+		public Pointer off_header;
 		public ushort zdxIndex;
 
 		public Pointer NextEntry {
-            get { return nextElement; }
+            get { return off_next; }
         }
 
         public Pointer PreviousEntry {
-            get { return null; }
+            get { return off_prev; }
         }
 
         public CollideActivationZone(Pointer offset) {
@@ -21,16 +23,20 @@ namespace OpenSpace.Collide
         }
 
         public static CollideActivationZone Read(Reader reader, Pointer offset) {
-            CollideActivationZone e = new CollideActivationZone(offset);
+            CollideActivationZone z = new CollideActivationZone(offset);
 
 			if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
-				e.nextElement = Pointer.Read(reader);
+				z.off_next = Pointer.Read(reader);
+				if (Settings.s.hasLinkedListHeaderPointers) {
+					z.off_prev = Pointer.Read(reader);
+					z.off_header = Pointer.Read(reader);
+				}
 			}
-			e.zdxIndex = reader.ReadUInt16();
+			z.zdxIndex = reader.ReadUInt16();
 			if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
-				e.nextElement = Pointer.Current(reader);
+				z.off_next = Pointer.Current(reader);
 			}
-			return e;
+			return z;
         }
     }
 }

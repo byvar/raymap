@@ -15,17 +15,14 @@ namespace OpenSpace.Visual {
         public List<VisualMaterialTexture> textures;
         public List<AnimatedTexture> animTextures;
         public uint flags;
-        [JsonIgnore]
         public Pointer offset;
         public Vector4 ambientCoef;
         public Vector4 diffuseCoef;
         public Vector4 specularCoef;
         public Vector4 color;
         public uint num_textures;
-
-        [JsonIgnore]
+		
         public Pointer off_animTextures_first;
-        [JsonIgnore]
         public Pointer off_animTextures_current;
         public ushort num_animTextures;
 

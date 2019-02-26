@@ -10,22 +10,16 @@ using UnityEngine;
 
 namespace OpenSpace.Object {
     public class PhysicalObject : IEquatable<PhysicalObject>, IEngineObject {
-        [JsonIgnore]
         public Pointer offset;
-        [JsonIgnore]
         public Pointer off_visualSet;
-        [JsonIgnore]
         public Pointer off_collideSet;
-        [JsonIgnore]
         public Pointer off_visualBoundingVolume;
-        [JsonIgnore]
         public Pointer off_collideBoundingVolume;
         public VisualSetLOD[] visualSet;
         public ushort visualSetType = 0;
         public CollideMeshObject collideMesh;
         public Vector3? scaleMultiplier = null;
         private GameObject gao = null;
-        [JsonIgnore]
         public GameObject Gao {
             get {
                 if (gao == null) {
@@ -46,7 +40,6 @@ namespace OpenSpace.Object {
 		}
 
 		private SuperObject superObject;
-        [JsonIgnore]
 		public SuperObject SuperObject {
 			get { return superObject; }
 		}

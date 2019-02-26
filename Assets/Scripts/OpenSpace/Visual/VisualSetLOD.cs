@@ -8,7 +8,6 @@ using UnityEngine;
 namespace OpenSpace.Visual {
     public struct VisualSetLOD {
         public float LODdistance;
-        [JsonIgnore]
         public Pointer off_data;
         public IGeometricObject obj;
     }

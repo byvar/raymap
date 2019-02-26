@@ -10,11 +10,9 @@ namespace OpenSpace.Visual {
     /// Visual Material definition
     /// </summary>
     public class VisualMaterialTexture {
-        [JsonIgnore]
         public Pointer offset;
         public uint scrollMode; // R2
-
-        [JsonIgnore]
+		
         public Pointer off_texture;
         public byte textureOp;
         /*

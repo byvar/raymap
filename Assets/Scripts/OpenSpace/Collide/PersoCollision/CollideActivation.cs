@@ -5,17 +5,19 @@ namespace OpenSpace.Collide
     public class CollideActivation : ILinkedListEntry
     {
         public Pointer offset;
-        public Pointer nextElement;
+        public Pointer off_next;
+		public Pointer off_prev;
+		public Pointer off_header;
 		public Pointer off_activationZone;
 		public LinkedList<CollideActivationZone> activationZone;
         public ushort index;
 
         public Pointer NextEntry {
-            get { return nextElement; }
+            get { return off_next; }
         }
 
         public Pointer PreviousEntry {
-            get { return null; }
+            get { return off_prev; }
         }
 
         public CollideActivation(Pointer offset) {
@@ -26,7 +28,11 @@ namespace OpenSpace.Collide
             CollideActivation a = new CollideActivation(offset);
 
             if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
-                a.nextElement = Pointer.Read(reader);
+                a.off_next = Pointer.Read(reader);
+				if (Settings.s.hasLinkedListHeaderPointers) {
+					a.off_prev = Pointer.Read(reader);
+					a.off_header = Pointer.Read(reader);
+				}
             }
 			a.off_activationZone = Pointer.Read(reader);
 			Pointer.DoAt(ref reader, a.off_activationZone, () => {
@@ -34,14 +40,16 @@ namespace OpenSpace.Collide
 						(off_element) => {
 							return CollideActivationZone.Read(reader, off_element);
 						},
-						flags: LinkedList.Flags.NoPreviousPointersForDouble,
+						flags: (Settings.s.hasLinkedListHeaderPointers ?
+								LinkedList.Flags.HasHeaderPointers :
+								LinkedList.Flags.NoPreviousPointersForDouble),
 						type: LinkedList.Type.Minimize
 					);
 			});
 			a.index = reader.ReadUInt16();
 			reader.ReadUInt16();
 			if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
-				a.nextElement = Pointer.Current(reader);
+				a.off_next = Pointer.Current(reader);
 			}
 			return a;
         }
