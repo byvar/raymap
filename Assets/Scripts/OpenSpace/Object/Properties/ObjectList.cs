@@ -280,6 +280,8 @@ namespace OpenSpace.Object.Properties {
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.Converters.Add(new GameMaterial.GameMaterialReferenceJsonConverter());
             settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
+            settings.TypeNameHandling = TypeNameHandling.All;
+            settings.ContractResolver = JsonIgnorePointersResolver.Instance;
 
             return JsonConvert.SerializeObject(this, settings);
         }

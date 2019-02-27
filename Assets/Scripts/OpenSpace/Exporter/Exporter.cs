@@ -72,7 +72,7 @@ namespace OpenSpace.Exporter {
             ExportableScene es = new ExportableScene(loader);
             string sceneJSON = es.ToJSON();
 
-            string filePath = Path.Combine(path, "Scene_"+loader.lvlName + ".json");
+            string filePath = Path.Combine(path, loader.lvlName + ".json");
             if (File.Exists(filePath)) {
                 File.Delete(filePath);
             }

@@ -152,6 +152,8 @@ namespace OpenSpace.AI {
                         break;
 
                     case DsgVarInfoEntry.DsgVarType.Perso:
+                    case DsgVarInfoEntry.DsgVarType.GameMaterial:
+                    case DsgVarInfoEntry.DsgVarType.VisualMaterial:
 
                         returnValue = Pointer.Read(reader);
 
@@ -241,6 +243,8 @@ namespace OpenSpace.AI {
             for (uint i = 0; i < arraySize; i++) {
                 if (itemType==DsgVarInfoEntry.DsgVarType.Vector)
                     resultList[i] = ReadValueFromBuffer(reader, itemType, 8 + i * 12, i, buffer);
+                else if (itemType == DsgVarInfoEntry.DsgVarType.Text)
+                    resultList[i] = ReadValueFromBuffer(reader, itemType, 40 + 8 + i * 4, i, buffer);
                 else
                     resultList[i] = ReadValueFromBuffer(reader, itemType, 8 + i * 4, i, buffer);
             }

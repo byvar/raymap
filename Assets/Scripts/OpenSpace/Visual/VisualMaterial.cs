@@ -122,7 +122,11 @@ namespace OpenSpace.Visual {
 
         public string ToJSON()
         {
-            return JsonConvert.SerializeObject(this);
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.All;
+            settings.ContractResolver = JsonIgnorePointersResolver.Instance;
+
+            return JsonConvert.SerializeObject(this, settings);
         }
 
         public bool IsTransparent {
@@ -383,7 +387,7 @@ namespace OpenSpace.Visual {
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
             {
                 VisualMaterial vmt = (VisualMaterial)value;
-                string hash = HashUtils.MD5Hash(JsonConvert.SerializeObject(vmt));
+                string hash = HashUtils.MD5Hash(vmt.ToJSON());
 
                 var jt = JToken.FromObject(hash);
                 jt.WriteTo(writer);
