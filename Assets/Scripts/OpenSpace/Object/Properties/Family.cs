@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpenSpace.Exporter;
 using OpenSpace.Object;
 using OpenSpace.Visual;
 using System;
@@ -157,12 +158,12 @@ namespace OpenSpace.Object.Properties {
 
         public string ToJSON()
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.All;
+            JsonSerializerSettings settings = MapExporter.JsonExportSettings;
+            
+            settings.Converters.Add(new UnityConverter());
             settings.Converters.Add(new GameMaterial.GameMaterialReferenceJsonConverter());
             settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
             settings.Converters.Add(new ObjectList.ObjectListReferenceJsonConverter());
-			settings.ContractResolver = JsonIgnorePointersResolver.Instance;
 
 			return JsonConvert.SerializeObject(this, settings);
         }

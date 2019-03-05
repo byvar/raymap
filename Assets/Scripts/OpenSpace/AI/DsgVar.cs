@@ -134,19 +134,21 @@ namespace OpenSpace.AI {
                         break;
                     case DsgVarInfoEntry.DsgVarType.Text:
                         uint textInd = reader.ReadUInt32();
-                        returnValue = MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)textInd, 0);
+                        returnValue = textInd; // MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)textInd, 0);
                         break;
                     case DsgVarInfoEntry.DsgVarType.Graph:
                         Pointer off_graph = Pointer.Read(reader);
                         Graph graph = Graph.FromOffsetOrRead(off_graph, reader);
-                        returnValue = "Graph " + off_graph;
+
+                        returnValue = off_graph; //"Graph " + off_graph;
 
                         break;
                     case DsgVarInfoEntry.DsgVarType.Waypoint:
                         Pointer off_waypoint = Pointer.Read(reader);
                         if (off_waypoint != null) {
                             WayPoint wayPoint = WayPoint.FromOffsetOrRead(off_waypoint, reader);
-                            returnValue = wayPoint;
+                            returnValue = off_waypoint;
+                            //returnValue = wayPoint;
                         }
 
                         break;
@@ -242,11 +244,9 @@ namespace OpenSpace.AI {
 
             for (uint i = 0; i < arraySize; i++) {
                 if (itemType==DsgVarInfoEntry.DsgVarType.Vector)
-                    resultList[i] = ReadValueFromBuffer(reader, itemType, 8 + i * 12, i, buffer);
-                else if (itemType == DsgVarInfoEntry.DsgVarType.Text)
-                    resultList[i] = ReadValueFromBuffer(reader, itemType, 40 + 8 + i * 4, i, buffer);
+                    resultList[i] = ReadValueFromBuffer(reader, itemType, entry.offsetInBuffer + 8 + i * 12, i, buffer);
                 else
-                    resultList[i] = ReadValueFromBuffer(reader, itemType, 8 + i * 4, i, buffer);
+                    resultList[i] = ReadValueFromBuffer(reader, itemType, entry.offsetInBuffer + 8 + i * 4, i, buffer);
             }
 
             return resultList;

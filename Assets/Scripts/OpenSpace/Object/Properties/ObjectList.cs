@@ -277,12 +277,12 @@ namespace OpenSpace.Object.Properties {
 
         public string ToJSON()
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings();
+            JsonSerializerSettings settings = MapExporter.JsonExportSettings;
+
+            settings.Converters.Add(new UnityConverter());
             settings.Converters.Add(new GameMaterial.GameMaterialReferenceJsonConverter());
             settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
-            settings.TypeNameHandling = TypeNameHandling.All;
-            settings.ContractResolver = JsonIgnorePointersResolver.Instance;
-
+            
             return JsonConvert.SerializeObject(this, settings);
         }
     }

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Input;
@@ -16,12 +15,25 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace OpenSpace.Exporter {
-    public class Exporter {
+    public partial class MapExporter {
         private MapLoader loader;
         private string exportPath;
         private string gameName;
 
-        public Exporter(MapLoader loader, string exportPath)
+        public static JsonSerializerSettings JsonExportSettings
+        {
+            get
+            {
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.TypeNameHandling = TypeNameHandling.Objects;
+                settings.ContractResolver = JsonIgnorePointersResolver.Instance;
+                settings.SerializationBinder = new OpenSpaceTypesBinder();
+
+                return settings;
+            }
+        }
+
+        public MapExporter(MapLoader loader, string exportPath)
         {
             this.loader = loader;
             this.exportPath = exportPath;
@@ -31,45 +43,44 @@ namespace OpenSpace.Exporter {
         public void Export()
         {
 
-            string exportDirectoryLevel = Path.Combine(this.exportPath, loader.lvlName);
-            string exportDirectoryCommon = Path.Combine(this.exportPath, "Common");
+            string exportDirectoryLevels = Path.Combine(this.exportPath, "Levels");
+            string exportDirectoryAIModels = Path.Combine(this.exportPath, "AIModels");
+            string exportDirectoryMaterials = Path.Combine(this.exportPath, "Materials");
+            string exportDirectoryTextures = Path.Combine(this.exportPath, "Textures");
+            string exportDirectoryFamilies = Path.Combine(this.exportPath, "Families");
+            string exportDirectoryGeneral = Path.Combine(this.exportPath, "General");
 
-            string exportDirectoryAIModels = Path.Combine(exportDirectoryCommon, "AIModels");
-            string exportDirectoryMaterialsCommon = Path.Combine(exportDirectoryCommon, "Materials");
-            string exportDirectoryTexturesCommon = Path.Combine(exportDirectoryCommon, "Textures");
-            string exportDirectoryFamiliesCommon = Path.Combine(exportDirectoryCommon, "Families");
-
-            if (!Directory.Exists(exportDirectoryLevel)) {
-                Directory.CreateDirectory(exportDirectoryLevel);
-            }
-            if (!Directory.Exists(exportDirectoryCommon)) {
-                Directory.CreateDirectory(exportDirectoryCommon);
+            if (!Directory.Exists(exportDirectoryLevels)) {
+                Directory.CreateDirectory(exportDirectoryLevels);
             }
             if (!Directory.Exists(exportDirectoryAIModels)) {
                 Directory.CreateDirectory(exportDirectoryAIModels);
             }
-            if (!Directory.Exists(exportDirectoryMaterialsCommon)) {
-                Directory.CreateDirectory(exportDirectoryMaterialsCommon);
+            if (!Directory.Exists(exportDirectoryMaterials)) {
+                Directory.CreateDirectory(exportDirectoryMaterials);
             }
-            if (!Directory.Exists(exportDirectoryTexturesCommon)) {
-                Directory.CreateDirectory(exportDirectoryTexturesCommon);
+            if (!Directory.Exists(exportDirectoryTextures)) {
+                Directory.CreateDirectory(exportDirectoryTextures);
             }
-            if (!Directory.Exists(exportDirectoryFamiliesCommon)) {
-                Directory.CreateDirectory(exportDirectoryFamiliesCommon);
+            if (!Directory.Exists(exportDirectoryFamilies)) {
+                Directory.CreateDirectory(exportDirectoryFamilies);
+            }
+            if (!Directory.Exists(exportDirectoryGeneral)) {
+                Directory.CreateDirectory(exportDirectoryGeneral);
             }
 
-            ExportTextures(exportDirectoryTexturesCommon);
-            ExportMaterials(exportDirectoryMaterialsCommon, exportDirectoryLevel);
-            ExportFamilies(exportDirectoryFamiliesCommon);
-            ExportAIModels(exportDirectoryAIModels);
-            ExportEntryActions(exportDirectoryCommon);
-            ExportTextTable(exportDirectoryCommon);
-            ExportScene(exportDirectoryLevel);
+            ExportTextures(exportDirectoryTextures);
+            ExportMaterials(exportDirectoryMaterials, exportDirectoryLevels);
+            ExportFamilies(exportDirectoryFamilies);
+            //ExportAIModels(exportDirectoryAIModels);
+            ExportEntryActions(exportDirectoryGeneral);
+            ExportTextTable(exportDirectoryGeneral);
+            ExportScene(exportDirectoryLevels);
         }
 
         private void ExportScene(string path)
         {
-            ExportableScene es = new ExportableScene(loader);
+            SerializedScene es = new SerializedScene(loader);
             string sceneJSON = es.ToJSON();
 
             string filePath = Path.Combine(path, loader.lvlName + ".json");
@@ -87,9 +98,9 @@ namespace OpenSpace.Exporter {
 
         private void ExportTextures(string texturePath)
         {
-            foreach(TextureInfo texture in loader.textures) {
+            foreach (TextureInfo texture in loader.textures) {
 
-                if (texture==null) {
+                if (texture == null) {
                     continue;
                 }
                 string textureName = texture.name != null ? texture.name : texture.offset.offset.ToString("X8");
@@ -145,7 +156,7 @@ namespace OpenSpace.Exporter {
 
                 string matFileName = "GameMaterial_" + contentsHash;
 
-                string matFilePath = Path.Combine(path, matFileName+".json");
+                string matFilePath = Path.Combine(path, matFileName + ".json");
                 if (File.Exists(matFilePath)) {
                     File.Delete(matFilePath);
                 }
@@ -162,14 +173,14 @@ namespace OpenSpace.Exporter {
         private void ExportFamilies(string path)
         {
             foreach (Family fam in loader.families) {
-                
+
                 string familyDirectory = Path.Combine(path, fam.name);
 
                 if (!Directory.Exists(familyDirectory)) {
                     Directory.CreateDirectory(familyDirectory);
                 }
 
-                string filePath = Path.Combine(familyDirectory, "Family_"+fam.name+".json");
+                string filePath = Path.Combine(familyDirectory, "Family_" + fam.name + ".json");
                 if (File.Exists(filePath)) {
                     File.Delete(filePath);
                 }
@@ -181,7 +192,7 @@ namespace OpenSpace.Exporter {
                     aiModelFileStream.Close();
                 }
 
-                foreach(ObjectList objectList in fam.objectLists) {
+                foreach (ObjectList objectList in fam.objectLists) {
                     string objectListJSON = objectList.ToJSON();
                     string objectListHash = HashUtils.MD5Hash(objectListJSON);
 
@@ -205,7 +216,7 @@ namespace OpenSpace.Exporter {
             foreach (AIModel aiModel in loader.aiModels) {
 
                 // TODO: this is Rayman 2 specific for now :(
-                string aiModelCSharp = AIModelExporter.AIModelToCSharp_R2(gameName+".AIModels", aiModel);
+                string aiModelCSharp = AIModelExporter.AIModelToCSharp_R2(gameName + ".AIModels", aiModel);
 
                 string filePath = Path.Combine(path, aiModel.name + ".cs");
                 if (File.Exists(filePath)) {
@@ -252,8 +263,8 @@ namespace OpenSpace.Exporter {
 
         private static string EscapeStringForCSharp(string str)
         {
-            if (str!=null)
-            str = str.Replace((char)0x85, '\0'); // For some reason there's a ... whitespace character used sometimes
+            if (str != null)
+                str = str.Replace((char)0x85, '\0'); // For some reason there's a ... whitespace character used sometimes
             return str;
         }
 
@@ -273,14 +284,14 @@ namespace OpenSpace.Exporter {
             List<string> textEntries = new List<string>();
             int languageIndex = 0;
 
-            foreach(FontStructure.TextTable textTable in loader.fontStruct.languages) {
-                if (textTable.num_entries>numTextsPerLanguage) {
+            foreach (FontStructure.TextTable textTable in loader.fontStruct.languages) {
+                if (textTable.num_entries > numTextsPerLanguage) {
                     numTextsPerLanguage = textTable.num_entries;
                 }
 
                 int entryIndex = 0;
-                foreach(string entry in textTable.entries) {
-                    textEntries.Add("SetString(" + languageIndex + ", "+(entryIndex++)+", \"" + EscapeStringForCSharp(entry) + "\");");
+                foreach (string entry in textTable.entries) {
+                    textEntries.Add("SetStringForLanguage(" + languageIndex + ", " + (entryIndex++) + ", \"" + EscapeStringForCSharp(entry) + "\");");
                 }
 
                 textEntries.Add(""); // Extra line break
@@ -288,15 +299,15 @@ namespace OpenSpace.Exporter {
                 languageIndex++;
             }
 
-            string textManagerConstructor = "public StringManager() {" + Environment.NewLine +
+            string textManagerConstructor = "public TextManager() {" + Environment.NewLine +
                 "InitTable(" + loader.fontStruct.num_languages + ", " + loader.fontStruct.languages[0].num_entries_max + ");" + Environment.NewLine + Environment.NewLine +
                 string.Join(Environment.NewLine, textEntries) +
                 Environment.NewLine +
                 "}";
 
-            string content = "public class StringManager : OpenSpaceImplementation.Strings.StringManager {" + Environment.NewLine +
+            string content = "public class TextManager : OpenSpaceImplementation.Strings.TextManager {" + Environment.NewLine +
                     textManagerConstructor +
-                    Environment.NewLine + 
+                    Environment.NewLine +
                 "}";
 
             string fileContents = usingBlock + Environment.NewLine + "namespace " + gameName + ".Text {" + Environment.NewLine +
@@ -310,5 +321,6 @@ namespace OpenSpace.Exporter {
                 fileStream.Close();
             }
         }
+
     }
 }

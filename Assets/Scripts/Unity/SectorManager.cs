@@ -12,8 +12,9 @@ public class SectorManager : MonoBehaviour {
     public List<Sector> sectors;
     private List<SectorComponent> sectorComponents;
     public Camera mainCamera;
-    public List<Sector> activeSectors = new List<Sector>();
-	Vector3 camPosPrevious;
+    //public List<Sector> activeSectors = new List<Sector>();
+    public Sector activeSector = null;
+    Vector3 camPosPrevious;
 
     // Use this for initialization
     void Start() {
@@ -24,8 +25,7 @@ public class SectorManager : MonoBehaviour {
     void Update() {
         if (loaded) {
             Vector3 camPos = Camera.main.transform.localPosition;
-            activeSectors = GetActiveSectorsAtPoint(camPos);
-
+            activeSector = GetActiveSectorAtPoint(camPos, activeSector);
 
 			if (Input.GetKeyDown(KeyCode.Y)) {
 				displayInactiveSectors = !displayInactiveSectors;
@@ -59,26 +59,39 @@ public class SectorManager : MonoBehaviour {
 		}
 	}
 
-    public List<Sector> GetActiveSectorsAtPoint(Vector3 point, bool allowVirtual = false) {
-        List<Sector> activeSectors = new List<Sector>();
+    public Sector GetActiveSectorAtPoint(Vector3 point, Sector currentActiveSector = null, bool allowVirtual = false) {
+
+        if (currentActiveSector!=null && currentActiveSector.sectorBorder.ContainsPoint(point)) {
+            return currentActiveSector;
+        }
+
+        Sector activeSector = null;
         for (int i = 0; i < sectors.Count; i++) {
             Sector s = sectors[i];
             s.Loaded = false;
-            s.Active = (allowVirtual || s.isSectorVirtual == 0) && (s.sectorBorder != null ? s.sectorBorder.ContainsPoint(point) : true);
-            if (s.Active) activeSectors.Add(s);
         }
-        for (int i = 0; i < activeSectors.Count; i++) {
-            Sector s = activeSectors[i];
-            for (int j = 0; j < s.neighbors.Count; j++) {
-                s.neighbors[j].sector.Loaded = true;
+        for (int i = 0; i < sectors.Count; i++) {
+            Sector s = sectors[i];
+            s.Active = (allowVirtual || s.isSectorVirtual == 0) && (s.sectorBorder != null ? s.sectorBorder.ContainsPoint(point) : true);
+            if (s.Active) {
+                activeSector = s;
+
+                for (int j = 0; j < s.neighbors.Count; j++) {
+                    s.neighbors[j].sector.Loaded = true;
+                }
+
+                break;
             }
         }
-        if (activeSectors.Count == 0) {
+        if (activeSector == null) {
             for (int i = 0; i < sectors.Count; i++) {
                 sectors[i].Loaded = true;
             }
+        } else {
+            activeSector.Loaded = true;
         }
-        return activeSectors;
+
+        return activeSector;
     }
 
     public void Init() {

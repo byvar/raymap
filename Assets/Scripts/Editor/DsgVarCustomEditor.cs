@@ -72,12 +72,13 @@ public class DsgVarCustomEditor : Editor {
             case DsgVarInfoEntry.DsgVarType.Boolean: dsgVarEntry.valueAsBool = EditorGUILayout.Toggle(dsgVarEntry.valueAsBool); break;
             case DsgVarInfoEntry.DsgVarType.Int: stringVal = GUILayout.TextField(dsgVarEntry.valueAsInt.ToString()); Int32.TryParse(stringVal, out dsgVarEntry.valueAsInt); break;
             case DsgVarInfoEntry.DsgVarType.UInt: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt); break;
+            case DsgVarInfoEntry.DsgVarType.Caps: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt); break;
             case DsgVarInfoEntry.DsgVarType.Short: stringVal = GUILayout.TextField(dsgVarEntry.valueAsShort.ToString()); Int16.TryParse(stringVal, out dsgVarEntry.valueAsShort); break;
             case DsgVarInfoEntry.DsgVarType.UShort: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUShort.ToString()); UInt16.TryParse(stringVal, out dsgVarEntry.valueAsUShort); break;
             case DsgVarInfoEntry.DsgVarType.Byte: stringVal = GUILayout.TextField(dsgVarEntry.valueAsSByte.ToString()); SByte.TryParse(stringVal, out dsgVarEntry.valueAsSByte); break;
             case DsgVarInfoEntry.DsgVarType.UByte: stringVal = GUILayout.TextField(dsgVarEntry.valueAsByte.ToString()); Byte.TryParse(stringVal, out dsgVarEntry.valueAsByte); break;
             case DsgVarInfoEntry.DsgVarType.Float: stringVal = GUILayout.TextField(dsgVarEntry.valueAsFloat.ToString()); Single.TryParse(stringVal, out dsgVarEntry.valueAsFloat); break;
-            case DsgVarInfoEntry.DsgVarType.Text: stringVal = GUILayout.TextField(dsgVarEntry.valueAsString.ToString()); dsgVarEntry.valueAsString = stringVal; break;
+            case DsgVarInfoEntry.DsgVarType.Text: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt); break;
             case DsgVarInfoEntry.DsgVarType.Vector:
                 float val_x = dsgVarEntry.valueAsVector.x;
                 float val_y = dsgVarEntry.valueAsVector.y;
@@ -148,12 +149,13 @@ public class DsgVarCustomEditor : Editor {
                 case DsgVarInfoEntry.DsgVarType.Boolean: dsgVarEntry.valueAsBool_initial = EditorGUILayout.Toggle(dsgVarEntry.valueAsBool_initial); break;
                 case DsgVarInfoEntry.DsgVarType.Int: stringVal = GUILayout.TextField(dsgVarEntry.valueAsInt_initial.ToString()); Int32.TryParse(stringVal, out dsgVarEntry.valueAsInt_initial); break;
                 case DsgVarInfoEntry.DsgVarType.UInt: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt_initial.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt_initial); break;
+                case DsgVarInfoEntry.DsgVarType.Caps: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt_initial.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt_initial); break;
                 case DsgVarInfoEntry.DsgVarType.Short: stringVal = GUILayout.TextField(dsgVarEntry.valueAsShort_initial.ToString()); Int16.TryParse(stringVal, out dsgVarEntry.valueAsShort_initial); break;
                 case DsgVarInfoEntry.DsgVarType.UShort: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUShort_initial.ToString()); UInt16.TryParse(stringVal, out dsgVarEntry.valueAsUShort_initial); break;
                 case DsgVarInfoEntry.DsgVarType.Byte: stringVal = GUILayout.TextField(dsgVarEntry.valueAsSByte_initial.ToString()); SByte.TryParse(stringVal, out dsgVarEntry.valueAsSByte_initial); break;
                 case DsgVarInfoEntry.DsgVarType.UByte: stringVal = GUILayout.TextField(dsgVarEntry.valueAsByte_initial.ToString()); Byte.TryParse(stringVal, out dsgVarEntry.valueAsByte_initial); break;
                 case DsgVarInfoEntry.DsgVarType.Float: stringVal = GUILayout.TextField(dsgVarEntry.valueAsFloat_initial.ToString()); Single.TryParse(stringVal, out dsgVarEntry.valueAsFloat_initial); break;
-                case DsgVarInfoEntry.DsgVarType.Text: stringVal = GUILayout.TextField(dsgVarEntry.valueAsString_initial.ToString()); dsgVarEntry.valueAsString_initial = stringVal; break;
+                case DsgVarInfoEntry.DsgVarType.Text: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt_initial.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt); break;
                 case DsgVarInfoEntry.DsgVarType.Vector:
                     float val_x = dsgVarEntry.valueAsVector_initial.x;
                     float val_y = dsgVarEntry.valueAsVector_initial.y;

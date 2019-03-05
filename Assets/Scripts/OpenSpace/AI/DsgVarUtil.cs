@@ -79,10 +79,10 @@ namespace OpenSpace.AI {
                     typeText = "List<DsgVarInt>"; break;
                 case DsgVarInfoEntry.DsgVarType.WayPointArray:
                     typeText = "List<WayPoint>"; break;
-                case DsgVarInfoEntry.DsgVarType.TextArray:
-                    typeText = "List<DsgVarString>"; break;
-                case DsgVarInfoEntry.DsgVarType.TextRefArray:
+                case DsgVarInfoEntry.DsgVarType.TextArray: // These are text references
                     typeText = "List<DsgVarTextRef>"; break;
+                case DsgVarInfoEntry.DsgVarType.TextRefArray: // Don't know what these are then?
+                    typeText = "List<DsgVarTextRef2>"; break;
                 case DsgVarInfoEntry.DsgVarType.Array6:
                     typeText = "List<Unknown_6>"; break;
                 case DsgVarInfoEntry.DsgVarType.Array9:

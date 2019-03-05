@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace OpenSpace.Collide {
     public class CollideMeshElement : ICollideGeometricElement {
-        public CollideMeshObject mesh;
+        [JsonIgnore] public CollideMeshObject mesh;
         public Pointer offset;
 		
         public Pointer off_material;

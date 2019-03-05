@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -9,6 +12,7 @@ namespace OpenSpace.Waypoints {
         public Vector3 position;
         public float radius;
 
+        [JsonIgnore]
         public List<GraphNode> containingGraphNodes;
 
         // For isolate waypoints
@@ -72,6 +76,26 @@ namespace OpenSpace.Waypoints {
             wp.radius = radius;
 
             return wp;
+        }
+
+        public class WayPointReferenceJsonConverter : JsonConverter {
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(WayPoint);
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                WayPoint wp = (WayPoint)value;
+                
+                var jt = JToken.FromObject(wp.offset.ToString());
+                jt.WriteTo(writer);
+            }
         }
     }
 }

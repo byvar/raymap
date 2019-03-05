@@ -1,4 +1,5 @@
-﻿using OpenSpace.Collide;
+﻿using Newtonsoft.Json;
+using OpenSpace.Collide;
 using OpenSpace.Object.Properties;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,7 @@ namespace OpenSpace.Object {
         public Pointer off_brother_next;
         public Pointer off_brother_prev;
         public Pointer off_parent;
+        [JsonIgnore]
         public SuperObject parent;
         public Pointer off_matrix;
         public Matrix matrix;

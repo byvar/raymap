@@ -74,10 +74,10 @@ namespace OpenSpace {
 
         public string ToJSON()
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.All;
+            JsonSerializerSettings settings = Exporter.MapExporter.JsonExportSettings;
+
+            settings.Converters.Add(new UnityConverter());
             settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
-			settings.ContractResolver = JsonIgnorePointersResolver.Instance;
 
             return JsonConvert.SerializeObject(this, settings);
         }
@@ -97,8 +97,9 @@ namespace OpenSpace {
             {
                 GameMaterial gmt = (GameMaterial)value;
                 string hash = HashUtils.MD5Hash(gmt.ToJSON());
+                GameMaterialReference reference = new GameMaterialReference() { Hash = hash };
 
-                var jt = JToken.FromObject(hash);
+                var jt = JToken.FromObject(reference);
                 jt.WriteTo(writer);
             }
         }

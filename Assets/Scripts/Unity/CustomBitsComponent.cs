@@ -27,7 +27,7 @@ public class CustomBitsComponent : MonoBehaviour {
         AICustomBitsInitial
     }
 
-    public int GetRawFlags(CustomBitsType type) {
+    public uint GetRawFlags(CustomBitsType type) {
         switch (type) {
             case CustomBitsType.CustomBits: return stdGame.customBits;
             case CustomBitsType.AICustomBits: return stdGame.aiCustomBits;
@@ -41,7 +41,7 @@ public class CustomBitsComponent : MonoBehaviour {
         BitArray bitArray = bits[(int)type];
         if (bitArray.Get(index) != value) {
             bitArray.Set(index, value);
-            int[] array = new int[1];
+            uint[] array = new uint[1];
             bitArray.CopyTo(array, 0);
             SetRawFlags(type, array[0]);
         }
@@ -52,7 +52,7 @@ public class CustomBitsComponent : MonoBehaviour {
         return bitArray.Get(index);
     }
 
-    public void SetRawFlags(CustomBitsType type, int rawFlags) {
+    public void SetRawFlags(CustomBitsType type, uint rawFlags) {
         switch (type) {
             case CustomBitsType.CustomBits:
                 if (stdGame.customBits != rawFlags) {

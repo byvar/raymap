@@ -464,7 +464,7 @@ public class PersoBehaviour : MonoBehaviour {
 		}
         bool sectorActive = false, insideSectors = false;
         if (sector == null || isAlways || sector.Loaded) sectorActive = true;
-        if (sector == null || isAlways || controller.sectorManager.activeSectors.Count > 0) insideSectors = true;
+        if (sector == null || isAlways || controller.sectorManager.activeSector != null) insideSectors = true;
         if (controller.playAnimations && playAnimation && sectorActive) {
             updateCounter += Time.deltaTime * animationSpeed;
             // If the camera is not inside a sector, animations will only update 1 out of 2 times (w/ frameskip) to avoid lag

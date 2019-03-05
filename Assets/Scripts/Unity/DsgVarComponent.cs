@@ -66,7 +66,7 @@ namespace OpenSpace
                     case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte       = (byte)    entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat      = (float)   entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector     = (Vector3) entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsString     = (string)  entry.value;  break;
+                    case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsUInt        = (uint)    entry.value;  break;
                     case DsgVarInfoEntry.DsgVarType.Perso:
                         if (entry.value != null && entry.value is Pointer) {
                             Perso perso = MapLoader.Loader.persos.FirstOrDefault(p => (p.SuperObject!=null && p.SuperObject.offset == (Pointer)entry.value)); // find perso that belongs to the superobject
@@ -112,7 +112,7 @@ namespace OpenSpace
                         case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte_initial       = (byte)entry.initialValue;         break;
                         case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat_initial      = (float)entry.initialValue;        break;
                         case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector_initial     = (Vector3)entry.initialValue;      break;
-                        case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsString_initial     = (string)entry.initialValue;       break;
+                        case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsUInt_initial        = (uint)entry.initialValue;       break;
                         case DsgVarInfoEntry.DsgVarType.Perso:
                             if (entry.initialValue != null) {
                                 Perso perso = MapLoader.Loader.persos.FirstOrDefault(p => p.SuperObject.offset == (Pointer)entry.initialValue);

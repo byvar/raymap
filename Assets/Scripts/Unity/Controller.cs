@@ -225,7 +225,7 @@ public class Controller : MonoBehaviour {
 		loadingScreen.Active = false;
 
         if (exportAfterLoad) {
-            Exporter e = new Exporter(this.loader, exportPath);
+            MapExporter e = new MapExporter(this.loader, exportPath);
             e.Export();
 
             Application.Quit();
@@ -326,7 +326,7 @@ public class Controller : MonoBehaviour {
 					if (p.sectInfo != null && p.sectInfo.off_sector != null) {
 						unityBehaviour.sector = Sector.FromSuperObjectOffset(p.sectInfo.off_sector);
 					} else {
-						unityBehaviour.sector = sectorManager.GetActiveSectorsAtPoint(p.Gao.transform.position).FirstOrDefault();
+						unityBehaviour.sector = sectorManager.GetActiveSectorAtPoint(p.Gao.transform.position);
 					}
 				} else unityBehaviour.sector = null;
 				Moddable mod = null;

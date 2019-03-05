@@ -122,10 +122,7 @@ namespace OpenSpace.Visual {
 
         public string ToJSON()
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.TypeNameHandling = TypeNameHandling.All;
-            settings.ContractResolver = JsonIgnorePointersResolver.Instance;
-
+            JsonSerializerSettings settings = MapExporter.JsonExportSettings;
             return JsonConvert.SerializeObject(this, settings);
         }
 
@@ -388,8 +385,9 @@ namespace OpenSpace.Visual {
             {
                 VisualMaterial vmt = (VisualMaterial)value;
                 string hash = HashUtils.MD5Hash(vmt.ToJSON());
+                VisualMaterialReference reference = new VisualMaterialReference() { Hash = hash };
 
-                var jt = JToken.FromObject(hash);
+                var jt = JToken.FromObject(reference);
                 jt.WriteTo(writer);
             }
         }
