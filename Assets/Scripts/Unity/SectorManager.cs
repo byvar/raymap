@@ -61,7 +61,7 @@ public class SectorManager : MonoBehaviour {
 
     public Sector GetActiveSectorAtPoint(Vector3 point, Sector currentActiveSector = null, bool allowVirtual = false) {
 
-        if (currentActiveSector!=null && currentActiveSector.sectorBorder.ContainsPoint(point)) {
+        if (currentActiveSector!=null && (currentActiveSector.sectorBorder!=null ? currentActiveSector.sectorBorder.ContainsPoint(point) : true)) {
             return currentActiveSector;
         }
 
