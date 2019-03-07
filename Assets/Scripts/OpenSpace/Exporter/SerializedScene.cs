@@ -22,12 +22,14 @@ namespace OpenSpace.Exporter {
         public SerializedPersoData PersoData;
         public SerializedGraphData GraphData;
         public SerializedWorldData WorldData;
+        public SerializedLightData LightData;
 
         public SerializedScene(MapLoader loader)
         {
             PersoData = new SerializedPersoData(loader.persos);
             GraphData = new SerializedGraphData(loader.graphs, loader.graphNodes, loader.waypoints);
             WorldData = new SerializedWorldData(loader.sectors);
+            LightData = new SerializedLightData(loader.lights);
         }
 
         public string ToJSON()

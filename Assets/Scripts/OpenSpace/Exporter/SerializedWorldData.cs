@@ -14,9 +14,9 @@ namespace OpenSpace.Exporter {
         public struct ESector {
             public VisualMaterial SkyMaterial;
             public List<String> Neighbours;
+            public List<String> LightReferences;
             public Dictionary<string, EGeometry> Geometry;
             public BoundingVolume SectorBorder;
-            public List<LightInfo> LightInfo;
             public bool Virtual;
         }
 
@@ -33,13 +33,9 @@ namespace OpenSpace.Exporter {
             {
                 SkyMaterial = sector.skyMaterial,
                 SectorBorder = sector.sectorBorder,
-                LightInfo = sector.staticLights.ToList()
+                LightReferences = sector.staticLights.Select(l => l.offset.ToString()).ToList(),
+                Neighbours = sector.neighbors.Select(n => n.sector.offset.ToString()).ToList()
             };
-
-            eSector.Neighbours = new List<String>();
-            foreach (Sector.NeighborSector sn in sector.neighbors) {
-                eSector.Neighbours.Add(sn.sector.offset.ToString());
-            }
 
             eSector.Geometry = new Dictionary<string, EGeometry>();
             foreach(SuperObject spo in sector.SuperObject.children) {

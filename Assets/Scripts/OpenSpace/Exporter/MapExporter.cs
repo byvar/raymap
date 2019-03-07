@@ -46,9 +46,9 @@ namespace OpenSpace.Exporter {
             string exportDirectoryLevels = Path.Combine(this.exportPath, "Levels");
             string exportDirectoryAIModels = Path.Combine(this.exportPath, "AIModels");
             string exportDirectoryMaterials = Path.Combine(this.exportPath, "Materials");
-            string exportDirectoryTextures = Path.Combine(this.exportPath, "Textures");
             string exportDirectoryFamilies = Path.Combine(this.exportPath, "Families");
             string exportDirectoryGeneral = Path.Combine(this.exportPath, "General");
+            string exportDirectoryTextures = Path.Combine(this.exportPath, "Resources", "Textures");
 
             if (!Directory.Exists(exportDirectoryLevels)) {
                 Directory.CreateDirectory(exportDirectoryLevels);
