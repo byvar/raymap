@@ -58,7 +58,7 @@ namespace Assets.Scripts.OpenSpace.AI {
             this.json = GetJson();
         }
 
-        public String ToString()
+        public override String ToString()
         {
             return this.json;
         }

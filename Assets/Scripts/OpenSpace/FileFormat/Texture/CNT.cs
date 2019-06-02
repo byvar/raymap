@@ -57,7 +57,7 @@ namespace OpenSpace.FileFormat.Texture {
 
 
         bool isLittleEndian = true;
-        uint count = 0;
+        //uint count = 0;
 
         public uint Count {
             get { return (uint)fileCount; }

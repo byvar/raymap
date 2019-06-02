@@ -1,0 +1,17 @@
+{
+    "name": "Scripts-Editor",
+    "references": [
+        "GUID:4f01c1e5f95f3dc458cbdea7c023e9ce"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

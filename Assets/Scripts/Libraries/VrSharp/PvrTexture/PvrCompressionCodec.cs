@@ -1,5 +1,4 @@
-﻿using OpenSpace;
-using System;
+﻿using System;
 using System.IO;
 
 namespace VrSharp.PvrTexture
@@ -12,7 +11,7 @@ namespace VrSharp.PvrTexture
         {
             public override byte[] Decompress(byte[] input, int DataOffset, VrPixelCodec PixelCodec, VrDataCodec DataCodec)
             {
-                byte[] output     = new byte[Util.ToUInt32(input, 0x00, true)];
+                byte[] output     = new byte[PTMethods.ToUInt32(input, 0x00, true)];
                 int SourcePointer = DataOffset;
                 int DestPointer   = 0x00;
                 int PixelSize     = (DataCodec.Bpp >> 3);

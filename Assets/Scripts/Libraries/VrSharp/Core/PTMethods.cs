@@ -29,5 +29,25 @@ namespace VrSharp
 
             return true;
         }
-    }
+
+		public static byte[] GetBytesInEndian(byte[] array, int position, int length, bool isLittleEndian) {
+			byte[] data = new byte[length];
+			Array.Copy(array, position, data, 0, length);
+			if (isLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(data);
+			return data;
+		}
+
+		public static uint ToUInt32(byte[] array, int position, bool isLittleEndian) {
+			return BitConverter.ToUInt32(GetBytesInEndian(array, position, 4, isLittleEndian), 0);
+		}
+		public static int ToInt32(byte[] array, int position, bool isLittleEndian) {
+			return BitConverter.ToInt32(GetBytesInEndian(array, position, 4, isLittleEndian), 0);
+		}
+		public static ushort ToUInt16(byte[] array, int position, bool isLittleEndian) {
+			return BitConverter.ToUInt16(GetBytesInEndian(array, position, 2, isLittleEndian), 0);
+		}
+		public static short ToInt16(byte[] array, int position, bool isLittleEndian) {
+			return BitConverter.ToInt16(GetBytesInEndian(array, position, 2, isLittleEndian), 0);
+		}
+	}
 }
