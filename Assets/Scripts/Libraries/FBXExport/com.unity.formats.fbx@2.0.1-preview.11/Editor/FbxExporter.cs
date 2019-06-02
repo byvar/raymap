@@ -82,7 +82,7 @@ namespace UnityEditor.Formats.Fbx.Exporter
         /// <summary>
         /// Path to the CHANGELOG file in Unity's virtual file system. Used to get the version number.
         /// </summary>
-        const string ChangeLogPath = "Packages/com.unity.formats.fbx/CHANGELOG.md";
+        const string ChangeLogPath = "Assets/Scripts/Libraries/FBXExport/com.unity.formats.fbx/CHANGELOG.md";
 
         // NOTE: The ellipsis at the end of the Menu Item name prevents the context
         //       from being passed to command, thus resulting in OnContextItem()
