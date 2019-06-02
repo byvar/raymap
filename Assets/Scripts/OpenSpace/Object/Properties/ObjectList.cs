@@ -270,7 +270,7 @@ namespace OpenSpace.Object.Properties {
                 ObjectList objectList = (ObjectList)value;
                 string hash = HashUtils.MD5Hash(objectList.ToJSON());
 
-                var jt = JToken.FromObject(hash);
+                var jt = JToken.FromObject(new ObjectListReference() { Hash = hash });
                 jt.WriteTo(writer);
             }
         }
@@ -284,6 +284,10 @@ namespace OpenSpace.Object.Properties {
             settings.Converters.Add(new VisualMaterial.VisualMaterialReferenceJsonConverter());
             
             return JsonConvert.SerializeObject(this, settings);
+        }
+
+        public class ObjectListReference {
+            public string Hash;
         }
     }
 }

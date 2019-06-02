@@ -19,6 +19,7 @@ namespace OpenSpace.Object.Properties {
         public LinkedList<State> states;
         public LinkedList<int> preloadAnim; // int is just a placeholder type, change to actual type when I finally read it
         public Pointer off_physical_list_default;
+        [JsonProperty(PropertyName = "objectListReferences")]
         public LinkedList<ObjectList> objectLists;
         public Pointer off_bounding_volume;
         public Pointer off_vector4s;
