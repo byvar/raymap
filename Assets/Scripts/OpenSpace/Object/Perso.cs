@@ -88,7 +88,7 @@ namespace OpenSpace.Object {
             p.off_sectInfo = Pointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
-            if (Settings.s.game == Settings.Game.RA) reader.ReadUInt32();
+            if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) reader.ReadUInt32();
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();

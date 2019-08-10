@@ -788,6 +788,7 @@ public class PersoBehaviour : MonoBehaviour {
                 AnimChannel ch = a3d.channels[a3d.start_channels + i];
                 AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
                 AnimKeyframe kf = a3d.keyframes[kfi.kf];
+				//print(perso.p3dData.family.animBank);
                 AnimVector pos = a3d.vectors[kf.positionVector];
                 AnimQuaternion qua = a3d.quaternions[kf.quaternion];
                 AnimVector scl = a3d.vectors[kf.scaleVector];
@@ -819,8 +820,9 @@ public class PersoBehaviour : MonoBehaviour {
                     //interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
                     interpolation = framesSinceKF / (float)framesDifference;
                 }
-                //print(interpolation);
-                //print(a3d.vectors.Length + " - " + nextKF.positionVector);
+				//print(interpolation);
+				//print(a3d.vectors.Length + " - " + nextKF.positionVector);
+				//print(perso.p3dData.family.animBank);
                 AnimVector pos2 = a3d.vectors[nextKF.positionVector];
                 AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
                 AnimVector scl2 = a3d.vectors[nextKF.scaleVector];

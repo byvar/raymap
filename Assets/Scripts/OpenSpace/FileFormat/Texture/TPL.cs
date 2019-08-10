@@ -13,8 +13,11 @@ namespace OpenSpace.FileFormat.Texture {
             get { return count; }
         }
 
+		public string path;
+
         public Texture2D[] textures = null;
         public TPL(string path) {
+			this.path = path;
             Stream fs = FileSystem.GetFileReadStream(path);
             using (Reader reader = new Reader(fs, isLittleEndian)) {
                 reader.ReadUInt32();

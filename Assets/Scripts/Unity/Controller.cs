@@ -30,6 +30,7 @@ public class Controller : MonoBehaviour {
 	public bool allowDeadPointers = false;
 	public bool forceDisplayBackfaces = false;
 	public bool blockyMode = false;
+	public bool saveTextures = false;
 	MapLoader loader = null;
 	bool viewCollision_ = false; public bool viewCollision = false;
 	bool viewInvisible_ = false; public bool viewInvisible = false;
@@ -132,6 +133,8 @@ public class Controller : MonoBehaviour {
 				mode = Settings.Mode.Rayman3PC; break;
 			case "ra_pc":
 				mode = Settings.Mode.RaymanArenaPC; break;
+			case "rm_pc":
+				mode = Settings.Mode.RaymanMPC; break;
 			case "r2_pc":
 				mode = Settings.Mode.Rayman2PC; break;
 			case "r2_dc":
@@ -142,6 +145,12 @@ public class Controller : MonoBehaviour {
 				mode = Settings.Mode.Rayman2PS1; break;
 			case "r2_ps2":
 				mode = Settings.Mode.Rayman2PS2; break;
+			case "r2_ds":
+				mode = Settings.Mode.Rayman2DS; break;
+			case "r2_3ds":
+				mode = Settings.Mode.Rayman23DS; break;
+			case "r2_n64":
+				mode = Settings.Mode.Rayman2N64; break;
 			case "dd_pc":
 				mode = Settings.Mode.DonaldDuckPC; break;
 			case "dd_dc":
@@ -175,6 +184,7 @@ public class Controller : MonoBehaviour {
 		loader.collideMaterial = collideMaterial;
 		loader.collideTransparentMaterial = collideTransparentMaterial;
 		loader.baseLightMaterial = baseLightMaterial;
+		loader.exportTextures = saveTextures;
 
         if (exportFolder!="") {
             this.exportPath = exportFolder;

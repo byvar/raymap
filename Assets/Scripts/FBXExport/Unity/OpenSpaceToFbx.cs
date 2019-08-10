@@ -10,8 +10,19 @@ namespace Fbx {
 	public class OpenSpaceToFbx {
 		public string tempFilePath;
 		static bool exportCancelled = false;
+		/// <summary>
+		/// Format for creating unique names
+		/// </summary>
+		const string UniqueNameFormat = "{0}_{1}";
+		/// <summary>
+		/// Map for the Name of an Object to number of objects with this name.
+		/// Used for enforcing unique names on export.
+		/// </summary>
+		Dictionary<string, int> NameToIndexMap = new Dictionary<string, int>();
 
-		 bool ExportProgressCallback(float percentage, string status) {
+		
+
+		bool ExportProgressCallback(float percentage, string status) {
 			// Convert from percentage to [0,1].
 			// Then convert from that to [0.5,1] because the first half of
 			// the progress bar was for creating the scene.
@@ -79,16 +90,66 @@ namespace Fbx {
 
 				// export set of object
 				FbxNode fbxRootNode = fbxScene.GetRootNode();
-				// stores how many objects we have exported, -1 if export was cancelled
-				int exportProgress = 0;
-				IEnumerable<GameObject> revisedExportSet = null;
 
 				// Total # of objects to be exported
 				// Used by progress bar to show how many objects will be exported in total
 				// i.e. exporting x/count... 
 				int count = 0;
-				
+
+				string fbxName = "Box";
+				fbxName = FbxUtil.ConvertToMayaCompatibleName(fbxName);
+				FbxNode fbxNode = FbxNode.Create(fbxScene, GetUniqueName(fbxName));
+
+				// Default inheritance type in FBX is RrSs, which causes scaling issues in Maya as
+				// both Maya and Unity use RSrs inheritance by default.
+				// Note: MotionBuilder uses RrSs inheritance by default as well, though it is possible
+				//       to select a different inheritance type in the UI.
+				// Use RSrs as the scaling inheritance instead.
+				fbxNode.SetTransformationInheritType(FbxTransform.EInheritType.eInheritRSrs);
+
+				// Fbx rotation order is XYZ, but Unity rotation order is ZXY.
+				// This causes issues when converting euler to quaternion, causing the final
+				// rotation to be slighlty off.
+				// Fixed by exporting the rotations as eulers with XYZ rotation order.
+				// Can't just set the rotation order to ZXY on export as Maya incorrectly imports the
+				// rotation. Appears to first convert to XYZ rotation then set rotation order to ZXY.
+				fbxNode.SetRotationOrder(FbxNode.EPivotSet.eSourcePivot, FbxEuler.EOrder.eOrderXYZ);
+				Vector3 unityTranslate = Vector3.zero;
+				FbxDouble3 fbxRotate = FbxUtil.ConvertQuaternionToXYZEuler(Quaternion.identity);
+				Vector3 unityScale = Vector3.one;
+
+				// Transfer transform data from Unity to Fbx
+				var fbxTranslate = FbxUtil.ConvertToRightHanded(unityTranslate, FbxUtil.UnitScaleFactor);
+				var fbxScale = new FbxDouble3(unityScale.x, unityScale.y, unityScale.z);
+
+				// set the local position of fbxNode
+				fbxNode.LclTranslation.Set(new FbxDouble3(fbxTranslate.X, fbxTranslate.Y, fbxTranslate.Z));
+				fbxNode.LclRotation.Set(fbxRotate);
+				fbxNode.LclScaling.Set(fbxScale);
+
+				fbxRootNode.AddChild(fbxNode);
+
 			}
+		}
+
+
+
+		/// <summary>
+		/// Ensures that the inputted name is unique.
+		/// If a duplicate name is found, then it is incremented.
+		/// e.g. Sphere becomes Sphere_1
+		/// </summary>
+		/// <returns>Unique name</returns>
+		/// <param name="name">Name</param>
+		private string GetUniqueName(string name) {
+			var uniqueName = name;
+			if (NameToIndexMap.ContainsKey(name)) {
+				uniqueName = string.Format(UniqueNameFormat, name, NameToIndexMap[name]);
+				NameToIndexMap[name]++;
+			} else {
+				NameToIndexMap[name] = 1;
+			}
+			return uniqueName;
 		}
 	}
 }

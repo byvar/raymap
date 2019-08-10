@@ -9,8 +9,8 @@ namespace OpenSpace {
     public class Settings {
         public enum Mode {
             Rayman3PC, Rayman3GC,
-            RaymanArenaPC, RaymanArenaGC,
-            Rayman2PC, Rayman2DC, Rayman2IOS, Rayman2PS1, Rayman2PS2,
+            RaymanArenaPC, RaymanArenaGC, RaymanMPC,
+            Rayman2PC, Rayman2DC, Rayman2IOS, Rayman2PS1, Rayman2PS2, Rayman2DS, Rayman23DS, Rayman2N64,
             Rayman2PCDemo2, Rayman2PCDemo1,
             DonaldDuckPC, DonaldDuckDC,
             TonicTroublePC, TonicTroubleSEPC,
@@ -24,8 +24,8 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
-        public enum Platform { PC, iOS, GC, DC, PS1, PS2 };
+        public enum Game { R3, RA, RM, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
+        public enum Platform { PC, iOS, GC, DC, PS1, PS2, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
@@ -66,13 +66,17 @@ namespace OpenSpace {
                 case Mode.Rayman2PC: s = Settings.R2PC; break;
 				case Mode.Rayman2PS1: s = Settings.R2PS1; break;
 				case Mode.Rayman2PS2: s = Settings.R2PS2; break;
-                case Mode.Rayman2PCDemo1: s = Settings.R2PCDemo1; break;
+				case Mode.Rayman2DS: s = Settings.R2DS; break;
+				case Mode.Rayman23DS: s = Settings.R23DS; break;
+				case Mode.Rayman2N64: s = Settings.R2N64; break;
+				case Mode.Rayman2PCDemo1: s = Settings.R2PCDemo1; break;
                 case Mode.Rayman2PCDemo2: s = Settings.R2PCDemo2; break;
                 case Mode.Rayman3GC: s = Settings.R3GC; break;
                 case Mode.Rayman3PC: s = Settings.R3PC; break;
                 case Mode.RaymanArenaGC: s = Settings.RAGC; break;
                 case Mode.RaymanArenaPC: s = Settings.RAPC; break;
-                case Mode.DonaldDuckPC: s = Settings.DDPC; break;
+				case Mode.RaymanMPC: s = Settings.RMPC; break;
+				case Mode.DonaldDuckPC: s = Settings.DDPC; break;
 				case Mode.DonaldDuckDC: s = Settings.DDDC; break;
                 case Mode.TonicTroublePC: s = Settings.TTPC; break;
                 case Mode.TonicTroubleSEPC: s = Settings.TTSEPC; break;
@@ -146,7 +150,20 @@ namespace OpenSpace {
             saturate = false
         };
 
-        public static Settings RAPC = new Settings() {
+		public static Settings RMPC = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.RM,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			aiTypes = AITypes.R3,
+			hasDeformations = true,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.3f,
+			saturate = false
+		};
+
+		public static Settings RAPC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
             platform = Platform.PC,
@@ -298,6 +315,45 @@ namespace OpenSpace {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+
+		public static Settings R2DS = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.R2,
+			platform = Platform.DS,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+
+		public static Settings R23DS = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.R2,
+			platform = Platform._3DS,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+
+		public static Settings R2N64 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.R2,
+			platform = Platform.N64,
 			endian = Endian.Little,
 			linkedListType = LinkedListType.Double,
 			encryption = Encryption.ReadInit,
