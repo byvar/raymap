@@ -1,30 +1,27 @@
-﻿using OpenSpace.AI;
-using OpenSpace.Animation;
-using OpenSpace.Collide;
-using OpenSpace.Object;
-using OpenSpace.FileFormat;
-using OpenSpace.FileFormat.Texture;
-using OpenSpace.Input;
-using OpenSpace.Text;
-using OpenSpace.Visual;
-using OpenSpace.Waypoints;
+﻿using OpenSpace.FileFormat;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using OpenSpace.Object.Properties;
 using System.Collections;
-using System.Text.RegularExpressions;
-using lzo.net;
-using System.IO.Compression;
+using OpenSpace.ROM;
+using OpenSpace.FileFormat.Texture;
 
 namespace OpenSpace.Loader {
 	public class R2DSLoader : MapLoader {
 		public DSBIN data;
 		public DSBIN fat;
-		public DSFATTable[] fatTables;
+		public FATTable[] fatTables;
 		public int currentLevel = 0;
+
+		public Pointer[] texturesTable;
+		public Pointer[] palettesTable;
+		public uint ind_textureTable1;
+		public uint ind_textureTable2;
+		public uint ind_textureTable3;
+		public bool[] texturesTableSeen;
+		public bool[] palettesTableSeen;
 
 		public override IEnumerator Load() {
 			try {
@@ -94,10 +91,10 @@ namespace OpenSpace.Loader {
 			Reader reader = files_array[SMem.Fat].reader;
 
 			uint num_tables = reader.ReadUInt32();
-			fatTables = new DSFATTable[num_tables + 2];
+			fatTables = new FATTable[num_tables + 2];
 			for (uint i = 0; i < num_tables + 2; i++) {
-				fatTables[i] = DSFATTable.Read(reader, Pointer.Current(reader));
-				foreach (DSFATEntry e in fatTables[i].entries) {
+				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader));
+				foreach (FATEntry e in fatTables[i].entries) {
 					e.tableIndex = i;
 				}
 			}
@@ -108,6 +105,59 @@ namespace OpenSpace.Loader {
 			data = files_array[SMem.Data] as DSBIN;
 			Reader reader = files_array[SMem.Data].reader;
 
+			reader.ReadUInt16();
+			reader.ReadUInt16();
+			ushort num_textureTables = reader.ReadUInt16(); // for texture data. not referenced in fat.bin
+			ushort flags = reader.ReadUInt16();
+			ushort num_levels = reader.ReadUInt16();
+			reader.ReadUInt16();
+
+			if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform.N64) {
+				for (int i = 0; i < 18; i++) {
+					Pointer off_list = Pointer.Read(reader);
+					uint num_list = reader.ReadUInt32();
+				}
+				Pointer off_table1 = Pointer.Read(reader);
+				uint sz_table1 = reader.ReadUInt32() >> 2;
+				Pointer off_table2 = Pointer.Read(reader);
+				uint sz_table2 = reader.ReadUInt32() >> 2;
+				Pointer off_table3 = Pointer.Read(reader);
+				uint sz_table3 = reader.ReadUInt32() >> 2;
+				ind_textureTable1 = 0;
+				ind_textureTable2 = ind_textureTable1 + (sz_table1);
+				ind_textureTable3 = ind_textureTable2 + (sz_table2);
+				uint totalSz = ind_textureTable3 + (sz_table3);
+				texturesTable = new Pointer[totalSz];
+				Pointer.DoAt(ref reader, off_table1, () => {
+					for (int i = 0; i < sz_table1; i++) {
+						texturesTable[ind_textureTable1 + i] = Pointer.Read(reader);
+					}
+				});
+				Pointer.DoAt(ref reader, off_table2, () => {
+					for (int i = 0; i < sz_table2; i++) {
+						texturesTable[ind_textureTable2 + i] = Pointer.Read(reader);
+					}
+				});
+				Pointer.DoAt(ref reader, off_table3, () => {
+					for (int i = 0; i < sz_table3; i++) {
+						texturesTable[ind_textureTable3 + i] = Pointer.Read(reader);
+					}
+				});
+				Pointer off_palettesTable = Pointer.Read(reader);
+				if (Settings.s.platform == Settings.Platform.DS) {
+					uint sz_palettesTable = reader.ReadUInt32() >> 2;
+					palettesTable = new Pointer[sz_palettesTable];
+					print(texturesTable.Length + " - " + palettesTable.Length);
+					Pointer.DoAt(ref reader, off_palettesTable, () => {
+						for (int i = 0; i < sz_palettesTable; i++) {
+							palettesTable[i] = Pointer.Read(reader);
+						}
+					});
+				} else {
+					palettesTable = new Pointer[0];
+				}
+			}
+
 			if (exportTextures) {
 				string state = loadingState;
 				loadingState = "Exporting textures";
@@ -115,28 +165,23 @@ namespace OpenSpace.Loader {
 				ExportTextures(reader);
 				loadingState = state;
 				yield return null;
+				yield break;
 			}
-			reader.ReadUInt16();
-			reader.ReadUInt16();
-			ushort num_textureTables = reader.ReadUInt16(); // for texture data. not referenced in fat.bin
-			reader.ReadUInt16();
-			ushort num_levels = reader.ReadUInt16();
-			reader.ReadUInt16();
 
 			// Read fix texture list
-			Pointer off_engineStruct = GetStructPtr(DSFATEntry.Type.EngineStructure, 0x8000);
+			Pointer off_engineStruct = GetStructPtr(FATEntry.Type.EngineStructure, 0x8000);
 			Pointer.DoAt(ref reader, off_engineStruct, () => {
 				reader.ReadBytes(12);
 				ushort ind_shadowTexture = reader.ReadUInt16();
 				LoadTexture(reader, ind_shadowTexture);
 				reader.ReadUInt16();
 				ushort ind_characterMaterial = reader.ReadUInt16();
-				Pointer off_visualMaterial = GetStructPtr(DSFATEntry.Type.VisualMaterial, ind_characterMaterial);
+				Pointer off_visualMaterial = GetStructPtr(FATEntry.Type.VisualMaterial, ind_characterMaterial);
 				Pointer.DoAt(ref reader, off_visualMaterial, () => {
 					reader.ReadBytes(12);
 					ushort ind_vmTextureList = reader.ReadUInt16();
 					ushort num_vmTextureList = reader.ReadUInt16();
-					Pointer off_textureList = GetStructPtr(DSFATEntry.Type.VisualMaterialTextures, ind_vmTextureList);
+					Pointer off_textureList = GetStructPtr(FATEntry.Type.VisualMaterialTextures, ind_vmTextureList);
 					Pointer.DoAt(ref reader, off_textureList, () => {
 						for (ushort i = 0; i < num_vmTextureList; i++) {
 							ushort ind_texture = reader.ReadUInt16();
@@ -146,7 +191,7 @@ namespace OpenSpace.Loader {
 					});
 				});
 				ushort ind_noCtrlTextureList = reader.ReadUInt16();
-				Pointer off_noCtrlTextureList = GetStructPtr(DSFATEntry.Type.NoCtrlTextureList, ind_noCtrlTextureList);
+				Pointer off_noCtrlTextureList = GetStructPtr(FATEntry.Type.NoCtrlTextureList, ind_noCtrlTextureList);
 				Pointer.DoAt(ref reader, off_noCtrlTextureList, () => {
 					for (int i = 0; i < 5; i++) {
 						ushort ind_fixTexRef = reader.ReadUInt16();
@@ -156,12 +201,12 @@ namespace OpenSpace.Loader {
 			});
 
 			// Read languages table
-			Pointer off_numLang = GetStructPtr(DSFATEntry.Type.NumLanguages, 0);
+			Pointer off_numLang = GetStructPtr(FATEntry.Type.NumLanguages, 0);
 			Pointer.DoAt(ref reader, off_numLang, () => {
 				ushort num_languages = reader.ReadUInt16();
 				print("Number of languages: " + num_languages);
 				for (ushort i = 0; i < num_languages; i++) {
-					Pointer off_lang = GetStructPtr(DSFATEntry.Type.LanguageTable, i);
+					Pointer off_lang = GetStructPtr(FATEntry.Type.LanguageTable, i);
 					Pointer.DoAt(ref reader, off_lang, () => {
 						ushort ind_txtTable = reader.ReadUInt16();
 						ushort num_txtTable = reader.ReadUInt16();
@@ -170,15 +215,15 @@ namespace OpenSpace.Loader {
 						reader.ReadUInt16();
 						string name = reader.ReadString(0x12);
 						print(name);
-						Pointer off_txtTable = GetStructPtr(DSFATEntry.Type.TextTable, ind_txtTable);
+						Pointer off_txtTable = GetStructPtr(FATEntry.Type.TextTable, ind_txtTable);
 						Pointer.DoAt(ref reader, off_txtTable, () => {
 							for (ushort j = 0; j < num_txtTable; j++) {
 								ushort ind_strRef = reader.ReadUInt16();
-								Pointer off_strRef = GetStructPtr(DSFATEntry.Type.StringReference, ind_strRef);
+								Pointer off_strRef = GetStructPtr(FATEntry.Type.StringReference, ind_strRef);
 								Pointer.DoAt(ref reader, off_strRef, () => {
 									ushort strLen = reader.ReadUInt16();
 									ushort ind_str = reader.ReadUInt16();
-									Pointer off_str = GetStructPtr(DSFATEntry.Type.String, ind_str);
+									Pointer off_str = GetStructPtr(FATEntry.Type.String, ind_str);
 									Pointer.DoAt(ref reader, off_str, () => {
 										string str = reader.ReadString(strLen);
 										print(str);
@@ -195,56 +240,73 @@ namespace OpenSpace.Loader {
 
 		public void ExportTextures(Reader reader) {
 			// Textures in data.bin
+			texturesTableSeen = new bool[texturesTable.Length];
+			palettesTableSeen = new bool[palettesTable.Length];
 			for (int i = 0; i < fatTables.Length; i++) {
 				for (int j = 0; j < fatTables[i].entries.Length; j++) {
-					if (fatTables[i].entries[j].EntryType != DSFATEntry.Type.TextureInfo) continue;
+					if (fatTables[i].entries[j].EntryType != FATEntry.Type.TextureInfo) continue;
 					Pointer ptr = new Pointer(fatTables[i].entries[j].off_data, files_array[SMem.Data]);
 					Pointer.DoAt(ref reader, ptr, () => {
-						ReadTextureInfo(reader, true);
+						TextureInfo info = TextureInfo.Read(reader, ptr);
 					});
 				}
 			}
-			// Stored separately
-			for (int i = 1; i < 25; i++) {
-				ExportEtcFile("LoadingAnimation/Course_" + i.ToString("D2") + ".etc", 64, 64, false);
+			for (int i = 0; i < texturesTable.Length; i++) {
+				if (!texturesTableSeen[i]) {
+					print("Unused Texture: " + i + " - " + texturesTable[i] + ". Est. length: " + (texturesTable[i + 1].offset - texturesTable[i].offset));
+					uint size = (texturesTable[i + 1].offset - texturesTable[i].offset);
+					float logSize = Mathf.Log(size, 2);
+					for (int w = 3; w < 15; w++) {
+						for (int h = 3; h < 15; h++) {
+							if (w + h == (int)logSize) {
+								GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I8, null, 32);
+								Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + i + "_i8_" + gf.texture.width + "_" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+							}
+						}
+					}
+					for (int w = 3; w < 15; w++) {
+						for (int h = 3; h < 15; h++) {
+							if (w + h == (int)logSize+1) {
+								GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I4, null, 16);
+								Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + i + "_i4_" + gf.texture.width + "_" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+							}
+						}
+					}
+				}
 			}
-			ExportEtcFile("LoadingAnimation/home.etc", 64, 64, true);
-			foreach (string file in Directory.EnumerateFiles(gameDataBinFolder + "/vignette")) {
-				string fileName = file.Substring((gameDataBinFolder + "/vignette\\").Length);
-				ExportEtcFile("vignette/" + fileName, 512, 256, false);
+			/*for (int i = 0; i < palettesTable.Length; i++) {
+				if (!palettesTableSeen[i]) {
+					print("Unused Palette: " + i + " - " + palettesTable[i] + ". Est. num colors: " + (palettesTable[i+1].offset-palettesTable[i].offset)/2);
+
+					if (!File.Exists(gameDataBinFolder + "/textures/unused/palettes/" + i + ".pal")) {
+						Pointer.DoAt(ref reader, palettesTable[i], () => {
+							byte[] bytes = reader.ReadBytes((int)(palettesTable[i + 1].offset - palettesTable[i].offset));
+							Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/palettes/" + i + ".bin", bytes);
+						});
+					}
+				}
+			}*/
+			print("Unused textures: " + texturesTableSeen.Where(t => !t).Count() + " - Unused palettes: " + palettesTableSeen.Where(p => !p).Count());
+			if (Settings.s.platform == Settings.Platform._3DS) {
+				// Stored separately
+				for (int i = 1; i < 25; i++) {
+					ExportEtcFile("LoadingAnimation/Course_" + i.ToString("D2") + ".etc", 64, 64, false);
+				}
+				ExportEtcFile("LoadingAnimation/home.etc", 64, 64, true);
+				foreach (string file in Directory.EnumerateFiles(gameDataBinFolder + "/vignette")) {
+					string fileName = file.Substring((gameDataBinFolder + "/vignette\\").Length);
+					ExportEtcFile("vignette/" + fileName, 512, 256, false);
+				}
 			}
 		}
 
 		public void LoadTexture(Reader reader, ushort ind_texRef) {
-			Pointer off_texRef = GetStructPtr(DSFATEntry.Type.TextureInfoReference, ind_texRef);
+			Pointer off_texRef = GetStructPtr(FATEntry.Type.TextureInfoReference, ind_texRef);
 			Pointer.DoAt(ref reader, off_texRef, () => {
 				ushort ind_texInfo = reader.ReadUInt16();
-				Pointer off_texInfo = GetStructPtr(DSFATEntry.Type.TextureInfo, ind_texInfo);
-				Pointer.DoAt(ref reader, off_texInfo, () => {
-					ReadTextureInfo(reader, false);
-				});
+				Pointer off_texInfo = GetStructPtr(FATEntry.Type.TextureInfo, ind_texInfo);
+				TextureInfo.Read(reader, ind_texInfo);
 			});
-		}
-
-		public void ReadTextureInfo(Reader reader, bool export) {
-			if (Settings.s.platform == Settings.Platform._3DS) {
-				byte wExponent = reader.ReadByte();
-				byte hExponent = reader.ReadByte();
-				reader.ReadUInt16();
-				reader.ReadUInt16();
-				ushort size = reader.ReadUInt16();
-				ushort bitdepth = reader.ReadUInt16();
-				string name = reader.ReadString(200);
-				byte[] textureBytes = reader.ReadBytes(size); // max size: 0x10000
-				if (export) {
-					if (!File.Exists(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
-						Texture2D tex = ParseTexture(textureBytes, 1 << wExponent, 1 << hExponent, bitdepth == 32);
-						Util.ByteArrayToFile(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png", tex.EncodeToPNG());
-					}
-				} else {
-					print(name);
-				}
-			}
 		}
 
 		public void ExportEtcFile(string name, int w, int h, bool hasAlpha) {
@@ -252,66 +314,62 @@ namespace OpenSpace.Loader {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + name))) {
 					byte[] textureBytes = reader.ReadBytes((int)reader.BaseStream.Length);
 					if (!File.Exists(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
-						Texture2D tex = ParseTexture(textureBytes, w, h, hasAlpha);
+						Texture2D tex = new ETC(textureBytes, w, h, hasAlpha).texture;
 						Util.ByteArrayToFile(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png", tex.EncodeToPNG());
 					}
 				}
 			}
 		}
 
-		private Texture2D ParseTexture(byte[] bytes, int width, int height, bool hasAlpha) {
-			// it's ETC1AlphaRGB8A4NativeDMP if bitdepth = 32 else ETC1RGB8NativeDMP
-			// https://github.com/xdanieldzd/UntoldUnpack/blob/master/UntoldUnpack/Graphics/TileCodecs.cs
-			return UntoldUnpack.Graphics.Texture.ToTexture2D(
-				UntoldUnpack.Graphics.PicaDataTypes.UnsignedByte,
-				hasAlpha ? UntoldUnpack.Graphics.PicaPixelFormats.ETC1AlphaRGB8A4NativeDMP : UntoldUnpack.Graphics.PicaPixelFormats.ETC1RGB8NativeDMP,
-				width,
-				height,
-				new MemoryStream(bytes));
-
-
-			// https://gist.github.com/smealum/8807124
-			// https://github.com/Sage-of-Mirrors/Green-Eclipse/wiki/CTXB-Specification ?
-			// https://wiki.cloudmodding.com/oot/3D:CMB_format
-		}
-
-		/*private uint gpuTextureIndex(uint x, uint y, uint w, uint h) {
-			return (((y >> 3) * (w >> 3) + (x >> 3)) << 6) + ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) | ((x & 4) << 2) | ((y & 4) << 3));
-		}*/
-
-		public DSFATEntry GetEntry(ushort type, ushort index) {
+		public FATEntry GetEntry(ushort type, ushort index, bool global = false) {
 			type = (ushort)(type & 0x7FFF);
 			index = (ushort)(index & 0x7FFF);
 
-			DSFATEntry levelEntry = fatTables[currentLevel + 2].entries.FirstOrDefault(e => e.type == type && e.index == index);
+			FATEntry levelEntry = fatTables[currentLevel + 2].entries.FirstOrDefault(e => e.type == type && e.index == index);
 			if (levelEntry != null) return levelEntry;
 
-			DSFATEntry fix2Entry = fatTables[1].entries.FirstOrDefault(e => e.type == type && e.index == index);
+			FATEntry fix2Entry = fatTables[1].entries.FirstOrDefault(e => e.type == type && e.index == index);
 			if (fix2Entry != null) return fix2Entry;
 
-			DSFATEntry fixEntry = fatTables[0].entries.FirstOrDefault(e => e.type == type && e.index == index);
+			FATEntry fixEntry = fatTables[0].entries.FirstOrDefault(e => e.type == type && e.index == index);
 			if (fixEntry != null) return fixEntry;
+			
+			if (global) {
+				for (int i = 2; i < fatTables.Length; i++) {
+					if (i == currentLevel + 2) continue;
+					FATEntry entry = fatTables[i].entries.FirstOrDefault(e => e.type == type && e.index == index);
+					if (entry != null) return entry;
+				}
+			}
 
 			return null;
 		}
 
-		public DSFATEntry GetEntry(DSFATEntry.Type type, ushort index) {
+		public FATEntry GetEntry(FATEntry.Type type, ushort index, bool global = false) {
 			index = (ushort)(index & 0x7FFF);
 
-			DSFATEntry levelEntry = fatTables[currentLevel + 2].entries.FirstOrDefault(e => e.EntryType == type && e.index == index);
+			FATEntry levelEntry = fatTables[currentLevel + 2].entries.FirstOrDefault(e => e.EntryType == type && e.index == index);
 			if (levelEntry != null) return levelEntry;
 
-			DSFATEntry fix2Entry = fatTables[1].entries.FirstOrDefault(e => e.EntryType == type && e.index == index);
+			FATEntry fix2Entry = fatTables[1].entries.FirstOrDefault(e => e.EntryType == type && e.index == index);
 			if (fix2Entry != null) return fix2Entry;
 
-			DSFATEntry fixEntry = fatTables[0].entries.FirstOrDefault(e => e.EntryType == type && e.index == index);
+			FATEntry fixEntry = fatTables[0].entries.FirstOrDefault(e => e.EntryType == type && e.index == index);
 			if (fixEntry != null) return fixEntry;
+
+			if (global) {
+				for (int i = 2; i < fatTables.Length; i++) {
+					if (i == currentLevel + 2) continue;
+					FATEntry entry = fatTables[i].entries.FirstOrDefault(e => e.EntryType == type && e.index == index);
+					if (entry != null) return entry;
+				}
+			}
 
 			return null;
 		}
 
-		public Pointer GetStructPtr(ushort type, ushort index) {
-			DSFATEntry entry = GetEntry(type, index);
+		public Pointer GetStructPtr(ushort type, ushort index, bool global = false) {
+			FATEntry entry = GetEntry(type, index, global: global);
 			if (entry != null) {
 				return new Pointer(entry.off_data, files_array[SMem.Data]);
 			} else {
@@ -319,8 +377,8 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public Pointer GetStructPtr(DSFATEntry.Type type, ushort index) {
-			DSFATEntry entry = GetEntry(type, index);
+		public Pointer GetStructPtr(FATEntry.Type type, ushort index, bool global = false) {
+			FATEntry entry = GetEntry(type, index, global: global);
 			if (entry != null) {
 				return new Pointer(entry.off_data, files_array[SMem.Data]);
 			} else {
@@ -328,141 +386,6 @@ namespace OpenSpace.Loader {
 			}
 		}
 	}
-
-	public class DSFATEntry {
-		public Pointer offset;
-		public uint off_data;
-		public ushort type;
-		public ushort index;
-
-		// Calculated
-		public uint tableIndex;
-		public uint entryIndexWithinTable;
-		public uint size;
-
-		public static DSFATEntry Read(Reader reader, Pointer offset) {
-			DSFATEntry entry = new DSFATEntry();
-			entry.offset = offset;
-			entry.off_data = reader.ReadUInt32();
-			entry.type = reader.ReadUInt16();
-			entry.index = reader.ReadUInt16();
-			return entry;
-		}
-
-		public static Dictionary<ushort, Type> TypesDS = new Dictionary<ushort, Type>() {
-			{ 0, Type.EngineStructure },
-			{ 5, Type.ObjectListEntry }, // ?
-			{ 17, Type.TextureInfoReference }, // size: 0x2
-			{ 34, Type.VisualMaterial },
-			{ 43, Type.LevelList },
-			{ 44, Type.LevelHeader },
-			{ 63, Type.TextureInfo }, // size: 14
-			{ 91, Type.NoCtrlTextureList },
-			{ 132, Type.NumLanguages },
-			{ 133, Type.StringReference },
-			{ 134, Type.LanguageTable },
-			{ 135, Type.TextTable },
-			{ 136, Type.Language_136 },
-			{ 137, Type.Language_137 },
-			{ 156, Type.VisualMaterialTextures },
-			{ 157, Type.String },
-		};
-
-		public static Dictionary<ushort, Type> TypesN64 = new Dictionary<ushort, Type>() {
-			{ 0, Type.EngineStructure },
-			{ 5, Type.ObjectListEntry }, // ?
-			{ 17, Type.TextureInfoReference }, // size: 0x2
-			{ 34, Type.VisualMaterial },
-			{ 43, Type.LevelList },
-			{ 44, Type.LevelHeader },
-			{ 63, Type.TextureInfo }, // size: 14
-			{ 91, Type.NoCtrlTextureList },
-			{ 132, Type.NumLanguages },
-			{ 133, Type.StringReference },
-			{ 134, Type.LanguageTable },
-			{ 135, Type.TextTable },
-			{ 136, Type.Language_136 },
-			{ 137, Type.Language_137 },
-			{ 156, Type.VisualMaterialTextures },
-			{ 157, Type.String },
-		};
-
-		public static Dictionary<ushort, Type> Types3DS = new Dictionary<ushort, Type>() {
-			{ 0, Type.EngineStructure },
-			{ 17, Type.TextureInfoReference }, // size: 0x2
-			{ 30, Type.VisualMaterial },
-			{ 39, Type.LevelList },
-			{ 40, Type.LevelHeader },
-			{ 59, Type.TextureInfo }, // size: 0x100D2. contains the actual texture data too!
-			{ 87, Type.NoCtrlTextureList },
-			{ 128, Type.NumLanguages },
-			{ 129, Type.StringReference },
-			{ 130, Type.LanguageTable },
-			{ 131, Type.TextTable },
-			{ 132, Type.Language_136 },
-			{ 133, Type.Language_137 },
-			{ 152, Type.VisualMaterialTextures },
-			{ 153, Type.String },
-		};
-
-		public enum Type {
-			Unknown,
-			EngineStructure,
-			ObjectListEntry, // Size: 0x14
-			LevelList, // Size: 0x40 * num_levels (0x46 or 70 in Rayman 2)
-			LevelHeader, // Size: 0x38
-			NumLanguages,
-			LanguageTable,
-			TextTable,
-			StringReference,
-			String,
-			Language_136,
-			Language_137,
-			TextureInfo,
-			TextureInfoReference,
-			VisualMaterialTextures,
-			NoCtrlTextureList,
-			VisualMaterial,
-
-		}
-
-		public Type EntryType {
-			get {
-				Dictionary<ushort, Type> dict = null;
-				switch (Settings.s.platform) {
-					case Settings.Platform._3DS: dict = Types3DS; break;
-					case Settings.Platform.N64: dict = TypesN64; break;
-					default: dict = TypesDS; break;
-				}
-				if (dict.ContainsKey(type)) {
-					return dict[type];
-				} else return Type.Unknown;
-			}
-		}
-	}
-
-	public class DSFATTable {
-		public Pointer offset;
-		public Pointer off_table;
-		public uint num_entries;
-		public DSFATEntry[] entries;
-
-		public static DSFATTable Read(Reader reader, Pointer offset) {
-			DSFATTable t = new DSFATTable();
-			t.offset = offset;
-			t.off_table = Pointer.Read(reader);
-			t.num_entries = reader.ReadUInt32();
-			t.entries = new DSFATEntry[t.num_entries];
-			Pointer.DoAt(ref reader, t.off_table, () => {
-				for (int i = 0; i < t.entries.Length; i++) {
-					t.entries[i] = DSFATEntry.Read(reader, Pointer.Current(reader));
-					t.entries[i].entryIndexWithinTable = (uint)i;
-				}
-			});
-			return t;
-		}
-	}
-
 
 	public static class SMem {
 		public const int Data = 0;

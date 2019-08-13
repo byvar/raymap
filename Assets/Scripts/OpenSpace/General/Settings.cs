@@ -354,7 +354,7 @@ namespace OpenSpace {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.N64,
-			endian = Endian.Little,
+			endian = Endian.Big,
 			linkedListType = LinkedListType.Double,
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
