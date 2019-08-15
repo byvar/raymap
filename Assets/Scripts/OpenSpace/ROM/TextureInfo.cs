@@ -17,11 +17,11 @@ namespace OpenSpace.ROM {
         private Texture2D texture;
 		public ushort texture_index;
 		public ushort palette_index;
-		public ushort texture_index_alpha;
+		public ushort alpha_index;
 		public ushort flags;
 		public ushort wExponent;
 		public ushort hExponent;
-		public ushort size;
+		public ushort color_size;
 		public ushort bpp;
 		public ushort palette_num_colors;
 		public string name;
@@ -29,7 +29,10 @@ namespace OpenSpace.ROM {
 		public byte[] paletteBytes;
 
 		public Pointer off_texture;
+		public Pointer off_alpha;
 		public Pointer off_palette;
+		public GF64 mainTex;
+		public GF64 alphaTex;
 
 
         public static uint flags_isTransparent = (1 << 3);
@@ -41,7 +44,17 @@ namespace OpenSpace.ROM {
         public Texture2D Texture {
             get { return texture; }
             set {
-                texture = value;
+				texture = value;
+				/*if (Settings.s.platform == Settings.Platform.DS) {
+					if ((flags & 0x0A00) == 0x0A00) { // strange transparency thing
+						Color[] colors = texture.GetPixels();
+						for (int i = 0; i < colors.Length; i++) {
+							colors[i].a = 1f;
+						}
+						texture.SetPixels(colors);
+						texture.Apply();
+					}
+				}*/
             }
         }
 
@@ -62,11 +75,11 @@ namespace OpenSpace.ROM {
 				tex.hExponent = reader.ReadByte();
 				reader.ReadUInt16();
 				tex.flags = reader.ReadUInt16();
-				tex.size = reader.ReadUInt16();
+				tex.color_size = reader.ReadUInt16();
 				tex.bpp = reader.ReadUInt16();
 				tex.name = reader.ReadString(200);
 				tex.off_texture = Pointer.Current(reader);
-				tex.textureBytes = reader.ReadBytes(tex.size); // max size: 0x10000
+				tex.textureBytes = reader.ReadBytes(tex.color_size); // max size: 0x10000
 				tex.texture = new ETC(tex.textureBytes, 1 << tex.wExponent, 1 << tex.hExponent, tex.bpp == 32).texture;
 				if (l.exportTextures) {
 					if (!File.Exists(l.gameDataBinFolder + "/textures/" + Path.GetDirectoryName(tex.name) + "/" + Path.GetFileNameWithoutExtension(tex.name) + ".png")) {
@@ -78,98 +91,100 @@ namespace OpenSpace.ROM {
 			} else if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform.N64) {
 				tex.texture_index = reader.ReadUInt16();
 				tex.palette_index = reader.ReadUInt16();
-				tex.texture_index_alpha = reader.ReadUInt16();
+				tex.alpha_index = reader.ReadUInt16();
 				tex.wExponent = reader.ReadByte();
 				tex.hExponent = reader.ReadByte();
 				tex.flags = reader.ReadUInt16();
-				tex.size = reader.ReadUInt16();
+				tex.color_size = reader.ReadUInt16();
 				if (Settings.s.platform == Settings.Platform.DS) {
 					tex.palette_num_colors = reader.ReadUInt16();
 				} else {
 					tex.palette_num_colors = 16;
 				}
-				uint ind_texture = 0;
-				uint table_index = 0;
-				uint? alpha_texture = null;
-				bool rgba16 = false;
-				Pointer off_alpha_texture = null;
-				if (Settings.s.platform == Settings.Platform.DS) {
-					if ((tex.flags & 1) != 0) {
-						table_index = 1;
-						ind_texture = (tex.texture_index + l.ind_textureTable1) & 0xFFFF;
-					} else if ((tex.flags & 2) != 0) {
-						table_index = 2;
-						ind_texture = (tex.texture_index + l.ind_textureTable2) & 0xFFFF;
-					} else if ((tex.flags & 4) != 0) {
-						table_index = 3;
-						ind_texture = (tex.texture_index + l.ind_textureTable3) & 0xFFFF;
-					}
+				ushort ind_texture = 0;
+				string table_name = "";
+				bool rgba16 = tex.alpha_index != 0xFFFF && tex.texture_index != 0xFFFF;
+				if (rgba16) {
+					table_name = "RGBA";
+					ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_rgba) & 0xFFFF);
 				} else {
-					rgba16 = tex.texture_index_alpha != 0xFFFF && tex.texture_index != 0xFFFF;
-					// If both texture_index and texture_index2: texture_index2 is the real one, texture_index is palette_index.
-					ushort actualTexIndex = tex.texture_index_alpha != 0xFFFF ? tex.texture_index_alpha : tex.texture_index;
-					ind_texture = (uint)(actualTexIndex) & 0xFFFF;
-					if (rgba16) {
-						ind_texture = l.ind_textureTable3 + tex.texture_index;
-						alpha_texture = (uint)(tex.texture_index_alpha & 0xFFFF);
+					if (Settings.s.platform == Settings.Platform.DS) {
+						if ((tex.flags & 1) != 0) {
+							table_name = "I4";
+							ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_i4) & 0xFFFF);
+						} else if ((tex.flags & 2) != 0) {
+							table_name = "I8";
+							ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_i8) & 0xFFFF);
+						} else if ((tex.flags & 4) != 0) {
+							table_name = "RGBA";
+							ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_rgba) & 0xFFFF);
+						} else {
+							table_name = "I4";
+							ushort actualTexIndex = tex.alpha_index != 0xFFFF ? tex.alpha_index : tex.texture_index;
+							ind_texture = actualTexIndex;
+						}
+					} else {
+						table_name = "I4";
+						ind_texture = tex.texture_index;
+					}
+				}
+				if (ind_texture != 0xFFFF) {
+					tex.off_texture = l.texturesTable[ind_texture];
+					l.texturesTableSeen[ind_texture] = true;
+				}
+				if (tex.alpha_index != 0xFFFF) {
+					tex.off_alpha = l.texturesTable[tex.alpha_index];
+					l.texturesTableSeen[tex.alpha_index] = true;
+				}
+				tex.off_palette = null;
+				GF64.Format format = rgba16 ? GF64.Format.RGBA5551 : (tex.palette_num_colors == 16 ? GF64.Format.I4 : GF64.Format.I8);
+				if (tex.palette_index != 0xFFFF) {
+					if (Settings.s.platform == Settings.Platform.DS) {
+						tex.off_palette = l.palettesTable[tex.palette_index & 0x7FFF];
+						l.palettesTableSeen[tex.palette_index & 0x7FFF] = true;
+					} else {
+						tex.off_palette = l.GetStructPtr(FATEntry.Type.Palette, tex.palette_index, global: true);
 					}
 				}
 				l.print(((1 << tex.hExponent) * (1 << tex.wExponent)) + "\t"
 					+ (1 << tex.wExponent) + "\t" + (1 << tex.hExponent) + "\t"
 					+ (tex.texture_index == 0xFFFF ? "-" : tex.texture_index.ToString()) + "\t"
-					+ (tex.texture_index_alpha == 0xFFFF ? "-" : tex.texture_index_alpha.ToString()) + "\t"
+					+ (tex.alpha_index == 0xFFFF ? "-" : tex.alpha_index.ToString()) + "\t"
 					+ (tex.palette_index == 0xFFFF ? "-" : (tex.palette_index & 0x7FFF).ToString()) + "\t"
 					+ String.Format("{0:X4}", tex.flags) + "\t"
-					+ tex.size);
-
-				tex.off_texture = l.texturesTable[ind_texture];
-				l.texturesTableSeen[ind_texture] = true;
-				if (alpha_texture.HasValue) {
-					off_alpha_texture = l.texturesTable[alpha_texture.Value];
-					l.texturesTableSeen[alpha_texture.Value] = true;
-				}
-				tex.off_palette = null;
-				GF64.Format format = tex.palette_num_colors == 16 ? GF64.Format.I4 : GF64.Format.I8;
-				if (Settings.s.platform == Settings.Platform.DS) {
-					if (tex.palette_index != 0xFFFF) {
-						tex.off_palette = l.palettesTable[tex.palette_index & 0x7FFF];
-						l.palettesTableSeen[tex.palette_index & 0x7FFF] = true;
-					}
-				} else {
-					/*
-					ushort actualPaletteIndex = tex.texture_index2 != 0xFFFF ? tex.texture_index : tex.palette_index;
-					if (actualPaletteIndex != 0xFFFF) {
-						tex.off_palette = l.palettesTable[actualPaletteIndex & 0x7FFF];
-						l.palettesTableSeen[actualPaletteIndex & 0x7FFF] = true;
-						l.print((l.palettesTable[(actualPaletteIndex & 0x7FFF) + 1].offset - l.palettesTable[(actualPaletteIndex & 0x7FFF)].offset) / 2);
-					}*/
-					if (rgba16) format = GF64.Format.RGBA16;
-					if (tex.palette_index != 0xFFFF) {
-						tex.off_palette = l.GetStructPtr(FATEntry.Type.Palette, tex.palette_index, global: true);
-					}
-				}
+					+ tex.color_size + "\t"
+					+ tex.palette_num_colors + "\t"
+					+ tex.off_texture + "\t"
+					+ tex.off_palette + "\t");
 				//print(((1 << hExponent) * (1 << wExponent)) + "\t" + (1 << wExponent) + "\t" + (1 << hExponent) + "\t" + table_index + "\t" + field3 + "\t" + size + "\t" + palette_num_colors + "\t" + off_texture + "\t" + off_palette);
-				GF64 mainTex = new GF64(reader,
-					tex.off_texture,
+				if (tex.off_texture != null) {
+					tex.mainTex = new GF64(reader,
+						tex.off_texture,
+						(1 << tex.wExponent),
+						(1 << tex.hExponent),
+						format,
+						tex.off_palette,
+						tex.palette_num_colors);
+				}
+				if (tex.off_alpha != null) {
+					tex.alphaTex = new GF64(reader,
+					tex.off_alpha,
 					(1 << tex.wExponent),
 					(1 << tex.hExponent),
-					format,
-					tex.off_palette,
-					tex.palette_num_colors);
-				if (off_alpha_texture != null) {
-					GF64 alphaTex = new GF64(reader,
-					off_alpha_texture,
-					(1 << tex.wExponent),
-					(1 << tex.hExponent),
-					GF64.Format.I4,
+					GF64.Format.I4Alpha,
 					null,
 					tex.palette_num_colors);
-					mainTex.LoadAlphaTexture(alphaTex);
+					if (tex.mainTex != null) {
+						tex.mainTex.LoadAlphaTexture(tex.alphaTex);
+					}
 				}
-				tex.texture = mainTex.texture;
+				tex.Texture = tex.mainTex != null ? tex.mainTex.texture : tex.alphaTex.texture;
 				if (l.exportTextures) {
-					if (!File.Exists(l.gameDataBinFolder + "/textures/" + table_index + "_" + tex.texture_index + "_" + tex.palette_index + ".png")) {
-						Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + table_index + "_" + tex.texture_index + "_" + tex.palette_index + ".png", tex.texture.EncodeToPNG());
+					string palette = (tex.palette_index != 0xFFFF ? "_P" + (tex.palette_index & 0x7FFF) : "");
+					string alpha   = (tex.alpha_index != 0xFFFF ? "_A" + (tex.alpha_index & 0x7FFF) : "");
+					string main    = (tex.texture_index != 0xFFFF ? "_T" + (tex.texture_index & 0x7FFF) : "");
+					if (!File.Exists(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png")) {
+						Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png", tex.Texture.EncodeToPNG());
 					}
 				}
 			}

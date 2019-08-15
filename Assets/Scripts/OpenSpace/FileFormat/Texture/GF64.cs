@@ -18,7 +18,8 @@ namespace OpenSpace.FileFormat.Texture {
 			Parse(reader, null, off_texture, off_palette);
 		}
 
-        public GF64(string filePath, int width, int height, Format format, string palettePath, int palette_num_colors) : this(FileSystem.GetFileReadStream(filePath), width, height, format, FileSystem.GetFileReadStream(palettePath), palette_num_colors) { }
+        public GF64(string filePath, int width, int height, Format format, string palettePath, int palette_num_colors)
+			: this(FileSystem.GetFileReadStream(filePath), width, height, format, FileSystem.GetFileReadStream(palettePath), palette_num_colors) { }
 
 		public GF64(Stream stream, int width, int height, Format format, Stream palette, int palette_num_colors) {
 			MapLoader l = MapLoader.Loader;
@@ -43,7 +44,7 @@ namespace OpenSpace.FileFormat.Texture {
 			Color[] colors = texture.GetPixels();
 			Color[] alphaColors = gf.texture.GetPixels();
 			for (int i = 0; i < colors.Length; i++) {
-				colors[i] = new Color(colors[i].r, colors[i].g, colors[i].b, alphaColors[i].grayscale);
+				colors[i] = new Color(colors[i].r, colors[i].g, colors[i].b, alphaColors[i].a);
 			}
 			texture.SetPixels(colors);
 			texture.Apply();
@@ -63,7 +64,7 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 			texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
 			Color[] pixels = new Color[width * height];
-			if (format == Format.I4) {
+			if (format == Format.I4 || format == Format.I4Alpha) {
 				Pointer off_current = null;
 				if (off_texture != null) off_current = Pointer.Goto(ref reader, off_texture);
 				byte[] texBytes = reader.ReadBytes((width * height) / 2);
@@ -85,11 +86,18 @@ namespace OpenSpace.FileFormat.Texture {
 								texByte = (byte)(texByte >> 4);
 							}
 						}
-						if (palette != null) {
-							pixels[index] = palette[texByte % palette.Length];
-							//new Color(texByte / 255f, texByte / 255f, texByte / 255f);
+						if (format == Format.I4Alpha) {
+							if (palette != null) {
+								pixels[index] = new Color(1f,1f,1f, palette[texByte % palette.Length].r);
+							} else {
+								pixels[index] = new Color(1f, 1f, 1f, texByte / 15f);
+							}
 						} else {
-							pixels[index] = new Color(texByte / 15f, texByte / 15f, texByte / 15f);
+							if (palette != null) {
+								pixels[index] = palette[texByte % palette.Length];
+							} else {
+								pixels[index] = new Color(texByte / 15f, texByte / 15f, texByte / 15f, 1f);
+							}
 						}
 					}
 				}
@@ -103,22 +111,30 @@ namespace OpenSpace.FileFormat.Texture {
 						int index = (x * height) + y;
 						byte texByte = texBytes[(x * height) + y];
 						if (palette != null) {
-							pixels[index] = palette[texByte % palette.Length];
-							//new Color(texByte / 255f, texByte / 255f, texByte / 255f);
+							Color paletteCol = palette[texByte % palette.Length];
+							if (palette.Length > 64) {
+								pixels[index] = palette[texByte % palette.Length];
+							} else {
+								int alpha = texByte / palette.Length;
+								pixels[index] = new Color(paletteCol.r, paletteCol.g, paletteCol.b, alpha / 7f);
+							}
+							/*} else {
+								pixels[index] = palette[texByte % palette.Length];
+							}*/
 						} else {
-							pixels[index] = new Color(texByte / 255f, texByte / 255f, texByte / 255f);
+							pixels[index] = new Color(1f, 1f, 1f, texByte / 255f);
 						}
 					}
 				}
 				if (off_current != null) Pointer.Goto(ref reader, off_current);
-			} else if (format == Format.RGBA16) {
+			} else if (format == Format.RGBA5551) {
 				Pointer off_current = null;
 				if (off_texture != null) off_current = Pointer.Goto(ref reader, off_texture);
 				for (int x = 0; x < width; x++) {
 					for (int y = 0; y < height; y++) {
 						int index = (x * height) + y;
 						ushort shortCol = reader.ReadUInt16();
-						pixels[index] = ParseColorRGBA16(shortCol);
+						pixels[index] = ParseColorRGBA5551(shortCol);
 					}
 				}
 				if (off_current != null) Pointer.Goto(ref reader, off_current);
@@ -131,7 +147,7 @@ namespace OpenSpace.FileFormat.Texture {
 			Color[] palette = new Color[palette_num_colors];
 			for (int i = 0; i < palette_num_colors; i++) {
 				ushort shortCol = reader.ReadUInt16();
-				palette[i] = ParseColorRGBA16(shortCol);
+				palette[i] = ParseColorRGBA5551(shortCol);
 			}
 			return palette;
 		}
@@ -148,7 +164,7 @@ namespace OpenSpace.FileFormat.Texture {
 			return result;
 		}
 
-		static Color ParseColorRGBA16(ushort shortCol) {
+		static Color ParseColorRGBA5551(ushort shortCol) {
 			uint alpha, blue, green, red;
 			if (Settings.s.platform == Settings.Platform.DS) {
 				alpha = ExtractBits(shortCol, 1, 15);
@@ -173,8 +189,9 @@ namespace OpenSpace.FileFormat.Texture {
 
 		public enum Format {
 			I4,
+			I4Alpha,
 			I8,
-			RGBA16
+			RGBA5551
 		}
 		public enum ColorFormat {
 			Monochrome,

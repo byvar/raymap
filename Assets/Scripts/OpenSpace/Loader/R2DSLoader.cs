@@ -17,9 +17,9 @@ namespace OpenSpace.Loader {
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;
-		public uint ind_textureTable1;
-		public uint ind_textureTable2;
-		public uint ind_textureTable3;
+		public uint ind_textureTable_i4;
+		public uint ind_textureTable_i8;
+		public uint ind_textureTable_rgba;
 		public bool[] texturesTableSeen;
 		public bool[] palettesTableSeen;
 
@@ -123,24 +123,24 @@ namespace OpenSpace.Loader {
 				uint sz_table2 = reader.ReadUInt32() >> 2;
 				Pointer off_table3 = Pointer.Read(reader);
 				uint sz_table3 = reader.ReadUInt32() >> 2;
-				ind_textureTable1 = 0;
-				ind_textureTable2 = ind_textureTable1 + (sz_table1);
-				ind_textureTable3 = ind_textureTable2 + (sz_table2);
-				uint totalSz = ind_textureTable3 + (sz_table3);
+				ind_textureTable_i4 = 0;
+				ind_textureTable_i8 = ind_textureTable_i4 + (sz_table1);
+				ind_textureTable_rgba = ind_textureTable_i8 + (sz_table2);
+				uint totalSz = ind_textureTable_rgba + (sz_table3);
 				texturesTable = new Pointer[totalSz];
 				Pointer.DoAt(ref reader, off_table1, () => {
 					for (int i = 0; i < sz_table1; i++) {
-						texturesTable[ind_textureTable1 + i] = Pointer.Read(reader);
+						texturesTable[ind_textureTable_i4 + i] = Pointer.Read(reader);
 					}
 				});
 				Pointer.DoAt(ref reader, off_table2, () => {
 					for (int i = 0; i < sz_table2; i++) {
-						texturesTable[ind_textureTable2 + i] = Pointer.Read(reader);
+						texturesTable[ind_textureTable_i8 + i] = Pointer.Read(reader);
 					}
 				});
 				Pointer.DoAt(ref reader, off_table3, () => {
 					for (int i = 0; i < sz_table3; i++) {
-						texturesTable[ind_textureTable3 + i] = Pointer.Read(reader);
+						texturesTable[ind_textureTable_rgba + i] = Pointer.Read(reader);
 					}
 				});
 				Pointer off_palettesTable = Pointer.Read(reader);
@@ -256,19 +256,34 @@ namespace OpenSpace.Loader {
 					print("Unused Texture: " + i + " - " + texturesTable[i] + ". Est. length: " + (texturesTable[i + 1].offset - texturesTable[i].offset));
 					uint size = (texturesTable[i + 1].offset - texturesTable[i].offset);
 					float logSize = Mathf.Log(size, 2);
-					for (int w = 3; w < 15; w++) {
-						for (int h = 3; h < 15; h++) {
-							if (w + h == (int)logSize) {
-								GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I8, null, 32);
-								Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + i + "_i8_" + gf.texture.width + "_" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+					if (i < ind_textureTable_i8) {
+						// I4
+						for (int w = 3; w < 15; w++) {
+							for (int h = 3; h < 15; h++) {
+								if (w + h == (int)logSize + 1) {
+									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I4, null, 16);
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/I4_T" + (i-ind_textureTable_i4) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+								}
 							}
 						}
-					}
-					for (int w = 3; w < 15; w++) {
-						for (int h = 3; h < 15; h++) {
-							if (w + h == (int)logSize+1) {
-								GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I4, null, 16);
-								Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + i + "_i4_" + gf.texture.width + "_" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+					} else if (i < ind_textureTable_rgba) {
+						// I8
+						for (int w = 3; w < 15; w++) {
+							for (int h = 3; h < 15; h++) {
+								if (w + h == (int)logSize) {
+									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I8, null, 32);
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/I8_T" + (i-ind_textureTable_i8) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+								}
+							}
+						}
+					} else {
+						// RGBA16
+						for (int w = 3; w < 15; w++) {
+							for (int h = 3; h < 15; h++) {
+								if (w + h == (int)logSize-1) {
+									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.RGBA5551, null, 32);
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/RGBA_T" + (i-ind_textureTable_rgba) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+								}
 							}
 						}
 					}
