@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using OpenSpace.ROM;
 using OpenSpace.FileFormat.Texture;
+using OpenSpace.FileFormat.Texture.DS;
 
 namespace OpenSpace.Loader {
 	public class R2DSLoader : MapLoader {
@@ -240,7 +241,7 @@ namespace OpenSpace.Loader {
 
 		public void ExportTextures(Reader reader) {
 			// Textures in data.bin
-			texturesTableSeen = new bool[texturesTable.Length];
+			/*texturesTableSeen = new bool[texturesTable.Length];
 			palettesTableSeen = new bool[palettesTable.Length];
 			for (int i = 0; i < fatTables.Length; i++) {
 				for (int j = 0; j < fatTables[i].entries.Length; j++) {
@@ -288,7 +289,7 @@ namespace OpenSpace.Loader {
 						}
 					}
 				}
-			}
+			}*/
 			/*for (int i = 0; i < palettesTable.Length; i++) {
 				if (!palettesTableSeen[i]) {
 					print("Unused Palette: " + i + " - " + palettesTable[i] + ". Est. num colors: " + (palettesTable[i+1].offset-palettesTable[i].offset)/2);
@@ -301,7 +302,50 @@ namespace OpenSpace.Loader {
 					}
 				}
 			}*/
-			print("Unused textures: " + texturesTableSeen.Where(t => !t).Count() + " - Unused palettes: " + palettesTableSeen.Where(p => !p).Count());
+			//print("Unused textures: " + texturesTableSeen.Where(t => !t).Count() + " - Unused palettes: " + palettesTableSeen.Where(p => !p).Count());
+			if (Settings.s.platform == Settings.Platform.DS) {
+				// R2 DS
+				/*PAL palette = new PAL(gameDataBinFolder + "hud/objpal.bin");
+				ExportNBFC("hud/sprlums1.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/sprcage1.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/sprraym1.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/sprraym2.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/sprenmy1.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/sprnumb0.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb1.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb2.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb3.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb4.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb5.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb6.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb7.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb8.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprnumb9.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/sprslash.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/spbars.nbfc", 1, 9, palette.palette);
+				ExportNBFC("hud/stick.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/stickbase.nbfc", 8, 8, palette.palette);
+				ExportNBFC("hud/sprspark.nbfc", 1, 1, palette.palette);
+				ExportNBFC("hud/ok.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/smaller.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/bigger.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/starhi.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/starmed.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/starlow.nbfc", 2, 2, palette.palette);
+				ExportNBFC("hud/slider.nbfc", 4, 4, palette.palette);
+				ExportNBFC("hud/slider.nbfc", 4, 4, palette.palette);
+				ExportGFX("hud/bgcalib.gfx", "hud/bgcalib.map", "hud/bgcalib.pal", 32, 32); // tiles: 768
+				ExportGFX("hud/mainbg.gfx", "hud/mainbg.map", "hud/mainbg.pal", 32, 32); // tiles: 864*/
+
+				// RRR DS
+				foreach (string bg in rrrMapBackgrounds) {
+					ExportGFX("hud/" + bg + ".bgc", "hud/" + bg + ".scr", "hud/" + bg + ".pal", 32, 32);
+				}
+				PAL[] palettes = rrrPalettes.Select(p => new PAL(gameDataBinFolder + "hud/" + p)).ToArray();
+				foreach (RRRPalettedTextureReference texRef in rrrTexRefs) {
+					ExportNBFC("hud/" + texRef.name, texRef.width / 8, texRef.height / 8, palettes[texRef.palette].palette, i4: true);
+				}
+			}
 			if (Settings.s.platform == Settings.Platform._3DS) {
 				// Stored separately
 				for (int i = 1; i < 25; i++) {
@@ -332,6 +376,26 @@ namespace OpenSpace.Loader {
 						Texture2D tex = new ETC(textureBytes, w, h, hasAlpha).texture;
 						Util.ByteArrayToFile(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png", tex.EncodeToPNG());
 					}
+				}
+			}
+		}
+		public void ExportNBFC(string name, int w, int h, Color[] palette, bool i4 = false) {
+			if (Settings.s.platform == Settings.Platform.DS) {
+				if(FileSystem.FileExists(gameDataBinFolder + name)) {
+					if (!File.Exists(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
+						Texture2D tex = new NBFC(gameDataBinFolder + name, w, h, palette, i4).texture;
+						Util.ByteArrayToFile(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png", tex.EncodeToPNG());
+					}
+				}
+			}
+		}
+		public void ExportGFX(string name, string mapName, string palName, int w, int h) {
+			if (Settings.s.platform == Settings.Platform.DS) {
+				if (FileSystem.FileExists(gameDataBinFolder + name)) {
+					//if (!File.Exists(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
+						Texture2D tex = new GFX(gameDataBinFolder + name, gameDataBinFolder + mapName, gameDataBinFolder + palName, w, h).texture;
+						Util.ByteArrayToFile(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png", tex.EncodeToPNG());
+					//}
 				}
 			}
 		}
@@ -398,6 +462,149 @@ namespace OpenSpace.Loader {
 				return new Pointer(entry.off_data, files_array[SMem.Data]);
 			} else {
 				return null;
+			}
+		}
+
+		string[] rrrMapBackgrounds = new string[] {
+			"Background_MM_Default",
+			"Background_MM_R1",
+			"Background_MM_R2",
+			"Background_MM_A1",
+			"Background_MM_A2",
+			"Background_MM_A3",
+			"Background_MM_B1",
+			"Background_MM_B2",
+			"Background_MM_B3",
+			"Background_MM_C1",
+			"Background_MM_C2",
+			"Background_MM_C3",
+			"Background_MM_D1",
+			"Background_MM_D2",
+			"bg_sfx_0A",
+			"bg_sfx_0B",
+			"bg_sfx_1A",
+			"bg_sfx_1B",
+			"bg_sfx_2A",
+			"bg_sfx_2B",
+			"bg_sfx_3A",
+			"bg_sfx_3B",
+			"Interface_Ray",
+			"bg_MapE_2_2",
+			"bg_MapE_1_1",
+			"bg_loading0",
+			"bg_loading1",
+			"bg_loading2",
+			"bg_loading3",
+			"bg_loading4",
+			"Interface",
+			"Interface_Ray",
+			"Interface_Gar",
+			"Interface_RayGear",
+			"bg_com",
+			"bg_rayman",
+			"bg_gardien",
+			"bg_MM_Default",
+		};
+
+		string[] rrrPalettes = new string[] {
+			"0.pal",
+			"Jauge_2.pal",
+			"Jauge_Plt_1.pal",
+			"Circle_Icone.pal",
+			"RM_Icone.pal",
+			"XP_Icone.pal",
+			"Icone_Missile.pal",
+			"GT_Icone.pal",
+			"GF_Icone.pal",
+			"GV_Icone.pal",
+			"GG_Icone.pal",
+			"lums_01.pal",
+			"Cage_Ico1.pal",
+			"Wind_Icon1.pal",
+			"Serpent_Icon.pal",
+			"DG_Icone.pal",
+			"lap1.pal",
+			"lap2.pal",
+			"MapTermine.pal",
+			"Cage_Ico.pal",
+			"Icone_Ok.pal",
+			"MM_pastillejaune.pal",
+			"one.pal",
+			"trophe_chiffre.pal",
+			"Icone_Ok_1.pal",
+			"MM_cadna.pal",
+		};
+
+		RRRPalettedTextureReference[] rrrTexRefs = new RRRPalettedTextureReference[] {
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 1, "Jauge_8.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 1, "Jauge_2.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 1, "Jauge_R.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 1, "Jauge_Fond_8.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 1, "Jauge_Fond_R.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 1, "Jauge_Fond_L.bgc"),
+			new RRRPalettedTextureReference(1, 8, 8, 0, 2, "Jauge_Plt_1.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "slash.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "0.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "1.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "2.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "3.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "4.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "5.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "6.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "7.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "8.bgc"),
+			new RRRPalettedTextureReference(1, 8, 0x10, 0x8000, 0, "9.bgc"),
+			new RRRPalettedTextureReference(6, 0x20, 0x20, 0x80000000, 4, "RM_Icone.bgc"),
+			new RRRPalettedTextureReference(2, 0x20, 0x20, 0x80000000, 5, "XP_Icone.bgc"),
+			new RRRPalettedTextureReference(1, 0x20, 0x20, 0x80000000, 6, "Icone_Missile.bgc"),
+			new RRRPalettedTextureReference(1, 0x20, 0x20, 0x80000000, 4, "MissBB_Icone.bgc"),
+			new RRRPalettedTextureReference(1, 0x40, 0x40, 0xC0000000, 3, "Circle_Icone.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 7, "GT_Icone.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 8, "GF_Icone.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 9, "GV_Icone.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xA, "GG_Icone.bgc"),
+			new RRRPalettedTextureReference(1, 0x20, 0x20, 0x80000000, 0xB, "lums_01.bgc"),
+			new RRRPalettedTextureReference(1, 0x20, 0x20, 0x80000000, 0xB, "lums_02.bgc"),
+			new RRRPalettedTextureReference(1, 0x20, 0x20, 0x80000000, 0xB, "lums_03.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xC, "Cage_Ico.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xC, "Cage_Ico1.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xC, "Cage_Ico2.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xC, "Cage_Ico3.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xD, "Wind_Icon1.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xD, "Wind_Icon2.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xD, "Wind_Icon3.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xE, "Serpent_Icon.bgc"),
+			new RRRPalettedTextureReference(1, 8, 8, 0, 3, "hud_Map_Ind.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 4, "RM_Icone_Map.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xC, "Cage_Ico_Map.bgc"),
+			new RRRPalettedTextureReference(4, 0x20, 0x20, 0x80000000, 0xF, "DG_Icone.bgc"),
+			new RRRPalettedTextureReference(2, 0x20, 0x40, 0xC0008000, 0x10, "lap1.bgc"),
+			new RRRPalettedTextureReference(2, 0x20, 0x40, 0xC0008000, 0x11, "lap2.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x12, "MapTermine.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x13, "Cage_Ico.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x14, "Icone_Ok.bgc"),
+			new RRRPalettedTextureReference(8, 0x10, 0x10, 0x40000000, 0x15, "MM_pastillejaune.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x16, "one.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x16, "seven.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x16, "twintyfive.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x16, "fourtysix.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x16, "nintyn.bgc"),
+			new RRRPalettedTextureReference(8, 0x40, 0x40, 0xC0000000, 0x17, "trophe_chiffre.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x18, "Icone_Ok_1.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 4, "RM_Icone.bgc"),
+			new RRRPalettedTextureReference(8, 0x20, 0x20, 0x80000000, 0x19, "MM_cadna.bgc")
+		};
+
+		private struct RRRPalettedTextureReference {
+			public string name;
+			public byte width;
+			public byte height;
+			public byte palette;
+			public RRRPalettedTextureReference(uint unk, byte width, byte height, uint unk2, byte palette, string name) {
+				this.name = name;
+				this.width = width;
+				this.height = height;
+				this.palette = palette;
 			}
 		}
 	}
