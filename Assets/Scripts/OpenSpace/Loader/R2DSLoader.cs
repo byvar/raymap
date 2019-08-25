@@ -338,13 +338,46 @@ namespace OpenSpace.Loader {
 				ExportGFX("hud/mainbg.gfx", "hud/mainbg.map", "hud/mainbg.pal", 32, 32); // tiles: 864*/
 
 				// RRR DS
-				foreach (string bg in rrrMapBackgrounds) {
+				/*foreach (string bg in rrrMapBackgrounds) {
 					ExportGFX("hud/" + bg + ".bgc", "hud/" + bg + ".scr", "hud/" + bg + ".pal", 32, 32);
 				}
 				PAL[] palettes = rrrPalettes.Select(p => new PAL(gameDataBinFolder + "hud/" + p)).ToArray();
 				foreach (RRRPalettedTextureReference texRef in rrrTexRefs) {
 					ExportNBFC("hud/" + texRef.name, texRef.width / 8, texRef.height / 8, palettes[texRef.palette].palette, i4: true);
 				}
+				ExportNBFC("hud/Cage_Icone.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/Cage_Icone.pal").palette, i4: true);
+				ExportNBFC("hud/Etoile_Icone.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/Etoile_Icone.pal").palette, i4: true);
+				ExportNBFC("hud/hud_map_corner.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/hud_Map_Ind.pal").palette, i4: true);
+				ExportNBFC("hud/ICO_Wind_NZ.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/ICO_Wind_NZ.pal").palette, i4: true);
+				ExportNBFC("hud/Jauge_Block.bgc", 1, 1, new PAL(gameDataBinFolder + "hud/Jauge_Block.pal").palette, i4: true);
+				ExportNBFC("hud/Jauge_Fond.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Jauge_Block.pal").palette, i4: true);
+				ExportNBFC("hud/Jauge_Quart.bgc", 1, 1, new PAL(gameDataBinFolder + "hud/Jauge_Block.pal").palette, i4: true);
+				ExportNBFC("hud/lums_jaune.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/lums_jaune.pal").palette, i4: true);
+				ExportNBFC("hud/Map2d_blocage.bgc", 1, 2, new PAL(gameDataBinFolder + "hud/Map2d_blocage.pal").palette, i4: true);
+				ExportNBFC("hud/Map2d_Cage.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Map2d_blocage.pal").palette, i4: true);
+				ExportNBFC("hud/Map2d_Crystal.bgc", 2, 4, new PAL(gameDataBinFolder + "hud/Map2d_blocage.pal").palette, i4: true);
+				ExportNBFC("hud/Map2d_Gard_Pris.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/Map2d_blocage.pal").palette, i4: true);
+				ExportNBFC("hud/Map2d_Mont_Or.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Map2d_blocage.pal").palette, i4: true);
+				ExportNBFC("hud/Map2d_Teleport.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Map2d_blocage.pal").palette, i4: true);
+				ExportNBFC("hud/Panneau1.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/Panneau1.pal").palette, i4: true);
+				ExportNBFC("hud/Panneau2.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/Panneau2.pal").palette, i4: true);
+				ExportNBFC("hud/Panneau3.bgc", 4, 4, new PAL(gameDataBinFolder + "hud/Panneau3.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_0.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_1.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_2.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_3.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_4.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_5.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_6.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_7.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_8.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_9.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/Ray_Fnt_slash.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/Ray_Fnt_0.pal").palette, i4: true);
+				ExportNBFC("hud/trophee.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/trophee.pal").palette, i4: true);
+				ExportNBFC("hud/wifi_level_0.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/wifi_level_0.pal").palette, i4: true);
+				ExportNBFC("hud/wifi_level_1.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/wifi_level_0.pal").palette, i4: true);
+				ExportNBFC("hud/wifi_level_2.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/wifi_level_0.pal").palette, i4: true);
+				ExportNBFC("hud/wifi_level_3.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/wifi_level_0.pal").palette, i4: true);*/
 			}
 			if (Settings.s.platform == Settings.Platform._3DS) {
 				// Stored separately
