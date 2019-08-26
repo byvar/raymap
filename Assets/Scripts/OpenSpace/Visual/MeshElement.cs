@@ -568,6 +568,8 @@ namespace OpenSpace.Visual {
             s_mr_spe = null;
 			mr_main = null;
 			mr_spe = null;
+            mesh_main = null;
+            mesh_spe = null;
 			if (mesh.bones != null) {
 				mesh_main = null;
 				mesh_spe = null;

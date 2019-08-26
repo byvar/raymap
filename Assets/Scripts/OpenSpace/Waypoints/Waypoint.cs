@@ -66,12 +66,22 @@ namespace OpenSpace.Waypoints {
         }
 
         public static WayPoint Read(Reader reader, Pointer offset) {
+
             WayPoint wp = new WayPoint(offset);
+            float radius = 0;
+
+            if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
+                radius = reader.ReadSingle();
+            }
 
             float x = reader.ReadSingle();
             float y = reader.ReadSingle();
             float z = reader.ReadSingle();
-            float radius = reader.ReadSingle();
+
+            if (Settings.s.engineVersion != Settings.EngineVersion.TT) {
+                radius = reader.ReadSingle();
+            }
+
             wp.position = new Vector3(x, y, z);
             wp.radius = radius;
 

@@ -19,15 +19,17 @@ public class DynamicsMechanicsComponent : MonoBehaviour
     public void SetDynamics(Dynamics dynamics)
     {
         this.dynamics = dynamics;
-        this.dynamicsOffset = this.dynamics.offset.ToString();
+        if (this.dynamics != null) {
+            this.dynamicsOffset = this.dynamics.offset.ToString();
 
-        this.type = dynamics.type;
-        if (dynamics.matrixA != null) {
-            this.posA = dynamics.matrixA.GetPosition(convertAxes: true);
+            this.type = dynamics.type;
+            if (dynamics.matrixA != null) {
+                this.posA = dynamics.matrixA.GetPosition(convertAxes: true);
+            }
+            if (dynamics.matrixB != null) {
+                this.posB = dynamics.matrixB.GetPosition(convertAxes: true);
+            }
+            this.speed = dynamics.speedVector;
         }
-        if (dynamics.matrixB != null) {
-            this.posB = dynamics.matrixB.GetPosition(convertAxes: true);
-        }
-        this.speed = dynamics.speedVector;
     }
 }

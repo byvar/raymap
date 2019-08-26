@@ -120,7 +120,7 @@ namespace OpenSpace.Object {
 				}
 			});
 			
-            l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset);
+            l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset+" superObject offset: "+(so!=null?so.offset.ToString():"null"));
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal && Settings.s.game != Settings.Game.R2Revolution) {
 				Pointer.DoAt(ref reader, p.off_dynam, () => {
 					p.dynam = Dynam.Read(reader, p.off_dynam);

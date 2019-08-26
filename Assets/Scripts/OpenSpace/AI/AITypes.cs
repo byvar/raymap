@@ -2988,7 +2988,9 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.GameMaterialRef,
                 ScriptNode.NodeType.ParticleGenerator,
                 ScriptNode.NodeType.Color,
-                ScriptNode.NodeType.ModelRef
+                ScriptNode.NodeType.ModelRef,
+                ScriptNode.NodeType.Unknown,
+                ScriptNode.NodeType.GraphRef
             },
             #endregion
 

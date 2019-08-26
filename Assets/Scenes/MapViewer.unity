@@ -928,8 +928,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 4
-  gameDataBinFolder: ../../RIPPING/R2_PC/data
-  lvlName: Astro_00
+  gameDataBinFolder: r2_pc
+  lvlName: raycap
   baseMaterial: {fileID: 2100000, guid: 4c445331ca6381a44bb772fa126abb28, type: 2}
   baseTransparentMaterial: {fileID: 2100000, guid: f72b6a2550e50034d9212047304245fa,
     type: 2}
@@ -951,7 +951,7 @@ MonoBehaviour:
   playTextureAnimations: 1
   showPersos: 1
   livePreview: 0
-  exportPath: ../../RIPPING/R2_PC/exports
+  exportPath: exports
   exportAfterLoad: 0
 --- !u!4 &1701416322
 Transform:

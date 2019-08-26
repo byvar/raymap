@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Assets.Scripts.OpenSpace.Exporter;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OpenSpace;
 using OpenSpace.AI;
@@ -31,6 +32,11 @@ namespace OpenSpace.Exporter {
 
                 return settings;
             }
+        }
+
+        public void TestFbx()
+        {
+            
         }
 
         public MapExporter(MapLoader loader, string exportPath)
@@ -72,7 +78,7 @@ namespace OpenSpace.Exporter {
             ExportTextures(exportDirectoryTextures);
             ExportMaterials(exportDirectoryMaterials, exportDirectoryLevels);
             ExportFamilies(exportDirectoryFamilies);
-            //ExportAIModels(exportDirectoryAIModels);
+            ExportAIModels(exportDirectoryAIModels);
             ExportEntryActions(exportDirectoryGeneral);
             ExportTextTable(exportDirectoryGeneral);
             ExportScene(exportDirectoryLevels);
@@ -192,7 +198,26 @@ namespace OpenSpace.Exporter {
                     aiModelFileStream.Close();
                 }
 
+                foreach(State state in fam.states) {
+                    ExportState exportState = ExportState.CreateFromState(state);
+
+                    string stateFilePath = Path.Combine(familyDirectory, "State_" + state.index + ".json");
+                    if (File.Exists(stateFilePath)) {
+                        File.Delete(stateFilePath);
+                    }
+
+                    using (StreamWriter stateFileStream = File.CreateText(stateFilePath)) {
+
+                        stateFileStream.Write(exportState.ToJSON());
+                        stateFileStream.Flush();
+                        stateFileStream.Close();
+                    }
+                }
+
                 foreach (ObjectList objectList in fam.objectLists) {
+                    if (objectList == null) {
+                        continue;
+                    }
                     string objectListJSON = objectList.ToJSON();
                     string objectListHash = HashUtils.MD5Hash(objectListJSON);
 
@@ -277,6 +302,10 @@ namespace OpenSpace.Exporter {
 
             string[] usingItems = new string[] { "UnityEngine", "OpenSpaceImplementation.Strings", "OpenSpaceImplementation" };
             string usingBlock = string.Join(Environment.NewLine, usingItems.Select(i => "using " + i + ";"));
+
+            if (loader?.fontStruct?.languages==null) {
+                return;
+            }
 
             int numLanguages = loader.fontStruct.languages.Length;
             int numTextsPerLanguage = 0;
