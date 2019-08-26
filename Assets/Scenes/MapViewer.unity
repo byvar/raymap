@@ -94,8 +94,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
-    m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 206473930}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -195,6 +195,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &330329012
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,6 +394,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -440,7 +442,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 878624502}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_UiScaleMode: 1
@@ -536,7 +538,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1109753672}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_UiScaleMode: 1
@@ -617,7 +619,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1444678341}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -927,9 +929,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af587f4a54f84c42ae16a9378ca8d57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 4
-  gameDataBinFolder: r2_pc
-  lvlName: raycap
+  mode: 10
+  gameDataBinFolder: ..\..\RIPPING\R2_DS\data\RAYMAN DS\
+  lvlName: learn_30
   baseMaterial: {fileID: 2100000, guid: 4c445331ca6381a44bb772fa126abb28, type: 2}
   baseTransparentMaterial: {fileID: 2100000, guid: f72b6a2550e50034d9212047304245fa,
     type: 2}
@@ -944,6 +946,7 @@ MonoBehaviour:
   allowDeadPointers: 0
   forceDisplayBackfaces: 0
   blockyMode: 0
+  saveTextures: 0
   viewCollision: 0
   viewInvisible: 0
   viewGraphs: 0
@@ -951,7 +954,7 @@ MonoBehaviour:
   playTextureAnimations: 1
   showPersos: 1
   livePreview: 0
-  exportPath: exports
+  exportPath: ../../RIPPING/R2_PC/exports
   exportAfterLoad: 0
 --- !u!4 &1701416322
 Transform:
