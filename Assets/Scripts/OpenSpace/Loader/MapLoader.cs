@@ -33,6 +33,7 @@ namespace OpenSpace {
         public bool allowDeadPointers = false;
         public bool forceDisplayBackfaces = false;
         public bool blockyMode = false;
+		public bool exportTextures = false;
 
         public ObjectType[][] objectTypes;
         public TextureInfo[] textures;
@@ -127,6 +128,10 @@ namespace OpenSpace {
 							case Settings.Platform.DC: loader = new R2DCLoader(); break;
 							case Settings.Platform.PS2: loader = new R2PS2Loader(); break;
 							case Settings.Platform.PS1: loader = new R2PS1Loader(); break;
+							case Settings.Platform.DS:
+							case Settings.Platform._3DS:
+							case Settings.Platform.N64:
+								loader = new R2DSLoader(); break;
 							default: loader = new R2Loader(); break;
 						}
                     } else {
@@ -407,7 +412,7 @@ MonoBehaviour.print(str);
 							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 						}
 						cnt = new CNT(cntPaths);
-                    } else if (Settings.s.game == Settings.Game.RA) {
+                    } else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
                         cntPaths = new string[2];
                         cntPaths[0] = gameDataBinFolder + "vignette.cnt";
                         cntPaths[1] = gameDataBinFolder + "tex32.cnt";
@@ -421,6 +426,17 @@ MonoBehaviour.print(str);
 			if (cnt != null) {
 				yield return controller.StartCoroutine(cnt.Init());
 				cnt.SetCacheSize(2 * 1024 * 1024);
+				if (exportTextures) {
+					string state = loadingState;
+					loadingState = "Exporting textures";
+					yield return null;
+					// Export all textures in cnt
+					foreach (CNT.FileStruct file in cnt.fileList) {
+						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + file.FullName.Replace(".gf", ".png"), cnt.GetGF(file).GetTexture().EncodeToPNG());
+					}
+					loadingState = state;
+					yield return null;
+				}
 				//Debug.Log("CNT init Finished!");
 				yield return null;
 			}
@@ -536,11 +552,18 @@ MonoBehaviour.print(str);
                         Pointer off_texture = Pointer.Read(reader);
                         TextureInfo tex = textures.Where(t => t.offset == off_texture).First();
                         tex.Texture = menuTPL.textures[i];
-                    }
+
+						if (exportTextures) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/menu/" + i + ".png", menuTPL.textures[i].EncodeToPNG());
+						}
+					}
                     for (int i = 0, j = 0; i < fixTPL.Count; i++, j++) {
                         while (textures[j].Texture != null) j++;
                         textures[j].Texture = fixTPL.textures[i];
-                    }
+						if (exportTextures) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/fix/" + i + ".png", menuTPL.textures[i].EncodeToPNG());
+						}
+					}
                 } else if (Settings.s.platform == Settings.Platform.iOS) {
                     for (int i = 0; i < num_textures; i++) {
 						loadingState = "Loading fixed textures: " + (i+1) + "/" + num_textures;
@@ -616,7 +639,19 @@ MonoBehaviour.print(str);
                         textures[i].Texture = lvlTPL.textures[i - num_textures_fix - transitTexturesSeen];
                     }
                 }
-            } else if (Settings.s.platform == Settings.Platform.iOS) {
+				if (exportTextures) {
+					if (transitTPL != null) {
+						for(int i = 0; i < transitTPL.textures.Length; i++) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(transitTPL.path) + "/" + i + ".png", transitTPL.textures[i].EncodeToPNG());
+						}
+					}
+					if (lvlTPL != null) {
+						for (int i = 0; i < lvlTPL.textures.Length; i++) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(lvlTPL.path) + "/" + i + ".png", lvlTPL.textures[i].EncodeToPNG());
+						}
+					}
+				}
+			} else if (Settings.s.platform == Settings.Platform.iOS) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					if (textures[i] == null) continue;

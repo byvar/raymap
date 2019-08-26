@@ -2,16 +2,25 @@
 using System.Collections;
 using UnityEditor;
 using OpenSpace;
+using OpenSpace.Visual;
 
 [CustomEditor(typeof(FamilyComponent))]
 public class FamilyEditor : Editor {
     public override void OnInspectorGUI() {
         DrawDefaultInspector();
 
+
+        FamilyComponent fc = (FamilyComponent)target;
+
+        if (GUILayout.Button("Rebuild")) {
+            var obj = fc.family.objectLists[0].entries[0].po.visualSet[0].obj;
+            ((obj as MeshObject).subblocks[0] as MeshElement).Reset();
+            var test = ((obj as MeshObject).subblocks[0] as MeshElement).Gao;
+        }
+
         GUILayout.BeginVertical();
         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
-        FamilyComponent fc = (FamilyComponent)target;
         foreach(MechanicsIDCard idCard in fc.idCards) {
             GUILayout.BeginVertical();
             GUILayout.Label("Gravity: " + idCard.gravity);

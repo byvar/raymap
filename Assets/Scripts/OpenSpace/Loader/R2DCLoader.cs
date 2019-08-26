@@ -349,8 +349,20 @@ namespace OpenSpace.Loader {
 			yield return null;
 			ReadBehaviorCopies(reader);
 			yield return null;
-            // Parse transformation matrices and other settings for fix characters
-            /*if (off_mainChar != null && off_matrix_mainChar != null) {
+			print("Sectors: " + sectors.Count);
+			for (int i = 0; i < sectors.Count; i++) {
+				print("Sector " + i + "\t" + sectors[i].persos.Count + "\t" + sectors[i].staticLights.Count);
+			}
+			print("Persos: " + persos.Count);
+			print("World: " + superObjects.Count(so => so.type == SuperObject.Type.World));
+			print("IPOs: " + superObjects.Count(so => so.type == SuperObject.Type.IPO || so.type == SuperObject.Type.IPO_2));
+			print("POs: " + superObjects.Count(so => so.type == SuperObject.Type.PO));
+			print("SOs: " + superObjects.Count);
+			print("Families: " + families.Count);
+			print("Always: " + globals.num_always + " - Spawnables: " + globals.spawnablePersos.Count);
+
+			// Parse transformation matrices and other settings for fix characters
+			/*if (off_mainChar != null && off_matrix_mainChar != null) {
                 SuperObject so = SuperObject.FromOffset(off_mainChar);
                 Pointer.DoAt(ref reader, off_matrix_mainChar, () => {
                     reader.ReadUInt32();
@@ -375,7 +387,7 @@ namespace OpenSpace.Loader {
                     }
                 });
             }*/
-        }
+		}
         #endregion
 
         private void ReadLog(Stream logStream) {

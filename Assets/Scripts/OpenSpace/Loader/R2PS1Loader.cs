@@ -48,8 +48,8 @@ namespace OpenSpace.Loader {
 					for(int i = 0; i < memoryBlocks.Count; i++) {
 						MemoryBlock b = memoryBlocks[i];
 						ExtractBlock(reader, b.compressed, 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_compr.blk", compression: true);
+						ExtractBlock(reader, b.filetable, 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_fat_and_anims.blk");
 						ExtractBlock(reader, b.uncompressed, 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_uncompr.blk");
-						ExtractBlock(reader, b.filetable, 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_ff.blk");
 						for (int j = 0; j < b.cutscenes.Count; j++) {
 							ExtractBlock(reader, b.cutscenes[j], 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_lba_" + j + ".blk");
 						}

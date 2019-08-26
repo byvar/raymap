@@ -143,7 +143,7 @@ namespace OpenSpace.Exporter {
                     break;
                 case DsgVarInfoEntry.DsgVarType.TextArray: // TODO: check
                     goto default;
-                    break;
+                    //break;
                 case DsgVarInfoEntry.DsgVarType.TextRefArray: // TODO: check
                     goto default;
                 case DsgVarInfoEntry.DsgVarType.Array6:

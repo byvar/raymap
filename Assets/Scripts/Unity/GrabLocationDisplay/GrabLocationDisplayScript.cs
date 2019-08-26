@@ -42,8 +42,8 @@ public class GrabLocationDisplayScript : MonoBehaviour
                     vector40Entry = dsgVarComponent.dsgVarEntries[40];
                 } else if (Settings.s.game == Settings.Game.R3) {
                     return;
-                    vector38Entry = dsgVarComponent.dsgVarEntries[38];
-                    vector40Entry = dsgVarComponent.dsgVarEntries[40];
+                    /*vector38Entry = dsgVarComponent.dsgVarEntries[38];
+                    vector40Entry = dsgVarComponent.dsgVarEntries[40];*/
                 }
 
                 Vector3 vector38_xzy = (Vector3)vector38Entry.value;

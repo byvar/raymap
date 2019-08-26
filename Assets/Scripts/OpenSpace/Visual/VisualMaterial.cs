@@ -28,7 +28,7 @@ namespace OpenSpace.Visual {
 
         public byte properties;
         private Material material;
-        private Material materialBillboard;
+        //private Material materialBillboard;
 
         // UV scrolling
         public int currentAnimTexture = 0;
@@ -359,7 +359,7 @@ namespace OpenSpace.Visual {
 		// Call after clone
 		public void Reset() {
 			material = null;
-			materialBillboard = null;
+			//materialBillboard = null;
 		}
 		public VisualMaterial Clone() {
 			VisualMaterial vm = (VisualMaterial)MemberwiseClone();

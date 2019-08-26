@@ -42,8 +42,8 @@ public class PersoBehaviour : MonoBehaviour {
     public bool playAnimation = true;
     public float animationSpeed = 15f;
     private float updateCounter = 0f;
-    private PhysicalObject[][] subObjects = null; // [channel][ntto]
-    private GameObject[] channelObjects = null;
+    public PhysicalObject[][] subObjects { get; private set; } = null; // [channel][ntto]
+    public GameObject[] channelObjects { get; private set; }
 	private int[] currentActivePO = null;
 	private bool[] channelParents = null;
     public AnimMorphData[,] morphDataArray;
@@ -393,47 +393,55 @@ public class PersoBehaviour : MonoBehaviour {
 		}
 	}
 
-	public void SetState(int index) {
-		if (index < 0 || index >= perso.p3dData.family.states.Count) return;
-		stateIndex = index;
-		currentState = index;
-		state = perso.p3dData.family.states[index];
-		UpdateViewCollision(controller.viewCollision);
+    public void SetState(State s)
+    {
+        this.state = s;
+        stateIndex = s.index;
+        currentState = s.index;
+        UpdateViewCollision(controller.viewCollision);
 
-		// Set animation
-		MapLoader l = MapLoader.Loader;
+        // Set animation
+        MapLoader l = MapLoader.Loader;
         ushort anim_index = 0;
         byte bank_index = 0;
         if (state.anim_ref != null) {
             anim_index = state.anim_ref.anim_index;
             bank_index = perso.p3dData.family.animBank;
         }
-		if (state.anim_refMontreal != null) {
-			a3d = null;
-			animationSpeed = state.speed;
-			//animationSpeed = state.speed;
-			InitAnimationMontreal(state.anim_refMontreal);
-			UpdateAnimation();
-		} else if (state.anim_ref != null
-			&& l.animationBanks != null
-			&& l.animationBanks.Length > bank_index
-			&& l.animationBanks[bank_index] != null
-			&& l.animationBanks[bank_index].animations != null
-			&& l.animationBanks[bank_index].animations.Length > anim_index
-			&& l.animationBanks[bank_index].animations[anim_index] != null) {
-			animMontreal = null;
-			animationSpeed = state.speed;
-			//animationSpeed = state.speed;
-			InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
-			UpdateAnimation();
-		} else if (state.anim_ref != null && state.anim_ref.a3d != null) {
-			animMontreal = null;
-			animationSpeed = state.speed;
-			InitAnimation(state.anim_ref.a3d);
-			UpdateAnimation();
-		} else {
-			a3d = null;
-		}
+        if (state.anim_refMontreal != null) {
+            a3d = null;
+            animationSpeed = state.speed;
+            //animationSpeed = state.speed;
+            InitAnimationMontreal(state.anim_refMontreal);
+            UpdateAnimation();
+        } else if (state.anim_ref != null
+            && l.animationBanks != null
+            && l.animationBanks.Length > bank_index
+            && l.animationBanks[bank_index] != null
+            && l.animationBanks[bank_index].animations != null
+            && l.animationBanks[bank_index].animations.Length > anim_index
+            && l.animationBanks[bank_index].animations[anim_index] != null) {
+            animMontreal = null;
+            animationSpeed = state.speed;
+            //animationSpeed = state.speed;
+            InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
+            UpdateAnimation();
+        } else if (state.anim_ref != null && state.anim_ref.a3d != null) {
+            animMontreal = null;
+            animationSpeed = state.speed;
+            InitAnimation(state.anim_ref.a3d);
+            UpdateAnimation();
+        } else {
+            a3d = null;
+        }
+    }
+
+	public void SetState(int index) {
+		if (index < 0 || index >= perso.p3dData.family.states.Count) return;
+		stateIndex = index;
+		currentState = index;
+		state = perso.p3dData.family.states[index];
+        SetState(state);
     }
 
     // Update is called once per frame
@@ -735,7 +743,7 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    void UpdateAnimation() {
+    public void UpdateAnimation() {
         if (loaded && a3d != null && channelObjects != null & subObjects != null) {
             if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
             // First pass: reset TRS for all sub objects
@@ -788,6 +796,7 @@ public class PersoBehaviour : MonoBehaviour {
                 AnimChannel ch = a3d.channels[a3d.start_channels + i];
                 AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
                 AnimKeyframe kf = a3d.keyframes[kfi.kf];
+				//print(perso.p3dData.family.animBank);
                 AnimVector pos = a3d.vectors[kf.positionVector];
                 AnimQuaternion qua = a3d.quaternions[kf.quaternion];
                 AnimVector scl = a3d.vectors[kf.scaleVector];
@@ -819,8 +828,9 @@ public class PersoBehaviour : MonoBehaviour {
                     //interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
                     interpolation = framesSinceKF / (float)framesDifference;
                 }
-                //print(interpolation);
-                //print(a3d.vectors.Length + " - " + nextKF.positionVector);
+				//print(interpolation);
+				//print(a3d.vectors.Length + " - " + nextKF.positionVector);
+				//print(perso.p3dData.family.animBank);
                 AnimVector pos2 = a3d.vectors[nextKF.positionVector];
                 AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
                 AnimVector scl2 = a3d.vectors[nextKF.scaleVector];

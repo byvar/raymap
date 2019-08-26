@@ -32,3 +32,24 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+r3_pc
+r2_pc
+r2_dc
+Assets/StreamingAssets.meta
+ProjectSettings/VFXManager.asset
+Logs/Packages-Update.log
+Assets/Prefabs/GrabLocationDisplay/GrabLocationDisplayScript.cs.meta
+Assets/Prefabs/Editor/GrabLocationMovementGao.prefab
+Assets/Editor/CreatePrefabFromSelected.cs.meta
+Assets/Editor/CreatePrefabFromSelected.cs
+Assets/Prefabs/GrabLocationDisplay/GrabLocationDisplay.prefab.meta
+Assets/Prefabs/GrabLocationDisplay.meta
+Assets/Prefabs/Editor/GrabLocationMovementGao.prefab.meta
+Assets/Editor/Cone32v50t0b234l234oi.asset.meta
+Assets/Editor/Cone32v50t0b234l234oi.asset
+
+# Exported maps
+/exports/
+/exports_dd/
+r2_pc_demo2
+r2_pc_demo1

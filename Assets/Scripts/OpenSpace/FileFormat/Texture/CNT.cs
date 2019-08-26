@@ -57,7 +57,7 @@ namespace OpenSpace.FileFormat.Texture {
 
 
         bool isLittleEndian = true;
-        uint count = 0;
+        //uint count = 0;
 
         public uint Count {
             get { return (uint)fileCount; }
@@ -196,9 +196,13 @@ namespace OpenSpace.FileFormat.Texture {
 
         public GF GetGF(string filename) {
             FileStruct file = fileList.FirstOrDefault(f => f.FullName == filename);
-            if (file == null) return null;
-            return new GF(GetFileBytes(file));
+			return GetGF(file);
         }
+
+		public GF GetGF(FileStruct file) {
+			if (file == null) return null;
+			return new GF(GetFileBytes(file));
+		}
 
         public GF GetGFByTGAName(string tgaName) {
             FileStruct file = fileList.FirstOrDefault(f => f.TGAName.ToLower().Replace('/', '\\').Equals(tgaName.ToLower().Replace('/','\\')));

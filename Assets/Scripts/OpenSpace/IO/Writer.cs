@@ -4,8 +4,8 @@ using System.IO;
 namespace OpenSpace {
     public class Writer : BinaryWriter {
         bool isLittleEndian = true;
-        bool masking = false; // for Rayman 2
-        uint mask = 0;
+        //bool masking = false; // for Rayman 2
+        //uint mask = 0;
         public Writer(System.IO.Stream stream) : base(stream) { isLittleEndian = true; }
         public Writer(System.IO.Stream stream, bool isLittleEndian) : base(stream) { this.isLittleEndian = isLittleEndian; }
 
