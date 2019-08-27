@@ -241,7 +241,7 @@ namespace OpenSpace.Loader {
 
 		public void ExportTextures(Reader reader) {
 			// Textures in data.bin
-			/*texturesTableSeen = new bool[texturesTable.Length];
+			texturesTableSeen = new bool[texturesTable.Length];
 			palettesTableSeen = new bool[palettesTable.Length];
 			for (int i = 0; i < fatTables.Length; i++) {
 				for (int j = 0; j < fatTables[i].entries.Length; j++) {
@@ -289,8 +289,8 @@ namespace OpenSpace.Loader {
 						}
 					}
 				}
-			}*/
-			/*for (int i = 0; i < palettesTable.Length; i++) {
+			}
+			for (int i = 0; i < palettesTable.Length; i++) {
 				if (!palettesTableSeen[i]) {
 					print("Unused Palette: " + i + " - " + palettesTable[i] + ". Est. num colors: " + (palettesTable[i+1].offset-palettesTable[i].offset)/2);
 
@@ -301,7 +301,7 @@ namespace OpenSpace.Loader {
 						});
 					}
 				}
-			}*/
+			}
 			//print("Unused textures: " + texturesTableSeen.Where(t => !t).Count() + " - Unused palettes: " + palettesTableSeen.Where(p => !p).Count());
 			if (Settings.s.platform == Settings.Platform.DS) {
 				// R2 DS

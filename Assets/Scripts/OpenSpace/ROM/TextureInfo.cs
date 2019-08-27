@@ -178,14 +178,21 @@ namespace OpenSpace.ROM {
 						tex.mainTex.LoadAlphaTexture(tex.alphaTex);
 					}
 				}
-				tex.Texture = tex.mainTex != null ? tex.mainTex.texture : tex.alphaTex.texture;
+				tex.Texture = tex.mainTex != null ? tex.mainTex.texture : tex.alphaTex?.texture;
 				if (l.exportTextures) {
-					string palette = (tex.palette_index != 0xFFFF ? "_P" + (tex.palette_index & 0x7FFF) : "");
-					string alpha   = (tex.alpha_index != 0xFFFF ? "_A" + (tex.alpha_index & 0x7FFF) : "");
-					string main    = (tex.texture_index != 0xFFFF ? "_T" + (tex.texture_index & 0x7FFF) : "");
-					if (!File.Exists(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png")) {
-						Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png", tex.Texture.EncodeToPNG());
-					}
+
+                    if (tex.Texture != null) {
+
+                        string palette = (tex.palette_index != 0xFFFF ? "_P" + (tex.palette_index & 0x7FFF) : "");
+                        string alpha = (tex.alpha_index != 0xFFFF ? "_A" + (tex.alpha_index & 0x7FFF) : "");
+                        string main = (tex.texture_index != 0xFFFF ? "_T" + (tex.texture_index & 0x7FFF) : "");
+                        if (!File.Exists(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png")) {
+                            Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png", tex.Texture.EncodeToPNG());
+                        }
+
+                    } else {
+                        Debug.LogWarning("No mainTex or alphaTex for tex " + tex.offset);
+                    }
 				}
 			}
 			return tex;
