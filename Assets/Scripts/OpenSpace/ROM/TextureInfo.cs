@@ -101,32 +101,18 @@ namespace OpenSpace.ROM {
 				} else {
 					tex.palette_num_colors = 16;
 				}
-				ushort ind_texture = 0;
-				string table_name = "";
+				ushort ind_texture = 0xFFFF;
 				bool rgba16 = tex.alpha_index != 0xFFFF && tex.texture_index != 0xFFFF;
-				if (rgba16) {
-					table_name = "RGBA";
+				GF64.Format format = GF64.Format.I4;
+				if ((tex.flags & 1) != 0) {
+					ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_i4) & 0xFFFF);
+				} else if ((tex.flags & 2) != 0) {
+					format = GF64.Format.I8;
+					ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_i8) & 0xFFFF);
+					tex.palette_num_colors = 256;
+				} else if ((tex.flags & 4) != 0) {
+					format = GF64.Format.RGBA;
 					ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_rgba) & 0xFFFF);
-				} else {
-					if (Settings.s.platform == Settings.Platform.DS) {
-						if ((tex.flags & 1) != 0) {
-							table_name = "I4";
-							ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_i4) & 0xFFFF);
-						} else if ((tex.flags & 2) != 0) {
-							table_name = "I8";
-							ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_i8) & 0xFFFF);
-						} else if ((tex.flags & 4) != 0) {
-							table_name = "RGBA";
-							ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_rgba) & 0xFFFF);
-						} else {
-							table_name = "I4";
-							ushort actualTexIndex = tex.alpha_index != 0xFFFF ? tex.alpha_index : tex.texture_index;
-							ind_texture = actualTexIndex;
-						}
-					} else {
-						table_name = "I4";
-						ind_texture = tex.texture_index;
-					}
 				}
 				if (ind_texture != 0xFFFF) {
 					tex.off_texture = l.texturesTable[ind_texture];
@@ -137,7 +123,7 @@ namespace OpenSpace.ROM {
 					l.texturesTableSeen[tex.alpha_index] = true;
 				}
 				tex.off_palette = null;
-				GF64.Format format = rgba16 ? GF64.Format.RGBA5551 : (tex.palette_num_colors == 16 ? GF64.Format.I4 : GF64.Format.I8);
+				//GF64.Format format = rgba16 ? GF64.Format.RGBA5551 : (tex.palette_num_colors == 16 ? GF64.Format.I4 : GF64.Format.I8);
 				if (tex.palette_index != 0xFFFF) {
 					if (Settings.s.platform == Settings.Platform.DS) {
 						tex.off_palette = l.palettesTable[tex.palette_index & 0x7FFF];
@@ -155,6 +141,7 @@ namespace OpenSpace.ROM {
 					+ tex.color_size + "\t"
 					+ tex.palette_num_colors + "\t"
 					+ tex.off_texture + "\t"
+					+ tex.off_alpha + "\t"
 					+ tex.off_palette + "\t");
 				//print(((1 << hExponent) * (1 << wExponent)) + "\t" + (1 << wExponent) + "\t" + (1 << hExponent) + "\t" + table_index + "\t" + field3 + "\t" + size + "\t" + palette_num_colors + "\t" + off_texture + "\t" + off_palette);
 				if (tex.off_texture != null) {
@@ -186,8 +173,8 @@ namespace OpenSpace.ROM {
                         string palette = (tex.palette_index != 0xFFFF ? "_P" + (tex.palette_index & 0x7FFF) : "");
                         string alpha = (tex.alpha_index != 0xFFFF ? "_A" + (tex.alpha_index & 0x7FFF) : "");
                         string main = (tex.texture_index != 0xFFFF ? "_T" + (tex.texture_index & 0x7FFF) : "");
-                        if (!File.Exists(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png")) {
-                            Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + table_name + main + alpha + palette + ".png", tex.Texture.EncodeToPNG());
+                        if (!File.Exists(l.gameDataBinFolder + "/textures/" + format + main + alpha + palette + ".png")) {
+                            Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + format + main + alpha + palette + ".png", tex.Texture.EncodeToPNG());
                         }
 
                     } else {

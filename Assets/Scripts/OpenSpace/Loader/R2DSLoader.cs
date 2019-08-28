@@ -118,29 +118,29 @@ namespace OpenSpace.Loader {
 					Pointer off_list = Pointer.Read(reader);
 					uint num_list = reader.ReadUInt32();
 				}
-				Pointer off_table1 = Pointer.Read(reader);
-				uint sz_table1 = reader.ReadUInt32() >> 2;
-				Pointer off_table2 = Pointer.Read(reader);
-				uint sz_table2 = reader.ReadUInt32() >> 2;
-				Pointer off_table3 = Pointer.Read(reader);
-				uint sz_table3 = reader.ReadUInt32() >> 2;
+				Pointer off_table_i4 = Pointer.Read(reader);
+				uint sz_table_i4 = reader.ReadUInt32() >> 2;
+				Pointer off_table_i8 = Pointer.Read(reader);
+				uint sz_table_i8 = reader.ReadUInt32() >> 2;
+				Pointer off_table_rgba = Pointer.Read(reader);
+				uint sz_table_rgba = reader.ReadUInt32() >> 2;
 				ind_textureTable_i4 = 0;
-				ind_textureTable_i8 = ind_textureTable_i4 + (sz_table1);
-				ind_textureTable_rgba = ind_textureTable_i8 + (sz_table2);
-				uint totalSz = ind_textureTable_rgba + (sz_table3);
+				ind_textureTable_i8 = ind_textureTable_i4 + (sz_table_i4);
+				ind_textureTable_rgba = ind_textureTable_i8 + (sz_table_i8);
+				uint totalSz = ind_textureTable_rgba + (sz_table_rgba);
 				texturesTable = new Pointer[totalSz];
-				Pointer.DoAt(ref reader, off_table1, () => {
-					for (int i = 0; i < sz_table1; i++) {
+				Pointer.DoAt(ref reader, off_table_i4, () => {
+					for (int i = 0; i < sz_table_i4; i++) {
 						texturesTable[ind_textureTable_i4 + i] = Pointer.Read(reader);
 					}
 				});
-				Pointer.DoAt(ref reader, off_table2, () => {
-					for (int i = 0; i < sz_table2; i++) {
+				Pointer.DoAt(ref reader, off_table_i8, () => {
+					for (int i = 0; i < sz_table_i8; i++) {
 						texturesTable[ind_textureTable_i8 + i] = Pointer.Read(reader);
 					}
 				});
-				Pointer.DoAt(ref reader, off_table3, () => {
-					for (int i = 0; i < sz_table3; i++) {
+				Pointer.DoAt(ref reader, off_table_rgba, () => {
+					for (int i = 0; i < sz_table_rgba; i++) {
 						texturesTable[ind_textureTable_rgba + i] = Pointer.Read(reader);
 					}
 				});
@@ -263,7 +263,7 @@ namespace OpenSpace.Loader {
 							for (int h = 3; h < 15; h++) {
 								if (w + h == (int)logSize + 1) {
 									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I4, null, 16);
-									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/I4_T" + (i-ind_textureTable_i4) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + GF64.Format.I4 + "_T" + (i-ind_textureTable_i4) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
 								}
 							}
 						}
@@ -273,7 +273,7 @@ namespace OpenSpace.Loader {
 							for (int h = 3; h < 15; h++) {
 								if (w + h == (int)logSize) {
 									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I8, null, 32);
-									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/I8_T" + (i-ind_textureTable_i8) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + GF64.Format.I8 + "_T" + (i-ind_textureTable_i8) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
 								}
 							}
 						}
@@ -282,15 +282,15 @@ namespace OpenSpace.Loader {
 						for (int w = 3; w < 15; w++) {
 							for (int h = 3; h < 15; h++) {
 								if (w + h == (int)logSize-1) {
-									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.RGBA5551, null, 32);
-									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/RGBA_T" + (i-ind_textureTable_rgba) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.RGBA, null, 32);
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + GF64.Format.RGBA + "_T" + (i-ind_textureTable_rgba) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
 								}
 							}
 						}
 					}
 				}
 			}
-			for (int i = 0; i < palettesTable.Length; i++) {
+			/*for (int i = 0; i < palettesTable.Length; i++) {
 				if (!palettesTableSeen[i]) {
 					print("Unused Palette: " + i + " - " + palettesTable[i] + ". Est. num colors: " + (palettesTable[i+1].offset-palettesTable[i].offset)/2);
 
@@ -301,7 +301,7 @@ namespace OpenSpace.Loader {
 						});
 					}
 				}
-			}
+			}*/
 			//print("Unused textures: " + texturesTableSeen.Where(t => !t).Count() + " - Unused palettes: " + palettesTableSeen.Where(p => !p).Count());
 			if (Settings.s.platform == Settings.Platform.DS) {
 				// R2 DS
