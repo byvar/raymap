@@ -61,9 +61,11 @@ ra_pc
 rm_pc
 r2_pc
 r2_dc
+r2_dc_jp
 r2_ios
 r2_ps1
 r2_ps2
+r2_ps2_jp
 r2_ds
 rrr_ds
 r2_3ds

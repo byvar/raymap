@@ -109,7 +109,9 @@ namespace OpenSpace.ROM {
 				} else if ((tex.flags & 2) != 0) {
 					format = GF64.Format.I8;
 					ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_i8) & 0xFFFF);
-					tex.palette_num_colors = 256;
+					if (Settings.s.platform == Settings.Platform.N64) {
+						tex.palette_num_colors = 256;
+					}
 				} else if ((tex.flags & 4) != 0) {
 					format = GF64.Format.RGBA;
 					ind_texture = (ushort)((tex.texture_index + l.ind_textureTable_rgba) & 0xFFFF);
@@ -123,7 +125,9 @@ namespace OpenSpace.ROM {
 					l.texturesTableSeen[tex.alpha_index] = true;
 				}
 				tex.off_palette = null;
-				//GF64.Format format = rgba16 ? GF64.Format.RGBA5551 : (tex.palette_num_colors == 16 ? GF64.Format.I4 : GF64.Format.I8);
+				/*if (Settings.s.platform == Settings.Platform.DS) {
+					format = rgba16 ? GF64.Format.RGBA : (tex.palette_num_colors == 16 ? GF64.Format.I4 : GF64.Format.I8);
+				}*/
 				if (tex.palette_index != 0xFFFF) {
 					if (Settings.s.platform == Settings.Platform.DS) {
 						tex.off_palette = l.palettesTable[tex.palette_index & 0x7FFF];
