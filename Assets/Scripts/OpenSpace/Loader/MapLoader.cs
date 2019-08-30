@@ -131,7 +131,7 @@ namespace OpenSpace {
 							case Settings.Platform.DS:
 							case Settings.Platform._3DS:
 							case Settings.Platform.N64:
-								loader = new R2DSLoader(); break;
+								loader = new R2ROMLoader(); break;
 							default: loader = new R2Loader(); break;
 						}
                     } else {

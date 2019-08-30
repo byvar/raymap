@@ -10,9 +10,9 @@ using OpenSpace.FileFormat.Texture;
 using OpenSpace.FileFormat.Texture.DS;
 
 namespace OpenSpace.Loader {
-	public class R2DSLoader : MapLoader {
-		public DSBIN data;
-		public DSBIN fat;
+	public class R2ROMLoader : MapLoader {
+		public ROMBIN data;
+		public ROMBIN fat;
 		public FATTable[] fatTables;
 		public int currentLevel = 0;
 
@@ -24,6 +24,12 @@ namespace OpenSpace.Loader {
 		public bool[] texturesTableSeen;
 		public bool[] palettesTableSeen;
 
+		public List<TextureInfoRef> textureInfoRefs = new List<TextureInfoRef>();
+		public new List<TextureInfo> textures = new List<TextureInfo>();
+		public new List<VisualMaterial> visualMaterials = new List<VisualMaterial>();
+		public Dictionary<FATEntry.Type, List<ROMStruct>> structs = new Dictionary<FATEntry.Type, List<ROMStruct>>();
+		
+
 		public override IEnumerator Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
@@ -33,8 +39,8 @@ namespace OpenSpace.Loader {
 				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 				loadingState = "Initializing files";
-				files_array[SMem.Data] = new DSBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
-				files_array[SMem.Fat] = new DSBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
+				files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
+				files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
 
 				yield return controller.StartCoroutine(LoadFat());
 
@@ -87,8 +93,8 @@ namespace OpenSpace.Loader {
 		}
 		
 		public IEnumerator LoadFat() {
-			data = files_array[SMem.Data] as DSBIN;
-			fat = files_array[SMem.Fat] as DSBIN;
+			data = files_array[SMem.Data] as ROMBIN;
+			fat = files_array[SMem.Fat] as ROMBIN;
 			Reader reader = files_array[SMem.Fat].reader;
 
 			uint num_tables = reader.ReadUInt32();
@@ -103,7 +109,7 @@ namespace OpenSpace.Loader {
 		}
 
 		public IEnumerator LoadData() {
-			data = files_array[SMem.Data] as DSBIN;
+			data = files_array[SMem.Data] as ROMBIN;
 			Reader reader = files_array[SMem.Data].reader;
 
 			reader.ReadUInt16();
@@ -174,29 +180,16 @@ namespace OpenSpace.Loader {
 			Pointer.DoAt(ref reader, off_engineStruct, () => {
 				reader.ReadBytes(12);
 				ushort ind_shadowTexture = reader.ReadUInt16();
-				LoadTexture(reader, ind_shadowTexture);
+				TextureInfoRef shadowTexRef = GetOrRead<TextureInfoRef>(reader, ind_shadowTexture);
 				reader.ReadUInt16();
 				ushort ind_characterMaterial = reader.ReadUInt16();
-				Pointer off_visualMaterial = GetStructPtr(FATEntry.Type.VisualMaterial, ind_characterMaterial);
-				Pointer.DoAt(ref reader, off_visualMaterial, () => {
-					reader.ReadBytes(12);
-					ushort ind_vmTextureList = reader.ReadUInt16();
-					ushort num_vmTextureList = reader.ReadUInt16();
-					Pointer off_textureList = GetStructPtr(FATEntry.Type.VisualMaterialTextures, ind_vmTextureList);
-					Pointer.DoAt(ref reader, off_textureList, () => {
-						for (ushort i = 0; i < num_vmTextureList; i++) {
-							ushort ind_texture = reader.ReadUInt16();
-							ushort map_id = reader.ReadUInt16();
-							LoadTexture(reader, ind_texture);
-						}
-					});
-				});
+				VisualMaterial characterMaterial = GetOrRead<VisualMaterial>(reader, ind_characterMaterial);
 				ushort ind_noCtrlTextureList = reader.ReadUInt16();
 				Pointer off_noCtrlTextureList = GetStructPtr(FATEntry.Type.NoCtrlTextureList, ind_noCtrlTextureList);
 				Pointer.DoAt(ref reader, off_noCtrlTextureList, () => {
 					for (int i = 0; i < 5; i++) {
 						ushort ind_fixTexRef = reader.ReadUInt16();
-						LoadTexture(reader, ind_fixTexRef);
+						TextureInfoRef texRef = GetOrRead<TextureInfoRef>(reader, ind_fixTexRef);
 					}
 				});
 			});
@@ -207,32 +200,10 @@ namespace OpenSpace.Loader {
 				ushort num_languages = reader.ReadUInt16();
 				print("Number of languages: " + num_languages);
 				for (ushort i = 0; i < num_languages; i++) {
-					Pointer off_lang = GetStructPtr(FATEntry.Type.LanguageTable, i);
-					Pointer.DoAt(ref reader, off_lang, () => {
-						ushort ind_txtTable = reader.ReadUInt16();
-						ushort num_txtTable = reader.ReadUInt16();
-						ushort ind_136Table = reader.ReadUInt16();
-						ushort num_136Table = reader.ReadUInt16();
-						reader.ReadUInt16();
-						string name = reader.ReadString(0x12);
-						print(name);
-						Pointer off_txtTable = GetStructPtr(FATEntry.Type.TextTable, ind_txtTable);
-						Pointer.DoAt(ref reader, off_txtTable, () => {
-							for (ushort j = 0; j < num_txtTable; j++) {
-								ushort ind_strRef = reader.ReadUInt16();
-								Pointer off_strRef = GetStructPtr(FATEntry.Type.StringReference, ind_strRef);
-								Pointer.DoAt(ref reader, off_strRef, () => {
-									ushort strLen = reader.ReadUInt16();
-									ushort ind_str = reader.ReadUInt16();
-									Pointer off_str = GetStructPtr(FATEntry.Type.String, ind_str);
-									Pointer.DoAt(ref reader, off_str, () => {
-										string str = reader.ReadString(strLen);
-										print(str);
-									});
-								});
-							}
-						});
-					});
+					LanguageTable lang = GetOrRead<LanguageTable>(reader, i);
+					if (lang != null) {
+						print(lang.name);
+					}
 				}
 			});
 
@@ -247,9 +218,9 @@ namespace OpenSpace.Loader {
 				for (int j = 0; j < fatTables[i].entries.Length; j++) {
 					if (fatTables[i].entries[j].EntryType != FATEntry.Type.TextureInfo) continue;
 					Pointer ptr = new Pointer(fatTables[i].entries[j].off_data, files_array[SMem.Data]);
-					Pointer.DoAt(ref reader, ptr, () => {
-						TextureInfo info = TextureInfo.Read(reader, ptr);
-					});
+					TextureInfo texInfo = new TextureInfo();
+					texInfo.Init(ptr, fatTables[i].entries[j].index);
+					texInfo.Read(reader);
 				}
 			}
 			for (int i = 0; i < texturesTable.Length; i++) {
@@ -392,13 +363,28 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public void LoadTexture(Reader reader, ushort ind_texRef) {
-			Pointer off_texRef = GetStructPtr(FATEntry.Type.TextureInfoReference, ind_texRef);
-			Pointer.DoAt(ref reader, off_texRef, () => {
-				ushort ind_texInfo = reader.ReadUInt16();
-				Pointer off_texInfo = GetStructPtr(FATEntry.Type.TextureInfo, ind_texInfo);
-				TextureInfo.Read(reader, ind_texInfo);
-			});
+		public T Get<T>(ushort index) where T : ROMStruct {
+			FATEntry.Type type = FATEntry.types[typeof(T)];
+			if (!structs.ContainsKey(type)) return null;
+			ROMStruct rs = structs[type].FirstOrDefault(s => s.Index == index);
+			return rs as T;
+		}
+
+		public T GetOrRead<T>(Reader reader, ushort index, Action<T> onPreRead = null) where T : ROMStruct, new() {
+			T rs = Get<T>(index);
+			if (rs == null) {
+				if (index != 0xFFFF) {
+					FATEntry.Type type = FATEntry.types[typeof(T)];
+					Pointer offset = GetStructPtr(type, index);
+					if (offset != null) {
+						rs = new T();
+						rs.Init(offset, index);
+						onPreRead?.Invoke(rs);
+						rs.Read(reader);
+					}
+				}
+			}
+			return rs;
 		}
 
 		public void ExportEtcFile(string name, int w, int h, bool hasAlpha) {
