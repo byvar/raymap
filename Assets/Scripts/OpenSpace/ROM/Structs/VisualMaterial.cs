@@ -2,9 +2,8 @@
 
 namespace OpenSpace.ROM {
 	public class VisualMaterial : ROMStruct {
-		public ushort ind_vmTex;
-		public ushort num_vmTex;
-		public VisualMaterialTextures vmTex;
+		public Reference<VisualMaterialTextures> textures;
+		public ushort num_textures;
 		public ushort flags;
 
         protected override void ReadInternal(Reader reader) {
@@ -13,11 +12,9 @@ namespace OpenSpace.ROM {
 			reader.ReadUInt16();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			ind_vmTex = reader.ReadUInt16();
-			num_vmTex = reader.ReadUInt16();
-			vmTex = l.GetOrRead<VisualMaterialTextures>(reader, ind_vmTex, (vt) => {
-				vt.length = num_vmTex;
-			});
+			textures = new Reference<VisualMaterialTextures>(reader);
+			num_textures = reader.ReadUInt16();
+			textures.Resolve(reader, (vmt) => { vmt.length = num_textures; });
 			reader.ReadUInt16();
 			flags = reader.ReadUInt16();
         }

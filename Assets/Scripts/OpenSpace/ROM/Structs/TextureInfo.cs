@@ -99,11 +99,11 @@ namespace OpenSpace.ROM {
 				}
 				if (ind_texture != 0xFFFF) {
 					off_texture = l.texturesTable[ind_texture];
-					l.texturesTableSeen[ind_texture] = true;
+					if(l.texturesTableSeen != null) l.texturesTableSeen[ind_texture] = true;
 				}
 				if (alpha_index != 0xFFFF) {
 					off_alpha = l.texturesTable[alpha_index];
-					l.texturesTableSeen[alpha_index] = true;
+					if (l.texturesTableSeen != null) l.texturesTableSeen[alpha_index] = true;
 				}
 				off_palette = null;
 				/*if (Settings.s.platform == Settings.Platform.DS) {

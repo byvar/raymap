@@ -10,6 +10,7 @@ namespace OpenSpace.ROM {
 		public Pointer off_table;
 		public uint num_entries;
 		public FATEntry[] entries;
+		public Dictionary<FATEntry.Type, Dictionary<ushort, FATEntry>> entriesDict = new Dictionary<FATEntry.Type, Dictionary<ushort, FATEntry>>();
 
 		public static FATTable Read(Reader reader, Pointer offset) {
 			FATTable t = new FATTable();
@@ -21,9 +22,23 @@ namespace OpenSpace.ROM {
 				for (int i = 0; i < t.entries.Length; i++) {
 					t.entries[i] = FATEntry.Read(reader, Pointer.Current(reader));
 					t.entries[i].entryIndexWithinTable = (uint)i;
+					t.AddEntryToDict(t.entries[i]);
 				}
 			});
 			return t;
+		}
+
+		private void AddEntryToDict(FATEntry entry) {
+			FATEntry.Type entryType = entry.EntryType;
+			if (!entriesDict.ContainsKey(entryType)) {
+				entriesDict[entryType] = new Dictionary<ushort, FATEntry>();
+			}
+			entriesDict[entryType][entry.index] = entry;
+		}
+
+		public FATEntry GetEntry(FATEntry.Type type, ushort index) {
+			if (!entriesDict.ContainsKey(type) || !entriesDict[type].ContainsKey(index)) return null;
+			return entriesDict[type][index];
 		}
 	}
 }

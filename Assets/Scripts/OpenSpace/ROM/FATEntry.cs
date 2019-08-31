@@ -26,7 +26,7 @@ namespace OpenSpace.ROM {
 		}
 
 		public static Dictionary<ushort, Type> TypesDS = new Dictionary<ushort, Type>() {
-			{ 0, Type.EngineStructure },
+			{ 0, Type.EngineStruct },
 			{ 5, Type.ObjectListEntry }, // ?
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 22, Type.Vertex },
@@ -47,7 +47,7 @@ namespace OpenSpace.ROM {
 		};
 
 		public static Dictionary<ushort, Type> TypesN64 = new Dictionary<ushort, Type>() {
-			{ 0, Type.EngineStructure },
+			{ 0, Type.EngineStruct },
 			{ 5, Type.ObjectListEntry }, // ?
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 21, Type.Palette },
@@ -69,7 +69,7 @@ namespace OpenSpace.ROM {
 		};
 
 		public static Dictionary<ushort, Type> Types3DS = new Dictionary<ushort, Type>() {
-			{ 0, Type.EngineStructure },
+			{ 0, Type.EngineStruct },
 			{ 16, Type.Vertex },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 22, Type.Vertex },
@@ -91,7 +91,7 @@ namespace OpenSpace.ROM {
 
 		public enum Type {
 			Unknown,
-			EngineStructure,
+			EngineStruct,
 			ObjectListEntry, // Size: 0x14
 			LevelList, // Size: 0x40 * num_levels (0x46 or 70 in Rayman 2)
 			LevelHeader, // Size: 0x38
@@ -121,6 +121,9 @@ namespace OpenSpace.ROM {
 			{ typeof(String), Type.String },
 			{ typeof(TextTable), Type.TextTable },
 			{ typeof(LanguageTable), Type.LanguageTable },
+			{ typeof(NumLanguages), Type.NumLanguages },
+			{ typeof(NoCtrlTextureList), Type.NoCtrlTextureList },
+			{ typeof(EngineStruct), Type.EngineStruct },
 		};
 
 		public Type EntryType {
