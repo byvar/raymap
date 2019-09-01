@@ -127,7 +127,7 @@ namespace OpenSpace.FileFormat.Texture {
 					}
 				}
 				if (off_current != null) Pointer.Goto(ref reader, off_current);
-			} else if (format == Format.RGBA5551) {
+			} else if (format == Format.RGBA) {
 				Pointer off_current = null;
 				if (off_texture != null) off_current = Pointer.Goto(ref reader, off_texture);
 				for (int x = 0; x < width; x++) {
@@ -191,11 +191,7 @@ namespace OpenSpace.FileFormat.Texture {
 			I4,
 			I4Alpha,
 			I8,
-			RGBA5551
-		}
-		public enum ColorFormat {
-			Monochrome,
-			Palette
+			RGBA // RGBA5551
 		}
 
     }

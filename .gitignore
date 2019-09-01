@@ -32,12 +32,11 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
-r3_pc
-r2_pc
-r2_dc
 Assets/StreamingAssets.meta
 ProjectSettings/VFXManager.asset
 Logs/Packages-Update.log
+
+# Editor assets
 Assets/Prefabs/GrabLocationDisplay/GrabLocationDisplayScript.cs.meta
 Assets/Prefabs/Editor/GrabLocationMovementGao.prefab
 Assets/Editor/CreatePrefabFromSelected.cs.meta
@@ -51,5 +50,33 @@ Assets/Editor/Cone32v50t0b234l234oi.asset
 # Exported maps
 /exports/
 /exports_dd/
-r2_pc_demo2
-r2_pc_demo1
+ExportR2PC.bat
+mapnames_r2pc.txt
+
+# Shortcuts
+r3_gc
+ra_gc
+r3_pc
+ra_pc
+rm_pc
+r2_pc
+r2_dc
+r2_dc_jp
+r2_ios
+r2_ps1
+r2_ps2
+r2_ps2_jp
+r2_ds
+rrr_ds
+r2_3ds
+r2_n64
+dd_n64
+dd_pc
+dd_dc
+tt_pc
+ttse_pc
+r2_demo1_pc
+r2_demo2_pc
+playmobil_hype_pc
+playmobil_alex_pc
+playmobil_laura_pc

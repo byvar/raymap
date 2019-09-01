@@ -5,17 +5,17 @@ using System.Linq;
 using System.Text;
 
 namespace OpenSpace.FileFormat {
-    public class DSBIN : FileWithPointers {
+    public class ROMBIN : FileWithPointers {
         string path;
         long length;
         byte[] data = null;
 		private FileWithPointers pointerFile;
 
-        public DSBIN(string name, string path, int fileID) : this(name, FileSystem.GetFileReadStream(path), fileID) {
+        public ROMBIN(string name, string path, int fileID) : this(name, FileSystem.GetFileReadStream(path), fileID) {
             this.path = path;
         }
 
-        public DSBIN(string name, Stream stream, int fileID) {
+        public ROMBIN(string name, Stream stream, int fileID) {
             allowUnsafePointers = true;
             this.name = name;
             this.fileID = fileID;

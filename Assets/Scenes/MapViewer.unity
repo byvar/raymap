@@ -929,8 +929,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af587f4a54f84c42ae16a9378ca8d57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 10
-  gameDataBinFolder: ..\..\RIPPING\R2_DS\data\RAYMAN DS\
+  mode: 12
+  gameDataBinFolder: r2_n64
   lvlName: learn_30
   baseMaterial: {fileID: 2100000, guid: 4c445331ca6381a44bb772fa126abb28, type: 2}
   baseTransparentMaterial: {fileID: 2100000, guid: f72b6a2550e50034d9212047304245fa,
