@@ -29,8 +29,9 @@ namespace OpenSpace.ROM {
 			{ 0, Type.EngineStruct },
 			{ 5, Type.ObjectListEntry }, // ?
 			{ 17, Type.TextureInfoRef }, // size: 0x2
-			{ 22, Type.Vertex },
-			{ 23, Type.Triangle },
+			{ 22, Type.Vertices },
+			{ 23, Type.MeshElementTriangles },
+			{ 24, Type.MeshElement },
 			{ 34, Type.VisualMaterial },
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
@@ -51,8 +52,9 @@ namespace OpenSpace.ROM {
 			{ 5, Type.ObjectListEntry }, // ?
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 21, Type.Palette },
-			{ 22, Type.Vertex },
-			{ 23, Type.Triangle },
+			{ 22, Type.Vertices },
+			{ 23, Type.MeshElementTriangles },
+			{ 24, Type.MeshElement },
 			{ 34, Type.VisualMaterial },
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
@@ -70,10 +72,10 @@ namespace OpenSpace.ROM {
 
 		public static Dictionary<ushort, Type> Types3DS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
-			{ 16, Type.Vertex },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
-			{ 22, Type.Vertex },
-			{ 23, Type.Triangle },
+			{ 18, Type.Vertices },
+			{ 19, Type.MeshElementTriangles },
+			{ 20, Type.MeshElement },
 			{ 30, Type.VisualMaterial },
 			{ 39, Type.LevelList },
 			{ 40, Type.LevelHeader },
@@ -108,8 +110,10 @@ namespace OpenSpace.ROM {
 			NoCtrlTextureList,
 			VisualMaterial,
 			Palette,
-			Vertex,
-			Triangle
+			Vertices,
+			MeshElementTriangles,
+			MeshElement,
+			SpriteElement
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -124,6 +128,8 @@ namespace OpenSpace.ROM {
 			{ typeof(NumLanguages), Type.NumLanguages },
 			{ typeof(NoCtrlTextureList), Type.NoCtrlTextureList },
 			{ typeof(EngineStruct), Type.EngineStruct },
+			{ typeof(MeshElement), Type.MeshElement },
+			{ typeof(MeshElementTriangles), Type.MeshElementTriangles },
 		};
 
 		public Type EntryType {

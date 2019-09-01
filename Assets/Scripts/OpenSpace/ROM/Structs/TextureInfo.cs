@@ -112,7 +112,7 @@ namespace OpenSpace.ROM {
 				if (palette_index != 0xFFFF) {
 					if (Settings.s.platform == Settings.Platform.DS) {
 						off_palette = l.palettesTable[palette_index & 0x7FFF];
-						l.palettesTableSeen[palette_index & 0x7FFF] = true;
+						if(l.palettesTableSeen != null) l.palettesTableSeen[palette_index & 0x7FFF] = true;
 					} else {
 						off_palette = l.GetStructPtr(FATEntry.Type.Palette, palette_index, global: true);
 					}
