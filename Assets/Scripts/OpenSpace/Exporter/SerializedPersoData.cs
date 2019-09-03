@@ -64,7 +64,11 @@ namespace OpenSpace.Exporter {
                     TooFarLimit = perso.stdGame.tooFarLimit
                 };
 
-                Persos.Add(perso.namePerso, ePerso);
+                if (!Persos.ContainsKey(perso.namePerso)) {
+                    Persos.Add(perso.namePerso, ePerso);
+                } else {
+                    Debug.LogWarning("Warning: duplicate perso name " + perso.namePerso + ", ignoring duplicates...");
+                }
             }
         }
 
