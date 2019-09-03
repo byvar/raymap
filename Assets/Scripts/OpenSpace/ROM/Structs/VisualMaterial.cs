@@ -23,8 +23,10 @@ namespace OpenSpace.ROM {
 		public Material Mat {
 			get {
 				Material mat = new Material(MapLoader.Loader.baseMaterial);
-				mat.SetInt("_NumTextures", 1);
-				mat.SetTexture("_Tex0", textures.Value.vmTex[0].texRef.Value.texInfo.Value.Texture);
+				if (textures.Value != null && num_textures > 0) {
+					mat.SetInt("_NumTextures", 1);
+					mat.SetTexture("_Tex0", textures.Value.vmTex[0].texRef.Value.texInfo.Value.Texture);
+				}
 				mat.SetVector("_AmbientCoef", Vector4.one);
 				mat.SetVector("_DiffuseCoef", Vector4.one);
 				return mat;

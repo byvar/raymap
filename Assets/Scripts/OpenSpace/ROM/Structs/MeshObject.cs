@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace OpenSpace.ROM {
 	public class MeshObject : ROMStruct {
+		public short scaleFactor;
+		public short factor_1;
 		public Reference<CompressedVector3Array> vectors_0;
 		public Reference<CompressedVector3Array> vectors_1;
 		public Reference<CompressedVector3Array> vectors_2;
@@ -16,8 +18,8 @@ namespace OpenSpace.ROM {
 		public ushort num_elements_1;
 
 		protected override void ReadInternal(Reader reader) {
-			reader.ReadUInt16();
-			reader.ReadUInt16();
+			scaleFactor = reader.ReadInt16();
+			factor_1 = reader.ReadInt16();
 			reader.ReadUInt16();
 			reader.ReadUInt16();
 			vectors_0 = new Reference<CompressedVector3Array>(reader);
@@ -34,7 +36,7 @@ namespace OpenSpace.ROM {
 			reader.ReadUInt16();
 			reader.ReadUInt16();
 
-			MapLoader.Loader.print("Vertices: " + num_vectors_1 + " or " + string.Format("{0:X4}", num_vectors_1));
+			//MapLoader.Loader.print("Vertices: " + num_vectors_1 + " or " + string.Format("{0:X4}", num_vectors_1));
 
 			vectors_0.Resolve(reader, v => { v.length = num_vectors_0; });
 			vectors_1.Resolve(reader, v => { v.length = num_vectors_1; });
@@ -45,20 +47,31 @@ namespace OpenSpace.ROM {
 			if (Settings.s.platform == Settings.Platform._3DS) {
 				MapLoader l = MapLoader.Loader;
 				if (elements_1.Value != null) {
+					GameObject gao = new GameObject("MeshObject @ " + Offset);
+					//gao.transform.position = new Vector3(UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f));
 					foreach (GeometricElementList2.GeometricElementListEntry entry in elements_1.Value.elements) {
 						l.print(entry.element.type);
 						if (entry.element.Value != null) {
 							if (entry.element.Value is MeshElement) {
 								MeshElement el = entry.element.Value as MeshElement;
-								GameObject gao = new GameObject("Element @ " + Offset);
-								gao.transform.position = new Vector3(UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f));
-								MeshRenderer mr = gao.AddComponent<MeshRenderer>();
-								MeshFilter mf = gao.AddComponent<MeshFilter>();
+								GameObject elGao = new GameObject("Element @ " + el.Offset);
+								elGao.transform.parent = gao.transform;
+								elGao.transform.localPosition = Vector3.zero;
+								MeshRenderer mr = elGao.AddComponent<MeshRenderer>();
+								MeshFilter mf = elGao.AddComponent<MeshFilter>();
 								Mesh mesh = new Mesh();
-								mesh.vertices = vectors_1.Value.GetVectors((float)256f);
-								mesh.normals = vectors_2.Value.GetVectors((float)Int16.MaxValue);
+								/*mesh.vertices = vectors_1.Value.GetVectors(scaleFactor != 0 ? scaleFactor : 1);
+								mesh.normals = vectors_2.Value.GetVectors(Int16.MaxValue);*/
+								if (el.num_uvs == 0) {
+									mesh.vertices = vectors_1.Value.GetVectors(scaleFactor != 0 ? scaleFactor : 1);
+									mesh.normals = vectors_2.Value.GetVectors(Int16.MaxValue);
+								} else {
+									mesh.vertices = el.triangles.Value.verts.Select(v => v.GetVector(scaleFactor != 0 ? scaleFactor : 1)).ToArray();
+									mesh.normals = el.triangles.Value.normals.Select(v => v.GetVector(Int16.MaxValue)).ToArray();
+								}
+
 								mesh.SetUVs(0, el.triangles.Value.uvs.Select(u => new Vector3(u.x, u.y, 1f)).ToList());
-								mesh.triangles = el.triangles.Value.triangles.SelectMany(t => new int[] { t.v1, t.v2, t.v3 }).ToArray();
+								mesh.triangles = el.triangles.Value.triangles.SelectMany(t => new int[] { t.v2, t.v1, t.v3 }).ToArray();
 								mf.mesh = mesh;
 								mr.material = el.visualMaterial.Value.Mat;
 							}

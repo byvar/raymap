@@ -12,14 +12,16 @@ namespace OpenSpace.ROM {
 			elements = new GeometricElementListEntry[length];
 			for (ushort i = 0; i < length; i++) {
 				elements[i].element = new GenericReference(reader, true);
-				reader.ReadUInt16();
-				reader.ReadUInt16();
+				elements[i].unk0 = reader.ReadUInt16();
+				elements[i].unk1 = reader.ReadUInt16();
 				elements[i].element.Resolve(reader);
 			}
         }
 
 		public struct GeometricElementListEntry {
 			public GenericReference element;
+			public ushort unk0;
+			public ushort unk1;
 		}
     }
 }

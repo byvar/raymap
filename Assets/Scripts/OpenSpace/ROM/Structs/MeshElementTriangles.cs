@@ -9,9 +9,8 @@ namespace OpenSpace.ROM {
 		public ushort num_uvs;
 		public Triangle[] triangles;
 		public Vector2[] uvs;
-		public Vector3[] colors;
-		public Vector3[] verts;
-		public Vector3[] normals;
+		public CompressedVector3[] verts;
+		public CompressedVector3[] normals;
 
 		protected override void ReadInternal(Reader reader) {
 			MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_uvs));
@@ -36,23 +35,16 @@ namespace OpenSpace.ROM {
 					//}
 				}
 				uvs = new Vector2[num_uvs];
-				colors = new Vector3[num_uvs];
 				for (int i = 0; i < num_uvs; i++) {
 					uvs[i] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 				}
-				verts = new Vector3[num_uvs];
-				normals = new Vector3[num_uvs];
+				verts = new CompressedVector3[num_uvs];
+				normals = new CompressedVector3[num_uvs];
 				for (int i = 0; i < num_uvs; i++) {
-					// What is this???
-					float x = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-					float y = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-					float z = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-					float x2 = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-					float y2 = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-					float z2 = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-					verts[i] = new Vector3(x2, y2, z2);
-					normals[i] = new Vector3(x, y, z);
-					//colors[i] = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+					verts[i] = new CompressedVector3(reader);
+				}
+				for (int i = 0; i < num_uvs; i++) {
+					normals[i] = new CompressedVector3(reader);
 				}
 			}
 		}
