@@ -51,7 +51,9 @@ Assets/Editor/Cone32v50t0b234l234oi.asset
 /exports/
 /exports_dd/
 ExportR2PC.bat
+ExportDDPC.bat
 mapnames_r2pc.txt
+mapnames_ddpc.txt
 
 # Shortcuts
 r3_gc
@@ -71,6 +73,7 @@ rrr_ds
 r2_3ds
 r2_n64
 dd_n64
+dd_pc
 dd_dc
 tt_pc
 ttse_pc
