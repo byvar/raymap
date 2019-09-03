@@ -76,9 +76,11 @@ namespace OpenSpace.ROM {
 			{ 18, Type.Vertices },
 			{ 19, Type.MeshElementTriangles },
 			{ 20, Type.MeshElement },
+			{ 27, Type.MeshObject },
 			{ 30, Type.VisualMaterial },
 			{ 39, Type.LevelList },
 			{ 40, Type.LevelHeader },
+			{ 46, Type.CompressedVector3Array },
 			{ 59, Type.TextureInfo }, // size: 0x100D2. contains the actual texture data too!
 			{ 87, Type.NoCtrlTextureList },
 			{ 128, Type.NumLanguages },
@@ -87,6 +89,8 @@ namespace OpenSpace.ROM {
 			{ 131, Type.TextTable },
 			{ 132, Type.Language_136 },
 			{ 133, Type.Language_137 },
+			{ 144, Type.GeometricElementList2 },
+			{ 146, Type.GeometricElementList1 },
 			{ 152, Type.VisualMaterialTextures },
 			{ 153, Type.String },
 		};
@@ -113,7 +117,12 @@ namespace OpenSpace.ROM {
 			Vertices,
 			MeshElementTriangles,
 			MeshElement,
-			SpriteElement
+			SpriteElement,
+			MeshElementList,
+			MeshObject,
+			CompressedVector3Array,
+			GeometricElementList1,
+			GeometricElementList2,
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -130,20 +139,28 @@ namespace OpenSpace.ROM {
 			{ typeof(EngineStruct), Type.EngineStruct },
 			{ typeof(MeshElement), Type.MeshElement },
 			{ typeof(MeshElementTriangles), Type.MeshElementTriangles },
+			{ typeof(CompressedVector3Array), Type.CompressedVector3Array },
+			{ typeof(GeometricElementList1), Type.GeometricElementList1 },
+			{ typeof(GeometricElementList2), Type.GeometricElementList2 },
+			{ typeof(MeshObject), Type.MeshObject },
 		};
 
 		public Type EntryType {
 			get {
-				Dictionary<ushort, Type> dict = null;
-				switch (Settings.s.platform) {
-					case Settings.Platform._3DS: dict = Types3DS; break;
-					case Settings.Platform.N64: dict = TypesN64; break;
-					default: dict = TypesDS; break;
-				}
-				if (dict.ContainsKey(type)) {
-					return dict[type];
-				} else return Type.Unknown;
+				return GetEntryType(type);
 			}
+		}
+
+		public static Type GetEntryType(ushort type) {
+			Dictionary<ushort, Type> dict = null;
+			switch (Settings.s.platform) {
+				case Settings.Platform._3DS: dict = Types3DS; break;
+				case Settings.Platform.N64: dict = TypesN64; break;
+				default: dict = TypesDS; break;
+			}
+			if (dict.ContainsKey(type)) {
+				return dict[type];
+			} else return Type.Unknown;
 		}
 	}
 }

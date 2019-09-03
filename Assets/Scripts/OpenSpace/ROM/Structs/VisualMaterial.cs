@@ -1,4 +1,5 @@
 ﻿using OpenSpace.Loader;
+using UnityEngine;
 
 namespace OpenSpace.ROM {
 	public class VisualMaterial : ROMStruct {
@@ -18,5 +19,16 @@ namespace OpenSpace.ROM {
 			reader.ReadUInt16();
 			flags = reader.ReadUInt16();
         }
+
+		public Material Mat {
+			get {
+				Material mat = new Material(MapLoader.Loader.baseMaterial);
+				mat.SetInt("_NumTextures", 1);
+				mat.SetTexture("_Tex0", textures.Value.vmTex[0].texRef.Value.texInfo.Value.Texture);
+				mat.SetVector("_AmbientCoef", Vector4.one);
+				mat.SetVector("_DiffuseCoef", Vector4.one);
+				return mat;
+			}
+		}
     }
 }

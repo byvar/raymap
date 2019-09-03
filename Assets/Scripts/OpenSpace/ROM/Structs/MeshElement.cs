@@ -1,4 +1,6 @@
 ﻿using OpenSpace.Loader;
+using System.Linq;
+using UnityEngine;
 
 namespace OpenSpace.ROM {
 	public class MeshElement : ROMStruct {
@@ -24,6 +26,7 @@ namespace OpenSpace.ROM {
 				num_uvs = reader.ReadUInt16();
 			}
 			triangles.Resolve(reader, (t) => { t.length = sz_triangles; t.num_uvs = num_uvs; });
+			
 		}
     }
 }

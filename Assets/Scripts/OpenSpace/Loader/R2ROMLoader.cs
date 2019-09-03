@@ -194,8 +194,8 @@ namespace OpenSpace.Loader {
 				}
 			}
 
-			for (ushort i = 0; i < 256; i++) {
-				MeshElement me = GetOrRead<MeshElement>(reader, i);
+			for (ushort i = 0; i < short.MaxValue; i++) {
+				MeshObject mo = GetOrRead<MeshObject>(reader, i);
 			}
 
 			yield return null;
