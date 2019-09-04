@@ -50,11 +50,30 @@ namespace OpenSpace.ROM {
 					GameObject gao = new GameObject("MeshObject @ " + Offset);
 					//gao.transform.position = new Vector3(UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f));
 					foreach (GeometricElementList2.GeometricElementListEntry entry in elements_1.Value.elements) {
-						l.print(entry.element.type);
+						if (entry.element.Value == null) {
+							l.print(entry.element.type);
+						}
 						if (entry.element.Value != null) {
 							if (entry.element.Value is MeshElement) {
 								MeshElement el = entry.element.Value as MeshElement;
 								GameObject elGao = new GameObject("Element @ " + el.Offset);
+								/*if (el.visualMaterial.Value != null) {
+									elGao.name = elGao.name
+										+ " - F:" + string.Format("{0:X4}", el.visualMaterial.Value.flags)
+										+ " - 0:" + string.Format("{0:X4}", el.visualMaterial.Value.unk0)
+										+ " - 1:" + string.Format("{0:X4}", el.visualMaterial.Value.unk1)
+										+ " - 2:" + string.Format("{0:X8}", el.visualMaterial.Value.unk2)
+										+ " - 3:" + string.Format("{0:X8}", el.visualMaterial.Value.unk3)
+										+ " - 4:" + string.Format("{0:X4}", el.visualMaterial.Value.unk4);
+								}*/
+								/*if (el.visualMaterial.Value != null
+									&& el.visualMaterial.Value.textures.Value != null
+									&& el.visualMaterial.Value.textures.Value.length > 0) {
+									TextureInfo tex = el.visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo;
+									elGao.name = elGao.name
+										+ " - F1:" + string.Format("{0:X4}", tex.flags)
+										+ " - F2:" + string.Format("{0:X4}", tex.flags2);
+								}*/
 								elGao.transform.parent = gao.transform;
 								elGao.transform.localPosition = Vector3.zero;
 								MeshRenderer mr = elGao.AddComponent<MeshRenderer>();

@@ -24,10 +24,26 @@ namespace OpenSpace.ROM {
 			}
 		}
 
+		public Reference(ushort index, T value) {
+			this.index = index;
+			this.Value = value;
+		}
+
 		public Reference<T> Resolve(Reader reader, Action<T> onPreRead = null) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
 			Value = l.GetOrRead(reader, index, onPreRead: onPreRead);
 			return this;
+		}
+
+		public static implicit operator T(Reference<T> a) {
+			return a.Value;
+		}
+		public static implicit operator Reference<T>(T t) {
+			if (t == null) {
+				return new Reference<T>(0xFFFF, null);
+			} else {
+				return new Reference<T>(t.Index, t);
+			}
 		}
 	}
 

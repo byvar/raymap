@@ -13,6 +13,7 @@ namespace OpenSpace.ROM {
 		public ushort palette_index;
 		public ushort alpha_index;
 		public ushort flags;
+		public ushort flags2;
 		public ushort wExponent;
 		public ushort hExponent;
 		public ushort color_size;
@@ -30,6 +31,12 @@ namespace OpenSpace.ROM {
 
 
         public static uint flags_isTransparent = (1 << 3);
+
+		public bool IsTransparent {
+			get {
+				return (flags & flags_isTransparent) != 0;
+			}
+		}
 
 
         public Texture2D Texture {
@@ -54,8 +61,8 @@ namespace OpenSpace.ROM {
 			if (Settings.s.platform == Settings.Platform._3DS) {
 				wExponent = reader.ReadByte();
 				hExponent = reader.ReadByte();
-				reader.ReadUInt16();
 				flags = reader.ReadUInt16();
+				flags2 = reader.ReadUInt16();
 				color_size = reader.ReadUInt16();
 				bpp = reader.ReadUInt16();
 				name = reader.ReadString(200);
