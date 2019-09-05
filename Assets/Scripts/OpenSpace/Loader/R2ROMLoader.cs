@@ -14,7 +14,7 @@ namespace OpenSpace.Loader {
 		public ROMBIN data;
 		public ROMBIN fat;
 		public FATTable[] fatTables;
-		public int currentLevel = 10;
+		public int currentLevel = 5;
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;

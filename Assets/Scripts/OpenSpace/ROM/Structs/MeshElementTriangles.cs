@@ -6,14 +6,14 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class MeshElementTriangles : ROMStruct {
 		public ushort length;
-		public ushort num_uvs;
+		public ushort num_vertices;
 		public Triangle[] triangles;
 		public Vector2[] uvs;
 		public CompressedVector3[] verts;
 		public CompressedVector3[] normals;
 
 		protected override void ReadInternal(Reader reader) {
-			MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_uvs));
+			MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_vertices));
 			// For DS: https://github.com/scurest/apicula
 
 			// For N64: http://www.shootersforever.com/forums_message_boards/viewtopic.php?t=6920
@@ -34,16 +34,16 @@ namespace OpenSpace.ROM {
 						triangles[i].v3 = reader.ReadUInt16();
 					//}
 				}
-				uvs = new Vector2[num_uvs];
-				for (int i = 0; i < num_uvs; i++) {
+				uvs = new Vector2[num_vertices];
+				for (int i = 0; i < num_vertices; i++) {
 					uvs[i] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 				}
-				verts = new CompressedVector3[num_uvs];
-				normals = new CompressedVector3[num_uvs];
-				for (int i = 0; i < num_uvs; i++) {
+				verts = new CompressedVector3[num_vertices];
+				normals = new CompressedVector3[num_vertices];
+				for (int i = 0; i < num_vertices; i++) {
 					verts[i] = new CompressedVector3(reader);
 				}
-				for (int i = 0; i < num_uvs; i++) {
+				for (int i = 0; i < num_vertices; i++) {
 					normals[i] = new CompressedVector3(reader);
 				}
 			}

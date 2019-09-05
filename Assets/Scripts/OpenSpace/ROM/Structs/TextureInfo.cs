@@ -30,31 +30,87 @@ namespace OpenSpace.ROM {
 		public GF64 alphaTex;
 
 
-        public static uint flags_isTransparent = (1 << 3);
+        public static ushort flags_isTransparent = 0x0008;
+		public static ushort flags_isMirrorX     = 0x0010;
+		public static ushort flags_isMirrorY     = 0x0020;
+		public static ushort flags_isRepeatV     = 0x0040;
+		public static ushort flags_isRepeatU     = 0x0080;
+		public static ushort flags_renderWater1   = 0x0100;
+		public static ushort flags_renderWater2   = 0x0200;
+		public static ushort flags_renderTransparent   = 0x0400;
+		public static ushort flags_alphaIsTransparency = 0x0800;
 
 		public bool IsTransparent {
-			get {
-				return (flags & flags_isTransparent) != 0;
-			}
+			get { return (flags & flags_isTransparent) != 0; }
+		}
+		public bool IsMirrorX {
+			get { return (flags & flags_isMirrorX) != 0; }
+		}
+		public bool IsMirrorY {
+			get { return (flags & flags_isMirrorY) != 0; }
+		}
+		public bool IsRepeatU {
+			get { return (flags & flags_isRepeatU) != 0; }
+		}
+		public bool IsRepeatV {
+			get { return (flags & flags_isRepeatV) != 0; }
+		}
+		public bool RenderTransparent {
+			get { return (flags & flags_renderTransparent) != 0; }
+		}
+		public bool AlphaIsTransparency {
+			get { return (flags & flags_alphaIsTransparency) != 0; }
+		}
+		public bool RenderWater1 {
+			get { return (flags & flags_renderWater1) != 0; }
+		}
+		public bool RenderWater2 {
+			get { return (flags & flags_renderWater2) != 0; }
 		}
 
 
-        public Texture2D Texture {
-            get { return texture; }
-            set {
+		public Texture2D Texture {
+			get { return texture; }
+			set {
 				texture = value;
-				/*if (Settings.s.platform == Settings.Platform.DS) {
-					if ((flags & 0x0A00) == 0x0A00) { // strange transparency thing
-						Color[] colors = texture.GetPixels();
-						for (int i = 0; i < colors.Length; i++) {
-							colors[i].a = 1f;
-						}
-						texture.SetPixels(colors);
-						texture.Apply();
+				if (texture != null) {
+					if (!IsRepeatU) {
+						texture.wrapModeU = TextureWrapMode.Clamp;
 					}
-				}*/
-            }
-        }
+					if (!IsRepeatV) {
+						texture.wrapModeV = TextureWrapMode.Clamp;
+					}
+					if (IsMirrorX) {
+						texture.wrapModeU = TextureWrapMode.Mirror;
+					}
+					if (IsMirrorY) {
+						/*Texture2D flipped = new Texture2D(texture.width, texture.height);
+
+						int w = texture.width;
+						int h = texture.height;
+
+
+						for (int x = 0; x < w; x++) {
+							for (int y = 0; y < h; y++) {
+								flipped.SetPixel(x, h - y - 1, texture.GetPixel(x, y));
+							}
+						}
+						flipped.Apply();
+						texture = flipped;
+
+						if (!IsRepeatU) {
+							texture.wrapModeU = TextureWrapMode.Clamp;
+						}
+						if (IsMirrorX) {
+							texture.wrapModeU = TextureWrapMode.Mirror;
+						}*/
+						texture.wrapModeV = TextureWrapMode.Mirror;
+					}
+				}
+			}
+		}
+
+	
 
 		protected override void ReadInternal(Reader reader) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
@@ -68,14 +124,13 @@ namespace OpenSpace.ROM {
 				name = reader.ReadString(200);
 				off_texture = Pointer.Current(reader);
 				textureBytes = reader.ReadBytes(color_size); // max size: 0x10000
-				texture = new ETC(textureBytes, 1 << wExponent, 1 << hExponent, bpp == 32).texture;
+				Texture2D rawTex = new ETC(textureBytes, 1 << wExponent, 1 << hExponent, bpp == 32).texture;
 				if (l.exportTextures) {
 					if (!File.Exists(l.gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
-						Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png", texture.EncodeToPNG());
+						Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png", rawTex.EncodeToPNG());
 					}
-				} else {
-					l.print(name);
 				}
+				Texture = rawTex;
 			} else if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform.N64) {
 				texture_index = reader.ReadUInt16();
 				palette_index = reader.ReadUInt16();
@@ -156,22 +211,20 @@ namespace OpenSpace.ROM {
 						mainTex.LoadAlphaTexture(alphaTex);
 					}
 				}
-				Texture = mainTex != null ? mainTex.texture : alphaTex?.texture;
+				Texture2D rawTex = mainTex != null ? mainTex.texture : alphaTex?.texture;
 				if (l.exportTextures) {
-
-                    if (Texture != null) {
-
+                    if (rawTex != null) {
                         string palette = (palette_index != 0xFFFF ? "_P" + (palette_index & 0x7FFF) : "");
                         string alpha = (alpha_index != 0xFFFF ? "_A" + (alpha_index & 0x7FFF) : "");
                         string main = (texture_index != 0xFFFF ? "_T" + (texture_index & 0x7FFF) : "");
                         if (!File.Exists(l.gameDataBinFolder + "/textures/" + format + main + alpha + palette + ".png")) {
-                            Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + format + main + alpha + palette + ".png", Texture.EncodeToPNG());
+                            Util.ByteArrayToFile(l.gameDataBinFolder + "/textures/" + format + main + alpha + palette + ".png", rawTex.EncodeToPNG());
                         }
-
                     } else {
                         Debug.LogWarning("No mainTex or alphaTex for tex " + Offset);
                     }
 				}
+				Texture = rawTex;
 			}
         }
     }
