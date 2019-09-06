@@ -195,7 +195,15 @@ namespace OpenSpace.Loader {
 			}
 
 			for (ushort i = 0; i < short.MaxValue; i++) {
-				MeshObject mo = GetOrRead<MeshObject>(reader, i);
+				//GeometricObject mo = GetOrRead<GeometricObject>(reader, i);
+				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
+				if (ot != null) {
+					ot.Gao.name = "[" + i + "]" + ot.Gao.name;
+				}
+				/*PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
+				if (po != null) {
+					po.Gao.name = "[" + i + "]" + po.Gao.name;
+				}*/
 			}
 
 			yield return null;

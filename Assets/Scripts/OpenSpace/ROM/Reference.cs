@@ -28,6 +28,10 @@ namespace OpenSpace.ROM {
 			this.index = index;
 			this.Value = value;
 		}
+		public Reference() {
+			this.index = 0xFFFF;
+			this.Value = null;
+		}
 
 		public Reference<T> Resolve(Reader reader, Action<T> onPreRead = null) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
@@ -80,8 +84,8 @@ namespace OpenSpace.ROM {
 				}
 			}
 			switch (entryType) {
-				case FATEntry.Type.MeshElement:
-					Value = l.GetOrRead<MeshElement>(reader, index);
+				case FATEntry.Type.GeometricElementTriangles:
+					Value = l.GetOrRead<GeometricElementTriangles>(reader, index);
 					break;
 			}
 			return type;

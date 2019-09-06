@@ -78,8 +78,10 @@ public class DsgVarCustomEditor : Editor {
             case DsgVarInfoEntry.DsgVarType.Byte: stringVal = GUILayout.TextField(dsgVarEntry.valueAsSByte.ToString()); SByte.TryParse(stringVal, out dsgVarEntry.valueAsSByte); break;
             case DsgVarInfoEntry.DsgVarType.UByte: stringVal = GUILayout.TextField(dsgVarEntry.valueAsByte.ToString()); Byte.TryParse(stringVal, out dsgVarEntry.valueAsByte); break;
             case DsgVarInfoEntry.DsgVarType.Float: stringVal = GUILayout.TextField(dsgVarEntry.valueAsFloat.ToString()); Single.TryParse(stringVal, out dsgVarEntry.valueAsFloat); break;
-            case DsgVarInfoEntry.DsgVarType.Text: stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt); break;
-            case DsgVarInfoEntry.DsgVarType.Vector:
+            case DsgVarInfoEntry.DsgVarType.Text:
+				stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt);
+				GUILayout.Label(MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)dsgVarEntry.valueAsUInt, 0)); break;
+			case DsgVarInfoEntry.DsgVarType.Vector:
                 float val_x = dsgVarEntry.valueAsVector.x;
                 float val_y = dsgVarEntry.valueAsVector.y;
                 float val_z = dsgVarEntry.valueAsVector.z;
@@ -112,13 +114,28 @@ public class DsgVarCustomEditor : Editor {
                     dsgVarEntry.valueAsWaypointGao = selectedWaypointGao;
                 }
                 break;
-            case DsgVarInfoEntry.DsgVarType.ActionArray:
+			case DsgVarInfoEntry.DsgVarType.TextArray:
+				if (dsgVarEntry.entry.value.GetType().IsArray) {
+					object[] array = (object[])dsgVarEntry.entry.value;
+
+					GUILayout.BeginVertical();
+					for (int i = 0; i < array.Length; i++) {
+
+						if (array[i] != null) {
+							GUILayout.TextField(array[i].ToString());
+							GUILayout.Label(MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)(uint)array[i], 0));
+						}
+
+					}
+					GUILayout.EndVertical();
+				}
+				break;
+			case DsgVarInfoEntry.DsgVarType.ActionArray:
             case DsgVarInfoEntry.DsgVarType.FloatArray:
             case DsgVarInfoEntry.DsgVarType.IntegerArray:
             case DsgVarInfoEntry.DsgVarType.PersoArray:
             case DsgVarInfoEntry.DsgVarType.SoundEventArray:
             case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-            case DsgVarInfoEntry.DsgVarType.TextArray:
             case DsgVarInfoEntry.DsgVarType.TextRefArray:
             case DsgVarInfoEntry.DsgVarType.VectorArray:
             case DsgVarInfoEntry.DsgVarType.WayPointArray:

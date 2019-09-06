@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.ROM {
-	public class MeshElementTriangles : ROMStruct {
+	public class GeometricElementTrianglesData : ROMStruct {
 		public ushort length;
 		public ushort num_vertices;
 		public Triangle[] triangles;
