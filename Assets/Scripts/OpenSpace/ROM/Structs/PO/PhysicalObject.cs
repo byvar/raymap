@@ -12,28 +12,19 @@ namespace OpenSpace.ROM {
 			collide = new Reference<CollSet>(reader, true);
 		}
 
-		private GameObject gao;
-		public GameObject Gao {
-			get {
-				if (gao == null) {
-					gao = new GameObject("PO @ " + Offset);
-					InitGameObject();
-				}
-				return gao;
-			}
-		}
-
-		protected void InitGameObject() {
+		public GameObject GetGameObject() {
+			GameObject gao = new GameObject("PO @ " + Offset);
 			if (visual.Value != null) {
-				GameObject child = visual.Value.Gao;
-				child.transform.SetParent(Gao.transform);
+				GameObject child = visual.Value.GetGameObject(GeometricObject.Type.Visual);
+				child.transform.SetParent(gao.transform);
 				child.name = "[Visual] " + child.name;
 			}
 			if (collide.Value != null && collide.Value.mesh.Value != null) {
-				GameObject child = collide.Value.mesh.Value.Gao;
-				child.transform.SetParent(Gao.transform);
+				GameObject child = collide.Value.mesh.Value.GetGameObject(GeometricObject.Type.Collide);
+				child.transform.SetParent(gao.transform);
 				child.name = "[Collide] " + child.name;
 			}
+			return gao;
 		}
 	}
 }

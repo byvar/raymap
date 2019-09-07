@@ -18,27 +18,18 @@ namespace OpenSpace.ROM {
 			data.Resolve(reader, d => d.length = length);
 		}
 
-		private GameObject gao;
-		public GameObject Gao {
-			get {
-				if (gao == null) {
-					gao = new GameObject("ObjectsTable @ " + Offset);
-					InitGameObject();
-				}
-				return gao;
-			}
-		}
-
-		protected void InitGameObject() {
+		public GameObject GetGameObject() {
+			GameObject gao = new GameObject("ObjectsTable @ " + Offset + " - Data @ " + data.Value?.Offset);
 			if (data.Value != null) {
 				for (int i = 0; i < data.Value.entries.Length; i++) {
 					if (data.Value.entries[i].obj.Value != null) {
-						GameObject child = data.Value.entries[i].obj.Value.Gao;
-						child.transform.SetParent(Gao.transform);
+						GameObject child = data.Value.entries[i].obj.Value.GetGameObject();
+						child.transform.SetParent(gao.transform);
 						child.name = "[Entry " + i + "] " + child.name;
 					}
 				}
 			}
+			return gao;
 		}
 	}
 }

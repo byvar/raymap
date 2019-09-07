@@ -29,7 +29,7 @@ namespace OpenSpace.ROM {
 			{ 0, Type.EngineStruct },
 			{ 6, Type.ObjectsTable },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
-			{ 22, Type.Vertices },
+			{ 22, Type.VertexArray },
 			{ 23, Type.GeometricElementTrianglesData },
 			{ 24, Type.GeometricElementTriangles },
 			{ 31, Type.GeometricObject },
@@ -38,6 +38,7 @@ namespace OpenSpace.ROM {
 			{ 39, Type.PhysicalObject },
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
+			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 14
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
@@ -47,6 +48,8 @@ namespace OpenSpace.ROM {
 			{ 135, Type.TextTable },
 			{ 136, Type.Language_136 },
 			{ 137, Type.Language_137 },
+			{ 148, Type.GeometricElementListVisual },
+			{ 150, Type.GeometricElementListCollide },
 			{ 156, Type.VisualMaterialTextures },
 			{ 157, Type.String },
 		};
@@ -56,7 +59,7 @@ namespace OpenSpace.ROM {
 			{ 6, Type.ObjectsTable },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 21, Type.Palette },
-			{ 22, Type.Vertices },
+			{ 22, Type.VertexArray },
 			{ 23, Type.GeometricElementTrianglesData },
 			{ 24, Type.GeometricElementTriangles },
 			{ 31, Type.GeometricObject },
@@ -65,6 +68,7 @@ namespace OpenSpace.ROM {
 			{ 39, Type.PhysicalObject },
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
+			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 12
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
@@ -74,6 +78,8 @@ namespace OpenSpace.ROM {
 			{ 135, Type.TextTable },
 			{ 136, Type.Language_136 },
 			{ 137, Type.Language_137 },
+			{ 148, Type.GeometricElementListVisual },
+			{ 150, Type.GeometricElementListCollide },
 			{ 156, Type.VisualMaterialTextures },
 			{ 157, Type.String },
 		};
@@ -82,7 +88,7 @@ namespace OpenSpace.ROM {
 			{ 0, Type.EngineStruct },
 			{ 6, Type.ObjectsTable },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
-			{ 18, Type.Vertices },
+			{ 18, Type.VertexArray },
 			{ 19, Type.GeometricElementTrianglesData },
 			{ 20, Type.GeometricElementTriangles },
 			{ 27, Type.GeometricObject },
@@ -103,8 +109,8 @@ namespace OpenSpace.ROM {
 			{ 131, Type.TextTable },
 			{ 132, Type.Language_136 },
 			{ 133, Type.Language_137 },
-			{ 144, Type.GeometricElementList2 },
-			{ 146, Type.GeometricElementList1 },
+			{ 144, Type.GeometricElementListVisual },
+			{ 146, Type.GeometricElementListCollide },
 			{ 152, Type.VisualMaterialTextures },
 			{ 153, Type.String },
 		};
@@ -127,14 +133,14 @@ namespace OpenSpace.ROM {
 			NoCtrlTextureList,
 			VisualMaterial,
 			Palette,
-			Vertices,
+			VertexArray,
 			GeometricElementTrianglesData,
 			GeometricElementTriangles,
 			GeometricElementSprites,
 			GeometricObject,
 			CompressedVector3Array,
-			GeometricElementList1,
-			GeometricElementList2,
+			GeometricElementListCollide,
+			GeometricElementListVisual,
 			PhysicalObject,
 			CollSet,
 			Vector3Array,
@@ -159,8 +165,8 @@ namespace OpenSpace.ROM {
 			{ typeof(GeometricElementTriangles), Type.GeometricElementTriangles },
 			{ typeof(GeometricElementTrianglesData), Type.GeometricElementTrianglesData },
 			{ typeof(CompressedVector3Array), Type.CompressedVector3Array },
-			{ typeof(GeometricElementList1), Type.GeometricElementList1 },
-			{ typeof(GeometricElementList2), Type.GeometricElementList2 },
+			{ typeof(GeometricElementListCollide), Type.GeometricElementListCollide },
+			{ typeof(GeometricElementListVisual), Type.GeometricElementListVisual },
 			{ typeof(GeometricObject), Type.GeometricObject },
 			{ typeof(Vector3Array), Type.Vector3Array },
 			{ typeof(Short3Array), Type.Short3Array },
@@ -168,6 +174,7 @@ namespace OpenSpace.ROM {
 			{ typeof(ObjectsTableData), Type.ObjectsTableData },
 			{ typeof(CollSet), Type.CollSet },
 			{ typeof(PhysicalObject), Type.PhysicalObject },
+			{ typeof(VertexArray), Type.VertexArray },
 		};
 
 		public Type EntryType {

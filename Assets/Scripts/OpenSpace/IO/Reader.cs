@@ -58,9 +58,15 @@ namespace OpenSpace {
             var data = ReadBytes(4);
             if (isLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(data);
             return BitConverter.ToUInt32(data, 0);
-        }
+		}
 
-        public override byte[] ReadBytes(int count) {
+		public override UInt64 ReadUInt64() {
+			var data = ReadBytes(8);
+			if (isLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(data);
+			return BitConverter.ToUInt64(data, 0);
+		}
+
+		public override byte[] ReadBytes(int count) {
             byte[] bytes = base.ReadBytes(count);
             if(autoAlignOn) bytesReadSinceAlignStart += (uint)bytes.Length;
             if (masking != MaskingMode.Off) {

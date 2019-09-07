@@ -196,14 +196,16 @@ namespace OpenSpace.Loader {
 
 			for (ushort i = 0; i < short.MaxValue; i++) {
 				//GeometricObject mo = GetOrRead<GeometricObject>(reader, i);
-				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
+				/*ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
 				if (ot != null) {
-					ot.Gao.name = "[" + i + "]" + ot.Gao.name;
-				}
-				/*PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
-				if (po != null) {
-					po.Gao.name = "[" + i + "]" + po.Gao.name;
+					GameObject gao = ot.GetGameObject();
+					gao.name = "[" + i + "]" + gao.name;
 				}*/
+				PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
+				if (po != null) {
+					GameObject gao = po.GetGameObject();
+					gao.name = "[" + i + "]" + gao.name;
+				}
 			}
 
 			yield return null;

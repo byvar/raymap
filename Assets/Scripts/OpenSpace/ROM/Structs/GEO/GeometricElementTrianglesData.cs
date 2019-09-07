@@ -1,16 +1,23 @@
 ﻿using OpenSpace.Loader;
+using OpenSpace.ROM.RSP;
 using System;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.ROM {
 	public class GeometricElementTrianglesData : ROMStruct {
 		public ushort length;
+		// 3DS
 		public ushort num_vertices;
 		public Triangle[] triangles;
 		public Vector2[] uvs;
 		public CompressedVector3[] verts;
 		public CompressedVector3[] normals;
+
+		// N64
+		public byte[] data;
+		public RSPCommand[] rspCommands;
 
 		protected override void ReadInternal(Reader reader) {
 			MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_vertices));
@@ -29,9 +36,9 @@ namespace OpenSpace.ROM {
 						triangles[i].v1 = reader.ReadUInt16();
 						triangles[i].v3 = reader.ReadUInt16();
 					} else {*/
-						triangles[i].v1 = reader.ReadUInt16();
-						triangles[i].v2 = reader.ReadUInt16();
-						triangles[i].v3 = reader.ReadUInt16();
+					triangles[i].v1 = reader.ReadUInt16();
+					triangles[i].v2 = reader.ReadUInt16();
+					triangles[i].v3 = reader.ReadUInt16();
 					//}
 				}
 				uvs = new Vector2[num_vertices];
@@ -45,6 +52,18 @@ namespace OpenSpace.ROM {
 				}
 				for (int i = 0; i < num_vertices; i++) {
 					normals[i] = new CompressedVector3(reader);
+				}
+			} else {
+				data = reader.ReadBytes(length);
+				if (Settings.s.platform == Settings.Platform.N64) {
+					using (MemoryStream str = new MemoryStream(data)) {
+						using (Reader dataReader = new Reader(str, Settings.s.IsLittleEndian)) {
+							rspCommands = new RSPCommand[length / 8];
+							for (int i = 0; i < rspCommands.Length; i++) {
+								rspCommands[i] = new RSPCommand(dataReader);
+							}
+						}
+					}
 				}
 			}
 		}

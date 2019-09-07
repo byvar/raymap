@@ -1,0 +1,116 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace OpenSpace.ROM.RSP {
+	public class RSPParser {
+		public static Mesh Parse(RSPCommand[] commands, VertexArray.Vertex[] vertices, GeometricObject go, bool backfaceCulling) {
+			List<VertexArray.Vertex> verts = new List<VertexArray.Vertex>();
+			Dictionary<int, int> vertexBufferMapping = new Dictionary<int, int>();
+			List<GeometricElementTrianglesData.Triangle> triangles = new List<GeometricElementTrianglesData.Triangle>();
+			Mesh mesh = new Mesh();
+			for (int i = 0; i < Math.Min(32, vertices.Length); i++) {
+				int curVertsCount = i;
+				verts.Add(vertices[i]);
+				vertexBufferMapping[i] = i;
+			}
+			foreach (RSPCommand c in commands) {
+				//if (c.Command == RSPCommand.Type.RSP_GBI1_Vtx) break;
+				switch (c.Command) {
+					case RSPCommand.Type.RSP_GBI1_Vtx:
+						if (c.vtx.address % 16 != 0) {
+							Debug.LogError("Mom, RSP is doing weird memory saving tricks!");
+						}
+						uint startVtx = c.vtx.address / 16;
+						if (c.vtx.v0 != 0) {
+							MapLoader.Loader.print(c.vtx.v0 + " - " + c.vtx.n + " - " + c.vtx.address + " - " + c.vtx.segment);
+						}
+						if (c.vtx.segment != 6) {
+							Debug.LogWarning(c.vtx.segment);
+						}
+						for (int i = 0; i < c.vtx.n; i++) {
+							int curVertsCount = verts.Count;
+							verts.Add(vertices[startVtx + i]);
+							vertexBufferMapping[c.vtx.v0 + i] = curVertsCount;
+						}
+						break;
+					case RSPCommand.Type.RSP_GBI1_ModifyVtx:
+						ushort ind = c.modifyVtx.vertex;
+						if (ind > 32) {
+							Debug.LogError("Mom, my RSP implementation is wrong!");
+						}
+						VertexArray.Vertex og = verts[vertexBufferMapping[ind]];
+						vertexBufferMapping[ind] = verts.Count;
+						VertexArray.Vertex vtx = new VertexArray.Vertex() {
+							x = og.x,
+							y = og.y,
+							z = og.z,
+							flag = og.flag,
+							u = og.u,
+							v = og.v,
+							r = og.r,
+							g = og.b,
+							b = og.b,
+							a = og.a,
+							color = og.color,
+							normal = og.normal,
+						};
+						switch (c.modifyVtx.Command) {
+							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_RGBA:
+								vtx.r = c.modifyVtx.r;
+								vtx.g = c.modifyVtx.g;
+								vtx.b = c.modifyVtx.b;
+								vtx.a = c.modifyVtx.a;
+								break;
+							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_ST:
+								vtx.u = c.modifyVtx.u;
+								vtx.v = c.modifyVtx.v;
+								break;
+							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_XYSCREEN:
+							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_ZSCREEN:
+								Debug.LogWarning(c.modifyVtx.Command);
+								break;
+						}
+						verts.Add(vtx);
+						break;
+					case RSPCommand.Type.RSP_GBI1_Tri1:
+						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+							v1 = (ushort)vertexBufferMapping[c.tri1.v0],
+							v2 = (ushort)vertexBufferMapping[c.tri1.v1],
+							v3 = (ushort)vertexBufferMapping[c.tri1.v2],
+						});
+						break;
+					case RSPCommand.Type.RSP_GBI1_Tri2:
+						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+							v1 = (ushort)vertexBufferMapping[c.tri2.v0],
+							v2 = (ushort)vertexBufferMapping[c.tri2.v1],
+							v3 = (ushort)vertexBufferMapping[c.tri2.v2],
+						});
+						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+							v1 = (ushort)vertexBufferMapping[c.tri2.v3],
+							v2 = (ushort)vertexBufferMapping[c.tri2.v4],
+							v3 = (ushort)vertexBufferMapping[c.tri2.v5],
+						});
+						break;
+					case RSPCommand.Type.RSP_GBI1_EndDL:
+						break;
+					default:
+						Debug.LogError("Unparsed command: " + c.Command);
+						break;
+				}
+			}
+
+			mesh.vertices = verts.Select(v => v.GetVector(go.ScaleFactor)).ToArray();
+			//mesh.normals = verts.Select(v => v.GetVector(Int16.MaxValue)).ToArray();
+			mesh.SetUVs(0, verts.Select(v => new Vector3(v.u / 2047f, v.v / 2047f, 1f)).ToList());
+			mesh.SetUVs(1, verts.Select(v => new Vector4(v.color.r, v.color.g, v.color.b, v.color.a)).ToList());
+			mesh.triangles = triangles.SelectMany(t => backfaceCulling ? new int[] { t.v1, t.v2, t.v3 } : new int[] { t.v1, t.v2, t.v3, t.v2, t.v1, t.v3 }).ToArray();
+			mesh.RecalculateNormals();
+
+			return mesh;
+		}
+	}
+}

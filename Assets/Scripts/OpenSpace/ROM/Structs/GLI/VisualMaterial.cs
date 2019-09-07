@@ -25,35 +25,33 @@ namespace OpenSpace.ROM {
 			flags = reader.ReadUInt16();
         }
 
-		public Material Mat {
-			get {
-				Material mat;
-				if (textures.Value != null && num_textures > 0) {
-					TextureInfo texInfo = textures.Value.vmTex[0].texRef.Value.texInfo;
-					if (texInfo.RenderTransparent || texInfo.RenderWater1 || texInfo.RenderWater2) {
-						if (texInfo.AlphaIsTransparency || texInfo.RenderWater1 || texInfo.RenderWater2) {
-							mat = new Material(MapLoader.Loader.baseTransparentMaterial);
-						} else {
-							mat = new Material(MapLoader.Loader.baseLightMaterial);
-						}
+		public Material GetMaterial() {
+			Material mat;
+			if (textures.Value != null && num_textures > 0) {
+				TextureInfo texInfo = textures.Value.vmTex[0].texRef.Value.texInfo;
+				if (texInfo.RenderTransparent || texInfo.RenderWater1 || texInfo.RenderWater2) {
+					if (texInfo.AlphaIsTransparency || texInfo.RenderWater1 || texInfo.RenderWater2) {
+						mat = new Material(MapLoader.Loader.baseTransparentMaterial);
 					} else {
-						mat = new Material(MapLoader.Loader.baseMaterial);
+						mat = new Material(MapLoader.Loader.baseLightMaterial);
 					}
-					mat.SetInt("_NumTextures", 1);
-					string textureName = "_Tex0";
-					mat.SetTexture(textureName, textures.Value.vmTex[0].texRef.Value.texInfo.Value.Texture);
-					mat.SetVector(textureName + "Params", new Vector4(0,
-						(scrollSpeedX != 0 || scrollSpeedY != 0) ? 1f : 0f,
-						0f, 0f));
-					mat.SetVector(textureName + "Params2", new Vector4(
-						0f, 0f, scrollSpeedX, scrollSpeedY));
 				} else {
 					mat = new Material(MapLoader.Loader.baseMaterial);
 				}
-				mat.SetVector("_AmbientCoef", Vector4.one);
-				mat.SetVector("_DiffuseCoef", Vector4.one);
-				return mat;
+				mat.SetInt("_NumTextures", 1);
+				string textureName = "_Tex0";
+				mat.SetTexture(textureName, textures.Value.vmTex[0].texRef.Value.texInfo.Value.Texture);
+				mat.SetVector(textureName + "Params", new Vector4(0,
+					(scrollSpeedX != 0 || scrollSpeedY != 0) ? 1f : 0f,
+					0f, 0f));
+				mat.SetVector(textureName + "Params2", new Vector4(
+					0f, 0f, scrollSpeedX, scrollSpeedY));
+			} else {
+				mat = new Material(MapLoader.Loader.baseMaterial);
 			}
+			mat.SetVector("_AmbientCoef", Vector4.one);
+			mat.SetVector("_DiffuseCoef", Vector4.one);
+			return mat;
 		}
 
 		public static ushort flags_renderBackFaces = 0x0100;

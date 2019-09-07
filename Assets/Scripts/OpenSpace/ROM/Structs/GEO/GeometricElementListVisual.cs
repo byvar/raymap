@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace OpenSpace.ROM {
-	public class GeometricElementList1 : ROMStruct {
+	public class GeometricElementListVisual : ROMStruct {
 		public GeometricElementListEntry[] elements;
 
 		public ushort length;
@@ -14,7 +14,6 @@ namespace OpenSpace.ROM {
 				elements[i].element = new GenericReference(reader, true);
 				elements[i].unk0 = reader.ReadUInt16();
 				elements[i].unk1 = reader.ReadUInt16();
-				elements[i].element.Resolve(reader);
 			}
         }
 
