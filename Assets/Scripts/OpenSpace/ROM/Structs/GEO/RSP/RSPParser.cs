@@ -17,6 +17,7 @@ namespace OpenSpace.ROM.RSP {
 				verts.Add(vertices[i]);
 				vertexBufferMapping[i] = i;
 			}
+			bool parsing = true;
 			foreach (RSPCommand c in commands) {
 				//if (c.Command == RSPCommand.Type.RSP_GBI1_Vtx) break;
 				switch (c.Command) {
@@ -25,13 +26,13 @@ namespace OpenSpace.ROM.RSP {
 							Debug.LogError("Mom, RSP is doing weird memory saving tricks!");
 						}
 						uint startVtx = c.vtx.address / 16;
-						if (c.vtx.v0 != 0) {
-							MapLoader.Loader.print(c.vtx.v0 + " - " + c.vtx.n + " - " + c.vtx.address + " - " + c.vtx.segment);
-						}
 						if (c.vtx.segment != 6) {
 							Debug.LogWarning(c.vtx.segment);
 						}
-						for (int i = 0; i < c.vtx.n; i++) {
+						//MapLoader.Loader.print(c.vtx.n + " - " + c.vtx.length);
+						//int numVertices = (c.vtx.length + 1) / 16;
+						int numVertices = c.vtx.n;
+						for (int i = 0; i < numVertices; i++) {
 							int curVertsCount = verts.Count;
 							verts.Add(vertices[startVtx + i]);
 							vertexBufferMapping[c.vtx.v0 + i] = curVertsCount;
@@ -43,7 +44,6 @@ namespace OpenSpace.ROM.RSP {
 							Debug.LogError("Mom, my RSP implementation is wrong!");
 						}
 						VertexArray.Vertex og = verts[vertexBufferMapping[ind]];
-						vertexBufferMapping[ind] = verts.Count;
 						VertexArray.Vertex vtx = new VertexArray.Vertex() {
 							x = og.x,
 							y = og.y,
@@ -68,12 +68,15 @@ namespace OpenSpace.ROM.RSP {
 							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_ST:
 								vtx.u = c.modifyVtx.u;
 								vtx.v = c.modifyVtx.v;
+								/*og.u = c.modifyVtx.u;
+								og.v = c.modifyVtx.v;*/
 								break;
 							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_XYSCREEN:
 							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_ZSCREEN:
 								Debug.LogWarning(c.modifyVtx.Command);
 								break;
 						}
+						vertexBufferMapping[ind] = verts.Count;
 						verts.Add(vtx);
 						break;
 					case RSPCommand.Type.RSP_GBI1_Tri1:
@@ -96,16 +99,18 @@ namespace OpenSpace.ROM.RSP {
 						});
 						break;
 					case RSPCommand.Type.RSP_GBI1_EndDL:
+						parsing = false;
 						break;
 					default:
 						Debug.LogError("Unparsed command: " + c.Command);
 						break;
 				}
+				if (!parsing) break;
 			}
 
 			mesh.vertices = verts.Select(v => v.GetVector(go.ScaleFactor)).ToArray();
 			//mesh.normals = verts.Select(v => v.GetVector(Int16.MaxValue)).ToArray();
-			mesh.SetUVs(0, verts.Select(v => new Vector3(v.u / 2047f, v.v / 2047f, 1f)).ToList());
+			mesh.SetUVs(0, verts.Select(v => new Vector3(v.u / 32f / 64f, v.v / 32f / 64f, 1f)).ToList());
 			mesh.SetUVs(1, verts.Select(v => new Vector4(v.color.r, v.color.g, v.color.b, v.color.a)).ToList());
 			mesh.triangles = triangles.SelectMany(t => backfaceCulling ? new int[] { t.v1, t.v2, t.v3 } : new int[] { t.v1, t.v2, t.v3, t.v2, t.v1, t.v3 }).ToArray();
 			mesh.RecalculateNormals();

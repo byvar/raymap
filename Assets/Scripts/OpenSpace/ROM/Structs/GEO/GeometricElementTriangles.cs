@@ -9,10 +9,8 @@ namespace OpenSpace.ROM {
 		public Reference<GeometricElementTrianglesData> triangles;
 		public Reference<VertexArray> vertices;
 		public ushort sz_triangles;
-		public ushort num_vertices;
-		public ushort unk0;
 		public ushort sz_vertices;
-		public ushort unk2;
+		public ushort flags;
 
 		protected override void ReadInternal(Reader reader) {
 			visualMaterial = new Reference<VisualMaterial>(reader, true);
@@ -22,7 +20,7 @@ namespace OpenSpace.ROM {
 				vertices = new Reference<VertexArray>(reader);
 				sz_triangles = reader.ReadUInt16();
 				sz_vertices = reader.ReadUInt16();
-				unk2 = reader.ReadUInt16();
+				flags = reader.ReadUInt16();
 
 				vertices.Resolve(reader, v => v.length = sz_vertices);
 			} else if (Settings.s.platform == Settings.Platform.DS) {
@@ -31,9 +29,9 @@ namespace OpenSpace.ROM {
 			} else if (Settings.s.platform == Settings.Platform._3DS) {
 				triangles = new Reference<GeometricElementTrianglesData>(reader);
 				sz_triangles = reader.ReadUInt16();
-				num_vertices = reader.ReadUInt16();
+				sz_vertices = reader.ReadUInt16();
 			}
-			triangles.Resolve(reader, (t) => { t.length = sz_triangles; t.num_vertices = num_vertices; });
+			triangles.Resolve(reader, (t) => { t.length = sz_triangles; t.num_vertices = sz_vertices; });
 
 		}
 
@@ -45,7 +43,7 @@ namespace OpenSpace.ROM {
 			MeshFilter mf = gao.AddComponent<MeshFilter>();
 			Mesh mesh = new Mesh();
 			if (Settings.s.platform == Settings.Platform._3DS) {
-				if (num_vertices == 0) {
+				if (sz_vertices == 0) {
 					mesh.vertices = go.verticesVisual.Value.GetVectors(go.ScaleFactor);
 					mesh.normals = go.normals.Value.GetVectors(Int16.MaxValue);
 				} else {
@@ -57,6 +55,8 @@ namespace OpenSpace.ROM {
 				mesh.triangles = triangles.Value.triangles.SelectMany(t => backfaceCulling ? new int[] { t.v2, t.v1, t.v3 } : new int[] { t.v2, t.v1, t.v3, t.v1, t.v2, t.v3 }).ToArray();
 			} else if (Settings.s.platform == Settings.Platform.N64) {
 				mesh = RSP.RSPParser.Parse(triangles.Value.rspCommands, vertices.Value.vertices, go, backfaceCulling);
+				gao.name += " - Verts ( " + sz_vertices + "):" + vertices.Value.Offset + " - Tris ( " + sz_triangles + " ):" + triangles.Value.Offset + " - " + Index + " - " + flags;
+				//gao.name += " - Flags: " + string.Format("{0:X4}", visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value.flags);
 			}
 			mf.mesh = mesh;
 			mr.material = visualMaterial.Value.GetMaterial();

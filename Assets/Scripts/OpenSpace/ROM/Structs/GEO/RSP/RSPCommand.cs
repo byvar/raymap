@@ -50,7 +50,7 @@ namespace OpenSpace.ROM.RSP {
 				n = (byte)extractBits(data, 6, 4*8 + 10);
 				length = (byte)extractBits(data, 10, 4 * 8);
 				segment = (byte)extractBits(data, 8, 3 * 8);
-				address = (byte)extractBits(data, 3 * 8, 0 * 8);
+				address = (uint)extractBits(data, 3 * 8, 0 * 8);
 			}
 		}
 		public class GBI1_ModifyVtx {
