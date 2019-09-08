@@ -87,6 +87,18 @@ namespace OpenSpace.ROM {
 				case FATEntry.Type.GeometricElementTriangles:
 					Value = l.GetOrRead<GeometricElementTriangles>(reader, index);
 					break;
+				case FATEntry.Type.VisualMaterial:
+					Value = l.GetOrRead<VisualMaterial>(reader, index);
+					break;
+				case FATEntry.Type.GeometricElementTrianglesCollide:
+					Value = l.GetOrRead<GeometricElementTrianglesCollide>(reader, index);
+					break;
+				case FATEntry.Type.GameMaterial:
+					Value = l.GetOrRead<GameMaterial>(reader, index);
+					break;
+				default:
+					l.print("GenericReference: Unsupported struct with type " + entryType);
+					break;
 			}
 			return type;
 		}

@@ -14,15 +14,19 @@ namespace OpenSpace.ROM {
 
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject("PO @ " + Offset);
+			PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
 			if (visual.Value != null) {
 				GameObject child = visual.Value.GetGameObject(GeometricObject.Type.Visual);
 				child.transform.SetParent(gao.transform);
 				child.name = "[Visual] " + child.name;
+				poc.visual = child;
 			}
 			if (collide.Value != null && collide.Value.mesh.Value != null) {
 				GameObject child = collide.Value.mesh.Value.GetGameObject(GeometricObject.Type.Collide);
 				child.transform.SetParent(gao.transform);
 				child.name = "[Collide] " + child.name;
+				poc.collide = child;
+				poc.collide.SetActive(false);
 			}
 			return gao;
 		}

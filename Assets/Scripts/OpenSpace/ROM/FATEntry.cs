@@ -92,9 +92,13 @@ namespace OpenSpace.ROM {
 			{ 19, Type.GeometricElementTrianglesData },
 			{ 20, Type.GeometricElementTriangles },
 			{ 27, Type.GeometricObject },
+			{ 28, Type.GameMaterial },
+			{ 29, Type.CollideMaterial },
 			{ 30, Type.VisualMaterial },
+			{ 33, Type.MechanicsMaterial },
 			{ 34, Type.CollSet },
 			{ 35, Type.PhysicalObject },
+			{ 38, Type.GeometricElementTrianglesCollideData },
 			{ 39, Type.LevelList },
 			{ 40, Type.LevelHeader },
 			{ 46, Type.CompressedVector3Array },
@@ -110,6 +114,7 @@ namespace OpenSpace.ROM {
 			{ 132, Type.Language_136 },
 			{ 133, Type.Language_137 },
 			{ 144, Type.GeometricElementListVisual },
+			{ 145, Type.GeometricElementTrianglesCollide },
 			{ 146, Type.GeometricElementListCollide },
 			{ 152, Type.VisualMaterialTextures },
 			{ 153, Type.String },
@@ -148,6 +153,11 @@ namespace OpenSpace.ROM {
 			ObjectsTableData,
 			ObjectsTable,
 			Family,
+			GeometricElementTrianglesCollideData,
+			GeometricElementTrianglesCollide,
+			GameMaterial,
+			CollideMaterial,
+			MechanicsMaterial,
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -175,6 +185,12 @@ namespace OpenSpace.ROM {
 			{ typeof(CollSet), Type.CollSet },
 			{ typeof(PhysicalObject), Type.PhysicalObject },
 			{ typeof(VertexArray), Type.VertexArray },
+			{ typeof(GeometricElementTrianglesCollide), Type.GeometricElementTrianglesCollide },
+			{ typeof(GeometricElementTrianglesCollideData), Type.GeometricElementTrianglesCollideData },
+			{ typeof(GameMaterial), Type.GameMaterial },
+			{ typeof(CollideMaterial), Type.CollideMaterial },
+			{ typeof(MechanicsMaterial), Type.MechanicsMaterial },
+
 		};
 
 		public Type EntryType {
