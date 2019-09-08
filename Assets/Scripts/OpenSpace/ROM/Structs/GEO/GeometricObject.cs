@@ -58,7 +58,7 @@ namespace OpenSpace.ROM {
 
 			verticesCollide?.Resolve(reader, v => { v.length = num_verticesCollide; });
 			verticesVisual?.Resolve(reader, v => { v.length = num_verticesVisual; });
-			normals.Resolve(reader, v => { v.length = num_verticesVisual; });
+			normals?.Resolve(reader, v => { v.length = num_verticesVisual; });
 			elementsCollide.Resolve(reader, v => { v.length = num_elementsCollide; });
 			elementsVisual.Resolve(reader, v => { v.length = num_elementsVisual; });
 		}
