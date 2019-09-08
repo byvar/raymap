@@ -48,6 +48,7 @@ namespace OpenSpace.ROM {
 				//mesh.normals = go.normals.Value.GetVectors(Int16.MaxValue);
 				//mesh.SetUVs(0, triangles.Value.uvs.Select(u => new Vector3(u.x, u.y, 1f)).ToList());
 				mesh.triangles = triangles.Value.triangles.SelectMany(t => new int[] { t.v2, t.v1, t.v3 }).ToArray();
+				mesh.RecalculateNormals();
 				mf.mesh = mesh;
 			}
 			return gao;

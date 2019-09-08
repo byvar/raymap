@@ -22,6 +22,7 @@ namespace OpenSpace.ROM {
 		protected override void ReadInternal(Reader reader) {
 			MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_vertices));
 			// For DS: https://github.com/scurest/apicula
+			// http://problemkaputt.de/gbatek.htm#ds3dvideo check under Geometry Commands
 
 			// For N64: http://www.shootersforever.com/forums_message_boards/viewtopic.php?t=6920
 			// Or RSP commands sheet
