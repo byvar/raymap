@@ -147,6 +147,8 @@ public class Controller : MonoBehaviour {
 				mode = Settings.Mode.Rayman2PS2; break;
 			case "r2_ds":
 				mode = Settings.Mode.Rayman2DS; break;
+			case "rrr_ds":
+				mode = Settings.Mode.RaymanRavingRabbidsDS; break;
 			case "r2_3ds":
 				mode = Settings.Mode.Rayman23DS; break;
 			case "r2_n64":

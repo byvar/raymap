@@ -14,8 +14,9 @@ namespace OpenSpace {
             Rayman2PCDemo2, Rayman2PCDemo1,
             DonaldDuckPC, DonaldDuckDC,
             TonicTroublePC, TonicTroubleSEPC,
-            PlaymobilHypePC, PlaymobilAlexPC, PlaymobilLauraPC
-        };
+            PlaymobilHypePC, PlaymobilAlexPC, PlaymobilLauraPC,
+			RaymanRavingRabbidsDS
+		};
         public Mode mode = Mode.Rayman3PC;
 
         public enum EngineVersion {
@@ -24,7 +25,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex };
+        public enum Game { R3, RA, RM, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -83,6 +84,7 @@ namespace OpenSpace {
                 case Mode.PlaymobilHypePC: s = Settings.PlaymobilHypePC; break;
                 case Mode.PlaymobilAlexPC: s = Settings.PlaymobilAlexPC; break;
                 case Mode.PlaymobilLauraPC: s = Settings.PlaymobilLauraPC; break;
+				case Mode.RaymanRavingRabbidsDS: s = Settings.RRRDS; break;
             }
             if (s != null) s.mode = mode;
         }
@@ -327,6 +329,19 @@ namespace OpenSpace {
 		public static Settings R2DS = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
+			platform = Platform.DS,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+
+		public static Settings RRRDS = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.RRR,
 			platform = Platform.DS,
 			endian = Endian.Little,
 			linkedListType = LinkedListType.Double,

@@ -8,6 +8,7 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class GeometricElementTrianglesData : ROMStruct {
 		public ushort length;
+		public ushort compressedLength;
 		// 3DS
 		public ushort num_vertices;
 		public Triangle[] triangles;
@@ -18,6 +19,7 @@ namespace OpenSpace.ROM {
 		// N64
 		public byte[] data;
 		public RSPCommand[] rspCommands;
+		public DS3D.GeometryCommand[] ds3dCommands;
 
 		protected override void ReadInternal(Reader reader) {
 			MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_vertices));
@@ -55,8 +57,8 @@ namespace OpenSpace.ROM {
 					normals[i] = new CompressedVector3(reader);
 				}
 			} else {
-				data = reader.ReadBytes(length);
 				if (Settings.s.platform == Settings.Platform.N64) {
+					data = reader.ReadBytes(length);
 					using (MemoryStream str = new MemoryStream(data)) {
 						using (Reader dataReader = new Reader(str, Settings.s.IsLittleEndian)) {
 							rspCommands = new RSPCommand[length / 8];
@@ -65,6 +67,15 @@ namespace OpenSpace.ROM {
 							}
 						}
 					}
+				} else if (Settings.s.platform == Settings.Platform.DS) {
+					if (Settings.s.game == Settings.Game.RRR) {
+						data = reader.ReadBytes(compressedLength);
+						data = DS3D.GeometryParser.Decompress(data);
+						//data = DS3D.GeometryParser.ReadCompressed(reader);
+					} else {
+						data = reader.ReadBytes(length);
+					}
+					ds3dCommands = DS3D.GeometryParser.ReadCommands(data);
 				}
 			}
 		}

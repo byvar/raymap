@@ -9,8 +9,10 @@ namespace OpenSpace.ROM {
 		public Reference<GeometricElementTrianglesData> triangles;
 		public Reference<VertexArray> vertices;
 		public ushort sz_triangles;
+		public ushort sz_triangles_compressed;
 		public ushort sz_vertices;
 		public ushort flags;
+		public ushort unk0;
 
 		protected override void ReadInternal(Reader reader) {
 			visualMaterial = new Reference<VisualMaterial>(reader, true);
@@ -24,14 +26,21 @@ namespace OpenSpace.ROM {
 
 				vertices.Resolve(reader, v => v.length = sz_vertices);
 			} else if (Settings.s.platform == Settings.Platform.DS) {
-				triangles = new Reference<GeometricElementTrianglesData>(reader);
-				sz_triangles = reader.ReadUInt16();
+				if (Settings.s.game == Settings.Game.RRR) {
+					unk0 = reader.ReadUInt16();
+					sz_triangles = reader.ReadUInt16();
+					triangles = new Reference<GeometricElementTrianglesData>(reader);
+					sz_triangles_compressed = reader.ReadUInt16();
+				} else {
+					triangles = new Reference<GeometricElementTrianglesData>(reader);
+					sz_triangles = reader.ReadUInt16();
+				}
 			} else if (Settings.s.platform == Settings.Platform._3DS) {
 				triangles = new Reference<GeometricElementTrianglesData>(reader);
 				sz_triangles = reader.ReadUInt16();
 				sz_vertices = reader.ReadUInt16();
 			}
-			triangles.Resolve(reader, (t) => { t.length = sz_triangles; t.num_vertices = sz_vertices; });
+			triangles.Resolve(reader, (t) => { t.length = sz_triangles; t.num_vertices = sz_vertices; t.compressedLength = sz_triangles_compressed; });
 
 		}
 
@@ -59,6 +68,11 @@ namespace OpenSpace.ROM {
 					mesh = RSP.RSPParser.Parse(triangles.Value.rspCommands, vertices.Value.vertices, go, backfaceCulling);
 					gao.name += " - Verts ( " + sz_vertices + "):" + vertices.Value.Offset + " - Tris ( " + sz_triangles + " ):" + triangles.Value.Offset + " - " + Index + " - " + flags;
 					//gao.name += " - Flags: " + string.Format("{0:X4}", visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value.flags);
+				} else if (Settings.s.platform == Settings.Platform.DS) {
+					if (triangles.Value != null) {
+						mesh = DS3D.GeometryParser.Parse(triangles.Value.ds3dCommands, go, backfaceCulling);
+						gao.name += " - Tris ( " + sz_triangles + " ):" + triangles.Value.Offset + " - " + Index + " - " + flags;
+					}
 				}
 				mf.mesh = mesh;
 				mr.material = visualMaterial.Value.GetMaterial();
