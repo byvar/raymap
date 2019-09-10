@@ -1,6 +1,7 @@
 ﻿using OpenSpace.AI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using LinkedListType = OpenSpace.LinkedList.Type;
@@ -8,16 +9,59 @@ using LinkedListType = OpenSpace.LinkedList.Type;
 namespace OpenSpace {
     public class Settings {
         public enum Mode {
-            Rayman3PC, Rayman3GC,
-            RaymanArenaPC, RaymanArenaGC, RaymanMPC,
-            Rayman2PC, Rayman2DC, Rayman2IOS, Rayman2PS1, Rayman2PS2, Rayman2DS, Rayman23DS, Rayman2N64,
-            Rayman2PCDemo2, Rayman2PCDemo1,
-            DonaldDuckPC, DonaldDuckDC,
-            TonicTroublePC, TonicTroubleSEPC,
-            PlaymobilHypePC, PlaymobilAlexPC, PlaymobilLauraPC,
-			RaymanRavingRabbidsDS
+			[Description("Rayman 2 (PC)")] Rayman2PC,
+			[Description("Rayman 2 (DC)")] Rayman2DC,
+			[Description("Rayman 2 (iOS)")] Rayman2IOS,
+			[Description("Rayman 2 (PS1)")] Rayman2PS1,
+			[Description("Rayman 2 (PS2)")] Rayman2PS2,
+			[Description("Rayman 2 (N64)")] Rayman2N64,
+			[Description("Rayman 2 (DS)")] Rayman2DS,
+			[Description("Rayman 2 (3DS)")] Rayman23DS,
+			[Description("Rayman 2 Demo 1 (PC)")] Rayman2PCDemo1,
+			[Description("Rayman 2 Demo 2 (PC)")] Rayman2PCDemo2,
+			[Description("Rayman M (PC)")] RaymanMPC,
+			[Description("Rayman Arena (PC)")] RaymanArenaPC,
+			[Description("Rayman Arena (GC)")] RaymanArenaGC,
+			[Description("Rayman 3 (PC)")] Rayman3PC,
+			[Description("Rayman 3 (GC)")] Rayman3GC,
+			[Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
+			[Description("Tonic Trouble (PC)")] TonicTroublePC,
+			[Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
+			[Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
+			[Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
+			[Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
+			[Description("Playmobil: Hype (PC)")] PlaymobilHypePC,
+			[Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
+			[Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
 		};
         public Mode mode = Mode.Rayman3PC;
+		
+		public static Dictionary<string, Mode> cmdModeNameDict = new Dictionary<string, Mode>() {
+			{ "r3_gc", Mode.Rayman3GC },
+			{ "ra_gc", Mode.RaymanArenaGC },
+			{ "r3_pc", Mode.Rayman3PC },
+			{ "ra_pc", Mode.RaymanArenaPC },
+			{ "rm_pc", Mode.RaymanMPC },
+			{ "r2_pc", Mode.Rayman2PC },
+			{ "r2_dc", Mode.Rayman2DC },
+			{ "r2_ios", Mode.Rayman2IOS },
+			{ "r2_ps1", Mode.Rayman2PS1 },
+			{ "r2_ps2", Mode.Rayman2PS2 },
+			{ "r2_ds", Mode.Rayman2DS },
+			{ "rrr_ds", Mode.RaymanRavingRabbidsDS },
+			{ "r2_3ds", Mode.Rayman23DS },
+			{ "r2_n64", Mode.Rayman2N64 },
+			{ "dd_pc", Mode.DonaldDuckPC },
+			{ "dd_dc", Mode.DonaldDuckDC },
+			{ "dd_n64", Mode.DonaldDuckN64 },
+			{ "tt_pc", Mode.TonicTroublePC },
+			{ "ttse_pc", Mode.TonicTroubleSEPC },
+			{ "r2_demo1_pc", Mode.Rayman2PCDemo1 },
+			{ "r2_demo2_pc", Mode.Rayman2PCDemo2 },
+			{ "playmobil_hype_pc", Mode.PlaymobilHypePC },
+			{ "playmobil_alex_pc", Mode.PlaymobilAlexPC },
+			{ "playmobil_laura_pc", Mode.PlaymobilLauraPC },
+		};
 
         public enum EngineVersion {
             TT = 0,
@@ -61,31 +105,9 @@ namespace OpenSpace {
         }
 
         public static void Init(Mode mode) {
-            switch (mode) {
-                case Mode.Rayman2IOS: s = Settings.R2IOS; break;
-                case Mode.Rayman2DC: s = Settings.R2DC; break;
-                case Mode.Rayman2PC: s = Settings.R2PC; break;
-				case Mode.Rayman2PS1: s = Settings.R2PS1; break;
-				case Mode.Rayman2PS2: s = Settings.R2PS2; break;
-				case Mode.Rayman2DS: s = Settings.R2DS; break;
-				case Mode.Rayman23DS: s = Settings.R23DS; break;
-				case Mode.Rayman2N64: s = Settings.R2N64; break;
-				case Mode.Rayman2PCDemo1: s = Settings.R2PCDemo1; break;
-                case Mode.Rayman2PCDemo2: s = Settings.R2PCDemo2; break;
-                case Mode.Rayman3GC: s = Settings.R3GC; break;
-                case Mode.Rayman3PC: s = Settings.R3PC; break;
-                case Mode.RaymanArenaGC: s = Settings.RAGC; break;
-                case Mode.RaymanArenaPC: s = Settings.RAPC; break;
-				case Mode.RaymanMPC: s = Settings.RMPC; break;
-				case Mode.DonaldDuckPC: s = Settings.DDPC; break;
-				case Mode.DonaldDuckDC: s = Settings.DDDC; break;
-                case Mode.TonicTroublePC: s = Settings.TTPC; break;
-                case Mode.TonicTroubleSEPC: s = Settings.TTSEPC; break;
-                case Mode.PlaymobilHypePC: s = Settings.PlaymobilHypePC; break;
-                case Mode.PlaymobilAlexPC: s = Settings.PlaymobilAlexPC; break;
-                case Mode.PlaymobilLauraPC: s = Settings.PlaymobilLauraPC; break;
-				case Mode.RaymanRavingRabbidsDS: s = Settings.RRRDS; break;
-            }
+			if (settingsDict.ContainsKey(mode)) {
+				s = settingsDict[mode];
+			}
             if (s != null) s.mode = mode;
         }
 
@@ -501,5 +523,33 @@ namespace OpenSpace {
 				{ CapsType.LangLevelFolder, Caps.None }
 			}
         };
-    }
+
+
+		public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
+			{ Mode.Rayman2PC, R2PC },
+			{ Mode.Rayman2DC, R2DC },
+			{ Mode.Rayman2IOS, R2IOS },
+			{ Mode.Rayman2PS1, R2PS1 },
+			{ Mode.Rayman2PS2, R2PS2 },
+			{ Mode.Rayman2N64, R2N64 },
+			{ Mode.Rayman2DS, R2DS },
+			{ Mode.Rayman23DS, R23DS },
+			{ Mode.Rayman2PCDemo1, R2PCDemo1 },
+			{ Mode.Rayman2PCDemo2, R2PCDemo2 },
+			{ Mode.RaymanMPC, RMPC },
+			{ Mode.RaymanArenaPC, RAPC },
+			{ Mode.RaymanArenaGC, RAGC },
+			{ Mode.Rayman3PC, R3PC },
+			{ Mode.Rayman3GC, R3GC },
+			{ Mode.RaymanRavingRabbidsDS, RRRDS },
+			{ Mode.TonicTroublePC, TTPC },
+			{ Mode.TonicTroubleSEPC, TTSEPC },
+			{ Mode.DonaldDuckPC, DDPC },
+			{ Mode.DonaldDuckDC, DDDC },
+			{ Mode.DonaldDuckN64, R2N64 },
+			{ Mode.PlaymobilHypePC, PlaymobilHypePC },
+			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },
+			{ Mode.PlaymobilAlexPC, PlaymobilAlexPC },
+		};
+	}
 }

@@ -48,6 +48,7 @@ namespace OpenSpace.ROM.DS3D {
 					r = (byte)extractBits(param1, 5, 0);
 					g = (byte)extractBits(param1, 5, 5);
 					b = (byte)extractBits(param1, 5, 10);
+					// No alpha here, always 0.
 					scale = ((float)(1 << 5)) - 1f;
 					break;
 				case Type.VTX_16:

@@ -132,19 +132,25 @@ namespace OpenSpace.ROM.DS3D {
 			return commands.ToArray();
 		}
 
-		public static Mesh Parse(GeometryCommand[] commands, GeometricObject go, bool backfaceCulling) {
+		public static Mesh Parse(GeometryCommand[] commands, GeometricObject go, bool backfaceCulling, Material mat) {
 			List<Vertex> verts = new List<Vertex>();
 			Vertex wipVertex = new Vertex();
 			List<Triangle> triangles = new List<Triangle>();
 			GeometryCommand.PrimitiveType primitive = GeometryCommand.PrimitiveType.Triangles;
 			int lastVertexCount = 0;
+			Texture tex = mat.GetTexture("_Tex0");
+			float wFactor = 64f, hFactor = 64f;
+			if (tex != null) {
+				wFactor = tex.width;
+				hFactor = tex.height;
+			}
 			
 			Mesh mesh = new Mesh();
 			bool parsing = true;
 			foreach (GeometryCommand c in commands) {
 				switch (c.Command) {
 					case GeometryCommand.Type.TEXCOORD:
-						wipVertex.uv = new Vector2(c.u / c.scale / 64f, c.v / c.scale / 64f);
+						wipVertex.uv = new Vector2(c.u / c.scale / wFactor, c.v / c.scale / hFactor);
 						break;
 					case GeometryCommand.Type.COLOR:
 						wipVertex.color = new Color(c.r / c.scale, c.g / c.scale, c.b / c.scale, 1f);
@@ -265,7 +271,7 @@ namespace OpenSpace.ROM.DS3D {
 			public float z;
 			public Vector3 normal;
 			public Vector2 uv;
-			public Color color;
+			public Color color = Color.white;
 
 			public Vertex Clone() {
 				return new Vertex() {
