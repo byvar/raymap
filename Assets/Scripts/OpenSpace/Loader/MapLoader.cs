@@ -142,6 +142,9 @@ namespace OpenSpace {
                 return loader;
             }
         }
+		public static void Reset() {
+			loader = null;
+		}
 
         public MapLoader() {
         }

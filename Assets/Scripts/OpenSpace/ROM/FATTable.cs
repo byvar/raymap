@@ -9,23 +9,29 @@ namespace OpenSpace.ROM {
 		public Pointer offset;
 		public Pointer off_table;
 		public uint num_entries;
-		public FATEntry[] entries;
+		public FATEntry[] entries = new FATEntry[0];
 		public Dictionary<FATEntry.Type, Dictionary<ushort, FATEntry>> entriesDict = new Dictionary<FATEntry.Type, Dictionary<ushort, FATEntry>>();
 
-		public static FATTable Read(Reader reader, Pointer offset) {
+		public static FATTable Read(Reader reader, Pointer offset, bool readEntries = true) {
 			FATTable t = new FATTable();
 			t.offset = offset;
 			t.off_table = Pointer.Read(reader);
 			t.num_entries = reader.ReadUInt32();
-			t.entries = new FATEntry[t.num_entries];
-			Pointer.DoAt(ref reader, t.off_table, () => {
-				for (int i = 0; i < t.entries.Length; i++) {
-					t.entries[i] = FATEntry.Read(reader, Pointer.Current(reader));
-					t.entries[i].entryIndexWithinTable = (uint)i;
-					t.AddEntryToDict(t.entries[i]);
+			if (readEntries) {
+				t.ReadEntries(reader);
+			}
+			return t;
+		}
+
+		public void ReadEntries(Reader reader) {
+			entries = new FATEntry[num_entries];
+			Pointer.DoAt(ref reader, off_table, () => {
+				for (int i = 0; i < entries.Length; i++) {
+					entries[i] = FATEntry.Read(reader, Pointer.Current(reader));
+					entries[i].entryIndexWithinTable = (uint)i;
+					AddEntryToDict(entries[i]);
 				}
 			});
-			return t;
 		}
 
 		private void AddEntryToDict(FATEntry entry) {

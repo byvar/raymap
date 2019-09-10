@@ -5,6 +5,7 @@ using System.Linq;
 using OpenSpace;
 using System.IO;
 using UnityEngine;
+using OpenSpace.Loader;
 
 class MapSelectionDropdown : AdvancedDropdown {
 	public static string[] filterPaths = new string[] {
@@ -23,7 +24,6 @@ class MapSelectionDropdown : AdvancedDropdown {
 	};
 	public string selection = null;
 	public string directory;
-	public string extension;
 	public Settings.Mode mode;
 	public string[] files;
 	public string name;
@@ -59,6 +59,15 @@ class MapSelectionDropdown : AdvancedDropdown {
 				break;
 			case Settings.Platform.DC: extension = "*.DAT"; break;
 			case Settings.Platform.PS2: extension = "*.lv2"; break;
+			case Settings.Platform.DS:
+			case Settings.Platform.N64:
+			case Settings.Platform._3DS:
+				R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
+				l.gameDataBinFolder = directory;
+				string[] levels = l.LoadLevelList();
+				MapLoader.Reset();
+				output.AddRange(levels);
+				break;
 		}
 		if (extension != null) {
 			output.AddRange(

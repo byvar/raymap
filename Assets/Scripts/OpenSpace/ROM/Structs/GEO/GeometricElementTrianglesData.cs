@@ -22,7 +22,7 @@ namespace OpenSpace.ROM {
 		public DS3D.GeometryCommand[] ds3dCommands;
 
 		protected override void ReadInternal(Reader reader) {
-			MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_vertices));
+			//MapLoader.Loader.print("Triangles: " + Pointer.Current(reader) + " - " + string.Format("{0:X4}", length) + " - " + string.Format("{0:X4}", num_vertices));
 			// For DS: https://github.com/scurest/apicula
 			// http://problemkaputt.de/gbatek.htm#ds3dvideo check under Geometry Commands
 

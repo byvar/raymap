@@ -17,7 +17,7 @@ namespace OpenSpace.ROM {
 		protected override void ReadInternal(Reader reader) {
 			visualMaterial = new Reference<VisualMaterial>(reader, true);
 			if (Settings.s.platform == Settings.Platform.N64) {
-				MapLoader.Loader.print("Triangles: " + Pointer.Current(reader));
+				//MapLoader.Loader.print("Triangles: " + Pointer.Current(reader));
 				triangles = new Reference<GeometricElementTrianglesData>(reader);
 				vertices = new Reference<VertexArray>(reader);
 				sz_triangles = reader.ReadUInt16();

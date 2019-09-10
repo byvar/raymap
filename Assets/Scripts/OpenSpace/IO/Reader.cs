@@ -109,8 +109,15 @@ namespace OpenSpace {
         }
 
         public string ReadString(int size) {
-            return System.Text.Encoding.UTF8.GetString(ReadBytes(size)).TrimEnd('\0');
-        }
+			byte[] bytes = ReadBytes(size);
+			int firstIndexOf = Array.IndexOf(bytes, (byte)0x0);
+			if (firstIndexOf >= 0 && firstIndexOf < bytes.Length) {
+				if(firstIndexOf == 0) return "";
+				Array.Resize(ref bytes, firstIndexOf);
+			}
+			return System.Text.Encoding.UTF8.GetString(bytes);
+			//return System.Text.Encoding.UTF8.GetString(ReadBytes(size)).TrimEnd('\0');
+		}
 
         // To make sure position is a multiple of alignBytes
         public void Align(int alignBytes) {

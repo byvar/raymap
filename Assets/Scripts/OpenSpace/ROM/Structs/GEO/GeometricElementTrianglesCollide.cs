@@ -36,7 +36,7 @@ namespace OpenSpace.ROM {
 				mr.material = MapLoader.Loader.collideMaterial;
 				if (material.Value != null && material.Value is GameMaterial) {
 					GameMaterial gmt = material.Value as GameMaterial;
-					MapLoader.Loader.print(gmt.collideMaterial);
+					//MapLoader.Loader.print(gmt.collideMaterial);
 					if (gmt.collideMaterial.Value != null) {
 						gmt.collideMaterial.Value.SetMaterial(mr);
 					}
@@ -61,8 +61,8 @@ namespace OpenSpace.ROM {
                     float uvY = (mesh.vertices[j].y / 20.0f);
                     float uvZ = (mesh.vertices[j].z / 20.0f);
 
-                    Debug.Log("Norms: " + normal.x+","+normal.y+","+normal.z);
-                    Debug.Log("Biggest norm: " + biggestNorm);
+                    //Debug.Log("Norms: " + normal.x+","+normal.y+","+normal.z);
+                    //Debug.Log("Biggest norm: " + biggestNorm);
                     if (biggestNorm == Mathf.Abs(normal.x)) {
                         uvs[j] = new Vector2(uvY, uvZ);
                     } else if (biggestNorm == Mathf.Abs(normal.y)) {

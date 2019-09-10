@@ -14,7 +14,7 @@ namespace OpenSpace.Loader {
 		public ROMBIN data;
 		public ROMBIN fat;
 		public FATTable[] fatTables;
-		public int currentLevel = 5;
+		private int currentLevel = -1;
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;
@@ -25,6 +25,36 @@ namespace OpenSpace.Loader {
 		public bool[] palettesTableSeen;
 		
 		public Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>> structs = new Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>>();
+
+		public string[] LoadLevelList() {
+			if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) return null;
+			gameDataBinFolder += "/";
+			if (!File.Exists(gameDataBinFolder + "data.bin")) return null;
+			if (!File.Exists(gameDataBinFolder + "fat.bin")) return null;
+			files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
+			files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
+			
+			// Load fat
+			Reader reader = files_array[SMem.Fat].reader;
+			uint num_tables = reader.ReadUInt32();
+			if (fatTables == null) {
+				fatTables = new FATTable[num_tables + 2];
+			}
+			for (uint i = 0; i < num_tables + 2; i++) {
+				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader), readEntries: i < 2);
+			}
+			string[] levels = new string[num_tables];
+			Pointer off_levelList = GetStructPtr(FATEntry.Type.LevelList, 0x8000, false);
+			for (int i = 0; i < levels.Length; i++) {
+				Pointer.DoAt(ref reader, off_levelList + 64*i, () => {
+					reader.ReadUInt16();
+					levels[i] = reader.ReadNullDelimitedString();
+				});
+			}
+			/*LevelList levelList = GetOrRead<LevelList>(reader, 0x8000, l => l.num_levels = (ushort)num_tables);
+			levels = levelList.levels.Select(l => l.name).ToArray();*/
+			return levels;
+		}
 		
 
 		public override IEnumerator Load() {
@@ -36,15 +66,22 @@ namespace OpenSpace.Loader {
 				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 				loadingState = "Initializing files";
+				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "data.bin"));
+				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "fat.bin"));
+
 				files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
 				files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
 
 				yield return controller.StartCoroutine(LoadFat());
+				// Determine level index
+				yield return controller.StartCoroutine(LoadFix());
+				if (currentLevel == -1) {
+					throw new Exception("Level list does not contain this level");
+				}
 
-				/*for (int i = 0; i < fatTables[5 + 2].entries.Length; i++) {
-					print(fatTables[5 + 2].entries[i].type + " - " + fatTables[5 + 2].entries[i].index + " - " + String.Format("0x{0:X8}", fatTables[5 + 2].entries[i].off_data));
-				}*/
 
+				yield return controller.StartCoroutine(LoadFatLevel(loadAll: exportTextures));
+				
 				yield return controller.StartCoroutine(LoadData());
 
 				/*List<DSFATEntry> entries = new List<DSFATEntry>();
@@ -97,16 +134,32 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading struct tables";
 			yield return null;
 			uint num_tables = reader.ReadUInt32();
-			fatTables = new FATTable[num_tables + 2];
+			if (fatTables == null) {
+				fatTables = new FATTable[num_tables+2];
+			}
 			for (uint i = 0; i < num_tables + 2; i++) {
-				loadingState = "Loading struct table " + (i+1) + "/" + (num_tables+2);
-				yield return null;
-				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader));
+				if (i < 2) {
+					loadingState = "Loading struct table " + (i + 1) + "/" + (num_tables + 2);
+					yield return null;
+				}
+				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader), readEntries: i < 2);
 			}
 			yield return null;
 		}
 
-		public IEnumerator LoadData() {
+		public IEnumerator LoadFatLevel(bool loadAll = false) {
+			Reader reader = files_array[SMem.Fat].reader;
+			for (uint i = 2; i < fatTables.Length; i++) {
+				bool loadCurrent = loadAll || (i == currentLevel+2);
+				if (loadCurrent) {
+					loadingState = "Loading struct table " + (i + 1) + "/" + (fatTables.Length);
+					yield return null;
+					fatTables[i].ReadEntries(reader);
+				}
+			}
+		}
+
+		public IEnumerator LoadFix() {
 			data = files_array[SMem.Data] as ROMBIN;
 			Reader reader = files_array[SMem.Data].reader;
 
@@ -165,16 +218,6 @@ namespace OpenSpace.Loader {
 				}
 			}
 
-			if (exportTextures) {
-				string state = loadingState;
-				loadingState = "Exporting textures";
-				yield return null;
-				ExportTextures(reader);
-				loadingState = state;
-				yield return null;
-				yield break;
-			}
-
 			// Read fix texture list
 			loadingState = "Loading engine structure";
 			yield return null;
@@ -186,7 +229,7 @@ namespace OpenSpace.Loader {
 			NumLanguages numLanguages = GetOrRead<NumLanguages>(reader, 0);
 			print("Number of languages: " + numLanguages.num_languages);
 			for (ushort i = 0; i < numLanguages.num_languages; i++) {
-				loadingState = "Loading language table " + (i+1) + "/" + numLanguages.num_languages;
+				loadingState = "Loading language table " + (i + 1) + "/" + numLanguages.num_languages;
 				yield return null;
 				LanguageTable lang = GetOrRead<LanguageTable>(reader, i);
 				if (lang != null) {
@@ -194,7 +237,37 @@ namespace OpenSpace.Loader {
 				}
 			}
 
+			// Load level list
+			loadingState = "Loading level list";
+			yield return null;
+			LevelList levelList = GetOrRead<LevelList>(reader, 0x8000, l => l.num_levels = num_levels);
+			for (int i = 0; i < num_levels; i++) {
+				if (levelList.levels[i].name.ToLower() == lvlName.ToLower()) {
+					currentLevel = i;
+					break;
+				}
+			}
+		}
+
+		public IEnumerator LoadData() {
+			Reader reader = files_array[SMem.Data].reader;
+			if (exportTextures) {
+				string state = loadingState;
+				loadingState = "Exporting textures";
+				yield return null;
+				ExportTextures(reader);
+				loadingState = state;
+				yield return null;
+				yield break;
+			}
+
 			for (ushort i = 0; i < short.MaxValue; i++) {
+				// Only do it a few times because we're trying to load way more than there is,
+				// so it takes really long if we yield for everything
+				if (i % 256 == 0) {
+					loadingState = "Loading physical objects: " + (i + 1);
+					yield return null;
+				}
 				//GeometricObject mo = GetOrRead<GeometricObject>(reader, i);
 				/*ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
 				if (ot != null) {

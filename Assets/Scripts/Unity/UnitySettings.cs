@@ -10,22 +10,15 @@ using UnityEditor;
 public class UnitySettings
 {
 	public static Dictionary<Settings.Mode, string> GameDirs = new Dictionary<Settings.Mode, string>();
+	public static Dictionary<Settings.Mode, string> GameDirsWeb = new Dictionary<Settings.Mode, string>();
 
-    public static Settings.Mode GameMode { get; set; } = Settings.Mode.Rayman3PC;
+	public static Settings.Mode GameMode { get; set; } = Settings.Mode.Rayman3PC;
 
     public static string MapName { get; set; }
-
-	public static string CurrentGameDataDir {
-		get {
-			if (GameDirs.ContainsKey(GameMode)) {
-				return (GameDirs[GameMode] ?? "");
-			} else {
-				return "";
-			}
-		}
-	}
+	public static string ProcessName { get; set; }
 
 	// Misc
+	public static bool LoadFromMemory { get; set; }
 	public static bool AllowDeadPointers { get; set; }
 	public static bool ForceDisplayBackfaces { get; set; }
 	public static bool BlockyMode { get; set; }
@@ -42,8 +35,16 @@ public class UnitySettings
 			string dir = GameDirs.ContainsKey(mode) ? GameDirs[mode] : "";
 			EditorPrefs.SetString("Directory" + mode.ToString(), dir);
 		}
-        EditorPrefs.SetString("GameMode", GameMode.ToString());
+		foreach (Settings.Mode mode in modes) {
+			string dir = GameDirsWeb.ContainsKey(mode) ? GameDirsWeb[mode] : "";
+			EditorPrefs.SetString("WebDirectory" + mode.ToString(), dir);
+		}
+		EditorPrefs.SetString("GameMode", GameMode.ToString());
         EditorPrefs.SetString("MapName", MapName);
+
+		// Memory loading
+		EditorPrefs.SetString("ProcessName", ProcessName);
+		EditorPrefs.SetBool("LoadFromMemory", LoadFromMemory);
 
 		// Export
 		EditorPrefs.SetString("ExportPath", ExportPath);
@@ -74,8 +75,16 @@ public class UnitySettings
 			string dir = GameDirs.ContainsKey(mode) ? GameDirs[mode] : "";
 			GameDirs[mode] = EditorPrefs.GetString("Directory" + mode.ToString(), dir);
 		}
-        GameMode = Enum.TryParse(EditorPrefs.GetString("GameMode", GameMode.ToString()), out Settings.Mode gameMode) ? gameMode : GameMode;
+		foreach (Settings.Mode mode in modes) {
+			string dir = GameDirsWeb.ContainsKey(mode) ? GameDirsWeb[mode] : "";
+			GameDirsWeb[mode] = EditorPrefs.GetString("WebDirectory" + mode.ToString(), dir);
+		}
+		GameMode = Enum.TryParse(EditorPrefs.GetString("GameMode", GameMode.ToString()), out Settings.Mode gameMode) ? gameMode : GameMode;
         MapName = EditorPrefs.GetString("MapName", MapName);
+
+		// Memory loading
+		ProcessName = EditorPrefs.GetString("ProcessName", ProcessName);
+		LoadFromMemory = EditorPrefs.GetBool("LoadFromMemory", LoadFromMemory);
 
 		// Export
 		ExportPath = EditorPrefs.GetString("ExportPath", ExportPath);

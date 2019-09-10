@@ -200,7 +200,7 @@ namespace OpenSpace.ROM {
 			{ typeof(GameMaterial), Type.GameMaterial },
 			{ typeof(CollideMaterial), Type.CollideMaterial },
 			{ typeof(MechanicsMaterial), Type.MechanicsMaterial },
-
+			{ typeof(LevelList), Type.LevelList },
 		};
 
 		public Type EntryType {

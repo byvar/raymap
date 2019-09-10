@@ -66,6 +66,23 @@ public class Controller : MonoBehaviour {
 		ExportPath = UnitySettings.ExportPath;
 		ExportAfterLoad = UnitySettings.ExportAfterLoad;
 
+
+#if UNITY_EDITOR
+		if (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL) {
+			FileSystem.mode = FileSystem.Mode.Web;
+		}
+#endif
+		if (Application.platform == RuntimePlatform.WebGLPlayer) {
+			FileSystem.mode = FileSystem.Mode.Web;
+		}
+		if (FileSystem.mode == FileSystem.Mode.Web) {
+			gameDataBinFolder = UnitySettings.GameDirsWeb.ContainsKey(mode) ? UnitySettings.GameDirsWeb[mode] : "";
+		} else {
+			if (UnitySettings.LoadFromMemory) {
+				lvlName = UnitySettings.ProcessName + ".exe";
+			}
+		}
+
 		for (int i = 0; i < args.Length; i++) {
 			switch (args[i]) {
 				case "--lvl":
@@ -146,14 +163,6 @@ public class Controller : MonoBehaviour {
 	}
 
 	IEnumerator Init() {
-#if UNITY_EDITOR
-		if (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL) {
-			FileSystem.mode = FileSystem.Mode.Web;
-		}
-#endif
-		if (Application.platform == RuntimePlatform.WebGLPlayer) {
-			FileSystem.mode = FileSystem.Mode.Web;
-		}
 		state = State.Loading;
 		yield return new WaitForEndOfFrame();
 		yield return StartCoroutine(loader.Load());
