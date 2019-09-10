@@ -15,7 +15,7 @@ public class ControllerEditor : Editor {
         }
 
         if (GUILayout.Button("Export map")) {
-            MapExporter exporter = new MapExporter(MapLoader.Loader, cont.exportPath);
+            MapExporter exporter = new MapExporter(MapLoader.Loader, cont.ExportPath);
             exporter.Export();
         }
     }

@@ -929,9 +929,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af587f4a54f84c42ae16a9378ca8d57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mode: 5
-  gameDataBinFolder: r2_pc
-  lvlName: learn_40
   baseMaterial: {fileID: 2100000, guid: 4c445331ca6381a44bb772fa126abb28, type: 2}
   baseTransparentMaterial: {fileID: 2100000, guid: f72b6a2550e50034d9212047304245fa,
     type: 2}
@@ -943,10 +940,6 @@ MonoBehaviour:
   lightManager: {fileID: 1503682888}
   loadingScreen: {fileID: 1109753673}
   communicator: {fileID: 1701416323}
-  allowDeadPointers: 0
-  forceDisplayBackfaces: 0
-  blockyMode: 0
-  saveTextures: 0
   viewCollision: 0
   viewInvisible: 0
   viewGraphs: 0
@@ -954,8 +947,6 @@ MonoBehaviour:
   playTextureAnimations: 1
   showPersos: 1
   livePreview: 0
-  exportPath: ../../RIPPING/R2_PC/exports
-  exportAfterLoad: 0
 --- !u!4 &1701416322
 Transform:
   m_ObjectHideFlags: 0

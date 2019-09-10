@@ -14,10 +14,6 @@ using OpenSpace.Object.Properties;
 using OpenSpace.Exporter;
 
 public class Controller : MonoBehaviour {
-	public Settings.Mode mode = Settings.Mode.Rayman3PC;
-	public string gameDataBinFolder;
-	public string lvlName;
-
 	public Material baseMaterial;
 	public Material baseTransparentMaterial;
 	public Material baseLightMaterial;
@@ -27,10 +23,7 @@ public class Controller : MonoBehaviour {
 	public LightManager lightManager;
 	public LoadingScreen loadingScreen;
 	public WebCommunicator communicator;
-	public bool allowDeadPointers = false;
-	public bool forceDisplayBackfaces = false;
-	public bool blockyMode = false;
-	public bool saveTextures = false;
+
 	MapLoader loader = null;
 	bool viewCollision_ = false; public bool viewCollision = false;
 	bool viewInvisible_ = false; public bool viewInvisible = false;
@@ -41,14 +34,12 @@ public class Controller : MonoBehaviour {
     bool livePreview_ = false; public bool livePreview = false;
     float livePreviewUpdateCounter = 0;
 
-    // Exporting
-    public string exportPath = ".\\exports\\";
-    public bool exportAfterLoad; // If set to true, exports the map after loading is finished and quits Raymap.
-    //
-
     private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
 	private CinematicSwitcher cinematicSwitcher = null;
+
+	private bool ExportAfterLoad { get; set; }
+	public string ExportPath { get; set; }
 
 	public enum State {
 		None,
@@ -69,7 +60,11 @@ public class Controller : MonoBehaviour {
 		// Read command line arguments
 		string[] args = System.Environment.GetCommandLineArgs();
 		string modeString = "";
-        string exportFolder = "";
+		Settings.Mode mode = UnitySettings.GameMode;
+		string gameDataBinFolder = UnitySettings.GameDirs.ContainsKey(mode) ? UnitySettings.GameDirs[mode] : "";
+		string lvlName = UnitySettings.MapName;
+		ExportPath = UnitySettings.ExportPath;
+		ExportAfterLoad = UnitySettings.ExportAfterLoad;
 
 		for (int i = 0; i < args.Length; i++) {
 			switch (args[i]) {
@@ -91,7 +86,10 @@ public class Controller : MonoBehaviour {
 					i++;
 					break;
                 case "--export":
-                    exportFolder = args[i + 1];
+                    ExportPath = args[i + 1];
+					if (!string.IsNullOrEmpty(ExportPath)) {
+						ExportAfterLoad = true;
+					}
                     i++;
                     break;
             }
@@ -124,53 +122,8 @@ public class Controller : MonoBehaviour {
 				}
 			}
 		}
-		switch (modeString) {
-			case "r3_gc":
-				mode = Settings.Mode.Rayman3GC; break;
-			case "ra_gc":
-				mode = Settings.Mode.RaymanArenaGC; break;
-			case "r3_pc":
-				mode = Settings.Mode.Rayman3PC; break;
-			case "ra_pc":
-				mode = Settings.Mode.RaymanArenaPC; break;
-			case "rm_pc":
-				mode = Settings.Mode.RaymanMPC; break;
-			case "r2_pc":
-				mode = Settings.Mode.Rayman2PC; break;
-			case "r2_dc":
-				mode = Settings.Mode.Rayman2DC; break;
-			case "r2_ios":
-				mode = Settings.Mode.Rayman2IOS; break;
-			case "r2_ps1":
-				mode = Settings.Mode.Rayman2PS1; break;
-			case "r2_ps2":
-				mode = Settings.Mode.Rayman2PS2; break;
-			case "r2_ds":
-				mode = Settings.Mode.Rayman2DS; break;
-			case "rrr_ds":
-				mode = Settings.Mode.RaymanRavingRabbidsDS; break;
-			case "r2_3ds":
-				mode = Settings.Mode.Rayman23DS; break;
-			case "r2_n64":
-				mode = Settings.Mode.Rayman2N64; break;
-			case "dd_pc":
-				mode = Settings.Mode.DonaldDuckPC; break;
-			case "dd_dc":
-				mode = Settings.Mode.DonaldDuckDC; break;
-			case "tt_pc":
-				mode = Settings.Mode.TonicTroublePC; break;
-			case "ttse_pc":
-				mode = Settings.Mode.TonicTroubleSEPC; break;
-			case "r2_demo1_pc":
-				mode = Settings.Mode.Rayman2PCDemo1; break;
-			case "r2_demo2_pc":
-				mode = Settings.Mode.Rayman2PCDemo2; break;
-			case "playmobil_hype_pc":
-				mode = Settings.Mode.PlaymobilHypePC; break;
-			case "playmobil_alex_pc":
-				mode = Settings.Mode.PlaymobilAlexPC; break;
-			case "playmobil_laura_pc":
-				mode = Settings.Mode.PlaymobilLauraPC; break;
+		if (Settings.cmdModeNameDict.ContainsKey(modeString)) {
+			mode = Settings.cmdModeNameDict[modeString];
 		}
 		loadingScreen.Active = true;
 		Settings.Init(mode);
@@ -178,20 +131,16 @@ public class Controller : MonoBehaviour {
 		loader.controller = this;
 		loader.gameDataBinFolder = gameDataBinFolder;
 		loader.lvlName = lvlName;
-		loader.allowDeadPointers = allowDeadPointers;
-		loader.forceDisplayBackfaces = forceDisplayBackfaces;
-		loader.blockyMode = blockyMode;
 		loader.baseMaterial = baseMaterial;
 		loader.baseTransparentMaterial = baseTransparentMaterial;
 		loader.collideMaterial = collideMaterial;
 		loader.collideTransparentMaterial = collideTransparentMaterial;
 		loader.baseLightMaterial = baseLightMaterial;
-		loader.exportTextures = saveTextures;
 
-        if (exportFolder!="") {
-            this.exportPath = exportFolder;
-            exportAfterLoad = true;
-        }
+		loader.allowDeadPointers = UnitySettings.AllowDeadPointers;
+		loader.forceDisplayBackfaces = UnitySettings.ForceDisplayBackfaces;
+		loader.blockyMode = UnitySettings.BlockyMode;
+		loader.exportTextures = UnitySettings.SaveTextures;
 
 		StartCoroutine(Init());
 	}
@@ -236,8 +185,8 @@ public class Controller : MonoBehaviour {
 		state = State.Finished;
 		loadingScreen.Active = false;
 
-        if (exportAfterLoad) {
-            MapExporter e = new MapExporter(this.loader, exportPath);
+        if (ExportAfterLoad) {
+            MapExporter e = new MapExporter(this.loader, ExportPath);
             e.Export();
 
             Application.Quit();
