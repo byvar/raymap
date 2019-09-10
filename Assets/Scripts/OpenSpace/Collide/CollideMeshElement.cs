@@ -53,7 +53,9 @@ namespace OpenSpace.Collide {
                 for (int j = 0; j < num_triangles * 3; j++) {
                     new_vertices[j] = mesh.vertices[triangles[j]];
                     if(normals != null) new_normals[j] = normals[j/3];
-                    if (uvs != null) new_uvs[j] = uvs[mapping[j]];
+                    if (uvs != null) {
+                        new_uvs[j] = uvs[mapping[j]];
+                    }
                 }
                 int[] new_triangles = new int[num_triangles * 3];
                 for (int j = 0; j < num_triangles; j++) {
@@ -65,8 +67,31 @@ namespace OpenSpace.Collide {
                 meshUnity.vertices = new_vertices;
                 if(normals != null) meshUnity.normals = new_normals;
                 meshUnity.triangles = new_triangles;
-                if (uvs != null) meshUnity.uv = new_uvs;
 				if (normals == null) meshUnity.RecalculateNormals();
+
+                // If no UVs exist for collide mesh, generate simple UVs (basically a box projection)
+                if (uvs == null) {
+
+                    for (int j = 0; j < num_triangles * 3; j++) {
+                        Vector3 normal = meshUnity.normals[j];
+                        double biggestNorm = Math.Max(Math.Max(Math.Abs(normal.x), Math.Abs(normal.y)), Math.Abs(normal.z));
+                        
+                        float uvX = (new_vertices[j].x / 20.0f);
+                        float uvY = (new_vertices[j].y / 20.0f);
+                        float uvZ = (new_vertices[j].z / 20.0f);
+
+                        if (biggestNorm == Mathf.Abs(normal.x)) {
+                            new_uvs[j] = new Vector2(uvY, uvZ);
+                        } else if (biggestNorm == Mathf.Abs(normal.y)) {
+                            new_uvs[j] = new Vector2(uvX, uvZ);
+                        } else {
+                            new_uvs[j] = new Vector2(uvX, uvY);
+                        }
+                    }
+                }
+
+                meshUnity.uv = new_uvs;
+
                 MeshFilter mf = gao.AddComponent<MeshFilter>();
                 mf.mesh = meshUnity;
                 MeshRenderer mr = gao.AddComponent<MeshRenderer>();

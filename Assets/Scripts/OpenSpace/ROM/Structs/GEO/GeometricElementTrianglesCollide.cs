@@ -49,7 +49,33 @@ namespace OpenSpace.ROM {
 				//mesh.SetUVs(0, triangles.Value.uvs.Select(u => new Vector3(u.x, u.y, 1f)).ToList());
 				mesh.triangles = triangles.Value.triangles.SelectMany(t => new int[] { t.v2, t.v1, t.v3 }).ToArray();
 				mesh.RecalculateNormals();
-				mf.mesh = mesh;
+
+                Vector2[] uvs = new Vector2[mesh.vertexCount];
+                
+                // Generate simple UVs for collision checkerboard (basically a box projection)
+                for (int j = 0; j < mesh.vertexCount; j++) {
+                    Vector3 normal = mesh.normals[j];
+                    float biggestNorm = Mathf.Max(Mathf.Max(Mathf.Abs(normal.x), Mathf.Abs(normal.y)), Mathf.Abs(normal.z));
+
+                    float uvX = (mesh.vertices[j].x / 20.0f);
+                    float uvY = (mesh.vertices[j].y / 20.0f);
+                    float uvZ = (mesh.vertices[j].z / 20.0f);
+
+                    Debug.Log("Norms: " + normal.x+","+normal.y+","+normal.z);
+                    Debug.Log("Biggest norm: " + biggestNorm);
+                    if (biggestNorm == Mathf.Abs(normal.x)) {
+                        uvs[j] = new Vector2(uvY, uvZ);
+                    } else if (biggestNorm == Mathf.Abs(normal.y)) {
+                        uvs[j] = new Vector2(uvX, uvZ);
+                    } else if (biggestNorm == Mathf.Abs(normal.z)) {
+                        uvs[j] = new Vector2(uvX, uvY);
+                    } else {
+                        Debug.LogError("HALP");
+                    }
+                }
+                mesh.uv = uvs;
+
+                mf.mesh = mesh;
 			}
 			return gao;
 		}
