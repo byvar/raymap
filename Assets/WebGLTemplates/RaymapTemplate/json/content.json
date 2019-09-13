@@ -108,7 +108,7 @@
 				{ "level": "Chase_10", "name": "The Bayou 1" },
 				{ "level": "Chase_22", "name": "The Bayou 2" },
 				{ "level": "Ly_10", "name": "The Walk of Life" },
-				{ "level": "Nego_10", "name": "The Chamber of the Teensies" },
+				{ "level": "nego_10", "name": "The Chamber of the Teensies" },
 				{ "level": "Water_10", "name": "The Sanctuary of Water and Ice 1" },
 				{ "level": "Water_20", "name": "The Sanctuary of Water and Ice 2" },
 				{ "level": "poloc_10", "name": "Polokus - First Mask" },

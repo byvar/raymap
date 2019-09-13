@@ -190,7 +190,15 @@ public class DsgVarCustomEditor : Editor {
                         dsgVarEntry.valueAsPersoGao_initial = selectedPersoBehaviour.gameObject;
                     }
                     break;
-                case DsgVarInfoEntry.DsgVarType.SuperObject:
+				case DsgVarInfoEntry.DsgVarType.Waypoint:
+					GameObject currentWaypointGao = dsgVarEntry.valueAsWaypointGao_initial != null ? dsgVarEntry.valueAsWaypointGao_initial : null;
+					GameObject selectedWaypointGao = ((GameObject)EditorGUILayout.ObjectField(currentWaypointGao, typeof(GameObject), true));
+
+					if (selectedWaypointGao != null) {
+						dsgVarEntry.valueAsWaypointGao_initial = selectedWaypointGao;
+					}
+					break;
+				case DsgVarInfoEntry.DsgVarType.SuperObject:
                     GameObject currentGao = dsgVarEntry.valueAsSuperObjectGao_initial != null ? dsgVarEntry.valueAsSuperObjectGao_initial : null;
                     GameObject selectedGao = ((GameObject)EditorGUILayout.ObjectField(currentGao, typeof(GameObject), true));
 

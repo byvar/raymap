@@ -89,8 +89,9 @@ namespace OpenSpace
 
                         if (entry.value != null) {
                             WayPoint wp = null;
-                            if (entry.value is WayPoint) {
-                                wp = (WayPoint)entry.value;
+                            if (entry.value is Pointer) {
+								wp = WayPoint.FromOffset(entry.value as Pointer);
+                                //wp = (WayPoint)entry.value;
                             }
                             
                             if (wp != null) {
@@ -133,8 +134,9 @@ namespace OpenSpace
 
                             if (entry.initialValue != null) {
                                 WayPoint wp = null;
-                                if (entry.initialValue is WayPoint) {
-                                    wp = (WayPoint)entry.initialValue;
+                                if (entry.initialValue is Pointer) {
+									wp = WayPoint.FromOffset(entry.initialValue as Pointer);
+                                    //wp = (WayPoint)entry.initialValue;
                                 }
 
                                 if (wp != null) {
