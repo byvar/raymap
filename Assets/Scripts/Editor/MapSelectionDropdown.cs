@@ -62,10 +62,11 @@ class MapSelectionDropdown : AdvancedDropdown {
 			case Settings.Platform.DS:
 			case Settings.Platform.N64:
 			case Settings.Platform._3DS:
-                MapLoader.Reset();
-                R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
+				MapLoader.Reset();
+				R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
 				l.gameDataBinFolder = directory;
 				string[] levels = l.LoadLevelList();
+				MapLoader.Reset();
 				output.AddRange(levels);
 				break;
 		}
