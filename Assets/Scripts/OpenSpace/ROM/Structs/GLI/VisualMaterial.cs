@@ -45,13 +45,24 @@ namespace OpenSpace.ROM {
 					(scrollSpeedX != 0 || scrollSpeedY != 0) ? 1f : 0f,
 					0f, 0f));
 				mat.SetVector(textureName + "Params2", new Vector4(
-					0f, 0f, scrollSpeedX, scrollSpeedY));
+					0f, 0f, ScrollX, ScrollY));
 			} else {
 				mat = new Material(MapLoader.Loader.baseMaterial);
 			}
 			mat.SetVector("_AmbientCoef", Vector4.one);
 			mat.SetVector("_DiffuseCoef", Vector4.one);
 			return mat;
+		}
+
+		public float ScrollX {
+			get {
+				return scrollSpeedX * Mathf.Abs(Settings.s.textureAnimationSpeedModifier);
+			}
+		}
+		public float ScrollY {
+			get {
+				return scrollSpeedY * Settings.s.textureAnimationSpeedModifier;
+			}
 		}
 
 		public static ushort flags_renderBackFaces = 0x0100;

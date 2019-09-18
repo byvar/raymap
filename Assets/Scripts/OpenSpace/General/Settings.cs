@@ -358,7 +358,8 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2,
-			numEntryActions = 1
+			numEntryActions = 1,
+			textureAnimationSpeedModifier = -1f,
 		};
 
 		public static Settings RRRDS = new Settings() {
@@ -371,7 +372,8 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2,
-			numEntryActions = 1
+			numEntryActions = 1,
+			textureAnimationSpeedModifier = -1f,
 		};
 
 		public static Settings R23DS = new Settings() {
@@ -384,7 +386,8 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2,
-			numEntryActions = 1
+			numEntryActions = 1,
+			textureAnimationSpeedModifier = -1f,
 		};
 
 		public static Settings R2N64 = new Settings() {
