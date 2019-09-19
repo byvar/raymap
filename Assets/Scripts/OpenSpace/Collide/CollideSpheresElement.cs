@@ -52,6 +52,9 @@ namespace OpenSpace.Collide {
                 sphere_gao.transform.localScale = Vector3.one * spheres[i].radius * 2; // default Unity sphere radius is 0.5
                 sphere_gao.layer = LayerMask.NameToLayer("Collide");
 
+                BillboardBehaviour b = sphere_gao.AddComponent<BillboardBehaviour>();
+                b.mode = BillboardBehaviour.LookAtMode.CameraPosXYZ;
+
                 mr.material = MapLoader.Loader.collideMaterial;
                 if (spheres[i].gameMaterial != null && spheres[i].gameMaterial.collideMaterial != null) {
                     spheres[i].gameMaterial.collideMaterial.SetMaterial(mr);

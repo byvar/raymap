@@ -11,6 +11,7 @@ public class BillboardBehaviour : MonoBehaviour {
         ViewRotation = 1,
         CameraPos = 2,
         Unknown = 3,
+        CameraPosXYZ = 4
     }
     public LookAtMode mode = LookAtMode.None;
 
@@ -51,6 +52,22 @@ public class BillboardBehaviour : MonoBehaviour {
                     if (transform.parent != null) addRotation = transform.parent.rotation.eulerAngles.x;
                     transform.LookAt(transform.position + cam.transform.rotation * Vector3.right, cam.transform.rotation * Vector3.up);
                     transform.Rotate(new Vector3(-addRotation, 0, 0), Space.Self);
+                    break;
+                case LookAtMode.CameraPosXYZ: // Rotates to camera pos on all axes
+
+                    if (cam.transform.position == transform.position) {
+                        break;
+                    }
+
+                    lookRot = (inverseParent * Quaternion.LookRotation(
+                        (cam.transform.position - transform.position),
+                        parentRot * Vector3.up)) * Quaternion.Euler(0, -90, 0);
+                    transform.localRotation = Quaternion.Euler(0, lookRot.eulerAngles.y, lookRot.eulerAngles.z);
+                    //transform.rotation = Quaternion.Euler(newRot.eulerAngles.x, lookRot.eulerAngles.y, newRot.eulerAngles.z);
+                    /*transform.LookAt(transform.position + new Vector3(rotatedRight.x, 0f, rotatedRight.z), cam.transform.rotation * Vector3.up);
+                    transform.Rotate(new Vector3(-addRotation, 0, 0), Space.Self);*/
+                    /*transform.LookAt(cam.transform.position);
+                    transform.Rotate(new Vector3(-addRotation, -90, 0), Space.Self);*/
                     break;
             }
         }

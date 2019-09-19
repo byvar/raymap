@@ -13,6 +13,10 @@ namespace OpenSpace.Object.Properties {
         public byte updateCheckByte;
         public byte transparencyZoneMin;
         public byte transparencyZoneMax;
+
+        public int hitPoints;
+        public int hitPointsMax;
+
         public uint customBitsInitial;
         public uint aiCustomBitsInitial;
         public float tooFarLimit;
@@ -60,7 +64,11 @@ namespace OpenSpace.Object.Properties {
                         reader.ReadByte();
                         reader.ReadByte();
                     } else {
-                        reader.ReadBytes(0x14); // 0x10 - 0x23
+                        reader.ReadBytes(0x10); // 0x10 - 0x19
+                        stdGame.hitPoints = reader.ReadByte();
+                        reader.ReadByte();
+                        stdGame.hitPointsMax = reader.ReadByte();
+                        reader.ReadByte();
                     }
                     stdGame.customBits = reader.ReadUInt32(); // 0x24 custom bits
                     stdGame.isAPlatform = reader.ReadByte(); // 0x28
