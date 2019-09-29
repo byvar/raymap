@@ -125,10 +125,10 @@ namespace OpenSpace.Visual {
 					m.num_vertices = reader.ReadUInt16();
 					m.num_subblocks = reader.ReadUInt16();
 					reader.ReadInt32();
-					reader.ReadSingle();
-					reader.ReadSingle();
-					reader.ReadSingle();
-					reader.ReadSingle();
+					reader.ReadSingle(); // bounding volume radius
+					reader.ReadSingle(); // x
+					reader.ReadSingle(); // z
+					reader.ReadSingle(); // y
 					reader.ReadInt32();
 					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 						reader.ReadInt32();

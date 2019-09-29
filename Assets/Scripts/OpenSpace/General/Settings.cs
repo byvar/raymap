@@ -22,6 +22,7 @@ namespace OpenSpace {
 			[Description("Rayman M (PC)")] RaymanMPC,
 			[Description("Rayman Arena (PC)")] RaymanArenaPC,
 			[Description("Rayman Arena (GC)")] RaymanArenaGC,
+			[Description("Rayman Rush (PS1)")] RaymanRushPS1,
 			[Description("Rayman 3 (PC)")] Rayman3PC,
 			[Description("Rayman 3 (GC)")] Rayman3GC,
 			[Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
@@ -69,7 +70,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR };
+        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -345,6 +346,19 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2,
+			numEntryActions = 1,
+		};
+
+		public static Settings RRushPS1 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.RRush,
+			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
 			numEntryActions = 1
 		};
 
@@ -542,6 +556,7 @@ namespace OpenSpace {
 			{ Mode.RaymanMPC, RMPC },
 			{ Mode.RaymanArenaPC, RAPC },
 			{ Mode.RaymanArenaGC, RAGC },
+			{ Mode.RaymanRushPS1, RRushPS1 },
 			{ Mode.Rayman3PC, R3PC },
 			{ Mode.Rayman3GC, R3GC },
 			{ Mode.RaymanRavingRabbidsDS, RRRDS },

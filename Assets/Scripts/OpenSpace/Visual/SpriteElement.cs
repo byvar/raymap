@@ -39,8 +39,6 @@ namespace OpenSpace.Visual {
                 if (gao == null) {
                     gao = new GameObject(name);// Create object and read triangle data
                     gao.layer = LayerMask.NameToLayer("Visual");
-                    BillboardBehaviour billboard = gao.AddComponent<BillboardBehaviour>();
-                    billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
                     CreateUnityMesh();
                 }
                 return gao;
@@ -58,7 +56,10 @@ namespace OpenSpace.Visual {
                 bool mirrorY = false;
                 GameObject spr_gao = new GameObject(name + " - Sprite " + i);
                 spr_gao.transform.SetParent(gao.transform);
-                MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
+				spr_gao.transform.localPosition = mesh.vertices[sprites[i].centerPoint];
+				BillboardBehaviour billboard = spr_gao.AddComponent<BillboardBehaviour>();
+				billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
+				MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
                 BoxCollider bc = spr_gao.AddComponent<BoxCollider>();
                 bc.size = new Vector3(0, sprites[i].info_scale.y * 2, sprites[i].info_scale.x * 2);
@@ -169,7 +170,7 @@ namespace OpenSpace.Visual {
                 }
                 s.sprites[0].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                 reader.ReadUInt16();
-                reader.ReadUInt16();
+                s.sprites[0].centerPoint = reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt16();
