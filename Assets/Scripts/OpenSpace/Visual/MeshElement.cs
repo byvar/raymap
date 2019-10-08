@@ -303,7 +303,7 @@ namespace OpenSpace.Visual {
                 //}
             }
             if (visualMaterial != null) {
-                gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
+                //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
 				if (vertexColors != null & unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
@@ -405,7 +405,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             MeshElement sm = new MeshElement(offset, m);
             sm.name = "Submesh @ pos " + offset;
-			l.print(sm.name);
+			//l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
             if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
