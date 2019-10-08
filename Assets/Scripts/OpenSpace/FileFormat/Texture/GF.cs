@@ -124,7 +124,7 @@ namespace OpenSpace.FileFormat.Texture {
                 green_channel = new byte[channelPixels];
                 blue_channel = new byte[channelPixels];
                 alpha_channel = new byte[channelPixels];
-                if (format == 1555) isTransparent = true;
+                if (format == 1555 || format == 4444) isTransparent = true;
                 for (int i = 0; i < channelPixels; i++) {
                     ushort pixel = BitConverter.ToUInt16(new byte[] { channel_1[i], channel_2[i] }, 0); // RRRRR, GGGGGG, BBBBB (565)
                     uint red, green, blue, alpha;

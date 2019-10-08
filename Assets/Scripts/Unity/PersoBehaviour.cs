@@ -364,9 +364,12 @@ public class PersoBehaviour : MonoBehaviour {
 						CollideActivation ca = entry.Value[stateIndex];
 						if (ca.activationZone != null) {
 							foreach (CollideActivationZone caz in ca.activationZone) {
-								if (c.zdxList[entry.Key][caz.zdxIndex] == null) continue;
-								if (c.GetPrivilegedActionZoneStatus(entry.Key, (int)caz.zdxIndex) != CollSet.PrivilegedActivationStatus.ForceInactive) {
-									c.zdxList[entry.Key][caz.zdxIndex].SetVisualsActive(true);
+								int index = caz.zdxIndex;
+								if (index >= c.zdxList[entry.Key].Count) index = c.zdxList[entry.Key].Count - 1;
+								if (index < 0) continue;
+								if (c.zdxList[entry.Key][index] == null) continue;
+								if (c.GetPrivilegedActionZoneStatus(entry.Key, index) != CollSet.PrivilegedActivationStatus.ForceInactive) {
+									c.zdxList[entry.Key][index].SetVisualsActive(true);
 								}
 							}
 						}

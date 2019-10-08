@@ -24,7 +24,6 @@ namespace OpenSpace.Collide
 
         public static CollideActivationZone Read(Reader reader, Pointer offset) {
             CollideActivationZone z = new CollideActivationZone(offset);
-
 			if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
 				z.off_next = Pointer.Read(reader);
 				if (Settings.s.hasLinkedListHeaderPointers) {
