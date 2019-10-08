@@ -154,7 +154,7 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
-				} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA) {
+				} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.Dinosaur) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				}
@@ -205,8 +205,13 @@ namespace OpenSpace.Loader {
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaGC) {
 				sz_entryActions = 0xC4;
 				sz_fontDefine = 0x12E4;
-			} else if (Settings.s.mode == Settings.Mode.RaymanArenaPC || Settings.s.mode == Settings.Mode.RaymanMPC) {
+			} else if (Settings.s.mode == Settings.Mode.RaymanArenaPC
+				|| Settings.s.mode == Settings.Mode.RaymanMPC) {
 				sz_entryActions = 0xDC;
+			} else if (Settings.s.mode == Settings.Mode.DinosaurPC) {
+				sz_entryActions = 0xD8;
+				sz_randomStructure = 0xE0;
+				sz_fontDefine = 0xA00;
 			}
 			loadingState = "Loading input structure";
 			yield return null;
@@ -255,9 +260,11 @@ namespace OpenSpace.Loader {
 			}
 			/*loadingState = "Loading fixed animation bank";
 			yield return null;*/
-			off_animBankFix = Pointer.Read(reader); // Note: only one 0x104 bank in fix.
-			//print(Pointer.Current(reader));
-			print("Fix animation bank address: " + off_animBankFix);
+			if (Settings.s.game != Settings.Game.Dinosaur) {
+				off_animBankFix = Pointer.Read(reader); // Note: only one 0x104 bank in fix.
+														//print(Pointer.Current(reader));
+				print("Fix animation bank address: " + off_animBankFix);
+			}
 			/*if (off_animBankFix.file == files_array[Mem.Lvl]) {
 				animationBanks = new AnimationBank[4]; // 1 in fix, 4 in lvl
 				Pointer.DoAt(ref reader, off_animBankFix, () => {
@@ -297,16 +304,20 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
-				} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA) {
+				} else if (Settings.s.game == Settings.Game.RM
+					|| Settings.s.game == Settings.Game.RA
+					|| Settings.s.game == Settings.Game.Dinosaur) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				}
 			}
 			reader.ReadBytes(0x104); // vignette
-			reader.ReadUInt32();
+			if (Settings.s.game != Settings.Game.Dinosaur) {
+				reader.ReadUInt32();
+			}
 			loadingState = "Loading level textures";
 			yield return controller.StartCoroutine(ReadTexturesLvl(reader, Pointer.Current(reader)));
-			if (Settings.s.platform == Settings.Platform.PC && !hasTransit) {
+			if (Settings.s.platform == Settings.Platform.PC && !hasTransit && Settings.s.game != Settings.Game.Dinosaur) {
 				Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
 				Pointer.DoAt(ref reader, off_lightMapTexture, () => {
 					lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);
@@ -317,6 +328,15 @@ namespace OpenSpace.Loader {
 						overlightTexture = TextureInfo.Read(reader, off_overlightTexture);
 					});
 				}
+			}
+			Pointer off_animBankLvl = null;
+			if (Settings.s.game == Settings.Game.Dinosaur) {
+				// animation bank is read right here.
+				off_animBankLvl = Pointer.Current(reader); // Note: only one 0x104 bank in fix.
+				print("Lvl animation bank address: " + off_animBankLvl);
+				animationBanks = new AnimationBank[5];
+				AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 0, 1, files_array[Mem.LvlKeyFrames]);
+				animationBanks[0] = banks[0];
 			}
 			loadingState = "Loading globals";
 			yield return null;
@@ -371,7 +391,9 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32(); // only used if there was no transit in the previous lvl. Always 00165214 in R3GC?
 			reader.ReadUInt32(); // related to "SOL". What is this? Good question.
 			reader.ReadUInt32(); // same
-			reader.ReadUInt32(); // same
+			if (Settings.s.game != Settings.Game.Dinosaur) {
+				reader.ReadUInt32(); // same
+			}
 			Pointer off_cineManager = Pointer.Read(reader);
 			byte unk = reader.ReadByte();
 			byte IPO_numRLItables = reader.ReadByte();
@@ -383,6 +405,12 @@ namespace OpenSpace.Loader {
 
 			// The ptrsTable seems to be related to sound events. Perhaps cuuids.
 			reader.ReadUInt32();
+			if (Settings.s.game == Settings.Game.Dinosaur) {
+				for (int i = 0; i < 50; i++) {
+					reader.ReadUInt32();
+				}
+				// Actually, the previous uint is an amount for this array of uints, but it's padded to always be 50 long
+			}
 			uint num_ptrsTable = reader.ReadUInt32();
 			if (Settings.s.game == Settings.Game.R3) {
 				uint bool_ptrsTable = reader.ReadUInt32();
@@ -401,10 +429,12 @@ namespace OpenSpace.Loader {
 				Pointer off_array_geometric = Pointer.Read(reader);
 				Pointer off_array_geometric_RLI = Pointer.Read(reader);
 				Pointer off_array_transition_flags = Pointer.Read(reader);
-			} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+			} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.Dinosaur) {
 				uint num_unk = reader.ReadUInt32();
 				Pointer unk_first = Pointer.Read(reader);
-				Pointer unk_last = Pointer.Read(reader);
+				if (Settings.s.game != Settings.Game.Dinosaur) {
+					Pointer unk_last = Pointer.Read(reader);
+				}
 			}
 			uint num_visual_materials = reader.ReadUInt32();
 			Pointer off_array_visual_materials = Pointer.Read(reader);
@@ -440,6 +470,7 @@ namespace OpenSpace.Loader {
 				for (uint i = 0; i < num_visual_materials; i++) {
 					Pointer off_material = Pointer.Read(reader);
 					Pointer.DoAt(ref reader, off_material, () => {
+						//print(Pointer.Current(reader));
 						visualMaterials.Add(VisualMaterial.Read(reader, off_material));
 					});
 				}
@@ -503,7 +534,9 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
 					reader.ReadUInt32();
 					so = SuperObject.FromOffset(off_perso_so_with_settings_in_fix);
-				} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+				} else if (Settings.s.game == Settings.Game.RA
+					|| Settings.s.game == Settings.Game.RM
+					|| Settings.s.game == Settings.Game.Dinosaur) {
 					off_matrix = Pointer.Current(reader);
 					mat = Matrix.Read(reader, off_matrix);
 					so = superObjects.FirstOrDefault(s => s.off_data == persoInFix[i]);
@@ -523,22 +556,24 @@ namespace OpenSpace.Loader {
 			}
 			loadingState = "Loading animation banks";
 			yield return null;
-			Pointer off_animBankLvl = Pointer.Read(reader); // Note: 4 0x104 banks in lvl.
-			print("Lvl animation bank address: " + off_animBankLvl);
-			animationBanks = new AnimationBank[5];
-			if (off_animBankFix != off_animBankLvl) {
-				Pointer.DoAt(ref reader, off_animBankFix, () => {
-					animationBanks[0] = AnimationBank.Read(reader, off_animBankFix, 0, 1, files_array[Mem.FixKeyFrames])[0];
-				});
-			}
-			Pointer.DoAt(ref reader, off_animBankLvl, () => {
-				AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 1, 4, files_array[Mem.LvlKeyFrames]);
-				for (int i = 0; i < 4; i++) {
-					animationBanks[1 + i] = banks[i];
+			if (Settings.s.game != Settings.Game.Dinosaur) {
+				off_animBankLvl = Pointer.Read(reader); // Note: 4 0x104 banks in lvl.
+				print("Lvl animation bank address: " + off_animBankLvl);
+				animationBanks = new AnimationBank[5];
+				if (off_animBankFix != off_animBankLvl) {
+					Pointer.DoAt(ref reader, off_animBankFix, () => {
+						animationBanks[0] = AnimationBank.Read(reader, off_animBankFix, 0, 1, files_array[Mem.FixKeyFrames])[0];
+					});
 				}
-			});
-			if (off_animBankFix == off_animBankLvl) {
-				animationBanks[0] = animationBanks[1];
+				Pointer.DoAt(ref reader, off_animBankLvl, () => {
+					AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 1, 4, files_array[Mem.LvlKeyFrames]);
+					for (int i = 0; i < 4; i++) {
+						animationBanks[1 + i] = banks[i];
+					}
+				});
+				if (off_animBankFix == off_animBankLvl) {
+					animationBanks[0] = animationBanks[1];
+				}
 			}
 			// Load additional animation banks
 			for (int i = 0; i < families.Count; i++) {

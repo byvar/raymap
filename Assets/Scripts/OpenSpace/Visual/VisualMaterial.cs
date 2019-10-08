@@ -269,8 +269,11 @@ namespace OpenSpace.Visual {
                 reader.ReadByte();
                 reader.ReadByte(); // padding, not in DC
                 reader.ReadByte(); // padding, not in DC
-            } else {
+            } else { // EngineVersion >= R3
                 reader.ReadUInt32(); // current refresh number for scrolling/animated textures, 0x48
+				if (Settings.s.game == Settings.Game.Dinosaur) {
+					reader.ReadBytes(0x1C);
+				}
                 m.off_animTextures_first = Pointer.Read(reader);
                 m.off_animTextures_current = Pointer.Read(reader);
                 m.num_animTextures = reader.ReadUInt16();
@@ -288,29 +291,53 @@ namespace OpenSpace.Visual {
                     t.offset = Pointer.Current(reader);
                     t.off_texture = Pointer.Read(reader);
                     if (t.off_texture == null) break;
-                    t.texture = TextureInfo.FromOffset(t.off_texture);
+					/*if (Settings.s.game == Settings.Game.Dinosaur) {
+						Pointer.DoAt(ref reader, t.off_texture, () => {
+							Pointer off_tex = Pointer.Read(reader);
+							t.texture = TextureInfo.FromOffset(off_tex);
+						});
+					} else {*/
+					t.texture = TextureInfo.FromOffset(t.off_texture);
+					//}
 
                     t.textureOp = reader.ReadByte();
                     t.shadingMode = reader.ReadByte();
                     t.uvFunction = reader.ReadByte();
                     t.scrollByte = reader.ReadByte();
 
-                    t.properties = reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    t.scrollX = reader.ReadSingle();
-                    t.scrollY = reader.ReadSingle();
-                    t.rotateSpeed = reader.ReadSingle();
-                    t.rotateDirection = reader.ReadSingle();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    t.currentScrollX = reader.ReadSingle();
-                    t.currentScrollY = reader.ReadSingle();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    t.blendIndex = reader.ReadUInt32();
+					if (Settings.s.game == Settings.Game.Dinosaur) {
+						t.properties = reader.ReadInt32();
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						t.currentScrollX = reader.ReadSingle();
+						t.currentScrollY = reader.ReadSingle();
+						t.scrollX = reader.ReadSingle();
+						t.scrollY = reader.ReadSingle();
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+					} else {
+						t.properties = reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						t.scrollX = reader.ReadSingle();
+						t.scrollY = reader.ReadSingle();
+						t.rotateSpeed = reader.ReadSingle();
+						t.rotateDirection = reader.ReadSingle();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						t.currentScrollX = reader.ReadSingle();
+						t.currentScrollY = reader.ReadSingle();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						t.blendIndex = reader.ReadUInt32();
+					}
                     
                     m.textures.Add(t);
                 }

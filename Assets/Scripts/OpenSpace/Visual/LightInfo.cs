@@ -189,10 +189,17 @@ namespace OpenSpace.Visual {
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                     l.shadowIntensity = reader.ReadSingle(); // 0
                 }
-                l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
-                l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
-                l.paintingLightFlag = reader.ReadByte();
-                l.alphaLightFlag = reader.ReadByte();
+				if (Settings.s.game == Settings.Game.Dinosaur) {
+					l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
+					l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
+					l.alphaLightFlag = reader.ReadByte();
+					l.paintingLightFlag = reader.ReadByte();
+				} else {
+					l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
+					l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
+					l.paintingLightFlag = reader.ReadByte();
+					l.alphaLightFlag = reader.ReadByte();
+				}
                 l.interMinPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 l.exterMinPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 l.interMaxPos    = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -202,7 +209,7 @@ namespace OpenSpace.Visual {
                 l.intensityMin_fogBlendFar = reader.ReadSingle();
                 l.intensityMax = reader.ReadSingle();
                 l.background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-				if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
+				if ((Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur) || Settings.s.game == Settings.Game.R2Revolution) {
 					l.createsShadowsOrNot = reader.ReadUInt32();
 				}
             } else {

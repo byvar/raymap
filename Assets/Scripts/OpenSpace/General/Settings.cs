@@ -31,9 +31,11 @@ namespace OpenSpace {
 			[Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
 			[Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
 			[Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
+			[Description("Donald Duck: PK (GC)")] DonaldDuckPKGC,
 			[Description("Playmobil: Hype (PC)")] PlaymobilHypePC,
 			[Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
 			[Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
+			[Description("Disney's Dinosaur (PC)")] DinosaurPC,
 		};
         public Mode mode = Mode.Rayman3PC;
 		
@@ -55,6 +57,7 @@ namespace OpenSpace {
 			{ "dd_pc", Mode.DonaldDuckPC },
 			{ "dd_dc", Mode.DonaldDuckDC },
 			{ "dd_n64", Mode.DonaldDuckN64 },
+			{ "ddpk_gc", Mode.DonaldDuckPKGC },
 			{ "tt_pc", Mode.TonicTroublePC },
 			{ "ttse_pc", Mode.TonicTroubleSEPC },
 			{ "r2_demo1_pc", Mode.Rayman2PCDemo1 },
@@ -62,6 +65,7 @@ namespace OpenSpace {
 			{ "playmobil_hype_pc", Mode.PlaymobilHypePC },
 			{ "playmobil_alex_pc", Mode.PlaymobilAlexPC },
 			{ "playmobil_laura_pc", Mode.PlaymobilLauraPC },
+			{ "dinosaur_pc", Mode.DinosaurPC },
 		};
 
         public enum EngineVersion {
@@ -70,7 +74,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR };
+        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -542,6 +546,37 @@ namespace OpenSpace {
         };
 
 
+
+		public static Settings DDPKGC = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.DDPK,
+			platform = Platform.GC,
+			endian = Endian.Big,
+			linkedListType = LinkedListType.Double,
+			hasNames = true,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasExtraInputData = true,
+			hasLinkedListHeaderPointers = true,
+			textureAnimationSpeedModifier = -10f,
+			luminosity = 0.1f,
+			saturate = false
+		};
+
+		public static Settings DinosaurPC = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.Dinosaur,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			aiTypes = AITypes.R3,
+			hasDeformations = true,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.3f,
+			saturate = false
+		};
+
+
 		public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
 			{ Mode.Rayman2PC, R2PC },
 			{ Mode.Rayman2DC, R2DC },
@@ -565,9 +600,11 @@ namespace OpenSpace {
 			{ Mode.DonaldDuckPC, DDPC },
 			{ Mode.DonaldDuckDC, DDDC },
 			{ Mode.DonaldDuckN64, R2N64 },
+			{ Mode.DonaldDuckPKGC, DDPKGC },
 			{ Mode.PlaymobilHypePC, PlaymobilHypePC },
 			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },
 			{ Mode.PlaymobilAlexPC, PlaymobilAlexPC },
+			{ Mode.DinosaurPC, DinosaurPC },
 		};
 	}
 }

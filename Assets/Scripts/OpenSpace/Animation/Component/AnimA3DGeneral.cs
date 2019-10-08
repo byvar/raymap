@@ -105,7 +105,7 @@ namespace OpenSpace.Animation.Component {
                     a3d.start_morphData = 0;
                 }
             } else {
-                /* Each a3d is 0x3c long */
+				/* Each a3d is 0x3c long */
                 a3d.speed = reader.ReadUInt16();
                 a3d.num_vectors = reader.ReadUInt16();
                 a3d.num_quaternions = reader.ReadUInt16();

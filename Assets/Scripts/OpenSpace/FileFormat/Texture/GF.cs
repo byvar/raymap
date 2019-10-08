@@ -48,7 +48,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public GF(byte[] bytes) : this(new MemoryStream(bytes)) {}
         /*public GF(byte[] bytes) {
-            Util.ByteArrayToFile("hi" + bytes.Length + ".lol", bytes);
+            Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "hi" + bytes.Length + ".lol", bytes);
             GF gf = new GF(new MemoryStream(bytes));
             pixels = gf.pixels;
             //throw new Exception("exported");
@@ -73,14 +73,16 @@ namespace OpenSpace.FileFormat.Texture {
 
             channels = r.ReadByte();
             byte enlargeByte = 0;
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) enlargeByte = r.ReadByte();
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur) enlargeByte = r.ReadByte();
             uint w = width, h = height;
-            if (enlargeByte > 0) channelPixels = 0;
-            for (int i = 0; i < enlargeByte; i++) {
-                channelPixels += (w * h);
-                w /= 2;
-                h /= 2;
-            }
+			if (enlargeByte > 0) {
+				channelPixels = 0;
+				for (int i = 0; i < enlargeByte; i++) {
+					channelPixels += (w * h);
+					w /= 2;
+					h /= 2;
+				}
+			}
             repeatByte = r.ReadByte();
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 paletteNumColors = r.ReadUInt16();
@@ -135,30 +137,36 @@ namespace OpenSpace.FileFormat.Texture {
                             break;
                         case 4444:
                             alpha = extractBits(pixel, 4, 12);
-                            blue = extractBits(pixel, 4, 8);
+                            red = extractBits(pixel, 4, 8);
                             green = extractBits(pixel, 4, 4);
-                            red = extractBits(pixel, 4, 0);
+                            blue = extractBits(pixel, 4, 0);
                             red_channel[i] = (byte)((red / 15.0f) * 255.0f);
                             green_channel[i] = (byte)((green / 15.0f) * 255.0f);
                             blue_channel[i] = (byte)((blue / 15.0f) * 255.0f);
                             alpha_channel[i] = (byte)((alpha / 15.0f) * 255.0f);
                             break;
                         case 1555:
+							/*
                             alpha = extractBits(pixel, 1, 15);
                             red = extractBits(pixel, 5, 10);
                             green = extractBits(pixel, 5, 5);
                             blue = extractBits(pixel, 5, 0);
+							*/
+							alpha = extractBits(pixel, 1, 15);
+							red = extractBits(pixel, 5, 10);
+							green = extractBits(pixel, 5, 5);
+							blue = extractBits(pixel, 5, 0);
 
-                            red_channel[i] = (byte)((red / 31.0f) * 255.0f);
+							red_channel[i] = (byte)((red / 31.0f) * 255.0f);
                             green_channel[i] = (byte)((green / 31.0f) * 255.0f);
                             blue_channel[i] = (byte)((blue / 31.0f) * 255.0f);
                             alpha_channel[i] = (byte)(alpha * 255);
                             break;
                         case 565:
                         default: // 565
-                            red = extractBits(pixel, 5, 11);
-                            green = extractBits(pixel, 6, 5);
-                            blue = extractBits(pixel, 5, 0);
+							red = extractBits(pixel, 5, 11);
+							green = extractBits(pixel, 6, 5);
+							blue = extractBits(pixel, 5, 0);
 
                             red_channel[i] = (byte)((red / 31.0f) * 255.0f);
                             green_channel[i] = (byte)((green / 63.0f) * 255.0f);

@@ -207,7 +207,10 @@ namespace OpenSpace.Visual {
                     tex.name = "Texture @ " + offset;
                 } else {
                     tex.field0 = reader.ReadUInt32(); // 888 or 8888
-                    tex.field4 = reader.ReadUInt16(); // 20
+					if (Settings.s.game == Settings.Game.Dinosaur) {
+						reader.ReadUInt32();
+					}
+					tex.field4 = reader.ReadUInt16(); // 20
                     tex.field6 = reader.ReadUInt16();
                     tex.off_tempBuffer = Pointer.Read(reader); // always null because it's stored here dynamically
                     tex.fieldC = reader.ReadUInt32();

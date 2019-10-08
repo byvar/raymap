@@ -406,24 +406,32 @@ MonoBehaviour.print(str);
 				}
             } else {
                 if (Settings.s.platform == Settings.Platform.PC) {
-                    if (Settings.s.game == Settings.Game.R3) {
-                        cntPaths = new string[3];
-                        cntPaths[0] = gameDataBinFolder + "vignette.cnt";
-                        cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
-                        cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
+					if (Settings.s.game == Settings.Game.R3) {
+						cntPaths = new string[3];
+						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+						cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
+						cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
 						foreach (string path in cntPaths) {
 							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 						}
 						cnt = new CNT(cntPaths);
-                    } else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
-                        cntPaths = new string[2];
-                        cntPaths[0] = gameDataBinFolder + "vignette.cnt";
-                        cntPaths[1] = gameDataBinFolder + "tex32.cnt";
+					} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+						cntPaths = new string[2];
+						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+						cntPaths[1] = gameDataBinFolder + "tex32.cnt";
 						foreach (string path in cntPaths) {
 							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 						}
 						cnt = new CNT(cntPaths);
-                    }
+					} else if (Settings.s.game == Settings.Game.Dinosaur) {
+						cntPaths = new string[2];
+						cntPaths[0] = gameDataBinFolder + "VIGNETTE.CNT";
+						cntPaths[1] = gameDataBinFolder + "TEXTURES.CNT";
+						foreach (string path in cntPaths) {
+							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+						}
+						cnt = new CNT(cntPaths);
+					}
                 }
             }
 			if (cnt != null) {
@@ -435,7 +443,8 @@ MonoBehaviour.print(str);
 					yield return null;
 					// Export all textures in cnt
 					foreach (CNT.FileStruct file in cnt.fileList) {
-						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + file.FullName.Replace(".gf", ".png"), cnt.GetGF(file).GetTexture().EncodeToPNG());
+						GF gf = cnt.GetGF(file);
+						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + file.FullName.Replace(".gf", ".png"), gf.GetTexture().EncodeToPNG());
 					}
 					loadingState = state;
 					yield return null;
@@ -482,36 +491,30 @@ MonoBehaviour.print(str);
 
         public void ReadKeypadDefine(Reader reader, Pointer off_keypadDefine) {
             if (off_keypadDefine == null) return;
-            //print("off keypad: " + off_keypadDefine);
-            Pointer off_current = Pointer.Goto(ref reader, off_keypadDefine);
-            bool readKeypadDefine = true;
-            while (readKeypadDefine) {
-                KeypadEntry entry = new KeypadEntry();
-                entry.keycode = reader.ReadInt16();
-                if (entry.keycode != -1) {
-                    entry.unk2 = reader.ReadInt16();
-                    /* Interestingly, some pointers in this list are not in the relocation table.
-                     * and don't point to any key name, so they can't be read with Pointer.Read.
-                     * Perhaps restoring this can help to restore debug functions... */
-                    Pointer off_name = Pointer.GetPointerAtOffset(Pointer.Current(reader));
-                    reader.ReadUInt32();
-                    Pointer off_name2 = Pointer.GetPointerAtOffset(Pointer.Current(reader));
-                    reader.ReadUInt32();
-                    Pointer off_current_entry = Pointer.Current(reader);
-                    if (off_name != null) {
-                        Pointer.Goto(ref reader, off_name);
-                        entry.name = reader.ReadNullDelimitedString();
-                        //print(entry.name + " - " + entry.keycode + " - " + entry.unk2);
-                    }
-                    if (off_name2 != null) {
-                        Pointer.Goto(ref reader, off_name2);
-                        entry.name2 = reader.ReadNullDelimitedString();
-                    }
-                    Pointer.Goto(ref reader, off_current_entry);
-                    keypadEntries.Add(entry);
-                } else readKeypadDefine = false;
-            }
-            Pointer.Goto(ref reader, off_current);
+			Pointer.DoAt(ref reader, off_keypadDefine, () => {
+				bool readKeypadDefine = true;
+				while (readKeypadDefine) {
+					KeypadEntry entry = new KeypadEntry();
+					entry.keycode = reader.ReadInt16();
+					if (entry.keycode != -1) {
+						entry.unk2 = reader.ReadInt16();
+						/* Interestingly, some pointers in this list are not in the relocation table.
+						 * and don't point to any key name, so they can't be read with Pointer.Read.
+						 * Perhaps restoring this can help to restore debug functions... */
+						Pointer off_name = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+						reader.ReadUInt32();
+						Pointer off_name2 = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+						reader.ReadUInt32();
+						Pointer.DoAt(ref reader, off_name, () => {
+							entry.name = reader.ReadNullDelimitedString();
+						});
+						Pointer.DoAt(ref reader, off_name2, () => {
+							entry.name2 = reader.ReadNullDelimitedString();
+						});
+						keypadEntries.Add(entry);
+					} else readKeypadDefine = false;
+				}
+			});
         }
 
         public void ReadLevelNames(Reader reader, Pointer off_levels, uint num_levels) {
@@ -619,8 +622,8 @@ MonoBehaviour.print(str);
                 Pointer.DoAt(ref reader, off_texture, () => {
                     textures[i] = TextureInfo.Read(reader, off_texture);
                 });
-            }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
+			}
+			if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
                 uint num_texturesToCreate = reader.ReadUInt32();
                 for (uint i = 0; i < num_textures_fix; i++) { // ?
                     reader.ReadUInt32(); //1

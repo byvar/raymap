@@ -89,7 +89,7 @@ namespace OpenSpace.Object.Properties {
             LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             s.off_state_auto = Pointer.Read(reader, allowMinusOne: true);
             s.off_mechanicsIDCard = Pointer.Read(reader);
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur) {
                 s.off_cine_mapname = Pointer.Read(reader);
                 s.off_cine_name = Pointer.Read(reader);
             }

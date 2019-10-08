@@ -139,6 +139,7 @@ namespace OpenSpace.Object {
             }
 
             Pointer.DoAt(ref reader, off_boundingVolume, () => {
+				l.print(off_boundingVolume);
                 so.boundingVolume = BoundingVolume.Read(reader, off_boundingVolume, so.flags.HasFlag(SuperObjectFlags.Flags.BoundingBoxInsteadOfSphere) ?
                     BoundingVolume.Type.Box : BoundingVolume.Type.Sphere);
             });

@@ -151,11 +151,13 @@ namespace OpenSpace.Collide {
 					sm.num_triangles = reader.ReadUInt16();
 					reader.ReadUInt16();
 					reader.ReadUInt32();
-					sm.off_mapping = Pointer.Read(reader);
-					sm.off_unk = Pointer.Read(reader); // num_mapping_entries * 3 floats 
-					sm.off_unk2 = Pointer.Read(reader); // num_mapping_entries * 1 float
-					sm.num_mapping = reader.ReadUInt16();
-					reader.ReadUInt16();
+					if (Settings.s.game != Settings.Game.Dinosaur) {
+						sm.off_mapping = Pointer.Read(reader);
+						sm.off_unk = Pointer.Read(reader); // num_mapping_entries * 3 floats 
+						sm.off_unk2 = Pointer.Read(reader); // num_mapping_entries * 1 float
+						sm.num_mapping = reader.ReadUInt16();
+						reader.ReadUInt16();
+					}
 				}
 			}
 

@@ -119,6 +119,11 @@ namespace OpenSpace.Visual {
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
+				if (Settings.s.game == Settings.Game.Dinosaur) {
+					reader.ReadInt32();
+					reader.ReadInt32();
+					reader.ReadInt32();
+				}
 				if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
 					m.lookAtMode = reader.ReadUInt32();
 					//if (m.lookAtMode != 0) l.print(m.lookAtMode);

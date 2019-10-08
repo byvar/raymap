@@ -303,7 +303,7 @@ namespace OpenSpace.Visual {
                 //}
             }
             if (visualMaterial != null) {
-                //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
+                gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
 				if (vertexColors != null & unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
@@ -405,6 +405,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             MeshElement sm = new MeshElement(offset, m);
             sm.name = "Submesh @ pos " + offset;
+			l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
             if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
@@ -448,15 +449,25 @@ namespace OpenSpace.Visual {
 				}
 			}
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                reader.ReadUInt16();
-                sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
-                sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
-                sm.off_mapping_uvs = Pointer.Read(reader); // shorts_offset2 (2nd array of size num_shorts, max: num_weights)
-                sm.num_connected_vertices = reader.ReadUInt16(); // num_shorts2
-                sm.num_disconnected_triangles = reader.ReadUInt16();
-                sm.off_connected_vertices = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
-                sm.off_disconnected_triangles = Pointer.Read(reader);
-                if (Settings.s.hasNames) sm.name += reader.ReadString(0x34);
+				if (Settings.s.game != Settings.Game.Dinosaur) {
+					reader.ReadUInt16();
+					sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
+					sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
+					sm.off_mapping_uvs = Pointer.Read(reader); // shorts_offset2 (2nd array of size num_shorts, max: num_weights)
+					sm.num_connected_vertices = reader.ReadUInt16(); // num_shorts2
+					sm.num_disconnected_triangles = reader.ReadUInt16();
+					sm.off_connected_vertices = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
+					sm.off_disconnected_triangles = Pointer.Read(reader);
+					if (Settings.s.hasNames) sm.name += reader.ReadString(0x34);
+				} else {
+					sm.num_mapping_entries = 0;
+					sm.off_mapping_vertices = null;
+					sm.off_mapping_uvs = null;
+					sm.num_connected_vertices = 0;
+					sm.num_disconnected_triangles = 0;
+					sm.off_connected_vertices = null;
+					sm.off_disconnected_triangles = null;
+				}
             } else {
                 // Defaults for Rayman 2
                 sm.num_uvMaps = 1;

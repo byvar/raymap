@@ -25,7 +25,9 @@ namespace OpenSpace.Animation.Component {
         public static AnimKeyframe Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
             AnimKeyframe kf = new AnimKeyframe();
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.RM) {
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3
+				|| Settings.s.game == Settings.Game.RM
+				|| Settings.s.game == Settings.Game.Dinosaur) {
                 kf.x = reader.ReadSingle();
                 kf.y = reader.ReadSingle();
                 kf.z = reader.ReadSingle();
@@ -36,8 +38,11 @@ namespace OpenSpace.Animation.Component {
             kf.quaternion = reader.ReadUInt16();
             kf.quaternion2 = reader.ReadUInt16();
             kf.scaleVector = reader.ReadUInt16();
-            kf.positionVector = reader.ReadUInt16();
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.RM) {
+
+			kf.positionVector = reader.ReadUInt16();
+			if (Settings.s.engineVersion < Settings.EngineVersion.R3
+				|| Settings.s.game == Settings.Game.RM
+				|| Settings.s.game == Settings.Game.Dinosaur) {
                 reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt16();
@@ -56,7 +61,12 @@ namespace OpenSpace.Animation.Component {
         public static int Size {
             get {
                 switch (Settings.s.engineVersion) {
-                    case Settings.EngineVersion.R3: return 14;
+                    case Settings.EngineVersion.R3:
+						if (Settings.s.game == Settings.Game.Dinosaur || Settings.s.game == Settings.Game.RM) {
+							return 36;
+						} else {
+							return 14;
+						}
                     default: return 36;
                 }
             }

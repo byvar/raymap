@@ -32,6 +32,8 @@ namespace OpenSpace.Input {
 				case Settings.Platform.PC:
 					if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
 						reader.ReadBytes(0x700);
+					} else if (Settings.s.game == Settings.Game.Dinosaur) {
+						reader.ReadBytes(0xC58);
 					} else {
 						reader.ReadBytes(0x16BC);
 					}
