@@ -49,18 +49,22 @@ namespace OpenSpace.Loader {
 					yield return controller.StartCoroutine(PrepareFile(lvlPaths[0]));
 					if (FileSystem.FileExists(lvlPaths[0])) {
 						yield return controller.StartCoroutine(PrepareFile(ptrPaths[0]));
-						yield return controller.StartCoroutine(PrepareFile(tplPaths[0]));
+						if (Settings.s.platform == Settings.Platform.GC) {
+							yield return controller.StartCoroutine(PrepareFile(tplPaths[0]));
+						}
 					}
 
 					// Level
 					lvlNames[1] = lvlName;
 					lvlPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".lvl";
 					ptrPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".ptr";
-					tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ((Settings.s.mode == Settings.Mode.RaymanArenaGC) ? ".tpl" : "_Lvl.tpl");
+					tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ((Settings.s.mode == Settings.Mode.RaymanArenaGC || Settings.s.mode == Settings.Mode.DonaldDuckPKGC) ? ".tpl" : "_Lvl.tpl");
 					yield return controller.StartCoroutine(PrepareFile(lvlPaths[1]));
 					if (FileSystem.FileExists(lvlPaths[1])) {
 						yield return controller.StartCoroutine(PrepareFile(ptrPaths[1]));
-						yield return controller.StartCoroutine(PrepareFile(tplPaths[1]));
+						if (Settings.s.platform == Settings.Platform.GC) {
+							yield return controller.StartCoroutine(PrepareFile(tplPaths[1]));
+						}
 					}
 
 					// Transit
@@ -71,7 +75,9 @@ namespace OpenSpace.Loader {
 					yield return controller.StartCoroutine(PrepareFile(lvlPaths[2]));
 					if (FileSystem.FileExists(lvlPaths[2])) {
 						yield return controller.StartCoroutine(PrepareFile(ptrPaths[2]));
-						yield return controller.StartCoroutine(PrepareFile(tplPaths[2]));
+						if (Settings.s.platform == Settings.Platform.GC) {
+							yield return controller.StartCoroutine(PrepareFile(tplPaths[2]));
+						}
 					}
 					hasTransit = FileSystem.FileExists(lvlPaths[2]) && (FileSystem.GetFileLength(lvlPaths[2]) > 4);
 
@@ -212,6 +218,9 @@ namespace OpenSpace.Loader {
 				sz_entryActions = 0xD8;
 				sz_randomStructure = 0xE0;
 				sz_fontDefine = 0xA00;
+			} else if (Settings.s.mode == Settings.Mode.DonaldDuckPKGC) {
+				sz_entryActions = 0xC0;
+				sz_fontDefine = 0x12E4;
 			}
 			loadingState = "Loading input structure";
 			yield return null;
@@ -429,7 +438,10 @@ namespace OpenSpace.Loader {
 				Pointer off_array_geometric = Pointer.Read(reader);
 				Pointer off_array_geometric_RLI = Pointer.Read(reader);
 				Pointer off_array_transition_flags = Pointer.Read(reader);
-			} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.Dinosaur) {
+			} else if (Settings.s.game == Settings.Game.RA
+				|| Settings.s.game == Settings.Game.RM
+				|| Settings.s.game == Settings.Game.Dinosaur
+				|| Settings.s.game == Settings.Game.DDPK) {
 				uint num_unk = reader.ReadUInt32();
 				Pointer unk_first = Pointer.Read(reader);
 				if (Settings.s.game != Settings.Game.Dinosaur) {
@@ -438,7 +450,8 @@ namespace OpenSpace.Loader {
 			}
 			uint num_visual_materials = reader.ReadUInt32();
 			Pointer off_array_visual_materials = Pointer.Read(reader);
-			if (Settings.s.mode != Settings.Mode.RaymanArenaGC) {
+			print(off_array_visual_materials);
+			if (Settings.s.mode != Settings.Mode.RaymanArenaGC && Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
 				Pointer off_dynamic_so_list = Pointer.Read(reader);
 
 				// Parse SO list

@@ -33,7 +33,7 @@ namespace OpenSpace.Object.Properties {
                 if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
                     return off_state_next;
                 } else {
-                    if (Settings.s.mode == Settings.Mode.RaymanArenaGC) {
+					if (Settings.s.mode == Settings.Mode.RaymanArenaGC || Settings.s.mode == Settings.Mode.DonaldDuckPKGC) {
                         return offset + 0x28;
                     } else {//if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2DC) {
                         return offset + 0x20;
@@ -92,8 +92,8 @@ namespace OpenSpace.Object.Properties {
             if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur) {
                 s.off_cine_mapname = Pointer.Read(reader);
                 s.off_cine_name = Pointer.Read(reader);
-            }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
+			}
+			if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadByte();
@@ -109,14 +109,12 @@ namespace OpenSpace.Object.Properties {
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
             }
-            if (s.off_cine_mapname != null) {
-                Pointer.Goto(ref reader, s.off_cine_mapname);
-                s.cine_mapname = reader.ReadNullDelimitedString();
-            }
-            if (s.off_cine_name != null) {
-                Pointer.Goto(ref reader, s.off_cine_name);
-                s.cine_name = reader.ReadNullDelimitedString();
-            }
+			Pointer.DoAt(ref reader, s.off_cine_mapname, () => {
+				s.cine_mapname = reader.ReadNullDelimitedString();
+			});
+			Pointer.DoAt(ref reader, s.off_cine_name, () => {
+				s.cine_name = reader.ReadNullDelimitedString();
+			});
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal || Settings.s.game == Settings.Game.TTSE) {
                 s.anim_refMontreal = AnimationMontreal.FromOffsetOrRead(s.off_anim_ref, reader);
             } else {

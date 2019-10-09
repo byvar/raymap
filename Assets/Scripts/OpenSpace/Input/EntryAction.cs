@@ -74,8 +74,8 @@ namespace OpenSpace.Input {
 				ea.keywords = new LinkedList<KeyWord>(Pointer.Current(reader), ea.off_keywords, ea.num_keywords, type: LinkedList.Type.SingleNoElementPointers);
                 if (Settings.s.engineVersion < Settings.EngineVersion.R2) reader.ReadUInt32(); // Offset of extra input data in tmp memory? It's different by 0x18 every time
                 ea.off_name = Pointer.Read(reader);
-                if (Settings.s.hasExtraInputData || Settings.s.platform == Settings.Platform.DC || Settings.s.engineVersion == Settings.EngineVersion.R3) ea.off_name2 = Pointer.Read(reader);
-                reader.ReadInt32(); // -2
+                if (Settings.s.hasExtraInputData || Settings.s.platform == Settings.Platform.DC || Settings.s.engineVersion == Settings.EngineVersion.R3) ea.off_name2 = Pointer.Read(reader);  
+				reader.ReadInt32(); // -2
                 reader.ReadUInt32();
                 ea.active = reader.ReadByte();
                 reader.ReadBytes(3);

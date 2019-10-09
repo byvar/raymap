@@ -107,7 +107,7 @@ namespace OpenSpace.Visual {
 				} else {
 					m.off_blendWeights = Pointer.Read(reader);
 				}
-				if (Settings.s.mode != Settings.Mode.RaymanArenaGC && Settings.s.game != Settings.Game.RM) {
+				if (Settings.s.mode != Settings.Mode.RaymanArenaGC && Settings.s.game != Settings.Game.RM && Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
 					reader.ReadInt32();
 				}
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();

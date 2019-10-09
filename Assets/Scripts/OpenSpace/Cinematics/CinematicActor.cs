@@ -51,11 +51,13 @@ namespace OpenSpace.Cinematics {
 		public static CinematicActor Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
 			CinematicActor ca = new CinematicActor(offset);
-			if (Settings.s.platform == Settings.Platform.GC) {
-				reader.ReadUInt32();
+			if (Settings.s.game == Settings.Game.R3 || Settings.s.game == Settings.Game.Dinosaur) {
+				if (Settings.s.platform == Settings.Platform.GC) {
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+				}
 				reader.ReadUInt32();
 			}
-			reader.ReadUInt32();
 			ca.off_a3d = Pointer.Read(reader);
 			reader.ReadUInt32();
 			ca.name = reader.ReadString(0x100);

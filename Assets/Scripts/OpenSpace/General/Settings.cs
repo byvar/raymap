@@ -552,12 +552,9 @@ namespace OpenSpace {
 			game = Game.DDPK,
 			platform = Platform.GC,
 			endian = Endian.Big,
-			linkedListType = LinkedListType.Double,
-			hasNames = true,
+			linkedListType = LinkedListType.Minimize,
 			hasDeformations = true,
 			aiTypes = AITypes.R3,
-			hasExtraInputData = true,
-			hasLinkedListHeaderPointers = true,
 			textureAnimationSpeedModifier = -10f,
 			luminosity = 0.1f,
 			saturate = false

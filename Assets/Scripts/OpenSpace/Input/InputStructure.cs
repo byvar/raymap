@@ -21,7 +21,9 @@ namespace OpenSpace.Input {
 					//reader.ReadBytes(0x1714);
 					if (Settings.s.game == Settings.Game.R3) {
 						reader.ReadBytes(0x12E0);
-					} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+					} else if (Settings.s.game == Settings.Game.RA
+						|| Settings.s.game == Settings.Game.RM
+						|| Settings.s.game == Settings.Game.DDPK) {
 						//reader.ReadBytes(0x16e8);
 						reader.ReadBytes(0x12C8);
 					}
