@@ -21,6 +21,8 @@ using lzo.net;
 
 namespace OpenSpace.Loader {
 	public class LWLoader : MapLoader {
+		public PBT[] pbt = new PBT[2];
+
 		public override IEnumerator Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
@@ -76,22 +78,8 @@ namespace OpenSpace.Loader {
 					ReadLargoLVL(Mem.Fix, fixFolder + ConvertCase("Fix.dmp", Settings.CapsType.LevelFile));
 					ReadLargoLVL(Mem.Lvl, lvlFolder + ConvertCase(lvlName + ".dmp", Settings.CapsType.LevelFile));
 					if (FileSystem.mode != FileSystem.Mode.Web) {
-						if (FileSystem.FileExists(paths["fix.pbt"])) {
-							using (Reader reader = new Reader(FileSystem.GetFileReadStream(paths["fix.pbt"]), Settings.s.IsLittleEndian)) {
-								uint decompressed = reader.ReadUInt32();
-								uint compressed = reader.ReadUInt32();
-								byte[] decData = DecompressLargo(reader, compressed, decompressed);
-								Util.ByteArrayToFile(fixFolder + ConvertCase("Fix_PBT.dmp", Settings.CapsType.LevelFile), decData);
-							}
-						}
-						if (FileSystem.FileExists(paths["lvl.pbt"])) {
-							using (Reader reader = new Reader(FileSystem.GetFileReadStream(paths["lvl.pbt"]), Settings.s.IsLittleEndian)) {
-								uint decompressed = reader.ReadUInt32();
-								uint compressed = reader.ReadUInt32();
-								byte[] decData = DecompressLargo(reader, compressed, decompressed);
-								Util.ByteArrayToFile(lvlFolder + ConvertCase(lvlName + "_PBT.dmp", Settings.CapsType.LevelFile), decData);
-							}
-						}
+						pbt[Mem.Fix] = ReadPBT(paths["fix.pbt"], fixFolder + ConvertCase("Fix_PBT.dmp", Settings.CapsType.LevelFile));
+						pbt[Mem.Lvl] = ReadPBT(paths["lvl.pbt"], lvlFolder + ConvertCase(lvlName + "_PBT.dmp", Settings.CapsType.LevelFile));
 					}
 					for (int i = 0; i < loadOrder.Length; i++) {
 						int j = loadOrder[i];
@@ -128,6 +116,21 @@ namespace OpenSpace.Loader {
 			if (FileSystem.mode != FileSystem.Mode.Web) {
 				Util.ByteArrayToFile(path, decData);
 			}
+		}
+
+		private PBT ReadPBT(string path, string dmpPath) {
+			if (FileSystem.FileExists(path)) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(path), Settings.s.IsLittleEndian)) {
+					uint decompressed = reader.ReadUInt32();
+					uint compressed = reader.ReadUInt32();
+					byte[] decData = DecompressLargo(reader, compressed, decompressed);
+					if (FileSystem.mode != FileSystem.Mode.Web) {
+						Util.ByteArrayToFile(dmpPath, decData);
+					}
+					return new PBT(new MemoryStream(decData));
+				}
+			}
+			return null;
 		}
 
 		#region FIX
@@ -246,7 +249,7 @@ namespace OpenSpace.Loader {
 			reader.ReadString(0x1E);
 			reader.ReadString(0x1E);
 
-			Pointer off_animBankLvl = null;
+			//Pointer off_animBankLvl = null;
 			loadingState = "Loading globals";
 			yield return null;
 			globals.off_transitDynamicWorld = null;

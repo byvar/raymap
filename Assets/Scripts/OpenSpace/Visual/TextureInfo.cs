@@ -180,7 +180,20 @@ namespace OpenSpace.Visual {
         public static TextureInfo Read(Reader reader, Pointer offset) {
             TextureInfo tex = new TextureInfo(offset);
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-				if (Settings.s.game == Settings.Game.R2Revolution) {
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					tex.field0 = reader.ReadUInt32(); // 888 or 8888
+					tex.fieldC = reader.ReadUInt32();
+					tex.field10 = reader.ReadUInt32();
+					tex.flags = reader.ReadUInt32();
+					tex.height_ = reader.ReadUInt16();
+					tex.width_ = reader.ReadUInt16();
+					tex.height = reader.ReadUInt16();
+					tex.width = reader.ReadUInt16();
+					tex.field30 = reader.ReadUInt32();
+					tex.field48 = reader.ReadByte();
+					tex.flagsByte = reader.ReadByte(); // contains stuff like tiling mode
+					tex.name = reader.ReadString(0x80);
+				} else if (Settings.s.game == Settings.Game.R2Revolution) {
 					reader.ReadUInt32();
 					tex.flags = reader.ReadUInt16();
 					tex.flagsByte = reader.ReadByte();

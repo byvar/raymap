@@ -207,6 +207,7 @@ namespace OpenSpace.Visual {
 				m.ambientCoef = new Vector4(0, 0, 0, 1f);
 				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				//m.ambientCoef = m.diffuseCoef;
 				reader.ReadInt32(); // current refresh number for scrolling/animated textures
 				m.off_animTextures_first = Pointer.Read(reader);
 				m.off_animTextures_current = Pointer.Read(reader);

@@ -150,7 +150,7 @@ namespace OpenSpace.Visual {
             LightInfo l = new LightInfo(offset);
             l.turnedOn = reader.ReadByte();
             l.castShadows = reader.ReadByte();
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.R2Revolution || Settings.s.game == Settings.Game.LargoWinch) {
 				l.type = reader.ReadUInt16();
 			} else {
 				l.giroPhare = reader.ReadByte();
@@ -163,16 +163,17 @@ namespace OpenSpace.Visual {
 			l.near = reader.ReadSingle();
 			l.littleAlpha_fogInfinite = reader.ReadSingle();
 			l.bigAlpha_fogBlendNear = reader.ReadSingle();
+			if (Settings.s.game == Settings.Game.LargoWinch) reader.ReadSingle();
 			l.giroStep = reader.ReadSingle();
 			l.pulseStep = reader.ReadSingle();
-			if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+			if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.LargoWinch) {
 				l.pulseMaxRange = reader.ReadSingle();
 				l.giroAngle = reader.ReadSingle();
 				reader.ReadSingle();
 			}
 			if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
 			l.transMatrix = Matrix.Read(reader, Pointer.Current(reader));
-			if (Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.R2Revolution) {
+			if (Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
@@ -181,10 +182,11 @@ namespace OpenSpace.Visual {
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
                 if (Settings.s.platform == Settings.Platform.DC) {
 					reader.ReadSingle();
-                } else if(Settings.s.game != Settings.Game.R2Revolution) {
+                } else if(Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
 					reader.ReadUInt32(); // 0
 					reader.ReadUInt32(); // 0
 				}
+				lo.print("LIGHT " + Pointer.Current(reader));
                 l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                     l.shadowIntensity = reader.ReadSingle(); // 0
@@ -194,6 +196,11 @@ namespace OpenSpace.Visual {
 					l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
 					l.alphaLightFlag = reader.ReadByte();
 					l.paintingLightFlag = reader.ReadByte();
+				} else if (Settings.s.game == Settings.Game.LargoWinch) {
+					l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
+					l.paintingLightFlag = reader.ReadByte();
+					l.alphaLightFlag = reader.ReadByte();
+					l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
 				} else {
 					l.sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
 					l.objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
@@ -209,7 +216,7 @@ namespace OpenSpace.Visual {
                 l.intensityMin_fogBlendFar = reader.ReadSingle();
                 l.intensityMax = reader.ReadSingle();
                 l.background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-				if ((Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur) || Settings.s.game == Settings.Game.R2Revolution) {
+				if ((Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) || Settings.s.game == Settings.Game.R2Revolution) {
 					l.createsShadowsOrNot = reader.ReadUInt32();
 				}
             } else {

@@ -85,7 +85,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             MeshObject m = new MeshObject(offset);
 			if (Settings.s.game == Settings.Game.LargoWinch) {
-				m.lookAtMode = reader.ReadUInt32();
+				uint flags = reader.ReadUInt32();
 				m.num_vertices = reader.ReadUInt16();
 				m.num_subblocks = reader.ReadUInt16();
 				m.off_subblock_types = Pointer.Read(reader);
@@ -96,7 +96,7 @@ namespace OpenSpace.Visual {
 				reader.ReadSingle();
 				reader.ReadSingle();
 				reader.ReadSingle();
-				reader.ReadUInt32();
+				m.lookAtMode = reader.ReadUInt32();
 			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				m.off_subblock_types = Pointer.Read(reader);
 				m.off_subblocks = Pointer.Read(reader);

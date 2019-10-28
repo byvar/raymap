@@ -694,16 +694,39 @@ MonoBehaviour.print(str);
 				}
 				Pointer.Goto(ref reader, off_current);
 				int current_texture = 0;
-				for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                    uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
-                    if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
-					current_texture++;
-					loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
-					if (hasTransit && file_texture == 6) transitTexturesSeen++;
-					yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
-					GF gf = cnt.preparedGF;
-					if (gf != null) textures[i].Texture = gf.GetTexture();
-                }
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					int fixTexturesSeen = 0;
+					int lvlTexturesSeen = 0;
+					PBT[] pbt = (this as LWLoader).pbt;
+					print(Pointer.Current(reader));
+					for (uint i = num_textures_fix; i < num_textures_total; i++) {
+						uint file_texture = reader.ReadUInt32();
+						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+						current_texture++;
+						loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
+						if (!textures[i].name.EndsWith(".tga")) { // Yeah, nice hack huh
+							print(textures[i].name);
+						} else if (file_texture == 1) {
+							//print(file_texture + " - " + fixTexturesSeen + " / " + pbt[0].textures.Length + " - " + num_textures_total + " - " + textures[i].name);
+							textures[i].Texture = pbt[0].textures[fixTexturesSeen++];
+						} else {
+							//print(file_texture + " - " + lvlTexturesSeen + " / " + pbt[1].textures.Length + " - " + num_textures_total + " - " + textures[i].name);
+							textures[i].Texture = pbt[1].textures[lvlTexturesSeen++];
+						}
+
+					}
+				} else {
+					for (uint i = num_textures_fix; i < num_textures_total; i++) {
+						uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
+						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+						current_texture++;
+						loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
+						if (hasTransit && file_texture == 6) transitTexturesSeen++;
+						yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
+						GF gf = cnt.preparedGF;
+						if (gf != null) textures[i].Texture = gf.GetTexture();
+					}
+				}
 			}
 			loadingState = state;
 		}
