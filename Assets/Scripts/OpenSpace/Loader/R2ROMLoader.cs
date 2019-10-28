@@ -24,7 +24,7 @@ namespace OpenSpace.Loader {
 		public bool[] texturesTableSeen;
 		public bool[] palettesTableSeen;
 		
-		public Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>> structs = new Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>>();
+		public Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>> romStructs = new Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>>();
 
 		public string[] LoadLevelList() {
 			if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) return null;
@@ -439,8 +439,8 @@ namespace OpenSpace.Loader {
 
 		public T Get<T>(ushort index) where T : ROMStruct {
 			FATEntry.Type type = FATEntry.types[typeof(T)];
-			if (!structs.ContainsKey(type) || !structs[type].ContainsKey(index)) return null;
-			return structs[type][index] as T;
+			if (!romStructs.ContainsKey(type) || !romStructs[type].ContainsKey(index)) return null;
+			return romStructs[type][index] as T;
 		}
 
 		public T GetOrRead<T>(Reader reader, ushort index, Action<T> onPreRead = null) where T : ROMStruct, new() {
@@ -452,11 +452,11 @@ namespace OpenSpace.Loader {
 					if (offset != null) {
 						rs = new T();
 						rs.Init(offset, index);
-						if (!structs.ContainsKey(type)) {
-							structs[type] = new Dictionary<ushort, ROMStruct>();
+						if (!romStructs.ContainsKey(type)) {
+							romStructs[type] = new Dictionary<ushort, ROMStruct>();
 						}
-						if (!structs[type].ContainsKey(index)) {
-							structs[type][index] = rs;
+						if (!romStructs[type].ContainsKey(index)) {
+							romStructs[type][index] = rs;
 						} else {
 							Debug.LogWarning("Duplicate index " + index + " for type " + type);
 						}

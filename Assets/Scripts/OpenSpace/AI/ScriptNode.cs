@@ -58,6 +58,7 @@ namespace OpenSpace.AI {
             if (Settings.s.aiTypes != null) sn.nodeType = Settings.s.aiTypes.GetNodeType(sn.type);
 			
             if (sn.param_ptr != null && sn.nodeType != NodeType.Unknown) {
+				//l.print("ScriptNode " + offset + " - " + sn.nodeType + " (" + sn.type + ") - " + sn.param_ptr);
 				if (sn.nodeType == NodeType.WayPointRef) {
 					WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);
 				} else if (sn.nodeType == NodeType.String) {

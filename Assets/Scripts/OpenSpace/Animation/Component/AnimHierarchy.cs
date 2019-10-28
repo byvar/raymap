@@ -5,22 +5,23 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimHierarchy {
+    public class AnimHierarchy : OpenSpaceStruct {
         public short childChannelID;
         public short parentChannelID;
 
-        public AnimHierarchy() {}
+		protected override void ReadInternal(Reader reader) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				childChannelID = reader.ReadByte();
+				parentChannelID = reader.ReadByte();
+			} else {
+				childChannelID = reader.ReadInt16();
+				parentChannelID = reader.ReadInt16();
+			}
+		}
 
-        public static AnimHierarchy Read(Reader reader) {
-            AnimHierarchy h = new AnimHierarchy();
-            h.childChannelID = reader.ReadInt16();
-            h.parentChannelID = reader.ReadInt16();
-            return h;
-        }
-
-        public static int Size {
+		/*public static int Size {
             get { return 4; }
-        }
+        }*/
 
         public static bool Aligned {
             get {

@@ -51,7 +51,7 @@ namespace OpenSpace.Input {
             }
 
 			keyword.valueAsPointer = Pointer.GetPointerAtOffset(off_value);
-			if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadInt32();
+			if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.LargoWinch) reader.ReadInt32();
 			if(Settings.s.game != Settings.Game.R2Revolution) reader.ReadInt32();
 
             /*if (isFunction && Settings.s.game != Settings.Game.TTSE) {
@@ -102,22 +102,22 @@ namespace OpenSpace.Input {
             return keyword;
         }
 
-        public int FillInSubKeywords(LinkedList<KeyWord> keywords, int thisIndex) {
+        public int FillInSubKeywords(ref Reader reader, LinkedList<KeyWord> keywords, int thisIndex) {
             isFunction = true;
             int keywordsRead = 1;
             switch (FunctionType) {
                 case InputFunctions.FunctionType.Not:
                     subkeywords = new KeyWord[1];
                     subkeywords[0] = keywords[thisIndex + keywordsRead];
-                    keywordsRead += subkeywords[0].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                    keywordsRead += subkeywords[0].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
                     break;
                 case InputFunctions.FunctionType.And:
                 case InputFunctions.FunctionType.Or:
                     subkeywords = new KeyWord[2];
                     subkeywords[0] = keywords[thisIndex + keywordsRead];
-                    keywordsRead += subkeywords[0].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                    keywordsRead += subkeywords[0].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
                     subkeywords[1] = keywords[thisIndex + keywordsRead];
-                    keywordsRead += subkeywords[1].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                    keywordsRead += subkeywords[1].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
                     break;
                 case InputFunctions.FunctionType.KeyPressed:
                 case InputFunctions.FunctionType.KeyReleased:
@@ -135,13 +135,13 @@ namespace OpenSpace.Input {
                     if (sequenceLength > 0) {
                         Array.Resize(ref subkeywords, sequenceLength * 2 + 2);
                         subkeywords[1] = keywords[thisIndex + keywordsRead];
-                        keywordsRead += subkeywords[1].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                        keywordsRead += subkeywords[1].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
                         for (int i = 0; i < sequenceLength; i++) {
                             subkeywords[2 + i * 2] = keywords[thisIndex + keywordsRead]; // Keycode
                             keywordsRead += 1;
                             if (i < sequenceLength - 1) {
                                 subkeywords[3 + i * 2] = keywords[thisIndex + keywordsRead]; // SequenceKey
-                                keywordsRead += subkeywords[3 + i * 2].FillInSubKeywords(keywords, thisIndex + keywordsRead);
+                                keywordsRead += subkeywords[3 + i * 2].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
                             }
                         }
                     }
@@ -177,6 +177,9 @@ namespace OpenSpace.Input {
 				case InputFunctions.FunctionType.ActionJustInvalidated:
 					subkeywords = new KeyWord[1];
 					subkeywords[0] = keywords[thisIndex + keywordsRead];
+					if (subkeywords[0] != null && Settings.s.game == Settings.Game.TT) {
+						EntryAction.FromOffsetOrRead(subkeywords[0].valueAsPointer, reader);
+					}
 					keywordsRead += 1;
 					break;
 

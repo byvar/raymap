@@ -5,21 +5,17 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimQuaternion {
+    public class AnimQuaternion : OpenSpaceStruct {
         public Quaternion quaternion;
 
-        public AnimQuaternion() {}
-
-        public static AnimQuaternion Read(Reader reader) {
-            AnimQuaternion qua = new AnimQuaternion();
-            float x = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-            float y = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-            float z = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-            float w = (float)reader.ReadInt16() / (float)Int16.MaxValue;
-            qua.quaternion = new Quaternion(x, y, z, w);
-            qua.ConvertRotation();
-            return qua;
-        }
+		protected override void ReadInternal(Reader reader) {
+			float x = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+			float y = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+			float z = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+			float w = (float)reader.ReadInt16() / (float)Int16.MaxValue;
+			quaternion = new Quaternion(x, y, z, w);
+			ConvertRotation();
+		}
 
         public Matrix ToMatrix() {
             Matrix4x4 m = new Matrix4x4();
@@ -64,9 +60,7 @@ namespace OpenSpace.Animation.Component {
             quaternion = ToMatrix().GetRotation(convertAxes: true);
         }
 
-        public static int Size {
-            get { return 8; }
-        }
+		// Size: 8
 
         public static bool Aligned {
             get { return false; }

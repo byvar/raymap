@@ -7,6 +7,7 @@ using System.Text;
 namespace OpenSpace.FileFormat {
     public class LVL : FileWithPointers {
         string path;
+		private byte[] overrideData;
 
         public LVL(string name, string path, int fileID) : this(name, FileSystem.GetFileReadStream(path), fileID) {
             this.path = path;
@@ -25,7 +26,12 @@ namespace OpenSpace.FileFormat {
             Stream ptrStream = FileSystem.GetFileReadStream(path);
             long totalSize = ptrStream.Length;
             using (Reader ptrReader = new Reader(ptrStream, Settings.s.IsLittleEndian)) {
-                uint num_ptrs = ptrReader.ReadUInt32();
+				uint num_ptrs;
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					num_ptrs = (uint)totalSize / 8;
+				} else {
+					num_ptrs = ptrReader.ReadUInt32();
+				}
                 for (uint j = 0; j < num_ptrs; j++) {
                     int file = ptrReader.ReadInt32();
                     uint ptr_ptr = ptrReader.ReadUInt32();
@@ -96,6 +102,12 @@ namespace OpenSpace.FileFormat {
 
         public override void WritePointer(Pointer pointer) {
             throw new NotImplementedException();
-        }
-    }
+		}
+		public void OverrideData(byte[] data) {
+			baseOffset = 0;
+			overrideData = data;
+			reader.Close();
+			reader = new Reader(new MemoryStream(overrideData), Settings.s.IsLittleEndian);
+		}
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenSpace.Animation.Component;
+using OpenSpace.Animation.ComponentLargo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation {
-    public class AnimationReference { // Also known as Anim3d
-        public Pointer offset;
+    public class AnimationReference : OpenSpaceStruct { // Also known as Anim3d
         public string name = null;
         public ushort num_onlyFrames;
         public byte speed;
@@ -25,77 +25,66 @@ namespace OpenSpace.Animation {
 		
         public Pointer off_a3d = null;
         public AnimA3DGeneral a3d = null;
+		public AnimA3DLargo a3dLargo = null;
 
-        public AnimationReference(Pointer offset) {
-            this.offset = offset;
-        }
-
-        public static AnimationReference Read(Reader reader, Pointer offset) {
-            MapLoader l = MapLoader.Loader;
-            AnimationReference ar = new AnimationReference(offset);
-			
+		protected override void ReadInternal(Reader reader) {
 			if (Settings.s.game == Settings.Game.R2Revolution) {
-				ar.off_a3d = Pointer.Read(reader);
+				off_a3d = Pointer.Read(reader);
 				reader.ReadUInt32();
-				ar.off_events = Pointer.Read(reader);
+				off_events = Pointer.Read(reader);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
-				ar.num_onlyFrames = reader.ReadUInt16();
-				ar.speed = reader.ReadByte();
-				ar.num_channels = reader.ReadByte();
-				ar.anim_index = reader.ReadUInt16();
-				ar.num_events = reader.ReadByte();
-				ar.transition = reader.ReadByte();
+				num_onlyFrames = reader.ReadUInt16();
+				speed = reader.ReadByte();
+				num_channels = reader.ReadByte();
+				anim_index = reader.ReadUInt16();
+				num_events = reader.ReadByte();
+				transition = reader.ReadByte();
 			} else {
-				if (Settings.s.hasNames) ar.name = new string(reader.ReadChars(0x50));
+				if (Settings.s.hasNames) name = new string(reader.ReadChars(0x50));
 				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) reader.ReadUInt32();
-				ar.num_onlyFrames = reader.ReadUInt16();
-				ar.speed = reader.ReadByte();
-				ar.num_channels = reader.ReadByte();
-				ar.off_events = Pointer.Read(reader);
+				if (Settings.s.game == Settings.Game.LargoWinch) off_a3d = Pointer.Read(reader);
+				num_onlyFrames = reader.ReadUInt16();
+				speed = reader.ReadByte();
+				num_channels = reader.ReadByte();
+				off_events = Pointer.Read(reader);
 				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-					ar.x = reader.ReadSingle();
-					ar.y = reader.ReadSingle();
-					ar.z = reader.ReadSingle();
+					x = reader.ReadSingle();
+					y = reader.ReadSingle();
+					z = reader.ReadSingle();
 				}
-				ar.off_morphData = Pointer.Read(reader); // Runtime only?
+				off_morphData = Pointer.Read(reader); // Runtime only?
 				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				}
-				ar.anim_index = reader.ReadUInt16();
-				ar.num_events = reader.ReadByte();
-				ar.transition = reader.ReadByte();
+				if (Settings.s.game != Settings.Game.LargoWinch) {
+					anim_index = reader.ReadUInt16();
+					num_events = reader.ReadByte();
+					transition = reader.ReadByte();
+				} else {
+					num_events = reader.ReadByte();
+					transition = reader.ReadByte();
+					anim_index = reader.ReadUInt16();
+				}
 
 				if (Settings.s.engineVersion == Settings.EngineVersion.R2) reader.ReadUInt32(); // no idea what this is sadly
 				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
-					ar.off_a3d = Pointer.Read(reader);
+					off_a3d = Pointer.Read(reader);
 				}
 			}
-            Pointer.DoAt(ref reader, ar.off_a3d, () => {
-                ar.a3d = AnimA3DGeneral.ReadFull(reader, ar.off_a3d);
-            });
-
-            return ar;
-        }
-
-        public static AnimationReference FromOffsetOrRead(Pointer offset, Reader reader) {
-            if (offset == null) return null;
-            AnimationReference ar = FromOffset(offset);
-            if (ar == null) {
-                Pointer.DoAt(ref reader, offset, () => {
-                    ar = AnimationReference.Read(reader, offset);
-                    MapLoader.Loader.animationReferences.Add(ar);
-                });
-            }
-            return ar;
-        }
-
-        public static AnimationReference FromOffset(Pointer offset) {
-            if (offset == null) return null;
-            MapLoader l = MapLoader.Loader;
-            return l.animationReferences.FirstOrDefault(ar => ar.offset == offset);
-        }
-    }
+			MapLoader l = MapLoader.Loader;
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				a3dLargo = l.FromOffsetOrRead<AnimA3DLargo>(reader, off_a3d, (a) => {
+					a.num_onlyFrames = num_onlyFrames;
+					a.num_channels = num_channels;
+				});
+			} else {
+				Pointer.DoAt(ref reader, off_a3d, () => {
+					a3d = l.FromOffsetOrRead<AnimA3DGeneral>(reader, off_a3d, onPreRead: a3d => a3d.readFull = true);
+				});
+			}
+		}
+	}
 }

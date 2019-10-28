@@ -33,7 +33,14 @@ namespace OpenSpace.AI {
             MapLoader l = MapLoader.Loader;
             DsgVarInfoEntry d = new DsgVarInfoEntry(offset);
 			//l.print(offset);
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				d.offsetInBuffer = reader.ReadUInt32();
+				d.typeNumber = reader.ReadUInt32();
+				d.saveType = reader.ReadByte();
+				d.initType = reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				d.offsetInBuffer = reader.ReadUInt16();
 				reader.ReadUInt16();
 				d.typeNumber = reader.ReadByte();

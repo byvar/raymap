@@ -16,6 +16,8 @@ using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
 using OpenSpace.Cinematics;
+using System.IO.Compression;
+using lzo.net;
 
 namespace OpenSpace.Loader {
 	public class R3Loader : MapLoader {
@@ -44,39 +46,40 @@ namespace OpenSpace.Loader {
 					lvlNames[0] = "fix";
 					lvlPaths[0] = gameDataBinFolder + "fix.lvl";
 					ptrPaths[0] = gameDataBinFolder + "fix.ptr";
-					tplPaths[0] = gameDataBinFolder + ((Settings.s.mode == Settings.Mode.RaymanArenaGC) ? "../common.tpl" : "fix.tpl");
+					if (Settings.s.platform == Settings.Platform.GC) {
+						texPaths[0] = gameDataBinFolder + ((Settings.s.mode == Settings.Mode.RaymanArenaGC) ? "../common.tpl" : "fix.tpl");
+					}
 					yield return controller.StartCoroutine(PrepareFile(menuTPLPath));
 					yield return controller.StartCoroutine(PrepareFile(lvlPaths[0]));
 					if (FileSystem.FileExists(lvlPaths[0])) {
 						yield return controller.StartCoroutine(PrepareFile(ptrPaths[0]));
-						if (Settings.s.platform == Settings.Platform.GC) {
-							yield return controller.StartCoroutine(PrepareFile(tplPaths[0]));
-						}
+						yield return controller.StartCoroutine(PrepareFile(texPaths[0]));
 					}
 
 					// Level
 					lvlNames[1] = lvlName;
 					lvlPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".lvl";
 					ptrPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".ptr";
-					tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ((Settings.s.mode == Settings.Mode.RaymanArenaGC || Settings.s.mode == Settings.Mode.DonaldDuckPKGC) ? ".tpl" : "_Lvl.tpl");
+					if (Settings.s.platform == Settings.Platform.GC) {
+						texPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName
+							+ (Settings.s.game == Settings.Game.R3 ? "_Lvl" : "") +".tpl";
+					}
 					yield return controller.StartCoroutine(PrepareFile(lvlPaths[1]));
 					if (FileSystem.FileExists(lvlPaths[1])) {
 						yield return controller.StartCoroutine(PrepareFile(ptrPaths[1]));
-						if (Settings.s.platform == Settings.Platform.GC) {
-							yield return controller.StartCoroutine(PrepareFile(tplPaths[1]));
-						}
+						yield return controller.StartCoroutine(PrepareFile(texPaths[1]));
 					}
 
 					// Transit
 					lvlNames[2] = "transit";
 					lvlPaths[2] = gameDataBinFolder + lvlName + "/transit.lvl";
 					ptrPaths[2] = gameDataBinFolder + lvlName + "/transit.ptr";
-					tplPaths[2] = gameDataBinFolder + lvlName + "/" + lvlName + "_Trans.tpl";
+					texPaths[2] = gameDataBinFolder + lvlName + "/" + lvlName + "_Trans.tpl";
 					yield return controller.StartCoroutine(PrepareFile(lvlPaths[2]));
 					if (FileSystem.FileExists(lvlPaths[2])) {
 						yield return controller.StartCoroutine(PrepareFile(ptrPaths[2]));
 						if (Settings.s.platform == Settings.Platform.GC) {
-							yield return controller.StartCoroutine(PrepareFile(tplPaths[2]));
+							yield return controller.StartCoroutine(PrepareFile(texPaths[2]));
 						}
 					}
 					hasTransit = FileSystem.FileExists(lvlPaths[2]) && (FileSystem.GetFileLength(lvlPaths[2]) > 4);

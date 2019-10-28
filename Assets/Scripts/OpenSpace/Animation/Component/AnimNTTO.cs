@@ -5,32 +5,28 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimNTTO {
+    public class AnimNTTO : OpenSpaceStruct {
         public ushort flags;
         public ushort object_index;
         public byte unk4;
         public byte unk5;
 
-        public AnimNTTO() {}
-
         public static ushort flag_isBoneNTTO = 0x00FF;
         public static ushort flag_isInvisible = 0x2;
 
-        public static AnimNTTO Read(Reader reader) {
-            AnimNTTO n = new AnimNTTO();
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
-                n.object_index = reader.ReadUInt16();
-                n.flags = reader.ReadUInt16();
-            } else {
-                n.flags = reader.ReadUInt16();
-                n.object_index = reader.ReadUInt16();
-            }
-            n.unk4 = reader.ReadByte();
-            n.unk5 = reader.ReadByte();
-            return n;
-        }
+		protected override void ReadInternal(Reader reader) {
+			if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+				object_index = reader.ReadUInt16();
+				flags = reader.ReadUInt16();
+			} else {
+				flags = reader.ReadUInt16();
+				object_index = reader.ReadUInt16();
+			}
+			unk4 = reader.ReadByte();
+			unk5 = reader.ReadByte();
+		}
 
-        public bool IsInvisibleNTTO {
+		public bool IsInvisibleNTTO {
             get {
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
                     return (flags & flag_isBoneNTTO) != 0;
@@ -40,9 +36,9 @@ namespace OpenSpace.Animation.Component {
             }
         }
 
-        public static int Size {
+        /*public static int Size {
             get { return 6; }
-        }
+        }*/
 
         public static bool Aligned {
             get {

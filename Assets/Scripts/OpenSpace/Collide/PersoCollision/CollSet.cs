@@ -45,7 +45,8 @@ namespace OpenSpace.Collide {
 
         public static CollSet Read(Reader reader, Perso perso, Pointer offset) {
             MapLoader l = MapLoader.Loader;
-            //if (Settings.s.platform == Settings.Platform.DC) return null;
+			//if (Settings.s.platform == Settings.Platform.DC) return null;
+			l.print("CollSet @ " + offset);
             CollSet c = new CollSet(perso, offset);
 
 			c.off_zdxList[CollideType.ZDD] = Pointer.Read(reader);

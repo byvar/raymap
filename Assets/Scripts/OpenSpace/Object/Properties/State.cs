@@ -89,7 +89,9 @@ namespace OpenSpace.Object.Properties {
             LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             s.off_state_auto = Pointer.Read(reader, allowMinusOne: true);
             s.off_mechanicsIDCard = Pointer.Read(reader);
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3
+				&& Settings.s.game != Settings.Game.Dinosaur
+				&& Settings.s.game != Settings.Game.LargoWinch) {
                 s.off_cine_mapname = Pointer.Read(reader);
                 s.off_cine_name = Pointer.Read(reader);
 			}
@@ -105,6 +107,7 @@ namespace OpenSpace.Object.Properties {
                 s.speed = reader.ReadByte();
                 reader.ReadByte();
                 s.customStateBits = reader.ReadByte();
+				if (Settings.s.game == Settings.Game.LargoWinch) reader.ReadByte();
             }
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
@@ -116,9 +119,9 @@ namespace OpenSpace.Object.Properties {
 				s.cine_name = reader.ReadNullDelimitedString();
 			});
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal || Settings.s.game == Settings.Game.TTSE) {
-                s.anim_refMontreal = AnimationMontreal.FromOffsetOrRead(s.off_anim_ref, reader);
+                s.anim_refMontreal = l.FromOffsetOrRead<AnimationMontreal>(reader, s.off_anim_ref);
             } else {
-                s.anim_ref = AnimationReference.FromOffsetOrRead(s.off_anim_ref, reader);
+                s.anim_ref = l.FromOffsetOrRead<AnimationReference>(reader, s.off_anim_ref);
             }
             return s;
         }

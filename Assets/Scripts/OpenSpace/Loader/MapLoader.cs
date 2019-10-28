@@ -17,6 +17,7 @@ using OpenSpace.Object.Properties;
 using System.Collections;
 using OpenSpace.Loader;
 using OpenSpace.Cinematics;
+using OpenSpace.Animation.ComponentLargo;
 
 namespace OpenSpace {
     public class MapLoader {
@@ -80,12 +81,12 @@ namespace OpenSpace {
         public List<WayPoint> waypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
-        public List<AnimationReference> animationReferences = new List<AnimationReference>();
-        public List<AnimationMontreal> animationReferencesMontreal = new List<AnimationMontreal>();
         public List<ObjectList> objectLists = new List<ObjectList>();
         public List<ObjectList> uncategorizedObjectLists = new List<ObjectList>();
+		public List<EntryAction> entryActions = new List<EntryAction>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
-        public GameObject familiesRoot = null;
+		public Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>> structs = new Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>>();
+		public GameObject familiesRoot = null;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
 
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
@@ -95,7 +96,7 @@ namespace OpenSpace {
         protected string[] lvlNames = new string[7];
         protected string[] lvlPaths = new string[7];
         protected string[] ptrPaths = new string[7];
-        protected string[] tplPaths = new string[7];
+        protected string[] texPaths = new string[7];
         protected string[] cntPaths = null;
         protected CNT cnt = null;
         protected DSB gameDsb = null;
@@ -123,7 +124,7 @@ namespace OpenSpace {
             get {
                 if (loader == null) {
                     if (Settings.s == null) return null;
-                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+					if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 						switch (Settings.s.platform) {
 							case Settings.Platform.DC: loader = new R2DCLoader(); break;
 							case Settings.Platform.PS2: loader = new R2PS2Loader(); break;
@@ -134,8 +135,12 @@ namespace OpenSpace {
 								loader = new R2ROMLoader(); break;
 							default: loader = new R2Loader(); break;
 						}
-                    } else {
-                        loader = new R3Loader();
+					} else {
+						if (Settings.s.game == Settings.Game.LargoWinch) {
+							loader = new LWLoader();
+						} else {
+							loader = new R3Loader();
+						}
                     }
                     //loader = new MapLoader();
                 }
@@ -390,7 +395,14 @@ MonoBehaviour.print(str);
         }
 
 		protected IEnumerator CreateCNT() {
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				cntPaths = new string[1];
+				cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
+				foreach (string path in cntPaths) {
+					yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+				}
+				cnt = new CNT(cntPaths);
+			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 				if (Settings.s.platform != Settings.Platform.DC &&
 					Settings.s.platform != Settings.Platform.PS1 &&
 					Settings.s.platform != Settings.Platform.PS2) {
@@ -552,7 +564,7 @@ MonoBehaviour.print(str);
                 }
                 if (Settings.s.platform == Settings.Platform.GC) {
                     uint num_textures_menu = reader.ReadUInt32();
-                    TPL fixTPL = new TPL(tplPaths[Mem.Fix]);
+                    TPL fixTPL = new TPL(texPaths[Mem.Fix]);
                     TPL menuTPL = new TPL(menuTPLPath);
                     for (uint i = 0; i < num_textures_menu; i++) {
                         Pointer off_texture = Pointer.Read(reader);
@@ -606,7 +618,7 @@ MonoBehaviour.print(str);
 			string state = loadingState;
 			loadingState = "Loading level textures";
 
-			if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
+			if (Settings.s.engineVersion <= Settings.EngineVersion.R2 || Settings.s.game == Settings.Game.LargoWinch) {
                 num_textures_fix = (uint)textures.Length;
                 num_memoryChannels = reader.ReadUInt32();
                 num_textures_lvl = reader.ReadUInt32();
@@ -625,15 +637,15 @@ MonoBehaviour.print(str);
 			}
 			if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
                 uint num_texturesToCreate = reader.ReadUInt32();
-                for (uint i = 0; i < num_textures_fix; i++) { // ?
-                    reader.ReadUInt32(); //1
-                }
+				for (uint i = 0; i < num_textures_fix; i++) { // ?
+					reader.ReadUInt32(); //1
+				}
                 uint currentMemoryChannel = reader.ReadUInt32();
             }
             if (Settings.s.platform == Settings.Platform.GC) {
                 // Load textures from TPL
-                TPL lvlTPL = new TPL(tplPaths[Mem.Lvl]);
-                TPL transitTPL = hasTransit ? new TPL(tplPaths[Mem.Transit]) : null;
+                TPL lvlTPL = new TPL(texPaths[Mem.Lvl]);
+                TPL transitTPL = hasTransit ? new TPL(texPaths[Mem.Transit]) : null;
                 print("Lvl TPL Texture count: " + lvlTPL.Count);
                 if (hasTransit) print("Transit TPL Texture count: " + transitTPL.Count);
                 int transitTexturesSeen = 0;
@@ -803,7 +815,7 @@ MonoBehaviour.print(str);
         }
 
         protected IEnumerator PrepareFile(string path) {
-            if (FileSystem.mode == FileSystem.Mode.Web) {
+            if (FileSystem.mode == FileSystem.Mode.Web && !string.IsNullOrEmpty(path)) {
                 string state = loadingState;
                 loadingState = state + "\nDownloading file: " + path;
                 yield return controller.StartCoroutine(FileSystem.DownloadFile(path));
@@ -842,6 +854,72 @@ MonoBehaviour.print(str);
 				default:
 					return path;
 			}
+		}
+
+
+
+		public T FromOffset<T>(Pointer pointer) where T : OpenSpaceStruct {
+			if (pointer == null) return null;
+			System.Type type = typeof(T);
+			if (!structs.ContainsKey(type) || !structs[type].ContainsKey(pointer)) return null;
+			return structs[type][pointer] as T;
+		}
+
+		private T Read<T>(Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+			if (pointer != null) {
+				T rs = new T();
+				rs.Init(pointer);
+				System.Type type = typeof(T);
+				if (!structs.ContainsKey(type)) {
+					structs[type] = new Dictionary<Pointer, OpenSpaceStruct>();
+				}
+				if (!structs[type].ContainsKey(pointer)) {
+					structs[type][pointer] = rs;
+				} else {
+					Debug.LogWarning("Duplicate pointer " + pointer + " for type " + type);
+				}
+				onPreRead?.Invoke(rs);
+				rs.Read(reader, inline: inline);
+				return rs;
+			}
+			return null;
+		}
+
+		public T FromOffsetOrRead<T>(Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+			if (pointer == null) return null;
+			T rs = FromOffset<T>(pointer);
+			Pointer curPointer = pointer;
+			if (rs == null) {
+				rs = Read(reader, pointer, onPreRead: onPreRead, inline: inline);
+			} else {
+				if(inline) Pointer.Goto(ref reader, curPointer + rs.Size);
+			}
+			return rs;
+		}
+
+		public T[] ReadArray<T>(decimal length, Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+			T[] ts = new T[(int)length];
+			Pointer curPointer = pointer != null ? pointer : Pointer.Current(reader);
+			if (inline) {
+				//print(typeof(T) + " - " + curPointer);
+				for (int i = 0; i < length; i++) {
+					ts[i] = FromOffsetOrRead(reader, curPointer, onPreRead: onPreRead, inline: true);
+					curPointer = Pointer.Current(reader);
+				}
+			} else {
+				Pointer.DoAt(ref reader, pointer, () => {
+					for (int i = 0; i < length; i++) {
+						ts[i] = FromOffsetOrRead(reader, curPointer, onPreRead: onPreRead, inline: true);
+						curPointer = Pointer.Current(reader);
+					}
+				});
+			}
+			return ts;
+		}
+
+		// Read array in place
+		public T[] ReadArray<T>(decimal length, Reader reader, Action<T> onPreRead = null) where T : OpenSpaceStruct, new() {
+			return ReadArray<T>(length, reader, null, onPreRead: onPreRead, inline: true);
 		}
 	}
 }

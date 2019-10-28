@@ -5,57 +5,50 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimMorphData {
-
+    public class AnimMorphData : OpenSpaceStruct {
         public ushort objectIndexTo;
         public byte morphProgress;
 		public short channel;
         public ushort frame;
         public byte byte6;
         public byte byte7;
-        public float morphProgressFloat
-        {
-            get
-            {
+        public float morphProgressFloat {
+            get {
                 return ((float)morphProgress) / 100.0f;
             }
         }
 
-        public AnimMorphData() {}
-
-        public static AnimMorphData Read(Reader reader) {
-            AnimMorphData m = new AnimMorphData();
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                m.objectIndexTo = reader.ReadByte(); // object index to morph to
-                m.morphProgress = reader.ReadByte(); // 0-100, at 100 the morph is over.
-                m.channel = reader.ReadInt16(); // the channel for which this morph data is relevant
-                m.frame = reader.ReadUInt16(); // the frame for which this morph data is relevant
-                m.byte6 = reader.ReadByte();
-                m.byte7 = reader.ReadByte();
-            } else {
-				m.channel = reader.ReadInt16(); // the channel for which this morph data is relevant
-				m.frame = reader.ReadUInt16(); // the frame for which this morph data is relevant
+		protected override void ReadInternal(Reader reader) {
+			if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+				objectIndexTo = reader.ReadByte(); // object index to morph to
+				morphProgress = reader.ReadByte(); // 0-100, at 100 the morph is over.
+				channel = reader.ReadInt16(); // the channel for which this morph data is relevant
+				frame = reader.ReadUInt16(); // the frame for which this morph data is relevant
+				byte6 = reader.ReadByte();
+				byte7 = reader.ReadByte();
+			} else {
+				channel = reader.ReadInt16(); // the channel for which this morph data is relevant
+				frame = reader.ReadUInt16(); // the frame for which this morph data is relevant
 				reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
-				m.objectIndexTo = reader.ReadUInt16(); // 5
+				objectIndexTo = reader.ReadUInt16(); // 5
 				reader.ReadUInt16();
 				reader.ReadBytes(0x10); // Haven't deciphered this yet
-				m.morphProgress = reader.ReadByte();
+				morphProgress = reader.ReadByte();
 				reader.ReadBytes(0x9);
 			}
-            return m;
-        }
+		}
 
-        public static int Size {
+		/*public static int Size {
             get {
                 switch (Settings.s.engineVersion) {
                     case Settings.EngineVersion.R3: return 0x26;
                     default: return 0x8;
                 }
             }
-        }
+        }*/
 
         public static bool Aligned {
             get {

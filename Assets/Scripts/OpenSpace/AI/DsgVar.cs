@@ -41,6 +41,7 @@ namespace OpenSpace.AI {
                && Settings.s.platform != Settings.Platform.GC
                && Settings.s.platform != Settings.Platform.DC
 			   && Settings.s.game != Settings.Game.R2Revolution
+			   && Settings.s.game != Settings.Game.LargoWinch
 			   && Settings.s.engineVersion >= Settings.EngineVersion.R2) {
                 dsgVar.something3 = reader.ReadUInt32();
             }
@@ -50,7 +51,8 @@ namespace OpenSpace.AI {
 				dsgVar.amountOfInfos = reader.ReadUInt16();
 			} else if (Settings.s.platform == Settings.Platform.GC
                 || Settings.s.platform == Settings.Platform.DC
-                || Settings.s.engineVersion < Settings.EngineVersion.R2) {
+                || Settings.s.engineVersion < Settings.EngineVersion.R2
+				|| Settings.s.game == Settings.Game.LargoWinch) {
                 dsgVar.dsgMemBufferLength = reader.ReadUInt32();
                 dsgVar.amountOfInfos = reader.ReadByte();
             } else if (dsgMem == null) {
@@ -70,6 +72,7 @@ namespace OpenSpace.AI {
                     //l.print(dsgVar.amountOfInfos);
                     for (uint i = 0; i < dsgVar.amountOfInfos; i++) {
                         DsgVarInfoEntry infoEntry = DsgVarInfoEntry.Read(reader, Pointer.Current(reader), i);
+						//l.print(infoEntry.offset + " - " + infoEntry.typeNumber + " - " + infoEntry.type + " - " + infoEntry.offsetInBuffer);
 
                         if (dsgMem != null) {
                             if (Settings.s.platform != Settings.Platform.DC) {

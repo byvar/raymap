@@ -55,6 +55,7 @@ namespace OpenSpace
             {
                 this.number = number;
                 this.entry = entry;
+				//print(entry.typeNumber + " - " + entry.type + " - " + entry.offset + " - " + entry.offsetInBuffer + " - " + entry.value);
 
                 switch (entry.type) {
                     case DsgVarInfoEntry.DsgVarType.Boolean: this.valueAsBool       = (bool)    entry.value;  break;
@@ -77,7 +78,6 @@ namespace OpenSpace
                         break;
 
                     case DsgVarInfoEntry.DsgVarType.SuperObject:
-
                         if (entry.value != null) {
                             SuperObject spo = MapLoader.Loader.superObjects.FirstOrDefault(p => (p.offset!=null && p.offset == (Pointer)entry.value));
                             if (spo != null) {

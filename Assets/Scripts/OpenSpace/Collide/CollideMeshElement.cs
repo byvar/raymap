@@ -125,10 +125,14 @@ namespace OpenSpace.Collide {
             CollideMeshElement sm = new CollideMeshElement(offset, m);
             //l.print(offset + " - " + m.num_vertices);
             sm.off_material = Pointer.Read(reader);
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.R2Revolution || Settings.s.game == Settings.Game.LargoWinch) {
 				sm.num_triangles = reader.ReadUInt16();
 				reader.ReadUInt16();
 				sm.off_triangles = Pointer.Read(reader);
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					sm.off_normals = Pointer.Read(reader);
+					sm.off_unk = Pointer.Read(reader);
+				}
 			} else {
 				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 					sm.num_triangles = reader.ReadUInt16();

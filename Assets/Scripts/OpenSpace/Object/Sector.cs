@@ -60,11 +60,14 @@ namespace OpenSpace.Object {
             MapLoader l = MapLoader.Loader;
             if (neighbors != null && neighbors.Count > 0) {
                 neighbors.ReadEntries(ref reader, (off_element) => {
+					l.print(off_element);
                     NeighborSector n = new NeighborSector();
-                    n.short0 = reader.ReadUInt16();
-                    n.short2 = reader.ReadUInt16();
-                    Pointer sp = Pointer.Read(reader);
-                    n.sector = Sector.FromSuperObjectOffset(sp);
+					if (Settings.s.game != Settings.Game.LargoWinch) {
+						n.short0 = reader.ReadUInt16();
+						n.short2 = reader.ReadUInt16();
+					}
+					Pointer sp = Pointer.Read(reader);
+					n.sector = Sector.FromSuperObjectOffset(sp);
                     //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
                     if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
                         n.off_next = off_element + 8; // No next pointer, each entry is immediately after the first one.

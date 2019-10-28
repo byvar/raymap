@@ -65,7 +65,7 @@ namespace OpenSpace.Text {
 					}
 				});
 			} else {
-				if (Settings.s.platform != Settings.Platform.DC) f.field4 = reader.ReadUInt32();
+				if (Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.LargoWinch) f.field4 = reader.ReadUInt32();
 				f.num_languages = reader.ReadUInt16();
 				reader.ReadUInt16();
 				f.off_text_languages = Pointer.Read(reader);

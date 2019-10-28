@@ -72,12 +72,12 @@ namespace OpenSpace.Object {
 
         public static PhysicalObject Read(Reader reader, Pointer offset, SuperObject so = null) {
             PhysicalObject po = new PhysicalObject(offset, so);
-
-            // Header
-            po.off_visualSet = Pointer.Read(reader);
+			MapLoader.Loader.print("PO @ " + offset);
+			// Header
+			po.off_visualSet = Pointer.Read(reader);
             po.off_collideSet = Pointer.Read(reader);
             po.off_visualBoundingVolume = Pointer.Read(reader);
-            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+            if (Settings.s.engineVersion > Settings.EngineVersion.TT && Settings.s.game != Settings.Game.LargoWinch) {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     po.off_collideBoundingVolume = po.off_visualBoundingVolume;
                     reader.ReadUInt32();
@@ -90,7 +90,13 @@ namespace OpenSpace.Object {
             Pointer.DoAt(ref reader, po.off_visualSet, () => {
                 ushort numberOfLOD = 1;
                 po.visualSetType = 0;
-				if (Settings.s.game == Settings.Game.R2Revolution) {
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					po.visualSet = new VisualSetLOD[1];
+					po.visualSet[0] = new VisualSetLOD();
+					po.visualSet[0].obj = null;
+					po.visualSet[0].off_data = po.off_visualSet;
+					po.visualSet[0].LODdistance = 5f;
+				} else if (Settings.s.game == Settings.Game.R2Revolution) {
 					po.visualSet = new VisualSetLOD[1];
 					po.visualSet[0] = new VisualSetLOD();
 					po.visualSet[0].obj = MapLoader.Loader.meshObjects.FirstOrDefault(p => p.offset == po.off_visualSet);

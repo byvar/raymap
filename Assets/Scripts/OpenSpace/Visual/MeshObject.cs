@@ -84,7 +84,20 @@ namespace OpenSpace.Visual {
         public static MeshObject Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             MeshObject m = new MeshObject(offset);
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				m.lookAtMode = reader.ReadUInt32();
+				m.num_vertices = reader.ReadUInt16();
+				m.num_subblocks = reader.ReadUInt16();
+				m.off_subblock_types = Pointer.Read(reader);
+				m.off_subblocks = Pointer.Read(reader);
+				m.off_vertices = Pointer.Read(reader);
+				m.off_normals = Pointer.Read(reader);
+				reader.ReadSingle();
+				reader.ReadSingle();
+				reader.ReadSingle();
+				reader.ReadSingle();
+				reader.ReadUInt32();
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				m.off_subblock_types = Pointer.Read(reader);
 				m.off_subblocks = Pointer.Read(reader);
 				uint flags = reader.ReadUInt32();
@@ -232,6 +245,7 @@ namespace OpenSpace.Visual {
                         m.subblocks[i] = SpriteElement.Read(reader, block_offset, m);
                         break;
                     case 13:
+					case 15:
                         m.bones = DeformSet.Read(reader, block_offset, m);
                         m.subblocks[i] = m.bones;
                         break;

@@ -6,8 +6,8 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimA3DGeneral {
-        public Pointer offset;
+    public class AnimA3DGeneral : OpenSpaceStruct {
+		public bool readFull = false;
 
         public ushort speed;
         public ushort num_vectors;
@@ -53,230 +53,185 @@ namespace OpenSpace.Animation.Component {
         public AnimMorphData[] morphData;
         public AnimDeformation[] deformations;
 
-        public AnimA3DGeneral(Pointer offset) { this.offset = offset; }
-
-        public static AnimA3DGeneral Read(Reader reader, Pointer offset) {
-            MapLoader l = MapLoader.Loader;
-            AnimA3DGeneral a3d = new AnimA3DGeneral(offset);
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                /* Each a3d is 0x38 long in R2. 0x34 in TT */
-                a3d.speed = reader.ReadUInt16();
-                a3d.num_vectors = reader.ReadUInt16();
-                a3d.num_quaternions = reader.ReadUInt16();
-                a3d.num_hierarchies = reader.ReadUInt16();
-                a3d.num_NTTO = reader.ReadUInt16();
-                a3d.num_numNTTO = reader.ReadUInt16();
-                a3d.num_channels = reader.ReadUInt16();
-                a3d.num_onlyFrames = reader.ReadUInt16();
-                a3d.num_keyframes = reader.ReadUInt16();
-                if (Settings.s.engineVersion >= Settings.EngineVersion.R2 && Settings.s.game != Settings.Game.R2Demo) {
-                    a3d.unk_14 = reader.ReadUInt16();
-                }
-                a3d.num_events = reader.ReadUInt16();
-                a3d.unk_1A = reader.ReadUInt16(); // vector related
-                a3d.subtractFramesForSpeed = reader.ReadUInt16();
-                a3d.unk_1E = reader.ReadUInt16(); // only frames again?
-                a3d.speed2 = reader.ReadUInt16(); // field0 again?
-                a3d.unk_22_morphs = reader.ReadUInt16(); // morph count ? (GAM_fn_p_stGetMorphData)
-                a3d.start_vectors2 = reader.ReadUInt16();
-                a3d.start_quaternions2 = reader.ReadUInt16();
-                a3d.num_morphData = reader.ReadUInt16();
-                a3d.start_vectors = reader.ReadUInt16();
-                a3d.start_quaternions = reader.ReadUInt16();
-                a3d.start_hierarchies = reader.ReadUInt16();
-                a3d.start_NTTO = reader.ReadUInt16();
-                a3d.start_onlyFrames = reader.ReadUInt16();
-                a3d.start_channels = reader.ReadUInt16();
-                a3d.start_events = reader.ReadUInt16();
-                a3d.start_morphData = reader.ReadUInt16();
-                if (Settings.s.engineVersion >= Settings.EngineVersion.R2 && Settings.s.game != Settings.Game.R2Demo) {
-                    reader.ReadUInt16(); // padding?
-                }
-                if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
-                    a3d.start_vectors2 = 0;
-                    a3d.start_quaternions2 = 0;
-                    a3d.start_vectors = 0;
-                    a3d.start_quaternions = 0;
-                    a3d.start_hierarchies = 0;
-                    a3d.start_NTTO = 0;
-                    a3d.start_onlyFrames = 0;
-                    a3d.start_channels = 0;
-                    a3d.start_events = 0;
-                    a3d.start_morphData = 0;
-                }
-            } else {
-				/* Each a3d is 0x3c long */
-                a3d.speed = reader.ReadUInt16();
-                a3d.num_vectors = reader.ReadUInt16();
-                a3d.num_quaternions = reader.ReadUInt16();
-                a3d.num_hierarchies = reader.ReadUInt16();
-                a3d.num_NTTO = reader.ReadUInt16();
-                a3d.num_numNTTO = reader.ReadUInt16();
-                a3d.num_deformations = reader.ReadUInt16();
-                a3d.num_channels = reader.ReadUInt16();
-                a3d.num_onlyFrames = reader.ReadUInt16();
-                a3d.unk_12 = reader.ReadUInt16();
-                a3d.unk_14 = reader.ReadUInt16();
-                a3d.num_keyframes = reader.ReadUInt16();
-                a3d.num_events = reader.ReadUInt16();
-                a3d.unk_1A = reader.ReadUInt16();
-                a3d.subtractFramesForSpeed = reader.ReadUInt16();
-                a3d.unk_1E = reader.ReadUInt16();
-                a3d.speed2 = reader.ReadUInt16();
-                a3d.unk_22_morphs = reader.ReadUInt16();
-                a3d.start_vectors2 = reader.ReadUInt16();
-                a3d.start_quaternions2 = reader.ReadUInt16();
-                a3d.num_morphData = reader.ReadUInt16();
-                a3d.start_vectors = reader.ReadUInt16();
-                a3d.start_quaternions = reader.ReadUInt16();
-                a3d.start_hierarchies = reader.ReadUInt16();
-                a3d.start_NTTO = reader.ReadUInt16();
-                a3d.start_deformations = reader.ReadUInt16();
-                a3d.start_onlyFrames = reader.ReadUInt16();
-                a3d.start_channels = reader.ReadUInt16();
-                a3d.start_events = reader.ReadUInt16();
-                a3d.start_morphData = reader.ReadUInt16();
-            }
-            return a3d;
-        }
-
-        public static AnimA3DGeneral ReadFull(Reader reader, Pointer offset) {
-			if (Settings.s.game == Settings.Game.R2Revolution) {
-				MapLoader l = MapLoader.Loader;
-				AnimA3DGeneral a3d = new AnimA3DGeneral(offset);
-				Pointer off_vectors = Pointer.Read(reader);
-				Pointer off_quaternions = Pointer.Read(reader);
-				Pointer off_hierarchies = Pointer.Read(reader);
-				Pointer off_ntto = Pointer.Read(reader);
-				Pointer off_onlyFrames = Pointer.Read(reader);
-				Pointer off_channels = Pointer.Read(reader);
-				Pointer off_numNTTO = Pointer.Read(reader);
-				Pointer off_kfIndex = Pointer.Read(reader);
-				Pointer off_keyframes = Pointer.Read(reader);
-				Pointer off_events = Pointer.Read(reader);
-				Pointer off_morphData = Pointer.Read(reader);
-				a3d.speed = reader.ReadUInt16();
-				a3d.num_vectors = reader.ReadUInt16();
-				a3d.num_quaternions = reader.ReadUInt16();
-				a3d.num_hierarchies = reader.ReadUInt16();
-				a3d.num_NTTO = reader.ReadUInt16();
-				a3d.num_numNTTO = reader.ReadUInt16();
-				a3d.num_channels = reader.ReadUInt16();
-				a3d.num_onlyFrames = reader.ReadUInt16();
-				a3d.num_keyframes = reader.ReadUInt16();
-				a3d.num_events = reader.ReadUInt16();
-				reader.ReadUInt16();
-				reader.ReadUInt16();
-				reader.ReadUInt16();
-				reader.ReadUInt16();
-				a3d.num_morphData = reader.ReadUInt16();
-
-				a3d.vectors = new AnimVector[a3d.num_vectors];
-				a3d.quaternions = new AnimQuaternion[a3d.num_quaternions];
-				a3d.hierarchies = new AnimHierarchy[a3d.num_hierarchies];
-				a3d.ntto = new AnimNTTO[a3d.num_NTTO];
-				a3d.onlyFrames = new AnimOnlyFrame[a3d.num_onlyFrames];
-				a3d.channels = new AnimChannel[a3d.num_channels];
-				a3d.numOfNTTO = new AnimNumOfNTTO[a3d.num_numNTTO * a3d.num_channels];
-				a3d.framesKFIndex = new AnimFramesKFIndex[a3d.num_onlyFrames * a3d.num_channels];
-				a3d.keyframes = new AnimKeyframe[a3d.num_keyframes];
-				a3d.events = new AnimEvent[a3d.num_events];
-				a3d.morphData = new AnimMorphData[a3d.num_morphData];
-				a3d.deformations = new AnimDeformation[a3d.num_deformations];
-				Pointer.DoAt(ref reader, off_vectors, () => {
-					for (uint k = 0; k < a3d.vectors.Length; k++) a3d.vectors[k] = AnimVector.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_quaternions, () => {
-					for (uint k = 0; k < a3d.quaternions.Length; k++) a3d.quaternions[k] = AnimQuaternion.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_hierarchies, () => {
-					for (uint k = 0; k < a3d.hierarchies.Length; k++) a3d.hierarchies[k] = AnimHierarchy.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_ntto, () => {
-					for (uint k = 0; k < a3d.ntto.Length; k++) a3d.ntto[k] = AnimNTTO.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_onlyFrames, () => {
-					for (uint k = 0; k < a3d.onlyFrames.Length; k++) a3d.onlyFrames[k] = AnimOnlyFrame.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_channels, () => {
-					for (uint k = 0; k < a3d.channels.Length; k++) a3d.channels[k] = AnimChannel.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_numNTTO, () => {
-					for (uint k = 0; k < a3d.numOfNTTO.Length; k++) a3d.numOfNTTO[k] = AnimNumOfNTTO.Read(reader);
-					// There's something after this
-				});
-				Pointer.DoAt(ref reader, off_kfIndex, () => {
-					for (uint k = 0; k < a3d.framesKFIndex.Length; k++) a3d.framesKFIndex[k] = AnimFramesKFIndex.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_keyframes, () => {
-					for (uint k = 0; k < a3d.keyframes.Length; k++) a3d.keyframes[k] = AnimKeyframe.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_events, () => {
-					for (uint k = 0; k < a3d.events.Length; k++) a3d.events[k] = AnimEvent.Read(reader);
-				});
-				Pointer.DoAt(ref reader, off_morphData, () => {
-					for (uint k = 0; k < a3d.morphData.Length; k++) a3d.morphData[k] = AnimMorphData.Read(reader);
-				});
-				return a3d;
-			} else {
+		protected override void ReadInternal(Reader reader) {
+			if (readFull && Settings.s.game != Settings.Game.R2Revolution) {
 				reader.AutoAligning = true;
-				AnimA3DGeneral a3d = AnimA3DGeneral.Read(reader, offset);
-				a3d.vectors = new AnimVector[a3d.num_vectors];
-				a3d.quaternions = new AnimQuaternion[a3d.num_quaternions];
-				a3d.hierarchies = new AnimHierarchy[a3d.num_hierarchies];
-				a3d.ntto = new AnimNTTO[a3d.num_NTTO];
-				a3d.onlyFrames = new AnimOnlyFrame[a3d.num_onlyFrames];
-				a3d.channels = new AnimChannel[a3d.num_channels];
-				a3d.numOfNTTO = new AnimNumOfNTTO[a3d.num_numNTTO * a3d.num_channels];
-				a3d.framesKFIndex = new AnimFramesKFIndex[a3d.num_onlyFrames * a3d.num_channels];
-				a3d.keyframes = new AnimKeyframe[a3d.num_keyframes];
-				a3d.events = new AnimEvent[a3d.num_events];
-				a3d.morphData = new AnimMorphData[a3d.num_morphData];
-				a3d.deformations = new AnimDeformation[a3d.num_deformations];
-				if (AnimVector.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.vectors.Length; k++) a3d.vectors[k] = AnimVector.Read(reader);
-				if (AnimQuaternion.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.quaternions.Length; k++) a3d.quaternions[k] = AnimQuaternion.Read(reader);
-				if (AnimHierarchy.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.hierarchies.Length; k++) a3d.hierarchies[k] = AnimHierarchy.Read(reader);
-				if (AnimNTTO.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.ntto.Length; k++) a3d.ntto[k] = AnimNTTO.Read(reader);
-				if (AnimOnlyFrame.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.onlyFrames.Length; k++) a3d.onlyFrames[k] = AnimOnlyFrame.Read(reader);
-				if (AnimChannel.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.channels.Length; k++) a3d.channels[k] = AnimChannel.Read(reader);
-				if (AnimNumOfNTTO.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.numOfNTTO.Length; k++) a3d.numOfNTTO[k] = AnimNumOfNTTO.Read(reader);
-				if (AnimFramesKFIndex.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.framesKFIndex.Length; k++) a3d.framesKFIndex[k] = AnimFramesKFIndex.Read(reader);
-				if (AnimKeyframe.Aligned) reader.AutoAlign(4);
-				for (uint k = 0; k < a3d.keyframes.Length; k++) a3d.keyframes[k] = AnimKeyframe.Read(reader);
-				if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-					if (AnimEvent.Aligned) reader.AutoAlign(4);
-					for (uint k = 0; k < a3d.events.Length; k++) a3d.events[k] = AnimEvent.Read(reader);
-					if (AnimMorphData.Aligned) reader.AutoAlign(4);
-					//if (a3d.num_morphData > 0) MapLoader.Loader.print("MorphData " + a3d.num_morphData + ": " + Pointer.Current(reader));
-					for (uint k = 0; k < a3d.morphData.Length; k++) a3d.morphData[k] = AnimMorphData.Read(reader);
+			}
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				ReadRevolution(reader);
+			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+				/* Each a3d is 0x38 long in R2. 0x34 in TT */
+				speed = reader.ReadUInt16();
+				num_vectors = reader.ReadUInt16();
+				num_quaternions = reader.ReadUInt16();
+				num_hierarchies = reader.ReadUInt16();
+				num_NTTO = reader.ReadUInt16();
+				num_numNTTO = reader.ReadUInt16();
+				num_channels = reader.ReadUInt16();
+				num_onlyFrames = reader.ReadUInt16();
+				num_keyframes = reader.ReadUInt16();
+				if (Settings.s.engineVersion >= Settings.EngineVersion.R2 && Settings.s.game != Settings.Game.R2Demo) {
+					unk_14 = reader.ReadUInt16();
 				}
-				/*MapLoader.Loader.print("A3D: " + offset + " - " + Pointer.Current(reader)
-					+ " - NN:" + a3d.num_numNTTO
-					+ " - CH:" + a3d.num_channels
-					+ " - OF:" + a3d.num_onlyFrames
-					+ " - KF:" + a3d.num_keyframes
-					+ " - KFI: " + a3d.num_onlyFrames * a3d.num_channels
-					+ " - V:" + a3d.num_vectors
-					+ " - Q:" + a3d.num_quaternions);*/
-				if (Settings.s.hasDeformations) {
-					if (AnimDeformation.Aligned) reader.AutoAlign(4);
-					for (uint k = 0; k < a3d.deformations.Length; k++) a3d.deformations[k] = AnimDeformation.Read(reader);
-					//reader.Align(AnimDeformation.Size * a3d.deformations.Length, 4);
+				num_events = reader.ReadUInt16();
+				unk_1A = reader.ReadUInt16(); // vector related
+				subtractFramesForSpeed = reader.ReadUInt16();
+				unk_1E = reader.ReadUInt16(); // only frames again?
+				speed2 = reader.ReadUInt16(); // field0 again?
+				unk_22_morphs = reader.ReadUInt16(); // morph count ? (GAM_fn_p_stGetMorphData)
+				start_vectors2 = reader.ReadUInt16();
+				start_quaternions2 = reader.ReadUInt16();
+				num_morphData = reader.ReadUInt16();
+				start_vectors = reader.ReadUInt16();
+				start_quaternions = reader.ReadUInt16();
+				start_hierarchies = reader.ReadUInt16();
+				start_NTTO = reader.ReadUInt16();
+				start_onlyFrames = reader.ReadUInt16();
+				start_channels = reader.ReadUInt16();
+				start_events = reader.ReadUInt16();
+				start_morphData = reader.ReadUInt16();
+				if (Settings.s.engineVersion >= Settings.EngineVersion.R2 && Settings.s.game != Settings.Game.R2Demo) {
+					reader.ReadUInt16(); // padding?
 				}
+				if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
+					start_vectors2 = 0;
+					start_quaternions2 = 0;
+					start_vectors = 0;
+					start_quaternions = 0;
+					start_hierarchies = 0;
+					start_NTTO = 0;
+					start_onlyFrames = 0;
+					start_channels = 0;
+					start_events = 0;
+					start_morphData = 0;
+				}
+			} else {
+				/* Each a3d is 0x3c long */
+				speed = reader.ReadUInt16();
+				num_vectors = reader.ReadUInt16();
+				num_quaternions = reader.ReadUInt16();
+				num_hierarchies = reader.ReadUInt16();
+				num_NTTO = reader.ReadUInt16();
+				num_numNTTO = reader.ReadUInt16();
+				num_deformations = reader.ReadUInt16();
+				num_channels = reader.ReadUInt16();
+				num_onlyFrames = reader.ReadUInt16();
+				unk_12 = reader.ReadUInt16();
+				unk_14 = reader.ReadUInt16();
+				num_keyframes = reader.ReadUInt16();
+				num_events = reader.ReadUInt16();
+				unk_1A = reader.ReadUInt16();
+				subtractFramesForSpeed = reader.ReadUInt16();
+				unk_1E = reader.ReadUInt16();
+				speed2 = reader.ReadUInt16();
+				unk_22_morphs = reader.ReadUInt16();
+				start_vectors2 = reader.ReadUInt16();
+				start_quaternions2 = reader.ReadUInt16();
+				num_morphData = reader.ReadUInt16();
+				start_vectors = reader.ReadUInt16();
+				start_quaternions = reader.ReadUInt16();
+				start_hierarchies = reader.ReadUInt16();
+				start_NTTO = reader.ReadUInt16();
+				start_deformations = reader.ReadUInt16();
+				start_onlyFrames = reader.ReadUInt16();
+				start_channels = reader.ReadUInt16();
+				start_events = reader.ReadUInt16();
+				start_morphData = reader.ReadUInt16();
+			}
+			if (readFull && Settings.s.game != Settings.Game.R2Revolution) {
+				ReadFull(reader);
 				reader.AutoAligning = false;
-				return a3d;
+			}
+		}
+
+		private void ReadRevolution(Reader reader) {
+			MapLoader l = MapLoader.Loader;
+
+			Pointer off_vectors = Pointer.Read(reader);
+			Pointer off_quaternions = Pointer.Read(reader);
+			Pointer off_hierarchies = Pointer.Read(reader);
+			Pointer off_ntto = Pointer.Read(reader);
+			Pointer off_onlyFrames = Pointer.Read(reader);
+			Pointer off_channels = Pointer.Read(reader);
+			Pointer off_numNTTO = Pointer.Read(reader);
+			Pointer off_kfIndex = Pointer.Read(reader);
+			Pointer off_keyframes = Pointer.Read(reader);
+			Pointer off_events = Pointer.Read(reader);
+			Pointer off_morphData = Pointer.Read(reader);
+			speed = reader.ReadUInt16();
+			num_vectors = reader.ReadUInt16();
+			num_quaternions = reader.ReadUInt16();
+			num_hierarchies = reader.ReadUInt16();
+			num_NTTO = reader.ReadUInt16();
+			num_numNTTO = reader.ReadUInt16();
+			num_channels = reader.ReadUInt16();
+			num_onlyFrames = reader.ReadUInt16();
+			num_keyframes = reader.ReadUInt16();
+			num_events = reader.ReadUInt16();
+			reader.ReadUInt16();
+			reader.ReadUInt16();
+			reader.ReadUInt16();
+			reader.ReadUInt16();
+			num_morphData = reader.ReadUInt16();
+
+			vectors = l.ReadArray<AnimVector>(num_vectors, reader, off_vectors);
+			quaternions = l.ReadArray<AnimQuaternion>(num_quaternions, reader, off_quaternions);
+			hierarchies = l.ReadArray<AnimHierarchy>(num_hierarchies, reader, off_hierarchies);
+			ntto = l.ReadArray<AnimNTTO>(num_NTTO, reader, off_ntto);
+			onlyFrames = l.ReadArray<AnimOnlyFrame>(num_onlyFrames, reader, off_onlyFrames);
+			channels = l.ReadArray<AnimChannel>(num_channels, reader, off_channels);
+			numOfNTTO = l.ReadArray<AnimNumOfNTTO>(num_numNTTO * num_channels, reader, off_numNTTO); // There's something after this
+			framesKFIndex = l.ReadArray<AnimFramesKFIndex>(num_onlyFrames * num_channels, reader, off_kfIndex);
+			keyframes = l.ReadArray<AnimKeyframe>(num_keyframes, reader, off_keyframes);
+			events = l.ReadArray<AnimEvent>(num_events, reader, off_events);
+			morphData = l.ReadArray<AnimMorphData>(num_morphData, reader, off_morphData);
+		}
+
+
+		private void ReadFull(Reader reader) {
+			MapLoader l = MapLoader.Loader;
+
+			if (AnimVector.Aligned) reader.AutoAlign(4);
+			vectors = l.ReadArray<AnimVector>(num_vectors, reader);
+			if (AnimQuaternion.Aligned) reader.AutoAlign(4);
+			quaternions = l.ReadArray<AnimQuaternion>(num_quaternions, reader);
+			if (AnimHierarchy.Aligned) reader.AutoAlign(4);
+			hierarchies = l.ReadArray<AnimHierarchy>(num_hierarchies, reader);
+			if (AnimNTTO.Aligned) reader.AutoAlign(4);
+			ntto = l.ReadArray<AnimNTTO>(num_NTTO, reader);
+			if (AnimOnlyFrame.Aligned) reader.AutoAlign(4);
+			onlyFrames = l.ReadArray<AnimOnlyFrame>(num_onlyFrames, reader);
+			if (AnimChannel.Aligned) reader.AutoAlign(4);
+			channels = l.ReadArray<AnimChannel>(num_channels, reader);
+			if (AnimNumOfNTTO.Aligned) reader.AutoAlign(4);
+			numOfNTTO = l.ReadArray<AnimNumOfNTTO>(num_numNTTO * num_channels, reader);
+			if (AnimFramesKFIndex.Aligned) reader.AutoAlign(4);
+			framesKFIndex = l.ReadArray<AnimFramesKFIndex>(num_onlyFrames * num_channels, reader);
+			if (AnimKeyframe.Aligned) reader.AutoAlign(4);
+			keyframes = l.ReadArray<AnimKeyframe>(num_keyframes, reader);
+			if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+				if (AnimEvent.Aligned) reader.AutoAlign(4);
+				events = l.ReadArray<AnimEvent>(num_events, reader);
+				if (AnimMorphData.Aligned) reader.AutoAlign(4);
+				//if (a3d.num_morphData > 0) MapLoader.Loader.print("MorphData " + a3d.num_morphData + ": " + Pointer.Current(reader));
+				morphData = l.ReadArray<AnimMorphData>(num_morphData, reader);
+			}
+			/*MapLoader.Loader.print("A3D: " + offset + " - " + Pointer.Current(reader)
+				+ " - NN:" + a3d.num_numNTTO
+				+ " - CH:" + a3d.num_channels
+				+ " - OF:" + a3d.num_onlyFrames
+				+ " - KF:" + a3d.num_keyframes
+				+ " - KFI: " + a3d.num_onlyFrames * a3d.num_channels
+				+ " - V:" + a3d.num_vectors
+				+ " - Q:" + a3d.num_quaternions);*/
+			if (Settings.s.hasDeformations) {
+				if (AnimDeformation.Aligned) reader.AutoAlign(4);
+				deformations = l.ReadArray<AnimDeformation>(num_deformations, reader);
+				//reader.Align(AnimDeformation.Size * a3d.deformations.Length, 4);
 			}
         }
 
-        public static int Size {
+		/*public static int Size {
             get {
                 switch (Settings.s.engineVersion) {
                     case Settings.EngineVersion.R3: return 0x3C;
@@ -290,7 +245,7 @@ namespace OpenSpace.Animation.Component {
                     default: throw new Exception("Anim A3D size not set for this engine version");
                 }
             }
-        }
+        }*/
 
         public static bool Aligned {
             get { return false; }

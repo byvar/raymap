@@ -16,58 +16,63 @@ namespace OpenSpace.Input {
 
         public static InputStructure Read(Reader reader, Pointer offset) {
             InputStructure input = new InputStructure(offset);
-			switch (Settings.s.platform) {
-				case Settings.Platform.GC:
-					//reader.ReadBytes(0x1714);
-					if (Settings.s.game == Settings.Game.R3) {
-						reader.ReadBytes(0x12E0);
-					} else if (Settings.s.game == Settings.Game.RA
-						|| Settings.s.game == Settings.Game.RM
-						|| Settings.s.game == Settings.Game.DDPK) {
-						//reader.ReadBytes(0x16e8);
-						reader.ReadBytes(0x12C8);
-					}
-					input.num_entryActions = reader.ReadUInt32();
-					input.off_entryActions = Pointer.Read(reader);
-					reader.ReadBytes(0x418);
-					break;
-				case Settings.Platform.PC:
-					if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
-						reader.ReadBytes(0x700);
-					} else if (Settings.s.game == Settings.Game.Dinosaur) {
-						reader.ReadBytes(0xC58);
-					} else {
-						reader.ReadBytes(0x16BC);
-					}
-					input.num_entryActions = reader.ReadUInt32();
-					input.off_entryActions = Pointer.Read(reader);
-					reader.ReadBytes(0x418);
-					break;
-				case Settings.Platform.iOS:
-					reader.ReadBytes(0x2A0);
-					input.num_entryActions = reader.ReadUInt32();
-					input.off_entryActions = Pointer.Read(reader);
-					reader.ReadBytes(0x14);
-					break;
-				case Settings.Platform.DC:
-					reader.ReadBytes(0x278);
-					input.num_entryActions = reader.ReadUInt32();
-					input.off_entryActions = Pointer.Read(reader);
-					reader.ReadUInt32();
-					Pointer.Read(reader);
-					break;
-				case Settings.Platform.PS2:
-					if (Settings.s.game == Settings.Game.R2Revolution) {
-						reader.ReadBytes(0x130);
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				input.num_entryActions = reader.ReadUInt32();
+				input.off_entryActions = Pointer.Read(reader);
+			} else {
+				switch (Settings.s.platform) {
+					case Settings.Platform.GC:
+						//reader.ReadBytes(0x1714);
+						if (Settings.s.game == Settings.Game.R3) {
+							reader.ReadBytes(0x12E0);
+						} else if (Settings.s.game == Settings.Game.RA
+							|| Settings.s.game == Settings.Game.RM
+							|| Settings.s.game == Settings.Game.DDPK) {
+							//reader.ReadBytes(0x16e8);
+							reader.ReadBytes(0x12C8);
+						}
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
+						reader.ReadBytes(0x418);
+						break;
+					case Settings.Platform.PC:
+						if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
+							reader.ReadBytes(0x700);
+						} else if (Settings.s.game == Settings.Game.Dinosaur) {
+							reader.ReadBytes(0xC58);
+						} else {
+							reader.ReadBytes(0x16BC);
+						}
+						input.num_entryActions = reader.ReadUInt32();
+						input.off_entryActions = Pointer.Read(reader);
+						reader.ReadBytes(0x418);
+						break;
+					case Settings.Platform.iOS:
+						reader.ReadBytes(0x2A0);
+						input.num_entryActions = reader.ReadUInt32();
+						input.off_entryActions = Pointer.Read(reader);
+						reader.ReadBytes(0x14);
+						break;
+					case Settings.Platform.DC:
+						reader.ReadBytes(0x278);
+						input.num_entryActions = reader.ReadUInt32();
+						input.off_entryActions = Pointer.Read(reader);
+						reader.ReadUInt32();
 						Pointer.Read(reader);
-						reader.ReadUInt16();
-						reader.ReadUInt16();
-						reader.ReadUInt32(); // 0F00020000040100
-						reader.ReadBytes(0x300);
-					}
-					break;
+						break;
+					case Settings.Platform.PS2:
+						if (Settings.s.game == Settings.Game.R2Revolution) {
+							reader.ReadBytes(0x130);
+							input.num_entryActions = reader.ReadUInt32();
+							input.off_entryActions = Pointer.Read(reader);
+							Pointer.Read(reader);
+							reader.ReadUInt16();
+							reader.ReadUInt16();
+							reader.ReadUInt32(); // 0F00020000040100
+							reader.ReadBytes(0x300);
+						}
+						break;
+				}
 			}
 
             if (input.off_entryActions != null && input.num_entryActions > 0) {

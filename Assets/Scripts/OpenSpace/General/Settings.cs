@@ -36,6 +36,7 @@ namespace OpenSpace {
 			[Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
 			[Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
 			[Description("Disney's Dinosaur (PC)")] DinosaurPC,
+			[Description("Largo Winch (PC)")] LargoWinchPC,
 		};
         public Mode mode = Mode.Rayman3PC;
 		
@@ -66,6 +67,7 @@ namespace OpenSpace {
 			{ "playmobil_alex_pc", Mode.PlaymobilAlexPC },
 			{ "playmobil_laura_pc", Mode.PlaymobilLauraPC },
 			{ "dinosaur_pc", Mode.DinosaurPC },
+			{ "largowinch_pc", Mode.LargoWinchPC },
 		};
 
         public enum EngineVersion {
@@ -74,12 +76,12 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur };
+        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
-		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB };
+		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB, LMFile };
         
         public EngineVersion engineVersion;
         public Game game;
@@ -572,6 +574,25 @@ namespace OpenSpace {
 			luminosity = 0.3f,
 			saturate = false
 		};
+		public static Settings LargoWinchPC = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.LargoWinch,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			aiTypes = AITypes.Largo,
+			textureAnimationSpeedModifier = -10f,
+			luminosity = 0.1f,
+			saturate = false,
+			hasExtraInputData = true,
+			hasObjectTypes = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFolder, Caps.Normal },
+				{ CapsType.LMFile, Caps.Normal },
+				{ CapsType.LevelFile, Caps.None },
+			},
+			hasDeformations = true
+		};
 
 
 		public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
@@ -602,6 +623,7 @@ namespace OpenSpace {
 			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },
 			{ Mode.PlaymobilAlexPC, PlaymobilAlexPC },
 			{ Mode.DinosaurPC, DinosaurPC },
+			{ Mode.LargoWinchPC, LargoWinchPC },
 		};
 	}
 }

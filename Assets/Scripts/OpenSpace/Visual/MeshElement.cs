@@ -408,7 +408,10 @@ namespace OpenSpace.Visual {
 			//l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				//sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
+				sm.visualMaterial = VisualMaterial.FromOffsetOrRead(sm.off_material, reader);
+			} else if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                 sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
             } else {
                 sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
@@ -449,7 +452,7 @@ namespace OpenSpace.Visual {
 				}
 			}
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-				if (Settings.s.game != Settings.Game.Dinosaur) {
+				if (Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) {
 					reader.ReadUInt16();
 					sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
 					sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)

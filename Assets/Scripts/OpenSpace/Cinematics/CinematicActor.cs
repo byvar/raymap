@@ -110,7 +110,7 @@ namespace OpenSpace.Cinematics {
 			ca.off_header = Pointer.Read(reader);
 
 			//MapLoader.Loader.print(ca.name);
-			ca.anim_ref = AnimationReference.FromOffsetOrRead(ca.off_a3d, reader);
+			ca.anim_ref = l.FromOffsetOrRead<AnimationReference>(reader, ca.off_a3d);
 			ca.perso = Perso.FromOffset(ca.off_perso);
 			ca.waitState = State.FromOffset(ca.off_waitState);
 			ca.cineState = State.FromOffset(ca.off_cineState);

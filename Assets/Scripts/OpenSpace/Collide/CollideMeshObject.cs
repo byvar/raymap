@@ -54,13 +54,15 @@ namespace OpenSpace.Collide {
 
         public static CollideMeshObject Read(Reader reader, Pointer offset, CollideType type = CollideType.None) {
             MapLoader l = MapLoader.Loader;
-			//l.print("CollideMesh " + offset);
+			l.print("CollideMesh " + offset);
             CollideMeshObject m = new CollideMeshObject(offset, type);
             //l.print("Mesh obj: " + offset);
             if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_subblocks = reader.ReadUInt16();
-                if(Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32();
+				if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.LargoWinch) {
+					reader.ReadUInt32();
+				}
             }
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
             m.off_vertices = Pointer.Read(reader);
@@ -72,7 +74,7 @@ namespace OpenSpace.Collide {
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();
             m.off_subblock_types = Pointer.Read(reader);
             m.off_subblocks = Pointer.Read(reader);
-			if (Settings.s.game != Settings.Game.R2Revolution) {
+			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
 				Pointer.Read(reader);
 				if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
 					reader.ReadInt32();

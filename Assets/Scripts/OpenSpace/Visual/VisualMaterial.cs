@@ -183,27 +183,50 @@ namespace OpenSpace.Visual {
         public static VisualMaterial Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
-            // Material struct = 0x188
+			// Material struct = 0x188
+			//l.print("Material @ " + offset);
             m.flags = reader.ReadUInt32(); // After this: 0x4
-			if (Settings.s.game != Settings.Game.R2Revolution) {
+			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
 				if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
 				m.ambientCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
-			} else {
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				// Fill in light info for Revolution
-				m.ambientCoef = new Vector4(0,0,0,1f);
+				m.ambientCoef = new Vector4(0, 0, 0, 1f);
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				//m.diffuseCoef = new Vector4(1, 1, 1, 1);
 				reader.ReadInt32(); // current refresh number for scrolling/animated textures
 				m.off_animTextures_first = Pointer.Read(reader);
-				m.off_animTextures_current = Pointer.Read(reader); 
+				m.off_animTextures_current = Pointer.Read(reader);
 				reader.ReadInt32();
 				m.num_animTextures = reader.ReadUInt16();
 				reader.ReadUInt16(); // 0x70
+			} else if (Settings.s.game == Settings.Game.LargoWinch) {
+				m.ambientCoef = new Vector4(0, 0, 0, 1f);
+				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
+				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				reader.ReadInt32(); // current refresh number for scrolling/animated textures
+				m.off_animTextures_first = Pointer.Read(reader);
+				m.off_animTextures_current = Pointer.Read(reader);
+				reader.ReadInt32();
+				m.num_animTextures = reader.ReadUInt16();
+				reader.ReadUInt16();
 			}
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				m.num_textures = 1;
+				VisualMaterialTexture t = new VisualMaterialTexture();
+				t.offset = Pointer.Current(reader);
+				t.off_texture = Pointer.Read(reader); // 0x4c
+				t.texture = TextureInfo.FromOffset(t.off_texture);
+				t.properties = reader.ReadInt32();
+				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				m.textures.Add(t);
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				m.num_textures = 1;
 				VisualMaterialTexture t = new VisualMaterialTexture();
 				t.offset = Pointer.Current(reader);

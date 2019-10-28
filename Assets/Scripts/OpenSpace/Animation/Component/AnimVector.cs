@@ -5,23 +5,17 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimVector {
+    public class AnimVector : OpenSpaceStruct {
         public Vector3 vector;
 
-        public AnimVector() {}
+		protected override void ReadInternal(Reader reader) {
+			float x = reader.ReadSingle();
+			float z = reader.ReadSingle();
+			float y = reader.ReadSingle();
+			vector = new Vector3(x, y, z);
+		}
 
-        public static AnimVector Read(Reader reader) {
-            AnimVector vec = new AnimVector();
-            float x = reader.ReadSingle();
-            float z = reader.ReadSingle();
-            float y = reader.ReadSingle();
-            vec.vector = new Vector3(x, y, z);
-            return vec;
-        }
-
-        public static int Size {
-            get { return 12; }
-        }
+		// Size: 12
 
         public static bool Aligned {
             get { return true; }

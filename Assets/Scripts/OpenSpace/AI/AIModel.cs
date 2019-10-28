@@ -32,6 +32,8 @@ namespace OpenSpace.AI {
             MapLoader l = MapLoader.Loader;
             AIModel ai = new AIModel(offset);
 
+			l.print("AIModel @ " + offset);
+
             ai.off_behaviors_normal = Pointer.Read(reader);
             ai.off_behaviors_reflex = Pointer.Read(reader);
             ai.off_dsgVar = Pointer.Read(reader);

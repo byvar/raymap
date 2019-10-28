@@ -140,7 +140,7 @@ namespace OpenSpace.Visual {
                     reader.ReadInt16(); // -1
 					if (Settings.s.game != Settings.Game.R2Revolution) {
 						reader.ReadUInt32();
-						reader.ReadUInt32();
+						if(Settings.s.game != Settings.Game.LargoWinch) reader.ReadUInt32();
 					}
                 }
             } else {
@@ -186,9 +186,11 @@ namespace OpenSpace.Visual {
 						s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
                         if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                            s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                            s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                            s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+							if (Settings.s.game != Settings.Game.LargoWinch) {
+								s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+								s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+								s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+							}
                             s.sprites[i].centerPoint = reader.ReadUInt16();
                             reader.ReadUInt16();
                             if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
