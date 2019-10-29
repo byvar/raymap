@@ -55,7 +55,7 @@ namespace OpenSpace
             {
                 this.number = number;
                 this.entry = entry;
-				//print(entry.typeNumber + " - " + entry.type + " - " + entry.offset + " - " + entry.offsetInBuffer + " - " + entry.value);
+				//print(entry.typeNumber + " - " + entry.type + " - " + entry.debugValueOffset + " - " + entry.value);
 
                 switch (entry.type) {
                     case DsgVarInfoEntry.DsgVarType.Boolean: this.valueAsBool       = (bool)    entry.value;  break;

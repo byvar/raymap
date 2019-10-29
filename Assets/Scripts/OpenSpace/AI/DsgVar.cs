@@ -99,108 +99,110 @@ namespace OpenSpace.AI {
             return dsgVar;
         }
 
-        public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry infoEntry, Pointer buffer)
-        {
-            return ReadValueFromBuffer(reader, infoEntry.type, infoEntry.offsetInBuffer, infoEntry.number, buffer, infoEntry);
+        public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry infoEntry, Pointer buffer) {
+            return ReadValueFromBuffer(reader, infoEntry.type, infoEntry.offsetInBuffer, buffer, infoEntry);
         }
 
-        public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry.DsgVarType type, uint offsetInBuffer, uint number, Pointer buffer, DsgVarInfoEntry entry = null)
-        {
-            Pointer original = Pointer.Goto(ref reader, buffer + offsetInBuffer);
-            object returnValue = null;
+		private object ReadValue(Reader reader, DsgVarInfoEntry.DsgVarType type) {
+			object returnValue = null;
+			float x, y, z;
 
 			try {
+				switch (type) {
+					case DsgVarInfoEntry.DsgVarType.Boolean:
+						returnValue = reader.ReadBoolean(); break;
+					case DsgVarInfoEntry.DsgVarType.Byte:
+						returnValue = reader.ReadSByte(); break;
+					case DsgVarInfoEntry.DsgVarType.UByte:
+						returnValue = reader.ReadByte(); break;
+					case DsgVarInfoEntry.DsgVarType.Float:
+						returnValue = reader.ReadSingle(); break;
+					case DsgVarInfoEntry.DsgVarType.Int:
+						returnValue = reader.ReadInt32(); break;
+					case DsgVarInfoEntry.DsgVarType.UInt:
+						returnValue = reader.ReadUInt32(); break;
+					case DsgVarInfoEntry.DsgVarType.Short:
+						returnValue = reader.ReadInt16(); break;
+					case DsgVarInfoEntry.DsgVarType.UShort:
+						returnValue = reader.ReadUInt16(); break;
+					case DsgVarInfoEntry.DsgVarType.Vector:
+						x = reader.ReadSingle();
+						y = reader.ReadSingle();
+						z = reader.ReadSingle();
+						returnValue = new Vector3(x, y, z);
+						break;
+					case DsgVarInfoEntry.DsgVarType.Text:
+						uint textInd = reader.ReadUInt32();
+						returnValue = textInd; // MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)textInd, 0);
+						break;
+					case DsgVarInfoEntry.DsgVarType.Graph:
+						Pointer off_graph = Pointer.Read(reader);
+						Graph graph = Graph.FromOffsetOrRead(off_graph, reader);
 
-                switch (type) {
-                    case DsgVarInfoEntry.DsgVarType.Boolean:
-                        returnValue = reader.ReadBoolean(); break;
-                    case DsgVarInfoEntry.DsgVarType.Byte:
-                        returnValue = reader.ReadSByte(); break;
-                    case DsgVarInfoEntry.DsgVarType.UByte:
-                        returnValue = reader.ReadByte(); break;
-                    case DsgVarInfoEntry.DsgVarType.Float:
-                        returnValue = reader.ReadSingle(); break;
-                    case DsgVarInfoEntry.DsgVarType.Int:
-                        returnValue = reader.ReadInt32(); break;
-                    case DsgVarInfoEntry.DsgVarType.UInt:
-                        returnValue = reader.ReadUInt32(); break;
-                    case DsgVarInfoEntry.DsgVarType.Short:
-                        returnValue = reader.ReadInt16(); break;
-                    case DsgVarInfoEntry.DsgVarType.UShort:
-                        returnValue = reader.ReadUInt16(); break;
-                    case DsgVarInfoEntry.DsgVarType.Vector:
-                        float x = reader.ReadSingle();
-                        float y = reader.ReadSingle();
-                        float z = reader.ReadSingle();
-                        returnValue = new Vector3(x, y, z);
-                        
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.Text:
-                        uint textInd = reader.ReadUInt32();
-                        returnValue = textInd; // MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)textInd, 0);
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.Graph:
-                        Pointer off_graph = Pointer.Read(reader);
-                        Graph graph = Graph.FromOffsetOrRead(off_graph, reader);
+						returnValue = off_graph; //"Graph " + off_graph;
 
-                        returnValue = off_graph; //"Graph " + off_graph;
+						break;
+					case DsgVarInfoEntry.DsgVarType.Waypoint:
+						Pointer off_waypoint = Pointer.Read(reader);
+						if (off_waypoint != null) {
+							WayPoint wayPoint = WayPoint.FromOffsetOrRead(off_waypoint, reader);
+							returnValue = off_waypoint;
+							//returnValue = wayPoint;
+						}
 
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.Waypoint:
-                        Pointer off_waypoint = Pointer.Read(reader);
-                        if (off_waypoint != null) {
-                            WayPoint wayPoint = WayPoint.FromOffsetOrRead(off_waypoint, reader);
-                            returnValue = off_waypoint;
-                            //returnValue = wayPoint;
-                        }
+						break;
 
-                        break;
+					case DsgVarInfoEntry.DsgVarType.Perso:
+					case DsgVarInfoEntry.DsgVarType.GameMaterial:
+					case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+					case DsgVarInfoEntry.DsgVarType.ObjectList:
+						returnValue = Pointer.Read(reader);
 
-                    case DsgVarInfoEntry.DsgVarType.Perso:
-                    case DsgVarInfoEntry.DsgVarType.GameMaterial:
-                    case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+						break;
 
-                        returnValue = Pointer.Read(reader);
+					case DsgVarInfoEntry.DsgVarType.SuperObject:
 
-                        break;
+						returnValue = Pointer.Read(reader);
 
-                    case DsgVarInfoEntry.DsgVarType.SuperObject:
-
-                        returnValue = Pointer.Read(reader);
-
-                        break;
+						break;
 					case DsgVarInfoEntry.DsgVarType.Array11:
 					case DsgVarInfoEntry.DsgVarType.Array9:
 					case DsgVarInfoEntry.DsgVarType.Array6:
 						MapLoader.Loader.print(type);
 						returnValue = reader.ReadInt32(); break;
 
-                    case DsgVarInfoEntry.DsgVarType.ActionArray:
-                    case DsgVarInfoEntry.DsgVarType.FloatArray:
-                    case DsgVarInfoEntry.DsgVarType.IntegerArray:
-                    case DsgVarInfoEntry.DsgVarType.PersoArray:
-                    case DsgVarInfoEntry.DsgVarType.SoundEventArray:
-                    case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-                    case DsgVarInfoEntry.DsgVarType.TextArray:
-                    case DsgVarInfoEntry.DsgVarType.TextRefArray:
-                    case DsgVarInfoEntry.DsgVarType.VectorArray:
-                    case DsgVarInfoEntry.DsgVarType.WayPointArray:
+					case DsgVarInfoEntry.DsgVarType.ActionArray:
+					case DsgVarInfoEntry.DsgVarType.FloatArray:
+					case DsgVarInfoEntry.DsgVarType.IntegerArray:
+					case DsgVarInfoEntry.DsgVarType.PersoArray:
+					case DsgVarInfoEntry.DsgVarType.SoundEventArray:
+					case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
+					case DsgVarInfoEntry.DsgVarType.TextArray:
+					case DsgVarInfoEntry.DsgVarType.TextRefArray:
+					case DsgVarInfoEntry.DsgVarType.VectorArray:
+					case DsgVarInfoEntry.DsgVarType.WayPointArray:
+						returnValue = ReadArray(reader);
 
-                        returnValue = ReadArray(reader, entry, buffer);
+						break;
 
-                        break;
+					default:
+						returnValue = reader.ReadInt32(); break;
+				}
 
-                    default:
-                        returnValue = reader.ReadInt32(); break;
-                }
-
-            } catch (Exception e) {
+			} catch (Exception e) {
 				returnValue = "Exception: " + e.Message;
 				//returnValue = "Exception: " + e.Message + "\nBuffer: " + buffer + " - InfoEntry.Offset: " + infoEntry.offsetInBuffer + " - typeNumber: " + infoEntry.typeNumber + "\n" + e.StackTrace;
 			}
+			return returnValue;
+		}
 
-            Pointer.Goto(ref reader, original);
-
+        public object ReadValueFromBuffer(Reader reader, DsgVarInfoEntry.DsgVarType type, uint offsetInBuffer, Pointer buffer, DsgVarInfoEntry entry = null)
+        {
+			object returnValue = null;
+			Pointer.DoAt(ref reader, buffer + offsetInBuffer, () => {
+				if (entry != null) entry.debugValueOffset = Pointer.Current(reader);
+				returnValue = ReadValue(reader, type);
+			});
             return returnValue;
         }
 
@@ -219,38 +221,27 @@ namespace OpenSpace.AI {
             return ReadValueFromBuffer(reader, infoEntry, dsgVar.off_dsgMemBuffer);
         }
 
-        public object[] ReadArray(Reader reader, DsgVarInfoEntry entry, Pointer buffer)
-        {
-            uint o = entry.number * 16;
+        public object[] ReadArray(Reader reader) {
+			uint typeNumber;
+			byte arraySize;
 
-            Pointer.Goto(ref reader, off_dsgVarInfo + o);
-            int a = reader.ReadInt32();
+			if (Settings.s.game == Settings.Game.R2Revolution) {
+				reader.ReadUInt32();
+				typeNumber = reader.ReadByte();
+				arraySize = reader.ReadByte();
+				reader.ReadBytes(2); // padding
+			} else {
+				typeNumber = reader.ReadUInt32();
+				arraySize = reader.ReadByte();
+				reader.ReadBytes(3); // padding
+			}
+			DsgVarInfoEntry.DsgVarType itemType = Settings.s.aiTypes.GetDsgVarType(typeNumber);
 
-            Pointer byteAddress = off_dsgMemBuffer + 4 + a;
-
-            Pointer.Goto(ref reader, byteAddress);
-            byte arraySize = reader.ReadByte();
-
-            //this.
-
-            /*Pointer.Goto(ref reader, this.off_dsgMemBuffer + 4);
-            Pointer bufferStartAddress = Pointer.Read(reader);
-
-            Pointer.Goto(ref reader, bufferStartAddress + infoEntry.offsetInBuffer);
-            uint offset = reader.ReadUInt32();
-            Pointer.Goto(ref reader, this.off_dsgMemBuffer + 4 + offset);
-            uint arraySize = reader.ReadByte();
-            */
-            object[] resultList = new object[arraySize];
-
-            DsgVarInfoEntry.DsgVarType itemType = DsgVarInfoEntry.GetDsgVarTypeFromArrayType(entry.type);
+			object[] resultList = new object[arraySize];
 
             for (uint i = 0; i < arraySize; i++) {
-                if (itemType==DsgVarInfoEntry.DsgVarType.Vector)
-                    resultList[i] = ReadValueFromBuffer(reader, itemType, entry.offsetInBuffer + 8 + i * 12, i, buffer);
-                else
-                    resultList[i] = ReadValueFromBuffer(reader, itemType, entry.offsetInBuffer + 8 + i * 4, i, buffer);
-            }
+				resultList[i] = ReadValue(reader, itemType);
+			}
 
             return resultList;
         }

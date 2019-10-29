@@ -54,7 +54,7 @@ namespace OpenSpace.Collide {
 
         public static CollideMeshObject Read(Reader reader, Pointer offset, CollideType type = CollideType.None) {
             MapLoader l = MapLoader.Loader;
-			l.print("CollideMesh " + offset);
+			//l.print("CollideMesh " + offset);
             CollideMeshObject m = new CollideMeshObject(offset, type);
             //l.print("Mesh obj: " + offset);
             if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {

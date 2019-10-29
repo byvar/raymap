@@ -18,6 +18,7 @@ namespace OpenSpace.AI {
         public DsgVarType type;
         public object value;
         public object initialValue;
+		public Pointer debugValueOffset;
 
         public string NiceVariableName {
             get {
@@ -118,7 +119,8 @@ namespace OpenSpace.AI {
             Array11,
             Way, // TT SE only
             ActionArray, // Hype
-			SuperObjectArray
+			SuperObjectArray,
+			ObjectList, // Largo
 		}
     }
 }

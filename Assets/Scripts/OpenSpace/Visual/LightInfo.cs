@@ -186,7 +186,7 @@ namespace OpenSpace.Visual {
 					reader.ReadUInt32(); // 0
 					reader.ReadUInt32(); // 0
 				}
-				lo.print("LIGHT " + Pointer.Current(reader));
+				//lo.print("LIGHT " + Pointer.Current(reader));
                 l.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                     l.shadowIntensity = reader.ReadSingle(); // 0

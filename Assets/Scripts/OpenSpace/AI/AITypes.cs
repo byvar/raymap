@@ -5775,7 +5775,7 @@ namespace OpenSpace.AI {
 				DsgVarInfoEntry.DsgVarType.Waypoint,
 				DsgVarInfoEntry.DsgVarType.Perso,
 				DsgVarInfoEntry.DsgVarType.List,
-				DsgVarInfoEntry.DsgVarType.Comport,
+				DsgVarInfoEntry.DsgVarType.Vector,
 				DsgVarInfoEntry.DsgVarType.Action,
 				DsgVarInfoEntry.DsgVarType.Caps,
 				DsgVarInfoEntry.DsgVarType.Input,
@@ -5894,32 +5894,32 @@ namespace OpenSpace.AI {
 			#region Operators
 			operatorTable = new string[] {
 				"Operator_Plus", // 0
-                "Operator_Minus",
+				"Operator_Minus",
 				"Operator_Mul",
 				"Operator_Div",
 				"Operator_UnaryMinus",
 				"Operator_Mod", // 5
-                "Operator_PlusAffect",
+				"Operator_PlusAffect",
 				"Operator_MinusAffect",
 				"Operator_MulAffect",
 				"Operator_DivAffect",
 				"Operator_PlusPlusAffect", // 10
-                "Operator_MinusMinusAffect",
+				"Operator_MinusMinusAffect",
 				"Operator_Affect",
 				"Operator_Dot",
 				".X",
 				".Y", // 15
-                ".Z",
+				".Z",
 				"Operator_VectorPlusVector",
 				"Operator_VectorMinusVector",
 				"Operator_VectorUnaryMinus",
 				"Operator_VectorMulScalar", // 20
-                "Operator_VectorDivScalar",
+				"Operator_VectorDivScalar",
 				".X:=",
 				".Y:=",
 				".Z:=",
 				"Operator_Ultra", // 25
-                "Operator_ModelCast",
+				"Operator_ModelCast",
 				"Operator_Array",
 				"Operator_AffectArray"
 			},
@@ -5928,57 +5928,57 @@ namespace OpenSpace.AI {
 			#region Functions
 			functionTable = new string[] {
 				"GetPersoAbsolutePosition", // 0
-                "GetMyAbsolutePosition",
+				"GetMyAbsolutePosition",
 				"DistanceFunction",
 				"DistanceToPerso",
 				"DistanceFunction",
 				"DistanceFunction", // 5
-                "DistanceFunction",
+				"DistanceFunction",
 				"DistanceFunction",
 				"DistanceFunction",
 				"DistanceFunction",
 				"DistanceToPersoCenter", // 10
-                "DistanceFunction",
+				"DistanceFunction",
 				"DistanceFunction",
 				"DistanceFunction",
 				"DistanceFunction",
 				"DistanceFunction", // 15
-                "DistanceFunction",
+				"DistanceFunction",
 				"GetRadiusWP",
 				"InterpolationBt3WP",
 				"BezierBt3WP",
 				"DistanceFunction_DistanceBetweenPersoAndWP", // 20
-                "GetWpAbsolutePosition",
+				"GetWpAbsolutePosition",
 				"MathFunctionInt",
 				"MathFunctionInt",
 				"MathFunctionReal_Sin",
 				"MathFunctionReal_Cos", // 25
-                "MathFunctionReal_Pow2",
+				"MathFunctionReal_Pow2",
 				"MathFunctionReal_SquareRoot",
 				"MathFunctionReal_RandomReal",
 				"MathFunctionReal",
 				"MathFunctionReal", // 30
-                "MathFunctionReal",
+				"MathFunctionReal",
 				"MathFunctionReal_Rad2Deg",
 				"MathFunctionReal_Deg2Rad",
 				"MathAbsoluteValue",
 				"MathFunctionReal", // 35
-                "MathFunctionReal_Sign",
+				"MathFunctionReal_Sign",
 				"MathFunctionReal_Pow3",
 				"MathFunctionReal",
 				"Func_TernInf",
 				"Func_TernSup", // 40
-                "Func_TernEq",
+				"Func_TernEq",
 				"Func_TernInfEq",
 				"Func_TernSupEq",
 				"Func_TernOp",
 				"RealFunction", // 45
-                "HitPointsAndHitPointsMaxFunction_GetHitPoints",
+				"HitPointsAndHitPointsMaxFunction_GetHitPoints",
 				"HitPointsAndHitPointsMaxFunction_AddHitPoints",
 				"HitPointsAndHitPointsMaxFunction_SubHitPoints",
 				"HitPointsAndHitPointsMaxFunction_GetHitPointsMax",
 				"HitPointsAndHitPointsMaxFunction_AddHitPointsMax", // 50
-                "HitPointsAndHitPointsMaxFunction_SubHitPointsMax",
+				"HitPointsAndHitPointsMaxFunction_SubHitPointsMax",
 				"ListFunction",
 				"ListFunction",
 				"LocalToGlobal",
@@ -7492,33 +7492,55 @@ namespace OpenSpace.AI {
                 DsgVarInfoEntry.DsgVarType.Int,
 				DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
                 DsgVarInfoEntry.DsgVarType.Float,
+				DsgVarInfoEntry.DsgVarType.Waypoint,
+				DsgVarInfoEntry.DsgVarType.Perso,
+				/*DsgVarInfoEntry.DsgVarType.List, // 10
 				DsgVarInfoEntry.DsgVarType.Vector,
-				DsgVarInfoEntry.DsgVarType.List,
 				DsgVarInfoEntry.DsgVarType.Comport,
 				DsgVarInfoEntry.DsgVarType.Action,
+				DsgVarInfoEntry.DsgVarType.Text,
+				DsgVarInfoEntry.DsgVarType.GameMaterial,
+				DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
+                DsgVarInfoEntry.DsgVarType.Graph,
+				DsgVarInfoEntry.DsgVarType.PersoArray,
+				DsgVarInfoEntry.DsgVarType.VectorArray,
+				DsgVarInfoEntry.DsgVarType.FloatArray,
+				DsgVarInfoEntry.DsgVarType.IntegerArray,
+				DsgVarInfoEntry.DsgVarType.WayPointArray,
+				DsgVarInfoEntry.DsgVarType.TextArray,
+				DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
+				*/
+
+
+
+
+				DsgVarInfoEntry.DsgVarType.Comport, // 10
+				DsgVarInfoEntry.DsgVarType.Vector,
 				DsgVarInfoEntry.DsgVarType.Caps,
 				DsgVarInfoEntry.DsgVarType.Input,
-				DsgVarInfoEntry.DsgVarType.SoundEvent,
+				DsgVarInfoEntry.DsgVarType.Text,
 				DsgVarInfoEntry.DsgVarType.Light,
 				DsgVarInfoEntry.DsgVarType.GameMaterial,
-				DsgVarInfoEntry.DsgVarType.VisualMaterial,
-				DsgVarInfoEntry.DsgVarType.Perso,
-				DsgVarInfoEntry.DsgVarType.Waypoint,
-				DsgVarInfoEntry.DsgVarType.Graph,
-				DsgVarInfoEntry.DsgVarType.Text,
-				DsgVarInfoEntry.DsgVarType.SuperObject,
-				DsgVarInfoEntry.DsgVarType.SOLinks,
-				DsgVarInfoEntry.DsgVarType.IntegerArray,
-				DsgVarInfoEntry.DsgVarType.FloatArray,
-				DsgVarInfoEntry.DsgVarType.VectorArray,
-				DsgVarInfoEntry.DsgVarType.PersoArray,
+				DsgVarInfoEntry.DsgVarType.SoundEvent,
+				DsgVarInfoEntry.DsgVarType.None,
 				DsgVarInfoEntry.DsgVarType.WayPointArray,
+				DsgVarInfoEntry.DsgVarType.PersoArray, // 20
+				DsgVarInfoEntry.DsgVarType.VectorArray,
+				DsgVarInfoEntry.DsgVarType.FloatArray,
+				DsgVarInfoEntry.DsgVarType.IntegerArray,
+				DsgVarInfoEntry.DsgVarType.None,
+				DsgVarInfoEntry.DsgVarType.TextArray, // 25
+				DsgVarInfoEntry.DsgVarType.None,
+				DsgVarInfoEntry.DsgVarType.None,
+				DsgVarInfoEntry.DsgVarType.None,
 				DsgVarInfoEntry.DsgVarType.Array6,
-				DsgVarInfoEntry.DsgVarType.TextArray,
-				DsgVarInfoEntry.DsgVarType.SuperObjectArray,
-				DsgVarInfoEntry.DsgVarType.Array9,
+				DsgVarInfoEntry.DsgVarType.None, // 30
+				DsgVarInfoEntry.DsgVarType.SuperObject,
+				DsgVarInfoEntry.DsgVarType.None,
 				DsgVarInfoEntry.DsgVarType.SoundEventArray,
-				DsgVarInfoEntry.DsgVarType.Array11
+				DsgVarInfoEntry.DsgVarType.None,
+				DsgVarInfoEntry.DsgVarType.None,
+				DsgVarInfoEntry.DsgVarType.ObjectList, // 36
 			},
 			#endregion
 

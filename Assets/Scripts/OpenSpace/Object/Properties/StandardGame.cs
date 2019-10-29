@@ -45,7 +45,7 @@ namespace OpenSpace.Object.Properties {
         public static StandardGame Read(Reader reader, Pointer offset)
         {
             MapLoader l = MapLoader.Loader;
-            l.print("StdGame: " + offset);
+            //l.print("StdGame: " + offset);
             StandardGame stdGame = new StandardGame(offset);
 
 			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {

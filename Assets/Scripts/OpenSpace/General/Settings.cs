@@ -582,8 +582,8 @@ namespace OpenSpace {
 			linkedListType = LinkedListType.Double,
 			aiTypes = AITypes.Largo,
 			textureAnimationSpeedModifier = -10f,
-			luminosity = 0.1f,
-			saturate = false,
+			luminosity = 0.5f,
+			saturate = true,
 			hasExtraInputData = true,
 			hasObjectTypes = false,
 			caps = new Dictionary<CapsType, Caps>() {

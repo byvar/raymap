@@ -84,7 +84,7 @@ namespace OpenSpace.Object.Properties {
 
             if (Settings.s.linkedListType == LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Current(reader);
 
-			l.print("ObjectList " + offset + " - " + ol.num_entries);
+			//l.print("ObjectList " + offset + " - " + ol.num_entries);
 
             if (ol.off_objList_start != null) {
                 Pointer.Goto(ref reader, ol.off_objList_start);

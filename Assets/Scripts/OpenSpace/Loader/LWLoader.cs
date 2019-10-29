@@ -290,7 +290,7 @@ namespace OpenSpace.Loader {
 			reader.ReadByte();
 			reader.ReadByte();
 			reader.ReadByte();
-			print(Pointer.Current(reader));
+			//print(Pointer.Current(reader));
 
 			Pointer.Read(reader);
 			Pointer off_unk0_first = Pointer.Read(reader);
@@ -332,7 +332,7 @@ namespace OpenSpace.Loader {
 			for (int i = 0; i < 21; i++) {
 				Pointer.Read(reader);
 			}
-			FontStructure.Read(reader, Pointer.Current(reader));
+			fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
 			reader.ReadUInt16();
 			reader.ReadUInt16();
 			reader.ReadUInt32();

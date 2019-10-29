@@ -72,7 +72,7 @@ namespace OpenSpace.Object {
 
         public static PhysicalObject Read(Reader reader, Pointer offset, SuperObject so = null) {
             PhysicalObject po = new PhysicalObject(offset, so);
-			MapLoader.Loader.print("PO @ " + offset);
+			//MapLoader.Loader.print("PO @ " + offset);
 			// Header
 			po.off_visualSet = Pointer.Read(reader);
             po.off_collideSet = Pointer.Read(reader);

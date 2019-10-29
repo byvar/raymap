@@ -60,7 +60,7 @@ namespace OpenSpace.Object {
             MapLoader l = MapLoader.Loader;
             if (neighbors != null && neighbors.Count > 0) {
                 neighbors.ReadEntries(ref reader, (off_element) => {
-					l.print(off_element);
+					//l.print(off_element);
                     NeighborSector n = new NeighborSector();
 					if (Settings.s.game != Settings.Game.LargoWinch) {
 						n.short0 = reader.ReadUInt16();

@@ -698,7 +698,7 @@ MonoBehaviour.print(str);
 					int fixTexturesSeen = 0;
 					int lvlTexturesSeen = 0;
 					PBT[] pbt = (this as LWLoader).pbt;
-					print(Pointer.Current(reader));
+					//print(Pointer.Current(reader));
 					for (uint i = num_textures_fix; i < num_textures_total; i++) {
 						uint file_texture = reader.ReadUInt32();
 						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
