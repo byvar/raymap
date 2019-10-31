@@ -26,3 +26,4 @@ Map viewer/editor for OpenSpace games:
 * Hype: The Time Quest (PC)
 * Tonic Trouble: Special Edition (PC)
 * Tonic Trouble (PC)
+* Largo Winch: Empire Under Threat (PC)
