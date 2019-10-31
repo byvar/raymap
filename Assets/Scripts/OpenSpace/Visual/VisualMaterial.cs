@@ -34,10 +34,18 @@ namespace OpenSpace.Visual {
         public int currentAnimTexture = 0;
 
         // flags
-        public static uint flags_isTransparent = (1 << 3);
         public static uint flags_backfaceCulling = (1 << 10);
         public static uint flags_isMaterialChromed = (1 << 22);
         public static uint flags_isBillboard = (1 << 9);
+		public static uint Flags_IsTransparent {
+			get {
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					return (1 << 10);
+				} else {
+					return (1 << 3);
+				}
+			}
+		}
 
         //properties
         public static uint property_receiveShadows = 2;
@@ -130,7 +138,7 @@ namespace OpenSpace.Visual {
             get {
                 bool transparent = false;
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3 &&
-                    ((flags & flags_isTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent)) transparent = true;
+                    ((flags & Flags_IsTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent)) transparent = true;
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     if ((flags & 0x4000000) != 0) transparent = true;
                 }
@@ -145,14 +153,18 @@ namespace OpenSpace.Visual {
 
         public bool IsLight {
             get {
-                //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((flags & flags_isTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent
-                    || Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                    if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
-                        return textures[0].texture.IsLight;
-                    }
-                    return false;
-                } else return true;
+				//if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
+				if ((flags & Flags_IsTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent
+					|| Settings.s.engineVersion < Settings.EngineVersion.R3
+					|| Settings.s.game == Settings.Game.LargoWinch) {
+					if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
+						return textures[0].texture.IsLight;
+					}
+					return false;
+				} else {
+					if (Settings.s.game == Settings.Game.LargoWinch) return false;
+					return true;
+				}
             }
         }
 
