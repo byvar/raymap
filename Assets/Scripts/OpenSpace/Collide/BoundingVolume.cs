@@ -40,7 +40,7 @@ namespace OpenSpace.Collide {
             get {
                 switch (type) {
                     case Type.Box:
-                        return boxSize;
+                        return new Vector3(Mathf.Abs(boxSize.x), Mathf.Abs(boxSize.y), Mathf.Abs(boxSize.z));
                     case Type.Sphere:
                         return Vector3.one * sphereRadius * 0.5f;
                     default:

@@ -55,7 +55,7 @@ namespace OpenSpace.Loader {
 					paths["lvl.lvl"] = lvlFolder + ConvertCase(lvlName + ".lvl", Settings.CapsType.LevelFile);
 					paths["lvl.ptr"] = lvlFolder + ConvertCase(lvlName + ".ptr", Settings.CapsType.LevelFile);
 					paths["lvl.pbt"] = lvlFolder + ConvertCase(lvlName + ".pbt", Settings.CapsType.LevelFile);
-					paths["lvl.lms"] = lvlFolder + ConvertCase(lvlName + ".lms", Settings.CapsType.LMFile);
+					//paths["lvl.lms"] = lvlFolder + ConvertCase(lvlName + ".lms", Settings.CapsType.LMFile);
 
 					// Download files
 					foreach (KeyValuePair<string, string> path in paths) {
@@ -80,6 +80,7 @@ namespace OpenSpace.Loader {
 					if (FileSystem.mode != FileSystem.Mode.Web) {
 						pbt[Mem.Fix] = ReadPBT(paths["fix.pbt"], fixFolder + ConvertCase("Fix_PBT.dmp", Settings.CapsType.LevelFile));
 						pbt[Mem.Lvl] = ReadPBT(paths["lvl.pbt"], lvlFolder + ConvertCase(lvlName + "_PBT.dmp", Settings.CapsType.LevelFile));
+						//ReadLMS(paths["lvl.lms"], lvlFolder + ConvertCase(lvlName + "_LMS.dmp", Settings.CapsType.LevelFile));
 					}
 					for (int i = 0; i < loadOrder.Length; i++) {
 						int j = loadOrder[i];
@@ -131,6 +132,20 @@ namespace OpenSpace.Loader {
 				}
 			}
 			return null;
+		}
+		private void ReadLMS(string path, string dmpPath) {
+			if (FileSystem.FileExists(path)) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(path), Settings.s.IsLittleEndian)) {
+					uint decompressed = reader.ReadUInt32();
+					uint compressed = reader.ReadUInt32();
+					byte[] decData = DecompressLargo(reader, compressed, decompressed);
+					if (FileSystem.mode != FileSystem.Mode.Web) {
+						Util.ByteArrayToFile(dmpPath, decData);
+					}
+					// return new PBT(new MemoryStream(decData));
+				}
+			}
+			// return null;
 		}
 
 		#region FIX

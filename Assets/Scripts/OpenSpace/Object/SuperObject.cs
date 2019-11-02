@@ -158,13 +158,13 @@ namespace OpenSpace.Object {
                     if (so.boundingVolume.type == BoundingVolume.Type.Box) {
                         BoxCollider collider = so.Gao.AddComponent<BoxCollider>();
 
-                        collider.center = so.boundingVolume.boxCenter;
+                        collider.center = so.boundingVolume.Center;
                         collider.center -= so.Gao.transform.position;
-                        collider.size = so.boundingVolume.boxSize;
+                        collider.size = so.boundingVolume.Size;
                     } else {
                         SphereCollider collider = so.Gao.AddComponent<SphereCollider>();
 
-                        collider.center = so.boundingVolume.sphereCenter;
+                        collider.center = so.boundingVolume.Center;
                         collider.radius = so.boundingVolume.sphereRadius;
                     }
                 }
