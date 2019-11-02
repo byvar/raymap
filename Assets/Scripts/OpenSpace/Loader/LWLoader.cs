@@ -22,6 +22,7 @@ using lzo.net;
 namespace OpenSpace.Loader {
 	public class LWLoader : MapLoader {
 		public PBT[] pbt = new PBT[2];
+		public LMS lms;
 
 		public override IEnumerator Load() {
 			try {
@@ -55,7 +56,7 @@ namespace OpenSpace.Loader {
 					paths["lvl.lvl"] = lvlFolder + ConvertCase(lvlName + ".lvl", Settings.CapsType.LevelFile);
 					paths["lvl.ptr"] = lvlFolder + ConvertCase(lvlName + ".ptr", Settings.CapsType.LevelFile);
 					paths["lvl.pbt"] = lvlFolder + ConvertCase(lvlName + ".pbt", Settings.CapsType.LevelFile);
-					//paths["lvl.lms"] = lvlFolder + ConvertCase(lvlName + ".lms", Settings.CapsType.LMFile);
+					paths["lvl.lms"] = lvlFolder + ConvertCase(lvlName + ".lms", Settings.CapsType.LMFile);
 
 					// Download files
 					foreach (KeyValuePair<string, string> path in paths) {
@@ -80,7 +81,7 @@ namespace OpenSpace.Loader {
 					if (FileSystem.mode != FileSystem.Mode.Web) {
 						pbt[Mem.Fix] = ReadPBT(paths["fix.pbt"], fixFolder + ConvertCase("Fix_PBT.dmp", Settings.CapsType.LevelFile));
 						pbt[Mem.Lvl] = ReadPBT(paths["lvl.pbt"], lvlFolder + ConvertCase(lvlName + "_PBT.dmp", Settings.CapsType.LevelFile));
-						//ReadLMS(paths["lvl.lms"], lvlFolder + ConvertCase(lvlName + "_LMS.dmp", Settings.CapsType.LevelFile));
+						lms = ReadLMS(paths["lvl.lms"]);
 					}
 					for (int i = 0; i < loadOrder.Length; i++) {
 						int j = loadOrder[i];
@@ -133,19 +134,18 @@ namespace OpenSpace.Loader {
 			}
 			return null;
 		}
-		private void ReadLMS(string path, string dmpPath) {
+		private LMS ReadLMS(string path) {
 			if (FileSystem.FileExists(path)) {
-				using (Reader reader = new Reader(FileSystem.GetFileReadStream(path), Settings.s.IsLittleEndian)) {
-					uint decompressed = reader.ReadUInt32();
-					uint compressed = reader.ReadUInt32();
-					byte[] decData = DecompressLargo(reader, compressed, decompressed);
-					if (FileSystem.mode != FileSystem.Mode.Web) {
-						Util.ByteArrayToFile(dmpPath, decData);
+				LMS lms = new LMS(FileSystem.GetFileReadStream(path));
+				if (lms != null && exportTextures) {
+					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Settings.CapsType.LevelFolder);
+					for (int i = 0; i < lms.Count; i++) {
+						Util.ByteArrayToFile(lvlFolder + "textures/" + ConvertCase(lvlName + "_" + i + ".png", Settings.CapsType.LevelFile), lms.textures[i].EncodeToPNG());
 					}
-					// return new PBT(new MemoryStream(decData));
 				}
+				return lms;
 			}
-			// return null;
+			return null;
 		}
 
 		#region FIX
@@ -348,11 +348,21 @@ namespace OpenSpace.Loader {
 				Pointer.Read(reader);
 			}
 			fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
+			print("Yay " + Pointer.Current(reader));
 			reader.ReadUInt16();
 			reader.ReadUInt16();
 			reader.ReadUInt32();
-			uint num_unk1 = reader.ReadUInt32();
-			Pointer off_unk1 = Pointer.Read(reader);
+			uint num_lightmaps = reader.ReadUInt32();
+			Pointer off_lightmapUVs = Pointer.Read(reader);
+			Pointer.DoAt(ref reader, off_lightmapUVs, () => {
+				off_lightmapUV = new Pointer[num_lightmaps];
+				for (int i = 0; i < num_lightmaps; i++) {
+					reader.ReadUInt32();
+					reader.ReadByte();
+					reader.ReadBytes(3);
+					off_lightmapUV[i] = Pointer.Read(reader);
+				}
+			});
 			reader.ReadByte();
 			reader.ReadBytes(3);
 			reader.ReadUInt32();
@@ -494,6 +504,18 @@ namespace OpenSpace.Loader {
 				}
 			}
 			return decompressedData;
+		}
+
+		public Texture2D GetLightmap(int index) {
+			if (lms != null && lms.textures.Length > index) {
+				Texture2D tex = lms.textures[index];
+				if (tex != null) {
+					tex.filterMode = FilterMode.Bilinear;
+					tex.wrapMode = TextureWrapMode.Clamp;
+					return tex;
+				}
+			}
+			return null;
 		}
 	}
 }

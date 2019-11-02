@@ -354,27 +354,13 @@ namespace OpenSpace.Visual {
 									lm.filterMode = FilterMode.Bilinear;
 									lm.Apply();
 								}
-								me.visualMaterial = me.visualMaterial.Clone();
-								me.visualMaterial.num_textures += 1;
-								me.visualMaterial.textures.Add(new VisualMaterialTexture() {
-									texture = new TextureInfo(null) {
-										width = (ushort)lm.width,
-										height = (ushort)lm.height,
-										Texture = lm
-									},
-									textureOp = 50,
-									uvFunction = 1
-								});
+								Vector2[] lightmapUVs = new Vector2[mo.num_vertices];
 								Pointer.DoAt(ref reader, ps2l.off_lightmapUV[me.lightmap_index], () => {
-									Array.Resize(ref me.uvs, me.num_uvs + mo.num_vertices);
-									Array.Resize(ref me.mapping_uvs, me.num_uvMaps + 1);
-									me.mapping_uvs[me.mapping_uvs.Length - 1] = Enumerable.Range(me.num_uvs, mo.num_vertices).ToArray();
 									for (int j = 0; j < mo.num_vertices; j++) {
-										me.uvs[me.num_uvs + j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+										lightmapUVs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 									}
-									me.num_uvs += mo.num_vertices;
-									me.num_uvMaps++;
 								});
+								me.AddLightmap(lm, lightmapUVs);
 							}
 						}
 					}

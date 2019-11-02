@@ -51,7 +51,7 @@ namespace OpenSpace.FileFormat.Texture {
             Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "hi" + bytes.Length + ".lol", bytes);
             GF gf = new GF(new MemoryStream(bytes));
             pixels = gf.pixels;
-            //throw new Exception("exported");
+            throw new Exception("exported");
         }*/
 
         public GF(string filePath) : this(FileSystem.GetFileReadStream(filePath)) { }
@@ -73,7 +73,7 @@ namespace OpenSpace.FileFormat.Texture {
 
             channels = r.ReadByte();
             byte enlargeByte = 0;
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur) enlargeByte = r.ReadByte();
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) enlargeByte = r.ReadByte();
             uint w = width, h = height;
 			if (enlargeByte > 0) {
 				channelPixels = 0;

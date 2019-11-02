@@ -6,6 +6,7 @@ using UnityEngine;
 
 
 namespace OpenSpace.FileFormat.Texture {
+	// Largo Winch DDS Textures file
     public class PBT {
         uint count = 0;
 		uint baseOffset;

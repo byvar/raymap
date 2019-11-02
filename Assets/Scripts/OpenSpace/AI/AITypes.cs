@@ -4648,8 +4648,6 @@ namespace OpenSpace.AI {
             #endregion
         };
 
-
-
 		public static AITypes Revolution = new AITypes() {
 			#region Keywords
 			keywordTable = new string[] {
@@ -5778,7 +5776,7 @@ namespace OpenSpace.AI {
 				DsgVarInfoEntry.DsgVarType.Vector,
 				DsgVarInfoEntry.DsgVarType.Action,
 				DsgVarInfoEntry.DsgVarType.Caps,
-				DsgVarInfoEntry.DsgVarType.Input,
+				DsgVarInfoEntry.DsgVarType.Text,
 				DsgVarInfoEntry.DsgVarType.SoundEvent,
 				DsgVarInfoEntry.DsgVarType.Light,
 				DsgVarInfoEntry.DsgVarType.GameMaterial,

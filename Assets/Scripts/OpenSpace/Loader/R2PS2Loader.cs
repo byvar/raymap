@@ -24,7 +24,6 @@ namespace OpenSpace.Loader {
 		public List<TextureDictionary> txds = new List<TextureDictionary>();
 		public MeshFile ato;
 		public uint meshesRead = 0;
-		public Pointer[] off_lightmapUV;
 
         public override IEnumerator Load() {
             try {

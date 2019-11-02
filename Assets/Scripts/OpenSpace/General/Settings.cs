@@ -315,7 +315,7 @@ namespace OpenSpace {
 			linkedListType = LinkedListType.Minimize,
 			encryption = Encryption.None,
 			luminosity = 0.5f,
-			saturate = true,
+			saturate = false,
 			aiTypes = AITypes.Revolution,
 			//textureAnimationSpeedModifier = 2f,
 			hasExtraInputData = false,
@@ -583,7 +583,7 @@ namespace OpenSpace {
 			aiTypes = AITypes.Largo,
 			textureAnimationSpeedModifier = -10f,
 			luminosity = 0.5f,
-			saturate = true,
+			saturate = false,
 			hasExtraInputData = true,
 			hasObjectTypes = false,
 			caps = new Dictionary<CapsType, Caps>() {

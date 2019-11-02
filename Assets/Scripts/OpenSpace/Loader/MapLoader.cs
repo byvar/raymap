@@ -102,8 +102,9 @@ namespace OpenSpace {
         protected DSB gameDsb = null;
         protected DSB lvlDsb = null;
         protected string menuTPLPath;
+		public Pointer[] off_lightmapUV;
 
-        public Globals globals = null;
+		public Globals globals = null;
         public Settings settings = null;
 
         public static class Mem {
@@ -545,7 +546,7 @@ MonoBehaviour.print(str);
             }
         }
 
-        protected IEnumerator ReadTexturesFix(Reader reader, Pointer off_textures) {
+		protected IEnumerator ReadTexturesFix(Reader reader, Pointer off_textures) {
             uint num_textureMemoryChannels = 0;
             if (Settings.s.engineVersion <= Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
             uint num_textures = reader.ReadUInt32();
