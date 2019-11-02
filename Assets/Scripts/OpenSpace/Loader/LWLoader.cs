@@ -284,7 +284,7 @@ namespace OpenSpace.Loader {
 
 			Pointer.Read(reader);
 			reader.ReadUInt32();
-			Pointer off_mainChar = Pointer.Read(reader);
+			globals.off_camera = Pointer.Read(reader);
 			reader.ReadUInt32();
 			reader.ReadByte();
 			reader.ReadByte();

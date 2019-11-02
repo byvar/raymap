@@ -410,7 +410,7 @@ public class Controller : MonoBehaviour {
 	public void InitCamera() {
 		if (loader != null) {
 			Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
-			if (camera == null && loader.globals != null) {
+			if (camera == null && loader.globals != null && loader.globals.off_camera != null) {
 				camera = loader.persos.FirstOrDefault(p => p != null && p.stdGame != null && p.stdGame.off_superobject == loader.globals.off_camera);
 			}
 			if (camera != null) {
