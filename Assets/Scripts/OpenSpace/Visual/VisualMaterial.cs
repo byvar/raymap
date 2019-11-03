@@ -233,8 +233,14 @@ namespace OpenSpace.Visual {
 				t.offset = Pointer.Current(reader);
 				t.off_texture = Pointer.Read(reader); // 0x4c
 				t.texture = TextureInfo.FromOffset(t.off_texture);
-				t.properties = reader.ReadInt32();
-				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				t.textureOp = reader.ReadByte();
+				t.shadingMode = reader.ReadByte();
+				t.uvFunction = reader.ReadByte();
+				t.scrollByte = reader.ReadByte();
+				t.scrollX = reader.ReadSingle();
+				t.scrollY = reader.ReadSingle();
+				reader.ReadSingle();
+
 				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());

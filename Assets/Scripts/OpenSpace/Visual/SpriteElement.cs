@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpenSpace.Loader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,9 +156,17 @@ namespace OpenSpace.Visual {
 						s.sprites[i] = new IndexedSprite();
 						uint type = reader.ReadUInt32();
 						s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-						s.sprites[i].off_material = Pointer.GetPointerAtOffset(Pointer.Current(reader));
-						if (s.sprites[i].off_material != null) {
-							s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
+						if (type == 0x20) {
+							// Light cookie sprite
+							uint index = reader.ReadUInt32();
+							R2PS2Loader ps2l = MapLoader.Loader as R2PS2Loader;
+							s.sprites[i].visualMaterial = ps2l.lightCookieMaterial.Clone();
+							s.sprites[i].visualMaterial.diffuseCoef = ps2l.lightCookieColors[index];
+						} else {
+							s.sprites[i].off_material = Pointer.Read(reader);
+							if (s.sprites[i].off_material != null) {
+								s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
+							}
 						}
 					}
 				});

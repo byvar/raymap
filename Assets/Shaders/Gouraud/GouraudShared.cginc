@@ -245,7 +245,8 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 			* _DiffuseCoef.xyz //* _DiffuseCoef.w
 			* max(0.0, dot(normalDirection, lightDirection));*/
 	} else {
-		diffuseReflection = float3(1.0, 1.0, 1.0);
+		//diffuseReflection = float3(1.0, 1.0, 1.0);
+		diffuseReflection = _DiffuseCoef.xyz;
 	}
 	if (/*_ShadingMode == 0.0 && */isAdd == 0.0 && isLight == 0.0) {
 		float4 lightCol = ApplyStaticLights(normalDirection, multipliedPosition);

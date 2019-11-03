@@ -340,9 +340,9 @@ namespace OpenSpace.Visual {
 										for (int j = 0; j < lm.width; j++) {
 											for (int k = 0; k < lm.height; k++) {
 												Color r = lm.GetPixel(j, k);
-												Color g = lm.GetPixel(j, k);
-												Color b = lm.GetPixel(j, k);
-												lm.SetPixel(j, k, new Color(r.r, g.g, b.b, 1f));
+												Color g = lm_g.GetPixel(j, k);
+												Color b = lm_b.GetPixel(j, k);
+												lm.SetPixel(j, k, new Color(r.a, g.a, b.a, 1f));
 											}
 										}
 										lm.Apply();

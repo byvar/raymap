@@ -570,7 +570,7 @@ namespace OpenSpace {
 			linkedListType = LinkedListType.Double,
 			aiTypes = AITypes.R3,
 			hasDeformations = true,
-			textureAnimationSpeedModifier = 10f,
+			textureAnimationSpeedModifier = 1f,
 			luminosity = 0.3f,
 			saturate = false
 		};
@@ -581,7 +581,7 @@ namespace OpenSpace {
 			endian = Endian.Little,
 			linkedListType = LinkedListType.Double,
 			aiTypes = AITypes.Largo,
-			textureAnimationSpeedModifier = -10f,
+			textureAnimationSpeedModifier = 1f,
 			luminosity = 0.5f,
 			saturate = false,
 			hasExtraInputData = true,

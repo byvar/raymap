@@ -23,7 +23,10 @@ namespace OpenSpace.Loader {
     public class R2PS2Loader : MapLoader {
 		public List<TextureDictionary> txds = new List<TextureDictionary>();
 		public MeshFile ato;
+		public Pointer[] off_materials;
 		public uint meshesRead = 0;
+		public VisualMaterial lightCookieMaterial;
+		public Color[] lightCookieColors;
 
         public override IEnumerator Load() {
             try {
@@ -263,7 +266,7 @@ namespace OpenSpace.Loader {
 
 			textures = new TextureInfo[numTextures];
 			Pointer[] off_meshes = new Pointer[numMeshes];
-			Pointer[] off_materials = new Pointer[numMaterials];
+			off_materials = new Pointer[numMaterials];
 			for (int i = 0; i < numMeshes; i++) {
 				off_meshes[i] = Pointer.Read(reader);
 			}
@@ -312,15 +315,28 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32(); // 8
 			reader.ReadUInt32(); // 9
 			reader.ReadUInt32(); // 10
-			uint num_unk3 = reader.ReadUInt32();
-			for (int i = 0; i < num_unk3; i++) {
-				reader.ReadBytes(0x20);
+			uint num_lightCookies = reader.ReadUInt32();
+			lightCookieColors = new Color[num_lightCookies];
+			for (int i = 0; i < num_lightCookies; i++) {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				byte b = reader.ReadByte();
+				byte g = reader.ReadByte();
+				byte r = reader.ReadByte();
+				reader.ReadByte();
+				lightCookieColors[i] = new Color(r / 255f, g / 255f, b / 255f, 1f);
+				reader.ReadUInt32();
+				reader.ReadInt32();
+				reader.ReadUInt32();
 			}
-			for (int i = 0; i < num_unk3; i++) {
+			for (int i = 0; i < num_lightCookies; i++) {
 				reader.ReadByte();
 			}
 			reader.Align(0x4);
-			Pointer off_lmMaterial = Pointer.Read(reader);
+			Pointer off_lightCookieMaterial = Pointer.Read(reader);
+			lightCookieMaterial = VisualMaterial.FromOffsetOrRead(off_lightCookieMaterial, reader);
 			off_lightmapUV = new Pointer[numLightmappedObjects];
 			for (int i = 0; i < numLightmappedObjects; i++) {
 				reader.ReadUInt32();
@@ -332,9 +348,7 @@ namespace OpenSpace.Loader {
 
 
 			for (int i = 0; i < numMaterials; i++) {
-				Pointer.DoAt(ref reader, off_materials[i], () => {
-					visualMaterials.Add(VisualMaterial.Read(reader, off_materials[i]));
-				});
+				VisualMaterial.FromOffsetOrRead(off_materials[i], reader);
 			}
 			for (int i = 0; i < numMeshes; i++) {
 				Pointer.DoAt(ref reader, off_meshes[i], () => {
