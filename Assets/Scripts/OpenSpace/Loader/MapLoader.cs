@@ -408,8 +408,8 @@ MonoBehaviour.print(str);
 					Settings.s.platform != Settings.Platform.PS1 &&
 					Settings.s.platform != Settings.Platform.PS2) {
 					List<string> cntPaths = new List<string>();
-					if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileTextures, Settings.CapsType.All));
-					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileVignettes, Settings.CapsType.All));
+					if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileTextures), Settings.CapsType.All));
+					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileVignettes), Settings.CapsType.All));
 					if (cntPaths.Count > 0) {
 						foreach (string path in cntPaths) {
 							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
@@ -944,6 +944,10 @@ MonoBehaviour.print(str);
 		// Read array in place
 		public T[] ReadArray<T>(decimal length, Reader reader, Action<T> onPreRead = null) where T : OpenSpaceStruct, new() {
 			return ReadArray<T>(length, reader, null, onPreRead: onPreRead, inline: true);
+		}
+
+		public string ConvertPath(string path) {
+			return path.Replace("\\","/");
 		}
 	}
 }
