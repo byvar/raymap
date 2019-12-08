@@ -32,7 +32,7 @@ namespace Assets.Scripts.Unity.AnimationExporting
 
                 if (channelBone != null)
                 {
-                    animationFrameModel.addNode(isChannelObj(obj) ? getChannelBone(obj).name : null, channelBone.name,
+                    animationFrameModel.addNode(isChannelObj(obj) ? obj.name : null, child.gameObject.name,
                     child.gameObject.transform.position.x,
                     child.gameObject.transform.position.y,
                     child.gameObject.transform.position.z,
