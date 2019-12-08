@@ -98,6 +98,8 @@ public class PersoBehaviourEditor : Editor {
         GUILayout.EndHorizontal();
 
         if (GUILayout.Button("Print Animation Debug Info")) pb.PrintAnimationDebugInfo();
+        if (GUILayout.Button("Next Frame Of Animation")) pb.NextFrameOfAnimation();
+        if (GUILayout.Button("Export Animations Data")) pb.ExportAnimationsData();
     }
 
 	IList<StateTransitionsTreeElement> GetData() {

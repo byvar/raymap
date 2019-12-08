@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts;
+using Assets.Scripts.Unity;
 using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Animation;
@@ -42,6 +43,7 @@ public class PersoBehaviour : MonoBehaviour {
     bool forceAnimUpdate = false;
     public uint currentFrame = 0;
     public bool playAnimation = true;
+    public bool playAnimationFramesAutomatically = true;
     public float animationSpeed = 15f;
     private float updateCounter = 0f;
     public PhysicalObject[][] subObjects { get; private set; } = null; // [channel][ntto]
@@ -68,7 +70,8 @@ public class PersoBehaviour : MonoBehaviour {
 
     // Brain clearance
     public bool clearTheBrain = false;
-	
+    private PersoAnimationsDataExporter persoAnimationsDataExporter;
+
 
     // Use this for initialization
     void Start() {
@@ -104,6 +107,7 @@ public class PersoBehaviour : MonoBehaviour {
                     SetState(0);
                 }
             }
+            persoAnimationsDataExporter = new Assets.Scripts.Unity.PersoAnimationsDataExporter(this);
         }
         isLoaded = true;
     }
@@ -342,9 +346,19 @@ public class PersoBehaviour : MonoBehaviour {
             }
         }
     }
-	#endregion
 
-	public void UpdateViewCollision(bool viewCollision) {
+    public void NextFrameOfAnimation()
+    {
+        currentFrame += 1;
+    }
+
+    public void ExportAnimationsData()
+    {
+        persoAnimationsDataExporter.InitExportProcess();
+    }
+    #endregion
+
+    public void UpdateViewCollision(bool viewCollision) {
 		if (perso.collset != null) {
 			CollSet c = perso.collset;
 			foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<GeometricObjectCollide>> entry in c.zdxList) {
@@ -493,7 +507,10 @@ public class PersoBehaviour : MonoBehaviour {
             if ((!insideSectors && updateCounter >= 2f) || (insideSectors && updateCounter >= 1f)) {
                 uint passedFrames = (uint)Mathf.FloorToInt(updateCounter);
                 updateCounter %= 1;
-                currentFrame += passedFrames;
+                if (playAnimationFramesAutomatically)
+                {
+                    currentFrame += passedFrames;
+                }                
                 if (a3d != null && currentFrame >= a3d.num_onlyFrames) {
                     if (autoNextState) {
                         AnimA3DGeneral prevAnim = a3d;
@@ -521,6 +538,10 @@ public class PersoBehaviour : MonoBehaviour {
                 } else {
                     UpdateAnimation();
                 }
+            }
+            if (persoAnimationsDataExporter.isAnimationsExportInProgress)
+            {
+                persoAnimationsDataExporter.UpdateExportProcess();
             }
         }
     }
@@ -849,22 +870,6 @@ public class PersoBehaviour : MonoBehaviour {
 			// First pass: reset TRS for all sub objects
 			for (int i = 0; i < channelParents.Length; i++) {
 				channelParents[i] = false;
-				/*GameObject c = channelObjects[i];
-                if (c != null) {
-                    c.transform.SetParent(perso.Gao.transform);
-                    c.transform.localPosition = Vector3.zero;
-                    c.transform.localEulerAngles = Vector3.zero;
-                    c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
-                }
-               for (int j = 0; j < subObjects[i].Length; j++) {
-                    if (subObjects[i][j] == null) continue;
-                    subObjects[i][j].Gao.transform.parent = c.transform;
-                    subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
-                    subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
-                    subObjects[i][j].Gao.transform.localScale =
-                        subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
-                    //subObjects[i][j].Gao.SetActive(false);
-                }*/
 			}
 			AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
 			// Create hierarchy for this frame
@@ -1006,6 +1011,7 @@ public class PersoBehaviour : MonoBehaviour {
 					}
 				}
 			}
+            /* */
 			if (hasBones) {
 				for (int i = 0; i < a3d.num_channels; i++) {
 					AnimChannel ch = a3d.channels[a3d.start_channels + i];
@@ -1034,38 +1040,26 @@ public class PersoBehaviour : MonoBehaviour {
 								DeformBone bone = bones.r3bones[d.bone + 1];
 								if (bone != null) {
 									Transform channelTransform = channelObjects[ind_linkChannel].transform;
-									bone.UnityBone.transform.SetParent(channelTransform);
-									bone.UnityBone.localPosition = Vector3.zero;
+                                    bone.UnityBone.transform.SetParent(channelTransform);
+
+                                    //bone.UnityBone.position = new Vector3(channelTransform.position.x, channelTransform.position.y, channelTransform.position.z);
+
+                                    bone.UnityBone.localPosition = Vector3.zero;
 									bone.UnityBone.localRotation = Quaternion.identity;
 									bone.UnityBone.localScale = Vector3.one;
-									/*bone.UnityBone.position = channelTransform.position;
-									bone.UnityBone.rotation = channelTransform.rotation;
-									//bone.UnityBone.localScale = Vector3.one;
-									bone.UnityBone.localScale = channelTransform.localScale;*/
 								}
 							}
 						}
 					}
 				}
 			}
+            /* */
 			//this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
 		} else if (isLoaded && animMontreal != null && channelObjects != null & subObjects != null) {
 			UpdateFrameMontreal();
 		} else if (isLoaded && animLargo != null && channelObjects != null && subObjects != null) {
 			UpdateFrameLargo();
-		}/*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
-            for (int i = 0; i < perso.physical_objects.Length; i++) {
-                if (perso.physical_objects[i] != null) {
-                    GameObject poGao = perso.physical_objects[i].Gao;
-                    if (poGao != null && !poGao.activeSelf) {
-                        poGao.transform.SetParent(perso.Gao.transform);
-                        poGao.transform.localPosition = Vector3.zero;
-                        poGao.transform.localEulerAngles = Vector3.zero;
-                        poGao.SetActive(true);
-                    }
-                }
-            }
-        }*/
+		}
     }
 
     void UpdateFrameMontreal() {
