@@ -13,7 +13,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
 
         public void writeAnimationModel(AnimationsModel animationsModel)
         {
-            throw new NotImplementedException();
+            string jsonString = JsonUtility.ToJson(animationsModel);
+            System.IO.File.WriteAllText(filePath, jsonString);
         }
     }
 }
