@@ -58,6 +58,19 @@ namespace Assets.Scripts.Unity
                     animationsModelConstructor.addAnimationFrameToAnimationClip("Animation " + currentStateIndex.ToString(), persoBehaviour);
                     persoBehaviour.currentFrame += 1;
                     previousAnimationFrame = persoBehaviour.currentFrame;
+
+                    if (persoBehaviour.currentFrame > 500)
+                    {
+                        if (currentStateIndex < statesCount)
+                        {
+                            currentStateIndex += 1;
+                            persoBehaviour.SetState(currentStateIndex);
+                            previousAnimationFrame = 0;
+                        } else
+                        {
+                            EndExportProcess();
+                        }                            
+                    }
                 }                
             } else
             {

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Unity.AnimationExporting
 {
+    [Serializable]
     public class AnimationsModel
     {
-        Dictionary<string, List<AnimationFrameModel>> animationClips = new Dictionary<string, List<AnimationFrameModel>>();
+        public Dictionary<string, List<AnimationFrameModel>> animationClips = new Dictionary<string, List<AnimationFrameModel>>();
 
         public void addAnimationFrameModelToAnimationClip(string animationClipName, AnimationFrameModel animationFrameModel)
         {

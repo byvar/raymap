@@ -7,9 +7,10 @@ using UnityEngine;
 
 namespace Assets.Scripts.Unity.AnimationExporting
 {
+    [Serializable]
     public class AnimationFrameModel
     {
-        List<AnimationFrameModelNode> nodes = new List<AnimationFrameModelNode>();
+        public List<AnimationFrameModelNode> nodes = new List<AnimationFrameModelNode>();
 
         private AnimationFrameModelNode constructNode(string boneName,
             float positionX, float positionY, float positionZ, float rotationX,

@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Unity.AnimationExporting
 {
+    [Serializable]
     public class AnimationFrameModelNode
     {
-        List<AnimationFrameModelNode> children = new List<AnimationFrameModelNode>();
+        public string boneName;
         public double positionX, positionY, positionZ;
         public double rotationX, rotationY, rotationZ;
         public double scaleX, scaleY, scaleZ;
-        public string boneName;
+        
+        public List<AnimationFrameModelNode> children = new List<AnimationFrameModelNode>();
 
         public AnimationFrameModelNode(string boneName, float positionX, float positionY, float positionZ, float rotationX, float rotationY, float rotationZ, float scaleX, float scaleY, float scaleZ)
         {

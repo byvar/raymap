@@ -30,7 +30,9 @@ namespace Assets.Scripts.Unity.AnimationExporting
 
                 GameObject channelBone = getChannelBone(child.gameObject);
 
-                animationFrameModel.addNode(isChannelObj(obj) ? getChannelBone(obj).name : null, channelBone.name,
+                if (channelBone != null)
+                {
+                    animationFrameModel.addNode(isChannelObj(obj) ? getChannelBone(obj).name : null, channelBone.name,
                     child.gameObject.transform.position.x,
                     child.gameObject.transform.position.y,
                     child.gameObject.transform.position.z,
@@ -40,7 +42,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
                     child.gameObject.transform.lossyScale.x,
                     child.gameObject.transform.lossyScale.y,
                     child.gameObject.transform.lossyScale.z);
-                traverseRecursivelyChildrenChannels(child.gameObject, animationFrameModel);
+                    traverseRecursivelyChildrenChannels(child.gameObject, animationFrameModel);
+                }                
             }
             return animationFrameModel;
         }
@@ -56,12 +59,12 @@ namespace Assets.Scripts.Unity.AnimationExporting
                 if (child.gameObject.name.StartsWith("Bone"))
                 {
                     return child.gameObject;
-                } else
+                } else if (!child.gameObject.name.Contains("Invisible PO"))
                 {
                     return getChannelBone(child.gameObject);
                 }
             }
-            throw new KeyNotFoundException("Bone for channel not found!");
+            return null;
         }
 
         public void addAnimationFrameToAnimationClip(string animationClipName, PersoBehaviour persoBehaviour)
