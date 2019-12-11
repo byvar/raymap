@@ -13,10 +13,13 @@ namespace Assets.Scripts.Unity.AnimationExporting
         public double positionX, positionY, positionZ;
         public double rotationX, rotationY, rotationZ;
         public double scaleX, scaleY, scaleZ;
+        public bool hasBone;
         
         public List<AnimationFrameModelNode> children = new List<AnimationFrameModelNode>();
 
-        public AnimationFrameModelNode(string boneName, float positionX, float positionY, float positionZ, float rotationX, float rotationY, float rotationZ, float scaleX, float scaleY, float scaleZ)
+        public AnimationFrameModelNode(string boneName, float positionX, float positionY,
+            float positionZ, float rotationX, float rotationY,
+            float rotationZ, float scaleX, float scaleY, float scaleZ, bool hasBone)
         {
             this.boneName = boneName;
             this.positionX = positionX;
@@ -28,6 +31,7 @@ namespace Assets.Scripts.Unity.AnimationExporting
             this.scaleX = scaleX;
             this.scaleY = scaleY;
             this.scaleZ = scaleZ;
+            this.hasBone = hasBone;
         }
 
         public bool addChild(string parentBoneName, AnimationFrameModelNode node)

@@ -15,10 +15,10 @@ namespace Assets.Scripts.Unity.AnimationExporting
         private AnimationFrameModelNode constructNode(string boneName,
             float positionX, float positionY, float positionZ, float rotationX,
             float rotationY, float rotationZ,
-            float scaleX, float scaleY, float scaleZ)
+            float scaleX, float scaleY, float scaleZ, bool hasBone)
         {
             return new AnimationFrameModelNode(boneName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ,
-                scaleX, scaleY, scaleZ);
+                scaleX, scaleY, scaleZ, hasBone);
         }
 
         private void addNode(string parentBoneName, AnimationFrameModelNode node)
@@ -37,11 +37,11 @@ namespace Assets.Scripts.Unity.AnimationExporting
         public void addNode(string parentBoneName, string boneName,
             float positionX, float positionY, float positionZ, float rotationX,
             float rotationY, float rotationZ,
-            float scaleX, float scaleY, float scaleZ)
+            float scaleX, float scaleY, float scaleZ, bool hasBone)
         {
             AnimationFrameModelNode node = constructNode(
                 boneName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ,
-                scaleX, scaleY, scaleZ);
+                scaleX, scaleY, scaleZ, hasBone);
 
             if (parentBoneName == null)
             {

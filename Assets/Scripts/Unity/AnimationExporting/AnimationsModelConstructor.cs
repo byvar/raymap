@@ -30,20 +30,18 @@ namespace Assets.Scripts.Unity.AnimationExporting
 
                 GameObject channelBone = getChannelBone(child.gameObject);
 
-                if (channelBone != null)
-                {
-                    animationFrameModel.addNode(isChannelObj(obj) ? obj.name : null, child.gameObject.name,
-                    child.gameObject.transform.position.x,
-                    child.gameObject.transform.position.y,
-                    child.gameObject.transform.position.z,
-                    child.gameObject.transform.rotation.x,
-                    child.gameObject.transform.rotation.y,
-                    child.gameObject.transform.rotation.z,
-                    child.gameObject.transform.lossyScale.x,
-                    child.gameObject.transform.lossyScale.y,
-                    child.gameObject.transform.lossyScale.z);
-                    traverseRecursivelyChildrenChannels(child.gameObject, animationFrameModel);
-                }                
+                animationFrameModel.addNode(isChannelObj(obj) ? obj.name : null, child.gameObject.name,
+                child.gameObject.transform.position.x,
+                child.gameObject.transform.position.y,
+                child.gameObject.transform.position.z,
+                child.gameObject.transform.rotation.x,
+                child.gameObject.transform.rotation.y,
+                child.gameObject.transform.rotation.z,
+                child.gameObject.transform.lossyScale.x,
+                child.gameObject.transform.lossyScale.y,
+                child.gameObject.transform.lossyScale.z, 
+                channelBone != null);
+                traverseRecursivelyChildrenChannels(child.gameObject, animationFrameModel);               
             }
             return animationFrameModel;
         }
