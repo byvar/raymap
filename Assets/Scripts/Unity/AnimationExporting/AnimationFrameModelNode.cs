@@ -11,26 +11,43 @@ namespace Assets.Scripts.Unity.AnimationExporting
     {
         public string boneName;
         public double positionX, positionY, positionZ;
+        public double localPositionX, localPositionY, localPositionZ;
         public double rotationX, rotationY, rotationZ;
+        public double localRotationX, localRotationY, localRotationZ;
         public double scaleX, scaleY, scaleZ;
+        public double localScaleX, localScaleY, localScaleZ;
         public bool hasBone;
         
         public List<AnimationFrameModelNode> children = new List<AnimationFrameModelNode>();
 
-        public AnimationFrameModelNode(string boneName, float positionX, float positionY,
-            float positionZ, float rotationX, float rotationY,
-            float rotationZ, float scaleX, float scaleY, float scaleZ, bool hasBone)
+        public AnimationFrameModelNode(string boneName,
+            float positionX, float positionY, float positionZ,
+            float localPositionX, float localPositionY, float localPositionZ,
+            float rotationX, float rotationY, float rotationZ,
+            float localRotationX, float localRotationY, float localRotationZ,
+            float scaleX, float scaleY, float scaleZ,
+            float localScaleX, float localScaleY, float localScaleZ,
+            bool hasBone)
         {
             this.boneName = boneName;
             this.positionX = positionX;
             this.positionY = positionY;
             this.positionZ = positionZ;
+            this.localPositionX = localPositionX;
+            this.localPositionY = localPositionY;
+            this.localPositionZ = localPositionZ;
             this.rotationX = rotationX;
             this.rotationY = rotationY;
             this.rotationZ = rotationZ;
+            this.localRotationX = localRotationX;
+            this.localRotationY = localRotationY;
+            this.localRotationZ = localRotationZ;
             this.scaleX = scaleX;
             this.scaleY = scaleY;
             this.scaleZ = scaleZ;
+            this.localScaleX = localScaleX;
+            this.localScaleY = localScaleY;
+            this.localScaleZ = localScaleZ;
             this.hasBone = hasBone;
         }
 

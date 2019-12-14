@@ -13,12 +13,22 @@ namespace Assets.Scripts.Unity.AnimationExporting
         public List<AnimationFrameModelNode> nodes = new List<AnimationFrameModelNode>();
 
         private AnimationFrameModelNode constructNode(string boneName,
-            float positionX, float positionY, float positionZ, float rotationX,
-            float rotationY, float rotationZ,
-            float scaleX, float scaleY, float scaleZ, bool hasBone)
+            float positionX, float positionY, float positionZ,
+            float localPositionX, float localPositionY, float localPositionZ,
+            float rotationX, float rotationY, float rotationZ,
+            float localRotationX, float localRotationY, float localRotationZ,
+            float scaleX, float scaleY, float scaleZ,
+            float localScaleX, float localScaleY, float localScaleZ,
+            bool hasBone)
         {
-            return new AnimationFrameModelNode(boneName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ,
-                scaleX, scaleY, scaleZ, hasBone);
+            return new AnimationFrameModelNode(boneName,
+                positionX, positionY, positionZ,
+                localPositionX, localPositionY, localPositionZ,
+                rotationX, rotationY, rotationZ,
+                localRotationX, localRotationY, localRotationZ,
+                scaleX, scaleY, scaleZ,
+                localScaleX, localScaleY, localScaleZ
+                hasBone);
         }
 
         private void addNode(string parentBoneName, AnimationFrameModelNode node)
@@ -35,13 +45,23 @@ namespace Assets.Scripts.Unity.AnimationExporting
         }
 
         public void addNode(string parentBoneName, string boneName,
-            float positionX, float positionY, float positionZ, float rotationX,
-            float rotationY, float rotationZ,
-            float scaleX, float scaleY, float scaleZ, bool hasBone)
+            float positionX, float positionY, float positionZ,
+            float localPositionX, float localPositionY, float localPositionZ,
+            float rotationX, float rotationY, float rotationZ,
+            float localRotationX, float localRotationY, float localRotationZ,
+            float scaleX, float scaleY, float scaleZ,
+            float localScaleX, float localScaleY, float localScaleZ,
+            bool hasBone)
         {
             AnimationFrameModelNode node = constructNode(
-                boneName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ,
-                scaleX, scaleY, scaleZ, hasBone);
+                boneName,
+                positionX, positionY, positionZ,
+                localPositionX, localPositionY, localPositionZ,
+                rotationX, rotationY, rotationZ,
+                localRotationX, localRotationY, localRotationZ,
+                scaleX, scaleY, scaleZ,
+                localScaleX, localScaleY, localScaleZ,
+                hasBone);
 
             if (parentBoneName == null)
             {

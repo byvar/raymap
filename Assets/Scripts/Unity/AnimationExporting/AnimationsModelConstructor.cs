@@ -34,12 +34,21 @@ namespace Assets.Scripts.Unity.AnimationExporting
                 child.gameObject.transform.position.x,
                 child.gameObject.transform.position.y,
                 child.gameObject.transform.position.z,
+                child.gameObject.transform.localPosition.x,
+                child.gameObject.transform.localPosition.y,
+                child.gameObject.transform.localPosition.z,
                 child.gameObject.transform.rotation.x,
                 child.gameObject.transform.rotation.y,
                 child.gameObject.transform.rotation.z,
+                child.gameObject.transform.localRotation.x,
+                child.gameObject.transform.localRotation.y,
+                child.gameObject.transform.localRotation.z,
                 child.gameObject.transform.lossyScale.x,
                 child.gameObject.transform.lossyScale.y,
                 child.gameObject.transform.lossyScale.z, 
+                child.gameObject.transform.localScale.x,
+                child.gameObject.transform.localScale.y,
+                child.gameObject.transform.localScale.z,
                 channelBone != null);
                 traverseRecursivelyChildrenChannels(child.gameObject, animationFrameModel);               
             }
