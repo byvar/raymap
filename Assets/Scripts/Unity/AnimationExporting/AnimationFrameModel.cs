@@ -27,7 +27,7 @@ namespace Assets.Scripts.Unity.AnimationExporting
                 rotationX, rotationY, rotationZ,
                 localRotationX, localRotationY, localRotationZ,
                 scaleX, scaleY, scaleZ,
-                localScaleX, localScaleY, localScaleZ
+                localScaleX, localScaleY, localScaleZ,
                 hasBone);
         }
 
