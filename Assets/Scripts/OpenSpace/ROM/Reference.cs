@@ -96,6 +96,12 @@ namespace OpenSpace.ROM {
 				case FATEntry.Type.GameMaterial:
 					Value = l.GetOrRead<GameMaterial>(reader, index);
 					break;
+				case FATEntry.Type.PhysicalObject:
+					Value = l.GetOrRead<PhysicalObject>(reader, index);
+					break;
+				case FATEntry.Type.Sector:
+					Value = l.GetOrRead<Sector>(reader, index);
+					break;
 				default:
 					l.print("GenericReference: Unsupported struct with type " + entryType);
 					break;

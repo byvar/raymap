@@ -39,9 +39,13 @@ namespace OpenSpace.ROM {
 			{ 37, Type.MechanicsMaterial },
 			{ 38, Type.CollSet },
 			{ 39, Type.PhysicalObject },
+			{ 40, Type.Sector },
+			{ 41, Type.SuperObject },
 			{ 42, Type.GeometricElementTrianglesCollideData },
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
+			{ 45, Type.HierarchyRoot },
+			{ 49, Type.SuperObjectArray },
 			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 14
 			{ 75, Type.ObjectsTableData },
@@ -74,9 +78,13 @@ namespace OpenSpace.ROM {
 			{ 37, Type.MechanicsMaterial },
 			{ 38, Type.CollSet },
 			{ 39, Type.PhysicalObject },
+			{ 40, Type.Sector },
+			{ 41, Type.SuperObject },
 			{ 42, Type.GeometricElementTrianglesCollideData },
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
+			{ 45, Type.HierarchyRoot },
+			{ 49, Type.SuperObjectArray },
 			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 12
 			{ 75, Type.ObjectsTableData },
@@ -108,9 +116,13 @@ namespace OpenSpace.ROM {
 			{ 33, Type.MechanicsMaterial },
 			{ 34, Type.CollSet },
 			{ 35, Type.PhysicalObject },
+			{ 36, Type.Sector },
+			{ 37, Type.SuperObject },
 			{ 38, Type.GeometricElementTrianglesCollideData },
 			{ 39, Type.LevelList },
 			{ 40, Type.LevelHeader },
+			{ 41, Type.HierarchyRoot },
+			{ 45, Type.SuperObjectArray },
 			{ 46, Type.CompressedVector3Array },
 			{ 59, Type.TextureInfo }, // size: 0x100D2. contains the actual texture data too!
 			{ 71, Type.ObjectsTableData },
@@ -168,6 +180,10 @@ namespace OpenSpace.ROM {
 			GameMaterial,
 			CollideMaterial,
 			MechanicsMaterial,
+			SuperObject,
+			Sector,
+			SuperObjectArray,
+			HierarchyRoot
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -201,6 +217,11 @@ namespace OpenSpace.ROM {
 			{ typeof(CollideMaterial), Type.CollideMaterial },
 			{ typeof(MechanicsMaterial), Type.MechanicsMaterial },
 			{ typeof(LevelList), Type.LevelList },
+			{ typeof(SuperObject), Type.SuperObject },
+			{ typeof(Sector), Type.Sector },
+			{ typeof(SuperObjectArray), Type.SuperObjectArray },
+			{ typeof(LevelHeader), Type.LevelHeader },
+			{ typeof(HierarchyRoot), Type.HierarchyRoot },
 		};
 
 		public Type EntryType {

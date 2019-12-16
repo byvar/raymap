@@ -261,6 +261,15 @@ namespace OpenSpace.Loader {
 				yield break;
 			}
 
+			// Load current level data
+			LevelHeader lh = GetOrRead<LevelHeader>(reader, (ushort)currentLevel);
+			if (lh != null) {
+				if (lh.hierarchyRoot.Value != null) {
+					lh.hierarchyRoot.Value.GetGameObject();
+				}
+			}
+			yield break;
+
 			for (ushort i = 0; i < short.MaxValue; i++) {
 				// Only do it a few times because we're trying to load way more than there is,
 				// so it takes really long if we yield for everything
@@ -274,11 +283,21 @@ namespace OpenSpace.Loader {
 					GameObject gao = ot.GetGameObject();
 					gao.name = "[" + i + "]" + gao.name;
 				}*/
-				PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
+				/*PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
 				if (po != null) {
 					GameObject gao = po.GetGameObject();
 					gao.name = "[" + i + "]" + gao.name;
+				}*/
+				/*SuperObject so = GetOrRead<SuperObject>(reader, i);
+				if (so != null) {
+					GameObject gao = so.GetGameObject();
+					gao.name = "[" + i + "]" + gao.name;
 				}
+				*/
+				/*LevelHeader lh = GetOrRead<LevelHeader>(reader, i);
+				if (lh != null) {
+					print(i);
+				}*/
 			}
 
 			yield return null;
