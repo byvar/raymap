@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,12 @@ namespace OpenSpace.ROM {
 			Pointer.DoAt(ref reader, Offset, () => {
 				ReadInternal(reader);
 			});
+		}
+
+		public R2ROMLoader Loader {
+			get {
+				return MapLoader.Loader as R2ROMLoader;
+			}
 		}
 	}
 }

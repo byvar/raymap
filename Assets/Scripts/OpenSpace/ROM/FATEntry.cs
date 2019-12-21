@@ -50,6 +50,8 @@ namespace OpenSpace.ROM {
 			{ 63, Type.TextureInfo }, // size: 14
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
+			{ 127, Type.Vector3Array },
+			{ 128, Type.Short3Array },
 			{ 132, Type.NumLanguages },
 			{ 133, Type.StringRef },
 			{ 134, Type.LanguageTable },
@@ -89,6 +91,8 @@ namespace OpenSpace.ROM {
 			{ 63, Type.TextureInfo }, // size: 12
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
+			{ 127, Type.Vector3Array },
+			{ 128, Type.Short3Array },
 			{ 132, Type.NumLanguages },
 			{ 133, Type.StringRef },
 			{ 134, Type.LanguageTable },
@@ -141,6 +145,10 @@ namespace OpenSpace.ROM {
 			{ 152, Type.VisualMaterialTextures },
 			{ 153, Type.String },
 		};
+
+		public enum Flag {
+			Fix = 0x8000
+		}
 
 		public enum Type {
 			Unknown,

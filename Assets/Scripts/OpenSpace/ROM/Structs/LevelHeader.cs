@@ -29,10 +29,10 @@ namespace OpenSpace.ROM {
 		public ushort unk23;
 		public ushort unk24;
 		public ushort unk25;
-		public ushort unk26;
-		public ushort unk27;
-		public ushort unk28;
-		public ushort unk29;
+		public Reference<Vector3Array> vectors;
+		public Reference<Short3Array> indices;
+		public ushort len_vectors;
+		public ushort len_indices;
 		public ushort unk30;
 
 		protected override void ReadInternal(Reader reader) {
@@ -66,12 +66,14 @@ namespace OpenSpace.ROM {
 			unk23 = reader.ReadUInt16();
 			unk24 = reader.ReadUInt16();
 			unk25 = reader.ReadUInt16();
-			unk26 = reader.ReadUInt16();
-			unk27 = reader.ReadUInt16();
-			unk28 = reader.ReadUInt16();
-			unk29 = reader.ReadUInt16();
+			vectors = new Reference<Vector3Array>(reader);
+			indices = new Reference<Short3Array>(reader);
+			len_vectors = reader.ReadUInt16();
+			len_indices = reader.ReadUInt16();
 			unk30 = reader.ReadUInt16(); // 1 is divided by this one
 
+			vectors.Resolve(reader, v => { v.length = len_vectors; });
+			indices.Resolve(reader, i => { i.length = len_indices; });
 			hierarchyRoot.Resolve(reader);
 		}
     }

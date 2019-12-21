@@ -28,6 +28,7 @@ namespace OpenSpace.ROM {
 				GameObject fs = fatherSector.Value.GetGameObject();
 				fs.name = "[Father Sector] " + fs.name;
 				fs.transform.SetParent(gao.transform);
+				fatherSector.Value.SetTransform(fs);
 			}
 			return gao;
 		}

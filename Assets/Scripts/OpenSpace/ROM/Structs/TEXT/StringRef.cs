@@ -8,7 +8,7 @@ namespace OpenSpace.ROM {
         protected override void ReadInternal(Reader reader) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
 			sz_str = reader.ReadUInt16();
-			str = new Reference<String>(reader, true, (s) => { s.length = sz_str; });
+			str = new Reference<String>(reader, resolve: true, onPreRead: (s) => { s.length = sz_str; });
         }
     }
 }
