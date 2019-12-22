@@ -5,21 +5,23 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class HierarchyRoot : ROMStruct {
 		// Size: 12
-		public ushort ref_48;
+		public Reference<SuperObjectDynamicArray> persos;
 		public Reference<SuperObject> fatherSector;
-		public ushort ref_46;
-		public ushort len_48;
-		public ushort len_46;
+		public Reference<ShortArray> matrixIndices;
+		public ushort len_persos;
+		public ushort len_matrixIndices;
 		public ushort unk;
 
 		protected override void ReadInternal(Reader reader) {
-			ref_48 = reader.ReadUInt16();
+			persos = new Reference<SuperObjectDynamicArray>(reader);
 			fatherSector = new Reference<SuperObject>(reader, true);
-			ref_46 = reader.ReadUInt16();
-			len_48 = reader.ReadUInt16();
-			len_46 = reader.ReadUInt16();
+			matrixIndices = new Reference<ShortArray>(reader);
+			len_persos = reader.ReadUInt16();
+			len_matrixIndices = reader.ReadUInt16();
 			unk = reader.ReadUInt16();
 
+			matrixIndices.Resolve(reader, r => r.length = len_matrixIndices);
+			persos.Resolve(reader, p => p.length = len_persos);
 		}
 
 		public GameObject GetGameObject() {
@@ -29,6 +31,15 @@ namespace OpenSpace.ROM {
 				fs.name = "[Father Sector] " + fs.name;
 				fs.transform.SetParent(gao.transform);
 				fatherSector.Value.SetTransform(fs);
+			}
+			if (persos.Value != null) {
+				GameObject dynGao = new GameObject("Dynamic World @ " + persos.Value.Offset);
+				dynGao.transform.SetParent(gao.transform);
+				foreach (SuperObjectDynamic sod in persos.Value.superObjects) {
+					GameObject sodGao = sod.GetGameObject();
+					sodGao.transform.SetParent(dynGao.transform);
+					sod.SetTransform(sodGao);
+				}
 			}
 			return gao;
 		}

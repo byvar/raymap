@@ -3,39 +3,29 @@ using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.ROM {
-	public class SuperObject : ROMStruct {
-		// Size: 20
-		public ushort matrixIndex; // 0, references global indices. check load_so_matrices.
-		public ushort dataIndex; // 2
-		public Reference<SuperObjectArray> children; // 4
-		public Reference<CompressedVector3Array> comprVec3Array; // 6. Size: 12, so 2 vector3s
-		public ushort type; // 8
-		public ushort num_children; // 10
-		public ushort unk; // 12
-		public ushort unk2;
-		public uint flags; // 16
-
-		public GenericReference data;
-		public Transform transform;
+	public class SuperObjectDynamic : ROMStruct {
+		// Size: 12
+		public Reference<Perso> perso;
+		public ushort matrixIndex;
+		public ushort flags;
+		public ushort unkByte; // read as byte?
+		public uint unk;
+		public SuperObject.Transform transform;
 
 		protected override void ReadInternal(Reader reader) {
+			//Loader.print(Pointer.Current(reader));
+			perso = new Reference<Perso>(reader);
 			matrixIndex = reader.ReadUInt16();
-			dataIndex = reader.ReadUInt16();
-			children = new Reference<SuperObjectArray>(reader, false);
-			comprVec3Array = new Reference<CompressedVector3Array>(reader, true, v => v.length = 2);
-			type = reader.ReadUInt16();
-			num_children = reader.ReadUInt16();
-			unk = reader.ReadUInt16();
-			unk2 = reader.ReadUInt16();
-			flags = reader.ReadUInt32();
+			flags = reader.ReadUInt16();
+			unkByte = reader.ReadUInt16();
+			unk = reader.ReadUInt32();
 
 			ResolveMatrices(reader);
-			children.Resolve(reader, soa => soa.length = num_children);
-			data = new GenericReference(type, dataIndex, reader, true);
+			perso.Resolve(reader);
 		}
 
 		protected void ResolveMatrices(Reader reader) {
-			transform = new Transform();
+			transform = new SuperObject.Transform();
 			if (matrixIndex == 0xFFFF) return;
 			LevelHeader lh = Loader.Get<LevelHeader>((ushort)(Loader.CurrentLevel | (ushort)FATEntry.Flag.Fix));
 			if (lh != null) {
@@ -51,7 +41,7 @@ namespace OpenSpace.ROM {
 			}
 		}
 
-		protected ROMMatrix ResolveMatrix(Reader reader, ushort index, Short3Array indices, Vector3Array vectors) {
+		protected SuperObject.ROMMatrix ResolveMatrix(Reader reader, ushort index, Short3Array indices, Vector3Array vectors) {
 			if (index == 0xFFFF || indices == null || vectors == null) return null;
 			Short3Array.Triangle tri = indices.triangles[index];
 			Vector3[] matrixVecs = new Vector3[3];
@@ -65,10 +55,10 @@ namespace OpenSpace.ROM {
 		}
 
 		public GameObject GetGameObject() {
-			GameObject gao = new GameObject("SO @ " + Offset + " - " + type);
-			if (data.Value != null && data.Value is PhysicalObject) {
+			GameObject gao = new GameObject("SOD @ " + Offset);
+			/*if (data.Value != null && data.Value is PhysicalObject) {
 				GameObject po = ((PhysicalObject)data.Value).GetGameObject();
-				if(po !=  null) po.transform.SetParent(gao.transform);
+				if (po != null) po.transform.SetParent(gao.transform);
 			}
 			if (children.Value != null) {
 				foreach (Reference<SuperObject> so in children.Value.superObjects) {
@@ -80,7 +70,7 @@ namespace OpenSpace.ROM {
 						}
 					}
 				}
-			}
+			}*/
 			return gao;
 		}
 		public void SetTransform(GameObject gao) {
@@ -88,29 +78,6 @@ namespace OpenSpace.ROM {
 			gao.transform.localPosition = mat.GetPosition();
 			//gao.transform.localRotation = mat.GetRotation();
 			//gao.transform.localScale = mat.GetScale();
-		}
-
-		public class ROMMatrix {
-			public ushort v1;
-			public ushort v2;
-			public ushort v3;
-		}
-		public class Transform {
-			public ROMMatrix matrix1;
-			public ROMMatrix matrix2;
-			public Vector3? position;
-
-			public Matrix Matrix {
-				get {
-					Matrix4x4 mat;
-					if (position.HasValue) {
-						mat = Matrix4x4.Translate(position.Value);
-					} else {
-						mat = Matrix4x4.identity;
-					}
-					return new Matrix(null, 0, mat, Vector4.one);
-				}
-			}
 		}
 	}
 }

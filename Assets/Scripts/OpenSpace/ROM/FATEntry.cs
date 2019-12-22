@@ -27,6 +27,7 @@ namespace OpenSpace.ROM {
 
 		public static Dictionary<ushort, Type> TypesDS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
+			{ 1, Type.Perso },
 			{ 6, Type.ObjectsTable },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 22, Type.VertexArray },
@@ -45,6 +46,9 @@ namespace OpenSpace.ROM {
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
 			{ 45, Type.HierarchyRoot },
+			{ 46, Type.ShortArray },
+			{ 47, Type.SuperObjectDynamic },
+			{ 48, Type.SuperObjectDynamicArray },
 			{ 49, Type.SuperObjectArray },
 			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 14
@@ -67,6 +71,7 @@ namespace OpenSpace.ROM {
 
 		public static Dictionary<ushort, Type> TypesN64 = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
+			{ 1, Type.Perso },
 			{ 6, Type.ObjectsTable },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 21, Type.Palette },
@@ -86,6 +91,9 @@ namespace OpenSpace.ROM {
 			{ 43, Type.LevelList },
 			{ 44, Type.LevelHeader },
 			{ 45, Type.HierarchyRoot },
+			{ 46, Type.ShortArray },
+			{ 47, Type.SuperObjectDynamic },
+			{ 48, Type.SuperObjectDynamicArray },
 			{ 49, Type.SuperObjectArray },
 			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 12
@@ -108,6 +116,7 @@ namespace OpenSpace.ROM {
 
 		public static Dictionary<ushort, Type> Types3DS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
+			{ 1, Type.Perso },
 			{ 6, Type.ObjectsTable },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 18, Type.VertexArray },
@@ -126,6 +135,9 @@ namespace OpenSpace.ROM {
 			{ 39, Type.LevelList },
 			{ 40, Type.LevelHeader },
 			{ 41, Type.HierarchyRoot },
+			{ 42, Type.ShortArray },
+			{ 43, Type.SuperObjectDynamic },
+			{ 44, Type.SuperObjectDynamicArray },
 			{ 45, Type.SuperObjectArray },
 			{ 46, Type.CompressedVector3Array },
 			{ 59, Type.TextureInfo }, // size: 0x100D2. contains the actual texture data too!
@@ -191,7 +203,11 @@ namespace OpenSpace.ROM {
 			SuperObject,
 			Sector,
 			SuperObjectArray,
-			HierarchyRoot
+			HierarchyRoot,
+			ShortArray,
+			SuperObjectDynamic,
+			SuperObjectDynamicArray,
+			Perso,
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -230,6 +246,10 @@ namespace OpenSpace.ROM {
 			{ typeof(SuperObjectArray), Type.SuperObjectArray },
 			{ typeof(LevelHeader), Type.LevelHeader },
 			{ typeof(HierarchyRoot), Type.HierarchyRoot },
+			{ typeof(ShortArray), Type.ShortArray },
+			{ typeof(SuperObjectDynamic), Type.SuperObjectDynamic },
+			{ typeof(SuperObjectDynamicArray), Type.SuperObjectDynamicArray },
+			{ typeof(Perso), Type.Perso },
 		};
 
 		public Type EntryType {
