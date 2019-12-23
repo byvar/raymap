@@ -2,6 +2,7 @@
 
 namespace OpenSpace.ROM {
 	// Size: 3DS: 60
+	// Size: RRR: 60
 	// Size:  DS: 56
 	public class LevelHeader : ROMStruct {
 		public Reference<HierarchyRoot> hierarchyRoot; // 45 has size 12
@@ -43,12 +44,12 @@ namespace OpenSpace.ROM {
 			ref_144 = reader.ReadUInt16();
 			ref_143 = reader.ReadUInt16();
 			unk6 = reader.ReadUInt16();
-			if (Settings.s.platform == Settings.Platform._3DS) {
+			if (Settings.s.platform == Settings.Platform._3DS || Settings.s.game == Settings.Game.RRR) {
 				unk7_3dsOnly = reader.ReadUInt16();
 			}
 			length_46 = reader.ReadUInt16();
 			unk9 = reader.ReadUInt16();
-			if (Settings.s.platform == Settings.Platform._3DS) {
+			if (Settings.s.platform == Settings.Platform._3DS || Settings.s.game == Settings.Game.RRR) {
 				unk10_3dsOnly = reader.ReadUInt16();
 			}
 			unk11 = reader.ReadUInt16();

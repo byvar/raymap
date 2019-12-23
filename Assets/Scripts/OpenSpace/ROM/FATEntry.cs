@@ -28,7 +28,11 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> TypesDS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
+			{ 4, Type.Family },
+			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
+			{ 8, Type.AnimationReference },
+			{ 9, Type.Perso3dData },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 22, Type.VertexArray },
 			{ 23, Type.GeometricElementTrianglesData },
@@ -52,8 +56,12 @@ namespace OpenSpace.ROM {
 			{ 49, Type.SuperObjectArray },
 			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 14
+			{ 65, Type.StateTransitionArray },
+			{ 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
+			{ 107, Type.StateArrayRef },
+			{ 108, Type.StateArray },
 			{ 127, Type.Vector3Array },
 			{ 128, Type.Short3Array },
 			{ 132, Type.NumLanguages },
@@ -72,7 +80,11 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> TypesN64 = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
+			{ 4, Type.Family },
+			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
+			{ 8, Type.AnimationReference },
+			{ 9, Type.Perso3dData },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 21, Type.Palette },
 			{ 22, Type.VertexArray },
@@ -97,8 +109,12 @@ namespace OpenSpace.ROM {
 			{ 49, Type.SuperObjectArray },
 			{ 50, Type.CompressedVector3Array },
 			{ 63, Type.TextureInfo }, // size: 12
+			{ 65, Type.StateTransitionArray },
+			{ 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
+			{ 107, Type.StateArrayRef },
+			{ 108, Type.StateArray },
 			{ 127, Type.Vector3Array },
 			{ 128, Type.Short3Array },
 			{ 132, Type.NumLanguages },
@@ -117,7 +133,11 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> Types3DS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
+			{ 4, Type.Family },
+			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
+			{ 8, Type.AnimationReference },
+			{ 9, Type.Perso3dData },
 			{ 17, Type.TextureInfoRef }, // size: 0x2
 			{ 18, Type.VertexArray },
 			{ 19, Type.GeometricElementTrianglesData },
@@ -141,8 +161,12 @@ namespace OpenSpace.ROM {
 			{ 45, Type.SuperObjectArray },
 			{ 46, Type.CompressedVector3Array },
 			{ 59, Type.TextureInfo }, // size: 0x100D2. contains the actual texture data too!
+			{ 61, Type.StateTransitionArray },
+			{ 67, Type.StdGame },
 			{ 71, Type.ObjectsTableData },
 			{ 87, Type.NoCtrlTextureList },
+			{ 103, Type.StateArrayRef },
+			{ 104, Type.StateArray },
 			{ 123, Type.Vector3Array },
 			{ 124, Type.Short3Array },
 			{ 128, Type.NumLanguages },
@@ -208,6 +232,13 @@ namespace OpenSpace.ROM {
 			SuperObjectDynamic,
 			SuperObjectDynamicArray,
 			Perso,
+			Perso3dData,
+			State,
+			AnimationReference,
+			StdGame,
+			StateArrayRef,
+			StateArray,
+			StateTransitionArray,
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -250,6 +281,14 @@ namespace OpenSpace.ROM {
 			{ typeof(SuperObjectDynamic), Type.SuperObjectDynamic },
 			{ typeof(SuperObjectDynamicArray), Type.SuperObjectDynamicArray },
 			{ typeof(Perso), Type.Perso },
+			{ typeof(Perso3dData), Type.Perso3dData },
+			{ typeof(Family), Type.Family },
+			{ typeof(State), Type.State },
+			{ typeof(AnimationReference), Type.AnimationReference },
+			{ typeof(StdGame), Type.StdGame },
+			{ typeof(StateArrayRef), Type.StateArrayRef },
+			{ typeof(StateArray), Type.StateArray },
+			{ typeof(StateTransitionArray), Type.StateTransitionArray },
 		};
 
 		public Type EntryType {

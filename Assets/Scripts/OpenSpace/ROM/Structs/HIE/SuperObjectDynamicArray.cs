@@ -14,7 +14,7 @@ namespace OpenSpace.ROM {
 			superObjects = new Reference<SuperObjectDynamic>[length];
 			for (int i = 0; i < superObjects.Length; i++) {
 				superObjects[i] = new Reference<SuperObjectDynamic>(reader, true);
-				MapLoader.Loader.print(superObjects[i].index + " - " + superObjects[i].Value);
+				//MapLoader.Loader.print(superObjects[i].index + " - " + superObjects[i].Value);
 			}
 		}
 	}

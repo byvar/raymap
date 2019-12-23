@@ -36,7 +36,7 @@ namespace OpenSpace.ROM {
 				transform.matrix2 = ResolveMatrix(reader, tri.v2, indices, vectors);
 				if (tri.v3 != 0xFFFF) {
 					transform.position = vectors.vectors[tri.v3];
-					MapLoader.Loader.print(transform.position);
+					//MapLoader.Loader.print(transform.position);
 				}
 			}
 		}
@@ -44,18 +44,19 @@ namespace OpenSpace.ROM {
 		protected SuperObject.ROMMatrix ResolveMatrix(Reader reader, ushort index, Short3Array indices, Vector3Array vectors) {
 			if (index == 0xFFFF || indices == null || vectors == null) return null;
 			Short3Array.Triangle tri = indices.triangles[index];
-			Vector3[] matrixVecs = new Vector3[3];
-			matrixVecs[0] = vectors.vectors[tri.v1];
-			matrixVecs[1] = vectors.vectors[tri.v2];
-			matrixVecs[2] = vectors.vectors[tri.v3];
-			for (int i = 0; i < 3; i++) {
-				//MapLoader.Loader.print(matrixVecs[i]);
-			}
-			return null;
+			return new SuperObject.ROMMatrix() {
+				v1 = vectors.vectors[tri.v1],
+				v2 = vectors.vectors[tri.v2],
+				v3 = vectors.vectors[tri.v3]
+			};
 		}
 
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject("SOD @ " + Offset);
+			if (perso.Value != null) {
+				GameObject persoGao = perso.Value.GetGameObject();
+				persoGao.transform.SetParent(gao.transform);
+			}
 			/*if (data.Value != null && data.Value is PhysicalObject) {
 				GameObject po = ((PhysicalObject)data.Value).GetGameObject();
 				if (po != null) po.transform.SetParent(gao.transform);
@@ -74,10 +75,7 @@ namespace OpenSpace.ROM {
 			return gao;
 		}
 		public void SetTransform(GameObject gao) {
-			Matrix mat = transform.Matrix;
-			gao.transform.localPosition = mat.GetPosition();
-			//gao.transform.localRotation = mat.GetRotation();
-			//gao.transform.localScale = mat.GetScale();
+			transform.Apply(gao);
 		}
 	}
 }

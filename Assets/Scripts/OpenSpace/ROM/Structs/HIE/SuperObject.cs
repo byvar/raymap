@@ -59,7 +59,7 @@ namespace OpenSpace.ROM {
 			matrixVecs[1] = vectors.vectors[tri.v2];
 			matrixVecs[2] = vectors.vectors[tri.v3];
 			for (int i = 0; i < 3; i++) {
-				//MapLoader.Loader.print(matrixVecs[i]);
+				MapLoader.Loader.print(matrixVecs[i]);
 			}
 			return null;
 		}
@@ -84,16 +84,13 @@ namespace OpenSpace.ROM {
 			return gao;
 		}
 		public void SetTransform(GameObject gao) {
-			Matrix mat = transform.Matrix;
-			gao.transform.localPosition = mat.GetPosition();
-			//gao.transform.localRotation = mat.GetRotation();
-			//gao.transform.localScale = mat.GetScale();
+			transform.Apply(gao);
 		}
 
 		public class ROMMatrix {
-			public ushort v1;
-			public ushort v2;
-			public ushort v3;
+			public Vector3? v1;
+			public Vector3? v2;
+			public Vector3? v3;
 		}
 		public class Transform {
 			public ROMMatrix matrix1;
@@ -110,6 +107,12 @@ namespace OpenSpace.ROM {
 					}
 					return new Matrix(null, 0, mat, Vector4.one);
 				}
+			}
+			public void Apply(GameObject gao) {
+				Matrix mat = Matrix;
+				gao.transform.localPosition = mat.GetPosition(convertAxes: true);
+				gao.transform.localRotation = mat.GetRotation(convertAxes: true);
+				gao.transform.localScale = mat.GetScale(convertAxes: true);
 			}
 		}
 	}
