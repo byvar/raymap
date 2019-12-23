@@ -16,6 +16,9 @@ namespace OpenSpace {
 			if (member.MemberType == MemberTypes.Property || typeof(Pointer).IsAssignableFrom(member.DeclaringType)) {
 				property.Ignored = true;
 			}
+            if (member.GetCustomAttribute<JsonRequiredAttribute>() != null) {
+                property.Ignored = false;
+            }
 			return property;
 		}
 	}

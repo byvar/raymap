@@ -228,25 +228,17 @@ namespace OpenSpace.AI {
             Pointer.Goto(ref reader, byteAddress);
             byte arraySize = reader.ReadByte();
 
-            //this.
-
-            /*Pointer.Goto(ref reader, this.off_dsgMemBuffer + 4);
-            Pointer bufferStartAddress = Pointer.Read(reader);
-
-            Pointer.Goto(ref reader, bufferStartAddress + infoEntry.offsetInBuffer);
-            uint offset = reader.ReadUInt32();
-            Pointer.Goto(ref reader, this.off_dsgMemBuffer + 4 + offset);
-            uint arraySize = reader.ReadByte();
-            */
             object[] resultList = new object[arraySize];
+            entry.arrayEntryOffsets = new List<Pointer>(arraySize);
 
             DsgVarInfoEntry.DsgVarType itemType = DsgVarInfoEntry.GetDsgVarTypeFromArrayType(entry.type);
 
             for (uint i = 0; i < arraySize; i++) {
-                if (itemType==DsgVarInfoEntry.DsgVarType.Vector)
+                if (itemType == DsgVarInfoEntry.DsgVarType.Vector) {
                     resultList[i] = ReadValueFromBuffer(reader, itemType, entry.offsetInBuffer + 8 + i * 12, i, buffer);
-                else
+                } else {
                     resultList[i] = ReadValueFromBuffer(reader, itemType, entry.offsetInBuffer + 8 + i * 4, i, buffer);
+                }
             }
 
             return resultList;

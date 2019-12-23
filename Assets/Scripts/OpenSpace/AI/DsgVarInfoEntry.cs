@@ -18,6 +18,7 @@ namespace OpenSpace.AI {
         public DsgVarType type;
         public object value;
         public object initialValue;
+        public List<Pointer> arrayEntryOffsets; // For array variables, save the entry offsets in this list
 
         public string NiceVariableName {
             get {

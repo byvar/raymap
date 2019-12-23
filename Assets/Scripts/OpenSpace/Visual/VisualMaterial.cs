@@ -126,6 +126,7 @@ namespace OpenSpace.Visual {
             return JsonConvert.SerializeObject(this, settings);
         }
 
+        [JsonRequired]
         public bool IsTransparent {
             get {
                 bool transparent = false;
@@ -143,6 +144,7 @@ namespace OpenSpace.Visual {
             }
         }
 
+        [JsonRequired]
         public bool IsLight {
             get {
                 //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
