@@ -32,16 +32,16 @@ namespace OpenSpace.Loader {
 
                 // FIX
                 string fixDATPath = gameDataBinFolder + "FIX.DAT";
-                tplPaths[0] = gameDataBinFolder + "FIX.TEX";
+                texPaths[0] = gameDataBinFolder + "FIX.TEX";
                 yield return controller.StartCoroutine(PrepareFile(fixDATPath));
-                yield return controller.StartCoroutine(PrepareFile(tplPaths[0]));
+                yield return controller.StartCoroutine(PrepareFile(texPaths[0]));
                 DCDAT fixDAT = new DCDAT("fix", fixDATPath, 0);
 
                 // LEVEL
                 string lvlDATPath = gameDataBinFolder + lvlName + "/" + lvlName + ".DAT";
-                tplPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".TEX";
+                texPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".TEX";
                 yield return controller.StartCoroutine(PrepareFile(lvlDATPath));
-                yield return controller.StartCoroutine(PrepareFile(tplPaths[1]));
+                yield return controller.StartCoroutine(PrepareFile(texPaths[1]));
                 DCDAT lvlDAT = new DCDAT(lvlName, lvlDATPath, 1);
 
                 files_array[0] = fixDAT;
@@ -201,7 +201,7 @@ namespace OpenSpace.Loader {
                         textures[i] = TextureInfo.Read(reader, off_texture);
                     });
                 }
-                TEX tex = new TEX(tplPaths[0]);
+                TEX tex = new TEX(texPaths[0]);
                 for (uint i = 0; i < num_textures_fix; i++) {
                     if (textures[i] != null && tex.Count > i) {
                         textures[i].Texture = tex.textures[i];
@@ -318,7 +318,7 @@ namespace OpenSpace.Loader {
                         textures[i] = TextureInfo.Read(reader, off_texture);
                     });
                 }
-                TEX tex = new TEX(tplPaths[1]);
+                TEX tex = new TEX(texPaths[1]);
                 for (uint i = 0; i < num_textures_lvl; i++) {
                     if (textures[num_textures_fix + i] != null && tex.Count > i) {
                         textures[num_textures_fix + i].Texture = tex.textures[i];
@@ -349,7 +349,7 @@ namespace OpenSpace.Loader {
 			yield return null;
 			ReadBehaviorCopies(reader);
 			yield return null;
-			print("Sectors: " + sectors.Count);
+			/*print("Sectors: " + sectors.Count);
 			for (int i = 0; i < sectors.Count; i++) {
 				print("Sector " + i + "\t" + sectors[i].persos.Count + "\t" + sectors[i].staticLights.Count);
 			}
@@ -359,7 +359,7 @@ namespace OpenSpace.Loader {
 			print("POs: " + superObjects.Count(so => so.type == SuperObject.Type.PO));
 			print("SOs: " + superObjects.Count);
 			print("Families: " + families.Count);
-			print("Always: " + globals.num_always + " - Spawnables: " + globals.spawnablePersos.Count);
+			print("Always: " + globals.num_always + " - Spawnables: " + globals.spawnablePersos.Count);*/
 
 			// Parse transformation matrices and other settings for fix characters
 			/*if (off_mainChar != null && off_matrix_mainChar != null) {
@@ -452,7 +452,7 @@ namespace OpenSpace.Loader {
                                 if (state != null) state.name = name;
                                 break;
                             case "eST_Anim3d":
-                                AnimationReference ar = AnimationReference.FromOffset(offset);
+                                AnimationReference ar = FromOffset<AnimationReference>(offset);
                                 if (ar != null) ar.name = name;
                                 break;
                             case "eST_Graph":

@@ -27,13 +27,14 @@ namespace OpenSpace.Loader {
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
 				gameDataBinFolder += "/";
+				string bigFile = "COMBIN";
 				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 loadingState = "Initializing files";
 				byte[] data = new byte[0];
-				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + lvlName + ".DAT"))) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + bigFile + ".DAT"))) {
 					List<MemoryBlock> memoryBlocks = new List<MemoryBlock>();
-					foreach (string line in File.ReadLines(gameDataBinFolder + lvlName + ".txt")) {
+					foreach (string line in File.ReadLines(gameDataBinFolder + bigFile + ".txt")) {
 						string[] blockStr = line.Split('\t');
 						MemoryBlock b = new MemoryBlock(Convert.ToUInt32(blockStr[0], 16), int.Parse(blockStr[1]) == 1,
 							new LBA(Convert.ToUInt32(blockStr[2], 16), Convert.ToUInt32(blockStr[3], 16)),
@@ -47,11 +48,15 @@ namespace OpenSpace.Loader {
 					yield return null;
 					for(int i = 0; i < memoryBlocks.Count; i++) {
 						MemoryBlock b = memoryBlocks[i];
-						ExtractBlock(reader, b.compressed, 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_compr.blk", compression: true);
-						ExtractBlock(reader, b.filetable, 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_fat_and_anims.blk");
-						ExtractBlock(reader, b.uncompressed, 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_uncompr.blk");
+						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_compr.blk", ExtractBlock(reader, b.compressed, 0x1f4, compression: true));
+						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_fat_and_anims.blk", ExtractBlock(reader, b.filetable, 0x1f4));
+						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_uncompr.blk", ExtractBlock(reader, b.uncompressed, 0x1f4));
 						for (int j = 0; j < b.cutscenes.Count; j++) {
-							ExtractBlock(reader, b.cutscenes[j], 0x1f4, gameDataBinFolder + lvlName + "_" + i + "_lba_" + j + ".blk");
+							string cutsceneAudioName = gameDataBinFolder + "ext/" + bigFile + "_" + i + "_cutsceneAudio_" + j + ".blk";
+							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], 0x1f4);
+							if (cutsceneAudioBlk != null) {
+								Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
+							}
 						}
 						yield return null;
 					}
@@ -68,9 +73,45 @@ namespace OpenSpace.Loader {
             InitModdables();
         }
 
-		public void ExtractBlock(Reader reader, LBA lba, uint baseOffset, string name, bool compression = false) {
+		public byte[] DecompressCutsceneAudio(byte[] cutsceneData) {
+			List<byte[]> bytes = new List<byte[]>();
+			using (MemoryStream ms = new MemoryStream(cutsceneData)) {
+				using (Reader reader = new Reader(ms, Settings.s.IsLittleEndian)) {
+					uint hdrSize = 1;
+					while (reader.BaseStream.Position < reader.BaseStream.Length && hdrSize > 0) {
+						hdrSize = reader.ReadUInt32();
+						//print("HDR " + string.Format("{0:X8}", hdrSize));
+						if (hdrSize != 0xFFFFFFFF) {
+							reader.ReadBytes((int)hdrSize);
+							bool readParts = true;
+							while (readParts && reader.BaseStream.Position < reader.BaseStream.Length) {
+								uint size = reader.ReadUInt32();
+								//print("SIZE " + string.Format("{0:X8}", size));
+								if (size == 0xFFFFFFFE) {
+									readParts = false;
+									if (reader.BaseStream.Position % 0x800 > 0) {
+										reader.BaseStream.Position = 0x800 * ((reader.BaseStream.Position / 0x800) + 1);
+									}
+								} else {
+									bool isNull = (size & 0x80000000) != 0;
+									size = size & 0x7FFFFFFF;
+									if (isNull) {
+										bytes.Add(Enumerable.Repeat((byte)0x0, (int)size).ToArray());
+									} else {
+										bytes.Add(reader.ReadBytes((int)size));
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			return bytes.SelectMany(i => i).ToArray();
+		}
+
+		public byte[] ExtractBlock(Reader reader, LBA lba, uint baseOffset, bool compression = false) {
 			byte[] data;
-			if (lba.lba < baseOffset || lba.size <= 0) return;
+			if (lba.lba < baseOffset || lba.size <= 0) return null;
 			reader.BaseStream.Seek((lba.lba - baseOffset) * 0x800, SeekOrigin.Begin);
 			if (compression) {
 				data = new byte[0];
@@ -136,9 +177,10 @@ namespace OpenSpace.Loader {
 			} else {
 				data = reader.ReadBytes((int)lba.size);
 			}
-			if (data.Length > 0) {
+			/*if (data.Length > 0) {
 				Util.ByteArrayToFile(name, data);
-			}
+			}*/
+			return data;
 		}
     }
 

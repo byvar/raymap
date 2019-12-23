@@ -84,7 +84,20 @@ namespace OpenSpace.Visual {
         public static MeshObject Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             MeshObject m = new MeshObject(offset);
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				uint flags = reader.ReadUInt32();
+				m.num_vertices = reader.ReadUInt16();
+				m.num_subblocks = reader.ReadUInt16();
+				m.off_subblock_types = Pointer.Read(reader);
+				m.off_subblocks = Pointer.Read(reader);
+				m.off_vertices = Pointer.Read(reader);
+				m.off_normals = Pointer.Read(reader);
+				reader.ReadSingle();
+				reader.ReadSingle();
+				reader.ReadSingle();
+				reader.ReadSingle();
+				m.lookAtMode = reader.ReadUInt32();
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				m.off_subblock_types = Pointer.Read(reader);
 				m.off_subblocks = Pointer.Read(reader);
 				uint flags = reader.ReadUInt32();
@@ -107,7 +120,7 @@ namespace OpenSpace.Visual {
 				} else {
 					m.off_blendWeights = Pointer.Read(reader);
 				}
-				if (Settings.s.mode != Settings.Mode.RaymanArenaGC && Settings.s.game != Settings.Game.RM) {
+				if (Settings.s.mode != Settings.Mode.RaymanArenaGC && Settings.s.game != Settings.Game.RM && Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
 					reader.ReadInt32();
 				}
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();
@@ -119,16 +132,21 @@ namespace OpenSpace.Visual {
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
+				if (Settings.s.game == Settings.Game.Dinosaur) {
+					reader.ReadInt32();
+					reader.ReadInt32();
+					reader.ReadInt32();
+				}
 				if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
 					m.lookAtMode = reader.ReadUInt32();
 					//if (m.lookAtMode != 0) l.print(m.lookAtMode);
 					m.num_vertices = reader.ReadUInt16();
 					m.num_subblocks = reader.ReadUInt16();
 					reader.ReadInt32();
-					reader.ReadSingle();
-					reader.ReadSingle();
-					reader.ReadSingle();
-					reader.ReadSingle();
+					reader.ReadSingle(); // bounding volume radius
+					reader.ReadSingle(); // x
+					reader.ReadSingle(); // z
+					reader.ReadSingle(); // y
 					reader.ReadInt32();
 					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 						reader.ReadInt32();
@@ -227,6 +245,7 @@ namespace OpenSpace.Visual {
                         m.subblocks[i] = SpriteElement.Read(reader, block_offset, m);
                         break;
                     case 13:
+					case 15:
                         m.bones = DeformSet.Read(reader, block_offset, m);
                         m.subblocks[i] = m.bones;
                         break;
@@ -321,9 +340,9 @@ namespace OpenSpace.Visual {
 										for (int j = 0; j < lm.width; j++) {
 											for (int k = 0; k < lm.height; k++) {
 												Color r = lm.GetPixel(j, k);
-												Color g = lm.GetPixel(j, k);
-												Color b = lm.GetPixel(j, k);
-												lm.SetPixel(j, k, new Color(r.r, g.g, b.b, 1f));
+												Color g = lm_g.GetPixel(j, k);
+												Color b = lm_b.GetPixel(j, k);
+												lm.SetPixel(j, k, new Color(r.a, g.a, b.a, 1f));
 											}
 										}
 										lm.Apply();
@@ -335,27 +354,13 @@ namespace OpenSpace.Visual {
 									lm.filterMode = FilterMode.Bilinear;
 									lm.Apply();
 								}
-								me.visualMaterial = me.visualMaterial.Clone();
-								me.visualMaterial.num_textures += 1;
-								me.visualMaterial.textures.Add(new VisualMaterialTexture() {
-									texture = new TextureInfo(null) {
-										width = (ushort)lm.width,
-										height = (ushort)lm.height,
-										Texture = lm
-									},
-									textureOp = 50,
-									uvFunction = 1
-								});
+								Vector2[] lightmapUVs = new Vector2[mo.num_vertices];
 								Pointer.DoAt(ref reader, ps2l.off_lightmapUV[me.lightmap_index], () => {
-									Array.Resize(ref me.uvs, me.num_uvs + mo.num_vertices);
-									Array.Resize(ref me.mapping_uvs, me.num_uvMaps + 1);
-									me.mapping_uvs[me.mapping_uvs.Length - 1] = Enumerable.Range(me.num_uvs, mo.num_vertices).ToArray();
 									for (int j = 0; j < mo.num_vertices; j++) {
-										me.uvs[me.num_uvs + j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+										lightmapUVs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 									}
-									me.num_uvs += mo.num_vertices;
-									me.num_uvMaps++;
 								});
+								me.AddLightmap(lm, lightmapUVs);
 							}
 						}
 					}

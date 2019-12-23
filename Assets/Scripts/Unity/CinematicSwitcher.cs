@@ -54,7 +54,7 @@ public class CinematicSwitcher : MonoBehaviour {
 		if (cinematic != null) {
 			foreach (CinematicActor actor in cinematic.actors) {
 				PersoBehaviour pb = actor.perso.Gao.GetComponent<PersoBehaviour>();
-				actor.cineState.anim_ref = AnimationReference.FromOffset(actor.cineState.off_anim_ref);
+				actor.cineState.anim_ref = MapLoader.Loader.FromOffset<AnimationReference>(actor.cineState.off_anim_ref);
 				pb.SetState(actor.waitState.index);
 			}
 			cinematic = null;

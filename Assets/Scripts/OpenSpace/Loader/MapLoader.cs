@@ -17,6 +17,7 @@ using OpenSpace.Object.Properties;
 using System.Collections;
 using OpenSpace.Loader;
 using OpenSpace.Cinematics;
+using OpenSpace.Animation.ComponentLargo;
 
 namespace OpenSpace {
     public class MapLoader {
@@ -80,12 +81,12 @@ namespace OpenSpace {
         public List<WayPoint> waypoints = new List<WayPoint>();
         public List<KeypadEntry> keypadEntries = new List<KeypadEntry>();
         public List<MechanicsIDCard> mechanicsIDCards = new List<MechanicsIDCard>();
-        public List<AnimationReference> animationReferences = new List<AnimationReference>();
-        public List<AnimationMontreal> animationReferencesMontreal = new List<AnimationMontreal>();
         public List<ObjectList> objectLists = new List<ObjectList>();
         public List<ObjectList> uncategorizedObjectLists = new List<ObjectList>();
+		public List<EntryAction> entryActions = new List<EntryAction>();
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
-        public GameObject familiesRoot = null;
+		public Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>> structs = new Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>>();
+		public GameObject familiesRoot = null;
         //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
 
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
@@ -95,14 +96,15 @@ namespace OpenSpace {
         protected string[] lvlNames = new string[7];
         protected string[] lvlPaths = new string[7];
         protected string[] ptrPaths = new string[7];
-        protected string[] tplPaths = new string[7];
+        protected string[] texPaths = new string[7];
         protected string[] cntPaths = null;
         protected CNT cnt = null;
         protected DSB gameDsb = null;
         protected DSB lvlDsb = null;
         protected string menuTPLPath;
+		public Pointer[] off_lightmapUV;
 
-        public Globals globals = null;
+		public Globals globals = null;
         public Settings settings = null;
 
         public static class Mem {
@@ -123,7 +125,7 @@ namespace OpenSpace {
             get {
                 if (loader == null) {
                     if (Settings.s == null) return null;
-                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+					if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 						switch (Settings.s.platform) {
 							case Settings.Platform.DC: loader = new R2DCLoader(); break;
 							case Settings.Platform.PS2: loader = new R2PS2Loader(); break;
@@ -134,8 +136,12 @@ namespace OpenSpace {
 								loader = new R2ROMLoader(); break;
 							default: loader = new R2Loader(); break;
 						}
-                    } else {
-                        loader = new R3Loader();
+					} else {
+						if (Settings.s.game == Settings.Game.LargoWinch) {
+							loader = new LWLoader();
+						} else {
+							loader = new R3Loader();
+						}
                     }
                     //loader = new MapLoader();
                 }
@@ -390,13 +396,20 @@ MonoBehaviour.print(str);
         }
 
 		protected IEnumerator CreateCNT() {
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				cntPaths = new string[1];
+				cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
+				foreach (string path in cntPaths) {
+					yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+				}
+				cnt = new CNT(cntPaths);
+			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 				if (Settings.s.platform != Settings.Platform.DC &&
 					Settings.s.platform != Settings.Platform.PS1 &&
 					Settings.s.platform != Settings.Platform.PS2) {
 					List<string> cntPaths = new List<string>();
-					if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileTextures, Settings.CapsType.All));
-					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(gameDsb.bigfileVignettes, Settings.CapsType.All));
+					if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileTextures), Settings.CapsType.All));
+					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileVignettes), Settings.CapsType.All));
 					if (cntPaths.Count > 0) {
 						foreach (string path in cntPaths) {
 							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
@@ -406,24 +419,32 @@ MonoBehaviour.print(str);
 				}
             } else {
                 if (Settings.s.platform == Settings.Platform.PC) {
-                    if (Settings.s.game == Settings.Game.R3) {
-                        cntPaths = new string[3];
-                        cntPaths[0] = gameDataBinFolder + "vignette.cnt";
-                        cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
-                        cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
+					if (Settings.s.game == Settings.Game.R3) {
+						cntPaths = new string[3];
+						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+						cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
+						cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
 						foreach (string path in cntPaths) {
 							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 						}
 						cnt = new CNT(cntPaths);
-                    } else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
-                        cntPaths = new string[2];
-                        cntPaths[0] = gameDataBinFolder + "vignette.cnt";
-                        cntPaths[1] = gameDataBinFolder + "tex32.cnt";
+					} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+						cntPaths = new string[2];
+						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
+						cntPaths[1] = gameDataBinFolder + "tex32.cnt";
 						foreach (string path in cntPaths) {
 							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
 						}
 						cnt = new CNT(cntPaths);
-                    }
+					} else if (Settings.s.game == Settings.Game.Dinosaur) {
+						cntPaths = new string[2];
+						cntPaths[0] = gameDataBinFolder + "VIGNETTE.CNT";
+						cntPaths[1] = gameDataBinFolder + "TEXTURES.CNT";
+						foreach (string path in cntPaths) {
+							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+						}
+						cnt = new CNT(cntPaths);
+					}
                 }
             }
 			if (cnt != null) {
@@ -435,7 +456,8 @@ MonoBehaviour.print(str);
 					yield return null;
 					// Export all textures in cnt
 					foreach (CNT.FileStruct file in cnt.fileList) {
-						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + file.FullName.Replace(".gf", ".png"), cnt.GetGF(file).GetTexture().EncodeToPNG());
+						GF gf = cnt.GetGF(file);
+						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + file.FullName.Replace(".gf", ".png"), gf.GetTexture().EncodeToPNG());
 					}
 					loadingState = state;
 					yield return null;
@@ -482,36 +504,30 @@ MonoBehaviour.print(str);
 
         public void ReadKeypadDefine(Reader reader, Pointer off_keypadDefine) {
             if (off_keypadDefine == null) return;
-            //print("off keypad: " + off_keypadDefine);
-            Pointer off_current = Pointer.Goto(ref reader, off_keypadDefine);
-            bool readKeypadDefine = true;
-            while (readKeypadDefine) {
-                KeypadEntry entry = new KeypadEntry();
-                entry.keycode = reader.ReadInt16();
-                if (entry.keycode != -1) {
-                    entry.unk2 = reader.ReadInt16();
-                    /* Interestingly, some pointers in this list are not in the relocation table.
-                     * and don't point to any key name, so they can't be read with Pointer.Read.
-                     * Perhaps restoring this can help to restore debug functions... */
-                    Pointer off_name = Pointer.GetPointerAtOffset(Pointer.Current(reader));
-                    reader.ReadUInt32();
-                    Pointer off_name2 = Pointer.GetPointerAtOffset(Pointer.Current(reader));
-                    reader.ReadUInt32();
-                    Pointer off_current_entry = Pointer.Current(reader);
-                    if (off_name != null) {
-                        Pointer.Goto(ref reader, off_name);
-                        entry.name = reader.ReadNullDelimitedString();
-                        //print(entry.name + " - " + entry.keycode + " - " + entry.unk2);
-                    }
-                    if (off_name2 != null) {
-                        Pointer.Goto(ref reader, off_name2);
-                        entry.name2 = reader.ReadNullDelimitedString();
-                    }
-                    Pointer.Goto(ref reader, off_current_entry);
-                    keypadEntries.Add(entry);
-                } else readKeypadDefine = false;
-            }
-            Pointer.Goto(ref reader, off_current);
+			Pointer.DoAt(ref reader, off_keypadDefine, () => {
+				bool readKeypadDefine = true;
+				while (readKeypadDefine) {
+					KeypadEntry entry = new KeypadEntry();
+					entry.keycode = reader.ReadInt16();
+					if (entry.keycode != -1) {
+						entry.unk2 = reader.ReadInt16();
+						/* Interestingly, some pointers in this list are not in the relocation table.
+						 * and don't point to any key name, so they can't be read with Pointer.Read.
+						 * Perhaps restoring this can help to restore debug functions... */
+						Pointer off_name = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+						reader.ReadUInt32();
+						Pointer off_name2 = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+						reader.ReadUInt32();
+						Pointer.DoAt(ref reader, off_name, () => {
+							entry.name = reader.ReadNullDelimitedString();
+						});
+						Pointer.DoAt(ref reader, off_name2, () => {
+							entry.name2 = reader.ReadNullDelimitedString();
+						});
+						keypadEntries.Add(entry);
+					} else readKeypadDefine = false;
+				}
+			});
         }
 
         public void ReadLevelNames(Reader reader, Pointer off_levels, uint num_levels) {
@@ -530,7 +546,7 @@ MonoBehaviour.print(str);
             }
         }
 
-        protected IEnumerator ReadTexturesFix(Reader reader, Pointer off_textures) {
+		protected IEnumerator ReadTexturesFix(Reader reader, Pointer off_textures) {
             uint num_textureMemoryChannels = 0;
             if (Settings.s.engineVersion <= Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
             uint num_textures = reader.ReadUInt32();
@@ -549,7 +565,7 @@ MonoBehaviour.print(str);
                 }
                 if (Settings.s.platform == Settings.Platform.GC) {
                     uint num_textures_menu = reader.ReadUInt32();
-                    TPL fixTPL = new TPL(tplPaths[Mem.Fix]);
+                    TPL fixTPL = new TPL(texPaths[Mem.Fix]);
                     TPL menuTPL = new TPL(menuTPLPath);
                     for (uint i = 0; i < num_textures_menu; i++) {
                         Pointer off_texture = Pointer.Read(reader);
@@ -603,7 +619,7 @@ MonoBehaviour.print(str);
 			string state = loadingState;
 			loadingState = "Loading level textures";
 
-			if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
+			if (Settings.s.engineVersion <= Settings.EngineVersion.R2 || Settings.s.game == Settings.Game.LargoWinch) {
                 num_textures_fix = (uint)textures.Length;
                 num_memoryChannels = reader.ReadUInt32();
                 num_textures_lvl = reader.ReadUInt32();
@@ -619,18 +635,18 @@ MonoBehaviour.print(str);
                 Pointer.DoAt(ref reader, off_texture, () => {
                     textures[i] = TextureInfo.Read(reader, off_texture);
                 });
-            }
-            if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
+			}
+			if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
                 uint num_texturesToCreate = reader.ReadUInt32();
-                for (uint i = 0; i < num_textures_fix; i++) { // ?
-                    reader.ReadUInt32(); //1
-                }
+				for (uint i = 0; i < num_textures_fix; i++) { // ?
+					reader.ReadUInt32(); //1
+				}
                 uint currentMemoryChannel = reader.ReadUInt32();
             }
             if (Settings.s.platform == Settings.Platform.GC) {
                 // Load textures from TPL
-                TPL lvlTPL = new TPL(tplPaths[Mem.Lvl]);
-                TPL transitTPL = hasTransit ? new TPL(tplPaths[Mem.Transit]) : null;
+                TPL lvlTPL = new TPL(texPaths[Mem.Lvl]);
+                TPL transitTPL = hasTransit ? new TPL(texPaths[Mem.Transit]) : null;
                 print("Lvl TPL Texture count: " + lvlTPL.Count);
                 if (hasTransit) print("Transit TPL Texture count: " + transitTPL.Count);
                 int transitTexturesSeen = 0;
@@ -679,16 +695,39 @@ MonoBehaviour.print(str);
 				}
 				Pointer.Goto(ref reader, off_current);
 				int current_texture = 0;
-				for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                    uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
-                    if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
-					current_texture++;
-					loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
-					if (hasTransit && file_texture == 6) transitTexturesSeen++;
-					yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
-					GF gf = cnt.preparedGF;
-					if (gf != null) textures[i].Texture = gf.GetTexture();
-                }
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					int fixTexturesSeen = 0;
+					int lvlTexturesSeen = 0;
+					PBT[] pbt = (this as LWLoader).pbt;
+					//print(Pointer.Current(reader));
+					for (uint i = num_textures_fix; i < num_textures_total; i++) {
+						uint file_texture = reader.ReadUInt32();
+						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+						current_texture++;
+						loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
+						if (!textures[i].name.EndsWith(".tga")) { // Yeah, nice hack huh
+							print(textures[i].name);
+						} else if (file_texture == 1) {
+							//print(file_texture + " - " + fixTexturesSeen + " / " + pbt[0].textures.Length + " - " + num_textures_total + " - " + textures[i].name);
+							textures[i].Texture = pbt[0].textures[fixTexturesSeen++];
+						} else {
+							//print(file_texture + " - " + lvlTexturesSeen + " / " + pbt[1].textures.Length + " - " + num_textures_total + " - " + textures[i].name);
+							textures[i].Texture = pbt[1].textures[lvlTexturesSeen++];
+						}
+
+					}
+				} else {
+					for (uint i = num_textures_fix; i < num_textures_total; i++) {
+						uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
+						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+						current_texture++;
+						loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
+						if (hasTransit && file_texture == 6) transitTexturesSeen++;
+						yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
+						GF gf = cnt.preparedGF;
+						if (gf != null) textures[i].Texture = gf.GetTexture();
+					}
+				}
 			}
 			loadingState = state;
 		}
@@ -800,7 +839,7 @@ MonoBehaviour.print(str);
         }
 
         protected IEnumerator PrepareFile(string path) {
-            if (FileSystem.mode == FileSystem.Mode.Web) {
+            if (FileSystem.mode == FileSystem.Mode.Web && !string.IsNullOrEmpty(path)) {
                 string state = loadingState;
                 loadingState = state + "\nDownloading file: " + path;
                 yield return controller.StartCoroutine(FileSystem.DownloadFile(path));
@@ -839,6 +878,76 @@ MonoBehaviour.print(str);
 				default:
 					return path;
 			}
+		}
+
+
+
+		public T FromOffset<T>(Pointer pointer) where T : OpenSpaceStruct {
+			if (pointer == null) return null;
+			System.Type type = typeof(T);
+			if (!structs.ContainsKey(type) || !structs[type].ContainsKey(pointer)) return null;
+			return structs[type][pointer] as T;
+		}
+
+		private T Read<T>(Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+			if (pointer != null) {
+				T rs = new T();
+				rs.Init(pointer);
+				System.Type type = typeof(T);
+				if (!structs.ContainsKey(type)) {
+					structs[type] = new Dictionary<Pointer, OpenSpaceStruct>();
+				}
+				if (!structs[type].ContainsKey(pointer)) {
+					structs[type][pointer] = rs;
+				} else {
+					Debug.LogWarning("Duplicate pointer " + pointer + " for type " + type);
+				}
+				onPreRead?.Invoke(rs);
+				rs.Read(reader, inline: inline);
+				return rs;
+			}
+			return null;
+		}
+
+		public T FromOffsetOrRead<T>(Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+			if (pointer == null) return null;
+			T rs = FromOffset<T>(pointer);
+			Pointer curPointer = pointer;
+			if (rs == null) {
+				rs = Read(reader, pointer, onPreRead: onPreRead, inline: inline);
+			} else {
+				if(inline) Pointer.Goto(ref reader, curPointer + rs.Size);
+			}
+			return rs;
+		}
+
+		public T[] ReadArray<T>(decimal length, Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+			T[] ts = new T[(int)length];
+			Pointer curPointer = pointer != null ? pointer : Pointer.Current(reader);
+			if (inline) {
+				//print(typeof(T) + " - " + curPointer);
+				for (int i = 0; i < length; i++) {
+					ts[i] = FromOffsetOrRead(reader, curPointer, onPreRead: onPreRead, inline: true);
+					curPointer = Pointer.Current(reader);
+				}
+			} else {
+				Pointer.DoAt(ref reader, pointer, () => {
+					for (int i = 0; i < length; i++) {
+						ts[i] = FromOffsetOrRead(reader, curPointer, onPreRead: onPreRead, inline: true);
+						curPointer = Pointer.Current(reader);
+					}
+				});
+			}
+			return ts;
+		}
+
+		// Read array in place
+		public T[] ReadArray<T>(decimal length, Reader reader, Action<T> onPreRead = null) where T : OpenSpaceStruct, new() {
+			return ReadArray<T>(length, reader, null, onPreRead: onPreRead, inline: true);
+		}
+
+		public string ConvertPath(string path) {
+			return path.Replace("\\","/");
 		}
 	}
 }

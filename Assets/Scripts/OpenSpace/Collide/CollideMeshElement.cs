@@ -125,10 +125,14 @@ namespace OpenSpace.Collide {
             CollideMeshElement sm = new CollideMeshElement(offset, m);
             //l.print(offset + " - " + m.num_vertices);
             sm.off_material = Pointer.Read(reader);
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.R2Revolution || Settings.s.game == Settings.Game.LargoWinch) {
 				sm.num_triangles = reader.ReadUInt16();
 				reader.ReadUInt16();
 				sm.off_triangles = Pointer.Read(reader);
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					sm.off_normals = Pointer.Read(reader);
+					sm.off_unk = Pointer.Read(reader);
+				}
 			} else {
 				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 					sm.num_triangles = reader.ReadUInt16();
@@ -151,11 +155,13 @@ namespace OpenSpace.Collide {
 					sm.num_triangles = reader.ReadUInt16();
 					reader.ReadUInt16();
 					reader.ReadUInt32();
-					sm.off_mapping = Pointer.Read(reader);
-					sm.off_unk = Pointer.Read(reader); // num_mapping_entries * 3 floats 
-					sm.off_unk2 = Pointer.Read(reader); // num_mapping_entries * 1 float
-					sm.num_mapping = reader.ReadUInt16();
-					reader.ReadUInt16();
+					if (Settings.s.game != Settings.Game.Dinosaur) {
+						sm.off_mapping = Pointer.Read(reader);
+						sm.off_unk = Pointer.Read(reader); // num_mapping_entries * 3 floats 
+						sm.off_unk2 = Pointer.Read(reader); // num_mapping_entries * 1 float
+						sm.num_mapping = reader.ReadUInt16();
+						reader.ReadUInt16();
+					}
 				}
 			}
 

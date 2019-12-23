@@ -165,13 +165,15 @@ namespace OpenSpace.Visual {
         public bool IsRepeatU {
             get {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatU;
-                return (properties & 1) != 0;
+				if (Settings.s.game == Settings.Game.Dinosaur || Settings.s.game == Settings.Game.LargoWinch) return true;
+				return (properties & 1) != 0;
             }
         }
         public bool IsRepeatV {
             get {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatV;
-                return (properties & 2) != 0;
+				if (Settings.s.game == Settings.Game.Dinosaur || Settings.s.game == Settings.Game.LargoWinch) return true;
+				return (properties & 2) != 0;
             }
         }
         public uint Format {

@@ -14,7 +14,7 @@ namespace OpenSpace.Loader {
 		public ROMBIN data;
 		public ROMBIN fat;
 		public FATTable[] fatTables;
-		private int currentLevel = -1;
+		public int CurrentLevel { get; private set; } = -1;
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;
@@ -24,7 +24,7 @@ namespace OpenSpace.Loader {
 		public bool[] texturesTableSeen;
 		public bool[] palettesTableSeen;
 		
-		public Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>> structs = new Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>>();
+		public Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>> romStructs = new Dictionary<FATEntry.Type, Dictionary<ushort, ROMStruct>>();
 
 		public string[] LoadLevelList() {
 			if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) return null;
@@ -44,7 +44,7 @@ namespace OpenSpace.Loader {
 				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader), readEntries: i < 2);
 			}
 			string[] levels = new string[num_tables];
-			Pointer off_levelList = GetStructPtr(FATEntry.Type.LevelList, 0x8000, false);
+			Pointer off_levelList = GetStructPtr(FATEntry.Type.LevelList, (ushort)(0 | FATEntry.Flag.Fix), false);
 			for (int i = 0; i < levels.Length; i++) {
 				Pointer.DoAt(ref reader, off_levelList + 64*i, () => {
 					reader.ReadUInt16();
@@ -75,7 +75,7 @@ namespace OpenSpace.Loader {
 				yield return controller.StartCoroutine(LoadFat());
 				// Determine level index
 				yield return controller.StartCoroutine(LoadFix());
-				if (currentLevel == -1) {
+				if (CurrentLevel == -1) {
 					throw new Exception("Level list does not contain this level");
 				}
 
@@ -150,7 +150,7 @@ namespace OpenSpace.Loader {
 		public IEnumerator LoadFatLevel(bool loadAll = false) {
 			Reader reader = files_array[SMem.Fat].reader;
 			for (uint i = 2; i < fatTables.Length; i++) {
-				bool loadCurrent = loadAll || (i == currentLevel+2);
+				bool loadCurrent = loadAll || (i == CurrentLevel+2);
 				if (loadCurrent) {
 					loadingState = "Loading struct table " + (i + 1) + "/" + (fatTables.Length);
 					yield return null;
@@ -221,7 +221,7 @@ namespace OpenSpace.Loader {
 			// Read fix texture list
 			loadingState = "Loading engine structure";
 			yield return null;
-			EngineStruct engineStruct = GetOrRead<EngineStruct>(reader, 0x8000);
+			EngineStruct engineStruct = GetOrRead<EngineStruct>(reader, (ushort)(0 | FATEntry.Flag.Fix));
 
 			// Read languages table
 			loadingState = "Loading language tables";
@@ -240,10 +240,10 @@ namespace OpenSpace.Loader {
 			// Load level list
 			loadingState = "Loading level list";
 			yield return null;
-			LevelList levelList = GetOrRead<LevelList>(reader, 0x8000, l => l.num_levels = num_levels);
+			LevelList levelList = GetOrRead<LevelList>(reader, (ushort)(0 | FATEntry.Flag.Fix), l => l.num_levels = num_levels);
 			for (int i = 0; i < num_levels; i++) {
 				if (levelList.levels[i].name.ToLower() == lvlName.ToLower()) {
-					currentLevel = i;
+					CurrentLevel = i;
 					break;
 				}
 			}
@@ -261,6 +261,15 @@ namespace OpenSpace.Loader {
 				yield break;
 			}
 
+			// Load current level data
+			LevelHeader lh = GetOrRead<LevelHeader>(reader, (ushort)(CurrentLevel | (ushort)FATEntry.Flag.Fix));
+			if (lh != null) {
+				if (lh.hierarchyRoot.Value != null) {
+					lh.hierarchyRoot.Value.GetGameObject();
+				}
+			}
+			yield break;
+
 			for (ushort i = 0; i < short.MaxValue; i++) {
 				// Only do it a few times because we're trying to load way more than there is,
 				// so it takes really long if we yield for everything
@@ -274,11 +283,21 @@ namespace OpenSpace.Loader {
 					GameObject gao = ot.GetGameObject();
 					gao.name = "[" + i + "]" + gao.name;
 				}*/
-				PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
+				/*PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
 				if (po != null) {
 					GameObject gao = po.GetGameObject();
 					gao.name = "[" + i + "]" + gao.name;
+				}*/
+				/*SuperObject so = GetOrRead<SuperObject>(reader, i);
+				if (so != null) {
+					GameObject gao = so.GetGameObject();
+					gao.name = "[" + i + "]" + gao.name;
 				}
+				*/
+				/*LevelHeader lh = GetOrRead<LevelHeader>(reader, i);
+				if (lh != null) {
+					print(i);
+				}*/
 			}
 
 			yield return null;
@@ -439,8 +458,8 @@ namespace OpenSpace.Loader {
 
 		public T Get<T>(ushort index) where T : ROMStruct {
 			FATEntry.Type type = FATEntry.types[typeof(T)];
-			if (!structs.ContainsKey(type) || !structs[type].ContainsKey(index)) return null;
-			return structs[type][index] as T;
+			if (!romStructs.ContainsKey(type) || !romStructs[type].ContainsKey(index)) return null;
+			return romStructs[type][index] as T;
 		}
 
 		public T GetOrRead<T>(Reader reader, ushort index, Action<T> onPreRead = null) where T : ROMStruct, new() {
@@ -452,11 +471,11 @@ namespace OpenSpace.Loader {
 					if (offset != null) {
 						rs = new T();
 						rs.Init(offset, index);
-						if (!structs.ContainsKey(type)) {
-							structs[type] = new Dictionary<ushort, ROMStruct>();
+						if (!romStructs.ContainsKey(type)) {
+							romStructs[type] = new Dictionary<ushort, ROMStruct>();
 						}
-						if (!structs[type].ContainsKey(index)) {
-							structs[type][index] = rs;
+						if (!romStructs[type].ContainsKey(index)) {
+							romStructs[type][index] = rs;
 						} else {
 							Debug.LogWarning("Duplicate index " + index + " for type " + type);
 						}
@@ -504,7 +523,7 @@ namespace OpenSpace.Loader {
 			type = (ushort)(type & 0x7FFF);
 			index = (ushort)(index & 0x7FFF);
 
-			FATEntry levelEntry = fatTables[currentLevel + 2].entries.FirstOrDefault(e => e.type == type && e.index == index);
+			FATEntry levelEntry = fatTables[CurrentLevel + 2].entries.FirstOrDefault(e => e.type == type && e.index == index);
 			if (levelEntry != null) return levelEntry;
 
 			FATEntry fix2Entry = fatTables[1].entries.FirstOrDefault(e => e.type == type && e.index == index);
@@ -515,7 +534,7 @@ namespace OpenSpace.Loader {
 			
 			if (global) {
 				for (int i = 2; i < fatTables.Length; i++) {
-					if (i == currentLevel + 2) continue;
+					if (i == CurrentLevel + 2) continue;
 					FATEntry entry = fatTables[i].entries.FirstOrDefault(e => e.type == type && e.index == index);
 					if (entry != null) return entry;
 				}
@@ -525,21 +544,32 @@ namespace OpenSpace.Loader {
 		}
 
 		public FATEntry GetEntry(FATEntry.Type type, ushort index, bool global = false) {
-			index = (ushort)(index & 0x7FFF);
+			bool isFix = (index & (ushort)FATEntry.Flag.Fix) == (ushort)FATEntry.Flag.Fix;
+			ushort ind = (ushort)(index & 0x7FFF);
+			if (!global) {
+				if (!isFix) {
+					FATEntry levelEntry = fatTables[CurrentLevel + 2].GetEntry(type, ind);
+					if (levelEntry != null) return levelEntry;
 
-			FATEntry levelEntry = fatTables[currentLevel + 2].GetEntry(type, index);
-			if (levelEntry != null) return levelEntry;
+					FATEntry fix2Entry = fatTables[1].GetEntry(type, ind);
+					if (fix2Entry != null) return fix2Entry;
+				} else {
+					FATEntry fixEntry = fatTables[0].GetEntry(type, ind);
+					if (fixEntry != null) return fixEntry;
+				}
+			} else {
+				FATEntry levelEntry = fatTables[CurrentLevel + 2].GetEntry(type, ind);
+				if (levelEntry != null) return levelEntry;
 
-			FATEntry fix2Entry = fatTables[1].GetEntry(type, index);
-			if (fix2Entry != null) return fix2Entry;
+				FATEntry fix2Entry = fatTables[1].GetEntry(type, ind);
+				if (fix2Entry != null) return fix2Entry;
 
-			FATEntry fixEntry = fatTables[0].GetEntry(type, index);
-			if (fixEntry != null) return fixEntry;
+				FATEntry fixEntry = fatTables[0].GetEntry(type, ind);
+				if (fixEntry != null) return fixEntry;
 
-			if (global) {
 				for (int i = 2; i < fatTables.Length; i++) {
-					if (i == currentLevel + 2) continue;
-					FATEntry entry = fatTables[i].GetEntry(type, index);
+					if (i == CurrentLevel + 2) continue;
+					FATEntry entry = fatTables[i].GetEntry(type, ind);
 					if (entry != null) return entry;
 				}
 			}

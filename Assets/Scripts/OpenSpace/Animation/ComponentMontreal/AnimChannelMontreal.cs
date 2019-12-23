@@ -7,8 +7,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.ComponentMontreal {
-    public class AnimChannelMontreal {
-        public Pointer offset;
+    public class AnimChannelMontreal : OpenSpaceStruct {
         public Pointer off_matrix;
         public uint isIdentity = 0;
         public byte objectIndex;
@@ -20,33 +19,23 @@ namespace OpenSpace.Animation.ComponentMontreal {
         public uint unkUint;
         public Matrix matrix = null;
 
-        public AnimChannelMontreal(Pointer offset) {
-            this.offset = offset;
-        }
+		protected override void ReadInternal(Reader reader) {
+			off_matrix = Pointer.GetPointerAtOffset(Offset);
+			isIdentity = reader.ReadUInt32(); // if this is 1, don't check the pointer
+			objectIndex = reader.ReadByte();
+			unk1 = reader.ReadByte();
+			unk2 = reader.ReadInt16();
+			unk3 = reader.ReadInt16();
+			unkByte1 = reader.ReadByte();
+			unkByte2 = reader.ReadByte();
+			unkUint = reader.ReadUInt32();
 
-        public static AnimChannelMontreal Read(Reader reader, Pointer offset) {
-            MapLoader l = MapLoader.Loader;
-            AnimChannelMontreal ch = new AnimChannelMontreal(offset);
-            ch.off_matrix = Pointer.GetPointerAtOffset(offset);
-            ch.isIdentity = reader.ReadUInt32(); // if this is 1, don't check the pointer
-            ch.objectIndex = reader.ReadByte();
-            ch.unk1 = reader.ReadByte();
-            ch.unk2 = reader.ReadInt16();
-            ch.unk3 = reader.ReadInt16();
-            ch.unkByte1 = reader.ReadByte();
-            ch.unkByte2 = reader.ReadByte();
-            ch.unkUint = reader.ReadUInt32();
-
-            // Read compressed matrix
-            if (ch.isIdentity != 1 && ch.isIdentity != 0) {
-                Pointer.DoAt(ref reader, ch.off_matrix, () => {
-                    ch.matrix = Matrix.ReadCompressed(reader, ch.off_matrix);
-                });
-            } /*else if (ch.isIdentity == 1) {
-                ch.matrix = Matrix.Identity;
-            }*/
-            return ch;
-        }
-
-    }
+			// Read compressed matrix
+			if (isIdentity != 1 && isIdentity != 0) {
+				Pointer.DoAt(ref reader, off_matrix, () => {
+					matrix = Matrix.ReadCompressed(reader, off_matrix);
+				});
+			}
+		}
+	}
 }

@@ -30,7 +30,9 @@ namespace OpenSpace.Object {
         [JsonIgnore]
         public SuperObject parent;
         public Pointer off_matrix;
+		public Pointer off_matrix2;
         public Matrix matrix;
+		public Matrix matrix2;
         public IEngineObject data;
         public SuperObjectFlags flags;
         public BoundingVolume boundingVolume;
@@ -75,7 +77,7 @@ namespace OpenSpace.Object {
             so.off_brother_prev = Pointer.Read(reader); // 18 - 1C
             so.off_parent = Pointer.Read(reader); // 1C - 20
             so.off_matrix = Pointer.Read(reader); // 0x20->0x24
-            Pointer.Read(reader); // other matrix
+            so.off_matrix2 = Pointer.Read(reader); // other matrix
             reader.ReadInt32(); // 0x28 -> 0x2C
             reader.ReadInt32(); // 0x2C -> 0x30
             so.flags = SuperObjectFlags.Read(reader); // 0x30->0x34
@@ -93,7 +95,15 @@ namespace OpenSpace.Object {
                 rot = so.matrix.GetRotation(convertAxes: true);
                 scale = so.matrix.GetScale(convertAxes: true);
             });
-            so.type = GetSOType(so.typeCode);
+			/*Pointer.DoAt(ref reader, so.off_matrix2, () => {
+				so.matrix2 = Matrix.Read(reader, so.off_matrix2);
+				if (so.matrix == null) {
+					pos = so.matrix2.GetPosition(convertAxes: true);
+					rot = so.matrix2.GetRotation(convertAxes: true);
+					scale = so.matrix2.GetScale(convertAxes: true);
+				}
+			});*/
+			so.type = GetSOType(so.typeCode);
             switch (so.type) {
                 case Type.IPO:
                     Pointer.Goto(ref reader, so.off_data);
@@ -129,6 +139,7 @@ namespace OpenSpace.Object {
             }
 
             Pointer.DoAt(ref reader, off_boundingVolume, () => {
+				//l.print(off_boundingVolume);
                 so.boundingVolume = BoundingVolume.Read(reader, off_boundingVolume, so.flags.HasFlag(SuperObjectFlags.Flags.BoundingBoxInsteadOfSphere) ?
                     BoundingVolume.Type.Box : BoundingVolume.Type.Sphere);
             });
@@ -147,13 +158,13 @@ namespace OpenSpace.Object {
                     if (so.boundingVolume.type == BoundingVolume.Type.Box) {
                         BoxCollider collider = so.Gao.AddComponent<BoxCollider>();
 
-                        collider.center = so.boundingVolume.boxCenter;
+                        collider.center = so.boundingVolume.Center;
                         collider.center -= so.Gao.transform.position;
-                        collider.size = so.boundingVolume.boxSize;
+                        collider.size = so.boundingVolume.Size;
                     } else {
                         SphereCollider collider = so.Gao.AddComponent<SphereCollider>();
 
-                        collider.center = so.boundingVolume.sphereCenter;
+                        collider.center = so.boundingVolume.Center;
                         collider.radius = so.boundingVolume.sphereRadius;
                     }
                 }

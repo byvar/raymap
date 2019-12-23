@@ -34,10 +34,18 @@ namespace OpenSpace.Visual {
         public int currentAnimTexture = 0;
 
         // flags
-        public static uint flags_isTransparent = (1 << 3);
         public static uint flags_backfaceCulling = (1 << 10);
         public static uint flags_isMaterialChromed = (1 << 22);
         public static uint flags_isBillboard = (1 << 9);
+		public static uint Flags_IsTransparent {
+			get {
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					return (1 << 10);
+				} else {
+					return (1 << 3);
+				}
+			}
+		}
 
         //properties
         public static uint property_receiveShadows = 2;
@@ -131,7 +139,7 @@ namespace OpenSpace.Visual {
             get {
                 bool transparent = false;
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3 &&
-                    ((flags & flags_isTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent)) transparent = true;
+                    ((flags & Flags_IsTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent)) transparent = true;
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                     if ((flags & 0x4000000) != 0) transparent = true;
                 }
@@ -147,14 +155,18 @@ namespace OpenSpace.Visual {
         [JsonRequired]
         public bool IsLight {
             get {
-                //if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-                if ((flags & flags_isTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent
-                    || Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                    if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
-                        return textures[0].texture.IsLight;
-                    }
-                    return false;
-                } else return true;
+				//if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
+				if ((flags & Flags_IsTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent
+					|| Settings.s.engineVersion < Settings.EngineVersion.R3
+					|| Settings.s.game == Settings.Game.LargoWinch) {
+					if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
+						return textures[0].texture.IsLight;
+					}
+					return false;
+				} else {
+					if (Settings.s.game == Settings.Game.LargoWinch) return false;
+					return true;
+				}
             }
         }
 
@@ -185,27 +197,57 @@ namespace OpenSpace.Visual {
         public static VisualMaterial Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
-            // Material struct = 0x188
+			// Material struct = 0x188
+			//l.print("Material @ " + offset);
             m.flags = reader.ReadUInt32(); // After this: 0x4
-			if (Settings.s.game != Settings.Game.R2Revolution) {
+			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
 				if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
 				m.ambientCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
-			} else {
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				// Fill in light info for Revolution
-				m.ambientCoef = new Vector4(0,0,0,1f);
+				m.ambientCoef = new Vector4(0, 0, 0, 1f);
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				//m.diffuseCoef = new Vector4(1, 1, 1, 1);
 				reader.ReadInt32(); // current refresh number for scrolling/animated textures
 				m.off_animTextures_first = Pointer.Read(reader);
-				m.off_animTextures_current = Pointer.Read(reader); 
+				m.off_animTextures_current = Pointer.Read(reader);
 				reader.ReadInt32();
 				m.num_animTextures = reader.ReadUInt16();
 				reader.ReadUInt16(); // 0x70
+			} else if (Settings.s.game == Settings.Game.LargoWinch) {
+				m.ambientCoef = new Vector4(0, 0, 0, 1f);
+				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
+				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				//m.ambientCoef = m.diffuseCoef;
+				reader.ReadInt32(); // current refresh number for scrolling/animated textures
+				m.off_animTextures_first = Pointer.Read(reader);
+				m.off_animTextures_current = Pointer.Read(reader);
+				reader.ReadInt32();
+				m.num_animTextures = reader.ReadUInt16();
+				reader.ReadUInt16();
 			}
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				m.num_textures = 1;
+				VisualMaterialTexture t = new VisualMaterialTexture();
+				t.offset = Pointer.Current(reader);
+				t.off_texture = Pointer.Read(reader); // 0x4c
+				t.texture = TextureInfo.FromOffset(t.off_texture);
+				t.textureOp = reader.ReadByte();
+				t.shadingMode = reader.ReadByte();
+				t.uvFunction = reader.ReadByte();
+				t.scrollByte = reader.ReadByte();
+				t.scrollX = reader.ReadSingle();
+				t.scrollY = reader.ReadSingle();
+				reader.ReadSingle();
+
+				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+				m.textures.Add(t);
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				m.num_textures = 1;
 				VisualMaterialTexture t = new VisualMaterialTexture();
 				t.offset = Pointer.Current(reader);
@@ -271,8 +313,11 @@ namespace OpenSpace.Visual {
                 reader.ReadByte();
                 reader.ReadByte(); // padding, not in DC
                 reader.ReadByte(); // padding, not in DC
-            } else {
+            } else { // EngineVersion >= R3
                 reader.ReadUInt32(); // current refresh number for scrolling/animated textures, 0x48
+				if (Settings.s.game == Settings.Game.Dinosaur) {
+					reader.ReadBytes(0x1C);
+				}
                 m.off_animTextures_first = Pointer.Read(reader);
                 m.off_animTextures_current = Pointer.Read(reader);
                 m.num_animTextures = reader.ReadUInt16();
@@ -290,29 +335,53 @@ namespace OpenSpace.Visual {
                     t.offset = Pointer.Current(reader);
                     t.off_texture = Pointer.Read(reader);
                     if (t.off_texture == null) break;
-                    t.texture = TextureInfo.FromOffset(t.off_texture);
+					/*if (Settings.s.game == Settings.Game.Dinosaur) {
+						Pointer.DoAt(ref reader, t.off_texture, () => {
+							Pointer off_tex = Pointer.Read(reader);
+							t.texture = TextureInfo.FromOffset(off_tex);
+						});
+					} else {*/
+					t.texture = TextureInfo.FromOffset(t.off_texture);
+					//}
 
                     t.textureOp = reader.ReadByte();
                     t.shadingMode = reader.ReadByte();
                     t.uvFunction = reader.ReadByte();
                     t.scrollByte = reader.ReadByte();
 
-                    t.properties = reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    t.scrollX = reader.ReadSingle();
-                    t.scrollY = reader.ReadSingle();
-                    t.rotateSpeed = reader.ReadSingle();
-                    t.rotateDirection = reader.ReadSingle();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    t.currentScrollX = reader.ReadSingle();
-                    t.currentScrollY = reader.ReadSingle();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    reader.ReadInt32();
-                    t.blendIndex = reader.ReadUInt32();
+					if (Settings.s.game == Settings.Game.Dinosaur) {
+						t.properties = reader.ReadInt32();
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+						t.currentScrollX = reader.ReadSingle();
+						t.currentScrollY = reader.ReadSingle();
+						t.scrollX = reader.ReadSingle();
+						t.scrollY = reader.ReadSingle();
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						new Vector2(reader.ReadSingle(), reader.ReadSingle());
+					} else {
+						t.properties = reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						t.scrollX = reader.ReadSingle();
+						t.scrollY = reader.ReadSingle();
+						t.rotateSpeed = reader.ReadSingle();
+						t.rotateDirection = reader.ReadSingle();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						t.currentScrollX = reader.ReadSingle();
+						t.currentScrollY = reader.ReadSingle();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						reader.ReadInt32();
+						t.blendIndex = reader.ReadUInt32();
+					}
                     
                     m.textures.Add(t);
                 }

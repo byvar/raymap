@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimKeyframe {
+    public class AnimKeyframe : OpenSpaceStruct {
         public float x;
         public float y;
         public float z;
@@ -20,47 +20,52 @@ namespace OpenSpace.Animation.Component {
 
         public static ushort flag_endKF = (1 << 7);
 
-        public AnimKeyframe() {}
+		protected override void ReadInternal(Reader reader) {
+			if (Settings.s.engineVersion < Settings.EngineVersion.R3
+				|| Settings.s.game == Settings.Game.RM
+				|| Settings.s.game == Settings.Game.Dinosaur) {
+				x = reader.ReadSingle();
+				y = reader.ReadSingle();
+				z = reader.ReadSingle();
+				positionMultiplier = reader.ReadSingle();
+			}
+			frame = reader.ReadUInt16();
+			flags = reader.ReadUInt16();
+			quaternion = reader.ReadUInt16();
+			quaternion2 = reader.ReadUInt16();
+			scaleVector = reader.ReadUInt16();
 
-        public static AnimKeyframe Read(Reader reader) {
-            MapLoader l = MapLoader.Loader;
-            AnimKeyframe kf = new AnimKeyframe();
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.RM) {
-                kf.x = reader.ReadSingle();
-                kf.y = reader.ReadSingle();
-                kf.z = reader.ReadSingle();
-                kf.positionMultiplier = reader.ReadSingle();
-            }
-            kf.frame = reader.ReadUInt16();
-            kf.flags = reader.ReadUInt16();
-            kf.quaternion = reader.ReadUInt16();
-            kf.quaternion2 = reader.ReadUInt16();
-            kf.scaleVector = reader.ReadUInt16();
-            kf.positionVector = reader.ReadUInt16();
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.RM) {
-                reader.ReadUInt16();
-                reader.ReadUInt16();
-                reader.ReadUInt16();
-            }
-            kf.interpolationFactor = (double)reader.ReadUInt16() * 0.00012207031;
-            return kf;
-        }
+			positionVector = reader.ReadUInt16();
+			if (Settings.s.engineVersion < Settings.EngineVersion.R3
+				|| Settings.s.game == Settings.Game.RM
+				|| Settings.s.game == Settings.Game.Dinosaur) {
+				reader.ReadUInt16();
+				reader.ReadUInt16();
+				reader.ReadUInt16();
+			}
+			interpolationFactor = (double)reader.ReadUInt16() * 0.00012207031;
+		}
 
-        public bool IsEndKeyframe {
+		public bool IsEndKeyframe {
             get {
                 if((flags & flag_endKF) != 0) return true;
                 return false;
             }
         }
 
-        public static int Size {
+        /*public static int Size {
             get {
                 switch (Settings.s.engineVersion) {
-                    case Settings.EngineVersion.R3: return 14;
+                    case Settings.EngineVersion.R3:
+						if (Settings.s.game == Settings.Game.Dinosaur || Settings.s.game == Settings.Game.RM) {
+							return 36;
+						} else {
+							return 14;
+						}
                     default: return 36;
                 }
             }
-        }
+        }*/
 
         public static bool Aligned {
             get {

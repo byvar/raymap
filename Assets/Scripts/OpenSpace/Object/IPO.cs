@@ -41,13 +41,15 @@ namespace OpenSpace.Object {
             IPO ipo = new IPO(offset, so);
             ipo.off_data = Pointer.Read(reader);
             ipo.off_radiosity = Pointer.Read(reader);
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            reader.ReadUInt32();
-            ipo.name = "IPO @ " + offset;
-            if (Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
+			ipo.name = "IPO @ " + offset;
+			if (Settings.s.engineVersion >= Settings.EngineVersion.R3) {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				if (Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
+			}
 			Pointer.DoAt(ref reader, ipo.off_data, () => {
 				ipo.data = PhysicalObject.Read(reader, ipo.off_data);
 				if (ipo.data != null) {

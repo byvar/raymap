@@ -88,6 +88,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 				}
 
 				e.visualMaterial = materialIndices[i] == -1 ? materials[currentUniqueMaterial] : materials[materialIndices[i]];
+				e.visualMaterialOG = e.visualMaterial;
 				if (materialIndices[i] == -1) currentUniqueMaterial++;
 				m.subblocks[i] = e;
 			}

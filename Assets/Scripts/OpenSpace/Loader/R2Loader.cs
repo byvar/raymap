@@ -60,11 +60,11 @@ namespace OpenSpace.Loader {
                 } else {
                     hasTransit = false;
                     DAT dat = null;
-
-                    string levelsFolder = gameDataBinFolder + ConvertCase(gameDsb.levelsDataPath, Settings.CapsType.All) + "/";
+					string levelsSubFolder = ConvertCase(ConvertPath(gameDsb.levelsDataPath), Settings.CapsType.All) + "/";
+					string levelsFolder = gameDataBinFolder + levelsSubFolder;
                     string langDataPath = gameDataBinFolder
 						+ ConvertCase("../LangData/English/", Settings.CapsType.All)
-						+ ConvertCase(gameDsb.levelsDataPath, Settings.CapsType.All) + "/";
+						+ levelsSubFolder;
 					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
 						yield return controller.StartCoroutine(FileSystem.CheckDirectory(langDataPath));
 						if (FileSystem.mode != FileSystem.Mode.Web && !FileSystem.DirectoryExists(langDataPath)) {
@@ -74,7 +74,7 @@ namespace OpenSpace.Loader {
 								DirectoryInfo dirInfo = new DirectoryInfo(langPath);
 								DirectoryInfo firstLang = dirInfo.GetDirectories().FirstOrDefault();
 								if (firstLang != null) {
-									langDataPath = firstLang.FullName + "/" + ConvertCase(gameDsb.levelsDataPath, Settings.CapsType.All) + "/";
+									langDataPath = firstLang.FullName + "/" + levelsSubFolder;
 									yield return controller.StartCoroutine(FileSystem.CheckDirectory(langDataPath));
 								}
 							}
@@ -746,7 +746,7 @@ namespace OpenSpace.Loader {
                 animationBanks[1] = animationBanks[0];
             }
             if (FileSystem.mode != FileSystem.Mode.Web) {
-                string levelsFolder = gameDataBinFolder + gameDsb.levelsDataPath + "/";
+                string levelsFolder = gameDataBinFolder + ConvertPath(gameDsb.levelsDataPath) + "/";
                 ((SNA)files_array[0]).CreateMemoryDump(levelsFolder + "fix.dmp", true);
                 ((SNA)files_array[1]).CreateMemoryDump(levelsFolder + lvlName + "/" + lvlName + ".dmp", true);
             }

@@ -40,7 +40,8 @@ namespace OpenSpace.FileFormat.RenderWare {
 					byte addressingMode = (byte)texNativeHeader.variables["addressingMode"];
 					textures[i] = ParseTexture(texNativeData, width, height, bpp, textureDataSize, paletteDataSize, (FilterMode)filterMode, (AddressingMode)addressingMode, (RasterFormat)rasterFormat);
 					if (MapLoader.Loader.exportTextures) {
-						Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "textures/" + Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "/" + name + ".png", textures[i].EncodeToPNG());
+						//MapLoader.Loader.print(MapLoader.Loader.gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(path) + "/" + name + ".png");
+						Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(path) + "/" + name + ".png", textures[i].EncodeToPNG());
 					}
 				}
 			}

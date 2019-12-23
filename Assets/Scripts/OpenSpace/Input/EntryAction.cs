@@ -46,6 +46,7 @@ namespace OpenSpace.Input {
             MapLoader l = MapLoader.Loader;
             //MapLoader.Loader.print("Off: " + offset);
             EntryAction ea = new EntryAction(offset);
+			l.entryActions.Add(ea);
 
             if (Settings.s.game == Settings.Game.TTSE) {
                 ea.off_entryAction_next = Pointer.Read(reader);
@@ -74,8 +75,8 @@ namespace OpenSpace.Input {
 				ea.keywords = new LinkedList<KeyWord>(Pointer.Current(reader), ea.off_keywords, ea.num_keywords, type: LinkedList.Type.SingleNoElementPointers);
                 if (Settings.s.engineVersion < Settings.EngineVersion.R2) reader.ReadUInt32(); // Offset of extra input data in tmp memory? It's different by 0x18 every time
                 ea.off_name = Pointer.Read(reader);
-                if (Settings.s.hasExtraInputData || Settings.s.platform == Settings.Platform.DC || Settings.s.engineVersion == Settings.EngineVersion.R3) ea.off_name2 = Pointer.Read(reader);
-                reader.ReadInt32(); // -2
+                if (Settings.s.hasExtraInputData || Settings.s.platform == Settings.Platform.DC || Settings.s.engineVersion == Settings.EngineVersion.R3) ea.off_name2 = Pointer.Read(reader);  
+				reader.ReadInt32(); // -2
                 reader.ReadUInt32();
                 ea.active = reader.ReadByte();
                 reader.ReadBytes(3);
@@ -85,7 +86,7 @@ namespace OpenSpace.Input {
 				});
             }
 			if (ea.keywords != null && ea.keywords.Count > 0) {
-				ea.keywords[0].FillInSubKeywords(ea.keywords, 0);
+				ea.keywords[0].FillInSubKeywords(ref reader, ea.keywords, 0);
 			}
 			Pointer.DoAt(ref reader, ea.off_name, () => {
                 ea.name = reader.ReadNullDelimitedString();
@@ -134,21 +135,16 @@ namespace OpenSpace.Input {
 
         public static EntryAction FromOffset(Pointer offset) {
             if (offset == null) return null;
-            InputStructure i = MapLoader.Loader.inputStruct;
-            if (i == null || i.entryActions == null) return null;
-            return i.entryActions.FirstOrDefault(a => a.offset == offset);
+            return MapLoader.Loader.entryActions.FirstOrDefault(a => a.offset == offset);
         }
 
         public static EntryAction FromOffsetOrRead(Pointer offset, Reader reader) {
             if (offset == null) return null;
-            InputStructure i = MapLoader.Loader.inputStruct;
-            if (i == null || i.entryActions == null) return null;
             EntryAction e = EntryAction.FromOffset(offset);
             if (e == null) {
                 Pointer.DoAt(ref reader, offset, () => {
                     e = EntryAction.Read(reader, offset);
 					MapLoader.Loader.print(e.ToString());
-					i.entryActions.Add(e);
                 });
             }
             return e;

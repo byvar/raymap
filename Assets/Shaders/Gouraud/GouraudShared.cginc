@@ -245,7 +245,8 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 			* _DiffuseCoef.xyz //* _DiffuseCoef.w
 			* max(0.0, dot(normalDirection, lightDirection));*/
 	} else {
-		diffuseReflection = float3(1.0, 1.0, 1.0);
+		//diffuseReflection = float3(1.0, 1.0, 1.0);
+		diffuseReflection = _DiffuseCoef.xyz;
 	}
 	if (/*_ShadingMode == 0.0 && */isAdd == 0.0 && isLight == 0.0) {
 		float4 lightCol = ApplyStaticLights(normalDirection, multipliedPosition);
@@ -297,8 +298,19 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 	UNITY_SETUP_INSTANCE_ID(i);
 	float4 c = float4(0.0, 0.0, 0.0, 0.0);
 	if (_NumTextures > 1 && _Tex1Params.x == 50 && _DisableLighting != 1.0 && _DisableLightingLocal != 1.0) {
+		/*float4 diffuseReflection = i.diffuseColor;
+		diffuseReflection = TextureOp(diffuseReflection, i.diffuseColor, _Tex1, i.uv2, _Tex1Params, _Tex1Params2, 1);
+
+		if (_Saturate == 1.0) {
+			diffuseReflection.x = saturate(diffuseReflection.x);
+			diffuseReflection.y = saturate(diffuseReflection.y);
+			diffuseReflection.z = saturate(diffuseReflection.z);
+			diffuseReflection.w = saturate(diffuseReflection.w);
+		}
+		i.diffuseColor = diffuseReflection;*/
 		float4 diffuseReflection = float4(_Luminosity - 0.5, _Luminosity - 0.5, _Luminosity - 0.5, 1);
 		diffuseReflection = TextureOp(diffuseReflection, i.diffuseColor, _Tex1, i.uv2, _Tex1Params, _Tex1Params2, 1);
+		diffuseReflection = diffuseReflection * 2;
 
 		if (_Saturate == 1.0) {
 			diffuseReflection.x = saturate(diffuseReflection.x);

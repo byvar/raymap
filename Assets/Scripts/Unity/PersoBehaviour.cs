@@ -3,6 +3,7 @@ using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Animation;
 using OpenSpace.Animation.Component;
+using OpenSpace.Animation.ComponentLargo;
 using OpenSpace.Animation.ComponentMontreal;
 using OpenSpace.Collide;
 using OpenSpace.Object;
@@ -37,6 +38,7 @@ public class PersoBehaviour : MonoBehaviour {
     // Animation
     public AnimA3DGeneral a3d = null;
     public AnimationMontreal animMontreal = null;
+	public AnimA3DLargo animLargo = null;
     bool forceAnimUpdate = false;
     public uint currentFrame = 0;
     public bool playAnimation = true;
@@ -284,44 +286,47 @@ public class PersoBehaviour : MonoBehaviour {
 
     public void PrintAnimationDebugInfo() {
         if (loaded && hasStates) {
-            if (a3d != null) {
-                for (int i = 0; i < a3d.num_NTTO; i++) {
-                    AnimNTTO ntto = a3d.ntto[i + a3d.start_NTTO];
-                    print("NTTO " + i + ": FLAGS:" + ntto.flags + " - OBJIND:" + ntto.object_index +
-                        " - UNK4:" + ntto.unk4 + " - UNK5:" + ntto.unk5);
-                }
-                for (int i = 0; i < a3d.num_deformations; i++) {
-                    AnimDeformation d = a3d.deformations[i + a3d.start_deformations];
-                    print("Deform " + i + ": CH1:" + d.channel + " - BI1:" + d.bone +
-                        " - CH2:" + d.linkChannel + " - BI2:" + d.linkBone);
-                }
-                for (int i = 0; i < a3d.num_hierarchies; i++) {
-                    AnimHierarchy h = a3d.hierarchies[i + a3d.start_hierarchies];
-                    print("Hierarchy " + i + ": Child:" + h.childChannelID + " - Parent:" + h.parentChannelID);
-                }
-                for (int i = 0; i < a3d.num_channels; i++) {
-                    AnimChannel ch = a3d.channels[i + a3d.start_channels];
-                    AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
-                    AnimKeyframe kf = a3d.keyframes[kfi.kf];
-                    print("Channel " + i + ": ID:" + ch.id + " - U0:" + ch.unk0 + " - V:" + ch.vector + " - ");
-                    print("Current keyframe: Flags:" + kf.flags + " - Q2:" + kf.quaternion2 + " - Frame:" + kf.frame);
-                }
+			if (a3d != null) {
+				for (int i = 0; i < a3d.num_NTTO; i++) {
+					AnimNTTO ntto = a3d.ntto[i + a3d.start_NTTO];
+					print("NTTO " + i + ": FLAGS:" + ntto.flags + " - OBJIND:" + ntto.object_index +
+						" - UNK4:" + ntto.unk4 + " - UNK5:" + ntto.unk5);
+				}
+				for (int i = 0; i < a3d.num_deformations; i++) {
+					AnimDeformation d = a3d.deformations[i + a3d.start_deformations];
+					print("Deform " + i + ": CH1:" + d.channel + " - BI1:" + d.bone +
+						" - CH2:" + d.linkChannel + " - BI2:" + d.linkBone);
+				}
+				for (int i = 0; i < a3d.num_hierarchies; i++) {
+					AnimHierarchy h = a3d.hierarchies[i + a3d.start_hierarchies];
+					print("Hierarchy " + i + ": Child:" + h.childChannelID + " - Parent:" + h.parentChannelID);
+				}
+				for (int i = 0; i < a3d.num_channels; i++) {
+					AnimChannel ch = a3d.channels[i + a3d.start_channels];
+					AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
+					AnimKeyframe kf = a3d.keyframes[kfi.kf];
+					print("Channel " + i + ": ID:" + ch.id + " - U0:" + ch.unk0 + " - V:" + ch.vector + " - ");
+					print("Current keyframe: Flags:" + kf.flags + " - Q2:" + kf.quaternion2 + " - Frame:" + kf.frame);
+				}
 
-                //AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
-                print("POs offset: " + perso.p3dData.family.objectLists.off_head);
-            } else if (animMontreal != null) {
-                print("POs offset: " + perso.p3dData.family.objectLists.off_head + " - Length: " + perso.p3dData.family.objectLists[0].Count);
-                for (int i = 0; i < animMontreal.num_channels; i++) {
-                    for (int j = 0; j < animMontreal.num_frames; j++) {
-                        print("Frame " + j + " ch " + i + ": "
-                            + animMontreal.frames[j].channels[i].objectIndex + " - "
-                            + animMontreal.frames[j].channels[i].unk2 + " - "
-                            + animMontreal.frames[j].channels[i].unk3 + " - "
-                            + animMontreal.frames[j].channels[i].unkByte1 + " - "
-                            + animMontreal.frames[j].channels[i].unkByte2 + " - "
-                            + animMontreal.frames[j].channels[i].unkUint);
-                    }
-                }
+				//AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
+				print("POs offset: " + perso.p3dData.family.objectLists.off_head);
+			} else if (animMontreal != null) {
+				print("POs offset: " + perso.p3dData.family.objectLists.off_head + " - Length: " + perso.p3dData.family.objectLists[0].Count);
+				for (int i = 0; i < animMontreal.num_channels; i++) {
+					for (int j = 0; j < animMontreal.num_frames; j++) {
+						print("Frame " + j + " ch " + i + ": "
+							+ animMontreal.frames[j].channels[i].objectIndex + " - "
+							+ animMontreal.frames[j].channels[i].unk2 + " - "
+							+ animMontreal.frames[j].channels[i].unk3 + " - "
+							+ animMontreal.frames[j].channels[i].unkByte1 + " - "
+							+ animMontreal.frames[j].channels[i].unkByte2 + " - "
+							+ animMontreal.frames[j].channels[i].unkUint);
+					}
+				}
+			} else if(animLargo != null) {
+				print("Animation offset: " + animLargo.Offset);
+				print("Num Deformations: " + animLargo.num_deformations);
             } else if (state != null) {
                 MapLoader l = MapLoader.Loader;
                 ushort anim_index = 0;
@@ -364,9 +369,12 @@ public class PersoBehaviour : MonoBehaviour {
 						CollideActivation ca = entry.Value[stateIndex];
 						if (ca.activationZone != null) {
 							foreach (CollideActivationZone caz in ca.activationZone) {
-								if (c.zdxList[entry.Key][caz.zdxIndex] == null) continue;
-								if (c.GetPrivilegedActionZoneStatus(entry.Key, (int)caz.zdxIndex) != CollSet.PrivilegedActivationStatus.ForceInactive) {
-									c.zdxList[entry.Key][caz.zdxIndex].SetVisualsActive(true);
+								int index = caz.zdxIndex;
+								if (index >= c.zdxList[entry.Key].Count) index = c.zdxList[entry.Key].Count - 1;
+								if (index < 0) continue;
+								if (c.zdxList[entry.Key][index] == null) continue;
+								if (c.GetPrivilegedActionZoneStatus(entry.Key, index) != CollSet.PrivilegedActivationStatus.ForceInactive) {
+									c.zdxList[entry.Key][index].SetVisualsActive(true);
 								}
 							}
 						}
@@ -408,32 +416,41 @@ public class PersoBehaviour : MonoBehaviour {
             anim_index = state.anim_ref.anim_index;
             bank_index = perso.p3dData.family.animBank;
         }
-        if (state.anim_refMontreal != null) {
-            a3d = null;
-            animationSpeed = state.speed;
-            //animationSpeed = state.speed;
-            InitAnimationMontreal(state.anim_refMontreal);
-            UpdateAnimation();
-        } else if (state.anim_ref != null
-            && l.animationBanks != null
-            && l.animationBanks.Length > bank_index
-            && l.animationBanks[bank_index] != null
-            && l.animationBanks[bank_index].animations != null
-            && l.animationBanks[bank_index].animations.Length > anim_index
-            && l.animationBanks[bank_index].animations[anim_index] != null) {
-            animMontreal = null;
-            animationSpeed = state.speed;
-            //animationSpeed = state.speed;
-            InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
-            UpdateAnimation();
-        } else if (state.anim_ref != null && state.anim_ref.a3d != null) {
-            animMontreal = null;
-            animationSpeed = state.speed;
-            InitAnimation(state.anim_ref.a3d);
-            UpdateAnimation();
-        } else {
-            a3d = null;
-        }
+		if (state.anim_refMontreal != null) {
+			a3d = null;
+			animLargo = null;
+			animationSpeed = state.speed;
+			//animationSpeed = state.speed;
+			InitAnimationMontreal(state.anim_refMontreal);
+			UpdateAnimation();
+		} else if (state.anim_ref != null
+			&& l.animationBanks != null
+			&& l.animationBanks.Length > bank_index
+			&& l.animationBanks[bank_index] != null
+			&& l.animationBanks[bank_index].animations != null
+			&& l.animationBanks[bank_index].animations.Length > anim_index
+			&& l.animationBanks[bank_index].animations[anim_index] != null) {
+			animMontreal = null;
+			animLargo = null;
+			animationSpeed = state.speed;
+			//animationSpeed = state.speed;
+			InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
+			UpdateAnimation();
+		} else if (state.anim_ref != null && state.anim_ref.a3d != null) {
+			animMontreal = null;
+			animLargo = null;
+			animationSpeed = state.speed;
+			InitAnimation(state.anim_ref.a3d);
+			UpdateAnimation();
+		} else if (state.anim_ref != null && state.anim_ref.a3dLargo != null) {
+			animMontreal = null;
+			a3d = null;
+			animationSpeed = state.speed;
+			InitAnimationLargo(state.anim_ref.a3dLargo);
+			UpdateAnimation();
+		} else {
+			a3d = null;
+		}
     }
 
 	public void SetState(int index) {
@@ -743,13 +760,98 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    public void UpdateAnimation() {
-        if (loaded && a3d != null && channelObjects != null & subObjects != null) {
-            if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
-            // First pass: reset TRS for all sub objects
-            for (int i = 0; i < channelParents.Length; i++) {
+	void InitAnimationLargo(AnimA3DLargo animLargo) {
+		if (animLargo != this.animLargo || forceAnimUpdate) {
+			forceAnimUpdate = false;
+			DeinitAnimation();
+			// Init animation
+			this.animLargo = animLargo;
+			currentFrame = 0;
+			if (animLargo != null) {
+				//animationSpeed = a3d.speed;
+				// Init channels & subobjects
+				subObjects = new PhysicalObject[animLargo.num_channels][];
+				channelObjects = new GameObject[animLargo.num_channels];
+				currentActivePO = new int[animLargo.num_channels];
+				channelParents = new bool[animLargo.num_channels];
+				for (int i = 0; i < animLargo.num_channels; i++) {
+					short id = animLargo.channels[i].id;
+					channelObjects[i] = new GameObject("Channel " + id);
+					channelObjects[i].transform.SetParent(perso.Gao.transform);
+					currentActivePO[i] = -1;
+					AddChannelID(id, i);
+					subObjects[i] = new PhysicalObject[animLargo.num_ntto];
+					AnimChannelLargo ch = animLargo.channels[i];
+					List<ushort> listOfNTTOforChannel = new List<ushort>();
+					for (int j = 0; j < animLargo.num_onlyFrames; j++) {
+						AnimOnlyFrame of = animLargo.onlyFrames[j];
+						//print(ch.numOfNTTO + " - " + of.numOfNTTO + " - " + a3d.numOfNTTO.Length);
+						AnimNumOfNTTO numOfNTTO = animLargo.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
+						if (!listOfNTTOforChannel.Contains(numOfNTTO.numOfNTTO)) {
+							listOfNTTOforChannel.Add(numOfNTTO.numOfNTTO);
+						}
+					}
+					for (int k = 0; k < listOfNTTOforChannel.Count; k++) {
+						int j = listOfNTTOforChannel[k]; ;
+						AnimNTTO ntto = animLargo.ntto[j];
+						if (ntto.IsInvisibleNTTO) {
+							subObjects[i][j] = new PhysicalObject(null);
+							subObjects[i][j].Gao.transform.parent = channelObjects[i].transform;
+							subObjects[i][j].Gao.name = "[" + j + "] Invisible PO";
+							subObjects[i][j].Gao.SetActive(false);
+							/*GameObject boneVisualisation = new GameObject("Bone vis");
+                            boneVisualisation.transform.SetParent(subObjects[i][j].Gao.transform);
+                            MeshRenderer mr = boneVisualisation.AddComponent<MeshRenderer>();
+                            MeshFilter mf = boneVisualisation.AddComponent<MeshFilter>();
+                            Mesh mesh = Util.CreateBox(0.1f);
+                            mf.mesh = mesh;
+                            boneVisualisation.transform.localScale = Vector3.one / 4f;*/
+						} else {
+							if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > ntto.object_index) {
+								PhysicalObject o = perso.p3dData.objectList[ntto.object_index].po;
+								if (o != null) {
+									//if (o.visualSetType == 1) print(name);
+									PhysicalObject c = o.Clone();
+									subObjects[i][j] = c;
+									subObjects[i][j].Gao.transform.localScale =
+										subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
+									c.Gao.transform.parent = channelObjects[i].transform;
+									c.Gao.name = "[" + j + "] " + c.Gao.name;
+									if (Settings.s.hasDeformations && c.Bones != null) hasBones = true;
+									foreach (VisualSetLOD l in c.visualSet) {
+										if (l.obj != null) {
+											GameObject gao = l.obj.Gao;
+											if (gao != null) gao.SetActive(!controller.viewCollision);
+										}
+									}
+									if (c.collideMesh != null) c.collideMesh.SetVisualsActive(controller.viewCollision);
+									c.Gao.SetActive(false);
+								}
+							}
+						}
+					}
+				}
+	
+				morphDataArray = null;
+
+				// Keep lighting last so that it is applied to all new sub objects
+				if (!isAlways) {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
+				} else {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
+				}
+			}
+			loaded = true;
+		}
+	}
+
+	public void UpdateAnimation() {
+		if (loaded && a3d != null && channelObjects != null & subObjects != null) {
+			if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
+			// First pass: reset TRS for all sub objects
+			for (int i = 0; i < channelParents.Length; i++) {
 				channelParents[i] = false;
-                /*GameObject c = channelObjects[i];
+				/*GameObject c = channelObjects[i];
                 if (c != null) {
                     c.transform.SetParent(perso.Gao.transform);
                     c.transform.localPosition = Vector3.zero;
@@ -765,80 +867,80 @@ public class PersoBehaviour : MonoBehaviour {
                         subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
                     //subObjects[i][j].Gao.SetActive(false);
                 }*/
-            }
-            AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
+			}
+			AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
 			// Create hierarchy for this frame
-            for (int i = of.start_hierarchies_for_frame;
-                i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
-                AnimHierarchy h = a3d.hierarchies[i];
+			for (int i = of.start_hierarchies_for_frame;
+				i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
+				AnimHierarchy h = a3d.hierarchies[i];
 
-                if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
-                    channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
+				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+					channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
 					channelParents[h.childChannelID] = true;
 				} else {
-                    if (!channelIDDictionary.ContainsKey(h.childChannelID) || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
-                        continue;
-                    }
-                    List<int> ch_child_list = GetChannelByID(h.childChannelID);
-                    List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
-                    foreach (int ch_child in ch_child_list) {
-                        foreach (int ch_parent in ch_parent_list) {
-                            channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+					if (!channelIDDictionary.ContainsKey(h.childChannelID) || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
+						continue;
+					}
+					List<int> ch_child_list = GetChannelByID(h.childChannelID);
+					List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
+					foreach (int ch_child in ch_child_list) {
+						foreach (int ch_parent in ch_parent_list) {
+							channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
 							channelParents[ch_child] = true;
-                        }
-                    }
-                }
+						}
+					}
+				}
 
-                //channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
-            }
-            // Final pass
-            for (int i = 0; i < a3d.num_channels; i++) {
-                AnimChannel ch = a3d.channels[a3d.start_channels + i];
-                AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
-                AnimKeyframe kf = a3d.keyframes[kfi.kf];
+				//channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+			}
+			// Final pass
+			for (int i = 0; i < a3d.num_channels; i++) {
+				AnimChannel ch = a3d.channels[a3d.start_channels + i];
+				AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
+				AnimKeyframe kf = a3d.keyframes[kfi.kf];
 				//print(perso.p3dData.family.animBank);
-                AnimVector pos = a3d.vectors[kf.positionVector];
-                AnimQuaternion qua = a3d.quaternions[kf.quaternion];
-                AnimVector scl = a3d.vectors[kf.scaleVector];
-                AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
-                AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
+				AnimVector pos = a3d.vectors[kf.positionVector];
+				AnimQuaternion qua = a3d.quaternions[kf.quaternion];
+				AnimVector scl = a3d.vectors[kf.scaleVector];
+				AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
+				AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
 				//if (ntto.IsBoneNTTO) continue;
 				int poNum = numOfNTTO.numOfNTTO - a3d.start_NTTO;
 				PhysicalObject physicalObject = subObjects[i][poNum];
-                Vector3 vector = pos.vector;
-                Quaternion quaternion = qua.quaternion;
-                Vector3 scale = scl.vector;
-                int framesSinceKF = (int)currentFrame - (int)kf.frame;
-                AnimKeyframe nextKF = null;
-                int framesDifference;
-                float interpolation;
-                if (kf.IsEndKeyframe) {
-                    AnimFramesKFIndex next_kfi = a3d.framesKFIndex[0 + ch.framesKF];
-                    nextKF = a3d.keyframes[next_kfi.kf];
-                    framesDifference = a3d.num_onlyFrames - 1 + (int)nextKF.frame - (int)kf.frame;
-                    if (framesDifference == 0) {
-                        interpolation = 0;
-                    } else {
-                        //interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
-                        interpolation = framesSinceKF / (float)framesDifference;
-                    }
-                } else {
-                    nextKF = a3d.keyframes[kfi.kf + 1];
-                    framesDifference = (int)nextKF.frame - (int)kf.frame;
-                    //interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
-                    interpolation = framesSinceKF / (float)framesDifference;
-                }
+				Vector3 vector = pos.vector;
+				Quaternion quaternion = qua.quaternion;
+				Vector3 scale = scl.vector;
+				int framesSinceKF = (int)currentFrame - (int)kf.frame;
+				AnimKeyframe nextKF = null;
+				int framesDifference;
+				float interpolation;
+				if (kf.IsEndKeyframe) {
+					AnimFramesKFIndex next_kfi = a3d.framesKFIndex[0 + ch.framesKF];
+					nextKF = a3d.keyframes[next_kfi.kf];
+					framesDifference = a3d.num_onlyFrames - 1 + (int)nextKF.frame - (int)kf.frame;
+					if (framesDifference == 0) {
+						interpolation = 0;
+					} else {
+						//interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
+						interpolation = framesSinceKF / (float)framesDifference;
+					}
+				} else {
+					nextKF = a3d.keyframes[kfi.kf + 1];
+					framesDifference = (int)nextKF.frame - (int)kf.frame;
+					//interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
+					interpolation = framesSinceKF / (float)framesDifference;
+				}
 				//print(interpolation);
 				//print(a3d.vectors.Length + " - " + nextKF.positionVector);
 				//print(perso.p3dData.family.animBank);
-                AnimVector pos2 = a3d.vectors[nextKF.positionVector];
-                AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
-                AnimVector scl2 = a3d.vectors[nextKF.scaleVector];
-                vector = Vector3.Lerp(pos.vector, pos2.vector, interpolation);
-                quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
-                scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
-                float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
-				
+				AnimVector pos2 = a3d.vectors[nextKF.positionVector];
+				AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
+				AnimVector scl2 = a3d.vectors[nextKF.scaleVector];
+				vector = Vector3.Lerp(pos.vector, pos2.vector, interpolation);
+				quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
+				scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
+				float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
+
 				if (poNum != currentActivePO[i]) {
 					if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
 						foreach (PhysicalObject morphPO in fullMorphPOs[i].Values) {
@@ -849,15 +951,15 @@ public class PersoBehaviour : MonoBehaviour {
 						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
 					}
 					currentActivePO[i] = poNum;
-					if(physicalObject != null) physicalObject.Gao.SetActive(true);
+					if (physicalObject != null) physicalObject.Gao.SetActive(true);
 				}
-				if(!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
+				if (!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
 				channelObjects[i].transform.localPosition = vector * positionMultiplier;
-                channelObjects[i].transform.localRotation = quaternion;
-                channelObjects[i].transform.localScale = scale;
+				channelObjects[i].transform.localRotation = quaternion;
+				channelObjects[i].transform.localScale = scale;
 
-                if (physicalObject != null && a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
-                    AnimMorphData morphData = morphDataArray[i, currentFrame];
+				if (physicalObject != null && a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
+					AnimMorphData morphData = morphDataArray[i, currentFrame];
 
 					if (morphData != null && morphData.morphProgress != 0 && morphData.morphProgress != 100) {
 						PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
@@ -904,8 +1006,8 @@ public class PersoBehaviour : MonoBehaviour {
 							}
 						}
 					}
-                }
-            }
+				}
+			}
 			if (hasBones) {
 				for (int i = 0; i < a3d.num_channels; i++) {
 					AnimChannel ch = a3d.channels[a3d.start_channels + i];
@@ -948,10 +1050,12 @@ public class PersoBehaviour : MonoBehaviour {
 					}
 				}
 			}
-            //this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
-        } else if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
-            UpdateFrameMontreal();
-        }/*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
+			//this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
+		} else if (loaded && animMontreal != null && channelObjects != null & subObjects != null) {
+			UpdateFrameMontreal();
+		} else if (loaded && animLargo != null && channelObjects != null && subObjects != null) {
+			UpdateFrameLargo();
+		}/*else if (loaded && (a3d == null || !playAnimation) && perso.physical_objects != null) {
             for (int i = 0; i < perso.physical_objects.Length; i++) {
                 if (perso.physical_objects[i] != null) {
                     GameObject poGao = perso.physical_objects[i].Gao;
@@ -1033,7 +1137,192 @@ public class PersoBehaviour : MonoBehaviour {
         }
     }
 
-    List<int> GetChannelByID(short id) {
+
+	public void UpdateFrameLargo() {
+		if (loaded && animLargo != null && channelObjects != null & subObjects != null) {
+			if (currentFrame >= animLargo.num_onlyFrames) currentFrame %= animLargo.num_onlyFrames;
+			// First pass: reset TRS for all sub objects
+			for (int i = 0; i < channelParents.Length; i++) {
+				channelParents[i] = false;
+				/*GameObject c = channelObjects[i];
+                if (c != null) {
+                    c.transform.SetParent(perso.Gao.transform);
+                    c.transform.localPosition = Vector3.zero;
+                    c.transform.localEulerAngles = Vector3.zero;
+                    c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
+                }
+               for (int j = 0; j < subObjects[i].Length; j++) {
+                    if (subObjects[i][j] == null) continue;
+                    subObjects[i][j].Gao.transform.parent = c.transform;
+                    subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
+                    subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
+                    subObjects[i][j].Gao.transform.localScale =
+                        subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
+                    //subObjects[i][j].Gao.SetActive(false);
+                }*/
+			}
+			AnimOnlyFrame of = animLargo.onlyFrames[currentFrame];
+			// Create hierarchy for this frame
+			for (int i = of.start_hierarchies_for_frame;
+				i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
+				AnimHierarchy h = animLargo.hierarchies[i];
+
+				if (!channelIDDictionary.ContainsKey(h.childChannelID) || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
+					continue;
+				}
+				List<int> ch_child_list = GetChannelByID(h.childChannelID);
+				List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
+				foreach (int ch_child in ch_child_list) {
+					foreach (int ch_parent in ch_parent_list) {
+						channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+						channelParents[ch_child] = true;
+					}
+				}
+
+				//channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+			}
+			// Final pass
+			int startFrameVectors = 0;
+			int startFrameQuaternions = 0;
+			for (int i = 0; i < animLargo.num_channels; i++) {
+				AnimChannelLargo ch = animLargo.channels[i];
+				AnimFrameVector fv = null;
+				AnimFrameQuaternion fq = null;
+				int? curFV = null, curFQ = null, nextFV = null, nextFQ = null;
+				if (animLargo.channels[i].numFrameVectors > 0) {
+					curFV = startFrameVectors + animLargo.channels[i].numFrameVectors - 1;
+					nextFV = startFrameVectors;
+					for (int j = 0; j < animLargo.channels[i].numFrameVectors; j++) {
+						if (animLargo.framevector[startFrameVectors + j].frame > currentFrame) {
+							nextFV = startFrameVectors + j;
+							break;
+						}
+						curFV = startFrameVectors + j;
+					}
+					fv = animLargo.framevector[curFV.Value];
+					startFrameVectors += animLargo.channels[i].numFrameVectors;
+				}
+				if (animLargo.channels[i].numFrameQuaternions > 0) {
+					curFQ = startFrameQuaternions + animLargo.channels[i].numFrameQuaternions - 1;
+					nextFQ = startFrameQuaternions;
+					for (int j = 0; j < animLargo.channels[i].numFrameQuaternions; j++) {
+						if (animLargo.framequaternion[startFrameQuaternions + j].frame > currentFrame) {
+							nextFQ = startFrameQuaternions + j;
+							break;
+						}
+						curFQ = startFrameQuaternions + j;
+					}
+					fq = animLargo.framequaternion[curFQ.Value];
+					startFrameQuaternions += animLargo.channels[i].numFrameQuaternions;
+				}
+				AnimVector pos = fv != null ? animLargo.vectors[fv.vector] : null;
+				AnimQuaternion qua = fq != null ? animLargo.quaternions[fq.quaternion] : null;
+				AnimVector scl = null; // animLargo.vectors[0];
+				AnimNumOfNTTO numOfNTTO = animLargo.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
+				AnimNTTO ntto = animLargo.ntto[numOfNTTO.numOfNTTO];
+				//if (ntto.IsBoneNTTO) continue;
+				int poNum = numOfNTTO.numOfNTTO;
+				PhysicalObject physicalObject = subObjects[i][poNum];
+				Vector3 vector = pos != null ? pos.vector : Vector3.zero;
+				Quaternion quaternion = qua != null ? qua.quaternion : Quaternion.identity;
+				Vector3 scale = scl != null ? scl.vector : Vector3.one;
+
+				// Interpolation
+				if (nextFV.HasValue) {
+					AnimFrameVector fv2 = animLargo.framevector[nextFV.Value];
+					AnimVector pos2 = animLargo.vectors[fv2.vector];
+					int curFrame = fv.frame;
+					int nextFrame = fv2.frame;
+					if (curFrame != nextFrame) {
+						float interpolation = ((((int)currentFrame + animLargo.num_onlyFrames) - curFrame) % animLargo.num_onlyFrames) /
+							(((nextFrame + animLargo.num_onlyFrames) - curFrame) % animLargo.num_onlyFrames);
+						vector = Vector3.Lerp(pos.vector, pos2.vector, interpolation);
+					}
+				}
+				if (nextFQ.HasValue) {
+					AnimFrameQuaternion fq2 = animLargo.framequaternion[nextFQ.Value];
+					AnimQuaternion qua2 = animLargo.quaternions[fq2.quaternion];
+					int curFrame = fq.frame;
+					int nextFrame = fq2.frame;
+					if (curFrame != nextFrame) {
+						float interpolation = ((((int)currentFrame + animLargo.num_onlyFrames) - curFrame) % animLargo.num_onlyFrames) /
+							(((nextFrame + animLargo.num_onlyFrames) - curFrame) % animLargo.num_onlyFrames);
+						quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
+					}
+				}
+
+
+				//print(interpolation);
+				//print(a3d.vectors.Length + " - " + nextKF.positionVector);
+				//print(perso.p3dData.family.animBank);
+				//AnimVector scl2 = a3d.vectors[nextKF.scaleVector];
+				//scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
+				//float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
+
+				if (poNum != currentActivePO[i]) {
+					if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
+						foreach (PhysicalObject morphPO in fullMorphPOs[i].Values) {
+							if (morphPO.Gao.activeSelf) morphPO.Gao.SetActive(false);
+						}
+					}
+					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
+						subObjects[i][currentActivePO[i]].Gao.SetActive(false);
+					}
+					currentActivePO[i] = poNum;
+					if (physicalObject != null) physicalObject.Gao.SetActive(true);
+				}
+				if (!channelParents[i]) channelObjects[i].transform.SetParent(perso.Gao.transform);
+				channelObjects[i].transform.localPosition = vector; // * positionMultiplier;
+				channelObjects[i].transform.localRotation = quaternion;
+				channelObjects[i].transform.localScale = scale;
+			}
+			if (hasBones) {
+				for (int i = 0; i < animLargo.num_channels; i++) {
+					AnimChannelLargo ch = animLargo.channels[i];
+					Transform baseChannelTransform = channelObjects[i].transform;
+					Vector3 invertedScale = new Vector3(1f / baseChannelTransform.localScale.x, 1f / baseChannelTransform.localScale.y, 1f / baseChannelTransform.localScale.z);
+					AnimNumOfNTTO numOfNTTO = animLargo.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
+					AnimNTTO ntto = animLargo.ntto[numOfNTTO.numOfNTTO];
+					PhysicalObject physicalObject = subObjects[i][numOfNTTO.numOfNTTO];
+					if (physicalObject == null) continue;
+					DeformSet bones = physicalObject.Bones;
+					// Deformations
+					if (bones != null) {
+						for (int j = 0; j < animLargo.num_deformations; j++) {
+							AnimDeformation d = animLargo.deformations[j];
+							if (d.channel < ch.id) continue;
+							if (d.channel > ch.id) break;
+							if (!channelIDDictionary.ContainsKey(d.linkChannel)) continue;
+							List<int> ind_linkChannel_list = GetChannelByID(d.linkChannel);
+							foreach (int ind_linkChannel in ind_linkChannel_list) {
+								AnimChannelLargo ch_link = animLargo.channels[ind_linkChannel];
+								AnimNumOfNTTO numOfNTTO_link = animLargo.numOfNTTO[ch_link.numOfNTTO + of.numOfNTTO];
+								AnimNTTO ntto_link = animLargo.ntto[numOfNTTO_link.numOfNTTO];
+								//PhysicalObject physicalObject_link = subObjects[ind_linkChannel][numOfNTTO_link.numOfNTTO];
+								//if (physicalObject_link == null) continue;
+								if (bones == null || bones.bones.Length <= d.bone + 1) continue;
+								//print(d.bone + 1);
+								DeformBone bone = bones.r3bones[d.bone + 1];
+								if (bone != null) {
+									Transform channelTransform = channelObjects[ind_linkChannel].transform;
+									bone.UnityBone.transform.SetParent(channelTransform);
+									bone.UnityBone.localPosition = Vector3.zero;
+									bone.UnityBone.localRotation = Quaternion.identity;
+									bone.UnityBone.localScale = Vector3.one;
+									/*bone.UnityBone.position = channelTransform.position;
+									bone.UnityBone.rotation = channelTransform.rotation;
+									//bone.UnityBone.localScale = Vector3.one;
+									bone.UnityBone.localScale = channelTransform.localScale;*/
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	List<int> GetChannelByID(short id) {
         if (channelIDDictionary.ContainsKey(id)) {
             return channelIDDictionary[id];
         } else return new List<int>();

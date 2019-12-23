@@ -40,7 +40,7 @@ namespace OpenSpace.Collide {
             get {
                 switch (type) {
                     case Type.Box:
-                        return boxSize;
+                        return new Vector3(Mathf.Abs(boxSize.x), Mathf.Abs(boxSize.y), Mathf.Abs(boxSize.z));
                     case Type.Sphere:
                         return Vector3.one * sphereRadius * 0.5f;
                     default:
@@ -77,11 +77,11 @@ namespace OpenSpace.Collide {
             float float_2 = reader.ReadSingle();
             float float_3 = reader.ReadSingle();
             float float_4 = reader.ReadSingle();
-            float float_5 = reader.ReadSingle();
-            float float_6 = reader.ReadSingle();
-
-            if (type == Type.Box) {
-                volume.boxMin = new Vector3(float_1, float_3, float_2);
+			if (type == Type.Box) {
+				float float_5 = reader.ReadSingle();
+				float float_6 = reader.ReadSingle();
+	
+				volume.boxMin = new Vector3(float_1, float_3, float_2);
                 volume.boxMax = new Vector3(float_4, float_6, float_5);
 
                 volume.boxSize = volume.boxMax - volume.boxMin;

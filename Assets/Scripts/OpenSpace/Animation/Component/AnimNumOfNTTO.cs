@@ -5,20 +5,16 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Animation.Component {
-    public class AnimNumOfNTTO {
+    public class AnimNumOfNTTO : OpenSpaceStruct {
         public ushort numOfNTTO;
 
-        public AnimNumOfNTTO() {}
+		protected override void ReadInternal(Reader reader) {
+			numOfNTTO = reader.ReadUInt16();
+		}
 
-        public static AnimNumOfNTTO Read(Reader reader) {
-            AnimNumOfNTTO n = new AnimNumOfNTTO();
-            n.numOfNTTO = reader.ReadUInt16();
-            return n;
-        }
-
-        public static int Size {
+		/*public static int Size {
             get { return 2; }
-        }
+        }*/
 
         public static bool Aligned {
             get { return false; }

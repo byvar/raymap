@@ -22,6 +22,7 @@ namespace OpenSpace {
 			[Description("Rayman M (PC)")] RaymanMPC,
 			[Description("Rayman Arena (PC)")] RaymanArenaPC,
 			[Description("Rayman Arena (GC)")] RaymanArenaGC,
+			[Description("Rayman Rush (PS1)")] RaymanRushPS1,
 			[Description("Rayman 3 (PC)")] Rayman3PC,
 			[Description("Rayman 3 (GC)")] Rayman3GC,
 			[Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
@@ -30,9 +31,12 @@ namespace OpenSpace {
 			[Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
 			[Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
 			[Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
+			[Description("Donald Duck: PK (GC)")] DonaldDuckPKGC,
 			[Description("Playmobil: Hype (PC)")] PlaymobilHypePC,
 			[Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
 			[Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
+			[Description("Disney's Dinosaur (PC)")] DinosaurPC,
+			[Description("Largo Winch (PC)")] LargoWinchPC,
 		};
         public Mode mode = Mode.Rayman3PC;
 		
@@ -54,6 +58,7 @@ namespace OpenSpace {
 			{ "dd_pc", Mode.DonaldDuckPC },
 			{ "dd_dc", Mode.DonaldDuckDC },
 			{ "dd_n64", Mode.DonaldDuckN64 },
+			{ "ddpk_gc", Mode.DonaldDuckPKGC },
 			{ "tt_pc", Mode.TonicTroublePC },
 			{ "ttse_pc", Mode.TonicTroubleSEPC },
 			{ "r2_demo1_pc", Mode.Rayman2PCDemo1 },
@@ -61,6 +66,8 @@ namespace OpenSpace {
 			{ "playmobil_hype_pc", Mode.PlaymobilHypePC },
 			{ "playmobil_alex_pc", Mode.PlaymobilAlexPC },
 			{ "playmobil_laura_pc", Mode.PlaymobilLauraPC },
+			{ "dinosaur_pc", Mode.DinosaurPC },
+			{ "largowinch_pc", Mode.LargoWinchPC },
 		};
 
         public enum EngineVersion {
@@ -69,12 +76,12 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, R2, TT, TTSE, R2Demo, R2Revolution, DD, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR };
+        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
-		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB };
+		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB, LMFile };
         
         public EngineVersion engineVersion;
         public Game game;
@@ -308,7 +315,7 @@ namespace OpenSpace {
 			linkedListType = LinkedListType.Minimize,
 			encryption = Encryption.None,
 			luminosity = 0.5f,
-			saturate = true,
+			saturate = false,
 			aiTypes = AITypes.Revolution,
 			//textureAnimationSpeedModifier = 2f,
 			hasExtraInputData = false,
@@ -338,6 +345,19 @@ namespace OpenSpace {
 		public static Settings R2PS1 = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
+			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1,
+		};
+
+		public static Settings RRushPS1 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.RRush,
 			platform = Platform.PS1,
 			endian = Endian.Little,
 			linkedListType = LinkedListType.Double,
@@ -528,6 +548,53 @@ namespace OpenSpace {
         };
 
 
+
+		public static Settings DDPKGC = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.DDPK,
+			platform = Platform.GC,
+			endian = Endian.Big,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			textureAnimationSpeedModifier = -10f,
+			luminosity = 0.1f,
+			saturate = false
+		};
+
+		public static Settings DinosaurPC = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.Dinosaur,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			aiTypes = AITypes.R3,
+			hasDeformations = true,
+			textureAnimationSpeedModifier = 1f,
+			luminosity = 0.3f,
+			saturate = false
+		};
+		public static Settings LargoWinchPC = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.LargoWinch,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			aiTypes = AITypes.Largo,
+			textureAnimationSpeedModifier = 1f,
+			luminosity = 0.5f,
+			saturate = false,
+			hasExtraInputData = true,
+			hasObjectTypes = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFolder, Caps.Normal },
+				{ CapsType.LMFile, Caps.Normal },
+				{ CapsType.LevelFile, Caps.None },
+			},
+			hasDeformations = true
+		};
+
+
 		public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
 			{ Mode.Rayman2PC, R2PC },
 			{ Mode.Rayman2DC, R2DC },
@@ -542,6 +609,7 @@ namespace OpenSpace {
 			{ Mode.RaymanMPC, RMPC },
 			{ Mode.RaymanArenaPC, RAPC },
 			{ Mode.RaymanArenaGC, RAGC },
+			{ Mode.RaymanRushPS1, RRushPS1 },
 			{ Mode.Rayman3PC, R3PC },
 			{ Mode.Rayman3GC, R3GC },
 			{ Mode.RaymanRavingRabbidsDS, RRRDS },
@@ -550,9 +618,12 @@ namespace OpenSpace {
 			{ Mode.DonaldDuckPC, DDPC },
 			{ Mode.DonaldDuckDC, DDDC },
 			{ Mode.DonaldDuckN64, R2N64 },
+			{ Mode.DonaldDuckPKGC, DDPKGC },
 			{ Mode.PlaymobilHypePC, PlaymobilHypePC },
 			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },
 			{ Mode.PlaymobilAlexPC, PlaymobilAlexPC },
+			{ Mode.DinosaurPC, DinosaurPC },
+			{ Mode.LargoWinchPC, LargoWinchPC },
 		};
 	}
 }

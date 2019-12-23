@@ -18,7 +18,7 @@ namespace OpenSpace.AI {
         public DsgVarType type;
         public object value;
         public object initialValue;
-        public List<Pointer> arrayEntryOffsets; // For array variables, save the entry offsets in this list
+		public Pointer debugValueOffset;
 
         public string NiceVariableName {
             get {
@@ -34,7 +34,14 @@ namespace OpenSpace.AI {
             MapLoader l = MapLoader.Loader;
             DsgVarInfoEntry d = new DsgVarInfoEntry(offset);
 			//l.print(offset);
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				d.offsetInBuffer = reader.ReadUInt32();
+				d.typeNumber = reader.ReadUInt32();
+				d.saveType = reader.ReadByte();
+				d.initType = reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				d.offsetInBuffer = reader.ReadUInt16();
 				reader.ReadUInt16();
 				d.typeNumber = reader.ReadByte();
@@ -112,7 +119,8 @@ namespace OpenSpace.AI {
             Array11,
             Way, // TT SE only
             ActionArray, // Hype
-			SuperObjectArray
+			SuperObjectArray,
+			ObjectList, // Largo
 		}
     }
 }

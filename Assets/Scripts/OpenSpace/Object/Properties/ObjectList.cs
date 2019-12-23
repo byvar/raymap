@@ -71,10 +71,9 @@ namespace OpenSpace.Object.Properties {
 
         public static ObjectList Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
-			//l.print("ObjectList " + offset);
             ObjectList ol = new ObjectList(offset);
             if(Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Read(reader);
-            if (Settings.s.hasLinkedListHeaderPointers) {
+			if (Settings.s.hasLinkedListHeaderPointers) {
                 ol.off_objList_prev = Pointer.Read(reader);
                 ol.off_objList_hdr = Pointer.Read(reader);
             }
@@ -85,20 +84,26 @@ namespace OpenSpace.Object.Properties {
 
             if (Settings.s.linkedListType == LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Current(reader);
 
+			//l.print("ObjectList " + offset + " - " + ol.num_entries);
+
             if (ol.off_objList_start != null) {
                 Pointer.Goto(ref reader, ol.off_objList_start);
                 ol.entries = new ObjectListEntry[ol.num_entries];
                 for (uint i = 0; i < ol.num_entries; i++) {
                     // each entry is 0x14
                     ol.entries[i] = new ObjectListEntry();
-                    ol.entries[i].off_scale = Pointer.Read(reader);
-                    ol.entries[i].off_po = Pointer.Read(reader);
-                    ol.entries[i].thirdvalue = reader.ReadUInt32();
-                    ol.entries[i].unk0 = reader.ReadUInt16();
-                    ol.entries[i].unk1 = reader.ReadUInt16();
-                    if (Settings.s.platform != Settings.Platform.DC) {
-                        ol.entries[i].lastvalue = reader.ReadUInt32();
-                    }
+					if (Settings.s.game == Settings.Game.LargoWinch) {
+						ol.entries[i].off_po = Pointer.Read(reader);
+					} else {
+						ol.entries[i].off_scale = Pointer.Read(reader);
+						ol.entries[i].off_po = Pointer.Read(reader);
+						ol.entries[i].thirdvalue = reader.ReadUInt32();
+						ol.entries[i].unk0 = reader.ReadUInt16();
+						ol.entries[i].unk1 = reader.ReadUInt16();
+						if (Settings.s.platform != Settings.Platform.DC) {
+							ol.entries[i].lastvalue = reader.ReadUInt32();
+						}
+					}
                     // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
                     if (ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || Settings.s.engineVersion == Settings.EngineVersion.TT) {
                         ol.entries[i].po = null;
@@ -109,15 +114,7 @@ namespace OpenSpace.Object.Properties {
                             float y = reader.ReadSingle();
                             ol.entries[i].scale = new Vector3(x, y, z);
                         });
-                        Pointer.DoAt(ref reader, ol.entries[i].off_po, () => {
-                            ol.entries[i].po = PhysicalObject.Read(reader, ol.entries[i].off_po);
-                            if (ol.entries[i].po != null && ol.entries[i].scale.HasValue) {
-                                ol.entries[i].po.scaleMultiplier = ol.entries[i].scale.Value;
-                            }
-                            if (ol.entries[i].po != null && ol.entries[i].po.Gao != null) {
-                                ol.entries[i].po.Gao.transform.SetParent(ol.Gao.transform);
-                            }
-                        });
+                        ol.ReadPO(reader, (int)i);
                     }
                 }
             }
@@ -140,9 +137,22 @@ namespace OpenSpace.Object.Properties {
                 reader.ReadUInt32(); // 1?
             }*/
             return ol;
-        }
+		}
 
-        public static ObjectList FromOffset(Pointer offset) {
+		public void ReadPO(Reader reader, int i) {
+			if (entries[i].po != null) return;
+			Pointer.DoAt(ref reader, entries[i].off_po, () => {
+				entries[i].po = PhysicalObject.Read(reader, entries[i].off_po);
+				if (entries[i].po != null && entries[i].scale.HasValue) {
+					entries[i].po.scaleMultiplier = entries[i].scale.Value;
+				}
+				if (entries[i].po != null && entries[i].po.Gao != null) {
+					entries[i].po.Gao.transform.SetParent(Gao.transform);
+				}
+			});
+		}
+
+		public static ObjectList FromOffset(Pointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.objectLists.FirstOrDefault(f => f.offset == offset);

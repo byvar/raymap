@@ -128,8 +128,20 @@ namespace OpenSpace.Visual.Deform {
                     mat.SetColumn(j, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f));
                 }
                 d.r3bones[i].mat = new Matrix(null, 1, mat, new Vector4(1f, 1f, 1f, 1f));
-                d.r3bones[i].unknown1 = reader.ReadSingle();
-                d.r3bones[i].invert = reader.ReadUInt16();
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					Pointer off_shorts = Pointer.Read(reader); // offset of shorts. the next ushort, invert, is actually number of shorts.
+					d.r3bones[i].invert = reader.ReadUInt16();
+					//l.print("Number of shorts: " + d.r3bones[i].invert);
+					Pointer.DoAt(ref reader, off_shorts, () => {
+						for (int j = 0; j < d.r3bones[i].invert; j++) {
+							reader.ReadUInt16();
+						}
+					});
+				} else {
+					d.r3bones[i].unknown1 = reader.ReadSingle();
+					d.r3bones[i].invert = reader.ReadUInt16();
+				}
+
                 d.r3bones[i].index = reader.ReadByte();
                 reader.ReadByte(); // 0, padding
             }

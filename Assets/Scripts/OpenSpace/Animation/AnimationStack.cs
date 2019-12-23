@@ -18,7 +18,8 @@ namespace OpenSpace.Animation {
             reader.ReadUInt32();
             stack.count = reader.ReadUInt32();
             stack.reservedMemory = reader.ReadUInt32();
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32();
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3
+				&& Settings.s.game != Settings.Game.Dinosaur) reader.ReadUInt32();
             stack.countInFix = reader.ReadUInt32();
             return stack;
         }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpenSpace.Loader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,8 @@ namespace OpenSpace.Visual {
         public string name;
         public Pointer off_material;
         public GameMaterial gameMaterial;
-        public VisualMaterial visualMaterial;
+		public VisualMaterial visualMaterialOG;
+		public VisualMaterial visualMaterial;
         public bool backfaceCulling;
         public ushort num_disconnected_triangles_spe;
         public ushort num_uvs;
@@ -35,6 +37,9 @@ namespace OpenSpace.Visual {
         public ushort num_disconnected_triangles;
         public Pointer off_connected_vertices;
         public Pointer off_disconnected_triangles;
+		public Pointer off_mapping_lightmap;
+		public ushort num_mapping_lightmap;
+
         public int[] mapping_vertices = null;
         public int[][] mapping_uvs = null;
         public Vector2[] uvs = null;
@@ -42,6 +47,7 @@ namespace OpenSpace.Visual {
         public int[] disconnected_triangles = null;
         public int[][] mapping_uvs_spe = null;
         public int[] disconnected_triangles_spe = null;
+		public int[] mapping_lightmap = null;
         public Vector3[] normals_spe = null;
 
 		// Revolution
@@ -54,6 +60,8 @@ namespace OpenSpace.Visual {
         private Renderer mr_spe = null;
         private Mesh mesh_main = null;
         private Mesh mesh_spe = null;
+		private Texture2D lightmap = null;
+		private Vector2[] lightmapUVs = null;
 
 
         private GameObject gao = null;
@@ -405,14 +413,19 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             MeshElement sm = new MeshElement(offset, m);
             sm.name = "Submesh @ pos " + offset;
+			//l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				//sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
+				sm.visualMaterial = VisualMaterial.FromOffsetOrRead(sm.off_material, reader);
+			} else if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                 sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
             } else {
                 sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
                 sm.visualMaterial = sm.gameMaterial.visualMaterial;
             }
+			sm.visualMaterialOG = sm.visualMaterial;
             /*if (sm.visualMaterial != null && sm.visualMaterial.textures.Count > 0 && sm.visualMaterial.textures[0].off_texture != null) {
                 sm.name += " - VisMatTex:" + sm.visualMaterial.textures[0].offset + " - TexInfo:" + sm.visualMaterial.textures[0].off_texture;
             }*/
@@ -427,14 +440,18 @@ namespace OpenSpace.Visual {
 				sm.num_uvs = reader.ReadUInt16();
 				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 					sm.num_uvMaps = reader.ReadUInt16();
-					reader.ReadUInt16();
+					sm.lightmap_index = reader.ReadInt16();
 				}
 				sm.off_disconnected_triangles_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_vertices
 				if (Settings.s.mode == Settings.Mode.Rayman3GC) reader.ReadUInt32();
 				sm.off_mapping_uvs_spe = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
 				sm.off_weights_spe = Pointer.Read(reader); // 1 entry = 3 floats
 				sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats
-				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					sm.off_mapping_lightmap = Pointer.Read(reader);
+					sm.num_mapping_lightmap = reader.ReadUInt16();
+					reader.ReadUInt16();
+				} else if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				} else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
@@ -448,15 +465,25 @@ namespace OpenSpace.Visual {
 				}
 			}
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                reader.ReadUInt16();
-                sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
-                sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
-                sm.off_mapping_uvs = Pointer.Read(reader); // shorts_offset2 (2nd array of size num_shorts, max: num_weights)
-                sm.num_connected_vertices = reader.ReadUInt16(); // num_shorts2
-                sm.num_disconnected_triangles = reader.ReadUInt16();
-                sm.off_connected_vertices = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
-                sm.off_disconnected_triangles = Pointer.Read(reader);
-                if (Settings.s.hasNames) sm.name += reader.ReadString(0x34);
+				if (Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) {
+					reader.ReadUInt16();
+					sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
+					sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
+					sm.off_mapping_uvs = Pointer.Read(reader); // shorts_offset2 (2nd array of size num_shorts, max: num_weights)
+					sm.num_connected_vertices = reader.ReadUInt16(); // num_shorts2
+					sm.num_disconnected_triangles = reader.ReadUInt16();
+					sm.off_connected_vertices = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
+					sm.off_disconnected_triangles = Pointer.Read(reader);
+					if (Settings.s.hasNames) sm.name += reader.ReadString(0x34);
+				} else {
+					sm.num_mapping_entries = 0;
+					sm.off_mapping_vertices = null;
+					sm.off_mapping_uvs = null;
+					sm.num_connected_vertices = 0;
+					sm.num_disconnected_triangles = 0;
+					sm.off_connected_vertices = null;
+					sm.off_disconnected_triangles = null;
+				}
             } else {
                 // Defaults for Rayman 2
                 sm.num_uvMaps = 1;
@@ -545,8 +572,83 @@ namespace OpenSpace.Visual {
                     }
                 }
             }
+			if (Settings.s.game == Settings.Game.LargoWinch && sm.lightmap_index != -1) {
+				LWLoader lwl = MapLoader.Loader as LWLoader;
+				if (lwl.lms != null && sm.lightmap_index >= 0 && sm.lightmap_index < lwl.lms.Count) {
+					/*if (sm.lightmap_index < l.off_lightmapUV.Length - 1) {
+						int amount = ((int)l.off_lightmapUV[sm.lightmap_index + 1].offset - (int)l.off_lightmapUV[sm.lightmap_index].offset);
+						amount = amount / 8;
+						l.print(offset + " - UVs: " + amount + " - " + sm.mesh.num_vertices + " - " + sm.num_mapping_entries + " - " + sm.num_uvs + " - " + sm.num_disconnected_triangles_spe + " - " + sm.num_mapping_lightmap);
+					}*/
+					Vector2[] lightmapUVs = new Vector2[sm.num_mapping_lightmap];
+					Pointer.DoAt(ref reader, sm.off_mapping_lightmap, () => {
+						sm.mapping_lightmap = new int[sm.num_mapping_lightmap];
+						for (int i = 0; i < sm.num_mapping_lightmap; i++) {
+							sm.mapping_lightmap[i] = reader.ReadInt16();
+						}
+					});
+					Pointer.DoAt(ref reader, l.off_lightmapUV[sm.lightmap_index], () => {
+						for (int j = 0; j < lightmapUVs.Length; j++) {
+							lightmapUVs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+						}
+					});
+					sm.AddLightmap(lwl.GetLightmap(sm.lightmap_index), lightmapUVs);
+				}
+			}
             return sm;
         }
+
+		public void AddLightmap(Texture2D lightmap, Vector2[] lightmapUVs) {
+			this.lightmap = lightmap;
+			this.lightmapUVs = lightmapUVs;
+
+
+			// Bad hack
+			Array.Resize(ref uvs, num_uvs + lightmapUVs.Length);
+			if (mapping_uvs != null) {
+				Array.Resize(ref mapping_uvs, num_uvMaps + 1);
+				mapping_uvs[mapping_uvs.Length - 1] = Enumerable.Range(num_uvs, lightmapUVs.Length).ToArray();
+			}
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				if (mapping_uvs_spe != null && mapping_lightmap != null) {
+					Array.Resize(ref mapping_uvs_spe, num_uvMaps + 1);
+					mapping_uvs_spe[mapping_uvs_spe.Length - 1] = new int[num_disconnected_triangles_spe * 3];
+					for (int i = 0; i < num_disconnected_triangles_spe * 3; i++) {
+						int search = disconnected_triangles_spe[i];
+						int lightmapUV = Array.IndexOf(mapping_lightmap, search);
+						if (lightmapUV != -1) {
+							mapping_uvs_spe[mapping_uvs_spe.Length - 1][i] = num_uvs + lightmapUV;
+						} else {
+							MapLoader.Loader.print("not found");
+							mapping_uvs_spe[mapping_uvs_spe.Length - 1][i] = mapping_uvs_spe[mapping_uvs_spe.Length - 2][i];
+						}
+						//mapping_uvs_spe[mapping_uvs_spe.Length - 1][i] = num_uvs + disconnected_triangles_spe[i];
+					}
+
+					//Enumerable.Range(num_uvs, lightmapUVs.Length).ToArray();
+				}
+			}
+			Array.Copy(lightmapUVs, 0, uvs, num_uvs, lightmapUVs.Length);
+			/*for (int j = 0; j < lightmapUVs.Length; j++) {
+				uvs[num_uvs + j] = lightmapuv;
+			}*/
+			num_uvs += (ushort)lightmapUVs.Length;
+			num_uvMaps++;
+
+			if (visualMaterial != null) {
+				visualMaterial = visualMaterial.Clone();
+				visualMaterial.num_textures += 1;
+				visualMaterial.textures.Add(new VisualMaterialTexture() {
+					texture = new TextureInfo(null) {
+						width = (ushort)lightmap.width,
+						height = (ushort)lightmap.height,
+						Texture = lightmap
+					},
+					textureOp = 50,
+					uvFunction = 1
+				});
+			}
+		}
 
         public void ReinitBindPoses() {
             if (s_mr_main != null) {

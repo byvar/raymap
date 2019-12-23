@@ -76,8 +76,10 @@ namespace OpenSpace.Object.Properties {
             f.off_family_next = Pointer.Read(reader);
             f.off_family_prev = Pointer.Read(reader);
             f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
-			if (Settings.s.hasObjectTypes) {
+			if (Settings.s.game != Settings.Game.R2Revolution) {
 				f.family_index = reader.ReadUInt32();
+			}
+			if (Settings.s.hasObjectTypes) {
 				f.name = l.objectTypes[0][f.family_index].name;
 			}
             //l.print("(" + f.family_index + ") " + f.name + " - " + offset);
@@ -87,7 +89,7 @@ namespace OpenSpace.Object.Properties {
                 State s = State.Read(reader, off_element, f, stateIndex++);
                 return s;
             });
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.LargoWinch) {
                 // (0x10 blocks: next, prev, list end, a3d pointer)
                 f.preloadAnim = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             }
@@ -104,7 +106,13 @@ namespace OpenSpace.Object.Properties {
                 f.num_vector4s = reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			if (Settings.s.game == Settings.Game.LargoWinch) {
+				reader.ReadUInt32();
+				f.animBank = reader.ReadByte();
+				f.properties = reader.ReadByte();
+				reader.ReadByte();
+				reader.ReadByte();
+			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 f.animBank = reader.ReadByte();
                 reader.ReadByte();
@@ -125,6 +133,18 @@ namespace OpenSpace.Object.Properties {
             f.objectLists.ReadEntries(ref reader, (off_list) => {
                 ObjectList ol = ObjectList.FromOffsetOrRead(off_list, reader);
 				f.AddNewPhysicalList(ol, alreadyAdded: true);
+
+				if (Settings.s.game == Settings.Game.LargoWinch) {
+					foreach (State state in f.states) {
+						if (state != null && state.anim_ref != null && state.anim_ref.a3dLargo != null) {
+							foreach (Animation.Component.AnimNTTO n in state.anim_ref.a3dLargo.ntto) {
+								if (!n.IsInvisibleNTTO && n.object_index < ol.entries.Length) {
+									ol.ReadPO(reader, n.object_index);
+								}
+							}
+						}
+					}
+				}
                 /*if (ol.containingFamilies.Count == 0) {
                     ol.Gao.transform.SetParent(f.Gao.transform);
                 }

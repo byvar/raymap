@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpenSpace.Loader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +40,6 @@ namespace OpenSpace.Visual {
                 if (gao == null) {
                     gao = new GameObject(name);// Create object and read triangle data
                     gao.layer = LayerMask.NameToLayer("Visual");
-                    BillboardBehaviour billboard = gao.AddComponent<BillboardBehaviour>();
-                    billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
                     CreateUnityMesh();
                 }
                 return gao;
@@ -58,7 +57,10 @@ namespace OpenSpace.Visual {
                 bool mirrorY = false;
                 GameObject spr_gao = new GameObject(name + " - Sprite " + i);
                 spr_gao.transform.SetParent(gao.transform);
-                MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
+				spr_gao.transform.localPosition = mesh.vertices[sprites[i].centerPoint];
+				BillboardBehaviour billboard = spr_gao.AddComponent<BillboardBehaviour>();
+				billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
+				MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
                 MeshRenderer mr = spr_gao.AddComponent<MeshRenderer>();
                 BoxCollider bc = spr_gao.AddComponent<BoxCollider>();
                 bc.size = new Vector3(0, sprites[i].info_scale.y * 2, sprites[i].info_scale.x * 2);
@@ -139,7 +141,7 @@ namespace OpenSpace.Visual {
                     reader.ReadInt16(); // -1
 					if (Settings.s.game != Settings.Game.R2Revolution) {
 						reader.ReadUInt32();
-						reader.ReadUInt32();
+						if(Settings.s.game != Settings.Game.LargoWinch) reader.ReadUInt32();
 					}
                 }
             } else {
@@ -154,9 +156,17 @@ namespace OpenSpace.Visual {
 						s.sprites[i] = new IndexedSprite();
 						uint type = reader.ReadUInt32();
 						s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-						s.sprites[i].off_material = Pointer.GetPointerAtOffset(Pointer.Current(reader));
-						if (s.sprites[i].off_material != null) {
-							s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
+						if (type == 0x20) {
+							// Light cookie sprite
+							uint index = reader.ReadUInt32();
+							R2PS2Loader ps2l = MapLoader.Loader as R2PS2Loader;
+							s.sprites[i].visualMaterial = ps2l.lightCookieMaterial.Clone();
+							s.sprites[i].visualMaterial.diffuseCoef = ps2l.lightCookieColors[index];
+						} else {
+							s.sprites[i].off_material = Pointer.Read(reader);
+							if (s.sprites[i].off_material != null) {
+								s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
+							}
 						}
 					}
 				});
@@ -169,7 +179,7 @@ namespace OpenSpace.Visual {
                 }
                 s.sprites[0].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                 reader.ReadUInt16();
-                reader.ReadUInt16();
+                s.sprites[0].centerPoint = reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt16();
@@ -185,9 +195,11 @@ namespace OpenSpace.Visual {
 						s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
                         if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                            s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                            s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                            s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+							if (Settings.s.game != Settings.Game.LargoWinch) {
+								s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+								s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+								s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+							}
                             s.sprites[i].centerPoint = reader.ReadUInt16();
                             reader.ReadUInt16();
                             if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
