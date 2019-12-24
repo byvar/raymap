@@ -23,6 +23,7 @@ public class PersoBehaviourEditor : Editor {
 
         GUILayout.BeginVertical();
         byte updateCheckByte = pb.perso.stdGame.updateCheckByte;
+        GUILayout.Label("StdGame: " + pb.perso.stdGame.offset.ToString());
         GUILayout.Label("StdGame.UpdateByte: " + Convert.ToString(updateCheckByte, 2).PadLeft(8, '0'));
         bool consideredOnScreen = (updateCheckByte & (1 << 5)) != 0;
         bool consideredTooFarAway = (updateCheckByte & (1 << 7)) != 0;
