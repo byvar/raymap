@@ -31,6 +31,7 @@ namespace OpenSpace.Loader {
 			gameDataBinFolder += "/";
 			if (!File.Exists(gameDataBinFolder + "data.bin")) return null;
 			if (!File.Exists(gameDataBinFolder + "fat.bin")) return null;
+			if (!File.Exists(gameDataBinFolder + "anims.bin")) return null;
 			files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
 			files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
 			
@@ -71,6 +72,9 @@ namespace OpenSpace.Loader {
 
 				files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
 				files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
+				files_array[SMem.Anims] = new ROMBIN("anims.bin", gameDataBinFolder + "anims.bin", SMem.Anims);
+
+				yield return controller.StartCoroutine(LoadAnims());
 
 				yield return controller.StartCoroutine(LoadFat());
 				// Determine level index
@@ -262,7 +266,11 @@ namespace OpenSpace.Loader {
 			}
 
 			// Load current level data
+			loadingState = "Loading level data";
+			yield return null;
 			LevelHeader lh = GetOrRead<LevelHeader>(reader, (ushort)(CurrentLevel | (ushort)FATEntry.Flag.Fix));
+			loadingState = "Initializing hierarchy";
+			yield return null;
 			if (lh != null) {
 				if (lh.hierarchyRoot.Value != null) {
 					lh.hierarchyRoot.Value.GetGameObject();
@@ -301,6 +309,36 @@ namespace OpenSpace.Loader {
 			}
 
 			yield return null;
+		}
+
+		public IEnumerator LoadAnims() {
+			Reader reader = files_array[SMem.Anims].reader;
+			loadingState = "Loading animations";
+			yield return null;
+			uint num_anims = reader.ReadUInt32();
+			reader.ReadUInt32();
+			reader.ReadUInt32();
+			reader.ReadUInt32();
+			Pointer eof = null;
+			ROMAnimation[] anims = new ROMAnimation[num_anims];
+			for (uint i = 0; i < num_anims; i++) {
+				uint offset = reader.ReadUInt32();
+				anims[i] = new ROMAnimation() {
+					compressed = (offset & 0x80000000) == 0x80000000,
+					index = i
+				};
+				anims[i].Init(new Pointer(offset & 0x7FFFFFFF, files_array[SMem.Anims]));
+				if (i > 0) {
+					anims[i - 1].compressedSize = anims[i].Offset.offset - anims[i - 1].Offset.offset;
+				}
+			}
+			eof = new Pointer(reader.ReadUInt32(), files_array[SMem.Anims]); // EOF
+			if (num_anims > 0) {
+				anims[num_anims - 1].compressedSize = eof.offset - anims[num_anims - 1].Offset.offset;
+			}
+			for (uint i = 0; i < num_anims; i++) {
+				anims[i].Read(reader);
+			}
 		}
 
 		public void ExportTextures(Reader reader) {
@@ -742,5 +780,8 @@ namespace OpenSpace.Loader {
 	public static class SMem {
 		public const int Data = 0;
 		public const int Fat = 1;
+		public const int Anims = 2;
+		public const int ShAnims = 3;
+		public const int A3dHead = 4;
 	}
 }

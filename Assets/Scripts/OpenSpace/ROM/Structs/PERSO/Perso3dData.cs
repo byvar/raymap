@@ -8,7 +8,7 @@ namespace OpenSpace.ROM {
 		public uint dword0;
 		public float float4;
 		public float float8;
-		public ushort ref_5;
+		public Reference<State> currentState;
 		public Reference<ObjectsTable> objectsTable;
 		public byte byte16;
 		public byte byte17;
@@ -18,7 +18,7 @@ namespace OpenSpace.ROM {
 			dword0 = reader.ReadUInt32();
 			float4 = reader.ReadSingle();
 			float8 = reader.ReadSingle();
-			ref_5 = reader.ReadUInt16();
+			currentState = new Reference<State>(reader, true);
 			objectsTable = new Reference<ObjectsTable>(reader, true);
 			byte16 = reader.ReadByte();
 			byte17 = reader.ReadByte();

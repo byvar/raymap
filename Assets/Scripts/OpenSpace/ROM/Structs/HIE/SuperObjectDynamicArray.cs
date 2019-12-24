@@ -10,7 +10,7 @@ namespace OpenSpace.ROM {
 		public ushort length;
 
 		protected override void ReadInternal(Reader reader) {
-			Loader.print(Pointer.Current(reader) + " - " + length);
+			//Loader.print(Pointer.Current(reader) + " - " + length);
 			superObjects = new Reference<SuperObjectDynamic>[length];
 			for (int i = 0; i < superObjects.Length; i++) {
 				superObjects[i] = new Reference<SuperObjectDynamic>(reader, true);

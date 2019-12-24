@@ -37,7 +37,7 @@ namespace OpenSpace.ROM {
 		public ushort unk30;
 
 		protected override void ReadInternal(Reader reader) {
-			MapLoader.Loader.print(Pointer.Current(reader));
+			//MapLoader.Loader.print("Level Header: " + Pointer.Current(reader));
 			hierarchyRoot = new Reference<HierarchyRoot>(reader);
 			ref_46 = reader.ReadUInt16();
 			unk3 = reader.ReadUInt16();

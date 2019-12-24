@@ -13,7 +13,7 @@ namespace OpenSpace.ROM {
 		public ushort len_transitions;
 		public ushort type_32or31; // 12
 		public ushort word14;
-		public ushort word16;
+		public ushort speed;
 		public byte byte18;
 		public byte byte19;
 
@@ -26,7 +26,7 @@ namespace OpenSpace.ROM {
 			len_transitions = reader.ReadUInt16();
 			type_32or31 = reader.ReadUInt16();
 			word14 = reader.ReadUInt16();
-			word16 = reader.ReadUInt16();
+			speed = reader.ReadUInt16();
 			byte18 = reader.ReadByte();
 			byte19 = reader.ReadByte();
 
