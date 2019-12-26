@@ -289,7 +289,7 @@ namespace OpenSpace.Loader {
 				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, (ushort)(i | (ushort)FATEntry.Flag.Fix));
 				if (ot != null) objectsTables.Add(ot);
 			}
-			for (ushort i = 0; i < 0x7FFF; i++) {
+			for (ushort i = 0; i < 0x8000; i++) {
 				// Only do it a few times because we're trying to load way more than there is,
 				// so it takes really long if we yield for everything
 				if (i % 1024 == 0) {

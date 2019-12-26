@@ -350,7 +350,7 @@ namespace OpenSpace.Visual {
                         MultiTextureMaterial mtmat = mr_spe.gameObject.AddComponent<MultiTextureMaterial>();
                         mtmat.visMat = visualMaterial;
                         mtmat.mat = mr_spe.sharedMaterial;
-                    }
+					}
                     /*if (scroll) {
                         ScrollingTexture scrollComponent = mr_spe.gameObject.AddComponent<ScrollingTexture>();
                         scrollComponent.visMat = visualMaterial;

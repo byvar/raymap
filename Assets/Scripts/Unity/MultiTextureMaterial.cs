@@ -13,10 +13,16 @@ public class MultiTextureMaterial : MonoBehaviour {
     public string[] textureNames = { "Placeholder" };
     int currentTexture = 0;
     public int textureIndex = 0;
+	public int CurrentTextureROM { get; set; }
+	public float CurrentTextureROMTime { get; set; }
     public bool animate = true;
     //float currentTime = 0f;
 
     public void Start() {
+		MultiTextureManager mtm = MapLoader.Loader.controller.GetComponent<MultiTextureManager>();
+		if (mtm != null) {
+			mtm.Register(this);
+		}
 		if (visMat != null) {
 			textureNames = visMat.animTextures.Select(a => (a == null || a.texture == null) ? "Null" : a.texture.name).ToArray();
 			SetTexture(visMat.currentAnimTexture);
@@ -24,6 +30,7 @@ public class MultiTextureMaterial : MonoBehaviour {
 			textureNames = visMatROM.textures.Value.vmTex.Select(a => (a.texRef.Value == null || a.texRef.Value.texInfo.Value == null)
 			? "Null"
 			: (a.texRef.Value.texInfo.Value.name ?? "TexInfo " + a.texRef.Value.texInfo.index)).ToArray();
+			SetTexture(0);
 		}
     }
 
@@ -52,6 +59,7 @@ public class MultiTextureMaterial : MonoBehaviour {
 			if (visMat != null) {
 				textureIndex = visMat.currentAnimTexture;
 			} else if (visMatROM != null) {
+				textureIndex = CurrentTextureROM;
 				//textureIndex = visMatROM..currentAnimTexture;
 			}
 		}

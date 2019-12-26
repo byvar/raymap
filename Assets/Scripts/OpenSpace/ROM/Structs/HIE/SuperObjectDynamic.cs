@@ -32,23 +32,13 @@ namespace OpenSpace.ROM {
 				Short3Array indices = lh.indices.Value;
 				Vector3Array vectors = lh.vectors.Value;
 				Short3Array.Triangle tri = lh.indices.Value.triangles[matrixIndex];
-				transform.matrix1 = ResolveMatrix(reader, tri.v1, indices, vectors);
-				transform.matrix2 = ResolveMatrix(reader, tri.v2, indices, vectors);
+				transform.rotationMatrix = SuperObject.ResolveMatrix(reader, tri.v1, indices, vectors);
+				transform.scaleMatrix = SuperObject.ResolveMatrix(reader, tri.v2, indices, vectors);
 				if (tri.v3 != 0xFFFF) {
 					transform.position = vectors.vectors[tri.v3];
 					//MapLoader.Loader.print(transform.position);
 				}
 			}
-		}
-
-		protected SuperObject.ROMMatrix ResolveMatrix(Reader reader, ushort index, Short3Array indices, Vector3Array vectors) {
-			if (index == 0xFFFF || indices == null || vectors == null) return null;
-			Short3Array.Triangle tri = indices.triangles[index];
-			return new SuperObject.ROMMatrix() {
-				v1 = vectors.vectors[tri.v1],
-				v2 = vectors.vectors[tri.v2],
-				v3 = vectors.vectors[tri.v3]
-			};
 		}
 
 		public GameObject GetGameObject() {

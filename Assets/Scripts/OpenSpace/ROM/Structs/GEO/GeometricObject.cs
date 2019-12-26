@@ -18,7 +18,7 @@ namespace OpenSpace.ROM {
 		public ushort num_elementsVisual;
 		public ushort unk0;
 		public ushort unk1;
-		public ushort unk2;
+		public ushort hasVertexColors;
 		public ushort unk3;
 
 		public float ScaleFactor {
@@ -46,7 +46,7 @@ namespace OpenSpace.ROM {
 			num_elementsVisual = reader.ReadUInt16();
 			unk0 = reader.ReadUInt16();
 			unk1 = reader.ReadUInt16();
-			unk2 = reader.ReadUInt16();
+			hasVertexColors = reader.ReadUInt16();
 			unk3 = reader.ReadUInt16();
 
 			//MapLoader.Loader.print("Vertices: " + num_vectors_1 + " or " + string.Format("{0:X4}", num_vectors_1));
@@ -74,7 +74,7 @@ namespace OpenSpace.ROM {
 										+ " - S1:" + factor_1
 										+ " - U0:" + string.Format("{0:X4}", unk0)
 										+ " - U1:" + string.Format("{0:X4}", unk1)
-										+ " - U2:" + string.Format("{0:X4}", unk2)
+										+ " - U2:" + string.Format("{0:X4}", hasVertexColors)
 										+ " - U3:" + string.Format("{0:X4}", unk3);
 			MapLoader l = MapLoader.Loader;
 			if (type == Type.Visual) {

@@ -10,7 +10,7 @@ namespace OpenSpace.ROM {
 		public ushort unk1;
 		public float scrollSpeedX;
 		public float scrollSpeedY;
-		public ushort unk4;
+		public ushort num_animTextures;
 
         protected override void ReadInternal(Reader reader) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
@@ -21,11 +21,11 @@ namespace OpenSpace.ROM {
 			textures = new Reference<VisualMaterialTextures>(reader);
 			num_textures = reader.ReadUInt16();
 			textures.Resolve(reader, (vmt) => { vmt.length = num_textures; });
-			unk4 = reader.ReadUInt16();
+			num_animTextures = reader.ReadUInt16();
 			flags = reader.ReadUInt16();
         }
 
-		public Material GetMaterial(Hint hints) {
+		public Material GetMaterial(Hint hints, GameObject gao = null) {
 			Material mat;
 			bool billboard = (hints & Hint.Billboard) == Hint.Billboard;
 			if (textures.Value != null && num_textures > 0) {
@@ -53,6 +53,11 @@ namespace OpenSpace.ROM {
 			mat.SetVector("_AmbientCoef", Vector4.one);
 			mat.SetVector("_DiffuseCoef", Vector4.one);
 			if (billboard) mat.SetFloat("_Billboard", 1f);
+			if (gao != null && num_textures > 1) {
+				MultiTextureMaterial mtmat = gao.AddComponent<MultiTextureMaterial>();
+				mtmat.visMatROM = this;
+				mtmat.mat = mat;
+			}
 			return mat;
 		}
 

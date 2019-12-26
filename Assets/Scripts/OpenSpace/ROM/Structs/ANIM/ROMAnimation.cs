@@ -77,12 +77,6 @@ namespace OpenSpace.ROM {
 							if (r.BaseStream.Position != r.BaseStream.Length) {
 								MapLoader.Loader.print("Animation " + index + ": bad read");
 							}
-							/*for (int i = 0; i < numOfNTTO.Length; i++) {
-								if (numOfNTTO[i].numOfNTTO > ntto.Length && numOfNTTO[i].numOfNTTO != 0xFFFF) {
-									MapLoader.Loader.print("fuck " + index + " - " + a3d.num_unk0 + " - " + a3d.num_onlyFrames + " - " + posBeforeOF + " - " + posAfterOF);
-									break;
-								}
-							}*/
 						}
 					}
 				}

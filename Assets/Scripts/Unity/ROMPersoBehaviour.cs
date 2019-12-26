@@ -28,7 +28,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
     public int poListIndex = 0;
 
 	// Animation
-	ushort currentShAnim;
+	ushort currentShAnim = 0xFFFF;
 	ROMShAnimation shAnim;
 	ROMAnimationCutTable.AnimationCut[] animCuts;
 	int currentAnimCut;
@@ -108,12 +108,13 @@ public class ROMPersoBehaviour : MonoBehaviour {
 	public void UpdateViewCollision(bool viewCollision) {
 	}
 
-    private void SetState(State s)
+    private void SetState(State state)
     {
+		this.state = state;
         UpdateViewCollision(controller.viewCollision);
-
         // Set animation
         MapLoader l = MapLoader.Loader;
+		//print(name + " - " + state.Index + " - " + perso.p3dData.Value.currentState.index);
 		if (state.anim.Value != null && state.anim.Value.animIndex != 0xFFFF) {
 			animationSpeed = state.speed;
 			LoadNewAnimation(state.anim.Value.animIndex);
@@ -125,7 +126,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 
 	public void SetState(int index) {
 		Family fam = perso.stdGame.Value.family;
-		OpenSpace.ROM.Reference<OpenSpace.ROM.State>[] states = fam.states.Value.states.Value.states;
+		Reference<OpenSpace.ROM.State>[] states = fam.states.Value.states.Value.states;
 		//stateNames = states.Select(s => (s.Value == null ? "Null" : "State " + s.Value.Index)).ToArray();
 		if (index < 0 || index >= states.Length) return;
 		stateIndex = index;

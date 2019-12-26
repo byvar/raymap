@@ -11,7 +11,7 @@ namespace OpenSpace.ROM {
 		public ushort sz_triangles;
 		public ushort sz_triangles_compressed;
 		public ushort sz_vertices;
-		public ushort flags;
+		public ushort num_triangles;
 		public ushort unk0;
 
 		protected override void ReadInternal(Reader reader) {
@@ -22,7 +22,7 @@ namespace OpenSpace.ROM {
 				vertices = new Reference<VertexArray>(reader);
 				sz_triangles = reader.ReadUInt16();
 				sz_vertices = reader.ReadUInt16();
-				flags = reader.ReadUInt16();
+				num_triangles = reader.ReadUInt16();
 
 				vertices.Resolve(reader, v => v.length = sz_vertices);
 			} else if (Settings.s.platform == Settings.Platform.DS) {
@@ -51,7 +51,13 @@ namespace OpenSpace.ROM {
 				bool backfaceCulling = !visualMaterial.Value.RenderBackFaces;
 				gao.transform.localPosition = Vector3.zero;
 				MeshRenderer mr = gao.AddComponent<MeshRenderer>();
-				mr.material = visualMaterial.Value.GetMaterial(VisualMaterial.Hint.None);
+				mr.material = visualMaterial.Value.GetMaterial(VisualMaterial.Hint.None, gao: gao);
+				/*if (visualMaterial.Value.num_textures > 0
+					&& visualMaterial.Value.textures.Value.vmTex[0].texRef.Value != null
+					&& visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value != null) {
+					TextureInfo ti = visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value;
+					gao.name += " " + string.Format("0x{0:X4}", ti.flags) + " " + string.Format("0x{0:X4}", ti.flags2);
+				}*/
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
 				Mesh mesh = new Mesh();
 				if (Settings.s.platform == Settings.Platform._3DS) {
@@ -67,6 +73,7 @@ namespace OpenSpace.ROM {
 					mesh.triangles = triangles.Value.triangles.SelectMany(t => backfaceCulling ? new int[] { t.v2, t.v1, t.v3 } : new int[] { t.v2, t.v1, t.v3, t.v1, t.v2, t.v3 }).ToArray();
 				} else if (Settings.s.platform == Settings.Platform.N64) {
 					mesh = RSP.RSPParser.Parse(triangles.Value.rspCommands, vertices.Value.vertices, go, backfaceCulling, mr.material);
+					//gao.name += " " + go.unk0 + " " + go.unk1 + " " + go.hasVertexColors + " " + go.unk3;
 					//gao.name += " - Verts ( " + sz_vertices + "):" + vertices.Value.Offset + " - Tris ( " + sz_triangles + " ):" + triangles.Value.Offset + " - " + Index + " - " + flags;
 					//gao.name += " - Flags: " + string.Format("{0:X4}", visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value.flags);
 				} else if (Settings.s.platform == Settings.Platform.DS) {
@@ -78,7 +85,9 @@ namespace OpenSpace.ROM {
 				mf.mesh = mesh;
 				if (Settings.s.platform == Settings.Platform.N64 || Settings.s.platform == Settings.Platform.DS) {
 					// Apply vertex colors
-					mr.sharedMaterial.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
+					if (go.hasVertexColors != 0) {
+						mr.sharedMaterial.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
+					}
 				}
 				return gao;
 			} else {

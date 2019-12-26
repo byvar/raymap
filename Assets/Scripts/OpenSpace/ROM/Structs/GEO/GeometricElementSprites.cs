@@ -31,7 +31,7 @@ namespace OpenSpace.ROM {
 
 				GameObject spr_gao = new GameObject("Sprite 0");
 				spr_gao.transform.SetParent(gao.transform);
-				//spr_gao.transform.localPosition = new Vector3(posX, posY, 0f);
+				spr_gao.transform.localPosition = go.verticesCollide.Value.vectors[vertexIndex].GetVector(go.ScaleFactor);
 				BillboardBehaviour billboard = spr_gao.AddComponent<BillboardBehaviour>();
 				billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
 				MeshFilter mf = spr_gao.AddComponent<MeshFilter>();
@@ -39,7 +39,7 @@ namespace OpenSpace.ROM {
 				BoxCollider bc = spr_gao.AddComponent<BoxCollider>();
 				bc.size = new Vector3(0, curScaleY * 2, curScaleX * 2);
 				spr_gao.layer = LayerMask.NameToLayer("Visual");
-				mr.material = visualMaterial.Value.GetMaterial(VisualMaterial.Hint.Billboard);
+				mr.material = visualMaterial.Value.GetMaterial(VisualMaterial.Hint.Billboard, gao: spr_gao);
 
 				bool mirrorX = false;
 				bool mirrorY = false;
@@ -49,6 +49,10 @@ namespace OpenSpace.ROM {
 					TextureInfo ti = visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value;
 					if (ti.IsMirrorX) mirrorX = true;
 					if (ti.IsMirrorY) mirrorY = true;
+					/*spr_gao.name += " " + string.Format("0x{0:X4}", visualMaterial.Value.num_textures) + " " + string.Format("0x{0:X4}", visualMaterial.Value.num_animTextures);
+					for (int i = 0; i < visualMaterial.Value.num_textures; i++) {
+						spr_gao.name += " " + visualMaterial.Value.textures.Value.vmTex[i].time;
+					}*/
 				}
 				/*if (visualMaterial.Value.num_textures > 1) {
 					MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
@@ -68,10 +72,10 @@ namespace OpenSpace.ROM {
 				normals[3] = Vector3.forward;
 				Vector3[] uvs = new Vector3[4];
 				if (Settings.s.platform == Settings.Platform.N64) {
-					uvs[0] = new Vector3(0, 0, 1);
-					uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), 0, 1);
-					uvs[2] = new Vector3(0, 1 + (mirrorY ? 1 : 0), 1);
-					uvs[3] = new Vector3(1 + (mirrorX ? 1 : 0), 1 + (mirrorY ? 1 : 0), 1);
+					uvs[0] = new Vector3(0, - (mirrorY ? 1 : 0), 1);
+					uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), -(mirrorY ? 1 : 0), 1);
+					uvs[2] = new Vector3(0, 1, 1);
+					uvs[3] = new Vector3(1 + (mirrorX ? 1 : 0), 1, 1);
 				} else {
 					uvs[0] = new Vector3(0, 1 + (mirrorY ? 1 : 0), 1);
 					uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), 1 + (mirrorY ? 1 : 0), 1);
