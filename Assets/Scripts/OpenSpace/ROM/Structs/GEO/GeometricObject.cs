@@ -123,6 +123,37 @@ namespace OpenSpace.ROM {
 			return gao;
 		}
 
+		public void MorphVertices(GameObject gao, GeometricObject go, float lerp) {
+			for (int i = 0; i < num_elementsVisual; i++) {
+				ROMStruct entry1 = elementsVisual.Value.elements[i].element.Value;
+				ROMStruct entry2 = go.elementsVisual.Value.elements[i].element.Value;
+				if (entry1 != null && entry2 != null && entry1 is GeometricElementTriangles && entry2 is GeometricElementTriangles) {
+					GeometricElementTriangles tris1 = entry1 as GeometricElementTriangles;
+					GeometricElementTriangles tris2 = entry2 as GeometricElementTriangles;
+					MeshFilter[] mfs = gao.GetComponentsInChildren<MeshFilter>();
+					MeshFilter mf = mfs.FirstOrDefault(m => m.name == "ElementTriangles @ " + tris1.Offset);
+					if (mf != null) {
+						tris1.MorphVertices(mf.sharedMesh, tris2, this, go, lerp);
+					}
+				}
+			}
+		}
+
+		public void ResetMorph(GameObject gao) {
+			for (int i = 0; i < num_elementsVisual; i++) {
+				ROMStruct entry1 = elementsVisual.Value.elements[i].element.Value;
+				if (entry1 != null && entry1 is GeometricElementTriangles ) {
+					GeometricElementTriangles tris1 = entry1 as GeometricElementTriangles;
+					MeshFilter[] mfs = gao.GetComponentsInChildren<MeshFilter>();
+					MeshFilter mf = mfs.FirstOrDefault(m => m.name == "ElementTriangles @ " + tris1.Offset);
+					if (mf != null) {
+						tris1.ResetMorph(mf.sharedMesh, this);
+						//mf.mesh.RecalculateNormals();
+					}
+				}
+			}
+		}
+
 		public enum Type {
 			Visual,
 			Collide

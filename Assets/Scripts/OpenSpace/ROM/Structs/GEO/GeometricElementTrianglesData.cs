@@ -19,6 +19,8 @@ namespace OpenSpace.ROM {
 		// N64
 		public byte[] data;
 		public RSPCommand[] rspCommands;
+
+		// DS
 		public DS3D.GeometryCommand[] ds3dCommands;
 
 		protected override void ReadInternal(Reader reader) {

@@ -207,6 +207,55 @@ namespace OpenSpace.ROM.DS3D {
 			return mesh;
 		}
 
+
+		public static Vector3[] ParseVerticesOnly(GeometryCommand[] commands, GeometricObject go) {
+			List<Vertex> verts = new List<Vertex>();
+			Vertex wipVertex = new Vertex();
+			List<Triangle> triangles = new List<Triangle>();
+			GeometryCommand.PrimitiveType primitive = GeometryCommand.PrimitiveType.Triangles;
+			int lastVertexCount = 0;
+
+			Mesh mesh = new Mesh();
+			bool parsing = true;
+			foreach (GeometryCommand c in commands) {
+				switch (c.Command) {
+					case GeometryCommand.Type.VTX_XY:
+						wipVertex.x = c.x / c.scale;
+						wipVertex.y = c.y / c.scale;
+						verts.Add(wipVertex.Clone());
+						break;
+					case GeometryCommand.Type.VTX_XZ:
+						wipVertex.x = c.x / c.scale;
+						wipVertex.z = c.z / c.scale;
+						verts.Add(wipVertex.Clone());
+						break;
+					case GeometryCommand.Type.VTX_YZ:
+						wipVertex.y = c.y / c.scale;
+						wipVertex.z = c.z / c.scale;
+						verts.Add(wipVertex.Clone());
+						break;
+					case GeometryCommand.Type.VTX_16:
+						wipVertex.x = c.x / c.scale;
+						wipVertex.y = c.y / c.scale;
+						wipVertex.z = c.z / c.scale;
+						verts.Add(wipVertex.Clone());
+						break;
+					case GeometryCommand.Type.BEGIN_VTXS:
+						AddTriangles(triangles, verts.Count, lastVertexCount, primitive);
+						primitive = c.Primitive;
+						/*if (primitive != GeometryCommand.PrimitiveType.Triangles && primitive != GeometryCommand.PrimitiveType.TriangleStrip) {
+							Debug.LogError("QUADS???? FUUUU! " + primitive);
+						}*/
+						lastVertexCount = verts.Count;
+						break;
+					case GeometryCommand.Type.END_VTXS:
+						break;
+				}
+				if (!parsing) break;
+			}
+			return verts.Select(v => new Vector3(v.x / go.ScaleFactor, v.z / go.ScaleFactor, v.y / go.ScaleFactor)).ToArray();
+		}
+
 		private static void AddTriangles(List<Triangle> triangles, int curVertexCount, int lastVertexCount, GeometryCommand.PrimitiveType primitive) {
 			if (lastVertexCount != curVertexCount) {
 				int numTriangles;

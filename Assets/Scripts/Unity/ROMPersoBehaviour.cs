@@ -332,7 +332,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 											}
 											/*subObjects[i][j].transform.localScale =
 												subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;*/
-											c.transform.parent = channelObjects[i].transform;
+											c.transform.parent = channelObjects[channelIndex].transform;
 											c.name = "[Morph] " + c.name;
 											c.SetActive(false);
 										}
@@ -488,55 +488,25 @@ public class ROMPersoBehaviour : MonoBehaviour {
 				channelObjects[i].transform.localRotation = quaternion;
 				channelObjects[i].transform.localScale = scale;
 
-				/*if (physicalObject != null && anim.a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentRelativeFrame < morphDataArray.GetLength(1)) {
+				if (physicalObject != null && anim.a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentRelativeFrame < morphDataArray.GetLength(1)) {
 					AnimMorphData morphData = morphDataArray[i, currentRelativeFrame];
-
+					GeometricObject ogPO = perso.p3dData.Value.objectsTable.Value.data.Value.entries[anim.ntto[poNum].object_index].obj.Value.visual.Value;
 					if (morphData != null && morphData.morphProgress != 0 && morphData.morphProgress != 100) {
-						PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
-						Vector3[] morphVerts = null;
-
-						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
-							IGeometricObject obj = physicalObject.visualSet[j].obj;
-							if (obj == null || obj as MeshObject == null) continue;
-							MeshObject fromM = obj as MeshObject;
-							MeshObject toM = morphToPO.visualSet[j].obj as MeshObject;
-							if (toM == null) continue;
-							if (fromM.vertices.Length != toM.vertices.Length) {
-								// For those special cases like the mistake in the Clark cinematic
-								continue;
-							}
-							int numVertices = fromM.vertices.Length;
-							morphVerts = new Vector3[numVertices];
-							for (int vi = 0; vi < numVertices; vi++) {
-								morphVerts[vi] = Vector3.Lerp(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
-							}
-							for (int k = 0; k < fromM.num_subblocks; k++) {
-								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
-								MeshElement el = (MeshElement)fromM.subblocks[k];
-								if (el != null) el.UpdateMeshVertices(morphVerts);
-							}
-						}
+						//print("morphing " + physicalObject.name);
+						GeometricObject morphToPO = perso.p3dData.Value.objectsTable.Value.data.Value.entries[morphData.objectIndexTo].obj.Value.visual.Value;
+						ogPO.MorphVertices(physicalObject, morphToPO, morphData.morphProgress / 100f);
 					} else if (morphData != null && morphData.morphProgress == 100) {
 						physicalObject.SetActive(false);
 						GameObject c = fullMorphPOs[i][morphData.objectIndexTo];
-						c.transform.localScale = c.scaleMultiplier.HasValue ? c.scaleMultiplier.Value : Vector3.one;
+						c.transform.localScale = objectIndexScales.ContainsKey(morphData.objectIndexTo) ? objectIndexScales[morphData.objectIndexTo] : Vector3.one;
 						c.transform.localPosition = Vector3.zero;
 						c.transform.localRotation = Quaternion.identity;
 						c.SetActive(true);
 						currentActivePO[i] = -2;
 					} else {
-						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
-							IGeometricObject obj = physicalObject.visualSet[j].obj;
-							if (obj == null || obj as MeshObject == null) continue;
-							MeshObject fromM = obj as MeshObject;
-							for (int k = 0; k < fromM.num_subblocks; k++) {
-								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
-								MeshElement el = (MeshElement)fromM.subblocks[k];
-								if (el != null) el.ResetVertices();
-							}
-						}
+						ogPO.ResetMorph(physicalObject);
 					}
-				}*/
+				}
 			}
 		}
     }
