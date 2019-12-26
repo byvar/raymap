@@ -6,7 +6,7 @@ namespace OpenSpace.ROM {
 		public Reference<VisualMaterial> characterMaterial;
 		public Reference<NoCtrlTextureList> noCtrlTextureList;
 		public Reference<Vector3Array> vectors_0;
-		public Reference<Vector3Array> vectors_1;
+		public Reference<Vector3Array> vectors_1_poScales;
 		public ushort num_vectors_0;
 		public ushort num_vectors_1;
 		public Reference<Short3Array> indices_0;
@@ -28,14 +28,14 @@ namespace OpenSpace.ROM {
 			num_vectors_0 = reader.ReadUInt16();
 			num_indices_0 = reader.ReadUInt16();
 			reader.ReadUInt16();
-			vectors_1 = new Reference<Vector3Array>(reader);
+			vectors_1_poScales = new Reference<Vector3Array>(reader, forceFix: true);
 			indices_1 = new Reference<Short3Array>(reader);
 			num_vectors_1 = reader.ReadUInt16();
 			num_indices_1 = reader.ReadUInt16();
 			reader.ReadUInt16();
 
 			vectors_0.Resolve(reader, v => v.length = num_vectors_0);
-			vectors_1.Resolve(reader, v => v.length = num_vectors_1);
+			vectors_1_poScales.Resolve(reader, v => v.length = num_vectors_1);
 			indices_0.Resolve(reader, i => i.length = num_indices_0);
 			indices_1.Resolve(reader, i => i.length = num_indices_1);
 		}

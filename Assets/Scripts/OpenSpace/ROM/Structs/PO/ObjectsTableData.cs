@@ -27,6 +27,9 @@ namespace OpenSpace.ROM {
 			public byte unk5;
 			public byte unk6;
 
+			// Derived
+			public Vector3? scale;
+
 			public Entry(Reader reader) {
 				entryType = reader.ReadUInt16();
 				if (entryType != 0) {
@@ -39,8 +42,9 @@ namespace OpenSpace.ROM {
 
 					// Unused stuff for this entry type
 					obj = new Reference<PhysicalObject>();
-					index_scale = 0;
+					index_scale = 0xFFFF;
 					type = 0xFFFF;
+					scale = null;
 				} else {
 					unk1 = reader.ReadUInt16();
 					obj = new Reference<PhysicalObject>(reader, true);
@@ -53,6 +57,13 @@ namespace OpenSpace.ROM {
 					unk4 = 0;
 					unk5 = 0;
 					unk6 = 0;
+
+					if (index_scale != 0xFFFF) {
+						EngineStruct es = Loader.Get<EngineStruct>(0 | (ushort)FATEntry.Flag.Fix);
+						scale = es.vectors_1_poScales.Value.vectors[index_scale];
+					} else {
+						scale = null;
+					}
 				}
 			}
 		}

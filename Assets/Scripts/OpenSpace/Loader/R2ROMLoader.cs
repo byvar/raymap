@@ -15,6 +15,10 @@ namespace OpenSpace.Loader {
 		public ROMBIN fat;
 		public FATTable[] fatTables;
 		public int CurrentLevel { get; private set; } = -1;
+		public ROMAnimation[] romAnims;
+		public ROMShAnimation[] shAnims;
+		public ROMAnimationCutTable cutTable;
+		public List<ObjectsTable> objectsTables = new List<ObjectsTable>();
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;
@@ -31,7 +35,6 @@ namespace OpenSpace.Loader {
 			gameDataBinFolder += "/";
 			if (!File.Exists(gameDataBinFolder + "data.bin")) return null;
 			if (!File.Exists(gameDataBinFolder + "fat.bin")) return null;
-			if (!File.Exists(gameDataBinFolder + "anims.bin")) return null;
 			files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
 			files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
 			
@@ -69,10 +72,15 @@ namespace OpenSpace.Loader {
 				loadingState = "Initializing files";
 				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "data.bin"));
 				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "fat.bin"));
+				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "anims.bin"));
+				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "shAnims.bin"));
+				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "cuttable.bin"));
 
 				files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
 				files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
 				files_array[SMem.Anims] = new ROMBIN("anims.bin", gameDataBinFolder + "anims.bin", SMem.Anims);
+				files_array[SMem.ShAnims] = new ROMBIN("shAnims.bin", gameDataBinFolder + "shAnims.bin", SMem.ShAnims);
+				files_array[SMem.CutTable] = new ROMBIN("shAnims.bin", gameDataBinFolder + "cuttable.bin", SMem.CutTable);
 
 				yield return controller.StartCoroutine(LoadAnims());
 
@@ -269,6 +277,28 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading level data";
 			yield return null;
 			LevelHeader lh = GetOrRead<LevelHeader>(reader, (ushort)(CurrentLevel | (ushort)FATEntry.Flag.Fix));
+			loadingState = "Loading additional object lists";
+			yield return null;
+			for (ushort i = 0; i < 0x7FFF; i++) {
+				// Only do it a few times because we're trying to load way more than there is,
+				// so it takes really long if we yield for everything
+				if (i % 1024 == 0) {
+					loadingState = "Loading additional object lists: " + (i + 1);
+					yield return null;
+				}
+				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, (ushort)(i | (ushort)FATEntry.Flag.Fix));
+				if (ot != null) objectsTables.Add(ot);
+			}
+			for (ushort i = 0; i < 0x7FFF; i++) {
+				// Only do it a few times because we're trying to load way more than there is,
+				// so it takes really long if we yield for everything
+				if (i % 1024 == 0) {
+					loadingState = "Loading additional object lists: " + (i + 1);
+					yield return null;
+				}
+				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
+				if (ot != null) objectsTables.Add(ot);
+			}
 			loadingState = "Initializing hierarchy";
 			yield return null;
 			if (lh != null) {
@@ -312,6 +342,7 @@ namespace OpenSpace.Loader {
 		}
 
 		public IEnumerator LoadAnims() {
+			// Read anims.bin
 			Reader reader = files_array[SMem.Anims].reader;
 			loadingState = "Loading animations";
 			yield return null;
@@ -320,25 +351,43 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			Pointer eof = null;
-			ROMAnimation[] anims = new ROMAnimation[num_anims];
+			romAnims = new ROMAnimation[num_anims];
 			for (uint i = 0; i < num_anims; i++) {
 				uint offset = reader.ReadUInt32();
-				anims[i] = new ROMAnimation() {
+				romAnims[i] = new ROMAnimation() {
 					compressed = (offset & 0x80000000) == 0x80000000,
 					index = i
 				};
-				anims[i].Init(new Pointer(offset & 0x7FFFFFFF, files_array[SMem.Anims]));
+				romAnims[i].Init(new Pointer(offset & 0x7FFFFFFF, files_array[SMem.Anims]));
 				if (i > 0) {
-					anims[i - 1].compressedSize = anims[i].Offset.offset - anims[i - 1].Offset.offset;
+					romAnims[i - 1].compressedSize = romAnims[i].Offset.offset - romAnims[i - 1].Offset.offset;
 				}
 			}
 			eof = new Pointer(reader.ReadUInt32(), files_array[SMem.Anims]); // EOF
 			if (num_anims > 0) {
-				anims[num_anims - 1].compressedSize = eof.offset - anims[num_anims - 1].Offset.offset;
+				romAnims[num_anims - 1].compressedSize = eof.offset - romAnims[num_anims - 1].Offset.offset;
 			}
 			for (uint i = 0; i < num_anims; i++) {
-				anims[i].Read(reader);
+				romAnims[i].Read(reader);
 			}
+
+			// Read shAnims.bin
+			reader = files_array[SMem.ShAnims].reader;
+			List<ROMShAnimation> shAnimsList = new List<ROMShAnimation>();
+			while (reader.BaseStream.Position < reader.BaseStream.Length) {
+				ROMShAnimation shAnim = new ROMShAnimation();
+				shAnim.Init(Pointer.Current(reader));
+				shAnim.Read(reader, true);
+				shAnimsList.Add(shAnim);
+			}
+			shAnims = shAnimsList.ToArray();
+
+			// Read cuttable.bin
+			reader = files_array[SMem.CutTable].reader;
+			cutTable = new ROMAnimationCutTable();
+			cutTable.Init(Pointer.Current(reader));
+			cutTable.length = (ushort)num_anims;
+			cutTable.Read(reader, true);
 		}
 
 		public void ExportTextures(Reader reader) {
@@ -783,5 +832,6 @@ namespace OpenSpace.Loader {
 		public const int Anims = 2;
 		public const int ShAnims = 3;
 		public const int A3dHead = 4;
+		public const int CutTable = 5;
 	}
 }

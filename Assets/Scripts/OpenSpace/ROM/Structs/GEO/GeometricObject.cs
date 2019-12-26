@@ -81,9 +81,9 @@ namespace OpenSpace.ROM {
 				if (elementsVisual.Value != null) {
 					//gao.transform.position = new Vector3(UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f));
 					foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
-						if (entry.element.Value == null) {
+						/*if (entry.element.Value == null) {
 							l.print("Visual element null: " + entry.element.type);
-						}
+						}*/
 						if (entry.element.Value != null) {
 							GameObject child = null;
 							if (entry.element.Value is GeometricElementTriangles) {

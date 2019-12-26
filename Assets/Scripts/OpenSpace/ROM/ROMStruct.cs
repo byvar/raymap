@@ -21,7 +21,7 @@ namespace OpenSpace.ROM {
 			});
 		}
 
-		public R2ROMLoader Loader {
+		public static R2ROMLoader Loader {
 			get {
 				return MapLoader.Loader as R2ROMLoader;
 			}
