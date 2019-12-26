@@ -89,6 +89,9 @@ namespace OpenSpace.ROM {
 							if (entry.element.Value is GeometricElementTriangles) {
 								GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
 								child = el.GetGameObject(type, this);
+							} else if (entry.element.Value is GeometricElementSprites) {
+								GeometricElementSprites el = entry.element.Value as GeometricElementSprites;
+								child = el.GetGameObject(type, this);
 							}
 							if (child != null) {
 								child.transform.SetParent(gao.transform);

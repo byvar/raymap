@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class MultiTextureMaterial : MonoBehaviour {
     public VisualMaterial visMat;
+	public OpenSpace.ROM.VisualMaterial visMatROM;
     public Material mat;
     public string[] textureNames = { "Placeholder" };
     int currentTexture = 0;
@@ -16,23 +17,43 @@ public class MultiTextureMaterial : MonoBehaviour {
     //float currentTime = 0f;
 
     public void Start() {
-        textureNames = visMat.animTextures.Select(a => (a == null || a.texture == null) ? "Null" : a.texture.name).ToArray();
-        SetTexture(visMat.currentAnimTexture);
+		if (visMat != null) {
+			textureNames = visMat.animTextures.Select(a => (a == null || a.texture == null) ? "Null" : a.texture.name).ToArray();
+			SetTexture(visMat.currentAnimTexture);
+		} else if (visMatROM != null) {
+			textureNames = visMatROM.textures.Value.vmTex.Select(a => (a.texRef.Value == null || a.texRef.Value.texInfo.Value == null)
+			? "Null"
+			: (a.texRef.Value.texInfo.Value.name ?? "TexInfo " + a.texRef.Value.texInfo.index)).ToArray();
+		}
     }
 
     public void SetTexture(int index) {
-        if (index < 0 || index > visMat.animTextures.Count) return;
-        textureIndex = index;
-        currentTexture = index;
-        TextureInfo tex = visMat.animTextures[index].texture;
-        if (tex != null) {
-            mat.SetTexture("_Tex0", tex.Texture);
-        }
+		if (visMat != null) {
+			if (index < 0 || index > visMat.animTextures.Count) return;
+			textureIndex = index;
+			currentTexture = index;
+			TextureInfo tex = visMat.animTextures[index].texture;
+			if (tex != null) {
+				mat.SetTexture("_Tex0", tex.Texture);
+			}
+		} else if (visMatROM != null) {
+			if (index < 0 || index > visMatROM.num_textures) return;
+			textureIndex = index;
+			currentTexture = index;
+			OpenSpace.ROM.TextureInfo tex = visMatROM.textures.Value.vmTex[index].texRef.Value.texInfo.Value;
+			if (tex != null) {
+				mat.SetTexture("_Tex0", tex.Texture);
+			}
+		}
     }
 
     public void LateUpdate() {
 		if (animate) {
-			textureIndex = visMat.currentAnimTexture;
+			if (visMat != null) {
+				textureIndex = visMat.currentAnimTexture;
+			} else if (visMatROM != null) {
+				//textureIndex = visMatROM..currentAnimTexture;
+			}
 		}
         /*if (animate && !visMat.IsLockedAnimatedTexture) {
             if (textureIndex >= 0 && textureIndex < visMat.animTextures.Count) {

@@ -25,8 +25,9 @@ namespace OpenSpace.ROM {
 			flags = reader.ReadUInt16();
         }
 
-		public Material GetMaterial() {
+		public Material GetMaterial(Hint hints) {
 			Material mat;
+			bool billboard = (hints & Hint.Billboard) == Hint.Billboard;
 			if (textures.Value != null && num_textures > 0) {
 				TextureInfo texInfo = textures.Value.vmTex[0].texRef.Value.texInfo;
 				if (texInfo.RenderTransparent || texInfo.RenderWater1 || texInfo.RenderWater2) {
@@ -51,6 +52,7 @@ namespace OpenSpace.ROM {
 			}
 			mat.SetVector("_AmbientCoef", Vector4.one);
 			mat.SetVector("_DiffuseCoef", Vector4.one);
+			if (billboard) mat.SetFloat("_Billboard", 1f);
 			return mat;
 		}
 
@@ -69,6 +71,12 @@ namespace OpenSpace.ROM {
 
 		public bool RenderBackFaces {
 			get { return (flags & flags_renderBackFaces) != 0; }
+		}
+
+		public enum Hint {
+			None = 0,
+			Transparent = 1,
+			Billboard = 2
 		}
 	}
 }

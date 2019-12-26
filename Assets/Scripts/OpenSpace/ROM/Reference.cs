@@ -95,6 +95,9 @@ namespace OpenSpace.ROM {
 				case FATEntry.Type.GeometricElementTriangles:
 					Value = l.GetOrRead<GeometricElementTriangles>(reader, index);
 					break;
+				case FATEntry.Type.GeometricElementSprites:
+					Value = l.GetOrRead<GeometricElementSprites>(reader, index);
+					break;
 				case FATEntry.Type.VisualMaterial:
 					Value = l.GetOrRead<VisualMaterial>(reader, index);
 					break;

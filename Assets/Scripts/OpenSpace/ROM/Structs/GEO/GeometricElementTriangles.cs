@@ -51,7 +51,7 @@ namespace OpenSpace.ROM {
 				bool backfaceCulling = !visualMaterial.Value.RenderBackFaces;
 				gao.transform.localPosition = Vector3.zero;
 				MeshRenderer mr = gao.AddComponent<MeshRenderer>();
-				mr.material = visualMaterial.Value.GetMaterial();
+				mr.material = visualMaterial.Value.GetMaterial(VisualMaterial.Hint.None);
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
 				Mesh mesh = new Mesh();
 				if (Settings.s.platform == Settings.Platform._3DS) {

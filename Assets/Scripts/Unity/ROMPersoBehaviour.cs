@@ -366,6 +366,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 			animCuts = null;
 			if (shAnimIndex != 0xFFFF) {
 				shAnim = ROMStruct.Loader.shAnims[shAnimIndex];
+				animationSpeed = shAnim.speed;
 				animCuts = ROMStruct.Loader.cutTable.GetAnimationChain(shAnimIndex);
 				//print(animCuts.Length);
 				forceAnimUpdate = true;
