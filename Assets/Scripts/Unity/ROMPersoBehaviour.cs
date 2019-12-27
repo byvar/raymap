@@ -106,9 +106,43 @@ public class ROMPersoBehaviour : MonoBehaviour {
 	#endregion
 
 	public void UpdateViewCollision(bool viewCollision) {
+		/*if (perso.collset != null) {
+			CollSet c = perso.collset;
+			foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<CollideMeshObject>> entry in c.zdxList) {
+				if (entry.Value != null) {
+					for (int i = 0; i < entry.Value.Count; i++) {
+						CollideMeshObject col = entry.Value[i];
+						if (col == null) continue;
+						if (viewCollision && c.GetPrivilegedActionZoneStatus(entry.Key, i) == CollSet.PrivilegedActivationStatus.ForceActive) {
+							col.SetVisualsActive(true);
+						} else {
+							col.SetVisualsActive(false);
+						}
+					}
+				}
+			}
+			if (viewCollision) {
+				foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<CollideActivation>> entry in c.activationList) {
+					if (entry.Value != null && entry.Value.Count == perso.p3dData.family.states.Count) {
+						CollideActivation ca = entry.Value[stateIndex];
+						if (ca.activationZone != null) {
+							foreach (CollideActivationZone caz in ca.activationZone) {
+								int index = caz.zdxIndex;
+								if (index >= c.zdxList[entry.Key].Count) index = c.zdxList[entry.Key].Count - 1;
+								if (index < 0) continue;
+								if (c.zdxList[entry.Key][index] == null) continue;
+								if (c.GetPrivilegedActionZoneStatus(entry.Key, index) != CollSet.PrivilegedActivationStatus.ForceInactive) {
+									c.zdxList[entry.Key][index].SetVisualsActive(true);
+								}
+							}
+						}
+					}
+				}
+			}
+		}*/
 	}
 
-    private void SetState(State state)
+	private void SetState(State state)
     {
 		this.state = state;
         UpdateViewCollision(controller.viewCollision);

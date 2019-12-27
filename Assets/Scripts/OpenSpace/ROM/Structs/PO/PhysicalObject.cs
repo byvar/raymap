@@ -28,6 +28,7 @@ namespace OpenSpace.ROM {
 				poc.collide = child;
 				poc.collide.SetActive(false);
 			}
+			poc.Init(MapLoader.Loader.controller);
 			return gao;
 		}
 	}

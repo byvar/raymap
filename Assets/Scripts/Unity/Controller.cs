@@ -493,7 +493,7 @@ public class Controller : MonoBehaviour {
 			if (loader is OpenSpace.Loader.R2ROMLoader) {
 				PhysicalObjectComponent[] pos = FindObjectsOfType<PhysicalObjectComponent>();
 				foreach (PhysicalObjectComponent po in pos) {
-					po.Switch(viewCollision);
+					po.UpdateViewCollision(viewCollision);
 				}
 			}
 		}
