@@ -12,8 +12,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
         public string boneName;
         public double positionX, positionY, positionZ;
         public double localPositionX, localPositionY, localPositionZ;
-        public double rotationX, rotationY, rotationZ;
-        public double localRotationX, localRotationY, localRotationZ;
+        public double rotationW, rotationX, rotationY, rotationZ;
+        public double localRotationW, localRotationX, localRotationY, localRotationZ;
         public double scaleX, scaleY, scaleZ;
         public double localScaleX, localScaleY, localScaleZ;
         public bool hasBone;
@@ -23,8 +23,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
         public AnimationFrameModelNode(string boneName,
             float positionX, float positionY, float positionZ,
             float localPositionX, float localPositionY, float localPositionZ,
-            float rotationX, float rotationY, float rotationZ,
-            float localRotationX, float localRotationY, float localRotationZ,
+            float rotationW, float rotationX, float rotationY, float rotationZ,
+            float localRotationW, float localRotationX, float localRotationY, float localRotationZ,
             float scaleX, float scaleY, float scaleZ,
             float localScaleX, float localScaleY, float localScaleZ,
             bool hasBone)
@@ -36,9 +36,11 @@ namespace Assets.Scripts.Unity.AnimationExporting
             this.localPositionX = localPositionX;
             this.localPositionY = localPositionY;
             this.localPositionZ = localPositionZ;
+            this.rotationW = rotationW;
             this.rotationX = rotationX;
             this.rotationY = rotationY;
             this.rotationZ = rotationZ;
+            this.localRotationW = localRotationW;
             this.localRotationX = localRotationX;
             this.localRotationY = localRotationY;
             this.localRotationZ = localRotationZ;

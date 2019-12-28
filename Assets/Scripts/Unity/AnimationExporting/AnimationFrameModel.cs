@@ -15,8 +15,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
         private AnimationFrameModelNode constructNode(string boneName,
             float positionX, float positionY, float positionZ,
             float localPositionX, float localPositionY, float localPositionZ,
-            float rotationX, float rotationY, float rotationZ,
-            float localRotationX, float localRotationY, float localRotationZ,
+            float rotationW, float rotationX, float rotationY, float rotationZ,
+            float localRotationW, float localRotationX, float localRotationY, float localRotationZ,
             float scaleX, float scaleY, float scaleZ,
             float localScaleX, float localScaleY, float localScaleZ,
             bool hasBone)
@@ -24,8 +24,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
             return new AnimationFrameModelNode(boneName,
                 positionX, positionY, positionZ,
                 localPositionX, localPositionY, localPositionZ,
-                rotationX, rotationY, rotationZ,
-                localRotationX, localRotationY, localRotationZ,
+                rotationW, rotationX, rotationY, rotationZ,
+                localRotationW, localRotationX, localRotationY, localRotationZ,
                 scaleX, scaleY, scaleZ,
                 localScaleX, localScaleY, localScaleZ,
                 hasBone);
@@ -47,8 +47,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
         public void addNode(string parentBoneName, string boneName,
             float positionX, float positionY, float positionZ,
             float localPositionX, float localPositionY, float localPositionZ,
-            float rotationX, float rotationY, float rotationZ,
-            float localRotationX, float localRotationY, float localRotationZ,
+            float rotationW, float rotationX, float rotationY, float rotationZ,
+            float localRotationW, float localRotationX, float localRotationY, float localRotationZ,
             float scaleX, float scaleY, float scaleZ,
             float localScaleX, float localScaleY, float localScaleZ,
             bool hasBone)
@@ -57,8 +57,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
                 boneName,
                 positionX, positionY, positionZ,
                 localPositionX, localPositionY, localPositionZ,
-                rotationX, rotationY, rotationZ,
-                localRotationX, localRotationY, localRotationZ,
+                rotationW, rotationX, rotationY, rotationZ,
+                localRotationW, localRotationX, localRotationY, localRotationZ,
                 scaleX, scaleY, scaleZ,
                 localScaleX, localScaleY, localScaleZ,
                 hasBone);
