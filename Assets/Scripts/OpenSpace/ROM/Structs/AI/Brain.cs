@@ -5,14 +5,16 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class Brain : ROMStruct {
 		// Size: 8
-		public uint dword0;
-		public uint word4;
         public Reference<Mind> mind;
+		public Reference<Comport> comportIntelligence;
+		public Reference<Comport> comportReflex;
+		public ushort ref_107; // dsgMem
 
 		protected override void ReadInternal(Reader reader) {
-			dword0 = reader.ReadUInt32();
-			word4 = reader.ReadUInt16();
-            mind = new Reference<Mind>(reader, true);
+			mind = new Reference<Mind>(reader, true);
+			comportIntelligence = new Reference<Comport>(reader, true);
+			comportReflex = new Reference<Comport>(reader, true);
+			ref_107 = reader.ReadUInt16();
 		}
 	}
 }

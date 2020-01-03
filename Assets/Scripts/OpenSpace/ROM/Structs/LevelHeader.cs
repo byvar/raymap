@@ -7,13 +7,13 @@ namespace OpenSpace.ROM {
 	public class LevelHeader : ROMStruct {
 		public Reference<HierarchyRoot> hierarchyRoot; // 45 has size 12
 		public ushort ref_46; // 46 = array of ref_45s
-		public ushort unk3;
+		public Reference<SuperObjectDynamicArray> spawnablePersos;
 		public ushort ref_144;
 		public ushort ref_143;
 		public ushort unk6;
 		public ushort unk7_3dsOnly;
 		public ushort length_46;
-		public ushort unk9;
+		public ushort num_spawnablepersos;
 		public ushort unk10_3dsOnly;
 		public ushort unk11;
 		public ushort unk12;
@@ -44,7 +44,7 @@ namespace OpenSpace.ROM {
 			MapLoader.Loader.print("Level Header: " + Pointer.Current(reader));
 			hierarchyRoot = new Reference<HierarchyRoot>(reader);
 			ref_46 = reader.ReadUInt16();
-			unk3 = reader.ReadUInt16();
+			spawnablePersos = new Reference<SuperObjectDynamicArray>(reader);
 			ref_144 = reader.ReadUInt16();
 			ref_143 = reader.ReadUInt16();
 			unk6 = reader.ReadUInt16();
@@ -52,7 +52,7 @@ namespace OpenSpace.ROM {
 				unk7_3dsOnly = reader.ReadUInt16();
 			}
 			length_46 = reader.ReadUInt16();
-			unk9 = reader.ReadUInt16();
+			num_spawnablepersos = reader.ReadUInt16();
 			if (Settings.s.platform == Settings.Platform._3DS || Settings.s.game == Settings.Game.RRR) {
 				unk10_3dsOnly = reader.ReadUInt16();
 			}
@@ -86,6 +86,8 @@ namespace OpenSpace.ROM {
 			vectors.Resolve(reader, v => { v.length = len_vectors; });
 			indices.Resolve(reader, i => { i.length = len_indices; });
 			hierarchyRoot.Resolve(reader);
+			spawnablePersos.Resolve(reader, a => a.length = num_spawnablepersos);
+			Loader.print("Spawnable persos: " + num_spawnablepersos + " - " + spawnablePersos.Value.superObjects[0].Value.Offset);
 		}
     }
 }

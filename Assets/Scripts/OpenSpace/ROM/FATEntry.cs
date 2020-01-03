@@ -28,6 +28,7 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> TypesDS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
+			{ 2, Type.Comport },
             { 3, Type.Mind },
             { 4, Type.Family },
 			{ 5, Type.State },
@@ -72,6 +73,11 @@ namespace OpenSpace.ROM {
             { 66, Type.Brain },
             { 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
+			{ 77, Type.Intelligence },
+			{ 78, Type.ComportArray },
+			{ 79, Type.ScriptArray },
+			{ 80, Type.Script },
+			{ 82, Type.ScriptNodeArray },
 			{ 91, Type.NoCtrlTextureList },
 			{ 97, Type.SectorSuperObjectArray1Info },
 			{ 107, Type.StateArrayRef },
@@ -94,7 +100,8 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> TypesN64 = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
-            { 3, Type.Mind },
+			{ 2, Type.Comport },
+			{ 3, Type.Mind },
             { 4, Type.Family },
 			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
@@ -139,6 +146,11 @@ namespace OpenSpace.ROM {
             { 66, Type.Brain },
             { 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
+			{ 77, Type.Intelligence },
+			{ 78, Type.ComportArray },
+			{ 79, Type.ScriptArray },
+			{ 80, Type.Script },
+			{ 82, Type.ScriptNodeArray },
 			{ 91, Type.NoCtrlTextureList },
 			{ 97, Type.SectorSuperObjectArray1Info },
 			{ 107, Type.StateArrayRef },
@@ -161,7 +173,8 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> Types3DS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
-            { 3, Type.Mind },
+			{ 2, Type.Comport },
+			{ 3, Type.Mind },
 			{ 4, Type.Family },
 			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
@@ -205,6 +218,11 @@ namespace OpenSpace.ROM {
             { 62, Type.Brain },
 			{ 67, Type.StdGame },
 			{ 71, Type.ObjectsTableData },
+			{ 73, Type.Intelligence },
+			{ 74, Type.ComportArray },
+			{ 75, Type.ScriptArray },
+			{ 76, Type.Script },
+			{ 78, Type.ScriptNodeArray },
 			{ 87, Type.NoCtrlTextureList },
 			{ 93, Type.SectorSuperObjectArray1Info },
 			{ 103, Type.StateArrayRef },
@@ -293,7 +311,13 @@ namespace OpenSpace.ROM {
 			LightInfo,
             Brain,
             Mind,
-            AIModel
+            AIModel,
+			Comport,
+			ComportArray,
+			Script,
+			ScriptArray,
+			ScriptNodeArray,
+			Intelligence,
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -358,6 +382,12 @@ namespace OpenSpace.ROM {
             { typeof(Brain), Type.Brain },
             { typeof(Mind), Type.Mind },
             { typeof(AIModel), Type.AIModel },
+			{ typeof(Comport), Type.Comport },
+			{ typeof(Script), Type.Script },
+			{ typeof(ScriptArray), Type.ScriptArray },
+			{ typeof(ScriptNodeArray), Type.ScriptNodeArray },
+			{ typeof(Intelligence), Type.Intelligence },
+			{ typeof(ComportArray), Type.ComportArray },
         };
 
 		public Type EntryType {

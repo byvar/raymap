@@ -58,7 +58,8 @@ namespace OpenSpace.ROM {
 				Short3Array.Triangle tri = lh.indices.Value.triangles[index];
 				rotationMatrix = ROMMatrix.Get(tri.v1, indices, vectors);
 				scaleMatrix = ROMMatrix.Get(tri.v2, indices, vectors);
-				if (tri.v3 != 0xFFFF) {
+				if (tri.v3 != 0xFFFF && tri.v3 < vectors.length) {
+					//MapLoader.Loader.print(tri.v3);
 					position = vectors.vectors[tri.v3];
 					//MapLoader.Loader.print(transform.position);
 				}
@@ -156,9 +157,9 @@ namespace OpenSpace.ROM {
 				if (index == 0xFFFF || indices == null || vectors == null) return null;
 				Short3Array.Triangle tri = indices.triangles[index];
 				return new ROMMatrix() {
-					v1 = vectors.vectors[tri.v1],
-					v2 = vectors.vectors[tri.v2],
-					v3 = vectors.vectors[tri.v3]
+					v1 = tri.v1 != 0xFFFF && tri.v1 < vectors.length ? new Vector3?(vectors.vectors[tri.v1]) : null,
+					v2 = tri.v2 != 0xFFFF && tri.v2 < vectors.length ? new Vector3?(vectors.vectors[tri.v2]) : null,
+					v3 = tri.v3 != 0xFFFF && tri.v3 < vectors.length ? new Vector3?(vectors.vectors[tri.v3]) : null
 				};
 			}
 		}
