@@ -7,13 +7,13 @@ using System.Linq;
 using UnityEngine;
 
 public class SectorManager : MonoBehaviour {
+	public Controller controller;
     bool loaded = false;
     public bool displayInactiveSectors = true; bool _displayInactiveSectors = true;
-    public List<Sector> sectors;
-    private List<SectorComponent> sectorComponents;
+    public List<SectorComponent> sectors;
     public Camera mainCamera;
     //public List<Sector> activeSectors = new List<Sector>();
-    public Sector activeSector = null;
+    public SectorComponent activeSector = null;
     Vector3 camPosPrevious;
 
     // Use this for initialization
@@ -44,40 +44,39 @@ public class SectorManager : MonoBehaviour {
 	private void UpdateSectors() {
 		if (!displayInactiveSectors) {
 			for (int i = 0; i < sectors.Count; i++) {
-				Sector s = sectors[i];
-				if (s.Loaded) {
-					s.Gao.SetActive(true);
+				SectorComponent sc = sectors[i];
+				if (sc.Loaded) {
+					sc.SetGameObjectActive(true);
 				} else {
-					s.Gao.SetActive(false);
+					sc.SetGameObjectActive(false);
 				}
 			}
 		} else {
 			for (int i = 0; i < sectors.Count; i++) {
-				Sector s = sectors[i];
-				s.Gao.SetActive(true);
+				sectors[i].SetGameObjectActive(true);
 			}
 		}
 	}
 
-    public Sector GetActiveSectorAtPoint(Vector3 point, Sector currentActiveSector = null, bool allowVirtual = false) {
+    public SectorComponent GetActiveSectorAtPoint(Vector3 point, SectorComponent currentActiveSector = null, bool allowVirtual = false) {
 
-        if (currentActiveSector!=null && (currentActiveSector.sectorBorder!=null ? currentActiveSector.sectorBorder.ContainsPoint(point) : true)) {
+        if (currentActiveSector!=null && (currentActiveSector.SectorBorder!=null ? currentActiveSector.SectorBorder.ContainsPoint(point) : false)) {
             return currentActiveSector;
         }
 
-        Sector activeSector = null;
+        SectorComponent activeSector = null;
         for (int i = 0; i < sectors.Count; i++) {
-            Sector s = sectors[i];
+            SectorComponent s = sectors[i];
             s.Loaded = false;
         }
         for (int i = 0; i < sectors.Count; i++) {
-            Sector s = sectors[i];
-            s.Active = (allowVirtual || s.isSectorVirtual == 0) && (s.sectorBorder != null ? s.sectorBorder.ContainsPoint(point) : true);
+            SectorComponent s = sectors[i];
+            s.Active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
             if (s.Active) {
                 activeSector = s;
 
-                for (int j = 0; j < s.neighbors.Count; j++) {
-                    s.neighbors[j].sector.Loaded = true;
+                for (int j = 0; j < s.neighbors.Length; j++) {
+                    s.neighbors[j].Loaded = true;
                 }
 
                 break;
@@ -94,39 +93,59 @@ public class SectorManager : MonoBehaviour {
         return activeSector;
     }
 
+	public void AddSector(SectorComponent sc) {
+		sectors.Add(sc);
+	}
+
     public void Init() {
-        sectors = MapLoader.Loader.sectors;
+        /*sectors = MapLoader.Loader.sectors;
         sectorComponents = sectors.Select(s => s.Gao.AddComponent<SectorComponent>()).ToList();
-        for (int i = 0; i < sectors.Count; i++) {
-            Sector s = sectors[i];
-            sectorComponents[i].sector = s;
-            sectorComponents[i].Init();
-            ApplySectorLighting(s, s.Gao, LightInfo.ObjectLightedFlag.Environment);
+		if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
+			SectorsROM = new List<SectorComponent>();
+			OpenSpace.Loader.R2ROMLoader l = (OpenSpace.Loader.R2ROMLoader)MapLoader.Loader;
+			OpenSpace.ROM.LevelHeader lh = l.level;
+		}*/
+		for (int i = 0; i < sectors.Count; i++) {
+            SectorComponent sc = sectors[i];
+            sc.Init();
+			/*if (sc.sector != null) {
+				ApplySectorLighting(sc, sc.Gao, LightInfo.ObjectLightedFlag.Environment);
+			}*/
         }
-        loaded = true;
     }
 
+	public void InitLights() {
+		for (int i = 0; i < sectors.Count; i++) {
+			SectorComponent sc = sectors[i];
+			ApplySectorLighting(sc, sc.Gao, LightInfo.ObjectLightedFlag.Environment);
+		}
+		loaded = true;
+	}
+
     public void RecalculateSectorLighting() {
-        foreach (Sector s in sectors) {
-            ApplySectorLighting(s, s.Gao, LightInfo.ObjectLightedFlag.Environment);
-            /*foreach (Perso p in s.persos) {
-                if (p.Gao) {
-                    PersoBehaviour pb = p.Gao.GetComponent<PersoBehaviour>();
-                    if (pb != null) {
-                        pb.sector = s;
-                    }
-                }
-            }*/
+        foreach (SectorComponent sc in sectors) {
+			ApplySectorLighting(sc, sc.Gao, LightInfo.ObjectLightedFlag.Environment);
+			/*foreach (Perso p in sc.sector.persos) {
+				if (p.Gao) {
+					PersoBehaviour pb = p.Gao.GetComponent<PersoBehaviour>();
+					if (pb != null) {
+						pb.sector = sc;
+					}
+				}
+			}*/
         }
         if (loaded) {
             foreach (Perso p in MapLoader.Loader.persos) {
                 PersoBehaviour pb = p.Gao.GetComponent<PersoBehaviour>();
                 ApplySectorLighting(pb.sector, p.Gao, LightInfo.ObjectLightedFlag.Perso);
             }
+			foreach (ROMPersoBehaviour p in controller.romPersos) {
+				ApplySectorLighting(p.sector, p.gameObject, LightInfo.ObjectLightedFlag.Perso);
+			}
         }
     }
 
-    public void ApplySectorLighting(Sector s, GameObject gao, LightInfo.ObjectLightedFlag objectType) {
+    public void ApplySectorLighting(SectorComponent sector, GameObject gao, LightInfo.ObjectLightedFlag objectType) {
 		if (objectType == LightInfo.ObjectLightedFlag.None) {
 			if (gao) {
 				List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
@@ -143,8 +162,10 @@ public class SectorManager : MonoBehaviour {
 				}
 			}
 		} else {
-			if (s == null) return;
-			if (s.staticLights != null) {
+			if (sector == null) return;
+			/*Sector s = sector.sector;
+			if (s == null) return;*/
+			if (sector.lights != null) {
 				Vector4? fogColor = null;
 				Vector4? fogParams = null;
 				Vector4 ambientLight = Vector4.zero;
@@ -152,31 +173,33 @@ public class SectorManager : MonoBehaviour {
 				List<Vector4> staticLightDir = new List<Vector4>();
 				List<Vector4> staticLightCol = new List<Vector4>();
 				List<Vector4> staticLightParams = new List<Vector4>();
-				for (int i = 0; i < s.staticLights.Count; i++) {
-					LightInfo li = s.staticLights[i];
+				for (int i = 0; i < sector.lights.Length; i++) {
+					LightBehaviour lb = sector.lights[i];
+					//LightInfo li = lb.li;
+					//if (li == null) continue;
 					//if (!li.IsObjectLighted(objectType)) continue;
 					//if (li.turnedOn == 0x0) continue;
-					switch (li.type) {
+					switch (lb.Type) {
 						case 4:
-							ambientLight += li.color;
-							staticLightPos.Add(new Vector4(li.Light.transform.position.x, li.Light.transform.position.y, li.Light.transform.position.z, li.type));
-							staticLightDir.Add(li.Light.transform.TransformVector(Vector3.back));
-							staticLightCol.Add(li.color);
-							staticLightParams.Add(new Vector4(li.near, li.far, li.paintingLightFlag, li.alphaLightFlag));
+							ambientLight += lb.Color;
+							staticLightPos.Add(new Vector4(lb.transform.position.x, lb.transform.position.y, lb.transform.position.z, lb.Type));
+							staticLightDir.Add(lb.transform.TransformVector(Vector3.back));
+							staticLightCol.Add(lb.Color);
+							staticLightParams.Add(new Vector4(lb.Near, lb.Far, lb.PaintingLightFlag, lb.AlphaLightFlag));
 							break;
 						case 6:
 							if (!fogColor.HasValue) {
-								fogColor = li.color;
-								fogParams = new Vector4(li.bigAlpha_fogBlendNear / 255f, li.intensityMin_fogBlendFar / 255f, li.near, li.far);
+								fogColor = lb.Color;
+								fogParams = new Vector4(lb.FogBlendNear / 255f, lb.FogBlendFar / 255f, lb.Near, lb.Far);
 							}
 							break;
 						default:
-							staticLightPos.Add(new Vector4(li.Light.transform.position.x, li.Light.transform.position.y, li.Light.transform.position.z, li.type));
-							staticLightDir.Add(li.Light.transform.TransformVector(Vector3.back));
-							staticLightCol.Add(li.color);
-							Vector3 scale = li.transMatrix.GetScale(true);
+							staticLightPos.Add(new Vector4(lb.transform.position.x, lb.transform.position.y, lb.transform.position.z, lb.Type));
+							staticLightDir.Add(lb.transform.TransformVector(Vector3.back));
+							staticLightCol.Add(lb.Color);
+							Vector3 scale = lb.transform.localScale;
 							float maxScale = Mathf.Max(scale.x, scale.y, scale.z);
-							staticLightParams.Add(new Vector4(li.near * maxScale, li.far * maxScale, li.paintingLightFlag, li.alphaLightFlag));
+							staticLightParams.Add(new Vector4(lb.Near * maxScale, lb.Far * maxScale, lb.PaintingLightFlag, lb.AlphaLightFlag));
 							break;
 					}
 				}
@@ -184,6 +207,7 @@ public class SectorManager : MonoBehaviour {
 				Vector4[] staticLightDirArray = staticLightDir.ToArray();
 				Vector4[] staticLightColArray = staticLightCol.ToArray();
 				Vector4[] staticLightParamsArray = staticLightParams.ToArray();
+				//print(staticLightPosArray.Length + " - " + objectType);
 				if (gao) {
 					List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
 					foreach (Renderer r in rs) {

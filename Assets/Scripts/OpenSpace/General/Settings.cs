@@ -423,6 +423,19 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
+		public static Settings DDN64 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.DD,
+			platform = Platform.N64,
+			endian = Endian.Big,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+
 		public static Settings DDPC = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.DD,
@@ -617,7 +630,7 @@ namespace OpenSpace {
 			{ Mode.TonicTroubleSEPC, TTSEPC },
 			{ Mode.DonaldDuckPC, DDPC },
 			{ Mode.DonaldDuckDC, DDDC },
-			{ Mode.DonaldDuckN64, R2N64 },
+			{ Mode.DonaldDuckN64, DDN64 },
 			{ Mode.DonaldDuckPKGC, DDPKGC },
 			{ Mode.PlaymobilHypePC, PlaymobilHypePC },
 			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },

@@ -14,7 +14,7 @@ namespace OpenSpace.ROM {
 		public Triangle[] triangles;
 		public Vector2[] uvs;
 		public CompressedVector3[] verts;
-		public CompressedVector3[] normals;
+		public CompressedVector3[] colors;
 
 		// N64
 		public byte[] data;
@@ -51,12 +51,12 @@ namespace OpenSpace.ROM {
 					uvs[i] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 				}
 				verts = new CompressedVector3[num_vertices];
-				normals = new CompressedVector3[num_vertices];
+				colors = new CompressedVector3[num_vertices];
 				for (int i = 0; i < num_vertices; i++) {
 					verts[i] = new CompressedVector3(reader);
 				}
 				for (int i = 0; i < num_vertices; i++) {
-					normals[i] = new CompressedVector3(reader);
+					colors[i] = new CompressedVector3(reader);
 				}
 			} else {
 				if (Settings.s.platform == Settings.Platform.N64) {

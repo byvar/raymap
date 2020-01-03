@@ -63,16 +63,35 @@ namespace OpenSpace.ROM {
 				if (Settings.s.platform == Settings.Platform._3DS) {
 					if (sz_vertices == 0) {
 						mesh.vertices = go.verticesVisual.Value.GetVectors(go.ScaleFactor);
-						mesh.normals = go.normals.Value.GetVectors(Int16.MaxValue);
+						if (go.hasVertexColors == 0) {
+							mesh.normals = go.normals.Value.GetVectors(Int16.MaxValue);
+						} else {
+							mesh.SetUVs(1, go.normals.Value.GetVectors(255f, switchAxes: false).Select(v => new Vector4(v.x, v.y, v.z, 1f)).ToList());
+							//mesh.SetUVs(1, go.normals.Value.GetVectors(Int16.MaxValue).Select(v => new Vector4(v.x, v.y, v.z, 1f)).ToList());
+						}
 					} else {
 						// Use vertices located in element
 						mesh.vertices = triangles.Value.verts.Select(v => v.GetVector(go.ScaleFactor)).ToArray();
-						mesh.normals = triangles.Value.normals.Select(v => v.GetVector(Int16.MaxValue)).ToArray();
+						if (go.hasVertexColors == 0) {
+							mesh.normals = triangles.Value.colors.Select(v => v.GetVector(Int16.MaxValue)).ToArray();
+						} else {
+							mesh.SetUVs(1, triangles.Value.colors.Select(v => {
+								Vector3 v3 = v.GetVector(255f, switchAxes: false);
+								return new Vector4(v3.x, v3.y, v3.z, 1f);
+							}).ToList());
+						}
 					}
 					mesh.SetUVs(0, triangles.Value.uvs.Select(u => new Vector3(u.x, u.y, 1f)).ToList());
 					mesh.triangles = triangles.Value.triangles.SelectMany(t => backfaceCulling ? new int[] { t.v2, t.v1, t.v3 } : new int[] { t.v2, t.v1, t.v3, t.v1, t.v2, t.v3 }).ToArray();
+					if (go.hasVertexColors != 0) {
+						mesh.RecalculateNormals();
+					}
 				} else if (Settings.s.platform == Settings.Platform.N64) {
 					mesh = RSP.RSPParser.Parse(triangles.Value.rspCommands, vertices.Value.vertices, go, backfaceCulling, mr.material);
+					//gao.name += " " + vertices.Value.Offset + " - " + vertices.Value.vertices.Length + " - " + triangles.Value.Offset;
+					/*for (int i = 0; i < mesh.triangles.Length; i++) {
+						gao.name += " " + mesh.triangles[i];
+					}*/
 					//gao.name += " " + go.unk0 + " " + go.unk1 + " " + go.hasVertexColors + " " + go.unk3;
 					//gao.name += " - Verts ( " + sz_vertices + "):" + vertices.Value.Offset + " - Tris ( " + sz_triangles + " ):" + triangles.Value.Offset + " - " + Index + " - " + flags;
 					//gao.name += " - Flags: " + string.Format("{0:X4}", visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value.flags);
@@ -83,11 +102,9 @@ namespace OpenSpace.ROM {
 					}
 				}
 				mf.mesh = mesh;
-				if (Settings.s.platform == Settings.Platform.N64 || Settings.s.platform == Settings.Platform.DS) {
-					// Apply vertex colors
-					if (go.hasVertexColors != 0) {
-						mr.sharedMaterial.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
-					}
+				// Apply vertex colors
+				if (go.hasVertexColors != 0) {
+					mr.sharedMaterial.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
 				}
 				return gao;
 			} else {
@@ -155,6 +172,14 @@ namespace OpenSpace.ROM {
 			} else if (Settings.s.platform == Settings.Platform.DS) {
 				Vector3[] verts = DS3D.GeometryParser.ParseVerticesOnly(triangles.Value.ds3dCommands, go);
 				mesh.vertices = verts;
+			}
+		}
+
+		public void ResetVertexBuffer() {
+			if (Settings.s.platform == Settings.Platform.N64) {
+				if (vertices.Value != null) {
+					vertices.Value.ResetVertexBuffer();
+				}
 			}
 		}
 	}

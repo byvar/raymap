@@ -81,6 +81,7 @@ namespace OpenSpace.ROM {
 		}
 
 		public Type Resolve(Reader reader) {
+			if (this.type == 0xFFFF) return null;
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
 			FATEntry.Type entryType = FATEntry.GetEntryType(this.type);
 			System.Type type = null;
@@ -114,7 +115,7 @@ namespace OpenSpace.ROM {
 					Value = l.GetOrRead<Sector>(reader, index);
 					break;
 				default:
-					l.print("GenericReference: Unsupported struct with type " + entryType);
+					l.print("GenericReference: Unsupported struct with type " + entryType + "(" + this.type + ")");
 					break;
 			}
 			return type;

@@ -13,21 +13,25 @@ namespace OpenSpace.ROM {
 
 
 		protected override void ReadInternal(Reader reader) {
-			data = reader.ReadBytes(length);
 			if (Settings.s.platform == Settings.Platform.N64) {
-				using (MemoryStream str = new MemoryStream(data)) {
-					using (Reader dataReader = new Reader(str, Settings.s.IsLittleEndian)) {
-						vertices = new Vertex[length / 16];
-						for (int i = 0; i < vertices.Length; i++) {
-							vertices[i] = new Vertex(dataReader);
-						}
-					}
+				vertices = new Vertex[length / 16];
+				for (int i = 0; i < vertices.Length; i++) {
+					vertices[i] = new Vertex(reader);
+				}
+			} else {
+				data = reader.ReadBytes(length);
+			}
+		}
+		public void ResetVertexBuffer() {
+			if (Settings.s.platform == Settings.Platform.N64) {
+				foreach(Vertex v in vertices) {
+					v.ResetWorkingCopy();
 				}
 			}
 		}
 
 
-		public struct Vertex {
+		public class Vertex {
 			public short x;
 			public short y;
 			public short z;
@@ -42,6 +46,10 @@ namespace OpenSpace.ROM {
 			public Color color;
 			public Vector3 normal;
 
+			private Vertex workingCopy;
+			private Vertex original;
+
+			public Vertex() { }
 			public Vertex(Reader reader) {
 				x = reader.ReadInt16();
 				y = reader.ReadInt16();
@@ -60,6 +68,41 @@ namespace OpenSpace.ROM {
 					normal.y < 0 ? normal.y / 128f : normal.y / 127f,
 					normal.z < 0 ? normal.z / 128f : normal.z / 127f
 					);
+			}
+			public Vertex WorkingCopy {
+				get {
+					if (workingCopy == null) {
+						return this;
+					} else {
+						return workingCopy;
+					}
+				}
+			}
+			public void PrepareWorkingCopy() {
+				if (workingCopy == null) {
+					workingCopy = new Vertex() {
+						x = x,
+						y = y,
+						z = z,
+						flag = flag,
+						u = u,
+						v = v,
+						r = r,
+						g = g,
+						b = b,
+						a = a,
+						color = color,
+						normal = normal,
+						original = original != null ? original : this
+					};
+					if (original != null) {
+						original.workingCopy = workingCopy;
+					}
+				}
+			}
+
+			public void ResetWorkingCopy() {
+				workingCopy = null;
 			}
 
 			public Vector3 GetVector(float factor, bool switchAxes = true) {

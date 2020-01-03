@@ -20,7 +20,7 @@ namespace OpenSpace.ROM.RSP {
 			Mesh mesh = new Mesh();
 			for (int i = 0; i < Math.Min(32, vertices.Length); i++) {
 				int curVertsCount = i;
-				verts.Add(vertices[i]);
+				verts.Add(vertices[i].WorkingCopy);
 				vertexBufferMapping[i] = i;
 			}
 			bool parsing = true;
@@ -40,7 +40,7 @@ namespace OpenSpace.ROM.RSP {
 						int numVertices = c.vtx.n;
 						for (int i = 0; i < numVertices; i++) {
 							int curVertsCount = verts.Count;
-							verts.Add(vertices[startVtx + i]);
+							verts.Add(vertices[startVtx + i].WorkingCopy);
 							vertexBufferMapping[c.vtx.v0 + i] = curVertsCount;
 						}
 						break;
@@ -49,21 +49,9 @@ namespace OpenSpace.ROM.RSP {
 						if (ind > 32) {
 							Debug.LogError("Mom, my RSP implementation is wrong!");
 						}
-						VertexArray.Vertex og = verts[vertexBufferMapping[ind]];
-						VertexArray.Vertex vtx = new VertexArray.Vertex() {
-							x = og.x,
-							y = og.y,
-							z = og.z,
-							flag = og.flag,
-							u = og.u,
-							v = og.v,
-							r = og.r,
-							g = og.g,
-							b = og.b,
-							a = og.a,
-							color = og.color,
-							normal = og.normal,
-						};
+						VertexArray.Vertex og = verts[vertexBufferMapping[ind]].WorkingCopy;
+						og.PrepareWorkingCopy();
+						VertexArray.Vertex vtx = og.WorkingCopy;
 						switch (c.modifyVtx.Command) {
 							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_RGBA:
 								vtx.r = c.modifyVtx.r;
@@ -131,7 +119,7 @@ namespace OpenSpace.ROM.RSP {
 			Mesh mesh = new Mesh();
 			for (int i = 0; i < Math.Min(32, vertices.Length); i++) {
 				int curVertsCount = i;
-				verts.Add(vertices[i]);
+				verts.Add(vertices[i].WorkingCopy);
 				vertexBufferMapping[i] = i;
 			}
 			bool parsing = true;
@@ -151,7 +139,7 @@ namespace OpenSpace.ROM.RSP {
 						int numVertices = c.vtx.n;
 						for (int i = 0; i < numVertices; i++) {
 							int curVertsCount = verts.Count;
-							verts.Add(vertices[startVtx + i]);
+							verts.Add(vertices[startVtx + i].WorkingCopy);
 							vertexBufferMapping[c.vtx.v0 + i] = curVertsCount;
 						}
 						break;
@@ -160,21 +148,9 @@ namespace OpenSpace.ROM.RSP {
 						if (ind > 32) {
 							Debug.LogError("Mom, my RSP implementation is wrong!");
 						}
-						VertexArray.Vertex og = verts[vertexBufferMapping[ind]];
-						VertexArray.Vertex vtx = new VertexArray.Vertex() {
-							x = og.x,
-							y = og.y,
-							z = og.z,
-							flag = og.flag,
-							u = og.u,
-							v = og.v,
-							r = og.r,
-							g = og.g,
-							b = og.b,
-							a = og.a,
-							color = og.color,
-							normal = og.normal,
-						};
+						VertexArray.Vertex og = verts[vertexBufferMapping[ind]].WorkingCopy;
+						og.PrepareWorkingCopy();
+						VertexArray.Vertex vtx = og.WorkingCopy;
 						switch (c.modifyVtx.Command) {
 							case RSPCommand.GBI1_ModifyVtx.Type.RSP_MV_WORD_OFFSET_POINT_RGBA:
 								vtx.r = c.modifyVtx.r;

@@ -29,7 +29,11 @@ namespace OpenSpace.Object {
             get {
                 if (gao == null) {
                     gao = new GameObject(name);
-                }
+					SectorComponent sc = gao.AddComponent<SectorComponent>();
+					sc.sector = this;
+					sc.sectorManager = MapLoader.Loader.controller.sectorManager;
+					MapLoader.Loader.controller.sectorManager.AddSector(sc);
+				}
                 return gao;
             }
         }
@@ -37,17 +41,6 @@ namespace OpenSpace.Object {
         private SuperObject superObject;
         public SuperObject SuperObject {
             get { return superObject; }
-        }
-
-        private bool active = true;
-        private bool neighborActive = true;
-        public bool Active {
-            get { return active; }
-            set { active = value; }
-        }
-        public bool Loaded {
-            get { return active || neighborActive; }
-            set { neighborActive = value; }
         }
 
 

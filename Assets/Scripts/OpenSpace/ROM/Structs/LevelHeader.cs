@@ -35,9 +35,13 @@ namespace OpenSpace.ROM {
 		public ushort len_vectors;
 		public ushort len_indices;
 		public ushort unk30;
+		public Reference<VisualMaterial> backgroundUpLeft;
+		public Reference<VisualMaterial> backgroundUpRight;
+		public Reference<VisualMaterial> backgroundDownLeft;
+		public Reference<VisualMaterial> backgroundDownRight;
 
 		protected override void ReadInternal(Reader reader) {
-			//MapLoader.Loader.print("Level Header: " + Pointer.Current(reader));
+			MapLoader.Loader.print("Level Header: " + Pointer.Current(reader));
 			hierarchyRoot = new Reference<HierarchyRoot>(reader);
 			ref_46 = reader.ReadUInt16();
 			unk3 = reader.ReadUInt16();
@@ -72,6 +76,12 @@ namespace OpenSpace.ROM {
 			len_vectors = reader.ReadUInt16();
 			len_indices = reader.ReadUInt16();
 			unk30 = reader.ReadUInt16(); // 1 is divided by this one
+			if (Settings.s.game == Settings.Game.DD) {
+				backgroundUpLeft = new Reference<VisualMaterial>(reader, true);
+				backgroundUpRight = new Reference<VisualMaterial>(reader, true);
+				backgroundDownLeft = new Reference<VisualMaterial>(reader, true);
+				backgroundDownRight = new Reference<VisualMaterial>(reader, true);
+			}
 
 			vectors.Resolve(reader, v => { v.length = len_vectors; });
 			indices.Resolve(reader, i => { i.length = len_indices; });

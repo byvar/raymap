@@ -258,7 +258,8 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	o.diffuseColor = float4(ambientLighting + diffuseReflection, alpha);
 	if (_Tex2Params.x == 60 && !(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0)) {
 		// Prelit
-		o.diffuseColor = o.diffuseColor * v.texcoord2; // RGBA, so both need to be vector4
+		o.diffuseColor = v.texcoord2; // RGBA, so both need to be vector4
+		//o.diffuseColor = o.diffuseColor * v.texcoord2; // RGBA, so both need to be vector4
 	}
 	if (_SectorFog.w != 0) o.fogViewPos = UnityObjectToViewPos(v.vertex).xyz;
 	return o;
