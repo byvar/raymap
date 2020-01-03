@@ -6,8 +6,8 @@ namespace OpenSpace.ROM {
 	public class Perso : ROMStruct {
 		// Size: 20
 		public Reference<Perso3dData> p3dData;
-		public ushort _2;
-		public ushort _4;
+		public Reference<Brain> brain;
+        public ushort _4;
 		public ushort _6;
 		public ushort _8;
 		public ushort _10;
@@ -18,8 +18,8 @@ namespace OpenSpace.ROM {
 
 		protected override void ReadInternal(Reader reader) {
 			p3dData = new Reference<Perso3dData>(reader, true);
-			_2 = reader.ReadUInt16();
-			_4 = reader.ReadUInt16();
+            brain = new Reference<Brain>(reader, true);
+            _4 = reader.ReadUInt16();
 			_6 = reader.ReadUInt16();
 			_8 = reader.ReadUInt16();
 			_10 = reader.ReadUInt16();
