@@ -28,7 +28,8 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> TypesDS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
-			{ 4, Type.Family },
+            { 3, Type.Mind },
+            { 4, Type.Family },
 			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
 			{ 8, Type.AnimationReference },
@@ -65,15 +66,17 @@ namespace OpenSpace.ROM {
 			{ 58, Type.SectorSuperObjectArray4Info },
 			{ 59, Type.SectorSuperObjectArray5 },
 			{ 60, Type.SectorSuperObjectArray5Info },
-			{ 63, Type.TextureInfo }, // size: 14
-			{ 65, Type.StateTransitionArray },
-			{ 71, Type.StdGame },
+            { 63, Type.TextureInfo }, // size: 14
+            { 64, Type.AIModel },
+            { 65, Type.StateTransitionArray },
+            { 66, Type.Brain },
+            { 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
 			{ 97, Type.SectorSuperObjectArray1Info },
 			{ 107, Type.StateArrayRef },
 			{ 108, Type.StateArray },
-			{ 127, Type.Vector3Array },
+            { 127, Type.Vector3Array },
 			{ 128, Type.Short3Array },
 			{ 132, Type.NumLanguages },
 			{ 133, Type.StringRef },
@@ -91,7 +94,8 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> TypesN64 = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
-			{ 4, Type.Family },
+            { 3, Type.Mind },
+            { 4, Type.Family },
 			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
 			{ 8, Type.AnimationReference },
@@ -129,15 +133,17 @@ namespace OpenSpace.ROM {
 			{ 58, Type.SectorSuperObjectArray4Info },
 			{ 59, Type.SectorSuperObjectArray5 },
 			{ 60, Type.SectorSuperObjectArray5Info },
-			{ 63, Type.TextureInfo }, // size: 12
-			{ 65, Type.StateTransitionArray },
-			{ 71, Type.StdGame },
+            { 63, Type.TextureInfo }, // size: 12
+            { 64, Type.AIModel },
+            { 65, Type.StateTransitionArray },
+            { 66, Type.Brain },
+            { 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
 			{ 91, Type.NoCtrlTextureList },
 			{ 97, Type.SectorSuperObjectArray1Info },
 			{ 107, Type.StateArrayRef },
 			{ 108, Type.StateArray },
-			{ 127, Type.Vector3Array },
+            { 127, Type.Vector3Array },
 			{ 128, Type.Short3Array },
 			{ 132, Type.NumLanguages },
 			{ 133, Type.StringRef },
@@ -155,6 +161,7 @@ namespace OpenSpace.ROM {
 		public static Dictionary<ushort, Type> Types3DS = new Dictionary<ushort, Type>() {
 			{ 0, Type.EngineStruct },
 			{ 1, Type.Perso },
+            { 3, Type.Mind },
 			{ 4, Type.Family },
 			{ 5, Type.State },
 			{ 6, Type.ObjectsTable },
@@ -193,14 +200,16 @@ namespace OpenSpace.ROM {
 			{ 55, Type.SectorSuperObjectArray5 },
 			{ 56, Type.SectorSuperObjectArray5Info },
 			{ 59, Type.TextureInfo }, // size: 0x100D2. contains the actual texture data too!
-			{ 61, Type.StateTransitionArray },
+            { 60, Type.AIModel },
+            { 61, Type.StateTransitionArray },
+            { 62, Type.Brain },
 			{ 67, Type.StdGame },
 			{ 71, Type.ObjectsTableData },
 			{ 87, Type.NoCtrlTextureList },
 			{ 93, Type.SectorSuperObjectArray1Info },
 			{ 103, Type.StateArrayRef },
 			{ 104, Type.StateArray },
-			{ 123, Type.Vector3Array },
+            { 123, Type.Vector3Array },
 			{ 124, Type.Short3Array },
 			{ 128, Type.NumLanguages },
 			{ 129, Type.StringRef },
@@ -282,6 +291,9 @@ namespace OpenSpace.ROM {
 			SectorSuperObjectArray5Info,
 			LightInfoArray,
 			LightInfo,
+            Brain,
+            Mind,
+            AIModel
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -343,7 +355,10 @@ namespace OpenSpace.ROM {
 			{ typeof(SectorSuperObjectArray5Info), Type.SectorSuperObjectArray5Info },
 			{ typeof(LightInfoArray), Type.LightInfoArray },
 			{ typeof(LightInfo), Type.LightInfo },
-		};
+            { typeof(Brain), Type.Brain },
+            { typeof(Mind), Type.Mind },
+            { typeof(AIModel), Type.AIModel },
+        };
 
 		public Type EntryType {
 			get {

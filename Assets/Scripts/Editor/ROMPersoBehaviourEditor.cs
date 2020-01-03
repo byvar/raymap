@@ -59,6 +59,18 @@ public class ROMPersoBehaviourEditor : Editor {
         if (GUILayout.Button("Print DsgVar from Mind->DsgMem")) pb.PrintDsgVarFromMindMem();
         GUILayout.EndHorizontal();*/
 
+
+  
+
+        if (pb.perso?.brain?.Value?.mind?.Value != null) {
+            var mind = pb.perso.brain.Value.mind.Value;
+            GUILayout.Label("Intelligence Normal: " + mind.intelligenceNormal);
+            GUILayout.Label("Intelligence Reflex: " + mind.intelligenceReflex);
+
+            GUILayout.Label("Normal Behaviors: " + mind.aiModel.Value.numBehaviors);
+            GUILayout.Label("Reflex Behaviors: " + mind.aiModel.Value.numReflexes);
+        }
+
         if (GUILayout.Button("Print Animation Debug Info")) pb.PrintAnimationDebugInfo();
     }
 }
