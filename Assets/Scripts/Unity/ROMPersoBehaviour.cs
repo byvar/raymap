@@ -11,7 +11,7 @@ using UnityEngine;
 public class ROMPersoBehaviour : MonoBehaviour {
     bool loaded = false;
     public Perso perso;
-    public Sector sector;
+    public SectorComponent sector;
     public Controller controller;
 
     // States
@@ -194,10 +194,8 @@ public class ROMPersoBehaviour : MonoBehaviour {
 			}
 		}
         bool sectorActive = false, insideSectors = false;
-		//if (sector == null || isAlways || sector.Loaded) sectorActive = true;
-		//if (sector == null || isAlways || controller.sectorManager.activeSector != null) insideSectors = true;
-		sectorActive = true;
-		insideSectors = true;
+		if (sector == null || isAlways || sector.Loaded) sectorActive = true;
+		if (sector == null || isAlways || controller.sectorManager.activeSector != null) insideSectors = true;
         if (controller.playAnimations && playAnimation && sectorActive) {
             updateCounter += Time.deltaTime * animationSpeed;
             // If the camera is not inside a sector, animations will only update 1 out of 2 times (w/ frameskip) to avoid lag
@@ -381,11 +379,11 @@ public class ROMPersoBehaviour : MonoBehaviour {
 				}
 
 				// Keep lighting last so that it is applied to all new sub objects
-				/*if (!isAlways) {
-					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
+				if (!isAlways) {
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, OpenSpace.Visual.LightInfo.ObjectLightedFlag.Perso);
 				} else {
-					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
-				}*/
+					controller.sectorManager.ApplySectorLighting(sector, gameObject, OpenSpace.Visual.LightInfo.ObjectLightedFlag.None);
+				}
 			}
 			loaded = true;
 		}

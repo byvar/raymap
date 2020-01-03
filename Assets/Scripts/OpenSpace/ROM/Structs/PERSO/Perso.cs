@@ -33,7 +33,8 @@ namespace OpenSpace.ROM {
 			ROMPersoBehaviour romPerso = gao.AddComponent<ROMPersoBehaviour>();
 			romPerso.perso = this;
 			romPerso.controller = MapLoader.Loader.controller;
-			romPerso.Init();
+			romPerso.controller.romPersos.Add(romPerso);
+			//romPerso.Init();
 			/*if (p3dData.Value != null && p3dData.Value.objectsTable.Value != null) {
 				ObjectsTable ot = p3dData.Value.objectsTable.Value;
 				GameObject otGao = ot.GetGameObject();

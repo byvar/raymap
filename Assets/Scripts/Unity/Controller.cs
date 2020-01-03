@@ -41,6 +41,8 @@ public class Controller : MonoBehaviour {
 	private bool ExportAfterLoad { get; set; }
 	public string ExportPath { get; set; }
 
+	public List<ROMPersoBehaviour> romPersos = new List<ROMPersoBehaviour>();
+
 	public enum State {
 		None,
 		Downloading,
@@ -175,11 +177,12 @@ public class Controller : MonoBehaviour {
 		detailedState = "Initializing graphs";
 		yield return null;
 		CreateGraphs();
-		detailedState = "Initializing persos";
-		yield return StartCoroutine(InitPersos());
 		detailedState = "Initializing lights";
 		yield return null;
 		lightManager.Init();
+		detailedState = "Initializing persos";
+		yield return StartCoroutine(InitPersos());
+		sectorManager.InitLights();
 		detailedState = "Initializing camera";
 		yield return null;
 		InitCamera();
@@ -294,9 +297,10 @@ public class Controller : MonoBehaviour {
 				}
 				if (!unityBehaviour.IsAlways) {
 					if (p.sectInfo != null && p.sectInfo.off_sector != null) {
-						unityBehaviour.sector = Sector.FromSuperObjectOffset(p.sectInfo.off_sector);
+						unityBehaviour.sector = sectorManager.sectors.FirstOrDefault(s => s.sector != null && s.sector.SuperObject.offset == p.sectInfo.off_sector);
 					} else {
-						unityBehaviour.sector = sectorManager.GetActiveSectorAtPoint(p.Gao.transform.position);
+						SectorComponent sc = sectorManager.GetActiveSectorAtPoint(p.Gao.transform.position);
+						unityBehaviour.sector = sc;
 					}
 				} else unityBehaviour.sector = null;
 				Moddable mod = null;
@@ -403,6 +407,32 @@ public class Controller : MonoBehaviour {
 						c.Init();
 					}
 				}
+			}
+		}
+		if (romPersos.Count > 0) {
+			for (int i = 0; i < romPersos.Count; i++) {
+				detailedState = "Initializing persos: " + i + "/" + romPersos.Count;
+				yield return null;
+				ROMPersoBehaviour unityBehaviour = romPersos[i];
+				unityBehaviour.controller = this;
+				/*if (loader.globals != null && loader.globals.spawnablePersos != null) {
+					if (loader.globals.spawnablePersos.IndexOf(p) > -1) {
+						unityBehaviour.IsAlways = true;
+						unityBehaviour.transform.position = new Vector3(i * 10, -1000, 0);
+					}
+				}*/
+				if (!unityBehaviour.IsAlways) {
+					SectorComponent sc = sectorManager.GetActiveSectorAtPoint(unityBehaviour.transform.position);
+					unityBehaviour.sector = sc;
+				} else unityBehaviour.sector = null;
+				/*Moddable mod = null;
+				if (p.SuperObject != null && p.SuperObject.Gao != null) {
+					mod = p.SuperObject.Gao.GetComponent<Moddable>();
+					if (mod != null) {
+						mod.persoBehaviour = unityBehaviour;
+					}
+				}*/
+				unityBehaviour.Init();
 			}
 		}
 	}

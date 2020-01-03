@@ -12,9 +12,12 @@ public class LightManager : MonoBehaviour {
     public Controller controller;
     public SectorManager sectorManager;
     public MeshRenderer backgroundPanel;
+	public MeshRenderer[] backgroundPanelsROM;
     private VisualMaterial backgroundMaterial;
-    private Sector previousActiveBackgroundSector = null;
-    List<LightInfo> lights;
+	private OpenSpace.ROM.VisualMaterial backgroundMaterialROM;
+	private OpenSpace.ROM.VisualMaterial[] backgroundMaterialsDDROM;
+	private SectorComponent previousActiveBackgroundSector = null;
+	List<LightBehaviour> lights;
 
     [Range(0.0f, 1.0f)]
     public float luminosity = 0.5f;
@@ -45,92 +48,43 @@ public class LightManager : MonoBehaviour {
         backgroundScroll.visMat = null;
         backgroundScroll.mat = null;*/
     }
+
+	private void CheckKeys() {
+		if (Input.GetKeyDown(KeyCode.L)) {
+			enableLighting = !enableLighting;
+		}
+		if (Input.GetKeyDown(KeyCode.F)) {
+			enableFog = !enableFog;
+		}
+		if (_enableLighting != enableLighting) {
+			_enableLighting = enableLighting;
+			Shader.SetGlobalFloat("_DisableLighting", enableLighting ? 0f : 1f);
+			controller.communicator.SendSettings();
+		}
+		if (_enableFog != enableFog) {
+			_enableFog = enableFog;
+			Shader.SetGlobalFloat("_DisableFog", enableFog ? 0f : 1f);
+			controller.communicator.SendSettings();
+		}
+		if (_luminosity != luminosity) {
+			_luminosity = luminosity;
+			Shader.SetGlobalFloat("_Luminosity", luminosity);
+		}
+		if (_saturate != saturate) {
+			_saturate = saturate;
+			Shader.SetGlobalFloat("_Saturate", saturate ? 1f : 0f);
+		}
+	}
 	
 	// Update is called once per frame
 	void Update () {
         if (loaded) {
-            if (Input.GetKeyDown(KeyCode.L)) {
-                enableLighting = !enableLighting;
+			CheckKeys();
+			if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
+				UpdateBackgroundROM();
+			} else {
+				UpdateBackground();
 			}
-			if (Input.GetKeyDown(KeyCode.F)) {
-				enableFog = !enableFog;
-			}
-			if (_enableLighting != enableLighting) {
-				_enableLighting = enableLighting;
-                Shader.SetGlobalFloat("_DisableLighting", enableLighting ? 0f : 1f);
-				controller.communicator.SendSettings();
-			}
-			if (_enableFog != enableFog) {
-				_enableFog = enableFog;
-				Shader.SetGlobalFloat("_DisableFog", enableFog ? 0f : 1f);
-				controller.communicator.SendSettings();
-			}
-			if (_luminosity != luminosity) {
-                _luminosity = luminosity;
-                Shader.SetGlobalFloat("_Luminosity", luminosity);
-            }
-            if (_saturate != saturate) {
-                _saturate = saturate;
-                Shader.SetGlobalFloat("_Saturate", saturate ? 1f : 0f);
-            }
-
-            // Update background color or material
-            Color? backgroundColor = null;
-            VisualMaterial skyMaterial = null;
-            Sector activeBackgroundSector = null;
-            if (MapLoader.Loader.globals != null && MapLoader.Loader.globals.backgroundGameMaterial != null && MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial != null) {
-                skyMaterial = MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial;
-            } else {
-                if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
-                    foreach (Sector s in sectorManager.sectors) {
-                        if (!s.Active) continue;
-                        if (s.skyMaterial != null && s.skyMaterial.textures.Count > 0 && s.skyMaterial.textures.Where(t => t.texture != null).Count() > 0) {
-                            skyMaterial = s.skyMaterial;
-                            activeBackgroundSector = s;
-                            break;
-                        } else {
-                            foreach (LightInfo li in s.staticLights) {
-                                if (li.type == 6) {
-                                    backgroundColor = li.background_color;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (skyMaterial != null && !controller.viewCollision) {
-                backgroundPanel.gameObject.SetActive(true);
-                if (backgroundMaterial != skyMaterial) {
-                    backgroundMaterial = skyMaterial;
-                    Material skyboxMat = skyMaterial.GetMaterial();
-                    backgroundPanel.sharedMaterial = skyboxMat;
-                }
-                //skyboxMat.SetFloat("_DisableLighting", 1f);
-                backgroundPanel.sharedMaterial.SetFloat("_DisableLightingLocal", 1f);
-                if (activeBackgroundSector != null) {
-                    if (activeBackgroundSector != previousActiveBackgroundSector) {
-                        //backgroundPanel.material.SetFloat("_DisableLightingLocal", 0f);
-                        sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
-                        previousActiveBackgroundSector = activeBackgroundSector;
-                    }
-                } else {
-                    //backgroundPanel.material.SetFloat("_DisableLighting", 1f);
-                }
-                //RenderSettings.skybox = skyboxMat;
-                //Camera.main.clearFlags = CameraClearFlags.Skybox;
-            } else {
-                backgroundPanel.gameObject.SetActive(false);
-                //RenderSettings.skybox = null;
-                //Camera.main.clearFlags = CameraClearFlags.SolidColor;
-            }
-            if (backgroundColor.HasValue && !controller.viewCollision) {
-                Camera.main.backgroundColor = backgroundColor.Value;
-                //Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, backgroundColor.Value, 0.5f * Time.deltaTime);
-            } else {
-                Camera.main.backgroundColor = Color.black;
-                //Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, 0.5f * Time.deltaTime);
-            }
             /*if (useFog && Camera.main.renderingPath == RenderingPath.DeferredShading) {
                 // Fog doesn't work for deferred
                 Camera.main.renderingPath = RenderingPath.Forward;
@@ -195,11 +149,209 @@ public class LightManager : MonoBehaviour {
         }
 	}
 
-    public void Init() {
-        lights = MapLoader.Loader.lights;
-        for (int i = 0; i < lights.Count; i++) {
-            Register(lights[i]);
-        }
+	private void UpdateBackground() {
+		// Update background color or material
+		Color? backgroundColor = null;
+		VisualMaterial skyMaterial = null;
+		SectorComponent activeBackgroundSector = null;
+		if (MapLoader.Loader.globals != null && MapLoader.Loader.globals.backgroundGameMaterial != null && MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial != null) {
+			skyMaterial = MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial;
+		} else {
+			if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
+				foreach (SectorComponent s in sectorManager.sectors) {
+					if (!s.Active) continue;
+					if (s.sector == null) continue;
+					if (s.sector.skyMaterial != null && s.sector.skyMaterial.textures.Count > 0 && s.sector.skyMaterial.textures.Where(t => t.texture != null).Count() > 0) {
+						skyMaterial = s.sector.skyMaterial;
+						activeBackgroundSector = s;
+						break;
+					} else {
+						foreach (LightInfo li in s.sector.staticLights) {
+							if (li.type == 6) {
+								backgroundColor = li.background_color;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (skyMaterial != null && !controller.viewCollision) {
+			backgroundPanel.gameObject.SetActive(true);
+			if (backgroundMaterial != skyMaterial) {
+				backgroundMaterial = skyMaterial;
+				Material skyboxMat = skyMaterial.GetMaterial();
+				backgroundPanel.sharedMaterial = skyboxMat;
+			}
+			//skyboxMat.SetFloat("_DisableLighting", 1f);
+			backgroundPanel.sharedMaterial.SetFloat("_DisableLightingLocal", 1f);
+			if (activeBackgroundSector != null) {
+				if (activeBackgroundSector != previousActiveBackgroundSector) {
+					//backgroundPanel.material.SetFloat("_DisableLightingLocal", 0f);
+					sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
+					previousActiveBackgroundSector = activeBackgroundSector;
+				}
+			} else {
+				//backgroundPanel.material.SetFloat("_DisableLighting", 1f);
+			}
+			//RenderSettings.skybox = skyboxMat;
+			//Camera.main.clearFlags = CameraClearFlags.Skybox;
+		} else {
+			backgroundPanel.gameObject.SetActive(false);
+			//RenderSettings.skybox = null;
+			//Camera.main.clearFlags = CameraClearFlags.SolidColor;
+		}
+		if (backgroundColor.HasValue && !controller.viewCollision) {
+			Camera.main.backgroundColor = backgroundColor.Value;
+			//Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, backgroundColor.Value, 0.5f * Time.deltaTime);
+		} else {
+			Camera.main.backgroundColor = Color.black;
+			//Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, 0.5f * Time.deltaTime);
+		}
+	}
+
+
+	private void UpdateBackgroundROM() {
+		// Update background color or material
+		Color? backgroundColor = null;
+		OpenSpace.ROM.VisualMaterial skyMaterial = null;
+		OpenSpace.ROM.VisualMaterial[] skyMaterialsDD = null;
+		SectorComponent activeBackgroundSector = null;
+		OpenSpace.Loader.R2ROMLoader l = MapLoader.Loader as OpenSpace.Loader.R2ROMLoader;
+		OpenSpace.ROM.LevelHeader lh = l.level;
+		if (lh != null
+			&& lh.backgroundUpLeft != null && lh.backgroundUpLeft.Value != null
+			&& lh.backgroundUpRight != null && lh.backgroundUpRight.Value != null
+			&& lh.backgroundDownLeft != null && lh.backgroundDownLeft.Value != null 
+			&& lh.backgroundDownRight != null && lh.backgroundDownRight.Value != null) {
+			skyMaterial = null;
+			skyMaterialsDD = new OpenSpace.ROM.VisualMaterial[4];
+			skyMaterialsDD[0] = lh.backgroundUpLeft.Value;
+			skyMaterialsDD[1] = lh.backgroundUpRight.Value;
+			skyMaterialsDD[2] = lh.backgroundDownLeft.Value;
+			skyMaterialsDD[3] = lh.backgroundDownRight.Value;
+		} else {
+			if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
+				foreach (SectorComponent s in sectorManager.sectors) {
+					if (!s.Active) continue;
+					if (s.sectorROM == null) continue;
+					if (s.sectorROM.background != null
+						&& s.sectorROM.background.Value != null
+						&& s.sectorROM.background.Value.num_textures > 0
+						&& s.sectorROM.background.Value.textures.Value != null
+						&& s.sectorROM.background.Value.textures.Value.vmTex[0].texRef.Value != null
+						&& s.sectorROM.background.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value != null) {
+						skyMaterial = s.sectorROM.background;
+						//print(skyMaterial.Offset);
+						activeBackgroundSector = s;
+						break;
+					} else {
+						/*foreach (LightInfo li in s.sector.staticLights) {
+							if (li.type == 6) {
+								backgroundColor = li.background_color;
+								break;
+							}
+						}*/
+					}
+				}
+			}
+		}
+		if(!controller.viewCollision) {
+			if (skyMaterial != null) {
+				backgroundPanel.gameObject.SetActive(true);
+				if (backgroundMaterialROM != skyMaterial) {
+					backgroundMaterialROM = skyMaterial;
+					Material skyboxMat = skyMaterial.GetMaterial(OpenSpace.ROM.VisualMaterial.Hint.None);
+					/*Texture tex = skyboxMat.GetTexture("_Tex0");
+					tex.filterMode = FilterMode.Point;
+					tex.wrapMode = TextureWrapMode.Clamp;
+					skyboxMat.SetTexture("_Tex0", tex);*/
+					backgroundPanel.sharedMaterial = skyboxMat;
+				}
+				//skyboxMat.SetFloat("_DisableLighting", 1f);
+				backgroundPanel.sharedMaterial.SetFloat("_DisableLightingLocal", 1f);
+				if (activeBackgroundSector != null) {
+					if (activeBackgroundSector != previousActiveBackgroundSector) {
+						//backgroundPanel.material.SetFloat("_DisableLightingLocal", 0f);
+						//sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
+						previousActiveBackgroundSector = activeBackgroundSector;
+					}
+				} else {
+					//backgroundPanel.material.SetFloat("_DisableLighting", 1f);
+				}
+				//RenderSettings.skybox = skyboxMat;
+				//Camera.main.clearFlags = CameraClearFlags.Skybox;
+			} else {
+				backgroundPanel.gameObject.SetActive(false);
+			}
+			if (skyMaterialsDD != null) {
+				for (int i = 0; i < 4; i++) {
+					backgroundPanelsROM[i].gameObject.SetActive(true);
+				}
+				if (backgroundMaterialsDDROM == null) {
+					backgroundMaterialsDDROM = skyMaterialsDD;
+					for (int i = 0; i < 4; i++) {
+						Material skyboxMat = skyMaterialsDD[i].GetMaterial(OpenSpace.ROM.VisualMaterial.Hint.None);
+						backgroundPanelsROM[i].sharedMaterial = skyboxMat;
+						backgroundPanelsROM[i].sharedMaterial.SetFloat("_DisableLightingLocal", 1f);
+					}
+				}
+				if (activeBackgroundSector != null) {
+					if (activeBackgroundSector != previousActiveBackgroundSector) {
+						//backgroundPanel.material.SetFloat("_DisableLightingLocal", 0f);
+						//sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
+						previousActiveBackgroundSector = activeBackgroundSector;
+					}
+				} else {
+					//backgroundPanel.material.SetFloat("_DisableLighting", 1f);
+				}
+				//RenderSettings.skybox = skyboxMat;
+				//Camera.main.clearFlags = CameraClearFlags.Skybox;
+			} else {
+				for (int i = 0; i < 4; i++) {
+					backgroundPanelsROM[i].gameObject.SetActive(false);
+				}
+			}
+		} else {
+			backgroundPanel.gameObject.SetActive(false);
+			for (int i = 0; i < 4; i++) {
+				backgroundPanelsROM[i].gameObject.SetActive(false);
+			}
+			//RenderSettings.skybox = null;
+			//Camera.main.clearFlags = CameraClearFlags.SolidColor;
+		}
+		if (backgroundColor.HasValue && !controller.viewCollision) {
+			Camera.main.backgroundColor = backgroundColor.Value;
+			//Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, backgroundColor.Value, 0.5f * Time.deltaTime);
+		} else {
+			Camera.main.backgroundColor = Color.black;
+			//Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, Color.black, 0.5f * Time.deltaTime);
+		}
+	}
+
+	public void Init() {
+		lights = new List<LightBehaviour>();
+		if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
+			for (int i = 0; i < sectorManager.sectors.Count; i++) {
+				SectorComponent sc = sectorManager.sectors[i];
+				if (sc.sectorROM.lights.Value != null) {
+					sc.lights = new LightBehaviour[sc.sectorROM.lights.Value.lights.Length];
+					for (int j = 0; j < sc.lights.Length; j++) {
+						sc.lights[j] = Register(sc.sectorROM.lights.Value.lights[j]);
+					}
+				}
+			}
+		} else {
+			for (int i = 0; i < sectorManager.sectors.Count; i++) {
+				SectorComponent sc = sectorManager.sectors[i];
+				if (sc.sector.staticLights != null) {
+					sc.lights = new LightBehaviour[sc.sector.staticLights.Count];
+					for (int j = 0; j < sc.lights.Length; j++) {
+						sc.lights[j] = Register(sc.sector.staticLights[j]);
+					}
+				}
+			}
+		}
         if (useDefaultSettings) {
             luminosity = Settings.s.luminosity;
             saturate = Settings.s.saturate;
@@ -207,14 +359,30 @@ public class LightManager : MonoBehaviour {
         loaded = true;
     }
 
-    public void Register(LightInfo light) {
-        LightBehaviour l = light.Light;
-        l.lightManager = this;
-        l.Init();
-        l.transform.parent = transform;
-    }
+    public LightBehaviour Register(LightInfo light) {
+		LightBehaviour l = lights.FirstOrDefault(li => li.li == light);
+		if (l == null) {
+			GameObject gao = new GameObject("LightInfo @ " + light.offset);
+			l = gao.AddComponent<LightBehaviour>();
+			l.Init(this, light);
+			l.transform.parent = transform;
+			lights.Add(l);
+		}
+		return l;
+	}
+	public LightBehaviour Register(OpenSpace.ROM.LightInfo light) {
+		LightBehaviour l = lights.FirstOrDefault(li => li.liROM == light);
+		if (l == null) {
+			GameObject gao = new GameObject("LightInfo @ " + light.Offset);
+			l = gao.AddComponent<LightBehaviour>();
+			l.Init(this, light);
+			l.transform.parent = transform;
+			lights.Add(l);
+		}
+		return l;
+	}
 
-    public void RecalculateSectorLighting() {
+	public void RecalculateSectorLighting() {
         if (sectorManager != null) sectorManager.RecalculateSectorLighting();
     }
 }

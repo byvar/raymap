@@ -5,8 +5,8 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class Sector : ROMStruct {
 		// size: 52 or 0x34
-		public Reference<SectorSuperObjectArray1> sectors1;
-		public Reference<SectorSuperObjectArray1Info> sectors1Info;
+		public Reference<SectorSuperObjectArray1> neighbors;
+		public Reference<SectorSuperObjectArray1Info> neighborsInfo;
 		public Reference<SectorSuperObjectArray2> sectors2;
 		public Reference<SectorSuperObjectArray3> sectors3;
 		public Reference<LightInfoArray> lights;
@@ -20,7 +20,7 @@ namespace OpenSpace.ROM {
 		public Reference<VisualMaterial> background; // 0x1C
 		public byte byte1E;
 		public byte byte1F;
-		public ushort num_sectors1; // 0x20
+		public ushort num_neighbors; // 0x20
 		public ushort num_sectors2; // 0x22
 		public ushort num_sectors3; // 0x24
 		public ushort num_lights; // 0x26
@@ -34,8 +34,8 @@ namespace OpenSpace.ROM {
 		public ushort word32;
 
 		protected override void ReadInternal(Reader reader) {
-			sectors1 = new Reference<SectorSuperObjectArray1>(reader);
-			sectors1Info = new Reference<SectorSuperObjectArray1Info>(reader);
+			neighbors = new Reference<SectorSuperObjectArray1>(reader);
+			neighborsInfo = new Reference<SectorSuperObjectArray1Info>(reader);
 			sectors2 = new Reference<SectorSuperObjectArray2>(reader);
 			sectors3 = new Reference<SectorSuperObjectArray3>(reader);
 			lights = new Reference<LightInfoArray>(reader);
@@ -49,7 +49,7 @@ namespace OpenSpace.ROM {
 			background = new Reference<VisualMaterial>(reader, true);
 			byte1E = reader.ReadByte();
 			byte1F = reader.ReadByte();
-			num_sectors1 = reader.ReadUInt16();
+			num_neighbors = reader.ReadUInt16();
 			num_sectors2 = reader.ReadUInt16();
 			num_sectors3 = reader.ReadUInt16();
 			num_lights = reader.ReadUInt16();
@@ -63,8 +63,8 @@ namespace OpenSpace.ROM {
 			word32 = reader.ReadUInt16();
 
 
-			sectors1.Resolve(reader, s1 => s1.length = num_sectors1);
-			sectors1Info.Resolve(reader, s1 => s1.length = num_sectors1);
+			neighbors.Resolve(reader, s1 => s1.length = num_neighbors);
+			neighborsInfo.Resolve(reader, s1 => s1.length = num_neighbors);
 			sectors2.Resolve(reader, s2 => s2.length = num_sectors2);
 			sectors3.Resolve(reader, s3 => s3.length = num_sectors3);
 			lights.Resolve(reader, li => li.length = num_lights);
@@ -77,6 +77,11 @@ namespace OpenSpace.ROM {
 
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject("Sector @ " + Offset);
+			SectorComponent sc = gao.AddComponent<SectorComponent>();
+			sc.sectorROM = this;
+			sc.sectorManager = MapLoader.Loader.controller.sectorManager;
+			MapLoader.Loader.controller.sectorManager.AddSector(sc);
+			//sc.Init();
 			return gao;
 		}
 	}

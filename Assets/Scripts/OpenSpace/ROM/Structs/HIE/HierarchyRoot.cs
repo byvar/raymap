@@ -27,10 +27,10 @@ namespace OpenSpace.ROM {
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject("Hierarchy Root @ " + Offset);
 			if (fatherSector.Value != null) {
-				GameObject fs = fatherSector.Value.GetGameObject();
-				fs.name = "[Father Sector] " + fs.name;
-				fs.transform.SetParent(gao.transform);
-				fatherSector.Value.SetTransform(fs);
+				GameObject fsGao = fatherSector.Value.GetGameObject();
+				fsGao.name = "[Father Sector] " + fsGao.name;
+				fsGao.transform.SetParent(gao.transform);
+				ROMTransform.Apply(fatherSector.Value.transform, fsGao);
 			}
 			if (persos.Value != null) {
 				GameObject dynGao = new GameObject("Dynamic World @ " + persos.Value.Offset);
@@ -38,7 +38,7 @@ namespace OpenSpace.ROM {
 				foreach (SuperObjectDynamic sod in persos.Value.superObjects) {
 					GameObject sodGao = sod.GetGameObject();
 					sodGao.transform.SetParent(dynGao.transform);
-					sod.SetTransform(sodGao);
+					ROMTransform.Apply(sod.transform, sodGao);
 				}
 			}
 			return gao;

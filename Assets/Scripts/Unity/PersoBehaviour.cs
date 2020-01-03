@@ -19,7 +19,7 @@ using UnityEngine;
 public class PersoBehaviour : MonoBehaviour {
     bool loaded = false;
     public Perso perso;
-    public Sector sector;
+    public SectorComponent sector;
     public Controller controller;
 
     // States

@@ -79,6 +79,15 @@ namespace OpenSpace.ROM {
 			MapLoader l = MapLoader.Loader;
 			if (type == Type.Visual) {
 				if (elementsVisual.Value != null) {
+					// First, reset vertex buffer
+					if (Settings.s.platform == Settings.Platform.N64) {
+						foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+							if (entry.element.Value is GeometricElementTriangles) {
+								GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
+								el.ResetVertexBuffer();
+							}
+						}
+					}
 					//gao.transform.position = new Vector3(UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f));
 					foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 						/*if (entry.element.Value == null) {
@@ -128,6 +137,15 @@ namespace OpenSpace.ROM {
 		}
 
 		public void MorphVertices(GameObject gao, GeometricObject go, float lerp) {
+			// First, reset vertex buffer
+			if (Settings.s.platform == Settings.Platform.N64) {
+				foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+					if (entry.element.Value is GeometricElementTriangles) {
+						GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
+						el.ResetVertexBuffer();
+					}
+				}
+			}
 			for (int i = 0; i < num_elementsVisual; i++) {
 				ROMStruct entry1 = elementsVisual.Value.elements[i].element.Value;
 				ROMStruct entry2 = go.elementsVisual.Value.elements[i].element.Value;
@@ -144,6 +162,15 @@ namespace OpenSpace.ROM {
 		}
 
 		public void ResetMorph(GameObject gao) {
+			// First, reset vertex buffer
+			if (Settings.s.platform == Settings.Platform.N64) {
+				foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+					if (entry.element.Value is GeometricElementTriangles) {
+						GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
+						el.ResetVertexBuffer();
+					}
+				}
+			}
 			for (int i = 0; i < num_elementsVisual; i++) {
 				ROMStruct entry1 = elementsVisual.Value.elements[i].element.Value;
 				if (entry1 != null && entry1 is GeometricElementTriangles ) {

@@ -19,6 +19,7 @@ namespace OpenSpace.Loader {
 		public ROMShAnimation[] shAnims;
 		public ROMAnimationCutTable cutTable;
 		public List<ObjectsTable> objectsTables = new List<ObjectsTable>();
+		public LevelHeader level;
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;
@@ -277,12 +278,13 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading level data";
 			yield return null;
 			LevelHeader lh = GetOrRead<LevelHeader>(reader, (ushort)(CurrentLevel | (ushort)FATEntry.Flag.Fix));
+			level = lh;
 			loadingState = "Loading additional object lists";
 			yield return null;
 			for (ushort i = 0; i < 0x7FFF; i++) {
 				// Only do it a few times because we're trying to load way more than there is,
 				// so it takes really long if we yield for everything
-				if (i % 1024 == 0) {
+				if (i % 4096 == 0) {
 					loadingState = "Loading additional object lists: " + (i + 1);
 					yield return null;
 				}
@@ -292,7 +294,7 @@ namespace OpenSpace.Loader {
 			for (ushort i = 0; i < 0x8000; i++) {
 				// Only do it a few times because we're trying to load way more than there is,
 				// so it takes really long if we yield for everything
-				if (i % 1024 == 0) {
+				if (i % 4096 == 0) {
 					loadingState = "Loading additional object lists: " + (i + 1);
 					yield return null;
 				}

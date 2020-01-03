@@ -6,39 +6,23 @@ namespace OpenSpace.ROM {
 	public class SuperObjectDynamic : ROMStruct {
 		// Size: 12
 		public Reference<Perso> perso;
-		public ushort matrixIndex;
+		public ushort transformIndex;
 		public ushort flags;
 		public ushort unkByte; // read as byte?
 		public uint unk;
-		public SuperObject.Transform transform;
+		public ROMTransform transform;
 
 		protected override void ReadInternal(Reader reader) {
 			//Loader.print(Pointer.Current(reader));
 			perso = new Reference<Perso>(reader);
-			matrixIndex = reader.ReadUInt16();
+			transformIndex = reader.ReadUInt16();
 			flags = reader.ReadUInt16();
 			unkByte = reader.ReadUInt16();
 			unk = reader.ReadUInt32();
 
-			ResolveMatrices(reader);
-			perso.Resolve(reader);
-		}
 
-		protected void ResolveMatrices(Reader reader) {
-			transform = new SuperObject.Transform();
-			if (matrixIndex == 0xFFFF) return;
-			LevelHeader lh = Loader.Get<LevelHeader>((ushort)(Loader.CurrentLevel | (ushort)FATEntry.Flag.Fix));
-			if (lh != null) {
-				Short3Array indices = lh.indices.Value;
-				Vector3Array vectors = lh.vectors.Value;
-				Short3Array.Triangle tri = lh.indices.Value.triangles[matrixIndex];
-				transform.rotationMatrix = SuperObject.ResolveMatrix(reader, tri.v1, indices, vectors);
-				transform.scaleMatrix = SuperObject.ResolveMatrix(reader, tri.v2, indices, vectors);
-				if (tri.v3 != 0xFFFF) {
-					transform.position = vectors.vectors[tri.v3];
-					//MapLoader.Loader.print(transform.position);
-				}
-			}
+			transform = new ROMTransform(transformIndex);
+			perso.Resolve(reader);
 		}
 
 		public GameObject GetGameObject() {
@@ -63,9 +47,6 @@ namespace OpenSpace.ROM {
 				}
 			}*/
 			return gao;
-		}
-		public void SetTransform(GameObject gao) {
-			transform.Apply(gao);
 		}
 	}
 }

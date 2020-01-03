@@ -71,28 +71,7 @@ namespace OpenSpace.Visual {
 			SphereOtherType = 8 // ignores persos?
 		}
 
-        private LightBehaviour light;
-        public LightBehaviour Light {
-            get {
-                if (light == null) {
-                    GameObject gao = new GameObject((name == null ? "Light" : name) + " @ " + offset + " | " +
-                        "Type: " + type + " - Far: " + far + " - Near: " + near +
-                        //" - FogBlendNear: " + bigAlpha_fogBlendNear + " - FogBlendFar: " + intensityMin_fogBlendFar +
-                        " - AlphaLightFlag: " + alphaLightFlag +
-                        " - PaintingLightFlag: " + paintingLightFlag +
-                        " - ObjectLightedFlag: " + objectLightedFlag);
-                    Vector3 pos = transMatrix.GetPosition(convertAxes: true);
-                    Quaternion rot = transMatrix.GetRotation(convertAxes: true) * Quaternion.Euler(-90, 0,0);
-                    Vector3 scale = transMatrix.GetScale(convertAxes: true);
-                    gao.transform.localPosition = pos;
-                    gao.transform.localRotation = rot;
-                    gao.transform.localScale = scale;
-                    light = gao.AddComponent<LightBehaviour>();
-                    light.li = this;
-                }
-                return light;
-            }
-        }
+        public LightBehaviour light; // very dirty
 
         public LightInfo(Pointer offset) {
             this.offset = offset;
