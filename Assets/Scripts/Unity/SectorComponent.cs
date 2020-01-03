@@ -12,11 +12,11 @@ public class SectorComponent : MonoBehaviour {
 	public OpenSpace.ROM.Sector sectorROM;
     //public LightBehaviour[] staticLights;
     public SectorComponent[] neighbors;
-    public SectorComponent[] sectors_unk1;
+    public SectorComponent[] sectorTransitions;
     public SectorComponent[] sectors_unk2;
 	public LightBehaviour[] lights;
-	/*public string[] debugList4;
-	public string[] debugList5;*/
+	//public string[] debugList4;
+	//public string[] debugList5;
 	//public LightBehaviour[] dynamicLights;
 
 	private bool active = true;
@@ -35,7 +35,7 @@ public class SectorComponent : MonoBehaviour {
 			if (sector != null) {
 				return sector.isSectorVirtual != 0;
 			} else if (sectorROM != null) {
-				return sectorROM.byte2C != 0;
+				return sectorROM.isSectorVirtual != 0;
 			}
 			return false;
 		}
@@ -104,10 +104,11 @@ public class SectorComponent : MonoBehaviour {
 		if (gameObject.name.Contains("^Sector:")) {
 			gameObject.name = name.Substring(name.IndexOf("^Sector:") + 8);
 		}
+		//gameObject.name += " - " + IsSectorVirtual;
 		if (sector != null) {
 			//staticLights = sector.staticLights.Select(l => l.Light).ToArray();
 			neighbors = sector.neighbors.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
-			sectors_unk1 = sector.sectors_unk1.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
+			sectorTransitions = sector.sectors_unk1.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
 			sectors_unk2 = sector.sectors_unk2.Select(s => sectorManager.sectors.First(ns => ns.sector == s)).ToArray();
 			//dynamicLights = sector.dynamicLights.Select(l => l.Light).ToArray();
 		} else if (sectorROM != null) {
@@ -122,14 +123,14 @@ public class SectorComponent : MonoBehaviour {
 				sectors_unk2 = new SectorComponent[0];
 			}
 			if (sectorROM.sectors3.Value != null) {
-				sectors_unk1 = sectorROM.sectors3.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
+				sectorTransitions = sectorROM.sectors3.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
 			} else {
-				sectors_unk1 = new SectorComponent[0]; 
+				sectorTransitions = new SectorComponent[0]; 
 			}
 			//name += " - " + sectorROM.byte1E + " " + sectorROM.byte1F;
 			//neighbors = sectorROM.sectors2.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
-			/*if (sectorROM.sectors4.Value != null) debugList4 = sectorROM.sectors4.Value.superObjects.Select(s => s.Value.Offset.ToString()).ToArray();
-			if (sectorROM.sectors5.Value != null) debugList5 = sectorROM.sectors5.Value.superObjects.Select(s => s.Value.Offset.ToString()).ToArray();*/
+			//if (sectorROM.sectors4.Value != null) debugList4 = sectorROM.sectors4.Value.superObjects.Select(s => s.Value.Offset.ToString()).ToArray();
+			//if (sectorROM.sectors5.Value != null) debugList5 = sectorROM.sectors5.Value.superObjects.Select(s => s.Value.Offset.ToString()).ToArray();
 			//BoundingVolume vol = SectorBorder;
 		}
     }

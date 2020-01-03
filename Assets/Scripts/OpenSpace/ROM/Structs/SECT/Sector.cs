@@ -26,7 +26,7 @@ namespace OpenSpace.ROM {
 		public ushort num_lights; // 0x26
 		public ushort num_sectors4; // 0x28
 		public ushort num_sectors5; // 0x2A, 42
-		public byte byte2C;
+		public byte isSectorVirtual;
 		public byte byte2D;
 		public ushort word2E;
 		public byte byte30;
@@ -55,7 +55,7 @@ namespace OpenSpace.ROM {
 			num_lights = reader.ReadUInt16();
 			num_sectors4 = reader.ReadUInt16();
 			num_sectors5 = reader.ReadUInt16();
-			byte2C = reader.ReadByte();
+			isSectorVirtual = reader.ReadByte();
 			byte2D = reader.ReadByte();
 			word2E = reader.ReadUInt16();
 			byte30 = reader.ReadByte();

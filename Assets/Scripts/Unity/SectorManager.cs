@@ -60,35 +60,49 @@ public class SectorManager : MonoBehaviour {
 
     public SectorComponent GetActiveSectorAtPoint(Vector3 point, SectorComponent currentActiveSector = null, bool allowVirtual = false) {
 
-        if (currentActiveSector!=null && (currentActiveSector.SectorBorder!=null ? currentActiveSector.SectorBorder.ContainsPoint(point) : false)) {
-            return currentActiveSector;
+        if (currentActiveSector!= null && currentActiveSector.sectorTransitions != null && currentActiveSector.sectorTransitions.Length > 0) {
+			// We shouldn't really test the sector transitions here, but a lot of "absorbing" sectors have no transitions
+			if (currentActiveSector.SectorBorder != null ? currentActiveSector.SectorBorder.ContainsPoint(point) : false) {
+				return currentActiveSector;
+			}
         }
 
         SectorComponent activeSector = null;
         for (int i = 0; i < sectors.Count; i++) {
             SectorComponent s = sectors[i];
             s.Loaded = false;
+			s.Active = false;
         }
-        for (int i = 0; i < sectors.Count; i++) {
-            SectorComponent s = sectors[i];
-            s.Active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
-            if (s.Active) {
-                activeSector = s;
-
-                for (int j = 0; j < s.neighbors.Length; j++) {
-                    s.neighbors[j].Loaded = true;
-                }
-
-                break;
-            }
-        }
+		if(currentActiveSector != null && currentActiveSector.sectorTransitions != null) {
+			for (int i = 0; i < currentActiveSector.sectorTransitions.Length; i++) {
+				SectorComponent s = currentActiveSector.sectorTransitions[i];
+				s.Active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
+				if (s.Active) {
+					activeSector = s;
+					break;
+				}
+			}
+		}
+		if (activeSector == null) {
+			for (int i = 0; i < sectors.Count; i++) {
+				SectorComponent s = sectors[i];
+				s.Active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
+				if (s.Active) {
+					activeSector = s;
+					break;
+				}
+			}
+		}
         if (activeSector == null) {
             for (int i = 0; i < sectors.Count; i++) {
                 sectors[i].Loaded = true;
             }
         } else {
             activeSector.Loaded = true;
-        }
+			for (int j = 0; j < activeSector.neighbors.Length; j++) {
+				activeSector.neighbors[j].Loaded = true;
+			}
+		}
 
         return activeSector;
     }
