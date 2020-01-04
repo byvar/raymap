@@ -48,7 +48,7 @@ public class WaypointBehaviour : MonoBehaviour {
 					if (node.arcs_weights.Value != null && node.arcs_weights.Value.weights[i] != 0xFFFF) {
 						weight = node.arcs_weights.Value.weights[i];
 					}
-					if (weight != -1) {
+					if (weight == -1) {
 						color = Color.white;
 					} else {
 						uint caps = 0;

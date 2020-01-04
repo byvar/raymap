@@ -19,9 +19,11 @@ namespace OpenSpace.ROM {
 			arcs_weights = new Reference<ArcWeightArray>(reader);
 			num_arcs = reader.ReadUInt16();
 			unk = new Reference<ArcCapsArray>(reader, true, a => a.length = 1);
-			arcs_caps.Resolve(reader, a => a.length = num_arcs);
-			arcs_weights.Resolve(reader, a => a.length = num_arcs);
-			arcs_nodes.Resolve(reader, a => a.length = num_arcs);
+			if (num_arcs > 0) {
+				arcs_caps.Resolve(reader, a => a.length = num_arcs);
+				arcs_weights.Resolve(reader, a => a.length = num_arcs);
+				arcs_nodes.Resolve(reader, a => a.length = num_arcs);
+			}
 		}
 
 		public Vector3 Position {
