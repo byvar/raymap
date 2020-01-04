@@ -19,6 +19,8 @@ namespace OpenSpace.Loader {
 		public ROMShAnimation[] shAnims;
 		public ROMAnimationCutTable cutTable;
 		public List<ObjectsTable> objectsTables = new List<ObjectsTable>();
+		public List<Graph> graphsROM = new List<Graph>();
+		public List<WayPoint> waypointsROM = new List<WayPoint>();
 		public LevelHeader level;
 
 		public Pointer[] texturesTable;
@@ -301,6 +303,43 @@ namespace OpenSpace.Loader {
 				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
 				if (ot != null) objectsTables.Add(ot);
 			}
+
+			for (ushort i = 0; i < 0x7FFF; i++) {
+				// Only do it a few times because we're trying to load way more than there is,
+				// so it takes really long if we yield for everything
+				if (i % 4096 == 0) {
+					loadingState = "Loading waypoints: " + (i + 1);
+					yield return null;
+				}
+				WayPoint wp = GetOrRead<WayPoint>(reader, (ushort)(i | (ushort)FATEntry.Flag.Fix));
+			}
+			for (ushort i = 0; i < 0x8000; i++) {
+				// Only do it a few times because we're trying to load way more than there is,
+				// so it takes really long if we yield for everything
+				if (i % 4096 == 0) {
+					loadingState = "Loading waypoints: " + (i + 1);
+					yield return null;
+				}
+				WayPoint wp = GetOrRead<WayPoint>(reader, i);
+			}
+			for (ushort i = 0; i < 0x7FFF; i++) {
+				// Only do it a few times because we're trying to load way more than there is,
+				// so it takes really long if we yield for everything
+				if (i % 4096 == 0) {
+					loadingState = "Loading graphs: " + (i + 1);
+					yield return null;
+				}
+				Graph g = GetOrRead<Graph>(reader, (ushort)(i | (ushort)FATEntry.Flag.Fix));
+			}
+			for (ushort i = 0; i < 0x8000; i++) {
+				// Only do it a few times because we're trying to load way more than there is,
+				// so it takes really long if we yield for everything
+				if (i % 4096 == 0) {
+					loadingState = "Loading graphs: " + (i + 1);
+					yield return null;
+				}
+				Graph g = GetOrRead<Graph>(reader, i);
+			}
 			loadingState = "Initializing hierarchy";
 			yield return null;
 			if (lh != null) {
@@ -558,18 +597,18 @@ namespace OpenSpace.Loader {
 					FATEntry.Type type = FATEntry.types[typeof(T)];
 					Pointer offset = GetStructPtr(type, index);
 					if (offset != null) {
-						rs = new T();
-						rs.Init(offset, index);
 						if (!romStructs.ContainsKey(type)) {
 							romStructs[type] = new Dictionary<ushort, ROMStruct>();
 						}
 						if (!romStructs[type].ContainsKey(index)) {
+							rs = new T();
+							rs.Init(offset, index);
 							romStructs[type][index] = rs;
+							onPreRead?.Invoke(rs);
+							rs.Read(reader);
 						} else {
 							Debug.LogWarning("Duplicate index " + index + " for type " + type);
 						}
-						onPreRead?.Invoke(rs);
-						rs.Read(reader);
 					}
 				}
 			}

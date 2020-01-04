@@ -27,6 +27,7 @@ namespace OpenSpace.Waypoints {
             gao = new GameObject("WayPoint ("+this.offset+")");
             gao.transform.position = new Vector3(position.x, position.z, position.y);
             WaypointBehaviour wpBehaviour = gao.AddComponent<WaypointBehaviour>();
+			wpBehaviour.wp = this;
 
             if (radius > 1) {
                 GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);

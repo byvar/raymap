@@ -24,7 +24,7 @@ namespace OpenSpace.ROM {
 			shadowTexRef = new Reference<TextureInfoRef>(reader, true);
 			reader.ReadUInt16();
 			characterMaterial = new Reference<VisualMaterial>(reader, true);
-			noCtrlTextureList = new Reference<NoCtrlTextureList>(reader, true);
+			noCtrlTextureList = new Reference<NoCtrlTextureList>(reader, true, l => l.length = 5);
 			num_vectors_0 = reader.ReadUInt16();
 			num_indices_0 = reader.ReadUInt16();
 			reader.ReadUInt16();

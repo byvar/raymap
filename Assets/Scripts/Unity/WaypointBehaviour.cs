@@ -5,34 +5,73 @@ using System.Linq;
 using UnityEngine;
 
 public class WaypointBehaviour : MonoBehaviour {
-    public GraphNode node = null;
-    public LineRenderer[] lines = null;
+	public GraphManager manager;
+	public List<GraphNode> nodes = new List<GraphNode>();
+	public WayPoint wp = null;
+	public List<OpenSpace.ROM.GraphNode> nodesROM = new List<OpenSpace.ROM.GraphNode>();
+	public OpenSpace.ROM.WayPoint wpROM = null;
+	public List<WaypointBehaviour> targets = new List<WaypointBehaviour>();
+	public List<LineRenderer> lines = new List<LineRenderer>();
 
-    void Start() {
-        if (node != null) {
-            lines = new LineRenderer[node.arcList.list.Count];
-            for (int i = 0; i < node.arcList.list.Count; i++) {
-                Arc arc = node.arcList.list[i];
-                Color color = Color.white;
-                if (arc.weight == -1) {
-                    color = Color.white;
-                } else {
-                    Random.InitState((int)arc.capabilities * 33);
-                    color = Random.ColorHSV(0, 1, 0.2f, 1f, 0.4f, 1.0f);
-                }
-                lines[i] = new GameObject("Arc").AddComponent<LineRenderer>();
-                lines[i].transform.SetParent(transform);
-                lines[i].material = new Material(Shader.Find("Custom/Line"));
-                lines[i].gameObject.hideFlags |= HideFlags.HideInHierarchy;
-                lines[i].material.color = color;
-                lines[i].positionCount = 2;
-                lines[i].useWorldSpace = true;
-                lines[i].SetPositions(new Vector3[] { transform.position, arc.graphNode.Gao.transform.position });
-                lines[i].widthMultiplier = (arc.weight > 0 ? arc.weight : 30f) / 30f;
-
-                //DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
-            }
-        }
+    public void Init() {
+		if (nodes.Count > 0) {
+			foreach (GraphNode node in nodes) {
+				for (int i = 0; i < node.arcList.list.Count; i++) {
+					Arc arc = node.arcList.list[i];
+					Color color = Color.white;
+					if (arc.weight == -1) {
+						color = Color.white;
+					} else {
+						Random.InitState((int)arc.capabilities * 33);
+						color = Random.ColorHSV(0, 1, 0.2f, 1f, 0.4f, 1.0f);
+					}
+					LineRenderer lr = new GameObject("Arc").AddComponent<LineRenderer>();
+					lr.transform.SetParent(transform);
+					lr.material = new Material(Shader.Find("Custom/Line"));
+					lr.gameObject.hideFlags |= HideFlags.HideInHierarchy;
+					lr.material.color = color;
+					lr.positionCount = 2;
+					lr.useWorldSpace = true;
+					WaypointBehaviour tar = manager.waypoints.FirstOrDefault(w => w.nodes.Contains(arc.graphNode));
+					lr.SetPositions(new Vector3[] { transform.position, tar.transform.position });
+					lr.widthMultiplier = (arc.weight > 0 ? arc.weight : 30f) / 30f;
+					lines.Add(lr);
+					targets.Add(tar);
+					//DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
+				}
+			}
+		} else if (nodesROM.Count > 0) {
+			foreach (OpenSpace.ROM.GraphNode node in nodesROM) {
+				for (int i = 0; i < node.num_arcs; i++) {
+					Color color = Color.white;
+					int weight = -1;
+					if (node.arcs_weights.Value != null && node.arcs_weights.Value.weights[i] != 0xFFFF) {
+						weight = node.arcs_weights.Value.weights[i];
+					}
+					if (weight != -1) {
+						color = Color.white;
+					} else {
+						uint caps = 0;
+						if (node.arcs_caps.Value != null) caps = node.arcs_caps.Value.caps[i];
+						Random.InitState((int)caps * 33);
+						color = Random.ColorHSV(0, 1, 0.2f, 1f, 0.4f, 1.0f);
+					}
+					LineRenderer lr = new GameObject("Arc").AddComponent<LineRenderer>();
+					lr.transform.SetParent(transform);
+					lr.material = new Material(Shader.Find("Custom/Line"));
+					lr.gameObject.hideFlags |= HideFlags.HideInHierarchy;
+					lr.material.color = color;
+					lr.positionCount = 2;
+					lr.useWorldSpace = true;
+					WaypointBehaviour tar = manager.waypoints.FirstOrDefault(w => w.nodesROM.Contains(node.arcs_nodes.Value.nodes[i].Value));
+					lr.SetPositions(new Vector3[] { transform.position, tar.transform.position });
+					lr.widthMultiplier = (weight > 0 ? weight : 30f) / 30f;
+					lines.Add(lr);
+					targets.Add(tar);
+					//DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
+				}
+			}
+		}
         CreateMesh();
     }
 
@@ -70,12 +109,11 @@ public class WaypointBehaviour : MonoBehaviour {
 
     void Update() {
         if (lines == null) return;
-        for(int i = 0; i < node.arcList.list.Count; i++) {
-            Arc arc = node.arcList.list[i];
+        for(int i = 0; i < lines.Count; i++) {
             LineRenderer lr = lines[i];
             if (lr == null) continue;
             Vector3 ArrowOrigin = transform.position;
-            Vector3 ArrowTarget = arc.graphNode.Gao.transform.position;
+            Vector3 ArrowTarget = targets[i].transform.position;
             //lr.SetPositions(new Vector3[] { transform.position, arc.graphNode.Gao.transform.position });
             float AdaptiveSize = 1f / Vector3.Distance(ArrowOrigin, ArrowTarget);
             if (AdaptiveSize < 0.5f) {

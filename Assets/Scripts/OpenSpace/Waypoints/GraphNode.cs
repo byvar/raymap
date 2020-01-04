@@ -15,18 +15,6 @@ namespace OpenSpace.Waypoints {
 
         public Pointer off_arcList;
 
-        public GameObject Gao
-        {
-            get
-            {
-                if (wayPoint == null) return null;
-                WaypointBehaviour wpBehaviour = wayPoint.Gao.GetComponent<WaypointBehaviour>();
-                if (wpBehaviour==null) return null;
-                wpBehaviour.node = this;
-                return wayPoint.Gao;
-            }
-        }
-
         public Pointer NextEntry {
             get {
                 return off_nextNode;

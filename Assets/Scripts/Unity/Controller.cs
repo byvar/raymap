@@ -21,6 +21,7 @@ public class Controller : MonoBehaviour {
 	public Material collideTransparentMaterial;
 	public SectorManager sectorManager;
 	public LightManager lightManager;
+	public GraphManager graphManager;
 	public LoadingScreen loadingScreen;
 	public WebCommunicator communicator;
 
@@ -34,8 +35,6 @@ public class Controller : MonoBehaviour {
     bool livePreview_ = false; public bool livePreview = false;
     float livePreviewUpdateCounter = 0;
 
-    private GameObject graphRoot = null;
-	private GameObject isolateWaypointRoot = null;
 	private CinematicSwitcher cinematicSwitcher = null;
 
 	private bool ExportAfterLoad { get; set; }
@@ -176,7 +175,7 @@ public class Controller : MonoBehaviour {
 		sectorManager.Init();
 		detailedState = "Initializing graphs";
 		yield return null;
-		CreateGraphs();
+		graphManager.Init();
 		detailedState = "Initializing lights";
 		yield return null;
 		lightManager.Init();
@@ -453,8 +452,7 @@ public class Controller : MonoBehaviour {
 	public void UpdateViewGraphs() {
 		if (loader != null) {
 			viewGraphs_ = viewGraphs;
-			if (graphRoot != null) graphRoot.SetActive(viewGraphs);
-			if (isolateWaypointRoot != null) isolateWaypointRoot.SetActive(viewGraphs);
+			graphManager.UpdateViewGraphs();
 		}
 	}
 
@@ -526,40 +524,6 @@ public class Controller : MonoBehaviour {
 					po.UpdateViewCollision(viewCollision);
 				}
 			}
-		}
-	}
-
-	public void CreateGraphs() {
-		MapLoader l = MapLoader.Loader;
-		if (graphRoot == null && l.graphs.Count > 0) {
-			graphRoot = new GameObject("Graphs");
-			graphRoot.SetActive(false);
-		}
-		foreach (Graph graph in l.graphs) {
-			GameObject go_graph = new GameObject(graph.name ?? "Graph " + graph.offset.ToString());
-			go_graph.transform.SetParent(graphRoot.transform);
-
-			for (int i = 0; i < graph.nodes.Count; i++) {
-				GraphNode node = graph.nodes[i];
-                if (node.Gao == null) {
-                    continue;
-                }
-				node.Gao.name = "GraphNode[" + i + "].WayPoint ("+node?.wayPoint?.offset+")";
-				if (i == 0) {
-					go_graph.transform.position = graph.nodes[i].Gao.transform.position;
-				}
-				node.Gao.transform.SetParent(go_graph.transform);
-			}
-		}
-
-		List<WayPoint> isolateWaypoints = l.waypoints.Where(w => w.containingGraphNodes.Count == 0).ToList();
-		if (isolateWaypointRoot == null && isolateWaypoints.Count > 0) {
-			isolateWaypointRoot = new GameObject("Isolate WayPoints");
-			isolateWaypointRoot.SetActive(false);
-		}
-		foreach (WayPoint wayPoint in isolateWaypoints) {
-			wayPoint.Gao.name = "Isolate WayPoint @"+wayPoint.offset;
-			wayPoint.Gao.transform.SetParent(isolateWaypointRoot.transform);
 		}
 	}
 
