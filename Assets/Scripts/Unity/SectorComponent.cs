@@ -85,7 +85,8 @@ public class SectorComponent : MonoBehaviour {
 	public GameObject Gao {
 		get {
 			if (sectorROM != null) {
-				return transform.parent.gameObject;
+				//return transform.parent.gameObject;
+				return gameObject;
 			} else {
 				return gameObject;
 			}

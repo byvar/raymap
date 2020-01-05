@@ -75,14 +75,14 @@ namespace OpenSpace.ROM {
 
 		}
 
-		public GameObject GetGameObject() {
-			GameObject gao = new GameObject("Sector @ " + Offset);
+		public SectorComponent GetGameObject(GameObject gao) {
+			gao.name += " - Sector @ " + Offset;
 			SectorComponent sc = gao.AddComponent<SectorComponent>();
 			sc.sectorROM = this;
 			sc.sectorManager = MapLoader.Loader.controller.sectorManager;
 			MapLoader.Loader.controller.sectorManager.AddSector(sc);
 			//sc.Init();
-			return gao;
+			return sc;
 		}
 	}
 }

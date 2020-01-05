@@ -87,7 +87,7 @@ namespace OpenSpace.ROM {
 			indices.Resolve(reader, i => { i.length = len_indices; });
 			hierarchyRoot.Resolve(reader);
 			spawnablePersos.Resolve(reader, a => a.length = num_spawnablepersos);
-			Loader.print("Spawnable persos: " + num_spawnablepersos + " - " + spawnablePersos.Value.superObjects[0].Value.Offset);
+			//Loader.print("Spawnable persos: " + num_spawnablepersos + " - " + spawnablePersos.Value.superObjects[0].Value.Offset);
 		}
     }
 }

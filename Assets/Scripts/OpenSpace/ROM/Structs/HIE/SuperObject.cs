@@ -38,11 +38,9 @@ namespace OpenSpace.ROM {
 			GameObject gao = new GameObject("SO @ " + Offset + " - " + type);
 			if (data.Value != null) {
 				if (data.Value is PhysicalObject) {
-					GameObject po = ((PhysicalObject)data.Value).GetGameObject();
-					if (po != null) po.transform.SetParent(gao.transform);
+					PhysicalObjectComponent poc = ((PhysicalObject)data.Value).GetGameObject(gao);
 				} else if(data.Value is Sector) {
-					GameObject s = ((Sector)data.Value).GetGameObject();
-					if (s != null) s.transform.SetParent(gao.transform);
+					SectorComponent sc = ((Sector)data.Value).GetGameObject(gao);
 				}
 			}
 			if (children.Value != null) {

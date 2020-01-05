@@ -23,7 +23,7 @@ namespace OpenSpace.ROM {
 			if (data.Value != null) {
 				for (int i = 0; i < data.Value.entries.Length; i++) {
 					if (data.Value.entries[i].obj.Value != null) {
-						GameObject child = data.Value.entries[i].obj.Value.GetGameObject();
+						PhysicalObjectComponent child = data.Value.entries[i].obj.Value.GetGameObject();
 						child.transform.SetParent(gao.transform);
 						child.name = "[Entry " + i + "] " + child.name;
 					}

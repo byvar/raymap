@@ -40,7 +40,7 @@ public class Controller : MonoBehaviour {
 	private bool ExportAfterLoad { get; set; }
 	public string ExportPath { get; set; }
 
-	public List<ROMPersoBehaviour> romPersos = new List<ROMPersoBehaviour>();
+	public List<ROMPersoBehaviour> romPersos { get; set; } = new List<ROMPersoBehaviour>();
 
 	public enum State {
 		None,
@@ -408,30 +408,56 @@ public class Controller : MonoBehaviour {
 				}
 			}
 		}
-		if (romPersos.Count > 0) {
-			for (int i = 0; i < romPersos.Count; i++) {
-				detailedState = "Initializing persos: " + i + "/" + romPersos.Count;
-				yield return null;
-				ROMPersoBehaviour unityBehaviour = romPersos[i];
-				unityBehaviour.controller = this;
-				/*if (loader.globals != null && loader.globals.spawnablePersos != null) {
-					if (loader.globals.spawnablePersos.IndexOf(p) > -1) {
+		if (loader is OpenSpace.Loader.R2ROMLoader) {
+			OpenSpace.Loader.R2ROMLoader romLoader = loader as OpenSpace.Loader.R2ROMLoader;
+			if (romPersos.Count > 0) {
+				for (int i = 0; i < romPersos.Count; i++) {
+					detailedState = "Initializing persos: " + i + "/" + romPersos.Count;
+					yield return null;
+					ROMPersoBehaviour unityBehaviour = romPersos[i];
+					unityBehaviour.controller = this;
+					/*if (loader.globals != null && loader.globals.spawnablePersos != null) {
+						if (loader.globals.spawnablePersos.IndexOf(p) > -1) {
+							unityBehaviour.IsAlways = true;
+							unityBehaviour.transform.position = new Vector3(i * 10, -1000, 0);
+						}
+					}*/
+					if (!unityBehaviour.IsAlways) {
+						SectorComponent sc = sectorManager.GetActiveSectorAtPoint(unityBehaviour.transform.position);
+						unityBehaviour.sector = sc;
+					} else unityBehaviour.sector = null;
+					/*Moddable mod = null;
+					if (p.SuperObject != null && p.SuperObject.Gao != null) {
+						mod = p.SuperObject.Gao.GetComponent<Moddable>();
+						if (mod != null) {
+							mod.persoBehaviour = unityBehaviour;
+						}
+					}*/
+					unityBehaviour.Init();
+				}
+			}
+			if (romLoader.level != null && romLoader.level.spawnablePersos.Value != null && romLoader.level.num_spawnablepersos > 0) {
+				GameObject spawnableParent = new GameObject("Spawnable persos");
+				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
+					detailedState = "Initializing  spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
+					yield return null;
+					OpenSpace.ROM.SuperObjectDynamic sod = romLoader.level.spawnablePersos.Value.superObjects[i];
+					GameObject sodGao = sod.GetGameObject();
+					if (sodGao != null) {
+						ROMPersoBehaviour unityBehaviour = sodGao.GetComponent<ROMPersoBehaviour>();
+						unityBehaviour.controller = this;
 						unityBehaviour.IsAlways = true;
+						unityBehaviour.transform.SetParent(spawnableParent.transform);
 						unityBehaviour.transform.position = new Vector3(i * 10, -1000, 0);
+						unityBehaviour.transform.rotation = Quaternion.identity;
+						unityBehaviour.transform.localScale = Vector3.one;
+						if (!unityBehaviour.IsAlways) {
+							SectorComponent sc = sectorManager.GetActiveSectorAtPoint(unityBehaviour.transform.position);
+							unityBehaviour.sector = sc;
+						} else unityBehaviour.sector = null;
+						unityBehaviour.Init();
 					}
-				}*/
-				if (!unityBehaviour.IsAlways) {
-					SectorComponent sc = sectorManager.GetActiveSectorAtPoint(unityBehaviour.transform.position);
-					unityBehaviour.sector = sc;
-				} else unityBehaviour.sector = null;
-				/*Moddable mod = null;
-				if (p.SuperObject != null && p.SuperObject.Gao != null) {
-					mod = p.SuperObject.Gao.GetComponent<Moddable>();
-					if (mod != null) {
-						mod.persoBehaviour = unityBehaviour;
-					}
-				}*/
-				unityBehaviour.Init();
+				}
 			}
 		}
 	}

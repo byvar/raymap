@@ -26,27 +26,12 @@ namespace OpenSpace.ROM {
 		}
 
 		public GameObject GetGameObject() {
-			GameObject gao = new GameObject("SOD @ " + Offset);
 			if (perso.Value != null) {
-				GameObject persoGao = perso.Value.GetGameObject();
-				persoGao.transform.SetParent(gao.transform);
+				GameObject gao = new GameObject("SOD @ " + Offset);
+				ROMPersoBehaviour rpb = perso.Value.GetGameObject(gao);
+				return gao;
 			}
-			/*if (data.Value != null && data.Value is PhysicalObject) {
-				GameObject po = ((PhysicalObject)data.Value).GetGameObject();
-				if (po != null) po.transform.SetParent(gao.transform);
-			}
-			if (children.Value != null) {
-				foreach (Reference<SuperObject> so in children.Value.superObjects) {
-					if (so.Value != null) {
-						GameObject soGao = so.Value.GetGameObject();
-						if (soGao != null) {
-							soGao.transform.SetParent(gao.transform);
-							so.Value.SetTransform(soGao);
-						}
-					}
-				}
-			}*/
-			return gao;
+			return null;
 		}
 	}
 }

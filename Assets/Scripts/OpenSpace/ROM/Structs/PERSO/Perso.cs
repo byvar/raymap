@@ -28,20 +28,13 @@ namespace OpenSpace.ROM {
 			_16 = reader.ReadUInt16();
 			_18 = reader.ReadUInt16();
 		}
-		public GameObject GetGameObject() {
-			GameObject gao = new GameObject("P3dData @ " + Offset);
+		public ROMPersoBehaviour GetGameObject(GameObject gao) {
+			gao.name += " - P3dData @ " + Offset;
 			ROMPersoBehaviour romPerso = gao.AddComponent<ROMPersoBehaviour>();
 			romPerso.perso = this;
 			romPerso.controller = MapLoader.Loader.controller;
 			romPerso.controller.romPersos.Add(romPerso);
-			//romPerso.Init();
-			/*if (p3dData.Value != null && p3dData.Value.objectsTable.Value != null) {
-				ObjectsTable ot = p3dData.Value.objectsTable.Value;
-				GameObject otGao = ot.GetGameObject();
-				otGao.transform.SetParent(gao.transform);
-				otGao.transform.localPosition = Vector3.zero;
-			}*/
-			return gao;
+			return romPerso;
 		}
 	}
 }

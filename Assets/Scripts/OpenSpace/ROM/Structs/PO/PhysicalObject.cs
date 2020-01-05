@@ -12,8 +12,12 @@ namespace OpenSpace.ROM {
 			collide = new Reference<CollSet>(reader, true);
 		}
 
-		public GameObject GetGameObject() {
-			GameObject gao = new GameObject("PO @ " + Offset);
+		public PhysicalObjectComponent GetGameObject(GameObject gao = null) {
+			if (gao == null) {
+				gao = new GameObject("PO @ " + Offset);
+			} else {
+				gao.name += " - PO @ " + Offset;
+			}
 			PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
 			if (visual.Value != null) {
 				GameObject child = visual.Value.GetGameObject(GeometricObject.Type.Visual);
@@ -29,7 +33,7 @@ namespace OpenSpace.ROM {
 				poc.collide.SetActive(false);
 			}
 			poc.Init(MapLoader.Loader.controller);
-			return gao;
+			return poc;
 		}
 	}
 }

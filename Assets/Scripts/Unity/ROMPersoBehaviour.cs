@@ -321,7 +321,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 								PhysicalObject o = entry.obj.Value;
 								if (o != null) {
 									//if (o.visualSetType == 1) print(name);
-									GameObject c = o.GetGameObject();
+									GameObject c = o.GetGameObject().gameObject;
 									subObjects[i][j] = c;
 									if (entry.scale.HasValue) {
 										objectIndexScales[ntto.object_index] = new Vector3(entry.scale.Value.x, entry.scale.Value.z, entry.scale.Value.y);
@@ -357,7 +357,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 										PhysicalObject o = entry.obj.Value;
 										if (o != null) {
 											//if (o.visualSetType == 1) print(name);
-											GameObject c = o.GetGameObject();
+											GameObject c = o.GetGameObject().gameObject;
 											fullMorphPOs[channelIndex][m.objectIndexTo] = c;
 											if (entry.scale.HasValue) {
 												objectIndexScales[m.objectIndexTo] = new Vector3(entry.scale.Value.x, entry.scale.Value.z, entry.scale.Value.y);
