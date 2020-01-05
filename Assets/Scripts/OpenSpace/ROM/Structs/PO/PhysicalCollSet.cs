@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.ROM {
-	public class CollSet : ROMStruct {
+	public class PhysicalCollSet : ROMStruct {
 		public Reference<GeometricObject> mesh;
 		public ushort type;
 

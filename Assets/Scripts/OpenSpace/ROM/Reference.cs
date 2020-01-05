@@ -115,7 +115,7 @@ namespace OpenSpace.ROM {
 					Value = l.GetOrRead<Sector>(reader, index);
 					break;
 				default:
-					l.print("GenericReference: Unsupported struct with type " + entryType + "(" + this.type + ")");
+					UnityEngine.Debug.LogWarning("GenericReference: Unsupported struct with type " + entryType + "(" + this.type + ")");
 					break;
 			}
 			return type;

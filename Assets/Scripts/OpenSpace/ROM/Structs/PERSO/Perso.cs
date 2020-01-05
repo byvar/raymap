@@ -8,7 +8,7 @@ namespace OpenSpace.ROM {
 		public Reference<Perso3dData> p3dData;
 		public Reference<Brain> brain;
         public ushort _4;
-		public ushort _6;
+		public Reference<CollSet> collset;
 		public ushort _8;
 		public ushort _10;
 		public Reference<StdGame> stdGame;
@@ -20,7 +20,7 @@ namespace OpenSpace.ROM {
 			p3dData = new Reference<Perso3dData>(reader, true);
             brain = new Reference<Brain>(reader, true);
             _4 = reader.ReadUInt16();
-			_6 = reader.ReadUInt16();
+			collset = new Reference<CollSet>(reader, true);
 			_8 = reader.ReadUInt16();
 			_10 = reader.ReadUInt16();
 			stdGame = new Reference<StdGame>(reader, true);

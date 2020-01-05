@@ -5,11 +5,11 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class PhysicalObject : ROMStruct {
 		public Reference<GeometricObject> visual;
-		public Reference<CollSet> collide;
+		public Reference<PhysicalCollSet> collide;
 
 		protected override void ReadInternal(Reader reader) {
 			visual = new Reference<GeometricObject>(reader, true);
-			collide = new Reference<CollSet>(reader, true);
+			collide = new Reference<PhysicalCollSet>(reader, true);
 		}
 
 		public PhysicalObjectComponent GetGameObject(GameObject gao = null) {
