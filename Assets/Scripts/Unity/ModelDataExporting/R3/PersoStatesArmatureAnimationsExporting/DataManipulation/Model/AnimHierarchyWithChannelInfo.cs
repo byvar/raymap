@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model
+{
+    class AnimHierarchyWithChannelInfo
+    {
+        public string ParentChannelName;
+        public string ChannelName;
+        public Vector3 LocalPosition;
+        public Quaternion LocalRotation;
+        public Vector3 LocalScale;
+
+        public AnimHierarchyWithChannelInfo(string ParentChannelName, string ChannelName,
+            Vector3 LocalPosition, Quaternion LocalRotation, Vector3 LocalScale)
+        {
+            this.ParentChannelName = ParentChannelName;
+            this.ChannelName = ChannelName;
+            this.LocalPosition = LocalPosition;
+            this.LocalRotation = LocalRotation;
+            this.LocalScale = LocalScale;
+        }
+    }
+}

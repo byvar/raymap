@@ -27,7 +27,8 @@ namespace Assets.Scripts.Unity.AnimationExporting.DataManipulation
                 while (persoBehaviourInterface.IsValidAnimationFrame())
                 {
                     AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy = 
-                        persoBehaviourInterface.DeriveAnimTreeWithChannelsDataHierarchyForCurrentFrame();
+                        persoBehaviourInterface.DeriveAnimTreeWithChannelsDataHierarchyForGivenFrame(
+                            persoBehaviourInterface.GetCurrentFrameNumberForExport());
                     RaymapAnimationKeyframeModelFacadeAccessor raymapAnimationKeyframeModelFacadeAccessor = 
                         new RaymapAnimationKeyframeModelFacadeAccessor(animTreeWithChannelsDataHierarchy);
                     raymapAnimationClipModelFacadeAccessor.AddKeyframe(raymapAnimationKeyframeModelFacadeAccessor,

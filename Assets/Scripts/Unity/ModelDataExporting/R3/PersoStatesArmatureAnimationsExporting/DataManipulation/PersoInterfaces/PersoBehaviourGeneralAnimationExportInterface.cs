@@ -34,11 +34,19 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
             throw new NotImplementedException();
         }
 
-        public AnimTreeWithChannelsDataHierarchy DeriveAnimTreeWithChannelsDataHierarchyForCurrentFrame()
+        public AnimTreeWithChannelsDataHierarchy DeriveAnimTreeWithChannelsDataHierarchyForGivenFrame(
+            int animationFrameNumber)
         {
             AnimTreeWithChannelsDataHierarchyConstructor animTreeWithChannelsDataHierarchyConstructor =
                 new AnimTreeWithChannelsDataHierarchyConstructor();
-            return animTreeWithChannelsDataHierarchyConstructor.ConstructFromGiven(new PersoBehaviourAnimDataManipulationInterface(persoBehaviour));
+            return animTreeWithChannelsDataHierarchyConstructor.ConstructFromGiven(
+                new PersoBehaviourAnimDataManipulationInterface(persoBehaviour),
+                animationFrameNumber);
+        }
+
+        internal int GetCurrentFrameNumberForExport()
+        {
+            throw new NotImplementedException();
         }
 
         public void NextKeyframe()
