@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Unity.AnimationExporting.DataManipulation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -76,9 +77,10 @@ namespace Assets.Scripts.Unity.AnimationExporting
             return null;
         }
 
-        public void addAnimationFrameToAnimationClip(string animationClipName, PersoBehaviour persoBehaviour)
+        public void addAnimationFrameToAnimationClip(string animationClipName, int frameNumber,
+            PersoAnimationStatesDataManipulator persoAnimationStatesDataManipulator)
         {
-            var animationFrameModel = traverseRecursivelyChildrenChannels(persoBehaviour.gameObject, new AnimationFrameModel());
+            var animationFrameModel = persoAnimationStatesDataManipulator.deriveAnimationFrameModelOfNumber(frameNumber);
             animationsModel.addAnimationFrameModelToAnimationClip(animationClipName, animationFrameModel);
         }
 

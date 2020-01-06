@@ -116,7 +116,6 @@ public class PersoBehaviour : MonoBehaviour {
     public void PrintDsgVar() {
         if (isLoaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
-
                 DsgVar dsgVar = perso.brain.mind.AI_model.dsgVar;
                 if (dsgVar != null) {
                     MapLoader l = MapLoader.Loader;
@@ -129,14 +128,12 @@ public class PersoBehaviour : MonoBehaviour {
 						l.print("Info Entry " + c + ", type " + entry.type + ", offset " + entry.offsetInBuffer + " , value " + dsgVar.defaultValues[c].ToString() + ", initType " + entry.initType + ", saveType " + entry.saveType);
                     }
                 }
-
             }
         }
     }
 
     public void PrintDsgVarFromMindMem() {
         MapLoader l = MapLoader.Loader;
-
         if (isLoaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
 
@@ -156,9 +153,6 @@ public class PersoBehaviour : MonoBehaviour {
 						}
                     }
                 }
-
-
-
             }
         }
     }
@@ -269,10 +263,6 @@ public class PersoBehaviour : MonoBehaviour {
                     }
                 }
 
-                // TODO: replace evalMacro calls by replacing regex "evalMacro\([a-zA-Z0-9_]*\.Macro\[([0-9]+)\]\)" to "yield return Macro_$1()"
-                // TODO: replace Proc_ChangeMyComport\([a-zA-Z0-9_]+\.Rule\[[0-9]+\]\[\"([^"]+)\"\]\)     with     sm.ChangeActiveRuleState("$1")
-                // TODO: replace Cond_IsValidObject\(([^\)]+)\)    with $1 != null
-
                 string startString = "protected override void Start() {" + Environment.NewLine + "base.Start();" + Environment.NewLine + Environment.NewLine;
                 startString += "// Rules" + Environment.NewLine;
                 ruleStatesInitializer.ForEach((s) => { startString += "sm.AddRuleState(State.Create(\"" + s + "\", " + s + "));" + Environment.NewLine; });
@@ -354,7 +344,7 @@ public class PersoBehaviour : MonoBehaviour {
 
     public void ExportAnimationsData()
     {
-        persoAnimationsDataExporter.InitExportProcess();
+        persoAnimationsDataExporter.ExportPersoStatesAnimations();
     }
     #endregion
 
@@ -431,7 +421,6 @@ public class PersoBehaviour : MonoBehaviour {
 			a3d = null;
 			animLargo = null;
 			animationSpeed = state.speed;
-			//animationSpeed = state.speed;
 			InitAnimationMontreal(state.anim_refMontreal);
 			UpdateAnimation();
 		} else if (state.anim_ref != null
@@ -444,7 +433,6 @@ public class PersoBehaviour : MonoBehaviour {
 			animMontreal = null;
 			animLargo = null;
 			animationSpeed = state.speed;
-			//animationSpeed = state.speed;
 			InitAnimation(l.animationBanks[bank_index].animations[anim_index]);
 			UpdateAnimation();
 		} else if (state.anim_ref != null && state.anim_ref.a3d != null) {
@@ -539,10 +527,6 @@ public class PersoBehaviour : MonoBehaviour {
                     UpdateAnimation();
                 }
             }
-            if (persoAnimationsDataExporter.isAnimationsExportInProgress)
-            {
-                persoAnimationsDataExporter.UpdateExportProcess();
-            }
         }
     }
 
@@ -591,7 +575,6 @@ public class PersoBehaviour : MonoBehaviour {
             this.a3d = a3d;
             currentFrame = 0;
             if (a3d != null) {
-                //animationSpeed = a3d.speed;
                 // Init channels & subobjects
                 subObjects = new PhysicalObject[a3d.num_channels][];
                 channelObjects = new GameObject[a3d.num_channels];
@@ -609,7 +592,6 @@ public class PersoBehaviour : MonoBehaviour {
                     List<ushort> listOfNTTOforChannel = new List<ushort>();
                     for (int j = 0; j < a3d.num_onlyFrames; j++) {
                         AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + j];
-                        //print(ch.numOfNTTO + " - " + of.numOfNTTO + " - " + a3d.numOfNTTO.Length);
                         AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
                         if (!listOfNTTOforChannel.Contains(numOfNTTO.numOfNTTO)) {
                             listOfNTTOforChannel.Add(numOfNTTO.numOfNTTO);
@@ -623,13 +605,6 @@ public class PersoBehaviour : MonoBehaviour {
                             subObjects[i][j].Gao.transform.parent = channelObjects[i].transform;
                             subObjects[i][j].Gao.name = "[" + j + "] Invisible PO";
                             subObjects[i][j].Gao.SetActive(false);
-                            /*GameObject boneVisualisation = new GameObject("Bone vis");
-                            boneVisualisation.transform.SetParent(subObjects[i][j].Gao.transform);
-                            MeshRenderer mr = boneVisualisation.AddComponent<MeshRenderer>();
-                            MeshFilter mf = boneVisualisation.AddComponent<MeshFilter>();
-                            Mesh mesh = Util.CreateBox(0.1f);
-                            mf.mesh = mesh;
-                            boneVisualisation.transform.localScale = Vector3.one / 4f;*/
                         } else {
                             if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > ntto.object_index) {
                                 PhysicalObject o = perso.p3dData.objectList[ntto.object_index].po;
@@ -716,7 +691,6 @@ public class PersoBehaviour : MonoBehaviour {
             this.animMontreal = animMontreal;
             currentFrame = 0;
             if (animMontreal != null) {
-                //animationSpeed = a3d.speed;
                 // Init channels & subobjects
                 subObjects = new PhysicalObject[animMontreal.num_channels][];
                 channelObjects = new GameObject[animMontreal.num_channels];
@@ -787,8 +761,6 @@ public class PersoBehaviour : MonoBehaviour {
 			this.animLargo = animLargo;
 			currentFrame = 0;
 			if (animLargo != null) {
-				//animationSpeed = a3d.speed;
-				// Init channels & subobjects
 				subObjects = new PhysicalObject[animLargo.num_channels][];
 				channelObjects = new GameObject[animLargo.num_channels];
 				currentActivePO = new int[animLargo.num_channels];
@@ -804,7 +776,6 @@ public class PersoBehaviour : MonoBehaviour {
 					List<ushort> listOfNTTOforChannel = new List<ushort>();
 					for (int j = 0; j < animLargo.num_onlyFrames; j++) {
 						AnimOnlyFrame of = animLargo.onlyFrames[j];
-						//print(ch.numOfNTTO + " - " + of.numOfNTTO + " - " + a3d.numOfNTTO.Length);
 						AnimNumOfNTTO numOfNTTO = animLargo.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
 						if (!listOfNTTOforChannel.Contains(numOfNTTO.numOfNTTO)) {
 							listOfNTTOforChannel.Add(numOfNTTO.numOfNTTO);
@@ -818,18 +789,10 @@ public class PersoBehaviour : MonoBehaviour {
 							subObjects[i][j].Gao.transform.parent = channelObjects[i].transform;
 							subObjects[i][j].Gao.name = "[" + j + "] Invisible PO";
 							subObjects[i][j].Gao.SetActive(false);
-							/*GameObject boneVisualisation = new GameObject("Bone vis");
-                            boneVisualisation.transform.SetParent(subObjects[i][j].Gao.transform);
-                            MeshRenderer mr = boneVisualisation.AddComponent<MeshRenderer>();
-                            MeshFilter mf = boneVisualisation.AddComponent<MeshFilter>();
-                            Mesh mesh = Util.CreateBox(0.1f);
-                            mf.mesh = mesh;
-                            boneVisualisation.transform.localScale = Vector3.one / 4f;*/
 						} else {
 							if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > ntto.object_index) {
 								PhysicalObject o = perso.p3dData.objectList[ntto.object_index].po;
 								if (o != null) {
-									//if (o.visualSetType == 1) print(name);
 									PhysicalObject c = o.Clone();
 									subObjects[i][j] = c;
 									subObjects[i][j].Gao.transform.localScale =
@@ -893,21 +856,17 @@ public class PersoBehaviour : MonoBehaviour {
 						}
 					}
 				}
-
-				//channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
 			}
 			// Final pass
 			for (int i = 0; i < a3d.num_channels; i++) {
 				AnimChannel ch = a3d.channels[a3d.start_channels + i];
 				AnimFramesKFIndex kfi = a3d.framesKFIndex[currentFrame + ch.framesKF];
 				AnimKeyframe kf = a3d.keyframes[kfi.kf];
-				//print(perso.p3dData.family.animBank);
 				AnimVector pos = a3d.vectors[kf.positionVector];
 				AnimQuaternion qua = a3d.quaternions[kf.quaternion];
 				AnimVector scl = a3d.vectors[kf.scaleVector];
 				AnimNumOfNTTO numOfNTTO = a3d.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
 				AnimNTTO ntto = a3d.ntto[numOfNTTO.numOfNTTO];
-				//if (ntto.IsBoneNTTO) continue;
 				int poNum = numOfNTTO.numOfNTTO - a3d.start_NTTO;
 				PhysicalObject physicalObject = subObjects[i][poNum];
 				Vector3 vector = pos.vector;
@@ -924,18 +883,13 @@ public class PersoBehaviour : MonoBehaviour {
 					if (framesDifference == 0) {
 						interpolation = 0;
 					} else {
-						//interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
 						interpolation = framesSinceKF / (float)framesDifference;
 					}
 				} else {
 					nextKF = a3d.keyframes[kfi.kf + 1];
 					framesDifference = (int)nextKF.frame - (int)kf.frame;
-					//interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
 					interpolation = framesSinceKF / (float)framesDifference;
 				}
-				//print(interpolation);
-				//print(a3d.vectors.Length + " - " + nextKF.positionVector);
-				//print(perso.p3dData.family.animBank);
 				AnimVector pos2 = a3d.vectors[nextKF.positionVector];
 				AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
 				AnimVector scl2 = a3d.vectors[nextKF.scaleVector];
@@ -1042,8 +996,6 @@ public class PersoBehaviour : MonoBehaviour {
 									Transform channelTransform = channelObjects[ind_linkChannel].transform;
                                     bone.UnityBone.transform.SetParent(channelTransform);
 
-                                    //bone.UnityBone.position = new Vector3(channelTransform.position.x, channelTransform.position.y, channelTransform.position.z);
-
                                     bone.UnityBone.localPosition = Vector3.zero;
 									bone.UnityBone.localRotation = Quaternion.identity;
 									bone.UnityBone.localScale = Vector3.one;
@@ -1068,26 +1020,9 @@ public class PersoBehaviour : MonoBehaviour {
             // First pass: reset TRS for all sub objects
             for (int i = 0; i < channelParents.Length; i++) {
 				channelParents[i] = false;
-                /*GameObject c = channelObjects[i];
-                if (c != null) {
-                    c.transform.SetParent(perso.Gao.transform);
-                    c.transform.localPosition = Vector3.zero;
-                    c.transform.localEulerAngles = Vector3.zero;
-                    c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
-                }
-                for (int j = 0; j < subObjects[i].Length; j++) {
-                    if (subObjects[i][j] == null) continue;
-                    subObjects[i][j].Gao.transform.parent = c.transform;
-                    subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
-                    subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
-                    subObjects[i][j].Gao.transform.localScale =
-                        subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
-                    subObjects[i][j].Gao.SetActive(false);
-                }*/
             }
             AnimFrameMontreal of = animMontreal.frames[currentFrame];
 			// Create hierarchy for this frame
-			//bool[] channelParents = new bool[channelObjects.Length];
 			if (of.hierarchies != null) {
                 for (int i = 0; i < of.hierarchies.Length; i++) {
                     AnimHierarchy h = of.hierarchies[i];
@@ -1110,8 +1045,6 @@ public class PersoBehaviour : MonoBehaviour {
                     quaternion = Quaternion.identity;
                     scale = Vector3.one;
                 }
-				//float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
-
 
 				if (currentFrame != currentActivePO[i]) {
 					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
@@ -1125,7 +1058,6 @@ public class PersoBehaviour : MonoBehaviour {
                 channelObjects[i].transform.localRotation = quaternion;
                 channelObjects[i].transform.localScale = scale;
             }
-            //this.currentFrame = (currentFrame + 1) % animMontreal.num_frames;
         }
     }
 
@@ -1136,22 +1068,6 @@ public class PersoBehaviour : MonoBehaviour {
 			// First pass: reset TRS for all sub objects
 			for (int i = 0; i < channelParents.Length; i++) {
 				channelParents[i] = false;
-				/*GameObject c = channelObjects[i];
-                if (c != null) {
-                    c.transform.SetParent(perso.Gao.transform);
-                    c.transform.localPosition = Vector3.zero;
-                    c.transform.localEulerAngles = Vector3.zero;
-                    c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
-                }
-               for (int j = 0; j < subObjects[i].Length; j++) {
-                    if (subObjects[i][j] == null) continue;
-                    subObjects[i][j].Gao.transform.parent = c.transform;
-                    subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
-                    subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
-                    subObjects[i][j].Gao.transform.localScale =
-                        subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
-                    //subObjects[i][j].Gao.SetActive(false);
-                }*/
 			}
 			AnimOnlyFrame of = animLargo.onlyFrames[currentFrame];
 			// Create hierarchy for this frame
@@ -1170,8 +1086,6 @@ public class PersoBehaviour : MonoBehaviour {
 						channelParents[ch_child] = true;
 					}
 				}
-
-				//channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
 			}
 			// Final pass
 			int startFrameVectors = 0;
@@ -1212,7 +1126,6 @@ public class PersoBehaviour : MonoBehaviour {
 				AnimVector scl = null; // animLargo.vectors[0];
 				AnimNumOfNTTO numOfNTTO = animLargo.numOfNTTO[ch.numOfNTTO + of.numOfNTTO];
 				AnimNTTO ntto = animLargo.ntto[numOfNTTO.numOfNTTO];
-				//if (ntto.IsBoneNTTO) continue;
 				int poNum = numOfNTTO.numOfNTTO;
 				PhysicalObject physicalObject = subObjects[i][poNum];
 				Vector3 vector = pos != null ? pos.vector : Vector3.zero;
@@ -1242,14 +1155,6 @@ public class PersoBehaviour : MonoBehaviour {
 						quaternion = Quaternion.Lerp(qua.quaternion, qua2.quaternion, interpolation);
 					}
 				}
-
-
-				//print(interpolation);
-				//print(a3d.vectors.Length + " - " + nextKF.positionVector);
-				//print(perso.p3dData.family.animBank);
-				//AnimVector scl2 = a3d.vectors[nextKF.scaleVector];
-				//scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
-				//float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
 
 				if (poNum != currentActivePO[i]) {
 					if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
@@ -1290,10 +1195,7 @@ public class PersoBehaviour : MonoBehaviour {
 								AnimChannelLargo ch_link = animLargo.channels[ind_linkChannel];
 								AnimNumOfNTTO numOfNTTO_link = animLargo.numOfNTTO[ch_link.numOfNTTO + of.numOfNTTO];
 								AnimNTTO ntto_link = animLargo.ntto[numOfNTTO_link.numOfNTTO];
-								//PhysicalObject physicalObject_link = subObjects[ind_linkChannel][numOfNTTO_link.numOfNTTO];
-								//if (physicalObject_link == null) continue;
 								if (bones == null || bones.bones.Length <= d.bone + 1) continue;
-								//print(d.bone + 1);
 								DeformBone bone = bones.r3bones[d.bone + 1];
 								if (bone != null) {
 									Transform channelTransform = channelObjects[ind_linkChannel].transform;
@@ -1301,10 +1203,6 @@ public class PersoBehaviour : MonoBehaviour {
 									bone.UnityBone.localPosition = Vector3.zero;
 									bone.UnityBone.localRotation = Quaternion.identity;
 									bone.UnityBone.localScale = Vector3.one;
-									/*bone.UnityBone.position = channelTransform.position;
-									bone.UnityBone.rotation = channelTransform.rotation;
-									//bone.UnityBone.localScale = Vector3.one;
-									bone.UnityBone.localScale = channelTransform.localScale;*/
 								}
 							}
 						}
