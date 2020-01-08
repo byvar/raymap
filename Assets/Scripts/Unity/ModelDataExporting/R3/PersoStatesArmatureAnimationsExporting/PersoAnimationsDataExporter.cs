@@ -19,6 +19,7 @@ namespace Assets.Scripts.Unity
         public PersoAnimationsDataExporter(PersoBehaviour persoBehaviour)
         {
             this.persoAnimationStatesDataManipulator = new PersoAnimationStatesDataManipulator(persoBehaviour);
+            this.jsonAnimationDataFileWriter = new JSONAnimationDataFileWriter();
         }
 
         public void ExportPersoStatesAnimations()

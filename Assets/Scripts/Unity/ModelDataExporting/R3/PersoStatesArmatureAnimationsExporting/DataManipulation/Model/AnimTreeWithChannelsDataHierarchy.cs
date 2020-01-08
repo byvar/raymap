@@ -9,9 +9,21 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
 {
     public class AnimTreeWithChannelsDataHierarchy
     {
+        public class ParentChildPair
+        {
+            public AnimTreeChannelsHierarchyNode Parent;
+            public AnimTreeChannelsHierarchyNode Child;
+
+            public ParentChildPair(AnimTreeChannelsHierarchyNode Parent, AnimTreeChannelsHierarchyNode Child)
+            {
+                this.Parent = Parent;
+                this.Child = Child;
+            }
+        }
+
         AnimTreeChannelsHierarchyNode root;
 
-        internal void AddNode(
+        public void AddNode(
             string parentChannelName, 
             string channelName,
             Vector3 absolutePosition,
@@ -22,6 +34,32 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
             Vector3 localScale)
         {
             throw new NotImplementedException();
+        }
+
+        public IEnumerable<AnimTreeChannelsHierarchyNode> IterateChannels()
+        {
+            List<AnimTreeChannelsHierarchyNode> nodes = new List<AnimTreeChannelsHierarchyNode>();
+            if (root != null)
+            {
+                root.TraverseAndCollectAll(nodes);
+            }
+            foreach (var node in nodes)
+            {
+                yield return node;
+            }
+        }
+
+        public IEnumerable<ParentChildPair> IterateParentChildPairs()
+        {
+            List<ParentChildPair> pairs = new List<ParentChildPair>();
+            if (root != null)
+            {
+                root.TraverseChildParentPairsAndCollectAll(pairs);
+            }
+            foreach (var pair in pairs)
+            {
+                yield return pair;
+            }
         }
     }
 }
