@@ -25,7 +25,7 @@ public class SectorManager : MonoBehaviour {
     void Update() {
         if (loaded) {
             Vector3 camPos = Camera.main.transform.localPosition;
-            activeSector = GetActiveSectorAtPoint(camPos, activeSector);
+			UpdateSectorLoading(camPos);
 
 			if (Input.GetKeyDown(KeyCode.Y)) {
 				displayInactiveSectors = !displayInactiveSectors;
@@ -58,17 +58,38 @@ public class SectorManager : MonoBehaviour {
 		}
 	}
 
-    public SectorComponent GetActiveSectorAtPoint(Vector3 point, SectorComponent currentActiveSector = null, bool allowVirtual = false) {
+	public void UpdateSectorLoading(Vector3 camPos) {
+		if (Settings.s.engineVersion < Settings.EngineVersion.R2 || Settings.s.game == Settings.Game.LargoWinch) {
+			activeSector = GetActiveSectorAtPoint(camPos, activeSector);
+		} else {
+			activeSector = GetActiveSector(camPos);
+			for (int i = 0; i < sectors.Count; i++) {
+				SectorComponent s = sectors[i];
+				s.Loaded = false;
+				s.Active = false;
+			}
+			if (activeSector == null) {
+				for (int i = 0; i < sectors.Count; i++) {
+					sectors[i].Loaded = true;
+				}
+			} else {
+				activeSector.Loaded = true;
+				for (int j = 0; j < activeSector.neighbors.Length; j++) {
+					activeSector.neighbors[j].Loaded = true;
+				}
+			}
+		}
+	}
 
+    public SectorComponent GetActiveSectorAtPoint(Vector3 point, SectorComponent currentActiveSector = null, bool allowVirtual = false) {
         if (currentActiveSector!= null && currentActiveSector.sectorTransitions != null && currentActiveSector.sectorTransitions.Length > 0) {
 			// We shouldn't really test the sector transitions here, but a lot of "absorbing" sectors have no transitions
 			if (currentActiveSector.SectorBorder != null ? currentActiveSector.SectorBorder.ContainsPoint(point) : false) {
 				return currentActiveSector;
 			}
         }
-
-        SectorComponent activeSector = null;
-        for (int i = 0; i < sectors.Count; i++) {
+		SectorComponent activeSector = null;
+		for (int i = 0; i < sectors.Count; i++) {
             SectorComponent s = sectors[i];
             s.Loaded = false;
 			s.Active = false;
@@ -106,6 +127,40 @@ public class SectorManager : MonoBehaviour {
 
         return activeSector;
     }
+
+	public SectorComponent GetActiveSector(Vector3 point) {
+		float smallestDistanceToSector = float.MaxValue;
+		float smallestDistanceToSectorVirtual = float.MaxValue;
+		byte activeSectorPriority = 0;
+		byte activeSectorPriorityVirtual = 0;
+		SectorComponent activeSectorVirtual = null;
+		SectorComponent activeSector = null;
+		foreach(SectorComponent s in sectors) {
+			if (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false) {
+				float dist = Vector3.Distance(s.SectorBorder.Center, point);
+				if (s.IsSectorVirtual) {
+					if (s.SectorPriority > activeSectorPriorityVirtual || (s.SectorPriority == activeSectorPriorityVirtual && dist < smallestDistanceToSectorVirtual)) {
+						smallestDistanceToSectorVirtual = dist;
+						activeSectorVirtual = s;
+						activeSectorPriorityVirtual = s.SectorPriority;
+					}
+				} else {
+					if (s.SectorPriority > activeSectorPriority || (s.SectorPriority == activeSectorPriority && dist < smallestDistanceToSector)) {
+						smallestDistanceToSector = dist;
+						activeSector = s;
+						activeSectorPriority = s.SectorPriority;
+					}
+				}
+			}
+		}
+		if (activeSector != null) {
+			return activeSector;
+		} else if (activeSectorVirtual != null) {
+			return activeSectorVirtual;
+		} else {
+			return sectors.Last(); // Univers
+		}
+	}
 
 	public void AddSector(SectorComponent sc) {
 		sectors.Add(sc);

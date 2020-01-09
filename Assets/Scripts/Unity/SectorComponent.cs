@@ -40,6 +40,16 @@ public class SectorComponent : MonoBehaviour {
 			return false;
 		}
 	}
+	public byte SectorPriority {
+		get {
+			if (sector != null) {
+				return sector.sectorPriority;
+			} else if (sectorROM != null) {
+				return sectorROM.sectorPriority;
+			}
+			return 0;
+		}
+	}
 
 	private BoundingVolume bounds;
 	public BoundingVolume SectorBorder {
