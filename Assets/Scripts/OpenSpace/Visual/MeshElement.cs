@@ -39,6 +39,8 @@ namespace OpenSpace.Visual {
         public Pointer off_disconnected_triangles;
 		public Pointer off_mapping_lightmap;
 		public ushort num_mapping_lightmap;
+		public ushort parallelBox;
+		public byte isVisibleInPortal;
 
         public int[] mapping_vertices = null;
         public int[][] mapping_uvs = null;
@@ -460,13 +462,14 @@ namespace OpenSpace.Visual {
 				if (Settings.s.game != Settings.Game.TTSE) {
 					sm.off_vertex_indices = Pointer.Read(reader);
 					sm.num_vertex_indices = reader.ReadUInt16();
-					reader.ReadInt16();
+					sm.parallelBox = reader.ReadUInt16();
 					reader.ReadUInt32();
 				}
 			}
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 				if (Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) {
-					reader.ReadUInt16();
+					sm.isVisibleInPortal = reader.ReadByte();
+					reader.ReadByte();
 					sm.num_mapping_entries = reader.ReadUInt16(); // num_shorts
 					sm.off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
 					sm.off_mapping_uvs = Pointer.Read(reader); // shorts_offset2 (2nd array of size num_shorts, max: num_weights)
@@ -483,6 +486,7 @@ namespace OpenSpace.Visual {
 					sm.num_disconnected_triangles = 0;
 					sm.off_connected_vertices = null;
 					sm.off_disconnected_triangles = null;
+					sm.isVisibleInPortal = 0;
 				}
             } else {
                 // Defaults for Rayman 2

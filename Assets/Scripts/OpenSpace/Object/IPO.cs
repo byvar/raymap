@@ -12,6 +12,7 @@ namespace OpenSpace.Object {
         public Pointer offset;
         public Pointer off_data;
         public Pointer off_radiosity;
+		public Pointer off_portalCamera;
         public PhysicalObject data;
         public string name = "";
         private GameObject gao;
@@ -44,7 +45,7 @@ namespace OpenSpace.Object {
 			ipo.name = "IPO @ " + offset;
 			if (Settings.s.engineVersion >= Settings.EngineVersion.R3) {
 				reader.ReadUInt32();
-				reader.ReadUInt32();
+				ipo.off_portalCamera = Pointer.Read(reader);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
@@ -63,6 +64,9 @@ namespace OpenSpace.Object {
 					ipo.data.Gao.transform.parent = ipo.Gao.transform;
 				}
 			});
+			/*Pointer.DoAt(ref reader, ipo.off_portalCamera, () => {
+				ipo.portalCamera = SuperObject.FromOffsetOrRead(reader, 
+			});*/
             /*if (ipo.data != null && ipo.data.visualSet.Count > 0) {
                 if (ipo.data.visualSet[0].obj is R3Mesh) {
                     GameObject meshGAO = ((R3Mesh)ipo.data.visualSet[0].obj).gao;

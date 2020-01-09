@@ -30,10 +30,12 @@ namespace OpenSpace.Object {
         [JsonIgnore]
         public SuperObject parent;
         public Pointer off_matrix;
-		public Pointer off_matrix2;
+		public Pointer off_staticMatrix;
+		public int globalMatrix;
         public Matrix matrix;
-		public Matrix matrix2;
+		public Matrix staticMatrix;
         public IEngineObject data;
+		public SuperObjectDrawFlags drawFlags;
         public SuperObjectFlags flags;
         public BoundingVolume boundingVolume;
 
@@ -77,9 +79,9 @@ namespace OpenSpace.Object {
             so.off_brother_prev = Pointer.Read(reader); // 18 - 1C
             so.off_parent = Pointer.Read(reader); // 1C - 20
             so.off_matrix = Pointer.Read(reader); // 0x20->0x24
-            so.off_matrix2 = Pointer.Read(reader); // other matrix
-            reader.ReadInt32(); // 0x28 -> 0x2C
-            reader.ReadInt32(); // 0x2C -> 0x30
+            so.off_staticMatrix = Pointer.Read(reader); // other matrix
+            so.globalMatrix = reader.ReadInt32(); // 0x28 -> 0x2C
+			so.drawFlags = SuperObjectDrawFlags.Read(reader);
             so.flags = SuperObjectFlags.Read(reader); // 0x30->0x34
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32();
             Pointer off_boundingVolume = Pointer.Read(reader);

@@ -31,7 +31,7 @@ namespace OpenSpace.Object.Properties {
             NoTransformMatrix = 1 << 2, // No scale, no rotation
             ZoomInsteadOfScale = 1 << 3, // Same scale coëfficient over all 3 axes
             BoundingBoxInsteadOfSphere = 1 << 4,
-            DisplayOnTop = 1 << 5, // displayed over all C - 0 ; non collisionnable
+            DisplayOnTop = 1 << 5, // displayed over all C - 0 ; non collisionnable. Superimposed
             NoRayTracing = 1 << 6,
             NoShadow = 1 << 7,
             SemiLookat = 1 << 8,
@@ -44,8 +44,8 @@ namespace OpenSpace.Object.Properties {
             InfluencedByMagnet = 1 << 15,
             Transparent = 1 << 16,
             NoLighting = 1 << 17,
-            Flag18 = 1 << 18,
-            Flag19 = 1 << 19,
+            SuperimposedClipping = 1 << 18,
+            OutlineMode = 1 << 19,
             Flag20 = 1 << 20,
             Flag21 = 1 << 21,
             Flag22 = 1 << 22,
