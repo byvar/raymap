@@ -348,7 +348,7 @@ namespace OpenSpace.Loader {
 				Pointer.Read(reader);
 			}
 			fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
-			print("Yay " + Pointer.Current(reader));
+			//print("Yay " + Pointer.Current(reader));
 			reader.ReadUInt16();
 			reader.ReadUInt16();
 			reader.ReadUInt32();

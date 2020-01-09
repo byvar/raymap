@@ -20,6 +20,7 @@ namespace OpenSpace.Object {
         public LinkedList<Sector> sectors_unk2;
 
         public byte isSectorVirtual;
+		public byte sectorPriority;
         public Pointer off_skyMaterial;
         public VisualMaterial skyMaterial;
 
@@ -159,12 +160,16 @@ namespace OpenSpace.Object {
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
 				reader.ReadUInt32();
-				s.isSectorVirtual = reader.ReadByte();
-				reader.ReadByte();
-				reader.ReadByte();
-				reader.ReadByte();
-
-				if (Settings.s.game != Settings.Game.R2Revolution) {
+				if (Settings.s.game == Settings.Game.R2Revolution || Settings.s.game == Settings.Game.LargoWinch) {
+					s.isSectorVirtual = reader.ReadByte();
+					reader.ReadByte();
+					s.sectorPriority = reader.ReadByte();
+					reader.ReadByte();
+				} else {
+					s.isSectorVirtual = reader.ReadByte();
+					reader.ReadByte();
+					reader.ReadByte();
+					s.sectorPriority = reader.ReadByte();
 					if (Settings.s.engineVersion <= Settings.EngineVersion.R2) {
 						s.off_skyMaterial = Pointer.Read(reader);
 						s.skyMaterial = VisualMaterial.FromOffsetOrRead(s.off_skyMaterial, reader);

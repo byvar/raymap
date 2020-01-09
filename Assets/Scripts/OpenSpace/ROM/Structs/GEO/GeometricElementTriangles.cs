@@ -105,6 +105,7 @@ namespace OpenSpace.ROM {
 				// Apply vertex colors
 				if (go.hasVertexColors != 0) {
 					mr.sharedMaterial.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
+					mr.sharedMaterial.SetVector("_DiffuseCoef", new Vector4(1,1,1,1));
 				}
 				return gao;
 			} else {

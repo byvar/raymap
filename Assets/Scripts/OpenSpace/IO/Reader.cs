@@ -172,7 +172,8 @@ namespace OpenSpace {
         }
 
         uint GetNextMask(uint currentMask) {
-            if (Settings.s.mode == Settings.Mode.Rayman2IOS) {
+			// 0x075BD924 = 123459876
+			if (Settings.s.mode == Settings.Mode.Rayman2IOS) {
                 return (uint)(16807 * ((currentMask ^ 0x75BD924u) % 0x1F31D) - 2836 * ((currentMask ^ 0x75BD924u) / 0x1F31D));
             } else {
                 return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));
@@ -189,7 +190,8 @@ namespace OpenSpace {
                     mask = 0x6AB5CC79; return 0;
                 case Settings.Encryption.CalculateInit:
                     uint currentMask = 0xFFFFFFFF;
-                    mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));
+					// 0x075BD924 = 123459876
+					mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));
                     if ((mask & 0x80000000) != 0) {
                         mask += 0x7FFFFFFF;
                         currentMask = mask;
