@@ -29,7 +29,7 @@ namespace OpenSpace.ROM {
 		public byte isSectorVirtual;
 		public byte byte2D;
 		public ushort word2E;
-		public byte byte30;
+		public byte sectorPriority;
 		public byte byte31;
 		public ushort word32;
 
@@ -58,7 +58,7 @@ namespace OpenSpace.ROM {
 			isSectorVirtual = reader.ReadByte();
 			byte2D = reader.ReadByte();
 			word2E = reader.ReadUInt16();
-			byte30 = reader.ReadByte();
+			sectorPriority = reader.ReadByte();
 			byte31 = reader.ReadByte();
 			word32 = reader.ReadUInt16();
 
@@ -76,7 +76,7 @@ namespace OpenSpace.ROM {
 		}
 
 		public SectorComponent GetGameObject(GameObject gao) {
-			gao.name += " - Sector @ " + Offset;
+			gao.name += " - Sector @ " + Offset; // + " - " + isSectorVirtual + " - " + byte2D + " - " + sectorPriority + " - " + byte31 + " - " + byte1E + " - " + byte1F;
 			SectorComponent sc = gao.AddComponent<SectorComponent>();
 			sc.sectorROM = this;
 			sc.sectorManager = MapLoader.Loader.controller.sectorManager;
