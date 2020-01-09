@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class GraphManager : MonoBehaviour {
 	public Controller controller;
-    bool loaded = false;
+    //bool loaded = false;
     public List<WaypointBehaviour> waypoints;
 	private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
@@ -109,6 +109,6 @@ public class GraphManager : MonoBehaviour {
 			wp.Init();
 		}
 		UpdateViewGraphs();
-		loaded = true;
+		//loaded = true;
 	}
 }

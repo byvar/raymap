@@ -347,39 +347,6 @@ namespace OpenSpace.Loader {
 					lh.hierarchyRoot.Value.GetGameObject();
 				}
 			}
-			yield break;
-
-			for (ushort i = 0; i < short.MaxValue; i++) {
-				// Only do it a few times because we're trying to load way more than there is,
-				// so it takes really long if we yield for everything
-				if (i % 256 == 0) {
-					loadingState = "Loading physical objects: " + (i + 1);
-					yield return null;
-				}
-				//GeometricObject mo = GetOrRead<GeometricObject>(reader, i);
-				/*ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
-				if (ot != null) {
-					GameObject gao = ot.GetGameObject();
-					gao.name = "[" + i + "]" + gao.name;
-				}*/
-				/*PhysicalObject po = GetOrRead<PhysicalObject>(reader, i);
-				if (po != null) {
-					GameObject gao = po.GetGameObject();
-					gao.name = "[" + i + "]" + gao.name;
-				}*/
-				/*SuperObject so = GetOrRead<SuperObject>(reader, i);
-				if (so != null) {
-					GameObject gao = so.GetGameObject();
-					gao.name = "[" + i + "]" + gao.name;
-				}
-				*/
-				/*LevelHeader lh = GetOrRead<LevelHeader>(reader, i);
-				if (lh != null) {
-					print(i);
-				}*/
-			}
-
-			yield return null;
 		}
 
 		public IEnumerator LoadAnims() {
