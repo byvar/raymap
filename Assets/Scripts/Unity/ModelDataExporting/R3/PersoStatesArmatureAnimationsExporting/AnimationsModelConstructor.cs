@@ -77,13 +77,6 @@ namespace Assets.Scripts.Unity.AnimationExporting
             return null;
         }
 
-        public void addAnimationFrameToAnimationClip(string animationClipName, int frameNumber,
-            PersoAnimationStatesDataManipulator persoAnimationStatesDataManipulator)
-        {
-            var animationFrameModel = persoAnimationStatesDataManipulator.deriveAnimationFrameModelOfNumber(frameNumber);
-            animationsModel.addAnimationFrameModelToAnimationClip(animationClipName, animationFrameModel);
-        }
-
         public AnimationsModel getAnimationsModel()
         {
             return animationsModel;

@@ -11,32 +11,31 @@ namespace Assets.Scripts.Unity.AnimationExporting.DataManipulation
 {
     public class PersoAnimationStatesDataManipulator
     {
-        private PersoBehaviourGeneralAnimationExportInterface persoBehaviourInterface;
+        private PersoGeneralAnimationExportInterface animationExportInterface;
 
         public PersoAnimationStatesDataManipulator(PersoBehaviour persoBehaviour)
         {
-            this.persoBehaviourInterface = new PersoBehaviourGeneralAnimationExportInterface(persoBehaviour);
+            this.animationExportInterface = new PersoGeneralAnimationExportInterface(persoBehaviour.perso.p3dData.family);
         }
 
         public IEnumerable<RaymapAnimationClipModelFacadeAccessor> IterateAnimationClips()
         {
-            persoBehaviourInterface.ResetAnimationState();
-            while (persoBehaviourInterface.IsValidAnimationClip())
+            while (animationExportInterface.AreAnimationClipsLeft())
             {
                 RaymapAnimationClipModelFacadeAccessor raymapAnimationClipModelFacadeAccessor = new RaymapAnimationClipModelFacadeAccessor();
-                while (persoBehaviourInterface.IsValidAnimationFrame())
+                while (animationExportInterface.AreAnimationFramesLeft())
                 {
                     AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy = 
-                        persoBehaviourInterface.DeriveAnimTreeWithChannelsDataHierarchyForGivenFrame(
-                            persoBehaviourInterface.GetCurrentFrameNumberForExport());
+                        animationExportInterface.DeriveAnimTreeWithChannelsDataHierarchyForGivenFrame(
+                            animationExportInterface.GetCurrentFrameNumberForExport());
                     RaymapAnimationKeyframeModelFacadeAccessor raymapAnimationKeyframeModelFacadeAccessor = 
                         new RaymapAnimationKeyframeModelFacadeAccessor(animTreeWithChannelsDataHierarchy);
                     raymapAnimationClipModelFacadeAccessor.AddKeyframe(raymapAnimationKeyframeModelFacadeAccessor,
                         raymapAnimationKeyframeModelFacadeAccessor.FrameNumber);
-                    persoBehaviourInterface.NextKeyframe();
+                    animationExportInterface.NextKeyframe();
                 }
                 yield return raymapAnimationClipModelFacadeAccessor;
-                persoBehaviourInterface.NextAnimationClip();
+                animationExportInterface.NextAnimationClip();
             }
         }
     }

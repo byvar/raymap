@@ -11,7 +11,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
     class AnimTreeWithChannelsDataHierarchyConstructor
     {
         public AnimTreeWithChannelsDataHierarchy ConstructFromGiven(
-            PersoBehaviourAnimDataManipulationInterface persoBehaviourInterface, 
+            AnimA3DGeneralDataManipulationInterface persoBehaviourInterface, 
             int animationFrameNumber)
         {
             AnimTreeWithChannelsDataHierarchyBuilder builder = new AnimTreeWithChannelsDataHierarchyBuilder();

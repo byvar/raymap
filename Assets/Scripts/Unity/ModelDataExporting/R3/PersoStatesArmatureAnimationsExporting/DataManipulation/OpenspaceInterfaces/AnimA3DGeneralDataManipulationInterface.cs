@@ -9,19 +9,17 @@ using UnityEngine;
 
 namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.PersoInterfaces
 {
-    class PersoBehaviourAnimDataManipulationInterface
+    class AnimA3DGeneralDataManipulationInterface
     {
-        private PersoBehaviour persoBehaviour;
+        private AnimA3DGeneral animA3DGeneral;
 
-        public PersoBehaviourAnimDataManipulationInterface(PersoBehaviour persoBehaviour)
+        public AnimA3DGeneralDataManipulationInterface(AnimA3DGeneral animA3DGeneral)
         {
-            this.persoBehaviour = persoBehaviour;
+            this.animA3DGeneral = animA3DGeneral;
         }
 
         public IEnumerable<AnimHierarchyWithChannelInfo> IterateAnimHierarchiesWithChannelInfosForGivenFrame(int animationFrameNumber)
         {
-            AnimA3DGeneral animA3DGeneral = persoBehaviour.a3d;
-
             for (int i = 0; i < animA3DGeneral.num_channels; i++)
             {
                 AnimChannel channel = animA3DGeneral.channels[animA3DGeneral.start_channels + i];
