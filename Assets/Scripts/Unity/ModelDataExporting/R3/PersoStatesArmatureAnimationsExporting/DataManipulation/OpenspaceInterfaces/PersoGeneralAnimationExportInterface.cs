@@ -25,12 +25,12 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
 
         public bool AreAnimationClipsLeft()
         {
-            return familyAnimationStatesHelper.AreValidPersoAnimationStatesLeft();
+            return familyAnimationStatesHelper.AreValidPersoAnimationStatesLeftIncludingCurrentOne();
         }
 
         public bool AreAnimationFramesLeft()
         {
-            return familyAnimationStatesHelper.AreKeyframesLeftForCurrentAnimationStateAfterFrameNumber(currentFrameNumber);
+            return familyAnimationStatesHelper.AreKeyframesLeftForCurrentAnimationStateStartingWithFrameNumber(currentFrameNumber);
         }
 
         public AnimTreeWithChannelsDataHierarchy DeriveAnimTreeWithChannelsDataHierarchyForGivenFrame(

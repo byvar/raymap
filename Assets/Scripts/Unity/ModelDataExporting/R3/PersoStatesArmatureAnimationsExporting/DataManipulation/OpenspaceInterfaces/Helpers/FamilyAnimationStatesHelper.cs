@@ -18,12 +18,12 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             this.family = family;
         }
 
-        public bool AreValidPersoAnimationStatesLeft()
+        public bool AreValidPersoAnimationStatesLeftIncludingCurrentOne()
         {
             throw new NotImplementedException();
         }
 
-        public bool AreKeyframesLeftForCurrentAnimationStateAfterFrameNumber(int currentFrameNumber)
+        public bool AreKeyframesLeftForCurrentAnimationStateStartingWithFrameNumber(int currentFrameNumber)
         {
             throw new NotImplementedException();
         }
