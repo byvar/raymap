@@ -39,6 +39,11 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             return animA3DGeneralForCurrentPersoAnimationState;
         }
 
+        public int GetCurrentPersoStateIndex()
+        {
+            return currentPersoAnimationStateIndex;
+        }
+
         public int GetStateAnimationNextKeyframeFrameNumberAfter(int currentFrameNumber)
         {
             return currentFrameNumber + 1;

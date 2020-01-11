@@ -28,6 +28,11 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
             return familyAnimationStatesHelper.AreValidPersoAnimationStatesLeftIncludingCurrentOne();
         }
 
+        public string GetCurrentAnimationClipName()
+        {
+            return "Animation " + familyAnimationStatesHelper.GetCurrentPersoStateIndex();
+        }
+
         internal void ResetAnimationState()
         {
             familyAnimationStatesHelper.SwitchToFirstAnimationState();

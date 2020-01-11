@@ -22,7 +22,8 @@ namespace Assets.Scripts.Unity.AnimationExporting.DataManipulation
         {
             while (animationExportInterface.AreAnimationClipsLeft())
             {
-                RaymapAnimationClipModelFacadeAccessor raymapAnimationClipModelFacadeAccessor = new RaymapAnimationClipModelFacadeAccessor();
+                RaymapAnimationClipModelFacadeAccessor raymapAnimationClipModelFacadeAccessor = 
+                    new RaymapAnimationClipModelFacadeAccessor(animationExportInterface.GetCurrentAnimationClipName());
                 animationExportInterface.ResetAnimationState();
                 while (animationExportInterface.AreAnimationFramesLeft())
                 {

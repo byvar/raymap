@@ -10,7 +10,12 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
     {
         Dictionary<int, RaymapAnimationKeyframeModelFacadeAccessor> keyframes = new Dictionary<int, RaymapAnimationKeyframeModelFacadeAccessor>();
 
-        public string Name { get; internal set; }
+        public string Name;
+
+        public RaymapAnimationClipModelFacadeAccessor(string Name)
+        {
+            this.Name = Name;
+        }
 
         public IEnumerable<RaymapAnimationKeyframeModelFacadeAccessor> IterateKeyframes()
         {
