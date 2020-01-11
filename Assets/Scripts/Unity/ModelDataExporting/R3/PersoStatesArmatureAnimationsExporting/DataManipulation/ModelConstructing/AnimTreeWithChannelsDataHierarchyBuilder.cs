@@ -12,6 +12,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
     class AnimTreeWithChannelsDataHierarchyBuilder
     {
         AnimTreeWithChannelsDataHierarchy result = new AnimTreeWithChannelsDataHierarchy();
+        HashSet<AnimHierarchyWithChannelInfo> nodesToBuildResultFrom = new HashSet<AnimHierarchyWithChannelInfo>();
 
         public AnimTreeWithChannelsDataHierarchyBuilder()
         {
@@ -29,16 +30,33 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
 
         public void AddAnimHierarchyWithChannelInfo(AnimHierarchyWithChannelInfo animHierarchy)
         {
-            result.AddNode(
-                animHierarchy.ParentChannelName,
-                animHierarchy.ChannelName,
-                new Vector3(0.0f, 0.0f, 0.0f),
-                new Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
-                new Vector3(1.0f, 1.0f, 1.0f),
-                animHierarchy.LocalPosition,
-                animHierarchy.LocalRotation,
-                animHierarchy.LocalScale
-            );
+            animHierarchy.ParentChannelName = animHierarchy.ParentChannelName != null ? animHierarchy.ParentChannelName : "ROOT_CHANNEL";
+            nodesToBuildResultFrom.Add(animHierarchy);
+        }
+
+        private void BuildTreeWithProperNodesPuttingOrder()
+        {       
+            while (nodesToBuildResultFrom.Count != 0)
+            {
+                foreach (var node in nodesToBuildResultFrom)
+                {
+                    if (result.Contains(node.ParentChannelName))
+                    {
+                        result.AddNode(
+                            node.ParentChannelName,
+                            node.ChannelName,
+                            new Vector3(0.0f, 0.0f, 0.0f),
+                            new Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                            new Vector3(1.0f, 1.0f, 1.0f),
+                            node.LocalPosition,
+                            node.LocalRotation,
+                            node.LocalScale
+                        );
+                        nodesToBuildResultFrom.Remove(node);
+                        break;
+                    }
+                }
+            }
         }
 
         public AnimTreeWithChannelsDataHierarchy Build()

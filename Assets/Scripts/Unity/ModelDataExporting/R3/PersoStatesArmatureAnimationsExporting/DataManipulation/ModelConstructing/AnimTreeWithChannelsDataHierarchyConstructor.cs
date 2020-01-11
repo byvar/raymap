@@ -11,12 +11,12 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
     class AnimTreeWithChannelsDataHierarchyConstructor
     {
         public AnimTreeWithChannelsDataHierarchy ConstructFromGiven(
-            AnimA3DGeneralDataManipulationInterface persoBehaviourInterface, 
+            AnimA3DGeneralDataManipulationInterface animaA3DGeneralDataManipulator, 
             int animationFrameNumber)
         {
             AnimTreeWithChannelsDataHierarchyBuilder builder = new AnimTreeWithChannelsDataHierarchyBuilder();
             foreach (AnimHierarchyWithChannelInfo animHierarchyWithChannelInfo in 
-                persoBehaviourInterface.IterateAnimHierarchiesWithChannelInfosForGivenFrame(animationFrameNumber))
+                animaA3DGeneralDataManipulator.IterateAnimHierarchiesWithChannelInfosForGivenFrame(animationFrameNumber))
             {
                 builder.AddAnimHierarchyWithChannelInfo(animHierarchyWithChannelInfo);
             }

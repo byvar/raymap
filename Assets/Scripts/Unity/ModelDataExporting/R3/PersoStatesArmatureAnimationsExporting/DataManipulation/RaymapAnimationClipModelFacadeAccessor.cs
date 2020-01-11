@@ -8,7 +8,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
 {
     public class RaymapAnimationClipModelFacadeAccessor
     {
-        Dictionary<int, RaymapAnimationKeyframeModelFacadeAccessor> keyframes;
+        Dictionary<int, RaymapAnimationKeyframeModelFacadeAccessor> keyframes = new Dictionary<int, RaymapAnimationKeyframeModelFacadeAccessor>();
 
         public string Name { get; internal set; }
 
@@ -20,9 +20,9 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
             }
         }
 
-        internal void AddKeyframe(RaymapAnimationKeyframeModelFacadeAccessor raymapAnimationKeyframeModelFacadeAccessor, object frameNumber)
+        internal void AddKeyframe(RaymapAnimationKeyframeModelFacadeAccessor raymapAnimationKeyframeModelFacadeAccessor, int frameNumber)
         {
-            throw new NotImplementedException();
+            keyframes.Add(frameNumber, raymapAnimationKeyframeModelFacadeAccessor);
         }
     }
 }

@@ -12,16 +12,18 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
     {
         private AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy;
 
-        public RaymapAnimationKeyframeModelFacadeAccessor(AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy)
+        public RaymapAnimationKeyframeModelFacadeAccessor(AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy,
+            int FrameNumber)
         {
             this.animTreeWithChannelsDataHierarchy = animTreeWithChannelsDataHierarchy;
+            this.FrameNumber = FrameNumber;
         }
 
-        public object FrameNumber { get; internal set; }
+        public int FrameNumber;
 
-        internal AnimationFrameModel GetAnimationFrameModel()
+        public AnimationFrameModel GetAnimationFrameModel()
         {
-            throw new NotImplementedException();
+            return animTreeWithChannelsDataHierarchy.ToAnimationFrameModel();
         }
     }
 }

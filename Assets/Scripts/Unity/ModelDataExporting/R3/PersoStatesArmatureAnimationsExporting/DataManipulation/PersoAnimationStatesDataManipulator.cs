@@ -23,13 +23,15 @@ namespace Assets.Scripts.Unity.AnimationExporting.DataManipulation
             while (animationExportInterface.AreAnimationClipsLeft())
             {
                 RaymapAnimationClipModelFacadeAccessor raymapAnimationClipModelFacadeAccessor = new RaymapAnimationClipModelFacadeAccessor();
+                animationExportInterface.ResetAnimationState();
                 while (animationExportInterface.AreAnimationFramesLeft())
                 {
                     AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy = 
                         animationExportInterface.DeriveAnimTreeWithChannelsDataHierarchyForGivenFrame(
                             animationExportInterface.GetCurrentFrameNumberForExport());
                     RaymapAnimationKeyframeModelFacadeAccessor raymapAnimationKeyframeModelFacadeAccessor = 
-                        new RaymapAnimationKeyframeModelFacadeAccessor(animTreeWithChannelsDataHierarchy);
+                        new RaymapAnimationKeyframeModelFacadeAccessor(animTreeWithChannelsDataHierarchy,
+                        animationExportInterface.GetCurrentFrameNumberForExport());
                     raymapAnimationClipModelFacadeAccessor.AddKeyframe(raymapAnimationKeyframeModelFacadeAccessor,
                         raymapAnimationKeyframeModelFacadeAccessor.FrameNumber);
                     animationExportInterface.NextKeyframe();
