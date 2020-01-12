@@ -20,10 +20,10 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
                 null,
                 "ROOT_CHANNEL",
                 new Vector3(0.0f, 0.0f, 0.0f),
-                new Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                new Quaternion(0.0f, 0.0f, 0.0f, 1.0f),
                 new Vector3(1.0f, 1.0f, 1.0f),
                 new Vector3(0.0f, 0.0f, 0.0f),
-                new Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                new Quaternion(0.0f, 0.0f, 0.0f, 1.0f),
                 new Vector3(1.0f, 1.0f, 1.0f)
             );
         }
@@ -46,7 +46,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
                             node.ParentChannelName,
                             node.ChannelName,
                             new Vector3(0.0f, 0.0f, 0.0f),
-                            new Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                            new Quaternion(0.0f, 0.0f, 0.0f, 1.0f),
                             new Vector3(1.0f, 1.0f, 1.0f),
                             node.LocalPosition,
                             node.LocalRotation,
