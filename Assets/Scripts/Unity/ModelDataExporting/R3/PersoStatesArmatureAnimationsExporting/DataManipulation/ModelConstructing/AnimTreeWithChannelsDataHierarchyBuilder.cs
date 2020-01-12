@@ -61,6 +61,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
 
         public AnimTreeWithChannelsDataHierarchy Build()
         {
+            BuildTreeWithProperNodesPuttingOrder();
             var absoluteSpatialGameChannelsHierarchyContextSimulator = new AbsoluteSpatialGameChannelsHierarchyContextSimulator();
             absoluteSpatialGameChannelsHierarchyContextSimulator.SimulateInSceneAndFillWithAbsoluteOffsets(result);
             return result;

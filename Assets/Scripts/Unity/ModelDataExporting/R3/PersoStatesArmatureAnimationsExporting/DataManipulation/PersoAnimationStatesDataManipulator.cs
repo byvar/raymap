@@ -20,11 +20,11 @@ namespace Assets.Scripts.Unity.AnimationExporting.DataManipulation
 
         public IEnumerable<RaymapAnimationClipModelFacadeAccessor> IterateAnimationClips()
         {
+            animationExportInterface.ResetAnimationState();
             while (animationExportInterface.AreAnimationClipsLeft())
             {
                 RaymapAnimationClipModelFacadeAccessor raymapAnimationClipModelFacadeAccessor = 
                     new RaymapAnimationClipModelFacadeAccessor(animationExportInterface.GetCurrentAnimationClipName());
-                animationExportInterface.ResetAnimationState();
                 while (animationExportInterface.AreAnimationFramesLeft())
                 {
                     AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy = 

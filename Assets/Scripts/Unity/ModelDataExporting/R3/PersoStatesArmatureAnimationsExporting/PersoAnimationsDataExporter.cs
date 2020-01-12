@@ -27,6 +27,7 @@ namespace Assets.Scripts.Unity
             AnimationsModel animationsModel = new AnimationsModel();
             foreach (var animationClip in persoAnimationStatesDataManipulator.IterateAnimationClips())
             {
+                Debug.Log("Animation Clip: " + animationClip.Name);
                 foreach (var animationKeyframe in animationClip.IterateKeyframes())
                 {
                     animationsModel.addAnimationFrameModelToAnimationClip(
