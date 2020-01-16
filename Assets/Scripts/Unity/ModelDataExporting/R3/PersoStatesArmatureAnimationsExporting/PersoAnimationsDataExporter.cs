@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Assets.Scripts.Unity.AnimationExporting;
-using Assets.Scripts.Unity.AnimationExporting.DataManipulation;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model;
 using OpenSpace;
 using OpenSpace.Object.Properties;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity
-{  
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting
+{
     public class PersoAnimationsDataExporter
     {
         private PersoAnimationStatesDataManipulator persoAnimationStatesDataManipulator;

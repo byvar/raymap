@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.AnimationExporting
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model
 {
     [Serializable]
     public class AnimationFrameModel
@@ -66,7 +66,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
             if (parentBoneName == null)
             {
                 nodes.Add(node);
-            } else
+            }
+            else
             {
                 addNode(parentBoneName, node);
             }

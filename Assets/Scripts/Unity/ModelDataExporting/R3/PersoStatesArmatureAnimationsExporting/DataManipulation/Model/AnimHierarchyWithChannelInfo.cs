@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model
 {
-    class AnimHierarchyWithChannelInfo
+    public class AnimHierarchyWithChannelInfo
     {
         public string ParentChannelName;
         public string ChannelName;

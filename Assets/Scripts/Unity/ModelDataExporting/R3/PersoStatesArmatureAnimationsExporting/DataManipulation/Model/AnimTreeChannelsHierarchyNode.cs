@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model
 {
     public class AnimTreeChannelsHierarchyNode
     {
@@ -65,7 +65,8 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
             {
                 children.Add(node);
                 return true;
-            } else
+            }
+            else
             {
                 foreach (var child in children)
                 {

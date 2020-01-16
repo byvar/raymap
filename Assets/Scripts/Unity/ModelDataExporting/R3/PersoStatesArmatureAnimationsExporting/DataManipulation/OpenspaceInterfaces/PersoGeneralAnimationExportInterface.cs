@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.ModelConstructing;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.PersoInterfaces;
-using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.PersoInterfaces.Helpers;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.ModelConstructing;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.OpenspaceInterfaces.Helpers;
 using OpenSpace.Animation.Component;
 using OpenSpace.Object.Properties;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.OpenspaceInterfaces
 {
     public class PersoGeneralAnimationExportInterface
     {
@@ -33,7 +32,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
             return "Animation " + familyAnimationStatesHelper.GetCurrentPersoStateIndex();
         }
 
-        internal void ResetAnimationState()
+        public void ResetAnimationState()
         {
             familyAnimationStatesHelper.SwitchToFirstAnimationState();
         }

@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model;
-using Assets.Scripts.Unity.ModelDataExporting.R3.AnimationExporting.DataManipulation.ModelConstructing;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.ModelConstructing
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.ModelConstructing
 {
-    class AnimTreeWithChannelsDataHierarchyBuilder
+    public class AnimTreeWithChannelsDataHierarchyBuilder
     {
         AnimTreeWithChannelsDataHierarchy result = new AnimTreeWithChannelsDataHierarchy();
         HashSet<AnimHierarchyWithChannelInfo> nodesToBuildResultFrom = new HashSet<AnimHierarchyWithChannelInfo>();
@@ -35,7 +34,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
         }
 
         private void BuildTreeWithProperNodesPuttingOrder()
-        {       
+        {
             while (nodesToBuildResultFrom.Count != 0)
             {
                 foreach (var node in nodesToBuildResultFrom)

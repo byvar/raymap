@@ -1,15 +1,14 @@
-﻿using Assets.Scripts.Unity.AnimationExporting;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model.AnimTreeWithChannelsDataHierarchy;
 
 namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.ModelConstructing
 {
-    class AnimTreeWithChannelsDataHierarchyToAnimationFrameModelConverter
+    public class AnimTreeWithChannelsDataHierarchyToAnimationFrameModelConverter
     {
         public static AnimationFrameModel Convert(AnimTreeWithChannelsDataHierarchy hierarchy)
         {

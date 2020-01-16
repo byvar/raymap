@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Assets.Scripts.Unity.AnimationExporting;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation
 {
     public class RaymapAnimationKeyframeModelFacadeAccessor
     {

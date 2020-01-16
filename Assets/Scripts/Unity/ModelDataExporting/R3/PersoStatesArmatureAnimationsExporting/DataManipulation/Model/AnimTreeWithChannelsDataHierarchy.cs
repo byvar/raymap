@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Assets.Scripts.Unity.AnimationExporting;
-using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.ModelConstructing;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model
 {
     public class AnimTreeWithChannelsDataHierarchy
     {
@@ -31,7 +29,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
         AnimTreeChannelsHierarchyNode root;
 
         public void AddNode(
-            string parentChannelName, 
+            string parentChannelName,
             string channelName,
             Vector3 absolutePosition,
             Quaternion absoluteRotation,
@@ -51,13 +49,15 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
                 );
             if (parentChannelName == null)
             {
-                root = node; 
-            } else
+                root = node;
+            }
+            else
             {
                 if (root.TraverseAndAddNode(parentChannelName, node))
                 {
                     return;
-                } else
+                }
+                else
                 {
                     throw new InvalidOperationException("Did not find parent channel of that name! " + channelName);
                 }

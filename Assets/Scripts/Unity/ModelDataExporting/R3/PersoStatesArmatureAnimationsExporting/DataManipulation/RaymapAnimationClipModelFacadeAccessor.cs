@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation
 {
     public class RaymapAnimationClipModelFacadeAccessor
     {

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
 using OpenSpace.Animation.Component;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.PersoInterfaces
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.OpenspaceInterfaces
 {
-    class AnimA3DGeneralDataManipulationInterface
+    public class AnimA3DGeneralDataManipulationInterface
     {
         private AnimA3DGeneral animA3DGeneral;
 
@@ -43,7 +43,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipul
                     localPosition,
                     localRotation,
                     localScale);
-                }                
+                }
             }
         }
 

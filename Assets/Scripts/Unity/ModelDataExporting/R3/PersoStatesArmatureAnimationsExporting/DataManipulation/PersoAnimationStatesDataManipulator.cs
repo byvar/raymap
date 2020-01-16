@@ -1,5 +1,5 @@
-﻿using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.OpenspaceInterfaces;
 using OpenSpace.Animation.Component;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.Unity.AnimationExporting.DataManipulation
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation
 {
     public class PersoAnimationStatesDataManipulator
     {
@@ -23,14 +23,14 @@ namespace Assets.Scripts.Unity.AnimationExporting.DataManipulation
             animationExportInterface.ResetAnimationState();
             while (animationExportInterface.AreAnimationClipsLeft())
             {
-                RaymapAnimationClipModelFacadeAccessor raymapAnimationClipModelFacadeAccessor = 
+                RaymapAnimationClipModelFacadeAccessor raymapAnimationClipModelFacadeAccessor =
                     new RaymapAnimationClipModelFacadeAccessor(animationExportInterface.GetCurrentAnimationClipName());
                 while (animationExportInterface.AreAnimationFramesLeft())
                 {
-                    AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy = 
+                    AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy =
                         animationExportInterface.DeriveAnimTreeWithChannelsDataHierarchyForGivenFrame(
                             animationExportInterface.GetCurrentFrameNumberForExport());
-                    RaymapAnimationKeyframeModelFacadeAccessor raymapAnimationKeyframeModelFacadeAccessor = 
+                    RaymapAnimationKeyframeModelFacadeAccessor raymapAnimationKeyframeModelFacadeAccessor =
                         new RaymapAnimationKeyframeModelFacadeAccessor(animTreeWithChannelsDataHierarchy,
                         animationExportInterface.GetCurrentFrameNumberForExport());
                     raymapAnimationClipModelFacadeAccessor.AddKeyframe(raymapAnimationKeyframeModelFacadeAccessor,

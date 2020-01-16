@@ -1,22 +1,22 @@
-﻿using System;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Assets.Scripts.Unity.ModelDataExporting.AnimationExporting.DataManipulation.Model;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.R3.AnimationExporting.DataManipulation.ModelConstructing
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.ModelConstructing
 {
     public class AbsoluteSpatialGameChannelsHierarchyContextSimulator
     {
         public void SimulateInSceneAndFillWithAbsoluteOffsets(
             AnimTreeWithChannelsDataHierarchy animTreeWithChannelsDataHierarchy)
         {
-            Dictionary<string, GameObject> gameObjectsHierarchyRepresentation = new Dictionary<string, GameObject>(); 
+            Dictionary<string, GameObject> gameObjectsHierarchyRepresentation = new Dictionary<string, GameObject>();
             foreach (var channel in animTreeWithChannelsDataHierarchy.IterateChannels())
             {
-               gameObjectsHierarchyRepresentation.Add(channel.Name, CreateChannelInSceneRepresentation(channel));
+                gameObjectsHierarchyRepresentation.Add(channel.Name, CreateChannelInSceneRepresentation(channel));
             }
 
             foreach (var parentChildPair in animTreeWithChannelsDataHierarchy.IterateParentChildPairs())
@@ -25,7 +25,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.AnimationExporting.DataMani
                 {
                     ParentChildTo(gameObjectsHierarchyRepresentation[parentChildPair.Child.Name],
                     gameObjectsHierarchyRepresentation[parentChildPair.Parent.Name]);
-                }                
+                }
             }
 
             foreach (var channel in animTreeWithChannelsDataHierarchy.IterateChannels())

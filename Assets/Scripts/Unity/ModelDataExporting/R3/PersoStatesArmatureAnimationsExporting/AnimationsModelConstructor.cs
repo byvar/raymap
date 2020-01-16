@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Unity.AnimationExporting.DataManipulation;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.AnimationExporting
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting
 {
-    class AnimationsModelConstructor
+    public class AnimationsModelConstructor
     {
         AnimationsModel animationsModel = new AnimationsModel();
 
@@ -48,12 +48,12 @@ namespace Assets.Scripts.Unity.AnimationExporting
                 child.gameObject.transform.localRotation.z,
                 child.gameObject.transform.lossyScale.x,
                 child.gameObject.transform.lossyScale.y,
-                child.gameObject.transform.lossyScale.z, 
+                child.gameObject.transform.lossyScale.z,
                 child.gameObject.transform.localScale.x,
                 child.gameObject.transform.localScale.y,
                 child.gameObject.transform.localScale.z,
                 channelBone != null);
-                traverseRecursivelyChildrenChannels(child.gameObject, animationFrameModel);               
+                traverseRecursivelyChildrenChannels(child.gameObject, animationFrameModel);
             }
             return animationFrameModel;
         }
@@ -69,7 +69,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
                 if (child.gameObject.name.StartsWith("Bone"))
                 {
                     return child.gameObject;
-                } else if (!child.gameObject.name.Contains("Invisible PO"))
+                }
+                else if (!child.gameObject.name.Contains("Invisible PO"))
                 {
                     return getChannelBone(child.gameObject);
                 }

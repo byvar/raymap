@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.Unity.AnimationExporting
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model
 {
     [Serializable]
     public class AnimationFrameModelNode
@@ -17,7 +17,7 @@ namespace Assets.Scripts.Unity.AnimationExporting
         public double scaleX, scaleY, scaleZ;
         public double localScaleX, localScaleY, localScaleZ;
         public bool hasBone;
-        
+
         public List<AnimationFrameModelNode> children = new List<AnimationFrameModelNode>();
 
         public AnimationFrameModelNode(string boneName,
@@ -59,7 +59,8 @@ namespace Assets.Scripts.Unity.AnimationExporting
             {
                 children.Add(node);
                 return true;
-            } else
+            }
+            else
             {
                 foreach (AnimationFrameModelNode child in children)
                 {

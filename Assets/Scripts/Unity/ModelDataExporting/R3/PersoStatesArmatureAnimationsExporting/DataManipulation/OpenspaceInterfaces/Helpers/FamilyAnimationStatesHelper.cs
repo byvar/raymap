@@ -7,9 +7,9 @@ using OpenSpace;
 using OpenSpace.Animation.Component;
 using OpenSpace.Object.Properties;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.PersoInterfaces.Helpers
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.OpenspaceInterfaces.Helpers
 {
-    class FamilyAnimationStatesHelper
+    public class FamilyAnimationStatesHelper
     {
         private Family family;
         private AnimA3DGeneral animA3DGeneralForCurrentPersoAnimationState;
@@ -96,7 +96,8 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             if (animationStateIndex >= family.states.Count)
             {
                 return false;
-            } else
+            }
+            else
             {
                 State state = family.states[animationStateIndex];
                 int animationIndex = state.anim_ref.anim_index;
@@ -109,7 +110,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
                 && loader.animationBanks[animationBankIndex].animations != null
                 && loader.animationBanks[animationBankIndex].animations.Length > animationIndex
                 && loader.animationBanks[animationBankIndex].animations[animationIndex] != null;
-            }            
+            }
         }
     }
 }
