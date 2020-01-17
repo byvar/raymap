@@ -585,7 +585,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
                 if (rules != null) {
                     MapLoader.Loader.print("Normal behaviours");
                     for (int i = 0; i < rules.Length; i++) {
-                        var scripts = rules[i].Value.scripts.Value.scripts;
+                        var scripts = rules[i].Value?.scripts?.Value?.scripts;
                         if (scripts != null) {
                             string combinedScript = "private IEnumerator Rule_" + i + "() {" + Environment.NewLine;
                             ruleStatesInitializer.Add("Rule_" + i);
@@ -601,7 +601,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
                 if (reflexes != null) {
                     MapLoader.Loader.print("Reflex behaviours");
                     for (int i = 0; i < reflexes.Length; i++) {
-                        var scripts = rules[i].Value.scripts.Value.scripts;
+                        var scripts = rules[i].Value?.scripts?.Value?.scripts;
                         if (scripts != null) {
                             string combinedScript = "private IEnumerator Reflex_" + i + "() {" + Environment.NewLine;
                             for (int j = 0; j < scripts.Length; j++) {
