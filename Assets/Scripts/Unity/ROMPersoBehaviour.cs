@@ -567,4 +567,70 @@ public class ROMPersoBehaviour : MonoBehaviour {
             }
         }*/
     }
+
+    public void PrintTranslatedScripts()
+    {
+        if (loaded && hasStates) {
+            if (perso.brain.Value != null
+                && perso.brain.Value.mind.Value != null) {
+                Intelligence intelligenceNormal = perso.brain.Value.mind.Value.intelligence.Value;
+                Intelligence intelligenceReflex = perso.brain.Value.mind.Value.reflex.Value;
+
+                List<string> ruleStatesInitializer = new List<string>();
+                List<string> reflexStatesInitializer = new List<string>();
+
+                var rules = intelligenceNormal.comports.Value.comports;
+                var reflexes = intelligenceReflex.comports.Value.comports;
+
+                if (rules != null) {
+                    MapLoader.Loader.print("Normal behaviours");
+                    for (int i = 0; i < rules.Length; i++) {
+                        var scripts = rules[i].Value.scripts.Value.scripts;
+                        if (scripts != null) {
+                            string combinedScript = "private IEnumerator Rule_" + i + "() {" + Environment.NewLine;
+                            ruleStatesInitializer.Add("Rule_" + i);
+                            for (int j = 0; j < scripts.Length; j++) {
+                                TranslatedROMScript ts = new TranslatedROMScript(scripts[j], perso);
+                                combinedScript += "// Script " + j + Environment.NewLine + ts.ToString() + Environment.NewLine;
+                            }
+                            combinedScript += "yield return null;" + Environment.NewLine + "}";
+                            MapLoader.Loader.print(combinedScript);
+                        }
+                    }
+                }
+                if (reflexes != null) {
+                    MapLoader.Loader.print("Reflex behaviours");
+                    for (int i = 0; i < reflexes.Length; i++) {
+                        var scripts = rules[i].Value.scripts.Value.scripts;
+                        if (scripts != null) {
+                            string combinedScript = "private IEnumerator Reflex_" + i + "() {" + Environment.NewLine;
+                            for (int j = 0; j < scripts.Length; j++) {
+                                reflexStatesInitializer.Add("Reflex_" + i);
+                                TranslatedROMScript ts = new TranslatedROMScript(scripts[j], perso);
+                                combinedScript += "// Script " + j + Environment.NewLine + ts.ToString() + Environment.NewLine;
+                            }
+                            combinedScript += "yield return null;" + Environment.NewLine + "}";
+                            MapLoader.Loader.print(combinedScript);
+                        }
+                    }
+                }
+                
+
+                // TODO: replace evalMacro calls by replacing regex "evalMacro\([a-zA-Z0-9_]*\.Macro\[([0-9]+)\]\)" to "yield return Macro_$1()"
+                // TODO: replace Proc_ChangeMyComport\([a-zA-Z0-9_]+\.Rule\[[0-9]+\]\[\"([^"]+)\"\]\)     with     sm.ChangeActiveRuleState("$1")
+                // TODO: replace Cond_IsValidObject\(([^\)]+)\)    with $1 != null
+
+                string startString = "protected override void Start() {" + Environment.NewLine + "base.Start();" + Environment.NewLine + Environment.NewLine;
+                startString += "// Rules" + Environment.NewLine;
+                ruleStatesInitializer.ForEach((s) => { startString += "sm.AddRuleState(State.Create(\"" + s + "\", " + s + "));" + Environment.NewLine; });
+                startString += Environment.NewLine + "// Reflexes " + Environment.NewLine;
+                reflexStatesInitializer.ForEach((s) => { startString += "sm.AddReflexState(State.Create(\"" + s + "\", " + s + "));" + Environment.NewLine; });
+                startString += Environment.NewLine + "sm.ChangeActiveRuleState(0);" + Environment.NewLine + "sm.ChangeActiveReflexState(0);" + Environment.NewLine + "}";
+
+                MapLoader.Loader.print(startString);
+                
+            }
+        }
+    }
+
 }

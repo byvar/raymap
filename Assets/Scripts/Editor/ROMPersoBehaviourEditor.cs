@@ -51,10 +51,10 @@ public class ROMPersoBehaviourEditor : Editor {
         GUI.enabled = true;
         GUILayout.EndHorizontal();
 
-        /*if (GUILayout.Button("Print scripts")) pb.PrintScripts();
+        //if (GUILayout.Button("Print scripts")) pb.PrintScripts();
         if (GUILayout.Button("Print translated scripts")) pb.PrintTranslatedScripts();
 
-        GUILayout.BeginHorizontal();
+        /*GUILayout.BeginHorizontal();
         if (GUILayout.Button("Print DsgVar")) pb.PrintDsgVar();
         if (GUILayout.Button("Print DsgVar from Mind->DsgMem")) pb.PrintDsgVarFromMindMem();
         GUILayout.EndHorizontal();*/
