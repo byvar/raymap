@@ -75,7 +75,7 @@ public class PortalBehaviour : MonoBehaviour {
 			reflectionCamera.transform.eulerAngles = new Vector3(0, euler.y, euler.z);
 			try {
 				reflectionCamera.Render();
-			} catch (Exception ex) {
+			} catch {
 			}
 			reflectionCamera.transform.position = oldpos;
 			GL.invertCulling = false;
@@ -137,7 +137,7 @@ public class PortalBehaviour : MonoBehaviour {
 
 			try {
 				reflectionCamera.Render();
-			} catch (Exception ex) {
+			} catch {
 			}
 
 			//Material[] materials = rend.sharedMaterials;
