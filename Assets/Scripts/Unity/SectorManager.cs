@@ -60,28 +60,36 @@ public class SectorManager : MonoBehaviour {
 
 	public void UpdateSectorLoading(Vector3 camPos) {
 		if (Settings.s.engineVersion < Settings.EngineVersion.R2 || Settings.s.game == Settings.Game.LargoWinch) {
-			activeSector = GetActiveSectorAtPoint(camPos, activeSector);
+			activeSector = GetActiveSectorOld(camPos, activeSector);
 		} else {
-			activeSector = GetActiveSector(camPos);
+			activeSector = GetActiveSector(camPos, blockVirtual: true);
+		}
+		for (int i = 0; i < sectors.Count; i++) {
+			SectorComponent s = sectors[i];
+			s.Loaded = false;
+			s.Active = false;
+		}
+		if (activeSector == null) {
 			for (int i = 0; i < sectors.Count; i++) {
-				SectorComponent s = sectors[i];
-				s.Loaded = false;
-				s.Active = false;
+				sectors[i].Loaded = true;
 			}
-			if (activeSector == null) {
-				for (int i = 0; i < sectors.Count; i++) {
-					sectors[i].Loaded = true;
-				}
-			} else {
-				activeSector.Loaded = true;
-				for (int j = 0; j < activeSector.neighbors.Length; j++) {
-					activeSector.neighbors[j].Loaded = true;
-				}
+		} else {
+			activeSector.Loaded = true;
+			for (int j = 0; j < activeSector.neighbors.Length; j++) {
+				activeSector.neighbors[j].Loaded = true;
 			}
 		}
 	}
 
-    public SectorComponent GetActiveSectorAtPoint(Vector3 point, SectorComponent currentActiveSector = null, bool allowVirtual = false) {
+	public SectorComponent GetActiveSectorWrapper(Vector3 point) {
+		if (Settings.s.engineVersion < Settings.EngineVersion.R2 || Settings.s.game == Settings.Game.LargoWinch) {
+			return GetActiveSectorOld(point);
+		} else {
+			return GetActiveSector(point);
+		}
+	}
+
+	private SectorComponent GetActiveSectorOld(Vector3 point, SectorComponent currentActiveSector = null, bool allowVirtual = false) {
         if (currentActiveSector!= null && currentActiveSector.sectorTransitions != null && currentActiveSector.sectorTransitions.Length > 0) {
 			// We shouldn't really test the sector transitions here, but a lot of "absorbing" sectors have no transitions
 			if (currentActiveSector.SectorBorder != null ? currentActiveSector.SectorBorder.ContainsPoint(point) : false) {
@@ -97,8 +105,8 @@ public class SectorManager : MonoBehaviour {
 		if(currentActiveSector != null && currentActiveSector.sectorTransitions != null) {
 			for (int i = 0; i < currentActiveSector.sectorTransitions.Length; i++) {
 				SectorComponent s = currentActiveSector.sectorTransitions[i];
-				s.Active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
-				if (s.Active) {
+				bool active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
+				if (active) {
 					activeSector = s;
 					break;
 				}
@@ -107,28 +115,18 @@ public class SectorManager : MonoBehaviour {
 		if (activeSector == null) {
 			for (int i = 0; i < sectors.Count; i++) {
 				SectorComponent s = sectors[i];
-				s.Active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
-				if (s.Active) {
+				bool active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
+				if (active) {
 					activeSector = s;
 					break;
 				}
-			}
-		}
-        if (activeSector == null) {
-            for (int i = 0; i < sectors.Count; i++) {
-                sectors[i].Loaded = true;
-            }
-        } else {
-            activeSector.Loaded = true;
-			for (int j = 0; j < activeSector.neighbors.Length; j++) {
-				activeSector.neighbors[j].Loaded = true;
 			}
 		}
 
         return activeSector;
     }
 
-	public SectorComponent GetActiveSector(Vector3 point) {
+	private SectorComponent GetActiveSector(Vector3 point, bool blockVirtual = false) {
 		float smallestDistanceToSector = float.MaxValue;
 		float smallestDistanceToSectorVirtual = float.MaxValue;
 		byte activeSectorPriority = 0;
@@ -155,7 +153,7 @@ public class SectorManager : MonoBehaviour {
 		}
 		if (activeSector != null) {
 			return activeSector;
-		} else if (activeSectorVirtual != null) {
+		} else if (activeSectorVirtual != null && !blockVirtual) {
 			return activeSectorVirtual;
 		} else {
 			return sectors.Last(); // Univers
@@ -184,11 +182,13 @@ public class SectorManager : MonoBehaviour {
     }
 
 	public void InitLights() {
-		for (int i = 0; i < sectors.Count; i++) {
+		/*for (int i = 0; i < sectors.Count; i++) {
 			SectorComponent sc = sectors[i];
 			ApplySectorLighting(sc, sc.Gao, LightInfo.ObjectLightedFlag.Environment);
-		}
+		}*/
 		loaded = true;
+		RecalculateSectorLighting();
+		//loaded = true;
 	}
 
     public void RecalculateSectorLighting() {
@@ -220,13 +220,13 @@ public class SectorManager : MonoBehaviour {
 				List<Renderer> rs = gao.GetComponents<Renderer>().ToList();
 				foreach (Renderer r in rs) {
 					if (r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend")) {
-						r.sharedMaterial.SetFloat("_DisableLightingLocal", 1);
+						r.material.SetFloat("_DisableLightingLocal", 1);
 					}
 				}
 				rs = gao.GetComponentsInChildren<Renderer>(true).ToList();
 				foreach (Renderer r in rs) {
 					if (r.sharedMaterial.shader.name.Contains("Gouraud") || r.sharedMaterial.shader.name.Contains("Texture Blend")) {
-						r.sharedMaterial.SetFloat("_DisableLightingLocal", 1);
+						r.material.SetFloat("_DisableLightingLocal", 1);
 					}
 				}
 			}

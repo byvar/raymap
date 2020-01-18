@@ -18,9 +18,9 @@ TagManager:
   - Visual
   - Collide
   - SuperObject
-  - 
-  - 
-  - 
+  - Mirror
+  - VisualNotInMirror
+  - VisualOnlyInMirror
   - 
   - 
   - 

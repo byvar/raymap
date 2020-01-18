@@ -71,6 +71,7 @@ public class GraphManager : MonoBehaviour {
 			}
 			if (graphRoot == null && l.graphs.Count > 0) {
 				graphRoot = new GameObject("Graphs");
+				graphRoot.transform.SetParent(transform);
 				graphRoot.SetActive(false);
 			}
 			foreach (Graph graph in l.graphs) {

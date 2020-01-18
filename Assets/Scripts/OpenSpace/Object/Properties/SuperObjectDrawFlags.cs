@@ -33,15 +33,15 @@ namespace OpenSpace.Object.Properties {
             Flag20 = 1 << 20,
             Flag21 = 1 << 21,
             Flag22 = 1 << 22,
-            Flag23 = 1 << 23,
-            Flag24 = 1 << 24,
+            DrawOnlyInMirror = 1 << 23,
+            DontDrawInMirror = 1 << 24,
             Flag25 = 1 << 25,
             Flag26 = 1 << 26,
             Flag27 = 1 << 27,
             Mirror = 1 << 28,
             Flag29 = 1 << 29,
             Flag30 = 1 << 30,
-            Flag31 = 1 << 31,
+            SinusEffect = 1 << 31,
         }
 
         public static SuperObjectDrawFlags Read(Reader reader) {

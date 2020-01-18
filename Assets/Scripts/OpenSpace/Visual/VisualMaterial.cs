@@ -78,7 +78,9 @@ namespace OpenSpace.Visual {
                 //bool backfaceCulling = ((flags & flags_backfaceCulling) == flags_backfaceCulling); // example: 4DDC43FF
                 Material baseMaterial = l.baseMaterial;
                 bool transparent = IsTransparent || ((hints & Hint.Transparent) == Hint.Transparent) || textures.Count == 0;
-                if (textures.Where(t => (t.properties & 0x20) != 0).Count() > 0 || IsLight || (textures.Count > 0 && textures[0].textureOp == 1)) {
+                if (textures.Where(t => ((t.properties & 0x20) != 0 && (t.properties & 0x80000000) == 0)).Count() > 0
+					|| IsLight) {
+					//|| (textures.Count > 0 && textures[0].textureOp == 1)) {
                     baseMaterial = l.baseLightMaterial;
                 } else if (transparent) {
                     baseMaterial = l.baseTransparentMaterial;
@@ -156,7 +158,7 @@ namespace OpenSpace.Visual {
         public bool IsLight {
             get {
 				//if (R3Loader.Loader.mode == R3Loader.Mode.Rayman2PC) R3Loader.Loader.print("Flags: " + flags + "Transparent flag: " + flags_isTransparent);
-				if ((flags & Flags_IsTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent
+				/*if ((flags & Flags_IsTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent
 					|| Settings.s.engineVersion < Settings.EngineVersion.R3
 					|| Settings.s.game == Settings.Game.LargoWinch) {
 					if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
@@ -166,8 +168,12 @@ namespace OpenSpace.Visual {
 				} else {
 					if (Settings.s.game == Settings.Game.LargoWinch) return false;
 					return true;
+				}*/
+				if (textures.Count > 0 && textures[0] != null && textures[0].texture != null) {
+					return textures[0].texture.IsLight;
 				}
-            }
+				return false;
+			}
         }
 
         public bool IsPixelShaded {

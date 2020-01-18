@@ -22,6 +22,7 @@ public class Controller : MonoBehaviour {
 	public SectorManager sectorManager;
 	public LightManager lightManager;
 	public GraphManager graphManager;
+	public PortalManager portalManager;
 	public LoadingScreen loadingScreen;
 	public WebCommunicator communicator;
 
@@ -185,6 +186,10 @@ public class Controller : MonoBehaviour {
 		detailedState = "Initializing camera";
 		yield return null;
 		InitCamera();
+		detailedState = "Initializing portals";
+		yield return null;
+		portalManager.Init();
+
 		/*if (viewCollision)*/
 		UpdateViewCollision();
 		if (loader.cinematicsManager != null) {
@@ -298,7 +303,7 @@ public class Controller : MonoBehaviour {
 					if (p.sectInfo != null && p.sectInfo.off_sector != null) {
 						unityBehaviour.sector = sectorManager.sectors.FirstOrDefault(s => s.sector != null && s.sector.SuperObject.offset == p.sectInfo.off_sector);
 					} else {
-						SectorComponent sc = sectorManager.GetActiveSectorAtPoint(p.Gao.transform.position);
+						SectorComponent sc = sectorManager.GetActiveSectorWrapper(p.Gao.transform.position);
 						unityBehaviour.sector = sc;
 					}
 				} else unityBehaviour.sector = null;
@@ -423,7 +428,7 @@ public class Controller : MonoBehaviour {
 						}
 					}*/
 					if (!unityBehaviour.IsAlways) {
-						SectorComponent sc = sectorManager.GetActiveSectorAtPoint(unityBehaviour.transform.position);
+						SectorComponent sc = sectorManager.GetActiveSectorWrapper(unityBehaviour.transform.position);
 						unityBehaviour.sector = sc;
 					} else unityBehaviour.sector = null;
 					/*Moddable mod = null;
@@ -452,7 +457,7 @@ public class Controller : MonoBehaviour {
 						unityBehaviour.transform.rotation = Quaternion.identity;
 						unityBehaviour.transform.localScale = Vector3.one;
 						if (!unityBehaviour.IsAlways) {
-							SectorComponent sc = sectorManager.GetActiveSectorAtPoint(unityBehaviour.transform.position);
+							SectorComponent sc = sectorManager.GetActiveSectorWrapper(unityBehaviour.transform.position);
 							unityBehaviour.sector = sc;
 						} else unityBehaviour.sector = null;
 						unityBehaviour.Init();

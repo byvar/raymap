@@ -72,7 +72,7 @@ public class SectorComponent : MonoBehaviour {
 							boxCenter = vectors[0] + (vectors[1] - vectors[0]) * 0.5f
 						};
 
-						if (bounds != null) {
+						/*if (bounds != null) {
 							if (bounds.type == BoundingVolume.Type.Box) {
 								BoxCollider collider = gameObject.AddComponent<BoxCollider>();
 
@@ -80,11 +80,7 @@ public class SectorComponent : MonoBehaviour {
 								collider.center -= transform.position;
 								collider.size = bounds.Size;
 							}
-							/*GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-							go.name = name + " - Mesh";
-							go.transform.position = bounds.Center;
-							go.transform.localScale = bounds.Size;*/
-						}
+						}*/
 					}
 				}
 			}

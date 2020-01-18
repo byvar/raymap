@@ -53,10 +53,10 @@ float _DisableFog = 0;
 
 struct v2f {
 	float4 pos : SV_POSITION;
-	float4 uv1 : TEXCOORD0; // The first UV coordinate.
-	float4 uv2 : TEXCOORD1; // The second UV coordinate.
-	float4 uv3 : TEXCOORD2; // The second UV coordinate.
-	float4 uv4 : TEXCOORD3; // The second UV coordinate.
+	float4 uv1 : TEXCOORD0; // The 1st UV coordinate.
+	float4 uv2 : TEXCOORD1; // The 2nd UV coordinate.
+	float4 uv3 : TEXCOORD2; // The 3rd UV coordinate.
+	float4 uv4 : TEXCOORD3; // The 4th UV coordinate.
 	float4 diffuseColor : TEXCOORD4;
 	float3 normal : TEXCOORD5;
 	float3 multipliedPosition : TEXCOORD6;
@@ -208,7 +208,7 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_TRANSFER_INSTANCE_ID(v, o);
-	o.uv1 = float4(TRANSFORM_TEX(TransformUV( v.texcoord.xy, _Tex0Params, _Tex0Params2), _Tex0),  v.texcoord.z, v.texcoord.w);
+	o.uv1 = float4(TRANSFORM_TEX(TransformUV( v.texcoord.xy, _Tex0Params, _Tex0Params2), _Tex0),  v.texcoord.z,  v.texcoord.w);
 	o.uv2 = float4(TRANSFORM_TEX(TransformUV(v.texcoord1.xy, _Tex1Params, _Tex1Params2), _Tex1), v.texcoord1.z, v.texcoord1.w);
 	o.uv3 = float4(TRANSFORM_TEX(TransformUV(v.texcoord2.xy, _Tex2Params, _Tex2Params2), _Tex2), v.texcoord2.z, v.texcoord2.w);
 	o.uv4 = float4(TRANSFORM_TEX(TransformUV(v.texcoord3.xy, _Tex3Params, _Tex3Params2), _Tex3), v.texcoord3.z, v.texcoord3.w);
@@ -261,37 +261,73 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 		//o.diffuseColor = v.texcoord2; // RGBA, so both need to be vector4
 		o.diffuseColor = _DiffuseCoef * v.texcoord2; // RGBA, so both need to be vector4
 	}
+	// Process mirror or portal, this weird construction is so that it's faster
+	if (_NumTextures > 0) {
+		if (_NumTextures == 1) {
+			if (_Tex0Params.z > 0) o.uv1 = ComputeScreenPos(o.pos);
+		} else if (_NumTextures == 2) {
+			if (_Tex1Params.z > 0) o.uv2 = ComputeScreenPos(o.pos);
+		} else if (_NumTextures == 3) {
+			if (_Tex2Params.z > 0) o.uv3 = ComputeScreenPos(o.pos);
+		} else if (_NumTextures == 4) {
+			if (_Tex3Params.z > 0) o.uv4 = ComputeScreenPos(o.pos);
+		}
+	}
 	if (_SectorFog.w != 0) o.fogViewPos = UnityObjectToViewPos(v.vertex).xyz;
 	return o;
 }
 
 float4 TextureOp(float4 color_in, float4 diffuseColor, sampler2D tex, float4 uv, float4 tex_params, float4 tex_params_2, float index) {
-	float4 texColor = tex2D(tex, uv.xy);
 	//if (tex_params.w == 1 && index > 0) return color_in; // Mirrors are not supported yet
+	if (tex_params.z > 0) { // mirror / portal
+		if (tex_params.z == 1) { // mirror
+			float4 reflColor = tex2Dproj(tex, UNITY_PROJ_COORD(uv));
+			return color_in + diffuseColor * float4(reflColor.xyz, 1);
+		} else { // portal
+			float4 reflColor = tex2Dproj(tex, UNITY_PROJ_COORD(uv));
+			return color_in + diffuseColor * float4(reflColor.xyz, 1);
+		}
+	}
+	float4 texColor = tex2D(tex, uv.xy);
 	if (tex_params.x == 1 && index > 0) {
 		// Additive
+
+		//return (min(color_in + texColor, float4(1, 1, 1, 1)) * uv.z + color_in * (1.0 - uv.z));
 		return color_in + float4(texColor.xyz * texColor.w * uv.z, 0);
-	} /*else if (tex_params.w == 8888 && index > 0) {
-		float alpha = (diffuseColor.w * texColor.w * uv.z);
-		return color_in + float4(diffuseColor.xyz * texColor.xyz * alpha, alpha);
-	}*/
-	/*else if (tex_params.x == 3) {
+	/*} else if (tex_params.x == 1) {
+		return (min(color_in + texColor, float4(1,1,1,1)) * uv.z + color_in * (1.0 - uv.z));*/
+	} else if (tex_params.x == 2) {
+		// Opaque
+		/*if (index > 0) {
+			return color_in -texColor * uv.z;
+		} else {
+			return lerp(color_in, diffuseColor * texColor, uv.z);
+		}*/
+		return lerp(color_in, diffuseColor * texColor, uv.z);
+		//return color_in + texColor * diffuseColor;
+		//return float4(lerp(color_in.xyz, ))
+		//return color_in + float4(texColor.xyz, texColor.w * uv.z);
+		//return lerp(color_in, float4(diffuseColor.xyz * texColor.xyz, texColor.w), uv.z * texColor.w);
+	} else if (tex_params.x == 3) {
 		// Transparent
-		return lerp(color_in, diffuseColor * float4(texColor.xyz, 1), uv.z);
-	}*/ else if(tex_params.x != 50 && tex_params.x != 51 && tex_params.x != 52) {
+		//return lerp(color_in, diffuseColor * texColor, uv.z);
+		return lerp(color_in, diffuseColor * float4(texColor.xyz, 1), uv.z * texColor.w);
+	} else if (tex_params.x == 4) {
+		// Multiply
+		return color_in * float4(texColor.xyz * texColor.w * uv.z, 1);
+	} else if (tex_params.x == 5) {
+		// Should be additive, but let's just lerp
+		return lerp(color_in, diffuseColor * texColor, uv.z);
+	} else if (tex_params.x == 6) {
+		// Lightmap
+		return color_in + float4(texColor.xyz, 0);
+	} else if (tex_params.x != 50 && tex_params.x != 51 && tex_params.x != 52) {
 		return lerp(color_in, diffuseColor * texColor, uv.z);
 		//color_out.a = color_out.a = color_out.a * i.diffuseColor.w;
 		//return diffuseColor * color_out;
 	} else {
 		// Lightmap (custom)
 		return color_in + float4(texColor.xyz, 0);
-		/*if (tex_params.x == 50) {
-			return color_in + float4(texColor.x, 0, 0, 0);
-		} else if (tex_params.x == 51) {
-			return color_in + float4(0, texColor.y, 0, 0);
-		} else {
-			return color_in + float4(0, 0, texColor.z, 0);
-		}*/
 	}
 }
 
@@ -333,6 +369,10 @@ float4 process_frag(v2f i, float clipAlpha, float isAdd) : SV_TARGET {
 			}
 		}
 	}
+	/*float maxColor = max(max(max(c.x, c.y), c.z), c.w);
+	if (maxColor > 1.0) {
+		c = c / maxColor;
+	}*/
 
 	if (clipAlpha < 0) {
 		clip(clipAlpha * (c.a - 1.0));
