@@ -2,6 +2,7 @@
 using OpenSpace.Loader;
 using OpenSpace.ROM.RSP;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -23,13 +24,16 @@ namespace OpenSpace.ROM {
 		}
 
 
-		public class ScriptNode {
+        public class ScriptNode {
 			// size: 4
 			public byte type;
 			public byte indent;
 			public ushort param;
             public NodeType nodeType;
             public long offset;
+
+            public int paramAsInt;
+            public float paramAsFloat;
 
             public ScriptNode(Reader reader) {
 
@@ -41,6 +45,13 @@ namespace OpenSpace.ROM {
 
                 nodeType = NodeType.Unknown;
                 if (Settings.s.aiTypes != null) nodeType = Settings.s.aiTypes.GetNodeType(type);
+
+                try {
+                    paramAsInt = new Reference<Int32ROMStruct>(param, reader, true).Value.value;
+                    paramAsFloat = new Reference<FloatROMStruct>(param, reader, true).Value.value;
+                } catch (KeyNotFoundException e) {
+                    Debug.LogWarning("Param " + param + " is not a valid reference");
+                }
             }
 
             public bool ContentEquals(ScriptNode sn)
@@ -118,15 +129,15 @@ namespace OpenSpace.ROM {
                         }*/
                         return "dsgVar_" + param;
                     case NodeType.Constant:
-                        if (advanced) return "Constant: " + BitConverter.ToInt32(BitConverter.GetBytes(param), 0);
-                        var bytes = BitConverter.GetBytes(param);
-                        return BitConverter.ToInt16(bytes, 0).ToString();
+                        if (advanced) return "Constant: " + BitConverter.ToInt32(BitConverter.GetBytes(paramAsInt), 0);
+                        var bytes = BitConverter.GetBytes(paramAsInt);
+                        return BitConverter.ToInt32(bytes, 0).ToString()+" ("+param+")";
                     case NodeType.Real:
                         NumberFormatInfo nfi = new NumberFormatInfo()
                         {
                             NumberDecimalSeparator = "."
                         };
-                        return BitConverter.ToInt16(BitConverter.GetBytes(param), 0).ToString(nfi) + "f";
+                        return BitConverter.ToSingle(BitConverter.GetBytes(paramAsFloat), 0).ToString(nfi) + "f" + " (" + param + ")";
                     case NodeType.Button: // Button/entryaction
                         /*EntryAction ea = EntryAction.FromOffset(param_ptr);
 

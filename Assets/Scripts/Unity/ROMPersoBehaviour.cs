@@ -579,8 +579,8 @@ public class ROMPersoBehaviour : MonoBehaviour {
                 List<string> ruleStatesInitializer = new List<string>();
                 List<string> reflexStatesInitializer = new List<string>();
 
-                var rules = intelligenceNormal.comports.Value.comports;
-                var reflexes = intelligenceReflex.comports.Value.comports;
+                var rules = intelligenceNormal.comports?.Value?.comports;
+                var reflexes = intelligenceReflex.comports?.Value?.comports;
 
                 if (rules != null) {
                     MapLoader.Loader.print("Normal behaviours");
