@@ -382,8 +382,9 @@ namespace OpenSpace.AI {
             EnvironmentRef,
             FontRef,
             Color,
-            Module // Different from ModuleRef
-        };
+            Module, // Different from ModuleRef
+			LightInfoRef
+		};
 
         internal static bool IsNodeTypeVariable(NodeType nodeType) {
             switch (nodeType) {

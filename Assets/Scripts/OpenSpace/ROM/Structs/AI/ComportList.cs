@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.ROM {
-	public class Intelligence : ROMStruct {
+	public class ComportList : ROMStruct {
 		// Size: 8
 		public Reference<ComportArray> comports;
 		public Reference<Comport> currentComport;

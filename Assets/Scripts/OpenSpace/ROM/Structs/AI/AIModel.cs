@@ -4,26 +4,26 @@ using UnityEngine;
 
 namespace OpenSpace.ROM {
 	public class AIModel : ROMStruct {
-
-		// size: 16
-		public ushort word0;
-		public ushort ref_72;
-		public ushort ref_111_behaviors;
-		public ushort ref_111_reflexes;
-		public ushort num_dsgVars_2;
-		public ushort num_dsgVars;
-        public ushort num_behaviors;
-        public ushort num_reflexes;
+		// Size: 16
+		public Reference<DsgVar> dsgVar;
+        public Reference<ComportList> comportsIntelligence;
+        public Reference<ComportList> comportsReflex;
+		// seems to be unused:
+		public ushort word6; // always FFFF
+		public ushort word8; // same
+		public ushort wordA; // always 0000
+		public ushort wordC; // same
+		public ushort wordE; // same
 
 		protected override void ReadInternal(Reader reader) {
-            word0 = reader.ReadUInt16(); // 0x00
-            ref_72 = reader.ReadUInt16(); // 0x02
-            ref_111_behaviors = reader.ReadUInt16(); // 0x04
-            ref_111_reflexes = reader.ReadUInt16(); // 0x06
-            num_dsgVars_2 = reader.ReadUInt16(); // 0x08
-            num_dsgVars = reader.ReadUInt16(); // 0x0A
-            num_behaviors = reader.ReadUInt16(); // 0x0C
-            num_reflexes = reader.ReadUInt16(); // 0x0E
+			dsgVar = new Reference<DsgVar>(reader, true);
+			comportsIntelligence = new Reference<ComportList>(reader, true);
+			comportsReflex = new Reference<ComportList>(reader, true);
+			word6 = reader.ReadUInt16();
+			word8 = reader.ReadUInt16();
+			wordA = reader.ReadUInt16();
+			wordC = reader.ReadUInt16();
+			wordE = reader.ReadUInt16();
 		}
 	}
 }

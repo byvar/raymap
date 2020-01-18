@@ -64,13 +64,13 @@ public class ROMPersoBehaviourEditor : Editor {
 
         if (pb.perso?.brain?.Value?.mind?.Value != null) {
             var mind = pb.perso.brain.Value.mind.Value;
-			if (mind.intelligence.Value != null) {
-				GUILayout.Label("Normal Behaviors: " + mind.intelligence.Value.num_comports);
+			if (mind.comportsIntelligence.Value != null) {
+				GUILayout.Label("Normal Behaviors: " + mind.comportsIntelligence.Value.num_comports);
 			}
-			if (mind.reflex.Value != null) {
-				GUILayout.Label("Reflex Behaviors: " + mind.reflex.Value.num_comports);
+			if (mind.comportsReflex.Value != null) {
+				GUILayout.Label("Reflex Behaviors: " + mind.comportsReflex.Value.num_comports);
 			}
-			GUILayout.Label("Num DSGVars: " + mind.aiModel.Value.num_dsgVars);
+			GUILayout.Label("Num DSGVars: " + mind.dsgVar.Value.num_dsgVars);
 		}
 
 

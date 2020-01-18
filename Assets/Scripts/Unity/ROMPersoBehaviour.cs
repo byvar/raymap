@@ -573,8 +573,8 @@ public class ROMPersoBehaviour : MonoBehaviour {
         if (loaded && hasStates) {
             if (perso.brain.Value != null
                 && perso.brain.Value.mind.Value != null) {
-                Intelligence intelligenceNormal = perso.brain.Value.mind.Value.intelligence.Value;
-                Intelligence intelligenceReflex = perso.brain.Value.mind.Value.reflex.Value;
+                ComportList intelligenceNormal = perso.brain.Value.mind.Value.comportsIntelligence.Value;
+                ComportList intelligenceReflex = perso.brain.Value.mind.Value.comportsReflex.Value;
 
                 List<string> ruleStatesInitializer = new List<string>();
                 List<string> reflexStatesInitializer = new List<string>();

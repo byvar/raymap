@@ -377,7 +377,7 @@ namespace OpenSpace {
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
 			saturate = true,
-			aiTypes = AITypes.R2,
+			aiTypes = AITypes.R2ROM,
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
@@ -391,7 +391,7 @@ namespace OpenSpace {
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
 			saturate = true,
-			aiTypes = AITypes.R2,
+			aiTypes = AITypes.R2ROM,
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
@@ -405,7 +405,7 @@ namespace OpenSpace {
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
 			saturate = true,
-			aiTypes = AITypes.R2,
+			aiTypes = AITypes.R2ROM,
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
@@ -419,7 +419,7 @@ namespace OpenSpace {
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
 			saturate = true,
-			aiTypes = AITypes.R2,
+			aiTypes = AITypes.R2ROM,
 			numEntryActions = 1
 		};
 
@@ -432,7 +432,7 @@ namespace OpenSpace {
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
 			saturate = true,
-			aiTypes = AITypes.R2,
+			aiTypes = AITypes.R2ROM,
 			numEntryActions = 1
 		};
 

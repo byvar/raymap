@@ -32,8 +32,23 @@ namespace OpenSpace.ROM {
             public NodeType nodeType;
             public long offset;
 
-            public int paramAsInt;
-            public float paramAsFloat;
+			// Parsed param
+			public Reference<ROMInt32> paramInt;
+			public Reference<ROMReal> paramFloat;
+			public Reference<Script> paramScript;
+			public Reference<Comport> paramComport;
+			public Reference<AIModel> paramModel;
+			public Reference<GameMaterial> paramGameMaterial;
+			public Reference<Perso> paramPerso;
+			public Reference<SuperObject> paramSuperObject;
+			public Reference<WayPoint> paramWayPoint;
+			public Reference<Graph> paramGraph;
+			public Reference<Family> paramFamily;
+			public Reference<ObjectsTable> paramObjectTable;
+			public Reference<StringRef2> paramString;
+			public Reference<State> paramAction;
+			public Reference<LightInfo> paramLightInfo;
+			public Reference<ROMVector3> paramVector3;
 
             public ScriptNode(Reader reader) {
 
@@ -46,12 +61,61 @@ namespace OpenSpace.ROM {
                 nodeType = NodeType.Unknown;
                 if (Settings.s.aiTypes != null) nodeType = Settings.s.aiTypes.GetNodeType(type);
 
-                try {
+				switch (nodeType) {
+					case NodeType.GraphRef:
+						paramGraph = new Reference<Graph>(param, reader, true);
+						break;
+					case NodeType.ModelRef:
+						paramModel = new Reference<AIModel>(param, reader, true);
+						break;
+					case NodeType.ObjectTableRef:
+						paramObjectTable = new Reference<ObjectsTable>(param, reader, true);
+						break;
+					case NodeType.SubRoutine:
+						paramScript = new Reference<Script>(param, reader, true);
+						break;
+					case NodeType.WayPointRef:
+						paramWayPoint = new Reference<WayPoint>(param, reader, true);
+						break;
+					case NodeType.PersoRef:
+						paramPerso = new Reference<Perso>(param, reader, true);
+						break;
+					case NodeType.Constant:
+						paramInt = new Reference<ROMInt32>(param, reader, true);
+						break;
+					case NodeType.Real:
+						paramFloat = new Reference<ROMReal>(param, reader, true);
+						break;
+					case NodeType.GameMaterialRef:
+						paramGameMaterial = new Reference<GameMaterial>(param, reader, true);
+						break;
+					case NodeType.SuperObjectRef:
+						paramSuperObject = new Reference<SuperObject>(param, reader, true);
+						break;
+					case NodeType.String:
+						paramString = new Reference<StringRef2>(param, reader, true);
+						break;
+					case NodeType.ActionRef:
+						paramAction = new Reference<State>(param, reader, true);
+						break;
+					case NodeType.FamilyRef:
+						paramFamily = new Reference<Family>(param, reader, true);
+						break;
+					case NodeType.LightInfoRef:
+						paramLightInfo = new Reference<LightInfo>(param, reader, true);
+						break;
+					case NodeType.ConstantVector:
+						paramVector3 = new Reference<ROMVector3>(param, reader, true);
+						break;
+				}
+
+
+                /*try {
                     paramAsInt = new Reference<Int32ROMStruct>(param, reader, true).Value.value;
                     paramAsFloat = new Reference<FloatROMStruct>(param, reader, true).Value.value;
-                } catch (KeyNotFoundException e) {
+                } catch (KeyNotFoundException) {
                     Debug.LogWarning("Param " + param + " is not a valid reference");
-                }
+                }*/
             }
 
             public bool ContentEquals(ScriptNode sn)
@@ -129,15 +193,14 @@ namespace OpenSpace.ROM {
                         }*/
                         return "dsgVar_" + param;
                     case NodeType.Constant:
-                        if (advanced) return "Constant: " + BitConverter.ToInt32(BitConverter.GetBytes(paramAsInt), 0);
-                        var bytes = BitConverter.GetBytes(paramAsInt);
-                        return BitConverter.ToInt32(bytes, 0).ToString()+" ("+param+")";
+                        if (advanced) return "Constant: " + paramInt.Value?.value;
+                        return paramInt.Value?.value + "";
                     case NodeType.Real:
                         NumberFormatInfo nfi = new NumberFormatInfo()
                         {
                             NumberDecimalSeparator = "."
                         };
-                        return BitConverter.ToSingle(BitConverter.GetBytes(paramAsFloat), 0).ToString(nfi) + "f" + " (" + param + ")";
+                        return paramFloat.Value?.value.ToString(nfi) + "f";
                     case NodeType.Button: // Button/entryaction
                         /*EntryAction ea = EntryAction.FromOffset(param_ptr);
 
@@ -154,7 +217,7 @@ namespace OpenSpace.ROM {
                         */
                         return "entryaction_"+param;
                     case NodeType.ConstantVector:
-                        return "Constant Vector: " + "0x" + param.ToString("x8"); // TODO: get from address
+						return "Constant Vector: " + paramVector3.Value?.value.ToString();
                     case NodeType.Vector:
                         return "new Vector3"; // TODO: same
                     case NodeType.Mask:
