@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts;
 using Assets.Scripts.Unity;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting;
 using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Animation;
@@ -107,7 +108,7 @@ public class PersoBehaviour : MonoBehaviour {
                     SetState(0);
                 }
             }
-            persoAnimationsDataExporter = new Assets.Scripts.Unity.PersoAnimationsDataExporter(this);
+            persoAnimationsDataExporter = new PersoAnimationsDataExporter(this);
         }
         isLoaded = true;
     }

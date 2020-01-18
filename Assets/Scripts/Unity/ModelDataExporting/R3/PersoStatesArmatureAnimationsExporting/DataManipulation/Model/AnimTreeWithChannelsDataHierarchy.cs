@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.ModelConstructing;
+using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model;
+using Assets.Scripts.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,27 +10,8 @@ using UnityEngine;
 
 namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model
 {
-    public class AnimTreeWithChannelsDataHierarchy
+    public class AnimTreeWithChannelsDataHierarchy : Tree<AnimTreeChannelsHierarchyNode, string>
     {
-        public class ParentChildPair
-        {
-            public AnimTreeChannelsHierarchyNode Parent;
-            public AnimTreeChannelsHierarchyNode Child;
-
-            public ParentChildPair(AnimTreeChannelsHierarchyNode Parent, AnimTreeChannelsHierarchyNode Child)
-            {
-                this.Parent = Parent;
-                this.Child = Child;
-            }
-        }
-
-        public AnimTreeChannelsHierarchyNode GetRoot()
-        {
-            return root;
-        }
-
-        AnimTreeChannelsHierarchyNode root;
-
         public void AddNode(
             string parentChannelName,
             string channelName,
@@ -47,21 +31,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
                 absoluteRotation,
                 absoluteScale
                 );
-            if (parentChannelName == null)
-            {
-                root = node;
-            }
-            else
-            {
-                if (root.TraverseAndAddNode(parentChannelName, node))
-                {
-                    return;
-                }
-                else
-                {
-                    throw new InvalidOperationException("Did not find parent channel of that name! " + channelName);
-                }
-            }
+            AddNode(parentChannelName, channelName, node);
         }
 
         public AnimationFrameModel ToAnimationFrameModel()
@@ -71,40 +41,10 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
 
         public IEnumerable<AnimTreeChannelsHierarchyNode> IterateChannels()
         {
-            List<AnimTreeChannelsHierarchyNode> nodes = new List<AnimTreeChannelsHierarchyNode>();
-            if (root != null)
+            foreach (var Channel in IterateNodes())
             {
-                root.TraverseAndCollectAll(nodes);
+                yield return Channel.Node;
             }
-            foreach (var node in nodes)
-            {
-                yield return node;
-            }
-        }
-
-        public IEnumerable<ParentChildPair> IterateParentChildPairs()
-        {
-            List<ParentChildPair> pairs = new List<ParentChildPair>();
-            if (root != null)
-            {
-                root.TraverseChildParentPairsAndCollectAll(pairs);
-            }
-            foreach (var pair in pairs)
-            {
-                yield return pair;
-            }
-        }
-
-        public bool Contains(string NodeName)
-        {
-            foreach (var node in IterateChannels())
-            {
-                if (node.Name == NodeName)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

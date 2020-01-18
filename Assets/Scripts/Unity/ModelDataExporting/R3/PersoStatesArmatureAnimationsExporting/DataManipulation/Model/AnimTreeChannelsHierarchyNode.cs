@@ -16,7 +16,6 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
         public Vector3 Position;
         public Quaternion Rotation;
         public Vector3 Scale;
-        List<AnimTreeChannelsHierarchyNode> children;
 
         public AnimTreeChannelsHierarchyNode(
             string Name,
@@ -34,49 +33,6 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             this.Position = Position;
             this.Rotation = Rotation;
             this.Scale = Scale;
-            this.children = new List<AnimTreeChannelsHierarchyNode>();
-        }
-
-        public void TraverseAndCollectAll(List<AnimTreeChannelsHierarchyNode> nodes)
-        {
-            nodes.Add(this);
-
-            foreach (var child in children)
-            {
-                child.TraverseAndCollectAll(nodes);
-            }
-        }
-
-        public void TraverseChildParentPairsAndCollectAll(List<AnimTreeWithChannelsDataHierarchy.ParentChildPair> pairs)
-        {
-            foreach (var child in children)
-            {
-                pairs.Add(new AnimTreeWithChannelsDataHierarchy.ParentChildPair(this, child));
-            }
-            foreach (var child in children)
-            {
-                child.TraverseChildParentPairsAndCollectAll(pairs);
-            }
-        }
-
-        internal bool TraverseAndAddNode(string parentChannelName, AnimTreeChannelsHierarchyNode node)
-        {
-            if (Name == parentChannelName)
-            {
-                children.Add(node);
-                return true;
-            }
-            else
-            {
-                foreach (var child in children)
-                {
-                    if (child.TraverseAndAddNode(parentChannelName, node))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
         }
     }
 }

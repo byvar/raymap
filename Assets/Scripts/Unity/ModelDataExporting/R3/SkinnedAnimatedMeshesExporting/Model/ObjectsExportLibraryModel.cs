@@ -10,14 +10,15 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
     {
         public Dictionary<string, AnimatedExportObjectModel> animatedExportObjects;
 
-        public void AddSkinnedMeshObject(R3AnimatedMesh r3AnimatedMesh)
+        public void AddR3AnimatedMesh(R3AnimatedMesh r3AnimatedMesh)
         {
-            throw new NotImplementedException();
-        }
+            if (animatedExportObjects.ContainsKey(r3AnimatedMesh.GetName()))
+            {
+                throw new InvalidOperationException("Objects Export Library already contains mesh of name " + r3AnimatedMesh.GetName());
+            }
 
-        public void AddChannelParentedObject(R3AnimatedMesh r3AnimatedMesh)
-        {
-            throw new NotImplementedException();
+            AnimatedExportObjectModel animatedExportObjectModel = r3AnimatedMesh.ToAnimatedExportObjectModel();
+            animatedExportObjects.Add(animatedExportObjectModel.Name, animatedExportObjectModel);
         }
     }
 }

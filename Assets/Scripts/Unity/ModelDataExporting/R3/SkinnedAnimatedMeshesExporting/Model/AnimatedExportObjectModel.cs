@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,9 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
 {
     public class AnimatedExportObjectModel
     {
+        public string Name;
+        public TransformModel transform;
+        public MeshGeometry meshGeometry;
+        public ArmatureModel armatureModel;
     }
 }
