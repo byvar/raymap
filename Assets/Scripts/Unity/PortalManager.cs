@@ -101,7 +101,6 @@ public class PortalManager : MonoBehaviour {
 							camGao.transform.rotation = portal.cameraSO.matrix.GetRotation(true) * Quaternion.Euler(-180, 0, 0);
 							camGao.transform.localScale = portal.cameraSO.matrix.GetScale(true);
 							camera.fieldOfView = Camera.main.fieldOfView;
-							camera.cullingMask = LayerMask.GetMask("Mirror");
 							camera.enabled = false;
 							camGao.transform.SetParent(transform);
 							portal.camera = camera;
@@ -115,14 +114,15 @@ public class PortalManager : MonoBehaviour {
 							/*camGao.transform.rotation = portal.cameraSO.matrix.GetRotation(true) * Quaternion.Euler(-180, 0, 0);
 							camGao.transform.localScale = portal.cameraSO.matrix.GetScale(true);*/
 							camera.fieldOfView = Camera.main.fieldOfView;
-							camera.cullingMask = LayerMask.GetMask("Mirror");
 							camera.enabled = false;
 							camGao.transform.SetParent(transform);
 							portal.camera = camera;
 							portals.Add(portal);
 						}
 
+						el.Gao.layer = LayerMask.NameToLayer("VisualMirror");
 						PortalBehaviour pb = el.Gao.AddComponent<PortalBehaviour>();
+						pb.m_ReflectLayers = (1 << LayerMask.NameToLayer("Visual")) | (1 << LayerMask.NameToLayer("VisualOnlyInMirror"));
 						pb.portal = portal;
 						pb.textureIndex = portal.material.GetInt("_NumTextures");
 						portal.material.SetInt("_NumTextures", pb.textureIndex + 1);
