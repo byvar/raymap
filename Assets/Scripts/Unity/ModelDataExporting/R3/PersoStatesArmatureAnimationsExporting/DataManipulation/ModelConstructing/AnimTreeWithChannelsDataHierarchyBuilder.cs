@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.DataManipulation.Model;
+using Assets.Scripts.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
     public class AnimTreeWithChannelsDataHierarchyBuilder
     {
         AnimTreeWithChannelsDataHierarchy result = new AnimTreeWithChannelsDataHierarchy();
-        HashSet<AnimHierarchyWithChannelInfo> nodesToBuildResultFrom = new HashSet<AnimHierarchyWithChannelInfo>();
+        HashSet<TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>> nodesToBuildResultFrom = 
+            new HashSet<TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>>();
 
         public AnimTreeWithChannelsDataHierarchyBuilder()
         {
@@ -30,37 +32,30 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
         public void AddAnimHierarchyWithChannelInfo(AnimHierarchyWithChannelInfo animHierarchy)
         {
             animHierarchy.ParentChannelName = animHierarchy.ParentChannelName != null ? animHierarchy.ParentChannelName : "ROOT_CHANNEL";
-            nodesToBuildResultFrom.Add(animHierarchy);
-        }
-
-        private void BuildTreeWithProperNodesPuttingOrder()
-        {
-            while (nodesToBuildResultFrom.Count != 0)
-            {
-                foreach (var node in nodesToBuildResultFrom)
-                {
-                    if (result.Contains(node.ParentChannelName))
-                    {
-                        result.AddNode(
-                            node.ParentChannelName,
-                            node.ChannelName,
-                            new Vector3(0.0f, 0.0f, 0.0f),
-                            new Quaternion(0.0f, 0.0f, 0.0f, 1.0f),
-                            new Vector3(1.0f, 1.0f, 1.0f),
-                            node.LocalPosition,
-                            node.LocalRotation,
-                            node.LocalScale
-                        );
-                        nodesToBuildResultFrom.Remove(node);
-                        break;
-                    }
-                }
-            }
+            nodesToBuildResultFrom.Add(
+                new TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>(
+                        animHierarchy.ParentChannelName,
+                        animHierarchy.ChannelName,
+                        new AnimTreeChannelsHierarchyNode(
+                                animHierarchy.ChannelName,
+                                animHierarchy.LocalPosition,
+                                animHierarchy.LocalRotation,
+                                animHierarchy.LocalScale,
+                                new Vector3(0.0f, 0.0f, 0.0f),
+                                new Quaternion(0.0f, 0.0f, 0.0f, 1.0f),
+                                new Vector3(1.0f, 1.0f, 1.0f)
+                            )
+                    )
+                );
         }
 
         public AnimTreeWithChannelsDataHierarchy Build()
         {
-            BuildTreeWithProperNodesPuttingOrder();
+            var resultTree = (Assets.Scripts.Utils.Tree<AnimTreeChannelsHierarchyNode, string>)result;
+            resultTree = Assets.Scripts.Utils.Tree<AnimTreeChannelsHierarchyNode, string>.BuildTreeWithProperNodesPuttingOrder(
+                resultTree,
+                nodesToBuildResultFrom);
+            result = (AnimTreeWithChannelsDataHierarchy)resultTree;
             var absoluteSpatialGameChannelsHierarchyContextSimulator = new AbsoluteSpatialGameChannelsHierarchyContextSimulator();
             absoluteSpatialGameChannelsHierarchyContextSimulator.SimulateInSceneAndFillWithAbsoluteOffsets(result);
             return result;

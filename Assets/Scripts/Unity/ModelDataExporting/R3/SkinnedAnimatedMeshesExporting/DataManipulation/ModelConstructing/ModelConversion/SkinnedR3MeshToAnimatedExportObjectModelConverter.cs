@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.ArmatureModelConstructing;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.MeshGeometryConstructing;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription.Armature;
 using UnityEngine;
 
 namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing
@@ -16,8 +19,10 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             AnimatedExportObjectModel result = new AnimatedExportObjectModel();
             result.Name = r3AnimatedMesh.gameObject.name;
             SkinnedMeshRenderer skinnedMeshRendererComponent = r3AnimatedMesh.GetComponent<SkinnedMeshRenderer>();
-            ArmatureModel armatureModel = ConstructArmatureModel(skinnedMeshRendererComponent.bones);
-            MeshGeometry meshGeometry = DeriveMeshGeometryData(skinnedMeshRendererComponent.sharedMesh);
+            ArmatureModel armatureModel = ConstructArmatureModel(
+                skinnedMeshRendererComponent.sharedMesh.bindposes,
+                skinnedMeshRendererComponent.bones);
+            MeshGeometry meshGeometry = DeriveMeshGeometryData(skinnedMeshRendererComponent.sharedMesh, skinnedMeshRendererComponent.bones);
             TransformModel transformModel = GetTransformModel(r3AnimatedMesh.transform);
             result.armatureModel = armatureModel;
             result.meshGeometry = meshGeometry;
@@ -30,14 +35,14 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             throw new NotImplementedException();
         }
 
-        private MeshGeometry DeriveMeshGeometryData(Mesh sharedMesh)
+        private MeshGeometry DeriveMeshGeometryData(Mesh sharedMesh, Transform[] bones)
         {
-            return new MeshGeometryDataConstructor().ConstructFrom(sharedMesh);
+            return new SkinnedMeshGeometryDataConstructor().ConstructFrom(sharedMesh, bones);
         }
 
-        private ArmatureModel ConstructArmatureModel(Transform[] bones)
+        private ArmatureModel ConstructArmatureModel(Matrix4x4[] bindposes, Transform[] bones)
         {
-            return new ArmatureModelConstructor().ConstructFrom(bones);
+            return new SkinnedMeshArmatureModelConstructor().ConstructFrom(bindposes, bones);
         }
     }
 }

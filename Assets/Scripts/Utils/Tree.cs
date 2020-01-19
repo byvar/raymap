@@ -18,6 +18,20 @@ namespace Assets.Scripts.Utils
         }
     }
 
+    public class TreeBuildingNodeInfo<T, KeyType>
+    {
+        public KeyType ParentId;
+        public KeyType NodeId;
+        public T Node;
+
+        public TreeBuildingNodeInfo(KeyType ParentId, KeyType NodeId, T Node)
+        {
+            this.ParentId = ParentId;
+            this.NodeId = NodeId;
+            this.Node = Node;
+        }
+    }
+
     public class TreeNodeContainer<T, KeyType>
     {
         public T Node;
@@ -153,6 +167,46 @@ namespace Assets.Scripts.Utils
                 }
             }
             return false;
+        }
+
+        public static Tree<T, KeyType> BuildTreeWithProperNodesPuttingOrder(
+            Tree<T, KeyType> ExistingTree, 
+            HashSet<TreeBuildingNodeInfo<T, KeyType>> TreeBuldingNodes)
+        {
+            Tree<T, KeyType> result;
+            if (ExistingTree == null)
+            {
+                result = new Tree<T, KeyType>();
+            }
+            else
+            {
+                result = ExistingTree;
+            }
+            
+            while (TreeBuldingNodes.Count != 0)
+            {
+                foreach (var Node in TreeBuldingNodes)
+                {
+                    if (result.Contains(Node.ParentId))
+                    {
+                        result.AddNode(
+                            Node.ParentId,
+                            Node.NodeId,
+                            Node.Node
+                        );
+                        TreeBuldingNodes.Remove(Node);
+                        break;
+                    } else if (Node.ParentId == null)
+                    {
+                        result.AddNode(
+                            default(KeyType),
+                            Node.NodeId,
+                            Node.Node
+                            );
+                    }
+                }
+            }
+            return result;
         }
     }
 }
