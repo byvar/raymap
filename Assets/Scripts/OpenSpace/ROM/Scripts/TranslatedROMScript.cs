@@ -171,7 +171,7 @@ namespace OpenSpace.ROM {
 
                         case ScriptNode.NodeType.Operator:
                             string op = param < aiTypes.operatorTable.Length ? aiTypes.operatorTable[param] : "";
-                            Pointer persoPtr = null;
+                            //Pointer persoPtr = null;
 
                             switch (op) {
                                 // scalar:

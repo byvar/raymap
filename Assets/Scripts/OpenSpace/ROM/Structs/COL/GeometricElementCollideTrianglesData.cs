@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.ROM {
-	public class GeometricElementTrianglesCollideData : ROMStruct {
+	public class GeometricElementCollideTrianglesData : ROMStruct {
 		public ushort length;
 		public Triangle[] triangles;
 

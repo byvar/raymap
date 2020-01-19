@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.ROM {
 	public class GeometricObject : ROMStruct {
@@ -10,8 +11,8 @@ namespace OpenSpace.ROM {
 		public Reference<CompressedVector3Array> verticesCollide;
 		public Reference<CompressedVector3Array> verticesVisual;
 		public Reference<CompressedVector3Array> normals;
-		public Reference<GeometricElementListCollide> elementsCollide;
-		public Reference<GeometricElementListVisual> elementsVisual;
+		public Reference<GeometricElementCollideList> elementsCollide;
+		public Reference<GeometricElementVisualList> elementsVisual;
 		public ushort num_verticesCollide;
 		public ushort num_verticesVisual;
 		public ushort num_elementsCollide;
@@ -36,8 +37,8 @@ namespace OpenSpace.ROM {
 				verticesVisual = new Reference<CompressedVector3Array>(reader);
 				normals = new Reference<CompressedVector3Array>(reader);
 			}
-			elementsCollide = new Reference<GeometricElementListCollide>(reader);
-			elementsVisual = new Reference<GeometricElementListVisual>(reader);
+			elementsCollide = new Reference<GeometricElementCollideList>(reader);
+			elementsVisual = new Reference<GeometricElementVisualList>(reader);
 			num_verticesCollide = reader.ReadUInt16();
 			if (Settings.s.platform == Settings.Platform._3DS) {
 				num_verticesVisual = reader.ReadUInt16();
@@ -63,7 +64,7 @@ namespace OpenSpace.ROM {
 			elementsVisual.Resolve(reader, v => { v.length = num_elementsVisual; });
 		}
 
-		public GameObject GetGameObject(Type type) {
+		public GameObject GetGameObject(Type type, CollideType collideType = CollideType.None) {
 			GameObject gao = new GameObject("GeometricObject @ " + Offset);
 			if (type == Type.Visual) {
 				gao.layer = LayerMask.NameToLayer("Visual");
@@ -81,7 +82,7 @@ namespace OpenSpace.ROM {
 				if (elementsVisual.Value != null) {
 					// First, reset vertex buffer
 					if (Settings.s.platform == Settings.Platform.N64) {
-						foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+						foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 							if (entry.element.Value is GeometricElementTriangles) {
 								GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
 								el.ResetVertexBuffer();
@@ -89,7 +90,7 @@ namespace OpenSpace.ROM {
 						}
 					}
 					//gao.transform.position = new Vector3(UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f));
-					foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+					foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 						/*if (entry.element.Value == null) {
 							l.print("Visual element null: " + entry.element.type);
 						}*/
@@ -115,15 +116,15 @@ namespace OpenSpace.ROM {
 				}
 			} else {
 				if (elementsCollide.Value != null) {
-					foreach (GeometricElementListCollide.GeometricElementListEntry entry in elementsCollide.Value.elements) {
+					foreach (GeometricElementCollideList.GeometricElementListEntry entry in elementsCollide.Value.elements) {
 						if (entry.element.Value == null) {
 							l.print("Collide element null: " + entry.element.type);
 						}
 						if (entry.element.Value != null) {
 							GameObject child = null;
-							if (entry.element.Value is GeometricElementTrianglesCollide) {
-								GeometricElementTrianglesCollide el = entry.element.Value as GeometricElementTrianglesCollide;
-								child = el.GetGameObject(type, this);
+							if (entry.element.Value is GeometricElementCollideTriangles) {
+								GeometricElementCollideTriangles el = entry.element.Value as GeometricElementCollideTriangles;
+								child = el.GetGameObject(type, this, collideType: collideType);
 							}
 							if (child != null) {
 								child.transform.SetParent(gao.transform);
@@ -139,7 +140,7 @@ namespace OpenSpace.ROM {
 		public void MorphVertices(GameObject gao, GeometricObject go, float lerp) {
 			// First, reset vertex buffer
 			if (Settings.s.platform == Settings.Platform.N64) {
-				foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+				foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 					if (entry.element.Value is GeometricElementTriangles) {
 						GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
 						el.ResetVertexBuffer();
@@ -164,7 +165,7 @@ namespace OpenSpace.ROM {
 		public void ResetMorph(GameObject gao) {
 			// First, reset vertex buffer
 			if (Settings.s.platform == Settings.Platform.N64) {
-				foreach (GeometricElementListVisual.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+				foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 					if (entry.element.Value is GeometricElementTriangles) {
 						GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
 						el.ResetVertexBuffer();

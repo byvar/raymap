@@ -16,7 +16,7 @@ namespace OpenSpace.ROM {
 
 
 		protected override void ReadInternal(Reader reader) {
-			Loader.print("Script @ " + Pointer.Current(reader) + " - len: " + length);
+			//Loader.print("Script @ " + Pointer.Current(reader) + " - len: " + length);
 			nodes = new ScriptNode[length];
 			for (int i = 0; i < nodes.Length; i++) {
 				nodes[i] = new ScriptNode(reader);

@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace OpenSpace.ROM {
-	public class GeometricElementListCollide : ROMStruct {
+	public class GeometricElementVisualList : ROMStruct {
 		public GeometricElementListEntry[] elements;
 
 		public ushort length;

@@ -2,12 +2,13 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.ROM {
-	public class GeometricElementTrianglesCollide : ROMStruct {
+	public class GeometricElementCollideTriangles : ROMStruct {
 		public GenericReference material;
 		public ushort ind_material;
-		public Reference<GeometricElementTrianglesCollideData> triangles;
+		public Reference<GeometricElementCollideTrianglesData> triangles;
 		public ushort ind_37;
 		public ushort num_triangles;
 		public ushort type_material;
@@ -15,7 +16,7 @@ namespace OpenSpace.ROM {
 
 		protected override void ReadInternal(Reader reader) {
 			ind_material = reader.ReadUInt16();
-			triangles = new Reference<GeometricElementTrianglesCollideData>(reader);
+			triangles = new Reference<GeometricElementCollideTrianglesData>(reader);
 			ind_37 = reader.ReadUInt16();
 			num_triangles = reader.ReadUInt16();
 			unk = reader.ReadUInt16();
@@ -25,7 +26,7 @@ namespace OpenSpace.ROM {
 			material = new GenericReference(type_material, ind_material, reader, true);
 		}
 
-		public GameObject GetGameObject(GeometricObject.Type type, GeometricObject go) {
+		public GameObject GetGameObject(GeometricObject.Type type, GeometricObject go, CollideType collideType = CollideType.None) {
 			GameObject gao = null;
 			if (type == GeometricObject.Type.Collide) {
 				gao = new GameObject("Element @ " + Offset);
@@ -42,6 +43,21 @@ namespace OpenSpace.ROM {
 					}
 				} else {
 					MapLoader.Loader.print("Type: " + type_material + " - Ind: " + ind_material);
+				}
+				if (collideType != CollideType.None) {
+					Color col = mr.material.color;
+					mr.material = MapLoader.Loader.collideTransparentMaterial;
+					mr.material.color = new Color(col.r, col.g, col.b, col.a * 0.7f);
+					switch (collideType) {
+						case CollideType.ZDD:
+							mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdd")); break;
+						case CollideType.ZDE:
+							mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zde")); break;
+						case CollideType.ZDM:
+							mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdm")); break;
+						case CollideType.ZDR:
+							mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdr")); break;
+					}
 				}
 				Mesh mesh = new Mesh();
 				mesh.vertices = go.verticesCollide.Value.GetVectors(go.ScaleFactor);

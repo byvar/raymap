@@ -102,8 +102,14 @@ namespace OpenSpace.ROM {
 				case FATEntry.Type.VisualMaterial:
 					Value = l.GetOrRead<VisualMaterial>(reader, index);
 					break;
-				case FATEntry.Type.GeometricElementTrianglesCollide:
-					Value = l.GetOrRead<GeometricElementTrianglesCollide>(reader, index);
+				case FATEntry.Type.GeometricElementCollideTriangles:
+					Value = l.GetOrRead<GeometricElementCollideTriangles>(reader, index);
+					break;
+				case FATEntry.Type.GeometricElementCollideAlignedBoxes:
+					Value = l.GetOrRead<GeometricElementCollideAlignedBoxes>(reader, index);
+					break;
+				case FATEntry.Type.GeometricElementCollideSpheres:
+					Value = l.GetOrRead<GeometricElementCollideSpheres>(reader, index);
 					break;
 				case FATEntry.Type.GameMaterial:
 					Value = l.GetOrRead<GameMaterial>(reader, index);
