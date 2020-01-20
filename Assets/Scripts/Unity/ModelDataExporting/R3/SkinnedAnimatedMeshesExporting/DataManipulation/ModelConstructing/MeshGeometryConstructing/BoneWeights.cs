@@ -9,6 +9,6 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
     public class BoneWeights
     {
         public string BoneName;
-        public Dictionary<int, float> Weights;
+        public Dictionary<int, float> Weights = new Dictionary<int, float>();
     }
 }

@@ -11,5 +11,11 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
         public string BoneName;
         public string ChannelName;
         public int BoneIndex;
+
+        public BoneWeightsInfo(string BoneName, string ChannelName, int BoneIndex) {
+            this.BoneName = BoneName;
+            this.ChannelName = ChannelName;
+            this.BoneIndex = BoneIndex;
+        }
     }
 }

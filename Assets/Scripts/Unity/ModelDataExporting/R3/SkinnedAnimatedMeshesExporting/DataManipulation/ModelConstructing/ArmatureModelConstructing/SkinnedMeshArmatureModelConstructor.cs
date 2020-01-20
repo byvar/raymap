@@ -16,14 +16,19 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
         public ArmatureModel ConstructFrom(Matrix4x4[] bindposes, Transform[] bones)
         {
             var result = new ArmatureModel();
-            HashSet<TreeBuildingNodeInfo<ArmatureModelNode, string>> ArmatureTreeBuildingNodes = 
-                new HashSet<TreeBuildingNodeInfo<ArmatureModelNode, string>>();
+            Queue<TreeBuildingNodeInfo<ArmatureModelNode, string>> ArmatureTreeBuildingNodes = 
+                new Queue<TreeBuildingNodeInfo<ArmatureModelNode, string>>();
 
-            ArmatureTreeBuildingNodes.Add(
+            ArmatureTreeBuildingNodes.Enqueue(
                     new TreeBuildingNodeInfo<ArmatureModelNode, string>(
                         null,
                         "ROOT_CHANNEL",
-                        new ArmatureModelNode())
+                        new ArmatureModelNode(
+                            "ROOT_CHANNEL", 
+                            new Model.MathDescription.Vector3d(0.0f, 0.0f, 0.0f),
+                            new Model.MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                            new Model.MathDescription.Vector3d(1.0f, 1.0f, 1.0f))
+                    )
                 );
 
             for (int i = 0; i < bones.Length; i++)
@@ -39,7 +44,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
                     parentChannelName = "ROOT_CHANNEL";
                 }
 
-                ArmatureTreeBuildingNodes.Add(
+                ArmatureTreeBuildingNodes.Enqueue(
                     new TreeBuildingNodeInfo<ArmatureModelNode, string>(
                             parentChannelName,
                             channelGameObject.name,
@@ -65,7 +70,12 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             boneWorkingDuplicate.transform.localScale =
                 new Vector3(localMatrix.GetColumn(0).magnitude, localMatrix.GetColumn(1).magnitude, localMatrix.GetColumn(2).magnitude);
 
-            var result = new ArmatureModelNode();
+            var result = 
+                new ArmatureModelNode(
+                    "", 
+                    new Model.MathDescription.Vector3d(0.0f, 0.0f, 0.0f),
+                    new Model.MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                    new Model.MathDescription.Vector3d(1.0f, 1.0f, 1.0f));
             result.position = new Model.MathDescription.Vector3d(
                 boneWorkingDuplicate.transform.position.x,
                 boneWorkingDuplicate.transform.position.y,

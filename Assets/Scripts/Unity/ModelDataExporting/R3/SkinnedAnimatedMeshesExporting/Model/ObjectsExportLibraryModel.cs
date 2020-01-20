@@ -8,7 +8,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
 {
     public class ObjectsExportLibraryModel
     {
-        public Dictionary<string, AnimatedExportObjectModel> animatedExportObjects;
+        public Dictionary<string, AnimatedExportObjectModel> animatedExportObjects = new Dictionary<string, AnimatedExportObjectModel>();
 
         public void AddR3AnimatedMesh(R3AnimatedMesh r3AnimatedMesh)
         {

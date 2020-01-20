@@ -42,6 +42,7 @@ namespace Assets.Scripts.Utils
         public TreeNodeContainer(KeyType Id, T Node)
         {
             this.Node = Node;
+            this.Id = Id;
             this.Children = new List<TreeNodeContainer<T, KeyType>>();
         }
 
@@ -102,7 +103,7 @@ namespace Assets.Scripts.Utils
 
     public class Tree<T, KeyType>
     {
-        private TreeNodeContainer<T, KeyType> Root;
+        public TreeNodeContainer<T, KeyType> Root;
 
         public T GetRoot()
         {
@@ -171,7 +172,7 @@ namespace Assets.Scripts.Utils
 
         public static Tree<T, KeyType> BuildTreeWithProperNodesPuttingOrder(
             Tree<T, KeyType> ExistingTree, 
-            HashSet<TreeBuildingNodeInfo<T, KeyType>> TreeBuldingNodes)
+            Queue<TreeBuildingNodeInfo<T, KeyType>> TreeBuildingNodes)
         {
             Tree<T, KeyType> result;
             if (ExistingTree == null)
@@ -183,27 +184,26 @@ namespace Assets.Scripts.Utils
                 result = ExistingTree;
             }
             
-            while (TreeBuldingNodes.Count != 0)
+            while (TreeBuildingNodes.Count != 0)
             {
-                foreach (var Node in TreeBuldingNodes)
+                var Node = TreeBuildingNodes.Dequeue();               
+                if (result.Contains(Node.ParentId))
                 {
-                    if (result.Contains(Node.ParentId))
-                    {
-                        result.AddNode(
-                            Node.ParentId,
-                            Node.NodeId,
-                            Node.Node
+                    result.AddNode(
+                        Node.ParentId,
+                        Node.NodeId,
+                        Node.Node
+                    );
+                } else if (Node.ParentId == null)
+                {
+                    result.AddNode(
+                        default(KeyType),
+                        Node.NodeId,
+                        Node.Node
                         );
-                        TreeBuldingNodes.Remove(Node);
-                        break;
-                    } else if (Node.ParentId == null)
-                    {
-                        result.AddNode(
-                            default(KeyType),
-                            Node.NodeId,
-                            Node.Node
-                            );
-                    }
+                } else
+                {
+                    TreeBuildingNodes.Enqueue(Node);
                 }
             }
             return result;

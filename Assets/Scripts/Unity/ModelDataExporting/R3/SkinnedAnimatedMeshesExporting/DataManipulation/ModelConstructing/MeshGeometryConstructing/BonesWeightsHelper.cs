@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
     {
         public IEnumerable<BoneWeights> IterateBonesWeights(BoneWeight[] boneWeights, Transform[] bones)
         {
-            List<BoneWeightsInfo> BoneWeightsInfos = GetBoneWeightsInfos(boneWeights, bones);
+            List<BoneWeightsInfo> BoneWeightsInfos = GetBoneWeightsInfos(bones);
             foreach (var BoneWeightsInfo in BoneWeightsInfos)
             {
                 yield return GetBoneWeightsFor(BoneWeightsInfo.BoneName, BoneWeightsInfo.ChannelName,
@@ -19,9 +20,15 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             }
         }
 
-        private List<BoneWeightsInfo> GetBoneWeightsInfos(BoneWeight[] boneWeights, Transform[] bones)
+        private List<BoneWeightsInfo> GetBoneWeightsInfos(Transform[] bones)
         {
-            throw new NotImplementedException();
+            var result = new List<BoneWeightsInfo>();
+            for (int i = 0; i < bones.Length; i++)
+            {
+                var channelName = ObjectsHierarchyHelper.GetProperChannelForTransform(bones[i]).gameObject.name;
+                result.Add(new BoneWeightsInfo(bones[i].gameObject.name, channelName, i));
+            }
+            return result;
         }
 
         private BoneWeights GetBoneWeightsFor(string BoneName, string ChannelName, int BoneIndex, BoneWeight[] boneWeights)

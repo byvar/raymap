@@ -12,8 +12,8 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
     public class AnimTreeWithChannelsDataHierarchyBuilder
     {
         AnimTreeWithChannelsDataHierarchy result = new AnimTreeWithChannelsDataHierarchy();
-        HashSet<TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>> nodesToBuildResultFrom = 
-            new HashSet<TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>>();
+        Queue<TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>> nodesToBuildResultFrom = 
+            new Queue<TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>>();
 
         public AnimTreeWithChannelsDataHierarchyBuilder()
         {
@@ -32,7 +32,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
         public void AddAnimHierarchyWithChannelInfo(AnimHierarchyWithChannelInfo animHierarchy)
         {
             animHierarchy.ParentChannelName = animHierarchy.ParentChannelName != null ? animHierarchy.ParentChannelName : "ROOT_CHANNEL";
-            nodesToBuildResultFrom.Add(
+            nodesToBuildResultFrom.Enqueue(
                 new TreeBuildingNodeInfo<AnimTreeChannelsHierarchyNode, string>(
                         animHierarchy.ParentChannelName,
                         animHierarchy.ChannelName,
