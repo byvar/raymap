@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using CollideType = OpenSpace.Collide.CollideType;
 
 public class ROMPersoBehaviour : MonoBehaviour {
     bool loaded = false;
@@ -44,6 +45,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
     public AnimMorphData[,] morphDataArray;
     private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
+	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	public Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
 	private bool isAlways = false;
 	public bool IsAlways {
@@ -106,40 +108,65 @@ public class ROMPersoBehaviour : MonoBehaviour {
 	#endregion
 
 	public void UpdateViewCollision(bool viewCollision) {
-		/*if (perso.collset != null) {
-			CollSet c = perso.collset;
-			foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<CollideMeshObject>> entry in c.zdxList) {
-				if (entry.Value != null) {
-					for (int i = 0; i < entry.Value.Count; i++) {
-						CollideMeshObject col = entry.Value[i];
-						if (col == null) continue;
-						if (viewCollision && c.GetPrivilegedActionZoneStatus(entry.Key, i) == CollSet.PrivilegedActivationStatus.ForceActive) {
-							col.SetVisualsActive(true);
-						} else {
-							col.SetVisualsActive(false);
-						}
-					}
-				}
-			}
-			if (viewCollision) {
-				foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<CollideActivation>> entry in c.activationList) {
-					if (entry.Value != null && entry.Value.Count == perso.p3dData.family.states.Count) {
-						CollideActivation ca = entry.Value[stateIndex];
-						if (ca.activationZone != null) {
-							foreach (CollideActivationZone caz in ca.activationZone) {
-								int index = caz.zdxIndex;
-								if (index >= c.zdxList[entry.Key].Count) index = c.zdxList[entry.Key].Count - 1;
-								if (index < 0) continue;
-								if (c.zdxList[entry.Key][index] == null) continue;
-								if (c.GetPrivilegedActionZoneStatus(entry.Key, index) != CollSet.PrivilegedActivationStatus.ForceInactive) {
-									c.zdxList[entry.Key][index].SetVisualsActive(true);
-								}
+		if (perso.collset.Value != null) {
+			CollSet c = perso.collset.Value;
+			if (collSetObjects == null) {
+				collSetObjects = new Dictionary<CollideType, GameObject[]>();
+				foreach (KeyValuePair<CollideType, Reference<ZdxList>> entry in c.zdxList) {
+					if (entry.Value.Value != null) {
+						ZdxList zdx = entry.Value.Value;
+						collSetObjects[entry.Key] = new GameObject[zdx.num_objects];
+						if (zdx.num_objects > 0 && zdx.objects.Value != null) {
+							for (int i = 0; i < zdx.objects.Value.objects.Length; i++) {
+								GeometricObject geo = zdx.objects.Value.objects[i].Value;
+								if (geo == null) continue;
+								collSetObjects[entry.Key][i] = geo.GetGameObject(GeometricObject.Type.Collide, entry.Key);
+								collSetObjects[entry.Key][i].transform.SetParent(transform);
+								collSetObjects[entry.Key][i].transform.localPosition = Vector3.zero;
+								collSetObjects[entry.Key][i].transform.localRotation = Quaternion.identity;
+								collSetObjects[entry.Key][i].transform.localScale = Vector3.one;
+								/*if(viewCollision && 
+								if (viewCollision && c.GetPrivilegedActionZoneStatus(entry.Key, i) == CollSet.PrivilegedActivationStatus.ForceActive) {
+									col.SetVisualsActive(true);
+								} else {
+									col.SetVisualsActive(false);
+								}*/
 							}
 						}
 					}
 				}
 			}
-		}*/
+			foreach (KeyValuePair<CollideType, GameObject[]> entry in collSetObjects) {
+				if (entry.Value != null && entry.Value.Length > 0) {
+					foreach (GameObject gao in entry.Value) {
+						if (gao != null) gao.SetActive(false);
+					}
+				}
+			}
+			if (viewCollision) {
+				foreach (KeyValuePair<CollideType, Reference<ActivationList>> entry in c.activationList) {
+					if (!collSetObjects.ContainsKey(entry.Key)) continue;
+					if (entry.Value.Value != null && entry.Value.Value.num_objects > 0 && entry.Value.Value.objects.Value != null) {
+						ActivationZoneArray azr = entry.Value.Value.objects.Value;
+						if (azr.elements.Length == 0) continue;
+						for (int i = 0; i < azr.elements.Length; i++) {
+							if (azr.elements[i].state.Value == state) {
+								ActivationZone zone = azr.elements[i].activationList.Value;
+								if (zone != null && zone.num_objects > 0 && zone.objects.Value != null) {
+									foreach (ushort act in zone.objects.Value.objects) {
+										if (collSetObjects[entry.Key].Length > act
+											&& collSetObjects[entry.Key][act] != null) {
+											collSetObjects[entry.Key][act].SetActive(true);
+										}
+									}
+								}
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private void SetState(State state)

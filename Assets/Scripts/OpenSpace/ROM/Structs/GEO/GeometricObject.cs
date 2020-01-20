@@ -125,6 +125,12 @@ namespace OpenSpace.ROM {
 							if (entry.element.Value is GeometricElementCollideTriangles) {
 								GeometricElementCollideTriangles el = entry.element.Value as GeometricElementCollideTriangles;
 								child = el.GetGameObject(type, this, collideType: collideType);
+							} else if (entry.element.Value is GeometricElementCollideSpheres) {
+								GeometricElementCollideSpheres el = entry.element.Value as GeometricElementCollideSpheres;
+								child = el.GetGameObject(type, this, collideType: collideType);
+							} else if (entry.element.Value is GeometricElementCollideAlignedBoxes) {
+								GeometricElementCollideAlignedBoxes el = entry.element.Value as GeometricElementCollideAlignedBoxes;
+								child = el.GetGameObject(type, this, collideType: collideType);
 							}
 							if (child != null) {
 								child.transform.SetParent(gao.transform);

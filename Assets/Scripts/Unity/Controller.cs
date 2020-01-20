@@ -457,7 +457,7 @@ public class Controller : MonoBehaviour {
 			if (romLoader.level != null && romLoader.level.spawnablePersos.Value != null && romLoader.level.num_spawnablepersos > 0) {
 				GameObject spawnableParent = new GameObject("Spawnable persos");
 				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
-					detailedState = "Initializing  spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
+					detailedState = "Initializing spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
 					yield return null;
 					OpenSpace.ROM.SuperObjectDynamic sod = romLoader.level.spawnablePersos.Value.superObjects[i];
 					GameObject sodGao = sod.GetGameObject();
@@ -550,6 +550,9 @@ public class Controller : MonoBehaviour {
 					PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
 					pb.UpdateViewCollision(viewCollision);
 				}
+			}
+			foreach (ROMPersoBehaviour perso in romPersos) {
+				if (perso != null) { perso.UpdateViewCollision(viewCollision); }
 			}
 			foreach (SuperObject so in loader.superObjects) {
 				if (so.Gao != null) {
