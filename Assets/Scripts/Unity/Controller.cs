@@ -34,11 +34,13 @@ public class Controller : MonoBehaviour {
 	bool playTextureAnimations_ = true; public bool playTextureAnimations = true;
 	bool showPersos_ = true; public bool showPersos = true;
     bool livePreview_ = false; public bool livePreview = false;
+    bool levelGeometryCorruptions_ = false; public bool levelGeometryCorruptions = false;
     float livePreviewUpdateCounter = 0;
 
 	private CinematicSwitcher cinematicSwitcher = null;
+    private LevelGeometryCorruptor levelGeometryCorruptor = null;
 
-	private bool ExportAfterLoad { get; set; }
+    private bool ExportAfterLoad { get; set; }
 	public string ExportPath { get; set; }
 
 	public List<ROMPersoBehaviour> romPersos { get; set; } = new List<ROMPersoBehaviour>();
@@ -264,6 +266,9 @@ public class Controller : MonoBehaviour {
                 livePreview_ = livePreview;
                 //updatedSettings = true;
             }
+            if (levelGeometryCorruptions != levelGeometryCorruptions_) {
+                levelGeometryCorruptions_ = levelGeometryCorruptions;
+            }
             if (playAnimations != playAnimations_ || playTextureAnimations != playTextureAnimations_) {
 				playTextureAnimations_ = playTextureAnimations;
 				playAnimations_ = playAnimations;
@@ -282,6 +287,14 @@ public class Controller : MonoBehaviour {
                 UpdateLivePreview();
                 livePreviewUpdateCounter = 0.0f;
             }
+        }
+
+        if (levelGeometryCorruptions) {
+            if (levelGeometryCorruptor==null) {
+                levelGeometryCorruptor = new LevelGeometryCorruptor(this);
+            }
+
+            levelGeometryCorruptor.DoCorruptions();
         }
     }
 
