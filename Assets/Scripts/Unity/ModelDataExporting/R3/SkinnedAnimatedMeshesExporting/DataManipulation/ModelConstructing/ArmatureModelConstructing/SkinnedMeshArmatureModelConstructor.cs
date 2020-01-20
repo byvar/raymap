@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Assets.Scripts.Unity.ModelDataExporting.MathDescription;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.Utils;
-using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription.Armature;
 using Assets.Scripts.Utils;
 using UnityEngine;
@@ -25,9 +21,9 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
                         "ROOT_CHANNEL",
                         new ArmatureModelNode(
                             "ROOT_CHANNEL", 
-                            new Model.MathDescription.Vector3d(0.0f, 0.0f, 0.0f),
-                            new Model.MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
-                            new Model.MathDescription.Vector3d(1.0f, 1.0f, 1.0f))
+                            new Vector3d(0.0f, 0.0f, 0.0f),
+                            new MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                            new Vector3d(1.0f, 1.0f, 1.0f))
                     )
                 );
 
@@ -66,27 +62,27 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
 
             Matrix4x4 localMatrix = bindposeMatrix.inverse;
             boneWorkingDuplicate.transform.localPosition = localMatrix.MultiplyPoint(Vector3.zero);
-            boneWorkingDuplicate.transform.localRotation = Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
+            boneWorkingDuplicate.transform.localRotation = UnityEngine.Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
             boneWorkingDuplicate.transform.localScale =
                 new Vector3(localMatrix.GetColumn(0).magnitude, localMatrix.GetColumn(1).magnitude, localMatrix.GetColumn(2).magnitude);
 
             var result = 
                 new ArmatureModelNode(
                     "", 
-                    new Model.MathDescription.Vector3d(0.0f, 0.0f, 0.0f),
-                    new Model.MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
-                    new Model.MathDescription.Vector3d(1.0f, 1.0f, 1.0f));
-            result.position = new Model.MathDescription.Vector3d(
+                    new Vector3d(0.0f, 0.0f, 0.0f),
+                    new MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                    new Vector3d(1.0f, 1.0f, 1.0f));
+            result.position = new Vector3d(
                 boneWorkingDuplicate.transform.position.x,
                 boneWorkingDuplicate.transform.position.y,
                 boneWorkingDuplicate.transform.position.z);
-            result.rotation = new Model.MathDescription.Quaternion(
+            result.rotation = new MathDescription.Quaternion(
                 boneWorkingDuplicate.transform.rotation.w,
                 boneWorkingDuplicate.transform.rotation.x,
                 boneWorkingDuplicate.transform.rotation.y,
                 boneWorkingDuplicate.transform.rotation.z
                 );
-            result.scale = new Model.MathDescription.Vector3d(
+            result.scale = new Vector3d(
                 boneWorkingDuplicate.transform.lossyScale.x,
                 boneWorkingDuplicate.transform.lossyScale.y,
                 boneWorkingDuplicate.transform.lossyScale.z

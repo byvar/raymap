@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.MathDescription;
+﻿using Assets.Scripts.Unity.ModelDataExporting.MathDescription;
 using System;
 using System.Collections.Generic;
 using System.Linq;

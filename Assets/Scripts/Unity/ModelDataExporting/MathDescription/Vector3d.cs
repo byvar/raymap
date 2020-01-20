@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.MathDescription
+namespace Assets.Scripts.Unity.ModelDataExporting.MathDescription
 {
     public class Vector3d
     {

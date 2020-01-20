@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting.Model
 {
-    [Serializable]
     public class AnimationsModel
     {
         public Dictionary<string, Dictionary<int, AnimationFrameModel>> animationClips = new Dictionary<string, Dictionary<int, AnimationFrameModel>>();
@@ -19,11 +18,6 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             }
 
             animationClips[animationClipName][frameNumber] = animationFrameModel;
-        }
-
-        internal void addAnimationFrameModelToAnimationClip(object name, AnimationFrameModel animationFrameModel, object frameNumber)
-        {
-            throw new NotImplementedException();
         }
     }
 }
