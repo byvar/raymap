@@ -1,61 +1,30 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Unity.ModelDataExporting.MathDescription;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.Utils;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription.Armature;
 using Assets.Scripts.Utils;
 using UnityEngine;
 
 namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.ArmatureModelConstructing
 {
-    public class SkinnedMeshArmatureModelConstructor
+    public class SkinnedMeshBonesBindPosesDictionaryConstructor
     {
-        public ArmatureModel ConstructFrom(Matrix4x4[] bindposes, Transform[] bones)
+        public Dictionary<string, BoneBindPose> ConstructFrom(Matrix4x4[] bindposes, Transform[] bones)
         {
-            var result = new ArmatureModel();
-            Queue<TreeBuildingNodeInfo<ArmatureModelNode, string>> ArmatureTreeBuildingNodes = 
-                new Queue<TreeBuildingNodeInfo<ArmatureModelNode, string>>();
-
-            ArmatureTreeBuildingNodes.Enqueue(
-                    new TreeBuildingNodeInfo<ArmatureModelNode, string>(
-                        null,
-                        "ROOT_CHANNEL",
-                        new ArmatureModelNode(
-                            "ROOT_CHANNEL", 
-                            new Vector3d(0.0f, 0.0f, 0.0f),
-                            new MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
-                            new Vector3d(1.0f, 1.0f, 1.0f))
-                    )
-                );
-
+            var result = new Dictionary<string, BoneBindPose>();
             for (int i = 0; i < bones.Length; i++)
             {
                 var boneTransform = bones[i];
                 var channelGameObject = ObjectsHierarchyHelper.GetProperChannelForTransform(boneTransform).gameObject;
-                ArmatureModelNode boneBindPoseTransform = GetBindPoseBoneTransformForBindPoseMatrix(bones[i], bindposes[i]);
+                BoneBindPose boneBindPoseTransform = GetBindPoseBoneTransformForBindPoseMatrix(bones[i], bindposes[i]);
                 boneBindPoseTransform.boneName = channelGameObject.name;
-                var parentChannelName = ObjectsHierarchyHelper.GetParentChannelNameOrNullIfNotPresent(channelGameObject.transform);
-
-                if (parentChannelName == null)
-                {
-                    parentChannelName = "ROOT_CHANNEL";
-                }
-
-                ArmatureTreeBuildingNodes.Enqueue(
-                    new TreeBuildingNodeInfo<ArmatureModelNode, string>(
-                            parentChannelName,
-                            channelGameObject.name,
-                            boneBindPoseTransform
-                        )
-                    );
+                result.Add(channelGameObject.name, boneBindPoseTransform);
             }
-
-            var resultTree = (Tree<ArmatureModelNode, string>) result;
-            resultTree = Tree<ArmatureModelNode, string>.BuildTreeWithProperNodesPuttingOrder(resultTree, ArmatureTreeBuildingNodes);
-            result = (ArmatureModel)resultTree;
             return result;
         }
 
-        private ArmatureModelNode GetBindPoseBoneTransformForBindPoseMatrix(Transform bone, Matrix4x4 bindposeMatrix)
+        private BoneBindPose GetBindPoseBoneTransformForBindPoseMatrix(Transform bone, Matrix4x4 bindposeMatrix)
         {
             GameObject boneWorkingDuplicate = UnityEngine.Object.Instantiate(bone.gameObject);
             boneWorkingDuplicate.transform.SetParent(null);
@@ -67,7 +36,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
                 new Vector3(localMatrix.GetColumn(0).magnitude, localMatrix.GetColumn(1).magnitude, localMatrix.GetColumn(2).magnitude);
 
             var result = 
-                new ArmatureModelNode(
+                new BoneBindPose(
                     "", 
                     new Vector3d(0.0f, 0.0f, 0.0f),
                     new MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),

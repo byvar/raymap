@@ -20,12 +20,12 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             AnimatedExportObjectModel result = new AnimatedExportObjectModel();
             result.Name = r3AnimatedMesh.gameObject.name;
             SkinnedMeshRenderer skinnedMeshRendererComponent = r3AnimatedMesh.GetComponent<SkinnedMeshRenderer>();
-            ArmatureModel armatureModel = ConstructArmatureModel(
+            Dictionary<string, BoneBindPose> bonesBindPoses = ConstructBonesBindPosesDictionary(
                 skinnedMeshRendererComponent.sharedMesh.bindposes,
                 skinnedMeshRendererComponent.bones);
             MeshGeometry meshGeometry = DeriveMeshGeometryData(skinnedMeshRendererComponent.sharedMesh, skinnedMeshRendererComponent.bones);
             TransformModel transformModel = GetTransformModel(r3AnimatedMesh.transform);
-            result.armatureModel = armatureModel;
+            result.bindBonePoses = bonesBindPoses;
             result.meshGeometry = meshGeometry;
             result.transform = transformModel;
             return result;
@@ -48,9 +48,9 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             return new SkinnedMeshGeometryDataConstructor().ConstructFrom(sharedMesh, bones);
         }
 
-        private ArmatureModel ConstructArmatureModel(Matrix4x4[] bindposes, Transform[] bones)
+        private Dictionary<string, BoneBindPose> ConstructBonesBindPosesDictionary(Matrix4x4[] bindposes, Transform[] bones)
         {
-            return new SkinnedMeshArmatureModelConstructor().ConstructFrom(bindposes, bones);
+            return new SkinnedMeshBonesBindPosesDictionaryConstructor().ConstructFrom(bindposes, bones);
         }
     }
 }

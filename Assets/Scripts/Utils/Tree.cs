@@ -117,7 +117,13 @@ namespace Assets.Scripts.Utils
         {
             if (parentIdentifier == null)
             {
-                Root = new TreeNodeContainer<T, KeyType>(nodeIdentifier, node);
+                if (Root == null)
+                {
+                    Root = new TreeNodeContainer<T, KeyType>(nodeIdentifier, node);
+                } else
+                {
+                    throw new InvalidOperationException("The tree already contains root element!");
+                }                    
             }
             else
             {

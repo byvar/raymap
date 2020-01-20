@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription;
-using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription.Armature;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
         public string Name;
         public TransformModel transform;
         public MeshGeometry meshGeometry;
-        public ArmatureModel armatureModel;
+        public Dictionary<string, BoneBindPose> bindBonePoses;
     }
 }
+6

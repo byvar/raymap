@@ -1,6 +1,8 @@
 ﻿using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.ArmatureModelConstructing;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.ObjectsExportLibraryModelDescription;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,11 @@ public class R3AnimatedMesh : MonoBehaviour
     public void AddToExportObjectsLibrary()
     {
         objectsExportLibraryInterface.AddR3AnimatedMeshToLibrary(this);
+    }
+
+    public ArmatureHierarchyModel GetCurrentOverallArmatureHierarchy()
+    {
+        return (new ArmatureHierarchyModelConstructor()).DeriveArmatureHierarchyModel(this);
     }
 
     public void ClearExportObjectsLibrary()
