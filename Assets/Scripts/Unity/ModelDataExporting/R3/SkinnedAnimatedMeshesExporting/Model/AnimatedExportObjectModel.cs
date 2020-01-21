@@ -15,4 +15,3 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
         public Dictionary<string, BoneBindPose> bindBonePoses;
     }
 }
-6
