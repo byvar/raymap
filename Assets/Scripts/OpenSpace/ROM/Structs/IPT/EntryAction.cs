@@ -20,10 +20,26 @@ namespace OpenSpace.ROM {
         }
 
 		public override string ToString() {
+			return GetNameString() + " = " + GetValueString();
+		}
+		public string ToScriptString() {
+			return GetNameString() + "(" + GetValueOnlyString() + ")";
+		}
+		public string GetNameString() {
+			return "EntryAction_" + string.Format("{0:X4}", Index);
+		}
+		public string GetValueString() {
 			if (num_keywords > 0 && keywords.Value != null) {
-				return "EntryAction_" + string.Format("{0:X4}", Index) + " = EntryAction(" + keywords.Value.keywords[0].ToString() + ")";
+				return "EntryAction(" + keywords.Value.keywords[0].ToString() + ")";
 			} else {
-				return "EntryAction_" + string.Format("{0:X4}", Index) + " = EntryAction.Empty";
+				return "EntryAction.Empty";
+			}
+		}
+		public string GetValueOnlyString() {
+			if (num_keywords > 0 && keywords.Value != null) {
+				return keywords.Value.keywords[0].ToString();
+			} else {
+				return "Empty";
 			}
 		}
 	}

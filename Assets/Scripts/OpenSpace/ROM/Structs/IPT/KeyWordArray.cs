@@ -163,13 +163,13 @@ namespace OpenSpace.ROM {
 						case FunctionType.KeyReleased:
 						case FunctionType.KeyJustPressed:
 						case FunctionType.KeyJustReleased:
-							return FunctionType + "(" + Enum.GetName(typeof(KeyCode), subkeywords[0].indexOrKeyCode) + ")";
+							return FunctionType + "(" + Enum.GetName(typeof(OpenSpace.Input.KeyCode), subkeywords[0].indexOrKeyCode) + ")";
 						case FunctionType.Sequence:
 							string sequence = "";
 							// Skip 1 at the end (first sequenceKey), then do -2 to skip over every other sequenceKey
 							// Then stop because first two keywords (last two processed here) are length and sequenceEnd
 							for (int i = subkeywords.Length - 2; i > 1; i -= 2) {
-								sequence += Enum.GetName(typeof(KeyCode), subkeywords[i].indexOrKeyCode);
+								sequence += Enum.GetName(typeof(OpenSpace.Input.KeyCode), subkeywords[i].indexOrKeyCode);
 							}
 							return "Sequence(\"" + sequence + "\")";
 						case FunctionType.JoystickPressed:
@@ -177,14 +177,14 @@ namespace OpenSpace.ROM {
 						case FunctionType.JoystickOrPadPressed:
 						case FunctionType.JoystickOrPadReleased:
 							return FunctionType + "("
-								+ Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode)
+								+ ((Settings.s.platform == Settings.Platform._3DS) ? Enum.GetName(typeof(KeyCode3DS), subkeywords[1].indexOrKeyCode).ToString() : subkeywords[1].indexOrKeyCode.ToString())
 								+ (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "")
 								+ (subkeywords[2].indexOrKeyCode != 0 ? (", " + subkeywords[2].indexOrKeyCode) : "") + ")";
 						case FunctionType.JoystickJustPressed:
 						case FunctionType.JoystickJustReleased:
 						case FunctionType.JoystickOrPadJustPressed:
 						case FunctionType.JoystickOrPadJustReleased:
-							return FunctionType + "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+							return FunctionType + "(" + Enum.GetName(typeof(KeyCode3DS), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
 						case FunctionType.JoystickAxeValue:
 							return FunctionType + "("
 								+ (subkeywords[1].indexOrKeyCode == 4 ? "X" : "Y")
@@ -195,7 +195,7 @@ namespace OpenSpace.ROM {
 						case FunctionType.ActionInvalidated:
 							EntryAction action = subkeywords[0]?.subAction.Value;
 							return FunctionType + "("
-								+ (action != null ? "EntryAction_" + string.Format("{0:X4}", action.Index) : "null")
+								+ (action != null ? action.GetNameString() : "null")
 								+ (subkeywords[1].indexOrKeyCode != 0 ? (", " + subkeywords[1].indexOrKeyCode) : "")
 								+ ")";
 						//return FunctionType + "{" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + "}";
@@ -203,7 +203,7 @@ namespace OpenSpace.ROM {
 						case FunctionType.ActionJustInvalidated:
 							EntryAction action2 = subkeywords[0]?.subAction.Value;
 							return FunctionType + "("
-								+ (action2 != null ? "EntryAction_" + string.Format("{0:X4}", action2.Index) : "null")
+								+ (action2 != null ? action2.GetNameString() : "null")
 								+ ")";
 							//return FunctionType + "{" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + "}";
 						default:
@@ -246,7 +246,20 @@ namespace OpenSpace.ROM {
 				FunctionType.SequencePad,
 				FunctionType.SequencePadEnd,
 			};
-
+			public enum KeyCode3DS {
+				Dive = 0x10,
+				Jump = 0x11,
+				_18 = 0x12,
+				_19 = 0x13,
+				CamLeft = 0x14,
+				CamRight = 0x15,
+				_22 = 0x16,
+				_23 = 0x17,
+				LookMode = 0x18,
+				Strafe = 0x19,
+				_26 = 0x1A,
+				Shoot = 0x1B,
+			}
 		}
 
 	}

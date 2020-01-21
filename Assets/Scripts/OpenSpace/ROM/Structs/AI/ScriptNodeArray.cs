@@ -206,21 +206,20 @@ namespace OpenSpace.ROM {
                         };
                         return paramFloat.Value?.value.ToString(nfi) + "f";
                     case NodeType.Button: // Button/entryaction
-                        /*EntryAction ea = EntryAction.FromOffset(param_ptr);
+						EntryAction ea = paramButton.Value;
 
                         if (ea == null) {
                             return "ERR_ENTRYACTION_NOTFOUND";
                         }
 
-                        string eaName = (advanced ? ea.ToString() : ea.ToBasicString());
-                        if (advanced) return "Button: " + eaName + "(" + param_ptr + ")";
+                        string eaName = (advanced ? ea.ToString() : ea.ToScriptString());
+                        if (advanced) return "Button: " + eaName + "(" + ea.Offset + ")";
                         
                         if (!ts.expandEntryActions && ea != null) {
-                            return "\"" + ea.ExportName + "\"";
+                            return "\"" + eaName + "\"";
                         }
-                        */
-                        return "entryaction_"+param;
-                    case NodeType.ConstantVector:
+						return eaName;
+					case NodeType.ConstantVector:
 						return "Constant Vector: " + paramVector3.Value?.value.ToString();
                     case NodeType.Vector:
                         return "new Vector3"; // TODO: same
