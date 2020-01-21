@@ -49,6 +49,7 @@ namespace OpenSpace.ROM {
 			public Reference<State> paramAction;
 			public Reference<LightInfo> paramLightInfo;
 			public Reference<ROMVector3> paramVector3;
+			public Reference<EntryAction> paramButton;
 
             public ScriptNode(Reader reader) {
 
@@ -106,6 +107,9 @@ namespace OpenSpace.ROM {
 						break;
 					case NodeType.ConstantVector:
 						paramVector3 = new Reference<ROMVector3>(param, reader, true);
+						break;
+					case NodeType.Button:
+						paramButton = new Reference<EntryAction>(param, reader, true);
 						break;
 				}
 

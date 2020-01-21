@@ -246,7 +246,7 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 			* max(0.0, dot(normalDirection, lightDirection));*/
 	} else {
 		//diffuseReflection = float3(1.0, 1.0, 1.0);
-		diffuseReflection = _DiffuseCoef.xyz;
+		diffuseReflection = _AmbientCoef.xyz;// +_DiffuseCoef.xyz;
 	}
 	if (/*_ShadingMode == 0.0 && */isAdd == 0.0 && isLight == 0.0) {
 		float4 lightCol = ApplyStaticLights(normalDirection, multipliedPosition);
@@ -310,8 +310,8 @@ float4 TextureOp(float4 color_in, float4 diffuseColor, sampler2D tex, float4 uv,
 		//return lerp(color_in, float4(diffuseColor.xyz * texColor.xyz, texColor.w), uv.z * texColor.w);
 	} else if (tex_params.x == 3) {
 		// Transparent
-		//return lerp(color_in, diffuseColor * texColor, uv.z);
-		return lerp(color_in, diffuseColor * float4(texColor.xyz, 1), uv.z * texColor.w);
+		return lerp(color_in, diffuseColor * texColor, uv.z);
+		//return lerp(color_in, diffuseColor * float4(texColor.xyz, 1), uv.z * texColor.w);
 	} else if (tex_params.x == 4) {
 		// Multiply
 		return color_in * float4(texColor.xyz * texColor.w * uv.z, 1);

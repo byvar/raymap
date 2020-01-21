@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 
 namespace OpenSpace.Input {
-    public abstract class InputFunctions {
+    public class InputFunctions {
 
         public enum FunctionType {
             Unknown,

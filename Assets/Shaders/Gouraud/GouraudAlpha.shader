@@ -60,6 +60,7 @@
 
 			CGPROGRAM
 
+			#pragma target 3.0
 			#pragma vertex vert  
 			#pragma fragment frag 
 			#pragma multi_compile_fog
@@ -83,6 +84,7 @@
 
 			CGPROGRAM
 
+			#pragma target 3.0
 			#pragma vertex vert  
 			#pragma fragment frag 
 

@@ -154,7 +154,7 @@ namespace OpenSpace.ROM {
 			}
 
 			public static ROMMatrix Get(ushort index, Short3Array indices, Vector3Array vectors) {
-				if (index == 0xFFFF || indices == null || vectors == null) return null;
+				if (index == 0xFFFF || indices == null || vectors == null || index >= indices.length) return null;
 				Short3Array.Triangle tri = indices.triangles[index];
 				return new ROMMatrix() {
 					v1 = tri.v1 != 0xFFFF && tri.v1 < vectors.length ? new Vector3?(vectors.vectors[tri.v1]) : null,
