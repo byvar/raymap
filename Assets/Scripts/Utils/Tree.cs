@@ -6,15 +6,20 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Utils
 {
-    public class ParentChildPair<T>
+    public class ParentChildPair<T, KeyType>
     {
         public T Parent;
         public T Child;
 
-        public ParentChildPair(T Parent, T Child)
+        public KeyType ParentId;
+        public KeyType ChildId;
+
+        public ParentChildPair(T Parent, T Child, KeyType ParentId, KeyType ChildId)
         {
             this.Parent = Parent;
             this.Child = Child;
+            this.ParentId = ParentId;
+            this.ChildId = ChildId;
         }
     }
 
@@ -29,6 +34,28 @@ namespace Assets.Scripts.Utils
             this.ParentId = ParentId;
             this.NodeId = NodeId;
             this.Node = Node;
+        }
+    }
+
+    public class TreeBuildingNodesSet<T, KeyType>
+    {
+        List<TreeBuildingNodeInfo<T, KeyType>> BuildingNodes;
+
+        public TreeBuildingNodesSet(List<TreeBuildingNodeInfo<T, KeyType>> BuildingNodes)
+        {
+            this.BuildingNodes = BuildingNodes;
+        }
+
+        public Queue<TreeBuildingNodeInfo<T, KeyType>> ToBuildingTreeNodesQueue()
+        {
+            return new Queue<TreeBuildingNodeInfo<T, KeyType>>(BuildingNodes);
+        }
+
+        public TreeBuildingNodesSet<T, KeyType> Difference(TreeBuildingNodesSet<T, KeyType> Other)
+        {
+            return new TreeBuildingNodesSet<T, KeyType>(
+                BuildingNodes.Where(x => !Other.BuildingNodes.Any(y => y.NodeId.Equals(x.NodeId))).ToList()
+                );
         }
     }
 
@@ -56,11 +83,11 @@ namespace Assets.Scripts.Utils
             }
         }
 
-        public void TraverseChildParentPairsAndCollectAll(List<ParentChildPair<T>> pairs)
+        public void TraverseChildParentPairsAndCollectAll(List<ParentChildPair<T, KeyType>> pairs)
         {
             foreach (var Child in Children)
             {
-                pairs.Add(new ParentChildPair<T>(this.Node, Child.Node));
+                pairs.Add(new ParentChildPair<T, KeyType>(this.Node, Child.Node, this.Id, Child.Id));
             }
             foreach (var Child in Children)
             {
@@ -151,9 +178,9 @@ namespace Assets.Scripts.Utils
             }
         }
 
-        public IEnumerable<ParentChildPair<T>> IterateParentChildPairs()
+        public IEnumerable<ParentChildPair<T, KeyType>> IterateParentChildPairs()
         {
-            List<ParentChildPair<T>> pairs = new List<ParentChildPair<T>>();
+            List<ParentChildPair<T, KeyType>> pairs = new List<ParentChildPair<T, KeyType>>();
             if (Root != null)
             {
                 Root.TraverseChildParentPairsAndCollectAll(pairs);
@@ -213,6 +240,20 @@ namespace Assets.Scripts.Utils
                 }
             }
             return result;
+        }
+
+        public TreeBuildingNodesSet<T, KeyType> GetTreeBuildingNodes()
+        {
+            var resultList = new List<TreeBuildingNodeInfo<T, KeyType>>();
+            if (Root != null)
+            {
+                resultList.Add(new TreeBuildingNodeInfo<T, KeyType>(default(KeyType), Root.Id, GetRoot()));
+            }            
+            foreach (var parentChildPair in IterateParentChildPairs())
+            {
+                resultList.Add(new TreeBuildingNodeInfo<T, KeyType>(parentChildPair.ParentId, parentChildPair.ChildId, parentChildPair.Child));
+            }
+            return new TreeBuildingNodesSet<T, KeyType>(resultList);
         }
     }
 }

@@ -60,8 +60,10 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
                         )
                     );
             }
-            var resultTree = Tree<ArmatureHierarchyModelNode, string>.BuildTreeWithProperNodesPuttingOrder(null, armatureHierarchyModelBuildingNodes);
-            var result = (ArmatureHierarchyModel)resultTree;
+            var result = new ArmatureHierarchyModel();
+            var resultTree = (Tree<ArmatureHierarchyModelNode, string>)result;
+            resultTree = Tree<ArmatureHierarchyModelNode, string>.BuildTreeWithProperNodesPuttingOrder(resultTree, armatureHierarchyModelBuildingNodes);
+            result = (ArmatureHierarchyModel)resultTree;
             return result;
         }
 
