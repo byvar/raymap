@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenSpace.FileFormat {
     struct DATHeader {
@@ -27,13 +28,12 @@ namespace OpenSpace.FileFormat {
             reader = new Reader(stream, Settings.s.IsLittleEndian);
         }
 
-        public IEnumerator GetOffset(RelocationTableReference rtref) {
+        public async Task GetOffset(RelocationTableReference rtref) {
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
-			Controller c = MapLoader.Loader.controller;
 			reader.MaskingOff();
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
 
-			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(12*4));
+			if (httpStream != null) await httpStream.FillCacheForRead(12*4);
 			DATHeader header = new DATHeader();
             header.field_0 = reader.ReadInt32();
             header.field_4 = reader.ReadInt32();
@@ -131,7 +131,7 @@ namespace OpenSpace.FileFormat {
             long v14 = (long)Math.Floor(levels0DatValue_0 * v13);
 
             reader.BaseStream.Seek(levels0DatValue_4 + levels0DatValue_5 * v14, SeekOrigin.Begin);
-			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4 * 4));
+			if (httpStream != null) await httpStream.FillCacheForRead(4 * 4);
 
 			header.field_0 = reader.ReadInt32();
             header.field_4 = reader.ReadInt32();
@@ -153,7 +153,7 @@ namespace OpenSpace.FileFormat {
             }
 
             reader.BaseStream.Seek(4 * v28, SeekOrigin.Current);
-			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4));
+			if (httpStream != null) await httpStream.FillCacheForRead(4);
 			uint value1 = reader.ReadUInt32();
 
             uint dataOffset = (uint)(header.field_4 ^ (value1 - header.field_0));

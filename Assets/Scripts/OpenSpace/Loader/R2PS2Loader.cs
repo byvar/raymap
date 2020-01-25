@@ -18,6 +18,7 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using OpenSpace.FileFormat.RenderWare;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2PS2Loader : MapLoader {
@@ -28,16 +29,16 @@ namespace OpenSpace.Loader {
 		public VisualMaterial lightCookieMaterial;
 		public Color[] lightCookieColors;
 
-        public override IEnumerator Load() {
+		protected override async Task Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
 				gameDataBinFolder += "/";
-				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 loadingState = "Initializing files";
-                yield return controller.StartCoroutine(CreateCNT());
+                await CreateCNT();
 
 
 				// Prepare folder names
@@ -45,7 +46,6 @@ namespace OpenSpace.Loader {
 				string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Settings.CapsType.LevelFolder);
 				
 				// Prepare paths
-				Dictionary<string, string> paths = new Dictionary<string, string>();
 				paths["fix.lv2"] = fixFolder + ConvertCase("Fix.lv2", Settings.CapsType.LevelFile);
 				paths["fix.pt2"] = fixFolder + ConvertCase("Fix.pt2", Settings.CapsType.LevelFile);
 				paths["lvl.lv2"] = lvlFolder + ConvertCase(lvlName + ".lv2", Settings.CapsType.LevelFile);
@@ -59,14 +59,14 @@ namespace OpenSpace.Loader {
 
 				// Download files
 				foreach (KeyValuePair<string, string> path in paths) {
-					if (path.Value != null) yield return controller.StartCoroutine(PrepareFile(path.Value));
+					if (path.Value != null) await PrepareFile(path.Value);
 				}
 
 				loadingState = "Loading textures";
-				yield return null;
+				await WaitIfNecessary();
 				txds.Add(new TextureDictionary(paths["lvl.rw3.0"]));
 				loadingState = "Loading lightmaps";
-				yield return null;
+				await WaitIfNecessary();
 				if (FileSystem.FileExists(paths["lvl.lm3.0"])) {
 					txds.Add(new TextureDictionary(paths["lvl.lm3.0"]));
 				}
@@ -74,18 +74,18 @@ namespace OpenSpace.Loader {
 					txds.Add(new TextureDictionary(paths["lvl.lm3.1"]));
 				}
 				loadingState = "Loading geometry";
-				yield return null;
+				await WaitIfNecessary();
 				ato = new MeshFile(paths["lvl.ato.0"]);
 
 				loadingState = "Loading level files";
-				yield return null;
+				await WaitIfNecessary();
 				LVL fix = new LVL(lvlName, paths["fix.lv2"], 0);
 				LVL lvl = new LVL(lvlName, paths["lvl.lv2"], 1);
 				files_array[0] = fix;
 				files_array[1] = lvl;
 				fix.ReadPTR(paths["fix.pt2"]);
 				lvl.ReadPTR(paths["lvl.pt2"]);
-				yield return controller.StartCoroutine(LoadPS2());
+				await LoadPS2();
 			} finally {
                 for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
@@ -94,22 +94,23 @@ namespace OpenSpace.Loader {
                 }
                 if (cnt != null) cnt.Dispose();
             }
-            yield return null;
+            await WaitIfNecessary();
             InitModdables();
         }
 
         #region PS2
-        public IEnumerator LoadPS2() {
+        async Task LoadPS2() {
+			await WaitIfNecessary();
             textures = new TextureInfo[0];
 
             loadingState = "Loading fixed memory";
-            yield return null;
+            await WaitIfNecessary();
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
             Pointer off_base_fix = Pointer.Current(reader);
 
 			loadingState = "Loading input struct";
-			yield return null;
+			await WaitIfNecessary();
 			for (int i = 0; i < Settings.s.numEntryActions; i++) {
 				Pointer.Read(reader); // 3DOS_EntryActions
 			}
@@ -148,7 +149,7 @@ namespace OpenSpace.Loader {
 				}
 			});
 
-            yield return null;
+            await WaitIfNecessary();
             Pointer.Read(reader);
             Pointer.Read(reader);
             Pointer.Read(reader);
@@ -190,7 +191,7 @@ namespace OpenSpace.Loader {
                 for (int i = 0; i < num_languages; i++) {
                     loadingState = "Loading text files: " + (i+1) + "/" + num_languages;
                     string langFilePath = gameDataBinFolder + "TEXTS/" + languages[i].ToUpper() + ".LNG";
-                    yield return controller.StartCoroutine(PrepareFile(langFilePath));
+                    await PrepareFile(langFilePath));
                     files_array[2] = new DCDAT(languages[i], langFilePath, 2);
                     ((DCDAT)files_array[2]).SetHeaderOffset(base_language);
                     files_array[2].GotoHeader();
@@ -200,7 +201,7 @@ namespace OpenSpace.Loader {
             }
         
             loadingState = "Loading fixed textures";
-            yield return null;
+            await WaitIfNecessary();
             Pointer off_events_fix = Pointer.Read(reader);
             uint num_events_fix = reader.ReadUInt32();
             uint num_textures_fix = reader.ReadUInt32();
@@ -222,7 +223,7 @@ namespace OpenSpace.Loader {
                 }
             });*/
 			loadingState = "Loading level memory";
-            yield return null;
+            await WaitIfNecessary();
             files_array[Mem.Lvl].GotoHeader();
             reader = files_array[Mem.Lvl].reader;
 			string build = reader.ReadString(0x20);
@@ -359,19 +360,19 @@ namespace OpenSpace.Loader {
 			}
 
 			loadingState = "Loading families";
-            yield return null;
+            await WaitIfNecessary();
             ReadFamilies(reader);
 			//print("Families: " + families.Count);
             loadingState = "Loading superobject hierarchy";
-            yield return null;
+            await WaitIfNecessary();
             ReadSuperObjects(reader);
             loadingState = "Loading always structure";
-            yield return null;
+            await WaitIfNecessary();
             ReadAlways(reader);
             loadingState = "Filling in cross-references";
-            yield return null;
+            await WaitIfNecessary();
             ReadCrossReferences(reader);
-			yield return null;
+			await WaitIfNecessary();
         }
 		#endregion
 

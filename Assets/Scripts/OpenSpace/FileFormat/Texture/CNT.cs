@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace OpenSpace.FileFormat.Texture {
@@ -43,7 +44,6 @@ namespace OpenSpace.FileFormat.Texture {
         }
 
         public CNTVersion version;
-		public GF preparedGF = null;
 
 
         public string[][] directoryList = null;
@@ -88,16 +88,15 @@ namespace OpenSpace.FileFormat.Texture {
             readers = new Reader[1];
         }
 
-		public IEnumerator Init() {
+		public async Task Init() {
 			for (int i = 0; i < readers.Length; i++) {
-				yield return MapLoader.Loader.controller.StartCoroutine(Init(i, readers[i]));
+				await Init(i, readers[i]);
 			}
 		}
 
-        public IEnumerator Init(int readerIndex, Reader reader) {
+        public async Task Init(int readerIndex, Reader reader) {
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
-			Controller c = MapLoader.Loader.controller;
-			if(httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(11));
+			if(httpStream != null) await httpStream.FillCacheForRead(11);
             int localDirCount = reader.ReadInt32();
             int localFileCount = reader.ReadInt32();
             directoryCount += localDirCount;
@@ -112,8 +111,8 @@ namespace OpenSpace.FileFormat.Texture {
 
 			// Load directories
 			//Debug.Log("directories");
-			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(300 * localDirCount));
-			yield return null;
+			if (httpStream != null) await httpStream.FillCacheForRead(300 * localDirCount);
+			await MapLoader.WaitIfNecessary();
 			for (int i = 0; i < localDirCount; i++) {
 				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4));
 				int strLen = reader.ReadInt32();
@@ -140,7 +139,7 @@ namespace OpenSpace.FileFormat.Texture {
 
 			// Read files
 			//Debug.Log("files");
-			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(300 * localFileCount));
+			if (httpStream != null) await httpStream.FillCacheForRead(300 * localFileCount);
 			for (int i = 0; i < localFileCount; i++) {
 				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(8));
 				int dirIndex = reader.ReadInt32();
@@ -213,22 +212,21 @@ namespace OpenSpace.FileFormat.Texture {
             return gf;
         }
 
-		public IEnumerator PrepareGFByTGAName(string tgaName) {
+		public async Task<GF> PrepareGFByTGAName(string tgaName) {
 			FileStruct file = fileList.FirstOrDefault(f => f.TGAName.ToLower().Replace('/', '\\').Equals(tgaName.ToLower().Replace('/', '\\')));
 			if (file == null) {
-				preparedGF = null;
-				yield break;
+				return null;
 			}
 			Reader reader = readers[file.fileNum];
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 			if (httpStream != null) {
 				Controller c = MapLoader.Loader.controller;
 				readers[file.fileNum].BaseStream.Seek(file.pointer, SeekOrigin.Begin);
-				yield return c.StartCoroutine(httpStream.FillCacheForRead(file.size));
+				await httpStream.FillCacheForRead(file.size);
 			}
 			byte[] bytes = GetFileBytes(file);
 			//Util.ByteArrayToFile("textures/" + file.FullName, bytes);
-			preparedGF = new GF(bytes);
+			return new GF(bytes);
 		}
 
         public void Dispose() {

@@ -18,68 +18,105 @@ using System.Collections;
 using OpenSpace.Cinematics;
 using System.IO.Compression;
 using lzo.net;
+using System.Threading.Tasks;
 
 namespace OpenSpace.Loader {
 	public class R3Loader : MapLoader {
-		public override IEnumerator Load() {
+		protected override async Task Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
 				if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
 				globals = new Globals();
 				gameDataBinFolder += "/";
-				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 
 				loadingState = "Initializing files";
-				yield return controller.StartCoroutine(CreateCNT());
+				await CreateCNT();
 
 				if (lvlName.EndsWith(".exe")) {
 					if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
 					Settings.s.loadFromMemory = true;
 					MemoryFile mem = new MemoryFile(lvlName);
 					files_array[0] = mem;
-					yield return null;
+					await WaitIfNecessary();
 					LoadMemory();
 				} else {
-					// Fix
-					menuTPLPath = gameDataBinFolder + "menu.tpl";
-					lvlNames[0] = "fix";
-					lvlPaths[0] = gameDataBinFolder + "fix.lvl";
-					ptrPaths[0] = gameDataBinFolder + "fix.ptr";
+					// Prepare paths
+					string fixFolder = gameDataBinFolder;
+					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Settings.CapsType.LevelFolder);
+
+					paths["fix.lvl"] = fixFolder + ConvertCase("Fix.lvl", Settings.CapsType.Fix);
+					paths["fix.ptr"] = fixFolder + ConvertCase("Fix.ptr", Settings.CapsType.Fix);
+					paths["lvl.lvl"] = lvlFolder + ConvertCase(lvlName + ".lvl", Settings.CapsType.LevelFile);
+					paths["lvl.ptr"] = lvlFolder + ConvertCase(lvlName + ".ptr", Settings.CapsType.LevelFile);
+					paths["transit.lvl"] = lvlFolder + ConvertCase("transit.lvl", Settings.CapsType.LevelFile);
+					paths["transit.ptr"] = lvlFolder + ConvertCase("transit.ptr", Settings.CapsType.LevelFile);
 					if (Settings.s.platform == Settings.Platform.GC) {
-						texPaths[0] = gameDataBinFolder + ((Settings.s.mode == Settings.Mode.RaymanArenaGC) ? "../common.tpl" : "fix.tpl");
+						paths["menu.tpl"] = fixFolder + ConvertCase("menu.tpl", Settings.CapsType.Fix);
+						paths["fix.tpl"] = fixFolder + ConvertCase((Settings.s.mode == Settings.Mode.RaymanArenaGC) ? "../common.tpl" : "Fix.tpl", Settings.CapsType.Fix);
+						paths["lvl.tpl"] = lvlFolder + ConvertCase(lvlName + (Settings.s.game == Settings.Game.R3 ? "_Lvl" : "") + ".tpl", Settings.CapsType.TextureFile);
+						paths["transit.tpl"] = lvlFolder + ConvertCase(lvlName + "_Trans.tpl", Settings.CapsType.TextureFile);
+					} else if (Settings.s.platform == Settings.Platform.Xbox) {
+						paths["fix.btf"] = fixFolder + ConvertCase("Fix.btf", Settings.CapsType.Fix);
+						paths["fix.bhf"] = fixFolder + ConvertCase("Fix.bhf", Settings.CapsType.Fix);
+						paths["lvl.btf"] = lvlFolder + ConvertCase(lvlName + ".btf", Settings.CapsType.TextureFile);
+						paths["lvl.bhf"] = lvlFolder + ConvertCase(lvlName + ".bhf", Settings.CapsType.TextureFile);
 					}
-					yield return controller.StartCoroutine(PrepareFile(menuTPLPath));
-					yield return controller.StartCoroutine(PrepareFile(lvlPaths[0]));
+					paths["lvl_vb.lvl"] = lvlFolder + ConvertCase(lvlName + "_vb.lvl", Settings.CapsType.LevelFile);
+					paths["lvl_vb.ptr"] = lvlFolder + ConvertCase(lvlName + "_vb.ptr", Settings.CapsType.LevelFile);
+					paths["fixkf.lvl"] = fixFolder + ConvertCase("Fixkf.lvl", Settings.CapsType.Fix);
+					paths["fixkf.ptr"] = fixFolder + ConvertCase("Fixkf.ptr", Settings.CapsType.Fix);
+					paths["lvlkf.lvl"] = lvlFolder + ConvertCase(lvlName + "kf.lvl", Settings.CapsType.LevelFile);
+					paths["lvlkf.ptr"] = lvlFolder + ConvertCase(lvlName + "kf.ptr", Settings.CapsType.LevelFile);
+
+					// Download files
+					/*foreach (KeyValuePair<string, string> path in paths) {
+						if (path.Value != null) await PrepareFile(path.Value);
+					}*/
+
+
+
+					// Fix
+					lvlNames[0] = "fix";
+					lvlPaths[0] = paths["fix.lvl"];
+					ptrPaths[0] = paths["fix.ptr"];
+					if (Settings.s.platform == Settings.Platform.GC) {
+						await PrepareFile(paths["fix.tpl"]);
+						await PrepareFile(paths["menu.tpl"]);
+					} else if (Settings.s.platform == Settings.Platform.Xbox) {
+						await PrepareFile(paths["fix.btf"]);
+						await PrepareFile(paths["fix.bhf"]);
+					}
+					await PrepareFile(lvlPaths[0]);
 					if (FileSystem.FileExists(lvlPaths[0])) {
-						yield return controller.StartCoroutine(PrepareFile(ptrPaths[0]));
-						yield return controller.StartCoroutine(PrepareFile(texPaths[0]));
+						await PrepareFile(ptrPaths[0]);
 					}
 
 					// Level
 					lvlNames[1] = lvlName;
 					lvlPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".lvl";
 					ptrPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".ptr";
-					if (Settings.s.platform == Settings.Platform.GC) {
-						texPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName
-							+ (Settings.s.game == Settings.Game.R3 ? "_Lvl" : "") +".tpl";
-					}
-					yield return controller.StartCoroutine(PrepareFile(lvlPaths[1]));
+					await PrepareFile(lvlPaths[1]);
 					if (FileSystem.FileExists(lvlPaths[1])) {
-						yield return controller.StartCoroutine(PrepareFile(ptrPaths[1]));
-						yield return controller.StartCoroutine(PrepareFile(texPaths[1]));
+						await PrepareFile(ptrPaths[1]);
+						if (Settings.s.platform == Settings.Platform.GC) {
+							await PrepareFile(paths["lvl.tpl"]);
+						} else if (Settings.s.platform == Settings.Platform.Xbox) {
+							await PrepareFile(paths["lvl.btf"]);
+							await PrepareFile(paths["lvl.bhf"]);
+						}
 					}
 
 					// Transit
 					lvlNames[2] = "transit";
 					lvlPaths[2] = gameDataBinFolder + lvlName + "/transit.lvl";
 					ptrPaths[2] = gameDataBinFolder + lvlName + "/transit.ptr";
-					texPaths[2] = gameDataBinFolder + lvlName + "/" + lvlName + "_Trans.tpl";
-					yield return controller.StartCoroutine(PrepareFile(lvlPaths[2]));
+					await PrepareFile(lvlPaths[2]);
 					if (FileSystem.FileExists(lvlPaths[2])) {
-						yield return controller.StartCoroutine(PrepareFile(ptrPaths[2]));
+						await PrepareFile(ptrPaths[2]);
 						if (Settings.s.platform == Settings.Platform.GC) {
-							yield return controller.StartCoroutine(PrepareFile(texPaths[2]));
+							await PrepareFile(paths["transit.tpl"]);
 						}
 					}
 					hasTransit = FileSystem.FileExists(lvlPaths[2]) && (FileSystem.GetFileLength(lvlPaths[2]) > 4);
@@ -88,27 +125,27 @@ namespace OpenSpace.Loader {
 					lvlNames[4] = lvlName + "_vb";
 					lvlPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "_vb.lvl";
 					ptrPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "_vb.ptr";
-					yield return controller.StartCoroutine(PrepareFile(lvlPaths[4]));
+					await PrepareFile(lvlPaths[4]);
 					if (FileSystem.FileExists(lvlPaths[4])) {
-						yield return controller.StartCoroutine(PrepareFile(ptrPaths[4]));
+						await PrepareFile(ptrPaths[4]);
 					}
 
 					// Fix Keyframes
 					lvlNames[5] = "fixkf";
 					lvlPaths[5] = gameDataBinFolder + "fixkf.lvl";
 					ptrPaths[5] = gameDataBinFolder + "fixkf.ptr";
-					yield return controller.StartCoroutine(PrepareFile(lvlPaths[5]));
+					await PrepareFile(lvlPaths[5]);
 					if (FileSystem.FileExists(lvlPaths[5])) {
-						yield return controller.StartCoroutine(PrepareFile(ptrPaths[5]));
+						await PrepareFile(ptrPaths[5]);
 					}
 
 					// Level Keyframes
 					lvlNames[6] = lvlName + "kf";
 					lvlPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "kf.lvl";
 					ptrPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "kf.ptr";
-					yield return controller.StartCoroutine(PrepareFile(lvlPaths[6]));
+					await PrepareFile(lvlPaths[6]);
 					if (FileSystem.FileExists(lvlPaths[6])) {
-						yield return controller.StartCoroutine(PrepareFile(ptrPaths[6]));
+						await PrepareFile(ptrPaths[6]);
 					}
 
 					for (int i = 0; i < lvlPaths.Length; i++) {
@@ -124,8 +161,8 @@ namespace OpenSpace.Loader {
 						}
 					}
 
-					yield return controller.StartCoroutine(LoadFIX());
-					yield return controller.StartCoroutine(LoadLVL());
+					await LoadFIX();
+					await LoadLVL();
 				}
 			} finally {
 				for (int i = 0; i < files_array.Length; i++) {
@@ -135,16 +172,16 @@ namespace OpenSpace.Loader {
 				}
 				if (cnt != null) cnt.Dispose();
 			}
-			yield return null;
+			await WaitIfNecessary();
 			InitModdables();
 		}
 
 		#region FIX
 		Pointer off_animBankFix;
 
-		IEnumerator LoadFIX() {
+		async Task LoadFIX() {
 			loadingState = "Loading fixed memory";
-			yield return null;
+			await WaitIfNecessary();
 			files_array[Mem.Fix].GotoHeader();
 			Reader reader = files_array[Mem.Fix].reader;
 			// Read fix header
@@ -153,7 +190,7 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			if (Settings.s.platform == Settings.Platform.PC) {
+			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
 				if (Settings.s.game == Settings.Game.R3) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
@@ -170,7 +207,7 @@ namespace OpenSpace.Loader {
 			}
 			Pointer off_identityMatrix = Pointer.Read(reader);
 			loadingState = "Loading text";
-			yield return null;
+			await WaitIfNecessary();
 			fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
 			uint num_lvlNames = reader.ReadUInt32();
 			uint num_fixEntries1 = reader.ReadUInt32();
@@ -182,11 +219,12 @@ namespace OpenSpace.Loader {
 				string savMapName = new string(reader.ReadChars(0xC));
 			}
 			ReadLevelNames(reader, Pointer.Current(reader), num_lvlNames);
-			if (Settings.s.platform == Settings.Platform.PC) {
+			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
 				reader.ReadChars(0x1E);
 				reader.ReadChars(0x1E); // two zero entries
 			}
 			string firstMapName = new string(reader.ReadChars(0x1E));
+			//print(firstMapName);
 			if (reader.BaseStream.Position % 4 == 0) {
 				reader.ReadUInt32();
 			} else {
@@ -198,7 +236,8 @@ namespace OpenSpace.Loader {
 				ReadLanguages(reader, off_languages, num_languages);
 			});
 			loadingState = "Loading fixed textures";
-			yield return controller.StartCoroutine(ReadTexturesFix(reader, Pointer.Current(reader)));
+			print("Fix textures address: " + Pointer.Current(reader));
+			await ReadTexturesFix(reader, Pointer.Current(reader));
 			// Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
 			int sz_entryActions = 0x100;
 			int sz_randomStructure = 0xDC;
@@ -211,7 +250,8 @@ namespace OpenSpace.Loader {
 				sz_entryActions = 0xE8;
 				sz_binDataForMenu = 0x01F0;
 				sz_fontDefine = 0x12E4;
-			} else if (Settings.s.mode == Settings.Mode.RaymanArenaGC) {
+			} else if (Settings.s.mode == Settings.Mode.RaymanArenaGC
+				|| Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
 				sz_entryActions = 0xC4;
 				sz_fontDefine = 0x12E4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaPC
@@ -224,14 +264,18 @@ namespace OpenSpace.Loader {
 			} else if (Settings.s.mode == Settings.Mode.DonaldDuckPKGC) {
 				sz_entryActions = 0xC0;
 				sz_fontDefine = 0x12E4;
+			} else if (Settings.s.mode == Settings.Mode.RaymanArenaXbox) {
+				sz_entryActions = 0xF0;
+				sz_fontDefine = 0x12E4;
+				sz_videoStructure = 0x108;
 			}
 			loadingState = "Loading input structure";
-			yield return null;
+			await WaitIfNecessary();
 			inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
-			if (Settings.s.platform == Settings.Platform.PC) {
+			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
 				Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
 				ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 			}
@@ -246,6 +290,7 @@ namespace OpenSpace.Loader {
 			Pointer off_soundEventTable = Pointer.Read(reader);
 			byte num_fontBitmap = reader.ReadByte();
 			byte num_font = reader.ReadByte();
+			print(Pointer.Current(reader));
 			for (int i = 0; i < num_font; i++) {
 				reader.ReadBytes(sz_fontDefine); // Font definition
 			}
@@ -271,7 +316,7 @@ namespace OpenSpace.Loader {
 				}
 			}
 			/*loadingState = "Loading fixed animation bank";
-			yield return null;*/
+			await WaitIfNecessary();*/
 			if (Settings.s.game != Settings.Game.Dinosaur) {
 				off_animBankFix = Pointer.Read(reader); // Note: only one 0x104 bank in fix.
 														//print(Pointer.Current(reader));
@@ -292,9 +337,9 @@ namespace OpenSpace.Loader {
 		#endregion
 
 		#region LVL
-		IEnumerator LoadLVL() {
+		async Task LoadLVL() {
 			loadingState = "Loading level memory";
-			yield return null;
+			await WaitIfNecessary();
 			files_array[Mem.Lvl].GotoHeader();
 			Reader reader = files_array[Mem.Lvl].reader;
 			long totalSize = reader.BaseStream.Length;
@@ -306,7 +351,7 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			if (Settings.s.platform == Settings.Platform.PC) {
+			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
 				if (Settings.s.game == Settings.Game.R3) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
@@ -328,8 +373,9 @@ namespace OpenSpace.Loader {
 				reader.ReadUInt32();
 			}
 			loadingState = "Loading level textures";
-			yield return controller.StartCoroutine(ReadTexturesLvl(reader, Pointer.Current(reader)));
-			if (Settings.s.platform == Settings.Platform.PC && !hasTransit && Settings.s.game != Settings.Game.Dinosaur) {
+			await ReadTexturesLvl(reader, Pointer.Current(reader));
+			if ((Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox)
+				&& !hasTransit && Settings.s.game != Settings.Game.Dinosaur) {
 				Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
 				Pointer.DoAt(ref reader, off_lightMapTexture, () => {
 					lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);
@@ -351,7 +397,7 @@ namespace OpenSpace.Loader {
 				animationBanks[0] = banks[0];
 			}
 			loadingState = "Loading globals";
-			yield return null;
+			await WaitIfNecessary();
 			globals.off_transitDynamicWorld = null;
 			globals.off_actualWorld = Pointer.Read(reader);
 			globals.off_dynamicWorld = Pointer.Read(reader);
@@ -453,8 +499,10 @@ namespace OpenSpace.Loader {
 			}
 			uint num_visual_materials = reader.ReadUInt32();
 			Pointer off_array_visual_materials = Pointer.Read(reader);
-			print(off_array_visual_materials);
-			if (Settings.s.mode != Settings.Mode.RaymanArenaGC && Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
+			print(Pointer.Current(reader));
+			if (Settings.s.mode != Settings.Mode.RaymanArenaGC
+				&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
+				&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
 				Pointer off_dynamic_so_list = Pointer.Read(reader);
 
 				// Parse SO list
@@ -481,7 +529,7 @@ namespace OpenSpace.Loader {
 
 			// Parse materials list
 			loadingState = "Loading visual materials";
-			yield return null;
+			await WaitIfNecessary();
 			Pointer.DoAt(ref reader, off_array_visual_materials, () => {
 				for (uint i = 0; i < num_visual_materials; i++) {
 					Pointer off_material = Pointer.Read(reader);
@@ -494,7 +542,7 @@ namespace OpenSpace.Loader {
 
 			if (hasTransit) {
 				loadingState = "Loading transit memory";
-				yield return null;
+				await WaitIfNecessary();
 				Pointer off_transit = new Pointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
 				Pointer.DoAt(ref reader, off_transit, () => {
 					if (Settings.s.platform == Settings.Platform.PC) {
@@ -518,13 +566,13 @@ namespace OpenSpace.Loader {
 
 			// Parse actual world & always structure
 			loadingState = "Loading families";
-			yield return null;
+			await WaitIfNecessary();
 			ReadFamilies(reader);
 			loadingState = "Loading superobject hierarchy";
-			yield return null;
+			await WaitIfNecessary();
 			ReadSuperObjects(reader);
 			loadingState = "Loading always structure";
-			yield return null;
+			await WaitIfNecessary();
 			ReadAlways(reader);
 
 
@@ -536,7 +584,7 @@ namespace OpenSpace.Loader {
 
 			// Parse transformation matrices and other settings(state? :o) for fix characters
 			loadingState = "Loading settings for persos in fix";
-			yield return null;
+			await WaitIfNecessary();
 			uint num_perso_with_settings_in_fix = (uint)persoInFix.Length;
 			if (Settings.s.game == Settings.Game.R3) num_perso_with_settings_in_fix = reader.ReadUInt32();
 			for (int i = 0; i < num_perso_with_settings_in_fix; i++) {
@@ -571,7 +619,7 @@ namespace OpenSpace.Loader {
 				reader.ReadBytes(0x800); // floats
 			}
 			loadingState = "Loading animation banks";
-			yield return null;
+			await WaitIfNecessary();
 			if (Settings.s.game != Settings.Game.Dinosaur) {
 				off_animBankLvl = Pointer.Read(reader); // Note: 4 0x104 banks in lvl.
 				print("Lvl animation bank address: " + off_animBankLvl);
@@ -592,13 +640,23 @@ namespace OpenSpace.Loader {
 				}
 			}
 			// Load additional animation banks
+			string extraAnimFolder = "Anim/";
+			if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
+				extraAnimFolder = lvlName + "/";
+			}
 			for (int i = 0; i < families.Count; i++) {
 				if (families[i] != null && families[i].animBank > 4 && objectTypes[0][families[i].family_index].id != 0xFF) {
 					int animBank = families[i].animBank;
 					loadingState = "Loading additional animation bank " + animBank;
-					yield return null;
-					string animName = "Anim/ani" + objectTypes[0][families[i].family_index].id.ToString();
-					string kfName = "Anim/key" + objectTypes[0][families[i].family_index].id.ToString() + "kf";
+					await WaitIfNecessary();
+					int animFileID = objectTypes[0][families[i].family_index].id;
+					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
+						animFileID = animBank - 5;
+					}
+					string animName = extraAnimFolder + "ani" + animFileID.ToString();
+					string kfName = extraAnimFolder + "key" + animFileID.ToString() + "kf";
+
+					//print(animBank + " - " + objectTypes[0][families[i].family_index].id);
 					int fileID = animBank + 102;
 					int kfFileID = animBank + 2; // Anim bank will start at 5, so this will start at 7
 					if (Settings.s.game == Settings.Game.RM) {
@@ -606,13 +664,13 @@ namespace OpenSpace.Loader {
 					}
 
 					// Prepare files for WebGL
-					yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + animName + ".lvl"));
+					await PrepareFile(gameDataBinFolder + animName + ".lvl");
 					if (FileSystem.FileExists(gameDataBinFolder + animName + ".lvl")) {
-						yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + animName + ".ptr"));
+						await PrepareFile(gameDataBinFolder + animName + ".ptr");
 					}
-					yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + kfName + ".lvl"));
+					await PrepareFile(gameDataBinFolder + kfName + ".lvl");
 					if (FileSystem.FileExists(gameDataBinFolder + kfName + ".lvl")) {
-						yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + kfName + ".ptr"));
+						await PrepareFile(gameDataBinFolder + kfName + ".ptr");
 					}
 
 					FileWithPointers animFile = InitExtraLVL(animName, fileID);
@@ -633,7 +691,7 @@ namespace OpenSpace.Loader {
 			}
 
 			loadingState = "Filling in cross-references";
-			yield return null;
+			await WaitIfNecessary();
 			ReadCrossReferences(reader);
 		}
 		#endregion

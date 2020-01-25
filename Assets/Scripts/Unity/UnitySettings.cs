@@ -18,12 +18,13 @@ public class UnitySettings
 	public static string ProcessName { get; set; }
 
 	// Misc
+	public static string ScreenshotPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/Raymap/";
 	public static bool LoadFromMemory { get; set; }
 	public static bool AllowDeadPointers { get; set; }
 	public static bool ForceDisplayBackfaces { get; set; }
 	public static bool BlockyMode { get; set; }
 	public static bool SaveTextures { get; set; }
-	public static string ExportPath { get; set; } = ".\\exports\\";
+	public static string ExportPath { get; set; } = "./exports/";
 	public static bool ExportAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
 
 	/// <summary>
@@ -51,6 +52,7 @@ public class UnitySettings
 		EditorPrefs.SetBool("ExportAfterLoad", ExportAfterLoad);
 
 		// Misc
+		EditorPrefs.SetString("ScreenshotPath", ScreenshotPath);
 		EditorPrefs.SetBool("AllowDeadPointers", AllowDeadPointers);
 		EditorPrefs.SetBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
 		EditorPrefs.SetBool("BlockyMode", BlockyMode);
@@ -91,6 +93,7 @@ public class UnitySettings
 		ExportAfterLoad = EditorPrefs.GetBool("ExportAfterLoad", ExportAfterLoad);
 
 		// Misc
+		ScreenshotPath = EditorPrefs.GetString("ScreenshotPath", ScreenshotPath);
 		AllowDeadPointers = EditorPrefs.GetBool("AllowDeadPointers", AllowDeadPointers);
 		ForceDisplayBackfaces = EditorPrefs.GetBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
 		BlockyMode = EditorPrefs.GetBool("BlockyMode", BlockyMode);

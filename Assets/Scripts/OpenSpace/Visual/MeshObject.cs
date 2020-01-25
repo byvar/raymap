@@ -120,7 +120,10 @@ namespace OpenSpace.Visual {
 				} else {
 					m.off_blendWeights = Pointer.Read(reader);
 				}
-				if (Settings.s.mode != Settings.Mode.RaymanArenaGC && Settings.s.game != Settings.Game.RM && Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
+				if (Settings.s.mode != Settings.Mode.RaymanArenaGC 
+					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
+					&& Settings.s.game != Settings.Game.RM
+					&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
 					reader.ReadInt32();
 				}
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_subblocks = (ushort)reader.ReadUInt32();
@@ -303,26 +306,26 @@ namespace OpenSpace.Visual {
 							if (mo.normals != null) {
 								Array.Copy(mo.normals, 0, m.normals, curNumVertices, mo.num_vertices);
 							}
-							me.mapping_vertices = Enumerable.Range(curNumVertices, mo.num_vertices).ToArray();
+							me.OPT_mapping_vertices = Enumerable.Range(curNumVertices, mo.num_vertices).ToArray();
 							curNumVertices += mo.num_vertices;
 						} else {
-							me.mapping_vertices = new int[moe.num_mapping_entries];
+							me.OPT_mapping_vertices = new int[moe.OPT_num_mapping_entries];
 							for (int j = 0; j < mo.vertices.Length; j++) {
-								me.mapping_vertices[j] = Array.IndexOf(m.vertices, mo.vertices[j]);
-								if (me.mapping_vertices[j] == -1 || me.mapping_vertices[j] != Array.IndexOf(m.vertices, mo.vertices[j])) {
+								me.OPT_mapping_vertices[j] = Array.IndexOf(m.vertices, mo.vertices[j]);
+								if (me.OPT_mapping_vertices[j] == -1 || me.OPT_mapping_vertices[j] != Array.IndexOf(m.vertices, mo.vertices[j])) {
 									Debug.LogError("Failed matching vertices between Renderware and OpenSpace");
 								}
 							}
 						}
-						me.disconnected_triangles = moe.disconnected_triangles;
-						me.num_disconnected_triangles = moe.num_disconnected_triangles;
-						me.disconnected_triangles_spe = null;
-						me.num_disconnected_triangles_spe = 0;
+						me.OPT_disconnectedTriangles = moe.OPT_disconnectedTriangles;
+						me.OPT_num_disconnectedTriangles = moe.OPT_num_disconnectedTriangles;
+						me.triangles = null;
+						me.num_triangles = 0;
 						me.num_uvMaps = moe.num_uvMaps;
 						me.num_uvs = moe.num_uvs;
 						me.uvs = moe.uvs;
-						me.mapping_uvs = moe.mapping_uvs;
-						me.num_mapping_entries = moe.num_mapping_entries;
+						me.OPT_mapping_uvs = moe.OPT_mapping_uvs;
+						me.OPT_num_mapping_entries = moe.OPT_num_mapping_entries;
 						me.vertexColors = moe.vertexColors;
 						currentSubblock++;
 						if (me.lightmap_index != -1) {

@@ -1107,6 +1107,7 @@ GameObject:
   - component: {fileID: 1488385694}
   - component: {fileID: 1488385699}
   - component: {fileID: 1488385696}
+  - component: {fileID: 1488385700}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1268,6 +1269,18 @@ MonoBehaviour:
   flySpeed: 15
   cam: {fileID: 1488385697}
   lerpFactor: 3
+--- !u!114 &1488385700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1488385693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b54b537353efab4b93b691e568d1bcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1503682887
 GameObject:
   m_ObjectHideFlags: 0
@@ -1376,6 +1389,7 @@ MonoBehaviour:
   playTextureAnimations: 1
   showPersos: 1
   livePreview: 0
+  levelGeometryCorruptions: 0
 --- !u!4 &1701416322
 Transform:
   m_ObjectHideFlags: 0

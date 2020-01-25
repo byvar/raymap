@@ -18,30 +18,31 @@ using System.Collections;
 using OpenSpace.Cinematics;
 using System.IO.Compression;
 using lzo.net;
+using System.Threading.Tasks;
 
 namespace OpenSpace.Loader {
 	public class LWLoader : MapLoader {
 		public PBT[] pbt = new PBT[2];
 		public LMS lms;
 
-		public override IEnumerator Load() {
+		protected override async Task Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
 				if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
 				globals = new Globals();
 				gameDataBinFolder += "/";
-				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 
 				loadingState = "Initializing files";
-				yield return controller.StartCoroutine(CreateCNT());
+				await CreateCNT();
 
 				if (lvlName.EndsWith(".exe")) {
 					if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
 					Settings.s.loadFromMemory = true;
 					MemoryFile mem = new MemoryFile(lvlName);
 					files_array[0] = mem;
-					yield return null;
+					await WaitIfNecessary();
 					LoadMemory();
 				} else {
 					// Prepare folder names
@@ -49,7 +50,6 @@ namespace OpenSpace.Loader {
 					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Settings.CapsType.LevelFolder);
 
 					// Prepare paths
-					Dictionary<string, string> paths = new Dictionary<string, string>();
 					paths["fix.lvl"] = fixFolder + ConvertCase("Fix.lvl", Settings.CapsType.LevelFile);
 					paths["fix.ptr"] = fixFolder + ConvertCase("Fix.ptr", Settings.CapsType.LevelFile);
 					paths["fix.pbt"] = fixFolder + ConvertCase("Fix.pbt", Settings.CapsType.LevelFile);
@@ -60,7 +60,7 @@ namespace OpenSpace.Loader {
 
 					// Download files
 					foreach (KeyValuePair<string, string> path in paths) {
-						if (path.Value != null) yield return controller.StartCoroutine(PrepareFile(path.Value));
+						if (path.Value != null) await PrepareFile(path.Value);
 					}
 
 					lvlNames[Mem.Fix] = "fix";
@@ -90,8 +90,8 @@ namespace OpenSpace.Loader {
 						}
 					}
 
-					yield return controller.StartCoroutine(LoadFIX());
-					yield return controller.StartCoroutine(LoadLVL());
+					await LoadFIX();
+					await LoadLVL();
 				}
 			} finally {
 				for (int i = 0; i < files_array.Length; i++) {
@@ -101,7 +101,7 @@ namespace OpenSpace.Loader {
 				}
 				if (cnt != null) cnt.Dispose();
 			}
-			yield return null;
+			await WaitIfNecessary();
 			InitModdables();
 		}
 
@@ -150,10 +150,10 @@ namespace OpenSpace.Loader {
 
 		#region FIX
 		Pointer off_animBankFix;
-		IEnumerator LoadFIX() {
+		async Task LoadFIX() {
 			textures = new TextureInfo[0];
 			loadingState = "Loading fixed memory";
-			yield return null;
+			await WaitIfNecessary();
 			files_array[Mem.Fix].GotoHeader();
 			Reader reader = files_array[Mem.Fix].reader;
 			reader.ReadUInt32(); // Offset of languages
@@ -191,7 +191,7 @@ namespace OpenSpace.Loader {
 				reader.ReadBytes(0x101);
 			}
 			loadingState = "Loading input structure";
-			yield return null;
+			await WaitIfNecessary();
 			inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
@@ -245,9 +245,9 @@ namespace OpenSpace.Loader {
 		#endregion
 
 		#region LVL
-		IEnumerator LoadLVL() {
+		async Task LoadLVL() {
 			loadingState = "Loading level memory";
-			yield return null;
+			await WaitIfNecessary();
 			files_array[Mem.Lvl].GotoHeader();
 			Reader reader = files_array[Mem.Lvl].reader;
 			long totalSize = reader.BaseStream.Length;
@@ -266,7 +266,7 @@ namespace OpenSpace.Loader {
 
 			//Pointer off_animBankLvl = null;
 			loadingState = "Loading globals";
-			yield return null;
+			await WaitIfNecessary();
 			globals.off_transitDynamicWorld = null;
 			globals.off_actualWorld = Pointer.Read(reader);
 			globals.off_dynamicWorld = Pointer.Read(reader);
@@ -314,7 +314,7 @@ namespace OpenSpace.Loader {
 			Pointer off_unk = Pointer.Read(reader);
 
 			loadingState = "Loading level textures";
-			yield return controller.StartCoroutine(ReadTexturesLvl(reader, Pointer.Current(reader)));
+			await ReadTexturesLvl(reader, Pointer.Current(reader));
 
 			Pointer.Read(reader); // maybe perso in fix
 			reader.ReadUInt32();
@@ -373,18 +373,18 @@ namespace OpenSpace.Loader {
 
 			// Parse actual world & always structure
 			loadingState = "Loading families";
-			yield return null;
+			await WaitIfNecessary();
 			ReadFamilies(reader);
 			loadingState = "Loading superobject hierarchy";
-			yield return null;
+			await WaitIfNecessary();
 			ReadSuperObjects(reader);
 			loadingState = "Loading always structure";
-			yield return null;
+			await WaitIfNecessary();
 			ReadAlways(reader);
 
 
 			loadingState = "Filling in cross-references";
-			yield return null;
+			await WaitIfNecessary();
 			ReadCrossReferences(reader);
 		}
 		#endregion

@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Asyncoroutine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace OpenSpace {
@@ -258,8 +261,9 @@ namespace OpenSpace {
 			caches.Add(position, cache);
 		}
 
-		public IEnumerator FillCacheForRead(int count) {
-			if (count <= 0) yield break;
+		public async Task FillCacheForRead(int count) {
+			if (count <= 0) return;
+			await MapLoader.WaitIfNecessary();
 
 			// Try to read parts from cache
 			long lastPosition = Position;
@@ -343,7 +347,7 @@ namespace OpenSpace {
 					}
 					//UnityEngine.Debug.Log(range.Key + " - " + range.Value + ": " + Length + " - " + rangePos + " - " + newDataLength);
 					byte[] newData = new byte[newDataLength];
-					yield return MapLoader.Loader.controller.StartCoroutine(HttpRead(newData, 0, (int)newDataLength, startPosition));
+					await HttpRead(newData, 0, (int)newDataLength, startPosition);
 					int dataRead = lastRequestRead;
 					Array.Resize(ref newData, dataRead);
 					int numReadLocal = (int)Math.Min(range.Value, dataRead - addLengthBefore);
@@ -361,7 +365,7 @@ namespace OpenSpace {
 			return (int)(Position - lastPosition);*/
 		}
 
-		private IEnumerator HttpRead(byte[] buffer, int offset, int count, long startPosition) {
+		private async Task HttpRead(byte[] buffer, int offset, int count, long startPosition) {
 			HttpRequestsCount++;
 			UnityWebRequest www = UnityWebRequest.Get(Url);
 			string state = MapLoader.Loader.loadingState;
@@ -369,9 +373,9 @@ namespace OpenSpace {
 			MapLoader.Loader.loadingState = state + "\nDownloading part of bigfile: " + Url.Replace(FileSystem.serverAddress, "") + " (New size: " + Util.SizeSuffix(totalSize + count,0) + "/" + Util.SizeSuffix(Length, 0) + ")";
 			UnityEngine.Debug.Log("Requesting range: " + string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1) + " - " + Url);
 			www.SetRequestHeader("Range", string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1));
-			yield return www.SendWebRequest();
+			await www.SendWebRequest();
 			while (!www.isDone) {
-				yield return null;
+				await new WaitForEndOfFrame();
 			}
 			if (!www.isHttpError && !www.isNetworkError) {
 				byte[] data = www.downloadHandler.data;

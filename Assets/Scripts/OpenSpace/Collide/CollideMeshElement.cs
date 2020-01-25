@@ -54,7 +54,7 @@ namespace OpenSpace.Collide {
                     new_vertices[j] = mesh.vertices[triangles[j]];
                     if(normals != null) new_normals[j] = normals[j/3];
                     if (uvs != null) {
-                        new_uvs[j] = uvs[mapping[j]];
+                        new_uvs[j] = uvs[mapping[j] % uvs.Length];
                     }
                 }
                 int[] new_triangles = new int[num_triangles * 3];

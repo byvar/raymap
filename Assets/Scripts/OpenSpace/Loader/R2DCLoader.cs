@@ -16,38 +16,40 @@ using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2DCLoader : MapLoader {
-        public override IEnumerator Load() {
+		protected override async Task Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
 				gameDataBinFolder += "/";
-				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 loadingState = "Initializing files";
-                yield return controller.StartCoroutine(CreateCNT());
+				await MapLoader.WaitIfNecessary();
+				await CreateCNT();
 
                 // FIX
                 string fixDATPath = gameDataBinFolder + "FIX.DAT";
                 texPaths[0] = gameDataBinFolder + "FIX.TEX";
-                yield return controller.StartCoroutine(PrepareFile(fixDATPath));
-                yield return controller.StartCoroutine(PrepareFile(texPaths[0]));
+                await PrepareFile(fixDATPath);
+                await PrepareFile(texPaths[0]);
                 DCDAT fixDAT = new DCDAT("fix", fixDATPath, 0);
 
                 // LEVEL
                 string lvlDATPath = gameDataBinFolder + lvlName + "/" + lvlName + ".DAT";
                 texPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName + ".TEX";
-                yield return controller.StartCoroutine(PrepareFile(lvlDATPath));
-                yield return controller.StartCoroutine(PrepareFile(texPaths[1]));
+                await PrepareFile(lvlDATPath);
+                await PrepareFile(texPaths[1]);
                 DCDAT lvlDAT = new DCDAT(lvlName, lvlDATPath, 1);
 
                 files_array[0] = fixDAT;
                 files_array[1] = lvlDAT;
 
-                yield return controller.StartCoroutine(LoadDreamcast());
+                await LoadDreamcast();
 
 				if (Settings.s.game == Settings.Game.R2) {
 					string logPathTexFix = gameDataBinFolder + "TEXTURE_FIX.LOG";
@@ -55,22 +57,22 @@ namespace OpenSpace.Loader {
 					string logPathInfo = gameDataBinFolder + lvlName + "/INFO.LOG";
 					/*yield return controller.StartCoroutine(PrepareFile(logPathTexFix));
 					yield return controller.StartCoroutine(PrepareFile(logPathTexLvl));*/
-					yield return controller.StartCoroutine(PrepareFile(logPathInfo));
+					await PrepareFile(logPathInfo);
 					if (FileSystem.FileExists(logPathInfo)) {
 						ReadLog(FileSystem.GetFileReadStream(logPathInfo));
-						yield return null;
+						await WaitIfNecessary();
 					}
 					/*if (FileSystem.FileExists(logPathTexFix)) {
 						ReadLog(logPathTexFix);
-						yield return null;
+						await WaitIfNecessary();
 					}
 					if (FileSystem.FileExists(logPathTexLvl)) {
 						ReadLog(logPathTexLvl);
-						yield return null;
+						await WaitIfNecessary();
 					}*/
 				} else if (Settings.s.game == Settings.Game.DD) {
 					string backgroundPath = gameDataBinFolder + ConvertCase(lvlName, Settings.CapsType.LevelFolder) + "/FOND.PVR";
-					yield return controller.StartCoroutine(PrepareFile(backgroundPath));
+					await PrepareFile(backgroundPath);
 					if (FileSystem.FileExists(backgroundPath)) {
 						TEX backgroundTexFile = new TEX(backgroundPath, compressed: false);
 						globals.backgroundGameMaterial = new GameMaterial(null) {
@@ -103,17 +105,17 @@ namespace OpenSpace.Loader {
                     }
                 }
                 if (cnt != null) cnt.Dispose();
-            }
-            yield return null;
-            InitModdables();
+			}
+			await MapLoader.WaitIfNecessary();
+			InitModdables();
         }
 
         #region Dreamcast
-        public IEnumerator LoadDreamcast() {
+        async Task LoadDreamcast() {
             textures = new TextureInfo[0];
 
             loadingState = "Loading fixed memory";
-            yield return null;
+            await WaitIfNecessary();
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
             Pointer off_base_fix = Pointer.Current(reader);
@@ -135,7 +137,7 @@ namespace OpenSpace.Loader {
 				}
 			});
 
-            yield return null;
+            await WaitIfNecessary();
             Pointer.Read(reader);
             Pointer.Read(reader);
             Pointer.Read(reader);
@@ -177,7 +179,7 @@ namespace OpenSpace.Loader {
                 for (int i = 0; i < num_languages; i++) {
                     loadingState = "Loading text files: " + (i+1) + "/" + num_languages;
                     string langFilePath = gameDataBinFolder + "TEXTS/" + languages[i].ToUpper() + ".LNG";
-                    yield return controller.StartCoroutine(PrepareFile(langFilePath));
+                    await PrepareFile(langFilePath);
                     files_array[2] = new DCDAT(languages[i], langFilePath, 2);
                     ((DCDAT)files_array[2]).SetHeaderOffset(base_language);
                     files_array[2].GotoHeader();
@@ -187,7 +189,7 @@ namespace OpenSpace.Loader {
             }
         
             loadingState = "Loading fixed textures";
-            yield return null;
+            await WaitIfNecessary();
             Pointer off_events_fix = Pointer.Read(reader);
             uint num_events_fix = reader.ReadUInt32();
             uint num_textures_fix = reader.ReadUInt32();
@@ -209,7 +211,7 @@ namespace OpenSpace.Loader {
                 }
             });
             loadingState = "Loading level memory";
-            yield return null;
+            await WaitIfNecessary();
             files_array[Mem.Lvl].GotoHeader();
             reader = files_array[Mem.Lvl].reader;
 
@@ -289,7 +291,7 @@ namespace OpenSpace.Loader {
                 }
             });
 
-            yield return null;
+            await WaitIfNecessary();
             Pointer.Read(reader); // contains a pointer to the camera SO
             Pointer off_cameras = Pointer.Read(reader); // Double linkedlist of cameras
             Pointer off_families = Pointer.Read(reader);
@@ -305,7 +307,7 @@ namespace OpenSpace.Loader {
             reader.ReadUInt32();
 
             loadingState = "Loading level textures";
-            yield return null;
+            await WaitIfNecessary();
             uint num_textures_lvl = reader.ReadUInt32();
             uint num_textures_total = num_textures_fix + num_textures_lvl;
             Pointer off_textures_lvl = Pointer.Read(reader);
@@ -327,28 +329,28 @@ namespace OpenSpace.Loader {
             });
 
             loadingState = "Loading families";
-            yield return null;
+            await WaitIfNecessary();
             ReadFamilies(reader);
             loadingState = "Loading animation banks";
-            yield return null;
+            await WaitIfNecessary();
             Pointer.DoAt(ref reader, off_animationBank, () => {
                 animationBanks = new AnimationBank[2];
                 animationBanks[0] = AnimationBank.ReadDreamcast(reader, off_animationBank, off_events_fix, num_events_fix);
                 animationBanks[1] = animationBanks[0];
             });
             loadingState = "Loading superobject hierarchy";
-            yield return null;
+            await WaitIfNecessary();
             ReadSuperObjects(reader);
             loadingState = "Loading always structure";
-            yield return null;
+            await WaitIfNecessary();
             ReadAlways(reader);
             loadingState = "Filling in cross-references";
-            yield return null;
+            await WaitIfNecessary();
             ReadCrossReferences(reader);
 			loadingState = "Loading behavior copies";
-			yield return null;
+			await WaitIfNecessary();
 			ReadBehaviorCopies(reader);
-			yield return null;
+			await WaitIfNecessary();
 			/*print("Sectors: " + sectors.Count);
 			for (int i = 0; i < sectors.Count; i++) {
 				print("Sector " + i + "\t" + sectors[i].persos.Count + "\t" + sectors[i].staticLights.Count);

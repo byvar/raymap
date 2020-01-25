@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenSpace.FileFormat {
     public class RelocationPointerList {
@@ -84,16 +85,15 @@ namespace OpenSpace.FileFormat {
 			this.path = path;
         }
 
-		public IEnumerator Init() {
-			Controller c = MapLoader.Loader.controller;
+		public async Task Init() {
 			if (FileSystem.FileExists(path)) {
-				yield return c.StartCoroutine(Load(FileSystem.GetFileReadStream(path), false));
+				await Load(FileSystem.GetFileReadStream(path), false);
 			} else if (dat != null) {
-				yield return c.StartCoroutine(LoadFromDAT());
+				await LoadFromDAT();
 			}
 		}
 
-        private IEnumerator Load(Stream stream, bool masking) {
+        private async Task Load(Stream stream, bool masking) {
             using (Reader reader = new Reader(stream, isLittleEndian)) {
                 if (Settings.s.encryptPointerFiles) {
                     reader.InitMask();
@@ -104,8 +104,7 @@ namespace OpenSpace.FileFormat {
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
                     reader.InitWindowMask();*/
 				}
-				Controller c = MapLoader.Loader.controller;
-				yield return c.StartCoroutine(Read(reader));
+				await Read(reader);
 			}
         }
 
@@ -125,10 +124,9 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        private IEnumerator LoadFromDAT() {
+        private async Task LoadFromDAT() {
             Reader reader = dat.reader;
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
-			Controller c = MapLoader.Loader.controller;
 			
 			int levelIndex = 0;
             for (int i = 0; i < dat.gameDsb.levels.Count; i++) {
@@ -140,7 +138,7 @@ namespace OpenSpace.FileFormat {
             RelocationTableReference rtref = new RelocationTableReference((byte)levelIndex, (byte)type);
             //R3Loader.Loader.print("RtRef Pre  (" + rtref.levelId + "," + rtref.relocationType + ")");
             uint mask = dat.GetMask(rtref);
-			yield return c.StartCoroutine(dat.GetOffset(rtref));
+			await dat.GetOffset(rtref);
 			uint offset = dat.lastOffset;
             //R3Loader.Loader.print("RtRef Post (" + rtref.levelId + "," + rtref.relocationType + ")");
             /*dat.reader.BaseStream.Seek(offset, SeekOrigin.Begin);
@@ -148,10 +146,10 @@ namespace OpenSpace.FileFormat {
             byte[] dataNew = reader.ReadBytes(1000000);
             Util.ByteArrayToFile(name + "_" + type + ".data", dataNew);*/
             dat.reader.BaseStream.Seek(offset, SeekOrigin.Begin);
-			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4));
+			if (httpStream != null) await httpStream.FillCacheForRead(4);
 			reader.SetMask(mask);
             reader.ReadUInt32();
-            yield return c.StartCoroutine(Read(reader));
+            await Read(reader);
         }
 
         public RelocationPointerList GetListForPart(byte module, byte block) {
@@ -162,12 +160,11 @@ namespace OpenSpace.FileFormat {
             return null;
         }
 
-        IEnumerator Read(Reader reader) {
+        async Task Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
-			Controller c = MapLoader.Loader.controller;
 
-			if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(5));
+			if (httpStream != null) await httpStream.FillCacheForRead(5);
 			byte count = reader.ReadByte();
             if (Settings.s.game != Settings.Game.R2Demo
                 && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
@@ -179,7 +176,7 @@ namespace OpenSpace.FileFormat {
                     Array.Resize(ref pointerBlocks, i);
                     break;
 				}
-				if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(6));
+				if (httpStream != null) await httpStream.FillCacheForRead(6);
 				// A pointer list contains pointers located in SNA part with matching module & block
 				pointerBlocks[i] = new RelocationPointerList();
                 pointerBlocks[i].module = reader.ReadByte();
@@ -190,13 +187,13 @@ namespace OpenSpace.FileFormat {
 				pointerBlocks[i].pointers = new RelocationPointerInfo[pointerBlocks[i].count];
                 if (pointerBlocks[i].count > 0) {
                     if (Settings.s.snaCompression) {
-						if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(5*4));
+						if (httpStream != null) await httpStream.FillCacheForRead(5*4);
 						uint isCompressed = reader.ReadUInt32();
                         uint compressedSize = reader.ReadUInt32();
                         uint compressedChecksum = reader.ReadUInt32();
                         uint decompressedSize = reader.ReadUInt32();
                         uint decompressedChecksum = reader.ReadUInt32();
-						if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead((int)compressedSize));
+						if (httpStream != null) await httpStream.FillCacheForRead((int)compressedSize);
 						byte[] compressedData = reader.ReadBytes((int)compressedSize);
                         if (isCompressed != 0) {
                             using (var compressedStream = new MemoryStream(compressedData))
@@ -211,7 +208,7 @@ namespace OpenSpace.FileFormat {
                             }
                         }
                     } else {
-						if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead((int)pointerBlocks[i].count * 8));
+						if (httpStream != null) await httpStream.FillCacheForRead((int)pointerBlocks[i].count * 8);
 						ReadPointerBlock(reader, pointerBlocks[i]);
                     }
                 }
