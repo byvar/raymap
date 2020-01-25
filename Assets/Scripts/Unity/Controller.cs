@@ -452,6 +452,20 @@ public class Controller : MonoBehaviour {
 						}
 					}*/
 					unityBehaviour.Init();
+
+                    var iteratorPerso = unityBehaviour.perso;
+
+                    // Of sound brain and mind?
+                    if (iteratorPerso.brain?.Value?.mind?.Value != null) {
+                        var mind = iteratorPerso.brain.Value.mind.Value;
+
+                        if (mind.comportsIntelligence.Value != null) {
+                            mind.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
+                        }
+                        if (mind.comportsReflex.Value != null) {
+                            mind.comportsReflex.Value.CreateGameObjects("Reflex", unityBehaviour.gameObject, iteratorPerso);
+                        }
+                    }
 				}
 			}
 			if (romLoader.level != null && romLoader.level.spawnablePersos.Value != null && romLoader.level.num_spawnablepersos > 0) {

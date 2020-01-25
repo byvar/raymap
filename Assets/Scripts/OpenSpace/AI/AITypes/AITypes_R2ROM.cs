@@ -915,13 +915,13 @@ namespace OpenSpace.AI {
                 "Cond_And", // 0
                 "Cond_Or",
                 "Cond_Not",
-                "Cond_XOR",
-                "Cond_Different",
                 "Cond_Equal", // 5
+                "Cond_Different",
                 "Cond_Greater",
                 "Cond_Lesser",
                 "Cond_GreaterOrEqual",
                 "Cond_LesserOrEqual",
+                "Cond_XOR",
                 "Cond_CollidePersoZDDWithPerso", // 10
                 "Cond_CollideModuleZDDWithPerso",
                 "Cond_CollidePersoAllZDDWithPersoAllZDD",

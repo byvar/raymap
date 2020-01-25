@@ -6,7 +6,8 @@ using OpenSpace;
 
 [CustomEditor(typeof(Controller))]
 public class ControllerEditor : Editor {
-    public override void OnInspectorGUI() {
+    public override void OnInspectorGUI()
+    {
         DrawDefaultInspector();
 
         Controller cont = (Controller)target;
@@ -17,6 +18,15 @@ public class ControllerEditor : Editor {
         if (GUILayout.Button("Export map")) {
             MapExporter exporter = new MapExporter(MapLoader.Loader, cont.ExportPath);
             exporter.Export();
+        }
+
+        if (GUILayout.Button("Print all translated scripts")) {
+            if (cont.romPersos?.Count>0) {
+                foreach(var romPerso in cont.romPersos) {
+                    Debug.Log("romPerso: " + romPerso.name);
+                    romPerso.PrintTranslatedScripts();
+                }
+            }
         }
     }
 }

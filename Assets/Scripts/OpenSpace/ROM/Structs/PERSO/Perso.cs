@@ -17,7 +17,10 @@ namespace OpenSpace.ROM {
 		public ushort _18;
 
 		protected override void ReadInternal(Reader reader) {
-			p3dData = new Reference<Perso3dData>(reader, true);
+
+            Loader.print("Perso @ " + Pointer.Current(reader));
+
+            p3dData = new Reference<Perso3dData>(reader, true);
             brain = new Reference<Brain>(reader, true);
             _4 = reader.ReadUInt16();
 			collset = new Reference<CollSet>(reader, true);

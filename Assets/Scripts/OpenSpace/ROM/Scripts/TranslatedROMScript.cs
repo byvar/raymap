@@ -87,7 +87,7 @@ namespace OpenSpace.ROM {
                                 case "Cond_And": return prefix + firstChildNode + " && " + secondChildNode;
                                 case "Cond_Or": return prefix + firstChildNode + " || " + secondChildNode;
                                 case "Cond_Not": return prefix + "!" + "(" + firstChildNode + ")";
-                                case "Cond_XOR": return prefix + firstChildNode + " != " + secondChildNode; // XOR
+                                case "Cond_XOR": return prefix + firstChildNode + " xor " + secondChildNode; // XOR
                                 // Real (float) comparisons:
                                 case "Cond_Equal": return prefix + firstChildNode + " == " + secondChildNode;
                                 case "Cond_Different": return prefix + firstChildNode + " != " + secondChildNode;

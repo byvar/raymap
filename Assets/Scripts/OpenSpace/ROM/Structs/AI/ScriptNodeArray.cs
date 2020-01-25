@@ -16,7 +16,7 @@ namespace OpenSpace.ROM {
 
 
 		protected override void ReadInternal(Reader reader) {
-			//Loader.print("Script @ " + Pointer.Current(reader) + " - len: " + length);
+			Loader.print("Script @ " + Pointer.Current(reader) + " - len: " + length);
 			nodes = new ScriptNode[length];
 			for (int i = 0; i < nodes.Length; i++) {
 				nodes[i] = new ScriptNode(reader);
@@ -237,7 +237,7 @@ namespace OpenSpace.ROM {
                         if (advanced) return "DsgVarId: " + "0x" + (param).ToString("x8");
                         return "DsgVarId(" + param + ")";
                     case NodeType.String:
-                        return "\"str_" + param+ "\"";
+                        return paramString.Value.ToString();
                     case NodeType.LipsSynchroRef:
                         return "LipsSynchroRef: " + param;
                     case NodeType.FamilyRef:
@@ -295,7 +295,12 @@ namespace OpenSpace.ROM {
                         }
                         return "Caps(" + "0x" + (param).ToString("x8") + ")";
                     case NodeType.SubRoutine:
-                        return "Macro";
+                        string macroString = "/* Subroutine */";
+                        macroString += Environment.NewLine;
+                        TranslatedROMScript macroScript = new TranslatedROMScript(paramScript.Value, perso);
+                        macroString += macroScript.ToString();
+                        macroString += Environment.NewLine + "/* End Subroutine */";
+                        return macroString;
                     case NodeType.Null:
                         return "null";
                     case NodeType.GraphRef:
