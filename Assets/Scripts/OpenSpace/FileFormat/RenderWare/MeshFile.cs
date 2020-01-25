@@ -66,25 +66,25 @@ namespace OpenSpace.FileFormat.RenderWare {
 						triangles.Add(g.triangles[j]);
 					}
 				}
-				e.num_mapping_entries = m.num_vertices;
+				e.OPT_num_mapping_entries = m.num_vertices;
 				e.num_uvMaps = (ushort)g.numTexSets;
-				e.mapping_uvs = new int[e.num_uvMaps][];
+				e.OPT_mapping_uvs = new int[e.num_uvMaps][];
 				e.uvs = new Vector2[0];
 				e.vertexColors = g.vertexColors;
 				for (int j = 0; j < g.numTexSets; j++) {
-					e.mapping_uvs[j] = Enumerable.Range(e.num_uvs, m.num_vertices).ToArray();
+					e.OPT_mapping_uvs[j] = Enumerable.Range(e.num_uvs, m.num_vertices).ToArray();
 					Array.Resize(ref e.uvs, e.num_uvs + m.num_vertices);
 					Array.Copy(g.uvs[j], 0, e.uvs, e.num_uvs, m.num_vertices);
 					e.num_uvs += m.num_vertices;
 
 				}
-				e.mapping_vertices = Enumerable.Range(0, m.num_vertices).ToArray();
-				e.num_disconnected_triangles = (ushort)triangles.Count;
-				e.disconnected_triangles = new int[triangles.Count*3];
+				e.OPT_mapping_vertices = Enumerable.Range(0, m.num_vertices).ToArray();
+				e.OPT_num_disconnectedTriangles = (ushort)triangles.Count;
+				e.OPT_disconnectedTriangles = new int[triangles.Count*3];
 				for (int j = 0; j < triangles.Count; j++) {
-					e.disconnected_triangles[j * 3] = triangles[j].vertex1;
-					e.disconnected_triangles[j * 3+1] = triangles[j].vertex2;
-					e.disconnected_triangles[j * 3+2] = triangles[j].vertex3;
+					e.OPT_disconnectedTriangles[j * 3] = triangles[j].vertex1;
+					e.OPT_disconnectedTriangles[j * 3+1] = triangles[j].vertex2;
+					e.OPT_disconnectedTriangles[j * 3+2] = triangles[j].vertex3;
 				}
 
 				e.visualMaterial = materialIndices[i] == -1 ? materials[currentUniqueMaterial] : materials[materialIndices[i]];

@@ -66,7 +66,7 @@ namespace OpenSpace.Animation {
         public static AnimationBank[] Read(Reader reader, Pointer offset, uint index, uint num_banks, FileFormat.FileWithPointers kfFile, bool append = false) {
             MapLoader l = MapLoader.Loader;
             AnimationBank[] banks = new AnimationBank[num_banks];
-            
+
             for (int i = 0; i < num_banks; i++) {
                 // In R3, each animation bank is of size 0x104 = 13 times a stack description of 5 uint32s.
                 banks[i] = new AnimationBank(Pointer.Current(reader));
@@ -221,11 +221,11 @@ namespace OpenSpace.Animation {
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].events.off_data != null) Pointer.Goto(ref reader, banks[i].events.off_data);
-                    banks[i].global_events = l.ReadArray<AnimEvent>(banks[i].events.Count(append), reader);
+					banks[i].global_events = l.ReadArray<AnimEvent>(banks[i].events.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
                     if (banks[i].morphData.off_data != null) Pointer.Goto(ref reader, banks[i].morphData.off_data);
-                    banks[i].global_morphData = l.ReadArray<AnimMorphData>(banks[i].morphData.Count(append), reader);
+					banks[i].global_morphData = l.ReadArray<AnimMorphData>(banks[i].morphData.Count(append), reader);
 
 					if (Settings.s.hasDeformations) {
 						if (reader.AutoAligning) reader.AutoAlign(4);

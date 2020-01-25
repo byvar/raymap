@@ -15,27 +15,28 @@ using System.Linq;
 using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2Loader : MapLoader {
-        public override IEnumerator Load() {
+		protected override async Task Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
 				gameDataBinFolder += "/";
-				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 
                 loadingState = "Initializing files";
-                yield return null;
+                await WaitIfNecessary();
                 string gameDsbPath = gameDataBinFolder + ConvertCase("Game.dsb", Settings.CapsType.DSB);
                 if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                     gameDsbPath = gameDataBinFolder + ConvertCase("gamedsc.bin", Settings.CapsType.DSB);
                 } else if (Settings.s.game == Settings.Game.TTSE) {
                     gameDsbPath = gameDataBinFolder + ConvertCase("GAME.DSC", Settings.CapsType.DSB);
 				}
-				yield return controller.StartCoroutine(PrepareFile(gameDsbPath));
+				await PrepareFile(gameDsbPath);
 				gameDsb = new DSB("Game", gameDsbPath);
 				if (FileSystem.mode != FileSystem.Mode.Web) {
 					gameDsb.Save(gameDataBinFolder + ConvertCase("Game_dsb.dmp", Settings.CapsType.DSB));
@@ -43,11 +44,11 @@ namespace OpenSpace.Loader {
                 gameDsb.ReadAllSections();
                 gameDsb.Dispose();
 
-				yield return controller.StartCoroutine(CreateCNT());
+				await CreateCNT();
 
 				if (Settings.s.game == Settings.Game.R2) {
 					string comportsPath = gameDataBinFolder + "R2DC_Comports.json";
-					yield return controller.StartCoroutine(PrepareFile(comportsPath));
+					await PrepareFile(comportsPath);
 				}
 
 				if (lvlName.EndsWith(".exe")) {
@@ -55,7 +56,7 @@ namespace OpenSpace.Loader {
                     Settings.s.loadFromMemory = true;
                     MemoryFile mem = new MemoryFile(lvlName);
                     files_array[0] = mem;
-                    yield return null;
+                    await WaitIfNecessary();
                     LoadMemory();
                 } else {
                     hasTransit = false;
@@ -66,26 +67,26 @@ namespace OpenSpace.Loader {
 						+ ConvertCase("../LangData/English/", Settings.CapsType.All)
 						+ levelsSubFolder;
 					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-						yield return controller.StartCoroutine(FileSystem.CheckDirectory(langDataPath));
+						await FileSystem.CheckDirectory(langDataPath);
 						if (FileSystem.mode != FileSystem.Mode.Web && !FileSystem.DirectoryExists(langDataPath)) {
 							string langPath = gameDataBinFolder + ConvertCase("../LangData/", Settings.CapsType.All);
-							yield return controller.StartCoroutine(FileSystem.CheckDirectory(langPath));
+							await FileSystem.CheckDirectory(langPath);
 							if (FileSystem.DirectoryExists(langPath)) {
 								DirectoryInfo dirInfo = new DirectoryInfo(langPath);
 								DirectoryInfo firstLang = dirInfo.GetDirectories().FirstOrDefault();
 								if (firstLang != null) {
 									langDataPath = firstLang.FullName + "/" + levelsSubFolder;
-									yield return controller.StartCoroutine(FileSystem.CheckDirectory(langDataPath));
+									await FileSystem.CheckDirectory(langDataPath);
 								}
 							}
 						}
 					}
 
-                    yield return null;
+                    await WaitIfNecessary();
 					bool hasRelocationFiles = true;
                     if (Settings.s.mode == Settings.Mode.Rayman2PC || Settings.s.mode == Settings.Mode.DonaldDuckPC) {
                         string dataPath = levelsFolder + "LEVELS0.DAT";
-						yield return controller.StartCoroutine(PrepareBigFile(dataPath, 512*1024));
+						await PrepareBigFile(dataPath, 512*1024);
                         if (FileSystem.FileExists(dataPath)) {
                             dat = new DAT("LEVELS0", gameDsb, dataPath);
 							hasRelocationFiles = false;
@@ -97,7 +98,6 @@ namespace OpenSpace.Loader {
 					string langLvlFolder = ConvertCase(lvlName + "/", Settings.CapsType.LangLevelFolder);
 
 					// Prepare paths
-					Dictionary<string, string> paths = new Dictionary<string, string>();
 					paths["fix.sna"] = levelsFolder + ConvertCase("Fix.sna", Settings.CapsType.Fix);
 					paths["fix.rtb"] = levelsFolder + ConvertCase("Fix.rtb", Settings.CapsType.FixRelocation);
 					paths["fix.gpt"] = levelsFolder + ConvertCase("Fix.gpt", Settings.CapsType.Fix);
@@ -157,11 +157,11 @@ namespace OpenSpace.Loader {
 
 					// Download files
 					foreach (KeyValuePair<string, string> path in paths) {
-						if(path.Value != null) yield return controller.StartCoroutine(PrepareFile(path.Value));
+						if(path.Value != null) await PrepareFile(path.Value);
 					}
 
 					// LEVEL DSB
-					yield return null;
+					await WaitIfNecessary();
 					if (FileSystem.FileExists(paths["lvl.dsb"])) {
                         lvlDsb = new DSB(lvlName + ".dsc", paths["lvl.dsb"]);
 						if (FileSystem.mode != FileSystem.Mode.Web) {
@@ -173,37 +173,37 @@ namespace OpenSpace.Loader {
 
 					// FIX
                     RelocationTable fixRtb = new RelocationTable(paths["fix.rtb"], dat, "Fix", RelocationType.RTB);
-					yield return controller.StartCoroutine(fixRtb.Init());
+					await fixRtb.Init();
 					if (FileSystem.FileExists(paths["fixlvl.rtb"])) {
 						// Fix -> Lvl pointers for Tonic Trouble
 						RelocationTable fixLvlRtb = new RelocationTable(paths["fixlvl.rtb"], dat, lvlName + "Fix", RelocationType.RTB);
-						yield return controller.StartCoroutine(fixLvlRtb.Init());
+						await fixLvlRtb.Init();
 						fixRtb.Add(fixLvlRtb);
                     }
                     SNA fixSna = new SNA("Fix", paths["fix.sna"], fixRtb);
 					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
 						RelocationTable fixLangRTG = new RelocationTable(paths["fix.rtg"], dat, "fixLang", RelocationType.RTG);
-						yield return controller.StartCoroutine(fixLangRTG.Init());
+						await fixLangRTG.Init();
 						if (FileSystem.FileExists(paths["fixlvl.rtg"])) {
 							RelocationTable fixLvlRTG = new RelocationTable(paths["fixlvl.rtg"], dat, lvlName + "FixLang", RelocationType.RTG);
-							yield return controller.StartCoroutine(fixLvlRTG.Init());
+							await fixLvlRTG.Init();
 							fixLangRTG.Add(fixLvlRTG);
                         }
                         SNA fixLangSna = new SNA("fixLang", paths["fix.lng"], fixLangRTG);
-                        yield return null;
+                        await WaitIfNecessary();
                         fixSna.AddSNA(fixLangSna);
 
-                        yield return null;
+                        await WaitIfNecessary();
                         RelocationTable fixRtd = new RelocationTable(paths["fix.rtd"], dat, "fixLang", RelocationType.RTD);
-						yield return controller.StartCoroutine(fixRtd.Init());
+						await fixRtd.Init();
 						fixSna.ReadDLG(paths["fix.dlg"], fixRtd);
 					}
 					RelocationTable fixRtp = new RelocationTable(paths["fix.rtp"], dat, "fix", RelocationType.RTP);
-					yield return controller.StartCoroutine(fixRtp.Init());
+					await fixRtp.Init();
 					fixSna.ReadGPT(paths["fix.gpt"], fixRtp);
 					
 					RelocationTable fixRtt = new RelocationTable(paths["fix.rtt"], dat, "fix", RelocationType.RTT);
-					yield return controller.StartCoroutine(fixRtt.Init());
+					await fixRtt.Init();
 					fixSna.ReadPTX(paths["fix.ptx"], fixRtt);
 					
 					if (FileSystem.FileExists(paths["fix.sda"])) {
@@ -212,39 +212,39 @@ namespace OpenSpace.Loader {
 
 					// LEVEL
                     RelocationTable lvlRtb = new RelocationTable(paths["lvl.rtb"], dat, lvlName, RelocationType.RTB);
-					yield return controller.StartCoroutine(lvlRtb.Init());
+					await lvlRtb.Init();
 					SNA lvlSna = new SNA(lvlName, paths["lvl.sna"], lvlRtb);
 					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
 						RelocationTable lvlLangRTG = new RelocationTable(paths["lvl.rtg"], dat, lvlName + "Lang", RelocationType.RTG);
-						yield return controller.StartCoroutine(lvlLangRTG.Init());
+						await lvlLangRTG.Init();
 						SNA lvlLangSna = new SNA(lvlName + "Lang", paths["lvl.lng"], lvlLangRTG);
-                        yield return null;
+                        await WaitIfNecessary();
                         lvlSna.AddSNA(lvlLangSna);
-						yield return null;
+						await WaitIfNecessary();
                         RelocationTable lvlRtd = new RelocationTable(paths["lvl.rtd"], dat, lvlName + "Lang", RelocationType.RTD);
-						yield return controller.StartCoroutine(lvlRtd.Init());
+						await lvlRtd.Init();
 						lvlSna.ReadDLG(paths["lvl.dlg"], lvlRtd);
                     }
 
                     if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
                         RelocationTable lvlRtp = new RelocationTable(paths["lvl.rtp"], dat, lvlName, RelocationType.RTP);
-						yield return controller.StartCoroutine(lvlRtp.Init());
+						await lvlRtp.Init();
 						lvlSna.ReadGPT(paths["lvl.gpt"], lvlRtp);
                         RelocationTable lvlRtt = new RelocationTable(paths["lvl.rtt"], dat, lvlName, RelocationType.RTT);
-						yield return controller.StartCoroutine(lvlRtt.Init());
+						await lvlRtt.Init();
 						lvlSna.ReadPTX(paths["lvl.ptx"], lvlRtt);
                     } else {
                         lvlSna.ReadGPT(paths["lvl.gpt"], null);
                         lvlSna.ReadPTX(paths["lvl.ptx"], null);
 					}
 					if (FileSystem.FileExists(paths["lvl.sda"])) {
-                        yield return null;
+                        await WaitIfNecessary();
                         lvlSna.ReadSDA(paths["lvl.sda"]);
                     }
 
-                    yield return null;
+                    await WaitIfNecessary();
                     fixSna.CreatePointers();
-                    yield return null;
+                    await WaitIfNecessary();
                     lvlSna.CreatePointers();
 
                     files_array[0] = fixSna;
@@ -252,16 +252,16 @@ namespace OpenSpace.Loader {
                     files_array[2] = dat;
 
 					if (FileSystem.mode != FileSystem.Mode.Web) {
-						yield return null;
+						await WaitIfNecessary();
 						fixSna.CreateMemoryDump(levelsFolder + "fix.dmp", true);
-						yield return null;
+						await WaitIfNecessary();
 						lvlSna.CreateMemoryDump(levelsFolder + lvlFolder + lvlName + ".dmp", true);
 					}
 
-                    yield return controller.StartCoroutine(LoadFIXSNA());
-                    yield return controller.StartCoroutine(LoadLVLSNA());
+                    await LoadFIXSNA();
+                    await LoadLVLSNA();
 
-                    yield return null;
+                    await WaitIfNecessary();
                     fixSna.Dispose();
                     lvlSna.Dispose();
                     if (dat != null) dat.Dispose();
@@ -274,14 +274,14 @@ namespace OpenSpace.Loader {
                 }
                 if (cnt != null) cnt.Dispose();
             }
-            yield return null;
+            await WaitIfNecessary();
             InitModdables();
         }
 
         #region FIXSNA
-        IEnumerator LoadFIXSNA() {
+        async Task LoadFIXSNA() {
             loadingState = "Loading fixed memory";
-            yield return null;
+            await WaitIfNecessary();
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
             print("FIX GPT offset: " + Pointer.Current(reader));
@@ -432,7 +432,7 @@ namespace OpenSpace.Loader {
                 Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
 
                 loadingState = "Loading input structure";
-                yield return null;
+                await WaitIfNecessary();
                 for (int i = 0; i < Settings.s.numEntryActions; i++) {
                     Pointer.Read(reader); // 3DOS_EntryActions
                 }
@@ -449,11 +449,11 @@ namespace OpenSpace.Loader {
                 print("Off entryelements: " + off_IPT_entryElementList);
 
                 loadingState = "Loading text";
-                yield return null;
+                await WaitIfNecessary();
                 fontStruct = FontStructure.Read(reader, Pointer.Current(reader)); // FON_g_stGeneral
 
                 loadingState = "Loading fixed animation bank";
-                yield return null;
+                await WaitIfNecessary();
                 animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
                 animationBanks[0] = AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, files_array[Mem.FixKeyFrames])[0];
                 print("Fix animation bank: " + animationBanks[0].off_header);
@@ -462,11 +462,11 @@ namespace OpenSpace.Loader {
 
             // Read PTX
             loadingState = "Loading fixed textures";
-            yield return null;
+            await WaitIfNecessary();
 			// Can't yield inside a lambda, so we must do it the old fashioned way, with off_current
 			if (sna.PTX != null) {
 				Pointer off_current = Pointer.Goto(ref reader, sna.PTX);
-				yield return controller.StartCoroutine(ReadTexturesFix(reader, Pointer.Current(reader)));
+				await ReadTexturesFix(reader, Pointer.Current(reader));
 				Pointer.Goto(ref reader, off_current);
 			}
             /*Pointer.DoAt(ref reader, sna.PTX, () => {
@@ -476,9 +476,9 @@ namespace OpenSpace.Loader {
         #endregion
 
         #region LVLSNA
-        IEnumerator LoadLVLSNA() {
+        async Task LoadLVLSNA() {
             loadingState = "Loading level memory";
-            yield return null;
+            await WaitIfNecessary();
             Reader reader = files_array[Mem.Lvl].reader;
             Pointer off_current;
             SNA sna = (SNA)files_array[Mem.Lvl];
@@ -519,7 +519,7 @@ namespace OpenSpace.Loader {
             }
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
                 loadingState = "Reading settings for persos in fix";
-                yield return null;
+                await WaitIfNecessary();
                 // Fill in fix -> lvl pointers for perso's in fix
                 uint num_persoInFixPointers = reader.ReadUInt32();
                 Pointer[] persoInFixPointers = new Pointer[num_persoInFixPointers];
@@ -588,7 +588,7 @@ namespace OpenSpace.Loader {
                 }
             }
             loadingState = "Loading globals";
-            yield return null;
+            await WaitIfNecessary();
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 globals.off_actualWorld = Pointer.Read(reader);
                 globals.off_dynamicWorld = Pointer.Read(reader);
@@ -650,7 +650,7 @@ namespace OpenSpace.Loader {
 
             // Begin of engineStructure
             loadingState = "Loading engine structure";
-            yield return null;
+            await WaitIfNecessary();
             print("Start of EngineStructure: " + Pointer.Current(reader));
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 reader.ReadByte();
@@ -741,7 +741,7 @@ namespace OpenSpace.Loader {
                     Pointer.Read(reader);
                 }
                 loadingState = "Loading level animation bank";
-                yield return null;
+                await WaitIfNecessary();
                 AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, files_array[Mem.LvlKeyFrames], append: true);
                 animationBanks[1] = animationBanks[0];
             }
@@ -753,12 +753,12 @@ namespace OpenSpace.Loader {
 
             // Read PTX
             loadingState = "Loading level textures";
-            yield return null;
+            await WaitIfNecessary();
 
 			// Can't yield inside a lambda, so we must do it the old fashioned way, with off_current
 			if (sna.PTX != null) {
 				off_current = Pointer.Goto(ref reader, sna.PTX);
-				yield return controller.StartCoroutine(ReadTexturesLvl(reader, Pointer.Current(reader)));
+				await ReadTexturesLvl(reader, Pointer.Current(reader));
 				Pointer.Goto(ref reader, off_current);
 			}
 			/*Pointer.DoAt(ref reader, sna.PTX, () => {
@@ -770,11 +770,11 @@ namespace OpenSpace.Loader {
 
             // Parse actual world & always structure
             loadingState = "Loading families";
-            yield return null;
+            await WaitIfNecessary();
             ReadFamilies(reader);
 
             loadingState = "Creating animation bank";
-            yield return null;
+            await WaitIfNecessary();
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 animationBanks = new AnimationBank[2];
                 animationBanks[0] = new AnimationBank(null) {
@@ -797,19 +797,19 @@ namespace OpenSpace.Loader {
             }
 
             loadingState = "Loading superobject hierarchy";
-            yield return null;
+            await WaitIfNecessary();
             ReadSuperObjects(reader);
             loadingState = "Loading always structure";
-            yield return null;
+            await WaitIfNecessary();
             ReadAlways(reader);
             loadingState = "Filling in cross-references";
-            yield return null;
+            await WaitIfNecessary();
             ReadCrossReferences(reader);
 
 			// TODO: Make more generic
 			if (Settings.s.game == Settings.Game.R2) {
 				loadingState = "Filling in comport names";
-				yield return null;
+				await WaitIfNecessary();
 				string path = gameDataBinFolder + "R2DC_Comports.json";
 
                 if (!FileSystem.FileExists(path)) {

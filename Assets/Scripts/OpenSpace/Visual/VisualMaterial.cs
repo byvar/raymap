@@ -79,8 +79,8 @@ namespace OpenSpace.Visual {
                 Material baseMaterial = l.baseMaterial;
                 bool transparent = IsTransparent || ((hints & Hint.Transparent) == Hint.Transparent) || textures.Count == 0;
                 if (textures.Where(t => ((t.properties & 0x20) != 0 && (t.properties & 0x80000000) == 0)).Count() > 0
-					|| IsLight) {
-					//|| (textures.Count > 0 && textures[0].textureOp == 1)) {
+					|| IsLight//) {
+					|| (textures.Count > 0 && textures[0].textureOp == 1)) {
                     baseMaterial = l.baseLightMaterial;
                 } else if (transparent) {
                     baseMaterial = l.baseTransparentMaterial;

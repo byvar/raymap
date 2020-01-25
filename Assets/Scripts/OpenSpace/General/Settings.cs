@@ -22,9 +22,12 @@ namespace OpenSpace {
 			[Description("Rayman M (PC)")] RaymanMPC,
 			[Description("Rayman Arena (PC)")] RaymanArenaPC,
 			[Description("Rayman Arena (GC)")] RaymanArenaGC,
+			[Description("Rayman Arena Demo (GC)")] RaymanArenaGCDemo,
+			[Description("Rayman Arena (Xbox)")] RaymanArenaXbox,
 			[Description("Rayman Rush (PS1)")] RaymanRushPS1,
 			[Description("Rayman 3 (PC)")] Rayman3PC,
 			[Description("Rayman 3 (GC)")] Rayman3GC,
+			[Description("Rayman 3 (PS2)")] Rayman3PS2,
 			[Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
 			[Description("Tonic Trouble (PC)")] TonicTroublePC,
 			[Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
@@ -42,8 +45,11 @@ namespace OpenSpace {
 		
 		public static Dictionary<string, Mode> cmdModeNameDict = new Dictionary<string, Mode>() {
 			{ "r3_gc", Mode.Rayman3GC },
-			{ "ra_gc", Mode.RaymanArenaGC },
 			{ "r3_pc", Mode.Rayman3PC },
+			{ "r3_ps2", Mode.Rayman3PS2 },
+			{ "ra_gc", Mode.RaymanArenaGC },
+			{ "ra_demo_gc", Mode.RaymanArenaGCDemo },
+			{ "ra_xbox", Mode.RaymanArenaXbox },
 			{ "ra_pc", Mode.RaymanArenaPC },
 			{ "rm_pc", Mode.RaymanMPC },
 			{ "r2_pc", Mode.Rayman2PC },
@@ -77,11 +83,11 @@ namespace OpenSpace {
             R3 = 3
         };
         public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch };
-        public enum Platform { PC, iOS, GC, DC, PS1, PS2, DS, _3DS, N64 };
+        public enum Platform { PC, iOS, GC, DC, PS1, PS2, Xbox, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
-		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB, LMFile };
+		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB, LMFile, TextureFile };
         
         public EngineVersion engineVersion;
         public Game game;
@@ -162,9 +168,13 @@ namespace OpenSpace {
                 { "num_visualMaterials", 0x005F5E80 },
                 { "visualMaterials", 0x005BFAD4 },
                 { "brightness", 0x005F5E20 },
-            }
-        };
-
+            },
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
         public static Settings R3GC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.R3,
@@ -178,8 +188,31 @@ namespace OpenSpace {
             hasLinkedListHeaderPointers = true,
             textureAnimationSpeedModifier = -10f,
             luminosity = 0.1f,
-            saturate = false
-        };
+            saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+		public static Settings R3PS2 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = true,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.1f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
 
 		public static Settings RMPC = new Settings() {
 			engineVersion = EngineVersion.R3,
@@ -191,9 +224,13 @@ namespace OpenSpace {
 			hasDeformations = true,
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.3f,
-			saturate = false
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
 		};
-
 		public static Settings RAPC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
@@ -204,9 +241,13 @@ namespace OpenSpace {
             hasDeformations = true,
             textureAnimationSpeedModifier = 10f,
             luminosity = 0.3f,
-            saturate = false
-        };
-
+            saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
         public static Settings RAGC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
@@ -217,10 +258,49 @@ namespace OpenSpace {
             hasDeformations = true,
             textureAnimationSpeedModifier = -10f,
             luminosity = 0.1f,
-            saturate = false
-        };
+            saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+		public static Settings RAGCDemo = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.RA,
+			platform = Platform.GC,
+			endian = Endian.Big,
+			linkedListType = LinkedListType.Minimize,
+			aiTypes = AITypes.R3,
+			hasDeformations = true,
+			textureAnimationSpeedModifier = -10f,
+			luminosity = 0.1f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+		public static Settings RAXbox = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.RA,
+			platform = Platform.Xbox,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			aiTypes = AITypes.R3,
+			hasDeformations = true,
+			textureAnimationSpeedModifier = -10f,
+			luminosity = 0.1f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
 
-        public static Settings R2PC = new Settings() {
+		public static Settings R2PC = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.PC,
@@ -262,7 +342,6 @@ namespace OpenSpace {
                 { "fontStructure", 0x00500260 }
             }
         };
-
         public static Settings R2PCDemo1 = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
@@ -275,7 +354,6 @@ namespace OpenSpace {
             aiTypes = AITypes.R2,
             numEntryActions = 1
         };
-
         public static Settings R2PCDemo2 = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
@@ -288,7 +366,6 @@ namespace OpenSpace {
             luminosity = 0.5f,
             saturate = true
         };
-
         public static Settings R2DC = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
@@ -305,7 +382,6 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
         };
-
 		public static Settings R2PS2 = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2Revolution,
@@ -324,7 +400,6 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.None }
 			}
 		};
-
 		public static Settings R2IOS = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
@@ -341,7 +416,6 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
 		};
-
 		public static Settings R2PS1 = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
@@ -381,7 +455,6 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-
 		public static Settings RRRDS = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RRR,
@@ -395,7 +468,6 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-
 		public static Settings R23DS = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
@@ -409,7 +481,6 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-
 		public static Settings R2N64 = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
@@ -422,7 +493,6 @@ namespace OpenSpace {
 			aiTypes = AITypes.R2ROM,
 			numEntryActions = 1
 		};
-
 		public static Settings DDN64 = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
@@ -451,7 +521,6 @@ namespace OpenSpace {
 				{ CapsType.FixRelocation, Caps.AllExceptExtension }
 			}
         };
-
 		public static Settings DDDC = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
@@ -488,7 +557,6 @@ namespace OpenSpace {
 				{ CapsType.DSB, Caps.None }
 			}
         };
-
 		public static Settings TTSEPC = new Settings() {
 			engineVersion = EngineVersion.TT,
 			game = Game.TTSE,
@@ -521,7 +589,6 @@ namespace OpenSpace {
 				{ CapsType.FixLvl, Caps.None }
 			}
 		};
-
         public static Settings PlaymobilAlexPC = new Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilAlex,
@@ -538,7 +605,6 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
 		};
-
         public static Settings PlaymobilLauraPC = new Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilLaura,
@@ -560,8 +626,6 @@ namespace OpenSpace {
 			}
         };
 
-
-
 		public static Settings DDPKGC = new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.DDPK,
@@ -572,7 +636,12 @@ namespace OpenSpace {
 			aiTypes = AITypes.R3,
 			textureAnimationSpeedModifier = -10f,
 			luminosity = 0.1f,
-			saturate = false
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
 		};
 
 		public static Settings DinosaurPC = new Settings() {
@@ -585,7 +654,12 @@ namespace OpenSpace {
 			hasDeformations = true,
 			textureAnimationSpeedModifier = 1f,
 			luminosity = 0.3f,
-			saturate = false
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
 		};
 		public static Settings LargoWinchPC = new Settings() {
 			engineVersion = EngineVersion.R3,
@@ -622,9 +696,12 @@ namespace OpenSpace {
 			{ Mode.RaymanMPC, RMPC },
 			{ Mode.RaymanArenaPC, RAPC },
 			{ Mode.RaymanArenaGC, RAGC },
+			{ Mode.RaymanArenaGCDemo, RAGCDemo },
+			{ Mode.RaymanArenaXbox, RAXbox },
 			{ Mode.RaymanRushPS1, RRushPS1 },
 			{ Mode.Rayman3PC, R3PC },
 			{ Mode.Rayman3GC, R3GC },
+			{ Mode.Rayman3PS2, R3PS2 },
 			{ Mode.RaymanRavingRabbidsDS, RRRDS },
 			{ Mode.TonicTroublePC, TTPC },
 			{ Mode.TonicTroubleSEPC, TTSEPC },

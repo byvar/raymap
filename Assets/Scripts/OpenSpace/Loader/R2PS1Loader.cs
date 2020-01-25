@@ -18,17 +18,18 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using lzo.net;
 using System.IO.Compression;
+using System.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2PS1Loader : MapLoader {
-        public override IEnumerator Load() {
+		protected override async Task Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
 				gameDataBinFolder += "/";
 				string bigFile = "COMBIN";
-				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 loadingState = "Initializing files";
 				byte[] data = new byte[0];
@@ -45,7 +46,7 @@ namespace OpenSpace.Loader {
 						}
 						memoryBlocks.Add(b);
 					}
-					yield return null;
+					await WaitIfNecessary();
 					for(int i = 0; i < memoryBlocks.Count; i++) {
 						MemoryBlock b = memoryBlocks[i];
 						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_compr.blk", ExtractBlock(reader, b.compressed, 0x1f4, compression: true));
@@ -58,7 +59,7 @@ namespace OpenSpace.Loader {
 								Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
 							}
 						}
-						yield return null;
+						await WaitIfNecessary();
 					}
 				}
 			} finally {
@@ -69,7 +70,7 @@ namespace OpenSpace.Loader {
                 }
                 if (cnt != null) cnt.Dispose();
             }
-            yield return null;
+            await WaitIfNecessary();
             InitModdables();
         }
 

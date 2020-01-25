@@ -8,6 +8,7 @@ using System.Collections;
 using OpenSpace.ROM;
 using OpenSpace.FileFormat.Texture;
 using OpenSpace.FileFormat.Texture.DS;
+using System.Threading.Tasks;
 
 namespace OpenSpace.Loader {
 	public class R2ROMLoader : MapLoader {
@@ -62,22 +63,22 @@ namespace OpenSpace.Loader {
 			levels = levelList.levels.Select(l => l.name).ToArray();*/
 			return levels;
 		}
-		
 
-		public override IEnumerator Load() {
+
+		protected override async Task Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
 				if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
 				globals = new Globals();
 				gameDataBinFolder += "/";
-				yield return controller.StartCoroutine(FileSystem.CheckDirectory(gameDataBinFolder));
+				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 				loadingState = "Initializing files";
-				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "data.bin"));
-				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "fat.bin"));
-				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "anims.bin"));
-				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "shAnims.bin"));
-				yield return controller.StartCoroutine(PrepareFile(gameDataBinFolder + "cuttable.bin"));
+				await PrepareFile(gameDataBinFolder + "data.bin");
+				await PrepareFile(gameDataBinFolder + "fat.bin");
+				await PrepareFile(gameDataBinFolder + "anims.bin");
+				await PrepareFile(gameDataBinFolder + "shAnims.bin");
+				await PrepareFile(gameDataBinFolder + "cuttable.bin");
 
 				files_array[SMem.Data] = new ROMBIN("data.bin", gameDataBinFolder + "data.bin", SMem.Data);
 				files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
@@ -85,19 +86,19 @@ namespace OpenSpace.Loader {
 				files_array[SMem.ShAnims] = new ROMBIN("shAnims.bin", gameDataBinFolder + "shAnims.bin", SMem.ShAnims);
 				files_array[SMem.CutTable] = new ROMBIN("shAnims.bin", gameDataBinFolder + "cuttable.bin", SMem.CutTable);
 
-				yield return controller.StartCoroutine(LoadAnims());
+				await LoadAnims();
 
-				yield return controller.StartCoroutine(LoadFat());
+				await LoadFat();
 				// Determine level index
-				yield return controller.StartCoroutine(LoadFix());
+				await LoadFix();
 				if (CurrentLevel == -1) {
 					throw new Exception("Level list does not contain this level");
 				}
 
 
-				yield return controller.StartCoroutine(LoadFatLevel(loadAll: exportTextures));
+				await LoadFatLevel(loadAll: exportTextures);
 				
-				yield return controller.StartCoroutine(LoadData());
+				await LoadData();
 
 				/*List<DSFATEntry> entries = new List<DSFATEntry>();
 				for (int i = 0; i < fatTables.Length; i++) {
@@ -137,17 +138,17 @@ namespace OpenSpace.Loader {
 				}
 				if (cnt != null) cnt.Dispose();
 			}
-			yield return null;
+			await WaitIfNecessary();
 			InitModdables();
 		}
 		
-		public IEnumerator LoadFat() {
+		public async Task LoadFat() {
 			data = files_array[SMem.Data] as ROMBIN;
 			fat = files_array[SMem.Fat] as ROMBIN;
 			Reader reader = files_array[SMem.Fat].reader;
 
 			loadingState = "Loading struct tables";
-			yield return null;
+			await WaitIfNecessary();
 			uint num_tables = reader.ReadUInt32();
 			if (fatTables == null) {
 				fatTables = new FATTable[num_tables+2];
@@ -155,26 +156,26 @@ namespace OpenSpace.Loader {
 			for (uint i = 0; i < num_tables + 2; i++) {
 				if (i < 2) {
 					loadingState = "Loading struct table " + (i + 1) + "/" + (num_tables + 2);
-					yield return null;
+					await WaitIfNecessary();
 				}
 				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader), readEntries: i < 2);
 			}
-			yield return null;
+			await WaitIfNecessary();
 		}
 
-		public IEnumerator LoadFatLevel(bool loadAll = false) {
+		public async Task LoadFatLevel(bool loadAll = false) {
 			Reader reader = files_array[SMem.Fat].reader;
 			for (uint i = 2; i < fatTables.Length; i++) {
 				bool loadCurrent = loadAll || (i == CurrentLevel+2);
 				if (loadCurrent) {
 					loadingState = "Loading struct table " + (i + 1) + "/" + (fatTables.Length);
-					yield return null;
+					await WaitIfNecessary();
 					fatTables[i].ReadEntries(reader);
 				}
 			}
 		}
 
-		public IEnumerator LoadFix() {
+		public async Task LoadFix() {
 			data = files_array[SMem.Data] as ROMBIN;
 			Reader reader = files_array[SMem.Data].reader;
 
@@ -187,7 +188,7 @@ namespace OpenSpace.Loader {
 
 			if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform.N64) {
 				loadingState = "Loading texture tables";
-				yield return null;
+				await WaitIfNecessary();
 				for (int i = 0; i < 18; i++) {
 					Pointer off_list = Pointer.Read(reader);
 					uint num_list = reader.ReadUInt32();
@@ -235,17 +236,17 @@ namespace OpenSpace.Loader {
 
 			// Read fix texture list
 			loadingState = "Loading engine structure";
-			yield return null;
+			await WaitIfNecessary();
 			EngineStruct engineStruct = GetOrRead<EngineStruct>(reader, (ushort)(0 | FATEntry.Flag.Fix));
 
 			// Read languages table
 			loadingState = "Loading language tables";
-			yield return null;
+			await WaitIfNecessary();
 			NumLanguages numLanguages = GetOrRead<NumLanguages>(reader, 0);
 			print("Number of languages: " + numLanguages.num_languages);
 			for (ushort i = 0; i < numLanguages.num_languages; i++) {
 				loadingState = "Loading language table " + (i + 1) + "/" + numLanguages.num_languages;
-				yield return null;
+				await WaitIfNecessary();
 				LanguageTable lang = GetOrRead<LanguageTable>(reader, i);
 				if (lang != null) {
 					print(lang.name);
@@ -254,7 +255,7 @@ namespace OpenSpace.Loader {
 
 			// Load level list
 			loadingState = "Loading level list";
-			yield return null;
+			await WaitIfNecessary();
 			LevelList levelList = GetOrRead<LevelList>(reader, (ushort)(0 | FATEntry.Flag.Fix), l => l.num_levels = num_levels);
 			for (int i = 0; i < num_levels; i++) {
 				if (levelList.levels[i].name.ToLower() == lvlName.ToLower()) {
@@ -264,31 +265,31 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public IEnumerator LoadData() {
+		public async Task LoadData() {
 			Reader reader = files_array[SMem.Data].reader;
 			if (exportTextures) {
 				string state = loadingState;
 				loadingState = "Exporting textures";
-				yield return null;
+				await WaitIfNecessary();
 				ExportTextures(reader);
 				loadingState = state;
-				yield return null;
-				yield break;
+				await WaitIfNecessary();
+				return;
 			}
 
 			// Load current level data
 			loadingState = "Loading level data";
-			yield return null;
+			await WaitIfNecessary();
 			LevelHeader lh = GetOrRead<LevelHeader>(reader, (ushort)(CurrentLevel | (ushort)FATEntry.Flag.Fix));
 			level = lh;
 			loadingState = "Loading additional object lists";
-			yield return null;
+			await WaitIfNecessary();
 			for (ushort i = 0; i < 0x7FFF; i++) {
 				// Only do it a few times because we're trying to load way more than there is,
 				// so it takes really long if we yield for everything
 				if (i % 4096 == 0) {
 					loadingState = "Loading additional object lists: " + (i + 1);
-					yield return null;
+					await WaitIfNecessary();
 				}
 				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, (ushort)(i | (ushort)FATEntry.Flag.Fix));
 				if (ot != null) objectsTables.Add(ot);
@@ -298,7 +299,7 @@ namespace OpenSpace.Loader {
 				// so it takes really long if we yield for everything
 				if (i % 4096 == 0) {
 					loadingState = "Loading additional object lists: " + (i + 1);
-					yield return null;
+					await WaitIfNecessary();
 				}
 				ObjectsTable ot = GetOrRead<ObjectsTable>(reader, i);
 				if (ot != null) objectsTables.Add(ot);
@@ -309,7 +310,7 @@ namespace OpenSpace.Loader {
 				// so it takes really long if we yield for everything
 				if (i % 4096 == 0) {
 					loadingState = "Loading waypoints: " + (i + 1);
-					yield return null;
+					await WaitIfNecessary();
 				}
 				WayPoint wp = GetOrRead<WayPoint>(reader, (ushort)(i | (ushort)FATEntry.Flag.Fix));
 			}
@@ -318,7 +319,7 @@ namespace OpenSpace.Loader {
 				// so it takes really long if we yield for everything
 				if (i % 4096 == 0) {
 					loadingState = "Loading waypoints: " + (i + 1);
-					yield return null;
+					await WaitIfNecessary();
 				}
 				WayPoint wp = GetOrRead<WayPoint>(reader, i);
 			}
@@ -327,7 +328,7 @@ namespace OpenSpace.Loader {
 				// so it takes really long if we yield for everything
 				if (i % 4096 == 0) {
 					loadingState = "Loading graphs: " + (i + 1);
-					yield return null;
+					await WaitIfNecessary();
 				}
 				Graph g = GetOrRead<Graph>(reader, (ushort)(i | (ushort)FATEntry.Flag.Fix));
 			}
@@ -336,12 +337,12 @@ namespace OpenSpace.Loader {
 				// so it takes really long if we yield for everything
 				if (i % 4096 == 0) {
 					loadingState = "Loading graphs: " + (i + 1);
-					yield return null;
+					await WaitIfNecessary();
 				}
 				Graph g = GetOrRead<Graph>(reader, i);
 			}
 			loadingState = "Initializing hierarchy";
-			yield return null;
+			await WaitIfNecessary();
 			if (lh != null) {
 				if (lh.hierarchyRoot.Value != null) {
 					lh.hierarchyRoot.Value.GetGameObject();
@@ -349,11 +350,11 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public IEnumerator LoadAnims() {
+		public async Task LoadAnims() {
 			// Read anims.bin
 			Reader reader = files_array[SMem.Anims].reader;
 			loadingState = "Loading animations";
-			yield return null;
+			await WaitIfNecessary();
 			uint num_anims = reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();

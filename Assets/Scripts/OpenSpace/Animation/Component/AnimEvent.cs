@@ -24,7 +24,9 @@ namespace OpenSpace.Animation.Component {
 				reader.ReadUInt32();
 			} else {
 				if (Settings.s.platform != Settings.Platform.DC) {
-					unk0 = reader.ReadUInt32();
+					if (Settings.s.platform != Settings.Platform.iOS) {
+						unk0 = reader.ReadUInt32();
+					}
 					unk4 = reader.ReadUInt16();
 				}
 				unk6 = reader.ReadUInt16();

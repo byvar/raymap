@@ -5,11 +5,16 @@ using OpenSpace.AI;
 using System.Collections.Generic;
 using System;
 using OpenSpace.Animation.Component;
+using OpenSpace.Object.Properties;
+using UnityEditor.IMGUI.Controls;
 
 [CustomEditor(typeof(PersoBehaviour))]
 public class PersoBehaviourEditor : Editor {
+	StateTransitionsTreeView treeViewStateTransitions;
+	TreeViewState treeviewStateTransitionsState;
+	MultiColumnHeaderState m_MultiColumnHeaderState;
 
-    public override void OnInspectorGUI() {
+	public override void OnInspectorGUI() {
         DrawDefaultInspector();
 
         PersoBehaviour pb = (PersoBehaviour)target;
@@ -50,6 +55,37 @@ public class PersoBehaviourEditor : Editor {
         if (GUILayout.Button("Next state")) pb.SetState(pb.stateIndex + 1);
         GUI.enabled = true;
         GUILayout.EndHorizontal();
+		Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 100f);
+
+		InitTransitionsTreeIfNeeded(rect, pb);
+		if(treeViewStateTransitions.stateIndex != pb.stateIndex
+			|| treeViewStateTransitions.perso != pb) {
+			treeViewStateTransitions.perso = pb;
+			treeViewStateTransitions.stateIndex = pb.stateIndex;
+			treeViewStateTransitions.treeModel.SetData(GetData());
+			treeViewStateTransitions.Reload();
+		}
+		treeViewStateTransitions.OnGUI(rect);
+
+		/*if (pb.state != null && pb.state.stateTransitions != null && pb.state.stateTransitions.Count > 0) {
+			GUILayout.Label("State transition");
+			GUILayout.BeginHorizontal();
+			GUILayout.Label("Target State");
+			GUILayout.Label("State To Go");
+			GUILayout.EndHorizontal();
+			foreach (State.Transition t in pb.state.stateTransitions) {
+				if (t != null) {
+					State stateToGo = State.FromOffset(t.off_stateToGo);
+					State targetState = State.FromOffset(t.off_targetState);
+					if (stateToGo != null && targetState != null) {
+						GUILayout.BeginHorizontal();
+						if (GUILayout.Button(targetState.ToString())) pb.SetState(targetState);
+						if (GUILayout.Button(stateToGo.ToString())) pb.SetState(stateToGo);
+						GUILayout.EndHorizontal();
+					}
+				}
+			}
+		}*/
 
         if (GUILayout.Button("Print scripts")) pb.PrintScripts();
         if (GUILayout.Button("Print translated scripts")) pb.PrintTranslatedScripts();
@@ -61,4 +97,51 @@ public class PersoBehaviourEditor : Editor {
 
         if (GUILayout.Button("Print Animation Debug Info")) pb.PrintAnimationDebugInfo();
     }
+
+	IList<StateTransitionTreeElement> GetData() {
+		PersoBehaviour pb = (PersoBehaviour)target;
+		List<StateTransitionTreeElement> tr = new List<StateTransitionTreeElement>();
+		tr.Add(new StateTransitionTreeElement("Hidden root", -1, -1));
+		if (pb.state != null && pb.state.stateTransitions != null && pb.state.stateTransitions.Count > 0) {
+			int id = 0;
+			foreach (State.Transition t in pb.state.stateTransitions) {
+				if (t != null) {
+					State stateToGo = State.FromOffset(t.off_stateToGo);
+					State targetState = State.FromOffset(t.off_targetState);
+					tr.Add(new StateTransitionTreeElement("State transition " + targetState.ToString(), 0, id) {
+						stateToGoName = stateToGo.ToString(),
+						stateToGoIndex = stateToGo.index,
+						targetStateName = targetState.ToString(),
+						targetStateIndex = targetState.index,
+						linkingType = t.linkingType
+					});
+					id++;
+				}
+			}
+		}
+		return tr;
+	}
+
+	void InitTransitionsTreeIfNeeded(Rect transitionsRect, PersoBehaviour target) {
+		if (treeViewStateTransitions == null || treeviewStateTransitionsState == null || treeViewStateTransitions.perso != target) {
+			treeviewStateTransitionsState = new TreeViewState();
+
+			bool firstInit = m_MultiColumnHeaderState == null;
+			var headerState = StateTransitionsTreeView.CreateDefaultMultiColumnHeaderState(transitionsRect.width);
+			if (MultiColumnHeaderState.CanOverwriteSerializedFields(m_MultiColumnHeaderState, headerState))
+				MultiColumnHeaderState.OverwriteSerializedFields(m_MultiColumnHeaderState, headerState);
+			m_MultiColumnHeaderState = headerState;
+
+			var multiColumnHeader = new MultiColumnHeader(headerState);
+			if (firstInit)
+				multiColumnHeader.ResizeToFit();
+
+			var treeModel = new TreeModel<StateTransitionTreeElement>(GetData());
+
+			treeViewStateTransitions = new StateTransitionsTreeView(treeviewStateTransitionsState, multiColumnHeader, treeModel) {
+				perso = target,
+				stateIndex = target.stateIndex,
+			};
+		}
+	}
 }

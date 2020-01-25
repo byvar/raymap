@@ -12,6 +12,8 @@ using System.Collections;
 using OpenSpace.Waypoints;
 using OpenSpace.Object.Properties;
 using OpenSpace.Exporter;
+using System.Threading.Tasks;
+using Asyncoroutine;
 
 public class Controller : MonoBehaviour {
 	public Material baseMaterial;
@@ -60,7 +62,7 @@ public class Controller : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Start() {
+	async void Start() {
 		// Read command line arguments
 		string[] args = System.Environment.GetCommandLineArgs();
 		string modeString = "";
@@ -163,40 +165,38 @@ public class Controller : MonoBehaviour {
 		loader.blockyMode = UnitySettings.BlockyMode;
 		loader.exportTextures = UnitySettings.SaveTextures;
 
-		StartCoroutine(Init());
+		await Init();
 	}
 
-	IEnumerator Init() {
+	async Task Init() {
 		state = State.Loading;
-		yield return new WaitForEndOfFrame();
-		yield return StartCoroutine(loader.Load());
-		yield return new WaitForEndOfFrame();
-		if (state == State.Error) yield break;
+		await loader.LoadWrapper();
+		if (state == State.Error) return;
 		state = State.Initializing;
 		detailedState = "Initializing sectors";
-		yield return null;
+		await new WaitForEndOfFrame();
 		sectorManager.Init();
 		detailedState = "Initializing graphs";
-		yield return null;
+		await new WaitForEndOfFrame();
 		graphManager.Init();
 		detailedState = "Initializing lights";
-		yield return null;
+		await new WaitForEndOfFrame();
 		lightManager.Init();
 		detailedState = "Initializing persos";
-		yield return StartCoroutine(InitPersos());
+		await InitPersos();
 		sectorManager.InitLights();
 		detailedState = "Initializing camera";
-		yield return null;
+		await new WaitForEndOfFrame();
 		InitCamera();
 		detailedState = "Initializing portals";
-		yield return null;
+		await new WaitForEndOfFrame();
 		portalManager.Init();
 
 		/*if (viewCollision)*/
 		UpdateViewCollision();
 		if (loader.cinematicsManager != null) {
 			detailedState = "Initializing cinematics";
-			yield return null;
+			await new WaitForEndOfFrame();
 			InitCinematics();
 		}
 		detailedState = "Finished";
@@ -298,11 +298,11 @@ public class Controller : MonoBehaviour {
         }
     }
 
-    public IEnumerator InitPersos() {
+    async Task InitPersos() {
 		if (loader != null) {
 			for (int i = 0; i < loader.persos.Count; i++) {
 				detailedState = "Initializing persos: " + i + "/" + loader.persos.Count;
-				yield return null;
+				await new WaitForEndOfFrame();
 				Perso p = loader.persos[i];
 				PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
 				unityBehaviour.controller = this;
@@ -431,7 +431,7 @@ public class Controller : MonoBehaviour {
 			if (romPersos.Count > 0) {
 				for (int i = 0; i < romPersos.Count; i++) {
 					detailedState = "Initializing persos: " + i + "/" + romPersos.Count;
-					yield return null;
+					await new WaitForEndOfFrame();
 					ROMPersoBehaviour unityBehaviour = romPersos[i];
 					unityBehaviour.controller = this;
 					/*if (loader.globals != null && loader.globals.spawnablePersos != null) {
@@ -458,7 +458,7 @@ public class Controller : MonoBehaviour {
 				GameObject spawnableParent = new GameObject("Spawnable persos");
 				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
 					detailedState = "Initializing spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
-					yield return null;
+					await new WaitForEndOfFrame();
 					OpenSpace.ROM.SuperObjectDynamic sod = romLoader.level.spawnablePersos.Value.superObjects[i];
 					GameObject sodGao = sod.GetGameObject();
 					if (sodGao != null) {

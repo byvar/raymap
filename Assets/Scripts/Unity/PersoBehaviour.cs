@@ -644,6 +644,7 @@ public class PersoBehaviour : MonoBehaviour {
 					for (int i = 0; i < a3d.num_morphData; i++) {
 						AnimMorphData m = a3d.morphData[a3d.start_morphData + i];
 						if (m != null) {
+							//print(m.Offset);
 							/*print("F:" + a3d.num_onlyFrames + " - C:" + a3d.num_channels + " - CF" + (a3d.num_onlyFrames * a3d.num_channels) + " - " +
 								m.channel + " - " + m.frame + " - " + m.morphProgress + " - " + m.objectIndexTo + " - " + m.byte5 + " - " + m.byte6 + " - " + m.byte7);*/
 							int channelIndex = this.GetChannelByID(m.channel)[0];
@@ -1337,8 +1338,8 @@ public class PersoBehaviour : MonoBehaviour {
     }
 
     void GotoAutoNextState() {
-        if (state != null && state.off_state_auto != null) {
-            State state_auto = State.FromOffset(perso.p3dData.family, state.off_state_auto);
+        if (state != null && state.off_nextState != null) {
+            State state_auto = State.FromOffset(perso.p3dData.family, state.off_nextState);
             if (state_auto != null) {
                 int indexOfStateAuto = perso.p3dData.family.states.IndexOf(state_auto);
                 if (indexOfStateAuto > -1) SetState(indexOfStateAuto);

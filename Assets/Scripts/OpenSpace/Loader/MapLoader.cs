@@ -18,6 +18,9 @@ using System.Collections;
 using OpenSpace.Loader;
 using OpenSpace.Cinematics;
 using OpenSpace.Animation.ComponentLargo;
+using System.Threading.Tasks;
+using Asyncoroutine;
+using System.Diagnostics;
 
 namespace OpenSpace {
     public class MapLoader {
@@ -101,7 +104,7 @@ namespace OpenSpace {
         protected CNT cnt = null;
         protected DSB gameDsb = null;
         protected DSB lvlDsb = null;
-        protected string menuTPLPath;
+		protected Dictionary<string, string> paths = new Dictionary<string, string>();
 		public Pointer[] off_lightmapUV;
 
 		public Globals globals = null;
@@ -153,11 +156,35 @@ namespace OpenSpace {
 		}
 
         public MapLoader() {
-        }
-        
-        public virtual IEnumerator Load() {
-            yield return null;
-        }
+			stopwatch = new Stopwatch();
+		}
+
+		protected void StartLoad() {
+			stopwatch.Start();
+		}
+		protected void StopLoad() {
+			stopwatch.Stop();
+		}
+		public static async Task WaitFrame() {
+			await new WaitForEndOfFrame();
+			if (loader != null && loader.stopwatch.IsRunning) {
+				loader.stopwatch.Restart();
+			}
+		}
+		public static async Task WaitIfNecessary() {
+			if (loader.stopwatch.ElapsedMilliseconds > 16) {
+				await WaitFrame();
+			}
+		}
+
+		public async Task LoadWrapper() {
+			StartLoad();
+			await Load();
+			StopLoad();
+		}
+		protected virtual async Task Load() {
+			await MapLoader.WaitIfNecessary();
+		}
 
         public void InitModdables() {
             foreach (SuperObject so in superObjects) {
@@ -211,7 +238,7 @@ namespace OpenSpace {
                 // Save changes
                 SaveModdables();
             } catch (Exception e) {
-                Debug.LogError(e.ToString());
+				UnityEngine.Debug.LogError(e.ToString());
             } finally {
                 for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
@@ -352,12 +379,13 @@ namespace OpenSpace {
         public Controller controller;
         // Defining it this way, clicking the print will go straight to the code you want
         public Action<object> print = MonoBehaviour.print;
+		private Stopwatch stopwatch;
 
-        /*public void print(string str) {
+		/*public void print(string str) {
 MonoBehaviour.print(str);
 }*/
 
-        public FileWithPointers GetFileByReader(Reader reader) {
+		public FileWithPointers GetFileByReader(Reader reader) {
             for (int i = 0; i < files_array.Length; i++) {
                 FileWithPointers file = files_array[i];
                 if (file != null && reader.Equals(file.reader)) {
@@ -395,12 +423,13 @@ MonoBehaviour.print(str);
             }
         }
 
-		protected IEnumerator CreateCNT() {
+		protected async Task CreateCNT() {
+			await WaitIfNecessary();
 			if (Settings.s.game == Settings.Game.LargoWinch) {
 				cntPaths = new string[1];
 				cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
 				foreach (string path in cntPaths) {
-					yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+					await PrepareBigFile(path, 512 * 1024);
 				}
 				cnt = new CNT(cntPaths);
 			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
@@ -412,7 +441,7 @@ MonoBehaviour.print(str);
 					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileVignettes), Settings.CapsType.All));
 					if (cntPaths.Count > 0) {
 						foreach (string path in cntPaths) {
-							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+							await PrepareBigFile(path, 512 * 1024);
 						}
 						cnt = new CNT(cntPaths.ToArray());
 					}
@@ -425,7 +454,7 @@ MonoBehaviour.print(str);
 						cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
 						cntPaths[2] = gameDataBinFolder + "tex32_2.cnt";
 						foreach (string path in cntPaths) {
-							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+							await PrepareBigFile(path, 512 * 1024);
 						}
 						cnt = new CNT(cntPaths);
 					} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
@@ -433,7 +462,7 @@ MonoBehaviour.print(str);
 						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
 						cntPaths[1] = gameDataBinFolder + "tex32.cnt";
 						foreach (string path in cntPaths) {
-							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+							await PrepareBigFile(path, 512 * 1024);
 						}
 						cnt = new CNT(cntPaths);
 					} else if (Settings.s.game == Settings.Game.Dinosaur) {
@@ -441,29 +470,29 @@ MonoBehaviour.print(str);
 						cntPaths[0] = gameDataBinFolder + "VIGNETTE.CNT";
 						cntPaths[1] = gameDataBinFolder + "TEXTURES.CNT";
 						foreach (string path in cntPaths) {
-							yield return controller.StartCoroutine(PrepareBigFile(path, 512 * 1024));
+							await PrepareBigFile(path, 512 * 1024);
 						}
 						cnt = new CNT(cntPaths);
 					}
                 }
             }
 			if (cnt != null) {
-				yield return controller.StartCoroutine(cnt.Init());
+				await cnt.Init();
 				cnt.SetCacheSize(2 * 1024 * 1024);
 				if (exportTextures) {
 					string state = loadingState;
 					loadingState = "Exporting textures";
-					yield return null;
+					await MapLoader.WaitIfNecessary();
 					// Export all textures in cnt
 					foreach (CNT.FileStruct file in cnt.fileList) {
 						GF gf = cnt.GetGF(file);
 						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + file.FullName.Replace(".gf", ".png"), gf.GetTexture().EncodeToPNG());
 					}
 					loadingState = state;
-					yield return null;
+					await MapLoader.WaitIfNecessary();
 				}
 				//Debug.Log("CNT init Finished!");
-				yield return null;
+				await MapLoader.WaitIfNecessary();
 			}
         }
 
@@ -546,7 +575,7 @@ MonoBehaviour.print(str);
             }
         }
 
-		protected IEnumerator ReadTexturesFix(Reader reader, Pointer off_textures) {
+		protected async Task ReadTexturesFix(Reader reader, Pointer off_textures) {
             uint num_textureMemoryChannels = 0;
             if (Settings.s.engineVersion <= Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
             uint num_textures = reader.ReadUInt32();
@@ -556,7 +585,7 @@ MonoBehaviour.print(str);
 			textures = new TextureInfo[num_textures];
             if (num_textures > 0) {
 				loadingState = "Loading fixed textures";
-				yield return null;
+				await new WaitForEndOfFrame();
                 for (uint i = 0; i < num_textures; i++) {
                     Pointer off_texture = Pointer.Read(reader);
                     Pointer.DoAt(ref reader, off_texture, () => {
@@ -565,8 +594,8 @@ MonoBehaviour.print(str);
                 }
                 if (Settings.s.platform == Settings.Platform.GC) {
                     uint num_textures_menu = reader.ReadUInt32();
-                    TPL fixTPL = new TPL(texPaths[Mem.Fix]);
-                    TPL menuTPL = new TPL(menuTPLPath);
+                    TPL fixTPL = new TPL(paths["fix.tpl"]);
+                    TPL menuTPL = new TPL(paths["menu.tpl"]);
                     for (uint i = 0; i < num_textures_menu; i++) {
                         Pointer off_texture = Pointer.Read(reader);
                         TextureInfo tex = textures.Where(t => t.offset == off_texture).First();
@@ -586,7 +615,7 @@ MonoBehaviour.print(str);
                 } else if (Settings.s.platform == Settings.Platform.iOS) {
                     for (int i = 0; i < num_textures; i++) {
 						loadingState = "Loading fixed textures: " + (i+1) + "/" + num_textures;
-						yield return null;
+						await WaitIfNecessary();
 						string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";
                         if (FileSystem.FileExists(texturePath)) {
                             GF gf = new GF(texturePath);
@@ -596,9 +625,8 @@ MonoBehaviour.print(str);
                 } else {
                     for (int i = 0; i < num_textures; i++) {
 						loadingState = "Loading fixed textures: " + (i + 1) + "/" + num_textures;
-						yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
-						GF gf = cnt.preparedGF;
-                        if (gf != null) textures[i].Texture = gf.GetTexture();
+						GF gf = await cnt.PrepareGFByTGAName(textures[i].name);
+						if (gf != null) textures[i].Texture = gf.GetTexture();
                     }
                 }
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
@@ -611,7 +639,7 @@ MonoBehaviour.print(str);
 			loadingState = state;
 		}
 
-		protected IEnumerator ReadTexturesLvl(Reader reader, Pointer off_textures) {
+		protected async Task ReadTexturesLvl(Reader reader, Pointer off_textures) {
             uint num_textures_fix = (uint)textures.Length,
                 num_memoryChannels = 0,
                 num_textures_lvl = 0,
@@ -643,24 +671,51 @@ MonoBehaviour.print(str);
 				}
                 uint currentMemoryChannel = reader.ReadUInt32();
             }
-            if (Settings.s.platform == Settings.Platform.GC) {
-                // Load textures from TPL
-                TPL lvlTPL = new TPL(texPaths[Mem.Lvl]);
-                TPL transitTPL = hasTransit ? new TPL(texPaths[Mem.Transit]) : null;
-                print("Lvl TPL Texture count: " + lvlTPL.Count);
-                if (hasTransit) print("Transit TPL Texture count: " + transitTPL.Count);
-                int transitTexturesSeen = 0;
-                for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                    uint file_texture = reader.ReadUInt32();
-                    if (hasTransit && file_texture == 6) {
-                        textures[i].Texture = transitTPL.textures[transitTexturesSeen++];
-                    } else {
-                        textures[i].Texture = lvlTPL.textures[i - num_textures_fix - transitTexturesSeen];
-                    }
-                }
+			if (Settings.s.platform == Settings.Platform.GC) {
+				// Load textures from TPL
+				TPL lvlTPL = new TPL(paths["lvl.tpl"]);
+				TPL transitTPL = hasTransit ? new TPL(paths["transit.tpl"]) : null;
+				print("Lvl TPL Texture count: " + lvlTPL.Count);
+				if (hasTransit) print("Transit TPL Texture count: " + transitTPL.Count);
+				int transitTexturesSeen = 0;
+				for (uint i = num_textures_fix; i < num_textures_total; i++) {
+					uint file_texture = reader.ReadUInt32();
+					if (hasTransit && file_texture == 6) {
+						textures[i].Texture = transitTPL.textures[transitTexturesSeen++];
+					} else {
+						textures[i].Texture = lvlTPL.textures[i - num_textures_fix - transitTexturesSeen];
+					}
+				}
 				if (exportTextures) {
 					if (transitTPL != null) {
-						for(int i = 0; i < transitTPL.textures.Length; i++) {
+						for (int i = 0; i < transitTPL.textures.Length; i++) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(transitTPL.path) + "/" + i + ".png", transitTPL.textures[i].EncodeToPNG());
+						}
+					}
+					if (lvlTPL != null) {
+						for (int i = 0; i < lvlTPL.textures.Length; i++) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(lvlTPL.path) + "/" + i + ".png", lvlTPL.textures[i].EncodeToPNG());
+						}
+					}
+				}
+			} else if(Settings.s.platform == Settings.Platform.Xbox) {
+				// Load textures from TPL
+				TPL lvlTPL = new TPL(paths["lvl.tpl"]);
+				TPL transitTPL = hasTransit ? new TPL(paths["transit.tpl"]) : null;
+				print("Lvl TPL Texture count: " + lvlTPL.Count);
+				if (hasTransit) print("Transit TPL Texture count: " + transitTPL.Count);
+				int transitTexturesSeen = 0;
+				for (uint i = num_textures_fix; i < num_textures_total; i++) {
+					uint file_texture = reader.ReadUInt32();
+					if (hasTransit && file_texture == 6) {
+						textures[i].Texture = transitTPL.textures[transitTexturesSeen++];
+					} else {
+						textures[i].Texture = lvlTPL.textures[i - num_textures_fix - transitTexturesSeen];
+					}
+				}
+				if (exportTextures) {
+					if (transitTPL != null) {
+						for (int i = 0; i < transitTPL.textures.Length; i++) {
 							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(transitTPL.path) + "/" + i + ".png", transitTPL.textures[i].EncodeToPNG());
 						}
 					}
@@ -675,9 +730,9 @@ MonoBehaviour.print(str);
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					if (textures[i] == null) continue;
 					loadingState = "Loading level textures: " + (i - num_textures_fix + 1) + "/" + (num_textures_total - num_textures_fix);
-					yield return null;
+					await WaitIfNecessary();
 					string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";
-					yield return controller.StartCoroutine(PrepareFile(texturePath));
+					await PrepareFile(texturePath);
 					if (FileSystem.FileExists(texturePath)) {
                         GF gf = new GF(texturePath);
                         if (gf != null) textures[i].Texture = gf.GetTexture();
@@ -723,8 +778,7 @@ MonoBehaviour.print(str);
 						current_texture++;
 						loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
 						if (hasTransit && file_texture == 6) transitTexturesSeen++;
-						yield return controller.StartCoroutine(cnt.PrepareGFByTGAName(textures[i].name));
-						GF gf = cnt.preparedGF;
+						GF gf = await cnt.PrepareGFByTGAName(textures[i].name);
 						if (gf != null) textures[i].Texture = gf.GetTexture();
 					}
 				}
@@ -838,23 +892,23 @@ MonoBehaviour.print(str);
             objList.Gao.transform.SetParent(familiesRoot.transform);
         }
 
-        protected IEnumerator PrepareFile(string path) {
+        protected async Task PrepareFile(string path) {
             if (FileSystem.mode == FileSystem.Mode.Web && !string.IsNullOrEmpty(path)) {
                 string state = loadingState;
                 loadingState = state + "\nDownloading file: " + path;
-                yield return controller.StartCoroutine(FileSystem.DownloadFile(path));
+                await FileSystem.DownloadFile(path);
                 loadingState = state;
-                yield return null;
-            }
+				await WaitIfNecessary();
+			}
 		}
 
-		protected IEnumerator PrepareBigFile(string path, int cacheLength) {
+		protected async Task PrepareBigFile(string path, int cacheLength) {
 			if (FileSystem.mode == FileSystem.Mode.Web) {
 				string state = loadingState;
 				loadingState = state + "\nInitializing bigfile: " + path + " (Cache size: " + Util.SizeSuffix(cacheLength, 0) + ")";
-				yield return controller.StartCoroutine(FileSystem.InitBigFile(path, cacheLength));
+				await FileSystem.InitBigFile(path, cacheLength);
 				loadingState = state;
-				yield return null;
+				await WaitIfNecessary();
 			}
 		}
 
@@ -900,7 +954,7 @@ MonoBehaviour.print(str);
 				if (!structs[type].ContainsKey(pointer)) {
 					structs[type][pointer] = rs;
 				} else {
-					Debug.LogWarning("Duplicate pointer " + pointer + " for type " + type);
+					UnityEngine.Debug.LogWarning("Duplicate pointer " + pointer + " for type " + type);
 				}
 				onPreRead?.Invoke(rs);
 				rs.Read(reader, inline: inline);

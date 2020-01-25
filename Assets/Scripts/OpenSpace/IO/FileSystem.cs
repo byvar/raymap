@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Asyncoroutine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -67,10 +69,11 @@ namespace OpenSpace {
             }
         }
 
-        public static IEnumerator DownloadFile(string path) {
+        public static async Task DownloadFile(string path) {
 			Debug.Log("Downloading " + path);
-            UnityWebRequest www = UnityWebRequest.Get(serverAddress + path);
-            yield return www.SendWebRequest();
+			await MapLoader.WaitIfNecessary();
+			UnityWebRequest www = UnityWebRequest.Get(serverAddress + path);
+            await www.SendWebRequest();
 
             if (www.isNetworkError || www.isHttpError) {
                 Debug.Log(www.error);
@@ -81,12 +84,13 @@ namespace OpenSpace {
             }
         }
 
-		public static IEnumerator CheckDirectory(string path) {
-			if (existingDirectories.ContainsKey(path)) yield break;
+		public static async Task CheckDirectory(string path) {
+			if (existingDirectories.ContainsKey(path)) return;
+			await MapLoader.WaitIfNecessary();
 			UnityWebRequest www = UnityWebRequest.Head(serverAddress + path + "/");
-			yield return www.SendWebRequest();
+			await www.SendWebRequest();
 			while (!www.isDone) {
-				yield return null;
+				await new WaitForEndOfFrame();
 			}
 			if (!www.isHttpError && !www.isNetworkError) {
 				existingDirectories.Add(path, true);
@@ -95,11 +99,12 @@ namespace OpenSpace {
 			}
 		}
 
-		public static IEnumerator InitBigFile(string path, int cacheLength) {
+		public static async Task InitBigFile(string path, int cacheLength) {
 			UnityWebRequest www = UnityWebRequest.Head(serverAddress + path);
-			yield return www.SendWebRequest();
+			await MapLoader.WaitIfNecessary();
+			await www.SendWebRequest();
 			while (!www.isDone) {
-				yield return null;
+				await new WaitForEndOfFrame();
 			}
 			if (!www.isHttpError && !www.isNetworkError) {
 				long contentLength;
@@ -107,7 +112,6 @@ namespace OpenSpace {
 					AddVirtualBigFile(path, contentLength, cacheLength);
 				}
 			}
-			yield return null;
 		}
 
         public static long GetFileLength(string path) {
