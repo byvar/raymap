@@ -41,8 +41,9 @@ public class Controller : MonoBehaviour {
 
 	private CinematicSwitcher cinematicSwitcher = null;
     private LevelGeometryCorruptor levelGeometryCorruptor = null;
+	private System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
-    private bool ExportAfterLoad { get; set; }
+	private bool ExportAfterLoad { get; set; }
 	public string ExportPath { get; set; }
 
 	public List<ROMPersoBehaviour> romPersos { get; set; } = new List<ROMPersoBehaviour>();
@@ -121,7 +122,7 @@ public class Controller : MonoBehaviour {
 
 		if (Application.platform == RuntimePlatform.WebGLPlayer) {
 			//Application.logMessageReceived += communicator.WebLog;
-			Debug.unityLogger.logEnabled = false; // We don't need prints here
+			UnityEngine.Debug.unityLogger.logEnabled = false; // We don't need prints here
 			string url = Application.absoluteURL;
 			if (url.IndexOf('?') > 0) {
 				string urlArgsStr = url.Split('?')[1].Split('#')[0];
@@ -172,24 +173,25 @@ public class Controller : MonoBehaviour {
 		state = State.Loading;
 		await loader.LoadWrapper();
 		if (state == State.Error) return;
+		stopwatch.Start();
 		state = State.Initializing;
 		detailedState = "Initializing sectors";
-		await new WaitForEndOfFrame();
+		await WaitIfNecessary();
 		sectorManager.Init();
 		detailedState = "Initializing graphs";
-		await new WaitForEndOfFrame();
+		await WaitIfNecessary();
 		graphManager.Init();
 		detailedState = "Initializing lights";
-		await new WaitForEndOfFrame();
+		await WaitIfNecessary();
 		lightManager.Init();
 		detailedState = "Initializing persos";
 		await InitPersos();
 		sectorManager.InitLights();
 		detailedState = "Initializing camera";
-		await new WaitForEndOfFrame();
+		await WaitIfNecessary();
 		InitCamera();
 		detailedState = "Initializing portals";
-		await new WaitForEndOfFrame();
+		await WaitIfNecessary();
 		portalManager.Init();
 
 		/*if (viewCollision)*/
@@ -200,6 +202,7 @@ public class Controller : MonoBehaviour {
 			InitCinematics();
 		}
 		detailedState = "Finished";
+		stopwatch.Stop();
 		state = State.Finished;
 		loadingScreen.Active = false;
 
@@ -302,7 +305,7 @@ public class Controller : MonoBehaviour {
 		if (loader != null) {
 			for (int i = 0; i < loader.persos.Count; i++) {
 				detailedState = "Initializing persos: " + i + "/" + loader.persos.Count;
-				await new WaitForEndOfFrame();
+				await WaitIfNecessary();
 				Perso p = loader.persos[i];
 				PersoBehaviour unityBehaviour = p.Gao.AddComponent<PersoBehaviour>();
 				unityBehaviour.controller = this;
@@ -431,7 +434,7 @@ public class Controller : MonoBehaviour {
 			if (romPersos.Count > 0) {
 				for (int i = 0; i < romPersos.Count; i++) {
 					detailedState = "Initializing persos: " + i + "/" + romPersos.Count;
-					await new WaitForEndOfFrame();
+					await WaitIfNecessary();
 					ROMPersoBehaviour unityBehaviour = romPersos[i];
 					unityBehaviour.controller = this;
 					/*if (loader.globals != null && loader.globals.spawnablePersos != null) {
@@ -455,15 +458,15 @@ public class Controller : MonoBehaviour {
 
                     var iteratorPerso = unityBehaviour.perso;
 
-                    // Of sound brain and mind?
-                    if (iteratorPerso.brain?.Value?.mind?.Value != null) {
-                        var mind = iteratorPerso.brain.Value.mind.Value;
+                    // Of sound brain and AI model?
+                    if (iteratorPerso.brain?.Value?.aiModel?.Value != null) {
+                        var aiModel = iteratorPerso.brain.Value.aiModel.Value;
 
-                        if (mind.comportsIntelligence.Value != null) {
-                            mind.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
+                        if (aiModel.comportsIntelligence.Value != null) {
+                            aiModel.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
                         }
-                        if (mind.comportsReflex.Value != null) {
-                            mind.comportsReflex.Value.CreateGameObjects("Reflex", unityBehaviour.gameObject, iteratorPerso);
+                        if (aiModel.comportsReflex.Value != null) {
+                            aiModel.comportsReflex.Value.CreateGameObjects("Reflex", unityBehaviour.gameObject, iteratorPerso);
                         }
                     }
 				}
@@ -472,7 +475,7 @@ public class Controller : MonoBehaviour {
 				GameObject spawnableParent = new GameObject("Spawnable persos");
 				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
 					detailedState = "Initializing spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
-					await new WaitForEndOfFrame();
+					await WaitIfNecessary();
 					OpenSpace.ROM.SuperObjectDynamic sod = romLoader.level.spawnablePersos.Value.superObjects[i];
 					GameObject sodGao = sod.GetGameObject();
 					if (sodGao != null) {
@@ -697,6 +700,17 @@ public class Controller : MonoBehaviour {
 					}
 				}
 				break;
+		}
+	}
+	public async Task WaitFrame() {
+		await new WaitForEndOfFrame();
+		if (stopwatch.IsRunning) {
+			stopwatch.Restart();
+		}
+	}
+	public async Task WaitIfNecessary() {
+		if (stopwatch.ElapsedMilliseconds > 16) {
+			await WaitFrame();
 		}
 	}
 }

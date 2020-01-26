@@ -16,7 +16,7 @@ namespace OpenSpace.ROM {
 
 
 		protected override void ReadInternal(Reader reader) {
-			Loader.print("Script @ " + Pointer.Current(reader) + " - len: " + length);
+			//Loader.print("Script @ " + Pointer.Current(reader) + " - len: " + length);
 			nodes = new ScriptNode[length];
 			for (int i = 0; i < nodes.Length; i++) {
 				nodes[i] = new ScriptNode(reader);
@@ -29,12 +29,14 @@ namespace OpenSpace.ROM {
 			public byte type;
 			public byte indent;
 			public ushort param;
+
+			// Custom
             public NodeType nodeType;
-            public long offset;
+            public Pointer offset;
 
 			// Parsed param
-			public Reference<ROMInt32> paramInt;
-			public Reference<ROMReal> paramFloat;
+			public Reference<Scr_Int> paramInt;
+			public Reference<Scr_Real> paramFloat;
 			public Reference<Script> paramScript;
 			public Reference<Comport> paramComport;
 			public Reference<AIModel> paramModel;
@@ -45,15 +47,14 @@ namespace OpenSpace.ROM {
 			public Reference<Graph> paramGraph;
 			public Reference<Family> paramFamily;
 			public Reference<ObjectsTable> paramObjectTable;
-			public Reference<StringRef2> paramString;
+			public Reference<Scr_String> paramString;
 			public Reference<State> paramAction;
 			public Reference<LightInfo> paramLightInfo;
-			public Reference<ROMVector3> paramVector3;
+			public Reference<Scr_Vector3> paramVector3;
 			public Reference<EntryAction> paramButton;
 
             public ScriptNode(Reader reader) {
-
-                offset = reader.BaseStream.Position;
+                offset = Pointer.Current(reader);
 
 				type = reader.ReadByte();
 				indent = reader.ReadByte();
@@ -82,10 +83,10 @@ namespace OpenSpace.ROM {
 						paramPerso = new Reference<Perso>(param, reader, true);
 						break;
 					case NodeType.Constant:
-						paramInt = new Reference<ROMInt32>(param, reader, true);
+						paramInt = new Reference<Scr_Int>(param, reader, true);
 						break;
 					case NodeType.Real:
-						paramFloat = new Reference<ROMReal>(param, reader, true);
+						paramFloat = new Reference<Scr_Real>(param, reader, true);
 						break;
 					case NodeType.GameMaterialRef:
 						paramGameMaterial = new Reference<GameMaterial>(param, reader, true);
@@ -94,7 +95,7 @@ namespace OpenSpace.ROM {
 						paramSuperObject = new Reference<SuperObject>(param, reader, true);
 						break;
 					case NodeType.String:
-						paramString = new Reference<StringRef2>(param, reader, true);
+						paramString = new Reference<Scr_String>(param, reader, true);
 						break;
 					case NodeType.ActionRef:
 						paramAction = new Reference<State>(param, reader, true);
@@ -106,7 +107,7 @@ namespace OpenSpace.ROM {
 						paramLightInfo = new Reference<LightInfo>(param, reader, true);
 						break;
 					case NodeType.ConstantVector:
-						paramVector3 = new Reference<ROMVector3>(param, reader, true);
+						paramVector3 = new Reference<Scr_Vector3>(param, reader, true);
 						break;
 					case NodeType.Button:
 						paramButton = new Reference<EntryAction>(param, reader, true);

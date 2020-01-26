@@ -10,18 +10,18 @@ using UnityEngine;
 using CollideType = OpenSpace.Collide.CollideType;
 
 public class ROMPersoBehaviour : MonoBehaviour {
-    bool loaded = false;
+    public bool IsLoaded { get; private set; } = false;
     public Perso perso;
     public SectorComponent sector;
     public Controller controller;
 
     // States
     bool hasStates = false;
-    public State state = null;
+    public State state { get; private set; } = null;
     public string[] stateNames = { "Placeholder" };
-    int currentState = 0;
-    public int stateIndex = 0;
-    public bool autoNextState = false;
+	public int currentState { get; private set; } = 0; // Follows "stateIndex", sometimes with a small delay.
+	public int stateIndex = 0; // Set this variable
+	public bool autoNextState = false;
 
     // Physical object lists
     public string[] poListNames = { "Null" };
@@ -80,7 +80,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 
 			if (fam != null && fam.states.Value != null && fam.states.Value.states.Value != null && fam.states.Value.states.Value.states.Length > 0) {
 				OpenSpace.ROM.Reference<OpenSpace.ROM.State>[] states = fam.states.Value.states.Value.states;
-				stateNames = states.Select(s => (s.Value == null ? "Null" : "State " + s.Value.Index)).ToArray();
+				stateNames = states.Select(s => (s.Value == null ? "Null" : s.Value.ToString())).ToArray();
 				hasStates = true;
 				state = perso.p3dData.Value.currentState.Value;
 				for (int i = 0; i < states.Length; i++) {
@@ -98,12 +98,12 @@ public class ROMPersoBehaviour : MonoBehaviour {
 				}
 			}
 		}
-		loaded = true;
+		IsLoaded = true;
     }
 
     #region Print debug info
     public void PrintAnimationDebugInfo() {
-		if (loaded && hasStates) { }
+		if (IsLoaded && hasStates) { }
     }
 	#endregion
 
@@ -198,7 +198,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (loaded) {
+        if (IsLoaded) {
             if (hasStates) {
                 if (stateIndex != currentState) {
                     currentState = stateIndex;
@@ -250,7 +250,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
     }
 
     void DeinitAnimation() {
-        loaded = false;
+        IsLoaded = false;
         // Destroy currently loaded subobjects
         if (subObjects != null) {
             for (int i = 0; i < subObjects.Length; i++) {
@@ -412,7 +412,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, OpenSpace.Visual.LightInfo.ObjectLightedFlag.None);
 				}
 			}
-			loaded = true;
+			IsLoaded = true;
 		}
 	}
 
@@ -436,7 +436,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 	}
 
 	public void UpdateAnimation() {
-		if (loaded && shAnim != null && animCuts != null && animCuts.Length > 0 && channelObjects != null & subObjects != null) {
+		if (IsLoaded && shAnim != null && animCuts != null && animCuts.Length > 0 && channelObjects != null & subObjects != null) {
 			if (currentFrame >= shAnim.num_frames) currentFrame %= shAnim.num_frames;
 			UpdateAnimationCut();
 			// First pass: reset TRS for all sub objects
@@ -586,28 +586,30 @@ public class ROMPersoBehaviour : MonoBehaviour {
     }
 
     void GotoAutoNextState() {
-        /*if (state != null && state.off_state_auto != null) {
-            State state_auto = State.FromOffset(perso.p3dData.family, state.off_state_auto);
+        if (state != null && state.state_auto.Value != null) {
+			State state_auto = state.state_auto;
             if (state_auto != null) {
-                int indexOfStateAuto = perso.p3dData.family.states.IndexOf(state_auto);
+				State[] states = perso.stdGame.Value.family.Value.states.Value.states.Value.states.Select(s => s.Value).ToArray();
+				//int indexOfStateAuto = Array.IndexOf(stateNames, state_auto.ToString());
+				int indexOfStateAuto = Array.IndexOf(states, state_auto);
                 if (indexOfStateAuto > -1) SetState(indexOfStateAuto);
             }
-        }*/
+        }
     }
 
     public void PrintTranslatedScripts()
     {
-        if (loaded && hasStates) {
+        if (IsLoaded && hasStates) {
             if (perso.brain.Value != null
-                && perso.brain.Value.mind.Value != null) {
-                ComportList intelligenceNormal = perso.brain.Value.mind.Value.comportsIntelligence.Value;
-                ComportList intelligenceReflex = perso.brain.Value.mind.Value.comportsReflex.Value;
+                && perso.brain.Value.aiModel.Value != null) {
+                ComportList comportsIntelligence = perso.brain.Value.aiModel.Value.comportsIntelligence.Value;
+                ComportList comportsReflex = perso.brain.Value.aiModel.Value.comportsReflex.Value;
 
                 List<string> ruleStatesInitializer = new List<string>();
                 List<string> reflexStatesInitializer = new List<string>();
 
-                var rules = intelligenceNormal.comports?.Value?.comports;
-                var reflexes = intelligenceReflex.comports?.Value?.comports;
+                var rules = comportsIntelligence.comports?.Value?.comports;
+                var reflexes = comportsReflex.comports?.Value?.comports;
 
                 if (rules != null) {
                     MapLoader.Loader.print("Normal behaviours");

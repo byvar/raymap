@@ -85,6 +85,7 @@ namespace OpenSpace.Text {
 								Pointer off_text = Pointer.Read(reader);
 								Pointer.DoAt(ref reader, off_text, () => {
 									f.languages[i].entries[j] = reader.ReadNullDelimitedString();
+									//l.print(f.languages[i].entries[j]);
 								});
 							}
 						});

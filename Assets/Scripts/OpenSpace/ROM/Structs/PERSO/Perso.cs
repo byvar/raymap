@@ -17,9 +17,7 @@ namespace OpenSpace.ROM {
 		public ushort _18;
 
 		protected override void ReadInternal(Reader reader) {
-
-            Loader.print("Perso @ " + Pointer.Current(reader));
-
+            //Loader.print("Perso @ " + Pointer.Current(reader));
             p3dData = new Reference<Perso3dData>(reader, true);
             brain = new Reference<Brain>(reader, true);
             _4 = reader.ReadUInt16();

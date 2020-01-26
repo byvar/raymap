@@ -49,23 +49,25 @@ public class PersoBehaviourEditor : Editor {
         GUILayout.EndVertical();
 
         GUILayout.BeginHorizontal();
-        GUI.enabled = pb.stateIndex > 0;
-        if (GUILayout.Button("Previous state")) pb.SetState(pb.stateIndex - 1);
-        GUI.enabled = (pb.stateNames != null && pb.stateIndex < pb.stateNames.Length - 1);
-        if (GUILayout.Button("Next state")) pb.SetState(pb.stateIndex + 1);
+        GUI.enabled = pb.currentState > 0;
+        if (GUILayout.Button("Previous state")) pb.SetState(pb.currentState - 1);
+        GUI.enabled = (pb.stateNames != null && pb.currentState < pb.stateNames.Length - 1);
+        if (GUILayout.Button("Next state")) pb.SetState(pb.currentState + 1);
         GUI.enabled = true;
         GUILayout.EndHorizontal();
-		Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 100f);
 
-		InitTransitionsTreeIfNeeded(rect, pb);
-		if(treeViewStateTransitions.stateIndex != pb.stateIndex
-			|| treeViewStateTransitions.perso != pb) {
-			treeViewStateTransitions.perso = pb;
-			treeViewStateTransitions.stateIndex = pb.stateIndex;
-			treeViewStateTransitions.treeModel.SetData(GetData());
-			treeViewStateTransitions.Reload();
+		if (pb.isLoaded) {
+			Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 100f);
+			InitTransitionsTreeIfNeeded(rect, pb);
+			if (treeViewStateTransitions.stateIndex != pb.currentState
+				|| treeViewStateTransitions.perso != pb) {
+				treeViewStateTransitions.perso = pb;
+				treeViewStateTransitions.stateIndex = pb.currentState;
+				treeViewStateTransitions.treeModel.SetData(GetData());
+				treeViewStateTransitions.Reload();
+			}
+			treeViewStateTransitions.OnGUI(rect);
 		}
-		treeViewStateTransitions.OnGUI(rect);
 
 		/*if (pb.state != null && pb.state.stateTransitions != null && pb.state.stateTransitions.Count > 0) {
 			GUILayout.Label("State transition");

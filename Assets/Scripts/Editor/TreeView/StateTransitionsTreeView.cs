@@ -151,12 +151,14 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionTre
 		{
 			case Columns.TargetState:
 				if (GUI.Button(cellRect, item.data.targetStateName, MiniButton)) {
-					perso.SetState(item.data.targetStateIndex);
+					if (perso != null) perso.SetState(item.data.targetStateIndex);
+					if (persoROM != null) persoROM.SetState(item.data.targetStateIndex);
 				}
 				break;
 			case Columns.StateToGo:
-				if (GUI.Button(cellRect, item.data.stateToGoName, MiniButton) && perso != null) {
-					perso.SetState(item.data.stateToGoIndex);
+				if (GUI.Button(cellRect, item.data.stateToGoName, MiniButton)) {
+					if (perso != null) perso.SetState(item.data.stateToGoIndex);
+					if (persoROM != null) persoROM.SetState(item.data.stateToGoIndex);
 				}
 				break;
 			case Columns.LinkingType:

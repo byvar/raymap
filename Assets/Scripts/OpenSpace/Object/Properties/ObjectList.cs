@@ -118,6 +118,7 @@ namespace OpenSpace.Object.Properties {
                     }
                 }
             }
+
             //if (l.mode == MapLoader.Mode.RaymanArenaGC) ol.off_objList_next = Pointer.Current(reader);
 
             /*if (l.mode == MapLoader.Mode.Rayman3GC) {

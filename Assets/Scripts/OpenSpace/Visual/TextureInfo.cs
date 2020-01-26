@@ -246,6 +246,7 @@ namespace OpenSpace.Visual {
                     tex.field48 = reader.ReadByte();
                     tex.flagsByte = reader.ReadByte(); // contains stuff like tiling mode
                     tex.name = reader.ReadNullDelimitedString();
+					//MapLoader.Loader.print(tex.name + " - " + tex.width + " - " + tex.height + " - " + tex.width_ + " - " + tex.height_ + " - " + tex.IsMirrorX + " - " + tex.IsMirrorY);
                 }
             } else {
                 reader.ReadUInt32();
