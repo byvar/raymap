@@ -287,10 +287,10 @@ namespace OpenSpace {
 			game = Game.RA,
 			platform = Platform.Xbox,
 			endian = Endian.Little,
-			linkedListType = LinkedListType.Minimize,
+			linkedListType = LinkedListType.Double,
 			aiTypes = AITypes.R3,
 			hasDeformations = true,
-			textureAnimationSpeedModifier = -10f,
+			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.1f,
 			saturate = false,
 			caps = new Dictionary<CapsType, Caps>() {

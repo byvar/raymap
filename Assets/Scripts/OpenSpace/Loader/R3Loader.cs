@@ -290,7 +290,7 @@ namespace OpenSpace.Loader {
 			Pointer off_soundEventTable = Pointer.Read(reader);
 			byte num_fontBitmap = reader.ReadByte();
 			byte num_font = reader.ReadByte();
-			print(Pointer.Current(reader));
+
 			for (int i = 0; i < num_font; i++) {
 				reader.ReadBytes(sz_fontDefine); // Font definition
 			}
@@ -405,7 +405,6 @@ namespace OpenSpace.Loader {
 			globals.off_inactiveDynamicWorld = Pointer.Read(reader);
 			globals.off_fatherSector = Pointer.Read(reader); // It is I, Father Sector.
 			globals.off_firstSubMapPosition = Pointer.Read(reader);
-
 			globals.num_always = reader.ReadUInt32();
 			globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
 			globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
@@ -446,6 +445,7 @@ namespace OpenSpace.Loader {
 				Pointer off_mainCharacters_last = Pointer.Read(reader);
 				uint num_mainCharacters_entries = reader.ReadUInt32();
 			}
+
 			reader.ReadUInt32(); // only used if there was no transit in the previous lvl. Always 00165214 in R3GC?
 			reader.ReadUInt32(); // related to "SOL". What is this? Good question.
 			reader.ReadUInt32(); // same
@@ -499,7 +499,7 @@ namespace OpenSpace.Loader {
 			}
 			uint num_visual_materials = reader.ReadUInt32();
 			Pointer off_array_visual_materials = Pointer.Read(reader);
-			print(Pointer.Current(reader));
+
 			if (Settings.s.mode != Settings.Mode.RaymanArenaGC
 				&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
 				&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {

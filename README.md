@@ -13,6 +13,7 @@ Map viewer/editor for OpenSpace games:
 * Rayman M (PC)
 * Rayman Arena (PC)
 * Rayman Arena (GC)
+* Rayman Arena (Xbox)
 * Rayman 3 (PC)
 * Rayman 3 (GC)
 * Rayman Raving Rabbids (DS)
