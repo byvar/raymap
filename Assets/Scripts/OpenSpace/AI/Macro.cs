@@ -37,8 +37,7 @@ namespace OpenSpace.AI {
         public static Macro Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             Macro m = new Macro(offset);
-
-			if (Settings.s.hasNames) {
+			if (Settings.s.hasNames && Settings.s.platform != Settings.Platform.Xbox360) {
 				m.name = reader.ReadString(0x100);
 			}
 

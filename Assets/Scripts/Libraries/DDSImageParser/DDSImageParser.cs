@@ -59,7 +59,6 @@ namespace DDSImageParser {
 					case PixelFormat.DXT1:
 						rawData = this.DecompressDXT1(header, data, pixelFormat);
 						break;
-
 					case PixelFormat.DXT5:
 						rawData = this.DecompressDXT5(header, data, pixelFormat);
 						break;
