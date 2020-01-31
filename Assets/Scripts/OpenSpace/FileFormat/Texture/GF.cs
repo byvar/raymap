@@ -58,43 +58,45 @@ namespace OpenSpace.FileFormat.Texture {
 
         public GF(Stream stream) {
             MapLoader l = MapLoader.Loader;
-            Reader r = new Reader(stream, isLittleEndian);
+            Reader reader = new Reader(stream, isLittleEndian);
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-                byte version = r.ReadByte();
+                byte version = reader.ReadByte();
                 format = 1555;
             } else {
                 format = 8888;
-                if (Settings.s.platform != Settings.Platform.iOS && Settings.s.game != Settings.Game.TTSE) format = r.ReadUInt32();
+                if (Settings.s.platform != Settings.Platform.iOS && Settings.s.game != Settings.Game.TTSE) format = reader.ReadUInt32();
             }
 
-            width = r.ReadUInt32();
-            height = r.ReadUInt32();
+            width = reader.ReadUInt32();
+            height = reader.ReadUInt32();
             channelPixels = width * height;
 
-            channels = r.ReadByte();
+            channels = reader.ReadByte();
             byte enlargeByte = 0;
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) enlargeByte = r.ReadByte();
-            uint w = width, h = height;
-			if (enlargeByte > 0) {
-				channelPixels = 0;
-				for (int i = 0; i < enlargeByte; i++) {
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) enlargeByte = reader.ReadByte();
+			if (enlargeByte > 1) {
+                uint w = width, h = height, e = enlargeByte;
+                if (w != 1) w >>= 1;
+                if (h != 1) h >>= 1;
+                while(e > 1) {
 					channelPixels += (w * h);
-					w /= 2;
-					h /= 2;
-				}
+                    if (w != 1) w >>= 1;
+                    if (h != 1) h >>= 1;
+                    e --;
+                }
 			}
-            repeatByte = r.ReadByte();
+            repeatByte = reader.ReadByte();
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-                paletteNumColors = r.ReadUInt16();
-                paletteBytesPerColor = r.ReadByte();
-                byte1 = r.ReadByte();
-                byte2 = r.ReadByte();
-                byte3 = r.ReadByte();
-                num4 = r.ReadUInt32();
-                channelPixels = r.ReadUInt32(); // Hype has mipmaps
-                montrealType = r.ReadByte();
+                paletteNumColors = reader.ReadUInt16();
+                paletteBytesPerColor = reader.ReadByte();
+                byte1 = reader.ReadByte();
+                byte2 = reader.ReadByte();
+                byte3 = reader.ReadByte();
+                num4 = reader.ReadUInt32();
+                channelPixels = reader.ReadUInt32(); // Hype has mipmaps
+                montrealType = reader.ReadByte();
                 if (paletteNumColors != 0 && paletteBytesPerColor != 0) {
-                    palette = r.ReadBytes(paletteBytesPerColor * paletteNumColors);
+                    palette = reader.ReadBytes(paletteBytesPerColor * paletteNumColors);
                 }
                 switch (montrealType) {
                     case 5: format = 0; break; // palette
@@ -106,108 +108,147 @@ namespace OpenSpace.FileFormat.Texture {
             }
 
             pixels = new Color[width * height];
-            byte[] blue_channel = null, green_channel = null, red_channel = null, alpha_channel = null;
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && channels == 1) {
+                paletteBytesPerColor = 4;
+                paletteNumColors = 256;
+                palette = reader.ReadBytes(paletteBytesPerColor * paletteNumColors);
+            }
+            byte[] pixelData = ReadChannels(reader);
 
             if (channels >= 3) {
-                blue_channel = ReadChannel(r, repeatByte, channelPixels);
-                green_channel = ReadChannel(r, repeatByte, channelPixels);
-                red_channel = ReadChannel(r, repeatByte, channelPixels);
-                if (channels == 4) {
-                    alpha_channel = ReadChannel(r, repeatByte, channelPixels);
-                    isTransparent = true;
+                if (channels == 4) isTransparent = true;
+                uint pos = 0;
+                for (int i = 0; i < width * height; i++) {
+                    byte b = pixelData[pos + 0];
+                    byte g = pixelData[pos + 1];
+                    byte r = pixelData[pos + 2];
+                    if (channels == 4) {
+                        byte a = pixelData[pos + 3];
+                        pixels[i] = new Color(r / 255f, g / 255f, b / 255f, a / 255f);
+                    } else {
+                        float alphaValue = 1f;
+                        //if (red_channel[i] == 0 && green_channel[i] == 0 && blue_channel[i] == 0) alphaValue = 0f;
+                        pixels[i] = new Color(r / 255f, g / 255f, b / 255f, alphaValue);
+                    }
+                    pos += channels;
                 }
             } else if (channels == 2) {
-                byte[] channel_1 = ReadChannel(r, repeatByte, channelPixels);
-                byte[] channel_2 = ReadChannel(r, repeatByte, channelPixels);
-
-                red_channel = new byte[channelPixels];
-                green_channel = new byte[channelPixels];
-                blue_channel = new byte[channelPixels];
-                alpha_channel = new byte[channelPixels];
                 if (format == 1555 || format == 4444) isTransparent = true;
-                for (int i = 0; i < channelPixels; i++) {
-                    ushort pixel = BitConverter.ToUInt16(new byte[] { channel_1[i], channel_2[i] }, 0); // RRRRR, GGGGGG, BBBBB (565)
-                    uint red, green, blue, alpha;
+
+                uint pos = 0;
+                for (int i = 0; i < width * height; i++) {
+                    ushort pixel = BitConverter.ToUInt16(new byte[] { pixelData[pos], pixelData[pos + 1] }, 0); // RRRRR, GGGGGG, BBBBB (565)
+                    uint r, g, b, a;
                     switch (format) {
                         case 88:
-                            alpha_channel[i] = channel_2[i];
-                            red_channel[i] = channel_1[i];
-                            blue_channel[i] = channel_1[i];
-                            green_channel[i] = channel_1[i];
+                            pixels[i] = new Color(
+                                pixelData[pos] / 255,
+                                pixelData[pos] / 255,
+                                pixelData[pos] / 255,
+                                pixelData[pos + 1] / 255);
                             break;
                         case 4444:
-                            alpha = extractBits(pixel, 4, 12);
-                            red = extractBits(pixel, 4, 8);
-                            green = extractBits(pixel, 4, 4);
-                            blue = extractBits(pixel, 4, 0);
-                            red_channel[i] = (byte)((red / 15.0f) * 255.0f);
-                            green_channel[i] = (byte)((green / 15.0f) * 255.0f);
-                            blue_channel[i] = (byte)((blue / 15.0f) * 255.0f);
-                            alpha_channel[i] = (byte)((alpha / 15.0f) * 255.0f);
+                            a = extractBits(pixel, 4, 12);
+                            r = extractBits(pixel, 4, 8);
+                            g = extractBits(pixel, 4, 4);
+                            b = extractBits(pixel, 4, 0);
+
+                            pixels[i] = new Color(
+                                (r / 15.0f),
+                                (g / 15.0f),
+                                (b / 15.0f),
+                                (a / 15.0f));
                             break;
                         case 1555:
-							/*
+                            /*
                             alpha = extractBits(pixel, 1, 15);
                             red = extractBits(pixel, 5, 10);
                             green = extractBits(pixel, 5, 5);
                             blue = extractBits(pixel, 5, 0);
 							*/
-							alpha = extractBits(pixel, 1, 15);
-							red = extractBits(pixel, 5, 10);
-							green = extractBits(pixel, 5, 5);
-							blue = extractBits(pixel, 5, 0);
+                            a = extractBits(pixel, 1, 15);
+                            r = extractBits(pixel, 5, 10);
+                            g = extractBits(pixel, 5, 5);
+                            b = extractBits(pixel, 5, 0);
 
-							red_channel[i] = (byte)((red / 31.0f) * 255.0f);
-                            green_channel[i] = (byte)((green / 31.0f) * 255.0f);
-                            blue_channel[i] = (byte)((blue / 31.0f) * 255.0f);
-                            alpha_channel[i] = (byte)(alpha * 255);
+                            pixels[i] = new Color(
+                                (r / 31.0f),
+                                (g / 31.0f),
+                                (b / 31.0f),
+                                a);
                             break;
                         case 565:
                         default: // 565
-							red = extractBits(pixel, 5, 11);
-							green = extractBits(pixel, 6, 5);
-							blue = extractBits(pixel, 5, 0);
+                            r = extractBits(pixel, 5, 11);
+                            g = extractBits(pixel, 6, 5);
+                            b = extractBits(pixel, 5, 0);
 
-                            red_channel[i] = (byte)((red / 31.0f) * 255.0f);
-                            green_channel[i] = (byte)((green / 63.0f) * 255.0f);
-                            blue_channel[i] = (byte)((blue / 31.0f) * 255.0f);
+                            pixels[i] = new Color(
+                                (r / 31.0f),
+                                (g / 63.0f),
+                                (b / 31.0f),
+                                1f);
                             break;
                     }
+                    pos += channels;
                 }
             } else if (channels == 1) {
-                byte[] channel_1 = ReadChannel(r, repeatByte, channelPixels);
-                red_channel = new byte[channelPixels];
-                green_channel = new byte[channelPixels];
-                blue_channel = new byte[channelPixels];
-                for (int i = 0; i < channelPixels; i++) {
+                if (palette != null && paletteBytesPerColor == 4) isTransparent = true;
+                for (int i = 0; i < width * height; i++) {
+                    byte r, g, b;
+                    byte a = 255;
                     if (palette != null) {
-                        red_channel[i] = palette[channel_1[i] * paletteBytesPerColor + 2];
-                        green_channel[i] = palette[channel_1[i] * paletteBytesPerColor + 1];
-                        blue_channel[i] = palette[channel_1[i] * paletteBytesPerColor + 0];
+                        if (isTransparent) a = palette[pixelData[i] * paletteBytesPerColor + 3];
+                        r = palette[pixelData[i] * paletteBytesPerColor + 2];
+                        g = palette[pixelData[i] * paletteBytesPerColor + 1];
+                        b = palette[pixelData[i] * paletteBytesPerColor + 0];
                     } else {
-                        red_channel[i] = channel_1[i];
-                        blue_channel[i] = channel_1[i];
-                        green_channel[i] = channel_1[i];
+                        if (isTransparent) a = pixelData[i];
+                        r = pixelData[i];
+                        g = pixelData[i];
+                        b = pixelData[i];
+                    }
+                    pixels[i] = new Color(r / 255f, g / 255f, b / 255f, a / 255f);
+                }
+            }
+
+
+            if (reader.BaseStream.Position != reader.BaseStream.Length) {
+                Debug.LogError("Assertion failed: GF not fully read! Remaining bytes: " + (reader.BaseStream.Length - reader.BaseStream.Position));
+            }
+            /*if (r.BaseStream.Position != r.BaseStream.Length) {
+                Debug.LogError((r.BaseStream.Length - r.BaseStream.Position));
+                r.BaseStream.Position = 0;
+                byte[] bytes = r.ReadBytes((int)r.BaseStream.Length);
+                Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "hi" + bytes.Length + ".lol", bytes);
+                throw new Exception("exported");
+            }*/
+            reader.Close();
+        }
+
+        byte[] ReadChannels(Reader reader) {
+            byte[] data = new byte[channels * channelPixels];
+            int channel = 0;
+            while(channel < channels) {
+                int pixel = 0;
+                while (pixel < channelPixels) {
+                    byte b1 = reader.ReadByte();
+                    if (b1 == repeatByte) {
+                        byte value = reader.ReadByte();
+                        byte count = reader.ReadByte();
+
+                        for (int i = 0; i < count; ++i) {
+                            data[channel + pixel * channels] = value;
+                            pixel++;
+                        }
+                    } else {
+                        data[channel + pixel * channels] = b1;
+                        pixel++;
                     }
                 }
+                channel++;
             }
-            for (int i = 0; i < width * height; i++) {
-                if (isTransparent) {
-                    pixels[i] = new Color(red_channel[i] / 255f, green_channel[i] / 255f, blue_channel[i] / 255f, alpha_channel[i] / 255f);
-                } else {
-                    float alphaValue = 1f;
-                    //if (red_channel[i] == 0 && green_channel[i] == 0 && blue_channel[i] == 0) alphaValue = 0f;
-                    pixels[i] = new Color(red_channel[i] / 255f, green_channel[i] / 255f, blue_channel[i] / 255f, alphaValue);
-                }
-            }
-            /*for (int y = 0; y < height / 2; y++) {
-                for (int x = 0; x < width / 2; x++) {
-                    Color temp = pixels[y * width + x];
-                    pixels[y * width + x] = pixels[(height - 1 - y) * width + x];
-                    pixels[(height - 1 - y) * width + x] = temp;
-                }
-            }*/
-            r.Close();
+            return data;
         }
 
         byte[] ReadChannel(Reader r, byte repeatByte, uint pixels) {
@@ -222,7 +263,11 @@ namespace OpenSpace.FileFormat.Texture {
                     byte count = r.ReadByte();
 
                     for (int i = 0; i < count; ++i) {
-                        if (pixel < pixels) channel[pixel] = value;
+                        if (pixel < pixels) {
+                            channel[pixel] = value;
+                        } else {
+                            Debug.LogError("outside bounds: " + channels);
+                        }
                         pixel++;
                     }
                 } else {
