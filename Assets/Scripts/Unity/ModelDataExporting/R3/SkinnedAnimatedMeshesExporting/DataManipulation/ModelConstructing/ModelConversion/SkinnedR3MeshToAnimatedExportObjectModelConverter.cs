@@ -6,50 +6,56 @@ using System.Threading.Tasks;
 using Assets.Scripts.Unity.ModelDataExporting.MathDescription;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.ArmatureModelConstructing;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.MeshGeometryConstructing;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.ModelConversion;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.Utils;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription;
 using UnityEngine;
 
-namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing
+namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.ModelConversion
 {
-    public class SkinnedR3MeshToAnimatedExportObjectModelConverter
+    public class SkinnedR3MeshToAnimatedExportObjectModelConverter : R3MeshToAnimatedExportObjectModelConverterBase
     {
-        public AnimatedExportObjectModel convert(R3AnimatedMesh r3AnimatedMesh)
+        protected override MeshGeometry DeriveMeshGeometryData(Mesh mesh, Transform[] bones)
         {
-            AnimatedExportObjectModel result = new AnimatedExportObjectModel();
-            result.Name = r3AnimatedMesh.gameObject.name;
-            SkinnedMeshRenderer skinnedMeshRendererComponent = r3AnimatedMesh.GetComponent<SkinnedMeshRenderer>();
-            Dictionary<string, BoneBindPose> bonesBindPoses = ConstructBonesBindPosesDictionary(
-                skinnedMeshRendererComponent.sharedMesh.bindposes,
-                skinnedMeshRendererComponent.bones);
-            MeshGeometry meshGeometry = DeriveMeshGeometryData(skinnedMeshRendererComponent.sharedMesh, skinnedMeshRendererComponent.bones);
-            TransformModel transformModel = GetTransformModel(r3AnimatedMesh.transform);
-            result.bindBonePoses = bonesBindPoses;
-            result.meshGeometry = meshGeometry;
-            result.transform = transformModel;
+            return new SkinnedMeshGeometryDataConstructor().ConstructFrom(mesh, bones);
+        }
+
+        protected override Dictionary<string, TransformModel> GetBonesBindPoseTransforms(R3AnimatedMesh r3AnimatedMesh)
+        {
+            var result = new Dictionary<string, TransformModel>();
+            Transform[] bones = r3AnimatedMesh.GetComponent<SkinnedMeshRenderer>().bones;
+            Matrix4x4[] bindposes = r3AnimatedMesh.GetComponent<SkinnedMeshRenderer>().sharedMesh.bindposes;
+            for (int i = 0; i < bones.Length; i++)
+            {
+                var boneTransform = bones[i];
+                var channelGameObject = ObjectsHierarchyHelper.GetProperChannelForTransform(boneTransform).gameObject;
+                BoneBindPose boneBindPoseTransform = BoneBindPoseHelper.GetBindPoseBoneTransformForBindPoseMatrix(bones[i], bindposes[i]);
+                boneBindPoseTransform.boneName = channelGameObject.name;
+                result.Add(
+                    boneBindPoseTransform.boneName,
+                    new TransformModel(
+                        boneBindPoseTransform.position,
+                        boneBindPoseTransform.rotation,
+                        boneBindPoseTransform.scale,
+                        new Vector3d(0.0f, 0.0f, 0.0f),
+                        new MathDescription.Quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+                        new Vector3d(1.0f, 1.0f, 1.0f)
+                        )
+                    );
+
+            }
             return result;
         }
 
-        private TransformModel GetTransformModel(Transform transform)
+        protected override Mesh GetMesh(R3AnimatedMesh r3AnimatedMesh)
         {
-            var result = new TransformModel();
-            result.position = new Vector3d(transform.position.x, transform.position.y, transform.position.z);
-            result.rotation = new MathDescription.Quaternion(transform.rotation.w, transform.rotation.x, transform.rotation.y, transform.rotation.z);
-            result.scale = new Vector3d(transform.lossyScale.x, transform.lossyScale.y, transform.lossyScale.z);
-            result.localPosition = new Vector3d(transform.localPosition.x, transform.localPosition.y, transform.localPosition.z);
-            result.localRotation = new MathDescription.Quaternion(transform.localRotation.w, transform.localRotation.x, transform.localRotation.y, transform.localRotation.z);
-            result.localScale = new Vector3d(transform.localScale.x, transform.localScale.y, transform.localScale.z);
-            return result;
+            return r3AnimatedMesh.GetComponent<SkinnedMeshRenderer>().sharedMesh;
         }
 
-        private MeshGeometry DeriveMeshGeometryData(Mesh sharedMesh, Transform[] bones)
+        protected override Transform[] GetBonesTransforms(R3AnimatedMesh r3AnimatedMesh)
         {
-            return new SkinnedMeshGeometryDataConstructor().ConstructFrom(sharedMesh, bones);
-        }
-
-        private Dictionary<string, BoneBindPose> ConstructBonesBindPosesDictionary(Matrix4x4[] bindposes, Transform[] bones)
-        {
-            return new SkinnedMeshBonesBindPosesDictionaryConstructor().ConstructFrom(bindposes, bones);
+            return r3AnimatedMesh.GetComponent<SkinnedMeshRenderer>().bones;
         }
     }
 }

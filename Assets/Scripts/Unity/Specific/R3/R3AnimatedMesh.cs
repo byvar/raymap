@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.ArmatureModelConstructing;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.DataManipulation.ModelConstructing.Utils;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model;
 using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.ObjectsExportLibraryModelDescription;
 using System;
@@ -55,7 +56,17 @@ public class R3AnimatedMesh : MonoBehaviour
 
     private bool IsChannelParentedMesh()
     {
-        throw new NotImplementedException();
+        return GetComponent<SkinnedMeshRenderer>() == null && GetComponent<MeshRenderer>() != null && HasParentChannel();
+    }
+
+    private bool HasParentChannel()
+    {
+        return ObjectsHierarchyHelper.GetParentChannelNameOrNullIfNotPresent(transform) != null;
+    }
+
+    public GameObject GetParentChannel()
+    {
+        return ObjectsHierarchyHelper.GetProperChannelForTransform(transform).gameObject;
     }
 
     private bool IsSkinnedMesh()

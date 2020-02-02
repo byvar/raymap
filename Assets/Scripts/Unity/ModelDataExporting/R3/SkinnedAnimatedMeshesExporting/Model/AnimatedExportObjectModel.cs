@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription;
+using Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExporting.Model.AnimatedExportObjectModelDescription.MaterialsDescription;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
         public TransformModel transform;
         public MeshGeometry meshGeometry;
         public Dictionary<string, BoneBindPose> bindBonePoses;
+        public List<Material> materials;
     }
 }
