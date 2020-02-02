@@ -18,17 +18,17 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
         {
             var result = new Model.AnimatedExportObjectModelDescription.MaterialsDescription.Material();
             result.name = unityMaterial.name;
-            result.mainTexture = ConvertUnityTextureToTextureDescription(unityMaterial.GetTexture("_Tex0"));
+            result.mainTexture = ConvertUnityTextureToTextureDescription("_Tex0", unityMaterial.GetTexture("_Tex0"));
             result.mainTextureOffset = new Vector2d(unityMaterial.mainTextureOffset.x, unityMaterial.mainTextureOffset.y);
             result.mainTextureScale = new Vector2d(unityMaterial.mainTextureScale.x, unityMaterial.mainTextureScale.y);
             return result;
         }
 
         private Model.AnimatedExportObjectModelDescription.MaterialsDescription.Texture 
-            ConvertUnityTextureToTextureDescription(UnityEngine.Texture unityTexture)
+            ConvertUnityTextureToTextureDescription(string textureName, UnityEngine.Texture unityTexture)
         {
             var result = new Model.AnimatedExportObjectModelDescription.MaterialsDescription.Texture();
-            result.name = unityTexture.name;
+            result.name = textureName;
             result.width = unityTexture.width;
             result.height = unityTexture.height;
             if (unityTexture.GetType() == typeof(Texture2D))
