@@ -269,6 +269,20 @@
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
   </tr>
+  <tr>
+    <td class="tg-yw4l">Batman: Rise of Sin Tzu</td>
+    <td class="tg-yw4l">M2</td>
+    <td class="tg-yw4l">2003</td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+  </tr>
 </table>
 
 ### ROM OpenSpace games
