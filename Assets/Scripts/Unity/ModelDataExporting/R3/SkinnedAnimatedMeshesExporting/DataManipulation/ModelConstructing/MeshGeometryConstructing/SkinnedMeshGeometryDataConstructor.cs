@@ -56,6 +56,8 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             result.vertices = verticesList;
             result.triangles = trianglesList;
             result.bonesWeights = bonesWeights;
+            result.normals = MeshDataHelper.GetNormals(mesh.normals);
+            result.uvMaps = MeshDataHelper.GetUvMaps(mesh);
             return result;
         }
 
