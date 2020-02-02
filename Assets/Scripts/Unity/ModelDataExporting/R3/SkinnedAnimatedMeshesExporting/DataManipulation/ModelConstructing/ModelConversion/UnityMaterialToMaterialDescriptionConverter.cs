@@ -17,7 +17,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             MaterialDescriptionFromUnityMaterial(UnityEngine.Material unityMaterial)
         {
             var result = new Model.AnimatedExportObjectModelDescription.MaterialsDescription.Material();
-            result.mainTexture = ConvertUnityTextureToTextureDescription(unityMaterial.mainTexture);
+            result.mainTexture = ConvertUnityTextureToTextureDescription(unityMaterial.GetTexture("_Tex0"));
             result.mainTextureOffset = new Vector2d(unityMaterial.mainTextureOffset.x, unityMaterial.mainTextureOffset.y);
             result.mainTextureScale = new Vector2d(unityMaterial.mainTextureScale.x, unityMaterial.mainTextureScale.y);
             return result;
@@ -27,9 +27,10 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             ConvertUnityTextureToTextureDescription(UnityEngine.Texture unityTexture)
         {
             var result = new Model.AnimatedExportObjectModelDescription.MaterialsDescription.Texture();
+            result.name = unityTexture.name;
             result.width = unityTexture.width;
             result.height = unityTexture.height;
-            if (unityTexture.GetType() != typeof(Texture2D))
+            if (unityTexture.GetType() == typeof(Texture2D))
             {
                 result.pixels = ((Texture2D)unityTexture).GetPixels(TEXTURE_MIPMAP_LEVEL)
                 .Select(x => new Model.AnimatedExportObjectModelDescription.MaterialsDescription.Color(x.r, x.g, x.b, x.a)).ToList();

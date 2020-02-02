@@ -24,6 +24,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
 
     public class Texture
     {
+        public string name;
         public int width;
         public int height;
         public List<Color> pixels;
