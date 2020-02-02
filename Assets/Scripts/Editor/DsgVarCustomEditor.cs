@@ -80,7 +80,7 @@ public class DsgVarCustomEditor : Editor {
             case DsgVarInfoEntry.DsgVarType.Float: stringVal = GUILayout.TextField(dsgVarEntry.valueAsFloat.ToString()); Single.TryParse(stringVal, out dsgVarEntry.valueAsFloat); break;
             case DsgVarInfoEntry.DsgVarType.Text:
 				stringVal = GUILayout.TextField(dsgVarEntry.valueAsUInt.ToString()); UInt32.TryParse(stringVal, out dsgVarEntry.valueAsUInt);
-				GUILayout.Label(MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)dsgVarEntry.valueAsUInt, 0)); break;
+				GUILayout.Label(MapLoader.Loader.localization.GetTextForHandleAndLanguageID((int)dsgVarEntry.valueAsUInt, 0)); break;
 			case DsgVarInfoEntry.DsgVarType.Vector:
                 float val_x = dsgVarEntry.valueAsVector.x;
                 float val_y = dsgVarEntry.valueAsVector.y;
@@ -123,7 +123,7 @@ public class DsgVarCustomEditor : Editor {
 
 						if (array[i] != null) {
 							GUILayout.TextField(array[i].ToString());
-							GUILayout.Label(MapLoader.Loader.fontStruct.GetTextForHandleAndLanguageID((int)(uint)array[i], 0));
+							GUILayout.Label(MapLoader.Loader.localization.GetTextForHandleAndLanguageID((int)(uint)array[i], 0));
 						}
 
 					}

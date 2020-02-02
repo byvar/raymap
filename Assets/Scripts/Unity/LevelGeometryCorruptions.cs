@@ -61,9 +61,9 @@ public class LevelGeometryCorruptor {
         foreach (PhysicalObject po in pos) {
 
 
-            if (po.visualSet[0].obj is MeshObject) {
+            if (po.visualSet[0].obj is GeometricObject) {
 
-                var vmo = po.visualSet[0].obj as MeshObject;
+                var vmo = po.visualSet[0].obj as GeometricObject;
 
                 if (vmo != null) {
                    
@@ -143,9 +143,9 @@ public class LevelGeometryCorruptor {
                     cmo.vertices[i] = new Vector3(x, y, z);
                 }
 
-                foreach (var sb in cmo.subblocks) {
-                    if (sb is CollideMeshElement) {
-                        var me = sb as CollideMeshElement;
+                foreach (var sb in cmo.elements) {
+                    if (sb is GeometricObjectElementCollideTriangles) {
+                        var me = sb as GeometricObjectElementCollideTriangles;
 
                         for (int j = 0; j < me.num_triangles; j++) {
 

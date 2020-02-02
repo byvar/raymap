@@ -450,7 +450,7 @@ namespace OpenSpace.Loader {
 
                 loadingState = "Loading text";
                 await WaitIfNecessary();
-                fontStruct = FontStructure.Read(reader, Pointer.Current(reader)); // FON_g_stGeneral
+                localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true); // FON_g_stGeneral
 
                 loadingState = "Loading fixed animation bank";
                 await WaitIfNecessary();

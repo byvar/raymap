@@ -11,8 +11,8 @@ namespace OpenSpace.ROM {
 		public Reference<CompressedVector3Array> verticesCollide;
 		public Reference<CompressedVector3Array> verticesVisual;
 		public Reference<CompressedVector3Array> normals;
-		public Reference<GeometricElementCollideList> elementsCollide;
-		public Reference<GeometricElementVisualList> elementsVisual;
+		public Reference<GeometricObjectElementCollideList> elementsCollide;
+		public Reference<GeometricObjectElementVisualList> elementsVisual;
 		public ushort num_verticesCollide;
 		public ushort num_verticesVisual;
 		public ushort num_elementsCollide;
@@ -37,8 +37,8 @@ namespace OpenSpace.ROM {
 				verticesVisual = new Reference<CompressedVector3Array>(reader);
 				normals = new Reference<CompressedVector3Array>(reader);
 			}
-			elementsCollide = new Reference<GeometricElementCollideList>(reader);
-			elementsVisual = new Reference<GeometricElementVisualList>(reader);
+			elementsCollide = new Reference<GeometricObjectElementCollideList>(reader);
+			elementsVisual = new Reference<GeometricObjectElementVisualList>(reader);
 			num_verticesCollide = reader.ReadUInt16();
 			if (Settings.s.platform == Settings.Platform._3DS) {
 				num_verticesVisual = reader.ReadUInt16();
@@ -82,25 +82,25 @@ namespace OpenSpace.ROM {
 				if (elementsVisual.Value != null) {
 					// First, reset vertex buffer
 					if (Settings.s.platform == Settings.Platform.N64) {
-						foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
-							if (entry.element.Value is GeometricElementTriangles) {
-								GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
+						foreach (GeometricObjectElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+							if (entry.element.Value is GeometricObjectElementTriangles) {
+								GeometricObjectElementTriangles el = entry.element.Value as GeometricObjectElementTriangles;
 								el.ResetVertexBuffer();
 							}
 						}
 					}
 					//gao.transform.position = new Vector3(UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f), UnityEngine.Random.Range(-100f, 100f));
-					foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+					foreach (GeometricObjectElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 						/*if (entry.element.Value == null) {
 							l.print("Visual element null: " + entry.element.type);
 						}*/
 						if (entry.element.Value != null) {
 							GameObject child = null;
-							if (entry.element.Value is GeometricElementTriangles) {
-								GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
+							if (entry.element.Value is GeometricObjectElementTriangles) {
+								GeometricObjectElementTriangles el = entry.element.Value as GeometricObjectElementTriangles;
 								child = el.GetGameObject(type, this);
-							} else if (entry.element.Value is GeometricElementSprites) {
-								GeometricElementSprites el = entry.element.Value as GeometricElementSprites;
+							} else if (entry.element.Value is GeometricObjectElementSprites) {
+								GeometricObjectElementSprites el = entry.element.Value as GeometricObjectElementSprites;
 								child = el.GetGameObject(type, this);
 							}
 							if (child != null) {
@@ -116,20 +116,20 @@ namespace OpenSpace.ROM {
 				}
 			} else {
 				if (elementsCollide.Value != null) {
-					foreach (GeometricElementCollideList.GeometricElementListEntry entry in elementsCollide.Value.elements) {
+					foreach (GeometricObjectElementCollideList.GeometricElementListEntry entry in elementsCollide.Value.elements) {
 						if (entry.element.Value == null) {
 							l.print("Collide element null: " + entry.element.type);
 						}
 						if (entry.element.Value != null) {
 							GameObject child = null;
-							if (entry.element.Value is GeometricElementCollideTriangles) {
-								GeometricElementCollideTriangles el = entry.element.Value as GeometricElementCollideTriangles;
+							if (entry.element.Value is GeometricObjectElementCollideTriangles) {
+								GeometricObjectElementCollideTriangles el = entry.element.Value as GeometricObjectElementCollideTriangles;
 								child = el.GetGameObject(type, this, collideType: collideType);
-							} else if (entry.element.Value is GeometricElementCollideSpheres) {
-								GeometricElementCollideSpheres el = entry.element.Value as GeometricElementCollideSpheres;
+							} else if (entry.element.Value is GeometricObjectElementCollideSpheres) {
+								GeometricObjectElementCollideSpheres el = entry.element.Value as GeometricObjectElementCollideSpheres;
 								child = el.GetGameObject(type, this, collideType: collideType);
-							} else if (entry.element.Value is GeometricElementCollideAlignedBoxes) {
-								GeometricElementCollideAlignedBoxes el = entry.element.Value as GeometricElementCollideAlignedBoxes;
+							} else if (entry.element.Value is GeometricObjectElementCollideAlignedBoxes) {
+								GeometricObjectElementCollideAlignedBoxes el = entry.element.Value as GeometricObjectElementCollideAlignedBoxes;
 								child = el.GetGameObject(type, this, collideType: collideType);
 							}
 							if (child != null) {
@@ -146,9 +146,9 @@ namespace OpenSpace.ROM {
 		public void MorphVertices(GameObject gao, GeometricObject go, float lerp) {
 			// First, reset vertex buffer
 			if (Settings.s.platform == Settings.Platform.N64) {
-				foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
-					if (entry.element.Value is GeometricElementTriangles) {
-						GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
+				foreach (GeometricObjectElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+					if (entry.element.Value is GeometricObjectElementTriangles) {
+						GeometricObjectElementTriangles el = entry.element.Value as GeometricObjectElementTriangles;
 						el.ResetVertexBuffer();
 					}
 				}
@@ -156,9 +156,9 @@ namespace OpenSpace.ROM {
 			for (int i = 0; i < num_elementsVisual; i++) {
 				ROMStruct entry1 = elementsVisual.Value.elements[i].element.Value;
 				ROMStruct entry2 = go.elementsVisual.Value.elements[i].element.Value;
-				if (entry1 != null && entry2 != null && entry1 is GeometricElementTriangles && entry2 is GeometricElementTriangles) {
-					GeometricElementTriangles tris1 = entry1 as GeometricElementTriangles;
-					GeometricElementTriangles tris2 = entry2 as GeometricElementTriangles;
+				if (entry1 != null && entry2 != null && entry1 is GeometricObjectElementTriangles && entry2 is GeometricObjectElementTriangles) {
+					GeometricObjectElementTriangles tris1 = entry1 as GeometricObjectElementTriangles;
+					GeometricObjectElementTriangles tris2 = entry2 as GeometricObjectElementTriangles;
 					MeshFilter[] mfs = gao.GetComponentsInChildren<MeshFilter>();
 					MeshFilter mf = mfs.FirstOrDefault(m => m.name == "ElementTriangles @ " + tris1.Offset);
 					if (mf != null) {
@@ -171,17 +171,17 @@ namespace OpenSpace.ROM {
 		public void ResetMorph(GameObject gao) {
 			// First, reset vertex buffer
 			if (Settings.s.platform == Settings.Platform.N64) {
-				foreach (GeometricElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
-					if (entry.element.Value is GeometricElementTriangles) {
-						GeometricElementTriangles el = entry.element.Value as GeometricElementTriangles;
+				foreach (GeometricObjectElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
+					if (entry.element.Value is GeometricObjectElementTriangles) {
+						GeometricObjectElementTriangles el = entry.element.Value as GeometricObjectElementTriangles;
 						el.ResetVertexBuffer();
 					}
 				}
 			}
 			for (int i = 0; i < num_elementsVisual; i++) {
 				ROMStruct entry1 = elementsVisual.Value.elements[i].element.Value;
-				if (entry1 != null && entry1 is GeometricElementTriangles ) {
-					GeometricElementTriangles tris1 = entry1 as GeometricElementTriangles;
+				if (entry1 != null && entry1 is GeometricObjectElementTriangles ) {
+					GeometricObjectElementTriangles tris1 = entry1 as GeometricObjectElementTriangles;
 					MeshFilter[] mfs = gao.GetComponentsInChildren<MeshFilter>();
 					MeshFilter mf = mfs.FirstOrDefault(m => m.name == "ElementTriangles @ " + tris1.Offset);
 					if (mf != null) {

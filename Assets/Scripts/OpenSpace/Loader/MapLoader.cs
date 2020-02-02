@@ -48,7 +48,8 @@ namespace OpenSpace {
         public LinkedList<Family> families;
 
         public InputStructure inputStruct;
-        public FontStructure fontStruct;
+        public LocalizationStructure localization;
+		public FontStructure fonts;
         public string[] levels;
         public string[] languages;
         public string[] languages_loc;
@@ -70,7 +71,7 @@ namespace OpenSpace {
         public List<VisualMaterial> visualMaterials = new List<VisualMaterial>();
         public List<GameMaterial> gameMaterials = new List<GameMaterial>();
         public List<CollideMaterial> collideMaterials = new List<CollideMaterial>();
-		public List<MeshObject> meshObjects = new List<MeshObject>();
+		public List<GeometricObject> meshObjects = new List<GeometricObject>();
         public List<LightInfo> lights = new List<LightInfo>();
         public List<Sector> sectors = new List<Sector>();
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
@@ -349,11 +350,11 @@ namespace OpenSpace {
 				print(ea.ToString());
 			}
 
-			Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["fontStructure"], mem));
-            fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
+			Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["localizationStructure"], mem));
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
 
-            // Parse actual world & always structure
-            ReadFamilies(reader);
+			// Parse actual world & always structure
+			ReadFamilies(reader);
             ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);

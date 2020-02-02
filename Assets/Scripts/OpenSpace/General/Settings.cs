@@ -168,7 +168,7 @@ namespace OpenSpace {
                 { "textures", 0x007E4AA0 },
                 { "textureMemoryChannels", 0x007E3AA0 },
                 { "inputStructure", 0x0083F7E0 },
-                { "fontStructure", 0x007A84E0 },
+                { "localizationStructure", 0x007A84E0 },
                 { "num_visualMaterials", 0x005F5E80 },
                 { "visualMaterials", 0x005BFAD4 },
                 { "brightness", 0x005F5E20 },
@@ -380,7 +380,7 @@ namespace OpenSpace {
                 { "textures", 0x00502680 },
                 { "textureMemoryChannels", 0x00501660 },
                 { "inputStructure", 0x00509E60 },
-                { "fontStructure", 0x00500260 }
+                { "localizationStructure", 0x00500260 }
             }
         };
         public static Settings R2PCDemo1 = new Settings() {

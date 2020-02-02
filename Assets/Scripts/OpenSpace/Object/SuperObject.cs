@@ -16,7 +16,9 @@ namespace OpenSpace.Object {
             IPO_2,
             Perso,
             Sector,
-			PO
+			PhysicalObject,
+            GeometricObject, // Geometric Object
+            GeometricShadowObject, // Instantiated Geometric Object
         }
 
         public Pointer offset;
@@ -108,34 +110,49 @@ namespace OpenSpace.Object {
 			so.type = GetSOType(so.typeCode);
             switch (so.type) {
                 case Type.IPO:
-                    Pointer.Goto(ref reader, so.off_data);
-                    so.data = IPO.Read(reader, so.off_data, so);
+                    Pointer.DoAt(ref reader, so.off_data, () => {
+                        so.data = IPO.Read(reader, so.off_data, so);
+                    });
                     break;
                 case Type.IPO_2:
-                    l.print("IPO with code 0x40 at offset " + String.Format("0x{0:X}", so.offset.offset));
-                    Pointer.Goto(ref reader, so.off_data);
-                    so.data = IPO.Read(reader, so.off_data, so);
+                    Pointer.DoAt(ref reader, so.off_data, () => {
+                        l.print("IPO with code 0x40 at offset " + so.off_data);
+                        so.data = IPO.Read(reader, so.off_data, so);
+                    });
                     break;
-				case Type.PO:
-					if (!Settings.s.loadFromMemory) {
-						Pointer.Goto(ref reader, so.off_data);
-						so.data = PhysicalObject.Read(reader, so.off_data, so);
-					}
-					break;
-				case Type.Perso:
-                    Pointer.Goto(ref reader, so.off_data);
-                    so.data = Perso.Read(reader, so.off_data, so);
+                case Type.PhysicalObject:
+                    if (!Settings.s.loadFromMemory) {
+                        Pointer.DoAt(ref reader, so.off_data, () => {
+                            so.data = PhysicalObject.Read(reader, so.off_data, so);
+                        });
+                    }
+                    break;
+                case Type.Perso:
+                    Pointer.DoAt(ref reader, so.off_data, () => {
+                        so.data = Perso.Read(reader, so.off_data, so);
+                    });
                     break;
                 case Type.World:
                     so.data = World.New(so);
                     //print("parsing world superobject with " + num_children + " children");
                     break;
                 case Type.Sector:
-                    Pointer.Goto(ref reader, so.off_data);
-                    so.data = Sector.Read(reader, so.off_data, so);
+                    Pointer.DoAt(ref reader, so.off_data, () => {
+                        so.data = Sector.Read(reader, so.off_data, so);
+                    });
+                    break;
+                case Type.GeometricObject:
+                    Pointer.DoAt(ref reader, so.off_data, () => {
+                        so.data = Visual.GeometricObject.Read(reader, so.off_data);
+                    });
+                    break;
+                case Type.GeometricShadowObject:
+                    Pointer.DoAt(ref reader, so.off_data, () => {
+                        so.data = Visual.GeometricShadowObject.Read(reader, so.off_data, so);
+                    });
                     break;
                 default:
-                    l.print("Unknown SO type " + so.typeCode + " at offset " + String.Format("0x{0:X}", so.offset.offset));
+                    l.print("Unknown SO type " + so.typeCode + " at " + so.offset + " - " + so.off_data);
                     //isValidNode = false;
                     break;
             }
@@ -209,9 +226,11 @@ namespace OpenSpace.Object {
                     case 0x1: type = Type.World; break;
                     case 0x2: type = Type.Perso; break;
                     case 0x4: type = Type.Sector; break;
-					case 0x8: type = Type.PO; break;
+					case 0x8: type = Type.PhysicalObject; break;
                     case 0x20: type = Type.IPO; break;
                     case 0x40: type = Type.IPO_2; break;
+                    case 0x400: type = Type.GeometricObject; break;
+                    case 0x80000: type = Type.GeometricShadowObject; break;
                 }
             } else {
                 switch (typeCode) {

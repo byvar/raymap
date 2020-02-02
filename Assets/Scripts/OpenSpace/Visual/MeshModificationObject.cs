@@ -15,7 +15,7 @@ namespace OpenSpace.Visual {
         public uint num_properties;
         public Pointer off_properties;
 
-        [JsonIgnore] public MeshObject mesh = null;
+        [JsonIgnore] public GeometricObject mesh = null;
         public MeshModificationProperty[] properties;
 
 

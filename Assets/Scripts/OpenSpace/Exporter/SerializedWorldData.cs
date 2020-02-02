@@ -21,8 +21,8 @@ namespace OpenSpace.Exporter {
         }
 
         public struct EGeometry { // IPO
-            public MeshObject Visuals;
-            public CollideMeshObject Collision;
+            public GeometricObject Visuals;
+            public GeometricObjectCollide Collision;
         }
 
         public Dictionary<string, ESector> Sectors;
@@ -47,7 +47,7 @@ namespace OpenSpace.Exporter {
 
                     PhysicalObject po = ipo.data;
                     if (po.visualSet.Length > 0) {
-                        eg.Visuals = po.visualSet[0].obj as MeshObject;
+                        eg.Visuals = po.visualSet[0].obj as GeometricObject;
                         eg.Collision = po.collideMesh;
                     }
 

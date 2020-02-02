@@ -225,7 +225,7 @@ namespace OpenSpace.Loader {
 			Pointer off_identityMatrix = Pointer.Read(reader);
 			loadingState = "Loading text";
 			await WaitIfNecessary();
-			fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
 			uint num_lvlNames = reader.ReadUInt32();
 			uint num_fixEntries1 = reader.ReadUInt32();
 			// Read tables under header
@@ -260,7 +260,6 @@ namespace OpenSpace.Loader {
 			// Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
 			int sz_entryActions = 0x100;
 			int sz_randomStructure = 0xDC;
-			int sz_fontDefine = 0x12B2;
 			int sz_videoStructure = 0x18;
 			int sz_musicMarkerSlot = 0x28;
 			int sz_binDataForMenu = 0x020C;
@@ -269,24 +268,19 @@ namespace OpenSpace.Loader {
 			if (Settings.s.mode == Settings.Mode.Rayman3GC) {
 				sz_entryActions = 0xE8;
 				sz_binDataForMenu = 0x01F0;
-				sz_fontDefine = 0x12E4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaGC
 				|| Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
 				sz_entryActions = 0xC4;
-				sz_fontDefine = 0x12E4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaPC
 				|| Settings.s.mode == Settings.Mode.RaymanMPC) {
 				sz_entryActions = 0xDC;
 			} else if (Settings.s.mode == Settings.Mode.DinosaurPC) {
 				sz_entryActions = 0xD8;
 				sz_randomStructure = 0xE0;
-				sz_fontDefine = 0xA00;
 			} else if (Settings.s.mode == Settings.Mode.DonaldDuckPKGC) {
 				sz_entryActions = 0xC0;
-				sz_fontDefine = 0x12E4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaXbox) {
 				sz_entryActions = 0xF0;
-				sz_fontDefine = 0x12E4;
 			}
 			if (Settings.s.platform == Settings.Platform.Xbox) {
 				sz_videoStructure = 0x108;
@@ -294,7 +288,6 @@ namespace OpenSpace.Loader {
 			} else if (Settings.s.platform == Settings.Platform.Xbox360) {
 				sz_videoStructure = 0x108;
 				sz_entryActions = 0x108;
-				sz_fontDefine = 0x12E4 * 2 + 2;
 				sz_binDataForMenu = 0x33C;
 				num_menuPages = 96;
 			}
@@ -317,16 +310,7 @@ namespace OpenSpace.Loader {
 			reader.ReadBytes(sz_randomStructure);
 			uint soundEventTableIndexInFix = reader.ReadUInt32();
 			Pointer off_soundEventTable = Pointer.Read(reader);
-			byte num_fontBitmap = reader.ReadByte();
-			byte num_font = reader.ReadByte();
-
-			for (int i = 0; i < num_font; i++) {
-				reader.ReadBytes(sz_fontDefine); // Font definition
-			}
-			reader.Align(4); // Align position
-			for (int i = 0; i < num_fontBitmap; i++) {
-				Pointer off_fontTexture = Pointer.Read(reader);
-			}
+			fonts = FromOffsetOrRead<FontStructure>(reader, Pointer.Current(reader), inline: true);
 			reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
 			if (Settings.s.game == Settings.Game.R3) {
 				uint num_musicMarkerSlots = reader.ReadUInt32();

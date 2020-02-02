@@ -87,10 +87,10 @@ public class PortalManager : MonoBehaviour {
 						containerIPO = so.data as IPO
 					};
 					portal.cameraSO = SuperObject.FromOffset(portal.containerIPO.off_portalCamera);
-					MeshObject geo = portal.containerIPO.data.visualSet[0].obj as MeshObject;
+					GeometricObject geo = portal.containerIPO.data.visualSet[0].obj as GeometricObject;
 					portal.geometricObject = geo;
 					if (geo != null) {
-						MeshElement el = geo.subblocks[0] as MeshElement;
+						GeometricObjectElementTriangles el = geo.elements[0] as GeometricObjectElementTriangles;
 						portal.meshElement = el;
 						portal.material = el.Gao.GetComponent<Renderer>().sharedMaterial;
 						//Debug.LogWarning(so.type + " - " + portal.containerIPO.offset + " - " + portal.containerIPO.off_portalCamera);
@@ -169,11 +169,11 @@ public class PortalManager : MonoBehaviour {
 		public SuperObject containerSO;
 		public IPO containerIPO;
 		public SuperObject cameraSO;
-		public MeshObject geometricObject;
+		public GeometricObject geometricObject;
 		public Camera camera;
 		public RenderTexture rt;
 		public bool isMirror;
 		public Material material;
-		public MeshElement meshElement;
+		public GeometricObjectElementTriangles meshElement;
 	}
 }
