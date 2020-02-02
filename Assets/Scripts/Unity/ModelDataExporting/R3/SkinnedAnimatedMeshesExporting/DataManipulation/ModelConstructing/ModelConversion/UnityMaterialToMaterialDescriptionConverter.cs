@@ -17,6 +17,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.SkinnedAnimatedMeshesExport
             MaterialDescriptionFromUnityMaterial(UnityEngine.Material unityMaterial)
         {
             var result = new Model.AnimatedExportObjectModelDescription.MaterialsDescription.Material();
+            result.name = unityMaterial.name;
             result.mainTexture = ConvertUnityTextureToTextureDescription(unityMaterial.GetTexture("_Tex0"));
             result.mainTextureOffset = new Vector2d(unityMaterial.mainTextureOffset.x, unityMaterial.mainTextureOffset.y);
             result.mainTextureScale = new Vector2d(unityMaterial.mainTextureScale.x, unityMaterial.mainTextureScale.y);
