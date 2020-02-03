@@ -17,7 +17,7 @@ namespace OpenSpace.ROM {
 		public ushort _18;
 
 		protected override void ReadInternal(Reader reader) {
-            //Loader.print("Perso @ " + Pointer.Current(reader));
+            //Loader.print("Perso @ " + Offset);
             p3dData = new Reference<Perso3dData>(reader, true);
             brain = new Reference<Brain>(reader, true);
             _4 = reader.ReadUInt16();
@@ -30,7 +30,10 @@ namespace OpenSpace.ROM {
 			_18 = reader.ReadUInt16();
 		}
 		public ROMPersoBehaviour GetGameObject(GameObject gao) {
-			gao.name += " - P3dData @ " + Offset;
+			string aiModelName = "Model_" + (brain.Value?.aiModel.Value?.IndexString ?? "null");
+			gao.name = "[Family_" + stdGame.Value.family.Value.IndexString
+				+ "] " + aiModelName + " - " + Offset;
+			//gao.name += " - P3dData @ " + Offset;
 			ROMPersoBehaviour romPerso = gao.AddComponent<ROMPersoBehaviour>();
 			romPerso.perso = this;
 			romPerso.controller = MapLoader.Loader.controller;

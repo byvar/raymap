@@ -86,7 +86,7 @@ namespace OpenSpace.Visual {
 					if (sprites[i].visualMaterial.animTextures.Count > 0) {
 						MultiTextureMaterial mtmat = mr.gameObject.AddComponent<MultiTextureMaterial>();
 						mtmat.visMat = sprites[i].visualMaterial;
-						mtmat.mat = mr.sharedMaterial;
+						mtmat.mat = mr.material;
 					}
 				} else {
 					Material transMat = new Material(MapLoader.Loader.baseTransparentMaterial);

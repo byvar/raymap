@@ -491,6 +491,20 @@ public class Controller : MonoBehaviour {
 							unityBehaviour.sector = sc;
 						} else unityBehaviour.sector = null;
 						unityBehaviour.Init();
+
+						var iteratorPerso = unityBehaviour.perso;
+
+						// Of sound brain and AI model?
+						if (iteratorPerso.brain?.Value?.aiModel?.Value != null) {
+							var aiModel = iteratorPerso.brain.Value.aiModel.Value;
+
+							if (aiModel.comportsIntelligence.Value != null) {
+								aiModel.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
+							}
+							if (aiModel.comportsReflex.Value != null) {
+								aiModel.comportsReflex.Value.CreateGameObjects("Reflex", unityBehaviour.gameObject, iteratorPerso);
+							}
+						}
 					}
 				}
 			}

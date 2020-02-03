@@ -5,32 +5,32 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class StdGame : ROMStruct {
 		// Size: 24
-		public uint dword0;
-		public uint dword4;
+		public uint dword_00;
+		public uint dword_04;
 		public Reference<Family> family;
-		public ushort word10;
-		public ushort word12;
-		public ushort word14;
+		public ushort word_0A;
+		public ushort word_0C;
+		public ushort word_0E;
 		public ushort flags;
-		public ushort unk;
-		public byte byte20;
-		public byte byte21;
-		public byte byte22;
-		public byte byte23;
+		public ushort word_12;
+		public byte byte_14;
+		public byte byte_15;
+		public byte byte_16;
+		public byte byte_17;
 
 		protected override void ReadInternal(Reader reader) {
-			dword0 = reader.ReadUInt32();
-			dword4 = reader.ReadUInt32();
+			dword_00 = reader.ReadUInt32();
+			dword_04 = reader.ReadUInt32();
 			family = new Reference<Family>(reader, true);
-			word10 = reader.ReadUInt16();
-			word12 = reader.ReadUInt16();
-			word14 = reader.ReadUInt16();
+			word_0A = reader.ReadUInt16();
+			word_0C = reader.ReadUInt16();
+			word_0E = reader.ReadUInt16();
 			flags = reader.ReadUInt16();
-			unk = reader.ReadUInt16();
-			byte20 = reader.ReadByte();
-			byte21 = reader.ReadByte();
-			byte22 = reader.ReadByte();
-			byte23 = reader.ReadByte();
+			word_12 = reader.ReadUInt16();
+			byte_14 = reader.ReadByte();
+			byte_15 = reader.ReadByte();
+			byte_16 = reader.ReadByte();
+			byte_17 = reader.ReadByte();
 		}
 	}
 }

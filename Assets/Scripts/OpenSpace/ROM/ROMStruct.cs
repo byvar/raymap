@@ -9,7 +9,8 @@ namespace OpenSpace.ROM {
 	public abstract class ROMStruct {
 		public Pointer Offset { get; protected set; }
 		public ushort Index   { get; protected set; }
-		
+		public string IndexString { get { return string.Format("{0:X4}", Index); } }
+
 		public void Init(Pointer offset, ushort index) {
 			this.Offset = offset;
 			this.Index = index;
