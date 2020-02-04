@@ -1,7 +1,7 @@
 ﻿using OpenSpace.Loader;
 
 namespace OpenSpace.ROM {
-	public class TextTable : ROMStruct {
+	public class StringRefArray : ROMStruct {
 		public ushort length;
 		public Reference<StringRef>[] strings;
 
