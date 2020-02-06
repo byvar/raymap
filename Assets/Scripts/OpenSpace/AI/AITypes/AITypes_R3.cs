@@ -1663,7 +1663,7 @@ namespace OpenSpace.AI {
                 DsgVarInfoEntry.DsgVarType.GameMaterial,
                 DsgVarInfoEntry.DsgVarType.VisualMaterial,
                 DsgVarInfoEntry.DsgVarType.Perso,
-                DsgVarInfoEntry.DsgVarType.Waypoint,
+                DsgVarInfoEntry.DsgVarType.WayPoint,
                 DsgVarInfoEntry.DsgVarType.Graph,
                 DsgVarInfoEntry.DsgVarType.Text,
                 DsgVarInfoEntry.DsgVarType.SuperObject,

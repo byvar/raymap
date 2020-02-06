@@ -12,6 +12,7 @@ namespace OpenSpace.ROM {
 
 		// Custom
 		public DsgVarType dsgVarType;
+		public ushort index;
 
 		// Parsed param
 		public short paramShort;
@@ -38,17 +39,18 @@ namespace OpenSpace.ROM {
 			Pointer.Goto(ref reader, Offset + 4); paramShort = reader.ReadInt16();
 
 			Parse(reader);
-			//Loader.print("DsgMemInfo " + Offset + " - " + dsgVarType);
 		}
 
 		private void Parse(Reader reader) {
 			ushort typeNumber = type;
 			ushort usedParam = param;
+			index = index_in_array;
 			dsgVarType = DsgVarType.None;
 			if ((type & ((ushort)FATEntry.Flag.Fix)) == (ushort)FATEntry.Flag.Fix) {
 				paramEntry = new Reference<DsgVarEntry>(param, reader, true);
 				typeNumber = (ushort)(typeNumber & 0x7FFF);
 				usedParam = paramEntry.Value.param;
+				index = paramEntry.Value.index_of_entry;
 			}
 			if (Settings.s.aiTypes != null) dsgVarType = Settings.s.aiTypes.GetDsgVarType(typeNumber);
 			if (paramEntry == null) {
@@ -74,7 +76,7 @@ namespace OpenSpace.ROM {
 				case DsgVarType.Graph:
 					paramGraph = new Reference<Graph>(usedParam, reader, true);
 					break;
-				case DsgVarType.Waypoint:
+				case DsgVarType.WayPoint:
 					paramWaypoint = new Reference<WayPoint>(usedParam, reader, true);
 					break;
 				case DsgVarType.Comport:

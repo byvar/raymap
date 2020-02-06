@@ -59,7 +59,7 @@ namespace OpenSpace.AI {
                     typeText = "VisualMaterial"; break;
                 case DsgVarInfoEntry.DsgVarType.Perso:
                     typeText = "Perso"; break;
-                case DsgVarInfoEntry.DsgVarType.Waypoint:
+                case DsgVarInfoEntry.DsgVarType.WayPoint:
                     typeText = "WayPoint"; break;
                 case DsgVarInfoEntry.DsgVarType.Graph:
                     typeText = "Graph"; break;
@@ -104,46 +104,7 @@ namespace OpenSpace.AI {
             if (dsgVarEntry.initialValue != null) {
                 text += " = ";
 
-                string stringVal = "";
-
-                switch (dsgVarEntry.type) {
-                    case DsgVarInfoEntry.DsgVarType.Boolean: stringVal = editableEntry.valueAsBool_initial.ToString().ToLower(); break;
-                    case DsgVarInfoEntry.DsgVarType.Int: stringVal = (editableEntry.valueAsInt_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.UInt: stringVal = (editableEntry.valueAsUInt_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.Short: stringVal = (editableEntry.valueAsShort_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.UShort: stringVal = (editableEntry.valueAsUShort_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.Byte: stringVal = (editableEntry.valueAsSByte_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.UByte: stringVal = (editableEntry.valueAsByte_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.Float: stringVal = (editableEntry.valueAsFloat_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.Text: stringVal = (editableEntry.valueAsString_initial.ToString()); break;
-                    case DsgVarInfoEntry.DsgVarType.Vector:
-                        float val_x = editableEntry.valueAsVector_initial.x;
-                        float val_y = editableEntry.valueAsVector_initial.y;
-                        float val_z = editableEntry.valueAsVector_initial.z;
-
-                        stringVal = "new Vector3(" + val_x + ", " + val_y + ", " + val_z + ")";
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.Perso:
-                        PersoBehaviour currentPersoBehaviour = editableEntry.valueAsPersoGao_initial != null ? editableEntry.valueAsPersoGao_initial.GetComponent<PersoBehaviour>() : null;
-
-                        if (currentPersoBehaviour != null) {
-                            stringVal += "Perso.GetByName(" + currentPersoBehaviour.perso.namePerso + ")";
-                        } else {
-                            stringVal += "null";
-                        }
-
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.SuperObject:
-                        GameObject currentGao = editableEntry.valueAsSuperObjectGao_initial != null ? editableEntry.valueAsSuperObjectGao_initial : null;
-
-                        if (currentGao != null) {
-                            stringVal += "GameObject.GetByName(" + currentGao.name + ")";
-                        } else {
-                            stringVal += "null";
-                        }
-                        break;
-
-                }
+                string stringVal = editableEntry.valueInitial.ToString();
 
                 text += stringVal;
             }

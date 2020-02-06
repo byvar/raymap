@@ -94,10 +94,10 @@ public class ROMPersoBehaviourEditor : Editor {
         if (GUILayout.Button("Print Animation Debug Info")) pb.PrintAnimationDebugInfo();
 	}
 
-	IList<StateTransitionTreeElement> GetData() {
+	IList<StateTransitionsTreeElement> GetData() {
 		ROMPersoBehaviour pb = (ROMPersoBehaviour)target;
-		List<StateTransitionTreeElement> tr = new List<StateTransitionTreeElement>();
-		tr.Add(new StateTransitionTreeElement("Hidden root", -1, -1));
+		List<StateTransitionsTreeElement> tr = new List<StateTransitionsTreeElement>();
+		tr.Add(new StateTransitionsTreeElement("Hidden root", -1, -1));
 		if (pb.state != null && pb.state.transitions.Value != null && pb.state.transitions.Value.length > 0) {
 			int id = 0;
 			State[] states = pb.perso.stdGame.Value.family.Value.states.Value.states.Value.states.Select(s => s.Value).ToArray();
@@ -105,7 +105,7 @@ public class ROMPersoBehaviourEditor : Editor {
 				State stateToGo = t.stateToGo.Value;
 				State targetState = t.targetState.Value;
 				if (stateToGo == null || targetState == null) continue;
-				tr.Add(new StateTransitionTreeElement("State transition " + targetState.ToString(), 0, id) {
+				tr.Add(new StateTransitionsTreeElement("State transition " + targetState.ToString(), 0, id) {
 					stateToGoName = stateToGo.ToString(),
 					stateToGoIndex = Array.IndexOf(states,stateToGo),
 					targetStateName = targetState.ToString(),
@@ -132,7 +132,7 @@ public class ROMPersoBehaviourEditor : Editor {
 			if (firstInit)
 				multiColumnHeader.ResizeToFit();
 
-			var treeModel = new TreeModel<StateTransitionTreeElement>(GetData());
+			var treeModel = new TreeModel<StateTransitionsTreeElement>(GetData());
 
 			treeViewStateTransitions = new StateTransitionsTreeView(treeviewStateTransitionsState, multiColumnHeader, treeModel) {
 				persoROM = target,

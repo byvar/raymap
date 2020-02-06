@@ -109,7 +109,7 @@ namespace OpenSpace.Exporter {
                 case DsgVarInfoEntry.DsgVarType.Perso:
                     d.value = Perso.FromOffset((Pointer)(infoEntry.value))?.namePerso;
                     break;
-                case DsgVarInfoEntry.DsgVarType.Waypoint: // TODO
+                case DsgVarInfoEntry.DsgVarType.WayPoint: // TODO
                     d.value = ((Pointer)infoEntry.value).ToString();
                     break;
                 case DsgVarInfoEntry.DsgVarType.Graph: // TODO

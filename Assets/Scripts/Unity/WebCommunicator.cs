@@ -230,16 +230,16 @@ public class WebCommunicator : MonoBehaviour {
 		dsgObj["name"] = dsg.entry.NiceVariableName;
 		dsgObj["type"] = dsg.entry.type.ToString();
 		switch (dsg.entry.type) {
-			case DsgVarInfoEntry.DsgVarType.Boolean: dsgObj["value"] = dsg.valueAsBool; break;
-			case DsgVarInfoEntry.DsgVarType.Int: dsgObj["value"] = dsg.valueAsInt; break;
-			case DsgVarInfoEntry.DsgVarType.UInt: dsgObj["value"] = dsg.valueAsUInt; break;
-			case DsgVarInfoEntry.DsgVarType.Short: dsgObj["value"] = dsg.valueAsShort; break;
-			case DsgVarInfoEntry.DsgVarType.UShort: dsgObj["value"] = dsg.valueAsUShort; break;
-			case DsgVarInfoEntry.DsgVarType.Byte: dsgObj["value"] = dsg.valueAsByte; break;
-			case DsgVarInfoEntry.DsgVarType.UByte: dsgObj["value"] = dsg.valueAsByte; break;
-			case DsgVarInfoEntry.DsgVarType.Float: dsgObj["value"] = dsg.valueAsFloat; break;
-			case DsgVarInfoEntry.DsgVarType.Text: dsgObj["value"] = dsg.valueAsString; break;
-			case DsgVarInfoEntry.DsgVarType.Vector: dsgObj["value"] = dsg.valueAsVector; break;
+			case DsgVarInfoEntry.DsgVarType.Boolean: dsgObj["value"] = dsg.valueCurrent.valueAsBool; break;
+			case DsgVarInfoEntry.DsgVarType.Int: dsgObj["value"] = dsg.valueCurrent.valueAsInt; break;
+			case DsgVarInfoEntry.DsgVarType.UInt: dsgObj["value"] = dsg.valueCurrent.valueAsUInt; break;
+			case DsgVarInfoEntry.DsgVarType.Short: dsgObj["value"] = dsg.valueCurrent.valueAsShort; break;
+			case DsgVarInfoEntry.DsgVarType.UShort: dsgObj["value"] = dsg.valueCurrent.valueAsUShort; break;
+			case DsgVarInfoEntry.DsgVarType.Byte: dsgObj["value"] = dsg.valueCurrent.valueAsByte; break;
+			case DsgVarInfoEntry.DsgVarType.UByte: dsgObj["value"] = dsg.valueCurrent.valueAsByte; break;
+			case DsgVarInfoEntry.DsgVarType.Float: dsgObj["value"] = dsg.valueCurrent.valueAsFloat; break;
+			case DsgVarInfoEntry.DsgVarType.Text: dsgObj["value"] = dsg.valueCurrent.valueAsString; break;
+			case DsgVarInfoEntry.DsgVarType.Vector: dsgObj["value"] = dsg.valueCurrent.valueAsVector; break;
 			case DsgVarInfoEntry.DsgVarType.Perso:
 				if (dsg.entry.value != null) {
 					SuperObject so = SuperObject.FromOffset(dsg.entry.value as Pointer);

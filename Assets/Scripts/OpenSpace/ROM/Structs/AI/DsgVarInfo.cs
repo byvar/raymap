@@ -12,18 +12,30 @@ namespace OpenSpace.ROM {
 		protected override void ReadInternal(Reader reader) {
 			entries = new Entry[length];
 			for (int i = 0; i < entries.Length; i++) {
-				entries[i] = new Entry(reader);
+				entries[i] = new Entry(reader, i);
+				/*Loader.print("DsgVarInfoEntry[" + i + "]"
+					+ " - " + entries[i].dsgVarType
+					+ " - " + entries[i].offsetInBuffer
+					+ (entries[i].paramEntry?.Value != null ? "[" + entries[i].paramEntry.Value.index_in_array + "]" : "")
+					+ " - " + entries[i].param);*/
 			}
+		}
+
+		public Entry GetEntryFromIndex(int ind) {
+			Entry entry = null;
+			entry = entries.FirstOrDefault(e => e.index == ind);
+			return entry;
 		}
 
 		public class Entry {
 			public ushort type;
 			public ushort param;
-			public ushort unk;
+			public ushort offsetInBuffer;
 
 			// Custom
 			public DsgVarType dsgVarType;
 			public Pointer offset;
+			public int index;
 
 			// Parsed param
 			public short paramShort;
@@ -40,8 +52,9 @@ namespace OpenSpace.ROM {
 			public Reference<GameMaterial> paramGameMaterial;
 			public Reference<Perso> paramPerso;
 
-			public Entry(Reader reader) {
+			public Entry(Reader reader, int index) {
 				offset = Pointer.Current(reader);
+				this.index = index;
 
 				type = reader.ReadUInt16();
 				param = reader.ReadUInt16();
@@ -50,10 +63,9 @@ namespace OpenSpace.ROM {
 				Pointer.Goto(ref reader, offset + 2); paramByte = reader.ReadByte();
 				Pointer.Goto(ref reader, offset + 2); paramShort = reader.ReadInt16();
 
-				unk = reader.ReadUInt16();
+				offsetInBuffer = reader.ReadUInt16();
 
 				Parse(reader);
-				//Loader.print("DsgVarInfo " + offset + " - " + dsgVarType);
 			}
 
 			private void Parse(Reader reader) {
@@ -63,6 +75,7 @@ namespace OpenSpace.ROM {
 				if ((type & ((ushort)FATEntry.Flag.Fix)) == (ushort)FATEntry.Flag.Fix) {
 					paramEntry = new Reference<DsgVarEntry>(param, reader, true);
 					typeNumber = (ushort)(typeNumber & 0x7FFF);
+					index = paramEntry.Value.index_of_entry;
 					usedParam = paramEntry.Value.param;
 				}
 				if (Settings.s.aiTypes != null) dsgVarType = Settings.s.aiTypes.GetDsgVarType(typeNumber);
@@ -89,7 +102,7 @@ namespace OpenSpace.ROM {
 					case DsgVarType.Graph:
 						paramGraph = new Reference<Graph>(usedParam, reader, true);
 						break;
-					case DsgVarType.Waypoint:
+					case DsgVarType.WayPoint:
 						paramWaypoint = new Reference<WayPoint>(usedParam, reader, true);
 						break;
 					case DsgVarType.Comport:

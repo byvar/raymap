@@ -74,7 +74,7 @@ namespace OpenSpace.AI {
                 case DsgVarType.TextArray: return DsgVarType.Text;
                 case DsgVarType.TextRefArray: return DsgVarType.None;
                 case DsgVarType.VectorArray: return DsgVarType.Vector;
-                case DsgVarType.WayPointArray: return DsgVarType.Waypoint;
+                case DsgVarType.WayPointArray: return DsgVarType.WayPoint;
             }
 
             return DsgVarType.None;
@@ -101,7 +101,7 @@ namespace OpenSpace.AI {
             GameMaterial,
             VisualMaterial, // Also an array?
             Perso,
-            Waypoint,
+            WayPoint,
             Graph,
             Text,
             SuperObject,

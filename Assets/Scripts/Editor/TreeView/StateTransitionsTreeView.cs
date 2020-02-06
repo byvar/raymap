@@ -6,7 +6,7 @@ using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionTreeElement>
+public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTreeElement>
 {
 	const float kRowHeights = 20f;
 	const float kToggleWidth = 18f;
@@ -92,7 +92,7 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionTre
 		}
 	}
 
-	public StateTransitionsTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<StateTransitionTreeElement> model) : base (state, multicolumnHeader, model)
+	public StateTransitionsTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<StateTransitionsTreeElement> model) : base (state, multicolumnHeader, model)
 	{
 
 		// Custom setup
@@ -135,7 +135,7 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionTre
 
 	protected override void RowGUI (RowGUIArgs args)
 	{
-		var item = (TreeViewItem<StateTransitionTreeElement>) args.item;
+		var item = (TreeViewItem<StateTransitionsTreeElement>) args.item;
 
 		for (int i = 0; i < args.GetNumVisibleColumns (); ++i)
 		{
@@ -143,7 +143,7 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionTre
 		}
 	}
 
-	void CellGUI (Rect cellRect, TreeViewItem<StateTransitionTreeElement> item, Columns column, ref RowGUIArgs args)
+	void CellGUI (Rect cellRect, TreeViewItem<StateTransitionsTreeElement> item, Columns column, ref RowGUIArgs args)
 	{
 		// Center cell rect vertically (makes it easier to place controls, icons etc in the cells)
 		CenterRectUsingSingleLineHeight(ref cellRect);

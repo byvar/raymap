@@ -144,7 +144,7 @@ namespace OpenSpace.AI {
 						returnValue = off_graph; //"Graph " + off_graph;
 
 						break;
-					case DsgVarInfoEntry.DsgVarType.Waypoint:
+					case DsgVarInfoEntry.DsgVarType.WayPoint:
 						Pointer off_waypoint = Pointer.Read(reader);
 						if (off_waypoint != null) {
 							WayPoint wayPoint = WayPoint.FromOffsetOrRead(off_waypoint, reader);
@@ -170,20 +170,21 @@ namespace OpenSpace.AI {
 					case DsgVarInfoEntry.DsgVarType.Array11:
 					case DsgVarInfoEntry.DsgVarType.Array9:
 					case DsgVarInfoEntry.DsgVarType.Array6:
-						MapLoader.Loader.print(type);
-						returnValue = reader.ReadInt32(); break;
+						Debug.LogWarning(type);
+                        returnValue = ReadArray(reader);
+                        break;
 
-					case DsgVarInfoEntry.DsgVarType.ActionArray:
-					case DsgVarInfoEntry.DsgVarType.FloatArray:
-					case DsgVarInfoEntry.DsgVarType.IntegerArray:
-					case DsgVarInfoEntry.DsgVarType.PersoArray:
-					case DsgVarInfoEntry.DsgVarType.SoundEventArray:
-					case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-					case DsgVarInfoEntry.DsgVarType.TextArray:
-					case DsgVarInfoEntry.DsgVarType.TextRefArray:
-					case DsgVarInfoEntry.DsgVarType.VectorArray:
-					case DsgVarInfoEntry.DsgVarType.WayPointArray:
-						returnValue = ReadArray(reader);
+                    case DsgVarInfoEntry.DsgVarType.ActionArray:
+                    case DsgVarInfoEntry.DsgVarType.FloatArray:
+                    case DsgVarInfoEntry.DsgVarType.IntegerArray:
+                    case DsgVarInfoEntry.DsgVarType.PersoArray:
+                    case DsgVarInfoEntry.DsgVarType.SoundEventArray:
+                    case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
+                    case DsgVarInfoEntry.DsgVarType.TextArray:
+                    case DsgVarInfoEntry.DsgVarType.TextRefArray:
+                    case DsgVarInfoEntry.DsgVarType.VectorArray:
+                    case DsgVarInfoEntry.DsgVarType.WayPointArray:
+                        returnValue = ReadArray(reader);
 
 						break;
 
