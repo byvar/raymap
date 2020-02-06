@@ -62,6 +62,15 @@ namespace OpenSpace.Loader {
 						paths["fix.bhf"] = fixFolder + ConvertCase("Fix.bhf", Settings.CapsType.Fix);
 						paths["lvl.btf"] = lvlFolder + ConvertCase(lvlName + ".btf", Settings.CapsType.TextureFile);
 						paths["lvl.bhf"] = lvlFolder + ConvertCase(lvlName + ".bhf", Settings.CapsType.TextureFile);
+						paths["transit.btf"] = lvlFolder + ConvertCase("transit.btf", Settings.CapsType.TextureFile);
+						paths["transit.bhf"] = lvlFolder + ConvertCase("transit.bhf", Settings.CapsType.TextureFile);
+					} else if (Settings.s.platform == Settings.Platform.Xbox360) {
+						paths["fix.btf"] = fixFolder + ConvertCase("Fix.btf", Settings.CapsType.Fix);
+						paths["fix.bhf"] = fixFolder + ConvertCase("Fix.bhf", Settings.CapsType.Fix);
+						paths["lvl.btf"] = lvlFolder + ConvertCase(lvlName + "_2.btf", Settings.CapsType.TextureFile);
+						paths["lvl.bhf"] = lvlFolder + ConvertCase(lvlName + "_2.bhf", Settings.CapsType.TextureFile);
+						paths["transit.btf"] = lvlFolder + ConvertCase("transit_6.btf", Settings.CapsType.TextureFile);
+						paths["transit.bhf"] = lvlFolder + ConvertCase("transit_6.bhf", Settings.CapsType.TextureFile);
 					}
 					paths["lvl_vb.lvl"] = lvlFolder + ConvertCase(lvlName + "_vb.lvl", Settings.CapsType.LevelFile);
 					paths["lvl_vb.ptr"] = lvlFolder + ConvertCase(lvlName + "_vb.ptr", Settings.CapsType.LevelFile);
@@ -84,7 +93,8 @@ namespace OpenSpace.Loader {
 					if (Settings.s.platform == Settings.Platform.GC) {
 						await PrepareFile(paths["fix.tpl"]);
 						await PrepareFile(paths["menu.tpl"]);
-					} else if (Settings.s.platform == Settings.Platform.Xbox) {
+					} else if (Settings.s.platform == Settings.Platform.Xbox
+						|| Settings.s.platform == Settings.Platform.Xbox360) {
 						await PrepareFile(paths["fix.btf"]);
 						await PrepareFile(paths["fix.bhf"]);
 					}
@@ -102,7 +112,8 @@ namespace OpenSpace.Loader {
 						await PrepareFile(ptrPaths[1]);
 						if (Settings.s.platform == Settings.Platform.GC) {
 							await PrepareFile(paths["lvl.tpl"]);
-						} else if (Settings.s.platform == Settings.Platform.Xbox) {
+						} else if (Settings.s.platform == Settings.Platform.Xbox
+						|| Settings.s.platform == Settings.Platform.Xbox360) {
 							await PrepareFile(paths["lvl.btf"]);
 							await PrepareFile(paths["lvl.bhf"]);
 						}
@@ -117,6 +128,10 @@ namespace OpenSpace.Loader {
 						await PrepareFile(ptrPaths[2]);
 						if (Settings.s.platform == Settings.Platform.GC) {
 							await PrepareFile(paths["transit.tpl"]);
+						} else if (Settings.s.platform == Settings.Platform.Xbox
+						|| Settings.s.platform == Settings.Platform.Xbox360) {
+							await PrepareFile(paths["transit.btf"]);
+							await PrepareFile(paths["transit.bhf"]);
 						}
 					}
 					hasTransit = FileSystem.FileExists(lvlPaths[2]) && (FileSystem.GetFileLength(lvlPaths[2]) > 4);
@@ -190,7 +205,9 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
+			if (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.Xbox
+				|| Settings.s.platform == Settings.Platform.Xbox360) {
 				if (Settings.s.game == Settings.Game.R3) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
@@ -208,7 +225,7 @@ namespace OpenSpace.Loader {
 			Pointer off_identityMatrix = Pointer.Read(reader);
 			loadingState = "Loading text";
 			await WaitIfNecessary();
-			fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
 			uint num_lvlNames = reader.ReadUInt32();
 			uint num_fixEntries1 = reader.ReadUInt32();
 			// Read tables under header
@@ -219,7 +236,9 @@ namespace OpenSpace.Loader {
 				string savMapName = new string(reader.ReadChars(0xC));
 			}
 			ReadLevelNames(reader, Pointer.Current(reader), num_lvlNames);
-			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
+			if (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.Xbox
+				|| Settings.s.platform == Settings.Platform.Xbox360) {
 				reader.ReadChars(0x1E);
 				reader.ReadChars(0x1E); // two zero entries
 			}
@@ -241,33 +260,36 @@ namespace OpenSpace.Loader {
 			// Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
 			int sz_entryActions = 0x100;
 			int sz_randomStructure = 0xDC;
-			int sz_fontDefine = 0x12B2;
 			int sz_videoStructure = 0x18;
 			int sz_musicMarkerSlot = 0x28;
 			int sz_binDataForMenu = 0x020C;
+			int num_menuPages = 35;
 
 			if (Settings.s.mode == Settings.Mode.Rayman3GC) {
 				sz_entryActions = 0xE8;
 				sz_binDataForMenu = 0x01F0;
-				sz_fontDefine = 0x12E4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaGC
 				|| Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
 				sz_entryActions = 0xC4;
-				sz_fontDefine = 0x12E4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaPC
 				|| Settings.s.mode == Settings.Mode.RaymanMPC) {
 				sz_entryActions = 0xDC;
 			} else if (Settings.s.mode == Settings.Mode.DinosaurPC) {
 				sz_entryActions = 0xD8;
 				sz_randomStructure = 0xE0;
-				sz_fontDefine = 0xA00;
 			} else if (Settings.s.mode == Settings.Mode.DonaldDuckPKGC) {
 				sz_entryActions = 0xC0;
-				sz_fontDefine = 0x12E4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaXbox) {
 				sz_entryActions = 0xF0;
-				sz_fontDefine = 0x12E4;
+			}
+			if (Settings.s.platform == Settings.Platform.Xbox) {
 				sz_videoStructure = 0x108;
+				sz_binDataForMenu = 0x1AC;
+			} else if (Settings.s.platform == Settings.Platform.Xbox360) {
+				sz_videoStructure = 0x108;
+				sz_entryActions = 0x108;
+				sz_binDataForMenu = 0x33C;
+				num_menuPages = 96;
 			}
 			loadingState = "Loading input structure";
 			await WaitIfNecessary();
@@ -275,7 +297,7 @@ namespace OpenSpace.Loader {
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
-			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
+			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
 				Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
 				ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 			}
@@ -288,16 +310,7 @@ namespace OpenSpace.Loader {
 			reader.ReadBytes(sz_randomStructure);
 			uint soundEventTableIndexInFix = reader.ReadUInt32();
 			Pointer off_soundEventTable = Pointer.Read(reader);
-			byte num_fontBitmap = reader.ReadByte();
-			byte num_font = reader.ReadByte();
-			print(Pointer.Current(reader));
-			for (int i = 0; i < num_font; i++) {
-				reader.ReadBytes(sz_fontDefine); // Font definition
-			}
-			reader.Align(4); // Align position
-			for (int i = 0; i < num_fontBitmap; i++) {
-				Pointer off_fontTexture = Pointer.Read(reader);
-			}
+			fonts = FromOffsetOrRead<FontStructure>(reader, Pointer.Current(reader), inline: true);
 			reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
 			if (Settings.s.game == Settings.Game.R3) {
 				uint num_musicMarkerSlots = reader.ReadUInt32();
@@ -305,12 +318,14 @@ namespace OpenSpace.Loader {
 					reader.ReadBytes(sz_musicMarkerSlot);
 				}
 				reader.ReadBytes(sz_binDataForMenu);
-				if (Settings.s.platform == Settings.Platform.PC) {
+				if (Settings.s.platform == Settings.Platform.PC
+					|| Settings.s.platform == Settings.Platform.Xbox
+					|| Settings.s.platform == Settings.Platform.Xbox360) {
 					Pointer off_bgMaterialForMenu2D = Pointer.Read(reader);
 					Pointer off_fixMaterialForMenu2D = Pointer.Read(reader);
 					Pointer off_fixMaterialForSelectedFilms = Pointer.Read(reader);
 					Pointer off_fixMaterialForArcadeAndFilms = Pointer.Read(reader);
-					for (int i = 0; i < 35; i++) { // 35 is again hardcoded
+					for (int i = 0; i < num_menuPages; i++) {
 						Pointer off_menuPage = Pointer.Read(reader);
 					}
 				}
@@ -344,14 +359,15 @@ namespace OpenSpace.Loader {
 			Reader reader = files_array[Mem.Lvl].reader;
 			long totalSize = reader.BaseStream.Length;
 			//reader.ReadUInt32();
-			if (Settings.s.mode == Settings.Mode.Rayman3PC) {
+			if (Settings.s.game == Settings.Game.R3
+				&& (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360)) {
 				reader.ReadUInt32(); // fix checksum?
 			}
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox) {
+			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
 				if (Settings.s.game == Settings.Game.R3) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
@@ -374,7 +390,7 @@ namespace OpenSpace.Loader {
 			}
 			loadingState = "Loading level textures";
 			await ReadTexturesLvl(reader, Pointer.Current(reader));
-			if ((Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox)
+			if ((Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360)
 				&& !hasTransit && Settings.s.game != Settings.Game.Dinosaur) {
 				Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
 				Pointer.DoAt(ref reader, off_lightMapTexture, () => {
@@ -401,11 +417,15 @@ namespace OpenSpace.Loader {
 			globals.off_transitDynamicWorld = null;
 			globals.off_actualWorld = Pointer.Read(reader);
 			globals.off_dynamicWorld = Pointer.Read(reader);
-			if (Settings.s.mode == Settings.Mode.Rayman3PC) reader.ReadUInt32();
+			if (Settings.s.game == Settings.Game.R3
+				&& (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.Xbox
+				|| Settings.s.platform == Settings.Platform.Xbox360)) {
+				reader.ReadUInt32(); // ???
+			}
 			globals.off_inactiveDynamicWorld = Pointer.Read(reader);
 			globals.off_fatherSector = Pointer.Read(reader); // It is I, Father Sector.
 			globals.off_firstSubMapPosition = Pointer.Read(reader);
-
 			globals.num_always = reader.ReadUInt32();
 			globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
 			globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
@@ -446,6 +466,7 @@ namespace OpenSpace.Loader {
 				Pointer off_mainCharacters_last = Pointer.Read(reader);
 				uint num_mainCharacters_entries = reader.ReadUInt32();
 			}
+
 			reader.ReadUInt32(); // only used if there was no transit in the previous lvl. Always 00165214 in R3GC?
 			reader.ReadUInt32(); // related to "SOL". What is this? Good question.
 			reader.ReadUInt32(); // same
@@ -499,7 +520,7 @@ namespace OpenSpace.Loader {
 			}
 			uint num_visual_materials = reader.ReadUInt32();
 			Pointer off_array_visual_materials = Pointer.Read(reader);
-			print(Pointer.Current(reader));
+
 			if (Settings.s.mode != Settings.Mode.RaymanArenaGC
 				&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
 				&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
@@ -545,7 +566,7 @@ namespace OpenSpace.Loader {
 				await WaitIfNecessary();
 				Pointer off_transit = new Pointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
 				Pointer.DoAt(ref reader, off_transit, () => {
-					if (Settings.s.platform == Settings.Platform.PC) {
+					if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
 						Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
 						Pointer.DoAt(ref reader, off_lightMapTexture, () => {
 							lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);

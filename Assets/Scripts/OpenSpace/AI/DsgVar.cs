@@ -40,6 +40,7 @@ namespace OpenSpace.AI {
             if (dsgMem==null
                && Settings.s.platform != Settings.Platform.GC
                && Settings.s.platform != Settings.Platform.DC
+			   && Settings.s.platform != Settings.Platform.Xbox360
 			   && Settings.s.game != Settings.Game.R2Revolution
 			   && Settings.s.game != Settings.Game.LargoWinch
 			   && Settings.s.engineVersion >= Settings.EngineVersion.R2) {
@@ -51,6 +52,7 @@ namespace OpenSpace.AI {
 				dsgVar.amountOfInfos = reader.ReadUInt16();
 			} else if (Settings.s.platform == Settings.Platform.GC
                 || Settings.s.platform == Settings.Platform.DC
+				|| Settings.s.platform == Settings.Platform.Xbox360
                 || Settings.s.engineVersion < Settings.EngineVersion.R2
 				|| Settings.s.game == Settings.Game.LargoWinch) {
                 dsgVar.dsgMemBufferLength = reader.ReadUInt32();

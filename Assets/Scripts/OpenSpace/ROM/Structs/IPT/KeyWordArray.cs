@@ -177,14 +177,16 @@ namespace OpenSpace.ROM {
 						case FunctionType.JoystickOrPadPressed:
 						case FunctionType.JoystickOrPadReleased:
 							return FunctionType + "("
-								+ ((Settings.s.platform == Settings.Platform._3DS) ? Enum.GetName(typeof(KeyCode3DS), subkeywords[1].indexOrKeyCode).ToString() : subkeywords[1].indexOrKeyCode.ToString())
+								+ GetKeyCodeString(subkeywords[1].indexOrKeyCode)
 								+ (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "")
 								+ (subkeywords[2].indexOrKeyCode != 0 ? (", " + subkeywords[2].indexOrKeyCode) : "") + ")";
 						case FunctionType.JoystickJustPressed:
 						case FunctionType.JoystickJustReleased:
 						case FunctionType.JoystickOrPadJustPressed:
 						case FunctionType.JoystickOrPadJustReleased:
-							return FunctionType + "(" + Enum.GetName(typeof(KeyCode3DS), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+							return FunctionType + "("
+								+ GetKeyCodeString(subkeywords[1].indexOrKeyCode)
+								+ (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
 						case FunctionType.JoystickAxeValue:
 							return FunctionType + "("
 								+ (subkeywords[1].indexOrKeyCode == 4 ? "X" : "Y")
@@ -247,18 +249,63 @@ namespace OpenSpace.ROM {
 				FunctionType.SequencePadEnd,
 			};
 			public enum KeyCode3DS {
-				Dive = 0x10,
-				Jump = 0x11,
-				_18 = 0x12,
-				_19 = 0x13,
-				CamLeft = 0x14,
-				CamRight = 0x15,
+				A = 0x10,
+				B = 0x11,
+				Select = 0x12,
+				Start = 0x13,
+				DPadRight = 0x14,
+				DPadLeft = 0x15,
+				DPadUp = 0x16,
+				DPadDown = 0x17,
+				R = 0x18,
+				L = 0x19,
+				X = 0x1A,
+				Y = 0x1B,
+			}
+			public enum KeyCodeDS {
+				A = 0x10,
+				B = 0x11,
+				Select = 0x12,
+				Start = 0x13,
+				DPadRight = 0x14,
+				DPadLeft = 0x15,
+				DPadUp = 0x16,
+				DPadDown = 0x17,
+				R = 0x18,
+				L = 0x19,
+				X = 0x1A,
+				Y = 0x1B,
+			}
+			public enum KeyCodeN64 {
+				CRight = 0x10,
+				CLeft = 0x11,
+				CDown = 0x12,
+				CUp = 0x13,
+				R = 0x14,
+				L = 0x15,
 				_22 = 0x16,
 				_23 = 0x17,
-				LookMode = 0x18,
-				Strafe = 0x19,
-				_26 = 0x1A,
-				Shoot = 0x1B,
+				DPadRight = 0x18,
+				DPadLeft = 0x19,
+				DPadDown = 0x1A,
+				DPadUp = 0x1B,
+				Start = 0x1C,
+				Z = 0x1D,
+				B = 0x1E,
+				A = 0x1F,
+				_32 = 0x20,
+			}
+			private static string GetKeyCodeString(int keycode) {
+				switch (Settings.s.platform) {
+					case Settings.Platform._3DS:
+						return Enum.GetName(typeof(KeyCode3DS), keycode).ToString();
+					case Settings.Platform.DS:
+						return Enum.GetName(typeof(KeyCodeDS), keycode).ToString();
+					case Settings.Platform.N64:
+						return Enum.GetName(typeof(KeyCodeN64), keycode).ToString();
+					default:
+						return keycode.ToString();
+				}
 			}
 		}
 

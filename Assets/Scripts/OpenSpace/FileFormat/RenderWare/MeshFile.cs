@@ -12,7 +12,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 	public class MeshFile {
 		public Section root;
 
-		public MeshObject[] meshes;
+		public GeometricObject[] meshes;
 		public uint numAtomics;
 		public uint numMeshes;
 		public uint numFrames;
@@ -39,7 +39,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 			}
 		}
 
-		private MeshObject ConvertMeshSection(Section s) {
+		private GeometricObject ConvertMeshSection(Section s) {
 			Geometry g = (Geometry)s[0]["geometry"];
 			uint numMaterials = (uint)s[1][0]["numMaterials"];
 			uint numUniqueMaterials = (uint)s[1][0]["numUniqueMaterials"];
@@ -51,15 +51,15 @@ namespace OpenSpace.FileFormat.RenderWare {
 			materials = materialSections.Select(vms => ConvertMaterialSection(vms)).ToArray();
 			//if (numMaterials > 1) MapLoader.Loader.print("NUM MATERIALS " + numMaterials);
 
-			MeshObject m = new MeshObject(null);
+			GeometricObject m = new GeometricObject(null);
 			m.num_vertices = (ushort)g.numVertices;
 			m.normals = g.morphTargets[0].normals;
 			m.vertices = g.morphTargets[0].vertices;
-			m.num_subblocks = (ushort)numMaterials;
-			m.subblocks = new IGeometricElement[numMaterials];
+			m.num_elements = (ushort)numMaterials;
+			m.elements = new IGeometricObjectElement[numMaterials];
 			uint currentUniqueMaterial = 0;
 			for (int i = 0; i < numMaterials; i++) {
-				MeshElement e = new MeshElement(null, m);
+				GeometricObjectElementTriangles e = new GeometricObjectElementTriangles(null, m);
 				List<Geometry.Triangle> triangles = new List<Geometry.Triangle>();
 				for (int j = 0; j < g.numTriangles; j++) {
 					if (g.triangles[j].materialId == i) {
@@ -90,7 +90,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 				e.visualMaterial = materialIndices[i] == -1 ? materials[currentUniqueMaterial] : materials[materialIndices[i]];
 				e.visualMaterialOG = e.visualMaterial;
 				if (materialIndices[i] == -1) currentUniqueMaterial++;
-				m.subblocks[i] = e;
+				m.elements[i] = e;
 			}
 			m.name = "Mesh";
 			//GameObject gao = m.Gao;

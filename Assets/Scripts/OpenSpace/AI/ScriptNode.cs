@@ -240,10 +240,10 @@ namespace OpenSpace.AI {
                     if(advanced) return "WayPointRef: " + param_ptr;
 					return "WayPoint.FromOffset(\"" + param_ptr + "\")";
                 case ScriptNode.NodeType.TextRef:
-                    if (l.fontStruct == null) return "TextRef";
-                    if (advanced) return "TextRef: " + param + " (" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + ")";
+                    if (l.localization == null) return "TextRef";
+                    if (advanced) return "TextRef: " + param + " (" + l.localization.GetTextForHandleAndLanguageID((int)param, 0) + ")";
                     if (ts.expandStrings) {
-                        return "\"" + l.fontStruct.GetTextForHandleAndLanguageID((int)param, 0) + "\""; // Preview in english
+                        return "\"" + l.localization.GetTextForHandleAndLanguageID((int)param, 0) + "\""; // Preview in english
                     } else {
                         return "new TextReference(" + (int)param + ")";
                     }

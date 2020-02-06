@@ -17,7 +17,7 @@ namespace OpenSpace.Object {
         public Pointer off_collideBoundingVolume;
         public VisualSetLOD[] visualSet;
         public ushort visualSetType = 0;
-        public CollideMeshObject collideMesh;
+        public GeometricObjectCollide collideMesh;
         public Vector3? scaleMultiplier = null;
         private GameObject gao = null;
         public GameObject Gao {
@@ -31,8 +31,8 @@ namespace OpenSpace.Object {
         public DeformSet Bones {
             get {
                 for (int i = 0; i < visualSet.Length; i++) {
-                    if (visualSet[i].obj != null && visualSet[i].obj is MeshObject && ((MeshObject)visualSet[i].obj).bones != null) {
-                        return ((MeshObject)visualSet[i].obj).bones;
+                    if (visualSet[i].obj != null && visualSet[i].obj is GeometricObject && ((GeometricObject)visualSet[i].obj).bones != null) {
+                        return ((GeometricObject)visualSet[i].obj).bones;
                     }
                 }
                 return null;
@@ -144,8 +144,8 @@ namespace OpenSpace.Object {
                     Pointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
                         switch (po.visualSetType) {
                             case 0:
-                                if(po.visualSet[i].obj == null) po.visualSet[i].obj = MeshObject.Read(reader, po.visualSet[i].off_data);
-                                MeshObject m = ((MeshObject)po.visualSet[i].obj);
+                                if(po.visualSet[i].obj == null) po.visualSet[i].obj = GeometricObject.Read(reader, po.visualSet[i].off_data);
+                                GeometricObject m = ((GeometricObject)po.visualSet[i].obj);
                                 if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
                                 break;
                             case 1:
@@ -174,7 +174,7 @@ namespace OpenSpace.Object {
             Pointer.DoAt(ref reader, po.off_collideSet, () => {
 				if (Settings.s.game == Settings.Game.R2Revolution) {
 					// Read collide mesh object here directly
-					po.collideMesh = CollideMeshObject.Read(reader, po.off_collideSet);
+					po.collideMesh = GeometricObjectCollide.Read(reader, po.off_collideSet);
 					po.collideMesh.gao.transform.parent = po.Gao.transform;
 				} else {
 					// Read collide set containing collide mesh
@@ -183,7 +183,7 @@ namespace OpenSpace.Object {
 					uint u3 = reader.ReadUInt32(); // 0, zde
 					Pointer off_zdr = Pointer.Read(reader);
 					Pointer.DoAt(ref reader, off_zdr, () => {
-						po.collideMesh = CollideMeshObject.Read(reader, off_zdr);
+						po.collideMesh = GeometricObjectCollide.Read(reader, off_zdr);
 						po.collideMesh.gao.transform.parent = po.Gao.transform;
 					});
 				}
@@ -205,8 +205,8 @@ namespace OpenSpace.Object {
                 po.visualSet[i].LODdistance = visualSet[i].LODdistance;
                 po.visualSet[i].off_data = visualSet[i].off_data;
                 po.visualSet[i].obj = visualSet[i].obj.Clone();
-                if (po.visualSet[i].obj is MeshObject) {
-                    MeshObject m = ((MeshObject)po.visualSet[i].obj);
+                if (po.visualSet[i].obj is GeometricObject) {
+                    GeometricObject m = ((GeometricObject)po.visualSet[i].obj);
                     if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
                     m.Gao.transform.parent = po.Gao.transform;
                 }

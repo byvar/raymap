@@ -94,22 +94,22 @@ namespace OpenSpace.ROM {
 			ushort index = forceFix ? (ushort)(this.index | (ushort)FATEntry.Flag.Fix) : this.index;
 			switch (entryType) {
 				case FATEntry.Type.GeometricElementTriangles:
-					Value = l.GetOrRead<GeometricElementTriangles>(reader, index);
+					Value = l.GetOrRead<GeometricObjectElementTriangles>(reader, index);
 					break;
 				case FATEntry.Type.GeometricElementSprites:
-					Value = l.GetOrRead<GeometricElementSprites>(reader, index);
+					Value = l.GetOrRead<GeometricObjectElementSprites>(reader, index);
 					break;
 				case FATEntry.Type.VisualMaterial:
 					Value = l.GetOrRead<VisualMaterial>(reader, index);
 					break;
 				case FATEntry.Type.GeometricElementCollideTriangles:
-					Value = l.GetOrRead<GeometricElementCollideTriangles>(reader, index);
+					Value = l.GetOrRead<GeometricObjectElementCollideTriangles>(reader, index);
 					break;
 				case FATEntry.Type.GeometricElementCollideAlignedBoxes:
-					Value = l.GetOrRead<GeometricElementCollideAlignedBoxes>(reader, index);
+					Value = l.GetOrRead<GeometricObjectElementCollideAlignedBoxes>(reader, index);
 					break;
 				case FATEntry.Type.GeometricElementCollideSpheres:
-					Value = l.GetOrRead<GeometricElementCollideSpheres>(reader, index);
+					Value = l.GetOrRead<GeometricObjectElementCollideSpheres>(reader, index);
 					break;
 				case FATEntry.Type.GameMaterial:
 					Value = l.GetOrRead<GameMaterial>(reader, index);

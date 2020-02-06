@@ -119,7 +119,7 @@ namespace OpenSpace.Loader {
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
-			fontStruct = FontStructure.Read(reader,Pointer.Current(reader));
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
 
 			/*
             Pointer off_inputStructure = Pointer.Read(reader);
@@ -353,7 +353,7 @@ namespace OpenSpace.Loader {
 			}
 			for (int i = 0; i < numMeshes; i++) {
 				Pointer.DoAt(ref reader, off_meshes[i], () => {
-					MeshObject mesh = MeshObject.Read(reader, off_meshes[i]);
+					GeometricObject mesh = GeometricObject.Read(reader, off_meshes[i]);
 					meshObjects.Add(mesh);
 					//print("Mesh " + i + ": " + mesh.num_vertices + " - " + mesh.subblock_types[0] + " - " + mesh.num_subblocks);
 				});

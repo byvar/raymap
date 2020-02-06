@@ -182,7 +182,6 @@ namespace OpenSpace.Loader {
 			});
 
 			int sz_entryActions = 0xC0;
-			int sz_fontDefine = 0x0C00;
 
 			reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
 			reader.ReadUInt16();
@@ -207,20 +206,8 @@ namespace OpenSpace.Loader {
 			for (int i = 0; i < 2; i++) {
 				unkMatrices[i] = Pointer.Read(reader);
 			}
-			byte num_fontBitmap = reader.ReadByte();
-			byte num_font = reader.ReadByte();
-			reader.ReadByte();
-			reader.ReadByte();
-			for (int i = 0; i < num_fontBitmap; i++) {
-				Pointer off_fontTexture = Pointer.Read(reader);
-			}
-			Pointer off_fontDefine = Pointer.Read(reader);
-			Pointer.DoAt(ref reader, off_fontDefine, () => {
-				for (int i = 0; i < num_font; i++) {
-					reader.ReadBytes(sz_fontDefine); // Font definition
-					// Consists of 0x100 entries of 0xc length each
-				}
-			});
+			fonts = FromOffsetOrRead<FontStructure>(reader, Pointer.Current(reader), inline: true);
+
 			Pointer off_matrices = Pointer.Read(reader);
 			Pointer off_specialEntryAction = Pointer.Read(reader);
 			Pointer off_identityMatrix = Pointer.Read(reader);
@@ -347,7 +334,7 @@ namespace OpenSpace.Loader {
 			for (int i = 0; i < 21; i++) {
 				Pointer.Read(reader);
 			}
-			fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
 			//print("Yay " + Pointer.Current(reader));
 			reader.ReadUInt16();
 			reader.ReadUInt16();

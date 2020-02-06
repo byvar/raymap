@@ -48,7 +48,8 @@ namespace OpenSpace {
         public LinkedList<Family> families;
 
         public InputStructure inputStruct;
-        public FontStructure fontStruct;
+        public LocalizationStructure localization;
+		public FontStructure fonts;
         public string[] levels;
         public string[] languages;
         public string[] languages_loc;
@@ -70,7 +71,7 @@ namespace OpenSpace {
         public List<VisualMaterial> visualMaterials = new List<VisualMaterial>();
         public List<GameMaterial> gameMaterials = new List<GameMaterial>();
         public List<CollideMaterial> collideMaterials = new List<CollideMaterial>();
-		public List<MeshObject> meshObjects = new List<MeshObject>();
+		public List<GeometricObject> meshObjects = new List<GeometricObject>();
         public List<LightInfo> lights = new List<LightInfo>();
         public List<Sector> sectors = new List<Sector>();
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
@@ -349,11 +350,11 @@ namespace OpenSpace {
 				print(ea.ToString());
 			}
 
-			Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["fontStructure"], mem));
-            fontStruct = FontStructure.Read(reader, Pointer.Current(reader));
+			Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["localizationStructure"], mem));
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
 
-            // Parse actual world & always structure
-            ReadFamilies(reader);
+			// Parse actual world & always structure
+			ReadFamilies(reader);
             ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);
@@ -592,27 +593,59 @@ MonoBehaviour.print(str);
                         textures[i] = TextureInfo.Read(reader, off_texture);
                     });
                 }
-                if (Settings.s.platform == Settings.Platform.GC) {
-                    uint num_textures_menu = reader.ReadUInt32();
-                    TPL fixTPL = new TPL(paths["fix.tpl"]);
-                    TPL menuTPL = new TPL(paths["menu.tpl"]);
-                    for (uint i = 0; i < num_textures_menu; i++) {
-                        Pointer off_texture = Pointer.Read(reader);
-                        TextureInfo tex = textures.Where(t => t.offset == off_texture).First();
-                        tex.Texture = menuTPL.textures[i];
+				if (Settings.s.platform == Settings.Platform.GC) {
+					Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
+					TPL fixTPL = new TPL(paths["fix.tpl"]);
+					if (Settings.s.game == Settings.Game.R3) {
+						uint num_textures_menu = reader.ReadUInt32();
+						TPL menuTPL = new TPL(paths["menu.tpl"]);
+						for (uint i = 0; i < num_textures_menu; i++) {
+							Pointer off_texture = Pointer.Read(reader);
+							TextureInfo tex = textures.Where(t => t.offset == off_texture).First();
+							/*if (exportTextures) {
+								Util.ByteArrayToFile(gameDataBinFolder + "textures/" + tex.name.Substring(0, tex.name.LastIndexOf('.')) + ".png", menuTPL.textures[i].EncodeToPNG());
+							}*/
+							tex.Texture = menuTPL.textures[i];
+						}
+					}
+					for (int i = 0, j = 0; i < num_textures; i++, j++) {
+						uint file_texture = reader.ReadUInt32();
+						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+						if (!texturesSeenFile.ContainsKey(file_texture)) {
+							texturesSeenFile[file_texture] = 0;
+						}
+						Texture2D tex = null;
+						if (file_texture == 0) {
+							tex = fixTPL.textures[texturesSeenFile[file_texture]];
+						}
+						// if it's 8, it's menu and has already been assigned
+						if (exportTextures) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".png", tex.EncodeToPNG());
+						}
+						textures[i].Texture = tex;
+						texturesSeenFile[file_texture]++;
+					}
+				} else if (Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
+					Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
+					BTF fixBTF = new BTF(paths["fix.btf"], paths["fix.bhf"]);
 
-						if (exportTextures) {
-							Util.ByteArrayToFile(gameDataBinFolder + "textures/menu/" + i + ".png", menuTPL.textures[i].EncodeToPNG());
+					for (int i = 0, j = 0; i < num_textures; i++, j++) {
+						uint file_texture = reader.ReadUInt32();
+						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+						if (!texturesSeenFile.ContainsKey(file_texture)) {
+							texturesSeenFile[file_texture] = 0;
 						}
-					}
-                    for (int i = 0, j = 0; i < fixTPL.Count; i++, j++) {
-                        while (textures[j].Texture != null) j++;
-                        textures[j].Texture = fixTPL.textures[i];
-						if (exportTextures) {
-							Util.ByteArrayToFile(gameDataBinFolder + "textures/fix/" + i + ".png", menuTPL.textures[i].EncodeToPNG());
+						Texture2D tex = null;
+						if (file_texture == 0) {
+							tex = fixBTF.GetTexture(texturesSeenFile[file_texture], textures[i].width_, textures[i].height_);
 						}
+						if (exportTextures) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".png", tex.EncodeToPNG());
+						}
+						textures[i].Texture = tex;
+						texturesSeenFile[file_texture]++;
 					}
-                } else if (Settings.s.platform == Settings.Platform.iOS) {
+				} else if (Settings.s.platform == Settings.Platform.iOS) {
                     for (int i = 0; i < num_textures; i++) {
 						loadingState = "Loading fixed textures: " + (i+1) + "/" + num_textures;
 						await WaitIfNecessary();
@@ -627,13 +660,14 @@ MonoBehaviour.print(str);
 						loadingState = "Loading fixed textures: " + (i + 1) + "/" + num_textures;
 						GF gf = await cnt.PrepareGFByTGAName(textures[i].name);
 						if (gf != null) textures[i].Texture = gf.GetTexture();
-                    }
-                }
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                    for (uint i = 0; i < num_textures; i++) {
-                        reader.ReadUInt32(); // 0 or 8.
-                    }
-                }
+					}
+					// Memory channels, eg which file is this
+					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+						for (uint i = 0; i < num_textures; i++) {
+							reader.ReadUInt32(); // 0 or 8.
+						}
+					}
+				}
             }
 
 			loadingState = state;
@@ -673,58 +707,96 @@ MonoBehaviour.print(str);
             }
 			if (Settings.s.platform == Settings.Platform.GC) {
 				// Load textures from TPL
+				//TPL fixTPL = null;
 				TPL lvlTPL = new TPL(paths["lvl.tpl"]);
 				TPL transitTPL = hasTransit ? new TPL(paths["transit.tpl"]) : null;
 				print("Lvl TPL Texture count: " + lvlTPL.Count);
 				if (hasTransit) print("Transit TPL Texture count: " + transitTPL.Count);
-				int transitTexturesSeen = 0;
+				Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
 				for (uint i = num_textures_fix; i < num_textures_total; i++) {
+					Texture2D tex = null;
 					uint file_texture = reader.ReadUInt32();
-					if (hasTransit && file_texture == 6) {
-						textures[i].Texture = transitTPL.textures[transitTexturesSeen++];
+					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+					if (!texturesSeenFile.ContainsKey(file_texture)) {
+						texturesSeenFile[file_texture] = 0;
+					}
+					if (file_texture == 0) {
+						/*if (fixBTF == null) fixBTF = new BTF(paths["fix.btf"], paths["fix.bhf"]);
+						tex = fixBTF.textures[num_textures_fix + texturesSeenFile[file_texture]];*/
+						if (!texturesSeenFile.ContainsKey(2)) texturesSeenFile[2] = 0;
+						tex = lvlTPL.textures[texturesSeenFile[file_texture]];
+						texturesSeenFile[2]++;
+					} else if (hasTransit && file_texture == 6) {
+						tex = transitTPL.textures[texturesSeenFile[file_texture]];
 					} else {
-						textures[i].Texture = lvlTPL.textures[i - num_textures_fix - transitTexturesSeen];
+						tex = lvlTPL.textures[texturesSeenFile[file_texture]];
 					}
+					if (exportTextures) {
+						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".png", tex.EncodeToPNG());
+					}
+					textures[i].Texture = tex;
+					texturesSeenFile[file_texture]++;
 				}
-				if (exportTextures) {
-					if (transitTPL != null) {
-						for (int i = 0; i < transitTPL.textures.Length; i++) {
-							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(transitTPL.path) + "/" + i + ".png", transitTPL.textures[i].EncodeToPNG());
-						}
-					}
-					if (lvlTPL != null) {
-						for (int i = 0; i < lvlTPL.textures.Length; i++) {
-							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(lvlTPL.path) + "/" + i + ".png", lvlTPL.textures[i].EncodeToPNG());
-						}
-					}
-				}
-			} else if(Settings.s.platform == Settings.Platform.Xbox) {
+			} else if(Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
 				// Load textures from TPL
-				TPL lvlTPL = new TPL(paths["lvl.tpl"]);
-				TPL transitTPL = hasTransit ? new TPL(paths["transit.tpl"]) : null;
-				print("Lvl TPL Texture count: " + lvlTPL.Count);
-				if (hasTransit) print("Transit TPL Texture count: " + transitTPL.Count);
-				int transitTexturesSeen = 0;
+				BTF fixBTF = null;
+				BTF lvlBTF = new BTF(paths["lvl.btf"], paths["lvl.bhf"]);
+				BTF transitBTF = hasTransit ? new BTF(paths["transit.btf"], paths["transit.bhf"]) : null;
+				print("Lvl TPL Texture count: " + lvlBTF.Count);
+				if (hasTransit) print("Transit TPL Texture count: " + transitBTF.Count);
+				Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
+				/*int num_textures_level_real = 0;
+				Pointer off_current = Pointer.Current(reader);
+				for (uint i = num_textures_fix; i < num_textures_total; i++) {
+					uint file_texture = Settings.s.engineVersion == Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
+					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+					num_textures_level_real++;
+				}
+				Pointer.Goto(ref reader, off_current);*/
 				for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					uint file_texture = reader.ReadUInt32();
-					if (hasTransit && file_texture == 6) {
-						textures[i].Texture = transitTPL.textures[transitTexturesSeen++];
+					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+					if (!texturesSeenFile.ContainsKey(file_texture)) {
+						texturesSeenFile[file_texture] = 0;
+					}
+					//print(textures[i].name + " - " + textures[i].offset);
+					//print(i + " - " + texturesSeenFile[file_texture]);
+					Texture2D tex = null;
+					if (file_texture == 0) {
+						if(fixBTF == null) fixBTF = new BTF(paths["fix.btf"], paths["fix.bhf"]);
+						tex = fixBTF.GetTexture((int)num_textures_fix + texturesSeenFile[file_texture], textures[i].width_, textures[i].height_);
+						if (Settings.s.game == Settings.Game.RA) {
+							if (!texturesSeenFile.ContainsKey(2)) texturesSeenFile[2] = 0;
+							texturesSeenFile[2]++;
+						}
+					} else if (hasTransit && file_texture == 6) {
+						tex = transitBTF.GetTexture(texturesSeenFile[file_texture], textures[i].width_, textures[i].height_);
 					} else {
-						textures[i].Texture = lvlTPL.textures[i - num_textures_fix - transitTexturesSeen];
+						tex = lvlBTF.GetTexture(texturesSeenFile[file_texture], textures[i].width_, textures[i].height_);
 					}
+					if (exportTextures) {
+						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".png", tex.EncodeToPNG());
+					}
+					textures[i].Texture = tex;
+					texturesSeenFile[file_texture]++;
 				}
-				if (exportTextures) {
-					if (transitTPL != null) {
-						for (int i = 0; i < transitTPL.textures.Length; i++) {
-							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(transitTPL.path) + "/" + i + ".png", transitTPL.textures[i].EncodeToPNG());
+				/*if (exportTextures) {
+					if (transitBTF != null) {
+						for (int i = 0; i < transitBTF.textures.Length; i++) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(transitBTF.path) + "/" + i + ".png", transitBTF.textures[i].EncodeToPNG());
 						}
 					}
-					if (lvlTPL != null) {
-						for (int i = 0; i < lvlTPL.textures.Length; i++) {
-							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(lvlTPL.path) + "/" + i + ".png", lvlTPL.textures[i].EncodeToPNG());
+					if (fixBTF != null) {
+						for (int i = 0; i < fixBTF.textures.Length; i++) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/fix/" + i + ".png", fixBTF.textures[i].EncodeToPNG());
 						}
 					}
-				}
+					if (lvlBTF != null) {
+						for (int i = 0; i < lvlBTF.textures.Length; i++) {
+							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + Path.GetFileNameWithoutExtension(lvlBTF.path) + "/" + i + ".png", lvlBTF.textures[i].EncodeToPNG());
+						}
+					}
+				}*/
 			} else if (Settings.s.platform == Settings.Platform.iOS) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {

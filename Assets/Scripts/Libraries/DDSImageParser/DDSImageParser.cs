@@ -35,6 +35,38 @@ namespace DDSImageParser {
 			}
 		}
 
+		public DDSImage(BinaryReader reader) {
+			if (reader == null) return;
+			this.Parse(reader);
+		}
+
+		/// <summary>
+		/// For headerless DDS textures
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <param name="pixelFormat"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		public DDSImage(byte[] data, PixelFormat pixelFormat, uint width, uint height) {
+			DDSStruct header = new DDSStruct();
+			header.pixelformat = new DDSStruct.pixelformatstruct() { rgbbitcount = 32 };
+			header.height = height;
+			header.width = width;
+			header.depth = 1;
+			if (data != null) {
+				byte[] rawData = null;
+				switch (pixelFormat) {
+					case PixelFormat.DXT1:
+						rawData = this.DecompressDXT1(header, data, pixelFormat);
+						break;
+					case PixelFormat.DXT5:
+						rawData = this.DecompressDXT5(header, data, pixelFormat);
+						break;
+				}
+				this.m_bitmap = this.CreateBitmap((int)header.width, (int)header.height, rawData);
+			}
+		}
+
 		private DDSImage(Texture2D bitmap) {
 			this.m_bitmap = bitmap;
 		}
@@ -792,7 +824,6 @@ namespace DDSImageParser {
 					for (int x = 0; x < width; x += 4) {
 						if (y >= height || x >= width)
 							break;
-
 						alphas[0] = data[temp + 0];
 						alphas[1] = data[temp + 1];
 						int alphamask = (temp + 2);
@@ -1166,7 +1197,7 @@ namespace DDSImageParser {
 		/// <summary>
 		/// Various pixel formats/compressors used by the DDS image.
 		/// </summary>
-		private enum PixelFormat {
+		public enum PixelFormat {
 			/// <summary>
 			/// 32-bit image, with 8-bit red, green, blue and alpha.
 			/// </summary>

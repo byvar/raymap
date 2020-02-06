@@ -303,17 +303,17 @@ namespace OpenSpace.Exporter {
             string[] usingItems = new string[] { "UnityEngine", "OpenSpaceImplementation.Strings", "OpenSpaceImplementation" };
             string usingBlock = string.Join(Environment.NewLine, usingItems.Select(i => "using " + i + ";"));
 
-            if (loader?.fontStruct?.languages==null) {
+            if (loader?.localization?.languages==null) {
                 return;
             }
 
-            int numLanguages = loader.fontStruct.languages.Length;
+            int numLanguages = loader.localization.languages.Length;
             int numTextsPerLanguage = 0;
 
             List<string> textEntries = new List<string>();
             int languageIndex = 0;
 
-            foreach (FontStructure.TextTable textTable in loader.fontStruct.languages) {
+            foreach (LocalizationStructure.TextTable textTable in loader.localization.languages) {
                 if (textTable.num_entries > numTextsPerLanguage) {
                     numTextsPerLanguage = textTable.num_entries;
                 }
@@ -329,7 +329,7 @@ namespace OpenSpace.Exporter {
             }
 
             string textManagerConstructor = "public TextManager() {" + Environment.NewLine +
-                "InitTable(" + loader.fontStruct.num_languages + ", " + loader.fontStruct.languages[0].num_entries_max + ");" + Environment.NewLine + Environment.NewLine +
+                "InitTable(" + loader.localization.num_languages + ", " + loader.localization.languages[0].num_entries_max + ");" + Environment.NewLine + Environment.NewLine +
                 string.Join(Environment.NewLine, textEntries) +
                 Environment.NewLine +
                 "}";

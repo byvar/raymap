@@ -26,7 +26,6 @@ namespace OpenSpace.Input {
 						if (Settings.s.game == Settings.Game.R3) {
 							reader.ReadBytes(0x12E0);
 						} else if (Settings.s.game == Settings.Game.RA
-							|| Settings.s.game == Settings.Game.RM
 							|| Settings.s.game == Settings.Game.DDPK) {
 							//reader.ReadBytes(0x16e8);
 							reader.ReadBytes(0x12C8);
@@ -48,6 +47,7 @@ namespace OpenSpace.Input {
 						reader.ReadBytes(0x418);
 						break;
 					case Settings.Platform.Xbox:
+					case Settings.Platform.Xbox360:
 						reader.ReadBytes(0x16BC);
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);

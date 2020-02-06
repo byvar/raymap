@@ -10,7 +10,7 @@ namespace OpenSpace.ROM.RSP {
 		public static Mesh Parse(RSPCommand[] commands, VertexArray.Vertex[] vertices, GeometricObject go, bool backfaceCulling, Material mat) {
 			List<VertexArray.Vertex> verts = new List<VertexArray.Vertex>();
 			Dictionary<int, int> vertexBufferMapping = new Dictionary<int, int>();
-			List<GeometricElementTrianglesData.Triangle> triangles = new List<GeometricElementTrianglesData.Triangle>();
+			List<GeometricObjectElementTrianglesData.Triangle> triangles = new List<GeometricObjectElementTrianglesData.Triangle>();
 			Texture tex = mat.GetTexture("_Tex0");
 			float wFactor = 64f, hFactor = 64f;
 			if (tex != null) {
@@ -74,19 +74,19 @@ namespace OpenSpace.ROM.RSP {
 						verts.Add(vtx);
 						break;
 					case RSPCommand.Type.RSP_GBI1_Tri1:
-						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+						triangles.Add(new GeometricObjectElementTrianglesData.Triangle() {
 							v1 = (ushort)vertexBufferMapping[c.tri1.v0],
 							v2 = (ushort)vertexBufferMapping[c.tri1.v1],
 							v3 = (ushort)vertexBufferMapping[c.tri1.v2],
 						});
 						break;
 					case RSPCommand.Type.RSP_GBI1_Tri2:
-						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+						triangles.Add(new GeometricObjectElementTrianglesData.Triangle() {
 							v1 = (ushort)vertexBufferMapping[c.tri2.v0],
 							v2 = (ushort)vertexBufferMapping[c.tri2.v1],
 							v3 = (ushort)vertexBufferMapping[c.tri2.v2],
 						});
-						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+						triangles.Add(new GeometricObjectElementTrianglesData.Triangle() {
 							v1 = (ushort)vertexBufferMapping[c.tri2.v3],
 							v2 = (ushort)vertexBufferMapping[c.tri2.v4],
 							v3 = (ushort)vertexBufferMapping[c.tri2.v5],
@@ -115,7 +115,7 @@ namespace OpenSpace.ROM.RSP {
 		public static Vector3[] ParseVerticesOnly(RSPCommand[] commands, VertexArray.Vertex[] vertices, GeometricObject go) {
 			List<VertexArray.Vertex> verts = new List<VertexArray.Vertex>();
 			Dictionary<int, int> vertexBufferMapping = new Dictionary<int, int>();
-			List<GeometricElementTrianglesData.Triangle> triangles = new List<GeometricElementTrianglesData.Triangle>();
+			List<GeometricObjectElementTrianglesData.Triangle> triangles = new List<GeometricObjectElementTrianglesData.Triangle>();
 			Mesh mesh = new Mesh();
 			for (int i = 0; i < Math.Min(32, vertices.Length); i++) {
 				int curVertsCount = i;
@@ -173,19 +173,19 @@ namespace OpenSpace.ROM.RSP {
 						verts.Add(vtx);
 						break;
 					case RSPCommand.Type.RSP_GBI1_Tri1:
-						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+						triangles.Add(new GeometricObjectElementTrianglesData.Triangle() {
 							v1 = (ushort)vertexBufferMapping[c.tri1.v0],
 							v2 = (ushort)vertexBufferMapping[c.tri1.v1],
 							v3 = (ushort)vertexBufferMapping[c.tri1.v2],
 						});
 						break;
 					case RSPCommand.Type.RSP_GBI1_Tri2:
-						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+						triangles.Add(new GeometricObjectElementTrianglesData.Triangle() {
 							v1 = (ushort)vertexBufferMapping[c.tri2.v0],
 							v2 = (ushort)vertexBufferMapping[c.tri2.v1],
 							v3 = (ushort)vertexBufferMapping[c.tri2.v2],
 						});
-						triangles.Add(new GeometricElementTrianglesData.Triangle() {
+						triangles.Add(new GeometricObjectElementTrianglesData.Triangle() {
 							v1 = (ushort)vertexBufferMapping[c.tri2.v3],
 							v2 = (ushort)vertexBufferMapping[c.tri2.v4],
 							v3 = (ushort)vertexBufferMapping[c.tri2.v5],

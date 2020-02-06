@@ -24,6 +24,7 @@ namespace OpenSpace.Loader {
 		public List<Graph> graphsROM = new List<Graph>();
 		public List<WayPoint> waypointsROM = new List<WayPoint>();
 		public LevelHeader level;
+		public LanguageTable[] localizationROM = null;
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;
@@ -319,12 +320,13 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 			NumLanguages numLanguages = GetOrRead<NumLanguages>(reader, 0);
 			print("Number of languages: " + numLanguages.num_languages);
+			localizationROM = new LanguageTable[numLanguages.num_languages];
 			for (ushort i = 0; i < numLanguages.num_languages; i++) {
 				loadingState = "Loading language table " + (i + 1) + "/" + numLanguages.num_languages;
 				await WaitIfNecessary();
-				LanguageTable lang = GetOrRead<LanguageTable>(reader, i);
-				if (lang != null) {
-					print(lang.name);
+				localizationROM[i] = GetOrRead<LanguageTable>(reader, i);
+				if (localizationROM[i] != null) {
+					print(localizationROM[i].name);
 				}
 			}
 
@@ -629,6 +631,14 @@ namespace OpenSpace.Loader {
 
 		public T Get<T>(ushort index) where T : ROMStruct {
 			FATEntry.Type type = FATEntry.types[typeof(T)];
+			// Special treatment for EntryActions
+			if (type == FATEntry.Type.EntryAction
+				&& ((index & (ushort)FATEntry.Flag.Fix) != (ushort)FATEntry.Flag.Fix)) {
+				ushort ind = (ushort)(index | (ushort)FATEntry.Flag.Fix);
+				if (romStructs.ContainsKey(type) && romStructs[type].ContainsKey(ind)) {
+					return romStructs[type][ind] as T;
+				}
+			}
 			if (!romStructs.ContainsKey(type) || !romStructs[type].ContainsKey(index)) return null;
 			return romStructs[type][index] as T;
 		}
@@ -638,7 +648,19 @@ namespace OpenSpace.Loader {
 			if (rs == null) {
 				if (index != 0xFFFF) {
 					FATEntry.Type type = FATEntry.types[typeof(T)];
-					Pointer offset = GetStructPtr(type, index);
+					Pointer offset = null;
+					// For some reason, this type receives special treatment
+					if (type == FATEntry.Type.EntryAction
+						&& ((index & (ushort)FATEntry.Flag.Fix) != (ushort)FATEntry.Flag.Fix)) {
+						ushort fixIndex = (ushort)(index | (ushort)FATEntry.Flag.Fix);
+						offset = GetStructPtr(type, fixIndex);
+						if (offset != null) {
+							index = fixIndex;
+						}
+					}
+					if (offset == null) {
+						offset = GetStructPtr(type, index);
+					}
 					if (offset != null) {
 						if (!romStructs.ContainsKey(type)) {
 							romStructs[type] = new Dictionary<ushort, ROMStruct>();

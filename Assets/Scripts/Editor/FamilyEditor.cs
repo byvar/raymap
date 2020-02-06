@@ -14,8 +14,8 @@ public class FamilyEditor : Editor {
 
         if (GUILayout.Button("Rebuild")) {
             var obj = fc.family.objectLists[0].entries[0].po.visualSet[0].obj;
-            ((obj as MeshObject).subblocks[0] as MeshElement).Reset();
-            var test = ((obj as MeshObject).subblocks[0] as MeshElement).Gao;
+            ((obj as GeometricObject).elements[0] as GeometricObjectElementTriangles).Reset();
+            var test = ((obj as GeometricObject).elements[0] as GeometricObjectElementTriangles).Gao;
         }
 
         GUILayout.BeginVertical();

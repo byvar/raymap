@@ -126,9 +126,7 @@ namespace OpenSpace.Loader {
             reader.ReadUInt16();
             reader.ReadUInt32(); // base
             Pointer off_text_general = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_text_general, () => {
-                fontStruct = FontStructure.Read(reader, off_text_general);
-            });
+            localization = FromOffsetOrRead<LocalizationStructure>(reader, off_text_general);
             Pointer off_inputStructure = Pointer.Read(reader);
             Pointer.DoAt(ref reader, off_inputStructure, () => {
                 inputStruct = InputStructure.Read(reader, off_inputStructure);
@@ -175,7 +173,7 @@ namespace OpenSpace.Loader {
             Pointer.DoAt(ref reader, off_languages, () => {
                 ReadLanguages(reader, off_languages, num_languages);
             });
-            if (languages != null && fontStruct != null) {
+            if (languages != null && localization != null) {
                 for (int i = 0; i < num_languages; i++) {
                     loadingState = "Loading text files: " + (i+1) + "/" + num_languages;
                     string langFilePath = gameDataBinFolder + "TEXTS/" + languages[i].ToUpper() + ".LNG";
@@ -183,7 +181,7 @@ namespace OpenSpace.Loader {
                     files_array[2] = new DCDAT(languages[i], langFilePath, 2);
                     ((DCDAT)files_array[2]).SetHeaderOffset(base_language);
                     files_array[2].GotoHeader();
-                    fontStruct.ReadLanguageTableDreamcast(files_array[2].reader, i, (ushort)num_text_language);
+                    localization.ReadLanguageTableDreamcast(files_array[2].reader, i, (ushort)num_text_language);
                     files_array[2].Dispose();
                 }
             }

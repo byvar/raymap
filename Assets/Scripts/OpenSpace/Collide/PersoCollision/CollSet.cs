@@ -17,7 +17,7 @@ namespace OpenSpace.Collide {
 		public Dictionary<CollideType, int> privilegedActivations = new Dictionary<CollideType, int>(); 
 
 		// Generated
-		public Dictionary<CollideType, LinkedList<CollideMeshObject>> zdxList = new Dictionary<CollideType, LinkedList<CollideMeshObject>>();
+		public Dictionary<CollideType, LinkedList<GeometricObjectCollide>> zdxList = new Dictionary<CollideType, LinkedList<GeometricObjectCollide>>();
 		public Dictionary<CollideType, LinkedList<CollideActivation>> activationList = new Dictionary<CollideType, LinkedList<CollideActivation>>();
 		public Dictionary<CollideType, LinkedList<CollideActivationZone>> zones = new Dictionary<CollideType, LinkedList<CollideActivationZone>>();
 
@@ -74,9 +74,9 @@ namespace OpenSpace.Collide {
 			foreach (KeyValuePair<CollideType, Pointer> entry in c.off_zdxList) {
 				Pointer.DoAt(ref reader, entry.Value, () => {
 					//zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
-					c.zdxList[entry.Key] = LinkedList<CollideMeshObject>.Read(ref reader, entry.Value,
+					c.zdxList[entry.Key] = LinkedList<GeometricObjectCollide>.Read(ref reader, entry.Value,
 						(off_element) => {
-							CollideMeshObject col = CollideMeshObject.Read(reader, off_element, type: entry.Key);
+							GeometricObjectCollide col = GeometricObjectCollide.Read(reader, off_element, type: entry.Key);
 							col.gao.transform.SetParent(perso.Gao.transform);
 							return col;
 						},

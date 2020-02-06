@@ -6,8 +6,8 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Visual.Deform {
-    public class DeformSet : IGeometricElement {
-        [JsonIgnore] public MeshObject mesh;
+    public class DeformSet : IGeometricObjectElement {
+        [JsonIgnore] public GeometricObject mesh;
         public Pointer offset;
 		
         public Pointer off_weights;
@@ -33,7 +33,7 @@ namespace OpenSpace.Visual.Deform {
             }
         }
 
-        public DeformSet(Pointer offset, MeshObject mesh) {
+        public DeformSet(Pointer offset, GeometricObject mesh) {
             this.mesh = mesh;
             this.offset = offset;
         }
@@ -77,7 +77,7 @@ namespace OpenSpace.Visual.Deform {
         }
         
 
-        public static DeformSet Read(Reader reader, Pointer offset, MeshObject m) {
+        public static DeformSet Read(Reader reader, Pointer offset, GeometricObject m) {
             MapLoader l = MapLoader.Loader;
             DeformSet d = new DeformSet(offset, m);
             d.off_weights = Pointer.Read(reader);
@@ -154,7 +154,7 @@ namespace OpenSpace.Visual.Deform {
             gao = null;
         }
 
-        public IGeometricElement Clone(MeshObject mesh) {
+        public IGeometricObjectElement Clone(GeometricObject mesh) {
             DeformSet d = (DeformSet)MemberwiseClone();
             d.Reset();
             d.mesh = mesh;

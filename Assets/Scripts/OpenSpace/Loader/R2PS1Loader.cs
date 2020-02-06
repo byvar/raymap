@@ -49,7 +49,16 @@ namespace OpenSpace.Loader {
 					await WaitIfNecessary();
 					for(int i = 0; i < memoryBlocks.Count; i++) {
 						MemoryBlock b = memoryBlocks[i];
-						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_compr.blk", ExtractBlock(reader, b.compressed, 0x1f4, compression: true));
+						List<byte[]> mainBlock = ExtractPackedBlocks(reader, b.compressed, 0x1f4);
+						for (int j = 0; j < mainBlock.Count; j++) {
+							if (j == 0) {
+								Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_loading.tim", mainBlock[j]);
+							} else if(mainBlock[j].Length == 0xB0000) {
+								Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_textures.bin", mainBlock[j]);
+							} else {
+								Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_" + j + ".blk", mainBlock[j]);
+							}
+						}
 						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_fat_and_anims.blk", ExtractBlock(reader, b.filetable, 0x1f4));
 						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_uncompr.blk", ExtractBlock(reader, b.uncompressed, 0x1f4));
 						for (int j = 0; j < b.cutscenes.Count; j++) {
@@ -59,6 +68,7 @@ namespace OpenSpace.Loader {
 								Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
 							}
 						}
+						//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
 						await WaitIfNecessary();
 					}
 				}
@@ -73,6 +83,41 @@ namespace OpenSpace.Loader {
             await WaitIfNecessary();
             InitModdables();
         }
+
+		public void ParseMainBlock(byte[] data, MemoryBlock block, int index, string basename) {
+			using (MemoryStream ms = new MemoryStream(data)) {
+				using (Reader reader = new Reader(ms, Settings.s.IsLittleEndian)) {
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+					uint loadingImgSize = reader.ReadUInt32();
+					reader.ReadUInt32();
+					uint sz2 = reader.ReadUInt32();
+					byte[] loadingImg = reader.ReadBytes((int)loadingImgSize - 14);
+					Util.ByteArrayToFile(basename + "_loading.img", loadingImg);
+					reader.ReadUInt32();
+					if (index < 57) {
+						if (block.isSomething) {
+							uint i = 0;
+							int size = reader.ReadInt32();
+							while (size != 0) {
+								byte[] playableData = reader.ReadBytes(size * 4 * 2);
+								Util.ByteArrayToFile(basename + "_playableData_" + i + ".img", playableData);
+								print(string.Format("{0:X8}",reader.BaseStream.Position));
+								size = reader.ReadInt32();
+								i++;
+							}
+							//byte[] some
+						}
+						byte[] textureMem = reader.ReadBytes(0xB0000);
+						Util.ByteArrayToFile(basename + "_textures.img", textureMem);
+						byte[] preExeData = reader.ReadBytes(0x200);
+						Util.ByteArrayToFile(basename + "_preExeData.blk", preExeData);
+					}
+					byte[] exe = reader.ReadBytes((int)reader.BaseStream.Length - (int)reader.BaseStream.Position);
+					Util.ByteArrayToFile(basename + ".pxe", exe);
+				}
+			}
+		}
 
 		public byte[] DecompressCutsceneAudio(byte[] cutsceneData) {
 			List<byte[]> bytes = new List<byte[]>();
@@ -110,80 +155,88 @@ namespace OpenSpace.Loader {
 			return bytes.SelectMany(i => i).ToArray();
 		}
 
-		public byte[] ExtractBlock(Reader reader, LBA lba, uint baseOffset, bool compression = false) {
+		public byte[] ExtractBlock(Reader reader, LBA lba, uint baseOffset) {
 			byte[] data;
 			if (lba.lba < baseOffset || lba.size <= 0) return null;
 			reader.BaseStream.Seek((lba.lba - baseOffset) * 0x800, SeekOrigin.Begin);
-			if (compression) {
-				data = new byte[0];
-				uint end = (lba.lba + lba.size - baseOffset) * 0x800;
-				bool previousWasZero = false;
-				bool previousWasFF = false;
-				while (reader.BaseStream.Position < end) {
-					uint decompressedSize = reader.ReadUInt32(); // 0x8000
-					if (previousWasFF) {
-						if (decompressedSize == 0xFFFFFFFF && reader.ReadUInt32() == 0) {
-							reader.Align(0x800);
-							previousWasFF = false;
-						} else {
-							reader.BaseStream.Position = 0x800 * (reader.BaseStream.Position / 0x800);
-							byte[] uncompressedData = reader.ReadBytes(0x800);
-							if (uncompressedData != null) {
-								int originalDataLength = data.Length;
-								Array.Resize(ref data, originalDataLength + uncompressedData.Length);
-								Array.Copy(uncompressedData, 0, data, originalDataLength, uncompressedData.Length);
-							}
-						}
+			
+			data = reader.ReadBytes((int)lba.size);
+			return data;
+		}
+		public List<byte[]> ExtractPackedBlocks(Reader reader, LBA lba, uint baseOffset) {
+			List<byte[]> datas = new List<byte[]>();
+			byte[] data;
+			if (lba.lba < baseOffset || lba.size <= 0) return null;
+			reader.BaseStream.Seek((lba.lba - baseOffset) * 0x800, SeekOrigin.Begin);
+
+			data = new byte[0];
+			uint end = (lba.lba + lba.size - baseOffset) * 0x800;
+			bool previousWasZero = false;
+			bool previousWasFF = false;
+			while (reader.BaseStream.Position < end) {
+				uint decompressedSize = reader.ReadUInt32(); // 0x8000
+				if (previousWasFF) {
+					if (decompressedSize == 0xFFFFFFFF && reader.ReadUInt32() == 0) {
+						reader.Align(0x800);
+						previousWasFF = false;
 					} else {
-						if (decompressedSize == 0) {
-							if (previousWasZero) {
-								reader.Align(0x800);
-								previousWasZero = false;
-								break;
-							} else {
-								previousWasZero = true;
-							}
-							previousWasFF = false;
-							// If previous was zero, then padding to 0x800. If previous was not zero, then new file.
-							print(decompressedSize + " - " + String.Format("0x{0:X8}", reader.BaseStream.Position));
-							continue;
-						} else if (decompressedSize == 0xFFFFFFFF) {
-							if (previousWasZero) {
-								reader.Align(0x800);
-								previousWasFF = true;
-							}
-							previousWasZero = false;
-							continue;
-						} else {
-							previousWasZero = false;
-							previousWasFF = false;
-						}
-						uint compressedSize = reader.ReadUInt32();
-						print(decompressedSize + " - " + String.Format("0x{0:X8}", reader.BaseStream.Position));
-						byte[] uncompressedData = null;
-						byte[] compressedData = reader.ReadBytes((int)compressedSize);
-						using (var compressedStream = new MemoryStream(compressedData))
-						using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
-						using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
-							lzo.SetLength(decompressedSize);
-							uncompressedData = lzoReader.ReadBytes((int)decompressedSize);
-						}
+						reader.BaseStream.Position = 0x800 * (reader.BaseStream.Position / 0x800);
+						byte[] uncompressedData = reader.ReadBytes(0x800);
 						if (uncompressedData != null) {
 							int originalDataLength = data.Length;
 							Array.Resize(ref data, originalDataLength + uncompressedData.Length);
 							Array.Copy(uncompressedData, 0, data, originalDataLength, uncompressedData.Length);
 						}
 					}
+				} else {
+					if (decompressedSize == 0) {
+						if (previousWasZero) {
+							reader.Align(0x800);
+							previousWasZero = false;
+							break;
+						} else {
+							previousWasZero = true;
+						}
+						previousWasFF = false;
+						// If previous was zero, then padding to 0x800. If previous was not zero, then new file.
+						print(decompressedSize + " - " + String.Format("0x{0:X8}", reader.BaseStream.Position));
+						datas.Add(data);
+						data = new byte[0];
+						continue;
+					} else if (decompressedSize == 0xFFFFFFFF) {
+						if (previousWasZero) {
+							reader.Align(0x800);
+							previousWasFF = true;
+						}
+						previousWasZero = false;
+						continue;
+					} else {
+						previousWasZero = false;
+						previousWasFF = false;
+					}
+					uint compressedSize = reader.ReadUInt32();
+					print(decompressedSize + " - " + String.Format("0x{0:X8}", reader.BaseStream.Position));
+					byte[] uncompressedData = null;
+					byte[] compressedData = reader.ReadBytes((int)compressedSize);
+					using (var compressedStream = new MemoryStream(compressedData))
+					using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
+					using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+						lzo.SetLength(decompressedSize);
+						uncompressedData = lzoReader.ReadBytes((int)decompressedSize);
+					}
+					if (uncompressedData != null) {
+						int originalDataLength = data.Length;
+						Array.Resize(ref data, originalDataLength + uncompressedData.Length);
+						Array.Copy(uncompressedData, 0, data, originalDataLength, uncompressedData.Length);
+					}
 				}
-			} else {
-				data = reader.ReadBytes((int)lba.size);
 			}
-			/*if (data.Length > 0) {
-				Util.ByteArrayToFile(name, data);
-			}*/
-			return data;
+			if (data.Length > 0) {
+				datas.Add(data);
+			}
+			return datas;
 		}
-    }
+	}
 
 	public class LBA {
 		public uint lba;

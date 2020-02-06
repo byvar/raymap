@@ -350,10 +350,10 @@ public class PersoBehaviour : MonoBehaviour {
 	public void UpdateViewCollision(bool viewCollision) {
 		if (perso.collset != null) {
 			CollSet c = perso.collset;
-			foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<CollideMeshObject>> entry in c.zdxList) {
+			foreach (KeyValuePair<CollideType, OpenSpace.LinkedList<GeometricObjectCollide>> entry in c.zdxList) {
 				if (entry.Value != null) {
 					for (int i = 0; i < entry.Value.Count; i++) {
-						CollideMeshObject col = entry.Value[i];
+						GeometricObjectCollide col = entry.Value[i];
 						if (col == null) continue;
 						if (viewCollision && c.GetPrivilegedActionZoneStatus(entry.Key, i) == CollSet.PrivilegedActivationStatus.ForceActive) {
 							col.SetVisualsActive(true);
@@ -968,9 +968,9 @@ public class PersoBehaviour : MonoBehaviour {
 
 						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
 							IGeometricObject obj = physicalObject.visualSet[j].obj;
-							if (obj == null || obj as MeshObject == null) continue;
-							MeshObject fromM = obj as MeshObject;
-							MeshObject toM = morphToPO.visualSet[j].obj as MeshObject;
+							if (obj == null || obj as GeometricObject == null) continue;
+							GeometricObject fromM = obj as GeometricObject;
+							GeometricObject toM = morphToPO.visualSet[j].obj as GeometricObject;
 							if (toM == null) continue;
 							if (fromM.vertices.Length != toM.vertices.Length) {
 								// For those special cases like the mistake in the Clark cinematic
@@ -981,9 +981,9 @@ public class PersoBehaviour : MonoBehaviour {
 							for (int vi = 0; vi < numVertices; vi++) {
 								morphVerts[vi] = Vector3.Lerp(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
 							}
-							for (int k = 0; k < fromM.num_subblocks; k++) {
-								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
-								MeshElement el = (MeshElement)fromM.subblocks[k];
+							for (int k = 0; k < fromM.num_elements; k++) {
+								if (fromM.elements[k] == null || fromM.element_types[k] != 1) continue;
+								GeometricObjectElementTriangles el = (GeometricObjectElementTriangles)fromM.elements[k];
 								if (el != null) el.UpdateMeshVertices(morphVerts);
 							}
 						}
@@ -998,11 +998,11 @@ public class PersoBehaviour : MonoBehaviour {
 					} else {
 						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
 							IGeometricObject obj = physicalObject.visualSet[j].obj;
-							if (obj == null || obj as MeshObject == null) continue;
-							MeshObject fromM = obj as MeshObject;
-							for (int k = 0; k < fromM.num_subblocks; k++) {
-								if (fromM.subblocks[k] == null || fromM.subblock_types[k] != 1) continue;
-								MeshElement el = (MeshElement)fromM.subblocks[k];
+							if (obj == null || obj as GeometricObject == null) continue;
+							GeometricObject fromM = obj as GeometricObject;
+							for (int k = 0; k < fromM.num_elements; k++) {
+								if (fromM.elements[k] == null || fromM.element_types[k] != 1) continue;
+								GeometricObjectElementTriangles el = (GeometricObjectElementTriangles)fromM.elements[k];
 								if (el != null) el.ResetVertices();
 							}
 						}
