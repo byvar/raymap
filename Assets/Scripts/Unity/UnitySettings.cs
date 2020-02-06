@@ -1,12 +1,16 @@
 ﻿using OpenSpace;
 using System;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 /// <summary>
 /// Settings for Raymap
 /// </summary>
+#if UNITY_EDITOR
 [InitializeOnLoad]
+#endif
 public class UnitySettings
 {
 	public static Dictionary<Settings.Mode, string> GameDirs = new Dictionary<Settings.Mode, string>();
@@ -27,10 +31,12 @@ public class UnitySettings
 	public static string ExportPath { get; set; } = "./exports/";
 	public static bool ExportAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
 
-	/// <summary>
-	/// Saves the settings
-	/// </summary>
-	public static void Save() {
+    #if UNITY_EDITOR
+
+    /// <summary>
+    /// Saves the settings
+    /// </summary>
+    public static void Save() {
 		Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
 		foreach (Settings.Mode mode in modes) {
 			string dir = GameDirs.ContainsKey(mode) ? GameDirs[mode] : "";
@@ -59,11 +65,11 @@ public class UnitySettings
 		EditorPrefs.SetBool("SaveTextures", SaveTextures);
 	}
 
-	/// <summary>
-	/// Static constructor loads in editor data at editor startup.
-	/// This way, the data loads even if the editor window isn't active.
-	/// </summary>
-	static UnitySettings() {
+    /// <summary>
+    /// Static constructor loads in editor data at editor startup.
+    /// This way, the data loads even if the editor window isn't active.
+    /// </summary>
+    static UnitySettings() {
 		Load();
 	}
 
@@ -99,4 +105,6 @@ public class UnitySettings
 		BlockyMode = EditorPrefs.GetBool("BlockyMode", BlockyMode);
 		SaveTextures = EditorPrefs.GetBool("SaveTextures", SaveTextures);
 	}
+
+    #endif
 }

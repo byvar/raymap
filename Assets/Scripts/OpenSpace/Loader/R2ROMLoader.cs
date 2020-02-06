@@ -9,6 +9,7 @@ using OpenSpace.ROM;
 using OpenSpace.FileFormat.Texture;
 using OpenSpace.FileFormat.Texture.DS;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace OpenSpace.Loader {
 	public class R2ROMLoader : MapLoader {
@@ -100,18 +101,33 @@ namespace OpenSpace.Loader {
 				
 				await LoadData();
 
-				/*List<DSFATEntry> entries = new List<DSFATEntry>();
+                if (Settings.s.game == Settings.Game.R2) {
+
+                    string objectNamesFileName = "objectNames_" + lvlName + ".json";
+                    string objectNamesPath = gameDataBinFolder + objectNamesFileName;
+                    if (!FileSystem.FileExists(objectNamesPath)) {
+                        objectNamesPath = "Assets/StreamingAssets/" + objectNamesFileName; // Offline, the json doesn't exist, so grab it from StreamingAssets
+                    }
+
+                    Stream stream = FileSystem.GetFileReadStream(objectNamesPath);
+                    if (stream != null) {
+                        ReadAndFillObjectNames(stream);
+                    }
+                    stream.Close();
+                }
+
+                /*List<DSFATEntry> entries = new List<DSFATEntry>();
 				for (int i = 0; i < fatTables.Length; i++) {
 					for (int j = 0; j < fatTables[i].entries.Length; j++) {
 						entries.Add(fatTables[i].entries[j]);
 					}
 				}
 				entries.Sort((a,b) => (a.off_data.CompareTo(b.off_data)));*/
-				/*IEnumerable<KeyValuePair<DSFATEntry, int>> groups = entries.GroupBy(e => e.type).Select(g => new KeyValuePair<DSFATEntry, int>(g.First(e1 => e1.unk1 == g.Max(e2 => e2.unk1)), g.Count()));
+                /*IEnumerable<KeyValuePair<DSFATEntry, int>> groups = entries.GroupBy(e => e.type).Select(g => new KeyValuePair<DSFATEntry, int>(g.First(e1 => e1.unk1 == g.Max(e2 => e2.unk1)), g.Count()));
 				foreach (KeyValuePair<DSFATEntry, int> g in groups) {
 					print("Type: " + g.Key.type + " - Unk1: " + g.Key.unk1 + " - Amount: " + g.Value);
 				}*/
-				/*for (int i = 0; i < entries.Count; i++) {
+                /*for (int i = 0; i < entries.Count; i++) {
 					DSFATEntry entry = entries[i];
 					uint nextOffset;
 					if (i < entries.Count - 1) {
@@ -124,13 +140,13 @@ namespace OpenSpace.Loader {
 						Pointer off = new Pointer(entry.off_data, data);
 						Pointer.DoAt(ref reader, off, () => {
 							string bytes = reader.ReadNullDelimitedString();*/
-							//print(entry.unk1 + " - " + bytes);
-							/*string name = gameDataBinFolder + "ext/" + "t" + entry.tableIndex + " _e" + entry.entryIndex + "_ " + String.Format("0x{0:X8}", entry.off_data) + ".bin";
-							Util.ByteArrayToFile(name, bytes);*/
-				/*		});
+                //print(entry.unk1 + " - " + bytes);
+                /*string name = gameDataBinFolder + "ext/" + "t" + entry.tableIndex + " _e" + entry.entryIndex + "_ " + String.Format("0x{0:X8}", entry.off_data) + ".bin";
+                Util.ByteArrayToFile(name, bytes);*/
+                /*		});
 					}
 				}*/
-			} finally {
+            } finally {
 				for (int i = 0; i < files_array.Length; i++) {
 					if (files_array[i] != null) {
 						files_array[i].Dispose();
@@ -141,8 +157,67 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 			InitModdables();
 		}
-		
-		public async Task LoadFat() {
+
+        public void ReadAndFillObjectNames(Stream stream)
+        {
+            string dataAsJson = new StreamReader(stream).ReadToEnd();
+            var objectNames = JsonConvert.DeserializeObject<Controller.NameInfoContainer>(dataAsJson);
+
+            Dictionary<Vector3, int> coordinateCount = new Dictionary<Vector3, int>();
+            foreach(ROMPersoBehaviour perso in controller.romPersos) {
+                Vector3 pos = perso.gameObject.transform.position;
+
+                if (coordinateCount.ContainsKey(pos)) {
+                    coordinateCount[pos] += 1;
+                } else {
+                    coordinateCount[pos] = 1;
+                }
+
+            }
+
+            var mostCommonCoordinate = coordinateCount.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
+            Vector3 difference = Vector3.zero - mostCommonCoordinate; // Most Common Coordinate is Vector3.zero most of the time
+
+            Debug.Log("Difference with 0,0,0: " + difference);
+
+            foreach (ROMPersoBehaviour perso in controller.romPersos) {
+
+                Vector3 pos = perso.gameObject.transform.position + difference;
+                Vector3 roundedPos = new Vector3((float)Math.Round(pos.x, 1), (float)Math.Round(pos.y, 1), (float)Math.Round(pos.z, 1));
+                int hashCode = roundedPos.GetHashCode();
+
+                if (objectNames.nameInfos.ContainsKey(hashCode)) {
+                    var infos = objectNames.nameInfos[hashCode];
+                    Controller.NameInfo correctInfo = null;
+
+                    if (infos.Count == 1) {
+                        correctInfo = infos[0];
+                    } else {
+                        /*foreach (var i in infos) {
+                            if (i.customBits == perso.perso.stdGame.Value.customBits) { TODO: match on custom bits
+                                correctInfo = i;
+                                break;
+                            }
+                        }*/
+
+                        foreach (var i in infos) {
+                            if (i.numRules == perso.perso.brain.Value.aiModel.Value.comportsIntelligence.Value.num_comports && 
+                                i.numReflexes == perso.perso.brain.Value.aiModel.Value.comportsReflex.Value.num_comports) {
+                                correctInfo = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (correctInfo != null) {
+                        perso.gameObject.name = "SOD @ " + perso.perso.Offset + " | [" + correctInfo.familyName + "] " + correctInfo.modelName + " | " + correctInfo.instanceName;
+                    }
+                }
+
+            }
+        }
+
+        public async Task LoadFat() {
 			data = files_array[SMem.Data] as ROMBIN;
 			fat = files_array[SMem.Fat] as ROMBIN;
 			Reader reader = files_array[SMem.Fat].reader;
