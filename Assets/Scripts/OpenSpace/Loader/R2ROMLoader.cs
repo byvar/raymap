@@ -165,7 +165,20 @@ namespace OpenSpace.Loader {
             var objectNames = JsonConvert.DeserializeObject<Controller.NameInfoContainer>(dataAsJson);
 
             Dictionary<Vector3, int> coordinateCount = new Dictionary<Vector3, int>();
-            foreach(ROMPersoBehaviour perso in controller.romPersos) {
+
+            var positions = controller.romPersos.Where(p=>p.perso.p3dData.Value.objectsTable.Value!=null).Select(p => p.gameObject.transform.position);
+
+            float minX = positions.Select(p => p.x).Min();
+            float minY = positions.Select(p => p.y).Min();
+            float minZ = positions.Select(p => p.z).Min();
+
+            float maxX = positions.Select(p => p.x).Max();
+            float maxY = positions.Select(p => p.y).Max();
+            float maxZ = positions.Select(p => p.z).Max();
+
+            Vector3 centerVector = new Vector3(minX + maxX, minY + maxY, minZ + maxZ) * 0.5f;
+
+            foreach (ROMPersoBehaviour perso in controller.romPersos) {
                 Vector3 pos = perso.gameObject.transform.position;
 
                 if (coordinateCount.ContainsKey(pos)) {
@@ -177,7 +190,8 @@ namespace OpenSpace.Loader {
             }
 
             var mostCommonCoordinate = coordinateCount.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-            Vector3 difference = Vector3.zero - mostCommonCoordinate; // Most Common Coordinate is Vector3.zero most of the time
+            //Vector3 difference = Vector3.zero - mostCommonCoordinate; // Most Common Coordinate is Vector3.zero most of the time
+            Vector3 difference = new Vector3(objectNames.centerX, objectNames.centerY, objectNames.centerZ) - centerVector; // Most Common Coordinate is Vector3.zero most of the time
 
             Debug.Log("Difference with 0,0,0: " + difference);
 
@@ -202,8 +216,8 @@ namespace OpenSpace.Loader {
                         }*/
 
                         foreach (var i in infos) {
-                            if (i.numRules == perso.perso.brain.Value.aiModel.Value.comportsIntelligence.Value.num_comports && 
-                                i.numReflexes == perso.perso.brain.Value.aiModel.Value.comportsReflex.Value.num_comports) {
+                            if (i.numRules == perso.perso.brain.Value?.aiModel.Value?.comportsIntelligence.Value?.num_comports && 
+                                i.numReflexes == perso.perso.brain.Value?.aiModel.Value?.comportsReflex.Value?.num_comports) {
                                 correctInfo = i;
                                 break;
                             }
