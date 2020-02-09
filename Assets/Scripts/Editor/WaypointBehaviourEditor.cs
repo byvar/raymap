@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 using OpenSpace.Waypoints;
 
-[CustomEditor(typeof(WaypointBehaviour))]
+[CustomEditor(typeof(WayPointBehaviour))]
 public class WapointBehaviourEditor : Editor {
     
     public override void OnInspectorGUI() {

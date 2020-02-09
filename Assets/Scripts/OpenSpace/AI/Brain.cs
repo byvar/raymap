@@ -30,9 +30,7 @@ namespace OpenSpace.AI {
 				b.unknown2 = reader.ReadUInt32(); // 0
 			}
 
-            Pointer.DoAt(ref reader, b.off_mind, () => {
-                b.mind = Mind.Read(reader, b.off_mind);
-            });
+            b.mind = MapLoader.Loader.FromOffsetOrRead<Mind>(reader, b.off_mind);
 
             return b;
         }

@@ -16,7 +16,7 @@ namespace OpenSpace.Exporter {
         {
             Lights = new Dictionary<string, ELight>();
             foreach (LightInfo l in lights) {
-                Lights.Add(l.offset.ToString(), new ELight(l));
+                Lights.Add(l.Offset.ToString(), new ELight(l));
             }
         }
 

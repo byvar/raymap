@@ -36,7 +36,7 @@ public class ScriptComponent : MonoBehaviour {
             //translatedScript = translation.ToString();
             offset = script.offset.ToString();
             if (script.behaviorOrMacro != null) {
-                comportOffset = script.behaviorOrMacro.offset.ToString();
+                comportOffset = script.behaviorOrMacro.Offset.ToString();
             }
         }
     }

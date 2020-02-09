@@ -248,7 +248,7 @@ namespace OpenSpace.AI {
 
                             if (ts.expandMacros) {
 
-                                Macro macro = Macro.FromOffset(scriptNode.param_ptr);
+                                Macro macro = MapLoader.Loader.FromOffset<Macro>(scriptNode.param_ptr);
 
                                 if (macro != null) {
                                     string macroString = "// evalMacro(" + macro.ShortName + ");";

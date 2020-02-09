@@ -36,9 +36,9 @@ namespace OpenSpace.Exporter {
                     DsgVarInfoEntry[] dsgVars = dsgMem.dsgVar.dsgVarInfos;
                     Dictionary<string, EDsgVar> variables = new Dictionary<string, EDsgVar>();
 
-                    foreach (DsgVarInfoEntry infoEntry in dsgVars) {
+                    for(int i = 0; i < dsgMem.dsgVar.dsgVarInfos.Length; i++) {
 
-                        variables.Add("dsgVar_" + infoEntry.number, GetExportableDsgVar(infoEntry));
+                        variables.Add("dsgVar_" + i, GetExportableDsgVar(dsgMem,dsgMem.dsgVar,i));
                     }
 
                     ePerso.Variables = variables;
@@ -72,85 +72,56 @@ namespace OpenSpace.Exporter {
             }
         }
 
-        public EDsgVar GetExportableDsgVar(DsgVarInfoEntry infoEntry)
+        public EDsgVar GetExportableDsgVar(DsgMem dsgMem, DsgVar dsgVar, int infoIndex)
         {
+            DsgVarInfoEntry infoEntry = dsgVar.dsgVarInfos[infoIndex];
             EDsgVar d = new EDsgVar();
             d.type = infoEntry.type;
 
-            if (infoEntry.value == null) {
+            if (dsgMem.values == null || dsgMem.values[infoIndex] == null) {
                 return d;
             }
+            DsgVarValue val = dsgMem.values[infoIndex];
+            d.value = GetExportableDsgVarValueString(val);
 
-            switch (infoEntry.type) {
+            return d;
+        }
+
+        public string GetExportableDsgVarValueString(DsgVarValue val) {
+            string value = "";
+            switch (val.type) {
                 default:
-                    d.value = infoEntry.value;
-                    break;
-                case DsgVarInfoEntry.DsgVarType.None:
-                    break;
-                case DsgVarInfoEntry.DsgVarType.List: // TODO: figure out lists
-                    break;
-                case DsgVarInfoEntry.DsgVarType.Comport: // TODO: comport
-                    break;
-                case DsgVarInfoEntry.DsgVarType.Action: // TODO: action
-                    break;
-                case DsgVarInfoEntry.DsgVarType.Input: // TODO: check if this works
-                    //d.value = infoEntry.value
-                    break;
-                case DsgVarInfoEntry.DsgVarType.SoundEvent: // TODO: check
-                    break;
-                case DsgVarInfoEntry.DsgVarType.Light: // TODO: check
+                    value = val.ToString();
                     break;
                 case DsgVarInfoEntry.DsgVarType.GameMaterial:
-                    d.value = HashUtils.MD5Hash(GameMaterial.FromOffset((Pointer)(infoEntry.value)).ToJSON());
+                    value = HashUtils.MD5Hash(val.valueGameMaterial?.ToJSON());
                     break;
                 case DsgVarInfoEntry.DsgVarType.VisualMaterial:
-                    d.value = HashUtils.MD5Hash(VisualMaterial.FromOffset((Pointer)(infoEntry.value)).ToJSON());
+                    value = HashUtils.MD5Hash(val.valueVisualMaterial?.ToJSON());
                     break;
                 case DsgVarInfoEntry.DsgVarType.Perso:
-                    d.value = Perso.FromOffset((Pointer)(infoEntry.value))?.namePerso;
-                    break;
-                case DsgVarInfoEntry.DsgVarType.WayPoint: // TODO
-                    d.value = ((Pointer)infoEntry.value).ToString();
-                    break;
-                case DsgVarInfoEntry.DsgVarType.Graph: // TODO
-                    d.value = ((Pointer)infoEntry.value).ToString();
-                    break;
-                case DsgVarInfoEntry.DsgVarType.Text: // TODO: check
-                    goto default;
-                case DsgVarInfoEntry.DsgVarType.SuperObject: // TODO: check
-                    break;
-                case DsgVarInfoEntry.DsgVarType.SOLinks: // TODO
+                    value = val.valuePerso?.namePerso;
                     break;
                 case DsgVarInfoEntry.DsgVarType.PersoArray:
-
                     List<string> persoNames = new List<string>();
-                    foreach (object persoPointer in (object[])infoEntry.value) {
-                        if (persoPointer == null) {
-                            continue;
-                        }
-
-                        if (!(persoPointer is Pointer)) {
-                            persoNames.Add("Not a valid pointer: " + (persoPointer).ToString()); // TODO: fix
-                            continue;
-                        }
-
-                        Perso perso = Perso.FromOffset((Pointer)persoPointer);
+                    foreach (DsgVarValue child in val.valueArray) {
+                        Perso perso = child.valuePerso;
                         if (perso != null) {
                             persoNames.Add(perso.namePerso);
                         } else {
                             persoNames.Add("NullPointer");
                         }
                     }
-
+                    value = "{ " + string.Join(", ", persoNames) + " }";
                     break;
                 case DsgVarInfoEntry.DsgVarType.WayPointArray: // TODO
                     break;
                 case DsgVarInfoEntry.DsgVarType.TextArray: // TODO: check
                     goto default;
-                    //break;
+                //break;
                 case DsgVarInfoEntry.DsgVarType.TextRefArray: // TODO: check
                     goto default;
-                case DsgVarInfoEntry.DsgVarType.Array6:
+                case DsgVarInfoEntry.DsgVarType.GraphArray:
                     break;
                 case DsgVarInfoEntry.DsgVarType.Array9:
                     break;
@@ -166,7 +137,7 @@ namespace OpenSpace.Exporter {
                     break;
             }
 
-            return d;
+            return value;
         }
 
         public struct EPerso {

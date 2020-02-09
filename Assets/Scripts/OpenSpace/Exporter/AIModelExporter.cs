@@ -16,8 +16,8 @@ namespace OpenSpace.Exporter {
             string dsgVars = "";//  TODO
 
             if (ai.dsgVar != null) {
-                foreach (DsgVarInfoEntry dsgVarEntry in ai.dsgVar.dsgVarInfos) {
-                    dsgVars += "public " + DsgVarUtil.DsgVarEntryToCSharpAssignment(dsgVarEntry) + Environment.NewLine;
+                for(int i = 0; i < ai.dsgVar.dsgVarInfos.Length; i++) {
+                    dsgVars += "public " + DsgVarUtil.DsgVarEntryToCSharpAssignment(ai.dsgVar, i) + Environment.NewLine;
                 }
             }
 

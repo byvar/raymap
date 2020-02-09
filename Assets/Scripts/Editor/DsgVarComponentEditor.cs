@@ -9,9 +9,10 @@ using UnityEditor.IMGUI.Controls;
 
 [CustomEditor(typeof(DsgVarComponent))]
 public class DsgVarComponentEditor : Editor {
-    DsgVarsTreeView treeviewDsgVars;
-    TreeViewState treeviewDsgVarsState;
-    MultiColumnHeaderState m_MultiColumnHeaderState;
+    private DsgVarsTreeView treeviewDsgVars;
+    private TreeViewState treeviewDsgVarsState;
+    private MultiColumnHeaderState m_MultiColumnHeaderState;
+    private static LocalizationDropdown localizationDropdown = null;
 
     public Vector2 scrollPosition = new Vector2(0, 0);
 
@@ -49,7 +50,7 @@ public class DsgVarComponentEditor : Editor {
         }*/
 
 
-        if (GUILayout.Button("Print initial dsgvar assignments")) {
+        /*if (GUILayout.Button("Print initial dsgvar assignments")) {
 
             string printResult = "";
 
@@ -59,7 +60,7 @@ public class DsgVarComponentEditor : Editor {
             }
 
             MapLoader.Loader.print(printResult);
-        }
+        }*/
 
         if (GUILayout.Button("Print dsgvar value offsets")) {
 
@@ -142,74 +143,82 @@ public class DsgVarComponentEditor : Editor {
         string stringVal;
         switch (value.type) {
             case DsgVarInfoEntry.DsgVarType.Boolean:
-                value.valueAsBool = EditorGUI.Toggle(rect, value.valueAsBool);
+                value.AsBoolean = EditorGUI.Toggle(rect, value.AsBoolean);
                 break;
             case DsgVarInfoEntry.DsgVarType.Int:
-                value.valueAsInt = EditorGUI.IntField(rect, value.valueAsInt);
+                value.AsInt = EditorGUI.IntField(rect, value.AsInt);
                 break;
             case DsgVarInfoEntry.DsgVarType.UInt:
-                stringVal = EditorGUI.TextField(rect, value.valueAsUInt.ToString());
-                UInt32.TryParse(stringVal, out value.valueAsUInt);
+                stringVal = EditorGUI.TextField(rect, value.AsUInt.ToString());
+                if(UInt32.TryParse(stringVal, out uint r_uint)) value.AsUInt = r_uint;
                 break;
             case DsgVarInfoEntry.DsgVarType.Caps:
-                stringVal = EditorGUI.TextField(rect, value.valueAsUInt.ToString());
-                UInt32.TryParse(stringVal, out value.valueAsUInt);
+                stringVal = EditorGUI.TextField(rect, value.AsCaps.ToString());
+                if (UInt32.TryParse(stringVal, out uint r_caps)) value.AsCaps = r_caps;
                 break;
             case DsgVarInfoEntry.DsgVarType.Short:
-                stringVal = EditorGUI.TextField(rect, value.valueAsShort.ToString());
-                Int16.TryParse(stringVal, out value.valueAsShort);
+                stringVal = EditorGUI.TextField(rect, value.AsShort.ToString());
+                if(Int16.TryParse(stringVal, out short r_short)) value.AsShort = r_short;
                 break;
             case DsgVarInfoEntry.DsgVarType.UShort:
-                stringVal = EditorGUI.TextField(rect, value.valueAsUShort.ToString());
-                UInt16.TryParse(stringVal, out value.valueAsUShort);
+                stringVal = EditorGUI.TextField(rect, value.AsUShort.ToString());
+                if(UInt16.TryParse(stringVal, out ushort r_ushort)) value.AsUShort = r_ushort;
                 break;
             case DsgVarInfoEntry.DsgVarType.Byte:
-                stringVal = EditorGUI.TextField(rect, value.valueAsSByte.ToString());
-                SByte.TryParse(stringVal, out value.valueAsSByte);
+                stringVal = EditorGUI.TextField(rect, value.AsByte.ToString());
+                if (SByte.TryParse(stringVal, out sbyte r_sbyte)) value.AsByte = r_sbyte;
                 break;
             case DsgVarInfoEntry.DsgVarType.UByte:
-                stringVal = EditorGUI.TextField(rect, value.valueAsByte.ToString());
-                Byte.TryParse(stringVal, out value.valueAsByte);
+                stringVal = EditorGUI.TextField(rect, value.AsUByte.ToString());
+                if (Byte.TryParse(stringVal, out byte r_byte)) value.AsUByte = r_byte;
                 break;
             case DsgVarInfoEntry.DsgVarType.Float:
-                value.valueAsFloat = EditorGUI.FloatField(rect, value.valueAsFloat);
+                value.AsFloat = EditorGUI.FloatField(rect, value.AsFloat);
                 break;
             case DsgVarInfoEntry.DsgVarType.Text:
-                stringVal = EditorGUI.TextField(rect, value.valueAsUInt.ToString());
-                UInt32.TryParse(stringVal, out value.valueAsUInt);
-                //GUILayout.Label(MapLoader.Loader.localization.GetTextForHandleAndLanguageID((int)value.valueAsUInt, 0));
+                int? newTextID = DrawText(rect, value.AsText);
+                if (newTextID.HasValue) value.AsText = newTextID.Value;
+                //GUILayout.Label(MapLoader.Loader.localization.GetTextForHandleAndLanguageID((int)value.AsUInt, 0));
                 break;
             case DsgVarInfoEntry.DsgVarType.Vector:
-                value.valueAsVector = EditorGUI.Vector3Field(rect, "", value.valueAsVector);
+                value.AsVector = EditorGUI.Vector3Field(rect, "", value.AsVector);
                 break;
             case DsgVarInfoEntry.DsgVarType.Perso:
-                PersoBehaviour currentPersoBehaviour = value.valueAsPersoGao != null ? value.valueAsPersoGao.GetComponent<PersoBehaviour>() : null;
+                PersoBehaviour currentPersoBehaviour = value.AsPerso != null ? value.AsPerso : null;
                 PersoBehaviour selectedPersoBehaviour = ((PersoBehaviour)EditorGUI.ObjectField(rect, currentPersoBehaviour, typeof(PersoBehaviour), true));
 
                 if (selectedPersoBehaviour != null && selectedPersoBehaviour.gameObject != null) {
-                    value.valueAsPersoGao = selectedPersoBehaviour.gameObject;
+                    value.AsPerso = selectedPersoBehaviour;
                 }
                 break;
             case DsgVarInfoEntry.DsgVarType.SuperObject:
-                SuperObjectComponent currentGao = value.valueAsSuperObjectGao != null ? value.valueAsSuperObjectGao.GetComponent<SuperObjectComponent>() : null;
+                SuperObjectComponent currentGao = value.AsSuperObject != null ? value.AsSuperObject : null;
                 SuperObjectComponent selectedGao = ((SuperObjectComponent)EditorGUI.ObjectField(rect, currentGao, typeof(SuperObjectComponent), true));
 
                 if (selectedGao != null && selectedGao.gameObject != null) {
-                    value.valueAsSuperObjectGao = selectedGao.gameObject;
+                    value.AsSuperObject = selectedGao;
                 }
                 break;
             case DsgVarInfoEntry.DsgVarType.WayPoint:
-                WaypointBehaviour currentWaypointGao = value.valueAsWaypointGao != null ? value.valueAsWaypointGao.GetComponent<WaypointBehaviour>() : null;
-                WaypointBehaviour selectedWaypointGao = ((WaypointBehaviour)EditorGUI.ObjectField(rect, currentWaypointGao, typeof(WaypointBehaviour), true));
+                WayPointBehaviour currentWaypointGao = value.AsWayPoint != null ? value.AsWayPoint : null;
+                WayPointBehaviour selectedWaypointGao = ((WayPointBehaviour)EditorGUI.ObjectField(rect, currentWaypointGao, typeof(WayPointBehaviour), true));
 
                 if (selectedWaypointGao != null && selectedWaypointGao.gameObject != null) {
-                    value.valueAsWaypointGao = selectedWaypointGao.gameObject;
+                    value.AsWayPoint = selectedWaypointGao;
+                }
+                break;
+            case DsgVarInfoEntry.DsgVarType.Graph:
+                GraphBehaviour currentGraphGao = value.AsGraph != null ? value.AsGraph : null;
+                GraphBehaviour selectedGraphGao = ((GraphBehaviour)EditorGUI.ObjectField(rect, currentGraphGao, typeof(GraphBehaviour), true));
+
+                if (selectedGraphGao != null && selectedGraphGao.gameObject != null) {
+                    value.AsGraph = selectedGraphGao;
                 }
                 break;
             case DsgVarInfoEntry.DsgVarType.ActionArray:
             case DsgVarInfoEntry.DsgVarType.FloatArray:
             case DsgVarInfoEntry.DsgVarType.Array11:
-            case DsgVarInfoEntry.DsgVarType.Array6:
+            case DsgVarInfoEntry.DsgVarType.GraphArray:
             case DsgVarInfoEntry.DsgVarType.Array9:
             case DsgVarInfoEntry.DsgVarType.IntegerArray:
             case DsgVarInfoEntry.DsgVarType.PersoArray:
@@ -219,18 +228,44 @@ public class DsgVarComponentEditor : Editor {
             case DsgVarInfoEntry.DsgVarType.TextRefArray:
             case DsgVarInfoEntry.DsgVarType.VectorArray:
             case DsgVarInfoEntry.DsgVarType.WayPointArray:
-                if (dsgVarEntry.entry.value.GetType().IsArray) {
+                if (value.AsArray != null) {
                     if (arrayIndex.HasValue) {
-                        if (value.valueAsArray != null) {
-                            DrawDsgVarValue(rect, dsgVarEntry, value.valueAsArray[arrayIndex.Value], useDsgMem, arrayIndex);
-                        }
+                        DrawDsgVarValue(rect, dsgVarEntry, value.AsArray[arrayIndex.Value], useDsgMem, arrayIndex);
                     } else {
-                        object[] array = (object[])dsgVarEntry.entry.value;
-                        EditorGUI.LabelField(rect, "Length: " + array.Length);
+                        EditorGUI.LabelField(rect, "Length: " + value.AsArray.Length);
                     }
                 }
                 break;
         }
     }
 
+    public static int? DrawText(Rect rect, int textId) {
+        int indent = EditorGUI.indentLevel;
+        string locIdPreview = textId + " - ";
+        if (textId == -1) {
+            locIdPreview += "None";
+        } else {
+            locIdPreview += MapLoader.Loader.localization.GetTextForHandleAndLanguageID(textId, 0);
+        }
+        EditorGUI.indentLevel = 0;
+        int? result = null;
+        if (EditorGUI.DropdownButton(rect, new GUIContent(locIdPreview), FocusType.Passive)) {
+            if (localizationDropdown == null) {
+                localizationDropdown = new LocalizationDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState()) {
+                    name = "Text ID"
+                };
+            }
+            localizationDropdown.rect = rect;
+            localizationDropdown.Show(rect);
+        }
+        if (localizationDropdown != null
+            && localizationDropdown.selection.HasValue
+            && localizationDropdown.rect == rect) {
+            result = localizationDropdown.selection.Value;
+            localizationDropdown.selection = null;
+        }
+
+        EditorGUI.indentLevel = indent;
+        return result;
     }
+}

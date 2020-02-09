@@ -248,7 +248,7 @@ namespace OpenSpace.AI {
                         return "new TextReference(" + (int)param + ")";
                     }
                 case ScriptNode.NodeType.ComportRef:
-					Behavior comportRef = Behavior.FromOffset(param_ptr);
+					Behavior comportRef = l.FromOffset<Behavior>(param_ptr);
 
                     if (comportRef == null) {
                         if (advanced) return "ComportRef: " + param_ptr + " (null)";
@@ -296,7 +296,7 @@ namespace OpenSpace.AI {
                     return "VisualMaterial.FromOffset(\"" + param_ptr + "\")";
 				case ScriptNode.NodeType.ModelRef: // ModelCast
                     if (advanced) return "AIModel: " + param_ptr;
-                    AIModel model = AIModel.FromOffset(param_ptr);
+                    AIModel model = l.FromOffset<AIModel>(param_ptr);
                     return model != null ? model.name : "null";
                 case ScriptNode.NodeType.DataType42:
                     if(advanced) return "EvalDataType42: " + "0x" + (param).ToString("x8");
@@ -315,7 +315,7 @@ namespace OpenSpace.AI {
                     return "Caps(" + "0x" + (param).ToString("x8") + ")";
 				case ScriptNode.NodeType.SubRoutine:
                     if (advanced) return "Eval SubRoutine: " + param_ptr;
-                    Macro macro = Macro.FromOffset(param_ptr);
+                    Macro macro = l.FromOffset<Macro>(param_ptr);
                     if (macro == null) {
                         return "null";
                     }

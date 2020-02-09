@@ -36,7 +36,7 @@ public class MindComponent : MonoBehaviour {
             Pointer.DoAt(ref writer, this.mind.intelligenceNormal.offset + 0x8, () =>
             {
                 if (this.mind.intelligenceNormal.comport != null)
-                    Pointer.Write(writer, this.mind.intelligenceNormal.comport.offset);
+                    Pointer.Write(writer, this.mind.intelligenceNormal.comport.Offset);
                 else
                     Pointer.Write(writer, null);
             });
@@ -47,7 +47,7 @@ public class MindComponent : MonoBehaviour {
             Pointer.DoAt(ref writer, this.mind.intelligenceReflex.offset + 0x8, () =>
             {
                 if (this.mind.intelligenceReflex.comport!=null)
-                    Pointer.Write(writer, this.mind.intelligenceReflex.comport.offset);
+                    Pointer.Write(writer, this.mind.intelligenceReflex.comport.Offset);
                 else
                     Pointer.Write(writer, null);
             });

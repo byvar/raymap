@@ -107,7 +107,7 @@ public class PersoBehaviourEditor : Editor {
 		if (pb.state != null && pb.state.stateTransitions != null && pb.state.stateTransitions.Count > 0) {
 			int id = 0;
 			foreach (State.Transition t in pb.state.stateTransitions) {
-				if (t != null) {
+				if (t != null && t.off_targetState != null && t.off_stateToGo != null) {
 					State stateToGo = State.FromOffset(t.off_stateToGo);
 					State targetState = State.FromOffset(t.off_targetState);
 					tr.Add(new StateTransitionsTreeElement("State transition " + targetState.ToString(), 0, id) {

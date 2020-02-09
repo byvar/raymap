@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class WaypointBehaviour : MonoBehaviour {
+public class WayPointBehaviour : MonoBehaviour {
 	public GraphManager manager;
 	public List<GraphNode> nodes = new List<GraphNode>();
 	public WayPoint wp = null;
 	public List<OpenSpace.ROM.GraphNode> nodesROM = new List<OpenSpace.ROM.GraphNode>();
 	public OpenSpace.ROM.WayPoint wpROM = null;
-	public List<WaypointBehaviour> targets = new List<WaypointBehaviour>();
+	public List<WayPointBehaviour> targets = new List<WayPointBehaviour>();
 	public List<LineRenderer> lines = new List<LineRenderer>();
 
     public void Init() {
@@ -32,7 +32,7 @@ public class WaypointBehaviour : MonoBehaviour {
 					lr.material.color = color;
 					lr.positionCount = 2;
 					lr.useWorldSpace = true;
-					WaypointBehaviour tar = manager.waypoints.FirstOrDefault(w => w.nodes.Contains(arc.graphNode));
+					WayPointBehaviour tar = manager.waypoints.FirstOrDefault(w => w.nodes.Contains(arc.graphNode));
 					lr.SetPositions(new Vector3[] { transform.position, tar.transform.position });
 					lr.widthMultiplier = (arc.weight > 0 ? arc.weight : 30f) / 30f;
 					lines.Add(lr);
@@ -63,7 +63,7 @@ public class WaypointBehaviour : MonoBehaviour {
 					lr.material.color = color;
 					lr.positionCount = 2;
 					lr.useWorldSpace = true;
-					WaypointBehaviour tar = manager.waypoints.FirstOrDefault(w => w.nodesROM.Contains(node.arcs_nodes.Value.nodes[i].Value));
+					WayPointBehaviour tar = manager.waypoints.FirstOrDefault(w => w.nodesROM.Contains(node.arcs_nodes.Value.nodes[i].Value));
 					lr.SetPositions(new Vector3[] { transform.position, tar.transform.position });
 					lr.widthMultiplier = (weight > 0 ? weight : 30f) / 30f;
 					lines.Add(lr);

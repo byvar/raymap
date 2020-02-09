@@ -135,7 +135,7 @@ namespace OpenSpace.Object {
             s.persos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             s.staticLights = LinkedList<LightInfo>.Read(ref reader, Pointer.Current(reader),
                 (off_element) => {
-                    LightInfo li = LightInfo.Read(reader, off_element);
+                    LightInfo li = l.FromOffsetOrRead<LightInfo>(reader, off_element);
                     if (li != null) li.containingSectors.Add(s);
                     return li;
                 },

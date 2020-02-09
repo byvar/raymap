@@ -73,7 +73,7 @@ namespace Assets.Scripts.OpenSpace.AI {
  
             State state = new State();
             state.index = behavior.index;
-            state.offset = behavior.offset.ToString();
+            state.offset = behavior.Offset.ToString();
             state.name = behavior.VeryShortName;
 
             List<int> transitionToIndicesNormal = new List<int>();
@@ -117,7 +117,7 @@ namespace Assets.Scripts.OpenSpace.AI {
                     if (procedureType == "Proc_ChangeMyComport" || procedureType == "Proc_ChangeMyComportAndMyReflex" ||
                         procedureType == "_fn_p_stChangeMyComportIntelligenceProcedure" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure") {
 
-                        Behavior transitionBehavior = Behavior.FromOffset(nextNode.param_ptr);
+                        Behavior transitionBehavior = MapLoader.Loader.FromOffset<Behavior>(nextNode.param_ptr);
                         if (transitionBehavior!=null && !transitionToIndices.Contains(transitionBehavior.index)) {
                             transitionToIndices.Add(transitionBehavior.index);
                         }
@@ -125,7 +125,7 @@ namespace Assets.Scripts.OpenSpace.AI {
                 }
 
                 if (node.nodeType == ScriptNode.NodeType.SubRoutine) {
-                    Macro macro = Macro.FromOffset(node.param_ptr);
+                    Macro macro = MapLoader.Loader.FromOffset<Macro>(node.param_ptr);
                     if (macro != null) {
                         transitionToIndices.AddRange(GetTransitionToIndicesNormalBehavior(macro.script));
                     } else {
@@ -162,14 +162,14 @@ namespace Assets.Scripts.OpenSpace.AI {
                     }
                     string procedureType = Settings.s.aiTypes.procedureTable[node.param];
                     if (procedureType == "Proc_ChangeMyComportReflex" || procedureType == "_fn_p_stChangeMyComportReflexProcedure") {
-                        Behavior transitionBehavior = Behavior.FromOffset(nextNode.param_ptr);
+                        Behavior transitionBehavior = MapLoader.Loader.FromOffset<Behavior>(nextNode.param_ptr);
                         if (transitionBehavior!=null && !transitionToIndices.Contains(transitionBehavior.index)) {
                             transitionToIndices.Add(transitionBehavior.index);
                         }
                     }
 
                     if (nextNextNode != null && (procedureType == "Proc_ChangeMyComportAndMyReflex" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure")) {
-                        Behavior transitionBehavior = Behavior.FromOffset(nextNextNode.param_ptr);
+                        Behavior transitionBehavior = MapLoader.Loader.FromOffset<Behavior>(nextNextNode.param_ptr);
                         if (transitionBehavior != null && !transitionToIndices.Contains(transitionBehavior.index)) {
                             transitionToIndices.Add(transitionBehavior.index);
                         }
@@ -177,7 +177,7 @@ namespace Assets.Scripts.OpenSpace.AI {
                 }
 
                 if (node.nodeType == ScriptNode.NodeType.SubRoutine) {
-                    Macro macro = Macro.FromOffset(node.param_ptr);
+                    Macro macro = MapLoader.Loader.FromOffset<Macro>(node.param_ptr);
                     if (macro != null) {
                         transitionToIndices.AddRange(GetTransitionToIndicesReflexBehavior(macro.script));
                     } else {
