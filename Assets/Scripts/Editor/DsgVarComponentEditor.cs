@@ -126,20 +126,26 @@ public class DsgVarComponentEditor : Editor {
         }
     }
 
-    public static void DrawDsgVarCurrent(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, bool useDsgMem, int? arrayIndex) {
+    public static void DrawDsgVarCurrent(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, int? arrayIndex) {
         DsgVarComponent.DsgVarEditableEntry.Value value = dsgVarEntry.valueCurrent;
         if (value != null) {
-            DrawDsgVarValue(rect, dsgVarEntry, value, useDsgMem, arrayIndex);
+            DrawDsgVarValue(rect, dsgVarEntry, value, arrayIndex);
         }
     }
-    public static void DrawDsgVarInitial(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, bool useDsgMem, int? arrayIndex) {
+    public static void DrawDsgVarInitial(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, int? arrayIndex) {
         DsgVarComponent.DsgVarEditableEntry.Value value = dsgVarEntry.valueInitial;
         if (value != null) {
-            DrawDsgVarValue(rect, dsgVarEntry, value, useDsgMem, arrayIndex);
+            DrawDsgVarValue(rect, dsgVarEntry, value, arrayIndex);
+        }
+    }
+    public static void DrawDsgVarModel(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, int? arrayIndex) {
+        DsgVarComponent.DsgVarEditableEntry.Value value = dsgVarEntry.valueModel;
+        if (value != null) {
+            DrawDsgVarValue(rect, dsgVarEntry, value, arrayIndex);
         }
     }
 
-    public static void DrawDsgVarValue(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, DsgVarComponent.DsgVarEditableEntry.Value value, bool useDsgMem, int? arrayIndex) {
+    public static void DrawDsgVarValue(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, DsgVarComponent.DsgVarEditableEntry.Value value, int? arrayIndex) {
         string stringVal;
         switch (value.type) {
             case DsgVarInfoEntry.DsgVarType.Boolean:
@@ -230,7 +236,7 @@ public class DsgVarComponentEditor : Editor {
             case DsgVarInfoEntry.DsgVarType.WayPointArray:
                 if (value.AsArray != null) {
                     if (arrayIndex.HasValue) {
-                        DrawDsgVarValue(rect, dsgVarEntry, value.AsArray[arrayIndex.Value], useDsgMem, arrayIndex);
+                        DrawDsgVarValue(rect, dsgVarEntry, value.AsArray[arrayIndex.Value], arrayIndex);
                     } else {
                         EditorGUI.LabelField(rect, "Length: " + value.AsArray.Length);
                     }

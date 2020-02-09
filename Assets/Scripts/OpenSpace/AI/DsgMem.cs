@@ -27,7 +27,8 @@ namespace OpenSpace.AI {
 
             dsgVar = MapLoader.Loader.FromOffsetOrRead<DsgVar>(reader, off_dsgVar);
             if (dsgVar != null && dsgVar.amountOfInfos > 0) {
-                if (memBuffer != null) {
+                if (memBuffer != null && Settings.s.platform != Settings.Platform.DC) {
+                    // Current MemBuffer is cleared in DC files
                     values = new DsgVarValue[dsgVar.amountOfInfos];
                     for (int i = 0; i < dsgVar.amountOfInfos; i++) {
                         values[i] = new DsgVarValue(dsgVar.dsgVarInfos[i].type);

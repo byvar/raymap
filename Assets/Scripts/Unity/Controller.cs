@@ -411,7 +411,7 @@ public class Controller : MonoBehaviour {
 				}
 				if (p.Gao && p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
 					// DsgVars
-					if (p.brain != null && p.brain.mind != null && p.brain.mind.dsgMem != null) {
+					if (p.brain.mind.dsgMem != null || p.brain.mind.AI_model.dsgVar != null) {
 						DsgVarComponent dsgVarComponent = p.Gao.AddComponent<DsgVarComponent>();
 						dsgVarComponent.SetPerso(p);
 						if (mod != null) mod.dsgVarComponent = dsgVarComponent;

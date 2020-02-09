@@ -409,6 +409,98 @@ namespace OpenSpace.AI {
             ReadFromBuffer(reader, infoEntry, dsgVar.off_dsgMemBuffer);
         }
 
+		public bool IsSameValue(DsgVarValue other) {
+			if (other == null) return false;
+			if(Equals(other)) return true;
+			if (type != other.type) return false;
+			switch (type) {
+				case DsgVarInfoEntry.DsgVarType.Boolean:
+					return valueBool == other.valueBool;
+				case DsgVarInfoEntry.DsgVarType.Byte:
+					return valueByte == other.valueByte;
+				case DsgVarInfoEntry.DsgVarType.UByte:
+					return valueUByte == other.valueUByte;
+				case DsgVarInfoEntry.DsgVarType.Short:
+					return valueShort == other.valueShort;
+				case DsgVarInfoEntry.DsgVarType.UShort:
+					return valueUShort == other.valueUShort;
+				case DsgVarInfoEntry.DsgVarType.Int:
+					return valueInt == other.valueInt;
+				case DsgVarInfoEntry.DsgVarType.UInt:
+					return valueUInt == other.valueUInt;
+				case DsgVarInfoEntry.DsgVarType.Float:
+					return valueFloat == other.valueFloat;
+				case DsgVarInfoEntry.DsgVarType.Vector:
+					return valueVector == other.valueVector;
+				case DsgVarInfoEntry.DsgVarType.Text:
+					return valueText == other.valueText;
+				case DsgVarInfoEntry.DsgVarType.Graph:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.WayPoint:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.GameMaterial:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.ObjectList:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.List:
+					if (valueList.curLength != other.valueList.curLength
+						|| valueList.maxLength != other.valueList.maxLength) {
+						return false;
+					}
+					for (int i = 0; i < valueList.maxLength; i++) {
+						if (valueList.list[i].value != other.valueList.list[i].value) {
+							return false;
+						}
+					}
+					return true;
+				case DsgVarInfoEntry.DsgVarType.Light:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.Comport:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.Input:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.Perso:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.Action:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.SuperObject:
+					return valuePointer == other.valuePointer;
+				case DsgVarInfoEntry.DsgVarType.Caps:
+					return valueCaps == other.valueCaps;
+				case DsgVarInfoEntry.DsgVarType.SOLinks:
+					return valueSOLinks == other.valueSOLinks;
+				case DsgVarInfoEntry.DsgVarType.SoundEvent:
+					return valueSoundEvent == other.valueSoundEvent;
+				case DsgVarInfoEntry.DsgVarType.Way:
+					return valueWay == other.valueWay;
+
+				// Arrays
+				case DsgVarInfoEntry.DsgVarType.ActionArray:
+				case DsgVarInfoEntry.DsgVarType.FloatArray:
+				case DsgVarInfoEntry.DsgVarType.IntegerArray:
+				case DsgVarInfoEntry.DsgVarType.PersoArray:
+				case DsgVarInfoEntry.DsgVarType.SoundEventArray:
+				case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
+				case DsgVarInfoEntry.DsgVarType.TextArray:
+				case DsgVarInfoEntry.DsgVarType.TextRefArray:
+				case DsgVarInfoEntry.DsgVarType.VectorArray:
+				case DsgVarInfoEntry.DsgVarType.WayPointArray:
+				case DsgVarInfoEntry.DsgVarType.GraphArray:
+				case DsgVarInfoEntry.DsgVarType.Array11:
+				case DsgVarInfoEntry.DsgVarType.Array9:
+					if (arrayType != other.arrayType || arrayLength != other.arrayLength) {
+						return false;
+					}
+					for (int i = 0; i < valueArray.Length; i++) {
+						if (!valueArray[i].IsSameValue(other.valueArray[i])) return false;
+					}
+					return true;
+			}
+			return true;
+		}
+
 		public class List {
 			public byte curLength;
 			public byte maxLength;

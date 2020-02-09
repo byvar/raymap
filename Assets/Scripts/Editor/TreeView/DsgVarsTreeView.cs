@@ -77,10 +77,9 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 	{
 		Icon,
 		Name,
-		//CurrentValueInstance,
 		CurrentValue,
-		//InitialValueInstance,
-		InitialValue
+		InitialValue,
+		ModelValue
 	}
 
 	public static void TreeToList (TreeViewItem root, IList<TreeViewItem> result)
@@ -158,6 +157,14 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 	protected override void RowGUI (RowGUIArgs args)
 	{
 		var item = (TreeViewItem<DsgVarsTreeElement>) args.item;
+		if (item.data.entry != null && item.data.entry.IsCurrentDifferentFromInitial) {
+			Color accent = Color.red;
+			EditorGUI.DrawRect(args.rowRect, new Color(accent.r, accent.g, accent.b, 0.4f));
+		}
+		if (item.data.entry != null && item.data.entry.IsDifferentFromModel) {
+			Color accent = Color.yellow;
+			EditorGUI.DrawRect(args.rowRect, new Color(accent.r, accent.g, accent.b, 0.4f));
+		}
 		if (item.data.arrayIndex.HasValue) {
 			EditorGUI.DrawRect(args.rowRect, new Color(0, 0, 0, 0.1f));
 		}
@@ -193,17 +200,15 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 					GUI.Label(cellRect, new GUIContent(item.data.entry.Name), EditorStyles.miniLabel);
 				}
 				break;
-			/*case Columns.CurrentValueInstance:
-				item.data.sourceCurrentFromDSGMem = GUI.Toggle(cellRect, item.data.sourceCurrentFromDSGMem, new GUIContent("","Item is sourced from DSGMem"));
-				break;*/
 			case Columns.CurrentValue:
-				DsgVarComponentEditor.DrawDsgVarCurrent(cellRect, item.data.entry, item.data.sourceCurrentFromDSGMem, item.data.arrayIndex);
+				DsgVarComponentEditor.DrawDsgVarCurrent(cellRect, item.data.entry, item.data.arrayIndex);
 				break;
-			/*case Columns.InitialValueInstance:
-				item.data.sourceInitialFromDSGMem = GUI.Toggle(cellRect, item.data.sourceInitialFromDSGMem, new GUIContent("","Item is sourced from DSGMem"));
-				break;*/
 			case Columns.InitialValue:
-				DsgVarComponentEditor.DrawDsgVarInitial(cellRect, item.data.entry, item.data.sourceCurrentFromDSGMem, item.data.arrayIndex);
+				DsgVarComponentEditor.DrawDsgVarInitial(cellRect, item.data.entry, item.data.arrayIndex);
+				break;
+
+			case Columns.ModelValue:
+				DsgVarComponentEditor.DrawDsgVarModel(cellRect, item.data.entry, item.data.arrayIndex);
 				break;
 		}
 	}
@@ -254,48 +259,37 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 				canSort = false,
 				width = 60,
 				minWidth = 40,
+				maxWidth = 120,
 				autoResize = true,
 				allowToggleVisibility = false
 			},
-			/*new MultiColumnHeaderState.Column
-			{
-				headerContent = new GUIContent("Mem", "Use DSGMem (Instance memory)"),
-				headerTextAlignment = TextAlignment.Center,
-				canSort = false,
-				width = 30,
-				minWidth = 30,
-				maxWidth = 30,
-				autoResize = true,
-				allowToggleVisibility = false
-			},*/
 			new MultiColumnHeaderState.Column 
 			{
 				headerContent = new GUIContent("Current Value", ""),
 				headerTextAlignment = TextAlignment.Left,
 				canSort = false,
 				width = 100, 
-				minWidth = 60,
+				minWidth = 100,
 				autoResize = true,
 				allowToggleVisibility = false
 			},
-			/*new MultiColumnHeaderState.Column
-			{
-				headerContent = new GUIContent("Mem", "Use DSGMem (Instance memory"),
-				headerTextAlignment = TextAlignment.Center,
-				canSort = false,
-				width = 30,
-				minWidth = 30,
-				maxWidth = 30,
-				autoResize = true,
-				allowToggleVisibility = false
-			},*/
 			new MultiColumnHeaderState.Column 
 			{
 				headerContent = new GUIContent("Initial Value", ""),
 				headerTextAlignment = TextAlignment.Left,
 				canSort = false,
 				width = 100,
-				minWidth = 60,
+				minWidth = 100,
+				autoResize = true,
+				allowToggleVisibility = false
+			},
+			new MultiColumnHeaderState.Column
+			{
+				headerContent = new GUIContent("Model Value", ""),
+				headerTextAlignment = TextAlignment.Left,
+				canSort = false,
+				width = 100,
+				minWidth = 100,
 				autoResize = true,
 				allowToggleVisibility = false
 			},

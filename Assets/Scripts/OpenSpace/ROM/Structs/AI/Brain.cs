@@ -18,12 +18,12 @@ namespace OpenSpace.ROM {
 			if (dsgMem.Value != null && dsgMem.Value.num_info > 0) {
 				for (int i = 0; i < dsgMem.Value.info.Value.info.Length; i++) {
 					DsgMemInfo info = dsgMem.Value.info.Value.info[i].Value;
-					DsgVarInfo.Entry entry = aiModel.Value.dsgVar.Value.info.Value.GetEntryFromIndex(info.index);
+					DsgVarInfo.Entry entry = aiModel.Value.dsgVar.Value.info.Value.GetEntryFromIndex(info.value.index);
 					Loader.print("DsgMemInfo "
-						+ info.dsgVarType + (info.paramEntry?.Value != null ? "[" + info.paramEntry.Value.index_in_array + "]" : "")
+						+ info.value.dsgVarType + (info.value.paramEntry?.Value != null ? "[" + info.value.paramEntry.Value.index_in_array + "]" : "")
 						+ " - "
-						+ entry.dsgVarType + (entry.paramEntry?.Value != null ? "[" + entry.paramEntry.Value.index_in_array + "]" : "")
-						+ " - " + info.param + " - " + entry.param);
+						+ entry.value.dsgVarType + (entry.value.paramEntry?.Value != null ? "[" + entry.value.paramEntry.Value.index_in_array + "]" : "")
+						+ " - " + info.value.param + " - " + entry.value.param);
 				}
 			}
 		}

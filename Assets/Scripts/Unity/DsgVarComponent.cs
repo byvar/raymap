@@ -271,6 +271,11 @@ public class DsgVarComponent : MonoBehaviour {
                 if (val != null) return val.ToString();
                 return base.ToString();
             }
+            public bool IsSameValue(Value value) {
+                if (value == null) return false;
+                if (val != null) return val.IsSameValue(value.val);
+                return true;
+            }
         }
         public Value valueCurrent;
         public Value valueInitial;
@@ -287,6 +292,24 @@ public class DsgVarComponent : MonoBehaviour {
             if (valueCurrent != null) valueCurrent.Write(writer);
             if (valueInitial != null) valueInitial.Write(writer);
             if (valueModel != null) valueModel.Write(writer);
+        }
+
+        public bool IsCurrentDifferentFromInitial {
+            get {
+                if (valueCurrent == null) return false;
+                if (valueInitial == null) return false;
+                return !(valueCurrent.IsSameValue(valueInitial));
+            }
+        }
+        public bool IsDifferentFromModel {
+            get {
+                if (valueModel == null) return false;
+                if (valueCurrent == null) {
+                    if (valueInitial == null) return false;
+                    return (!valueInitial.IsSameValue(valueModel));
+                }
+                return !(valueCurrent.IsSameValue(valueModel));
+            }
         }
     }
 
