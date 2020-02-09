@@ -13,8 +13,8 @@ namespace OpenSpace.ROM {
 		public short paramShort;
 		public byte paramByte;
 
-		public ushort unk_04;
-		public ushort unk_06;
+		public ushort index_of_entry;
+		public ushort index_in_array;
 
 		protected override void ReadInternal(Reader reader) {
             param = reader.ReadUInt16(); // 0x00
@@ -26,8 +26,8 @@ namespace OpenSpace.ROM {
 			Pointer.Goto(ref reader, Offset); paramInt = reader.ReadInt32();
 			Pointer.Goto(ref reader, Offset); paramFloat = reader.ReadSingle();
 
-			unk_04 = reader.ReadUInt16(); // 0x04
-            unk_06 = reader.ReadUInt16(); // 0x06
+			index_of_entry = reader.ReadUInt16(); // 0x04
+            index_in_array = reader.ReadUInt16(); // 0x06
 		}
 	}
 }

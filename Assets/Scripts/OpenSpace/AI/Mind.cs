@@ -5,9 +5,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.AI {
-    public class Mind {
-        public Pointer offset;
-
+    public class Mind : OpenSpaceStruct {
         public Pointer off_AI_model;
         public Pointer off_intelligence_normal;
         public Pointer off_intelligence_reflex;
@@ -24,44 +22,6 @@ namespace OpenSpace.AI {
         public Intelligence intelligenceReflex;
         public string name = "";
 
-        public Mind(Pointer offset) {
-            this.offset = offset;
-        }
-
-        public static Mind Read(Reader reader, Pointer offset) {
-            Mind m = new Mind(offset);
-            m.off_AI_model = Pointer.Read(reader);
-            m.off_intelligence_normal = Pointer.Read(reader);
-            //if (m.off_intelligence_normal != null) MapLoader.Loader.print(m.off_intelligence_normal);
-            m.off_intelligence_reflex = Pointer.Read(reader);
-            m.off_dsgMem = Pointer.Read(reader);
-            if (Settings.s.hasNames) {
-                m.off_name = Pointer.Read(reader);
-            }
-            m.byte0 = reader.ReadByte();
-            m.byte1 = reader.ReadByte();
-            m.byte2 = reader.ReadByte();
-            m.byte3 = reader.ReadByte();
-
-            m.AI_model = AIModel.FromOffsetOrRead(m.off_AI_model, reader);
-
-            if (m.off_dsgMem != null) {
-                Pointer.Goto(ref reader, m.off_dsgMem);
-                m.dsgMem = DsgMem.Read(reader, m.off_dsgMem);
-            }
-
-            if (m.off_intelligence_normal != null) {
-                Pointer.Goto(ref reader, m.off_intelligence_normal);
-                m.intelligenceNormal = Intelligence.Read(reader, m.off_intelligence_normal);
-            }
-
-            if (m.off_intelligence_reflex != null) {
-                Pointer.Goto(ref reader, m.off_intelligence_reflex);
-                m.intelligenceReflex = Intelligence.Read(reader, m.off_intelligence_reflex);
-            }
-            return m;
-        }
-
         public void UpdateCurrentBehaviors(Reader reader)
         {
             off_AI_model = Pointer.Read(reader);
@@ -69,20 +29,54 @@ namespace OpenSpace.AI {
             off_intelligence_reflex = Pointer.Read(reader);
             off_dsgMem = Pointer.Read(reader);
 
-            if (off_dsgMem != null) {
-                Pointer.Goto(ref reader, off_dsgMem);
-                dsgMem = DsgMem.Read(reader, off_dsgMem);
+            MapLoader l = MapLoader.Loader;
+            if (dsgMem == null) {
+                dsgMem = l.FromOffsetOrRead<DsgMem>(reader, off_dsgMem);
+            } 
+            dsgMem?.Read(reader);
+
+            if (intelligenceNormal == null) {
+                intelligenceNormal = l.FromOffsetOrRead<Intelligence>(reader, off_intelligence_normal);
+            }
+            intelligenceNormal?.Read(reader);
+
+            if (intelligenceReflex == null) {
+                intelligenceReflex = l.FromOffsetOrRead<Intelligence>(reader, off_intelligence_reflex);
+            }
+            intelligenceReflex?.Read(reader);
+        }
+
+        protected override void ReadInternal(Reader reader) {
+            off_AI_model = Pointer.Read(reader);
+            off_intelligence_normal = Pointer.Read(reader);
+            if (Settings.s.game == Settings.Game.R2Demo) {
+                off_dsgMem = Pointer.Read(reader);
+                off_intelligence_reflex = Pointer.Read(reader);
+            } else {
+                off_intelligence_reflex = Pointer.Read(reader);
+                off_dsgMem = Pointer.Read(reader);
+            }
+            if (Settings.s.hasNames) {
+                off_name = Pointer.Read(reader);
+            }
+            byte0 = reader.ReadByte();
+            byte1 = reader.ReadByte();
+            byte2 = reader.ReadByte();
+            byte3 = reader.ReadByte();
+
+            if (Settings.s.game == Settings.Game.R2Demo) {
+                // null
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
             }
 
-            if (off_intelligence_normal != null) {
-                Pointer.Goto(ref reader, off_intelligence_normal);
-                intelligenceNormal = Intelligence.Read(reader, off_intelligence_normal);
-            }
-
-            if (off_intelligence_reflex != null) {
-                Pointer.Goto(ref reader, off_intelligence_reflex);
-                intelligenceReflex = Intelligence.Read(reader, off_intelligence_reflex);
-            }
+            MapLoader l = MapLoader.Loader;
+            AI_model = l.FromOffsetOrRead<AIModel>(reader, off_AI_model);
+            dsgMem = l.FromOffsetOrRead<DsgMem>(reader, off_dsgMem);
+            intelligenceNormal = l.FromOffsetOrRead<Intelligence>(reader, off_intelligence_normal);
+            intelligenceReflex = l.FromOffsetOrRead<Intelligence>(reader, off_intelligence_reflex);
         }
     }
 }

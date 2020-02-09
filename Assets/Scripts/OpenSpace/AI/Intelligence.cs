@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.AI {
-    public class Intelligence {
+    public class Intelligence : OpenSpaceStruct {
         public Pointer offset;
 
         public Pointer off_aiModel;
@@ -19,26 +19,18 @@ namespace OpenSpace.AI {
         public Behavior comport;
         public Behavior lastComport;
 
-        public Intelligence(Pointer offset) {
-            this.offset = offset;
-        }
-
-        public static Intelligence Read(Reader reader, Pointer offset) {
-            MapLoader l = MapLoader.Loader;
-            Intelligence i = new Intelligence(offset);
-            i.off_aiModel = Pointer.Read(reader); // 0x0
-            i.off_actionTree = Pointer.Read(reader); //0x4
-            i.off_comport = Pointer.Read(reader); //0x8
+        protected override void ReadInternal(Reader reader) {
+            off_aiModel = Pointer.Read(reader); // 0x0
+            off_actionTree = Pointer.Read(reader); //0x4
+            off_comport = Pointer.Read(reader); //0x8
             if (Settings.s.game != Settings.Game.R2Demo) {
-                i.off_lastComport = Pointer.Read(reader);
-                i.off_actionTable = Pointer.Read(reader);
+                off_lastComport = Pointer.Read(reader);
+                off_actionTable = Pointer.Read(reader);
             }
 
-            i.aiModel = AIModel.FromOffset(i.off_aiModel);
-            i.comport = Behavior.FromOffset(i.off_comport);
-            i.lastComport = Behavior.FromOffset(i.off_comport);
-
-            return i;
+            aiModel = Load.FromOffset<AIModel>(off_aiModel);
+            comport = Load.FromOffset<Behavior>(off_comport);
+            lastComport = Load.FromOffset<Behavior>(off_lastComport);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace OpenSpace.AI {
     public partial class AITypes {
 
-        public static AITypes Largo = new AITypes()
+        public static AITypes R2Demo = new AITypes()
         {
             #region Keywords
             keywordTable = new string[] {
@@ -17,10 +17,6 @@ namespace OpenSpace.AI {
                 "If4",
                 "If8",
                 "If16",
-                "If32",
-                "If64",
-                "IfNot32",
-                "IfNot64",
                 "IfDebug",
                 "IfNotU64",
                 "Then",
@@ -1134,45 +1130,22 @@ namespace OpenSpace.AI {
                 DsgVarInfoEntry.DsgVarType.Float,
                 DsgVarInfoEntry.DsgVarType.WayPoint,
                 DsgVarInfoEntry.DsgVarType.Perso,
-				DsgVarInfoEntry.DsgVarType.List, // 10
-				DsgVarInfoEntry.DsgVarType.Vector,
-				DsgVarInfoEntry.DsgVarType.Comport,
-				DsgVarInfoEntry.DsgVarType.Action,
-				DsgVarInfoEntry.DsgVarType.Text,
-				/*DsgVarInfoEntry.DsgVarType.GameMaterial,
-				DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
-                DsgVarInfoEntry.DsgVarType.Graph,
-				DsgVarInfoEntry.DsgVarType.PersoArray,
-				DsgVarInfoEntry.DsgVarType.VectorArray,
-				DsgVarInfoEntry.DsgVarType.FloatArray,
-				DsgVarInfoEntry.DsgVarType.IntegerArray,
-				DsgVarInfoEntry.DsgVarType.WayPointArray,
-				DsgVarInfoEntry.DsgVarType.TextArray,
-				DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
-				*/
-                DsgVarInfoEntry.DsgVarType.Light,
+                DsgVarInfoEntry.DsgVarType.List,
+                DsgVarInfoEntry.DsgVarType.Vector,
+                DsgVarInfoEntry.DsgVarType.Comport,
+                DsgVarInfoEntry.DsgVarType.Action,
+                DsgVarInfoEntry.DsgVarType.Text,
                 DsgVarInfoEntry.DsgVarType.GameMaterial,
-                DsgVarInfoEntry.DsgVarType.SoundEvent,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.WayPointArray,
-                DsgVarInfoEntry.DsgVarType.PersoArray, // 20
-				DsgVarInfoEntry.DsgVarType.VectorArray,
+                DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
+                DsgVarInfoEntry.DsgVarType.Graph,
+                DsgVarInfoEntry.DsgVarType.PersoArray,
+                DsgVarInfoEntry.DsgVarType.VectorArray,
                 DsgVarInfoEntry.DsgVarType.FloatArray,
                 DsgVarInfoEntry.DsgVarType.IntegerArray,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.TextArray, // 25
-				DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.GraphArray,
-                DsgVarInfoEntry.DsgVarType.None, // 30
-				DsgVarInfoEntry.DsgVarType.SuperObject,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.ActionArray,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.ObjectList, // 36
-			},
+                DsgVarInfoEntry.DsgVarType.WayPointArray,
+                DsgVarInfoEntry.DsgVarType.TextArray,
+                DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
+            },
             #endregion
 
             #region Node types
@@ -1208,18 +1181,19 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.ComportRef,
                 ScriptNode.NodeType.ModuleRef,
                 ScriptNode.NodeType.SoundEventRef, // 30
-				ScriptNode.NodeType.ObjectTableRef,
+                ScriptNode.NodeType.ObjectTableRef,
                 ScriptNode.NodeType.GameMaterialRef,
-                ScriptNode.NodeType.VisualMaterial,
                 ScriptNode.NodeType.ParticleGenerator,
+                ScriptNode.NodeType.VisualMaterial,
                 ScriptNode.NodeType.ModelRef, // 35
-				ScriptNode.NodeType.ModelRef, // different type though
-				ScriptNode.NodeType.CustomBits,
+                ScriptNode.NodeType.DataType42,
+                ScriptNode.NodeType.CustomBits,
                 ScriptNode.NodeType.Caps,
+                ScriptNode.NodeType.SubRoutine,
+                ScriptNode.NodeType.Null, // 40
                 ScriptNode.NodeType.Unknown,
-                ScriptNode.NodeType.SubRoutine, // 40
-				ScriptNode.NodeType.Null,
-                ScriptNode.NodeType.Null,
+                ScriptNode.NodeType.Unknown,
+                ScriptNode.NodeType.Unknown,
                 ScriptNode.NodeType.GraphRef
             }
             #endregion

@@ -185,24 +185,36 @@ public class WebCommunicator : MonoBehaviour {
 			if (perso.brain.mind.AI_model.behaviors_normal != null && perso.brain.mind.AI_model.behaviors_normal.Length > 0) {
 				JSONArray ruleBehaviorsJSON = new JSONArray();
 				Behavior[] ruleBehaviors = perso.brain.mind.AI_model.behaviors_normal;
+				int iter = 0;
 				foreach (Behavior behavior in ruleBehaviors) {
-					ruleBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior, includeScriptContents));
+					ruleBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior,
+						perso.brain.mind.AI_model, Behavior.BehaviorType.Intelligence, iter,
+						includeScriptContents));
+					iter++;
 				}
 				brainJSON["ruleBehaviors"] = ruleBehaviorsJSON;
 			}
 			if (perso.brain.mind.AI_model.behaviors_reflex != null && perso.brain.mind.AI_model.behaviors_reflex.Length > 0) {
 				JSONArray reflexBehaviorsJSON = new JSONArray();
 				Behavior[] reflexBehaviors = perso.brain.mind.AI_model.behaviors_reflex;
+				int iter = 0;
 				foreach (Behavior behavior in reflexBehaviors) {
-					reflexBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior, includeScriptContents));
+					reflexBehaviorsJSON.Add(GetBehaviorJSON(perso, behavior,
+						perso.brain.mind.AI_model, Behavior.BehaviorType.Reflex, iter, 
+						includeScriptContents));
+					iter++;
 				}
 				brainJSON["reflexBehaviors"] = reflexBehaviorsJSON;
 			}
 			if (perso.brain.mind.AI_model.macros != null && perso.brain.mind.AI_model.macros.Length > 0) {
 				JSONArray macrosJSON = new JSONArray();
 				Macro[] macros = perso.brain.mind.AI_model.macros;
+				int iter = 0;
 				foreach (Macro macro in macros) {
-					macrosJSON.Add(GetBehaviorJSON(perso, macro, includeScriptContents));
+					macrosJSON.Add(GetBehaviorJSON(perso, macro,
+						perso.brain.mind.AI_model, null, iter,
+						includeScriptContents));
+					iter++;
 				}
 				brainJSON["macros"] = macrosJSON;
 			}
@@ -229,36 +241,34 @@ public class WebCommunicator : MonoBehaviour {
 		JSONObject dsgObj = new JSONObject();
 		dsgObj["name"] = dsg.entry.NiceVariableName;
 		dsgObj["type"] = dsg.entry.type.ToString();
-		switch (dsg.entry.type) {
-			case DsgVarInfoEntry.DsgVarType.Boolean: dsgObj["value"] = dsg.valueAsBool; break;
-			case DsgVarInfoEntry.DsgVarType.Int: dsgObj["value"] = dsg.valueAsInt; break;
-			case DsgVarInfoEntry.DsgVarType.UInt: dsgObj["value"] = dsg.valueAsUInt; break;
-			case DsgVarInfoEntry.DsgVarType.Short: dsgObj["value"] = dsg.valueAsShort; break;
-			case DsgVarInfoEntry.DsgVarType.UShort: dsgObj["value"] = dsg.valueAsUShort; break;
-			case DsgVarInfoEntry.DsgVarType.Byte: dsgObj["value"] = dsg.valueAsByte; break;
-			case DsgVarInfoEntry.DsgVarType.UByte: dsgObj["value"] = dsg.valueAsByte; break;
-			case DsgVarInfoEntry.DsgVarType.Float: dsgObj["value"] = dsg.valueAsFloat; break;
-			case DsgVarInfoEntry.DsgVarType.Text: dsgObj["value"] = dsg.valueAsString; break;
-			case DsgVarInfoEntry.DsgVarType.Vector: dsgObj["value"] = dsg.valueAsVector; break;
+		dsgObj["valueCurrent"] = GetDsgVarValueJSON(dsg.valueCurrent);
+		dsgObj["valueInitial"] = GetDsgVarValueJSON(dsg.valueInitial);
+		dsgObj["valueModel"] = GetDsgVarValueJSON(dsg.valueModel);
+		return dsgObj;
+	}
+	private JSONObject GetDsgVarValueJSON(DsgVarComponent.DsgVarEditableEntry.Value value) {
+		if (value == null) return null;
+		JSONObject dsgObj = new JSONObject();
+		dsgObj["string"] = value.ToString();
+		switch (value.type) {
 			case DsgVarInfoEntry.DsgVarType.Perso:
-				if (dsg.entry.value != null) {
-					SuperObject so = SuperObject.FromOffset(dsg.entry.value as Pointer);
-					if (so != null && so.type == SuperObject.Type.Perso && so.data != null) {
-						Perso p = so.data as Perso;
-						if (p != null) {
-							JSONObject persoJSON = new JSONObject();
-							persoJSON["offset"] = p.offset.ToString();
-							persoJSON["nameFamily"] = p.nameFamily;
-							persoJSON["nameModel"] = p.nameModel;
-							persoJSON["nameInstance"] = p.namePerso;
-							dsgObj["value"] = persoJSON;
-						}
+				PersoBehaviour pb = value.AsPerso;
+				if (pb != null) {
+					Perso p = pb.perso;
+					if (p != null) {
+						JSONObject persoJSON = new JSONObject();
+						persoJSON["offset"] = p.offset.ToString();
+						persoJSON["nameFamily"] = p.nameFamily;
+						persoJSON["nameModel"] = p.nameModel;
+						persoJSON["nameInstance"] = p.namePerso;
+						dsgObj["perso"] = persoJSON;
 					}
 				}
 				break;
 			case DsgVarInfoEntry.DsgVarType.SuperObject:
-				SuperObject spo = SuperObject.FromOffset(dsg.entry.value as Pointer);
-				if (spo != null) {
+				SuperObjectComponent soc = value.AsSuperObject;
+				if (soc != null) {
+					SuperObject spo = soc.so;
 					JSONObject soJSON = new JSONObject();
 					soJSON["offset"] = spo.offset.ToString();
 					soJSON["type"] = spo.type.ToString();
@@ -280,12 +290,14 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		return dsgObj;
 	}
-	private JSONObject GetBehaviorJSON(Perso perso, BehaviorOrMacro behavior, bool includeScriptContents) {
+	private JSONObject GetBehaviorJSON(Perso perso, BehaviorOrMacro behavior,
+		AIModel model, Behavior.BehaviorType? type, int index,
+		bool includeScriptContents) {
 		JSONObject behaviorJSON = new JSONObject();
 		string name;
 		if (behavior is Macro) {
 			Macro m = behavior as Macro;
-			name = m.ShortName;
+			name = m.GetShortName(model, index);
 			if (m.script == null) name += " (null)";
 			if (m.script != null) {
 				behaviorJSON["script"] = GetScriptJSON(perso, m.script, includeScriptContents);
@@ -293,7 +305,7 @@ public class WebCommunicator : MonoBehaviour {
 			behaviorJSON["type"] = "Macro";
 		} else {
 			Behavior b = behavior as Behavior;
-			name = b.ShortName;
+			name = b.GetShortName(model, type.Value, index);
 			JSONArray scripts = new JSONArray();
 			foreach (Script script in b.scripts) {
 				if (script != null) {

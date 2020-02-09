@@ -383,13 +383,6 @@ public class Controller : MonoBehaviour {
 						unityBehaviour.sector = sc;
 					}
 				} else unityBehaviour.sector = null;
-				Moddable mod = null;
-				if (p.SuperObject != null && p.SuperObject.Gao != null) {
-					mod = p.SuperObject.Gao.GetComponent<Moddable>();
-					if (mod != null) {
-						mod.persoBehaviour = unityBehaviour;
-					}
-				}
 				unityBehaviour.perso = p;
 				unityBehaviour.Init();
 
@@ -402,7 +395,8 @@ public class Controller : MonoBehaviour {
 							Behavior[] normalBehaviors = p.brain.mind.AI_model.behaviors_normal;
 							int iter = 0;
 							foreach (Behavior behavior in normalBehaviors) {
-								GameObject behaviorGao = new GameObject(behavior.ShortName);
+								string shortName = behavior.GetShortName(p.brain.mind.AI_model, Behavior.BehaviorType.Intelligence, iter);
+								GameObject behaviorGao = new GameObject(shortName);
 								behaviorGao.transform.parent = intelParent.transform;
 								foreach (Script script in behavior.scripts) {
 									GameObject scriptGao = new GameObject("Script");
@@ -429,7 +423,8 @@ public class Controller : MonoBehaviour {
 							Behavior[] reflexBehaviors = p.brain.mind.AI_model.behaviors_reflex;
 							int iter = 0;
 							foreach (Behavior behavior in reflexBehaviors) {
-								GameObject behaviorGao = new GameObject(behavior.ShortName);
+								string shortName = behavior.GetShortName(p.brain.mind.AI_model, Behavior.BehaviorType.Reflex, iter);
+								GameObject behaviorGao = new GameObject(shortName);
 								behaviorGao.transform.parent = reflexParent.transform;
 								foreach (Script script in behavior.scripts) {
 									GameObject scriptGao = new GameObject("Script");
@@ -454,7 +449,7 @@ public class Controller : MonoBehaviour {
 							int iter = 0;
 
 							foreach (Macro macro in macros) {
-								GameObject behaviorGao = new GameObject(macro.ShortName);
+								GameObject behaviorGao = new GameObject(macro.GetShortName(p.brain.mind.AI_model, iter));
 								behaviorGao.transform.parent = macroParent.transform;
 								ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
 								scriptComponent.SetScript(macro.script, p);
@@ -462,8 +457,21 @@ public class Controller : MonoBehaviour {
 							}
 						}
 					}
+				}
+			}
+			// Initialize DSGVars after all persos have their perso behaviours
+			for (int i = 0; i < loader.persos.Count; i++) {
+				Perso p = loader.persos[i];
+				Moddable mod = null;
+				if (p.SuperObject != null && p.SuperObject.Gao != null) {
+					mod = p.SuperObject.Gao.GetComponent<Moddable>();
+					if (mod != null) {
+						mod.persoBehaviour = p.Gao.GetComponent<PersoBehaviour>();
+					}
+				}
+				if (p.Gao && p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null) {
 					// DsgVars
-					if (p.brain != null && p.brain.mind != null && p.brain.mind.dsgMem != null) {
+					if (p.brain.mind.dsgMem != null || p.brain.mind.AI_model.dsgVar != null) {
 						DsgVarComponent dsgVarComponent = p.Gao.AddComponent<DsgVarComponent>();
 						dsgVarComponent.SetPerso(p);
 						if (mod != null) mod.dsgVarComponent = dsgVarComponent;
@@ -707,12 +715,12 @@ public class Controller : MonoBehaviour {
 						}
                     }
 
-
                     MindComponent mc = perso.Gao.GetComponent<MindComponent>();
                     if (mc != null) {
                         Mind mind = mc.mind;
-                        Pointer.Goto(ref reader, mind.offset);
-                        mind.UpdateCurrentBehaviors(reader);
+						Pointer.DoAt(ref reader, mind.Offset, () => {
+							mind.UpdateCurrentBehaviors(reader);
+						});
                     }
 
                     DsgVarComponent dsgVarComponent = perso.Gao.GetComponent<DsgVarComponent>();

@@ -7,11 +7,9 @@ using UnityEngine;
 namespace OpenSpace.AI {
     public class Behavior : BehaviorOrMacro {
 		public enum BehaviorType {
-			Rule,
+			Intelligence,
 			Reflex
 		}
-
-		public List<Pointer> copies;
 
         public string name = null;
         public Pointer off_scripts;
@@ -20,22 +18,30 @@ namespace OpenSpace.AI {
         public Script[] scripts;
         public Script firstScript;
 
+        // Custom
+        public List<Pointer> copies;
+        public AIModel aiModel;
+        public BehaviorType type;
+        public int index;
 
-		public string ShortName {
+        public string ShortName {
 			get {
-				string shortName = "";
-				if (name != null) {
-					shortName = name;
-					//string comportNamePattern = @"^(?<family>[^\\]+?)\\(?<model>[^\\]+?)\\(?<model2>[^\\]+?)\.(?<type>...?)\^CreateIntelligence\^CreateComport:(?<name>.*?)$";
-					if (shortName.Contains("^CreateComport:")) {
-						shortName = shortName.Substring(shortName.LastIndexOf("^CreateComport:") + 15);
-					}
-					shortName = "[\"" + shortName + "\"]";
-				}
-				shortName = aiModel.name + "." + type.ToString() + "[" + index +  "]" + shortName;
-				return shortName;
+                return GetShortName(aiModel, type, index);
 			}
 		}
+        public string GetShortName(AIModel model, BehaviorType type, int index) {
+            string shortName = "";
+            if (name != null) {
+                shortName = name;
+                //string comportNamePattern = @"^(?<family>[^\\]+?)\\(?<model>[^\\]+?)\\(?<model2>[^\\]+?)\.(?<type>...?)\^CreateIntelligence\^CreateComport:(?<name>.*?)$";
+                if (shortName.Contains("^CreateComport:")) {
+                    shortName = shortName.Substring(shortName.LastIndexOf("^CreateComport:") + 15);
+                }
+                shortName = "[\"" + shortName + "\"]";
+            }
+            shortName = model.name + "." + type.ToString() + "[" + index + "]" + shortName;
+            return shortName;
+        }
 
         public string VeryShortName
         {
@@ -54,31 +60,9 @@ namespace OpenSpace.AI {
             }
         }
 
-        public AIModel aiModel;
-		public BehaviorType type;
-		public int index;
-
-		public Behavior(Pointer offset) {
-            this.offset = offset;
+		public Behavior() : base() {
 			copies = new List<Pointer>();
         }
-
-        public static Behavior FromOffset(Pointer offset) {
-            if (offset == null) return null;
-            MapLoader l = MapLoader.Loader;
-            return l.behaviors.FirstOrDefault(b => (b.offset == offset) || (Settings.s.platform == Settings.Platform.DC && b.copies.Contains(offset)));
-        }
-
-		public static Behavior FromOffsetOrRead(Pointer offset, Reader reader) {
-			if (offset == null) return null;
-			Behavior b = FromOffset(offset);
-			if (b == null) {
-				Pointer.DoAt(ref reader, offset, () => {
-					b = Behavior.Read(reader, offset);
-				});
-			}
-			return b;
-		}
 
 		public bool ContentEquals(Behavior b) {
 			if (firstScript != null) {
@@ -93,47 +77,32 @@ namespace OpenSpace.AI {
 			return true;
 		}
 
-		/*public static Behavior FromOffsetOrRead(Pointer offset, Reader reader, AIModel aiModel, BehaviorType type, int number) {
-            if (offset == null) return null;
-            Behavior b = FromOffset(offset);
-            if (b == null) {
-                Pointer.DoAt(ref reader, offset, () => {
-                    b = Behavior.Read(reader, offset, aiModel, type, number);
-                });
-            }
-            return b;
-        }*/
-
-		public static Behavior Read(Reader reader, Pointer offset) {
+        protected override void ReadInternal(Reader reader) {
             MapLoader l = MapLoader.Loader;
-            Behavior behavior = new Behavior(offset);
+            l.behaviors.Add(this);
 
             if (Settings.s.hasNames) {
-                behavior.name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
+                name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
             }
-            behavior.off_scripts = Pointer.Read(reader);
-            behavior.off_firstScript = Pointer.Read(reader);
+            off_scripts = Pointer.Read(reader);
+            off_firstScript = Pointer.Read(reader);
             if (Settings.s.game == Settings.Game.R2Demo || Settings.s.platform == Settings.Platform.DC) {
                 reader.ReadUInt32();
             }
-            behavior.num_scripts = reader.ReadByte();
+            num_scripts = reader.ReadByte();
             reader.ReadByte();
             reader.ReadByte();
             reader.ReadByte();
             //if (entry.name != null) l.print(entry.name);
-            behavior.scripts = new Script[behavior.num_scripts];
-            Pointer.DoAt(ref reader, behavior.off_scripts, () => {
-                for (int i = 0; i < behavior.num_scripts; i++) {
-                    behavior.scripts[i] = Script.Read(reader, Pointer.Current(reader), behavior);
+            scripts = new Script[num_scripts];
+            Pointer.DoAt(ref reader, off_scripts, () => {
+                for (int i = 0; i < num_scripts; i++) {
+                    scripts[i] = Script.Read(reader, Pointer.Current(reader), this);
                 }
             });
-            Pointer.DoAt(ref reader, behavior.off_firstScript, () => {
-                behavior.firstScript = Script.Read(reader, Pointer.Current(reader), behavior, single: true);
+            Pointer.DoAt(ref reader, off_firstScript, () => {
+                firstScript = Script.Read(reader, Pointer.Current(reader), this, single: true);
             });
-
-            l.behaviors.Add(behavior);
-
-            return behavior;
         }
 
         public override string ToString() {

@@ -117,7 +117,7 @@ public class LightBehaviour : MonoBehaviour {
 		li.light = this; // very dirty
 		this.lightManager = lm;
 
-		name = (li.name == null ? "Light" : li.name) + " @ " + li.offset + " | " +
+		name = (li.name == null ? "Light" : li.name) + " @ " + li.Offset + " | " +
 						"Type: " + Type + " - Far: " + Far + " - Near: " + Near +
 						//" - FogBlendNear: " + FogBlendNear + " - FogBlendFar: " + FogBlendFar +
 						" - AlphaLF: " + AlphaLightFlag +

@@ -10,7 +10,9 @@ using UnityEngine;
 public class GraphManager : MonoBehaviour {
 	public Controller controller;
     //bool loaded = false;
-    public List<WaypointBehaviour> waypoints;
+    public List<WayPointBehaviour> waypoints;
+	public List<GraphBehaviour> graphs;
+	public Dictionary<Graph, GraphBehaviour> graphDict = new Dictionary<Graph, GraphBehaviour>();
 	private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
 
@@ -23,7 +25,7 @@ public class GraphManager : MonoBehaviour {
     void Update() {
     }
 
-	public void AddWaypoint(WaypointBehaviour wp) {
+	public void AddWaypoint(WayPointBehaviour wp) {
 		waypoints.Add(wp);
 		wp.manager = this;
 	}
@@ -48,12 +50,15 @@ public class GraphManager : MonoBehaviour {
 			foreach (OpenSpace.ROM.Graph graph in l.graphsROM) {
 				GameObject go_graph = new GameObject("Graph " + graph.Offset);
 				go_graph.transform.SetParent(graphRoot.transform);
+				GraphBehaviour gb = go_graph.AddComponent<GraphBehaviour>();
+				gb.graphROM = graph;
 
 				for (int i = 0; i < graph.num_nodes; i++) {
 					OpenSpace.ROM.GraphNode node = graph.nodes.Value.nodes[i].Value;
 					if (node.waypoint.Value != null) {
-						WaypointBehaviour wp = waypoints.FirstOrDefault(w => w.wpROM == node.waypoint.Value);
+						WayPointBehaviour wp = waypoints.FirstOrDefault(w => w.wpROM == node.waypoint.Value);
 						if (wp != null) {
+							gb.nodes.Add(wp);
 							wp.nodesROM.Add(node);
 							wp.name = "GraphNode[" + i + "].WayPoint (" + wp.wpROM.Offset + ")";
 							if (i == 0) {
@@ -67,7 +72,7 @@ public class GraphManager : MonoBehaviour {
 		} else {
 			MapLoader l = MapLoader.Loader;
 			foreach (WayPoint wp in l.waypoints) {
-				AddWaypoint(wp.Gao.GetComponent<WaypointBehaviour>());
+				AddWaypoint(wp.Gao.GetComponent<WayPointBehaviour>());
 			}
 			if (graphRoot == null && l.graphs.Count > 0) {
 				graphRoot = new GameObject("Graphs");
@@ -77,13 +82,17 @@ public class GraphManager : MonoBehaviour {
 			foreach (Graph graph in l.graphs) {
 				GameObject go_graph = new GameObject(graph.name ?? "Graph " + graph.offset.ToString());
 				go_graph.transform.SetParent(graphRoot.transform);
+				GraphBehaviour gb = go_graph.AddComponent<GraphBehaviour>();
+				gb.graph = graph;
+				graphDict[graph] = gb;
 
 				for (int i = 0; i < graph.nodes.Count; i++) {
 					GraphNode node = graph.nodes[i];
 					if (node == null) continue;
 					if (node.wayPoint != null) {
-						WaypointBehaviour wp = waypoints.FirstOrDefault(w => w.wp == node.wayPoint);
+						WayPointBehaviour wp = waypoints.FirstOrDefault(w => w.wp == node.wayPoint);
 						if (wp != null) {
+							gb.nodes.Add(wp);
 							wp.nodes.Add(node);
 							wp.name = "GraphNode[" + i + "].WayPoint (" + wp.wp.offset + ")";
 							if (i == 0) {
@@ -96,17 +105,17 @@ public class GraphManager : MonoBehaviour {
 			}
 		}
 
-		List<WaypointBehaviour> isolateWaypoints = waypoints.Where(w => w.nodes.Count == 0 && w.nodesROM.Count == 0).ToList();
+		List<WayPointBehaviour> isolateWaypoints = waypoints.Where(w => w.nodes.Count == 0 && w.nodesROM.Count == 0).ToList();
 		if (isolateWaypointRoot == null && isolateWaypoints.Count > 0) {
 			isolateWaypointRoot = new GameObject("Isolate WayPoints");
 			isolateWaypointRoot.transform.SetParent(transform);
 			isolateWaypointRoot.SetActive(false);
 		}
-		foreach (WaypointBehaviour wp in isolateWaypoints) {
+		foreach (WayPointBehaviour wp in isolateWaypoints) {
 			wp.name = "Isolate WayPoint @" + (wp.wpROM != null ? wp.wpROM.Offset : wp.wp.offset);
 			wp.transform.SetParent(isolateWaypointRoot.transform);
 		}
-		foreach (WaypointBehaviour wp in waypoints) {
+		foreach (WayPointBehaviour wp in waypoints) {
 			wp.Init();
 		}
 		UpdateViewGraphs();

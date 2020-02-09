@@ -7,207 +7,339 @@ using System;
 using UnityEditor;
 using System.Linq;
 using OpenSpace.Waypoints;
+using OpenSpace;
 
-namespace OpenSpace
-{
-    public class DsgVarComponent : MonoBehaviour
+public class DsgVarComponent : MonoBehaviour {
+    public Perso perso;
+    public DsgMem dsgMem;
+    public DsgVar dsgVar;
+    public DsgVarInfoEntry[] dsgVarEntries;
+    public DsgVarEditableEntry[] editableEntries;
+
+    public class DsgVarEditableEntry {
+        public DsgVarInfoEntry entry;
+        public int number;
+        public string Name {
+            get {
+                return entry.NiceVariableName;
+            }
+        }
+        public bool IsArray {
+            get {
+                return DsgVarInfoEntry.GetDsgVarTypeFromArrayType(entry.type) != DsgVarInfoEntry.DsgVarType.None;
+            }
+        }
+        public DsgVarInfoEntry.DsgVarType Type {
+            get {
+                return entry.type;
+            }
+        }
+        public int ArrayLength {
+            get {
+                if (IsArray) {
+                    if (valueModel != null) return valueModel.AsArray.Length;
+                    if (valueCurrent != null) return valueCurrent.AsArray.Length;
+                    if (valueInitial != null) return valueInitial.AsArray.Length;
+                }
+                return 0;
+            }
+        }
+
+        // Unity interface for the different DSGVar Types
+        public class Value {
+            public DsgVarValue val;
+            public DsgVarInfoEntry.DsgVarType type;
+
+            public SuperObjectComponent AsSuperObject {
+                get {
+                    if (type != DsgVarInfoEntry.DsgVarType.SuperObject) return null;
+                    if (val != null) {
+                        if (val.valueSuperObject == null && val.valuePointer != null) {
+                            val.valueSuperObject = MapLoader.Loader.superObjects.FirstOrDefault(p => (p.offset != null && p.offset == val.valuePointer));
+                        }
+                        return val.valueSuperObject?.Gao.GetComponent<SuperObjectComponent>();
+                    }
+                    return null;
+                }
+                set {
+                    if (type != DsgVarInfoEntry.DsgVarType.SuperObject) return;
+                    if (val != null) {
+                        if (value != null) {
+                            val.valueSuperObject = value.so;
+                            val.valuePointer = value.so.offset;
+                        } else {
+                            val.valueSuperObject = null;
+                            val.valuePointer = null;
+                        }
+                    }
+                }
+            }
+            public PersoBehaviour AsPerso {
+                get {
+                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return null;
+                    if (val != null) {
+                        if (val.valuePerso == null && val.valuePointer != null) {
+                            SuperObject so = SuperObject.FromOffset(val.valuePointer);
+                            if (so != null) {
+                                val.valuePerso = so.data as Perso;
+                            }
+                        }
+                        return val.valuePerso?.Gao.GetComponent<PersoBehaviour>();
+                    }
+                    return null;
+                }
+                set {
+                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return;
+                    if (val != null) {
+                        if (value != null) {
+                            val.valuePerso = value.perso;
+                            val.valuePointer = value.perso.offset;
+                        } else {
+                            val.valuePerso = null;
+                            val.valuePointer = null;
+                        }
+                    }
+                }
+            }
+            public WayPointBehaviour AsWayPoint {
+                get {
+                    if (type != DsgVarInfoEntry.DsgVarType.WayPoint) return null;
+                    if (val != null) {
+                        return val.valueWayPoint?.Gao.GetComponent<WayPointBehaviour>();
+                    }
+                    return null;
+                }
+                set {
+                    if (type != DsgVarInfoEntry.DsgVarType.WayPoint) return;
+                    if (val != null) {
+                        if (value != null) {
+                            val.valueWayPoint = value.wp;
+                            val.valuePointer = value.wp.offset;
+                        } else {
+                            val.valueWayPoint = null;
+                            val.valuePointer = null;
+                        }
+                    }
+                }
+            }
+            public GraphBehaviour AsGraph {
+                get {
+                    if (type != DsgVarInfoEntry.DsgVarType.Graph) return null;
+                    if (val != null) {
+                        Graph graph = val.valueGraph;
+                        if (graph == null) return null;
+                        return MapLoader.Loader.controller.graphManager.graphDict[graph];
+                    }
+                    return null;
+                }
+                set {
+                    if (type != DsgVarInfoEntry.DsgVarType.Graph) return;
+                    if (val != null) {
+                        if (value != null) {
+                            val.valueGraph = value.graph;
+                            val.valuePointer = value.graph.offset;
+                        } else {
+                            val.valueGraph = null;
+                            val.valuePointer = null;
+                        }
+                    }
+                }
+            }
+            public bool AsBoolean {
+                get {
+                    if (val != null) return val.valueBool;
+                    return false;
+                }
+                set {
+                    if (val != null) val.valueBool = value;
+                }
+            }
+            public sbyte AsByte {
+                get {
+                    if (val != null) return val.valueByte;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueByte = value;
+                }
+            }
+            public byte AsUByte {
+                get {
+                    if (val != null) return val.valueUByte;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueUByte = value;
+                }
+            }
+            public short AsShort {
+                get {
+                    if (val != null) return val.valueShort;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueShort = value;
+                }
+            }
+            public ushort AsUShort {
+                get {
+                    if (val != null) return val.valueUShort;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueUShort = value;
+                }
+            }
+            public int AsInt {
+                get {
+                    if (val != null) return val.valueInt;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueInt = value;
+                }
+            }
+            public uint AsUInt {
+                get {
+                    if (val != null) return val.valueUInt;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueUInt = value;
+                }
+            }
+            public float AsFloat {
+                get {
+                    if (val != null) return val.valueFloat;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueFloat = value;
+                }
+            }
+            public Vector3 AsVector {
+                get {
+                    if (val != null) return val.valueVector;
+                    return Vector3.zero;
+                }
+                set {
+                    if (val != null) val.valueVector = value;
+                }
+            }
+            public int AsText {
+                get {
+                    if (val != null) return val.valueText;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueText = value;
+                }
+            }
+            public uint AsCaps {
+                get {
+                    if (val != null) return val.valueCaps;
+                    return 0;
+                }
+                set {
+                    if (val != null) val.valueCaps = value;
+                }
+            }
+
+            public Value[] AsArray;
+
+            public Value(DsgVarValue value) {
+                this.val = value;
+                if (value != null) InitValue(value);
+            }
+
+            public void InitValue(DsgVarValue value) {
+                this.type = value.type;
+
+                if (value.valueArray != null) {
+                    AsArray = new Value[value.arrayLength];
+                    for (int i = 0; i < AsArray.Length; i++) {
+                        AsArray[i] = new Value(value.valueArray[i]);
+                    }
+                }
+            }
+
+            public void Write(Writer writer) {
+                if (val != null) val.Write(writer);
+            }
+
+            public override string ToString() {
+                if (val != null) return val.ToString();
+                return base.ToString();
+            }
+            public bool IsSameValue(Value value) {
+                if (value == null) return false;
+                if (val != null) return val.IsSameValue(value.val);
+                return true;
+            }
+        }
+        public Value valueCurrent;
+        public Value valueInitial;
+        public Value valueModel;
+
+        public DsgVarEditableEntry(DsgVarInfoEntry entry, DsgVarValue current, DsgVarValue initial, DsgVarValue model) {
+            this.entry = entry;
+            if (current != null) valueCurrent = new Value(current);
+            if (initial != null) valueInitial = new Value(initial);
+            if (model != null) valueModel = new Value(model);
+        }
+
+        public void Write(Writer writer) {
+            if (valueCurrent != null) valueCurrent.Write(writer);
+            if (valueInitial != null) valueInitial.Write(writer);
+            if (valueModel != null) valueModel.Write(writer);
+        }
+
+        public bool IsCurrentDifferentFromInitial {
+            get {
+                if (valueCurrent == null) return false;
+                if (valueInitial == null) return false;
+                return !(valueCurrent.IsSameValue(valueInitial));
+            }
+        }
+        public bool IsDifferentFromModel {
+            get {
+                if (valueModel == null) return false;
+                if (valueCurrent == null) {
+                    if (valueInitial == null) return false;
+                    return (!valueInitial.IsSameValue(valueModel));
+                }
+                return !(valueCurrent.IsSameValue(valueModel));
+            }
+        }
+    }
+
+    public void Write(Writer writer)
     {
-        public Perso perso;
-        public DsgMem dsgMem;
-        public DsgVar dsgVar;
-        public DsgVarInfoEntry[] dsgVarEntries;
-        public DsgVarEditableEntry[] editableEntries;
-
-        public class DsgVarEditableEntry {
-            public DsgVarInfoEntry entry;
-            public int number;
-
-            // Values for different types
-            public bool valueAsBool;
-            public uint valueAsUInt;
-            public int valueAsInt;
-            public sbyte valueAsSByte;
-            public byte valueAsByte;
-            public short valueAsShort;
-            public ushort valueAsUShort;
-            public float valueAsFloat;
-            public Vector3 valueAsVector;
-            public GameObject valueAsSuperObjectGao;
-            public GameObject valueAsWaypointGao;
-            public GameObject valueAsPersoGao;
-            public string valueAsString;
-
-            public bool valueAsBool_initial;
-            public uint valueAsUInt_initial;
-            public int valueAsInt_initial;
-            public sbyte valueAsSByte_initial;
-            public byte valueAsByte_initial;
-            public short valueAsShort_initial;
-            public ushort valueAsUShort_initial;
-            public float valueAsFloat_initial;
-            public Vector3 valueAsVector_initial;
-            public GameObject valueAsSuperObjectGao_initial;
-            public GameObject valueAsPersoGao_initial;
-            public GameObject valueAsWaypointGao_initial;
-            public string valueAsString_initial;
-
-            public DsgVarEditableEntry(int number, DsgVarInfoEntry entry)
-            {
-                this.number = number;
-                this.entry = entry;
-				//print(entry.typeNumber + " - " + entry.type + " - " + entry.debugValueOffset + " - " + entry.value);
-
-                switch (entry.type) {
-                    case DsgVarInfoEntry.DsgVarType.Boolean: this.valueAsBool       = (bool)    entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Int:     this.valueAsInt        = (int)     entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.UInt:    this.valueAsUInt       = (uint)    entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Short:   this.valueAsShort      = (short)   entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.UShort:  this.valueAsUShort     = (ushort)  entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Byte:    this.valueAsSByte      = (sbyte)   entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte       = (byte)    entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat      = (float)   entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector     = (Vector3) entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsUInt        = (uint)    entry.value;  break;
-                    case DsgVarInfoEntry.DsgVarType.Perso:
-                        if (entry.value != null && entry.value is Pointer) {
-                            Perso perso = MapLoader.Loader.persos.FirstOrDefault(p => (p.SuperObject!=null && p.SuperObject.offset == (Pointer)entry.value)); // find perso that belongs to the superobject
-                            if (perso!=null) {
-                                this.valueAsPersoGao = perso.Gao;
-                            }
-                        }
-                        break;
-
-                    case DsgVarInfoEntry.DsgVarType.SuperObject:
-                        if (entry.value != null) {
-                            SuperObject spo = MapLoader.Loader.superObjects.FirstOrDefault(p => (p.offset!=null && p.offset == (Pointer)entry.value));
-                            if (spo != null) {
-                                this.valueAsSuperObjectGao = spo.Gao;
-                            }
-                        }
-                        break;
-                    case DsgVarInfoEntry.DsgVarType.Waypoint:
-
-                        if (entry.value != null) {
-                            WayPoint wp = null;
-                            if (entry.value is Pointer) {
-								wp = WayPoint.FromOffset(entry.value as Pointer);
-                                //wp = (WayPoint)entry.value;
-                            }
-                            
-                            if (wp != null) {
-                                this.valueAsWaypointGao = wp.Gao;
-                            }
-                        }
-                        break;
-
-                }
-
-                if (entry.initialValue!=null) {
-                    switch (entry.type) {
-                        case DsgVarInfoEntry.DsgVarType.Boolean: this.valueAsBool_initial       = (bool)entry.initialValue;         break;
-                        case DsgVarInfoEntry.DsgVarType.Int:     this.valueAsInt_initial        = (int)entry.initialValue;          break;
-                        case DsgVarInfoEntry.DsgVarType.UInt:    this.valueAsUInt_initial       = (uint)entry.initialValue;         break;
-                        case DsgVarInfoEntry.DsgVarType.Short:   this.valueAsShort_initial      = (short)entry.initialValue;        break;
-                        case DsgVarInfoEntry.DsgVarType.UShort:  this.valueAsUShort_initial     = (ushort)entry.initialValue;       break;
-                        case DsgVarInfoEntry.DsgVarType.Byte:    this.valueAsSByte_initial      = (sbyte)entry.initialValue;        break;
-                        case DsgVarInfoEntry.DsgVarType.UByte:   this.valueAsByte_initial       = (byte)entry.initialValue;         break;
-                        case DsgVarInfoEntry.DsgVarType.Float:   this.valueAsFloat_initial      = (float)entry.initialValue;        break;
-                        case DsgVarInfoEntry.DsgVarType.Vector:  this.valueAsVector_initial     = (Vector3)entry.initialValue;      break;
-                        case DsgVarInfoEntry.DsgVarType.Text:    this.valueAsUInt_initial        = (uint)entry.initialValue;       break;
-                        case DsgVarInfoEntry.DsgVarType.Perso:
-                            if (entry.initialValue != null) {
-                                Perso perso = MapLoader.Loader.persos.FirstOrDefault(p => p.SuperObject.offset == (Pointer)entry.initialValue);
-                                if (perso != null) {
-                                    this.valueAsPersoGao_initial = perso.Gao;
-                                }
-                            }
-                        break;
-                        case DsgVarInfoEntry.DsgVarType.SuperObject:
-                            if (entry.initialValue != null) {
-                                SuperObject spo = MapLoader.Loader.superObjects.FirstOrDefault(p => p.offset == (Pointer)entry.initialValue);
-                                if (spo != null) {
-                                    this.valueAsSuperObjectGao_initial = spo.Gao;
-                                }
-                            }
-                        break;
-                        case DsgVarInfoEntry.DsgVarType.Waypoint:
-
-                            if (entry.initialValue != null) {
-                                WayPoint wp = null;
-                                if (entry.initialValue is Pointer) {
-									wp = WayPoint.FromOffset(entry.initialValue as Pointer);
-                                    //wp = (WayPoint)entry.initialValue;
-                                }
-
-                                if (wp != null) {
-                                    this.valueAsWaypointGao_initial = wp.Gao;
-                                }
-                            }
-                            break;
-                    }
-                }
-            }
-
-            public void Write(DsgMem dsgMem, Writer writer)
-            {
-                Pointer.Goto(ref writer, dsgMem.memBuffer + entry.offsetInBuffer);
-                switch (entry.type) {
-                    case DsgVarInfoEntry.DsgVarType.Boolean:    writer.Write(this.valueAsBool); break;
-                    case DsgVarInfoEntry.DsgVarType.Int:        writer.Write(this.valueAsInt); break;
-                    case DsgVarInfoEntry.DsgVarType.UInt:       writer.Write(this.valueAsUInt); break;
-                    case DsgVarInfoEntry.DsgVarType.Short:      writer.Write(this.valueAsShort); break;
-                    case DsgVarInfoEntry.DsgVarType.UShort:     writer.Write(this.valueAsUShort); break;
-                    case DsgVarInfoEntry.DsgVarType.Byte:       writer.Write(this.valueAsSByte); break;
-                    case DsgVarInfoEntry.DsgVarType.UByte:      writer.Write(this.valueAsByte); break;
-                    case DsgVarInfoEntry.DsgVarType.Float:      writer.Write(this.valueAsFloat); break;
-                    case DsgVarInfoEntry.DsgVarType.Vector:     writer.Write(this.valueAsVector.x); writer.Write(this.valueAsVector.y); writer.Write(this.valueAsVector.z); break;
-                }
-
-                if (entry.initialValue != null && dsgMem.memBufferInitial!=null) {
-                    Pointer.Goto(ref writer, dsgMem.memBufferInitial + entry.offsetInBuffer);
-
-                    switch (entry.type) {
-                        case DsgVarInfoEntry.DsgVarType.Boolean:    writer.Write(this.valueAsBool_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Int:        writer.Write(this.valueAsInt_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.UInt:       writer.Write(this.valueAsUInt_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Short:      writer.Write(this.valueAsShort_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.UShort:     writer.Write(this.valueAsUShort_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Byte:       writer.Write(this.valueAsSByte_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.UByte:      writer.Write(this.valueAsByte_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Float:      writer.Write(this.valueAsFloat_initial); break;
-                        case DsgVarInfoEntry.DsgVarType.Vector:     writer.Write(this.valueAsVector_initial.x); writer.Write(this.valueAsVector_initial .y); writer.Write(this.valueAsVector_initial.z); break;
-                    }
-                }
-            }
+        foreach (DsgVarEditableEntry entry in this.editableEntries) {
+            entry.Write(writer);
         }
+    }
 
-        public void Write(Writer writer)
-        {
-            foreach (DsgVarEditableEntry entry in this.editableEntries) {
-                entry.Write(dsgMem, writer);
+    public void SetPerso(Perso perso)
+    {
+        this.perso = perso;
+        if (perso != null && perso.brain != null && perso.brain.mind != null) {
+            dsgMem = perso.brain.mind.dsgMem;
+            if (dsgMem != null) {
+                dsgVar = dsgMem.dsgVar;
+            } else {
+                dsgVar = perso.brain.mind.AI_model?.dsgVar;
             }
-        }
+            dsgVarEntries = dsgVar.dsgVarInfos;
+            editableEntries = new DsgVarEditableEntry[dsgVarEntries.Length];
 
-        public void SetDsgMem(DsgMem dsgMem)
-        {
-            this.dsgMem = dsgMem;
-            this.dsgVar = dsgMem.dsgVar;
-            this.dsgVarEntries = this.dsgVar.dsgVarInfos;
-            this.editableEntries = new DsgVarEditableEntry[this.dsgVarEntries.Length];
-
-            int i = 0;
-            foreach (DsgVarInfoEntry entry in this.dsgVarEntries) {
-                DsgVarEditableEntry editableEntry = new DsgVarEditableEntry(i, entry);
+            for(int i = 0; i < editableEntries.Length; i++) {
+                DsgVarEditableEntry editableEntry = new DsgVarEditableEntry(
+                    dsgVar.dsgVarInfos[i],
+                    dsgMem?.values?[i],
+                    dsgMem?.valuesInitial?[i],
+                    dsgVar?.defaultValues?[i]);
                 editableEntries[i] = editableEntry;
-                i++;
-            }
-        }
-
-        public void SetPerso(Perso perso)
-        {
-            this.perso = perso;
-            if (perso != null && perso.brain != null && perso.brain.mind != null && perso.brain.mind.dsgMem != null && perso.brain.mind.dsgMem.dsgVar != null) {
-                SetDsgMem(perso.brain.mind.dsgMem);
             }
         }
     }

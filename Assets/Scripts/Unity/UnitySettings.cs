@@ -1,18 +1,14 @@
 ﻿using OpenSpace;
 using System;
 using System.Collections.Generic;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 
 /// <summary>
 /// Settings for Raymap
 /// </summary>
-#if UNITY_EDITOR
 [InitializeOnLoad]
-#endif
-public class UnitySettings
-{
+public class UnitySettings {
+	private static string editorPrefsPrefix = "Raymap.";
 	public static Dictionary<Settings.Mode, string> GameDirs = new Dictionary<Settings.Mode, string>();
 	public static Dictionary<Settings.Mode, string> GameDirsWeb = new Dictionary<Settings.Mode, string>();
 
@@ -31,45 +27,43 @@ public class UnitySettings
 	public static string ExportPath { get; set; } = "./exports/";
 	public static bool ExportAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
 
-    #if UNITY_EDITOR
-
-    /// <summary>
-    /// Saves the settings
-    /// </summary>
-    public static void Save() {
+	/// <summary>
+	/// Saves the settings
+	/// </summary>
+	public static void Save() {
 		Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
 		foreach (Settings.Mode mode in modes) {
 			string dir = GameDirs.ContainsKey(mode) ? GameDirs[mode] : "";
-			EditorPrefs.SetString("Directory" + mode.ToString(), dir);
+			EditorPrefs.SetString(editorPrefsPrefix + "Directory" + mode.ToString(), dir);
 		}
 		foreach (Settings.Mode mode in modes) {
 			string dir = GameDirsWeb.ContainsKey(mode) ? GameDirsWeb[mode] : "";
-			EditorPrefs.SetString("WebDirectory" + mode.ToString(), dir);
+			EditorPrefs.SetString(editorPrefsPrefix + "WebDirectory" + mode.ToString(), dir);
 		}
-		EditorPrefs.SetString("GameMode", GameMode.ToString());
-        EditorPrefs.SetString("MapName", MapName);
+		EditorPrefs.SetString(editorPrefsPrefix + "GameMode", GameMode.ToString());
+        EditorPrefs.SetString(editorPrefsPrefix + "MapName", MapName);
 
 		// Memory loading
-		EditorPrefs.SetString("ProcessName", ProcessName);
-		EditorPrefs.SetBool("LoadFromMemory", LoadFromMemory);
+		EditorPrefs.SetString(editorPrefsPrefix + "ProcessName", ProcessName);
+		EditorPrefs.SetBool(editorPrefsPrefix + "LoadFromMemory", LoadFromMemory);
 
 		// Export
-		EditorPrefs.SetString("ExportPath", ExportPath);
-		EditorPrefs.SetBool("ExportAfterLoad", ExportAfterLoad);
+		EditorPrefs.SetString(editorPrefsPrefix + "ExportPath", ExportPath);
+		EditorPrefs.SetBool(editorPrefsPrefix + "ExportAfterLoad", ExportAfterLoad);
 
 		// Misc
-		EditorPrefs.SetString("ScreenshotPath", ScreenshotPath);
-		EditorPrefs.SetBool("AllowDeadPointers", AllowDeadPointers);
-		EditorPrefs.SetBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
-		EditorPrefs.SetBool("BlockyMode", BlockyMode);
-		EditorPrefs.SetBool("SaveTextures", SaveTextures);
+		EditorPrefs.SetString(editorPrefsPrefix + "ScreenshotPath", ScreenshotPath);
+		EditorPrefs.SetBool(editorPrefsPrefix + "AllowDeadPointers", AllowDeadPointers);
+		EditorPrefs.SetBool(editorPrefsPrefix + "ForceDisplayBackfaces", ForceDisplayBackfaces);
+		EditorPrefs.SetBool(editorPrefsPrefix + "BlockyMode", BlockyMode);
+		EditorPrefs.SetBool(editorPrefsPrefix + "SaveTextures", SaveTextures);
 	}
 
-    /// <summary>
-    /// Static constructor loads in editor data at editor startup.
-    /// This way, the data loads even if the editor window isn't active.
-    /// </summary>
-    static UnitySettings() {
+	/// <summary>
+	/// Static constructor loads in editor data at editor startup.
+	/// This way, the data loads even if the editor window isn't active.
+	/// </summary>
+	static UnitySettings() {
 		Load();
 	}
 
@@ -81,30 +75,30 @@ public class UnitySettings
 		Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
 		foreach (Settings.Mode mode in modes) {
 			string dir = GameDirs.ContainsKey(mode) ? GameDirs[mode] : "";
-			GameDirs[mode] = EditorPrefs.GetString("Directory" + mode.ToString(), dir);
+			GameDirs[mode] = EditorPrefs.GetString(editorPrefsPrefix + "Directory" + mode.ToString(), dir);
 		}
 		foreach (Settings.Mode mode in modes) {
 			string dir = GameDirsWeb.ContainsKey(mode) ? GameDirsWeb[mode] : "";
-			GameDirsWeb[mode] = EditorPrefs.GetString("WebDirectory" + mode.ToString(), dir);
+			GameDirsWeb[mode] = EditorPrefs.GetString(editorPrefsPrefix + "WebDirectory" + mode.ToString(), dir);
 		}
-		GameMode = Enum.TryParse(EditorPrefs.GetString("GameMode", GameMode.ToString()), out Settings.Mode gameMode) ? gameMode : GameMode;
-        MapName = EditorPrefs.GetString("MapName", MapName);
+
+		string modeString = EditorPrefs.GetString(editorPrefsPrefix + "GameMode", GameMode.ToString());
+		GameMode = Enum.TryParse(modeString, out Settings.Mode gameMode) ? gameMode : GameMode;
+        MapName = EditorPrefs.GetString(editorPrefsPrefix + "MapName", MapName);
 
 		// Memory loading
-		ProcessName = EditorPrefs.GetString("ProcessName", ProcessName);
-		LoadFromMemory = EditorPrefs.GetBool("LoadFromMemory", LoadFromMemory);
+		ProcessName = EditorPrefs.GetString(editorPrefsPrefix + "ProcessName", ProcessName);
+		LoadFromMemory = EditorPrefs.GetBool(editorPrefsPrefix + "LoadFromMemory", LoadFromMemory);
 
 		// Export
-		ExportPath = EditorPrefs.GetString("ExportPath", ExportPath);
-		ExportAfterLoad = EditorPrefs.GetBool("ExportAfterLoad", ExportAfterLoad);
+		ExportPath = EditorPrefs.GetString(editorPrefsPrefix + "ExportPath", ExportPath);
+		ExportAfterLoad = EditorPrefs.GetBool(editorPrefsPrefix + "ExportAfterLoad", ExportAfterLoad);
 
 		// Misc
-		ScreenshotPath = EditorPrefs.GetString("ScreenshotPath", ScreenshotPath);
-		AllowDeadPointers = EditorPrefs.GetBool("AllowDeadPointers", AllowDeadPointers);
-		ForceDisplayBackfaces = EditorPrefs.GetBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
-		BlockyMode = EditorPrefs.GetBool("BlockyMode", BlockyMode);
-		SaveTextures = EditorPrefs.GetBool("SaveTextures", SaveTextures);
+		ScreenshotPath = EditorPrefs.GetString(editorPrefsPrefix + "ScreenshotPath", ScreenshotPath);
+		AllowDeadPointers = EditorPrefs.GetBool(editorPrefsPrefix + "AllowDeadPointers", AllowDeadPointers);
+		ForceDisplayBackfaces = EditorPrefs.GetBool(editorPrefsPrefix + "ForceDisplayBackfaces", ForceDisplayBackfaces);
+		BlockyMode = EditorPrefs.GetBool(editorPrefsPrefix + "BlockyMode", BlockyMode);
+		SaveTextures = EditorPrefs.GetBool(editorPrefsPrefix + "SaveTextures", SaveTextures);
 	}
-
-    #endif
 }

@@ -3,7 +3,4 @@ using UnityEditor;
 using OpenSpace.AI;
 using OpenSpace;
 
-public class BehaviorOrMacro
-{
-    public Pointer offset;
-}
+public abstract class BehaviorOrMacro : OpenSpaceStruct {}

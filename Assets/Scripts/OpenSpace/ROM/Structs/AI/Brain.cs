@@ -15,6 +15,17 @@ namespace OpenSpace.ROM {
 			comportIntelligence = new Reference<Comport>(reader, true);
 			comportReflex = new Reference<Comport>(reader, true);
 			dsgMem = new Reference<DsgMem>(reader, true);
+			if (dsgMem.Value != null && dsgMem.Value.num_info > 0) {
+				for (int i = 0; i < dsgMem.Value.info.Value.info.Length; i++) {
+					DsgMemInfo info = dsgMem.Value.info.Value.info[i].Value;
+					DsgVarInfo.Entry entry = aiModel.Value.dsgVar.Value.info.Value.GetEntryFromIndex(info.value.index);
+					Loader.print("DsgMemInfo "
+						+ info.value.dsgVarType + (info.value.paramEntry?.Value != null ? "[" + info.value.paramEntry.Value.index_in_array + "]" : "")
+						+ " - "
+						+ entry.value.dsgVarType + (entry.value.paramEntry?.Value != null ? "[" + entry.value.paramEntry.Value.index_in_array + "]" : "")
+						+ " - " + info.value.param + " - " + entry.value.param);
+				}
+			}
 		}
 	}
 }

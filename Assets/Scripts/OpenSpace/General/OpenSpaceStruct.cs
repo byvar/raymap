@@ -29,5 +29,10 @@ namespace OpenSpace {
 		}
 
 		public virtual uint Size { get; protected set; }
+		public static MapLoader Load {
+			get {
+				return MapLoader.Loader;
+			}
+		}
 	}
 }

@@ -408,7 +408,7 @@ namespace OpenSpace.Loader {
                         Pointer offset = file.GetUnsafePointer(offsetUint);
                         switch (type) {
                             case "eST_Comport":
-                                Behavior b = Behavior.FromOffset(offset);
+                                Behavior b = FromOffset<Behavior>(offset);
 								if (b == null) {
 									Match comportMatch = Regex.Match(name, comportNamePattern, RegexOptions.IgnoreCase);
 									if (comportMatch.Success) {
@@ -416,13 +416,13 @@ namespace OpenSpace.Loader {
 										AIModel aiModel = aiModels.FirstOrDefault(ai => ai.name == modelName);
 										Reader reader = files_array[Mem.Fix].reader;
 										Pointer.DoAt(ref reader, offset, () => {
-											Behavior newB = Behavior.Read(reader, offset);
+											Behavior newB = FromOffsetOrRead<Behavior>(reader, offset);
 											if (aiModel != null && newB != null) {
 												switch (comportMatch.Groups["type"].Value) {
 													case "rul":
 														foreach (Behavior originalBehavior in aiModel.behaviors_normal) {
 															if (newB.ContentEquals(originalBehavior)) {
-																originalBehavior.copies.Add(newB.offset);
+																originalBehavior.copies.Add(newB.Offset);
 																b = originalBehavior;
 																break;
 															}
@@ -431,7 +431,7 @@ namespace OpenSpace.Loader {
 													case "rfx":
 														foreach (Behavior originalBehavior in aiModel.behaviors_reflex) {
 															if (newB.ContentEquals(originalBehavior)) {
-																originalBehavior.copies.Add(newB.offset);
+																originalBehavior.copies.Add(newB.Offset);
 																b = originalBehavior;
 																break;
 															}
@@ -483,7 +483,7 @@ namespace OpenSpace.Loader {
 								List<ScriptNode> nodes = ai.behaviors_normal[i].scripts[j].scriptNodes;
 								foreach (ScriptNode node in nodes) {
 									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
-										Behavior b = Behavior.FromOffset(node.param_ptr);
+										Behavior b = FromOffset<Behavior>(node.param_ptr);
 										if (b == null) {
 											Pointer.DoAt(ref reader, node.param_ptr, () => {
 												ReadBehaviorCopy(reader, node.param_ptr, ai);
@@ -502,7 +502,7 @@ namespace OpenSpace.Loader {
 								List<ScriptNode> nodes = ai.behaviors_reflex[i].scripts[j].scriptNodes;
 								foreach (ScriptNode node in nodes) {
 									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
-										Behavior b = Behavior.FromOffset(node.param_ptr);
+										Behavior b = FromOffset<Behavior>(node.param_ptr);
 										if (b == null) {
 											Pointer.DoAt(ref reader, node.param_ptr, () => {
 												ReadBehaviorCopy(reader, node.param_ptr, ai);
@@ -517,11 +517,11 @@ namespace OpenSpace.Loader {
 			}
 		}
 		private void ReadBehaviorCopy(Reader reader, Pointer offset, AIModel ai) {
-			Behavior b = Behavior.Read(reader, offset);
+            Behavior b = FromOffsetOrRead<Behavior>(reader, offset);
 			if (b != null && ai != null && ai.behaviors_normal != null) {
 				foreach (Behavior originalBehavior in ai.behaviors_normal) {
 					if (b.ContentEquals(originalBehavior)) {
-						originalBehavior.copies.Add(b.offset);
+						originalBehavior.copies.Add(b.Offset);
 						b = null;
 						break;
 					}
@@ -530,7 +530,7 @@ namespace OpenSpace.Loader {
 			if (b != null && ai != null && ai.behaviors_reflex != null) {
 				foreach (Behavior originalBehavior in ai.behaviors_reflex) {
 					if (b.ContentEquals(originalBehavior)) {
-						originalBehavior.copies.Add(b.offset);
+						originalBehavior.copies.Add(b.Offset);
 						b = null;
 						break;
 					}
@@ -539,7 +539,7 @@ namespace OpenSpace.Loader {
 			if (b != null && behaviors != null) {
 				foreach (Behavior originalBehavior in behaviors) {
 					if (b.ContentEquals(originalBehavior)) {
-						originalBehavior.copies.Add(b.offset);
+						originalBehavior.copies.Add(b.Offset);
 						b = null;
 						break;
 					}

@@ -91,7 +91,8 @@ namespace OpenSpace {
         public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
 		public Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>> structs = new Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>>();
 		public GameObject familiesRoot = null;
-        //List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
+		//List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
+		public List<Action> onPostLoad = new List<Action>();
 
         public Dictionary<ushort, SNAMemoryBlock> relocation_global = new Dictionary<ushort, SNAMemoryBlock>();
         public FileWithPointers[] files_array = new FileWithPointers[7];
@@ -181,6 +182,10 @@ namespace OpenSpace {
 		public async Task LoadWrapper() {
 			StartLoad();
 			await Load();
+			for (int i = 0; i < onPostLoad.Count; i++) {
+				onPostLoad[i].Invoke();
+				await MapLoader.WaitIfNecessary();
+			}
 			StopLoad();
 		}
 		protected virtual async Task Load() {

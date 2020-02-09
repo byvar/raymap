@@ -392,7 +392,7 @@ namespace OpenSpace {
             encryption = Encryption.ReadInit,
             luminosity = 0.5f,
             saturate = true,
-            aiTypes = AITypes.R2,
+            aiTypes = AITypes.R2Demo,
             numEntryActions = 1
         };
         public static Settings R2PCDemo2 = new Settings() {

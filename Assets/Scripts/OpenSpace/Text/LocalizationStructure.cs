@@ -22,7 +22,6 @@ namespace OpenSpace.Text {
 
 		protected override void ReadInternal(Reader reader) {
 			MapLoader l = MapLoader.Loader;
-
 			field0 = reader.ReadUInt32();
 			if (Settings.s.game == Settings.Game.R2Revolution) {
 				num_languages = reader.ReadUInt16();
@@ -79,7 +78,7 @@ namespace OpenSpace.Text {
 								Pointer off_text = Pointer.Read(reader);
 								Pointer.DoAt(ref reader, off_text, () => {
 									languages[i].entries[j] = reader.ReadNullDelimitedString();
-									//l.print(f.languages[i].entries[j]);
+									//l.print(languages[i].entries[j]);
 								});
 							}
 						});

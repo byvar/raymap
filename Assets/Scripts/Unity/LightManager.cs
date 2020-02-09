@@ -362,7 +362,7 @@ public class LightManager : MonoBehaviour {
     public LightBehaviour Register(LightInfo light) {
 		LightBehaviour l = lights.FirstOrDefault(li => li.li == light);
 		if (l == null) {
-			GameObject gao = new GameObject("LightInfo @ " + light.offset);
+			GameObject gao = new GameObject("LightInfo @ " + light.Offset);
 			l = gao.AddComponent<LightBehaviour>();
 			l.Init(this, light);
 			l.transform.parent = transform;

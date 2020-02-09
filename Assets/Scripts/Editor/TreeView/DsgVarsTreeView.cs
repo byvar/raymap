@@ -1,3 +1,4 @@
+using OpenSpace.AI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,18 +6,17 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
+using DsgVarType = OpenSpace.AI.DsgVarInfoEntry.DsgVarType;
 
-public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTreeElement>
+public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 {
 	const float kRowHeights = 20f;
 	const float kToggleWidth = 18f;
 	public bool showControls = true;
 
-	public PersoBehaviour perso;
-	public ROMPersoBehaviour persoROM;
-	public int stateIndex;
+	public DsgVarComponent target;
 
-	GUIStyle miniButton;
+	private static GUIStyle miniButton;
 	GUIStyle MiniButton {
 		get {
 			if (miniButton == null) {
@@ -41,24 +41,45 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTr
 			return miniButton;
 		}
 	}
+	private static GUIStyle centeredLabel;
+	GUIStyle CenteredLabel {
+		get {
+			if (centeredLabel == null) {
+				centeredLabel = new GUIStyle(EditorStyles.label);
+				centeredLabel.alignment = TextAnchor.MiddleCenter;
+			}
+			return centeredLabel;
+		}
+	}
 
 
-	/*static Texture2D[] s_TestIcons =
-	{
-		EditorGUIUtility.FindTexture ("Folder Icon"),
+
+	static Dictionary<DsgVarType, GUIContent> icons = new Dictionary<DsgVarType, GUIContent>() {
+		{ DsgVarType.SoundEvent,		EditorGUIUtility.IconContent("AudioSource Icon") },
+		//{ DsgVarType.SoundEventArray,	EditorGUIUtility.IconContent("AudioSource Icon") },
+		{ DsgVarType.WayPoint,			new GUIContent(EditorGUIUtility.FindTexture("WPtex.png")) },
+		//{ DsgVarType.WayPointArray,     new GUIContent(EditorGUIUtility.FindTexture("WPtex.png")) },
+		{ DsgVarType.Text,				EditorGUIUtility.IconContent("Text Icon") },
+		//{ DsgVarType.TextArray,			EditorGUIUtility.IconContent("Text Icon") },
+		//{ DsgVarType.TextRefArray,		EditorGUIUtility.IconContent("Text Icon") },
+		{ DsgVarType.Action,			EditorGUIUtility.IconContent("Animation Icon") },
+		//{ DsgVarType.ActionArray,		EditorGUIUtility.IconContent("Animation Icon") },
+		{ DsgVarType.Boolean,			EditorGUIUtility.IconContent("Toggle Icon") },
+		/*EditorGUIUtility.FindTexture ("Folder Icon"),
 		EditorGUIUtility.FindTexture ("AudioSource Icon"),
 		EditorGUIUtility.FindTexture ("Camera Icon"),
 		EditorGUIUtility.FindTexture ("Windzone Icon"),
-		EditorGUIUtility.FindTexture ("GameObject Icon")
-
-	};*/
+		EditorGUIUtility.FindTexture ("GameObject Icon")*/
+	};
 
 	// All columns
 	enum Columns
 	{
-		TargetState,
-		StateToGo,
-		LinkingType
+		Icon,
+		Name,
+		CurrentValue,
+		InitialValue,
+		ModelValue
 	}
 
 	public static void TreeToList (TreeViewItem root, IList<TreeViewItem> result)
@@ -92,12 +113,12 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTr
 		}
 	}
 
-	public StateTransitionsTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<StateTransitionsTreeElement> model) : base (state, multicolumnHeader, model)
+	public DsgVarsTreeView(TreeViewState state, MultiColumnHeader multicolumnHeader, TreeModel<DsgVarsTreeElement> model) : base (state, multicolumnHeader, model)
 	{
 
 		// Custom setup
 		rowHeight = kRowHeights;
-		columnIndexForTreeFoldouts = 2;
+		columnIndexForTreeFoldouts = 0;
 		showAlternatingRowBackgrounds = true;
 		showBorder = true;
 		customFoldoutYOffset = (kRowHeights - EditorGUIUtility.singleLineHeight) * 0.5f; // center foldout in the row since we also center content. See RowGUI
@@ -135,34 +156,59 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTr
 
 	protected override void RowGUI (RowGUIArgs args)
 	{
-		var item = (TreeViewItem<StateTransitionsTreeElement>) args.item;
-
+		var item = (TreeViewItem<DsgVarsTreeElement>) args.item;
+		if (item.data.entry != null && item.data.entry.IsCurrentDifferentFromInitial) {
+			Color accent = Color.red;
+			EditorGUI.DrawRect(args.rowRect, new Color(accent.r, accent.g, accent.b, 0.4f));
+		}
+		if (item.data.entry != null && item.data.entry.IsDifferentFromModel) {
+			Color accent = Color.yellow;
+			EditorGUI.DrawRect(args.rowRect, new Color(accent.r, accent.g, accent.b, 0.4f));
+		}
+		if (item.data.arrayIndex.HasValue) {
+			EditorGUI.DrawRect(args.rowRect, new Color(0, 0, 0, 0.1f));
+		}
 		for (int i = 0; i < args.GetNumVisibleColumns (); ++i)
 		{
 			CellGUI(args.GetCellRect(i), item, (Columns)args.GetColumn(i), ref args);
 		}
 	}
 
-	void CellGUI (Rect cellRect, TreeViewItem<StateTransitionsTreeElement> item, Columns column, ref RowGUIArgs args)
+	void CellGUI (Rect cellRect, TreeViewItem<DsgVarsTreeElement> item, Columns column, ref RowGUIArgs args)
 	{
 		// Center cell rect vertically (makes it easier to place controls, icons etc in the cells)
 		CenterRectUsingSingleLineHeight(ref cellRect);
 		switch (column)
 		{
-			case Columns.TargetState:
-				if (GUI.Button(cellRect, item.data.targetStateName, MiniButton)) {
-					if (perso != null) perso.SetState(item.data.targetStateIndex);
-					if (persoROM != null) persoROM.SetState(item.data.targetStateIndex);
+			case Columns.Icon:
+				DsgVarType type = item.data.entry.Type;
+				if (item.data.arrayIndex.HasValue) {
+					type = DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type);
+				}
+				if (icons.ContainsKey(type)) {
+					GUI.Label(cellRect, icons[type], CenteredLabel);
 				}
 				break;
-			case Columns.StateToGo:
-				if (GUI.Button(cellRect, item.data.stateToGoName, MiniButton)) {
-					if (perso != null) perso.SetState(item.data.stateToGoIndex);
-					if (persoROM != null) persoROM.SetState(item.data.stateToGoIndex);
+			case Columns.Name:
+				if (item.data.arrayIndex.HasValue) {
+					Rect indentedRect = cellRect;
+					float indentValue = Mathf.Min(10f, indentedRect.width);
+					indentedRect.x += indentValue;
+					indentedRect.width -= indentValue;
+					GUI.Label(indentedRect, new GUIContent("[" + item.data.arrayIndex.Value + "]"), EditorStyles.miniLabel);
+				} else {
+					GUI.Label(cellRect, new GUIContent(item.data.entry.Name), EditorStyles.miniLabel);
 				}
 				break;
-			case Columns.LinkingType:
-				GUI.Label(cellRect, item.data.linkingType.ToString(), EditorStyles.centeredGreyMiniLabel);
+			case Columns.CurrentValue:
+				DsgVarComponentEditor.DrawDsgVarCurrent(cellRect, item.data.entry, item.data.arrayIndex);
+				break;
+			case Columns.InitialValue:
+				DsgVarComponentEditor.DrawDsgVarInitial(cellRect, item.data.entry, item.data.arrayIndex);
+				break;
+
+			case Columns.ModelValue:
+				DsgVarComponentEditor.DrawDsgVarModel(cellRect, item.data.entry, item.data.arrayIndex);
 				break;
 		}
 	}
@@ -182,10 +228,10 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTr
 		return false;
 	}
 	protected override bool CanBeParent(TreeViewItem item) {
-		return false;
+		return item.hasChildren;
 	}
 	protected override bool CanChangeExpandedState(TreeViewItem item) {
-		return false;
+		return item.hasChildren;
 	}
 	protected override bool CanMultiSelect (TreeViewItem item) {
 		return false;
@@ -193,38 +239,59 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTr
 
 	public static MultiColumnHeaderState CreateDefaultMultiColumnHeaderState(float treeViewWidth)
 	{
-		var columns = new[] 
+		var columns = new[]
 		{
-			new MultiColumnHeaderState.Column 
+			new MultiColumnHeaderState.Column
 			{
-				headerContent = new GUIContent("Target State", "State you want to go to"),
-				headerTextAlignment = TextAlignment.Left,
-				canSort = false,
-				width = 100, 
-				minWidth = 60,
-				autoResize = true,
-				allowToggleVisibility = false
-			},
-			new MultiColumnHeaderState.Column 
-			{
-				headerContent = new GUIContent("State To Go", "This state will be used as transition between current and target state"),
-				headerTextAlignment = TextAlignment.Left,
-				canSort = false,
-				width = 100,
-				minWidth = 60,
-				autoResize = true,
-				allowToggleVisibility = false
-			},
-			new MultiColumnHeaderState.Column 
-			{
-				headerContent = new GUIContent("Link", "???"),
-				headerTextAlignment = TextAlignment.Right,
+				headerContent = new GUIContent("Type", ""),
+				headerTextAlignment = TextAlignment.Center,
 				canSort = false,
 				width = 30,
 				minWidth = 30,
 				maxWidth = 30,
 				autoResize = true,
 				allowToggleVisibility = true
+			},
+			new MultiColumnHeaderState.Column
+			{
+				headerContent = new GUIContent("Name", ""),
+				headerTextAlignment = TextAlignment.Left,
+				canSort = false,
+				width = 60,
+				minWidth = 40,
+				maxWidth = 120,
+				autoResize = true,
+				allowToggleVisibility = false
+			},
+			new MultiColumnHeaderState.Column 
+			{
+				headerContent = new GUIContent("Current Value", ""),
+				headerTextAlignment = TextAlignment.Left,
+				canSort = false,
+				width = 100, 
+				minWidth = 100,
+				autoResize = true,
+				allowToggleVisibility = false
+			},
+			new MultiColumnHeaderState.Column 
+			{
+				headerContent = new GUIContent("Initial Value", ""),
+				headerTextAlignment = TextAlignment.Left,
+				canSort = false,
+				width = 100,
+				minWidth = 100,
+				autoResize = true,
+				allowToggleVisibility = false
+			},
+			new MultiColumnHeaderState.Column
+			{
+				headerContent = new GUIContent("Model Value", ""),
+				headerTextAlignment = TextAlignment.Left,
+				canSort = false,
+				width = 100,
+				minWidth = 100,
+				autoResize = true,
+				allowToggleVisibility = false
 			},
 		};
 

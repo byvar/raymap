@@ -1130,7 +1130,7 @@ namespace OpenSpace.AI {
                 DsgVarInfoEntry.DsgVarType.Int,
                 DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
                 DsgVarInfoEntry.DsgVarType.Float,
-                DsgVarInfoEntry.DsgVarType.Waypoint,
+                DsgVarInfoEntry.DsgVarType.WayPoint,
                 DsgVarInfoEntry.DsgVarType.Perso,
                 DsgVarInfoEntry.DsgVarType.List,
                 DsgVarInfoEntry.DsgVarType.Vector,

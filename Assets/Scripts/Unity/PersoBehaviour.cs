@@ -116,15 +116,13 @@ public class PersoBehaviour : MonoBehaviour {
                 DsgVar dsgVar = perso.brain.mind.AI_model.dsgVar;
                 if (dsgVar != null) {
                     MapLoader l = MapLoader.Loader;
-                    l.print("DsgVar.offset: " + dsgVar.offset);
+                    l.print("DsgVar.offset: " + dsgVar.Offset);
                     l.print("DsgVarFromModel.amountOfInfos: " + dsgVar.amountOfInfos);
                     l.print("DsgVarFromModel.dsgMemBufferLength: " + dsgVar.dsgMemBufferLength);
 
-                    int c = 0;
-
-                    foreach (DsgVarInfoEntry entry in dsgVar.dsgVarInfos) {
-                        l.print("Info Entry " + c + ", type " + entry.type + ", offset " + entry.offsetInBuffer + " , value " + entry.value + ", initType " + entry.initType + ", saveType " + entry.saveType);
-                        c++;
+					for(int c = 0; c < dsgVar.dsgVarInfos.Length; c++) {
+						DsgVarInfoEntry entry = dsgVar.dsgVarInfos[c];
+						l.print("Info Entry " + c + ", type " + entry.type + ", offset " + entry.offsetInBuffer + " , value " + dsgVar.defaultValues[c].ToString() + ", initType " + entry.initType + ", saveType " + entry.saveType);
                     }
                 }
 
@@ -140,19 +138,18 @@ public class PersoBehaviour : MonoBehaviour {
 
                 DsgMem dsgMem = perso.brain.mind.dsgMem;
                 if (dsgMem != null) {
-                    l.print("DsgMem.offset: " + dsgMem.offset);
+                    l.print("DsgMem.offset: " + dsgMem.Offset);
                     DsgVar dsgVar = perso.brain.mind.dsgMem.dsgVar;
                     if (dsgVar != null) {
-                        l.print("DsgVar.offset: " + dsgVar.offset);
+                        l.print("DsgVar.offset: " + dsgVar.Offset);
                         l.print("DsgVarFromMem.amountOfInfos: " + dsgVar.amountOfInfos);
                         l.print("DsgVarFromMem.dsgMemBufferLength: " + dsgVar.dsgMemBufferLength);
 
-                        int c = 0;
 
-                        foreach (DsgVarInfoEntry entry in dsgVar.dsgVarInfos) {
-                            l.print("Info Entry " + c + ", type " + entry.type + ", offset " + entry.offsetInBuffer + " , value " + entry.value + ", initType " + entry.initType + ", saveType " + entry.saveType);
-                            c++;
-                        }
+						for (int c = 0; c < dsgVar.dsgVarInfos.Length; c++) {
+							DsgVarInfoEntry entry = dsgVar.dsgVarInfos[c];
+							l.print("Info Entry " + c + ", type " + entry.type + ", offset " + entry.offsetInBuffer + " , value " + (dsgMem.values != null ? dsgMem.values[c] : dsgVar.defaultValues[c]).ToString() + ", initType " + entry.initType + ", saveType " + entry.saveType);
+						}
                     }
                 }
 

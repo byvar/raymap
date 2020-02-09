@@ -34,20 +34,20 @@ public class GrabLocationDisplayScript : MonoBehaviour
             DsgVarComponent dsgVarComponent = raymanGAO.GetComponent<DsgVarComponent>();
             if (dsgVarComponent != null) {
 
-                DsgVarInfoEntry vector38Entry = null;
-                DsgVarInfoEntry vector40Entry = null;
+                DsgVarComponent.DsgVarEditableEntry vector38Entry = null;
+                DsgVarComponent.DsgVarEditableEntry vector40Entry = null;
 
                 if (Settings.s.game == Settings.Game.R2) {
-                    vector38Entry = dsgVarComponent.dsgVarEntries[38];
-                    vector40Entry = dsgVarComponent.dsgVarEntries[40];
+                    vector38Entry = dsgVarComponent.editableEntries[38];
+                    vector40Entry = dsgVarComponent.editableEntries[40];
                 } else if (Settings.s.game == Settings.Game.R3) {
                     return;
                     /*vector38Entry = dsgVarComponent.dsgVarEntries[38];
                     vector40Entry = dsgVarComponent.dsgVarEntries[40];*/
                 }
 
-                Vector3 vector38_xzy = (Vector3)vector38Entry.value;
-                Vector3 vector40_xzy = (Vector3)vector40Entry.value;
+                Vector3 vector38_xzy = (Vector3)vector38Entry.valueCurrent.AsVector;
+                Vector3 vector40_xzy = (Vector3)vector40Entry.valueCurrent.AsVector;
 
                 Vector3 vector38 = new Vector3(vector38_xzy.x, vector38_xzy.z, vector38_xzy.y);
                 Vector3 vector40 = new Vector3(vector40_xzy.x, vector40_xzy.z, vector40_xzy.y);

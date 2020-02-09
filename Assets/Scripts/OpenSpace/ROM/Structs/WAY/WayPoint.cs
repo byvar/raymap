@@ -20,7 +20,7 @@ namespace OpenSpace.ROM {
 			Loader.waypointsROM.Add(this);
 		}
 
-		public WaypointBehaviour GetGameObject() {
+		public WayPointBehaviour GetGameObject() {
 			GameObject gao = new GameObject("WayPoint (" + Offset + ")");
 			if (perso.Value != null) gao.name += " - Perso: " + perso.Value.Offset;
 			float factor = 32f;
@@ -28,7 +28,7 @@ namespace OpenSpace.ROM {
 			float radius_conv = radius / factor;
 
 			gao.transform.position = pos;
-			WaypointBehaviour wpBehaviour = gao.AddComponent<WaypointBehaviour>();
+			WayPointBehaviour wpBehaviour = gao.AddComponent<WayPointBehaviour>();
 			wpBehaviour.wpROM = this;
 			if (radius_conv > 1) {
 				GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
