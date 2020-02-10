@@ -11,7 +11,8 @@ namespace OpenSpace.ROM {
 		public float paramFloat;
 		public int paramInt;
 		public short paramShort;
-		public byte paramByte;
+		public sbyte paramByte;
+		public byte paramUByte;
 
 		public ushort index_of_entry;
 		public ushort index_in_array;
@@ -20,7 +21,8 @@ namespace OpenSpace.ROM {
             param = reader.ReadUInt16(); // 0x00
 
 			// Read different types of param
-			Pointer.Goto(ref reader, Offset); paramByte = reader.ReadByte();
+			Pointer.Goto(ref reader, Offset); paramByte = reader.ReadSByte();
+			Pointer.Goto(ref reader, Offset); paramUByte = reader.ReadByte();
 			Pointer.Goto(ref reader, Offset); paramShort = reader.ReadInt16();
 			Pointer.Goto(ref reader, Offset); paramUInt = reader.ReadUInt32();
 			Pointer.Goto(ref reader, Offset); paramInt = reader.ReadInt32();

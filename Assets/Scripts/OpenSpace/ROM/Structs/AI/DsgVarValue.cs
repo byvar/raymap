@@ -15,8 +15,9 @@ namespace OpenSpace.ROM {
 		public int index;
 
 		// Parsed param
+		public sbyte paramByte;
+		public byte paramUByte;
 		public short paramShort;
-		public byte paramByte;
 		public Reference<DsgVarEntry> paramEntry;
 		public Reference<Dsg_Int> paramInt;
 		public Reference<Dsg_UInt> paramUInt;
@@ -28,6 +29,8 @@ namespace OpenSpace.ROM {
 		public Reference<State> paramState;
 		public Reference<GameMaterial> paramGameMaterial;
 		public Reference<Perso> paramPerso;
+		public AI.DsgVarValue.List paramList;
+		public Reference<Dsg_UInt> paramCaps;
 
 		public DsgVarValue(ushort index_of_info, ushort type) {
 			this.index_of_info = index_of_info;
@@ -38,7 +41,8 @@ namespace OpenSpace.ROM {
 			param = reader.ReadUInt16();
 
 			// Read different types of param
-			Pointer.Goto(ref reader, offset); paramByte = reader.ReadByte();
+			Pointer.Goto(ref reader, offset); paramByte = reader.ReadSByte();
+			Pointer.Goto(ref reader, offset); paramUByte = reader.ReadByte();
 			Pointer.Goto(ref reader, offset); paramShort = reader.ReadInt16();
 
 			Parse(reader);
@@ -94,7 +98,111 @@ namespace OpenSpace.ROM {
 				case DsgVarType.Perso:
 					paramPerso = new Reference<Perso>(usedParam, reader, true);
 					break;
+				case DsgVarType.List:
+					paramList = new AI.DsgVarValue.List();
+					paramList.curLength = 0;
+					paramList.maxLength = (byte)param;
+					paramList.list = new AI.DsgVarValue.List.Entry[paramList.maxLength];
+					break;
+				case DsgVarType.Caps:
+					// Always uses the default param in the info
+					paramCaps = new Reference<Dsg_UInt>(param, reader, true);
+					break;
 			}
+		}
+
+		// Getters for different types
+		public sbyte ValueByte {
+			get {
+				if (paramEntry == null) {
+					return paramByte;
+				} else {
+					return paramEntry.Value.paramByte;
+				}
+			}
+		}
+		public byte ValueUByte {
+			get {
+				if (paramEntry == null) {
+					return paramUByte;
+				} else {
+					return paramEntry.Value.paramUByte;
+				}
+			}
+		}
+		public short ValueShort {
+			get {
+				if (paramEntry == null) {
+					return paramShort;
+				} else {
+					return paramEntry.Value.paramShort;
+				}
+			}
+		}
+		public ushort ValueUShort {
+			get {
+				if (paramEntry == null) {
+					return param;
+				} else {
+					return paramEntry.Value.param;
+				}
+			}
+		}
+		public int ValueInt {
+			get {
+				if (paramEntry == null) {
+					return paramInt.Value?.value ?? 0;
+				} else {
+					return paramEntry.Value.paramInt;
+				}
+			}
+		}
+		public uint ValueUInt {
+			get {
+				if (paramEntry == null) {
+					return paramUInt.Value?.value ?? 0;
+				} else {
+					return paramEntry.Value.paramUInt;
+				}
+			}
+		}
+		public float ValueFloat {
+			get {
+				if (paramEntry == null) {
+					return paramFloat.Value?.value ?? 0f;
+				} else {
+					return paramEntry.Value.paramFloat;
+				}
+			}
+		}
+		public Vector3 ParamVector {
+			get {
+				return paramVector3.Value?.value ?? Vector3.zero;
+			}
+		}
+		public WayPoint ParamWayPoint {
+			get { return paramWaypoint.Value; }
+		}
+		public Graph ParamGraph {
+			get { return paramGraph.Value; }
+		}
+		public Comport ParamComport {
+			get { return paramComport.Value; }
+		}
+		public State ParamAction {
+			get { return paramState.Value; }
+		}
+		public GameMaterial ParamGameMaterial {
+			get { return paramGameMaterial.Value; }
+		}
+		public Perso ParamPerso {
+			get { return paramPerso.Value; }
+		}
+		public int ParamText {
+			get { return param; }
+		}
+		public uint ParamCaps {
+			get { return paramCaps.Value?.value ?? 0; }
 		}
 	}
 }

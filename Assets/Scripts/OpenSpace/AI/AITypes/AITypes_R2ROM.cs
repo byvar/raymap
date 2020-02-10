@@ -1143,7 +1143,9 @@ namespace OpenSpace.AI {
                 DsgVarInfoEntry.DsgVarType.IntegerArray,
                 DsgVarInfoEntry.DsgVarType.WayPointArray,
                 DsgVarInfoEntry.DsgVarType.TextArray,
-                DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
+                DsgVarInfoEntry.DsgVarType.None
+                // 24, the above, seems to be an array on 3DS. Doesn't seem to be treated at all on DS
+                //24 on PC is DsgVarInfoEntry.DsgVarType.SuperObject and input on iOS.
             },
             #endregion
 
