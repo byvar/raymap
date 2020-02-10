@@ -170,20 +170,6 @@ public class Controller : MonoBehaviour {
 		await Init();
 	}
 
-    public class NameInfoContainer {
-        public Dictionary<int, List<Controller.NameInfo>> nameInfos;
-    }
-
-    public class NameInfo {
-        public string instanceName;
-        public string modelName;
-        public string familyName;
-
-        public int numRules;
-        public int numReflexes;
-        public uint customBits;
-    }
-
     async Task Init() {
 		state = State.Loading;
 		await loader.LoadWrapper();
@@ -222,53 +208,8 @@ public class Controller : MonoBehaviour {
 		loadingScreen.Active = false;
 
         if (ExportAfterLoad) {
-            //MapExporter e = new MapExporter(this.loader, ExportPath);
-            //e.Export();
-
-            string filePath = "objectNames_" + loader.lvlName + ".json";
-            if (File.Exists(filePath)) {
-                File.Delete(filePath);
-            }
-
-            Dictionary<int, List<NameInfo>> nameInfos = new Dictionary<int, List<NameInfo>>();
-
-            foreach (Perso p in MapLoader.Loader.persos) {
-
-                Vector3 pos = p.Gao.transform.position;
-                Vector3 roundedPos = new Vector3((float)Math.Round(pos.x, 1), (float)Math.Round(pos.y, 1), (float)Math.Round(pos.z, 1));
-                int hashCode = roundedPos.GetHashCode();
-
-                NameInfo info = new NameInfo()
-                {
-                    instanceName = p.namePerso,
-                    familyName = p.nameFamily,
-                    modelName = p.nameModel,
-                    numRules = -1,
-                    numReflexes = -1,
-                    customBits = p.stdGame.customBits
-                };
-
-                if (p.brain?.mind?.AI_model != null) {
-                    var model = p.brain?.mind?.AI_model;
-                    if (model.behaviors_normal!=null)
-                        info.numRules = model.behaviors_normal.Length;
-                    if (model.behaviors_reflex != null)
-                        info.numReflexes = model.behaviors_reflex.Length;
-                }
-
-                if (!nameInfos.ContainsKey(hashCode)) {
-                    nameInfos.Add(hashCode, new List<NameInfo>() {  info });
-                } else {
-                    nameInfos[hashCode].Add(info);
-                }
-            }
-
-            NameInfoContainer nameInfosContainer = new NameInfoContainer()
-            {
-                nameInfos = nameInfos
-            };
-
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(nameInfosContainer));
+            MapExporter e = new MapExporter(this.loader, ExportPath);
+            e.Export();
 
             Application.Quit();
         }

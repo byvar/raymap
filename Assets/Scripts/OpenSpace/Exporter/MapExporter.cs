@@ -4,6 +4,7 @@ using Newtonsoft.Json.Converters;
 using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Input;
+using OpenSpace.Object;
 using OpenSpace.Object.Properties;
 using OpenSpace.Text;
 using OpenSpace.Visual;
@@ -46,8 +47,72 @@ namespace OpenSpace.Exporter {
             this.gameName = Settings.s.mode.ToString();
         }
 
+        public class NameInfoContainer {
+            public Dictionary<int, List<NameInfo>> nameInfos;
+            public float centerX;
+            public float centerY;
+            public float centerZ;
+        }
+
+        public class NameInfo {
+            public string instanceName;
+            public string modelName;
+            public string familyName;
+
+            public int numRules;
+            public int numReflexes;
+            public uint customBits;
+        }
+
+        public void ExportNames() {
+            string filePath = "objectNames_" + loader.lvlName.ToLower() + ".json";
+            if (File.Exists(filePath)) {
+                File.Delete(filePath);
+            }
+
+            Dictionary<int, List<NameInfo>> nameInfos = new Dictionary<int, List<NameInfo>>();
+
+            foreach (Perso p in MapLoader.Loader.persos) {
+
+                Vector3 pos = p.Gao.transform.position;
+                Vector3 roundedPos = new Vector3((float)Math.Round(pos.x, 1), (float)Math.Round(pos.y, 1), (float)Math.Round(pos.z, 1));
+                int hashCode = roundedPos.GetHashCode();
+
+                NameInfo info = new NameInfo() {
+                    instanceName = p.namePerso,
+                    familyName = p.nameFamily,
+                    modelName = p.nameModel,
+                    numRules = -1,
+                    numReflexes = -1,
+                    customBits = p.stdGame.customBits
+                };
+
+                if (p.brain?.mind?.AI_model != null) {
+                    var model = p.brain?.mind?.AI_model;
+                    if (model.behaviors_normal != null)
+                        info.numRules = model.behaviors_normal.Length;
+                    if (model.behaviors_reflex != null)
+                        info.numReflexes = model.behaviors_reflex.Length;
+                }
+
+                if (!nameInfos.ContainsKey(hashCode)) {
+                    nameInfos.Add(hashCode, new List<NameInfo>() { info });
+                } else {
+                    nameInfos[hashCode].Add(info);
+                }
+            }
+
+            NameInfoContainer nameInfosContainer = new NameInfoContainer() {
+                nameInfos = nameInfos
+            };
+
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(nameInfosContainer));
+        }
+
         public void Export()
         {
+            ExportNames();
+            //return;
 
             string exportDirectoryLevels = Path.Combine(this.exportPath, "Levels");
             string exportDirectoryAIModels = Path.Combine(this.exportPath, "AIModels");

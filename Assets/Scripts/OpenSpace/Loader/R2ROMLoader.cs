@@ -102,11 +102,13 @@ namespace OpenSpace.Loader {
 				
 				await LoadData();
 
-                if (Settings.s.game == Settings.Game.R2) {
-
-                    string objectNamesFileName = "objectNames_" + lvlName + ".json";
+				if (Settings.s.game == Settings.Game.R2
+					&& (Settings.s.platform == Settings.Platform.N64 || Settings.s.platform == Settings.Platform.DS)) {
+                    string objectNamesFileName = "R2_N64_DS/objectNames_" + lvlName.ToLower() + ".json";
                     string objectNamesPath = gameDataBinFolder + objectNamesFileName;
-                    if (!FileSystem.FileExists(objectNamesPath)) {
+					await PrepareFile(objectNamesPath);
+
+					if (!FileSystem.FileExists(objectNamesPath)) {
                         objectNamesPath = "Assets/StreamingAssets/" + objectNamesFileName; // Offline, the json doesn't exist, so grab it from StreamingAssets
                     }
 
@@ -162,7 +164,7 @@ namespace OpenSpace.Loader {
         public void ReadAndFillObjectNames(Stream stream)
         {
             string dataAsJson = new StreamReader(stream).ReadToEnd();
-            var objectNames = JsonConvert.DeserializeObject<Controller.NameInfoContainer>(dataAsJson);
+            var objectNames = JsonConvert.DeserializeObject<Exporter.MapExporter.NameInfoContainer>(dataAsJson);
 
             Dictionary<Vector3, int> coordinateCount = new Dictionary<Vector3, int>();
 
@@ -193,7 +195,7 @@ namespace OpenSpace.Loader {
             //Vector3 difference = Vector3.zero - mostCommonCoordinate; // Most Common Coordinate is Vector3.zero most of the time
             Vector3 difference = new Vector3(objectNames.centerX, objectNames.centerY, objectNames.centerZ) - centerVector; // Most Common Coordinate is Vector3.zero most of the time
 
-            Debug.Log("Difference with 0,0,0: " + difference);
+            //Debug.Log("Difference with 0,0,0: " + difference);
 
             foreach (ROMPersoBehaviour perso in controller.romPersos) {
 
@@ -203,7 +205,7 @@ namespace OpenSpace.Loader {
 
                 if (objectNames.nameInfos.ContainsKey(hashCode)) {
                     var infos = objectNames.nameInfos[hashCode];
-                    Controller.NameInfo correctInfo = null;
+					Exporter.MapExporter.NameInfo correctInfo = null;
 
                     if (infos.Count == 1) {
                         correctInfo = infos[0];
@@ -225,7 +227,7 @@ namespace OpenSpace.Loader {
                     }
 
                     if (correctInfo != null) {
-                        perso.gameObject.name = "SOD @ " + perso.perso.Offset + " | [" + correctInfo.familyName + "] " + correctInfo.modelName + " | " + correctInfo.instanceName;
+                        perso.gameObject.name = "[" + correctInfo.familyName + "] " + correctInfo.modelName + " | " + correctInfo.instanceName;
                     }
                 }
 
