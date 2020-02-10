@@ -89,12 +89,14 @@ namespace OpenSpace.Visual {
                 Pointer.Goto(ref writer, Pointer.Current(writer) + (6 * 4));
                 writer.Write(color.x); writer.Write(color.y); writer.Write(color.z); writer.Write(color.w);
 
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-                    writer.Write(shadowIntensity); // 0
+                if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
+                    if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+                        writer.Write(shadowIntensity); // 0
+                    }
+                    Pointer.Goto(ref writer, Pointer.Current(writer) + 2);
+                    writer.Write(paintingLightFlag);
+                    writer.Write(alphaLightFlag);
                 }
-                Pointer.Goto(ref writer, Pointer.Current(writer) + 2);
-                writer.Write(paintingLightFlag);
-                writer.Write(alphaLightFlag);
             }
         }
 

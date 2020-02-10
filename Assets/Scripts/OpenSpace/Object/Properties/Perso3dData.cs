@@ -54,6 +54,7 @@ namespace OpenSpace.Object.Properties {
         }
 
         public void Write(Writer writer) {
+            Pointer.Goto(ref writer, offset);
             Pointer.Write(writer, off_stateInitial);
             Pointer.Write(writer, off_stateCurrent);
             Pointer.Write(writer, off_state2);

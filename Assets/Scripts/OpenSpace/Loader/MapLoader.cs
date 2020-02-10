@@ -229,12 +229,12 @@ namespace OpenSpace {
                         fc.SaveChanges(writer);
                     }
                 }
+			}
 
-                foreach (LightInfo light in lights) {
-                    light.Write(writer);
-                }
-            }
-        }
+			foreach (LightInfo light in lights) {
+				light.Write(writer);
+			}
+		}
 
         public void Save() {
             try {

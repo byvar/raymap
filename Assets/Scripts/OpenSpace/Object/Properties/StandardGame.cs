@@ -169,8 +169,9 @@ namespace OpenSpace.Object.Properties {
 
         public void Write(Writer writer)
         {
+			Pointer.Goto(ref writer, offset);
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                Pointer.Goto(ref writer, Pointer.Current(writer) + 0x24);
+                Pointer.Goto(ref writer, offset + 0x24);
                 writer.Write(customBits);
                 writer.Write(isAPlatform);
                 writer.Write(updateCheckByte);
@@ -178,7 +179,7 @@ namespace OpenSpace.Object.Properties {
                 writer.Write(transparencyZoneMax);
                 writer.Write(customBitsInitial);
             } else {
-                Pointer.Goto(ref writer, Pointer.Current(writer) + 0x20);
+                Pointer.Goto(ref writer, offset + 0x20);
                 writer.Write(customBits);
                 writer.Write(aiCustomBits);
                 writer.Write(isAPlatform);

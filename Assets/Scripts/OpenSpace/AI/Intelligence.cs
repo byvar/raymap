@@ -6,8 +6,6 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class Intelligence : OpenSpaceStruct {
-        public Pointer offset;
-
         public Pointer off_aiModel;
         public Pointer off_actionTree;
         public Pointer off_comport;
@@ -31,6 +29,11 @@ namespace OpenSpace.AI {
             aiModel = Load.FromOffset<AIModel>(off_aiModel);
             comport = Load.FromOffset<Behavior>(off_comport);
             lastComport = Load.FromOffset<Behavior>(off_lastComport);
+        }
+
+        public void Write(Writer writer) {
+            Pointer.Goto(ref writer, Offset + 8);
+            Pointer.Write(writer, off_comport);
         }
     }
 }

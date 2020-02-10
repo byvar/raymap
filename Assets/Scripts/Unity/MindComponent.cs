@@ -33,24 +33,13 @@ public class MindComponent : MonoBehaviour {
     public void Write(Writer writer)
     {
         if (this.writeNormalComport) {
-            Pointer.DoAt(ref writer, this.mind.intelligenceNormal.offset + 0x8, () =>
-            {
-                if (this.mind.intelligenceNormal.comport != null)
-                    Pointer.Write(writer, this.mind.intelligenceNormal.comport.Offset);
-                else
-                    Pointer.Write(writer, null);
-            });
+            mind.intelligenceNormal.off_comport = mind.intelligenceNormal.comport?.Offset;
+            mind.intelligenceNormal.Write(writer);
             this.writeNormalComport = false;
         }
-
         if (this.writeReflexComport) {
-            Pointer.DoAt(ref writer, this.mind.intelligenceReflex.offset + 0x8, () =>
-            {
-                if (this.mind.intelligenceReflex.comport!=null)
-                    Pointer.Write(writer, this.mind.intelligenceReflex.comport.Offset);
-                else
-                    Pointer.Write(writer, null);
-            });
+            mind.intelligenceReflex.off_comport = mind.intelligenceReflex.comport?.Offset;
+            mind.intelligenceReflex.Write(writer);
             this.writeReflexComport = false;
         }
     }

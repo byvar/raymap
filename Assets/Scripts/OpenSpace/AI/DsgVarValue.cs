@@ -282,29 +282,29 @@ namespace OpenSpace.AI {
 				case DsgVarInfoEntry.DsgVarType.Text:
 					writer.Write(valueText); break;
 				case DsgVarInfoEntry.DsgVarType.Graph:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.WayPoint:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.GameMaterial:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.VisualMaterial:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.ObjectList:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.List:
-					valueList.Write(writer); break;
+					valueList?.Write(writer); break;
 				case DsgVarInfoEntry.DsgVarType.Light:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.Comport:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.Input:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.Perso:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.Action:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 				case DsgVarInfoEntry.DsgVarType.SuperObject:
-					valuePointer.Write(writer); break;
+					Pointer.Write(writer, valuePointer); break;
 
 				// TODO: Figure these out
 				case DsgVarInfoEntry.DsgVarType.Caps:

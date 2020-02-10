@@ -251,7 +251,6 @@ namespace OpenSpace.Object {
             if (p3dData != null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {
                 if (persoBehaviour.state.offset != p3dData.off_stateCurrent) {
                     p3dData.off_stateCurrent = persoBehaviour.state.offset;
-                    Pointer.Goto(ref writer, p3dData.offset);
                     p3dData.Write(writer);
                 } /*else {
                     MapLoader.Loader.print("do not write state for perso " + fullName);
@@ -259,14 +258,17 @@ namespace OpenSpace.Object {
             }
 
             if (persoBehaviour.clearTheBrain) {
-                Pointer.Goto(ref writer, this.offset + 0xC); // perso + 0xC = Brain * 
+                if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                   Pointer.Goto(ref writer, offset + 0x10);
+                } else {
+                    Pointer.Goto(ref writer, offset + 0xC);
+                }
                 Pointer.Write(writer, null);
                 persoBehaviour.clearTheBrain = false;
             }
 
             CustomBitsComponent customBits = gao.GetComponent<CustomBitsComponent>();
             if (customBits != null && customBits.modified && stdGame != null) {
-                Pointer.Goto(ref writer, stdGame.offset);
                 stdGame.Write(writer);
             }
         }

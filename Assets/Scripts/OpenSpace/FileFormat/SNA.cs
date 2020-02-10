@@ -64,6 +64,7 @@ namespace OpenSpace.FileFormat {
              * TODO: Before WriteSNA:
              * - Implement WritePoointer: Reverse pointer relocation, write them into the data
              * */
+            writer.Flush();
             WriteSNA();
             /* 
              * TODO: At the end of WriteSNA:
@@ -74,30 +75,29 @@ namespace OpenSpace.FileFormat {
              * */
         }
 
-        public void WriteSNA()
-        {
-            if (Settings.s.game == Settings.Game.TT)
-            {
-                throw new NotImplementedException();
-                //byte headerLength = reader.ReadByte();
-                //reader.ReadBytes(headerLength);
-            }
-            foreach (SNAMemoryBlock block in blocks)
-            {
-                writer.Write(block.module);
-                writer.Write(block.id);
-                if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) writer.Write(block.unk1);
-                writer.Write(block.baseInMemory);
+        public void WriteSNA() {
+            using (FileStream stream = new FileStream(path, FileMode.Open)) {
+                Writer writer = new Writer(stream, Settings.s.IsLittleEndian);
+                if (Settings.s.game == Settings.Game.TT) {
+                    throw new NotImplementedException();
+                    //byte headerLength = reader.ReadByte();
+                    //reader.ReadBytes(headerLength);
+                }
+                foreach (SNAMemoryBlock block in blocks) {
+                    writer.Write(block.module);
+                    writer.Write(block.id);
+                    if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) writer.Write(block.unk1);
+                    writer.Write(block.baseInMemory);
 
-                if (block.baseInMemory != -1)
-                {
-                    writer.Write(block.unk2);
-                    writer.Write(block.unk3);
-                    writer.Write(block.maxPosMinus9);
-                    writer.Write(block.size);
-                    if (Settings.s.game == Settings.Game.TT) writer.Write(block.unk1);
+                    if (block.baseInMemory != -1) {
+                        writer.Write(block.unk2);
+                        writer.Write(block.unk3);
+                        writer.Write(block.maxPosMinus9);
+                        writer.Write(block.size);
+                        if (Settings.s.game == Settings.Game.TT) writer.Write(block.unk1);
 
-                    WriteSNABlock(block);
+                        WriteSNABlock(writer, block);
+                    }
                 }
             }
         }
@@ -214,7 +214,7 @@ namespace OpenSpace.FileFormat {
                     uint compressedChecksum = reader.ReadUInt32();
                     uint decompressedSize = reader.ReadUInt32();
                     uint decompressedChecksum = reader.ReadUInt32();
-                    //l.print(isCompressed + " - " + compressedSize + " - " + decompressedSize);
+                    l.print(isCompressed + " - " + compressedSize + " - " + decompressedSize);
                     byte[] compressedData = reader.ReadBytes((int)compressedSize);
                     byte[] uncompressedData = null;
                     int diff = 0;
@@ -330,20 +330,21 @@ namespace OpenSpace.FileFormat {
             return sum | (v5 << 16);
         }
 
-        void WriteSNABlock(SNAMemoryBlock block)
+        void WriteSNABlock(Writer writer, SNAMemoryBlock block)
         {
             if (block.size > 0)
             {
                 uint checksum = (uint)CalculateChecksum(block);
-                writer.Write(0); // no compression
+                writer.Write((uint)0); // no compression
                 // compressed size & checksum
                 writer.Write(block.size);
                 writer.Write(checksum);
                 // decompressed size & checksum
                 writer.Write(block.size);
                 writer.Write(checksum);
-
-                writer.BaseStream.Write(data, (int)block.dataPosition, (int)block.size);
+                byte[] blockData = new byte[block.size];
+                Array.Copy(data, block.dataPosition, blockData, 0, blockData.Length);
+                writer.Write(blockData);
             }
         }
 
@@ -651,13 +652,16 @@ namespace OpenSpace.FileFormat {
 
         public override void CreateWriter() {
             if (path != null) {
-                FileStream stream = new FileStream(path, FileMode.Open);
+                MemoryStream stream = new MemoryStream(data, true);
+                //FileStream stream = new FileStream(path, FileMode.Open);
                 writer = new Writer(stream, Settings.s.IsLittleEndian);
             }
         }
 
         public override void WritePointer(Pointer pointer) {
-            throw new NotImplementedException();
+            UnityEngine.Debug.LogWarning("Pointer writing not supported!");
+            writer.BaseStream.Position += 4;
+            //throw new NotImplementedException();
         }
     }
 }

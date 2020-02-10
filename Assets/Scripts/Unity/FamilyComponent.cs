@@ -35,7 +35,9 @@ public class FamilyComponent : MonoBehaviour {
         if (dirty) {
 
             foreach (State state in this.family.states) {
-                state.mechanicsIDCard.Write(writer);
+                if (state.mechanicsIDCard != null) {
+                    state.mechanicsIDCard.Write(writer);
+                }
             }
 
             dirty = false;
