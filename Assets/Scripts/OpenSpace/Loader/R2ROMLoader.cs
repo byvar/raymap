@@ -104,19 +104,19 @@ namespace OpenSpace.Loader {
 
 				if (Settings.s.game == Settings.Game.R2
 					&& (Settings.s.platform == Settings.Platform.N64 || Settings.s.platform == Settings.Platform.DS)) {
-                    string objectNamesFileName = "R2_N64_DS/objectNames_" + lvlName.ToLower() + ".json";
+                    string objectNamesFileName = "objectNames_" + lvlName.ToLower() + ".json";
                     string objectNamesPath = gameDataBinFolder + objectNamesFileName;
 					await PrepareFile(objectNamesPath);
 
 					if (!FileSystem.FileExists(objectNamesPath)) {
-                        objectNamesPath = "Assets/StreamingAssets/" + objectNamesFileName; // Offline, the json doesn't exist, so grab it from StreamingAssets
+                        objectNamesPath = Application.streamingAssetsPath + "/R2_N64_DS/" + objectNamesFileName; // Offline, the json doesn't exist, so grab it from StreamingAssets
                     }
 
-                    Stream stream = FileSystem.GetFileReadStream(objectNamesPath);
-                    if (stream != null) {
-                        ReadAndFillObjectNames(stream);
-                    }
-                    stream.Close();
+					using (Stream stream = FileSystem.GetFileReadStream(objectNamesPath)) {
+						if (stream != null) {
+							ReadAndFillObjectNames(stream);
+						}
+					}
                 }
 
                 /*List<DSFATEntry> entries = new List<DSFATEntry>();
