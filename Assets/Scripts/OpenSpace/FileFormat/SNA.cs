@@ -58,6 +58,22 @@ namespace OpenSpace.FileFormat {
             ReadSNA();
         }
 
+        public override void EndWrite() {
+            base.EndWrite();
+            /*
+             * TODO: Before WriteSNA:
+             * - Implement WritePoointer: Reverse pointer relocation, write them into the data
+             * */
+            WriteSNA();
+            /* 
+             * TODO: At the end of WriteSNA:
+             * - R2: After getting SNA data, encode using masking (see Reader.cs)
+             * - Save into multiple files (gpt, ptx, sda, dlg)
+             * - Save relocation files
+             * - R2: Save DAT file
+             * */
+        }
+
         public void WriteSNA()
         {
             if (Settings.s.game == Settings.Game.TT)
@@ -245,7 +261,7 @@ namespace OpenSpace.FileFormat {
         }
         long CalculateChecksum(SNAMemoryBlock block)
         {
-            long v4 = 1;
+            long sum = 1;
             long v5 = 0;
             long v39 = 0;
             
@@ -259,11 +275,43 @@ namespace OpenSpace.FileFormat {
                 uint v8 = i;
                 if (i >= 5552)
                     v8 = 5552;
-                for (i -= v8; v8 >= 16; v5 = v4 + v39)
+                for (i -= v8; v8 >= 16; v5 = sum + v39)
                 {
                     v8 -= 16;
-                    v39 = data[offset + 14] + 2 * data[offset + 13] + 3 * data[offset + 12] + 4 * data[offset + 11] + 5 * data[offset + 10] + 6 * data[offset + 9] + 7 * data[offset + 8] + 8 * data[offset + 7] + 9 * data[offset + 6] + 10 * data[offset + 5] + 11 * data[offset + 4] + 12 * data[offset + 3] + 13 * data[offset + 2] + 14 * data[offset + 1] + 15 * data[offset + 0] + 15 * v4 + v5;
-                    v4 = data[offset + 15] + data[offset + 14] + data[offset + 13] + data[offset + 12] + data[offset + 11] + data[offset + 10] + data[offset + 9] + data[offset + 8] + data[offset + 7] + data[offset + 6] + data[offset + 5] + data[offset + 4] + data[offset + 3] + data[offset + 2] + data[offset + 1] + data[offset + 0] + v4;
+                    v39 = data[offset + 14]
+                        + 2 * data[offset + 13]
+                        + 3 * data[offset + 12]
+                        + 4 * data[offset + 11]
+                        + 5 * data[offset + 10]
+                        + 6 * data[offset + 9]
+                        + 7 * data[offset + 8]
+                        + 8 * data[offset + 7]
+                        + 9 * data[offset + 6]
+                        + 10 * data[offset + 5]
+                        + 11 * data[offset + 4]
+                        + 12 * data[offset + 3]
+                        + 13 * data[offset + 2]
+                        + 14 * data[offset + 1]
+                        + 15 * data[offset + 0]
+                        + 15 * sum
+                        + v5;
+                    sum = data[offset + 15]
+                        + data[offset + 14]
+                        + data[offset + 13]
+                        + data[offset + 12]
+                        + data[offset + 11]
+                        + data[offset + 10]
+                        + data[offset + 9]
+                        + data[offset + 8]
+                        + data[offset + 7]
+                        + data[offset + 6]
+                        + data[offset + 5]
+                        + data[offset + 4]
+                        + data[offset + 3]
+                        + data[offset + 2]
+                        + data[offset + 1]
+                        + data[offset + 0]
+                        + sum;
 
                     offset += 16;
                 }
@@ -271,15 +319,15 @@ namespace OpenSpace.FileFormat {
                 {
                   do
                   {
-                    v4 += data[offset++];
-                    v5 += v4;
+                    sum += data[offset++];
+                    v5 += sum;
                     --v8;
                   }
                   while (v8 > 0);
                 }
-                v4 %= 0xFFF1u;
+                sum %= 0xFFF1u;
             }
-            return v4 | (v5 << 16);
+            return sum | (v5 << 16);
         }
 
         void WriteSNABlock(SNAMemoryBlock block)
@@ -602,8 +650,7 @@ namespace OpenSpace.FileFormat {
         }
 
         public override void CreateWriter() {
-            if (path != null)
-            {
+            if (path != null) {
                 FileStream stream = new FileStream(path, FileMode.Open);
                 writer = new Writer(stream, Settings.s.IsLittleEndian);
             }

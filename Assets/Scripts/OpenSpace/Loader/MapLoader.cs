@@ -239,15 +239,8 @@ namespace OpenSpace {
         public void Save() {
             try {
                 for (int i = 0; i < files_array.Length; i++) {
-					if (files_array[i] != null)
-					{
+					if (files_array[i] != null) {
 						files_array[i].CreateWriter();
-						if (files_array[i] is SNA)
-						{
-							(files_array[i] as SNA).WriteSNA();
-							files_array[i].Dispose();
-							files_array[i] = null;
-						}
 					}
                 }
                 // Save changes
@@ -257,6 +250,7 @@ namespace OpenSpace {
             } finally {
                 for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
+						files_array[i].EndWrite();
                         files_array[i].Dispose();
                     }
                 }
