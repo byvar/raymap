@@ -35,6 +35,38 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
                 string channelName = "Channel " + channel.id;
                 var channelInHierarchyInfo = GetParentChannelName(channel.id, animationFrameNumber, animA3DGeneral);
 
+                int framesSinceKF = (int)animationFrameNumber - (int)openspaceKeyframe.frame;
+
+                AnimKeyframe nextKF = null;
+                int framesDifference;
+                float interpolation;
+                if (openspaceKeyframe.IsEndKeyframe)
+                {
+                    AnimFramesKFIndex next_kfi = animA3DGeneral.framesKFIndex[0 + channel.framesKF];
+                    nextKF = animA3DGeneral.keyframes[next_kfi.kf];
+                    framesDifference = animA3DGeneral.num_onlyFrames - 1 + (int)nextKF.frame - (int)openspaceKeyframe.frame;
+                    if (framesDifference == 0)
+                    {
+                        interpolation = 0;
+                    }
+                    else
+                    {
+                        interpolation = framesSinceKF / (float)framesDifference;
+                    }
+                }
+                else
+                {
+                    nextKF = animA3DGeneral.keyframes[openspaceKeyframeIndex.kf + 1];
+                    framesDifference = (int)nextKF.frame - (int)openspaceKeyframe.frame;
+                    interpolation = framesSinceKF / (float)framesDifference;
+                }
+                AnimVector pos2 = animA3DGeneral.vectors[nextKF.positionVector];
+                AnimQuaternion qua2 = animA3DGeneral.quaternions[nextKF.quaternion];
+                AnimVector scl2 = animA3DGeneral.vectors[nextKF.scaleVector];
+                localPosition = Vector3.Lerp(openspaceKeyframePositionVector.vector, pos2.vector, interpolation);
+                localRotation = Quaternion.Lerp(openspaceKeyframeRotationQuaternion.quaternion, qua2.quaternion, interpolation);
+                localScale = Vector3.Lerp(openspaceKeyframeScaleVector.vector, scl2.vector, interpolation);
+
                 if (channelInHierarchyInfo.found)
                 {
                     yield return new AnimHierarchyWithChannelInfo(
