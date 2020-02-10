@@ -101,7 +101,8 @@ namespace OpenSpace.FileFormat {
         }
 
         public override void WritePointer(Pointer pointer) {
-            throw new NotImplementedException();
+			UnityEngine.Debug.LogWarning("Pointer writing not supported!");
+			writer.BaseStream.Position += 4;
 		}
 		public void OverrideData(byte[] data) {
 			baseOffset = 0;
