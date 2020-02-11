@@ -10,28 +10,43 @@ using OpenSpace.Waypoints;
 using OpenSpace;
 
 public class DsgVarComponent : MonoBehaviour {
+    // Normal
     public Perso perso;
     public DsgMem dsgMem;
     public DsgVar dsgVar;
     public DsgVarInfoEntry[] dsgVarEntries;
+
+    // ROM
+    public OpenSpace.ROM.Perso persoROM;
+    public OpenSpace.ROM.DsgMem dsgMemROM;
+    public OpenSpace.ROM.DsgVar dsgVarROM;
+
     public DsgVarEditableEntry[] editableEntries;
 
     public class DsgVarEditableEntry {
         public DsgVarInfoEntry entry;
+        public OpenSpace.ROM.DsgVarInfo.Entry entryROM;
+        public List<OpenSpace.ROM.DsgMemInfo> entriesMemROM;
+
+
         public int number;
         public string Name {
             get {
-                return entry.NiceVariableName;
+                if (entry != null) return entry.NiceVariableName;
+                if (entryROM != null) return entryROM.NiceVariableName;
+                return "null";
             }
         }
         public bool IsArray {
             get {
-                return DsgVarInfoEntry.GetDsgVarTypeFromArrayType(entry.type) != DsgVarInfoEntry.DsgVarType.None;
+                return DsgVarInfoEntry.GetDsgVarTypeFromArrayType(Type) != DsgVarInfoEntry.DsgVarType.None;
             }
         }
         public DsgVarInfoEntry.DsgVarType Type {
             get {
-                return entry.type;
+                if(entry != null) return entry.type;
+                if (entryROM != null) return entryROM.value.dsgVarType;
+                return DsgVarInfoEntry.DsgVarType.None;
             }
         }
         public int ArrayLength {
@@ -48,6 +63,7 @@ public class DsgVarComponent : MonoBehaviour {
         // Unity interface for the different DSGVar Types
         public class Value {
             public DsgVarValue val;
+            public OpenSpace.ROM.DsgVarValue valROM;
             public DsgVarInfoEntry.DsgVarType type;
 
             public SuperObjectComponent AsSuperObject {
@@ -101,11 +117,41 @@ public class DsgVarComponent : MonoBehaviour {
                     }
                 }
             }
+
+            public ROMPersoBehaviour AsPersoROM {
+                get {
+                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return null;
+                    if (valROM != null) {
+                        OpenSpace.ROM.Perso p = valROM.ValuePerso;
+                        if (p == null) return null;
+                        List<ROMPersoBehaviour> romPersos = MapLoader.Loader.controller.romPersos;
+                        return romPersos.FirstOrDefault(r => r.perso == p);
+                    }
+                    return null;
+                }
+                set {
+                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return;
+                    if (val != null) {
+                        /*if (value != null) {
+                            val.valuePerso = value.perso;
+                            val.valuePointer = value.perso.offset;
+                        } else {
+                            val.valuePerso = null;
+                            val.valuePointer = null;
+                        }*/
+                    }
+                }
+            }
             public WayPointBehaviour AsWayPoint {
                 get {
                     if (type != DsgVarInfoEntry.DsgVarType.WayPoint) return null;
                     if (val != null) {
                         return val.valueWayPoint?.Gao.GetComponent<WayPointBehaviour>();
+                    }
+                    if (valROM != null) {
+                        OpenSpace.ROM.WayPoint wp = valROM.ValueWayPoint;
+                        if (wp == null) return null;
+                        return MapLoader.Loader.controller.graphManager.waypoints.FirstOrDefault(w => w.wpROM == wp);
                     }
                     return null;
                 }
@@ -130,6 +176,11 @@ public class DsgVarComponent : MonoBehaviour {
                         if (graph == null) return null;
                         return MapLoader.Loader.controller.graphManager.graphDict[graph];
                     }
+                    if (valROM != null) {
+                        OpenSpace.ROM.Graph graph = valROM.ValueGraph;
+                        if (graph == null) return null;
+                        return MapLoader.Loader.controller.graphManager.graphROMDict[graph];
+                    }
                     return null;
                 }
                 set {
@@ -148,6 +199,7 @@ public class DsgVarComponent : MonoBehaviour {
             public bool AsBoolean {
                 get {
                     if (val != null) return val.valueBool;
+                    if (valROM != null) return valROM.ValueBoolean;
                     return false;
                 }
                 set {
@@ -157,6 +209,7 @@ public class DsgVarComponent : MonoBehaviour {
             public sbyte AsByte {
                 get {
                     if (val != null) return val.valueByte;
+                    if (valROM != null) return valROM.ValueByte;
                     return 0;
                 }
                 set {
@@ -166,6 +219,7 @@ public class DsgVarComponent : MonoBehaviour {
             public byte AsUByte {
                 get {
                     if (val != null) return val.valueUByte;
+                    if (valROM != null) return valROM.ValueUByte;
                     return 0;
                 }
                 set {
@@ -175,6 +229,7 @@ public class DsgVarComponent : MonoBehaviour {
             public short AsShort {
                 get {
                     if (val != null) return val.valueShort;
+                    if (valROM != null) return valROM.ValueShort;
                     return 0;
                 }
                 set {
@@ -184,6 +239,7 @@ public class DsgVarComponent : MonoBehaviour {
             public ushort AsUShort {
                 get {
                     if (val != null) return val.valueUShort;
+                    if (valROM != null) return valROM.ValueUShort;
                     return 0;
                 }
                 set {
@@ -193,6 +249,7 @@ public class DsgVarComponent : MonoBehaviour {
             public int AsInt {
                 get {
                     if (val != null) return val.valueInt;
+                    if (valROM != null) return valROM.ValueInt;
                     return 0;
                 }
                 set {
@@ -202,6 +259,7 @@ public class DsgVarComponent : MonoBehaviour {
             public uint AsUInt {
                 get {
                     if (val != null) return val.valueUInt;
+                    if (valROM != null) return valROM.ValueUInt;
                     return 0;
                 }
                 set {
@@ -211,6 +269,7 @@ public class DsgVarComponent : MonoBehaviour {
             public float AsFloat {
                 get {
                     if (val != null) return val.valueFloat;
+                    if (valROM != null) return valROM.ValueFloat;
                     return 0;
                 }
                 set {
@@ -220,6 +279,7 @@ public class DsgVarComponent : MonoBehaviour {
             public Vector3 AsVector {
                 get {
                     if (val != null) return val.valueVector;
+                    if (valROM != null) return valROM.ValueVector;
                     return Vector3.zero;
                 }
                 set {
@@ -229,6 +289,7 @@ public class DsgVarComponent : MonoBehaviour {
             public int AsText {
                 get {
                     if (val != null) return val.valueText;
+                    if (valROM != null) return valROM.ValueText;
                     return 0;
                 }
                 set {
@@ -238,6 +299,7 @@ public class DsgVarComponent : MonoBehaviour {
             public uint AsCaps {
                 get {
                     if (val != null) return val.valueCaps;
+                    if (valROM != null) return valROM.ValueCaps;
                     return 0;
                 }
                 set {
@@ -251,6 +313,20 @@ public class DsgVarComponent : MonoBehaviour {
                 this.val = value;
                 if (value != null) InitValue(value);
             }
+            public Value(OpenSpace.ROM.DsgVarValue value) {
+                this.valROM = value;
+                if (value != null) {
+                    InitValue(value);
+                }
+            }
+            // Create an empty array
+            public Value(DsgVarInfoEntry.DsgVarType type, int length) {
+                this.type = type;
+                AsArray = new Value[length];
+                for (int i = 0; i < AsArray.Length; i++) {
+                    AsArray[i] = null;
+                }
+            }
 
             public void InitValue(DsgVarValue value) {
                 this.type = value.type;
@@ -259,6 +335,16 @@ public class DsgVarComponent : MonoBehaviour {
                     AsArray = new Value[value.arrayLength];
                     for (int i = 0; i < AsArray.Length; i++) {
                         AsArray[i] = new Value(value.valueArray[i]);
+                    }
+                }
+            }
+            public void InitValue(OpenSpace.ROM.DsgVarValue value) {
+                this.type = value.dsgVarType;
+
+                if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type) != DsgVarInfoEntry.DsgVarType.None) {
+                    AsArray = new Value[value.ValueArrayLength];
+                    for (int i = 0; i < AsArray.Length; i++) {
+                        AsArray[i] = null;
                     }
                 }
             }
@@ -274,6 +360,7 @@ public class DsgVarComponent : MonoBehaviour {
             public bool IsSameValue(Value value) {
                 if (value == null) return false;
                 if (val != null) return val.IsSameValue(value.val);
+                if (valROM != null) return valROM.IsSameValue(value.valROM);
                 return true;
             }
         }
@@ -286,6 +373,28 @@ public class DsgVarComponent : MonoBehaviour {
             if (current != null) valueCurrent = new Value(current);
             if (initial != null) valueInitial = new Value(initial);
             if (model != null) valueModel = new Value(model);
+        }
+
+        public DsgVarEditableEntry(OpenSpace.ROM.DsgVarInfo.Entry modelEntry, List<OpenSpace.ROM.DsgMemInfo> currentEntries) {
+            this.entryROM = modelEntry;
+            this.entriesMemROM = currentEntries;
+            if(modelEntry != null) valueModel = new Value(modelEntry.value);
+            if (currentEntries.Count > 0) {
+                if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(modelEntry.value.dsgVarType) != DsgVarInfoEntry.DsgVarType.None) {
+                    // Check for array
+                    valueInitial = new Value(modelEntry.value.dsgVarType, modelEntry.value.ValueArrayLength);
+                    for (int i = 0; i < currentEntries.Count; i++) {
+                        if (currentEntries[i].value.paramEntry == null) continue;  // Skip this, it just redefines the array anyway
+                        ushort arrayIndex = currentEntries[i].value.paramEntry.Value.index_in_array;
+                        valueInitial.AsArray[arrayIndex] = new Value(currentEntries[i].value);
+                    }
+                } else {
+                    // Not an array
+                    valueInitial = new Value(currentEntries[0].value);
+                }
+                //List<OpenSpace.ROM.DsgMemInfo> entriesNoArray = currentEntries.Where(e => e.value.paramEntry == null || e.value.paramEntry.Value == null).ToList();
+            }
+
         }
 
         public void Write(Writer writer) {
@@ -339,6 +448,31 @@ public class DsgVarComponent : MonoBehaviour {
                     dsgMem?.values?[i],
                     dsgMem?.valuesInitial?[i],
                     dsgVar?.defaultValues?[i]);
+                editableEntries[i] = editableEntry;
+            }
+        }
+    }
+
+    public void SetPerso(OpenSpace.ROM.Perso perso) {
+        this.persoROM = perso;
+        if (perso != null && perso.brain?.Value != null) {
+            dsgMemROM = perso.brain.Value.dsgMem.Value;
+            dsgVarROM = perso.brain.Value.aiModel?.Value.dsgVar?.Value;
+            if (dsgVarROM?.info?.Value == null) return;
+            editableEntries = new DsgVarEditableEntry[dsgVarROM.info.Value.entries.Length];
+
+            for (int i = 0; i < editableEntries.Length; i++) {
+                List<OpenSpace.ROM.DsgMemInfo> memInfos = new List<OpenSpace.ROM.DsgMemInfo>();
+                if (dsgMemROM?.info?.Value != null && dsgMemROM.info.Value.info.Length > 0) {
+                    for (int j = 0; j < dsgMemROM.info.Value.info.Length; j++) {
+                        OpenSpace.ROM.DsgMemInfo info = dsgMemROM.info.Value.info[j].Value;
+                        OpenSpace.ROM.DsgVarInfo.Entry entry = dsgVarROM.info.Value.GetEntryFromIndex(info.value.index);
+                        if (entry == dsgVarROM.info.Value.entries[i]) {
+                            memInfos.Add(info);
+                        }
+                    }
+                }
+                DsgVarEditableEntry editableEntry = new DsgVarEditableEntry(dsgVarROM.info.Value.entries[i], memInfos);
                 editableEntries[i] = editableEntry;
             }
         }

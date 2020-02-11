@@ -13,6 +13,7 @@ public class GraphManager : MonoBehaviour {
     public List<WayPointBehaviour> waypoints;
 	public List<GraphBehaviour> graphs;
 	public Dictionary<Graph, GraphBehaviour> graphDict = new Dictionary<Graph, GraphBehaviour>();
+	public Dictionary<OpenSpace.ROM.Graph, GraphBehaviour> graphROMDict = new Dictionary<OpenSpace.ROM.Graph, GraphBehaviour>();
 	private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
 
@@ -52,6 +53,7 @@ public class GraphManager : MonoBehaviour {
 				go_graph.transform.SetParent(graphRoot.transform);
 				GraphBehaviour gb = go_graph.AddComponent<GraphBehaviour>();
 				gb.graphROM = graph;
+				graphROMDict[graph] = gb;
 
 				for (int i = 0; i < graph.num_nodes; i++) {
 					OpenSpace.ROM.GraphNode node = graph.nodes.Value.nodes[i].Value;

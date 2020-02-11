@@ -45,6 +45,11 @@ namespace OpenSpace.ROM {
 				offsetInBuffer = reader.ReadUInt16();
 
 			}
+			public string NiceVariableName {
+				get {
+					return value.dsgVarType + "_" + value.index_of_info;
+				}
+			}
 		}
 	}
 }

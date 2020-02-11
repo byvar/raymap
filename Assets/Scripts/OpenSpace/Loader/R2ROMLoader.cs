@@ -24,7 +24,7 @@ namespace OpenSpace.Loader {
 		public List<Graph> graphsROM = new List<Graph>();
 		public List<WayPoint> waypointsROM = new List<WayPoint>();
 		public LevelHeader level;
-		public LanguageTable[] localizationROM = null;
+		public Localization localizationROM = null;
 
 		public Pointer[] texturesTable;
 		public Pointer[] palettesTable;
@@ -332,19 +332,8 @@ namespace OpenSpace.Loader {
 			EngineStruct engineStruct = GetOrRead<EngineStruct>(reader, (ushort)(0 | FATEntry.Flag.Fix));
 
 			// Read languages table
-			loadingState = "Loading language tables";
-			await WaitIfNecessary();
-			NumLanguages numLanguages = GetOrRead<NumLanguages>(reader, 0);
-			print("Number of languages: " + numLanguages.num_languages);
-			localizationROM = new LanguageTable[numLanguages.num_languages];
-			for (ushort i = 0; i < numLanguages.num_languages; i++) {
-				loadingState = "Loading language table " + (i + 1) + "/" + numLanguages.num_languages;
-				await WaitIfNecessary();
-				localizationROM[i] = GetOrRead<LanguageTable>(reader, i);
-				if (localizationROM[i] != null) {
-					print(localizationROM[i].name);
-				}
-			}
+			localizationROM = new Localization();
+			await localizationROM.Read(reader);
 
 			// Load level list
 			loadingState = "Loading level list";

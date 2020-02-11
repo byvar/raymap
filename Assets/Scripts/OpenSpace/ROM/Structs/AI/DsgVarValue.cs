@@ -1,4 +1,5 @@
 ﻿using OpenSpace.Loader;
+using System;
 using System.Linq;
 using UnityEngine;
 using DsgVarType = OpenSpace.AI.DsgVarInfoEntry.DsgVarType;
@@ -112,6 +113,15 @@ namespace OpenSpace.ROM {
 		}
 
 		// Getters for different types
+		public bool ValueBoolean {
+			get {
+				if (paramEntry == null) {
+					return paramUByte != 0;
+				} else {
+					return paramEntry.Value.paramUByte != 0;
+				}
+			}
+		}
 		public sbyte ValueByte {
 			get {
 				if (paramEntry == null) {
@@ -175,34 +185,114 @@ namespace OpenSpace.ROM {
 				}
 			}
 		}
-		public Vector3 ParamVector {
+		public Vector3 ValueVector {
 			get {
 				return paramVector3.Value?.value ?? Vector3.zero;
 			}
 		}
-		public WayPoint ParamWayPoint {
+		public WayPoint ValueWayPoint {
 			get { return paramWaypoint.Value; }
 		}
-		public Graph ParamGraph {
+		public Graph ValueGraph {
 			get { return paramGraph.Value; }
 		}
-		public Comport ParamComport {
+		public Comport ValueComport {
 			get { return paramComport.Value; }
 		}
-		public State ParamAction {
+		public State ValueAction {
 			get { return paramState.Value; }
 		}
-		public GameMaterial ParamGameMaterial {
+		public GameMaterial ValueGameMaterial {
 			get { return paramGameMaterial.Value; }
 		}
-		public Perso ParamPerso {
+		public Perso ValuePerso {
 			get { return paramPerso.Value; }
 		}
-		public int ParamText {
+		public int ValueText {
+			get { return param == 0xFFFF ? -1 : param; }
+		}
+		public uint ValueCaps {
+			get { return paramCaps.Value?.value ?? 0; }
+		}
+		public ushort ValueArrayLength {
 			get { return param; }
 		}
-		public uint ParamCaps {
-			get { return paramCaps.Value?.value ?? 0; }
+		public AI.DsgVarValue.List ValueList {
+			get {
+				return paramList;
+			}
+		}
+
+
+		public bool IsSameValue(DsgVarValue other) {
+			if (other == null) return false;
+			if (Equals(other)) return true;
+			if (dsgVarType != other.dsgVarType) return false;
+			switch (dsgVarType) {
+				case DsgVarType.Boolean:
+					return ValueBoolean == other.ValueBoolean;
+				case DsgVarType.Byte:
+					return ValueByte == other.ValueByte;
+				case DsgVarType.UByte:
+					return ValueUByte == other.ValueUByte;
+				case DsgVarType.Short:
+					return ValueShort == other.ValueShort;
+				case DsgVarType.UShort:
+					return ValueUShort == other.ValueUShort;
+				case DsgVarType.Int:
+					return ValueInt == other.ValueInt;
+				case DsgVarType.UInt:
+					return ValueUInt == other.ValueUInt;
+				case DsgVarType.Float:
+					return ValueFloat == other.ValueFloat;
+				case DsgVarType.Vector:
+					return ValueVector == other.ValueVector;
+				case DsgVarType.Text:
+					return ValueText == other.ValueText;
+				case DsgVarType.Graph:
+					return ValueGraph == other.ValueGraph;
+				case DsgVarType.WayPoint:
+					return ValueWayPoint == other.ValueWayPoint;
+				case DsgVarType.GameMaterial:
+					return ValueGameMaterial == other.ValueGameMaterial;
+				case DsgVarType.List:
+					if (ValueList.curLength != other.ValueList.curLength
+						|| ValueList.maxLength != other.ValueList.maxLength) {
+						return false;
+					}
+					for (int i = 0; i < ValueList.maxLength; i++) {
+						if (ValueList.list[i].value != other.ValueList.list[i].value) {
+							return false;
+						}
+					}
+					return true;
+				case DsgVarType.Comport:
+					return ValueComport == other.ValueComport;
+				case DsgVarType.Perso:
+					return ValuePerso == other.ValuePerso;
+				case DsgVarType.Action:
+					return ValueAction == other.ValueAction;
+				case DsgVarType.Caps:
+					return ValueCaps == other.ValueCaps;
+
+				// Arrays
+				case DsgVarType.ActionArray:
+				case DsgVarType.FloatArray:
+				case DsgVarType.IntegerArray:
+				case DsgVarType.PersoArray:
+				case DsgVarType.SoundEventArray:
+				case DsgVarType.SuperObjectArray:
+				case DsgVarType.TextArray:
+				case DsgVarType.TextRefArray:
+				case DsgVarType.VectorArray:
+				case DsgVarType.WayPointArray:
+				case DsgVarType.GraphArray:
+				case DsgVarType.Array11:
+				case DsgVarType.Array9:
+					if (ValueArrayLength != other.ValueArrayLength) return false;
+					return true;
+			}
+			return true;
 		}
 	}
 }

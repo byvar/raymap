@@ -253,8 +253,7 @@ namespace OpenSpace.ROM {
                     case NodeType.WayPointRef:
                         return "WayPoint.FromOffset(\"" + param + "\")";
                     case NodeType.TextRef:
-                        if (param == 0xFFFF) return "TextRef.Null";
-                        if (l.localizationROM == null || l.localizationROM.Length == 0) return "TextRef";
+                        if (param == 0xFFFF || l.localizationROM == null) return "TextRef.Null";
                         /*if (advanced) return "TextRef: " + param + " (" + l.localizationROM.GetTextForHandleAndLanguageID((int)param, 0) + ")";
                         if (ts.expandStrings) {
                             return "\"" + l.localizationROM[0].GetTextForHandleAndLanguageID((int)param, 0) + "\""; // Preview in english
@@ -262,17 +261,12 @@ namespace OpenSpace.ROM {
                             return "new TextReference(" + (int)param + ")";
                         }*/
                         int txtIndex = param;
-                        LanguageTable table = l.localizationROM[1];
-                        if (txtIndex >= table.num_txtTable + table.num_txtTable2) {
-                            txtIndex = txtIndex - (table.num_txtTable + table.num_txtTable2);
-                            table = l.localizationROM[0]; // Common table
+                        string result = l.localizationROM.Lookup(txtIndex);
+                        if (result != null) {
+                            return "\"" + result + "\"";
+                        } else {
+                            return "TextRef_" + param;
                         }
-                        if (txtIndex < table.num_txtTable) {
-                            return "\"" + table.textTable.Value.strings[txtIndex].Value.str.Value.str + "\"";
-                        } else if (txtIndex < table.num_txtTable + table.num_txtTable2) {
-                            return "\"" + table.textTable2.Value.strings[txtIndex - table.num_txtTable].Value.ToString() + "\"";
-                        }
-                        return "TextRef_" + param;
                     case NodeType.ComportRef:
 
                         return "Comport.FromOffset(\"" + param + "\")";

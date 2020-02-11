@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using OpenSpace;
 using System;
 using UnityEditor.IMGUI.Controls;
+using System.Linq;
 
 [CustomEditor(typeof(DsgVarComponent))]
 public class DsgVarComponentEditor : Editor {
@@ -22,7 +23,7 @@ public class DsgVarComponentEditor : Editor {
         DsgVarComponent c = (DsgVarComponent)target;
 
         if (c.editableEntries != null) {
-            Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 200f);
+            Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 400f);
             InitDsgVarsTreeIfNeeded(rect, c);
             if (treeviewDsgVars.target != c) {
                 treeviewDsgVars.target = c;
@@ -84,10 +85,16 @@ public class DsgVarComponentEditor : Editor {
         DsgVarComponent pb = (DsgVarComponent)target;
         List<DsgVarsTreeElement> tr = new List<DsgVarsTreeElement>();
         tr.Add(new DsgVarsTreeElement("Hidden root", -1, -1));
+        bool visibleCurrent = false;
+        bool visibleInitial = false;
+        bool visibleModel = false;
         if (pb.editableEntries.Length > 0) {
             int id = 0;
             foreach (DsgVarComponent.DsgVarEditableEntry entry in pb.editableEntries) {
                 DsgVarsTreeElement el = new DsgVarsTreeElement(entry.Name, 0, id) { entry = entry };
+                if (entry.valueCurrent != null) visibleCurrent = true;
+                if (entry.valueInitial != null) visibleInitial = true;
+                if (entry.valueModel != null) visibleModel = true;
                 tr.Add(el);
                 id++;
                 if (entry.IsArray) {
@@ -100,6 +107,30 @@ public class DsgVarComponentEditor : Editor {
                     }
                 }
             }
+            // Activate columns
+            List<int> visibleColumns = m_MultiColumnHeaderState.visibleColumns.ToList();
+            if (visibleCurrent != visibleColumns.Contains((int)DsgVarsTreeView.Columns.CurrentValue)) {
+                if (visibleCurrent) {
+                    visibleColumns.Add((int)DsgVarsTreeView.Columns.CurrentValue);
+                } else {
+                    visibleColumns.Remove((int)DsgVarsTreeView.Columns.CurrentValue);
+                }
+            }
+            if (visibleInitial != visibleColumns.Contains((int)DsgVarsTreeView.Columns.InitialValue)) {
+                if (visibleInitial) {
+                    visibleColumns.Add((int)DsgVarsTreeView.Columns.InitialValue);
+                } else {
+                    visibleColumns.Remove((int)DsgVarsTreeView.Columns.InitialValue);
+                }
+            }
+            if (visibleModel != visibleColumns.Contains((int)DsgVarsTreeView.Columns.ModelValue)) {
+                if (visibleModel) {
+                    visibleColumns.Add((int)DsgVarsTreeView.Columns.ModelValue);
+                } else {
+                    visibleColumns.Remove((int)DsgVarsTreeView.Columns.ModelValue);
+                }
+            }
+            m_MultiColumnHeaderState.visibleColumns = visibleColumns.ToArray();
         }
         return tr;
     }
@@ -190,11 +221,20 @@ public class DsgVarComponentEditor : Editor {
                 value.AsVector = EditorGUI.Vector3Field(rect, "", value.AsVector);
                 break;
             case DsgVarInfoEntry.DsgVarType.Perso:
-                PersoBehaviour currentPersoBehaviour = value.AsPerso != null ? value.AsPerso : null;
-                PersoBehaviour selectedPersoBehaviour = ((PersoBehaviour)EditorGUI.ObjectField(rect, currentPersoBehaviour, typeof(PersoBehaviour), true));
+                if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
+                    ROMPersoBehaviour currentPersoBehaviour = value.AsPersoROM != null ? value.AsPersoROM : null;
+                    ROMPersoBehaviour selectedPersoBehaviour = ((ROMPersoBehaviour)EditorGUI.ObjectField(rect, currentPersoBehaviour, typeof(ROMPersoBehaviour), true));
 
-                if (selectedPersoBehaviour != null && selectedPersoBehaviour.gameObject != null) {
-                    value.AsPerso = selectedPersoBehaviour;
+                    if (selectedPersoBehaviour != null && selectedPersoBehaviour.gameObject != null) {
+                        value.AsPersoROM = selectedPersoBehaviour;
+                    }
+                } else {
+                    PersoBehaviour currentPersoBehaviour = value.AsPerso != null ? value.AsPerso : null;
+                    PersoBehaviour selectedPersoBehaviour = ((PersoBehaviour)EditorGUI.ObjectField(rect, currentPersoBehaviour, typeof(PersoBehaviour), true));
+
+                    if (selectedPersoBehaviour != null && selectedPersoBehaviour.gameObject != null) {
+                        value.AsPerso = selectedPersoBehaviour;
+                    }
                 }
                 break;
             case DsgVarInfoEntry.DsgVarType.SuperObject:
@@ -236,7 +276,9 @@ public class DsgVarComponentEditor : Editor {
             case DsgVarInfoEntry.DsgVarType.WayPointArray:
                 if (value.AsArray != null) {
                     if (arrayIndex.HasValue) {
-                        DrawDsgVarValue(rect, dsgVarEntry, value.AsArray[arrayIndex.Value], arrayIndex);
+                        if (value.AsArray[arrayIndex.Value] != null) {
+                            DrawDsgVarValue(rect, dsgVarEntry, value.AsArray[arrayIndex.Value], arrayIndex);
+                        }
                     } else {
                         EditorGUI.LabelField(rect, "Length: " + value.AsArray.Length);
                     }
@@ -251,7 +293,11 @@ public class DsgVarComponentEditor : Editor {
         if (textId == -1) {
             locIdPreview += "None";
         } else {
-            locIdPreview += MapLoader.Loader.localization.GetTextForHandleAndLanguageID(textId, 0);
+            if (MapLoader.Loader.localization != null) {
+                locIdPreview += MapLoader.Loader.localization.GetTextForHandleAndLanguageID(textId, 0);
+            } else if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
+                locIdPreview += (MapLoader.Loader as OpenSpace.Loader.R2ROMLoader).localizationROM?.Lookup(textId);
+            }
         }
         EditorGUI.indentLevel = 0;
         int? result = null;

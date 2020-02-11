@@ -471,7 +471,14 @@ public class Controller : MonoBehaviour {
                     if (iteratorPerso.brain?.Value?.aiModel?.Value != null) {
                         var aiModel = iteratorPerso.brain.Value.aiModel.Value;
 
-                        if (aiModel.comportsIntelligence.Value != null) {
+						// DsgVars
+						if (iteratorPerso.brain?.Value?.dsgMem?.Value != null || aiModel.dsgVar?.Value != null) {
+							DsgVarComponent dsgVarComponent = unityBehaviour.gameObject.AddComponent<DsgVarComponent>();
+							dsgVarComponent.SetPerso(iteratorPerso);
+						}
+
+						// Comports
+						if (aiModel.comportsIntelligence.Value != null) {
                             aiModel.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
                         }
                         if (aiModel.comportsReflex.Value != null) {
@@ -507,6 +514,13 @@ public class Controller : MonoBehaviour {
 						if (iteratorPerso.brain?.Value?.aiModel?.Value != null) {
 							var aiModel = iteratorPerso.brain.Value.aiModel.Value;
 
+							// DsgVars
+							if (iteratorPerso.brain?.Value?.dsgMem?.Value != null || aiModel.dsgVar?.Value != null) {
+								DsgVarComponent dsgVarComponent = unityBehaviour.gameObject.AddComponent<DsgVarComponent>();
+								dsgVarComponent.SetPerso(iteratorPerso);
+							}
+
+							// Comports
 							if (aiModel.comportsIntelligence.Value != null) {
 								aiModel.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
 							}

@@ -73,7 +73,7 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 	};
 
 	// All columns
-	enum Columns
+	public enum Columns
 	{
 		Icon,
 		Name,
@@ -250,7 +250,7 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 				minWidth = 30,
 				maxWidth = 30,
 				autoResize = true,
-				allowToggleVisibility = true
+				allowToggleVisibility = false
 			},
 			new MultiColumnHeaderState.Column
 			{
@@ -271,7 +271,7 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 				width = 100, 
 				minWidth = 100,
 				autoResize = true,
-				allowToggleVisibility = false
+				allowToggleVisibility = true
 			},
 			new MultiColumnHeaderState.Column 
 			{
@@ -281,7 +281,7 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 				width = 100,
 				minWidth = 100,
 				autoResize = true,
-				allowToggleVisibility = false
+				allowToggleVisibility = true
 			},
 			new MultiColumnHeaderState.Column
 			{
