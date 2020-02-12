@@ -207,7 +207,8 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			if (Settings.s.platform == Settings.Platform.PC
 				|| Settings.s.platform == Settings.Platform.Xbox
-				|| Settings.s.platform == Settings.Platform.Xbox360) {
+				|| Settings.s.platform == Settings.Platform.Xbox360
+				|| Settings.s.platform == Settings.Platform.PS3) {
 				if (Settings.s.game == Settings.Game.R3) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
@@ -238,7 +239,8 @@ namespace OpenSpace.Loader {
 			ReadLevelNames(reader, Pointer.Current(reader), num_lvlNames);
 			if (Settings.s.platform == Settings.Platform.PC
 				|| Settings.s.platform == Settings.Platform.Xbox
-				|| Settings.s.platform == Settings.Platform.Xbox360) {
+				|| Settings.s.platform == Settings.Platform.Xbox360
+				|| Settings.s.platform == Settings.Platform.PS3) {
 				reader.ReadChars(0x1E);
 				reader.ReadChars(0x1E); // two zero entries
 			}
@@ -290,6 +292,11 @@ namespace OpenSpace.Loader {
 				sz_entryActions = 0x108;
 				sz_binDataForMenu = 0x33C;
 				num_menuPages = 96;
+			} else if (Settings.s.platform == Settings.Platform.PS3) {
+				sz_videoStructure = 0x108;
+				sz_entryActions = 0x108;
+				sz_binDataForMenu = 0x348;
+				num_menuPages = 96;
 			}
 			loadingState = "Loading input structure";
 			await WaitIfNecessary();
@@ -297,7 +304,10 @@ namespace OpenSpace.Loader {
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
-			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
+			if (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.Xbox
+				|| Settings.s.platform == Settings.Platform.Xbox360
+				|| Settings.s.platform == Settings.Platform.PS3) {
 				Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
 				ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 			}
@@ -312,6 +322,7 @@ namespace OpenSpace.Loader {
 			Pointer off_soundEventTable = Pointer.Read(reader);
 			fonts = FromOffsetOrRead<FontStructure>(reader, Pointer.Current(reader), inline: true);
 			reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
+			print(Pointer.Current(reader));
 			if (Settings.s.game == Settings.Game.R3) {
 				uint num_musicMarkerSlots = reader.ReadUInt32();
 				for (int i = 0; i < num_musicMarkerSlots; i++) {
@@ -320,7 +331,8 @@ namespace OpenSpace.Loader {
 				reader.ReadBytes(sz_binDataForMenu);
 				if (Settings.s.platform == Settings.Platform.PC
 					|| Settings.s.platform == Settings.Platform.Xbox
-					|| Settings.s.platform == Settings.Platform.Xbox360) {
+					|| Settings.s.platform == Settings.Platform.Xbox360
+					|| Settings.s.platform == Settings.Platform.PS3) {
 					Pointer off_bgMaterialForMenu2D = Pointer.Read(reader);
 					Pointer off_fixMaterialForMenu2D = Pointer.Read(reader);
 					Pointer off_fixMaterialForSelectedFilms = Pointer.Read(reader);
@@ -360,14 +372,20 @@ namespace OpenSpace.Loader {
 			long totalSize = reader.BaseStream.Length;
 			//reader.ReadUInt32();
 			if (Settings.s.game == Settings.Game.R3
-				&& (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360)) {
+				&& (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.Xbox
+				|| Settings.s.platform == Settings.Platform.Xbox360
+				|| Settings.s.platform == Settings.Platform.PS3)) {
 				reader.ReadUInt32(); // fix checksum?
 			}
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
+			if (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.Xbox
+				|| Settings.s.platform == Settings.Platform.Xbox360
+				|| Settings.s.platform == Settings.Platform.PS3) {
 				if (Settings.s.game == Settings.Game.R3) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
@@ -390,7 +408,10 @@ namespace OpenSpace.Loader {
 			}
 			loadingState = "Loading level textures";
 			await ReadTexturesLvl(reader, Pointer.Current(reader));
-			if ((Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360)
+			if ((Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.Xbox
+				|| Settings.s.platform == Settings.Platform.Xbox360
+				|| Settings.s.platform == Settings.Platform.PS3)
 				&& !hasTransit && Settings.s.game != Settings.Game.Dinosaur) {
 				Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
 				Pointer.DoAt(ref reader, off_lightMapTexture, () => {
@@ -420,7 +441,8 @@ namespace OpenSpace.Loader {
 			if (Settings.s.game == Settings.Game.R3
 				&& (Settings.s.platform == Settings.Platform.PC
 				|| Settings.s.platform == Settings.Platform.Xbox
-				|| Settings.s.platform == Settings.Platform.Xbox360)) {
+				|| Settings.s.platform == Settings.Platform.Xbox360
+				|| Settings.s.platform == Settings.Platform.PS3)) {
 				reader.ReadUInt32(); // ???
 			}
 			globals.off_inactiveDynamicWorld = Pointer.Read(reader);
@@ -566,7 +588,10 @@ namespace OpenSpace.Loader {
 				await WaitIfNecessary();
 				Pointer off_transit = new Pointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
 				Pointer.DoAt(ref reader, off_transit, () => {
-					if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
+					if (Settings.s.platform == Settings.Platform.PC
+					|| Settings.s.platform == Settings.Platform.Xbox
+					|| Settings.s.platform == Settings.Platform.Xbox360
+					|| Settings.s.platform == Settings.Platform.PS3) {
 						Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
 						Pointer.DoAt(ref reader, off_lightMapTexture, () => {
 							lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);

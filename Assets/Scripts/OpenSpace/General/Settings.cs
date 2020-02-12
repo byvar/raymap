@@ -30,6 +30,7 @@ namespace OpenSpace {
 			[Description("Rayman 3 (PS2)")] Rayman3PS2,
 			[Description("Rayman 3 (Xbox)")] Rayman3Xbox,
 			[Description("Rayman 3 (Xbox 360)")] Rayman3Xbox360,
+			[Description("Rayman 3 (PS3)")] Rayman3PS3,
 			[Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
 			[Description("Tonic Trouble (PC)")] TonicTroublePC,
 			[Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
@@ -51,6 +52,7 @@ namespace OpenSpace {
 			{ "r3_ps2", Mode.Rayman3PS2 },
 			{ "r3_xbox", Mode.Rayman3Xbox },
 			{ "r3_xbox360", Mode.Rayman3Xbox360 },
+			{ "r3_ps3", Mode.Rayman3PS3 },
 			{ "ra_gc", Mode.RaymanArenaGC },
 			{ "ra_demo_gc", Mode.RaymanArenaGCDemo },
 			{ "ra_xbox", Mode.RaymanArenaXbox },
@@ -87,7 +89,7 @@ namespace OpenSpace {
             R3 = 3
         };
         public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch };
-        public enum Platform { PC, iOS, GC, DC, PS1, PS2, Xbox, Xbox360, DS, _3DS, N64 };
+        public enum Platform { PC, iOS, GC, DC, PS1, PS2, PS3, Xbox, Xbox360, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
@@ -239,6 +241,25 @@ namespace OpenSpace {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.Xbox360,
+			endian = Endian.Big,
+			linkedListType = LinkedListType.Double,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = true,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.1f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+			hasNames = true,
+		};
+		public static Settings R3PS3 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PS3,
 			endian = Endian.Big,
 			linkedListType = LinkedListType.Double,
 			hasDeformations = true,
@@ -745,6 +766,7 @@ namespace OpenSpace {
 			{ Mode.Rayman3PS2, R3PS2 },
 			{ Mode.Rayman3Xbox, R3Xbox },
 			{ Mode.Rayman3Xbox360, R3Xbox360 },
+			{ Mode.Rayman3PS3, R3PS3 },
 			{ Mode.RaymanRavingRabbidsDS, RRRDS },
 			{ Mode.TonicTroublePC, TTPC },
 			{ Mode.TonicTroubleSEPC, TTSEPC },

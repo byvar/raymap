@@ -53,6 +53,7 @@ class MapSelectionDropdown : AdvancedDropdown {
 			case Settings.Platform.GC:
 			case Settings.Platform.Xbox:
 			case Settings.Platform.Xbox360:
+			case Settings.Platform.PS3:
 				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 					extension = "*.sna";
 				} else {
@@ -62,7 +63,11 @@ class MapSelectionDropdown : AdvancedDropdown {
 			case Settings.Platform.DC: extension = "*.DAT"; break;
 			case Settings.Platform.PS2:
 				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-					extension = "*.lv2";
+					if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
+						extension = "*.sna";
+					} else {
+						extension = "*.lv2";
+					}
 				} else {
 					extension = "*.lvl";
 				}

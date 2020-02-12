@@ -24,7 +24,7 @@ namespace OpenSpace.Text {
 				for (int i = 0; i < num_fonts; i++) {
 					fonts[i] = new FontDefine(reader);
 				}
-				if (Settings.s.platform == Settings.Platform.Xbox360) {
+				if (Settings.s.platform == Settings.Platform.Xbox360 || Settings.s.platform == Settings.Platform.PS3) {
 					reader.Align(4); // Align position
 					num_fontsBitmap2 = reader.ReadByte();
 					num_fonts2 = reader.ReadByte();
@@ -98,6 +98,7 @@ namespace OpenSpace.Text {
 			public FontDefine(Reader reader) {
 				if (Settings.s.platform == Settings.Platform.GC
 					|| Settings.s.platform == Settings.Platform.Xbox360
+					|| Settings.s.platform == Settings.Platform.PS3
 					|| Settings.s.mode == Settings.Mode.RaymanArenaXbox) {
 					name = reader.ReadString(50);
 				}

@@ -70,6 +70,7 @@ namespace OpenSpace {
         }
 
         public static async Task DownloadFile(string path) {
+			if (virtualFiles.ContainsKey(path) && virtualFiles[path] != null) return;
 			Debug.Log("Downloading " + path);
 			await MapLoader.WaitIfNecessary();
 			UnityWebRequest www = UnityWebRequest.Get(serverAddress + path);

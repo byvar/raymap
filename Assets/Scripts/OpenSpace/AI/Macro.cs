@@ -36,7 +36,9 @@ namespace OpenSpace.AI {
 
 		protected override void ReadInternal(Reader reader) {
 			MapLoader.Loader.macros.Add(this);
-			if (Settings.s.hasNames && Settings.s.platform != Settings.Platform.Xbox360) {
+			if (Settings.s.hasNames
+				&& Settings.s.platform != Settings.Platform.Xbox360
+				&& Settings.s.platform != Settings.Platform.PS3) {
 				name = reader.ReadString(0x100);
 			}
 

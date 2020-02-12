@@ -653,11 +653,32 @@ MonoBehaviour.print(str);
 						textures[i].Texture = tex;
 						texturesSeenFile[file_texture]++;
 					}
+				} else if(Settings.s.platform == Settings.Platform.PS3) {
+					Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
+					for (int i = 0, j = 0; i < num_textures; i++, j++) {
+						uint file_texture = reader.ReadUInt32();
+						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+						if (!texturesSeenFile.ContainsKey(file_texture)) {
+							texturesSeenFile[file_texture] = 0;
+						}
+						Texture2D tex = null;
+						string texturePath = gameDataBinFolder + "../Gamedata/World/Graphics/TexturesDDS/" + textures[i].name.ToLower().Substring(0, textures[i].name.LastIndexOf('.')) + ".dds";
+						await PrepareFile(texturePath);
+						if (FileSystem.FileExists(texturePath)) {
+							using (Stream str = FileSystem.GetFileReadStream(texturePath)) {
+								DDSImageParser.DDSImage dds = new DDSImageParser.DDSImage(str);
+								tex = dds.BitmapImage;
+							}
+						}
+						textures[i].Texture = tex;
+						texturesSeenFile[file_texture]++;
+					}
 				} else if (Settings.s.platform == Settings.Platform.iOS) {
                     for (int i = 0; i < num_textures; i++) {
 						loadingState = "Loading fixed textures: " + (i+1) + "/" + num_textures;
 						await WaitIfNecessary();
 						string texturePath = gameDataBinFolder + "WORLD/GRAPHICS/TEXTURES/" + textures[i].name.ToUpper().Substring(0, textures[i].name.LastIndexOf('.')) + ".GF";
+						await PrepareFile(texturePath);
                         if (FileSystem.FileExists(texturePath)) {
                             GF gf = new GF(texturePath);
                             if (gf != null) textures[i].Texture = gf.GetTexture();
@@ -745,7 +766,7 @@ MonoBehaviour.print(str);
 					textures[i].Texture = tex;
 					texturesSeenFile[file_texture]++;
 				}
-			} else if(Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
+			} else if (Settings.s.platform == Settings.Platform.Xbox || Settings.s.platform == Settings.Platform.Xbox360) {
 				// Load textures from TPL
 				BTF fixBTF = null;
 				BTF lvlBTF = new BTF(paths["lvl.btf"], paths["lvl.bhf"]);
@@ -771,7 +792,7 @@ MonoBehaviour.print(str);
 					//print(i + " - " + texturesSeenFile[file_texture]);
 					Texture2D tex = null;
 					if (file_texture == 0) {
-						if(fixBTF == null) fixBTF = new BTF(paths["fix.btf"], paths["fix.bhf"]);
+						if (fixBTF == null) fixBTF = new BTF(paths["fix.btf"], paths["fix.bhf"]);
 						tex = fixBTF.GetTexture((int)num_textures_fix + texturesSeenFile[file_texture], textures[i].width_, textures[i].height_);
 						if (Settings.s.game == Settings.Game.RA) {
 							if (!texturesSeenFile.ContainsKey(2)) texturesSeenFile[2] = 0;
@@ -805,6 +826,26 @@ MonoBehaviour.print(str);
 						}
 					}
 				}*/
+			} else if(Settings.s.platform == Settings.Platform.PS3) {
+				Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
+				for (uint i = num_textures_fix; i < num_textures_total; i++) {
+					uint file_texture = reader.ReadUInt32();
+					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
+					if (!texturesSeenFile.ContainsKey(file_texture)) {
+						texturesSeenFile[file_texture] = 0;
+					}
+					Texture2D tex = null;
+					string texturePath = gameDataBinFolder + "../Gamedata/World/Graphics/TexturesDDS/" + textures[i].name.ToLower().Substring(0, textures[i].name.LastIndexOf('.')) + ".dds";
+					await PrepareFile(texturePath);
+					if (FileSystem.FileExists(texturePath)) {
+						using (Stream str = FileSystem.GetFileReadStream(texturePath)) {
+							DDSImageParser.DDSImage dds = new DDSImageParser.DDSImage(str);
+							tex = dds.BitmapImage;
+						}
+					}
+					textures[i].Texture = tex;
+					texturesSeenFile[file_texture]++;
+				}
 			} else if (Settings.s.platform == Settings.Platform.iOS) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {

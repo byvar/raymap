@@ -48,6 +48,7 @@ namespace OpenSpace.Input {
 						break;
 					case Settings.Platform.Xbox:
 					case Settings.Platform.Xbox360:
+					case Settings.Platform.PS3:
 						reader.ReadBytes(0x16BC);
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
