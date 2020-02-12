@@ -141,7 +141,7 @@
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l">✔️</td>
     <td class="tg-yw4l">✔️</td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">✔️</td>
   </tr>
   <tr>
     <td class="tg-yw4l">Disney's PK: Out of the Shadows</td>

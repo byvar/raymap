@@ -18,6 +18,7 @@ Map viewer/editor for OpenSpace games:
 * Rayman 3 (GC)
 * Rayman 3 (Xbox)
 * Rayman 3 HD (Xbox 360)
+* Rayman 3 HD (PS3)
 * Rayman Raving Rabbids (DS)
 * Donald Duck: Quack Attack (PC)
 * Donald Duck: Quack Attack (DC)
