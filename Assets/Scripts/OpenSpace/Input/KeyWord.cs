@@ -222,7 +222,11 @@ namespace OpenSpace.Input {
 						} else if(Settings.s.platform == Settings.Platform.DC) {
 							return FunctionType + "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
 						} else if (Settings.s.platform == Settings.Platform.PS2) {
-							return FunctionType + "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                                return FunctionType + "(" + Enum.GetName(typeof(RevolutionPS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                            } else {
+                                return FunctionType + "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                            }
 						} else {
 							return FunctionType + "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
 						}

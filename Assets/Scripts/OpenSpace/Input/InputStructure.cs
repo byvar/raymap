@@ -77,6 +77,11 @@ namespace OpenSpace.Input {
 							reader.ReadUInt16();
 							reader.ReadUInt32(); // 0F00020000040100
 							reader.ReadBytes(0x300);
+						} else {
+							reader.ReadBytes(0x1250);
+							input.num_entryActions = reader.ReadUInt32();
+							input.off_entryActions = Pointer.Read(reader);
+							reader.ReadBytes(0x418);
 						}
 						break;
 				}

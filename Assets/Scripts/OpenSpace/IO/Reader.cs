@@ -125,6 +125,11 @@ namespace OpenSpace {
                 ReadBytes(alignBytes - (int)(BaseStream.Position % alignBytes));
             }
         }
+        public void AlignOffset(int alignBytes, int offset) {
+            if ((BaseStream.Position - offset) % alignBytes != 0) {
+                ReadBytes(alignBytes - (int)((BaseStream.Position - offset) % alignBytes));
+            }
+        }
 
         // To make sure position is a multiple of alignBytes after reading a block of blocksize, regardless of prior position
         public void Align(int blockSize, int alignBytes) {

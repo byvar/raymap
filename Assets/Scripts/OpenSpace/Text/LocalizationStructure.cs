@@ -58,7 +58,9 @@ namespace OpenSpace.Text {
 					}
 				});
 			} else {
-				if (Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.LargoWinch) field4 = reader.ReadUInt32();
+				if (Settings.s.platform != Settings.Platform.DC
+					&& Settings.s.platform != Settings.Platform.PS2
+					&& Settings.s.game != Settings.Game.LargoWinch) field4 = reader.ReadUInt32();
 				num_languages = reader.ReadUInt16();
 				reader.ReadUInt16();
 				off_text_languages = Pointer.Read(reader);
@@ -117,6 +119,19 @@ namespace OpenSpace.Text {
                 });
             }
         }
+
+		public void ReadLanguageTablePS2(Reader reader, int index) {
+			languages[index].off_textTable = Pointer.Read(reader);
+			languages[index].num_entries_max = reader.ReadUInt16();
+			languages[index].num_entries = reader.ReadUInt16();
+			languages[index].entries = new string[languages[index].num_entries];
+			for (int j = 0; j < languages[index].num_entries; j++) {
+				Pointer off_text = Pointer.Read(reader);
+				Pointer.DoAt(ref reader, off_text, () => {
+					languages[index].entries[j] = reader.ReadNullDelimitedString();
+				});
+			}
+		}
 
         public string GetTextForHandleAndLanguageID(int index, uint currentLanguageId) { // FON_fn_szGetTextPointerForHandle(index)
             if (index == -1) {

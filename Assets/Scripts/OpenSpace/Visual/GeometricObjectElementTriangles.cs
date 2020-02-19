@@ -421,7 +421,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementTriangles sm = new GeometricObjectElementTriangles(offset, geo);
             sm.name = "Submesh @ pos " + offset;
-			//l.print(sm.name);
+			l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
 			if (Settings.s.game == Settings.Game.LargoWinch) {
@@ -475,7 +475,8 @@ namespace OpenSpace.Visual {
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 				if (Settings.s.game != Settings.Game.Dinosaur
 					&& Settings.s.game != Settings.Game.LargoWinch
-					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo) {
+					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
+					&& Settings.s.mode != Settings.Mode.Rayman3PS2) {
 					sm.isVisibleInPortal = reader.ReadByte();
 					reader.ReadByte();
 					sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts

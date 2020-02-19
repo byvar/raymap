@@ -22,7 +22,7 @@ namespace OpenSpace.Input {
 		DPadDown = 0x1A,
 		DPadLeft = 0x1B
 	}
-	public enum PS2KeyCode {
+	public enum RevolutionPS2KeyCode {
 		Select = 0x1A,
 		L3 = 0x1B,
 		R3 = 0x1C,
@@ -40,7 +40,43 @@ namespace OpenSpace.Input {
 		Cross = 0x28,
 		Square = 0x29
 	}
-	public enum DreamcastKeyCode {
+    public enum PS2KeyCode {
+        GenShoot = 0xA,
+        GenJump = 0xB,
+        GenTriangle = 0xC,
+        GenCircle = 0xD,
+        GenCross = 0xE,
+        GenSquare = 0xF,
+        GenL2 = 0x10,
+        GenR2 = 0x11,
+        GenL1 = 0x12,
+        GenR1 = 0x13,
+        GenSelect = 0x14,
+        GenUnknown = 0x15,
+        GenTakePicture = 0x16,
+        GenStart = 0x17,
+        GenDPadUp = 0x18,
+        GenDPadRight = 0x19,
+        GenPadDown = 0x1A,
+        GenDPadLeft = 0x1B,
+        Select = 0x1C,
+        L3 = 0x1D,
+        R3 = 0x1E,
+        Start = 0x1F,
+        DPadUp = 0x20,
+        DPadRight = 0x21,
+        DPadDown = 0x22,
+        DPadLeft = 0x23,
+        L2 = 0x24,
+        R2 = 0x25,
+        L1 = 0x26,
+        R1 = 0x27,
+        Triangle = 0x28,
+        Circle = 0x29,
+        Cross = 0x2A,
+        Square = 0x2B
+    }
+    public enum DreamcastKeyCode {
 		C = 0x10,
 		B = 0x11,
 		A = 0x12,

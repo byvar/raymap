@@ -204,7 +204,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
 			// Material struct = 0x188
-			//l.print("Material @ " + offset);
+			l.print("Material @ " + offset);
             m.flags = reader.ReadUInt32(); // After this: 0x4
 			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
 				if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
@@ -329,6 +329,9 @@ namespace OpenSpace.Visual {
                 m.num_animTextures = reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt32();
+                if (Settings.s.platform == Settings.Platform.PS2) {
+                    reader.ReadBytes(0x20);
+                }
                 reader.ReadByte();
                 reader.ReadByte();
                 m.properties = reader.ReadByte();
@@ -339,6 +342,7 @@ namespace OpenSpace.Visual {
                 for (int i = 0; i < 4; i++) {
                     VisualMaterialTexture t = new VisualMaterialTexture();
                     t.offset = Pointer.Current(reader);
+                    //l.print(t.offset);
                     t.off_texture = Pointer.Read(reader);
                     if (t.off_texture == null) break;
 					/*if (Settings.s.game == Settings.Game.Dinosaur) {
@@ -370,7 +374,19 @@ namespace OpenSpace.Visual {
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
-					} else {
+					} else if (Settings.s.platform == Settings.Platform.PS2) {
+                        reader.ReadInt32();
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        reader.ReadInt32();
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                    } else {
 						t.properties = reader.ReadInt32();
 						reader.ReadInt32();
 						reader.ReadInt32();

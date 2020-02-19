@@ -185,4 +185,49 @@ namespace OpenSpace {
             if (newPos != null) newPos.DoAt(ref writer, action);
         }
     }
+
+    public class Pointer<T> where T : OpenSpaceStruct, new() {
+        public Pointer pointer;
+        public T Value { get; set; }
+
+        public Pointer(Reader reader, bool resolve = false, Action<T> onPreRead = null) {
+            pointer = Pointer.Read(reader);
+            if (resolve) {
+                Resolve(reader, onPreRead: onPreRead);
+            }
+        }
+
+        public Pointer(Pointer pointer, Reader reader = null, bool resolve = false, Action<T> onPreRead = null) {
+            this.pointer = pointer;
+            if (resolve) {
+                Resolve(reader, onPreRead: onPreRead);
+            }
+        }
+
+        public Pointer(Pointer pointer, T value) {
+            this.pointer = pointer;
+            this.Value = value;
+        }
+        public Pointer() {
+            this.pointer = null;
+            this.Value = null;
+        }
+
+        public Pointer<T> Resolve(Reader reader, Action<T> onPreRead = null) {
+            MapLoader l = MapLoader.Loader;
+            Value = l.FromOffsetOrRead<T>(reader, pointer, onPreRead: onPreRead);
+            return this;
+        }
+
+        public static implicit operator T(Pointer<T> a) {
+            return a.Value;
+        }
+        public static implicit operator Pointer<T>(T t) {
+            if (t == null) {
+                return new Pointer<T>(null, null);
+            } else {
+                return new Pointer<T>(t.Offset, t);
+            }
+        }
+    }
 }

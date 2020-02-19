@@ -2,6 +2,7 @@
 using OpenSpace.Loader;
 using OpenSpace.Object;
 using OpenSpace.Visual.Deform;
+using OpenSpace.Visual.PS2Optimized;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,8 @@ namespace OpenSpace.Visual {
 		public int[][] mapping = null;
         public IGeometricObjectElement[] elements = null;
         public DeformSet bones = null;
+
+		public Pointer<PS2OptimizedGeometricObject> optimizedObject;
         
         private GameObject gao = null;
         public GameObject Gao {
@@ -86,6 +89,7 @@ namespace OpenSpace.Visual {
 
         public static GeometricObject Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
+			l.print("GEO REAL: " + offset);
             GeometricObject m = new GeometricObject(offset);
 			if (Settings.s.game == Settings.Game.LargoWinch) {
 				uint flags = reader.ReadUInt32();
@@ -126,7 +130,8 @@ namespace OpenSpace.Visual {
 				if (Settings.s.mode != Settings.Mode.RaymanArenaGC 
 					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
 					&& Settings.s.game != Settings.Game.RM
-					&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
+					&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC
+					&& Settings.s.mode != Settings.Mode.Rayman3PS2) {
 					reader.ReadInt32();
 				}
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
@@ -157,6 +162,13 @@ namespace OpenSpace.Visual {
 					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 						reader.ReadInt32();
 						reader.ReadInt16();
+						if (Settings.s.platform == Settings.Platform.PS2) {
+							reader.ReadInt16();
+							reader.ReadUInt32();
+							reader.ReadUInt32();
+							reader.ReadUInt32();
+							m.optimizedObject = new Pointer<PS2OptimizedGeometricObject>(reader, true);
+						}
 					}
 				} else {
 					reader.ReadInt32();
