@@ -11,8 +11,26 @@ using UnityEngine;
 namespace OpenSpace.Collide {
     public class CollideMaterial {
         public Pointer offset;
+        public enum Type : ushort {
+            Slide = 1 << 0,
+            Trampoline = 1 << 1,
+            GrabbaleLedge = 1 << 2,
+            Wall = 1 << 3,
+            FlagUnknown = 1 << 4,
+            HangableCeiling = 1 << 5,
+            ClimbableWall = 1 << 6,
+            Electric = 1 << 7,
+            LavaDeathWarp = 1 << 8,
+            FallTrigger = 1 << 9,
+            HurtTrigger = 1 << 10,
+            DeathWarp = 1 << 11,
+            FlagUnk2 = 1 << 12,
+            FlagUnk3 = 1 << 13,
+            Water = 1 << 14,
+            NoCollision = 1 << 15
+        }
 
-        public ushort type;
+        public Type type;
         public ushort identifier;
         public Vector3 direction;
         public float coef;
@@ -58,10 +76,10 @@ namespace OpenSpace.Collide {
 			//l.print(offset);
 
 			if (Settings.s.game == Settings.Game.R2Revolution) {
-				cm.type = reader.ReadUInt16();
+				cm.type = (Type)reader.ReadUInt16();
 				cm.identifier = reader.ReadUInt16();
 			} else {
-				cm.type = reader.ReadUInt16();
+				cm.type = (Type)reader.ReadUInt16();
 				cm.identifier = reader.ReadUInt16();
 				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 					cm.direction = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -110,13 +128,24 @@ namespace OpenSpace.Collide {
             if (LavaDeathWarp || DeathWarp) {
                 mr.material.color = Color.red;
             }
-            if (HurtTrigger) mr.material.color = new Color(126 / 255f, 2 / 255f, 204 / 255f); // purple
-            if (FallTrigger) mr.material.color = Color.black;
-            if (Trampoline) mr.material.color = Color.yellow;
-            if (Electric) mr.material.color = new Color(219f / 255f, 140 / 255f, 212 / 255f); // pink
-            if (Wall) mr.material.color = Color.grey;
-            if (GrabbableLedge) mr.material.color = Color.green;
-            if (FlagUnknown || FlagUnk2 || FlagUnk3) mr.material.color = new Color(124 / 255f, 68 / 255f, 33 / 255f); // brown
+            if (HurtTrigger) mr.material.color = Colors.HurtTrigger;
+            if (FallTrigger) mr.material.color = Colors.FallTrigger;
+            if (Trampoline) mr.material.color = Colors.Trampoline;
+            if (Electric) mr.material.color = Colors.Electric;
+            if (Wall) mr.material.color = Colors.Wall;
+            if (GrabbableLedge) mr.material.color = Colors.GrabbableLedge;
+            if (FlagUnknown || FlagUnk2 || FlagUnk3) mr.material.color = Colors.FlagUnknown;
+        }
+
+        public static class Colors {
+            public static Color
+                HurtTrigger = new Color(126 / 255f, 2 / 255f, 204 / 255f), // purple
+                FallTrigger = Color.black,
+                Trampoline = Color.yellow,
+                Electric = new Color(219f / 255f, 140 / 255f, 212 / 255f), // Pink
+                Wall = new Color(126 / 255f, 2 / 255f, 204 / 255f),
+                GrabbableLedge = Color.green,
+                FlagUnknown = new Color(124 / 255f, 68 / 255f, 33 / 255f); // brown
         }
     }
 }
