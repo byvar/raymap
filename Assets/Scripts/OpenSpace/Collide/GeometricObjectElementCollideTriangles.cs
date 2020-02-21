@@ -98,6 +98,8 @@ namespace OpenSpace.Collide {
                 MeshCollider mc = gao.AddComponent<MeshCollider>();
                 mc.sharedMesh = mf.sharedMesh;
 
+                gao.AddComponent<CollideComponent>().collide = this;
+
                 mr.material = MapLoader.Loader.collideMaterial;
                 if (gameMaterial != null && gameMaterial.collideMaterial != null) {
                     gameMaterial.collideMaterial.SetMaterial(mr);
