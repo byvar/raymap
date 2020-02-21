@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenSpace.Loader;
+using OpenSpace.Visual.PS2Optimized;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,7 +68,8 @@ namespace OpenSpace.Visual {
 
 
         private GameObject gao = null;
-        public GameObject Gao {
+
+		public GameObject Gao {
             get {
                 if (gao == null) {
                     gao = new GameObject(name);// Create object and read triangle data
@@ -476,7 +478,7 @@ namespace OpenSpace.Visual {
 				if (Settings.s.game != Settings.Game.Dinosaur
 					&& Settings.s.game != Settings.Game.LargoWinch
 					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
-					&& Settings.s.mode != Settings.Mode.Rayman3PS2) {
+					&& Settings.s.platform != Settings.Platform.PS2) {
 					sm.isVisibleInPortal = reader.ReadByte();
 					reader.ReadByte();
 					sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts
@@ -487,6 +489,24 @@ namespace OpenSpace.Visual {
 					sm.OPT_off_triangleStrip = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
 					sm.OPT_off_disconnectedTriangles = Pointer.Read(reader);
 					if (Settings.s.hasNames) sm.name += reader.ReadString(0x34);
+				} else if(Settings.s.platform == Settings.Platform.PS2) {
+					sm.OPT_off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
+					sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts
+					reader.ReadUInt16();
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+					sm.isVisibleInPortal = reader.ReadByte();
+					reader.ReadByte();
+					reader.ReadUInt16();
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+					sm.OPT_off_mapping_uvs = null;
+					sm.OPT_num_triangleStrip = 0;
+					sm.OPT_num_disconnectedTriangles = 0;
+					sm.OPT_off_triangleStrip = null;
+					sm.OPT_off_disconnectedTriangles = null;
 				} else {
 					sm.OPT_num_mapping_entries = 0;
 					sm.OPT_off_mapping_vertices = null;

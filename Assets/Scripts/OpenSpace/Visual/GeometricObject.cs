@@ -90,7 +90,7 @@ namespace OpenSpace.Visual {
 
         public static GeometricObject Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
-			//l.print("GEO REAL: " + offset);
+			//l.print("Geometric Object: " + offset);
             GeometricObject m = new GeometricObject(offset);
 			if (Settings.s.game == Settings.Game.LargoWinch) {
 				uint flags = reader.ReadUInt32();
@@ -290,10 +290,35 @@ namespace OpenSpace.Visual {
 			ReadMeshFromATO(reader, m);
 			if (Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion == Settings.EngineVersion.R3) {
 				m.optimizedObject?.Resolve(reader, onPreRead: opt => opt.isSinus = m.ps2IsSinus);
+				m.ReadMeshFromSDC();
 			}
 			m.InitGameObject();
             return m;
         }
+
+		private void ReadMeshFromSDC() {
+			if (optimizedObject?.Value == null) return;
+			PS2OptimizedSDCStructure sdc = optimizedObject.Value;
+			int sdcIndex = 0;
+			for (int i = 0; i < num_elements; i++) {
+				if (element_types[i] != 1) continue;
+				PS2OptimizedSDCStructureElement sdcEl = sdc.elements[sdcIndex];
+				GeometricObjectElementTriangles mainEl = elements[i] as GeometricObjectElementTriangles;
+				if (sdc.visualMaterials[sdcIndex] != mainEl.visualMaterial) {
+					Debug.LogWarning("SDC and Main materials did not match!");
+				}
+				if (bones != null) {
+					if (sdc.num_triangles[sdcIndex] != mainEl.num_triangles) {
+						Debug.LogWarning(mainEl.offset + " - " + sdcEl.offset + " - " + num_vertices);
+					}
+				}
+				/*if (sdcEl.vertices.Length != mainEl.OPT_num_mapping_entries) {
+					Debug.LogWarning("SDC vertices was longer than main!");
+				}*/
+				//mainEl.sdc = sdcEl;
+				sdcIndex++;
+			}
+		}
 
 		private static void ReadMeshFromATO(Reader reader, GeometricObject m) {
 			// Revolution only: Before creating the gameobject, read the actual model data from the ATO

@@ -31,12 +31,13 @@ namespace OpenSpace.Visual.PS2Optimized {
 		public void Read(Reader reader) {
 			offset = Pointer.Current(reader);
 			if (geo.Type == 4 || geo.Type == 5 || geo.Type == 6) {
+				// Optimized
 				unk0 = reader.ReadUInt32();
 				num_vertices = reader.ReadUInt32();
 				num_uvs = reader.ReadUInt32();
 				unk3 = reader.ReadUInt32();
 			} else {
-				num_vertices = geo.uint2[index] * 3;
+				num_vertices = geo.num_triangles[index] * 3;
 				num_uvs = (num_vertices + 3) >> 2;
 			}
 			VisualMaterial vm = geo.visualMaterials[index];
@@ -52,8 +53,6 @@ namespace OpenSpace.Visual.PS2Optimized {
 						case 0: hasUv0 = true; break;
 					}
 				}
-			} else {
-				hasUv0 = true;
 			}
 			vertices = new Vertex[num_vertices];
 			for (int i = 0; i < num_vertices; i++) {

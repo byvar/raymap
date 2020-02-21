@@ -23,7 +23,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 		public PS2OptimizedSDCStructureElement[] elements;
 		public VisualMaterial[] visualMaterials;
 		public uint[] uint1;
-		public uint[] uint2;
+		public uint[] num_triangles;
 
 		protected override void ReadInternal(Reader reader) {
 			flags = reader.ReadUInt32();
@@ -52,9 +52,9 @@ namespace OpenSpace.Visual.PS2Optimized {
 				}
 			});
 			Pointer.DoAt(ref reader, off_uint2, () => {
-				uint2 = new uint[num_elements];
+				num_triangles = new uint[num_elements];
 				for (int i = 0; i < num_elements; i++) {
-					uint2[i] = reader.ReadUInt32();
+					num_triangles[i] = reader.ReadUInt32();
 				}
 			});
 			Pointer.DoAt(ref reader, off_elements, () => {
