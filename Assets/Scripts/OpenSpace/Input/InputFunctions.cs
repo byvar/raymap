@@ -223,7 +223,7 @@ namespace OpenSpace.Input {
 				if (Settings.s.game == Settings.Game.TTSE) return functionTypesSE[index];
                 if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) return functionTypesHype[index];
 				if (Settings.s.platform == Settings.Platform.GC) return functionTypesGC[index];
-				if (Settings.s.platform == Settings.Platform.DC) return functionTypesDC[index];
+				if (Settings.s.platform == Settings.Platform.DC || Settings.s.platform == Settings.Platform.iOS) return functionTypesDC[index];
                 if (Settings.s.engineVersion > Settings.EngineVersion.R2 && 
                     Settings.s.platform == Settings.Platform.PS2) return functionTypesPS2[index];
                 return (FunctionType)(index);

@@ -132,21 +132,30 @@ namespace OpenSpace.Input {
                     subkeywords[0] = keywords[thisIndex + keywordsRead];
                     keywordsRead += 1;
                     int sequenceLength = subkeywords[0].indexOrKeyCode;
+
                     if (sequenceLength > 0) {
-                        Array.Resize(ref subkeywords, sequenceLength * 2 + 2);
-                        subkeywords[1] = keywords[thisIndex + keywordsRead];
-                        keywordsRead += subkeywords[1].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
+                        Array.Resize(ref subkeywords, sequenceLength+1);
                         for (int i = 0; i < sequenceLength; i++) {
-                            subkeywords[2 + i * 2] = keywords[thisIndex + keywordsRead]; // Keycode
-                            keywordsRead += 1;
-                            if (i < sequenceLength - 1) {
-                                subkeywords[3 + i * 2] = keywords[thisIndex + keywordsRead]; // SequenceKey
-                                keywordsRead += subkeywords[3 + i * 2].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
-                            }
+                            subkeywords[1+i] = keywords[thisIndex + keywordsRead];
+                            keywordsRead += subkeywords[1+i].FillInSubKeywords(ref reader, keywords, thisIndex + keywordsRead);
                         }
                     }
                     break;
-				case InputFunctions.FunctionType.JoystickPressed:
+                case InputFunctions.FunctionType.SequenceKey:
+                case InputFunctions.FunctionType.SequenceKeyEnd:
+                    subkeywords = new KeyWord[1];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead]; // Keycode
+                    keywordsRead += 1;
+                    break;
+                case InputFunctions.FunctionType.SequencePad:
+                case InputFunctions.FunctionType.SequencePadEnd:
+                    subkeywords = new KeyWord[2];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead]; // 0
+                    keywordsRead += 1;
+                    subkeywords[1] = keywords[thisIndex + keywordsRead]; // Keycode
+                    keywordsRead += 1;
+                    break;
+                case InputFunctions.FunctionType.JoystickPressed:
 				case InputFunctions.FunctionType.JoystickReleased:
 				case InputFunctions.FunctionType.JoystickJustPressed:
 				case InputFunctions.FunctionType.JoystickJustReleased:
@@ -205,8 +214,18 @@ namespace OpenSpace.Input {
                         string sequence = "";
                         // Skip 1 at the end (first sequenceKey), then do -2 to skip over every other sequenceKey
                         // Then stop because first two keywords (last two processed here) are length and sequenceEnd
-                        for (int i = subkeywords.Length - 2; i > 1; i-=2) {
-                            sequence += Enum.GetName(typeof(KeyCode), subkeywords[i].indexOrKeyCode);
+                        for (int i = subkeywords.Length - 1; i > 0; i--) {
+                            KeyWord w = subkeywords[i];
+                            switch (w.FunctionType) {
+                                case InputFunctions.FunctionType.SequenceKey:
+                                case InputFunctions.FunctionType.SequenceKeyEnd:
+                                    sequence += Enum.GetName(typeof(KeyCode), subkeywords[i].subkeywords[0].indexOrKeyCode);
+                                    break;
+                                case InputFunctions.FunctionType.SequencePad:
+                                case InputFunctions.FunctionType.SequencePadEnd:
+                                    sequence += GetJoyPadString(subkeywords[i].subkeywords);
+                                    break;
+                            }
                         }
                         return "Sequence(\"" + sequence + "\")";
 					case InputFunctions.FunctionType.JoystickPressed:
@@ -217,19 +236,7 @@ namespace OpenSpace.Input {
 					case InputFunctions.FunctionType.JoystickOrPadReleased:
 					case InputFunctions.FunctionType.JoystickOrPadJustPressed:
 					case InputFunctions.FunctionType.JoystickOrPadJustReleased:
-						if (Settings.s.platform == Settings.Platform.GC) {
-							return FunctionType + "(" + Enum.GetName(typeof(GameCubeKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
-						} else if(Settings.s.platform == Settings.Platform.DC) {
-							return FunctionType + "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
-						} else if (Settings.s.platform == Settings.Platform.PS2) {
-                            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                                return FunctionType + "(" + Enum.GetName(typeof(RevolutionPS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
-                            } else {
-                                return FunctionType + "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
-                            }
-						} else {
-							return FunctionType + "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
-						}
+                        return FunctionType + GetJoyPadString(subkeywords);
 					case InputFunctions.FunctionType.JoystickAxeValue:
 						return FunctionType + "("
 							+ (subkeywords[1].indexOrKeyCode == 4 ? "X" : "Y")
@@ -249,6 +256,22 @@ namespace OpenSpace.Input {
                 }
             } else {
                 return "[" + indexOrKeyCode + "]<" + Enum.GetName(typeof(KeyCode), indexOrKeyCode) + ">";
+            }
+        }
+
+        private string GetJoyPadString(KeyWord[] subkeywords) {
+            if (Settings.s.platform == Settings.Platform.GC) {
+                return "(" + Enum.GetName(typeof(GameCubeKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+            } else if (Settings.s.platform == Settings.Platform.DC) {
+                return "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+            } else if (Settings.s.platform == Settings.Platform.PS2) {
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    return "(" + Enum.GetName(typeof(RevolutionPS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                } else {
+                    return "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                }
+            } else {
+                return "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
             }
         }
     }

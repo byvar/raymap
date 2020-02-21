@@ -159,13 +159,14 @@ public class LightManager : MonoBehaviour {
 		} else {
 			if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
 				foreach (SectorComponent s in sectorManager.sectors) {
-					if (!s.Active) continue;
+					if (!s.Loaded) continue;
 					if (s.sector == null) continue;
 					if (s.sector.skyMaterial != null && s.sector.skyMaterial.textures.Count > 0 && s.sector.skyMaterial.textures.Where(t => t.texture != null).Count() > 0) {
 						skyMaterial = s.sector.skyMaterial;
 						activeBackgroundSector = s;
 						break;
 					} else {
+						if (!s.Active) continue;
 						foreach (LightInfo li in s.sector.staticLights) {
 							if (li.type == 6) {
 								backgroundColor = li.background_color;
@@ -233,7 +234,7 @@ public class LightManager : MonoBehaviour {
 		} else {
 			if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
 				foreach (SectorComponent s in sectorManager.sectors) {
-					if (!s.Active) continue;
+					if (!s.Loaded) continue;
 					if (s.sectorROM == null) continue;
 					if (s.sectorROM.background != null
 						&& s.sectorROM.background.Value != null
@@ -273,7 +274,7 @@ public class LightManager : MonoBehaviour {
 				if (activeBackgroundSector != null) {
 					if (activeBackgroundSector != previousActiveBackgroundSector) {
 						//backgroundPanel.material.SetFloat("_DisableLightingLocal", 0f);
-						//sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
+						sectorManager.ApplySectorLighting(activeBackgroundSector, backgroundPanel.gameObject, LightInfo.ObjectLightedFlag.Environment);
 						previousActiveBackgroundSector = activeBackgroundSector;
 					}
 				} else {

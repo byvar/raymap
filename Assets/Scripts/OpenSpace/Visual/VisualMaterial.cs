@@ -21,6 +21,7 @@ namespace OpenSpace.Visual {
         public Vector4 specularCoef;
         public Vector4 color;
         public uint num_textures;
+        public uint num_textures_in_material;
 		
         public Pointer off_animTextures_first;
         public Pointer off_animTextures_current;
@@ -204,7 +205,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
 			// Material struct = 0x188
-			l.print("Material @ " + offset);
+			//l.print("Material @ " + offset);
             m.flags = reader.ReadUInt32(); // After this: 0x4
 			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
 				if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
@@ -338,7 +339,7 @@ namespace OpenSpace.Visual {
                 reader.ReadByte();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-               /* m.num_textures = */reader.ReadUInt32();
+                m.num_textures_in_material = reader.ReadUInt32();
                 for (int i = 0; i < 4; i++) {
                     VisualMaterialTexture t = new VisualMaterialTexture();
                     t.offset = Pointer.Current(reader);

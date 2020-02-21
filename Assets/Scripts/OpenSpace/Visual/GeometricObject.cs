@@ -36,7 +36,8 @@ namespace OpenSpace.Visual {
         public IGeometricObjectElement[] elements = null;
         public DeformSet bones = null;
 
-		public Pointer<PS2OptimizedGeometricObject> optimizedObject;
+		public Pointer<PS2OptimizedSDCStructure> optimizedObject;
+		public uint ps2IsSinus;
         
         private GameObject gao = null;
         public GameObject Gao {
@@ -89,7 +90,7 @@ namespace OpenSpace.Visual {
 
         public static GeometricObject Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
-			l.print("GEO REAL: " + offset);
+			//l.print("GEO REAL: " + offset);
             GeometricObject m = new GeometricObject(offset);
 			if (Settings.s.game == Settings.Game.LargoWinch) {
 				uint flags = reader.ReadUInt32();
@@ -167,7 +168,10 @@ namespace OpenSpace.Visual {
 							reader.ReadUInt32();
 							reader.ReadUInt32();
 							reader.ReadUInt32();
-							m.optimizedObject = new Pointer<PS2OptimizedGeometricObject>(reader, true);
+							m.optimizedObject = new Pointer<PS2OptimizedSDCStructure>(reader, resolve: false);
+							reader.ReadUInt32();
+							reader.ReadUInt32();
+							m.ps2IsSinus = reader.ReadUInt32();
 						}
 					}
 				} else {
@@ -284,6 +288,9 @@ namespace OpenSpace.Visual {
                 }
 			}
 			ReadMeshFromATO(reader, m);
+			if (Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion == Settings.EngineVersion.R3) {
+				m.optimizedObject?.Resolve(reader, onPreRead: opt => opt.isSinus = m.ps2IsSinus);
+			}
 			m.InitGameObject();
             return m;
         }

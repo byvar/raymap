@@ -421,7 +421,7 @@ namespace OpenSpace.Visual {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementTriangles sm = new GeometricObjectElementTriangles(offset, geo);
             sm.name = "Submesh @ pos " + offset;
-			l.print(sm.name);
+			//l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
 			if (Settings.s.game == Settings.Game.LargoWinch) {
@@ -518,34 +518,37 @@ namespace OpenSpace.Visual {
             // Read mapping tables
             sm.OPT_mapping_uvs = new int[sm.num_uvMaps][];
             if (sm.OPT_num_mapping_entries > 0) {
-                Pointer.Goto(ref reader, sm.OPT_off_mapping_vertices);
-                //print("Mapping offset: " + String.Format("0x{0:X}", fs.Position));
-                sm.OPT_mapping_vertices = new int[sm.OPT_num_mapping_entries];
-                for (int j = 0; j < sm.OPT_num_mapping_entries; j++) {
-                    sm.OPT_mapping_vertices[j] = reader.ReadInt16();
-                }
-                Pointer.Goto(ref reader, sm.OPT_off_mapping_uvs);
-                for (int j = 0; j < sm.num_uvMaps; j++) {
-                    sm.OPT_mapping_uvs[j] = new int[sm.OPT_num_mapping_entries];
-                }
-                for (int j = 0; j < sm.OPT_num_mapping_entries; j++) {
-                    for (int um = 0; um < sm.num_uvMaps; um++) {
-                        sm.OPT_mapping_uvs[um][j] = reader.ReadInt16();
-                    }
-                }
+				Pointer.DoAt(ref reader, sm.OPT_off_mapping_vertices, () => {
+					//print("Mapping offset: " + String.Format("0x{0:X}", fs.Position));
+					sm.OPT_mapping_vertices = new int[sm.OPT_num_mapping_entries];
+					for (int j = 0; j < sm.OPT_num_mapping_entries; j++) {
+						sm.OPT_mapping_vertices[j] = reader.ReadInt16();
+					}
+				});
+				Pointer.DoAt(ref reader, sm.OPT_off_mapping_uvs, () => {
+					for (int j = 0; j < sm.num_uvMaps; j++) {
+						sm.OPT_mapping_uvs[j] = new int[sm.OPT_num_mapping_entries];
+					}
+					for (int j = 0; j < sm.OPT_num_mapping_entries; j++) {
+						for (int um = 0; um < sm.num_uvMaps; um++) {
+							sm.OPT_mapping_uvs[um][j] = reader.ReadInt16();
+						}
+					}
+				});
             }
             if (sm.num_triangles > 0) {
-                Pointer.Goto(ref reader, sm.off_mapping_uvs);
-                sm.mapping_uvs = new int[sm.num_uvMaps][];
-                for (int j = 0; j < sm.num_uvMaps; j++) {
-                    sm.mapping_uvs[j] = new int[sm.num_triangles * 3];
-                }
-                // Why is uv maps here the outer loop instead of inner like the other thing?
-                for (int um = 0; um < sm.num_uvMaps; um++) {
-                    for (int j = 0; j < sm.num_triangles * 3; j++) {
-                        sm.mapping_uvs[um][j] = reader.ReadInt16();
-                    }
-                }
+				Pointer.DoAt(ref reader, sm.off_mapping_uvs, () => {
+					sm.mapping_uvs = new int[sm.num_uvMaps][];
+					for (int j = 0; j < sm.num_uvMaps; j++) {
+						sm.mapping_uvs[j] = new int[sm.num_triangles * 3];
+					}
+					// Why is uv maps here the outer loop instead of inner like the other thing?
+					for (int um = 0; um < sm.num_uvMaps; um++) {
+						for (int j = 0; j < sm.num_triangles * 3; j++) {
+							sm.mapping_uvs[um][j] = reader.ReadInt16();
+						}
+					}
+				});
             }
 
 			// Read UVs
@@ -572,23 +575,25 @@ namespace OpenSpace.Visual {
 				}
 			});
             if (sm.num_triangles > 0) {
-                Pointer.Goto(ref reader, sm.off_triangles);
-                sm.triangles = new int[sm.num_triangles * 3];
-                //print("Loading disconnected triangles at " + String.Format("0x{0:X}", fs.Position));
-                for (int j = 0; j < sm.num_triangles; j++) {
-                    sm.triangles[(j * 3) + 0] = reader.ReadInt16();
-                    sm.triangles[(j * 3) + 1] = reader.ReadInt16();
-                    sm.triangles[(j * 3) + 2] = reader.ReadInt16();
-                }
+				Pointer.DoAt(ref reader, sm.off_triangles, () => {
+					sm.triangles = new int[sm.num_triangles * 3];
+					//print("Loading disconnected triangles at " + String.Format("0x{0:X}", fs.Position));
+					for (int j = 0; j < sm.num_triangles; j++) {
+						sm.triangles[(j * 3) + 0] = reader.ReadInt16();
+						sm.triangles[(j * 3) + 1] = reader.ReadInt16();
+						sm.triangles[(j * 3) + 2] = reader.ReadInt16();
+					}
+				});
                 if (sm.off_normals != null) {
-                    Pointer.Goto(ref reader, sm.off_normals);
-                    sm.normals = new Vector3[sm.num_triangles];
-                    for (int j = 0; j < sm.num_triangles; j++) {
-                        float x = reader.ReadSingle();
-                        float z = reader.ReadSingle();
-                        float y = reader.ReadSingle();
-                        sm.normals[j] = new Vector3(x, y, z);
-                    }
+					Pointer.DoAt(ref reader, sm.off_normals, () => {
+						sm.normals = new Vector3[sm.num_triangles];
+						for (int j = 0; j < sm.num_triangles; j++) {
+							float x = reader.ReadSingle();
+							float z = reader.ReadSingle();
+							float y = reader.ReadSingle();
+							sm.normals[j] = new Vector3(x, y, z);
+						}
+					});
                 }
             }
 			if (Settings.s.game == Settings.Game.LargoWinch && sm.lightmap_index != -1) {

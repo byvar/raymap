@@ -535,7 +535,6 @@ namespace OpenSpace.Loader {
 			if (!hasTransit) {
 				reader.ReadUInt32(); // viewport related <--- cameras in here
 			}
-			print(Pointer.Current(reader));
 
 			LinkedList<int> unknown = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
 			
@@ -554,7 +553,6 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32(); // only used if there was no transit in the previous lvl. Always 00165214 in R3GC?
 			reader.ReadUInt32(); // related to "SOL". What is this? Good question.
 			reader.ReadUInt32(); // same
-			print(Pointer.Current(reader));
 			if (Settings.s.game != Settings.Game.Dinosaur && Settings.s.platform != Settings.Platform.PS2) {
 				reader.ReadUInt32(); // same
 			}
@@ -612,7 +610,6 @@ namespace OpenSpace.Loader {
 				off_settingsForPersoInFix = Pointer.Current(reader);
 				uint num_persoInFix = reader.ReadUInt32();
 				for (int i = 0; i < num_persoInFix; i++) {
-					print(Pointer.Current(reader));
 					if (Settings.s.game == Settings.Game.R3) {
 						Pointer off_mainChar = Pointer.Read(reader);
 						reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
@@ -629,8 +626,6 @@ namespace OpenSpace.Loader {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 			}
-
-			print(Pointer.Current(reader));
 
 			uint num_visual_materials = reader.ReadUInt32();
 			Pointer off_array_visual_materials = Pointer.Read(reader);
