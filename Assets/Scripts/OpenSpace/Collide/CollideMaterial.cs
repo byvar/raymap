@@ -11,27 +11,32 @@ using UnityEngine;
 namespace OpenSpace.Collide {
     public class CollideMaterial {
         public Pointer offset;
-        public enum Type : ushort {
-            Slide = 1 << 0,
-            Trampoline = 1 << 1,
-            GrabbaleLedge = 1 << 2,
-            Wall = 1 << 3,
-            FlagUnknown = 1 << 4,
+
+        [Flags]
+        public enum CollisionFlags_R2 : ushort {
+            None            = 0,
+            Slide           = 1 << 0,
+            Trampoline      = 1 << 1,
+            GrabbaleLedge   = 1 << 2,
+            Wall            = 1 << 3,
+            FlagUnknown     = 1 << 4,
             HangableCeiling = 1 << 5,
-            ClimbableWall = 1 << 6,
-            Electric = 1 << 7,
-            LavaDeathWarp = 1 << 8,
-            FallTrigger = 1 << 9,
-            HurtTrigger = 1 << 10,
-            DeathWarp = 1 << 11,
-            FlagUnk2 = 1 << 12,
-            FlagUnk3 = 1 << 13,
-            Water = 1 << 14,
-            NoCollision = 1 << 15
+            ClimbableWall   = 1 << 6,
+            Electric        = 1 << 7,
+            LavaDeathWarp   = 1 << 8,
+            FallTrigger     = 1 << 9,
+            HurtTrigger     = 1 << 10,
+            DeathWarp       = 1 << 11,
+            FlagUnk2        = 1 << 12,
+            FlagUnk3        = 1 << 13,
+            Water           = 1 << 14,
+            NoCollision     = 1 << 15,
+            All             = 0xFFFF
         }
 
-        public Type type;
+        public ushort type;
         public ushort identifier;
+        public CollisionFlags_R2 identifier_R2;
         public Vector3 direction;
         public float coef;
         public uint typeForAI;
@@ -54,16 +59,28 @@ namespace OpenSpace.Collide {
         public bool NoCollision     { get { return GetFlag(15); } set { SetFlag(15, value); } }
 
         public void SetFlag(int index, bool value) {
-            BitArray bitArray = new BitArray(BitConverter.GetBytes(identifier));
-            bitArray.Set(index, value);
-            ushort[] array = new ushort[1];
-            bitArray.CopyTo(array, 0);
-            this.identifier = array[0];
+            ushort flag = (ushort)(1 << index);
+            if (value) {
+                identifier = (ushort)(identifier | flag);
+            } else {
+                identifier = (ushort)(identifier & (ushort)(~flag));
+            }
         }
 
         public bool GetFlag(int index) {
-            BitArray bitArray = new BitArray(BitConverter.GetBytes(identifier));
-            return bitArray.Get(index);
+            ushort flag = (ushort)(1 << index);
+            return (identifier & flag) != 0;
+        }
+        public bool GetFlag(CollisionFlags_R2 flags) {
+            return (identifier_R2 & flags) != CollisionFlags_R2.None;
+        }
+        public void SetFlag(CollisionFlags_R2 flags, bool on) {
+            if (on) {
+                identifier_R2 = identifier_R2 | flags;
+            } else {
+                identifier_R2 = identifier_R2 & (~flags);
+            }
+            identifier = (ushort)(identifier_R2);
         }
 
         public CollideMaterial(Pointer offset) {
@@ -76,10 +93,10 @@ namespace OpenSpace.Collide {
 			//l.print(offset);
 
 			if (Settings.s.game == Settings.Game.R2Revolution) {
-				cm.type = (Type)reader.ReadUInt16();
+				cm.type = reader.ReadUInt16();
 				cm.identifier = reader.ReadUInt16();
 			} else {
-				cm.type = (Type)reader.ReadUInt16();
+				cm.type = reader.ReadUInt16();
 				cm.identifier = reader.ReadUInt16();
 				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 					cm.direction = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -87,6 +104,9 @@ namespace OpenSpace.Collide {
 				}
 				cm.typeForAI = reader.ReadUInt32();
 			}
+
+            // For specific games
+            cm.identifier_R2 = (CollisionFlags_R2)cm.identifier;
             return cm;
         }
 

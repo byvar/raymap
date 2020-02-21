@@ -18,8 +18,9 @@ public class CollideComponentEditor : Editor {
                 new Color(0, 0, 0, 1f * flag % 2 == 1 ?
                 0.2f : 0.15f));
 
-            EditorGUI.LabelField(rect, ((CollideMaterial.Type)(1 << flag)).ToString());
-            if (col.col != null && col.col.type.HasFlag((CollideMaterial.Type)flag))
+            EditorGUI.LabelField(rect, ((CollideMaterial.CollisionFlags_R2)(1 << flag)).ToString());
+            // or col.col.GetFlag((CollideMaterial.CollisionFlags_R2)(1 << flag)
+            if (col.col != null && col.col.GetFlag(flag))
                 EditorGUI.LabelField(new Rect(150 + rect.x, rect.y, rect.width, rect.height), "Yes");
         }
     }
