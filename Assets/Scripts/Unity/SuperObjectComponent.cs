@@ -15,7 +15,7 @@ public class SuperObjectComponent : MonoBehaviour {
 
     public void Start() {
         if (so != null) {
-            this.matrixType = so.matrix.type;
+            if(so.matrix != null) this.matrixType = so.matrix.type;
             this.flagPreview = so.flags.flags.ToString();
 			this.drawFlagsPreview = so.drawFlags.flags.ToString();
             this.spoOffset = so.offset.ToString();

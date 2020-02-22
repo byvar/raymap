@@ -107,7 +107,8 @@ namespace OpenSpace {
                 }
                 return null;
             }
-            // enable for R3GC_US: if (file.name == "test" && file.pointers[fileOff].file.name == "fix") return null;
+            // Enable for R3GC US:
+            //if (file.allowUnsafePointers && file.name == "test" && file.pointers[fileOff].file.name == "fix") return null;
             return file.pointers[fileOff];
         }
 

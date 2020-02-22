@@ -324,9 +324,9 @@ namespace OpenSpace.Visual {
 								/*tris.Add(v - 2);
 								tris.Add(v - 1);
 								tris.Add(v - 0);*/
-								tris.Add(v - 2);
-								tris.Add(v - 0);
-								tris.Add(v - 1);
+								tris.Add(v - 0); // 0
+								tris.Add(v - 1); // 1
+								tris.Add(v - 2); // 2
 								/*uvs.Add(sdcEl.GetUV0(v - 2));
 								uvs.Add(sdcEl.GetUV0(v - 1));
 								uvs.Add(sdcEl.GetUV0(v - 0));*/
@@ -335,9 +335,12 @@ namespace OpenSpace.Visual {
 								/*tris.Add(v - 2);
 								tris.Add(v - 0);
 								tris.Add(v - 1);*/
-								tris.Add(v - 2);
-								tris.Add(v - 1);
-								tris.Add(v - 0);
+								tris.Add(v - 2); // 0
+								tris.Add(v - 1); // 1
+								tris.Add(v - 0); // 2
+								/*tris.Add(v - 2); // 2
+								tris.Add(v - 0); // 3
+								tris.Add(v - 1); // 0*/
 								/*uvs.Add(sdcEl.GetUV0(v - 2));
 								uvs.Add(sdcEl.GetUV0(v - 0));
 								uvs.Add(sdcEl.GetUV0(v - 1));*/
@@ -348,15 +351,27 @@ namespace OpenSpace.Visual {
 							//currentTriInStrip = 0;
 						}
 					}
-					Debug.LogWarning(sdcEl.offset
+					if (sdcEl.vertices[0].w != 1f) {
+						Debug.LogWarning("0 - " + sdcEl.offset);
+					}
+					if (sdcEl.vertices[sdcEl.vertices.Length-1].w != 1f) {
+						Debug.LogWarning("LAST");
+					}
+					/*Debug.LogWarning(sdcEl.offset
 						+ " - " + sdc.Type
 						+ " - " + (tris.Count / 3)
 						+ " - " + sdc.num_triangles[sdcIndex]
 						+ " - " + sdc.uint1[sdcIndex]
 						+ " - " + sdcEl.num_uvs
 						+ " - " + ((sdcEl.num_vertices + 3) >> 2)
-						+ " - " + ((tris.Count + 3) >> 2));
-					
+						+ " - " + ((tris.Count + 3) >> 2));*/
+					if (bones != null) {
+						Debug.LogWarning(sdcEl.offset
+						+ " - " + mainEl.off_triangles
+						+ " - " + sdcEl.num_vertices
+						+ " - " + sdc.num_triangles[sdcIndex]);
+					}
+
 					m.vertices = sdcEl.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
 					uvs = Enumerable.Range(0, sdcEl.vertices.Length).Select(v => sdcEl.GetUV0(v)).ToList();
 					m.SetUVs(0, uvs.ToArray());
