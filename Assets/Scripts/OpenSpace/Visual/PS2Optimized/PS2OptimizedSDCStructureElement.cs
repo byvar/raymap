@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace OpenSpace.Visual.PS2Optimized {
 	public class PS2OptimizedSDCStructureElement {
@@ -15,7 +16,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 		public uint num_uvs;
 		public uint unk3;
 		public Vertex[] vertices;
-		public Vertex[] normals;
+		public UVUnoptimized[] uvUnoptimized;
 		public UV0[] uv0;
 		public UV1[] uv1;
 		public VertexColor[] blendWeights;
@@ -59,9 +60,9 @@ namespace OpenSpace.Visual.PS2Optimized {
 				vertices[i] = new Vertex(reader);
 			}
 			if (geo.Type == 1) {
-				blendWeights = new VertexColor[num_vertices];
-				for (int i = 0; i < blendWeights.Length; i++) {
-					blendWeights[i] = new VertexColor(reader);
+				uvUnoptimized = new UVUnoptimized[num_vertices];
+				for (int i = 0; i < uvUnoptimized.Length; i++) {
+					uvUnoptimized[i] = new UVUnoptimized(reader);
 				}
 			} else {
 				if (hasUv0) {
@@ -83,7 +84,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 					}
 				}
 			}
-			uv_tex = new UV0[num_textures][];
+			uv_tex = new UV0[num_textures][]; // Seem to be in a color-like format? 7F 7F 7F 80, repeated 4 times
 			for (int i = 0; i < uv_tex.Length; i++) {
 				uv_tex[i] = new UV0[num_uvs];
 				for (int j = 0; j < uv_tex[i].Length; j++) {
@@ -108,6 +109,16 @@ namespace OpenSpace.Visual.PS2Optimized {
 			}*/
 		}
 
+		public Vector3 GetUV0(int index) {
+			if (uv0 != null) {
+				int uv0Index = index / 4;
+				int indexInUV = index % 4;
+				UV0.UV uv = uv0[uv0Index].uv[indexInUV];
+				return new Vector3(uv.u / 4096f, uv.v / 4096f, 1f);
+			}
+			return Vector3.zero;
+		}
+
 		public class Vertex {
 			public float x;
 			public float y;
@@ -120,18 +131,49 @@ namespace OpenSpace.Visual.PS2Optimized {
 				z = reader.ReadSingle();
 				w = reader.ReadSingle();
 			}
+
+			// override object.Equals
+			public override bool Equals(object obj) {
+				//       
+				// See the full list of guidelines at
+				//   http://go.microsoft.com/fwlink/?LinkID=85237  
+				// and also the guidance for operator== at
+				//   http://go.microsoft.com/fwlink/?LinkId=85238
+				//
+
+				if (obj == null || GetType() != obj.GetType()) {
+					return false;
+				}
+
+				Vertex vo = obj as Vertex;
+				return (x == vo.x && y == vo.y && z == vo.z && w == vo.w);
+			}
+
+			// override object.GetHashCode
+			public override int GetHashCode() {
+				// TODO: write your implementation of GetHashCode() here
+				throw new NotImplementedException();
+				return base.GetHashCode();
+			}
 		}
 		public class UV0 {
-			public uint unk0;
-			public uint unk1;
-			public uint unk2;
-			public uint unk3;
+			public UV[] uv;
 
 			public UV0(Reader reader) {
-				unk0 = reader.ReadUInt32();
-				unk1 = reader.ReadUInt32();
-				unk2 = reader.ReadUInt32();
-				unk3 = reader.ReadUInt32();
+				uv = new UV[4];
+				for (int i = 0; i < 4; i++) {
+					uv[i] = new UV(reader);
+				}
+			}
+
+			public struct UV {
+				public short u;
+				public short v;
+
+				public UV(Reader reader) {
+					u = reader.ReadInt16();
+					v = reader.ReadInt16();
+				}
 			}
 		}
 		public class UV1 {
@@ -145,6 +187,18 @@ namespace OpenSpace.Visual.PS2Optimized {
 				unk1 = reader.ReadUInt32();
 				unk2 = reader.ReadUInt32();
 				unk3 = reader.ReadUInt32();
+			}
+		}
+		public class UVUnoptimized {
+			public float u;
+			public float v;
+			public float z;
+			public float w;
+			public UVUnoptimized(Reader reader) {
+				u = reader.ReadSingle();
+				v = reader.ReadSingle();
+				z = reader.ReadSingle();
+				w = reader.ReadSingle();
 			}
 		}
 		public class VertexColor {

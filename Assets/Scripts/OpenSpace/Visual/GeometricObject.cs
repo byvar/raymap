@@ -307,6 +307,80 @@ namespace OpenSpace.Visual {
 				if (sdc.visualMaterials[sdcIndex] != mainEl.visualMaterial) {
 					Debug.LogWarning("SDC and Main materials did not match!");
 				}
+				if (sdc.Type == 4 || sdc.Type == 5 || sdc.Type == 6) {
+					GameObject g = new GameObject("BAD SDC" + sdc.Type + "- " + sdcEl.offset);
+					MeshFilter mf = g.AddComponent<MeshFilter>();
+					MeshRenderer mr = g.AddComponent<MeshRenderer>();
+					mr.material = mainEl.visualMaterial.GetMaterial(VisualMaterial.Hint.None);
+					Mesh m = new Mesh();
+					m.vertices = sdcEl.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
+					List<int> tris = new List<int>();
+					List<Vector3> uvs = new List<Vector3>();
+					int currentTriInStrip = 0;
+					for (int v = 2; v < sdcEl.vertices.Length; v++) {
+						if (sdcEl.vertices[v].Equals(sdcEl.vertices[v - 1])) continue;
+						if (sdcEl.vertices[v].w == 1f) {
+							if (currentTriInStrip % 2 == 0) {
+								/*tris.Add(v - 2);
+								tris.Add(v - 1);
+								tris.Add(v - 0);*/
+								tris.Add(v - 2);
+								tris.Add(v - 0);
+								tris.Add(v - 1);
+								/*uvs.Add(sdcEl.GetUV0(v - 2));
+								uvs.Add(sdcEl.GetUV0(v - 1));
+								uvs.Add(sdcEl.GetUV0(v - 0));*/
+
+							} else {
+								/*tris.Add(v - 2);
+								tris.Add(v - 0);
+								tris.Add(v - 1);*/
+								tris.Add(v - 2);
+								tris.Add(v - 1);
+								tris.Add(v - 0);
+								/*uvs.Add(sdcEl.GetUV0(v - 2));
+								uvs.Add(sdcEl.GetUV0(v - 0));
+								uvs.Add(sdcEl.GetUV0(v - 1));*/
+							}
+							currentTriInStrip++;
+						} else {
+							currentTriInStrip++;
+							//currentTriInStrip = 0;
+						}
+					}
+					Debug.LogWarning(sdcEl.offset
+						+ " - " + sdc.Type
+						+ " - " + (tris.Count / 3)
+						+ " - " + sdc.num_triangles[sdcIndex]
+						+ " - " + sdc.uint1[sdcIndex]
+						+ " - " + sdcEl.num_uvs
+						+ " - " + ((sdcEl.num_vertices + 3) >> 2)
+						+ " - " + ((tris.Count + 3) >> 2));
+					
+					m.vertices = sdcEl.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
+					uvs = Enumerable.Range(0, sdcEl.vertices.Length).Select(v => sdcEl.GetUV0(v)).ToList();
+					m.SetUVs(0, uvs.ToArray());
+					/*m.triangles = Enumerable.Range(0, sdcEl.vertices.Length).ToArray();
+					Debug.LogWarning(sdcEl.offset + " - " + sdc.Type + " - " + (m.triangles.Length / 3) + " - " + (m.triangles.Length % 3) + " - " + sdc.num_triangles[sdcIndex]);
+					*/
+					m.triangles = tris.ToArray();
+					//m.uv = sdcEl.uvUnoptimized.Select(uv => new Vector2(uv.u, uv.v)).ToArray();
+					//m.uv = 
+					m.RecalculateNormals();
+					mf.mesh = m;
+				} else {
+					GameObject g = new GameObject("SDC " + sdcEl.offset);
+					MeshFilter mf = g.AddComponent<MeshFilter>();
+					MeshRenderer mr = g.AddComponent<MeshRenderer>();
+					mr.material = mainEl.visualMaterial.GetMaterial(VisualMaterial.Hint.None);
+					Mesh m = new Mesh();
+					m.vertices = sdcEl.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
+					m.triangles = Enumerable.Range(0, sdcEl.vertices.Length).ToArray();
+					m.SetUVs(0, sdcEl.uvUnoptimized.Select(uv => new Vector3(uv.u, uv.v, 1f)).ToArray());
+					//m.uv = 
+					m.RecalculateNormals();
+					mf.mesh = m;
+				}
 				if (bones != null) {
 					if (sdc.num_triangles[sdcIndex] != mainEl.num_triangles) {
 						Debug.LogWarning(mainEl.offset + " - " + sdcEl.offset + " - " + num_vertices);
