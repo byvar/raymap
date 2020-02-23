@@ -155,6 +155,10 @@ namespace OpenSpace.Input {
                     subkeywords[1] = keywords[thisIndex + keywordsRead]; // Keycode
                     keywordsRead += 1;
                     break;
+                case InputFunctions.FunctionType.PadPressed:
+                case InputFunctions.FunctionType.PadReleased:
+                case InputFunctions.FunctionType.PadJustPressed:
+                case InputFunctions.FunctionType.PadJustReleased:
                 case InputFunctions.FunctionType.JoystickPressed:
 				case InputFunctions.FunctionType.JoystickReleased:
 				case InputFunctions.FunctionType.JoystickJustPressed:
@@ -180,7 +184,21 @@ namespace OpenSpace.Input {
 					subkeywords[3] = keywords[thisIndex + keywordsRead];
 					keywordsRead += 1;
 					break;
-				case InputFunctions.FunctionType.ActionValidated:
+                case InputFunctions.FunctionType.JoystickAngularValue:
+                case InputFunctions.FunctionType.JoystickTrueNormValue:
+                    subkeywords = new KeyWord[5];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    subkeywords[1] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    subkeywords[2] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    subkeywords[3] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    subkeywords[4] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    break;
+                case InputFunctions.FunctionType.ActionValidated:
 				case InputFunctions.FunctionType.ActionInvalidated:
 				case InputFunctions.FunctionType.ActionJustValidated:
 				case InputFunctions.FunctionType.ActionJustInvalidated:
@@ -191,8 +209,7 @@ namespace OpenSpace.Input {
 					}
 					keywordsRead += 1;
 					break;
-
-			}
+            }
             return keywordsRead;
         }
 
@@ -228,7 +245,11 @@ namespace OpenSpace.Input {
                             }
                         }
                         return "Sequence(\"" + sequence + "\")";
-					case InputFunctions.FunctionType.JoystickPressed:
+                    case InputFunctions.FunctionType.PadPressed:
+                    case InputFunctions.FunctionType.PadReleased:
+                    case InputFunctions.FunctionType.PadJustPressed:
+                    case InputFunctions.FunctionType.PadJustReleased:
+                    case InputFunctions.FunctionType.JoystickPressed:
 					case InputFunctions.FunctionType.JoystickReleased:
 					case InputFunctions.FunctionType.JoystickJustPressed:
 					case InputFunctions.FunctionType.JoystickJustReleased:

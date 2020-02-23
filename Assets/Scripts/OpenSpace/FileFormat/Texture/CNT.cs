@@ -11,18 +11,13 @@ using UnityEngine;
 
 namespace OpenSpace.FileFormat.Texture {
     public class CNT : IDisposable {
-        public enum CNTVersion {
-            Rayman2,
-            Rayman2Vignette
-        }
-
         public class FileStruct {
             public string name;
             public string directory;
             public int pointer;
             public int size;
             public byte[] xorKey;
-            public uint magic2;
+            public uint checksum;
             public int fileNum;
 
             public string FullName {
@@ -42,8 +37,6 @@ namespace OpenSpace.FileFormat.Texture {
                 }
             }
         }
-
-        public CNTVersion version;
 
 
         public string[][] directoryList = null;
@@ -102,13 +95,10 @@ namespace OpenSpace.FileFormat.Texture {
             directoryCount += localDirCount;
             fileCount += localFileCount;
             directoryList[readerIndex] = new string[localDirCount];
-            // Check signature
-            if (reader.ReadInt16() != 257) {
-                throw new FormatException("This is not a valid CNT archive!");
-            }
-
+            byte isXor = reader.ReadByte();
+            byte isChecksum = reader.ReadByte();
             byte xorKey = reader.ReadByte();
-
+            byte curChecksum = 0;
 			// Load directories
 			//Debug.Log("directories");
 			if (httpStream != null) await httpStream.FillCacheForRead(300 * localDirCount);
@@ -118,23 +108,29 @@ namespace OpenSpace.FileFormat.Texture {
 				int strLen = reader.ReadInt32();
                 string directory = "";
 
-				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(strLen));
-				for (int j = 0; j < strLen; j++) {
-                    directory += (char)(xorKey ^ reader.ReadByte());
+                if (isXor != 0 || isChecksum != 0) {
+                    for (int j = 0; j < strLen; j++) {
+                        byte b = reader.ReadByte();
+                        if (isXor != 0) {
+                            b = (byte)(xorKey ^ b);
+                        }
+                        if (isChecksum != 0) {
+                            curChecksum = (byte)((curChecksum + b) % 256);
+                        }
+                        directory += (char)b;
+                    }
+                } else {
+                    directory = reader.ReadString(strLen);
                 }
 
                 directoryList[readerIndex][i] = directory;
             }
 
-			// Load and check version
-			//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(1));
-			byte verId = reader.ReadByte();
-
-            switch (verId) {
-                case 246:
-                    version = CNTVersion.Rayman2; break;
-                default:
-                    version = CNTVersion.Rayman2Vignette; break;
+            // Load and check version
+            //if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(1));
+            byte directoryChecksum = reader.ReadByte();
+            if (directoryChecksum != curChecksum) {
+                Debug.LogWarning("CNT: Directory checksum failed");
             }
 
 			// Read files
@@ -155,7 +151,7 @@ namespace OpenSpace.FileFormat.Texture {
                 byte[] fileXorKey = new byte[4];
                 reader.Read(fileXorKey, 0, 4);
 
-                uint magic2 = reader.ReadUInt32();
+                uint fileChecksum = reader.ReadUInt32();
 
                 int dataPointer = reader.ReadInt32();
                 int fileSize = reader.ReadInt32();
@@ -168,7 +164,7 @@ namespace OpenSpace.FileFormat.Texture {
                     pointer = dataPointer,
                     size = fileSize,
                     xorKey = fileXorKey,
-                    magic2 = magic2,
+                    checksum = fileChecksum,
                     fileNum = readerIndex
                 });
 			}
