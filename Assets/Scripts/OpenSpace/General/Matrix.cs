@@ -259,7 +259,7 @@ namespace OpenSpace {
                     transMatrix.SetColumn(2, sclColZ);
                 }*/
             } else {
-                if (Settings.s.platform == Settings.Platform.PS2) {
+                if (Settings.s.platform == Settings.Platform.PS2 && Settings.s.game != Settings.Game.R2Revolution) {
                     Vector3 v = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 }
                 mat.m.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));

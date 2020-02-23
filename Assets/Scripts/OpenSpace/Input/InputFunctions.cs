@@ -240,7 +240,44 @@ namespace OpenSpace.Input {
 			FunctionType.SequencePadEnd,
 		};
 
-		public static FunctionType[] functionTypesGC = new FunctionType[] {
+        public static FunctionType[] functionTypesRevolution = new FunctionType[] {
+            FunctionType.Unknown,
+            FunctionType.And,
+            FunctionType.Or,
+            FunctionType.Not,
+            FunctionType.KeyJustPressed,
+            FunctionType.KeyJustReleased,
+            FunctionType.KeyPressed,
+            FunctionType.KeyReleased,
+            FunctionType.ActionJustValidated,
+            FunctionType.ActionJustInvalidated,
+            FunctionType.ActionValidated,
+            FunctionType.ActionInvalidated,
+            FunctionType.PadJustPressed,
+            FunctionType.PadJustReleased,
+            FunctionType.PadPressed,
+            FunctionType.PadReleased,
+            FunctionType.JoystickAxeValue,
+            FunctionType.JoystickAngularValue,
+            FunctionType.JoystickTrueNormValue,
+            FunctionType.JoystickCorrectedNormValue,
+            FunctionType.JoystickJustPressed,
+            FunctionType.JoystickJustReleased,
+            FunctionType.JoystickPressed,
+            FunctionType.JoystickReleased,
+            FunctionType.JoystickOrPadJustPressed,
+            FunctionType.JoystickOrPadJustReleased,
+            FunctionType.JoystickOrPadPressed,
+            FunctionType.JoystickOrPadReleased,
+            FunctionType.MousePressed,
+            FunctionType.Sequence,
+            FunctionType.SequenceKey,
+            FunctionType.SequenceKeyEnd,
+            FunctionType.SequencePad,
+            FunctionType.SequencePadEnd,
+        };
+
+        public static FunctionType[] functionTypesGC = new FunctionType[] {
 			FunctionType.Unknown,
 			FunctionType.And,
 			FunctionType.Or,
@@ -310,6 +347,7 @@ namespace OpenSpace.Input {
 				if (Settings.s.game == Settings.Game.TTSE) return functionTypesSE[index];
                 if (Settings.s.game == Settings.Game.TT) return functionTypesTT[index];
                 if (Settings.s.game == Settings.Game.LargoWinch) return functionTypesLargo[index];
+                if (Settings.s.game == Settings.Game.R2Revolution) return functionTypesRevolution[index];
                 if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) return functionTypesHype[index];
 				if (Settings.s.platform == Settings.Platform.GC) return functionTypesGC[index];
 				if (Settings.s.platform == Settings.Platform.DC || Settings.s.platform == Settings.Platform.iOS) return functionTypesDC[index];
