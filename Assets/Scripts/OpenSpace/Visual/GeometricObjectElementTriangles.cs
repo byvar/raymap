@@ -204,11 +204,14 @@ namespace OpenSpace.Visual {
 					bc.size = s_mr.bounds.size;
 				} else {
 					MeshFilter mf = gao.AddComponent<MeshFilter>();
-					mf.sharedMesh = unityMesh;
 					mr = gao.AddComponent<MeshRenderer>();
-					MeshCollider mc = gao.AddComponent<MeshCollider>();
-					mc.isTrigger = false;
-					mc.sharedMesh = unityMesh;
+					mf.sharedMesh = unityMesh;
+					try {
+						MeshCollider mc = gao.AddComponent<MeshCollider>();
+						mc.isTrigger = false;
+						//mc.cookingOptions = MeshColliderCookingOptions.None;
+						//mc.sharedMesh = unityMesh;
+					} catch (Exception) { }
 				}
 				//}
 			}
@@ -315,9 +318,13 @@ namespace OpenSpace.Visual {
                     MeshFilter mf = OPT_gao.AddComponent<MeshFilter>();
                     mf.sharedMesh = OPT_unityMesh;
                     OPT_mr = OPT_gao.AddComponent<MeshRenderer>();
-					MeshCollider mc = OPT_gao.AddComponent<MeshCollider>();
-					mc.isTrigger = false;
-					mc.sharedMesh = OPT_unityMesh;
+
+					try {
+						MeshCollider mc = OPT_gao.AddComponent<MeshCollider>();
+						mc.isTrigger = false;
+						//mc.cookingOptions = MeshColliderCookingOptions.None;
+						//mc.sharedMesh = OPT_unityMesh;
+					} catch (Exception) { }
 				}
             }
             if (visualMaterial != null) {

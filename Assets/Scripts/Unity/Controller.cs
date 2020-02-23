@@ -731,6 +731,7 @@ public class Controller : MonoBehaviour {
 				if (state != State.Finished) {
 					// Allowed exceptions
 					if (condition.Contains("cleaning the mesh failed")) break;
+					if (condition.Contains("desc.isValid() failed!")) break;
 
 					// Go to error state
 					state = State.Error;

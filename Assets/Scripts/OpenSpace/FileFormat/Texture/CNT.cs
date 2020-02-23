@@ -139,13 +139,19 @@ namespace OpenSpace.FileFormat.Texture {
 			for (int i = 0; i < localFileCount; i++) {
 				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(8));
 				int dirIndex = reader.ReadInt32();
-                int size = reader.ReadInt32();
+                int strLen = reader.ReadInt32();
 
                 string file = "";
 
-				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(size + 16));
-				for (int j = 0; j < size; j++) {
-                    file += (char)(xorKey ^ reader.ReadByte());
+                //if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(size + 16));
+                if (isXor != 0) {
+                    for (int j = 0; j < strLen; j++) {
+                        byte b = reader.ReadByte();
+                        b = (byte)(xorKey ^ b);
+                        file += (char)b;
+                    }
+                } else {
+                    file = reader.ReadString(strLen);
                 }
 
                 byte[] fileXorKey = new byte[4];

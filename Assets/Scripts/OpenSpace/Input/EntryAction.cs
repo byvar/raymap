@@ -89,6 +89,7 @@ namespace OpenSpace.Input {
                 int keywordsRead = ea.keywords[0].FillInSubKeywords(ref reader, ea.keywords, 0);
                 if (keywordsRead != ea.keywords.Count) {
                     Debug.LogError(offset + " - Keywords read was: " + keywordsRead + " vs " + ea.keywords.Count);
+                    Debug.LogError(ea.ToString());
                 }
             }
             Pointer.DoAt(ref reader, ea.off_name, () => {

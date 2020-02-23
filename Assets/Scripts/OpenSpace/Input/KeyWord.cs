@@ -149,10 +149,37 @@ namespace OpenSpace.Input {
                     break;
                 case InputFunctions.FunctionType.SequencePad:
                 case InputFunctions.FunctionType.SequencePadEnd:
-                    subkeywords = new KeyWord[2];
-                    subkeywords[0] = keywords[thisIndex + keywordsRead]; // 0
+                    if (Settings.s.game == Settings.Game.LargoWinch) {
+                        subkeywords = new KeyWord[3];
+                        subkeywords[0] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[1] = keywords[thisIndex + keywordsRead]; // 0
+                        keywordsRead += 1;
+                        subkeywords[2] = keywords[thisIndex + keywordsRead]; // Keycode
+                        keywordsRead += 1;
+                    } else {
+                        subkeywords = new KeyWord[2];
+                        subkeywords[0] = keywords[thisIndex + keywordsRead]; // 0
+                        keywordsRead += 1;
+                        subkeywords[1] = keywords[thisIndex + keywordsRead]; // Keycode
+                        keywordsRead += 1;
+                    }
+                    break;
+                case InputFunctions.FunctionType.MouseAxeValue:
+                case InputFunctions.FunctionType.MouseAxePosition:
+                    subkeywords = new KeyWord[3];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead];
                     keywordsRead += 1;
-                    subkeywords[1] = keywords[thisIndex + keywordsRead]; // Keycode
+                    subkeywords[1] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    subkeywords[2] = keywords[thisIndex + keywordsRead];
+                    keywordsRead += 1;
+                    break;
+                case InputFunctions.FunctionType.MousePressed:
+                case InputFunctions.FunctionType.MouseJustPressed:
+                case InputFunctions.FunctionType.MouseJustReleased:
+                    subkeywords = new KeyWord[1];
+                    subkeywords[0] = keywords[thisIndex + keywordsRead];
                     keywordsRead += 1;
                     break;
                 case InputFunctions.FunctionType.PadPressed:
@@ -167,25 +194,50 @@ namespace OpenSpace.Input {
 				case InputFunctions.FunctionType.JoystickOrPadReleased:
 				case InputFunctions.FunctionType.JoystickOrPadJustPressed:
 				case InputFunctions.FunctionType.JoystickOrPadJustReleased:
-					subkeywords = new KeyWord[2];
-					subkeywords[0] = keywords[thisIndex + keywordsRead];
-					keywordsRead += 1;
-					subkeywords[1] = keywords[thisIndex + keywordsRead];
-					keywordsRead += 1;
+                    if (Settings.s.game == Settings.Game.LargoWinch) {
+                        subkeywords = new KeyWord[3];
+                        subkeywords[0] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[1] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[2] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                    } else {
+                        subkeywords = new KeyWord[2];
+                        subkeywords[0] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[1] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                    }
 					break;
 				case InputFunctions.FunctionType.JoystickAxeValue:
-					subkeywords = new KeyWord[4];
-					subkeywords[0] = keywords[thisIndex + keywordsRead];
-					keywordsRead += 1;
-					subkeywords[1] = keywords[thisIndex + keywordsRead];
-					keywordsRead += 1;
-					subkeywords[2] = keywords[thisIndex + keywordsRead];
-					keywordsRead += 1;
-					subkeywords[3] = keywords[thisIndex + keywordsRead];
-					keywordsRead += 1;
+                    if (Settings.s.game == Settings.Game.LargoWinch) {
+                        subkeywords = new KeyWord[5];
+                        subkeywords[0] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[1] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[2] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[3] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[4] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                    } else {
+                        subkeywords = new KeyWord[4];
+                        subkeywords[0] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[1] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[2] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                        subkeywords[3] = keywords[thisIndex + keywordsRead];
+                        keywordsRead += 1;
+                    }
 					break;
                 case InputFunctions.FunctionType.JoystickAngularValue:
                 case InputFunctions.FunctionType.JoystickTrueNormValue:
+                case InputFunctions.FunctionType.JoystickCorrectedNormValue:
                     subkeywords = new KeyWord[5];
                     subkeywords[0] = keywords[thisIndex + keywordsRead];
                     keywordsRead += 1;
@@ -259,12 +311,20 @@ namespace OpenSpace.Input {
 					case InputFunctions.FunctionType.JoystickOrPadJustReleased:
                         return FunctionType + GetJoyPadString(subkeywords);
 					case InputFunctions.FunctionType.JoystickAxeValue:
-						return FunctionType + "("
-							+ (subkeywords[1].indexOrKeyCode == 4 ? "X" : "Y")
-							+ ", " + subkeywords[2].valueAsInt
-							+ ", " + subkeywords[3].valueAsInt
-							+ (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
-					case InputFunctions.FunctionType.ActionValidated:
+                        if (Settings.s.game == Settings.Game.LargoWinch) {
+                            return FunctionType + "("
+                                + (subkeywords[2].indexOrKeyCode == 4 ? "X" : "Y")
+                                + ", " + subkeywords[3].valueAsInt
+                                + ", " + subkeywords[4].valueAsInt
+                                + (subkeywords[1].indexOrKeyCode != 0 ? (", " + subkeywords[1].indexOrKeyCode) : "") + ")";
+                        } else {
+                            return FunctionType + "("
+                                + (subkeywords[1].indexOrKeyCode == 4 ? "X" : "Y")
+                                + ", " + subkeywords[2].valueAsInt
+                                + ", " + subkeywords[3].valueAsInt
+                                + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                        }
+                    case InputFunctions.FunctionType.ActionValidated:
 					case InputFunctions.FunctionType.ActionInvalidated:
 					case InputFunctions.FunctionType.ActionJustValidated:
 					case InputFunctions.FunctionType.ActionJustInvalidated:
@@ -281,18 +341,20 @@ namespace OpenSpace.Input {
         }
 
         private string GetJoyPadString(KeyWord[] subkeywords) {
+            int firstKW = 0;
+            if (Settings.s.game == Settings.Game.LargoWinch) firstKW++;
             if (Settings.s.platform == Settings.Platform.GC) {
-                return "(" + Enum.GetName(typeof(GameCubeKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                return "(" + Enum.GetName(typeof(GameCubeKeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
             } else if (Settings.s.platform == Settings.Platform.DC) {
-                return "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                return "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
             } else if (Settings.s.platform == Settings.Platform.PS2) {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-                    return "(" + Enum.GetName(typeof(RevolutionPS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                    return "(" + Enum.GetName(typeof(RevolutionPS2KeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
                 } else {
-                    return "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                    return "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
                 }
             } else {
-                return "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[1].indexOrKeyCode) + (subkeywords[0].indexOrKeyCode != 0 ? (", " + subkeywords[0].indexOrKeyCode) : "") + ")";
+                return "(" + Enum.GetName(typeof(JoypadKeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
             }
         }
     }

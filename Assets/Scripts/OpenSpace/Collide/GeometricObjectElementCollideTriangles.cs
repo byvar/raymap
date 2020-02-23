@@ -93,10 +93,13 @@ namespace OpenSpace.Collide {
                 meshUnity.uv = new_uvs;
 
                 MeshFilter mf = gao.AddComponent<MeshFilter>();
-                mf.mesh = meshUnity;
                 MeshRenderer mr = gao.AddComponent<MeshRenderer>();
-                MeshCollider mc = gao.AddComponent<MeshCollider>();
-                mc.sharedMesh = mf.sharedMesh;
+                mf.mesh = meshUnity;
+                try {
+                    MeshCollider mc = gao.AddComponent<MeshCollider>();
+                    //mc.cookingOptions = MeshColliderCookingOptions.None;
+                    //mc.sharedMesh = mf.sharedMesh;
+                } catch (Exception) { }
 
                 gao.AddComponent<CollideComponent>().collide = this;
 
