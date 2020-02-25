@@ -22,7 +22,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 		public VertexColor[] colors;
 		public VectorForSinusEffect[] sinusState;
 
-		public BlendWeight[][] weights;
+		public NormalBlendWeight[][] weights;
 
 		public PS2OptimizedSDCStructureElement(PS2OptimizedSDCStructure geo, int index) {
 			this.geo = geo;
@@ -84,11 +84,11 @@ namespace OpenSpace.Visual.PS2Optimized {
 					}
 				}
 			}
-			weights = new BlendWeight[num_textures][]; // Seem to be in a color-like format? 7F 7F 7F 80, repeated 4 times
+			weights = new NormalBlendWeight[num_textures][]; // Seem to be in a color-like format? 7F 7F 7F 80, repeated 4 times
 			for (int i = 0; i < weights.Length; i++) {
-				weights[i] = new BlendWeight[num_uvs];
+				weights[i] = new NormalBlendWeight[num_uvs];
 				for (int j = 0; j < weights[i].Length; j++) {
-					weights[i][j] = new BlendWeight(reader);
+					weights[i][j] = new NormalBlendWeight(reader);
 				}
 			}
 			if(geo.isSinus != 0) {
@@ -125,6 +125,12 @@ namespace OpenSpace.Visual.PS2Optimized {
 			}
 			return baseUV;
 		}
+		public Vector3 GetNormal(int index) {
+			if (weights != null && weights.Length > 0) {
+				return GetWeight(0, index).Normal;
+			}
+			return Vector3.zero;
+		}
 
 		public Vector3 GetUV0(int index) {
 			if (uv0 != null) {
@@ -135,11 +141,11 @@ namespace OpenSpace.Visual.PS2Optimized {
 			}
 			return Vector3.zero;
 		}
-		public BlendWeight.Weight GetWeight(int texIndex, int index) {
+		public NormalBlendWeight.Weight GetWeight(int texIndex, int index) {
 			if (weights != null) {
 				int uv0Index = index / 4;
 				int indexInUV = index % 4;
-				BlendWeight.Weight w = weights[texIndex][uv0Index].uv[indexInUV];
+				NormalBlendWeight.Weight w = weights[texIndex][uv0Index].uv[indexInUV];
 				return w;
 			}
 			return default;
@@ -211,9 +217,9 @@ namespace OpenSpace.Visual.PS2Optimized {
 				}
 			}
 		}
-		public class BlendWeight {
+		public class NormalBlendWeight {
 			public Weight[] uv;
-			public BlendWeight(Reader reader) {
+			public NormalBlendWeight(Reader reader) {
 				uv = new Weight[4];
 				for (int i = 0; i < 4; i++) {
 					uv[i] = new Weight(reader);
@@ -231,6 +237,15 @@ namespace OpenSpace.Visual.PS2Optimized {
 					y = reader.ReadByte();
 					z = reader.ReadByte();
 					w = reader.ReadByte();
+				}
+
+				public Vector3 Normal {
+					get {
+						float x = ((this.x & 0x7F) / (float)0x7F) * (((this.x & 0x80) != 0) ? -1 : 1);
+						float y = ((this.y & 0x7F) / (float)0x7F) * (((this.y & 0x80) != 0) ? -1 : 1);
+						float z = ((this.z & 0x7F) / (float)0x7F) * (((this.z & 0x80) != 0) ? -1 : 1);
+						return new Vector3(x, z, y);
+					}
 				}
 			}
 		}

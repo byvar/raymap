@@ -60,6 +60,7 @@ namespace OpenSpace.Visual {
 		// R3 PS2
 		public Pointer off_sdc_mapping = null;
 		public ushort[] sdc_mapping;
+		public PS2OptimizedSDCStructureElement sdc = null;
 
         private SkinnedMeshRenderer OPT_s_mr = null;
         private SkinnedMeshRenderer s_mr = null;
@@ -89,6 +90,159 @@ namespace OpenSpace.Visual {
             this.offset = offset;
         }
 
+		private void CreateUnityMeshFromSDC() {
+			if (sdc.geo.Type == 6) {
+				// Just fill in things based on mapping
+				return;
+			}
+			BoneWeight[] new_boneWeights = null;
+			if (OPT_unityMesh != null) {
+				OPT_unityMesh = CopyMesh(OPT_unityMesh);
+			} else {
+				bool backfaceCulling = false;
+				int triangle_size = 3 * (int)(backfaceCulling ? 1 : 2);
+				if (sdc.geo.Type == 4 || sdc.geo.Type == 5 || sdc.geo.Type == 6) {
+					int[] triangles = new int[triangle_size * sdc.geo.num_triangles[sdc.index]];
+					OPT_unityMesh = new Mesh();
+					Vector3[] vertices = sdc.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
+					Array.Resize(ref vertices, (int)sdc.num_vertices_actual);
+					OPT_unityMesh.vertices = vertices;
+					new_boneWeights = geo.bones == null ? null : new BoneWeight[vertices.Length];
+					int currentTriInStrip = 0;
+					int triangleIndex = 0;
+					for (int v = 2; v < sdc.num_vertices_actual; v++) {
+						if (triangleIndex >= triangles.Length) MapLoader.Loader.print(offset + " - " + sdc.offset + " - " + sdc.geo.Type);
+						if (sdc.vertices[v].w == 1f) {
+							if ((currentTriInStrip) % 2 == 0) {
+								triangles[triangleIndex + 0] = v - 2;
+								triangles[triangleIndex + 1] = v - 1;
+								triangles[triangleIndex + 2] = v - 0;
+								if (!backfaceCulling) {
+									triangles[triangleIndex + 3] = v - 1;
+									triangles[triangleIndex + 4] = v - 2;
+									triangles[triangleIndex + 5] = v - 0;
+								}
+							} else {
+								triangles[triangleIndex + 0] = v - 1;
+								triangles[triangleIndex + 1] = v - 2;
+								triangles[triangleIndex + 2] = v - 0;
+								if (!backfaceCulling) {
+									triangles[triangleIndex + 3] = v - 2;
+									triangles[triangleIndex + 4] = v - 1;
+									triangles[triangleIndex + 5] = v - 0;
+								}
+							}
+							triangleIndex += triangle_size;
+							currentTriInStrip++;
+						} else {
+							currentTriInStrip = 0;
+						}
+					}
+					/*for (int v = (int)sdcEl.num_vertices_actual - 1; v > 1; v--) {
+
+						if (sdcEl.vertices[v].w == 1f) {
+							//if ((currentTriInStrip) % 2 == 0) {
+							tris.Add(v - 2); // 0
+							tris.Add(v - 1); // 1
+							tris.Add(v - 0); // 2
+
+							//} else {
+							tris.Add(v - 1); // 0
+							tris.Add(v - 2); // 1
+							tris.Add(v - 0); // 2
+											 //}
+							currentTriInStrip++;
+						} else {
+							//currentTriInStrip++;
+							if (currentTriInStrip != 0) {
+								currentStrip++;
+							}
+							currentTriInStrip = 0;
+						}
+					}*/
+					/*Debug.LogWarning(sdcEl.offset
+						+ " - " + sdc.Type
+						+ " - " + (tris.Count / 3)
+						+ " - " + sdc.num_triangles[sdcIndex]
+						+ " - " + sdc.uint1[sdcIndex]
+						+ " - " + sdcEl.num_uvs
+						+ " - " + ((sdcEl.num_vertices + 3) >> 2)
+						+ " - " + ((tris.Count + 3) >> 2));*/
+					/*if (bones != null) {
+						Debug.LogWarning("SDC:" + sdcEl.offset
+						+ " - T:" + mainEl.off_triangles
+						+ " - NV:" + sdcEl.num_vertices
+						+ " - NT:" + sdc.num_triangles[sdcIndex]
+						+ " - V:" + off_vertices
+						+ " - El:" + mainEl.offset
+						+ " - MAP:" + mainEl.off_sdc_mapping);
+					} else {
+						Debug.LogWarning(sdc.Type + " SDC:" + sdcEl.offset
+						+ " - NV:" + sdcEl.num_vertices
+						+ " - NVA:" + sdcEl.num_vertices_actual
+						+ " - NT:" + sdc.num_triangles[sdcIndex]
+						+ " - MAP:" + mainEl.off_sdc_mapping);
+					}*/
+
+					uint num_textures = Math.Max(1, visualMaterial.num_textures_in_material);
+					for (int t = 0; t < num_textures; t++) {
+						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t)).ToList();
+						OPT_unityMesh.SetUVs(t, uv.ToArray());
+					}
+					OPT_unityMesh.normals = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetNormal(i)).ToArray();
+					/*m.triangles = Enumerable.Range(0, sdcEl.vertices.Length).ToArray();
+					Debug.LogWarning(sdcEl.offset + " - " + sdc.Type + " - " + (m.triangles.Length / 3) + " - " + (m.triangles.Length % 3) + " - " + sdc.num_triangles[sdcIndex]);
+					*/
+					OPT_unityMesh.triangles = triangles;
+					//m.uv = sdcEl.uvUnoptimized.Select(uv => new Vector2(uv.u, uv.v)).ToArray();
+					//m.uv = 
+					//OPT_unityMesh.RecalculateNormals();
+				} else {
+					OPT_unityMesh = new Mesh();
+					OPT_unityMesh.vertices = sdc.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
+					OPT_unityMesh.triangles = Enumerable.Range(0, sdc.vertices.Length).ToArray();
+					OPT_unityMesh.SetUVs(0, sdc.uvUnoptimized.Select(uv => new Vector3(uv.u, uv.v, 1f)).ToArray());
+					OPT_unityMesh.normals = Enumerable.Range(0, sdc.vertices.Length).Select(i => sdc.GetNormal(i)).ToArray();
+					//m.uv = 
+					//OPT_unityMesh.RecalculateNormals();
+				}
+
+				if (new_boneWeights != null) {
+					OPT_unityMesh.boneWeights = new_boneWeights;
+					OPT_unityMesh.bindposes = geo.bones.bindPoses;
+				}
+			}
+			GameObject OPT_gao = (OPT_mr == null ? gao : new GameObject("[Optimized] " + name));
+			if (OPT_gao != gao) {
+				OPT_gao.transform.SetParent(gao.transform);
+			} else {
+				gao.name = "[Optimized] " + gao.name;
+				gao.name += " - " + sdc.offset;
+			}
+			if (geo.bones != null) {
+				OPT_mr = OPT_gao.AddComponent<SkinnedMeshRenderer>();
+				OPT_s_mr = (SkinnedMeshRenderer)OPT_mr;
+				OPT_s_mr.bones = geo.bones.bones;
+				OPT_s_mr.rootBone = geo.bones.bones[0];
+				OPT_s_mr.sharedMesh = CopyMesh(OPT_unityMesh);
+
+				BoxCollider bc = OPT_gao.AddComponent<BoxCollider>();
+				bc.center = OPT_s_mr.bounds.center;
+				bc.size = OPT_s_mr.bounds.size;
+			} else {
+				MeshFilter mf = OPT_gao.AddComponent<MeshFilter>();
+				mf.sharedMesh = OPT_unityMesh;
+				OPT_mr = OPT_gao.AddComponent<MeshRenderer>();
+
+				try {
+					MeshCollider mc = OPT_gao.AddComponent<MeshCollider>();
+					mc.isTrigger = false;
+					//mc.cookingOptions = MeshColliderCookingOptions.None;
+					//mc.sharedMesh = OPT_unityMesh;
+				} catch (Exception) { }
+			}
+		}
+
         private void CreateUnityMesh() {
             /*if (mesh.bones != null) {
                 for (int j = 0; j < mesh.bones.num_bones; j++) {
@@ -102,14 +256,16 @@ namespace OpenSpace.Visual {
             uint num_textures = 0;
             if (visualMaterial != null) {
                 num_textures = visualMaterial.num_textures;
-            }
-
+			}
 			uint triangle_size = 3 * (uint)(backfaceCulling ? 1 : 2);
+
+			if (sdc != null) {
+				CreateUnityMeshFromSDC();
+			}
 
 
 			// Create mesh from unoptimized data
-			if (num_triangles > 0) {
-				uint triangles_index = 0;
+			if ((sdc == null || sdc.geo.Type == 6) && num_triangles > 0) {
 				Vector3[] new_vertices = new Vector3[num_triangles * 3];
 				Vector3[] new_normals = new Vector3[num_triangles * 3];
 				Vector3[][] new_uvs = new Vector3[num_textures][];
@@ -118,7 +274,6 @@ namespace OpenSpace.Visual {
 					new_uvs[um] = new Vector3[num_triangles * 3];
 				}
 				int[] unityTriangles = new int[num_triangles * triangle_size];
-				triangles_index = 0;
 				for (int um = 0; um < num_textures; um++) {
 					for (int j = 0; j < num_triangles * 3; j++) {
 						uint uvMap = (uint)visualMaterial.textures[um].uvFunction % num_uvMaps;
@@ -136,6 +291,7 @@ namespace OpenSpace.Visual {
 					}
 				}
 				//print("Loading disconnected triangles at " + String.Format("0x{0:X}", fs.Position));
+				uint triangles_index = 0;
 				for (int j = 0; j < num_triangles; j++, triangles_index += triangle_size) {
 					int i0 = triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
 					int i1 = triangles[(j * 3) + 1], m1 = (j * 3) + 1;
@@ -223,7 +379,7 @@ namespace OpenSpace.Visual {
 
 			// Create mesh from optimized data
 			long OPT_num_triangles_total = ((OPT_num_triangleStrip > 2 ? OPT_num_triangleStrip - 2 : 0) + OPT_num_disconnectedTriangles) * (backfaceCulling ? 1 : 2);
-            if (OPT_num_triangles_total > 0 && num_triangles <= 0) {
+            if (sdc == null && OPT_num_triangles_total > 0 && num_triangles <= 0) {
 				uint triangles_index = 0;
 				Vector3[] new_vertices = new Vector3[OPT_num_mapping_entries];
                 Vector3[] new_normals = new Vector3[OPT_num_mapping_entries];

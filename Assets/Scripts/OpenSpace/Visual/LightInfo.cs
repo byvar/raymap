@@ -145,7 +145,7 @@ namespace OpenSpace.Visual {
             }
             if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
             transMatrix = Matrix.Read(reader, Pointer.Current(reader));
-            if (Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
+            if (Settings.s.platform != Settings.Platform.PS2 && Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
@@ -154,12 +154,17 @@ namespace OpenSpace.Visual {
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
                 if (Settings.s.platform == Settings.Platform.DC) {
                     reader.ReadSingle();
-                } else if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
+                } else if (Settings.s.game != Settings.Game.R2Revolution
+                    && Settings.s.game != Settings.Game.LargoWinch
+                    && Settings.s.platform != Settings.Platform.PS2) {
                     reader.ReadUInt32(); // 0
                     reader.ReadUInt32(); // 0
                 }
                 //lo.print("LIGHT " + Pointer.Current(reader));
                 color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.platform == Settings.Platform.PS2) {
+                    reader.ReadBytes(0x20);
+                }
                 if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                     shadowIntensity = reader.ReadSingle(); // 0
                 }
@@ -190,6 +195,9 @@ namespace OpenSpace.Visual {
                 background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 if ((Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) || Settings.s.game == Settings.Game.R2Revolution) {
                     createsShadowsOrNot = reader.ReadUInt32();
+                }
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.platform == Settings.Platform.PS2) {
+                    reader.ReadBytes(0xC);
                 }
             } else {
                 paintingLightFlag = (byte)reader.ReadUInt32();
