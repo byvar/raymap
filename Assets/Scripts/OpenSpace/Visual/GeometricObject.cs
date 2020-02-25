@@ -308,54 +308,68 @@ namespace OpenSpace.Visual {
 					Debug.LogWarning("SDC and Main materials did not match!");
 				}
 				if (sdc.Type == 4 || sdc.Type == 5 || sdc.Type == 6) {
-					GameObject g = new GameObject("BAD SDC" + sdc.Type + "- " + sdcEl.offset);
+					GameObject g = new GameObject("BAD SDC" + sdc.Type + "- " + sdcEl.offset + " - " + mainEl.visualMaterial.offset);
 					MeshFilter mf = g.AddComponent<MeshFilter>();
 					MeshRenderer mr = g.AddComponent<MeshRenderer>();
 					mr.material = mainEl.visualMaterial.GetMaterial(VisualMaterial.Hint.None);
 					Mesh m = new Mesh();
 					m.vertices = sdcEl.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
 					List<int> tris = new List<int>();
-					List<Vector3> uvs = new List<Vector3>();
 					int currentTriInStrip = 0;
-					for (int v = 2; v < sdcEl.vertices.Length; v++) {
-						if (sdcEl.vertices[v].Equals(sdcEl.vertices[v - 1])) continue;
+					int currentStrip = 0;
+					/*for (int v = 2; v < sdcEl.num_vertices_actual; v++) {
+						if (((v-2) % 0x3C) == 0) {
+							currentTriInStrip = 0;
+						}
 						if (sdcEl.vertices[v].w == 1f) {
-							if (currentTriInStrip % 2 == 0) {
-								/*tris.Add(v - 2);
-								tris.Add(v - 1);
-								tris.Add(v - 0);*/
-								tris.Add(v - 0); // 0
-								tris.Add(v - 1); // 1
-								tris.Add(v - 2); // 2
-								/*uvs.Add(sdcEl.GetUV0(v - 2));
-								uvs.Add(sdcEl.GetUV0(v - 1));
-								uvs.Add(sdcEl.GetUV0(v - 0));*/
-
-							} else {
-								/*tris.Add(v - 2);
-								tris.Add(v - 0);
-								tris.Add(v - 1);*/
+							if ((currentTriInStrip) % 2 == 0) {
 								tris.Add(v - 2); // 0
 								tris.Add(v - 1); // 1
 								tris.Add(v - 0); // 2
-								/*tris.Add(v - 2); // 2
-								tris.Add(v - 0); // 3
-								tris.Add(v - 1); // 0*/
-								/*uvs.Add(sdcEl.GetUV0(v - 2));
-								uvs.Add(sdcEl.GetUV0(v - 0));
-								uvs.Add(sdcEl.GetUV0(v - 1));*/
+
+							} else {
+								tris.Add(v - 1); // 0
+								tris.Add(v - 2); // 1
+								tris.Add(v - 0); // 2
 							}
 							currentTriInStrip++;
 						} else {
+							//currentTriInStrip++;
+							if (currentTriInStrip != 0) {
+								currentStrip++;
+							}
+							currentTriInStrip = 0;
+						}
+					}*/
+					for (int v = (int)sdcEl.num_vertices_actual-1; v > 1; v--) {
+						
+						if (sdcEl.vertices[v].w == 1f) {
+							//if ((currentTriInStrip) % 2 == 0) {
+								tris.Add(v - 2); // 0
+								tris.Add(v - 1); // 1
+								tris.Add(v - 0); // 2
+
+							//} else {
+								tris.Add(v - 1); // 0
+								tris.Add(v - 2); // 1
+								tris.Add(v - 0); // 2
+							//}
 							currentTriInStrip++;
-							//currentTriInStrip = 0;
+						} else {
+							//currentTriInStrip++;
+							if (currentTriInStrip != 0) {
+								currentStrip++;
+							}
+							currentTriInStrip = 0;
 						}
 					}
-					if (sdcEl.vertices[0].w != 1f) {
-						Debug.LogWarning("0 - " + sdcEl.offset);
-					}
-					if (sdcEl.vertices[sdcEl.vertices.Length-1].w != 1f) {
-						Debug.LogWarning("LAST");
+					if (sdc.Type != 6) {
+						if (sdcEl.vertices[0].w != 1f) {
+							Debug.LogWarning("0 - " + sdcEl.offset);
+						}
+						if (sdcEl.vertices[sdcEl.vertices.Length - 1].w != 1f) {
+							Debug.LogWarning("LAST");
+						}
 					}
 					/*Debug.LogWarning(sdcEl.offset
 						+ " - " + sdc.Type
@@ -365,16 +379,28 @@ namespace OpenSpace.Visual {
 						+ " - " + sdcEl.num_uvs
 						+ " - " + ((sdcEl.num_vertices + 3) >> 2)
 						+ " - " + ((tris.Count + 3) >> 2));*/
-					if (bones != null) {
-						Debug.LogWarning(sdcEl.offset
-						+ " - " + mainEl.off_triangles
-						+ " - " + sdcEl.num_vertices
-						+ " - " + sdc.num_triangles[sdcIndex]);
-					}
+					/*if (bones != null) {
+						Debug.LogWarning("SDC:" + sdcEl.offset
+						+ " - T:" + mainEl.off_triangles
+						+ " - NV:" + sdcEl.num_vertices
+						+ " - NT:" + sdc.num_triangles[sdcIndex]
+						+ " - V:" + off_vertices
+						+ " - El:" + mainEl.offset
+						+ " - MAP:" + mainEl.off_sdc_mapping);
+					} else {
+						Debug.LogWarning(sdc.Type + " SDC:" + sdcEl.offset
+						+ " - NV:" + sdcEl.num_vertices
+						+ " - NVA:" + sdcEl.num_vertices_actual
+						+ " - NT:" + sdc.num_triangles[sdcIndex]
+						+ " - MAP:" + mainEl.off_sdc_mapping);
+					}*/
 
 					m.vertices = sdcEl.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
-					uvs = Enumerable.Range(0, sdcEl.vertices.Length).Select(v => sdcEl.GetUV0(v)).ToList();
-					m.SetUVs(0, uvs.ToArray());
+					uint num_textures = Math.Max(1, mainEl.visualMaterial.num_textures_in_material);
+					for (int t = 0; t < num_textures; t++) {
+						List<Vector3> uv = Enumerable.Range(0, sdcEl.vertices.Length).Select(v => sdcEl.GetUV(v, t)).ToList();
+						m.SetUVs(t, uv.ToArray());
+					}
 					/*m.triangles = Enumerable.Range(0, sdcEl.vertices.Length).ToArray();
 					Debug.LogWarning(sdcEl.offset + " - " + sdc.Type + " - " + (m.triangles.Length / 3) + " - " + (m.triangles.Length % 3) + " - " + sdc.num_triangles[sdcIndex]);
 					*/

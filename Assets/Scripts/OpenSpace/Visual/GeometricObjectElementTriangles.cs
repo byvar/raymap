@@ -57,6 +57,10 @@ namespace OpenSpace.Visual {
 		public Color[] vertexColors = null;
 		public int lightmap_index = -1;
 
+		// R3 PS2
+		public Pointer off_sdc_mapping = null;
+		public ushort[] sdc_mapping;
+
         private SkinnedMeshRenderer OPT_s_mr = null;
         private SkinnedMeshRenderer s_mr = null;
         private Renderer OPT_mr = null;
@@ -469,8 +473,21 @@ namespace OpenSpace.Visual {
 					sm.num_mapping_lightmap = reader.ReadUInt16();
 					reader.ReadUInt16();
 				} else if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-					reader.ReadUInt32();
-					reader.ReadUInt32();
+					if (Settings.s.platform != Settings.Platform.PS2) {
+						reader.ReadUInt32();
+						reader.ReadUInt32();
+					} else {
+						// PS2
+						reader.ReadUInt32();
+						sm.off_sdc_mapping = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, sm.off_sdc_mapping, () => {
+							uint length = reader.ReadUInt32();
+							sm.sdc_mapping = new ushort[length];
+							for (int i = 0; i < length; i++) {
+								sm.sdc_mapping[i] = reader.ReadUInt16();
+							}
+						});
+					}
 				} else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
 					reader.ReadUInt32();
 				}
@@ -497,10 +514,6 @@ namespace OpenSpace.Visual {
 					sm.OPT_off_disconnectedTriangles = Pointer.Read(reader);
 					if (Settings.s.hasNames) sm.name += reader.ReadString(0x34);
 				} else if(Settings.s.platform == Settings.Platform.PS2) {
-					sm.OPT_off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
-					sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts
-					reader.ReadUInt16();
-					reader.ReadUInt32();
 					reader.ReadUInt32();
 					sm.isVisibleInPortal = reader.ReadByte();
 					reader.ReadByte();
@@ -509,6 +522,8 @@ namespace OpenSpace.Visual {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
+					sm.OPT_num_mapping_entries = 0;
+					sm.OPT_off_mapping_vertices = null;
 					sm.OPT_off_mapping_uvs = null;
 					sm.OPT_num_triangleStrip = 0;
 					sm.OPT_num_disconnectedTriangles = 0;

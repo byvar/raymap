@@ -11,7 +11,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 		public Pointer off_visualMaterials;
 		public Pointer off_elements;
 		public Pointer off_uint1;
-		public Pointer off_uint2;
+		public Pointer off_num_triangles;
 		public Pointer off_unk; // Seems like an empty buffer? Some 2's in it
 		public uint unk1;
 		public uint unk2;
@@ -40,7 +40,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 			});
 			off_elements = Pointer.Read(reader);
 			off_uint1 = Pointer.Read(reader);
-			off_uint2 = Pointer.Read(reader);
+			off_num_triangles = Pointer.Read(reader);
 			off_unk = Pointer.Read(reader);
 			unk1 = reader.ReadUInt32();
 			unk2 = reader.ReadUInt32();
@@ -51,7 +51,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 					uint1[i] = reader.ReadUInt32();
 				}
 			});
-			Pointer.DoAt(ref reader, off_uint2, () => {
+			Pointer.DoAt(ref reader, off_num_triangles, () => {
 				num_triangles = new uint[num_elements];
 				for (int i = 0; i < num_elements; i++) {
 					num_triangles[i] = reader.ReadUInt32();
@@ -77,6 +77,14 @@ namespace OpenSpace.Visual.PS2Optimized {
 			get {
 				return flags & 0xF;
 			}
+			/* Seems to be based on GL types (but only a little):
+			#define GL_POINTS                         0x0000
+			#define GL_LINES                          0x0001
+			#define GL_LINE_LOOP                      0x0002
+			#define GL_LINE_STRIP                     0x0003
+			#define GL_TRIANGLES                      0x0004
+			#define GL_TRIANGLE_STRIP                 0x0005
+			#define GL_TRIANGLE_FAN                   0x0006*/
 		}
 	}
 }

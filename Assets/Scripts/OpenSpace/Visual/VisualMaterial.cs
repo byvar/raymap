@@ -376,16 +376,20 @@ namespace OpenSpace.Visual {
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 					} else if (Settings.s.platform == Settings.Platform.PS2) {
-                        reader.ReadInt32();
+                        t.properties = reader.ReadInt32();
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
                         reader.ReadInt32();
+                        reader.ReadSingle();
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
-                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                        t.currentScrollX = reader.ReadSingle();
+                        t.currentScrollY = reader.ReadSingle();
+                        t.scrollX = reader.ReadSingle();
+                        t.scrollY = reader.ReadSingle();
+                        t.rotateSpeed = reader.ReadSingle();
+                        t.rotateDirection = reader.ReadSingle();
+                        reader.ReadInt32();
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
                     } else {
 						t.properties = reader.ReadInt32();
