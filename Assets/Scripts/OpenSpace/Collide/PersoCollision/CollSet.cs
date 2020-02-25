@@ -119,5 +119,21 @@ namespace OpenSpace.Collide {
 
             return c;
         }
-    }
+
+
+
+		public CollSet Clone(UnityEngine.Transform parent) {
+			CollSet m = (CollSet)MemberwiseClone();
+			m.zdxList = new Dictionary<CollideType, LinkedList<GeometricObjectCollide>>();
+			foreach (KeyValuePair<CollideType, LinkedList<GeometricObjectCollide>> kv in zdxList) {
+				LinkedList<GeometricObjectCollide> geos = new LinkedList<GeometricObjectCollide>(kv.Value.offset, kv.Value.off_head, kv.Value.off_tail, (uint)kv.Value.Count, kv.Value.type);
+				for (int i = 0; i < kv.Value.Count; i++) {
+					geos[i] = kv.Value[i].Clone();
+					geos[i].gao.transform.SetParent(parent);
+				}
+				m.zdxList.Add(kv.Key, geos);
+			}
+			return m;
+		}
+	}
 }
