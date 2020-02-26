@@ -211,7 +211,7 @@ namespace OpenSpace {
 			aiTypes = AITypes.R3,
 			hasMemorySupport = false,
 			textureAnimationSpeedModifier = 10f,
-			luminosity = 0.1f,
+			luminosity = 0.5f,
 			saturate = false,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },

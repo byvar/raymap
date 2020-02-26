@@ -91,10 +91,10 @@ namespace OpenSpace.Visual {
         }
 
 		private void CreateUnityMeshFromSDC() {
-			if (sdc.geo.Type == 6) {
+			/*if (sdc.geo.Type == 6) {
 				// Just fill in things based on mapping
 				return;
-			}
+			}*/
 			BoneWeight[] new_boneWeights = null;
 			if (OPT_unityMesh != null) {
 				OPT_unityMesh = CopyMesh(OPT_unityMesh);
@@ -107,11 +107,20 @@ namespace OpenSpace.Visual {
 					Vector3[] vertices = sdc.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
 					Array.Resize(ref vertices, (int)sdc.num_vertices_actual);
 					OPT_unityMesh.vertices = vertices;
-					new_boneWeights = geo.bones == null ? null : new BoneWeight[vertices.Length];
+					new_boneWeights = (geo.bones == null || sdc_mapping == null) ? null : new BoneWeight[vertices.Length];
 					int currentTriInStrip = 0;
 					int triangleIndex = 0;
-					for (int v = 2; v < sdc.num_vertices_actual; v++) {
-						if (triangleIndex >= triangles.Length) MapLoader.Loader.print(offset + " - " + sdc.offset + " - " + sdc.geo.Type);
+					for (int v = 2; (v < sdc.num_vertices_actual && triangleIndex < triangles.Length); v++) {
+						//if (sdc.vertices[v].Equals(sdc.vertices[v - 1])) continue;
+						if (triangleIndex >= triangles.Length) MapLoader.Loader.print(
+							offset 
+							+ " - " + sdc.geo.Offset
+							+ " - " + sdc.offset 
+							+ " - " + sdc.geo.Type
+							+ " - " + sdc.geo.num_triangles[sdc.index]
+							+ " - " + num_triangles
+							+ " - " + triangleIndex
+							+ " - " + v);
 						if (sdc.vertices[v].w == 1f) {
 							if ((currentTriInStrip) % 2 == 0) {
 								triangles[triangleIndex + 0] = v - 2;
@@ -141,7 +150,7 @@ namespace OpenSpace.Visual {
 
 					uint num_textures = Math.Max(1, visualMaterial.num_textures_in_material);
 					for (int t = 0; t < num_textures; t++) {
-						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t)).ToList();
+						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t, applyBlendWeight: sdc.geo.Type != 6)).ToList();
 						OPT_unityMesh.SetUVs(t, uv.ToArray());
 					}
 					/*Vector3[] normals = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetNormal(i)).ToArray();
@@ -151,9 +160,36 @@ namespace OpenSpace.Visual {
 						g.transform.position = vertices[i] + normals[i];
 						g.transform.localScale = Vector3.one * 0.2f;
 					}*/
-					Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
-					OPT_unityMesh.SetUVs((int)num_textures, colors);
-					OPT_unityMesh.RecalculateNormals();
+					if (sdc.geo.Type != 6) {
+						Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
+						OPT_unityMesh.SetUVs((int)num_textures, colors);
+						OPT_unityMesh.RecalculateNormals();
+					} else {
+						//Vector3[] normals = new Vector3[vertices.Length];
+
+						// Also set bone weights
+						//if (new_boneWeights != null) {
+						ushort mapping_i = 0;
+						for (int i = 0; i < geo.vertices.Length; i++) {
+							ushort length = sdc_mapping[mapping_i];
+							mapping_i++;
+							if (mapping_i >= sdc_mapping.Length) break;
+							for (int j = 0; j < length; j++) {
+								ushort vertIndexInSdc = (ushort)(sdc_mapping[mapping_i] & 0x7FFF);
+								if (vertIndexInSdc < vertices.Length) {
+									if (new_boneWeights != null) {
+										new_boneWeights[vertIndexInSdc] = geo.bones.weights[i];
+									}
+									//normals[vertIndexInSdc] = geo.normals[i];
+								}
+								mapping_i++;
+								if (mapping_i >= sdc_mapping.Length) break;
+							}
+						}
+
+						OPT_unityMesh.RecalculateNormals();
+						//}
+					}
 					/*m.triangles = Enumerable.Range(0, sdcEl.vertices.Length).ToArray();
 					Debug.LogWarning(sdcEl.offset + " - " + sdc.Type + " - " + (m.triangles.Length / 3) + " - " + (m.triangles.Length % 3) + " - " + sdc.num_triangles[sdcIndex]);
 					*/
@@ -168,7 +204,7 @@ namespace OpenSpace.Visual {
 					OPT_unityMesh.triangles = Enumerable.Range(0, vertices.Length).ToArray();
 					uint num_textures = Math.Max(1, visualMaterial.num_textures_in_material);
 					for (int t = 0; t < num_textures; t++) {
-						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t)).ToList();
+						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t, applyBlendWeight: true)).ToList();
 						OPT_unityMesh.SetUVs(t, uv.ToArray());
 					}
 					Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
@@ -236,7 +272,7 @@ namespace OpenSpace.Visual {
 
 
 			// Create mesh from unoptimized data
-			if ((sdc == null || sdc.geo.Type == 6) && num_triangles > 0) {
+			if ((sdc == null) && num_triangles > 0) {
 				Vector3[] new_vertices = new Vector3[num_triangles * 3];
 				Vector3[] new_normals = new Vector3[num_triangles * 3];
 				Vector3[][] new_uvs = new Vector3[num_textures][];

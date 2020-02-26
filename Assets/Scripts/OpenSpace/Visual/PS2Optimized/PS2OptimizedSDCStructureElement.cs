@@ -110,7 +110,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 			}*/
 		}
 
-		public Vector3 GetUV(int index, int texIndex) {
+		public Vector3 GetUV(int index, int texIndex, bool applyBlendWeight) {
 			Vector3 baseUV = Vector3.zero;
 			if (geo.Type == 1) {
 				baseUV = new Vector3(uvUnoptimized[index].u, uvUnoptimized[index].v, 1f);
@@ -124,7 +124,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 					case 1: baseUV = GetUV1(index); break;
 				}
 			}
-			if (colors != null && texIndex < colors.Length) {
+			if (applyBlendWeight && colors != null && texIndex < colors.Length) {
 				float weight = (float)(GetColor(texIndex, index).a) / 0x80;
 				baseUV = new Vector3(baseUV.x, baseUV.y, weight);
 			}
@@ -198,12 +198,12 @@ namespace OpenSpace.Visual.PS2Optimized {
 				}
 
 				Vertex vo = obj as Vertex;
-				return (x == vo.x && y == vo.y && z == vo.z && w == vo.w);
+				return (x == vo.x && y == vo.y && z == vo.z);
 			}
 
 			// override object.GetHashCode
 			public override int GetHashCode() {
-				return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode() ^ w.GetHashCode();
+				return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
 			}
 		}
 		public class TexCoord {
