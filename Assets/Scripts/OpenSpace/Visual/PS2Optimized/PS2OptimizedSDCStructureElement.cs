@@ -19,10 +19,10 @@ namespace OpenSpace.Visual.PS2Optimized {
 		public UVUnoptimized[] uvUnoptimized;
 		public TexCoord[] uv0;
 		public TexCoord[] uv1;
-		public VertexColor[] colors;
+		public TexCoordUnknown[] unknown;
 		public VectorForSinusEffect[] sinusState;
 
-		public NormalBlendWeight[][] weights;
+		public VertexColor[][] colors;
 
 		public PS2OptimizedSDCStructureElement(PS2OptimizedSDCStructure geo, int index) {
 			this.geo = geo;
@@ -40,6 +40,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 			} else {
 				num_vertices = geo.num_triangles[index] * 3;
 				num_uvs = (num_vertices + 3) >> 2;
+				num_vertices_actual = num_vertices;
 			}
 			VisualMaterial vm = geo.visualMaterials[index];
 			bool hasUv0 = true, hasUv1 = false, hasUv4 = false;
@@ -78,17 +79,17 @@ namespace OpenSpace.Visual.PS2Optimized {
 					}
 				}
 				if (hasUv4) {
-					colors = new VertexColor[num_vertices];
-					for (int i = 0; i < colors.Length; i++) {
-						colors[i] = new VertexColor(reader);
+					unknown = new TexCoordUnknown[num_vertices];
+					for (int i = 0; i < unknown.Length; i++) {
+						unknown[i] = new TexCoordUnknown(reader);
 					}
 				}
 			}
-			weights = new NormalBlendWeight[num_textures][]; // Seem to be in a color-like format? 7F 7F 7F 80, repeated 4 times
-			for (int i = 0; i < weights.Length; i++) {
-				weights[i] = new NormalBlendWeight[num_uvs];
-				for (int j = 0; j < weights[i].Length; j++) {
-					weights[i][j] = new NormalBlendWeight(reader);
+			colors = new VertexColor[num_textures][]; // Seem to be in a color-like format? 7F 7F 7F 80, repeated 4 times
+			for (int i = 0; i < colors.Length; i++) {
+				colors[i] = new VertexColor[num_uvs];
+				for (int j = 0; j < colors[i].Length; j++) {
+					colors[i][j] = new VertexColor(reader);
 				}
 			}
 			if(geo.isSinus != 0) {
@@ -111,27 +112,37 @@ namespace OpenSpace.Visual.PS2Optimized {
 
 		public Vector3 GetUV(int index, int texIndex) {
 			Vector3 baseUV = Vector3.zero;
-			byte uvFunction = 0;
-			if (geo.visualMaterials[this.index].textures.Count > texIndex) {
-				uvFunction = geo.visualMaterials[this.index].textures[texIndex].uvFunction;
+			if (geo.Type == 1) {
+				baseUV = new Vector3(uvUnoptimized[index].u, uvUnoptimized[index].v, 1f);
+			} else {
+				byte uvFunction = 0;
+				if (geo.visualMaterials[this.index].textures.Count > texIndex) {
+					uvFunction = geo.visualMaterials[this.index].textures[texIndex].uvFunction;
+				}
+				switch (uvFunction) {
+					case 0: baseUV = GetUV0(index); break;
+					case 1: baseUV = GetUV1(index); break;
+				}
 			}
-			switch (uvFunction) {
-				case 0: baseUV = GetUV0(index); break;
-				case 1: baseUV = GetUV1(index); break;
-			}
-			if (weights != null && texIndex < weights.Length) {
-				float weight = (float)(GetWeight(texIndex, index).w) / 0x80;
+			if (colors != null && texIndex < colors.Length) {
+				float weight = (float)(GetColor(texIndex, index).a) / 0x80;
 				baseUV = new Vector3(baseUV.x, baseUV.y, weight);
 			}
 			return baseUV;
 		}
-		public Vector3 GetNormal(int index) {
-			if (weights != null && weights.Length > 0) {
+		/*public Vector3 GetNormal(int index) {
+			if (colors != null && colors.Length > 0) {
 				return GetWeight(0, index).Normal;
 			}
 			return Vector3.zero;
-		}
+		}*/
 
+		public Vector4 GetColor(int index) {
+			if (colors != null && colors.Length > 0) {
+				return GetColor(0, index).Color;
+			}
+			return Vector4.one;
+		}
 		public Vector3 GetUV0(int index) {
 			if (uv0 != null) {
 				int uv0Index = index / 4;
@@ -141,11 +152,11 @@ namespace OpenSpace.Visual.PS2Optimized {
 			}
 			return Vector3.zero;
 		}
-		public NormalBlendWeight.Weight GetWeight(int texIndex, int index) {
-			if (weights != null) {
+		public VertexColor.Col GetColor(int texIndex, int index) {
+			if (colors != null) {
 				int uv0Index = index / 4;
 				int indexInUV = index % 4;
-				NormalBlendWeight.Weight w = weights[texIndex][uv0Index].uv[indexInUV];
+				VertexColor.Col w = colors[texIndex][uv0Index].uv[indexInUV];
 				return w;
 			}
 			return default;
@@ -192,9 +203,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 
 			// override object.GetHashCode
 			public override int GetHashCode() {
-				// TODO: write your implementation of GetHashCode() here
-				throw new NotImplementedException();
-				return base.GetHashCode();
+				return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode() ^ w.GetHashCode();
 			}
 		}
 		public class TexCoord {
@@ -217,34 +226,46 @@ namespace OpenSpace.Visual.PS2Optimized {
 				}
 			}
 		}
-		public class NormalBlendWeight {
-			public Weight[] uv;
-			public NormalBlendWeight(Reader reader) {
-				uv = new Weight[4];
+		public class VertexColor {
+			public Col[] uv;
+			public VertexColor(Reader reader) {
+				uv = new Col[4];
 				for (int i = 0; i < 4; i++) {
-					uv[i] = new Weight(reader);
+					uv[i] = new Col(reader);
 				}
 			}
-			public struct Weight {
-				// Normal?
-				public byte x;
-				public byte y;
-				public byte z;
+			public struct Col {
+				public byte r;
+				public byte g;
+				public byte b;
 				// Blend weight
-				public byte w;
-				public Weight(Reader reader) {
-					x = reader.ReadByte();
-					y = reader.ReadByte();
-					z = reader.ReadByte();
-					w = reader.ReadByte();
+				public byte a;
+				public Col(Reader reader) {
+					r = reader.ReadByte();
+					g = reader.ReadByte();
+					b = reader.ReadByte();
+					a = reader.ReadByte();
 				}
 
-				public Vector3 Normal {
+				/*public Vector3 Normal {
 					get {
 						float x = ((this.x & 0x7F) / (float)0x7F) * (((this.x & 0x80) != 0) ? -1 : 1);
 						float y = ((this.y & 0x7F) / (float)0x7F) * (((this.y & 0x80) != 0) ? -1 : 1);
 						float z = ((this.z & 0x7F) / (float)0x7F) * (((this.z & 0x80) != 0) ? -1 : 1);
 						return new Vector3(x, z, y);
+					}
+				}*/
+				/*public Vector3 Normal {
+					get {
+						float x = (this.b - 128) / 127f;
+						float y = (this.g - 128) / 127f;
+						float z = (this.r - 128) / 127f;
+						return new Vector3(x, z, y);
+					}
+				}*/
+				public Vector4 Color {
+					get {
+						return new Vector4(r / 127f, g / 127f, b / 127f, 1f);
 					}
 				}
 			}
@@ -261,13 +282,13 @@ namespace OpenSpace.Visual.PS2Optimized {
 				w = reader.ReadSingle();
 			}
 		}
-		public class VertexColor {
+		public class TexCoordUnknown {
 			public float x;
 			public float y;
 			public float z;
 			public float w;
 
-			public VertexColor(Reader reader) {
+			public TexCoordUnknown(Reader reader) {
 				x = reader.ReadSingle();
 				y = reader.ReadSingle();
 				z = reader.ReadSingle();

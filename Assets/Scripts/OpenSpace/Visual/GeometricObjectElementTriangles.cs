@@ -138,58 +138,22 @@ namespace OpenSpace.Visual {
 							currentTriInStrip = 0;
 						}
 					}
-					/*for (int v = (int)sdcEl.num_vertices_actual - 1; v > 1; v--) {
-
-						if (sdcEl.vertices[v].w == 1f) {
-							//if ((currentTriInStrip) % 2 == 0) {
-							tris.Add(v - 2); // 0
-							tris.Add(v - 1); // 1
-							tris.Add(v - 0); // 2
-
-							//} else {
-							tris.Add(v - 1); // 0
-							tris.Add(v - 2); // 1
-							tris.Add(v - 0); // 2
-											 //}
-							currentTriInStrip++;
-						} else {
-							//currentTriInStrip++;
-							if (currentTriInStrip != 0) {
-								currentStrip++;
-							}
-							currentTriInStrip = 0;
-						}
-					}*/
-					/*Debug.LogWarning(sdcEl.offset
-						+ " - " + sdc.Type
-						+ " - " + (tris.Count / 3)
-						+ " - " + sdc.num_triangles[sdcIndex]
-						+ " - " + sdc.uint1[sdcIndex]
-						+ " - " + sdcEl.num_uvs
-						+ " - " + ((sdcEl.num_vertices + 3) >> 2)
-						+ " - " + ((tris.Count + 3) >> 2));*/
-					/*if (bones != null) {
-						Debug.LogWarning("SDC:" + sdcEl.offset
-						+ " - T:" + mainEl.off_triangles
-						+ " - NV:" + sdcEl.num_vertices
-						+ " - NT:" + sdc.num_triangles[sdcIndex]
-						+ " - V:" + off_vertices
-						+ " - El:" + mainEl.offset
-						+ " - MAP:" + mainEl.off_sdc_mapping);
-					} else {
-						Debug.LogWarning(sdc.Type + " SDC:" + sdcEl.offset
-						+ " - NV:" + sdcEl.num_vertices
-						+ " - NVA:" + sdcEl.num_vertices_actual
-						+ " - NT:" + sdc.num_triangles[sdcIndex]
-						+ " - MAP:" + mainEl.off_sdc_mapping);
-					}*/
 
 					uint num_textures = Math.Max(1, visualMaterial.num_textures_in_material);
 					for (int t = 0; t < num_textures; t++) {
 						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t)).ToList();
 						OPT_unityMesh.SetUVs(t, uv.ToArray());
 					}
-					OPT_unityMesh.normals = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetNormal(i)).ToArray();
+					/*Vector3[] normals = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetNormal(i)).ToArray();
+					OPT_unityMesh.normals = normals;*/
+					/*for (int i = 0; i < normals.Length; i++) {
+						GameObject g = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+						g.transform.position = vertices[i] + normals[i];
+						g.transform.localScale = Vector3.one * 0.2f;
+					}*/
+					Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
+					OPT_unityMesh.SetUVs((int)num_textures, colors);
+					OPT_unityMesh.RecalculateNormals();
 					/*m.triangles = Enumerable.Range(0, sdcEl.vertices.Length).ToArray();
 					Debug.LogWarning(sdcEl.offset + " - " + sdc.Type + " - " + (m.triangles.Length / 3) + " - " + (m.triangles.Length % 3) + " - " + sdc.num_triangles[sdcIndex]);
 					*/
@@ -199,10 +163,17 @@ namespace OpenSpace.Visual {
 					//OPT_unityMesh.RecalculateNormals();
 				} else {
 					OPT_unityMesh = new Mesh();
-					OPT_unityMesh.vertices = sdc.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
-					OPT_unityMesh.triangles = Enumerable.Range(0, sdc.vertices.Length).ToArray();
-					OPT_unityMesh.SetUVs(0, sdc.uvUnoptimized.Select(uv => new Vector3(uv.u, uv.v, 1f)).ToArray());
-					OPT_unityMesh.normals = Enumerable.Range(0, sdc.vertices.Length).Select(i => sdc.GetNormal(i)).ToArray();
+					Vector3[] vertices = sdc.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
+					OPT_unityMesh.vertices = vertices;
+					OPT_unityMesh.triangles = Enumerable.Range(0, vertices.Length).ToArray();
+					uint num_textures = Math.Max(1, visualMaterial.num_textures_in_material);
+					for (int t = 0; t < num_textures; t++) {
+						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t)).ToList();
+						OPT_unityMesh.SetUVs(t, uv.ToArray());
+					}
+					Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
+					OPT_unityMesh.SetUVs((int)num_textures, colors);
+					OPT_unityMesh.RecalculateNormals();
 					//m.uv = 
 					//OPT_unityMesh.RecalculateNormals();
 				}
@@ -490,7 +461,7 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
-				if (vertexColors != null & unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
+				if (((sdc != null && sdc.geo.Type != 6) || vertexColors != null) && unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
                 /*if (num_uvMaps > 1) {
