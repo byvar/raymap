@@ -46,7 +46,9 @@ namespace OpenSpace.ROM {
 					if (texInfo.AlphaIsTransparency || texInfo.RenderWater1 || texInfo.RenderWater2) {
 						mat = new Material(MapLoader.Loader.baseTransparentMaterial);
 					} else {
-						mat = new Material(MapLoader.Loader.baseLightMaterial);
+						mat = new Material(MapLoader.Loader.baseTransparentMaterial);
+						mat.SetFloat("_DisableLightingLocal", 1f);
+						//mat = new Material(MapLoader.Loader.baseLightMaterial);
 					}
 				} else {
 					mat = new Material(MapLoader.Loader.baseMaterial);

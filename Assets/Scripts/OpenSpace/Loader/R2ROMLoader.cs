@@ -86,7 +86,7 @@ namespace OpenSpace.Loader {
 				files_array[SMem.Fat] = new ROMBIN("fat.bin", gameDataBinFolder + "fat.bin", SMem.Fat);
 				files_array[SMem.Anims] = new ROMBIN("anims.bin", gameDataBinFolder + "anims.bin", SMem.Anims);
 				files_array[SMem.ShAnims] = new ROMBIN("shAnims.bin", gameDataBinFolder + "shAnims.bin", SMem.ShAnims);
-				files_array[SMem.CutTable] = new ROMBIN("shAnims.bin", gameDataBinFolder + "cuttable.bin", SMem.CutTable);
+				files_array[SMem.CutTable] = new ROMBIN("cuttable.bin", gameDataBinFolder + "cuttable.bin", SMem.CutTable);
 
 				await LoadAnims();
 
@@ -102,6 +102,10 @@ namespace OpenSpace.Loader {
 				
 				await LoadData();
 
+				if (exportTextures) {
+					Debug.LogError("Textures saved. Due to how N64 loading works, levels can only be loaded without Save Textures.");
+					return;
+				}
 				if (Settings.s.game == Settings.Game.R2
 					&& (Settings.s.platform == Settings.Platform.N64 || Settings.s.platform == Settings.Platform.DS)) {
                     string objectNamesFileName = "objectNames_" + lvlName.ToLower() + ".json";
