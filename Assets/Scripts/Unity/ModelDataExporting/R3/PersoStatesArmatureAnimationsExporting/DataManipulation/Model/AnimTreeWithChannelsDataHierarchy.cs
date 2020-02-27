@@ -15,6 +15,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
         public void AddNode(
             string parentChannelName,
             string channelName,
+            bool isKeyframe,
             Vector3 absolutePosition,
             Quaternion absoluteRotation,
             Vector3 absoluteScale,
@@ -24,6 +25,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
         {
             AnimTreeChannelsHierarchyNode node = new AnimTreeChannelsHierarchyNode(
                 channelName,
+                isKeyframe,
                 localPosition,
                 localRotation,
                 localScale,

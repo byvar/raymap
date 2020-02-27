@@ -37,6 +37,8 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
 
                 int framesSinceKF = (int)animationFrameNumber - (int)openspaceKeyframe.frame;
 
+                bool isKeyframe = framesSinceKF == 0;
+
                 AnimKeyframe nextKF = null;
                 int framesDifference;
                 float interpolation;
@@ -74,7 +76,8 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
                     channelName,
                     localPosition,
                     localRotation,
-                    localScale);
+                    localScale,
+                    isKeyframe);
                 }
             }
         }

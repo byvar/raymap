@@ -10,6 +10,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
     public class AnimationFrameModelNode
     {
         public string boneName;
+        public bool isKeyframe;
         public Vector3d position;
         public Vector3d localPosition;
         public Quaternion rotation;
@@ -20,6 +21,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
 
         public AnimationFrameModelNode(
             string boneName,
+            bool isKeyframe,
             Vector3d position,
             Vector3d localPosition,
             Quaternion rotation,
@@ -29,6 +31,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             bool hasBone)
         {
             this.boneName = boneName;
+            this.isKeyframe = isKeyframe;
             this.position = position;
             this.localPosition = localPosition;
             this.rotation = rotation;

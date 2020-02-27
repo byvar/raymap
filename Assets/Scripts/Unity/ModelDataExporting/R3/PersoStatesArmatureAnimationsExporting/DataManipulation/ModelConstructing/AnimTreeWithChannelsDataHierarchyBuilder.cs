@@ -20,6 +20,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             result.AddNode(
                 null,
                 "ROOT_CHANNEL",
+                false,
                 new Vector3(0.0f, 0.0f, 0.0f),
                 new Quaternion(0.0f, 0.0f, 0.0f, 1.0f),
                 new Vector3(1.0f, 1.0f, 1.0f),
@@ -38,6 +39,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
                         animHierarchy.ChannelName,
                         new AnimTreeChannelsHierarchyNode(
                                 animHierarchy.ChannelName,
+                                animHierarchy.IsKeyframe,
                                 animHierarchy.LocalPosition,
                                 animHierarchy.LocalRotation,
                                 animHierarchy.LocalScale,

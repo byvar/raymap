@@ -20,6 +20,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
                 hierarchy.GetRoot().Name,
                 new AnimationFrameModelNode(
                     hierarchy.GetRoot().Name,
+                    hierarchy.GetRoot().IsKeyframe,
                     new Vector3d(
                         hierarchy.GetRoot().Position.x,
                         hierarchy.GetRoot().Position.y,
@@ -56,6 +57,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
                     childParentPair.Child.Name,
                     new AnimationFrameModelNode(
                         childParentPair.Child.Name,
+                        childParentPair.Child.IsKeyframe,
                         new Vector3d(
                             childParentPair.Child.Position.x,
                             childParentPair.Child.Position.y,

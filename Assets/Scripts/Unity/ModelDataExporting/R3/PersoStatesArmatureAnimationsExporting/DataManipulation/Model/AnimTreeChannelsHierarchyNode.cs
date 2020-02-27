@@ -10,6 +10,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
     public class AnimTreeChannelsHierarchyNode
     {
         public string Name;
+        public bool IsKeyframe;
         public Vector3 LocalPosition;
         public Quaternion LocalRotation;
         public Vector3 LocalScale;
@@ -19,6 +20,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
 
         public AnimTreeChannelsHierarchyNode(
             string Name,
+            bool IsKeyframe,
             Vector3 LocalPosition,
             Quaternion LocalRotation,
             Vector3 LocalScale,
@@ -27,6 +29,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
             Vector3 Scale)
         {
             this.Name = Name;
+            this.IsKeyframe = IsKeyframe;
             this.LocalPosition = LocalPosition;
             this.LocalRotation = LocalRotation;
             this.LocalScale = LocalScale;
