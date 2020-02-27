@@ -34,7 +34,7 @@
 		Lighting Off
 		Pass{
 			//Tags{ "LightMode" = "ForwardBase" }
-			Blend SrcAlpha One
+			Blend SrcAlpha OneMinusSrcColor
 			//Blend One One
 			// pass for ambient light and first light source
 
