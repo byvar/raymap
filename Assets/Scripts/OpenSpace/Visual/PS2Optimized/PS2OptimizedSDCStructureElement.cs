@@ -19,7 +19,8 @@ namespace OpenSpace.Visual.PS2Optimized {
 		public UVUnoptimized[] uvUnoptimized;
 		public TexCoord[] uv0;
 		public TexCoord[] uv1;
-		public TexCoordUnknown[] unknown;
+		public Normal[] normals;
+		public TexCoord[] uv_unk;
 		public VectorForSinusEffect[] sinusState;
 
 		public VertexColor[][] colors;
@@ -43,14 +44,14 @@ namespace OpenSpace.Visual.PS2Optimized {
 				num_vertices_actual = num_vertices;
 			}
 			VisualMaterial vm = geo.visualMaterials[index];
-			bool hasUv0 = true, hasUv1 = false, hasUv4 = false;
+			bool hasUv0 = true, hasUv1 = false, hasNormals = false;
 			uint num_textures = 1;
 			if (vm != null && vm.num_textures_in_material > 0) {
 				hasUv0 = false;
 				num_textures = vm.num_textures_in_material;
 				for (int i = 0; i < vm.num_textures_in_material; i++) {
 					switch (vm.textures[i].uvFunction) {
-						case 4: hasUv4 = true; break;
+						case 4: hasNormals = true; break;
 						case 1: hasUv1 = true; break;
 						case 0: hasUv0 = true; break;
 					}
@@ -78,10 +79,16 @@ namespace OpenSpace.Visual.PS2Optimized {
 						uv1[i] = new TexCoord(reader);
 					}
 				}
-				if (hasUv4) {
-					unknown = new TexCoordUnknown[num_vertices];
-					for (int i = 0; i < unknown.Length; i++) {
-						unknown[i] = new TexCoordUnknown(reader);
+				if (hasNormals) {
+					normals = new Normal[num_vertices];
+					for (int i = 0; i < normals.Length; i++) {
+						normals[i] = new Normal(reader);
+					}
+				}
+				if ((geo.flags & 0x100) != 0) {
+					uv_unk = new TexCoord[num_uvs];
+					for (int i = 0; i < uv_unk.Length; i++) {
+						uv_unk[i] = new TexCoord(reader);
 					}
 				}
 			}
@@ -100,7 +107,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 			}
 			if ((index < geo.num_elements - 1 && Pointer.Current(reader) != geo.off_elements_array[index + 1])
 				|| (index == geo.num_elements - 1 && Pointer.Current(reader) != geo.off_uint1)) {
-				UnityEngine.Debug.LogWarning("B " + geo.Offset + " - " + offset + " - " + hasUv0 + " - " + hasUv1 + " - " + hasUv4);
+				UnityEngine.Debug.LogWarning("B " + geo.Offset + " - " + offset + " - " + hasUv0 + " - " + hasUv1 + " - " + hasNormals);
 			} else {
 				//UnityEngine.Debug.LogWarning("G " + geo.Offset + " - " + offset + " - " + hasUv0 + " - " + hasUv1 + " - " + hasUv4);
 			}
@@ -122,6 +129,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 				switch (uvFunction) {
 					case 0: baseUV = GetUV0(index); break;
 					case 1: baseUV = GetUV1(index); break;
+					default: baseUV = new Vector3(0, 0, 1f); break;
 				}
 			}
 			if (applyBlendWeight && colors != null && texIndex < colors.Length) {
@@ -130,12 +138,12 @@ namespace OpenSpace.Visual.PS2Optimized {
 			}
 			return baseUV;
 		}
-		/*public Vector3 GetNormal(int index) {
-			if (colors != null && colors.Length > 0) {
-				return GetWeight(0, index).Normal;
+		public Vector3 GetNormal(int index) {
+			if (normals != null && normals.Length > index) {
+				return normals[index].Vector;
 			}
 			return Vector3.zero;
-		}*/
+		}
 
 		public Vector4 GetColor(int index) {
 			if (colors != null && colors.Length > 0) {
@@ -282,17 +290,21 @@ namespace OpenSpace.Visual.PS2Optimized {
 				w = reader.ReadSingle();
 			}
 		}
-		public class TexCoordUnknown {
+		public class Normal {
 			public float x;
 			public float y;
 			public float z;
 			public float w;
 
-			public TexCoordUnknown(Reader reader) {
+			public Normal(Reader reader) {
 				x = reader.ReadSingle();
 				y = reader.ReadSingle();
 				z = reader.ReadSingle();
 				w = reader.ReadSingle();
+			}
+
+			public Vector3 Vector {
+				get { return new Vector3(x, z, y); }
 			}
 		}
 		public class VectorForSinusEffect {

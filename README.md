@@ -16,6 +16,7 @@ Map viewer/editor for OpenSpace games:
 * Rayman Arena (Xbox)
 * Rayman 3 (PC)
 * Rayman 3 (GC)
+* Rayman 3 (PS2)
 * Rayman 3 (Xbox)
 * Rayman 3 HD (Xbox 360)
 * Rayman 3 HD (PS3)

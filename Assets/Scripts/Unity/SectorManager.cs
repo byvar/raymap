@@ -244,10 +244,8 @@ public class SectorManager : MonoBehaviour {
 				List<Vector4> staticLightParams = new List<Vector4>();
 				for (int i = 0; i < sector.lights.Length; i++) {
 					LightBehaviour lb = sector.lights[i];
-					//LightInfo li = lb.li;
-					//if (li == null) continue;
-					//if (!li.IsObjectLighted(objectType)) continue;
-					//if (li.turnedOn == 0x0) continue;
+					if (!lb.IsActive) continue;
+					if (!lb.IsObjectLighted(objectType)) continue;
 					switch (lb.Type) {
 						case 4:
 							ambientLight += lb.Color;

@@ -22,6 +22,23 @@ public class LightBehaviour : MonoBehaviour {
     private Color col;
     private Color bckCol;
     private bool modified = false;
+	public bool IsActive {
+		get {
+			if (li != null) {
+				return li.turnedOn != 0;
+			} else if (liROM != null) {
+				return liROM.IsActive;
+			} else return false;
+		}
+	}
+	public bool IsObjectLighted(LightInfo.ObjectLightedFlag type) {
+
+		if (li != null) {
+			return li.IsObjectLighted(type);
+		} else if (liROM != null) {
+			return true;
+		} else return true;
+	}
 	public int Type {
 		get {
 			if (li != null) {

@@ -324,15 +324,15 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32(); // current refresh number for scrolling/animated textures, 0x48
 				if (Settings.s.game == Settings.Game.Dinosaur) {
 					reader.ReadBytes(0x1C);
-				}
+                }
+                if (Settings.s.platform == Settings.Platform.PS2) {
+                    reader.ReadBytes(0x20);
+                }
                 m.off_animTextures_first = Pointer.Read(reader);
                 m.off_animTextures_current = Pointer.Read(reader);
                 m.num_animTextures = reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt32();
-                if (Settings.s.platform == Settings.Platform.PS2) {
-                    reader.ReadBytes(0x20);
-                }
                 reader.ReadByte();
                 reader.ReadByte();
                 m.properties = reader.ReadByte();
@@ -378,8 +378,7 @@ namespace OpenSpace.Visual {
 					} else if (Settings.s.platform == Settings.Platform.PS2) {
                         t.properties = reader.ReadInt32();
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
-                        reader.ReadInt32();
-                        reader.ReadSingle();
+                        new Vector2(reader.ReadSingle(), reader.ReadSingle());
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
 

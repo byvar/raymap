@@ -78,7 +78,10 @@ namespace OpenSpace.Visual {
 
         public bool IsObjectLighted(ObjectLightedFlag flags) {
             if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) return true;
-            if (flags == ObjectLightedFlag.Environment) return true;
+            if (Settings.s.platform != Settings.Platform.PS2 || Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                return true;
+                //if (flags == ObjectLightedFlag.Environment) return true;
+            }
             return ((objectLightedFlag & (int)flags) == (int)flags);
         }
 

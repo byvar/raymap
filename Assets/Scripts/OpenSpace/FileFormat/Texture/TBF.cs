@@ -25,6 +25,7 @@ namespace OpenSpace.FileFormat.Texture {
 				List<TBFHeader> headers = new List<TBFHeader>();
 				while (reader.BaseStream.Position < reader.BaseStream.Length) {
 					TBFHeader h = new TBFHeader();
+					h.offset = (uint)reader.BaseStream.Position;
 					h.signature = reader.ReadUInt32();
 					h.flags = reader.ReadUInt32();
 					h.width = reader.ReadUInt32();
@@ -32,7 +33,7 @@ namespace OpenSpace.FileFormat.Texture {
 					Texture2D tex = null;
 					switch (h.TypeNumber) {
 						case 0x1: {
-								Color[] palette = ReadPalette(reader, 16);
+								Color[] palette = ReadPalette(reader, 16, h.HasAlpha);
 								byte[] texData = reader.ReadBytes((int)(h.height * h.width / 2));
 								ezSwizzle s = new ezSwizzle();
 								s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 4, texData);
@@ -43,7 +44,7 @@ namespace OpenSpace.FileFormat.Texture {
 							}
 							break;
 						case 0x2: {
-								Color[] palette = ReadPalette(reader, 256);
+								Color[] palette = ReadPalette(reader, 256, h.HasAlpha);
 								byte[] texData = reader.ReadBytes((int)(h.height * h.width));
 								ezSwizzle s = new ezSwizzle();
 								s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 2, texData);
@@ -52,10 +53,17 @@ namespace OpenSpace.FileFormat.Texture {
 								tex = CreateTexture(palette, texData, h.width, h.height);
 							}
 							break;
+						case 0:
+							// Do nothing, this is empty
+							if (h.width != 0 || h.height != 0) {
+								throw new InvalidDataException(path + " - " + string.Format("{0:X8}", h.offset) + " - Type 0, but width & height aren't 0!");
+							}
+							break;
 						// Rayman 3 supports types 3 and 4 as well
 						default:
-							throw new InvalidDataException("Unknown type: " + h.TypeNumber);
+							throw new InvalidDataException(path + " - " + string.Format("{0:X8}", h.offset) + " - Unknown type: " + h.TypeNumber);
 					}
+					//MapLoader.Loader.print(string.Format("{0:X8}", h.offset) + " - " + h.TypeNumber);
 					headers.Add(h);
 					textures.Add(tex);
 				}
@@ -65,14 +73,14 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 		}
 
-		private Color[] ReadPalette(Reader reader, int length) {
+		private Color[] ReadPalette(Reader reader, int length, bool hasAlpha = true) {
 			Color[] palette = new Color[length];
 			for (int i = 0; i < length; i++) {
 				byte r = reader.ReadByte();
 				byte g = reader.ReadByte();
 				byte b = reader.ReadByte();
 				byte a = reader.ReadByte();
-				palette[i] = new Color(r / 255f, g / 255f, b / 255f, a / 128f);
+				palette[i] = new Color(r / 255f, g / 255f, b / 255f, hasAlpha ? (a / 128f) : 1f);
 			}
 			Color[] pal = palette;
 			if (length == 256) {
@@ -111,6 +119,7 @@ namespace OpenSpace.FileFormat.Texture {
 		}
 
 		public class TBFHeader {
+			public uint offset;
 			public uint signature;
 			public uint flags;
 			public uint width;

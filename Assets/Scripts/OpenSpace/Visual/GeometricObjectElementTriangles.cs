@@ -108,6 +108,7 @@ namespace OpenSpace.Visual {
 					Array.Resize(ref vertices, (int)sdc.num_vertices_actual);
 					OPT_unityMesh.vertices = vertices;
 					new_boneWeights = (geo.bones == null || sdc_mapping == null) ? null : new BoneWeight[vertices.Length];
+					normals = null;
 					int currentTriInStrip = 0;
 					int triangleIndex = 0;
 					for (int v = 2; (v < sdc.num_vertices_actual && triangleIndex < triangles.Length); v++) {
@@ -163,12 +164,41 @@ namespace OpenSpace.Visual {
 					if (sdc.geo.Type != 6) {
 						Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
 						OPT_unityMesh.SetUVs((int)num_textures, colors);
-						OPT_unityMesh.RecalculateNormals();
 					} else {
-						//Vector3[] normals = new Vector3[vertices.Length];
+						Vector3[] calculatedNormals = new Vector3[geo.num_vertices];
+						if (sdc.normals == null && geo.normals == null) {
+							// Calculate normals here
+							Mesh tempMesh = new Mesh();
+							Vector3[] new_vertices = new Vector3[num_triangles * 3];
+							int triangles_index = 0;
+							int[] unityTriangles = new int[num_triangles * 3];
+							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
+								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
+								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
+								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
+								new_vertices[m0] = geo.vertices[i0];
+								new_vertices[m1] = geo.vertices[i1];
+								new_vertices[m2] = geo.vertices[i2];
+								unityTriangles[triangles_index + 0] = m0;
+								unityTriangles[triangles_index + 1] = m2;
+								unityTriangles[triangles_index + 2] = m1;
+							}
+							tempMesh.vertices = new_vertices;
+							tempMesh.triangles = unityTriangles;
+							tempMesh.RecalculateNormals();
+							triangles_index = 0;
+							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
+								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
+								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
+								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
+								calculatedNormals[i0] = tempMesh.normals[m0];
+								calculatedNormals[i1] = tempMesh.normals[m1];
+								calculatedNormals[i2] = tempMesh.normals[m2];
+							}
 
+						}
+						normals = new Vector3[vertices.Length];
 						// Also set bone weights
-						//if (new_boneWeights != null) {
 						ushort mapping_i = 0;
 						for (int i = 0; i < geo.vertices.Length; i++) {
 							ushort length = sdc_mapping[mapping_i];
@@ -180,20 +210,30 @@ namespace OpenSpace.Visual {
 									if (new_boneWeights != null) {
 										new_boneWeights[vertIndexInSdc] = geo.bones.weights[i];
 									}
+									if (geo.normals != null) {
+										normals[vertIndexInSdc] = geo.normals[i];
+									} else {
+										normals[vertIndexInSdc] = calculatedNormals[i];
+									}
 									//normals[vertIndexInSdc] = geo.normals[i];
 								}
 								mapping_i++;
 								if (mapping_i >= sdc_mapping.Length) break;
 							}
 						}
-
-						OPT_unityMesh.RecalculateNormals();
-						//}
 					}
 					/*m.triangles = Enumerable.Range(0, sdcEl.vertices.Length).ToArray();
 					Debug.LogWarning(sdcEl.offset + " - " + sdc.Type + " - " + (m.triangles.Length / 3) + " - " + (m.triangles.Length % 3) + " - " + sdc.num_triangles[sdcIndex]);
 					*/
 					OPT_unityMesh.triangles = triangles;
+
+					if (sdc.normals != null) {
+						OPT_unityMesh.normals = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetNormal(v)).ToArray();
+					} else if (sdc.geo.Type == 6) {
+						OPT_unityMesh.normals = normals;
+					} else {
+						OPT_unityMesh.RecalculateNormals();
+					}
 					//m.uv = sdcEl.uvUnoptimized.Select(uv => new Vector2(uv.u, uv.v)).ToArray();
 					//m.uv = 
 					//OPT_unityMesh.RecalculateNormals();
@@ -571,8 +611,27 @@ namespace OpenSpace.Visual {
 		public void UpdateMeshVertices(Vector3[] vertices) {
 			if (OPT_unityMesh != null) {
 				Vector3[] new_vertices = OPT_unityMesh.vertices;
-				for (int j = 0; j < OPT_num_mapping_entries; j++) {
-					new_vertices[j] = vertices[OPT_mapping_vertices[j]];
+				if (sdc != null && sdc_mapping != null) {
+					// R3 PS2
+					ushort mapping_i = 0;
+					for (int i = 0; i < geo.vertices.Length; i++) {
+						ushort length = sdc_mapping[mapping_i];
+						mapping_i++;
+						if (mapping_i >= sdc_mapping.Length) break;
+						for (int j = 0; j < length; j++) {
+							ushort vertIndexInSdc = (ushort)(sdc_mapping[mapping_i] & 0x7FFF);
+							if (vertIndexInSdc < vertices.Length) {
+								new_vertices[vertIndexInSdc] = vertices[i];
+							}
+							mapping_i++;
+							if (mapping_i >= sdc_mapping.Length) break;
+						}
+					}
+				} else {
+					// Other games / platforms
+					for (int j = 0; j < OPT_num_mapping_entries; j++) {
+						new_vertices[j] = vertices[OPT_mapping_vertices[j]];
+					}
 				}
 				OPT_unityMesh.vertices = new_vertices;
 			}

@@ -611,18 +611,18 @@ namespace OpenSpace.Loader {
 				uint num_persoInFix = reader.ReadUInt32();
 				for (int i = 0; i < num_persoInFix; i++) {
 					if (Settings.s.game == Settings.Game.R3) {
-						Pointer off_mainChar = Pointer.Read(reader);
+						Pointer.Read(reader);
 						reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
 						Matrix.Read(reader, Pointer.Current(reader));
 						reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
 						reader.ReadUInt32();
-						Pointer.Read(reader);
 					} else if (Settings.s.game == Settings.Game.RA
 						|| Settings.s.game == Settings.Game.RM
 						|| Settings.s.game == Settings.Game.Dinosaur) {
 						Matrix.Read(reader, Pointer.Current(reader));
 					}
 				}
+				Pointer.Read(reader);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 			}
@@ -816,13 +816,12 @@ namespace OpenSpace.Loader {
 				Matrix mat = null;
 				if (Settings.s.game == Settings.Game.R3) {
 					if (Settings.s.platform == Settings.Platform.PS2) {
-						Pointer off_mainChar = Pointer.Read(reader);
+						off_perso_so_with_settings_in_fix = Pointer.Read(reader);
 						reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
 						off_matrix = Pointer.Current(reader);
 						mat = Matrix.Read(reader, off_matrix);
 						reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
 						reader.ReadUInt32();
-						off_perso_so_with_settings_in_fix = Pointer.Read(reader);
 					} else {
 						off_perso_so_with_settings_in_fix = Pointer.Read(reader);
 						off_matrix = Pointer.Current(reader);
