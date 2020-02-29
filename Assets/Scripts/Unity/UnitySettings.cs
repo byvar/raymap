@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 
 /// <summary>
 /// Settings for Raymap
 /// </summary>
-[InitializeOnLoad]
+#if UNITY_EDITOR
+[UnityEditor.InitializeOnLoad]
+#endif
 public class UnitySettings {
 	private const string editorPrefsPrefix = "Raymap.";
 	private const string settingsFile = "Settings.txt";
@@ -76,8 +77,10 @@ public class UnitySettings {
 	/// </summary>
 	public static void Save() {
 		if (UnityEngine.Application.isEditor) {
+#if UNITY_EDITOR
 			ISerializer s = new EditorWriteSerializer();
 			SerializeSettings(s);
+#endif
 		} else if (UnityEngine.Application.platform != UnityEngine.RuntimePlatform.WebGLPlayer) {
 			using (SettingsFileWriteSerializer s = new SettingsFileWriteSerializer(settingsFile)) {
 				SerializeSettings(s);
@@ -90,8 +93,10 @@ public class UnitySettings {
 	/// </summary>
 	public static void Load() {
 		if (UnityEngine.Application.isEditor) {
+#if UNITY_EDITOR
 			ISerializer s = new EditorReadSerializer();
 			SerializeSettings(s);
+#endif
 		} else if (UnityEngine.Application.platform != UnityEngine.RuntimePlatform.WebGLPlayer) {
 			if (!File.Exists(settingsFile)) {
 				Save();
@@ -106,27 +111,29 @@ public class UnitySettings {
 		bool SerializeBool(string key, bool value);
 	}
 
+#if UNITY_EDITOR
 	private class EditorReadSerializer : ISerializer {
 		public bool SerializeBool(string key, bool value) {
-			return EditorPrefs.GetBool(editorPrefsPrefix + key, value);
+			return UnityEditor.EditorPrefs.GetBool(editorPrefsPrefix + key, value);
 		}
 
 		public string SerializeString(string key, string value) {
-			return EditorPrefs.GetString(editorPrefsPrefix + key, value);
+			return UnityEditor.EditorPrefs.GetString(editorPrefsPrefix + key, value);
 		}
 	}
 
 	private class EditorWriteSerializer : ISerializer {
 		public bool SerializeBool(string key, bool value) {
-			EditorPrefs.SetBool(editorPrefsPrefix + key, value);
+			UnityEditor.EditorPrefs.SetBool(editorPrefsPrefix + key, value);
 			return value;
 		}
 
 		public string SerializeString(string key, string value) {
-			EditorPrefs.SetString(editorPrefsPrefix + key, value);
+			UnityEditor.EditorPrefs.SetString(editorPrefsPrefix + key, value);
 			return value;
 		}
 	}
+#endif
 
 	private class SettingsFileWriteSerializer : ISerializer, IDisposable {
 		StreamWriter writer;

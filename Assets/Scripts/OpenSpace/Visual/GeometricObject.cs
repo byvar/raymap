@@ -132,7 +132,7 @@ namespace OpenSpace.Visual {
 					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
 					&& Settings.s.game != Settings.Game.RM
 					&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC
-					&& Settings.s.mode != Settings.Mode.Rayman3PS2) {
+					&& !(Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion == Settings.EngineVersion.R3)) {
 					reader.ReadInt32();
 				}
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();

@@ -7,8 +7,10 @@ using OpenSpace.Object.Properties;
 using OpenSpace.Text;
 using OpenSpace.Visual;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace OpenSpace.Loader {
 	public class R3Loader : MapLoader {
@@ -175,6 +177,10 @@ namespace OpenSpace.Loader {
 							((LVL)files_array[j]).ReadPTR(ptrPaths[j]);
 						}
 					}
+					// Export PS2 vignette textures
+					if (exportTextures && Settings.s.platform == Settings.Platform.PS2 && Settings.s.game == Settings.Game.R3) {
+						ExportR3PS2Textures();
+					}
 
 					await LoadFIX();
 					await LoadLVL();
@@ -189,6 +195,90 @@ namespace OpenSpace.Loader {
 			}
 			await WaitIfNecessary();
 			InitModdables();
+		}
+		void ExportR3PS2Textures() {
+			ExportSingleFileTBF("MENU/MNU_AB~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_BL~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_DE~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_DO~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_FO~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_JA~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_LA~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_MA~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_MO~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_OP~1", "TGA");
+			ExportSingleFileTBF("MENU/MNU_ABRA", "TGA");
+			ExportSingleFileTBF("MENU/MNU_ARCA", "TGA");
+			ExportSingleFileTBF("MENU/MNU_BAD", "TGA");
+			ExportSingleFileTBF("MENU/MNU_BLAC", "TGA");
+			ExportSingleFileTBF("MENU/MNU_BONU", "TGA");
+			ExportSingleFileTBF("MENU/MNU_BOUC", "TGA");
+			ExportSingleFileTBF("MENU/MNU_DESE", "TGA");
+			ExportSingleFileTBF("MENU/MNU_DONJ", "TGA");
+			ExportSingleFileTBF("MENU/MNU_EXTR", "TGA");
+			ExportSingleFileTBF("MENU/MNU_FILM", "TGA");
+			ExportSingleFileTBF("MENU/MNU_FIX", "TGA");
+			ExportSingleFileTBF("MENU/MNU_FLMS", "TGA");
+			ExportSingleFileTBF("MENU/MNU_FORE", "TGA");
+			ExportSingleFileTBF("MENU/MNU_FRT", "TGA");
+			ExportSingleFileTBF("MENU/MNU_GAME", "TGA");
+			ExportSingleFileTBF("MENU/MNU_GEN", "TGA");
+			ExportSingleFileTBF("MENU/MNU_GLC", "TGA");
+			ExportSingleFileTBF("MENU/MNU_GOOD", "TGA");
+			ExportSingleFileTBF("MENU/MNU_JARD", "TGA");
+			ExportSingleFileTBF("MENU/MNU_JEU", "TGA");
+			ExportSingleFileTBF("MENU/MNU_LAND", "TGA");
+			ExportSingleFileTBF("MENU/MNU_MARA", "TGA");
+			ExportSingleFileTBF("MENU/MNU_MER", "TGA");
+			ExportSingleFileTBF("MENU/MNU_MONT", "TGA");
+			ExportSingleFileTBF("MENU/MNU_OK", "TGA");
+			ExportSingleFileTBF("MENU/MNU_OPT", "TGA");
+			ExportSingleFileTBF("MENU/MNU_OPTI", "TGA");
+			ExportSingleFileTBF("MENU/MNU_PHTS", "TGA");
+			ExportSingleFileTBF("MENU/MNU_SAV", "TGA");
+			ExportSingleFileTBF("MENU/MNU_SECR", "TGA");
+			ExportSingleFileTBF("MENU/MNU_STAR", "TGA");
+			ExportSingleFileTBF("../LSBIN/BACK1", "TXR");
+			ExportSingleFileTBF("../LSBIN/CAG_GUN", "TXR");
+			ExportSingleFileTBF("../LSBIN/CODE", "TXR");
+			ExportSingleFileTBF("../LSBIN/NOISE", "TXR");
+			ExportSingleFileTBF("../LSBIN/TVLOOK", "TXR");
+			ExportVIG("FRA/SEA_10", "RAW", 512, 512);
+			ExportVIG("FRA/KNAAR_00", "RAW", 512, 512);
+			ExportVIG("FRA/KNAAR_70", "RAW", 512, 512);
+			ExportVIG("FRA/MOOR_10", "RAW", 512, 512);
+			ExportVIG("FRA/SWAMP_WO", "RAW", 512, 512);
+			ExportVIG("FLAGS1", "SCR", 512, 512);
+			ExportVIG("FLAGS2", "SCR", 512, 512);
+			ExportVIG("FLAGSN", "SCR", 512, 512);
+			ExportVIG("FLAGSP", "SCR", 512, 512);
+			ExportVIG("LOADING", "SCR", 512, 512);
+			ExportVIG("SONYDEMO", "SCR", 512, 512);
+			ExportVIG("UBISOFT", "SCR", 512, 512);
+			ExportVIG("UBITEX", "SCR", 256, 256);
+		}
+		void ExportSingleFileTBF(string name, string ext) {
+			string p = gameDataBinFolder + name + "." + ext;
+			if (!FileSystem.FileExists(p)) return;
+			FileFormat.Texture.TBF tbf = new FileFormat.Texture.TBF(p);
+			Util.ByteArrayToFile(gameDataBinFolder + "textures/VIG/" + name + ".png", tbf.textures[0].EncodeToPNG());
+		}
+		void ExportVIG(string name, string extension, int width, int height) {
+			string p = gameDataBinFolder + "VIG/" + name + "." + extension;
+			if (!FileSystem.FileExists(p)) return;
+			Texture2D tex = new Texture2D(width, height);
+			using (Reader reader = new Reader(FileSystem.GetFileReadStream(p), true)) {
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						byte r = reader.ReadByte();
+						byte g = reader.ReadByte();
+						byte b = reader.ReadByte();
+						tex.SetPixel(x, height-1-y, new Color(r / 255f, g / 255f, b / 255f, 1f));
+					}
+				}
+			}
+			tex.Apply();
+			Util.ByteArrayToFile(gameDataBinFolder + "textures/VIG/" + name + ".png", tex.EncodeToPNG());
 		}
 
 		#region FIX
@@ -328,8 +418,16 @@ namespace OpenSpace.Loader {
 			}
 			if (Settings.s.platform == Settings.Platform.PS2) {
 				sz_videoStructure = 0x108;
-				sz_entryActions = 0x10C; // probably not right but oh well
-				sz_binDataForMenu = 0x1A4;
+				if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild) {
+					sz_entryActions = 0xF8;
+					sz_binDataForMenu = 0x78;
+				} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_10_29) {
+					sz_entryActions = 0x108; // probably not right but oh well
+					sz_binDataForMenu = 0x1F4;
+				} else {
+					sz_entryActions = 0x10C; // probably not right but oh well
+					sz_binDataForMenu = 0x1A4;
+				}
 			} else if (Settings.s.platform == Settings.Platform.Xbox) {
 				sz_videoStructure = 0x108;
 				sz_binDataForMenu = 0x1AC;

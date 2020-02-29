@@ -72,6 +72,7 @@ namespace OpenSpace.Object.Properties {
         public static ObjectList Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             ObjectList ol = new ObjectList(offset);
+            //l.print("ObjectList: " + Pointer.Current(reader));
             if(Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Read(reader);
 			if (Settings.s.hasLinkedListHeaderPointers) {
                 ol.off_objList_prev = Pointer.Read(reader);

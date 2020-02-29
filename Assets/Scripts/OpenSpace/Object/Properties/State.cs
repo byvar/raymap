@@ -37,7 +37,7 @@ namespace OpenSpace.Object.Properties {
 					if (Settings.s.mode == Settings.Mode.RaymanArenaGC
 						|| Settings.s.mode == Settings.Mode.RaymanArenaGCDemo
 						|| Settings.s.mode == Settings.Mode.DonaldDuckPKGC
-                        || Settings.s.mode == Settings.Mode.Rayman3PS2) {
+                        || (Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion == Settings.EngineVersion.R3)) {
                         return offset + 0x28;
                     } else {//if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2DC) {
                         return offset + 0x20;

@@ -15,7 +15,7 @@ namespace OpenSpace.Text {
 		public Pointer[] fontsBitmap;
 
 		protected override void ReadInternal(Reader reader) {
-			// 1 fontDefine is normally sized 0x12E4
+			// 1 fontDefine is normally sized 0x12E4 ( 0x12B0 if no names )
 			num_fontsBitmap = reader.ReadByte();
 			num_fonts = reader.ReadByte();
 			fonts = new FontDefine[num_fonts];
