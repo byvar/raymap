@@ -28,8 +28,10 @@ namespace OpenSpace {
 			[Description("Rayman 3 (PC)")] Rayman3PC,
 			[Description("Rayman 3 (GC)")] Rayman3GC,
 			[Description("Rayman 3 (PS2)")] Rayman3PS2,
+			[Description("R3 (PS2) Demo (2002/08/07)")] Rayman3PS2Demo_2002_08_07,
 			[Description("R3 (PS2) Dev Build (2002/09/06)")] Rayman3PS2DevBuild,
 			[Description("R3 (PS2) Demo (2002/10/29)")] Rayman3PS2Demo_2002_10_29,
+			[Description("R3 (PS2) Demo (2002/12/18)")] Rayman3PS2Demo_2002_12_18,
 			[Description("Rayman 3 (Xbox)")] Rayman3Xbox,
 			[Description("Rayman 3 (Xbox 360)")] Rayman3Xbox360,
 			[Description("Rayman 3 (PS3)")] Rayman3PS3,
@@ -52,8 +54,10 @@ namespace OpenSpace {
 			{ "r3_gc", Mode.Rayman3GC },
 			{ "r3_pc", Mode.Rayman3PC },
 			{ "r3_ps2", Mode.Rayman3PS2 },
+			{ "r3_demo_ps2_20020807", Mode.Rayman3PS2Demo_2002_08_07 },
 			{ "r3_devbuild_ps2", Mode.Rayman3PS2DevBuild },
 			{ "r3_demo_ps2_20021029", Mode.Rayman3PS2Demo_2002_10_29 },
+			{ "r3_demo_ps2_20021218", Mode.Rayman3PS2Demo_2002_12_18 },
 			{ "r3_xbox", Mode.Rayman3Xbox },
 			{ "r3_xbox360", Mode.Rayman3Xbox360 },
 			{ "r3_ps3", Mode.Rayman3PS3 },
@@ -218,9 +222,23 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = false,
 			caps = new Dictionary<CapsType, Caps>() {
-				{ CapsType.LevelFile, Caps.None },
-				{ CapsType.Fix, Caps.None },
-				{ CapsType.TextureFile, Caps.Normal },
+				{ CapsType.All, Caps.All }
+			},
+		};
+		public static Settings R3PS2Demo_20020807 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.5f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
 			},
 		};
 		public static Settings R3PS2DevBuild = new Settings() {
@@ -236,9 +254,7 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = false,
 			caps = new Dictionary<CapsType, Caps>() {
-				{ CapsType.LevelFile, Caps.None },
-				{ CapsType.Fix, Caps.None },
-				{ CapsType.TextureFile, Caps.Normal },
+				{ CapsType.All, Caps.All }
 			},
 		};
 		public static Settings R3PS2Demo_20021029 = new Settings() {
@@ -254,9 +270,24 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = false,
 			caps = new Dictionary<CapsType, Caps>() {
-				{ CapsType.LevelFile, Caps.None },
-				{ CapsType.Fix, Caps.None },
-				{ CapsType.TextureFile, Caps.Normal },
+				{ CapsType.All, Caps.All }
+			},
+		};
+		public static Settings R3PS2Demo_20021218 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.5f,
+			saturate = false,
+			hasNames = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
 			},
 		};
 		public static Settings R3Xbox = new Settings() {
@@ -804,8 +835,10 @@ namespace OpenSpace {
 			{ Mode.Rayman3PC, R3PC },
 			{ Mode.Rayman3GC, R3GC },
 			{ Mode.Rayman3PS2, R3PS2 },
+			{ Mode.Rayman3PS2Demo_2002_08_07, R3PS2Demo_20020807 },
 			{ Mode.Rayman3PS2DevBuild, R3PS2DevBuild },
 			{ Mode.Rayman3PS2Demo_2002_10_29, R3PS2Demo_20021029 },
+			{ Mode.Rayman3PS2Demo_2002_12_18, R3PS2Demo_20021218 },
 			{ Mode.Rayman3Xbox, R3Xbox },
 			{ Mode.Rayman3Xbox360, R3Xbox360 },
 			{ Mode.Rayman3PS3, R3PS3 },

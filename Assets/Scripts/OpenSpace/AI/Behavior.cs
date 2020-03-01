@@ -80,8 +80,8 @@ namespace OpenSpace.AI {
         protected override void ReadInternal(Reader reader) {
             MapLoader l = MapLoader.Loader;
             l.behaviors.Add(this);
-
-            if (Settings.s.hasNames) {
+            //l.print("Behavior " + Offset);
+            if (Settings.s.hasNames && Settings.s.platform != Settings.Platform.PS2) {
                 name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
             }
             off_scripts = Pointer.Read(reader);

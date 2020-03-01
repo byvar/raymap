@@ -166,12 +166,6 @@ namespace OpenSpace.Visual {
 						if (Settings.s.platform == Settings.Platform.PS2) {
 							reader.ReadInt16();
 							reader.ReadUInt32();
-							reader.ReadUInt32();
-							reader.ReadUInt32();
-							m.optimizedObject = new Pointer<PS2OptimizedSDCStructure>(reader, resolve: false);
-							reader.ReadUInt32();
-							reader.ReadUInt32();
-							m.ps2IsSinus = reader.ReadUInt32();
 						}
 					}
 				} else {
@@ -185,6 +179,15 @@ namespace OpenSpace.Visual {
 			}
             m.name = "Mesh @ " + offset;
             if (Settings.s.hasNames) m.name = reader.ReadString(0x32);
+			if (Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion >= Settings.EngineVersion.R3) {
+				reader.Align(0x4);
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				m.optimizedObject = new Pointer<PS2OptimizedSDCStructure>(reader, resolve: false);
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				m.ps2IsSinus = reader.ReadUInt32();
+			}
             // Vertices
 			Pointer.DoAt(ref reader, m.off_vertices, () => {
 				m.vertices = new Vector3[m.num_vertices];

@@ -38,7 +38,8 @@ namespace OpenSpace.AI {
 			MapLoader.Loader.macros.Add(this);
 			if (Settings.s.hasNames
 				&& Settings.s.platform != Settings.Platform.Xbox360
-				&& Settings.s.platform != Settings.Platform.PS3) {
+				&& Settings.s.platform != Settings.Platform.PS3
+				&& Settings.s.platform != Settings.Platform.PS2) {
 				name = reader.ReadString(0x100);
 			}
 

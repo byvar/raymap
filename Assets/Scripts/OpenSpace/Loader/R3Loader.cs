@@ -243,6 +243,15 @@ namespace OpenSpace.Loader {
 			ExportSingleFileTBF("../LSBIN/CODE", "TXR");
 			ExportSingleFileTBF("../LSBIN/NOISE", "TXR");
 			ExportSingleFileTBF("../LSBIN/TVLOOK", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODMECA", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS201", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS202", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS203", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS204", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS205", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS206", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS207", "TXR");
+			ExportSingleFileTBF("../LSBIN/LODPS208", "TXR");
 			ExportVIG("FRA/SEA_10", "RAW", 512, 512);
 			ExportVIG("FRA/KNAAR_00", "RAW", 512, 512);
 			ExportVIG("FRA/KNAAR_70", "RAW", 512, 512);
@@ -421,6 +430,9 @@ namespace OpenSpace.Loader {
 				if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild) {
 					sz_entryActions = 0xF8;
 					sz_binDataForMenu = 0x78;
+				} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_08_07) {
+					sz_entryActions = 0xF8;
+					sz_binDataForMenu = 0;
 				} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_10_29) {
 					sz_entryActions = 0x108; // probably not right but oh well
 					sz_binDataForMenu = 0x1F4;
@@ -682,7 +694,7 @@ namespace OpenSpace.Loader {
 
 
 			uint num_internalStructure = num_ptrsTable;
-			if (Settings.s.mode == Settings.Mode.Rayman3GC) {
+			if (Settings.s.mode == Settings.Mode.Rayman3GC || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18) {
 				reader.ReadUInt32();
 			}
 			Pointer off_internalStructure_first = Pointer.Read(reader);

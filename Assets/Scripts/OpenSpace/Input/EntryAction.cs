@@ -44,7 +44,6 @@ namespace OpenSpace.Input {
 
         public static EntryAction Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
-            //MapLoader.Loader.print("Off: " + offset);
             EntryAction ea = new EntryAction(offset);
 			l.entryActions.Add(ea);
 
@@ -69,6 +68,9 @@ namespace OpenSpace.Input {
             } else {
                 if (Settings.s.hasExtraInputData) {
                     reader.ReadBytes(0x18);
+                }
+                if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18) {
+                    reader.ReadBytes(0x8);
                 }
                 ea.num_keywords = reader.ReadUInt32();
                 ea.off_keywords = Pointer.Read(reader);
