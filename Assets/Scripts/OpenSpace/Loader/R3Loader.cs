@@ -64,7 +64,11 @@ namespace OpenSpace.Loader {
 						paths["transit.btf"] = lvlFolder + ConvertCase("transit_6.btf", Settings.CapsType.TextureFile);
 						paths["transit.bhf"] = lvlFolder + ConvertCase("transit_6.bhf", Settings.CapsType.TextureFile);
 					} else if (Settings.s.platform == Settings.Platform.PS2) {
-						paths["fix.tbf"] = fixFolder + ConvertCase("Fix.tbf", Settings.CapsType.Fix);
+						if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+							paths["fix.tbf"] = fixFolder + ConvertCase("Textures.txc", Settings.CapsType.Fix);
+						} else {
+							paths["fix.tbf"] = fixFolder + ConvertCase("Fix.tbf", Settings.CapsType.Fix);
+						}
 						paths["lvl.tbf"] = lvlFolder + ConvertCase(lvlName + ".tbf", Settings.CapsType.TextureFile);
 						paths["transit.tbf"] = lvlFolder + ConvertCase("transit.tbf", Settings.CapsType.TextureFile);
 					}
@@ -319,6 +323,13 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.Dinosaur) {
+					if (Settings.s.platform == Settings.Platform.PS2) {
+						string timeStamp = reader.ReadString(0x14);
+						reader.ReadUInt32();
+						reader.ReadUInt32();
+						reader.ReadUInt32();
+						reader.ReadUInt32();
+					}
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				}
@@ -365,13 +376,16 @@ namespace OpenSpace.Loader {
 				for (uint i = 0; i < num_fixEntries1; i++) {
 					string savMapName = new string(reader.ReadChars(0xC));
 				}
+				if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+					reader.Align(4);
+				}
 			}
 			uint num_languages = reader.ReadUInt32();
 			Pointer off_languages = Pointer.Read(reader);
 			Pointer.DoAt(ref reader, off_languages, () => {
 				ReadLanguages(reader, off_languages, num_languages);
 			});
-			if (Settings.s.platform == Settings.Platform.PS2 && localization != null) {
+			if (Settings.s.platform == Settings.Platform.PS2 && localization != null && Settings.s.game == Settings.Game.R3) {
 				for (int i = 0; i < localization.num_languages; i++) {
 					if (localization.languages[i].off_textTable == null) {
 						// Load text from file
@@ -427,18 +441,21 @@ namespace OpenSpace.Loader {
 			}
 			if (Settings.s.platform == Settings.Platform.PS2) {
 				sz_videoStructure = 0x108;
-				if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild) {
-					sz_entryActions = 0xF8;
-					sz_binDataForMenu = 0x78;
-				} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_08_07) {
-					sz_entryActions = 0xF8;
-					sz_binDataForMenu = 0;
-				} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_10_29) {
-					sz_entryActions = 0x108; // probably not right but oh well
-					sz_binDataForMenu = 0x1F4;
-				} else {
-					sz_entryActions = 0x10C; // probably not right but oh well
-					sz_binDataForMenu = 0x1A4;
+				if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+				} else if (Settings.s.game == Settings.Game.R3) {
+					if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild) {
+						sz_entryActions = 0xF8;
+						sz_binDataForMenu = 0x78;
+					} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_08_07) {
+						sz_entryActions = 0xF8;
+						sz_binDataForMenu = 0;
+					} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_10_29) {
+						sz_entryActions = 0x108; // probably not right but oh well
+						sz_binDataForMenu = 0x1F4;
+					} else {
+						sz_entryActions = 0x10C; // probably not right but oh well
+						sz_binDataForMenu = 0x1A4;
+					}
 				}
 			} else if (Settings.s.platform == Settings.Platform.Xbox) {
 				sz_videoStructure = 0x108;

@@ -20,7 +20,9 @@ namespace OpenSpace {
 			[Description("R2 (PC) Demo 1 (1999/08/19)")] Rayman2PCDemo1,
 			[Description("R2 (PC) Demo 2 (1999/09/11)")] Rayman2PCDemo2,
 			[Description("Rayman M (PC)")] RaymanMPC,
+			[Description("Rayman M (PS2)")] RaymanMPS2,
 			[Description("Rayman Arena (PC)")] RaymanArenaPC,
+			[Description("Rayman Arena (PS2)")] RaymanArenaPS2,
 			[Description("Rayman Arena (GC)")] RaymanArenaGC,
 			[Description("Rayman Arena Demo (GC)")] RaymanArenaGCDemo,
 			[Description("Rayman Arena (Xbox)")] RaymanArenaXbox,
@@ -64,7 +66,9 @@ namespace OpenSpace {
 			{ "ra_gc", Mode.RaymanArenaGC },
 			{ "ra_demo_gc", Mode.RaymanArenaGCDemo },
 			{ "ra_xbox", Mode.RaymanArenaXbox },
+			{ "ra_ps2", Mode.RaymanArenaPS2 },
 			{ "ra_pc", Mode.RaymanArenaPC },
+			{ "rm_ps2", Mode.RaymanMPS2 },
 			{ "rm_pc", Mode.RaymanMPC },
 			{ "r2_pc", Mode.Rayman2PC },
 			{ "r2_dc", Mode.Rayman2DC },
@@ -364,6 +368,21 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
+		public static Settings RMPS2 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.RM,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.5f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			},
+		};
 		public static Settings RAPC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
@@ -381,7 +400,22 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-        public static Settings RAGC = new Settings() {
+		public static Settings RAPS2 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.RA,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.5f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			},
+		};
+		public static Settings RAGC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
             platform = Platform.GC,
@@ -827,7 +861,9 @@ namespace OpenSpace {
 			{ Mode.Rayman2PCDemo1, R2PCDemo1 },
 			{ Mode.Rayman2PCDemo2, R2PCDemo2 },
 			{ Mode.RaymanMPC, RMPC },
+			{ Mode.RaymanMPS2, RMPS2 },
 			{ Mode.RaymanArenaPC, RAPC },
+			{ Mode.RaymanArenaPS2, RAPS2 },
 			{ Mode.RaymanArenaGC, RAGC },
 			{ Mode.RaymanArenaGCDemo, RAGCDemo },
 			{ Mode.RaymanArenaXbox, RAXbox },

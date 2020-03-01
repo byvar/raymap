@@ -17,60 +17,92 @@ namespace OpenSpace.FileFormat.Texture {
 		public Texture2D[] textures = null;
 		public TBFHeader[] headers = null;
 
-		public TBF(string path) {
+		public TBF(string path, bool hasNames = false) {
 			this.path = path;
 			Stream tbf = FileSystem.GetFileReadStream(path);
 			using (Reader reader = new Reader(tbf, Settings.s.IsLittleEndian)) {
-				List<Texture2D> textures = new List<Texture2D>();
-				List<TBFHeader> headers = new List<TBFHeader>();
-				while (reader.BaseStream.Position < reader.BaseStream.Length) {
-					TBFHeader h = new TBFHeader();
-					h.offset = (uint)reader.BaseStream.Position;
-					h.signature = reader.ReadUInt32();
-					h.flags = reader.ReadUInt32();
-					h.width = reader.ReadUInt32();
-					h.height = reader.ReadUInt32();
-					Texture2D tex = null;
-					switch (h.TypeNumber) {
-						case 0x1: {
-								Color[] palette = ReadPalette(reader, 16, h.HasAlpha);
-								byte[] texData = reader.ReadBytes((int)(h.height * h.width / 2));
-								ezSwizzle s = new ezSwizzle();
-								s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 4, texData);
-								texData = new byte[h.height * h.width];
-								s.readTexPSMT4_mod(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
-								//Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "/textures/lol_" + h.width + "_" + h.height +".bin", texData);
-								tex = CreateTexture(palette, texData, h.width, h.height);
-							}
-							break;
-						case 0x2: {
-								Color[] palette = ReadPalette(reader, 256, h.HasAlpha);
-								byte[] texData = reader.ReadBytes((int)(h.height * h.width));
-								ezSwizzle s = new ezSwizzle();
-								s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 2, texData);
-								texData = new byte[h.height * h.width];
-								s.readTexPSMT8(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
-								tex = CreateTexture(palette, texData, h.width, h.height);
-							}
-							break;
-						case 0:
-							// Do nothing, this is empty
-							if (h.width != 0 || h.height != 0) {
-								throw new InvalidDataException(path + " - " + string.Format("{0:X8}", h.offset) + " - Type 0, but width & height aren't 0!");
-							}
-							break;
-						// Rayman 3 supports types 3 and 4 as well
-						default:
-							throw new InvalidDataException(path + " - " + string.Format("{0:X8}", h.offset) + " - Unknown type: " + h.TypeNumber);
+				if (hasNames) { // for example, TXC file in Rayman M/Arena
+					Count = reader.ReadUInt32();
+					headers = new TBFHeader[Count];
+					for (uint i = 0; i < Count; i++) {
+						TBFHeader h = new TBFHeader();
+						uint len = reader.ReadUInt32();
+						h.name = reader.ReadString((int)len);
+						h.offset = reader.ReadUInt32();
+						headers[i] = h;
 					}
-					//MapLoader.Loader.print(string.Format("{0:X8}", h.offset) + " - " + h.TypeNumber);
-					headers.Add(h);
-					textures.Add(tex);
+					for (uint i = 0; i < Count; i++) {
+						reader.BaseStream.Position = headers[i].offset;
+						ReadTexture(reader, h: headers[i]);
+					}
+				} else {
+					List<Texture2D> textures = new List<Texture2D>();
+					List<TBFHeader> headers = new List<TBFHeader>();
+					while (reader.BaseStream.Position < reader.BaseStream.Length) {
+						TBFHeader h = ReadTexture(reader);
+						headers.Add(h);
+					}
+					Count = (uint)headers.Count;
+					this.textures = headers.Select(h => h.texture).ToArray();
+					this.headers = headers.ToArray();
 				}
-				Count = (uint)headers.Count;
-				this.textures = textures.ToArray();
-				this.headers = headers.ToArray();
 			}
+		}
+
+		public Texture2D GetTextureByName(string name) {
+			// Remove point
+			name = name.ToUpper().Substring(0, name.LastIndexOf('.'));
+			return headers.FirstOrDefault(h => h.name == name + ".TXR")?.texture;
+		}
+
+		private TBFHeader ReadTexture(Reader reader, TBFHeader h = null) {
+			if (h == null) {
+				h = new TBFHeader();
+				h.offset = (uint)reader.BaseStream.Position;
+			}
+			h.signature = reader.ReadUInt32();
+			h.flags = reader.ReadUInt32();
+			h.width = reader.ReadUInt32();
+			h.height = reader.ReadUInt32();
+			switch (h.TypeNumber) {
+				case 0x1: {
+						Color[] palette = ReadPalette(reader, 16, h.HasAlpha);
+						byte[] texData = reader.ReadBytes((int)(h.height * h.width / 2));
+						if (Settings.s.game == Settings.Game.R3) {
+							ezSwizzle s = new ezSwizzle();
+							s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 4, texData);
+							texData = new byte[h.height * h.width];
+							s.readTexPSMT4_mod(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
+						} else {
+							texData = texData.SelectMany(b => new byte[] { (byte)(b & 0xF), (byte)(b >> 4) }).ToArray();
+						}
+						//Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "/textures/lol_" + h.width + "_" + h.height +".bin", texData);
+						h.texture = CreateTexture(palette, texData, h.width, h.height);
+					}
+					break;
+				case 0x2: {
+						Color[] palette = ReadPalette(reader, 256, h.HasAlpha);
+						byte[] texData = reader.ReadBytes((int)(h.height * h.width));
+						if (Settings.s.game == Settings.Game.R3) {
+							ezSwizzle s = new ezSwizzle();
+							s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 2, texData);
+							texData = new byte[h.height * h.width];
+							s.readTexPSMT8(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
+						}
+						h.texture = CreateTexture(palette, texData, h.width, h.height);
+					}
+					break;
+				case 0:
+					// Do nothing, this is empty
+					if (h.width != 0 || h.height != 0) {
+						throw new InvalidDataException(path + " - " + string.Format("{0:X8}", h.offset) + " - Type 0, but width & height aren't 0!");
+					}
+					break;
+				// Rayman 3 supports types 3 and 4 as well
+				default:
+					throw new InvalidDataException(path + " - " + string.Format("{0:X8}", h.offset) + " - Unknown type: " + h.TypeNumber);
+			}
+			return h;
 		}
 
 		private Color[] ReadPalette(Reader reader, int length, bool hasAlpha = true) {
@@ -83,7 +115,7 @@ namespace OpenSpace.FileFormat.Texture {
 				palette[i] = new Color(r / 255f, g / 255f, b / 255f, hasAlpha ? (a / 128f) : 1f);
 			}
 			Color[] pal = palette;
-			if (length == 256) {
+			if (length == 256 && Settings.s.game == Settings.Game.R3) {
 				// Tile
 				pal = new Color[palette.Length];
 				for (int i = 0; i < length; i++) {
@@ -127,6 +159,9 @@ namespace OpenSpace.FileFormat.Texture {
 
 			public uint TypeNumber => flags & 0xF;
 			public bool HasAlpha => (flags & 0x30) == 0x30;
+
+			public string name;
+			public Texture2D texture;
 		}
 	}
 }
