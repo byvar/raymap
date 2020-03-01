@@ -379,6 +379,7 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
+			hasNames = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
@@ -411,6 +412,7 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
+			hasNames = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},

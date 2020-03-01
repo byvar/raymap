@@ -45,6 +45,7 @@ namespace OpenSpace.Input {
         public static EntryAction Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
             EntryAction ea = new EntryAction(offset);
+            //l.print("EntryAction " + offset);
 			l.entryActions.Add(ea);
 
             if (Settings.s.game == Settings.Game.TTSE) {
@@ -69,7 +70,10 @@ namespace OpenSpace.Input {
                 if (Settings.s.hasExtraInputData) {
                     reader.ReadBytes(0x18);
                 }
-                if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18) {
+                if (Settings.s.platform == Settings.Platform.PS2 &&
+                    (Settings.s.game == Settings.Game.RM
+                    || Settings.s.game == Settings.Game.RA
+                    || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18)) {
                     reader.ReadBytes(0x8);
                 }
                 ea.num_keywords = reader.ReadUInt32();

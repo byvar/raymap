@@ -30,7 +30,7 @@ namespace OpenSpace.Visual {
         public byte properties;
         private Material material;
         //private Material materialBillboard;
-
+        
         // UV scrolling
         public int currentAnimTexture = 0;
 
@@ -325,8 +325,11 @@ namespace OpenSpace.Visual {
 				if (Settings.s.game == Settings.Game.Dinosaur) {
 					reader.ReadBytes(0x1C);
                 }
+                Pointer off_ps2Tex = null;
                 if (Settings.s.platform == Settings.Platform.PS2) {
-                    reader.ReadBytes(0x20);
+                    reader.ReadUInt32();
+                    off_ps2Tex = Pointer.Read(reader);
+                    reader.ReadBytes(0x18);
                 }
                 m.off_animTextures_first = Pointer.Read(reader);
                 m.off_animTextures_current = Pointer.Read(reader);
@@ -345,6 +348,9 @@ namespace OpenSpace.Visual {
                     t.offset = Pointer.Current(reader);
                     //l.print(t.offset);
                     t.off_texture = Pointer.Read(reader);
+                    if (t.off_texture == null && i == 0 && off_ps2Tex != null) {
+                        t.off_texture = off_ps2Tex;
+                    }
                     if (t.off_texture == null) break;
 					/*if (Settings.s.game == Settings.Game.Dinosaur) {
 						Pointer.DoAt(ref reader, t.off_texture, () => {

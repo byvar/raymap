@@ -241,17 +241,87 @@ namespace OpenSpace.Visual {
 					OPT_unityMesh = new Mesh();
 					Vector3[] vertices = sdc.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
 					OPT_unityMesh.vertices = vertices;
-					OPT_unityMesh.triangles = Enumerable.Range(0, vertices.Length).ToArray();
+					new_boneWeights = (geo.bones == null) ? null : new BoneWeight[vertices.Length];
+					/*if (Settings.s.game == Settings.Game.R3) {
+						OPT_unityMesh.triangles = Enumerable.Range(0, vertices.Length).ToArray();
+					} else {*/
+					int[] tris = new int[sdc.geo.num_triangles[sdc.index] * triangle_size];
+					for (int i = 0; i < sdc.geo.num_triangles[sdc.index]; i++) {
+						tris[i * triangle_size + 0] = i * 3 + 0;
+						tris[i * triangle_size + 1] = i * 3 + 1;
+						tris[i * triangle_size + 2] = i * 3 + 2;
+						tris[i * triangle_size + 3] = i * 3 + 0;
+						tris[i * triangle_size + 4] = i * 3 + 2;
+						tris[i * triangle_size + 5] = i * 3 + 1;
+					}
+					OPT_unityMesh.triangles = tris;
+					//}
 					uint num_textures = Math.Max(1, visualMaterial.num_textures_in_material);
 					for (int t = 0; t < num_textures; t++) {
-						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t, applyBlendWeight: true)).ToList();
+						List<Vector3> uv = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetUV(v, t, applyBlendWeight: sdc.geo.Type != 3)).ToList();
 						OPT_unityMesh.SetUVs(t, uv.ToArray());
 					}
-					Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
-					OPT_unityMesh.SetUVs((int)num_textures, colors);
-					OPT_unityMesh.RecalculateNormals();
-					//m.uv = 
-					//OPT_unityMesh.RecalculateNormals();
+					if (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3) {
+						Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
+						OPT_unityMesh.SetUVs((int)num_textures, colors);
+					} else {
+						Vector3[] calculatedNormals = new Vector3[geo.num_vertices];
+						if (sdc.normals == null && geo.normals == null) {
+							// Calculate normals here
+							Mesh tempMesh = new Mesh();
+							Vector3[] new_vertices = new Vector3[num_triangles * 3];
+							int triangles_index = 0;
+							int[] unityTriangles = new int[num_triangles * 3];
+							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
+								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
+								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
+								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
+								new_vertices[m0] = geo.vertices[i0];
+								new_vertices[m1] = geo.vertices[i1];
+								new_vertices[m2] = geo.vertices[i2];
+								unityTriangles[triangles_index + 0] = m0;
+								unityTriangles[triangles_index + 1] = m2;
+								unityTriangles[triangles_index + 2] = m1;
+							}
+							tempMesh.vertices = new_vertices;
+							tempMesh.triangles = unityTriangles;
+							tempMesh.RecalculateNormals();
+							triangles_index = 0;
+							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
+								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
+								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
+								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
+								calculatedNormals[i0] = tempMesh.normals[m0];
+								calculatedNormals[i1] = tempMesh.normals[m1];
+								calculatedNormals[i2] = tempMesh.normals[m2];
+							}
+
+						}
+						normals = new Vector3[vertices.Length];
+						// Also set bone weights
+						for (int i = 0; i < triangles.Length; i++) {
+							int vertIndexInSdc = i;
+							int vertIndexInGeo = triangles[i];
+							if (vertIndexInSdc < vertices.Length) {
+								if (new_boneWeights != null) {
+									new_boneWeights[vertIndexInSdc] = geo.bones.weights[vertIndexInGeo];
+								}
+								if (geo.normals != null) {
+									normals[vertIndexInSdc] = geo.normals[vertIndexInGeo];
+								} else {
+									normals[vertIndexInSdc] = calculatedNormals[vertIndexInGeo];
+								}
+								//normals[vertIndexInSdc] = geo.normals[i];
+							}
+						}
+					}
+					if (sdc.normals != null) {
+						OPT_unityMesh.normals = Enumerable.Range(0, vertices.Length).Select(v => sdc.GetNormal(v)).ToArray();
+					} else if (sdc.geo.Type == 3 && Settings.s.game != Settings.Game.R3) {
+						OPT_unityMesh.normals = normals;
+					} else {
+						OPT_unityMesh.RecalculateNormals();
+					}
 				}
 
 				if (new_boneWeights != null) {
@@ -537,7 +607,7 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
-				if (((sdc != null && sdc.geo.Type != 6) || vertexColors != null) && unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
+				if (((sdc != null && sdc.geo.Type != 6 && (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3)) || vertexColors != null) && unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
                 /*if (num_uvMaps > 1) {

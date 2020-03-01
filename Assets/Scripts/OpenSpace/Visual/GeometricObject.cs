@@ -162,10 +162,12 @@ namespace OpenSpace.Visual {
 					reader.ReadInt32();
 					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 						reader.ReadInt32();
-						reader.ReadInt16();
-						if (Settings.s.platform == Settings.Platform.PS2) {
+						if (!(Settings.s.platform == Settings.Platform.PS2 && (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA))) {
 							reader.ReadInt16();
-							reader.ReadUInt32();
+							if (Settings.s.platform == Settings.Platform.PS2) {
+								reader.ReadInt16();
+								reader.ReadUInt32();
+							}
 						}
 					}
 				} else {
@@ -186,7 +188,9 @@ namespace OpenSpace.Visual {
 				m.optimizedObject = new Pointer<PS2OptimizedSDCStructure>(reader, resolve: false);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
-				m.ps2IsSinus = reader.ReadUInt32();
+				if (Settings.s.game == Settings.Game.R3) {
+					m.ps2IsSinus = reader.ReadUInt32();
+				}
 			}
             // Vertices
 			Pointer.DoAt(ref reader, m.off_vertices, () => {
@@ -307,6 +311,8 @@ namespace OpenSpace.Visual {
 				if (element_types[i] != 1) continue;
 				PS2OptimizedSDCStructureElement sdcEl = sdc.elements[sdcIndex];
 				GeometricObjectElementTriangles mainEl = elements[i] as GeometricObjectElementTriangles;
+				if (mainEl.visualMaterial == null) mainEl.visualMaterial = sdc.visualMaterials[sdcIndex];
+				//MapLoader.Loader.print(name + " - " + mainEl.visualMaterial.offset);
 				if (sdc.visualMaterials[sdcIndex] != mainEl.visualMaterial) {
 					Debug.LogWarning("SDC and Main materials did not match!");
 				}

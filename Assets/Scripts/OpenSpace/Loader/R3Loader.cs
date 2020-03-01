@@ -442,6 +442,7 @@ namespace OpenSpace.Loader {
 			if (Settings.s.platform == Settings.Platform.PS2) {
 				sz_videoStructure = 0x108;
 				if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+					sz_entryActions = 0xE8;
 				} else if (Settings.s.game == Settings.Game.R3) {
 					if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild) {
 						sz_entryActions = 0xF8;
@@ -562,6 +563,10 @@ namespace OpenSpace.Loader {
 				|| Settings.s.platform == Settings.Platform.PS2)) {
 				reader.ReadUInt32(); // fix checksum?
 			}
+			if (Settings.s.platform == Settings.Platform.PS2 &&
+				(Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA)) {
+				reader.ReadUInt32(); // fix checksum?
+			}
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
@@ -583,6 +588,11 @@ namespace OpenSpace.Loader {
 				} else if (Settings.s.game == Settings.Game.RM
 					|| Settings.s.game == Settings.Game.RA
 					|| Settings.s.game == Settings.Game.Dinosaur) {
+					if (Settings.s.platform == Settings.Platform.PS2) {
+						string timeStamp = reader.ReadString(0x18);
+						reader.ReadUInt32();
+						reader.ReadUInt32();
+					}
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				}
@@ -689,6 +699,18 @@ namespace OpenSpace.Loader {
 				byte IPO_numRLItables = reader.ReadByte();
 				reader.ReadUInt16();
 			}
+
+			if (Settings.s.platform == Settings.Platform.PS2 && (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM)) {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
+				Matrix identity = Matrix.Read(reader, Pointer.Current(reader));
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+			}
 			Pointer off_COL_taggedFacesTable = Pointer.Read(reader);
 			uint num_COL_maxTaggedFaces = reader.ReadUInt32();
 			if (Settings.s.platform != Settings.Platform.PS2) {
@@ -711,31 +733,38 @@ namespace OpenSpace.Loader {
 
 
 			uint num_internalStructure = num_ptrsTable;
-			if (Settings.s.mode == Settings.Mode.Rayman3GC || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18) {
+			if (Settings.s.mode == Settings.Mode.Rayman3GC
+				|| Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18
+				|| (Settings.s.platform == Settings.Platform.PS2 && (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM))) {
 				reader.ReadUInt32();
 			}
 			Pointer off_internalStructure_first = Pointer.Read(reader);
 			Pointer off_internalStructure_last = Pointer.Read(reader);
 
-			if (Settings.s.platform != Settings.Platform.PS2 && !hasTransit && Settings.s.game == Settings.Game.R3) {
-				uint num_geometric = reader.ReadUInt32();
-				Pointer off_array_geometric = Pointer.Read(reader);
-				Pointer off_array_geometric_RLI = Pointer.Read(reader);
-				Pointer off_array_transition_flags = Pointer.Read(reader);
-			} else if (Settings.s.game == Settings.Game.RA
-				|| Settings.s.game == Settings.Game.RM
-				|| Settings.s.game == Settings.Game.Dinosaur
-				|| Settings.s.game == Settings.Game.DDPK) {
-				uint num_unk = reader.ReadUInt32();
-				Pointer unk_first = Pointer.Read(reader);
-				if (Settings.s.game != Settings.Game.Dinosaur) {
-					Pointer unk_last = Pointer.Read(reader);
+			if (Settings.s.platform != Settings.Platform.PS2) {
+				if (!hasTransit && Settings.s.game == Settings.Game.R3) {
+					uint num_geometric = reader.ReadUInt32();
+					Pointer off_array_geometric = Pointer.Read(reader);
+					Pointer off_array_geometric_RLI = Pointer.Read(reader);
+					Pointer off_array_transition_flags = Pointer.Read(reader);
+				} else if (Settings.s.game == Settings.Game.RA
+					|| Settings.s.game == Settings.Game.RM
+					|| Settings.s.game == Settings.Game.Dinosaur
+					|| Settings.s.game == Settings.Game.DDPK) {
+					uint num_unk = reader.ReadUInt32();
+					Pointer unk_first = Pointer.Read(reader);
+					if (Settings.s.game != Settings.Game.Dinosaur) {
+						Pointer unk_last = Pointer.Read(reader);
+					}
 				}
 			}
 			Pointer off_settingsForPersoInFix = null;
 			if (Settings.s.platform == Settings.Platform.PS2) {
 				off_settingsForPersoInFix = Pointer.Current(reader);
-				uint num_persoInFix = reader.ReadUInt32();
+				uint num_persoInFix = (uint)persoInFix.Length;
+				if (Settings.s.game == Settings.Game.R3) {
+					num_persoInFix = reader.ReadUInt32();
+				}
 				for (int i = 0; i < num_persoInFix; i++) {
 					if (Settings.s.game == Settings.Game.R3) {
 						Pointer.Read(reader);
@@ -750,8 +779,10 @@ namespace OpenSpace.Loader {
 					}
 				}
 				Pointer.Read(reader);
-				reader.ReadUInt32();
-				reader.ReadUInt32();
+				if (Settings.s.game == Settings.Game.R3 || Settings.s.game == Settings.Game.DDPK) {
+					reader.ReadUInt32();
+					reader.ReadUInt32();
+				}
 			}
 
 			uint num_visual_materials = reader.ReadUInt32();
@@ -876,7 +907,7 @@ namespace OpenSpace.Loader {
 			}
 			// Load additional animation banks
 			string extraAnimFolder = "Anim/";
-			if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
+			if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo || Settings.s.platform == Settings.Platform.PS2) {
 				extraAnimFolder = lvlName + "/";
 			}
 			for (int i = 0; i < families.Count; i++) {
@@ -885,7 +916,7 @@ namespace OpenSpace.Loader {
 					loadingState = "Loading additional animation bank " + animBank;
 					await WaitIfNecessary();
 					int animFileID = objectTypes[0][families[i].family_index].id;
-					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
+					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo || Settings.s.platform == Settings.Platform.PS2) {
 						animFileID = animBank - 5;
 					}
 					string animName = extraAnimFolder + "ani" + animFileID.ToString();
@@ -894,18 +925,22 @@ namespace OpenSpace.Loader {
 					//print(animBank + " - " + objectTypes[0][families[i].family_index].id);
 					int fileID = animBank + 102;
 					int kfFileID = animBank + 2; // Anim bank will start at 5, so this will start at 7
-					if (Settings.s.game == Settings.Game.RM) {
+					if (Settings.s.game == Settings.Game.RM || (Settings.s.game == Settings.Game.RA && Settings.s.platform == Settings.Platform.PS2)) {
 						fileID = animBank;
 					}
 
 					// Prepare files for WebGL
-					await PrepareFile(gameDataBinFolder + animName + ".lvl");
-					if (FileSystem.FileExists(gameDataBinFolder + animName + ".lvl")) {
-						await PrepareFile(gameDataBinFolder + animName + ".ptr");
+					string animFileLvl = gameDataBinFolder + animName + ".lvl";
+					string animFilePtr = gameDataBinFolder + animName + ".ptr";
+					string kfFileLvl = gameDataBinFolder + kfName + ".lvl";
+					string kfFilePtr = gameDataBinFolder + kfName + ".ptr";
+					await PrepareFile(animFileLvl);
+					if (FileSystem.FileExists(animFileLvl)) {
+						await PrepareFile(animFilePtr);
 					}
-					await PrepareFile(gameDataBinFolder + kfName + ".lvl");
-					if (FileSystem.FileExists(gameDataBinFolder + kfName + ".lvl")) {
-						await PrepareFile(gameDataBinFolder + kfName + ".ptr");
+					await PrepareFile(kfFileLvl);
+					if (FileSystem.FileExists(kfFileLvl)) {
+						await PrepareFile(kfFilePtr);
 					}
 
 					FileWithPointers animFile = InitExtraLVL(animName, fileID);
@@ -916,8 +951,17 @@ namespace OpenSpace.Loader {
 						}
 						Pointer off_animBankExtra = new Pointer(0, animFile);
 						Pointer.DoAt(ref reader, off_animBankExtra, () => {
-							int alignBytes = reader.ReadInt32();
-							if (alignBytes > 0) reader.Align(4, alignBytes);
+							if (Settings.s.platform == Settings.Platform.PS2) {
+								string timestamp = reader.ReadString(0x18);
+								reader.ReadUInt32();
+								reader.ReadUInt32();
+								reader.ReadUInt32();
+								reader.ReadUInt32();
+								reader.ReadUInt32();
+							} else {
+								int alignBytes = reader.ReadInt32();
+								if (alignBytes > 0) reader.Align(4, alignBytes);
+							}
 							off_animBankExtra = Pointer.Current(reader);
 							animationBanks[animBank] = AnimationBank.Read(reader, off_animBankExtra, (uint)animBank, 1, kfFile)[0];
 						});

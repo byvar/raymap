@@ -23,7 +23,8 @@ namespace OpenSpace.Animation.Component {
 		protected override void ReadInternal(Reader reader) {
 			if (Settings.s.engineVersion < Settings.EngineVersion.R3
 				|| Settings.s.game == Settings.Game.RM
-				|| Settings.s.game == Settings.Game.Dinosaur) {
+				|| Settings.s.game == Settings.Game.Dinosaur
+                || (Settings.s.game == Settings.Game.RA && Settings.s.platform == Settings.Platform.PS2)) {
 				x = reader.ReadSingle();
 				y = reader.ReadSingle();
 				z = reader.ReadSingle();
@@ -38,7 +39,8 @@ namespace OpenSpace.Animation.Component {
 			positionVector = reader.ReadUInt16();
 			if (Settings.s.engineVersion < Settings.EngineVersion.R3
 				|| Settings.s.game == Settings.Game.RM
-				|| Settings.s.game == Settings.Game.Dinosaur) {
+				|| Settings.s.game == Settings.Game.Dinosaur
+                || (Settings.s.game == Settings.Game.RA && Settings.s.platform == Settings.Platform.PS2)) {
 				reader.ReadUInt16();
 				reader.ReadUInt16();
 				reader.ReadUInt16();

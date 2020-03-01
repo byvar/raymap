@@ -80,6 +80,7 @@ namespace OpenSpace.Object.Properties {
 
         public static State Read(Reader reader, Pointer offset, Family family, int index) {
             MapLoader l = MapLoader.Loader;
+            //l.print("State " + Pointer.Current(reader));
             State s = new State(offset, family, index);
             l.states.Add(s);
             if (Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');

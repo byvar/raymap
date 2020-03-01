@@ -421,7 +421,7 @@ MonoBehaviour.print(str);
             string ptrPath = path + ".ptr";
             if (FileSystem.FileExists(lvlPath)) {
                 Array.Resize(ref files_array, files_array.Length + 1);
-                LVL lvl = new LVL(lvlName, lvlPath, id);
+				LVL lvl = new LVL(lvlName, lvlPath, id);
                 files_array[files_array.Length - 1] = lvl;
                 if (FileSystem.FileExists(ptrPath)) {
                     lvl.ReadPTR(ptrPath);
@@ -743,13 +743,16 @@ MonoBehaviour.print(str);
                 num_textures_lvl = reader.ReadUInt32();
                 num_textures_total = num_textures_fix + num_textures_lvl;
             } else {
-				if (Settings.s.platform == Settings.Platform.PS2) {
+				if (Settings.s.platform == Settings.Platform.PS2
+					&& (Settings.s.game == Settings.Game.R3
+					|| Settings.s.game == Settings.Game.DDPK)) {
 					num_textures_lvl = reader.ReadUInt32();
 					num_textures_fix = (uint)textures.Length;
 					num_textures_total = num_textures_fix + num_textures_lvl;
 				} else {
-					num_textures_total = Settings.s.platform == Settings.Platform.GC ? reader.ReadUInt32() : 1024;
-					num_textures_fix = Settings.s.platform == Settings.Platform.GC ? (uint)textures.Length : reader.ReadUInt32();
+					bool readTotal = (Settings.s.platform == Settings.Platform.GC || Settings.s.platform == Settings.Platform.PS2);
+					num_textures_total = readTotal ? reader.ReadUInt32() : 1024;
+					num_textures_fix = readTotal ? (uint)textures.Length : reader.ReadUInt32();
 					num_textures_lvl = num_textures_total - num_textures_fix;
 				}
             }
@@ -845,11 +848,16 @@ MonoBehaviour.print(str);
 			} else if (Settings.s.platform == Settings.Platform.PS2) {
 				// Load textures from TPL
 				TBF fixTBF = null;
+
+				bool hasNames = (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA);
 				TBF lvlTBF = new TBF(paths["lvl.tbf"]);
 				TBF transitTBF = hasTransit ? new TBF(paths["transit.tbf"]) : null;
 				print("Lvl TBF Texture count: " + lvlTBF.Count);
 				if (hasTransit) print("Transit TBF Texture count: " + transitTBF.Count);
 				Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
+				if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA) {
+					texturesSeenFile[2] = (int)num_textures_fix;
+				}
 				for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					uint file_texture = reader.ReadUInt32();
 					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
@@ -859,10 +867,14 @@ MonoBehaviour.print(str);
 					Texture2D tex = null;
 					//string type = "";
 					if (file_texture == 0) {
-						if (fixTBF == null) fixTBF = new TBF(paths["fix.tbf"]);
-						tex = fixTBF.textures[(int)num_textures_fix + texturesSeenFile[file_texture]];
+						if (fixTBF == null) fixTBF = new TBF(paths["fix.tbf"], hasNames: hasNames);
+						if (hasNames) {
+							tex = fixTBF.GetTextureByName(textures[i].name);
+						} else {
+							tex = fixTBF.textures[(int)num_textures_fix + texturesSeenFile[file_texture]];
+						}
 						//type = string.Format("{0:X4}", fixTBF.headers[(int)num_textures_fix + texturesSeenFile[file_texture]].flags);
-						if (Settings.s.game == Settings.Game.RA) {
+						if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
 							if (!texturesSeenFile.ContainsKey(2)) texturesSeenFile[2] = 0;
 							texturesSeenFile[2]++;
 						}
