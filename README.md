@@ -11,12 +11,14 @@ Map viewer/editor for OpenSpace games:
 * Rayman 2 (3DS)
 * Rayman 2: Revolution (PS2)
 * Rayman M (PC)
+* Rayman M (PS2) + Demo
 * Rayman Arena (PC)
-* Rayman Arena (GC)
+* Rayman Arena (PS2)
+* Rayman Arena (GC) + Prototype
 * Rayman Arena (Xbox)
 * Rayman 3 (PC)
 * Rayman 3 (GC)
-* Rayman 3 (PS2)
+* Rayman 3 (PS2) + Demos & Dev Build
 * Rayman 3 (Xbox)
 * Rayman 3 HD (Xbox 360)
 * Rayman 3 HD (PS3)
