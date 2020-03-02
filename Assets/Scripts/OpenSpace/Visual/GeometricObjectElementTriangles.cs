@@ -612,7 +612,7 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
-				if (((sdc != null && sdc.geo.Type != 6 && (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3)) || vertexColors != null) && unityMat != null) unityMat.SetFloat("_Prelit", 1f);
+				if (((sdc != null && (sdc.geo.Type != 6 || (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3))) || vertexColors != null) && unityMat != null) unityMat.SetFloat("_Prelit", 1f);
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
                 /*if (num_uvMaps > 1) {

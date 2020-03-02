@@ -10,6 +10,8 @@ namespace OpenSpace {
     public class Settings {
         public enum Mode {
 			[Description("Rayman 2 (PC)")] Rayman2PC,
+			[Description("R2 (PC) Demo 1 (1999/08/19)")] Rayman2PCDemo1,
+			[Description("R2 (PC) Demo 2 (1999/09/11)")] Rayman2PCDemo2,
 			[Description("Rayman 2 (DC)")] Rayman2DC,
 			[Description("Rayman 2 (iOS)")] Rayman2IOS,
 			[Description("Rayman 2 (PS1)")] Rayman2PS1,
@@ -17,10 +19,9 @@ namespace OpenSpace {
 			[Description("Rayman 2 (N64)")] Rayman2N64,
 			[Description("Rayman 2 (DS)")] Rayman2DS,
 			[Description("Rayman 2 (3DS)")] Rayman23DS,
-			[Description("R2 (PC) Demo 1 (1999/08/19)")] Rayman2PCDemo1,
-			[Description("R2 (PC) Demo 2 (1999/09/11)")] Rayman2PCDemo2,
 			[Description("Rayman M (PC)")] RaymanMPC,
 			[Description("Rayman M (PS2)")] RaymanMPS2,
+			[Description("RM (PS2) Demo (2001/07/25)")] RaymanMPS2Demo,
 			[Description("Rayman Arena (PC)")] RaymanArenaPC,
 			[Description("Rayman Arena (PS2)")] RaymanArenaPS2,
 			[Description("Rayman Arena (GC)")] RaymanArenaGC,
@@ -69,8 +70,11 @@ namespace OpenSpace {
 			{ "ra_ps2", Mode.RaymanArenaPS2 },
 			{ "ra_pc", Mode.RaymanArenaPC },
 			{ "rm_ps2", Mode.RaymanMPS2 },
+			{ "rm_demo_ps2", Mode.RaymanMPS2Demo },
 			{ "rm_pc", Mode.RaymanMPC },
 			{ "r2_pc", Mode.Rayman2PC },
+			{ "r2_demo1_pc", Mode.Rayman2PCDemo1 },
+			{ "r2_demo2_pc", Mode.Rayman2PCDemo2 },
 			{ "r2_dc", Mode.Rayman2DC },
 			{ "r2_ios", Mode.Rayman2IOS },
 			{ "r2_ps1", Mode.Rayman2PS1 },
@@ -85,8 +89,6 @@ namespace OpenSpace {
 			{ "ddpk_gc", Mode.DonaldDuckPKGC },
 			{ "tt_pc", Mode.TonicTroublePC },
 			{ "ttse_pc", Mode.TonicTroubleSEPC },
-			{ "r2_demo1_pc", Mode.Rayman2PCDemo1 },
-			{ "r2_demo2_pc", Mode.Rayman2PCDemo2 },
 			{ "playmobil_hype_pc", Mode.PlaymobilHypePC },
 			{ "playmobil_alex_pc", Mode.PlaymobilAlexPC },
 			{ "playmobil_laura_pc", Mode.PlaymobilLauraPC },
@@ -369,6 +371,22 @@ namespace OpenSpace {
 			},
 		};
 		public static Settings RMPS2 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.RM,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.5f,
+			saturate = false,
+			hasNames = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			},
+		};
+		public static Settings RMPS2Demo = new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RM,
 			platform = Platform.PS2,
@@ -853,6 +871,8 @@ namespace OpenSpace {
 
 		public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
 			{ Mode.Rayman2PC, R2PC },
+			{ Mode.Rayman2PCDemo1, R2PCDemo1 },
+			{ Mode.Rayman2PCDemo2, R2PCDemo2 },
 			{ Mode.Rayman2DC, R2DC },
 			{ Mode.Rayman2IOS, R2IOS },
 			{ Mode.Rayman2PS1, R2PS1 },
@@ -860,10 +880,9 @@ namespace OpenSpace {
 			{ Mode.Rayman2N64, R2N64 },
 			{ Mode.Rayman2DS, R2DS },
 			{ Mode.Rayman23DS, R23DS },
-			{ Mode.Rayman2PCDemo1, R2PCDemo1 },
-			{ Mode.Rayman2PCDemo2, R2PCDemo2 },
 			{ Mode.RaymanMPC, RMPC },
 			{ Mode.RaymanMPS2, RMPS2 },
+			{ Mode.RaymanMPS2Demo, RMPS2Demo },
 			{ Mode.RaymanArenaPC, RAPC },
 			{ Mode.RaymanArenaPS2, RAPS2 },
 			{ Mode.RaymanArenaGC, RAGC },
