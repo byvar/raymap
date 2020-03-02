@@ -326,10 +326,12 @@ namespace OpenSpace.Visual {
 					reader.ReadBytes(0x1C);
                 }
                 Pointer off_ps2Tex = null;
+                Vector4 ps2Scroll = Vector4.zero;
                 if (Settings.s.platform == Settings.Platform.PS2) {
                     reader.ReadUInt32();
                     off_ps2Tex = Pointer.Read(reader);
-                    reader.ReadBytes(0x18);
+                    ps2Scroll = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                    reader.ReadBytes(0x8);
                 }
                 m.off_animTextures_first = Pointer.Read(reader);
                 m.off_animTextures_current = Pointer.Read(reader);
@@ -348,8 +350,15 @@ namespace OpenSpace.Visual {
                     t.offset = Pointer.Current(reader);
                     //l.print(t.offset);
                     t.off_texture = Pointer.Read(reader);
+                    bool usePs2Scroll = false;
                     if (t.off_texture == null && i == 0 && off_ps2Tex != null) {
                         t.off_texture = off_ps2Tex;
+
+                        t.currentScrollX = ps2Scroll.x;
+                        t.currentScrollY = ps2Scroll.y;
+                        t.scrollX = ps2Scroll.z;
+                        t.scrollY = ps2Scroll.w;
+                        usePs2Scroll = true;
                     }
                     if (t.off_texture == null) break;
 					/*if (Settings.s.game == Settings.Game.Dinosaur) {
@@ -372,10 +381,18 @@ namespace OpenSpace.Visual {
 						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-						t.currentScrollX = reader.ReadSingle();
-						t.currentScrollY = reader.ReadSingle();
-						t.scrollX = reader.ReadSingle();
-						t.scrollY = reader.ReadSingle();
+                        if (!usePs2Scroll) {
+                            t.currentScrollX = reader.ReadSingle();
+                            t.currentScrollY = reader.ReadSingle();
+                            t.scrollX = reader.ReadSingle();
+                            t.scrollY = reader.ReadSingle();
+                        } else {
+                            reader.ReadSingle();
+                            reader.ReadSingle();
+                            reader.ReadSingle();
+                            reader.ReadSingle();
+                            if (t.scrollByte == 0 && ps2Scroll != Vector4.zero) t.scrollByte = 6;
+                        }
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
@@ -388,10 +405,18 @@ namespace OpenSpace.Visual {
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
-                        t.currentScrollX = reader.ReadSingle();
-                        t.currentScrollY = reader.ReadSingle();
-                        t.scrollX = reader.ReadSingle();
-                        t.scrollY = reader.ReadSingle();
+                        if (!usePs2Scroll) {
+                            t.currentScrollX = reader.ReadSingle();
+                            t.currentScrollY = reader.ReadSingle();
+                            t.scrollX = reader.ReadSingle();
+                            t.scrollY = reader.ReadSingle();
+                        } else {
+                            reader.ReadSingle();
+                            reader.ReadSingle();
+                            reader.ReadSingle();
+                            reader.ReadSingle();
+                            if (t.scrollByte == 0 && ps2Scroll != Vector4.zero) t.scrollByte = 6;
+                        }
                         t.rotateSpeed = reader.ReadSingle();
                         t.rotateDirection = reader.ReadSingle();
                         reader.ReadInt32();

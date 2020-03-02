@@ -8,6 +8,7 @@
 uniform float4 _AmbientCoef;
 uniform float4 _DiffuseCoef;
 
+float _Prelit;
 float _NumTextures;
 sampler2D _Tex0;
 sampler2D _Tex1;
@@ -256,10 +257,10 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	o.normal = normalDirection;
 	o.multipliedPosition = multipliedPosition;
 	o.diffuseColor = float4(ambientLighting + diffuseReflection, alpha);
-	if (_Tex2Params.x == 60 && !(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0)) {
+	if (_Prelit == 1 && !(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0)) {
 		// Prelit
 		//o.diffuseColor = v.texcoord2; // RGBA, so both need to be vector4
-		o.diffuseColor = _DiffuseCoef * v.texcoord2; // RGBA, so both need to be vector4
+		o.diffuseColor = _DiffuseCoef * v.color; // RGBA, so both need to be vector4
 	}
 	// Process mirror or portal, this weird construction is so that it's faster
 	if (_NumTextures > 0) {

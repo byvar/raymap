@@ -162,8 +162,8 @@ namespace OpenSpace.Visual {
 						g.transform.localScale = Vector3.one * 0.2f;
 					}*/
 					if (sdc.geo.Type != 6) {
-						Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
-						OPT_unityMesh.SetUVs((int)num_textures, colors);
+						Color[] colors = Enumerable.Range(0, vertices.Length).Select(i => (Color)sdc.GetColor(i)).ToArray();
+						OPT_unityMesh.SetColors(colors);
 					} else {
 						Vector3[] calculatedNormals = new Vector3[geo.num_vertices];
 						if (sdc.normals == null && geo.normals == null) {
@@ -262,8 +262,9 @@ namespace OpenSpace.Visual {
 						OPT_unityMesh.SetUVs(t, uv.ToArray());
 					}
 					if (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3) {
-						Vector4[] colors = Enumerable.Range(0, vertices.Length).Select(i => sdc.GetColor(i)).ToArray();
-						OPT_unityMesh.SetUVs((int)num_textures, colors);
+						Color[] colors = Enumerable.Range(0, vertices.Length).Select(i => (Color)sdc.GetColor(i)).ToArray();
+						OPT_unityMesh.SetColors(colors);
+						//OPT_unityMesh.SetUVs((int)num_textures, colors);
 					} else {
 						Vector3[] calculatedNormals = new Vector3[geo.num_vertices];
 						if (sdc.normals == null && geo.normals == null) {
@@ -335,6 +336,7 @@ namespace OpenSpace.Visual {
 			} else {
 				gao.name = "[Optimized] " + gao.name;
 				gao.name += " - " + sdc.offset;
+				gao.name += " - " + sdc.colors?.Length;
 			}
 			if (geo.bones != null) {
 				OPT_mr = OPT_gao.AddComponent<SkinnedMeshRenderer>();
@@ -500,15 +502,15 @@ namespace OpenSpace.Visual {
 				uint triangles_index = 0;
 				Vector3[] new_vertices = new Vector3[OPT_num_mapping_entries];
                 Vector3[] new_normals = new Vector3[OPT_num_mapping_entries];
-                Vector4[][] new_uvs = new Vector4[num_textures + (vertexColors != null ? 1 : 0)][]; // Thanks to Unity we can only store the blend weights as a third component of the UVs
+                Vector4[][] new_uvs = new Vector4[num_textures][]; // Thanks to Unity we can only store the blend weights as a third component of the UVs
+				Color[] colors = vertexColors == null ? null : new Color[OPT_num_mapping_entries];
                 BoneWeight[] new_boneWeights = geo.bones != null ? new BoneWeight[OPT_num_mapping_entries] : null;
                 for (int um = 0; um < num_textures; um++) {
                     new_uvs[um] = new Vector4[OPT_num_mapping_entries];
                 }
 				if (vertexColors != null) {
-					new_uvs[num_textures] = new Vector4[OPT_num_mapping_entries];
 					for (int i = 0; i < OPT_num_mapping_entries; i++) {
-						new_uvs[num_textures][i] = new Vector4(vertexColors[i].r, vertexColors[i].g, vertexColors[i].b, vertexColors[i].a);
+						colors[i] = new Color(vertexColors[i].r, vertexColors[i].g, vertexColors[i].b, vertexColors[i].a);
 					}
 				}
                 for (int j = 0; j < OPT_num_mapping_entries; j++) {
@@ -565,6 +567,9 @@ namespace OpenSpace.Visual {
 					OPT_unityMesh.vertices = new_vertices;
 					if (geo.normals != null) OPT_unityMesh.normals = new_normals;
 					OPT_unityMesh.triangles = unityTriangles;
+					if (colors != null) {
+						OPT_unityMesh.colors = colors;
+					}
 					if (new_boneWeights != null) {
 						OPT_unityMesh.boneWeights = new_boneWeights;
 						OPT_unityMesh.bindposes = geo.bones.bindPoses;
@@ -607,7 +612,7 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
-				if (((sdc != null && sdc.geo.Type != 6 && (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3)) || vertexColors != null) && unityMat != null) unityMat.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
+				if (((sdc != null && sdc.geo.Type != 6 && (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3)) || vertexColors != null) && unityMat != null) unityMat.SetFloat("_Prelit", 1f);
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
                 /*if (num_uvMaps > 1) {

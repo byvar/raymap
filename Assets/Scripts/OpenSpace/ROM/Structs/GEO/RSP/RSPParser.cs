@@ -105,7 +105,7 @@ namespace OpenSpace.ROM.RSP {
 			mesh.vertices = verts.Select(v => v.GetVector(go.ScaleFactor)).ToArray();
 			//mesh.normals = verts.Select(v => v.GetVector(Int16.MaxValue)).ToArray();
 			mesh.SetUVs(0, verts.Select(v => new Vector3(v.u / 32f / wFactor, v.v / 32f / hFactor, 1f)).ToList());
-			mesh.SetUVs(1, verts.Select(v => new Vector4(v.color.r, v.color.g, v.color.b, v.color.a)).ToList());
+			mesh.SetColors(verts.Select(v => new Color(v.color.r, v.color.g, v.color.b, v.color.a)).ToList());
 			mesh.triangles = triangles.SelectMany(t => backfaceCulling ? new int[] { t.v1, t.v2, t.v3 } : new int[] { t.v1, t.v2, t.v3, t.v2, t.v1, t.v3 }).ToArray();
 			mesh.RecalculateNormals();
 

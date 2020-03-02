@@ -182,8 +182,12 @@ namespace OpenSpace.Loader {
 						}
 					}
 					// Export PS2 vignette textures
-					if (exportTextures && Settings.s.platform == Settings.Platform.PS2 && Settings.s.game == Settings.Game.R3) {
-						ExportR3PS2Textures();
+					if (exportTextures && Settings.s.platform == Settings.Platform.PS2) {
+						if (Settings.s.game == Settings.Game.R3) {
+							ExportR3PS2Textures();
+						} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA) {
+							ExportRAPS2Textures();
+						}
 					}
 
 					await LoadFIX();
@@ -199,6 +203,25 @@ namespace OpenSpace.Loader {
 			}
 			await WaitIfNecessary();
 			InitModdables();
+		}
+		void ExportRAPS2Textures() {
+			ExportSingleFileTBF("../LSBIN/CODE", "TXR");
+			ExportSingleFileTBF("../LSBIN/GLOBOX", "TXR");
+			ExportSingleFileTBF("../LSBIN/HUNCH", "TXR");
+			ExportSingleFileTBF("../LSBIN/HUNCH2", "TXR");
+			ExportSingleFileTBF("../LSBIN/NOISE", "TXR");
+			ExportSingleFileTBF("../LSBIN/PIRATEB", "TXR");
+			ExportSingleFileTBF("../LSBIN/RAYMAN", "TXR");
+			ExportSingleFileTBF("../LSBIN/RAZORW", "TXR");
+			ExportSingleFileTBF("../LSBIN/TEENSIES", "TXR");
+			ExportSingleFileTBF("../LSBIN/TILY", "TXR");
+			ExportSingleFileTBF("../LSBIN/TVLOOK", "TXR");
+			ExportSingleFileTBF("../VIG/RASTFNT", "TXR");
+			ExportVIG("FLAGS1", "SCR", 512, 512);
+			ExportVIG("RAYM", "SCR", 512, 512);
+			ExportVIG("SONYDEMO", "SCR", 512, 512);
+			ExportVIG("UBISOFT", "SCR", 512, 512);
+			ExportVIG("RAYMLOGO", "SCR", 256, 256);
 		}
 		void ExportR3PS2Textures() {
 			ExportSingleFileTBF("MENU/MNU_AB~1", "TGA");

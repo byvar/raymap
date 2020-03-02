@@ -66,7 +66,7 @@ namespace OpenSpace.ROM {
 						if (go.hasVertexColors == 0) {
 							mesh.normals = go.normals.Value.GetVectors(Int16.MaxValue);
 						} else {
-							mesh.SetUVs(1, go.normals.Value.GetVectors(255f, switchAxes: false).Select(v => new Vector4(v.x, v.y, v.z, 1f)).ToList());
+							mesh.SetColors(go.normals.Value.GetVectors(255f, switchAxes: false).Select(v => new Color(v.x, v.y, v.z, 1f)).ToList());
 							//mesh.SetUVs(1, go.normals.Value.GetVectors(Int16.MaxValue).Select(v => new Vector4(v.x, v.y, v.z, 1f)).ToList());
 						}
 					} else {
@@ -75,9 +75,9 @@ namespace OpenSpace.ROM {
 						if (go.hasVertexColors == 0) {
 							mesh.normals = triangles.Value.colors.Select(v => v.GetVector(Int16.MaxValue)).ToArray();
 						} else {
-							mesh.SetUVs(1, triangles.Value.colors.Select(v => {
+							mesh.SetColors(triangles.Value.colors.Select(v => {
 								Vector3 v3 = v.GetVector(255f, switchAxes: false);
-								return new Vector4(v3.x, v3.y, v3.z, 1f);
+								return new Color(v3.x, v3.y, v3.z, 1f);
 							}).ToList());
 						}
 					}
@@ -104,7 +104,7 @@ namespace OpenSpace.ROM {
 				mf.mesh = mesh;
 				// Apply vertex colors
 				if (go.hasVertexColors != 0) {
-					mr.sharedMaterial.SetVector("_Tex2Params", new Vector4(60, 0, 0, 0));
+					mr.sharedMaterial.SetFloat("_Prelit", 1f);
 					mr.sharedMaterial.SetVector("_DiffuseCoef", new Vector4(1,1,1,1));
 				}
 				return gao;

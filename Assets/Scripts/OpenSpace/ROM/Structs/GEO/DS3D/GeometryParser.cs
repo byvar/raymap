@@ -200,7 +200,7 @@ namespace OpenSpace.ROM.DS3D {
 			mesh.vertices = verts.Select(v => new Vector3(v.x/go.ScaleFactor, v.z/go.ScaleFactor, v.y/go.ScaleFactor)).ToArray();
 			mesh.normals = verts.Select(v => new Vector3(v.normal.x, v.normal.z, v.normal.y)).ToArray();
 			mesh.SetUVs(0, verts.Select(v => new Vector3(v.uv.x, v.uv.y, 1f)).ToList());
-			mesh.SetUVs(1, verts.Select(v => new Vector4(v.color.r, v.color.g, v.color.b, v.color.a)).ToList());
+			mesh.SetColors(verts.Select(v => new Color(v.color.r, v.color.g, v.color.b, v.color.a)).ToList());
 			mesh.triangles = triangles.SelectMany(t => backfaceCulling ? new int[] { t.v1, t.v2, t.v3 } : new int[] { t.v1, t.v2, t.v3, t.v2, t.v1, t.v3 }).ToArray();
 			mesh.RecalculateNormals();
 
