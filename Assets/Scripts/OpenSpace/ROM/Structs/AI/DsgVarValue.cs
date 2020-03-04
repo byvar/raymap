@@ -209,7 +209,13 @@ namespace OpenSpace.ROM {
 			get { return paramPerso.Value; }
 		}
 		public int ValueText {
-			get { return param == 0xFFFF ? -1 : param; }
+			get {
+				if (paramEntry != null) {
+					return paramEntry.Value.param == 0xFFFF ? -1 : paramEntry.Value.param;
+				} else {
+					return param == 0xFFFF ? -1 : param;
+				}
+			}
 		}
 		public uint ValueCaps {
 			get { return paramCaps.Value?.value ?? 0; }
