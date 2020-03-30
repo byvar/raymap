@@ -22,6 +22,9 @@ public class CollideComponentEditor : Editor {
             // or col.col.GetFlag((CollideMaterial.CollisionFlags_R2)(1 << flag)
             if (col.col != null && col.col.GetFlag(flag))
                 EditorGUI.LabelField(new Rect(150 + rect.x, rect.y, rect.width, rect.height), "Yes");
+
+            if (col.colROM != null && col.colROM.GetFlag(flag))
+                EditorGUI.LabelField(new Rect(150 + rect.x, rect.y, rect.width, rect.height), "Yes");
         }
     }
 }

@@ -107,6 +107,13 @@ namespace OpenSpace.ROM {
 					mr.sharedMaterial.SetFloat("_Prelit", 1f);
 					mr.sharedMaterial.SetVector("_DiffuseCoef", new Vector4(1,1,1,1));
 				}
+
+				try {
+					MeshCollider mc = gao.AddComponent<MeshCollider>();
+					mc.isTrigger = false;
+					//mc.cookingOptions = MeshColliderCookingOptions.None;
+					//mc.sharedMesh = mesh;
+				} catch (Exception) { }
 				return gao;
 			} else {
 				return null;

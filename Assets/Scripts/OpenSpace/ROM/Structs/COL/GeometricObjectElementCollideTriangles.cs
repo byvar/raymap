@@ -92,6 +92,14 @@ namespace OpenSpace.ROM {
                 mesh.uv = uvs;
 
                 mf.mesh = mesh;
+
+				try {
+					MeshCollider mc = gao.AddComponent<MeshCollider>();
+					//mc.cookingOptions = MeshColliderCookingOptions.None;
+					//mc.sharedMesh = mf.sharedMesh;
+				} catch (Exception) { }
+
+				gao.AddComponent<CollideComponent>().collideROM = this;
 			}
 			return gao;
 		}
