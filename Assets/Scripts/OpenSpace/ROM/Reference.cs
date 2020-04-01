@@ -44,7 +44,7 @@ namespace OpenSpace.ROM {
 		}
 
 		public static implicit operator T(Reference<T> a) {
-			return a.Value;
+			return a?.Value;
 		}
 		public static implicit operator Reference<T>(T t) {
 			if (t == null) {

@@ -234,5 +234,9 @@ namespace OpenSpace.Collide {
             sm.Reset();
             return sm;
         }
+
+        public GameMaterial GetMaterial(int? index) {
+            return gameMaterial;
+        }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.ROM {
-	public class GeometricObjectElementCollideTriangles : ROMStruct {
+	public class GeometricObjectElementCollideTriangles : ROMStruct, IGeometricObjectElementCollide {
 		public GenericReference material;
 		public ushort ind_material;
 		public Reference<GeometricObjectElementCollideTrianglesData> triangles;
@@ -102,6 +102,13 @@ namespace OpenSpace.ROM {
 				gao.AddComponent<CollideComponent>().collideROM = this;
 			}
 			return gao;
+		}
+
+		public GameMaterial GetMaterial(int? index) {
+			if (material.Value != null && material.Value is GameMaterial) {
+				return material.Value as GameMaterial;
+			}
+			return null;
 		}
 	}
 }

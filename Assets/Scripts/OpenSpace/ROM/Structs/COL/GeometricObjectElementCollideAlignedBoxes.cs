@@ -5,7 +5,7 @@ using UnityEngine;
 using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.ROM {
-	public class GeometricObjectElementCollideAlignedBoxes : ROMStruct {
+	public class GeometricObjectElementCollideAlignedBoxes : ROMStruct, IGeometricObjectElementCollide {
 		public Reference<GeometricObjectElementCollideAlignedBoxArray> boxes;
 		public ushort num_boxes;
 
@@ -35,6 +35,10 @@ namespace OpenSpace.ROM {
 						box_gao.transform.localPosition = center;
 						box_gao.transform.localScale = verts[b[i].maxVertex] - verts[b[i].minVertex];
 
+						CollideComponent cc = box_gao.AddComponent<CollideComponent>();
+						cc.collideROM = this;
+						cc.index = i;
+
 						mr.material = MapLoader.Loader.collideMaterial;
 						GameMaterial gmt = boxes.Value.boxes[i].material.Value;
 						if (gmt != null && gmt.collideMaterial.Value != null) {
@@ -59,6 +63,11 @@ namespace OpenSpace.ROM {
 				}
 			}
 			return gao;
+		}
+
+		public GameMaterial GetMaterial(int? index) {
+			if (!index.HasValue) return null;
+			return boxes.Value?.boxes[index.Value].material;
 		}
 	}
 }

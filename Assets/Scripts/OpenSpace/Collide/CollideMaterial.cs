@@ -17,7 +17,7 @@ namespace OpenSpace.Collide {
             None            = 0,
             Slide           = 1 << 0,
             Trampoline      = 1 << 1,
-            GrabbaleLedge   = 1 << 2,
+            GrabbableLedge  = 1 << 2,
             Wall            = 1 << 3,
             FlagUnknown     = 1 << 4,
             HangableCeiling = 1 << 5,
@@ -134,19 +134,19 @@ namespace OpenSpace.Collide {
             if (NoCollision) {
                 mr.material = MapLoader.Loader.collideTransparentMaterial;
                 //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
-                mr.material.color = new Color(1, 1, 1, 0.3f); // transparent cyan
+                mr.material.color = Colors.NoCollision;
             }
-            if (Slide) mr.material.color = Color.blue;
+            if (Slide) mr.material.color = Colors.Slide;
             if (Water) {
                 mr.material = MapLoader.Loader.collideTransparentMaterial;
                 //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
-                mr.material.color = new Color(0, 1, 1, 0.5f); // transparent cyan
+                mr.material.color = Colors.Water;
             }
             if (ClimbableWall || HangableCeiling) {
-                mr.material.color = new Color(244f / 255f, 131f / 255f, 66f / 255f); // ORANGE
+                mr.material.color = Colors.Climbable;
             }
             if (LavaDeathWarp || DeathWarp) {
-                mr.material.color = Color.red;
+                mr.material.color = Colors.DeathWarp;
             }
             if (HurtTrigger) mr.material.color = Colors.HurtTrigger;
             if (FallTrigger) mr.material.color = Colors.FallTrigger;
@@ -159,7 +159,12 @@ namespace OpenSpace.Collide {
 
         public static class Colors {
             public static Color
+                Slide = Color.blue,
+                DeathWarp = Color.red,
+                Climbable = new Color(244f / 255f, 131f / 255f, 66f / 255f), // ORANGE
                 HurtTrigger = new Color(126 / 255f, 2 / 255f, 204 / 255f), // purple
+                Water = new Color(0, 1, 1, 0.5f), // transparent cyan
+                NoCollision = new Color(1, 1, 1, 0.3f), 
                 FallTrigger = Color.black,
                 Trampoline = Color.yellow,
                 Electric = new Color(219f / 255f, 140 / 255f, 212 / 255f), // Pink

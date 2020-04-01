@@ -5,7 +5,7 @@ using UnityEngine;
 using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.ROM {
-	public class GeometricObjectElementCollideSpheres : ROMStruct {
+	public class GeometricObjectElementCollideSpheres : ROMStruct, IGeometricObjectElementCollide {
 		public Reference<GeometricObjectElementCollideSphereArray> spheres;
 		public ushort num_spheres;
 
@@ -36,6 +36,10 @@ namespace OpenSpace.ROM {
 						BillboardBehaviour bill = sphere_gao.AddComponent<BillboardBehaviour>();
 						bill.mode = BillboardBehaviour.LookAtMode.CameraPosXYZ;
 
+						CollideComponent cc = sphere_gao.AddComponent<CollideComponent>();
+						cc.collideROM = this;
+						cc.index = i;
+
 						mr.material = MapLoader.Loader.collideMaterial;
 						GameMaterial gmt = spheres.Value.spheres[i].material.Value;
 						if (gmt != null && gmt.collideMaterial.Value != null) {
@@ -60,6 +64,11 @@ namespace OpenSpace.ROM {
 				}
 			}
 			return gao;
+		}
+
+		public GameMaterial GetMaterial(int? index) {
+			if (!index.HasValue) return null;
+			return spheres.Value?.spheres[index.Value].material;
 		}
 	}
 }
