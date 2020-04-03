@@ -49,6 +49,7 @@ namespace OpenSpace.Collide {
                 MeshRenderer mr = sphere_gao.GetComponent<MeshRenderer>();
                 CollideComponent cc = sphere_gao.AddComponent<CollideComponent>();
                 cc.collide = this;
+                cc.type = geo.type;
                 cc.index = (int)i;
                 //MonoBehaviour.Destroy(sphere_gao.GetComponent<SphereCollider>());
                 sphere_gao.transform.localPosition = geo.vertices[spheres[i].centerPoint];

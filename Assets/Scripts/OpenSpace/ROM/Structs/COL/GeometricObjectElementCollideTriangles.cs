@@ -99,7 +99,9 @@ namespace OpenSpace.ROM {
 					//mc.sharedMesh = mf.sharedMesh;
 				} catch (Exception) { }
 
-				gao.AddComponent<CollideComponent>().collideROM = this;
+				CollideComponent cc = gao.AddComponent<CollideComponent>();
+				cc.collideROM = this;
+				cc.type = collideType;
 			}
 			return gao;
 		}

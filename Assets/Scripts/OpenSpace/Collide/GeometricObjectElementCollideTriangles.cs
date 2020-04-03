@@ -101,7 +101,9 @@ namespace OpenSpace.Collide {
                     //mc.sharedMesh = mf.sharedMesh;
                 } catch (Exception) { }
 
-                gao.AddComponent<CollideComponent>().collide = this;
+                CollideComponent cc = gao.AddComponent<CollideComponent>();
+                cc.collide = this;
+                cc.type = geo.type;
 
                 mr.material = MapLoader.Loader.collideMaterial;
                 if (gameMaterial != null && gameMaterial.collideMaterial != null) {

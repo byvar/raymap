@@ -49,6 +49,7 @@ namespace OpenSpace.Collide {
                 MeshRenderer mr = box_gao.GetComponent<MeshRenderer>();
                 CollideComponent cc = box_gao.AddComponent<CollideComponent>();
                 cc.collide = this;
+                cc.type = geo.type;
                 cc.index = (int)i;
                 //MonoBehaviour.Destroy(box_gao.GetComponent<BoxCollider>());
                 Vector3 center = Vector3.Lerp(geo.vertices[boxes[i].minPoint], geo.vertices[boxes[i].maxPoint], 0.5f);

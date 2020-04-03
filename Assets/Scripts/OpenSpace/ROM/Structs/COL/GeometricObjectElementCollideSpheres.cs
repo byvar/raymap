@@ -38,6 +38,7 @@ namespace OpenSpace.ROM {
 
 						CollideComponent cc = sphere_gao.AddComponent<CollideComponent>();
 						cc.collideROM = this;
+						cc.type = collideType;
 						cc.index = i;
 
 						mr.material = MapLoader.Loader.collideMaterial;

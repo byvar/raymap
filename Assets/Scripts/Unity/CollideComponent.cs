@@ -10,4 +10,6 @@ public class CollideComponent : MonoBehaviour {
     public OpenSpace.ROM.CollideMaterial colROM => collideROM?.GetMaterial(index)?.collideMaterial;
 
     public int? index;
+
+    public CollideType type;
 }
