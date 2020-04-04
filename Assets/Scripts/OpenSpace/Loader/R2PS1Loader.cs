@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using lzo.net;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using OpenSpace.PS1;
 
 namespace OpenSpace.Loader {
     public class R2PS1Loader : MapLoader {
@@ -28,50 +29,10 @@ namespace OpenSpace.Loader {
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
                 globals = new Globals();
 				gameDataBinFolder += "/";
-				string bigFile = "COMBIN";
 				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
                 loadingState = "Initializing files";
-				byte[] data = new byte[0];
-				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + bigFile + ".DAT"))) {
-					List<MemoryBlock> memoryBlocks = new List<MemoryBlock>();
-					foreach (string line in File.ReadLines(gameDataBinFolder + bigFile + ".txt")) {
-						string[] blockStr = line.Split('\t');
-						MemoryBlock b = new MemoryBlock(Convert.ToUInt32(blockStr[0], 16), int.Parse(blockStr[1]) == 1,
-							new LBA(Convert.ToUInt32(blockStr[2], 16), Convert.ToUInt32(blockStr[3], 16)),
-							new LBA(Convert.ToUInt32(blockStr[4], 16), Convert.ToUInt32(blockStr[5], 16)),
-							new LBA(Convert.ToUInt32(blockStr[6], 16), Convert.ToUInt32(blockStr[7], 16)));
-						for (int i = 8; i < blockStr.Length; i+=2) {
-							b.cutscenes.Add(new LBA(Convert.ToUInt32(blockStr[i], 16), Convert.ToUInt32(blockStr[i + 1], 16)));
-						}
-						memoryBlocks.Add(b);
-					}
-					await WaitIfNecessary();
-					for(int i = 0; i < memoryBlocks.Count; i++) {
-						MemoryBlock b = memoryBlocks[i];
-						List<byte[]> mainBlock = ExtractPackedBlocks(reader, b.compressed, 0x1f4);
-						for (int j = 0; j < mainBlock.Count; j++) {
-							if (j == 0) {
-								Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_loading.tim", mainBlock[j]);
-							} else if(mainBlock[j].Length == 0xB0000) {
-								Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_textures.bin", mainBlock[j]);
-							} else {
-								Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_" + j + ".blk", mainBlock[j]);
-							}
-						}
-						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_fat_and_anims.blk", ExtractBlock(reader, b.filetable, 0x1f4));
-						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_uncompr.blk", ExtractBlock(reader, b.uncompressed, 0x1f4));
-						for (int j = 0; j < b.cutscenes.Count; j++) {
-							string cutsceneAudioName = gameDataBinFolder + "ext/" + bigFile + "_" + i + "_cutsceneAudio_" + j + ".blk";
-							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], 0x1f4);
-							if (cutsceneAudioBlk != null) {
-								Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
-							}
-						}
-						//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
-						await WaitIfNecessary();
-					}
-				}
+				await ExtractDAT(PS1FileInfo.R2_PS1_US.FirstOrDefault(f => f.bigfile == "COMBIN"));
 			} finally {
                 for (int i = 0; i < files_array.Length; i++) {
                     if (files_array[i] != null) {
@@ -84,7 +45,97 @@ namespace OpenSpace.Loader {
             InitModdables();
         }
 
-		public void ParseMainBlock(byte[] data, MemoryBlock block, int index, string basename) {
+		/*public async Task ExtractDAT(string bigfile) {
+			string bigFile = "COMBIN";
+			byte[] data = new byte[0];
+			using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + bigFile + ".DAT"))) {
+				List<MemoryBlock> memoryBlocks = new List<MemoryBlock>();
+				foreach (string line in File.ReadLines(gameDataBinFolder + bigFile + ".txt")) {
+					string[] blockStr = line.Split('\t');
+					MemoryBlock b = new MemoryBlock(Convert.ToUInt32(blockStr[0], 16), int.Parse(blockStr[1]) == 1,
+						new LBA(Convert.ToUInt32(blockStr[2], 16), Convert.ToUInt32(blockStr[3], 16)),
+						new LBA(Convert.ToUInt32(blockStr[4], 16), Convert.ToUInt32(blockStr[5], 16)),
+						new LBA(Convert.ToUInt32(blockStr[6], 16), Convert.ToUInt32(blockStr[7], 16)));
+					for (int i = 8; i < blockStr.Length; i += 2) {
+						b.cutscenes.Add(new LBA(Convert.ToUInt32(blockStr[i], 16), Convert.ToUInt32(blockStr[i + 1], 16)));
+					}
+					memoryBlocks.Add(b);
+				}
+				await WaitIfNecessary();
+				for (int i = 0; i < memoryBlocks.Count; i++) {
+					MemoryBlock b = memoryBlocks[i];
+					List<byte[]> mainBlock = ExtractPackedBlocks(reader, b.compressed, 0x1f4);
+					for (int j = 0; j < mainBlock.Count; j++) {
+						if (j == 0) {
+							Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_loading.tim", mainBlock[j]);
+						} else if (mainBlock[j].Length == 0xB0000) {
+							Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_textures.bin", mainBlock[j]);
+						} else {
+							Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main_" + j + ".blk", mainBlock[j]);
+						}
+					}
+					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_fat_and_anims.blk", ExtractBlock(reader, b.filetable, 0x1f4));
+					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_uncompr.blk", ExtractBlock(reader, b.uncompressed, 0x1f4));
+					for (int j = 0; j < b.cutscenes.Count; j++) {
+						string cutsceneAudioName = gameDataBinFolder + "ext/" + bigFile + "_" + i + "_cutsceneAudio_" + j + ".blk";
+						byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], 0x1f4);
+						if (cutsceneAudioBlk != null) {
+							Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
+						}
+					}
+					//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
+					await WaitIfNecessary();
+				}
+			}
+		}*/
+
+
+		public async Task ExtractDAT(PS1FileInfo fileInfo) {
+			string bigFile = fileInfo.bigfile;
+			byte[] data = new byte[0];
+			using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + bigFile + "." + fileInfo.extension))) {
+				PS1FileInfo.MemoryBlock[] memoryBlocks = fileInfo.memoryBlocks;
+				for (int i = 0; i < memoryBlocks.Length; i++) {
+					PS1FileInfo.MemoryBlock b = memoryBlocks[i];
+					List<byte[]> mainBlock = ExtractPackedBlocks(reader, b.compressed, 0x1f4);
+					int blockIndex = 0;
+					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_LoadImage.TIM", mainBlock[blockIndex++]);
+					if (b.inEngine) {
+						if (b.isPlayable) {
+							Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_UNK_Playable.BLK", mainBlock[blockIndex++]);
+						}
+						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Textures.VRAM", mainBlock[blockIndex++]);
+						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Level_Header.GPT", mainBlock[blockIndex++]);
+					}
+					byte[] exe = mainBlock[blockIndex++];
+					byte[] exeData = mainBlock[blockIndex++];
+					/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
+					Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
+					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Executable.PXE", exe);
+					if (b.inEngine) {
+						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Level.DAT", mainBlock[blockIndex++]);
+					}
+					if (blockIndex != mainBlock.Count) {
+						Debug.LogWarning("Not all blocks were exported!");
+					}
+
+
+					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_UNK_Anims.BLK", ExtractBlock(reader, b.filetable, 0x1f4));
+					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_UNK_Uncompressed.BLK", ExtractBlock(reader, b.uncompressed, 0x1f4));
+					for (int j = 0; j < b.cutscenes.Length; j++) {
+						string cutsceneAudioName = gameDataBinFolder + "ext/" + bigFile + "_" + i + "_CutsceneAudio_" + j + ".BLK";
+						byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], 0x1f4);
+						if (cutsceneAudioBlk != null) {
+							Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
+						}
+					}
+					//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
+					await WaitIfNecessary();
+				}
+			}
+		}
+
+		public void ParseMainBlock(byte[] data, PS1FileInfo.MemoryBlock block, int index, string basename) {
 			using (MemoryStream ms = new MemoryStream(data)) {
 				using (Reader reader = new Reader(ms, Settings.s.IsLittleEndian)) {
 					reader.ReadUInt32();
@@ -96,7 +147,7 @@ namespace OpenSpace.Loader {
 					Util.ByteArrayToFile(basename + "_loading.img", loadingImg);
 					reader.ReadUInt32();
 					if (index < 57) {
-						if (block.isSomething) {
+						if (block.isPlayable) {
 							uint i = 0;
 							int size = reader.ReadInt32();
 							while (size != 0) {
@@ -155,7 +206,7 @@ namespace OpenSpace.Loader {
 			return bytes.SelectMany(i => i).ToArray();
 		}
 
-		public byte[] ExtractBlock(Reader reader, LBA lba, uint baseOffset) {
+		public byte[] ExtractBlock(Reader reader, PS1FileInfo.LBA lba, uint baseOffset) {
 			byte[] data;
 			if (lba.lba < baseOffset || lba.size <= 0) return null;
 			reader.BaseStream.Seek((lba.lba - baseOffset) * 0x800, SeekOrigin.Begin);
@@ -163,7 +214,7 @@ namespace OpenSpace.Loader {
 			data = reader.ReadBytes((int)lba.size);
 			return data;
 		}
-		public List<byte[]> ExtractPackedBlocks(Reader reader, LBA lba, uint baseOffset) {
+		public List<byte[]> ExtractPackedBlocks(Reader reader, PS1FileInfo.LBA lba, uint baseOffset) {
 			List<byte[]> datas = new List<byte[]>();
 			byte[] data;
 			if (lba.lba < baseOffset || lba.size <= 0) return null;
@@ -235,34 +286,6 @@ namespace OpenSpace.Loader {
 				datas.Add(data);
 			}
 			return datas;
-		}
-	}
-
-	public class LBA {
-		public uint lba;
-		public uint size;
-
-		public LBA(uint lba, uint size) {
-			this.lba = lba;
-			this.size = size;
-		}
-	}
-
-	public class MemoryBlock {
-		public uint address;
-		public bool isSomething;
-		public LBA compressed;
-		public LBA filetable;
-		public LBA uncompressed;
-		public List<LBA> cutscenes;
-
-		public MemoryBlock(uint address, bool isSomething, LBA compressed, LBA filetable, LBA uncompressed) {
-			this.address = address;
-			this.isSomething = isSomething;
-			this.compressed = compressed;
-			this.filetable = filetable;
-			this.uncompressed = uncompressed;
-			cutscenes = new List<LBA>();
 		}
 	}
 }

@@ -156,7 +156,7 @@ public class SectorManager : MonoBehaviour {
 		} else if (activeSectorVirtual != null && !blockVirtual) {
 			return activeSectorVirtual;
 		} else {
-			return sectors.Last(); // Univers
+			return sectors.LastOrDefault(); // Univers
 		}
 	}
 
