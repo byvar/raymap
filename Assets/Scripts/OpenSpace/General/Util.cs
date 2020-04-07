@@ -26,6 +26,15 @@ namespace OpenSpace {
         public static short ToInt16(byte[] array, int position, bool isLittleEndian) {
             return BitConverter.ToInt16(GetBytesInEndian(array, position, 2, isLittleEndian), 0);
         }
+        public static int ExtractBits(int value, int count, int offset) {
+            return (((1 << count) - 1) & (value >> (offset)));
+        }
+
+        public static int SetBits(int bits, int value, int count, int offset) {
+            int mask = ((1 << count) - 1) << offset;
+            bits = (bits & ~mask) | (value << offset);
+            return bits;
+        }
 
         public static void AppendArrayAndMergeReferences<T>(ref T[] array1, ref T[] array2, int originalLength = -1) {
             if (array1 == null || array2 == null) return;

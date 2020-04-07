@@ -47,6 +47,7 @@ class MapSelectionDropdown : AdvancedDropdown {
 
 		// Add the found files containing the correct file extension
 		string extension = null;
+		string[] levels;
 		switch (Settings.s.platform) {
 			case Settings.Platform.PC:
 			case Settings.Platform.iOS:
@@ -72,13 +73,21 @@ class MapSelectionDropdown : AdvancedDropdown {
 					extension = "*.lvl";
 				}
 				break;
+			case Settings.Platform.PS1:
+				MapLoader.Reset();
+				R2PS1Loader l1 = MapLoader.Loader as R2PS1Loader;
+				l1.gameDataBinFolder = directory;
+				levels = l1.LoadLevelList();
+				MapLoader.Reset();
+				output.AddRange(levels);
+				break;
 			case Settings.Platform.DS:
 			case Settings.Platform.N64:
 			case Settings.Platform._3DS:
 				MapLoader.Reset();
-				R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
-				l.gameDataBinFolder = directory;
-				string[] levels = l.LoadLevelList();
+				R2ROMLoader lr = MapLoader.Loader as R2ROMLoader;
+				lr.gameDataBinFolder = directory;
+				levels = lr.LoadLevelList();
 				MapLoader.Reset();
 				output.AddRange(levels);
 				break;
