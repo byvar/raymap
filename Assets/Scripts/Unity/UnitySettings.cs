@@ -30,7 +30,7 @@ public class UnitySettings {
 	public static bool SaveTextures { get; set; }
 	public static string ExportPath { get; set; } = "./exports/";
 	public static bool ExportAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
-    public static bool ScreenshotAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
+    public static ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
 
     /// <summary>
     /// Static constructor loads in editor data at editor startup.
@@ -39,6 +39,13 @@ public class UnitySettings {
     static UnitySettings() {
 		Load();
 	}
+
+    public enum ScreenshotAfterLoadSetting {
+         None,
+         TopDownOnly,
+         OrthographicOnly,
+         TopDownAndOrthographic
+    }
 
 	private static void SerializeSettings(ISerializer s) {
 		Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
@@ -63,10 +70,11 @@ public class UnitySettings {
 		// Export
 		ExportPath = s.SerializeString("ExportPath", ExportPath);
 		ExportAfterLoad = s.SerializeBool("ExportAfterLoad", ExportAfterLoad);
-		ScreenshotAfterLoad = s.SerializeBool("ScreenshotAfterLoad", ScreenshotAfterLoad);
+		string screenshotAfterLoadString = s.SerializeString("ScreenshotAfterLoad", ScreenshotAfterLoad.ToString());
+        ScreenshotAfterLoad = Enum.TryParse(screenshotAfterLoadString, out ScreenshotAfterLoadSetting setting) ? setting : ScreenshotAfterLoad;
 
-		// Misc
-		ScreenshotPath = s.SerializeString("ScreenshotPath", ScreenshotPath);
+        // Misc
+        ScreenshotPath = s.SerializeString("ScreenshotPath", ScreenshotPath);
 		AllowDeadPointers = s.SerializeBool("AllowDeadPointers", AllowDeadPointers);
 		ForceDisplayBackfaces = s.SerializeBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
 		BlockyMode = s.SerializeBool("BlockyMode", BlockyMode);

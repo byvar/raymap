@@ -120,11 +120,9 @@ public class UnityWindowSettings : UnityWindow {
 		rect = PrefixToggle(rect, ref export);
 		UnitySettings.ExportAfterLoad = export;
 
-        bool screenshot = UnitySettings.ScreenshotAfterLoad;
-        rect = GetNextRect(ref yPos);
-        rect = EditorGUI.PrefixLabel(rect, new GUIContent("Screenshot After Load"));
-        rect = PrefixToggle(rect, ref screenshot);
-        UnitySettings.ScreenshotAfterLoad = screenshot;
+        UnitySettings.GameMode = (Settings.Mode)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Game"), UnitySettings.GameMode);
+        
+        UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
 
         if (UnitySettings.ExportAfterLoad) {
 			UnitySettings.ExportPath = DirectoryField(rect, "Export Path", UnitySettings.ExportPath, includeLabel: false);

@@ -45,14 +45,15 @@ namespace OpenSpace {
             if (FileSystem.mode == FileSystem.Mode.Web) { // || (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)) {
                 return ((virtualFiles.ContainsKey(path) && virtualFiles[path] != null) || (virtualBigFiles.ContainsKey(path)));
             } else {
-                return File.Exists(path);
+				if ((virtualFiles.ContainsKey(path) && virtualFiles[path] != null)) return true;
+				return File.Exists(path);
             }
         }
 
         public static void AddVirtualFile(string path, byte[] data) {
             virtualFiles[path] = data;
         }
-		public static void AddVirtualBigFile(string path, long size, int cacheLength) {
+		private static void AddVirtualBigFile(string path, long size, int cacheLength) {
 			virtualBigFiles[path] = new BigFileEntry(cacheLength, size);
 		}
 
@@ -65,7 +66,11 @@ namespace OpenSpace {
 					return new PartialHttpStream(serverAddress + path, cacheLen: virtualBigFiles[path].cacheLength, length: virtualBigFiles[path].fileLength);
 				} else return null;
             } else {
-                return File.OpenRead(path);
+				if (virtualFiles.ContainsKey(path)) {
+					return new MemoryStream(virtualFiles[path]);
+				} else {
+					return File.OpenRead(path);
+				}
             }
         }
 
@@ -124,7 +129,11 @@ namespace OpenSpace {
 						return virtualBigFiles[path].fileLength;
 					} else return 0;
                 } else {
-                    return new FileInfo(path).Length;
+					if (virtualFiles.ContainsKey(path)) {
+						return virtualFiles[path].Length;
+					} else {
+						return new FileInfo(path).Length;
+					}
                 }
             } else {
                 return 0;

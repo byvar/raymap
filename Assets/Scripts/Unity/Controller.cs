@@ -28,8 +28,9 @@ public class Controller : MonoBehaviour {
 	public PortalManager portalManager;
 	public LoadingScreen loadingScreen;
 	public WebCommunicator communicator;
+    public GameObject spawnableParent;
 
-	public MapLoader loader = null;
+    public MapLoader loader = null;
 	bool viewCollision_ = false; public bool viewCollision = false;
 	bool viewInvisible_ = false; public bool viewInvisible = false;
 	bool viewGraphs_ = false; public bool viewGraphs = false;
@@ -45,7 +46,7 @@ public class Controller : MonoBehaviour {
 	private System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
 	private bool ExportAfterLoad { get; set; }
-    private bool ScreenshotAfterLoad { get; set; }
+    private UnitySettings.ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; }
     public string ExportPath { get; set; }
 
 	public List<ROMPersoBehaviour> romPersos { get; set; } = new List<ROMPersoBehaviour>();
@@ -124,7 +125,14 @@ public class Controller : MonoBehaviour {
                 case "--screenshot":
                     UnitySettings.ScreenshotPath = args[i + 1];
                     if (!string.IsNullOrEmpty(UnitySettings.ScreenshotPath)) {
-                        ScreenshotAfterLoad = true;
+                        ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic;
+                    }
+                    i++;
+                    break;
+                case "--screenshot-topdown":
+                    UnitySettings.ScreenshotPath = args[i + 1];
+                    if (!string.IsNullOrEmpty(UnitySettings.ScreenshotPath)) {
+                        ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic;
                     }
                     i++;
                     break;
@@ -225,7 +233,8 @@ public class Controller : MonoBehaviour {
             Application.Quit();
         }
 
-        if (ScreenshotAfterLoad) {
+        if (ScreenshotAfterLoad!=UnitySettings.ScreenshotAfterLoadSetting.None) {
+
             Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
             System.DateTime dateTime = System.DateTime.Now;
             TransparencyCaptureBehaviour pb = new GameObject("Dummy").AddComponent<TransparencyCaptureBehaviour>();
@@ -242,7 +251,6 @@ public class Controller : MonoBehaviour {
             float maxY = filledSectors.Max(v => v.SectorBorder.boxMax.y);
             float maxZ = filledSectors.Max(v => v.SectorBorder.boxMax.z);
 
-
             Vector3 worldMin = new Vector3(minX, minY, minZ);
             Vector3 worldMax = new Vector3(maxX, maxY, maxZ);
 
@@ -251,24 +259,34 @@ public class Controller : MonoBehaviour {
 
             sectorManager.displayInactiveSectors = true;
             lightManager.luminosity = 1.0f;
+            spawnableParent?.SetActive(false);
 
-            Camera.main.transform.position = center + new Vector3(0,Camera.main.farClipPlane*0.5f,0);
-            Camera.main.transform.rotation = Quaternion.Euler(90, worldSize.z<=worldSize.x?90:0, 0);
+            byte[] screenshotBytes;
 
-            Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
+            if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic || ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownOnly) {
 
-            byte[] screenshotBytes = await pb.Capture(res.width * 8, res.height * 8);
-            OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
+                Camera.main.transform.position = center + new Vector3(0, Camera.main.farClipPlane * 0.5f, 0);
+                Camera.main.transform.rotation = Quaternion.Euler(90, worldSize.z <= worldSize.x ? 90 : 0, 0);
 
-            var pitch = Mathf.Rad2Deg * Mathf.Atan(Mathf.Sin(Mathf.Deg2Rad * 45));
-            for (int i = 0; i < 360; i += 45) {
-                Camera.main.transform.rotation = Quaternion.Euler(pitch, i, 0);
-                Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
+                Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
 
-                Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
                 screenshotBytes = await pb.Capture(res.width * 8, res.height * 8);
-                OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
+                OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
 
+            }
+
+            if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic || ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.OrthographicOnly) {
+
+                var pitch = Mathf.Rad2Deg * Mathf.Atan(Mathf.Sin(Mathf.Deg2Rad * 45));
+                for (int i = 0; i < 360; i += 45) {
+                    Camera.main.transform.rotation = Quaternion.Euler(pitch, i, 0);
+                    Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
+
+                    Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
+                    screenshotBytes = await pb.Capture(res.width * 8, res.height * 8);
+                    OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
+
+                }
             }
 
             Destroy(pb.gameObject);
@@ -548,7 +566,7 @@ public class Controller : MonoBehaviour {
 				}
 			}
 			if (romLoader.level != null && romLoader.level.spawnablePersos.Value != null && romLoader.level.num_spawnablepersos > 0) {
-				GameObject spawnableParent = new GameObject("Spawnable persos");
+				spawnableParent = new GameObject("Spawnable persos");
 				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
 					detailedState = "Initializing spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
 					await WaitIfNecessary();
