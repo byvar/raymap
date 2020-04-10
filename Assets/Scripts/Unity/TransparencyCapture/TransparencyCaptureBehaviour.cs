@@ -22,6 +22,16 @@ public class TransparencyCaptureBehaviour : MonoBehaviour
 		return screenshotBytes;
 	}
 
+    public static Resolution GetCurrentResolution()
+    {   
+        return new Resolution
+        {
+            width = Camera.main.pixelWidth,
+            height = Camera.main.pixelHeight,
+            refreshRate = Screen.currentResolution.refreshRate,
+        };
+    }
+
     /*public void Update()
     {
         if (Input.GetKeyDown(KeyCode.T)) {

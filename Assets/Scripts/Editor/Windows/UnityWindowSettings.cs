@@ -119,7 +119,14 @@ public class UnityWindowSettings : UnityWindow {
 		bool export = UnitySettings.ExportAfterLoad;
 		rect = PrefixToggle(rect, ref export);
 		UnitySettings.ExportAfterLoad = export;
-		if (UnitySettings.ExportAfterLoad) {
+
+        bool screenshot = UnitySettings.ScreenshotAfterLoad;
+        rect = GetNextRect(ref yPos);
+        rect = EditorGUI.PrefixLabel(rect, new GUIContent("Screenshot After Load"));
+        rect = PrefixToggle(rect, ref screenshot);
+        UnitySettings.ScreenshotAfterLoad = screenshot;
+
+        if (UnitySettings.ExportAfterLoad) {
 			UnitySettings.ExportPath = DirectoryField(rect, "Export Path", UnitySettings.ExportPath, includeLabel: false);
 		}
 
