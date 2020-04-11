@@ -11,20 +11,15 @@ public class TransparencyCaptureBehaviourEditor : Editor {
         DrawDefaultInspector();
 
         TransparencyCaptureBehaviour pb = (TransparencyCaptureBehaviour)target;
-		if (GUILayout.Button("Take screenshot")) {
-			Resolution res = GetCurrentResolution();
+
+        if (GUILayout.Button("Take screenshot")) {
+			Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
 			System.DateTime dateTime = System.DateTime.Now;
 			byte[] screenshotBytes = await pb.Capture(res.width* 4, res.height * 4);
 			OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
 		}
     }
 
-	Resolution GetCurrentResolution() {
-		return new Resolution {
-			width = Camera.main.pixelWidth,
-			height = Camera.main.pixelHeight,
-			refreshRate = Screen.currentResolution.refreshRate,
-		};
-	}
+	
 
 }

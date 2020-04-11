@@ -28,8 +28,9 @@ public class Controller : MonoBehaviour {
 	public PortalManager portalManager;
 	public LoadingScreen loadingScreen;
 	public WebCommunicator communicator;
+    public GameObject spawnableParent;
 
-	public MapLoader loader = null;
+    public MapLoader loader = null;
 	bool viewCollision_ = false; public bool viewCollision = false;
 	bool viewInvisible_ = false; public bool viewInvisible = false;
 	bool viewGraphs_ = false; public bool viewGraphs = false;
@@ -45,7 +46,8 @@ public class Controller : MonoBehaviour {
 	private System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
 	private bool ExportAfterLoad { get; set; }
-	public string ExportPath { get; set; }
+    private UnitySettings.ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; }
+    public string ExportPath { get; set; }
 
 	public List<ROMPersoBehaviour> romPersos { get; set; } = new List<ROMPersoBehaviour>();
 
@@ -84,6 +86,7 @@ public class Controller : MonoBehaviour {
 		lvlName = UnitySettings.MapName;
 		ExportPath = UnitySettings.ExportPath;
 		ExportAfterLoad = UnitySettings.ExportAfterLoad;
+        ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoad;
 		if (FileSystem.mode == FileSystem.Mode.Web) {
 			gameDataBinFolder = UnitySettings.GameDirsWeb.ContainsKey(mode) ? UnitySettings.GameDirsWeb[mode] : "";
 		} else {
@@ -119,7 +122,21 @@ public class Controller : MonoBehaviour {
 					}
 					i++;
 					break;
-			}
+                case "--screenshot":
+                    UnitySettings.ScreenshotPath = args[i + 1];
+                    if (!string.IsNullOrEmpty(UnitySettings.ScreenshotPath)) {
+                        ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic;
+                    }
+                    i++;
+                    break;
+                case "--screenshot-topdown":
+                    UnitySettings.ScreenshotPath = args[i + 1];
+                    if (!string.IsNullOrEmpty(UnitySettings.ScreenshotPath)) {
+                        ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic;
+                    }
+                    i++;
+                    break;
+            }
 		}
 		Application.logMessageReceived += Log;
 
@@ -172,49 +189,108 @@ public class Controller : MonoBehaviour {
 		await Init();
 	}
 
-	async Task Init() {
-		state = State.Loading;
-		await loader.LoadWrapper();
-		if (state == State.Error) return;
-		stopwatch.Start();
-		state = State.Initializing;
-		detailedState = "Initializing sectors";
-		await WaitIfNecessary();
-		sectorManager.Init();
-		detailedState = "Initializing graphs";
-		await WaitIfNecessary();
-		graphManager.Init();
-		detailedState = "Initializing lights";
-		await WaitIfNecessary();
-		lightManager.Init();
-		detailedState = "Initializing persos";
-		await InitPersos();
-		sectorManager.InitLights();
-		detailedState = "Initializing camera";
-		await WaitIfNecessary();
-		InitCamera();
-		detailedState = "Initializing portals";
-		await WaitIfNecessary();
-		portalManager.Init();
+    async Task Init() {
+        state = State.Loading;
+        await loader.LoadWrapper();
+        if (state == State.Error) return;
+        stopwatch.Start();
+        state = State.Initializing;
+        detailedState = "Initializing sectors";
+        await WaitIfNecessary();
+        sectorManager.Init();
+        detailedState = "Initializing graphs";
+        await WaitIfNecessary();
+        graphManager.Init();
+        detailedState = "Initializing lights";
+        await WaitIfNecessary();
+        lightManager.Init();
+        detailedState = "Initializing persos";
+        await InitPersos();
+        sectorManager.InitLights();
+        detailedState = "Initializing camera";
+        await WaitIfNecessary();
+        InitCamera();
+        detailedState = "Initializing portals";
+        await WaitIfNecessary();
+        portalManager.Init();
 
-		/*if (viewCollision)*/
-		UpdateViewCollision();
-		if (loader.cinematicsManager != null) {
-			detailedState = "Initializing cinematics";
-			await new WaitForEndOfFrame();
-			InitCinematics();
-		}
-		detailedState = "Finished";
-		stopwatch.Stop();
-		state = State.Finished;
-		loadingScreen.Active = false;
+        /*if (viewCollision)*/
+        UpdateViewCollision();
+        if (loader.cinematicsManager != null) {
+            detailedState = "Initializing cinematics";
+            await new WaitForEndOfFrame();
+            InitCinematics();
+        }
+        detailedState = "Finished";
+        stopwatch.Stop();
+        state = State.Finished;
+        loadingScreen.Active = false;
 
-		if (ExportAfterLoad) {
-			MapExporter e = new MapExporter(this.loader, ExportPath);
-			e.Export();
+        if (ExportAfterLoad) {
+            MapExporter e = new MapExporter(this.loader, ExportPath);
+            e.Export();
 
-			Application.Quit();
-		}
+            Application.Quit();
+        }
+
+        if (ScreenshotAfterLoad!=UnitySettings.ScreenshotAfterLoadSetting.None) {
+
+            Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
+            System.DateTime dateTime = System.DateTime.Now;
+            TransparencyCaptureBehaviour pb = new GameObject("Dummy").AddComponent<TransparencyCaptureBehaviour>();
+            lightManager.enableFog = false;
+            Camera.main.orthographic = true;
+
+            var filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 ? true : false);
+
+            float minX = filledSectors.Min(v => v.SectorBorder.boxMin.x);
+            float minY = filledSectors.Min(v => v.SectorBorder.boxMin.y);
+            float minZ = filledSectors.Min(v => v.SectorBorder.boxMin.z);
+
+            float maxX = filledSectors.Max(v => v.SectorBorder.boxMax.x);
+            float maxY = filledSectors.Max(v => v.SectorBorder.boxMax.y);
+            float maxZ = filledSectors.Max(v => v.SectorBorder.boxMax.z);
+
+            Vector3 worldMin = new Vector3(minX, minY, minZ);
+            Vector3 worldMax = new Vector3(maxX, maxY, maxZ);
+
+            Vector3 worldSize = (worldMax - worldMin);
+            Vector3 center = worldMin + worldSize * 0.5f;
+
+            sectorManager.displayInactiveSectors = true;
+            lightManager.luminosity = 1.0f;
+            spawnableParent?.SetActive(false);
+
+            byte[] screenshotBytes;
+
+            if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic || ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownOnly) {
+
+                Camera.main.transform.position = center + new Vector3(0, Camera.main.farClipPlane * 0.5f, 0);
+                Camera.main.transform.rotation = Quaternion.Euler(90, worldSize.z <= worldSize.x ? 90 : 0, 0);
+
+                Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
+
+                screenshotBytes = await pb.Capture(res.width * 8, res.height * 8);
+                OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
+
+            }
+
+            if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic || ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.OrthographicOnly) {
+
+                var pitch = Mathf.Rad2Deg * Mathf.Atan(Mathf.Sin(Mathf.Deg2Rad * 45));
+                for (int i = 0; i < 360; i += 45) {
+                    Camera.main.transform.rotation = Quaternion.Euler(pitch, i, 0);
+                    Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
+
+                    Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
+                    screenshotBytes = await pb.Capture(res.width * 8, res.height * 8);
+                    OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
+
+                }
+            }
+
+            Destroy(pb.gameObject);
+        }
 	}
 
 	// Update is called once per frame
@@ -490,7 +566,7 @@ public class Controller : MonoBehaviour {
 				}
 			}
 			if (romLoader.level != null && romLoader.level.spawnablePersos.Value != null && romLoader.level.num_spawnablepersos > 0) {
-				GameObject spawnableParent = new GameObject("Spawnable persos");
+				spawnableParent = new GameObject("Spawnable persos");
 				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
 					detailedState = "Initializing spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
 					await WaitIfNecessary();
