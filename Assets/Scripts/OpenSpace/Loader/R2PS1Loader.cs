@@ -46,7 +46,7 @@ namespace OpenSpace.Loader {
 				PS1GameInfo game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
 				await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.bigfile == "COMBIN"));
-				//await ExtractDAT(game.files.FirstOrDefault(f => f.bigfile == "COMBIN"));
+				//await ExtractDAT(game, game.files.FirstOrDefault(f => f.bigfile == "COMBIN"), relocatePointers: true);
 				await LoadLevel();
 			} finally {
                 for (int i = 0; i < files_array.Length; i++) {
@@ -123,47 +123,90 @@ namespace OpenSpace.Loader {
 			await InitFiles(gameInfo, fileInfo);
 		}
 
-		public async Task ExtractDAT(PS1GameInfo.File fileInfo) {
+		public async Task ExtractDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, bool relocatePointers = false) {
 			string bigFile = fileInfo.bigfile;
-			byte[] data = new byte[0];
-			using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + bigFile + "." + fileInfo.extension))) {
-				PS1GameInfo.File.MemoryBlock[] memoryBlocks = fileInfo.memoryBlocks;
-				for (int i = 0; i < memoryBlocks.Length; i++) {
-					PS1GameInfo.File.MemoryBlock b = memoryBlocks[i];
-					List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.compressed, fileInfo.baseLBA);
-					int blockIndex = 0;
-					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_LoadImage.TIM", mainBlock[blockIndex++]);
-					if (b.inEngine) {
-						if (b.isPlayable) {
-							Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_UNK_Playable.BLK", mainBlock[blockIndex++]);
+			string bigFilePath = gameDataBinFolder + bigFile + "." + fileInfo.extension;
+			if (FileSystem.FileExists(bigFilePath)) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath))) {
+					PS1GameInfo.File.MemoryBlock[] memoryBlocks = fileInfo.memoryBlocks;
+					for (int i = 0; i < memoryBlocks.Length; i++) {
+						int gptIndex = 0, lvlIndex = 0;
+						PS1GameInfo.File.MemoryBlock b = memoryBlocks[i];
+						string levelDir = gameDataBinFolder + "ext/" + (i < gameInfo.maps.Length ? gameInfo.maps[i] : (bigFile + "_" + i)) + "/";
+						List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.compressed, fileInfo.baseLBA);
+						int blockIndex = 0;
+						Util.ByteArrayToFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
+						if (b.inEngine) {
+							if (b.isPlayable) {
+								Util.ByteArrayToFile(levelDir + "unk_playable.blk", mainBlock[blockIndex++]);
+							}
+							Util.ByteArrayToFile(levelDir + "vram.bin", mainBlock[blockIndex++]);
+							Util.ByteArrayToFile(levelDir + "level.gpt", mainBlock[blockIndex++]);
+							if (relocatePointers) {
+								gptIndex = blockIndex - 1;
+							}
 						}
-						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Textures.VRAM", mainBlock[blockIndex++]);
-						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Level_Header.GPT", mainBlock[blockIndex++]);
-					}
-					byte[] exe = mainBlock[blockIndex++];
-					byte[] exeData = mainBlock[blockIndex++];
-					/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
-					Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
-					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Executable.PXE", exe);
-					if (b.inEngine) {
-						Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_Level.DAT", mainBlock[blockIndex++]);
-					}
-					if (blockIndex != mainBlock.Count) {
-						Debug.LogWarning("Not all blocks were exported!");
-					}
+						byte[] exe = mainBlock[blockIndex++];
+						byte[] exeData = mainBlock[blockIndex++];
+						/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
+						Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
+						Util.ByteArrayToFile(levelDir + "executable.pxe", exe);
+						if (b.inEngine) {
+							Util.ByteArrayToFile(levelDir + "level.dat", mainBlock[blockIndex++]);
+							if (relocatePointers) {
+								lvlIndex = blockIndex - 1;
+								uint length = (uint)mainBlock[lvlIndex].Length;
+								byte[] data = mainBlock[gptIndex];
+								for (int j = 0; j < data.Length; j++) {
+									if (data[j] == 0x80) {
+										int off = j - 3;
+										uint ptr = BitConverter.ToUInt32(data, off);
+										if (ptr >= b.address && ptr < b.address + length) {
+											ptr = (ptr - b.address) + 0xDD000000;
+											byte[] newData = BitConverter.GetBytes(ptr);
+											for (int y = 0; y < 4; y++) {
+												data[off + 3 - y] = newData[y];
+											}
+											j += 3;
+										}
+									}
+								}
+								Util.ByteArrayToFile(levelDir + "level_relocated.gpt", data);
+								data = mainBlock[lvlIndex];
+								for (int j = 0; j < data.Length; j++) {
+									if (data[j] == 0x80) {
+										int off = j - 3;
+										uint ptr = BitConverter.ToUInt32(data, off);
+										if (ptr >= b.address && ptr < b.address + length) {
+											ptr = (ptr - b.address) + 0xDD000000;
+											byte[] newData = BitConverter.GetBytes(ptr);
+											for (int y = 0; y < 4; y++) {
+												data[off + 3 - y] = newData[y];
+											}
+											j += 3;
+										}
+									}
+								}
+								Util.ByteArrayToFile(levelDir + "level_relocated.dat", data);
+							}
+						}
+						if (blockIndex != mainBlock.Count) {
+							Debug.LogWarning("Not all blocks were exported!");
+						}
 
 
-					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_UNK_Anims.BLK", ExtractBlock(reader, b.filetable, fileInfo.baseLBA));
-					Util.ByteArrayToFile(gameDataBinFolder + "ext/" + bigFile + "_" + i + "_UNK_Uncompressed.BLK", ExtractBlock(reader, b.uncompressed, fileInfo.baseLBA));
-					for (int j = 0; j < b.cutscenes.Length; j++) {
-						string cutsceneAudioName = gameDataBinFolder + "ext/" + bigFile + "_" + i + "_CutsceneAudio_" + j + ".BLK";
-						byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
-						if (cutsceneAudioBlk != null) {
-							Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
+						Util.ByteArrayToFile(levelDir + "unk_anims.blk", ExtractBlock(reader, b.filetable, fileInfo.baseLBA));
+						Util.ByteArrayToFile(levelDir + "unk_uncompressed.blk", ExtractBlock(reader, b.uncompressed, fileInfo.baseLBA));
+						for (int j = 0; j < b.cutscenes.Length; j++) {
+							string cutsceneAudioName = levelDir + "cutscene_audio_" + j + ".blk";
+							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
+							if (cutsceneAudioBlk != null) {
+								Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
+							}
 						}
+						//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
+						await WaitIfNecessary();
 					}
-					//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
-					await WaitIfNecessary();
 				}
 			}
 		}
