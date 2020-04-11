@@ -608,7 +608,7 @@ namespace OpenSpace {
 			game = Game.R2,
 			platform = Platform.PS1,
 			endian = Endian.Little,
-			linkedListType = LinkedListType.Double,
+			linkedListType = LinkedListType.Single,
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
 			saturate = true,

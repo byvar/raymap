@@ -79,6 +79,8 @@ namespace OpenSpace.Loader {
 			// TODO: Load header here
 			vram.Export(gameDataBinFolder + "vram.png");
 			await Task.CompletedTask;
+
+			LevelHeader header = FromOffsetOrRead<LevelHeader>(reader, Pointer.Current(reader));
 		}
 
 		#region DAT Parsing

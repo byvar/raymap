@@ -287,6 +287,74 @@ namespace OpenSpace.FileFormat.Texture {
 			float a = Util.ExtractBits(col, 1, 15);
 			return new Color(r, g, b, a);
 		}
+		public Texture2D GetTexture(ushort width, ushort height, ushort texturePageInfo, ushort paletteInfo, PixelMode pixelMode, int xInPage, int yInPage) {
+			// see http://hitmen.c02.at/files/docs/psx/psx.pdf page 37
+			int pageX = Util.ExtractBits(texturePageInfo, 4, 0);
+			int pageY = Util.ExtractBits(texturePageInfo, 1, 4);
+			int abr = Util.ExtractBits(texturePageInfo, 2, 5);
+			int tp = Util.ExtractBits(texturePageInfo, 2, 7); // 0: 4-bit, 1: 8-bit, 2: 15-bit direct
+
+			if (pageX < 5)
+				return null;
+
+			// Get palette coordinates
+			int paletteX = Util.ExtractBits(paletteInfo, 6, 0) * 16;
+			int paletteY = Util.ExtractBits(paletteInfo, 10, 6);
+
+			//Debug.Log((paletteX*2) + " - " + paletteY + " - " + pageX + " - " + pageY + " - " + tp);
+
+			// Get the palette size
+			Color?[] palette = tp == 0 ? new Color?[16] : new Color?[256];
+
+			// Create the texture
+			Texture2D tex = new Texture2D(width, height, TextureFormat.RGBA32, false);
+			tex.SetPixels(Enumerable.Repeat(Color.clear, width * height).ToArray());
+
+			if (tp == 1) {
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						var paletteIndex = GetPixel8(pageX, pageY, xInPage + x, yInPage + y);
+
+						// Get the color from the palette
+						if (!palette[paletteIndex].HasValue) {
+							palette[paletteIndex] = GetColor1555(0, 0, paletteX + paletteIndex, paletteY);
+						}
+						/*var palettedByte0 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex, paletteY);
+                        var palettedByte1 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex + 1, paletteY);
+                        var color = palette[paletteIndex];*/
+
+						// Set the pixel
+						//palette[paletteIndex] = new Color(palette[paletteIndex].r, palette[paletteIndex].g, palette[paletteIndex].b, 1f);
+						tex.SetPixel(x, height - 1 - y, palette[paletteIndex].Value);
+					}
+				}
+			} else if (tp == 0) {
+				for (int y = 0; y < height; y++) {
+					for (int x = 0; x < width; x++) {
+						var paletteIndex = GetPixel8(pageX, pageY, (xInPage + x) / 2, yInPage + y);
+						if (x % 2 == 0)
+							paletteIndex = (byte)Util.ExtractBits(paletteIndex, 4, 0);
+						else
+							paletteIndex = (byte)Util.ExtractBits(paletteIndex, 4, 4);
+
+
+						// Get the color from the palette
+						if (!palette[paletteIndex].HasValue) {
+							palette[paletteIndex] = GetColor1555(0, 0, paletteX + paletteIndex, paletteY);
+						}
+						/*var palettedByte0 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex, paletteY);
+                        var palettedByte1 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex + 1, paletteY);*/
+
+						// Set the pixel
+						//palette[paletteIndex] = new Color(palette[paletteIndex].r, palette[paletteIndex].g, palette[paletteIndex].b, 1f);
+						tex.SetPixel(x, height - 1 - y, palette[paletteIndex].Value);
+					}
+				}
+			}
+			tex.Apply();
+
+			return tex;
+		}
 
 		public class Page {
 			public byte[] data = new byte[page_width * page_height];
@@ -333,6 +401,11 @@ namespace OpenSpace.FileFormat.Texture {
 			public int y;
 			public int width;
 			public int height;
+		}
+		public enum PixelMode {
+			Ushort = 1,
+			Byte = 2,
+			Nibble = 3
 		}
 	}
 }
