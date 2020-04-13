@@ -693,12 +693,15 @@ namespace OpenSpace.Loader {
             LinkedList<SuperObject> alwaysActiveCharacters = LinkedList<SuperObject>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
 
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+                Pointer off_languages = Pointer.Read(reader);
+                reader.ReadUInt32();
 
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
+                Pointer.DoAt(ref reader, off_languages, () => {
+                    ReadLanguages(reader, off_languages, localization.num_languages);
+                });
 
                 for (uint i = 0; i < 2; i++) {
                     Pointer off_matrix = Pointer.Current(reader);

@@ -46,6 +46,7 @@ public class Controller : MonoBehaviour {
 	private System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
 	private bool ExportAfterLoad { get; set; }
+	private bool ExportText { get; set; }
     private UnitySettings.ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; }
     public string ExportPath { get; set; }
 
@@ -185,6 +186,7 @@ public class Controller : MonoBehaviour {
 		loader.forceDisplayBackfaces = UnitySettings.ForceDisplayBackfaces;
 		loader.blockyMode = UnitySettings.BlockyMode;
 		loader.exportTextures = UnitySettings.SaveTextures;
+		ExportText = UnitySettings.ExportText;
 
 		await Init();
 	}
@@ -225,6 +227,10 @@ public class Controller : MonoBehaviour {
         stopwatch.Stop();
         state = State.Finished;
         loadingScreen.Active = false;
+
+		if (ExportText) {
+			MapExporter.ExportText();
+		}
 
         if (ExportAfterLoad) {
             MapExporter e = new MapExporter(this.loader, ExportPath);

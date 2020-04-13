@@ -27,6 +27,9 @@ public class UnitySettings {
 	public static bool AllowDeadPointers { get; set; }
 	public static bool ForceDisplayBackfaces { get; set; }
 	public static bool BlockyMode { get; set; }
+
+	// Export
+	public static bool ExportText { get; set; }
 	public static bool SaveTextures { get; set; }
 	public static string ExportPath { get; set; } = "./exports/";
 	public static bool ExportAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
@@ -79,6 +82,7 @@ public class UnitySettings {
 		ForceDisplayBackfaces = s.SerializeBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
 		BlockyMode = s.SerializeBool("BlockyMode", BlockyMode);
 		SaveTextures = s.SerializeBool("SaveTextures", SaveTextures);
+		ExportText = s.SerializeBool("ExportText", ExportText);
 	}
 
 
