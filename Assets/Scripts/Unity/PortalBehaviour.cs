@@ -168,7 +168,7 @@ public class PortalBehaviour : MonoBehaviour {
 	private void UpdateCameraModes(Camera src, Camera dest) {
 		if (dest == null)
 			return;
-		// set camera to clear the same way as current camera
+		// set camera to clear the same way as current camera, but adjust view space when below 16:9.
 		dest.clearFlags = src.clearFlags;
 		dest.backgroundColor = src.backgroundColor;
 		// update other values to match current camera.
@@ -177,9 +177,9 @@ public class PortalBehaviour : MonoBehaviour {
 		dest.farClipPlane = src.farClipPlane;
 		dest.nearClipPlane = src.nearClipPlane;
 		dest.orthographic = src.orthographic;
-		dest.fieldOfView = src.fieldOfView;
+		dest.fieldOfView = (float)Math.Atan((float)Math.Tan(src.fieldOfView * (float)Math.PI / 360f) / (src.aspect < 16f / 9f ? src.aspect : 16f / 9f) * 16f / 9f);
 		dest.aspect = src.aspect;
-		dest.orthographicSize = src.orthographicSize;
+		dest.orthographicSize = src.orthographicSize / (src.aspect < 16f / 9f ? src.aspect : 16f / 9f) * 16f / 9f);
 	}
 
 	// On-demand create any objects we need
