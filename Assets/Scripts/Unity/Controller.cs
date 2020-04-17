@@ -620,13 +620,21 @@ public class Controller : MonoBehaviour {
 
 	public void InitCamera() {
 		if (loader != null) {
-			Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
-			if (camera == null && loader.globals != null && loader.globals.off_camera != null) {
-				camera = loader.persos.FirstOrDefault(p => p != null && p.stdGame != null && p.stdGame.off_superobject == loader.globals.off_camera);
-			}
-			if (camera != null) {
-				Camera.main.transform.position = camera.Gao.transform.position;
-				Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0, 180, 0);
+			if (loader is OpenSpace.Loader.R2ROMLoader) {
+				ROMPersoBehaviour camera = romPersos.FirstOrDefault(p => p.perso.camera != null);
+				if (camera != null) {
+					Camera.main.transform.position = camera.transform.position;
+					Camera.main.transform.rotation = camera.transform.rotation * Quaternion.Euler(0, 180, 0);
+				}
+			} else {
+				Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
+				if (camera == null && loader.globals != null && loader.globals.off_camera != null) {
+					camera = loader.persos.FirstOrDefault(p => p != null && p.stdGame != null && p.stdGame.off_superobject == loader.globals.off_camera);
+				}
+				if (camera != null) {
+					Camera.main.transform.position = camera.Gao.transform.position;
+					Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0, 180, 0);
+				}
 			}
 		}
 	}

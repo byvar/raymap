@@ -231,8 +231,10 @@ namespace OpenSpace.Loader {
                     }
 
                     if (correctInfo != null) {
-                        perso.gameObject.name = "[" + correctInfo.familyName + "] " + correctInfo.modelName + " | " + correctInfo.instanceName;
-                    }
+						perso.gameObject.name = "[" + correctInfo.familyName + "] " + correctInfo.modelName + " | " + correctInfo.instanceName;
+						//perso.gameObject.name = "[" + correctInfo.familyName + "] " + perso.gameObject.name;
+
+					}
                 }
 
             }
@@ -368,6 +370,9 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 			LevelHeader lh = GetOrRead<LevelHeader>(reader, (ushort)(CurrentLevel | (ushort)FATEntry.Flag.Fix));
 			level = lh;
+			/*loadingState = "Loading persos in fix";
+			await WaitIfNecessary();
+			PersosInFixList persosInFix = GetOrRead<PersosInFixList>(reader, 0);*/
 			loadingState = "Loading additional object lists";
 			await WaitIfNecessary();
 			for (ushort i = 0; i < 0x7FFF; i++) {
@@ -434,6 +439,14 @@ namespace OpenSpace.Loader {
 					lh.hierarchyRoot.Value.GetGameObject();
 				}
 			}
+			/*if (persosInFix?.persos.Value != null) {
+				for (int i = 0; i < persosInFix.persos.Value.persos.Length; i++) {
+					Perso p = persosInFix.persos.Value.persos[i];
+					if (p != null) {
+						print(p.IndexString + " - " + p.Offset);
+					}
+				}
+			}*/
 		}
 
 		public async Task LoadAnims() {
