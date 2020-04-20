@@ -151,7 +151,7 @@
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l">✔️</td>
     <td class="tg-yw4l">❌</td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
