@@ -264,7 +264,7 @@ public class Controller : MonoBehaviour {
             Vector3 center = worldMin + worldSize * 0.5f;
 
             sectorManager.displayInactiveSectors = true;
-            lightManager.luminosity = 1.0f;
+            lightManager.luminosity = Settings.s.luminosity * 2.0f;
             spawnableParent?.SetActive(false);
 
             byte[] screenshotBytes;
