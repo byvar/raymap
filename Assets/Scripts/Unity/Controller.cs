@@ -46,6 +46,7 @@ public class Controller : MonoBehaviour {
 	private System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
 	private bool ExportAfterLoad { get; set; }
+	private bool ExportText { get; set; }
     private UnitySettings.ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; }
     public string ExportPath { get; set; }
 
@@ -185,6 +186,7 @@ public class Controller : MonoBehaviour {
 		loader.forceDisplayBackfaces = UnitySettings.ForceDisplayBackfaces;
 		loader.blockyMode = UnitySettings.BlockyMode;
 		loader.exportTextures = UnitySettings.SaveTextures;
+		ExportText = UnitySettings.ExportText;
 
 		await Init();
 	}
@@ -225,6 +227,10 @@ public class Controller : MonoBehaviour {
         stopwatch.Stop();
         state = State.Finished;
         loadingScreen.Active = false;
+
+		if (ExportText) {
+			MapExporter.ExportText();
+		}
 
         if (ExportAfterLoad) {
             MapExporter e = new MapExporter(this.loader, ExportPath);
@@ -614,13 +620,21 @@ public class Controller : MonoBehaviour {
 
 	public void InitCamera() {
 		if (loader != null) {
-			Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
-			if (camera == null && loader.globals != null && loader.globals.off_camera != null) {
-				camera = loader.persos.FirstOrDefault(p => p != null && p.stdGame != null && p.stdGame.off_superobject == loader.globals.off_camera);
-			}
-			if (camera != null) {
-				Camera.main.transform.position = camera.Gao.transform.position;
-				Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0, 180, 0);
+			if (loader is OpenSpace.Loader.R2ROMLoader) {
+				ROMPersoBehaviour camera = romPersos.FirstOrDefault(p => p.perso.camera != null);
+				if (camera != null) {
+					Camera.main.transform.position = camera.transform.position;
+					Camera.main.transform.rotation = camera.transform.rotation * Quaternion.Euler(0, 180, 0);
+				}
+			} else {
+				Perso camera = loader.persos.FirstOrDefault(p => p != null && p.namePerso.Equals("StdCamer"));
+				if (camera == null && loader.globals != null && loader.globals.off_camera != null) {
+					camera = loader.persos.FirstOrDefault(p => p != null && p.stdGame != null && p.stdGame.off_superobject == loader.globals.off_camera);
+				}
+				if (camera != null) {
+					Camera.main.transform.position = camera.Gao.transform.position;
+					Camera.main.transform.rotation = camera.Gao.transform.rotation * Quaternion.Euler(0, 180, 0);
+				}
 			}
 		}
 	}

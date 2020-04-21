@@ -144,6 +144,13 @@ namespace OpenSpace {
             if (s != null) s.mode = mode;
         }
 
+		public string CmdModeName {
+			get {
+				if(!cmdModeNameDict.Any(c => c.Value == mode)) return null;
+				return cmdModeNameDict.FirstOrDefault(c => c.Value == mode).Key;
+			}
+		}
+
 
         public static Settings s = null;
         public static Settings R3PC = new Settings() {

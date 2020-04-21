@@ -64,6 +64,41 @@ namespace OpenSpace.Exporter {
             public uint customBits;
         }
 
+        public static void ExportText() {
+            MapLoader l = MapLoader.Loader;
+            string filePath = l.gameDataBinFolder + "/localization_" + Settings.s.CmdModeName + ".json";
+            if (l is Loader.R2ROMLoader) {
+                Loader.R2ROMLoader rl = l as Loader.R2ROMLoader;
+                ROM.Localization rloc = rl.localizationROM;
+                if (rloc != null) {
+                    var output = Enumerable.Range(0, rloc.languageTables.Length).Select(ind => new
+                    {
+                        Language = rloc.languageTables?[ind].name ?? ("Language " + ind),
+                        Text = rloc.languageTables?[ind].textTable.Value?.strings.Select(s => s.Value?.ToString() ?? ""),
+                        Binary = rloc.languageTables?[ind].binaryTable.Value?.strings.Select(s => s.Value?.ToString() ?? "")
+                    });
+                    string json = JsonConvert.SerializeObject(output, Formatting.Indented);
+                    Util.ByteArrayToFile(filePath, Encoding.UTF8.GetBytes(json));
+                }
+            } else {
+                LocalizationStructure loc = l.localization;
+                if (loc != null) {
+                    var output = new {
+                        Common = new {
+                            Entries = loc.misc.entries
+                        },
+                        Languages = Enumerable.Range(0, loc.num_languages).Select(ind => new {
+                            Language = l.languages?[ind] ?? ("Language " + ind),
+                            LanguageLocalized = l.languages_loc?[ind] ?? ("Language " + ind),
+                            Entries = loc.languages[ind].entries
+                        })
+                    };
+                    string json = JsonConvert.SerializeObject(output, Formatting.Indented);
+                    Util.ByteArrayToFile(filePath, Encoding.UTF8.GetBytes(json));
+                }
+            }
+        }
+
         public void ExportNames() {
             string filePath = "objectNames_" + loader.lvlName.ToLower() + ".json";
             if (File.Exists(filePath)) {

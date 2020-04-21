@@ -27,7 +27,7 @@ namespace OpenSpace.ROM {
 
 		public GameObject GetGameObject() {
 			if (perso.Value != null) {
-				GameObject gao = new GameObject("SOD @ " + Offset);
+				GameObject gao = new GameObject("SOD_" + IndexString + " @ " + Offset);
 				ROMPersoBehaviour rpb = perso.Value.GetGameObject(gao);
 				return gao;
 			}

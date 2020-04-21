@@ -52,15 +52,15 @@ namespace OpenSpace.PS1 {
 		public int int_17C;
 
 		public Pointer off_180;
-		public Pointer off_184;
+		public Pointer off_sector_meshes;
 		public uint uint_188;
 
 		public ushort ushort_18C;
 		public ushort ushort_18E;
 		public short short_190;
 		public ushort ushort_192;
-		public uint uint_194;
-		public Pointer off_198;
+		public uint num_sectors;
+		public Pointer off_sector_matrices;
 		public uint uint_19C;
 		public uint bad_off_1A0;
 		public Pointer off_1A4;
@@ -122,21 +122,23 @@ namespace OpenSpace.PS1 {
 			int_17C = reader.ReadInt32(); // -1
 
 			off_180 = Pointer.Read(reader); // big array of pointers, 2 pointers per thing
-			off_184 = Pointer.Read(reader); // ?
+			off_sector_meshes = Pointer.Read(reader); // 2 x 0 uint, then y structs of 8
 			uint_188 = reader.ReadUInt32(); // x things
-			Load.print(off_178 + " - " + off_180 + " - " + off_184 + " - " + uint_188);
+			Load.print(off_178 + " - " + off_180 + " - " + off_sector_meshes + " - " + uint_188);
 
 			ushort_18C = reader.ReadUInt16();
 			ushort_18E = reader.ReadUInt16();
 			short_190 = reader.ReadInt16();
 			ushort_192 = reader.ReadUInt16();
-			uint_194 = reader.ReadUInt32(); // y
-			off_198 = Pointer.Read(reader); // y structs of 0x3c
+			num_sectors = reader.ReadUInt32(); // y
+			off_sector_matrices = Pointer.Read(reader); // y structs of 0x3c
 			uint_19C = reader.ReadUInt32();
 			bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
 			off_1A4 = Pointer.Read(reader); // num_1A8 structs of 0x54
 			num_1A8 = reader.ReadUInt16();
-			Load.print(off_198 + " - " + bad_off_1A0 + " - " + off_1A4);
+			Load.print(off_sector_matrices + " - " + bad_off_1A0 + " - " + off_1A4);
+
+			ParseSectors(reader);
 		}
 
 		public void ParseUITextures(Reader reader) {
@@ -199,6 +201,23 @@ namespace OpenSpace.PS1 {
 				//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
 				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, PS1VRAM.PixelMode.Byte, t.xInPage, t.yInPage);
 				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex/" + t.name + ".png", t.texture.EncodeToPNG());
+			}
+		}
+
+		public void ParseSectors(Reader reader) {
+			uint count = num_sectors;
+			Pointer[] sectorMeshPtrs = new Pointer[count];
+			Pointer.DoAt(ref reader, off_sector_meshes, () => {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				for (int i = 0; i < count; i++) {
+					reader.ReadUInt32();
+					sectorMeshPtrs[i] = Pointer.Read(reader);
+				}
+			});
+			PS1StaticGeometricObject[] ipos = new PS1StaticGeometricObject[count];
+			for (int i = 0; i < count; i++) {
+				ipos[i] = Load.FromOffsetOrRead<PS1StaticGeometricObject>(reader, sectorMeshPtrs[i]);
 			}
 		}
 
