@@ -10,16 +10,20 @@ namespace OpenSpace.PS1 {
 		public short y;
 		public short z;
 		public ushort ushort_06;
-		public ushort ushort_08;
-		public ushort ushort_0A;
+		public byte r;
+		public byte g;
+		public byte b;
+		public byte padding;
 
 		protected override void ReadInternal(Reader reader) {
 			x = reader.ReadInt16();
 			y = reader.ReadInt16();
 			z = reader.ReadInt16();
 			ushort_06 = reader.ReadUInt16();
-			ushort_08 = reader.ReadUInt16();
-			ushort_0A = reader.ReadUInt16();
+			r = reader.ReadByte();
+			g = reader.ReadByte();
+			b = reader.ReadByte();
+			padding = reader.ReadByte();
 		}
 	}
 }

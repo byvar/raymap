@@ -59,12 +59,12 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_18E;
 		public short short_190;
 		public ushort ushort_192;
-		public uint num_sectors;
-		public Pointer off_sector_matrices;
+		public uint num_sectors_minus_one;
+		public Pointer off_sector_minus_one_things;
 		public uint uint_19C;
 		public uint bad_off_1A0;
-		public Pointer off_1A4;
-		public ushort num_1A8;
+		public Pointer off_sectors;
+		public ushort num_sectors;
 
 		// Parsed
 		public PointerList<UnkStruct1> states;
@@ -130,13 +130,13 @@ namespace OpenSpace.PS1 {
 			ushort_18E = reader.ReadUInt16();
 			short_190 = reader.ReadInt16();
 			ushort_192 = reader.ReadUInt16();
-			num_sectors = reader.ReadUInt32(); // y
-			off_sector_matrices = Pointer.Read(reader); // y structs of 0x3c
+			num_sectors_minus_one = reader.ReadUInt32(); // y
+			off_sector_minus_one_things = Pointer.Read(reader); // y structs of 0x3c
 			uint_19C = reader.ReadUInt32();
 			bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
-			off_1A4 = Pointer.Read(reader); // num_1A8 structs of 0x54
-			num_1A8 = reader.ReadUInt16();
-			Load.print(off_sector_matrices + " - " + bad_off_1A0 + " - " + off_1A4);
+			off_sectors = Pointer.Read(reader); // num_1A8 structs of 0x54
+			num_sectors = reader.ReadUInt16(); // actual sectors
+			Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
 
 			ParseSectors(reader);
 		}
@@ -208,8 +208,6 @@ namespace OpenSpace.PS1 {
 			uint count = num_sectors;
 			Pointer[] sectorMeshPtrs = new Pointer[count];
 			Pointer.DoAt(ref reader, off_sector_meshes, () => {
-				reader.ReadUInt32();
-				reader.ReadUInt32();
 				for (int i = 0; i < count; i++) {
 					reader.ReadUInt32();
 					sectorMeshPtrs[i] = Pointer.Read(reader);
@@ -219,7 +217,62 @@ namespace OpenSpace.PS1 {
 			for (int i = 0; i < count; i++) {
 				ipos[i] = Load.FromOffsetOrRead<PS1StaticGeometricObject>(reader, sectorMeshPtrs[i]);
 			}
-		}
+			Pointer.DoAt(ref reader, off_sectors, () => {
+				for (int i = 0; i < count; i++) {
+					reader.ReadBytes(0x1c);
+					int x = reader.ReadInt32();
+					int y = reader.ReadInt32();
+					int z = reader.ReadInt32();
+					reader.ReadUInt32();
+					int x2 = reader.ReadInt32();
+					int y2 = reader.ReadInt32();
+					int z2 = reader.ReadInt32();
+					reader.ReadBytes(0x1c);
+					if (ipos[i] != null) {
+						GameObject g = ipos[i].CreateGAO();
+						g.transform.localPosition = new Vector3(x / 256f, z / 256f, y / 256f);
+					}
+
+				}
+			});
+				/*Pointer.DoAt(ref reader, off_sector_minus_one_things, () => {
+					for (int i = 0; i < count; i++) {
+						ushort type = reader.ReadUInt16();
+						reader.ReadUInt16();
+						reader.ReadUInt16();
+						reader.ReadUInt16();
+
+						short x = reader.ReadInt16();
+						short y4 = reader.ReadInt16();
+						short x3 = reader.ReadInt16();
+						reader.ReadUInt16();
+
+						short y = reader.ReadInt16();
+						reader.ReadUInt16();
+						short y3 = reader.ReadInt16();
+						reader.ReadUInt16();
+
+						short z = reader.ReadInt16();
+						reader.ReadUInt16();
+						short z3 = reader.ReadInt16();
+						reader.ReadUInt16();
+
+						short x2 = reader.ReadInt16();
+						short y2 = reader.ReadInt16();
+						short z2 = reader.ReadInt16();
+						reader.ReadUInt16();
+
+						Pointer.Read(reader);
+						Pointer.Read(reader);
+						Pointer.Read(reader);
+						Pointer.Read(reader);
+						Pointer.Read(reader);
+
+						GameObject g = ipos[i].CreateGAO();
+						//g.transform.localPosition = new Vector3(x3 / 256f, 0f / 256f, y3 / 256f);
+					}
+				});*/
+			}
 
 		public class UITexture {
 			public string name;

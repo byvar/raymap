@@ -16,9 +16,9 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_08;
 		public ushort ushort_0A;
 		public ushort ushort_0C;
-		public ushort ushort_0E;
+		public ushort paletteInfo;
 		public ushort ushort_10;
-		public ushort ushort_12;
+		public ushort pageInfo;
 		public ushort ushort_14;
 		public ushort ushort_16;
 
@@ -30,9 +30,9 @@ namespace OpenSpace.PS1 {
 			ushort_08 = reader.ReadUInt16();
 			ushort_0A = reader.ReadUInt16();
 			ushort_0C = reader.ReadUInt16();
-			ushort_0E = reader.ReadUInt16();// palette info?
+			paletteInfo = reader.ReadUInt16();// palette info?
 			ushort_10 = reader.ReadUInt16();
-			ushort_12 = reader.ReadUInt16();// page info?
+			pageInfo = reader.ReadUInt16();// page info?
 			ushort_14 = reader.ReadUInt16();
 			ushort_16 = reader.ReadUInt16();
 
