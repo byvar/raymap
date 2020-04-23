@@ -9,8 +9,8 @@ using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class LevelHeader : OpenSpaceStruct {
-		public Pointer off_0F0;
-		public Pointer off_0F4;
+		public Pointer off_dynamicWorld;
+		public Pointer off_fatherSector;
 		public Pointer off_0F8;
 		public uint uint_0FC;
 		public Pointer off_100;
@@ -71,8 +71,8 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			reader.ReadBytes(0xF0);
-			off_0F0 = Pointer.Read(reader);
-			off_0F4 = Pointer.Read(reader);
+			off_dynamicWorld = Pointer.Read(reader);
+			off_fatherSector = Pointer.Read(reader);
 			off_0F8 = Pointer.Read(reader);
 			uint_0FC = reader.ReadUInt32();
 			off_100 = Pointer.Read(reader); // pointer to struct in big array of structs of 0x18 size
@@ -84,7 +84,7 @@ namespace OpenSpace.PS1 {
 			ushort_116 = reader.ReadUInt16();
 			off_persos = Pointer.Read(reader);
 			Perso[] persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
-			Load.print(off_0F0 + " - " + off_0F4 + " - " + off_0F8 + " - " + off_100 + " - " + off_10C + " - " + off_110 + " - " + off_persos);
+			Load.print(off_dynamicWorld + " - " + off_fatherSector + " - " + off_0F8 + " - " + off_100 + " - " + off_10C + " - " + off_110 + " - " + off_persos);
 			off_states = Pointer.Read(reader);
 			num_states = reader.ReadUInt16();
 			ushort_122 = reader.ReadUInt16();
@@ -217,7 +217,22 @@ namespace OpenSpace.PS1 {
 			for (int i = 0; i < count; i++) {
 				ipos[i] = Load.FromOffsetOrRead<PS1StaticGeometricObject>(reader, sectorMeshPtrs[i]);
 			}
-			Pointer.DoAt(ref reader, off_sectors, () => {
+			Load.print(num_sectors);
+			SuperObject fatherSector = Load.FromOffsetOrRead<SuperObject>(reader, off_fatherSector, onPreRead: s => s.isDynamic = false);
+			foreach (SuperObject so in fatherSector.children) {
+				if (so.type == Object.SuperObject.Type.Sector) {
+					GameObject g = ipos[so.dataIndex]?.CreateGAO();
+					if (so.matrix1 != null && g != null) {
+						g.transform.localPosition = new Vector3(
+							so.matrix1.int_14 / 256f,
+							so.matrix1.int_1C / 256f,
+							so.matrix1.int_18 / 256f);
+					}
+				}
+			}
+			SuperObject dynamicWorld = Load.FromOffsetOrRead<SuperObject>(reader, off_dynamicWorld, onPreRead: s => s.isDynamic = true);
+
+			/*Pointer.DoAt(ref reader, off_sectors, () => {
 				for (int i = 0; i < count; i++) {
 					reader.ReadBytes(0x1c);
 					int x = reader.ReadInt32();
@@ -231,48 +246,49 @@ namespace OpenSpace.PS1 {
 					if (ipos[i] != null) {
 						GameObject g = ipos[i].CreateGAO();
 						g.transform.localPosition = new Vector3(x / 256f, z / 256f, y / 256f);
+						//g.transform.localEulerAngles = new Vector3(0f, -90f, 0f);
 					}
 
 				}
-			});
-				/*Pointer.DoAt(ref reader, off_sector_minus_one_things, () => {
-					for (int i = 0; i < count; i++) {
-						ushort type = reader.ReadUInt16();
-						reader.ReadUInt16();
-						reader.ReadUInt16();
-						reader.ReadUInt16();
+			});*/
+			/*Pointer.DoAt(ref reader, off_sector_minus_one_things, () => {
+				for (int i = 0; i < count; i++) {
+					ushort type = reader.ReadUInt16();
+					reader.ReadUInt16();
+					reader.ReadUInt16();
+					reader.ReadUInt16();
 
-						short x = reader.ReadInt16();
-						short y4 = reader.ReadInt16();
-						short x3 = reader.ReadInt16();
-						reader.ReadUInt16();
+					short x = reader.ReadInt16();
+					short y4 = reader.ReadInt16();
+					short x3 = reader.ReadInt16();
+					reader.ReadUInt16();
 
-						short y = reader.ReadInt16();
-						reader.ReadUInt16();
-						short y3 = reader.ReadInt16();
-						reader.ReadUInt16();
+					short y = reader.ReadInt16();
+					reader.ReadUInt16();
+					short y3 = reader.ReadInt16();
+					reader.ReadUInt16();
 
-						short z = reader.ReadInt16();
-						reader.ReadUInt16();
-						short z3 = reader.ReadInt16();
-						reader.ReadUInt16();
+					short z = reader.ReadInt16();
+					reader.ReadUInt16();
+					short z3 = reader.ReadInt16();
+					reader.ReadUInt16();
 
-						short x2 = reader.ReadInt16();
-						short y2 = reader.ReadInt16();
-						short z2 = reader.ReadInt16();
-						reader.ReadUInt16();
+					short x2 = reader.ReadInt16();
+					short y2 = reader.ReadInt16();
+					short z2 = reader.ReadInt16();
+					reader.ReadUInt16();
 
-						Pointer.Read(reader);
-						Pointer.Read(reader);
-						Pointer.Read(reader);
-						Pointer.Read(reader);
-						Pointer.Read(reader);
+					Pointer.Read(reader);
+					Pointer.Read(reader);
+					Pointer.Read(reader);
+					Pointer.Read(reader);
+					Pointer.Read(reader);
 
-						GameObject g = ipos[i].CreateGAO();
-						//g.transform.localPosition = new Vector3(x3 / 256f, 0f / 256f, y3 / 256f);
-					}
-				});*/
-			}
+					GameObject g = ipos[i].CreateGAO();
+					//g.transform.localPosition = new Vector3(x3 / 256f, 0f / 256f, y3 / 256f);
+				}
+			});*/
+		}
 
 		public class UITexture {
 			public string name;
