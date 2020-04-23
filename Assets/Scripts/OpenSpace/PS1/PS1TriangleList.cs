@@ -14,6 +14,7 @@ namespace OpenSpace.PS1 {
 
 		public PS1Triangle[] triangles;
 		public PS1Quad[] quads;
+		public PS1Quad2[] quads2;
 
 		protected override void ReadInternal(Reader reader) {
 			type = reader.ReadUInt16();
@@ -25,6 +26,8 @@ namespace OpenSpace.PS1 {
 					triangles = Load.ReadArray<PS1Triangle>(length, reader);
 				} else if (type == 6) {
 					quads = Load.ReadArray<PS1Quad>(length, reader);
+				} else if (type == 1) {
+					quads2 = Load.ReadArray<PS1Quad2>(length, reader);
 				} else {
 					Load.print(type + " - " + Offset);
 				}

@@ -92,6 +92,16 @@ namespace OpenSpace.PS1 {
 						triangles.Add(tris.quads[j].v1);
 						triangles.Add(tris.quads[j].v3);
 					}
+				} else if (tris.type == 1) {
+					for (int j = 0; j < tris.length; j++) {
+						triangles.Add(tris.quads2[j].v0);
+						triangles.Add(tris.quads2[j].v1);
+						triangles.Add(tris.quads2[j].v2);
+
+						triangles.Add(tris.quads2[j].v2);
+						triangles.Add(tris.quads2[j].v1);
+						triangles.Add(tris.quads2[j].v3);
+					}
 				} else if (tris.type == 5) {
 					for (int j = 0; j < tris.length; j++) {
 						triangles.Add(tris.triangles[j].v0);

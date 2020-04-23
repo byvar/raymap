@@ -12,9 +12,9 @@ namespace OpenSpace.PS1 {
 		public int int_0C;
 		public int int_10;
 
-		public int int_14;
-		public int int_18;
-		public int int_1C;
+		public int x;
+		public int y;
+		public int z;
 		public int int_20;
 		public int int_24;
 
@@ -26,9 +26,9 @@ namespace OpenSpace.PS1 {
 			int_08 = reader.ReadInt32();
 			int_0C = reader.ReadInt32();
 			int_10 = reader.ReadInt32();
-			int_14 = reader.ReadInt32();
-			int_18 = reader.ReadInt32();
-			int_1C = reader.ReadInt32();
+			x = reader.ReadInt32();
+			y = reader.ReadInt32();
+			z = reader.ReadInt32();
 			int_20 = reader.ReadInt32();
 			int_24 = reader.ReadInt32();
 		}

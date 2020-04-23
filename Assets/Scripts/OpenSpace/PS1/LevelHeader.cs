@@ -75,10 +75,10 @@ namespace OpenSpace.PS1 {
 			off_fatherSector = Pointer.Read(reader);
 			off_0F8 = Pointer.Read(reader);
 			uint_0FC = reader.ReadUInt32();
-			off_100 = Pointer.Read(reader); // pointer to struct in big array of structs of 0x18 size
-			uint_104 = reader.ReadUInt32();
+			off_100 = Pointer.Read(reader); //
+			uint_104 = reader.ReadUInt32(); // x
 			uint_108 = reader.ReadUInt32();
-			off_10C = Pointer.Read(reader);
+			off_10C = Pointer.Read(reader); // x structs of 0x14
 			off_110 = Pointer.Read(reader);
 			num_persos = reader.ReadUInt16();
 			ushort_116 = reader.ReadUInt16();
@@ -218,20 +218,31 @@ namespace OpenSpace.PS1 {
 				ipos[i] = Load.FromOffsetOrRead<PS1StaticGeometricObject>(reader, sectorMeshPtrs[i]);
 			}
 			Load.print(num_sectors);
+			Sector[] sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 			SuperObject fatherSector = Load.FromOffsetOrRead<SuperObject>(reader, off_fatherSector, onPreRead: s => s.isDynamic = false);
 			foreach (SuperObject so in fatherSector.children) {
 				if (so.type == Object.SuperObject.Type.Sector) {
-					GameObject g = ipos[so.dataIndex]?.CreateGAO();
-					if (so.matrix1 != null && g != null) {
-						g.transform.localPosition = new Vector3(
-							so.matrix1.int_14 / 256f,
-							so.matrix1.int_1C / 256f,
-							so.matrix1.int_18 / 256f);
+					SuperObject so2 = so.children.FirstOrDefault();
+					if (so2 != null && so.dataIndex + 1 < ipos.Length) {
+						GameObject g = ipos[so.dataIndex + 1]?.CreateGAO();
+						if (so.matrix1 != null && g != null) {
+							g.transform.localPosition = new Vector3(
+								so.matrix1.x / 256f,
+								so.matrix1.z / 256f,
+								so.matrix1.y / 256f);
+						}
 					}
+					/*GameObject g = ipos[so.dataIndex]?.CreateGAO();
+					Sector s = sectors[so.dataIndex];
+					if (s != null && g != null) {
+						g.transform.localPosition = new Vector3(
+							s.int_1C / 256f,
+							s.int_24 / 256f,
+							s.int_20 / 256f);
+					}*/
 				}
 			}
 			SuperObject dynamicWorld = Load.FromOffsetOrRead<SuperObject>(reader, off_dynamicWorld, onPreRead: s => s.isDynamic = true);
-
 			/*Pointer.DoAt(ref reader, off_sectors, () => {
 				for (int i = 0; i < count; i++) {
 					reader.ReadBytes(0x1c);
