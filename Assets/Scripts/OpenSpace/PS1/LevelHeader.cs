@@ -59,7 +59,7 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_18E;
 		public short short_190;
 		public ushort ushort_192;
-		public uint num_sectors_minus_one;
+		public uint num_ipos;
 		public Pointer off_sector_minus_one_things;
 		public uint uint_19C;
 		public uint bad_off_1A0;
@@ -130,7 +130,7 @@ namespace OpenSpace.PS1 {
 			ushort_18E = reader.ReadUInt16();
 			short_190 = reader.ReadInt16();
 			ushort_192 = reader.ReadUInt16();
-			num_sectors_minus_one = reader.ReadUInt32(); // y
+			num_ipos = reader.ReadUInt32(); // y
 			off_sector_minus_one_things = Pointer.Read(reader); // y structs of 0x3c
 			uint_19C = reader.ReadUInt32();
 			bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
@@ -205,9 +205,11 @@ namespace OpenSpace.PS1 {
 		}
 
 		public void ParseSectors(Reader reader) {
-			uint count = num_sectors;
+			uint count = num_ipos;
 			Pointer[] sectorMeshPtrs = new Pointer[count];
 			Pointer.DoAt(ref reader, off_sector_meshes, () => {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
 				for (int i = 0; i < count; i++) {
 					reader.ReadUInt32();
 					sectorMeshPtrs[i] = Pointer.Read(reader);
@@ -222,14 +224,17 @@ namespace OpenSpace.PS1 {
 			SuperObject fatherSector = Load.FromOffsetOrRead<SuperObject>(reader, off_fatherSector, onPreRead: s => s.isDynamic = false);
 			foreach (SuperObject so in fatherSector.children) {
 				if (so.type == Object.SuperObject.Type.Sector) {
-					SuperObject so2 = so.children.FirstOrDefault();
-					if (so2 != null && so.dataIndex + 1 < ipos.Length) {
-						GameObject g = ipos[so.dataIndex + 1]?.CreateGAO();
-						if (so.matrix1 != null && g != null) {
-							g.transform.localPosition = new Vector3(
-								so.matrix1.x / 256f,
-								so.matrix1.z / 256f,
-								so.matrix1.y / 256f);
+					for (int i = 0; i < so.children.Count; i++) {
+						SuperObject so2 = so.children[i];
+						if (so2.type == Object.SuperObject.Type.IPO) {
+							if ((so2.dataIndex >> 1) >= ipos.Length) throw new Exception("SO data index was too high! " + ipos.Length + " - " + so2.dataIndex);
+							GameObject g = ipos[(so2.dataIndex >> 1)]?.CreateGAO();
+							if (so.matrix1 != null && g != null) {
+								g.transform.localPosition = new Vector3(
+									so.matrix1.x / 256f,
+									so.matrix1.z / 256f,
+									so.matrix1.y / 256f);
+							}
 						}
 					}
 					/*GameObject g = ipos[so.dataIndex]?.CreateGAO();

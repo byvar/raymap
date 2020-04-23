@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenSpace.PS1 {
-	public class PS1Triangle : OpenSpaceStruct { // TextureTable
+	public class PS1Triangle : OpenSpaceStruct {
 		public ushort v0;
 		public ushort v1;
 		public ushort v2;

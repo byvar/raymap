@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace OpenSpace.PS1 {
-	public class PS1Quad2 : OpenSpaceStruct {
+	public class PS1QuadLOD : OpenSpaceStruct {
 		public ushort v0;
 		public ushort v1;
 		public ushort v2;
@@ -21,7 +21,10 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_12;
 		public ushort ushort_14;
 		public ushort ushort_16;
-		public Pointer off_18;
+		public Pointer off_actualQuads;
+
+		public uint length;
+		public PS1Quad[] quads;
 
 		protected override void ReadInternal(Reader reader) {
 			v0 = reader.ReadUInt16();
@@ -36,7 +39,12 @@ namespace OpenSpace.PS1 {
 			ushort_12 = reader.ReadUInt16();// page info?
 			ushort_14 = reader.ReadUInt16();
 			ushort_16 = reader.ReadUInt16();
-			off_18 = Pointer.Read(reader);
+			off_actualQuads = Pointer.Read(reader);
+
+			Pointer.DoAt(ref reader, off_actualQuads, () => {
+				length = reader.ReadUInt32();
+				quads = Load.ReadArray<PS1Quad>(length, reader);
+			});
 
 
 			/*R2PS1Loader l = Load as R2PS1Loader;

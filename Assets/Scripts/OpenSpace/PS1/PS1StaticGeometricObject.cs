@@ -53,7 +53,7 @@ namespace OpenSpace.PS1 {
 				short_0A / 256f);
 			for (int i = 0; i < triangleLists.Length; i++) {
 				PS1TriangleList tris = triangleLists[i];
-				GameObject gao = new GameObject(Offset.ToString());
+				GameObject gao = new GameObject(Offset.ToString() + " - " + tris.Offset + " - " + tris.type);
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
@@ -94,13 +94,42 @@ namespace OpenSpace.PS1 {
 					}
 				} else if (tris.type == 1) {
 					for (int j = 0; j < tris.length; j++) {
-						triangles.Add(tris.quads2[j].v0);
-						triangles.Add(tris.quads2[j].v1);
-						triangles.Add(tris.quads2[j].v2);
+						PS1QuadLOD q = tris.quadsLOD[j];
+						if (q.length > 0) {
+							for (int k = 0; k < q.quads.Length; k++) {
+								triangles.Add(q.quads[k].v0);
+								triangles.Add(q.quads[k].v1);
+								triangles.Add(q.quads[k].v2);
 
-						triangles.Add(tris.quads2[j].v2);
-						triangles.Add(tris.quads2[j].v1);
-						triangles.Add(tris.quads2[j].v3);
+								triangles.Add(q.quads[k].v1);
+								triangles.Add(q.quads[k].v3);
+								triangles.Add(q.quads[k].v2);
+							}
+						} else {
+							triangles.Add(q.v0);
+							triangles.Add(q.v1);
+							triangles.Add(q.v2);
+
+							triangles.Add(q.v1);
+							triangles.Add(q.v3);
+							triangles.Add(q.v2);
+						}
+					}
+				} else if (tris.type == 3) {
+					for (int j = 0; j < tris.length; j++) {
+						triangles.Add(tris.trianglesNoTex[j].v0);
+						triangles.Add(tris.trianglesNoTex[j].v1);
+						triangles.Add(tris.trianglesNoTex[j].v2);
+					}
+				} else if(tris.type == 4) {
+					for (int j = 0; j < tris.length; j++) {
+						triangles.Add(tris.quadsNoTex[j].v0);
+						triangles.Add(tris.quadsNoTex[j].v1);
+						triangles.Add(tris.quadsNoTex[j].v2);
+
+						triangles.Add(tris.quadsNoTex[j].v2);
+						triangles.Add(tris.quadsNoTex[j].v1);
+						triangles.Add(tris.quadsNoTex[j].v3);
 					}
 				} else if (tris.type == 5) {
 					for (int j = 0; j < tris.length; j++) {

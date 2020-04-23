@@ -13,8 +13,10 @@ namespace OpenSpace.PS1 {
 		public uint length;
 
 		public PS1Triangle[] triangles;
+		public PS1TriangleNoTexture[] trianglesNoTex;
+		public PS1QuadNoTexture[] quadsNoTex;
 		public PS1Quad[] quads;
-		public PS1Quad2[] quads2;
+		public PS1QuadLOD[] quadsLOD;
 
 		protected override void ReadInternal(Reader reader) {
 			type = reader.ReadUInt16();
@@ -26,10 +28,14 @@ namespace OpenSpace.PS1 {
 					triangles = Load.ReadArray<PS1Triangle>(length, reader);
 				} else if (type == 6) {
 					quads = Load.ReadArray<PS1Quad>(length, reader);
+				} else if(type == 4) {
+					quadsNoTex = Load.ReadArray<PS1QuadNoTexture>(length, reader);
+				} else if(type == 3) {
+					trianglesNoTex = Load.ReadArray<PS1TriangleNoTexture>(length, reader);
 				} else if (type == 1) {
-					quads2 = Load.ReadArray<PS1Quad2>(length, reader);
+					quadsLOD = Load.ReadArray<PS1QuadLOD>(length, reader);
 				} else {
-					Load.print(type + " - " + Offset);
+					UnityEngine.Debug.LogWarning(type + " - " + Offset);
 				}
 			});
 		}
