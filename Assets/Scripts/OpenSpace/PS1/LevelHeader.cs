@@ -199,7 +199,7 @@ namespace OpenSpace.PS1 {
 			for (int i = 0; i < textures.Length; i++) {
 				UITexture t = textures[i];
 				//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
-				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, PS1VRAM.PixelMode.Byte, t.xInPage, t.yInPage);
+				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, t.xInPage, t.yInPage);
 				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex/" + t.name + ".png", t.texture.EncodeToPNG());
 			}
 		}

@@ -368,6 +368,7 @@ namespace OpenSpace.Loader {
 		}
 		#endregion
 
+		#region Textures
 		public void FillVRAM() {
 			vram.currentXPage = 5;
 			using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + lvlName + "/vram.bin"))) {
@@ -376,5 +377,51 @@ namespace OpenSpace.Loader {
 				vram.AddData(data, width);
 			}
 		}
+
+		private List<TextureBounds> textureBounds = new List<TextureBounds>();
+
+		public void RegisterTexture(ushort pageInfo, ushort palette, int xMin, int xMax, int yMin, int yMax) {
+			TextureBounds b = new TextureBounds() {
+				pageInfo = pageInfo,
+				paletteInfo = palette,
+				xMin = xMin,
+				xMax = xMax,
+				yMin = yMin,
+				yMax = yMax
+			};
+			// TODO: Add TextureBounds to list
+			// Check all elements in the list for overlap. Merge if there is any overlap, then check again until no overlap?
+		}
+
+		public void CalculateTextures() {
+			int i = 0;
+			foreach (TextureBounds b in textureBounds) {
+				int w = b.xMax - b.xMin;
+				int h = b.yMax - b.yMin;
+				Texture2D tex = vram.GetTexture((ushort)w, (ushort)h, b.pageInfo, b.paletteInfo, b.xMin, b.yMin);
+				b.texture = tex;
+				if (exportTextures) {
+					Util.ByteArrayToFile(gameDataBinFolder + "test_tex/" + i++ + $"_{w}_{h}" + ".png", tex.EncodeToPNG());
+				}
+			}
+		}
+
+		public TextureBounds GetTextureBounds(ushort pageInfo, ushort paletteInfo, int x, int y) {
+			return textureBounds.FirstOrDefault(t => t.pageInfo == pageInfo && t.paletteInfo == paletteInfo &&
+			x >= t.xMin && x < t.xMax &&
+			y >= t.yMin && y < t.yMax);
+		}
+
+		public class TextureBounds {
+			public ushort pageInfo;
+			public ushort paletteInfo;
+			public int xMin;
+			public int xMax;
+			public int yMin;
+			public int yMax;
+
+			public Texture2D texture;
+		}
+		#endregion
 	}
 }

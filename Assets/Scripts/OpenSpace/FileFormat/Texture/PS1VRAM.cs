@@ -287,7 +287,7 @@ namespace OpenSpace.FileFormat.Texture {
 			float a = Util.ExtractBits(col, 1, 15);
 			return new Color(r, g, b, a);
 		}
-		public Texture2D GetTexture(ushort width, ushort height, ushort texturePageInfo, ushort paletteInfo, PixelMode pixelMode, int xInPage, int yInPage) {
+		public Texture2D GetTexture(ushort width, ushort height, ushort texturePageInfo, ushort paletteInfo, int xInPage, int yInPage) {
 			// see http://hitmen.c02.at/files/docs/psx/psx.pdf page 37
 			int pageX = Util.ExtractBits(texturePageInfo, 4, 0);
 			int pageY = Util.ExtractBits(texturePageInfo, 1, 4);

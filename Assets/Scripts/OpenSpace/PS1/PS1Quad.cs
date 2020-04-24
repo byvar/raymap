@@ -55,6 +55,8 @@ namespace OpenSpace.PS1 {
 
 
 
+			R2PS1Loader l = Load as R2PS1Loader;
+			l.RegisterTexture(pageInfo, paletteInfo, xMin, xMax, yMin, yMax);
 			/*
 			R2PS1Loader l = Load as R2PS1Loader;
 			PS1VRAM vram = l.vram;
