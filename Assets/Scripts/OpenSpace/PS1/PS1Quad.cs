@@ -15,12 +15,16 @@ namespace OpenSpace.PS1 {
 		public ushort v3;
 		public ushort ushort_08;
 		public ushort ushort_0A;
-		public ushort ushort_0C;
+		public byte x1;
+		public byte y1;
 		public ushort paletteInfo;
-		public ushort ushort_10;
+		public byte x2;
+		public byte y2;
 		public ushort pageInfo;
-		public ushort ushort_14;
-		public ushort ushort_16;
+		public byte x3;
+		public byte y3;
+		public byte x4;
+		public byte y4;
 
 		protected override void ReadInternal(Reader reader) {
 			v0 = reader.ReadUInt16();
@@ -29,18 +33,34 @@ namespace OpenSpace.PS1 {
 			v3 = reader.ReadUInt16();
 			ushort_08 = reader.ReadUInt16();
 			ushort_0A = reader.ReadUInt16();
-			ushort_0C = reader.ReadUInt16();
+			x1 = reader.ReadByte();
+			y1 = reader.ReadByte();
 			paletteInfo = reader.ReadUInt16();// palette info?
-			ushort_10 = reader.ReadUInt16();
+			x2 = reader.ReadByte();
+			y2 = reader.ReadByte();
 			pageInfo = reader.ReadUInt16();// page info?
-			ushort_14 = reader.ReadUInt16();
-			ushort_16 = reader.ReadUInt16();
+			x3 = reader.ReadByte();
+			y3 = reader.ReadByte();
+			x4 = reader.ReadByte();
+			y4 = reader.ReadByte();
+
+			byte[] x = new[] { x1, x2, x3, x4 };
+			byte[] y = new[] { y1, y2, y3, y4 };
+			int xMin = x.Min();
+			int xMax = x.Max() + 1;
+			int yMin = y.Min();
+			int yMax = y.Max() + 1;
+			int w = xMax - xMin;
+			int h = yMax - yMin;
 
 
-			/*R2PS1Loader l = Load as R2PS1Loader;
+
+			/*
+			R2PS1Loader l = Load as R2PS1Loader;
 			PS1VRAM vram = l.vram;
-			Texture2D tex = vram.GetTexture(128, 128, ushort_12, ushort_0E, PS1VRAM.PixelMode.Byte, 0, 0);
-			Util.ByteArrayToFile(l.gameDataBinFolder + "test_tex/" + Offset.FileOffset + ".png", tex.EncodeToPNG());*/
+			Texture2D tex = vram.GetTexture((ushort)w, (ushort)h, pageInfo, paletteInfo, PS1VRAM.PixelMode.Byte, xMin, yMin);
+			Util.ByteArrayToFile(l.gameDataBinFolder + "test_tex/" + Offset.StringFileOffset + $"_{w}_{h}" + ".png", tex.EncodeToPNG());
+			*/
 		}
 	}
 }

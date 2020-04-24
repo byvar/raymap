@@ -56,6 +56,12 @@ namespace OpenSpace {
             }
         }
 
+        public string StringFileOffset {
+            get {
+                return String.Format("{0:X8}", FileOffset);
+            }
+        }
+
         public static Pointer GetPointerAtOffset(Pointer pointer) {
             MapLoader l = MapLoader.Loader;
             Pointer ptr = null;

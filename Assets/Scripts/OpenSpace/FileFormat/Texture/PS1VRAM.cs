@@ -329,6 +329,7 @@ namespace OpenSpace.FileFormat.Texture {
 					}
 				}
 			} else if (tp == 0) {
+				if (xInPage % 2 != 0) xInPage--;
 				for (int y = 0; y < height; y++) {
 					for (int x = 0; x < width; x++) {
 						var paletteIndex = GetPixel8(pageX, pageY, (xInPage + x) / 2, yInPage + y);
