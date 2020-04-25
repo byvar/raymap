@@ -10,8 +10,22 @@ namespace OpenSpace.PS1.GLI {
 		public byte materialFlags;
 		public byte scroll;
 
-		public float ScrollX => (scroll >> 4) / 15f / 10f;
-		public float ScrollY => (scroll & 0xF) / 15f / 10f; // factor is still wrong, maybe it should be 256 or 255?
+		public float ScrollX {
+            get {
+                int scr = ((scroll >> 4) & 0b1111);
+                float scrf = scr / 256f;
+                return scrf;
+                //return (scr & 0b1000) != 0 ? -scrf : scrf;
+            }
+        }
+        public float ScrollY {
+            get {
+                int scr = ((scroll) & 0b1111);
+                float scrf = scr / 256f;
+                return scrf;
+                //return (scr & 0b1000) != 0 ? -scrf : scrf;
+            }
+        }
         public bool ScrollingEnabled => scroll != 0;
         public bool IsTransparent => texture?.IsTransparent ?? false;
         public bool IsLight => (materialFlags & 0x80) == 0x80;
