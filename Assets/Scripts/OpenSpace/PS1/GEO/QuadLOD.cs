@@ -1,5 +1,6 @@
 ﻿using OpenSpace.FileFormat.Texture;
 using OpenSpace.Loader;
+using OpenSpace.PS1.GLI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace OpenSpace.PS1 {
-	public class PS1QuadLOD : OpenSpaceStruct {
+	public class QuadLOD : OpenSpaceStruct, IPS1Polygon {
 		public ushort v0;
 		public ushort v1;
 		public ushort v2;
@@ -24,7 +25,9 @@ namespace OpenSpace.PS1 {
 		public Pointer off_actualQuads;
 
 		public uint length;
-		public PS1Quad[] quads;
+		public Quad[] quads;
+
+		public TextureBounds Texture => null;
 
 		protected override void ReadInternal(Reader reader) {
 			v0 = reader.ReadUInt16();
@@ -43,7 +46,7 @@ namespace OpenSpace.PS1 {
 
 			Pointer.DoAt(ref reader, off_actualQuads, () => {
 				length = reader.ReadUInt32();
-				quads = Load.ReadArray<PS1Quad>(length, reader);
+				quads = Load.ReadArray<Quad>(length, reader);
 			});
 
 

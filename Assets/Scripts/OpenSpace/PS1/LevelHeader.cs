@@ -222,6 +222,7 @@ namespace OpenSpace.PS1 {
 			Load.print(num_sectors);
 			Sector[] sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 			SuperObject fatherSector = Load.FromOffsetOrRead<SuperObject>(reader, off_fatherSector, onPreRead: s => s.isDynamic = false);
+			((R2PS1Loader)Load).CalculateTextures();
 			foreach (SuperObject so in fatherSector.children) {
 				if (so.type == Object.SuperObject.Type.Sector) {
 					for (int i = 0; i < so.children.Count; i++) {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenSpace.PS1 {
-	public class PS1Vertex : OpenSpaceStruct {
+	public class Vertex : OpenSpaceStruct {
 		public short x;
 		public short y;
 		public short z;

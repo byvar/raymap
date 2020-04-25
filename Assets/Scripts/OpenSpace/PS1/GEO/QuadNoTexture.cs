@@ -1,5 +1,6 @@
 ﻿using OpenSpace.FileFormat.Texture;
 using OpenSpace.Loader;
+using OpenSpace.PS1.GLI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +9,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace OpenSpace.PS1 {
-	public class PS1QuadNoTexture : OpenSpaceStruct {
+	public class QuadNoTexture : OpenSpaceStruct, IPS1Polygon {
 		public ushort v0;
 		public ushort v1;
 		public ushort v2;
 		public ushort v3;
 		public ushort ushort_08;
 		public ushort ushort_0A;
+
+		public TextureBounds Texture => null;
 
 		protected override void ReadInternal(Reader reader) {
 			v0 = reader.ReadUInt16();

@@ -20,6 +20,7 @@ using lzo.net;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using OpenSpace.PS1;
+using OpenSpace.PS1.GLI;
 
 namespace OpenSpace.Loader {
     public class R2PS1Loader : MapLoader {
@@ -420,40 +421,11 @@ namespace OpenSpace.Loader {
         }
 
         public TextureBounds GetTextureBounds(ushort pageInfo, ushort paletteInfo, int x, int y) {
-			return textureBounds.FirstOrDefault(t => t.pageInfo == pageInfo && t.paletteInfo == paletteInfo &&
-			x >= t.xMin && x < t.xMax &&
-			y >= t.yMin && y < t.yMax);
+			return textureBounds.FirstOrDefault(
+				t => t.pageInfo == pageInfo && t.paletteInfo == paletteInfo &&
+				x >= t.xMin && x < t.xMax &&
+				y >= t.yMin && y < t.yMax);
 		}
-
-		public class TextureBounds {
-			public ushort pageInfo;
-			public ushort paletteInfo;
-			public int xMin;
-			public int xMax;
-			public int yMin;
-			public int yMax;
-
-			public Texture2D texture;
-
-            public bool HasOverlap(TextureBounds b)
-            {
-                if (b.pageInfo!=pageInfo || b.paletteInfo!=paletteInfo) {
-                    return false;
-                }
-
-                bool xOverlap = (xMin > b.xMin || xMin < b.xMax) && (xMax > b.xMin || xMax < b.xMax);
-                bool yOverlap = (yMin > b.yMin || yMin < b.yMax) && (yMax > b.yMin || yMax < b.yMax);
-                return xOverlap && yOverlap;
-            }
-
-            public void ExpandWithBounds(TextureBounds b)
-            {
-                xMin = Math.Min(xMin, b.xMin);
-                xMax = Math.Max(xMax, b.xMax);
-                yMin = Math.Min(yMin, b.yMin);
-                yMax = Math.Max(yMax, b.yMax);
-            }
-        }
 		#endregion
 	}
 }

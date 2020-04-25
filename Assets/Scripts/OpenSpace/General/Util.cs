@@ -147,6 +147,19 @@ namespace OpenSpace {
             return texture;
         }
 
+        public static Texture2D WhiteTexture() {
+            Texture2D tex = new Texture2D(1, 1);
+            tex.SetPixel(0, 0, Color.white);
+            tex.Apply();
+            return tex;
+        }
+        public static Texture2D GrayTexture() {
+            Texture2D tex = new Texture2D(1, 1);
+            tex.SetPixel(0, 0, Color.gray);
+            tex.Apply();
+            return tex;
+        }
+
         public static Texture2D CreateDummyCheckerTexture() {
             Texture2D texture = new Texture2D(2, 2);
             Color col1 = Color.white;
