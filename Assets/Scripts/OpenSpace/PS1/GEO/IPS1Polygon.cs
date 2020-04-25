@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace OpenSpace.PS1 {
 	public interface IPS1Polygon {
 		TextureBounds Texture { get; }
-
+		VisualMaterial Material { get; }
+		Pointer Offset { get; }
 	}
 }

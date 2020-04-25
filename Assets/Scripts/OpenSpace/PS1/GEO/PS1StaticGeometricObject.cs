@@ -51,7 +51,7 @@ namespace OpenSpace.PS1 {
 			GameObject parentGao = new GameObject(Offset.ToString());
 			// First pass
 			
-			Dictionary<TextureBounds, List<IPS1Polygon>> textured = new Dictionary<TextureBounds, List<IPS1Polygon>>();
+			Dictionary<VisualMaterial, List<IPS1Polygon>> textured = new Dictionary<VisualMaterial, List<IPS1Polygon>>();
 			List<IPS1Polygon> untextured = new List<IPS1Polygon>();
 			for (int i = 0; i < triangleLists.Length; i++) {
 				PolygonList polys = triangleLists[i];
@@ -60,7 +60,7 @@ namespace OpenSpace.PS1 {
 						if (p is QuadLOD && (p as QuadLOD).quads?.Length > 0) {
 							Quad[] quads = (p as QuadLOD).quads;
 							foreach (Quad q in quads) {
-								TextureBounds b = q.Texture;
+								VisualMaterial b = q.Material;
 								if (b == null) {
 									untextured.Add(q);
 								} else {
@@ -69,7 +69,7 @@ namespace OpenSpace.PS1 {
 								}
 							}
 						} else {
-							TextureBounds b = p.Texture;
+							VisualMaterial b = p.Material;
 							if (b == null) {
 								untextured.Add(p);
 							} else {
@@ -82,10 +82,11 @@ namespace OpenSpace.PS1 {
 			}
 
 			// Second pass
-			TextureBounds[] textures = textured.Keys.ToArray();
+			VisualMaterial[] textures = textured.Keys.ToArray();
 			for (int i = 0; i < textures.Length; i++) {
-				TextureBounds b = textures[i];
-				GameObject gao = new GameObject(Offset.ToString() + " - " + i);
+				VisualMaterial vm = textures[i];
+				TextureBounds b = vm.texture;
+				GameObject gao = new GameObject(Offset.ToString() + " - " + i + " - " + textured[vm].FirstOrDefault()?.Offset);
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
@@ -94,7 +95,7 @@ namespace OpenSpace.PS1 {
 				List<int> vertIndices = new List<int>();
 				List<int> triIndices = new List<int>();
 				List<Vector2> uvs = new List<Vector2>();
-				foreach (IPS1Polygon p in textured[b]) {
+				foreach (IPS1Polygon p in textured[vm]) {
 					int currentCount = vertIndices.Count;
 					switch (p) {
 						case Triangle t:
@@ -155,7 +156,9 @@ namespace OpenSpace.PS1 {
 
 
 				Material baseMaterial;
-				if (/*m.colors.Any(c => c.a != 1f) || */b.IsTransparent) {
+				if (vm.IsLight) {
+					baseMaterial = Load.baseLightMaterial;
+				} else if (/*m.colors.Any(c => c.a != 1f) || */vm.IsTransparent) {
 					baseMaterial = Load.baseTransparentMaterial;
 				} else {
 					baseMaterial = Load.baseMaterial;
@@ -163,8 +166,15 @@ namespace OpenSpace.PS1 {
 				Material mat = new Material(baseMaterial);
 				mat.SetInt("_NumTextures", 1);
 				string textureName = "_Tex0";
-				Texture2D tex = textures[i].texture;
+				Texture2D tex = b.texture;
 				mat.SetTexture(textureName, tex);
+
+				mat.SetVector(textureName + "Params", new Vector4(0,
+					vm.ScrollingEnabled ? 1f : 0f,
+					0f, 0f));
+				mat.SetVector(textureName + "Params2", new Vector4(
+					0f, 0f,
+					vm.ScrollX, vm.ScrollY));
 				mat.SetVector("_AmbientCoef", Vector4.one);
 				mat.SetFloat("_Prelit", 1f);
 				mr.material = mat;

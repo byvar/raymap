@@ -14,7 +14,8 @@ namespace OpenSpace.PS1 {
 		public ushort v1;
 		public ushort v2;
 		public ushort v3;
-		public ushort ushort_08;
+		public byte materialFlags;
+		public byte scroll;
 		public ushort ushort_0A;
 		public byte x0;
 		public byte y0;
@@ -32,7 +33,8 @@ namespace OpenSpace.PS1 {
 			v1 = reader.ReadUInt16();
 			v2 = reader.ReadUInt16();
 			v3 = reader.ReadUInt16();
-			ushort_08 = reader.ReadUInt16();
+			materialFlags = reader.ReadByte();
+			scroll = reader.ReadByte();
 			ushort_0A = reader.ReadUInt16();
 			x0 = reader.ReadByte();
 			y0 = reader.ReadByte();
@@ -70,6 +72,16 @@ namespace OpenSpace.PS1 {
 			get {
 				R2PS1Loader l = Load as R2PS1Loader;
 				return l.GetTextureBounds(pageInfo, paletteInfo, x0, y0);
+			}
+		}
+
+		public VisualMaterial Material {
+			get {
+				return new VisualMaterial() {
+					materialFlags = materialFlags,
+					scroll = scroll,
+					texture = Texture
+				};
 			}
 		}
 	}

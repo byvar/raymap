@@ -18,6 +18,7 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_0A;
 
 		public TextureBounds Texture => null;
+		public VisualMaterial Material => null;
 
 		protected override void ReadInternal(Reader reader) {
 			v0 = reader.ReadUInt16();
