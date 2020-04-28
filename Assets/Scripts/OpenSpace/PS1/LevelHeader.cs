@@ -207,6 +207,7 @@ namespace OpenSpace.PS1 {
 		public void ParseSectors(Reader reader) {
 			uint count = num_ipos;
 			Pointer[] sectorMeshPtrs = new Pointer[count];
+			List<Pointer> otherMeshPtrs = new List<Pointer>();
 			Pointer.DoAt(ref reader, off_sector_meshes, () => {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
@@ -215,10 +216,24 @@ namespace OpenSpace.PS1 {
 					sectorMeshPtrs[i] = Pointer.Read(reader);
 				}
 			});
-			PS1StaticGeometricObject[] ipos = new PS1StaticGeometricObject[count];
+			// Bad hack
+			Pointer.DoAt(ref reader, off_other_meshes, () => {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				while (reader.ReadUInt32() != 0) {
+					otherMeshPtrs.Add(Pointer.Read(reader));
+				}
+			});
+			GeometricObject[] ipos = new GeometricObject[count];
 			for (int i = 0; i < count; i++) {
-				ipos[i] = Load.FromOffsetOrRead<PS1StaticGeometricObject>(reader, sectorMeshPtrs[i]);
+				ipos[i] = Load.FromOffsetOrRead<GeometricObject>(reader, sectorMeshPtrs[i]);
 			}
+			GeometricObject[] p = new GeometricObject[otherMeshPtrs.Count];
+			for (int i = 0; i < otherMeshPtrs.Count; i++) {
+				Load.print(i + ": " + otherMeshPtrs[i]);
+				p[i] = Load.FromOffsetOrRead<GeometricObject>(reader, otherMeshPtrs[i]);
+			}
+
 			Load.print(num_sectors);
 			Sector[] sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 			SuperObject fatherSector = Load.FromOffsetOrRead<SuperObject>(reader, off_fatherSector, onPreRead: s => s.isDynamic = false);
@@ -247,6 +262,11 @@ namespace OpenSpace.PS1 {
 							s.int_20 / 256f);
 					}*/
 				}
+			}
+			GameObject persoParent = new GameObject("Perso parts");
+			foreach (var o in p) {
+				GameObject g = o?.CreateGAO();
+				g?.transform.SetParent(persoParent.transform);
 			}
 			SuperObject dynamicWorld = Load.FromOffsetOrRead<SuperObject>(reader, off_dynamicWorld, onPreRead: s => s.isDynamic = true);
 			/*Pointer.DoAt(ref reader, off_sectors, () => {

@@ -21,6 +21,9 @@ namespace OpenSpace.PS1 {
 			Pointer.DoAt(ref reader, off_polygons, () => {
 				length = reader.ReadUInt32();
 				switch (type) {
+					case 0:
+						polygons = Load.ReadArray<Sprite>(length, reader);
+						break;
 					case 1:
 						polygons = Load.ReadArray<QuadLOD>(length, reader);
 						break;
