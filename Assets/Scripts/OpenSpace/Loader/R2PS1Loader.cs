@@ -413,9 +413,10 @@ namespace OpenSpace.Loader {
                 int w = b.xMax - b.xMin;
                 int h = b.yMax - b.yMin;
                 Texture2D tex = vram.GetTexture((ushort)w, (ushort)h, b.pageInfo, b.paletteInfo, b.xMin, b.yMin);
+				tex.wrapMode = TextureWrapMode.Clamp;
                 b.texture = tex;
                 if (exportTextures) {
-                    Util.ByteArrayToFile(gameDataBinFolder + "test_tex/" + i++ + $"_{w}_{h}" + ".png", tex.EncodeToPNG());
+                    Util.ByteArrayToFile(gameDataBinFolder + "test_tex/" + lvlName + "/" + i++ + $"_{b.xMin}_{b.yMin}_{w}_{h}" + ".png", tex.EncodeToPNG());
                 }
             }
         }

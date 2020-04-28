@@ -51,7 +51,7 @@ namespace OpenSpace.PS1 {
 		public Pointer off_178;
 		public int int_17C;
 
-		public Pointer off_180;
+		public Pointer off_other_meshes;
 		public Pointer off_sector_meshes;
 		public uint uint_188;
 
@@ -121,10 +121,10 @@ namespace OpenSpace.PS1 {
 			off_178 = Pointer.Read(reader);
 			int_17C = reader.ReadInt32(); // -1
 
-			off_180 = Pointer.Read(reader); // big array of pointers, 2 pointers per thing
+			off_other_meshes = Pointer.Read(reader); // big array of pointers, 2 pointers per thing
 			off_sector_meshes = Pointer.Read(reader); // 2 x 0 uint, then y structs of 8
 			uint_188 = reader.ReadUInt32(); // x things
-			Load.print(off_178 + " - " + off_180 + " - " + off_sector_meshes + " - " + uint_188);
+			Load.print(off_178 + " - " + off_other_meshes + " - " + off_sector_meshes + " - " + uint_188);
 
 			ushort_18C = reader.ReadUInt16();
 			ushort_18E = reader.ReadUInt16();

@@ -20,7 +20,7 @@ namespace OpenSpace.PS1 {
 		public Pointer off_triangleLists;
 		public short short_18;
 		public short short_1A;
-		public short short_1C;
+		public short currentScrollValue;
 		public short short_1E;
 
 		// Parsed
@@ -39,7 +39,7 @@ namespace OpenSpace.PS1 {
 			off_triangleLists = Pointer.Read(reader);
 			short_18 = reader.ReadInt16();
 			short_1A = reader.ReadInt16();
-			short_1C = reader.ReadInt16();
+			currentScrollValue = reader.ReadInt16();
 			short_1E = reader.ReadInt16();
 
 			vertices = Load.ReadArray<Vertex>(num_vertices, reader, off_vertices);
@@ -86,7 +86,7 @@ namespace OpenSpace.PS1 {
 			for (int i = 0; i < textures.Length; i++) {
 				VisualMaterial vm = textures[i];
 				TextureBounds b = vm.texture;
-				GameObject gao = new GameObject(Offset.ToString() + " - " + i + " - " + textured[vm].FirstOrDefault()?.Offset);
+				GameObject gao = new GameObject(Offset.ToString() + " - " + i + " - " + textured[vm].FirstOrDefault()?.Offset + " - " + textured[vm].FirstOrDefault()?.GetType() + " - " + string.Format("{0:X2}",vm.materialFlags) + "|" + string.Format("{0:X2}", vm.scroll));
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
@@ -167,8 +167,9 @@ namespace OpenSpace.PS1 {
 				mat.SetInt("_NumTextures", 1);
 				string textureName = "_Tex0";
 				Texture2D tex = b.texture;
+				if (vm.ScrollingEnabled) tex.wrapMode = TextureWrapMode.Repeat;
 				mat.SetTexture(textureName, tex);
-
+				
 				mat.SetVector(textureName + "Params", new Vector4(0,
 					vm.ScrollingEnabled ? 1f : 0f,
 					0f, 0f));

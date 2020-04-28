@@ -34,6 +34,13 @@ namespace OpenSpace.PS1.GLI {
             }
         }
 
+        public int BitDepth {
+            get {
+                int tp = Util.ExtractBits(pageInfo, 2, 7); // 0: 4-bit, 1: 8-bit, 2: 15-bit direct
+                return tp;
+            }
+        }
+
         public bool HasOverlap(TextureBounds b) {
             if (b.pageInfo != pageInfo || b.paletteInfo != paletteInfo) {
                 return false;
