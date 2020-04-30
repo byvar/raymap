@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace OpenSpace {
     public class Reader : BinaryReader {
@@ -98,12 +100,24 @@ namespace OpenSpace {
             return result;
         }
 
-        public string ReadNullDelimitedString() {
+        public string ReadNullDelimitedString(Encoding encoding = null) {
             string result = "";
-            char c = Convert.ToChar(ReadByte());
-            while (c != 0x0) {
-                result += c;
-                c = Convert.ToChar(ReadByte());
+            if (encoding != null) {
+                List<byte> bytes = new List<byte>();
+                byte b = ReadByte();
+                while (b != 0x0) {
+                    bytes.Add(b);
+                    b = ReadByte();
+                }
+                if (bytes.Count > 0) {
+                    return encoding.GetString(bytes.ToArray());
+                }
+            } else {
+                char c = Convert.ToChar(ReadByte());
+                while (c != 0x0) {
+                    result += c;
+                    c = Convert.ToChar(ReadByte());
+                }
             }
             return result;
         }

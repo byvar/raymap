@@ -21,11 +21,13 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 using OpenSpace.PS1;
 using OpenSpace.PS1.GLI;
+using System.Text;
 
 namespace OpenSpace.Loader {
     public class R2PS1Loader : MapLoader {
 		public int CurrentLevel { get; private set; } = -1;
 		public PS1VRAM vram = new PS1VRAM();
+		public LevelHeader levelHeader;
 
 		public string[] LoadLevelList() {
 			if (PS1GameInfo.Games.ContainsKey(Settings.s.mode)) {
@@ -44,6 +46,7 @@ namespace OpenSpace.Loader {
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
 				if (!PS1GameInfo.Games.ContainsKey(Settings.s.mode)) throw new Exception("PS1 info wasn't defined for this mode");
 				loadingState = "Initializing files";
+				//RipRHRLoc();
 				PS1GameInfo game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
 				await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.bigfile == "COMBIN"));
@@ -60,6 +63,28 @@ namespace OpenSpace.Loader {
             await WaitIfNecessary();
             InitModdables();
         }
+
+		/*public void RipRHRLoc() {
+			string offsetsFile = gameDataBinFolder + "en_string_offsets.bin";
+			string locFile = gameDataBinFolder + "rhr_loc_from_memory.bin";
+			List<ushort> offsets = new List<ushort>();
+			string[] strings;
+			using (Reader reader = new Reader(FileSystem.GetFileReadStream(offsetsFile))) {
+				while (reader.BaseStream.Position < reader.BaseStream.Length) {
+					offsets.Add(reader.ReadUInt16());
+				}
+			}
+			strings = new string[offsets.Count];
+			using (Reader reader = new Reader(FileSystem.GetFileReadStream(locFile))) {
+				for (int i = 0; i < strings.Length; i++) {
+					reader.BaseStream.Position = offsets[i];
+					strings[i] = reader.ReadNullDelimitedString(encoding: Encoding.GetEncoding(1252));
+				}
+			}
+			var output = strings;
+			string json = Newtonsoft.Json.JsonConvert.SerializeObject(output, Newtonsoft.Json.Formatting.Indented);
+			Util.ByteArrayToFile(gameDataBinFolder + "rhr.json", Encoding.UTF8.GetBytes(json));
+		}*/
 
 		public async Task InitFiles(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo) {
 			if (CurrentLevel < 0 || CurrentLevel >= gameInfo.maps.Length) return;
@@ -79,11 +104,35 @@ namespace OpenSpace.Loader {
 
 			// TODO: Load header here
 			vram.Export(gameDataBinFolder + "vram.png");
-			await Task.CompletedTask;
 
-			LevelHeader header = FromOffsetOrRead<LevelHeader>(reader, Pointer.Current(reader));
+			loadingState = "Loading level header";
+			await WaitIfNecessary();
+			levelHeader = FromOffsetOrRead<LevelHeader>(reader, Pointer.Current(reader));
 
-            CalculateTextures();
+			loadingState = "Calculating texture bounds";
+			await WaitIfNecessary();
+			CalculateTextures();
+
+			loadingState = "Loading superobject hierarchy";
+			await WaitIfNecessary();
+			levelHeader.fatherSector = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_fatherSector, onPreRead: s => s.isDynamic = false);
+			levelHeader.dynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_dynamicWorld, onPreRead: s => s.isDynamic = true);
+			levelHeader.inactiveDynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_inactiveDynamicWorld, onPreRead: s => s.isDynamic = true);
+
+			loadingState = "Creating gameobjects";
+			await WaitIfNecessary();
+			GameObject fatherSector = levelHeader.fatherSector?.GetGameObject();
+			fatherSector.name = "Father Sector | " + fatherSector.name;
+			GameObject dynamicWorld = levelHeader.dynamicWorld?.GetGameObject();
+			dynamicWorld.name = "Dynamic World | " + dynamicWorld.name;
+			GameObject inactiveDynamicWorld = levelHeader.inactiveDynamicWorld?.GetGameObject();
+			inactiveDynamicWorld.name = "Inactive Dynamic World | " + inactiveDynamicWorld.name;
+
+			GameObject persoPartsParent = new GameObject("Perso parts");
+			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
+				GameObject g = e.GetGameObject();
+				g.transform.parent = persoPartsParent.transform;
+			}
 		}
 
 		#region DAT Parsing

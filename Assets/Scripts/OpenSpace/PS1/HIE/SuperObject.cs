@@ -1,8 +1,10 @@
-﻿using System;
+﻿using OpenSpace.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Type = OpenSpace.Object.SuperObject.Type;
 
 namespace OpenSpace.PS1 {
@@ -37,8 +39,8 @@ namespace OpenSpace.PS1 {
 		// Parsed
 		public Type type;
 		public SuperObject parent;
-		public Matrix matrix1;
-		public Matrix matrix2;
+		public PS1Matrix matrix1;
+		public PS1Matrix matrix2;
 
 		public Pointer NextEntry => off_next_brother;
 		public Pointer PreviousEntry => off_prev_brother;
@@ -83,8 +85,8 @@ namespace OpenSpace.PS1 {
 				return child;
 			}, LinkedList.Flags.HasHeaderPointers);
 			SuperObject parent = Load.FromOffsetOrRead<SuperObject>(reader, off_parent, onPreRead: s => s.isDynamic = isDynamic);
-			matrix1 = Load.FromOffsetOrRead<Matrix>(reader, off_matrix1);
-			matrix2 = Load.FromOffsetOrRead<Matrix>(reader, off_matrix2);
+			matrix1 = Load.FromOffsetOrRead<PS1Matrix>(reader, off_matrix1);
+			matrix2 = Load.FromOffsetOrRead<PS1Matrix>(reader, off_matrix2);
 
 		}
 
@@ -99,6 +101,47 @@ namespace OpenSpace.PS1 {
 				case 0x15: type = Type.IPO_2; break;
 			}
 			return type;
+		}
+
+		public GameObject GetGameObject() {
+			GameObject gao = new GameObject(type + " @ " + Offset);
+			if (type != Type.IPO) {
+				matrix1?.Apply(gao);
+			}
+			/*if (.Value != null) {
+				if (data.Value is PhysicalObject) {
+					PhysicalObjectComponent poc = ((PhysicalObject)data.Value).GetGameObject(gao);
+				} else if (data.Value is Sector) {
+					SectorComponent sc = ((Sector)data.Value).GetGameObject(gao);
+				}
+			}*/
+			if (type == Type.IPO) {
+				LevelHeader h = (Load as R2PS1Loader).levelHeader;
+				if ((dataIndex >> 1) >= h.geometricObjectsStatic.entries.Length) throw new Exception("SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
+				GameObject g = h.geometricObjectsStatic.GetGameObject(dataIndex >> 1);
+				if (g != null) {
+					g.transform.SetParent(gao.transform);
+					g.transform.localPosition = Vector3.zero;
+					g.transform.localRotation = Quaternion.identity;
+				}
+			}
+			if (children != null) {
+				foreach (SuperObject so in children) {
+					if (so != null) {
+						GameObject soGao = so.GetGameObject();
+						if (soGao != null) {
+							soGao.transform.SetParent(gao.transform);
+							if (so.type != Type.IPO) {
+								so.matrix1?.Apply(soGao);
+							} else {
+								soGao.transform.localPosition = Vector3.zero;
+								soGao.transform.localRotation = Quaternion.identity;
+							}
+						}
+					}
+				}
+			}
+			return gao;
 		}
 	}
 }

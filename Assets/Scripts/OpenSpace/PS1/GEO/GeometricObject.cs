@@ -47,7 +47,7 @@ namespace OpenSpace.PS1 {
 			//CreateGAO();
 		}
 
-		public GameObject CreateGAO() {
+		public GameObject GetGameObject() {
 			GameObject parentGao = new GameObject(Offset.ToString());
 			// First pass
 			

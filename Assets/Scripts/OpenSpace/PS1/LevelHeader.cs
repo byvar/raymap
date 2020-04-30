@@ -11,9 +11,9 @@ namespace OpenSpace.PS1 {
 	public class LevelHeader : OpenSpaceStruct {
 		public Pointer off_dynamicWorld;
 		public Pointer off_fatherSector;
-		public Pointer off_0F8;
-		public uint uint_0FC;
-		public Pointer off_100;
+		public Pointer off_inactiveDynamicWorld;
+		public uint num_always;
+		public Pointer off_always;
 		public uint uint_104;
 		public uint uint_108;
 		public Pointer off_10C;
@@ -29,7 +29,7 @@ namespace OpenSpace.PS1 {
 		public Pointer off_12C;
 		public Pointer off_130;
 		public uint uint_134;
-		public uint num_always;
+		public uint uint_138;
 		public uint uint_13C;
 		public uint uint_140;
 		public uint uint_144;
@@ -51,9 +51,9 @@ namespace OpenSpace.PS1 {
 		public Pointer off_178;
 		public int int_17C;
 
-		public Pointer off_other_meshes;
-		public Pointer off_sector_meshes;
-		public uint uint_188;
+		public Pointer off_geometricObjects_dynamic;
+		public Pointer off_geometricObjects_static;
+		public uint num_geometricObjects_dynamic;
 
 		public ushort ushort_18C;
 		public ushort ushort_18E;
@@ -68,14 +68,19 @@ namespace OpenSpace.PS1 {
 
 		// Parsed
 		public PointerList<UnkStruct1> states;
+		public SuperObject fatherSector;
+		public SuperObject dynamicWorld;
+		public SuperObject inactiveDynamicWorld;
+		public ObjectsTable geometricObjectsStatic;
+		public ObjectsTable geometricObjectsDynamic;
 
 		protected override void ReadInternal(Reader reader) {
 			reader.ReadBytes(0xF0);
 			off_dynamicWorld = Pointer.Read(reader);
 			off_fatherSector = Pointer.Read(reader);
-			off_0F8 = Pointer.Read(reader);
-			uint_0FC = reader.ReadUInt32();
-			off_100 = Pointer.Read(reader); //
+			off_inactiveDynamicWorld = Pointer.Read(reader);
+			num_always = reader.ReadUInt32();
+			off_always = Pointer.Read(reader); //
 			uint_104 = reader.ReadUInt32(); // x
 			uint_108 = reader.ReadUInt32();
 			off_10C = Pointer.Read(reader); // x structs of 0x14
@@ -84,7 +89,7 @@ namespace OpenSpace.PS1 {
 			ushort_116 = reader.ReadUInt16();
 			off_persos = Pointer.Read(reader);
 			Perso[] persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
-			Load.print(off_dynamicWorld + " - " + off_fatherSector + " - " + off_0F8 + " - " + off_100 + " - " + off_10C + " - " + off_110 + " - " + off_persos);
+			Load.print(off_dynamicWorld + " - " + off_fatherSector + " - " + off_inactiveDynamicWorld + " - " + off_always + " - " + off_10C + " - " + off_110 + " - " + off_persos);
 			off_states = Pointer.Read(reader);
 			num_states = reader.ReadUInt16();
 			ushort_122 = reader.ReadUInt16();
@@ -94,7 +99,7 @@ namespace OpenSpace.PS1 {
 			off_12C = Pointer.Read(reader);
 			off_130 = Pointer.Read(reader);
 			uint_134 = reader.ReadUInt32();
-			num_always = reader.ReadUInt32();
+			uint_138 = reader.ReadUInt32();
 			uint_13C = reader.ReadUInt32(); // same as mainChar_states count
 			uint_140 = reader.ReadUInt32();
 			uint_144 = reader.ReadUInt32();
@@ -121,10 +126,9 @@ namespace OpenSpace.PS1 {
 			off_178 = Pointer.Read(reader);
 			int_17C = reader.ReadInt32(); // -1
 
-			off_other_meshes = Pointer.Read(reader); // big array of pointers, 2 pointers per thing
-			off_sector_meshes = Pointer.Read(reader); // 2 x 0 uint, then y structs of 8
-			uint_188 = reader.ReadUInt32(); // x things
-			Load.print(off_178 + " - " + off_other_meshes + " - " + off_sector_meshes + " - " + uint_188);
+			off_geometricObjects_dynamic = Pointer.Read(reader);
+			off_geometricObjects_static = Pointer.Read(reader);
+			num_geometricObjects_dynamic = reader.ReadUInt32();
 
 			ushort_18C = reader.ReadUInt16();
 			ushort_18E = reader.ReadUInt16();
@@ -139,6 +143,8 @@ namespace OpenSpace.PS1 {
 			Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
 
 			ParseSectors(reader);
+			geometricObjectsDynamic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_dynamic, onPreRead: t => t.length = num_geometricObjects_dynamic - 2);
+			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => t.length = num_ipos);
 		}
 
 		public void ParseUITextures(Reader reader) {
@@ -206,28 +212,15 @@ namespace OpenSpace.PS1 {
 
 		public void ParseSectors(Reader reader) {
 			uint count = num_ipos;
-			Pointer[] sectorMeshPtrs = new Pointer[count];
 			List<Pointer> otherMeshPtrs = new List<Pointer>();
-			Pointer.DoAt(ref reader, off_sector_meshes, () => {
-				reader.ReadUInt32();
-				reader.ReadUInt32();
-				for (int i = 0; i < count; i++) {
-					reader.ReadUInt32();
-					sectorMeshPtrs[i] = Pointer.Read(reader);
-				}
-			});
 			// Bad hack
-			Pointer.DoAt(ref reader, off_other_meshes, () => {
+			Pointer.DoAt(ref reader, off_geometricObjects_dynamic, () => {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				while (reader.ReadUInt32() != 0) {
 					otherMeshPtrs.Add(Pointer.Read(reader));
 				}
 			});
-			GeometricObject[] ipos = new GeometricObject[count];
-			for (int i = 0; i < count; i++) {
-				ipos[i] = Load.FromOffsetOrRead<GeometricObject>(reader, sectorMeshPtrs[i]);
-			}
 			GeometricObject[] p = new GeometricObject[otherMeshPtrs.Count];
 			for (int i = 0; i < otherMeshPtrs.Count; i++) {
 				Load.print(i + ": " + otherMeshPtrs[i]);
@@ -236,39 +229,6 @@ namespace OpenSpace.PS1 {
 
 			Load.print(num_sectors);
 			Sector[] sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
-			SuperObject fatherSector = Load.FromOffsetOrRead<SuperObject>(reader, off_fatherSector, onPreRead: s => s.isDynamic = false);
-			((R2PS1Loader)Load).CalculateTextures();
-			foreach (SuperObject so in fatherSector.children) {
-				if (so.type == Object.SuperObject.Type.Sector) {
-					for (int i = 0; i < so.children.Count; i++) {
-						SuperObject so2 = so.children[i];
-						if (so2.type == Object.SuperObject.Type.IPO) {
-							if ((so2.dataIndex >> 1) >= ipos.Length) throw new Exception("SO data index was too high! " + ipos.Length + " - " + so2.dataIndex);
-							GameObject g = ipos[(so2.dataIndex >> 1)]?.CreateGAO();
-							if (so.matrix1 != null && g != null) {
-								g.transform.localPosition = new Vector3(
-									so.matrix1.x / 256f,
-									so.matrix1.z / 256f,
-									so.matrix1.y / 256f);
-							}
-						}
-					}
-					/*GameObject g = ipos[so.dataIndex]?.CreateGAO();
-					Sector s = sectors[so.dataIndex];
-					if (s != null && g != null) {
-						g.transform.localPosition = new Vector3(
-							s.int_1C / 256f,
-							s.int_24 / 256f,
-							s.int_20 / 256f);
-					}*/
-				}
-			}
-			GameObject persoParent = new GameObject("Perso parts");
-			foreach (var o in p) {
-				GameObject g = o?.CreateGAO();
-				g?.transform.SetParent(persoParent.transform);
-			}
-			SuperObject dynamicWorld = Load.FromOffsetOrRead<SuperObject>(reader, off_dynamicWorld, onPreRead: s => s.isDynamic = true);
 			/*Pointer.DoAt(ref reader, off_sectors, () => {
 				for (int i = 0; i < count; i++) {
 					reader.ReadBytes(0x1c);
