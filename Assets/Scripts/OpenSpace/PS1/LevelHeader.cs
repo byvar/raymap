@@ -34,12 +34,14 @@ namespace OpenSpace.PS1 {
 		public uint uint_140;
 		public uint uint_144;
 		public int int_148;
-		public Pointer off_14C;
-		public Pointer off_150;
-		public Pointer off_154;
-		public uint uint_158;
+		public Pointer off_vectors;
+		public Pointer off_quaternions;
+		public Pointer off_hierarchies;
 
 		// UI Textures
+		public byte num_ui_textures;
+		public byte byte_159;
+		public ushort ushort_15A;
 		public Pointer off_ui_textures_names;
 		public Pointer off_ui_textures_width;
 		public Pointer off_ui_textures_height;
@@ -60,19 +62,22 @@ namespace OpenSpace.PS1 {
 		public short short_190;
 		public ushort ushort_192;
 		public uint num_ipos;
-		public Pointer off_sector_minus_one_things;
+		public Pointer off_ipos;
 		public uint uint_19C;
 		public uint bad_off_1A0;
 		public Pointer off_sectors;
 		public ushort num_sectors;
 
 		// Parsed
-		public PointerList<UnkStruct1> states;
+		public PointerList<State> states;
 		public SuperObject fatherSector;
 		public SuperObject dynamicWorld;
 		public SuperObject inactiveDynamicWorld;
 		public ObjectsTable geometricObjectsStatic;
 		public ObjectsTable geometricObjectsDynamic;
+		public Perso[] persos;
+		public AlwaysList[] always;
+		public Sector[] sectors;
 
 		protected override void ReadInternal(Reader reader) {
 			reader.ReadBytes(0xF0);
@@ -88,12 +93,10 @@ namespace OpenSpace.PS1 {
 			num_persos = reader.ReadUInt16();
 			ushort_116 = reader.ReadUInt16();
 			off_persos = Pointer.Read(reader);
-			Perso[] persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
 			Load.print(off_dynamicWorld + " - " + off_fatherSector + " - " + off_inactiveDynamicWorld + " - " + off_always + " - " + off_10C + " - " + off_110 + " - " + off_persos);
 			off_states = Pointer.Read(reader);
 			num_states = reader.ReadUInt16();
 			ushort_122 = reader.ReadUInt16();
-			states = Load.FromOffsetOrRead<PointerList<UnkStruct1>>(reader, off_states, s => s.length = num_states);
 			uint_124 = reader.ReadUInt32();
 			uint_128 = reader.ReadUInt32();
 			off_12C = Pointer.Read(reader);
@@ -104,13 +107,15 @@ namespace OpenSpace.PS1 {
 			uint_140 = reader.ReadUInt32();
 			uint_144 = reader.ReadUInt32();
 			int_148 = reader.ReadInt32(); // -1
-			off_14C = Pointer.Read(reader);
-			off_150 = Pointer.Read(reader); // big array of structs of 0x6 size. 3 ushorts per struct
-			off_154 = Pointer.Read(reader);
-			uint_158 = reader.ReadUInt32();
-			Load.print(off_12C + " - " + off_130 + " - " + off_14C + " - " + off_150 + " - " + off_154);
+			off_vectors = Pointer.Read(reader); // 0x6 size
+			off_quaternions = Pointer.Read(reader); // big array of structs of 0x8 size. 4 ushorts per struct
+			off_hierarchies = Pointer.Read(reader);
+			Load.print(off_12C + " - " + off_130 + " - " + off_vectors + " - " + off_quaternions + " - " + off_hierarchies);
 
 			// Vignette stuff, big textures
+			num_ui_textures = reader.ReadByte();
+			byte_159 = reader.ReadByte();
+			ushort_15A = reader.ReadUInt16();
 			off_ui_textures_names = Pointer.Read(reader);
 			off_ui_textures_width = Pointer.Read(reader); // num_vignettes * ushort
 			off_ui_textures_height = Pointer.Read(reader); // num_vignettes * ushort
@@ -121,7 +126,6 @@ namespace OpenSpace.PS1 {
 
 			ParseUITextures(reader);
 
-			Load.print(Pointer.Current(reader));
 			// Something else
 			off_178 = Pointer.Read(reader);
 			int_17C = reader.ReadInt32(); // -1
@@ -135,20 +139,24 @@ namespace OpenSpace.PS1 {
 			short_190 = reader.ReadInt16();
 			ushort_192 = reader.ReadUInt16();
 			num_ipos = reader.ReadUInt32(); // y
-			off_sector_minus_one_things = Pointer.Read(reader); // y structs of 0x3c
+			off_ipos = Pointer.Read(reader); // y structs of 0x3c
 			uint_19C = reader.ReadUInt32();
 			bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
 			off_sectors = Pointer.Read(reader); // num_1A8 structs of 0x54
 			num_sectors = reader.ReadUInt16(); // actual sectors
-			Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
+			//Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
 
+			// Parse
+			states = Load.FromOffsetOrRead<PointerList<State>>(reader, off_states, s => s.length = num_states);
+			persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
 			ParseSectors(reader);
 			geometricObjectsDynamic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_dynamic, onPreRead: t => t.length = num_geometricObjects_dynamic - 2);
 			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => t.length = num_ipos);
+			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
+			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 		}
 
 		public void ParseUITextures(Reader reader) {
-			uint num_ui_textures = (off_ui_textures_height.offset - off_ui_textures_width.offset) / 2;
 			Load.print("Num UI Textures: " + num_ui_textures);
 
 			UITexture[] textures = new UITexture[num_ui_textures];
@@ -157,15 +165,10 @@ namespace OpenSpace.PS1 {
 			}
 			Pointer.DoAt(ref reader, off_ui_textures_names, () => {
 				for (int i = 0; i < textures.Length; i++) {
-					Pointer p = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+					Pointer p = Pointer.Read(reader);
 					Pointer.DoAt(ref reader, p, () => {
 						textures[i].name = reader.ReadString(0x1C);
 					});
-					reader.ReadUInt32();
-					if (p == null) {
-						Array.Resize(ref textures, i);
-						break;
-					}
 				}
 			});
 			Pointer.DoAt(ref reader, off_ui_textures_width, () => {
@@ -211,24 +214,6 @@ namespace OpenSpace.PS1 {
 		}
 
 		public void ParseSectors(Reader reader) {
-			uint count = num_ipos;
-			List<Pointer> otherMeshPtrs = new List<Pointer>();
-			// Bad hack
-			Pointer.DoAt(ref reader, off_geometricObjects_dynamic, () => {
-				reader.ReadUInt32();
-				reader.ReadUInt32();
-				while (reader.ReadUInt32() != 0) {
-					otherMeshPtrs.Add(Pointer.Read(reader));
-				}
-			});
-			GeometricObject[] p = new GeometricObject[otherMeshPtrs.Count];
-			for (int i = 0; i < otherMeshPtrs.Count; i++) {
-				Load.print(i + ": " + otherMeshPtrs[i]);
-				p[i] = Load.FromOffsetOrRead<GeometricObject>(reader, otherMeshPtrs[i]);
-			}
-
-			Load.print(num_sectors);
-			Sector[] sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 			/*Pointer.DoAt(ref reader, off_sectors, () => {
 				for (int i = 0; i < count; i++) {
 					reader.ReadBytes(0x1c);

@@ -127,6 +127,11 @@ namespace OpenSpace.Loader {
 			dynamicWorld.name = "Dynamic World | " + dynamicWorld.name;
 			GameObject inactiveDynamicWorld = levelHeader.inactiveDynamicWorld?.GetGameObject();
 			inactiveDynamicWorld.name = "Inactive Dynamic World | " + inactiveDynamicWorld.name;
+			GameObject always = new GameObject("Always");
+			foreach (AlwaysList alw in levelHeader.always) {
+				GameObject alwGao = alw.GetGameObject();
+				alwGao.transform.SetParent(always.transform);
+			}
 
 			GameObject persoPartsParent = new GameObject("Perso parts");
 			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {

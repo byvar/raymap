@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace OpenSpace.PS1 {
+	public class Perso3dData : OpenSpaceStruct { // Animation/state related
+		public uint uint_00;
+		public Pointer off_04;
+		public Pointer off_58;
+		public ushort ushort_5C;
+		public short short_5E;
+		public Pointer off_60;
+		public Pointer off_64;
+		public Pointer off_68;
+		public uint uint_6C;
+		public uint uint_70;
+		public uint uint_74;
+		public uint stateIndex;
+
+		public string name;
+
+		protected override void ReadInternal(Reader reader) {
+			uint_00 = reader.ReadUInt32();
+			off_04 = Pointer.Read(reader);
+			reader.ReadBytes(0x50); // TODO
+			off_58 = Pointer.Read(reader);
+			ushort_5C = reader.ReadUInt16();
+			short_5E = reader.ReadInt16();
+			off_60 = Pointer.Read(reader);
+			off_64 = Pointer.Read(reader);
+			off_68 = Pointer.Read(reader);
+			uint_6C = reader.ReadUInt32();
+			uint_70 = reader.ReadUInt32();
+			uint_74 = reader.ReadUInt32();
+			stateIndex = reader.ReadUInt32();
+			reader.ReadBytes(0x28); // TODO
+			/*Pointer.DoAt(ref reader, off_68, () => {
+				for (int i = 0; i < ushort_5C; i++) {
+					reader.ReadUInt16();
+				}
+				reader.ReadByte();
+				byte unk = reader.ReadByte();
+				if (unk != 0xFF) {
+					string familyName = reader.ReadString(0x20);
+					Load.print(familyName);
+				}
+			});*/
+		}
+	}
+}

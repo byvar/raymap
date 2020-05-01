@@ -117,13 +117,17 @@ namespace OpenSpace.PS1 {
 			}*/
 			if (type == Type.IPO) {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
-				if ((dataIndex >> 1) >= h.geometricObjectsStatic.entries.Length) throw new Exception("SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
+				if ((dataIndex >> 1) >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
 				GameObject g = h.geometricObjectsStatic.GetGameObject(dataIndex >> 1);
 				if (g != null) {
 					g.transform.SetParent(gao.transform);
 					g.transform.localPosition = Vector3.zero;
 					g.transform.localRotation = Quaternion.identity;
 				}
+			} else if (type == Type.Perso) {
+				LevelHeader h = (Load as R2PS1Loader).levelHeader;
+				if(dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
+				gao.name = h.persos[dataIndex].name + " | " + gao.name;
 			}
 			if (children != null) {
 				foreach (SuperObject so in children) {
