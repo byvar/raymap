@@ -36,7 +36,6 @@ namespace OpenSpace.PS1 {
 			byte_1C = reader.ReadByte();
 			speed = reader.ReadByte(); // Usually 30, but can also be 20, 40, 60, 35
 			ushort_1E = reader.ReadUInt16();
-			//Load.print("UnkStruct1 " + Offset + ": " + off_00 + " - " + off_transitions + " - " + off_state_auto + " - " + off_18);
 
 			anim = Load.FromOffsetOrRead<PS1AnimationIndex>(reader, off_anim);
 			transitions = Load.ReadArray<StateTransition>(num_transitions, reader, off_transitions);
@@ -45,6 +44,7 @@ namespace OpenSpace.PS1 {
 				name = transitions.name;
 				Load.print(Offset + " - " + name);
 			}*/
+			Load.print("State " + anim?.index + " - " + Offset + ": " + off_anim + " - " + off_18);
 		}
 	}
 }

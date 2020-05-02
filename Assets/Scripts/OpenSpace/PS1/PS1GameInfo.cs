@@ -22,7 +22,7 @@ namespace OpenSpace.PS1 {
 				public bool isPlayable;
 				public LBA compressed;
 				public LBA filetable;
-				public LBA uncompressed;
+				public LBA cinedata;
 				public LBA[] cutscenes;
 				public bool inEngine;
 
@@ -31,7 +31,7 @@ namespace OpenSpace.PS1 {
 					this.isPlayable = isSomething;
 					this.compressed = compressed;
 					this.filetable = filetable;
-					this.uncompressed = uncompressed;
+					this.cinedata = uncompressed;
 					if (cutscenes == null) {
 						cutscenes = new File.LBA[0];
 					}

@@ -175,6 +175,10 @@ namespace OpenSpace.Loader {
 					if (blockIndex != mainBlock.Count) {
 						Debug.LogWarning("Not all blocks were extracted!");
 					}
+					byte[] cineblock = ExtractBlock(reader, b.cinedata, fileInfo.baseLBA);
+					if (cineblock != null) {
+						FileSystem.AddVirtualFile(levelDir + "cine.dat", cineblock);
+					}
 				}
 			}
 			await InitFiles(gameInfo, fileInfo);
@@ -183,6 +187,7 @@ namespace OpenSpace.Loader {
 		public async Task ExtractDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, bool relocatePointers = false) {
 			string bigFile = fileInfo.bigfile;
 			string bigFilePath = gameDataBinFolder + bigFile + "." + fileInfo.extension;
+			uint cineDataBaseAddress = 0;
 			if (FileSystem.FileExists(bigFilePath)) {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath))) {
 					PS1GameInfo.File.MemoryBlock[] memoryBlocks = fileInfo.memoryBlocks;
@@ -219,6 +224,9 @@ namespace OpenSpace.Loader {
 										int off = j - 3;
 										uint ptr = BitConverter.ToUInt32(data, off);
 										if (ptr >= b.address && ptr < b.address + length) {
+											if (off == 0x14c) {
+												cineDataBaseAddress = ptr;
+											}
 											ptr = (ptr - b.address) + 0xDD000000;
 											byte[] newData = BitConverter.GetBytes(ptr);
 											for (int y = 0; y < 4; y++) {
@@ -253,7 +261,35 @@ namespace OpenSpace.Loader {
 
 
 						Util.ByteArrayToFile(levelDir + "unk_anims.blk", ExtractBlock(reader, b.filetable, fileInfo.baseLBA));
-						Util.ByteArrayToFile(levelDir + "unk_uncompressed.blk", ExtractBlock(reader, b.uncompressed, fileInfo.baseLBA));
+						byte[] cineblock = ExtractBlock(reader, b.cinedata, fileInfo.baseLBA);
+						Util.ByteArrayToFile(levelDir + "cine.dat", cineblock);
+						if(cineblock != null) {
+							byte[] data = cineblock;
+							cineDataBaseAddress += 0x1f800 + 0x32 * 0xc00; // magic!
+							for (int j = 0; j < data.Length; j++) {
+								if (data[j] == 0x80) {
+									int off = j - 3;
+									uint ptr = BitConverter.ToUInt32(data, off);
+									if (ptr >= b.address && ptr < cineDataBaseAddress) {
+										ptr = (ptr - b.address) + 0xDD000000;
+										byte[] newData = BitConverter.GetBytes(ptr);
+										for (int y = 0; y < 4; y++) {
+											data[off + 3 - y] = newData[y];
+										}
+										j += 3;
+									}
+									if (ptr >= cineDataBaseAddress && ptr < cineDataBaseAddress + data.Length) {
+										ptr = (ptr - cineDataBaseAddress) + 0xCC000000;
+										byte[] newData = BitConverter.GetBytes(ptr);
+										for (int y = 0; y < 4; y++) {
+											data[off + 3 - y] = newData[y];
+										}
+										j += 3;
+									}
+								}
+							}
+							Util.ByteArrayToFile(levelDir + "cine_relocated.dat", data);
+						}
 						for (int j = 0; j < b.cutscenes.Length; j++) {
 							string cutsceneAudioName = levelDir + "cutscene_audio_" + j + ".blk";
 							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
