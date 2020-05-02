@@ -128,6 +128,9 @@ namespace OpenSpace.PS1 {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				if(dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
 				gao.name = h.persos[dataIndex].name + " | " + gao.name;
+				if (h.persos[dataIndex]?.p3dData?.family?.name != null) {
+					gao.name = $"[{h.persos[dataIndex]?.p3dData?.family?.name}] {gao.name}"; 
+				}
 			}
 			if (children != null) {
 				foreach (SuperObject so in children) {

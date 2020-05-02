@@ -29,7 +29,7 @@ namespace OpenSpace.PS1 {
 		public Pointer off_12C;
 		public Pointer off_130;
 		public uint uint_134;
-		public uint uint_138;
+		public uint uint_138; // usually 0x28
 		public uint uint_13C;
 		public uint uint_140;
 		public uint uint_144;
@@ -67,6 +67,31 @@ namespace OpenSpace.PS1 {
 		public uint bad_off_1A0;
 		public Pointer off_sectors;
 		public ushort num_sectors;
+		public ushort ushort_1AA;
+		public uint uint_1AC;
+		public uint uint_1B0;
+		public uint uint_1B4;
+		public uint uint_1B8;
+		public Pointer off_1BC; // 0x28 structs of 0x38 size
+		public Pointer off_1C0; // 0x28 structs of 0x68 size. starts with 0x5.
+		public Pointer off_1C4; // b structs of 0x10
+		public uint uint_1C8; // b
+		public uint uint_1CC;
+		public ushort ushort_1D0;
+		public ushort ushort_1D2;
+		public Pointer off_1D4; // same offset as the first pointer in the first struct of off_1C4
+		public uint uint_1D8;
+		public Pointer off_1DC;
+		public Pointer off_1E0;
+		public Pointer off_1E4;
+		public Pointer off_1E8;
+		public Pointer off_1EC;
+		public Pointer off_1F0;
+		public uint uint_1F4;
+		public uint uint_1F8;
+		public uint uint_1FC;
+
+
 
 		// Parsed
 		public PointerList<State> states;
@@ -99,7 +124,7 @@ namespace OpenSpace.PS1 {
 			ushort_122 = reader.ReadUInt16();
 			uint_124 = reader.ReadUInt32();
 			uint_128 = reader.ReadUInt32();
-			off_12C = Pointer.Read(reader);
+			off_12C = Pointer.Read(reader); // this + 0x10 = main character
 			off_130 = Pointer.Read(reader);
 			uint_134 = reader.ReadUInt32();
 			uint_138 = reader.ReadUInt32();
@@ -144,7 +169,31 @@ namespace OpenSpace.PS1 {
 			bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
 			off_sectors = Pointer.Read(reader); // num_1A8 structs of 0x54
 			num_sectors = reader.ReadUInt16(); // actual sectors
-			//Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
+											   //Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
+
+			ushort_1AA = reader.ReadUInt16();
+			uint_1AC = reader.ReadUInt32();
+			uint_1B0 = reader.ReadUInt32();
+			uint_1B4 = reader.ReadUInt32();
+			uint_1B8 = reader.ReadUInt32();
+			off_1BC = Pointer.Read(reader);
+			off_1C0 = Pointer.Read(reader);
+			off_1C4 = Pointer.Read(reader);
+			uint_1C8 = reader.ReadUInt32();
+			uint_1CC = reader.ReadUInt32();
+			ushort_1D0 = reader.ReadUInt16();
+			ushort_1D2 = reader.ReadUInt16();
+			off_1D4 = Pointer.Read(reader);
+			uint_1D8 = reader.ReadUInt32();
+			off_1DC = Pointer.Read(reader);
+			off_1E0 = Pointer.Read(reader);
+			off_1E4 = Pointer.Read(reader);
+			off_1E8 = Pointer.Read(reader);
+			off_1EC = Pointer.Read(reader);
+			off_1F0 = Pointer.Read(reader);
+			uint_1F4 = reader.ReadUInt32();
+			uint_1F8 = reader.ReadUInt32();
+			uint_1FC = reader.ReadUInt32();
 
 			// Parse
 			states = Load.FromOffsetOrRead<PointerList<State>>(reader, off_states, s => s.length = num_states);

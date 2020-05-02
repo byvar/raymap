@@ -258,6 +258,7 @@ namespace OpenSpace.Loader {
 							string cutsceneAudioName = levelDir + "cutscene_audio_" + j + ".blk";
 							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
 							if (cutsceneAudioBlk != null) {
+								Util.ByteArrayToFile(levelDir + "cutscene_audio_" + j + "_compr.blk", cutsceneAudioBlk);
 								Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
 							}
 						}

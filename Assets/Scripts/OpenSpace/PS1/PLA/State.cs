@@ -19,7 +19,7 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_1E;
 
 		// Parsed
-		public PS1Animation anim;
+		public PS1AnimationIndex anim;
 		public State state_auto;
 		public StateTransition[] transitions;
 		public string name;
@@ -38,7 +38,7 @@ namespace OpenSpace.PS1 {
 			ushort_1E = reader.ReadUInt16();
 			//Load.print("UnkStruct1 " + Offset + ": " + off_00 + " - " + off_transitions + " - " + off_state_auto + " - " + off_18);
 
-			anim = Load.FromOffsetOrRead<PS1Animation>(reader, off_anim);
+			anim = Load.FromOffsetOrRead<PS1AnimationIndex>(reader, off_anim);
 			transitions = Load.ReadArray<StateTransition>(num_transitions, reader, off_transitions);
 			state_auto = Load.FromOffsetOrRead<State>(reader, off_state_auto);
 			/*if (transitions != null) {
