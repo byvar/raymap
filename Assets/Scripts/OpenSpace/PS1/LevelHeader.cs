@@ -33,7 +33,7 @@ namespace OpenSpace.PS1 {
 		public uint uint_13C;
 		public uint uint_140;
 		public uint uint_144;
-		public int int_148;
+		public int initialStreamID; // ID of first cutscene stream upon entering level
 		public Pointer off_vectors;
 		public Pointer off_quaternions;
 		public Pointer off_hierarchies;
@@ -131,7 +131,7 @@ namespace OpenSpace.PS1 {
 			uint_13C = reader.ReadUInt32(); // same as mainChar_states count
 			uint_140 = reader.ReadUInt32();
 			uint_144 = reader.ReadUInt32();
-			int_148 = reader.ReadInt32(); // -1
+			initialStreamID = reader.ReadInt32(); // -1
 			off_vectors = Pointer.Read(reader); // 0x6 size
 			off_quaternions = Pointer.Read(reader); // big array of structs of 0x8 size. 4 ushorts per struct
 			off_hierarchies = Pointer.Read(reader);

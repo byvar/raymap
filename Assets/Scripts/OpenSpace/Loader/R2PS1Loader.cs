@@ -291,11 +291,15 @@ namespace OpenSpace.Loader {
 							Util.ByteArrayToFile(levelDir + "cine_relocated.dat", data);
 						}
 						for (int j = 0; j < b.cutscenes.Length; j++) {
-							string cutsceneAudioName = levelDir + "cutscene_audio_" + j + ".blk";
+							string cutsceneAudioName = levelDir + "stream_audio_" + j + ".blk";
+							string cutsceneFramesName = levelDir + "stream_frames_" + j + ".blk";
 							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
 							if (cutsceneAudioBlk != null) {
-								Util.ByteArrayToFile(levelDir + "cutscene_audio_" + j + "_compr.blk", cutsceneAudioBlk);
-								Util.ByteArrayToFile(cutsceneAudioName, DecompressCutsceneAudio(cutsceneAudioBlk));
+								byte[] cutsceneAudio;
+								byte[] cutsceneFrames;
+								SplitCutsceneStream(cutsceneAudioBlk, out cutsceneAudio, out cutsceneFrames);
+								Util.ByteArrayToFile(cutsceneAudioName, cutsceneAudio);
+								Util.ByteArrayToFile(cutsceneFramesName, cutsceneFrames);
 							}
 						}
 						//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
@@ -340,8 +344,9 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public byte[] DecompressCutsceneAudio(byte[] cutsceneData) {
-			List<byte[]> bytes = new List<byte[]>();
+		public void SplitCutsceneStream(byte[] cutsceneData, out byte[] cutsceneAudio, out byte[] cutsceneFrames) {
+			List<byte[]> cutsceneAudioList = new List<byte[]>();
+			List<byte[]> cutsceneFramesList = new List<byte[]>();
 			using (MemoryStream ms = new MemoryStream(cutsceneData)) {
 				using (Reader reader = new Reader(ms, Settings.s.IsLittleEndian)) {
 					uint hdrSize = 1;
@@ -349,7 +354,7 @@ namespace OpenSpace.Loader {
 						hdrSize = reader.ReadUInt32();
 						//print("HDR " + string.Format("{0:X8}", hdrSize));
 						if (hdrSize != 0xFFFFFFFF) {
-							reader.ReadBytes((int)hdrSize);
+							cutsceneFramesList.Add(reader.ReadBytes((int)hdrSize));
 							bool readParts = true;
 							while (readParts && reader.BaseStream.Position < reader.BaseStream.Length) {
 								uint size = reader.ReadUInt32();
@@ -363,9 +368,9 @@ namespace OpenSpace.Loader {
 									bool isNull = (size & 0x80000000) != 0;
 									size = size & 0x7FFFFFFF;
 									if (isNull) {
-										bytes.Add(Enumerable.Repeat((byte)0x0, (int)size).ToArray());
+										cutsceneAudioList.Add(Enumerable.Repeat((byte)0x0, (int)size).ToArray());
 									} else {
-										bytes.Add(reader.ReadBytes((int)size));
+										cutsceneAudioList.Add(reader.ReadBytes((int)size));
 									}
 								}
 							}
@@ -373,7 +378,8 @@ namespace OpenSpace.Loader {
 					}
 				}
 			}
-			return bytes.SelectMany(i => i).ToArray();
+			cutsceneAudio = cutsceneAudioList.SelectMany(i => i).ToArray();
+			cutsceneFrames = cutsceneFramesList.SelectMany(i => i).ToArray();
 		}
 
 		public byte[] ExtractBlock(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {
