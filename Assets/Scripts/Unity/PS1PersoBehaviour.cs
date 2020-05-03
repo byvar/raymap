@@ -285,7 +285,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 							}*/
 							c.transform.parent = channelObjects[i].transform;
 							c.name = "[" + j + "] " + c.name;
-							//c.SetActive(false);
+							c.SetActive(false);
 						}
 						subObjects[i][k].transform.localPosition = Vector3.zero;
 					}
@@ -321,6 +321,47 @@ public class PS1PersoBehaviour : MonoBehaviour {
 	}
 
 	public void UpdateAnimation() {
+		if (IsLoaded && anim != null && channelObjects != null && subObjects != null) {
+			if (currentFrame >= anim.num_frames) currentFrame %= anim.num_frames;
+			// First pass: reset TRS for all sub objects
+			/*for (int i = 0; i < channelParents.Length; i++) {
+				channelParents[i] = false;
+			}*/
+			for (int i = 0; i < anim.channels.Length; i++) {
+				PS1AnimationChannel ch = anim.channels[i];
+				if (currentFrame < ch.frames.Length) {
+					PS1AnimationChannelFrame frame = ch.frames[currentFrame];
+					if (frame.ntto.HasValue) {
+						int poNum = frame.ntto.Value;
+						poNum = Array.IndexOf(channelNTTO[i], (ushort)poNum);
+
+						GameObject physicalObject = subObjects[i][poNum];
+						if (poNum != currentActivePO[i]) {
+							if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
+								foreach (GameObject morphPO in fullMorphPOs[i].Values) {
+									if (morphPO.activeSelf) morphPO.SetActive(false);
+								}
+							}
+							if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
+								subObjects[i][currentActivePO[i]].SetActive(false);
+							}
+							currentActivePO[i] = poNum;
+							if (physicalObject != null) physicalObject.SetActive(true);
+						}
+						if (!channelParents[i]) channelObjects[i].transform.SetParent(transform);
+					}
+					if (frame.pos.HasValue) {
+						channelObjects[i].transform.localPosition = h.vectors[frame.pos.Value].vector;
+					}
+					if (frame.rot.HasValue) {
+						channelObjects[i].transform.localRotation = h.quaternions[frame.rot.Value].quaternion;
+					}
+					if (frame.scl.HasValue) {
+						channelObjects[i].transform.localScale = h.vectors[frame.scl.Value].vector;
+					}
+				}
+			}
+		}
 	}
 	/*public void UpdateAnimation() {
 		if (IsLoaded && anim != null && channelObjects != null && subObjects != null) {

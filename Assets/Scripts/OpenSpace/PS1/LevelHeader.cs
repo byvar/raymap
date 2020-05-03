@@ -104,6 +104,9 @@ namespace OpenSpace.PS1 {
 		public AlwaysList[] always;
 		public Sector[] sectors;
 
+		public PS1AnimationVector[] vectors;
+		public PS1AnimationQuaternion[] quaternions;
+
 		protected override void ReadInternal(Reader reader) {
 			reader.ReadBytes(0xF0);
 			off_dynamicWorld = Pointer.Read(reader);
@@ -203,6 +206,9 @@ namespace OpenSpace.PS1 {
 			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => t.length = num_ipos);
 			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
+
+			vectors = Load.ReadArray<PS1AnimationVector>((off_quaternions.offset - off_vectors.offset) / 6, reader, off_vectors);
+			quaternions = Load.ReadArray<PS1AnimationQuaternion>((off_hierarchies.offset - off_quaternions.offset) / 8, reader, off_quaternions);
 		}
 
 		public void ParseUITextures(Reader reader) {
