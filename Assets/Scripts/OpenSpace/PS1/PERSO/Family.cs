@@ -16,6 +16,7 @@ namespace OpenSpace.PS1 {
 		public int int_1C;
 
 		// Parsed
+		public PS1Animation[] animations;
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
@@ -32,7 +33,7 @@ namespace OpenSpace.PS1 {
 			int_18 = reader.ReadInt32();
 			int_1C = reader.ReadInt32();
 
-			Load.ReadArray<PS1Animation>(num_animations, reader, off_animations);
+			animations = Load.ReadArray<PS1Animation>(num_animations, reader, off_animations);
 		}
 	}
 }

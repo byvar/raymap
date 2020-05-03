@@ -129,8 +129,12 @@ namespace OpenSpace.PS1 {
 				if(dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
 				gao.name = h.persos[dataIndex].name + " | " + gao.name;
 				if (h.persos[dataIndex]?.p3dData?.family?.name != null) {
-					gao.name = $"[{h.persos[dataIndex]?.p3dData?.family?.name}] {gao.name}"; 
+					gao.name = $"[{h.persos[dataIndex]?.p3dData?.family?.name}] {gao.name}";
 				}
+				PS1PersoBehaviour romPerso = gao.AddComponent<PS1PersoBehaviour>();
+				romPerso.perso =  h.persos[dataIndex];
+				romPerso.controller = MapLoader.Loader.controller;
+				romPerso.controller.ps1Persos.Add(romPerso);
 			}
 			if (children != null) {
 				foreach (SuperObject so in children) {

@@ -51,6 +51,7 @@ public class Controller : MonoBehaviour {
     public string ExportPath { get; set; }
 
 	public List<ROMPersoBehaviour> romPersos { get; set; } = new List<ROMPersoBehaviour>();
+	public List<PS1PersoBehaviour> ps1Persos { get; set; } = new List<PS1PersoBehaviour>();
 
 	public enum State {
 		None,
@@ -615,6 +616,100 @@ public class Controller : MonoBehaviour {
 					}
 				}
 			}
+		}
+		if (loader is OpenSpace.Loader.R2PS1Loader) {
+			OpenSpace.Loader.R2PS1Loader romLoader = loader as OpenSpace.Loader.R2PS1Loader;
+			if (ps1Persos.Count > 0) {
+				for (int i = 0; i < ps1Persos.Count; i++) {
+					detailedState = "Initializing persos: " + i + "/" + ps1Persos.Count;
+					await WaitIfNecessary();
+					PS1PersoBehaviour unityBehaviour = ps1Persos[i];
+					unityBehaviour.controller = this;
+					/*if (loader.globals != null && loader.globals.spawnablePersos != null) {
+						if (loader.globals.spawnablePersos.IndexOf(p) > -1) {
+							unityBehaviour.IsAlways = true;
+							unityBehaviour.transform.position = new Vector3(i * 10, -1000, 0);
+						}
+					}*/
+					if (!unityBehaviour.IsAlways) {
+						SectorComponent sc = sectorManager.GetActiveSectorWrapper(unityBehaviour.transform.position);
+						unityBehaviour.sector = sc;
+					} else unityBehaviour.sector = null;
+					/*Moddable mod = null;
+					if (p.SuperObject != null && p.SuperObject.Gao != null) {
+						mod = p.SuperObject.Gao.GetComponent<Moddable>();
+						if (mod != null) {
+							mod.persoBehaviour = unityBehaviour;
+						}
+					}*/
+					unityBehaviour.Init();
+
+					var iteratorPerso = unityBehaviour.perso;
+
+					// Of sound brain and AI model?
+					/*if (iteratorPerso.brain?.Value?.aiModel?.Value != null) {
+						var aiModel = iteratorPerso.brain.Value.aiModel.Value;
+
+						// DsgVars
+						if (iteratorPerso.brain?.Value?.dsgMem?.Value != null || aiModel.dsgVar?.Value != null) {
+							DsgVarComponent dsgVarComponent = unityBehaviour.gameObject.AddComponent<DsgVarComponent>();
+							dsgVarComponent.SetPerso(iteratorPerso);
+						}
+
+						// Comports
+						if (aiModel.comportsIntelligence.Value != null) {
+							aiModel.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
+						}
+						if (aiModel.comportsReflex.Value != null) {
+							aiModel.comportsReflex.Value.CreateGameObjects("Reflex", unityBehaviour.gameObject, iteratorPerso);
+						}
+					}*/
+				}
+			}
+			/*if (romLoader.level != null && romLoader.level.spawnablePersos.Value != null && romLoader.level.num_spawnablepersos > 0) {
+				spawnableParent = new GameObject("Spawnable persos");
+				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
+					detailedState = "Initializing spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
+					await WaitIfNecessary();
+					OpenSpace.ROM.SuperObjectDynamic sod = romLoader.level.spawnablePersos.Value.superObjects[i];
+					GameObject sodGao = sod.GetGameObject();
+					if (sodGao != null) {
+						ROMPersoBehaviour unityBehaviour = sodGao.GetComponent<ROMPersoBehaviour>();
+						unityBehaviour.controller = this;
+						unityBehaviour.IsAlways = true;
+						unityBehaviour.transform.SetParent(spawnableParent.transform);
+						unityBehaviour.transform.position = new Vector3(i * 10, -1000, 0);
+						unityBehaviour.transform.rotation = Quaternion.identity;
+						unityBehaviour.transform.localScale = Vector3.one;
+						if (!unityBehaviour.IsAlways) {
+							SectorComponent sc = sectorManager.GetActiveSectorWrapper(unityBehaviour.transform.position);
+							unityBehaviour.sector = sc;
+						} else unityBehaviour.sector = null;
+						unityBehaviour.Init();
+
+						var iteratorPerso = unityBehaviour.perso;
+
+						// Of sound brain and AI model?
+						if (iteratorPerso.brain?.Value?.aiModel?.Value != null) {
+							var aiModel = iteratorPerso.brain.Value.aiModel.Value;
+
+							// DsgVars
+							if (iteratorPerso.brain?.Value?.dsgMem?.Value != null || aiModel.dsgVar?.Value != null) {
+								DsgVarComponent dsgVarComponent = unityBehaviour.gameObject.AddComponent<DsgVarComponent>();
+								dsgVarComponent.SetPerso(iteratorPerso);
+							}
+
+							// Comports
+							if (aiModel.comportsIntelligence.Value != null) {
+								aiModel.comportsIntelligence.Value.CreateGameObjects("Rule", unityBehaviour.gameObject, iteratorPerso);
+							}
+							if (aiModel.comportsReflex.Value != null) {
+								aiModel.comportsReflex.Value.CreateGameObjects("Reflex", unityBehaviour.gameObject, iteratorPerso);
+							}
+						}
+					}
+				}
+			}*/
 		}
 	}
 

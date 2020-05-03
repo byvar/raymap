@@ -28,9 +28,9 @@ namespace OpenSpace.PS1 {
 
 			p3dData = Load.FromOffsetOrRead<Perso3dData>(reader, off_p3dData);
 			Pointer.DoAt(ref reader, off_04, () => {
-				Pointer off_unk = Pointer.Read(reader);
+				Pointer off_superobject = Pointer.Read(reader);
 				name = reader.ReadNullDelimitedString();
-				Load.print(off_unk + " - " + name);
+				Load.print(off_superobject + " - " + name);
 			});
 			/*Pointer.DoAt(ref reader, off_00, () => {
 				reader.ReadBytes(0x5c);
