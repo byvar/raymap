@@ -37,8 +37,8 @@ public class PS1PersoBehaviour : MonoBehaviour {
     public GameObject[] channelObjects { get; private set; }
 	private int[] currentActivePO = null;
 	private bool[] channelParents = null;
-	private ushort[][] channelNTTO;
-    private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
+	private short[][] channelNTTO;
+	private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
 	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	public Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
@@ -242,6 +242,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 		}
         channelIDDictionary.Clear();
 		objectIndexScales.Clear();
+		channelNTTO = null;
     }
 
 	void InitAnimation() {
@@ -257,17 +258,17 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				//if (anim.a3d.num_morphData > 0) fullMorphPOs = new Dictionary<ushort, GameObject>[anim.a3d.num_channels];
 				currentActivePO = new int[anim.num_channels];
 				channelParents = new bool[anim.num_channels];
-				channelNTTO = new ushort[anim.num_channels][];
+				channelNTTO = new short[anim.num_channels][];
 				for (int i = 0; i < anim.num_channels; i++) {
 					PS1AnimationChannel ch = anim.channels[i];
 					short id = ch.id;
-					channelObjects[i] = new GameObject("Channel " + id);
+					channelObjects[i] = new GameObject("Channel " + id + " - " + ch.Offset);
 					channelObjects[i].transform.SetParent(transform);
 					channelObjects[i].transform.localPosition = Vector3.zero;
 
 					currentActivePO[i] = -1;
 					AddChannelID(id, i);
-					channelNTTO[i] = ch.frames?.SelectMany(f => f.ntto != null ? new ushort[] { f.ntto.Value } : new ushort[0]).Distinct().ToArray();
+					channelNTTO[i] = ch.frames?.SelectMany(f => (f.ntto != null && f.ntto >= 1) ? new short[] { f.ntto.Value } : new short[0]).Distinct().ToArray();
 					subObjects[i] = new GameObject[channelNTTO[i] != null ? channelNTTO[i].Length : 0];
 					for (int k = 0; k < subObjects[i].Length; k++) {
 						int j = (int)channelNTTO[i][k] - 1;
@@ -320,20 +321,86 @@ public class PS1PersoBehaviour : MonoBehaviour {
 		}
 	}
 
+	private int GetNextGoodFrameIndex(int channel, int curFrame) {
+		PS1AnimationChannel ch = anim.channels[channel];
+		PS1AnimationKeyframe frame = ch.frames[curFrame];
+		int skipFrames = 0;
+		while (frame.ntto < 0) {
+			skipFrames++;
+			if (skipFrames >= ch.frames.Length) break;
+			frame = ch.frames[(curFrame + skipFrames) % ch.frames.Length];
+		}
+		if (skipFrames == ch.frames.Length) return -1;
+		return skipFrames;
+	}
+
 	public void UpdateAnimation() {
 		if (IsLoaded && anim != null && channelObjects != null && subObjects != null) {
-			if (currentFrame >= anim.num_frames) currentFrame %= anim.num_frames;
+			if (currentFrame >= anim.num_frames) {
+				currentFrame %= anim.num_frames;
+			}
 			// First pass: reset TRS for all sub objects
-			/*for (int i = 0; i < channelParents.Length; i++) {
+			for (int i = 0; i < channelParents.Length; i++) {
 				channelParents[i] = false;
-			}*/
+			}
+			// Create hierarchy for this frame
+			for (int i = 0; i < anim.hierarchies.Length; i++) {
+				PS1AnimationHierarchy h = anim.hierarchies[i];
+
+				if (h.child > anim.channels.Length || h.parent > anim.channels.Length
+					|| h.child < 1 || h.parent < 1) {
+					continue;
+				}
+				int ch_child = h.child - 1;
+				int ch_parent = h.parent - 1;
+				channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+				channelParents[ch_child] = true;
+			}
 			for (int i = 0; i < anim.channels.Length; i++) {
 				PS1AnimationChannel ch = anim.channels[i];
-				if (currentFrame < ch.frames.Length) {
-					PS1AnimationChannelFrame frame = ch.frames[currentFrame];
-					if (frame.ntto.HasValue) {
-						int poNum = frame.ntto.Value;
-						poNum = Array.IndexOf(channelNTTO[i], (ushort)poNum);
+				if (ch.frames.Length < 1) continue;
+				PS1AnimationKeyframe frame = ch.frames[0];
+				PS1AnimationKeyframe nextKF = null;
+
+				int? posInd = null;
+				int? rotInd = null;
+				int? sclInd = null;
+				int curChannelFrame = 0;
+				int nextChannelFrame = 0;
+				int curFrameIndex = 0;
+
+				for (int f = 0; f < ch.frames.Length; f++) {
+					if (ch.frames[f].ntto >= 0) {
+						frame = ch.frames[f];
+						curChannelFrame = nextChannelFrame;
+						curFrameIndex = f;
+						if (frame.pos.HasValue) posInd = frame.pos.Value;
+						if (frame.rot.HasValue) rotInd = frame.rot.Value;
+						if (frame.scl.HasValue) sclInd = frame.scl.Value;
+						nextChannelFrame++;
+						if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0) {
+							nextChannelFrame += frame.extraDuration.Value;
+						}
+						if (currentFrame < nextChannelFrame) {
+							break;
+						}
+					}
+				}
+				if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0) {
+					nextKF = ch.frames[curFrameIndex + 1];
+					if (!nextKF.ntto.HasValue || nextKF.ntto.Value < 0) nextKF = ch.frames[curFrameIndex + 2];
+				}
+				float interpolation = 0f;
+
+				if (nextKF != null) {
+					interpolation = (currentFrame - curChannelFrame) / (float)(nextChannelFrame - curChannelFrame);
+				}
+
+
+				if (frame.ntto.HasValue) {
+					if (frame.ntto.Value >= 0) {
+						short poNum = frame.ntto.Value;
+						poNum = (short)Array.IndexOf(channelNTTO[i], poNum);
 
 						GameObject physicalObject = subObjects[i][poNum];
 						if (poNum != currentActivePO[i]) {
@@ -349,20 +416,86 @@ public class PS1PersoBehaviour : MonoBehaviour {
 							if (physicalObject != null) physicalObject.SetActive(true);
 						}
 						if (!channelParents[i]) channelObjects[i].transform.SetParent(transform);
-					}
-					if (frame.pos.HasValue) {
-						channelObjects[i].transform.localPosition = h.vectors[frame.pos.Value].vector;
-					}
-					if (frame.rot.HasValue) {
-						channelObjects[i].transform.localRotation = h.quaternions[frame.rot.Value].quaternion;
-					}
-					if (frame.scl.HasValue) {
-						channelObjects[i].transform.localScale = h.vectors[frame.scl.Value].vector;
+
+
+						if (posInd.HasValue) {
+							Vector3 pos = h.animPositions[posInd.Value].vector;
+							if (interpolation > 0f && nextKF.pos.HasValue) {
+								pos = Vector3.Lerp(pos, h.animPositions[nextKF.pos.Value].vector, interpolation);
+							}
+							channelObjects[i].transform.localPosition = pos;
+						}
+						if (rotInd.HasValue) {
+							Quaternion rot = h.quaternions[rotInd.Value].quaternion;
+							if (interpolation > 0f && nextKF.rot.HasValue) {
+								rot = Quaternion.Lerp(rot, h.quaternions[nextKF.rot.Value].quaternion, interpolation);
+							}
+							channelObjects[i].transform.localRotation = rot;
+						}
+						if (sclInd.HasValue) {
+							Vector3 scl = h.animScales[sclInd.Value].GetVector(factor: 256f * 16f);
+							if (interpolation > 0f && nextKF.scl.HasValue) {
+								scl = Vector3.Lerp(scl, h.animScales[nextKF.scl.Value].GetVector(factor: 256f * 16f), interpolation);
+							}
+
+							
+							/*scl = new Vector3(
+								1f / (scl.x != 0f ? scl.x : 256f),
+								1f / (scl.y != 0f ? scl.y : 256f),
+								1f / (scl.z != 0f ? scl.z : 256f));*/
+							channelObjects[i].transform.localScale = scl;
+						}
+					} else {
+						switch (frame.ntto.Value) {
+							case -13:
+								// morph
+								break;
+							case -9:
+								// 6
+								break;
+							case -8:
+								break;
+							case -7:
+								// 5
+								break;
+							case -6:
+								// 4
+								break;
+							case -5:
+								// 3
+								break;
+							case -4:
+								// 2
+								break;
+							case -3:
+								// sound event related. extraDuration is sound bank
+								break;
+							case -2:
+								// 1
+								break;
+							case -1:
+								break;
+						}
 					}
 				}
+				/*if (frame.pos.HasValue) {
+					channelObjects[i].transform.localPosition = h.animPositions[frame.pos.Value].vector;
+				}
+				if (frame.rot.HasValue) {
+					channelObjects[i].transform.localRotation = h.quaternions[frame.rot.Value].quaternion;
+				}
+				if (frame.scl.HasValue) {
+					Vector3 v = h.animScales[frame.scl.Value].vector;
+					v = new Vector3(
+						(1 / 256f) * (v.x != 0f ? v.x : 256f),
+						(1 / 256f) * (v.y != 0f ? v.y : 256f),
+						(1 / 256f) * (v.z != 0f ? v.z : 256f));
+					channelObjects[i].transform.localScale = v;
+				}*/
 			}
 		}
 	}
+
 	/*public void UpdateAnimation() {
 		if (IsLoaded && anim != null && channelObjects != null && subObjects != null) {
 			if (currentFrame >= anim.num_frames) currentFrame %= anim.num_frames;

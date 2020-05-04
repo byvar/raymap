@@ -10,14 +10,14 @@ namespace OpenSpace.PS1 {
 		public ushort num_frames;
 		public short id;
 
-		public PS1AnimationChannelFrame[] frames;
+		public PS1AnimationKeyframe[] frames;
 
 		protected override void ReadInternal(Reader reader) {
 			off_frames = Pointer.Read(reader);
 			num_frames = reader.ReadUInt16();
 			id = reader.ReadInt16();
 
-			frames = Load.ReadArray<PS1AnimationChannelFrame>(num_frames, reader, off_frames);
+			frames = Load.ReadArray<PS1AnimationKeyframe>(num_frames, reader, off_frames);
 		}
 	}
 }

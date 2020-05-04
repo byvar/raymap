@@ -28,6 +28,7 @@ namespace OpenSpace.Loader {
 		public int CurrentLevel { get; private set; } = -1;
 		public PS1VRAM vram = new PS1VRAM();
 		public LevelHeader levelHeader;
+		public ushort maxScaleVector = 0;
 
 		public string[] LoadLevelList() {
 			if (PS1GameInfo.Games.ContainsKey(Settings.s.mode)) {
