@@ -354,6 +354,9 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				int ch_child = h.child - 1;
 				int ch_parent = h.parent - 1;
 				channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
+				channelObjects[ch_child].transform.localPosition = Vector3.zero;
+				channelObjects[ch_child].transform.localRotation = Quaternion.identity;
+				channelObjects[ch_child].transform.localScale = Vector3.one;
 				channelParents[ch_child] = true;
 			}
 			for (int i = 0; i < anim.channels.Length; i++) {
@@ -370,7 +373,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				int curFrameIndex = 0;
 
 				for (int f = 0; f < ch.frames.Length; f++) {
-					if (ch.frames[f].ntto >= 0) {
+					if (!ch.frames[f].ntto.HasValue || ch.frames[f].ntto >= 0) {
 						frame = ch.frames[f];
 						curChannelFrame = nextChannelFrame;
 						curFrameIndex = f;
@@ -388,7 +391,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				}
 				if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0) {
 					nextKF = ch.frames[curFrameIndex + 1];
-					if (!nextKF.ntto.HasValue || nextKF.ntto.Value < 0) nextKF = ch.frames[curFrameIndex + 2];
+					if (nextKF.ntto.HasValue && nextKF.ntto.Value < 0) nextKF = ch.frames[curFrameIndex + 2];
 				}
 				float interpolation = 0f;
 
@@ -397,85 +400,83 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				}
 
 
-				if (frame.ntto.HasValue) {
-					if (frame.ntto.Value >= 0) {
-						short poNum = frame.ntto.Value;
-						poNum = (short)Array.IndexOf(channelNTTO[i], poNum);
-
-						GameObject physicalObject = subObjects[i][poNum];
-						if (poNum != currentActivePO[i]) {
-							if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
-								foreach (GameObject morphPO in fullMorphPOs[i].Values) {
-									if (morphPO.activeSelf) morphPO.SetActive(false);
-								}
+				if (!frame.ntto.HasValue || frame.ntto.Value >= 0) {
+					short poNum = frame.ntto.HasValue ? frame.ntto.Value : (short)-1;
+					poNum = (short)Array.IndexOf(channelNTTO[i], poNum);
+					
+					GameObject physicalObject = poNum >= 0 ? subObjects[i][poNum] : null;
+					if (poNum != currentActivePO[i]) {
+						if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
+							foreach (GameObject morphPO in fullMorphPOs[i].Values) {
+								if (morphPO.activeSelf) morphPO.SetActive(false);
 							}
-							if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
-								subObjects[i][currentActivePO[i]].SetActive(false);
-							}
-							currentActivePO[i] = poNum;
-							if (physicalObject != null) physicalObject.SetActive(true);
 						}
-						if (!channelParents[i]) channelObjects[i].transform.SetParent(transform);
+						if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
+							subObjects[i][currentActivePO[i]].SetActive(false);
+						}
+						currentActivePO[i] = poNum;
+						if (physicalObject != null) physicalObject.SetActive(true);
+					}
+					if (!channelParents[i]) channelObjects[i].transform.SetParent(transform);
 
 
-						if (posInd.HasValue) {
-							Vector3 pos = h.animPositions[posInd.Value].vector;
-							if (interpolation > 0f && nextKF.pos.HasValue) {
-								pos = Vector3.Lerp(pos, h.animPositions[nextKF.pos.Value].vector, interpolation);
-							}
-							channelObjects[i].transform.localPosition = pos;
+					if (posInd.HasValue) {
+						Vector3 pos = h.animPositions[posInd.Value].vector;
+						if (interpolation > 0f && nextKF.pos.HasValue) {
+							pos = Vector3.Lerp(pos, h.animPositions[nextKF.pos.Value].vector, interpolation);
 						}
-						if (rotInd.HasValue) {
-							Quaternion rot = h.quaternions[rotInd.Value].quaternion;
-							if (interpolation > 0f && nextKF.rot.HasValue) {
-								rot = Quaternion.Lerp(rot, h.quaternions[nextKF.rot.Value].quaternion, interpolation);
-							}
-							channelObjects[i].transform.localRotation = rot;
+						channelObjects[i].transform.localPosition = pos;
+					}
+					if (rotInd.HasValue) {
+						Quaternion rot = h.quaternions[rotInd.Value].quaternion;
+						if (interpolation > 0f && nextKF.rot.HasValue) {
+							rot = Quaternion.Lerp(rot, h.quaternions[nextKF.rot.Value].quaternion, interpolation);
 						}
-						if (sclInd.HasValue) {
-							Vector3 scl = h.animScales[sclInd.Value].GetVector(factor: 256f * 16f);
-							if (interpolation > 0f && nextKF.scl.HasValue) {
-								scl = Vector3.Lerp(scl, h.animScales[nextKF.scl.Value].GetVector(factor: 256f * 16f), interpolation);
-							}
+						channelObjects[i].transform.localRotation = rot;
+					}
+					if (sclInd.HasValue) {
+						Vector3 scl = h.animScales[sclInd.Value].GetVector(factor: 256f * 16f);
+						if (interpolation > 0f && nextKF.scl.HasValue) {
+							scl = Vector3.Lerp(scl, h.animScales[nextKF.scl.Value].GetVector(factor: 256f * 16f), interpolation);
+						}
 
 							
-							/*scl = new Vector3(
-								1f / (scl.x != 0f ? scl.x : 256f),
-								1f / (scl.y != 0f ? scl.y : 256f),
-								1f / (scl.z != 0f ? scl.z : 256f));*/
-							channelObjects[i].transform.localScale = scl;
-						}
-					} else {
-						switch (frame.ntto.Value) {
-							case -13:
-								// morph
-								break;
-							case -9:
-								// 6
-								break;
-							case -8:
-								break;
-							case -7:
-								// 5
-								break;
-							case -6:
-								// 4
-								break;
-							case -5:
-								// 3
-								break;
-							case -4:
-								// 2
-								break;
-							case -3:
-								// sound event related. extraDuration is sound bank
-								break;
-							case -2:
-								// 1
-								break;
-							case -1:
-								break;
-						}
+						/*scl = new Vector3(
+							1f / (scl.x != 0f ? scl.x : 256f),
+							1f / (scl.y != 0f ? scl.y : 256f),
+							1f / (scl.z != 0f ? scl.z : 256f));*/
+						channelObjects[i].transform.localScale = scl;
+					}
+				} else {
+					switch (frame.ntto.Value) {
+						case -13:
+							// morph
+							break;
+						case -9:
+							// 6
+							break;
+						case -8:
+							break;
+						case -7:
+							// 5
+							break;
+						case -6:
+							// 4
+							break;
+						case -5:
+							// 3
+							break;
+						case -4:
+							// 2
+							break;
+						case -3:
+							// sound event related. extraDuration is sound bank
+							break;
+						case -2:
+							// 1
+							break;
+						case -1:
+							break;
 					}
 				}
 				/*if (frame.pos.HasValue) {

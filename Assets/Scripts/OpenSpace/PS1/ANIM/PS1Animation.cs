@@ -11,9 +11,9 @@ namespace OpenSpace.PS1 {
 		public uint num_channels;
 		public ushort num_frames;
 		public ushort ushort_0E;
-		public uint uint_10;
-		public Pointer off_hierarchies;
 		public uint num_hierarchies;
+		public Pointer off_hierarchies;
+		public uint uint_18;
 
 		// Parsed
 		public PS1AnimationChannel[] channels;
@@ -26,9 +26,9 @@ namespace OpenSpace.PS1 {
 			num_channels = reader.ReadUInt32();
 			num_frames = reader.ReadUInt16();
 			ushort_0E = reader.ReadUInt16();
-			uint_10 = reader.ReadUInt32();
-			off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
 			num_hierarchies = reader.ReadUInt32();
+			off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
+			uint_18 = reader.ReadUInt32();
 
 			
 			channels = Load.ReadArray<PS1AnimationChannel>(num_channels, reader, off_channels);
