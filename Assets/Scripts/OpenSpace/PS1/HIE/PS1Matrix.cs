@@ -21,8 +21,8 @@ namespace OpenSpace.PS1 {
 		public int x;
 		public int y;
 		public int z;
-		public int int_20;
-		public int int_24;
+		public ushort ushort_20;
+		public ushort ushort_22;
 
 
 
@@ -40,8 +40,8 @@ namespace OpenSpace.PS1 {
 			x = reader.ReadInt32();
 			y = reader.ReadInt32();
 			z = reader.ReadInt32();
-			int_20 = reader.ReadInt32();
-			int_24 = reader.ReadInt32();
+			ushort_20 = reader.ReadUInt16();
+			ushort_22 = reader.ReadUInt16();
 		}
 
 

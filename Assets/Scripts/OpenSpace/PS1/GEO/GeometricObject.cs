@@ -160,6 +160,8 @@ namespace OpenSpace.PS1 {
 
                             GameObject spr_gao = new GameObject("Sprite");
                             spr_gao.transform.SetParent(gao.transform);
+							Vertex spr_v = this.vertices[s.v0];
+							spr_gao.transform.localPosition = new Vector3(spr_v.x / 256, spr_v.z / 256f, spr_v.y / 256f);
                             BillboardBehaviour billboard = spr_gao.AddComponent<BillboardBehaviour>();
                             billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
                             MeshFilter sprites_mf = spr_gao.AddComponent<MeshFilter>();
