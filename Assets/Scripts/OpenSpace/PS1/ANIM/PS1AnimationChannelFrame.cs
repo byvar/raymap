@@ -18,24 +18,24 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			flags = reader.ReadUInt16();
-			if ((flags & ((ushort)AnimationFlags.First)) != 0) {
+			if (HasFlag(AnimationFlags.First)) {
 				ntto = reader.ReadInt16();
 			}
-			if ((flags & ((ushort)AnimationFlags.Position)) != 0) {
+			if (HasFlag(AnimationFlags.Position)) {
 				pos = reader.ReadUInt16();
 			}
-			if ((flags & ((ushort)AnimationFlags.Rotation)) != 0) {
+			if (HasFlag(AnimationFlags.Rotation)) {
 				rot = reader.ReadUInt16();
 			}
-			if ((flags & ((ushort)AnimationFlags.Duration)) != 0) {
+			if (HasFlag(AnimationFlags.Duration)) {
 				extraDuration = reader.ReadInt16();
 			}
-			if ((flags & ((ushort)AnimationFlags.Scale)) != 0) {
+			if (HasFlag(AnimationFlags.Scale)) {
 				scl = reader.ReadUInt16();
 				R2PS1Loader l = Load as R2PS1Loader;
 				if(scl > l.maxScaleVector) l.maxScaleVector = scl.Value;
 			}
-			if ((flags & ((ushort)AnimationFlags.NTTO)) != 0) {
+			if (HasFlag(AnimationFlags.NTTO)) {
 				morphNTTO = reader.ReadInt16();
 				morphProgress = reader.ReadInt16();
 			}
@@ -50,6 +50,12 @@ namespace OpenSpace.PS1 {
 			Duration = 1 << 3,
 			Scale = 1 << 4,
 			NTTO = 1 << 5,
+
+			FlipX = 1 << 6
+		}
+
+		public bool HasFlag(AnimationFlags flags) {
+			return (this.flags & (ushort)flags) == (ushort)flags;
 		}
 	}
 }

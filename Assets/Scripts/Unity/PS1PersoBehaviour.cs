@@ -417,6 +417,13 @@ public class PS1PersoBehaviour : MonoBehaviour {
 						currentActivePO[i] = poNum;
 						if (physicalObject != null) physicalObject.SetActive(true);
 					}
+					if (physicalObject != null) {
+						if (frame.HasFlag(PS1AnimationKeyframe.AnimationFlags.FlipX)) {
+							physicalObject.transform.localScale = new Vector3(-1, 1, 1);
+						} else {
+							physicalObject.transform.localScale = Vector3.one;
+						}
+					}
 					if (!channelParents[i]) channelObjects[i].transform.SetParent(transform);
 
 
