@@ -79,5 +79,33 @@ namespace OpenSpace.PS1.GLI {
             Backwards,
             Width128_5,
         }
+
+        public Material CreateMaterial(TextureBounds b)
+        {
+            Material baseMaterial;
+            if (IsLight) {
+                baseMaterial = MapLoader.Loader.baseLightMaterial;
+            } else if (/*m.colors.Any(c => c.a != 1f) || */IsTransparent) {
+                baseMaterial = MapLoader.Loader.baseTransparentMaterial;
+            } else {
+                baseMaterial = MapLoader.Loader.baseMaterial;
+            }
+            Material mat = new Material(baseMaterial);
+            mat.SetInt("_NumTextures", 1);
+            string textureName = "_Tex0";
+            Texture2D tex = b.texture;
+            if (ScrollingEnabled) tex.wrapMode = TextureWrapMode.Repeat;
+            mat.SetTexture(textureName, tex);
+
+            mat.SetVector(textureName + "Params", new Vector4(0,
+                ScrollingEnabled ? 1f : 0f,
+                0f, 0f));
+            mat.SetVector(textureName + "Params2", new Vector4(
+                0f, 0f,
+                ScrollX, ScrollY));
+            mat.SetVector("_AmbientCoef", Vector4.one);
+            mat.SetFloat("_Prelit", 1f);
+            return mat;
+        }
     }
 }

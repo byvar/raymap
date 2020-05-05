@@ -135,9 +135,11 @@ namespace OpenSpace.Loader {
 			}
 
 			GameObject persoPartsParent = new GameObject("Perso parts");
-			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
+            int i = 0;
+            foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
 				GameObject g = e.GetGameObject();
 				g.transform.parent = persoPartsParent.transform;
+                g.transform.position = new Vector3(i++ * 4, 1000, 0);
 			}
 		}
 
