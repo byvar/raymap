@@ -86,6 +86,19 @@ namespace OpenSpace.PS1 {
 			for (int i = 0; i < textures.Length; i++) {
 				VisualMaterial vm = textures[i];
 				TextureBounds b = vm.texture;
+
+				float alpha = 1f;
+				//if (!vm.IsLight) {
+					/*switch (vm.BlendMode) {
+						case VisualMaterial.SemiTransparentMode.Point25:
+							alpha = 0.25f * 4f;
+							break;
+						case VisualMaterial.SemiTransparentMode.Point5:
+							alpha = 0.5f * 4f;
+							break;
+					}*/
+				//}
+
 				IPS1Polygon pf = textured[vm].FirstOrDefault();
 				GameObject gao = new GameObject(Offset.ToString()
 					+ " - " + i
@@ -143,6 +156,58 @@ namespace OpenSpace.PS1 {
 							triIndices.Add(currentCount + 1);
 							triIndices.Add(currentCount + 3);
 							break;
+                        case Sprite s:
+
+                            GameObject spr_gao = new GameObject("Sprite");
+                            spr_gao.transform.SetParent(gao.transform);
+                            BillboardBehaviour billboard = spr_gao.AddComponent<BillboardBehaviour>();
+                            billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
+                            MeshFilter sprites_mf = spr_gao.AddComponent<MeshFilter>();
+                            MeshRenderer sprites_mr = spr_gao.AddComponent<MeshRenderer>();
+
+                            spr_gao.layer = LayerMask.NameToLayer("Visual");
+
+                            //Material unityMat = sprites[i].visualMaterial.MaterialBillboard;
+                            
+                            sprites_mr.receiveShadows = false;
+                            sprites_mr.material = vm.CreateMaterial();
+
+                            var meshUnity = new Mesh();
+                            Vector3[] vertices = new Vector3[4];
+
+                            float scale_x = 1.0f;
+                            float scale_y = 1.0f;
+
+                            scale_x = ((float)s.height / 256f) / 2.0f;
+                            scale_y = ((float)s.width / 256f) / 2.0f;
+
+                            vertices[0] = new Vector3(0, -scale_y, -scale_x);
+                            vertices[1] = new Vector3(0, -scale_y, scale_x);
+                            vertices[2] = new Vector3(0, scale_y, -scale_x);
+                            vertices[3] = new Vector3(0, scale_y, scale_x);
+                            Vector3[] normals = new Vector3[4];
+                            normals[0] = Vector3.forward;
+                            normals[1] = Vector3.forward;
+                            normals[2] = Vector3.forward;
+                            normals[3] = Vector3.forward;
+                            Vector3[] sprite_uvs = new Vector3[4];
+
+                            bool mirrorX = false;
+                            bool mirrorY = false;
+
+                            sprite_uvs[0] = new Vector3(0, 0 - (mirrorY ? 1 : 0), alpha);
+                            sprite_uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), 0 - (mirrorY ? 1 : 0), alpha);
+                            sprite_uvs[2] = new Vector3(0, 1, alpha);
+                            sprite_uvs[3] = new Vector3(1 + (mirrorX ? 1 : 0), 1, alpha);
+                            int[] triangles = new int[] { 0, 2, 1, 1, 2, 3 };
+
+                            meshUnity.vertices = vertices;
+                            meshUnity.normals = normals;
+                            meshUnity.triangles = triangles;
+                            meshUnity.SetUVs(0, sprite_uvs.ToList());
+                            sprites_mf.sharedMesh = meshUnity;
+                            
+                            break;
 					}
 				}
 				Vertex[] v = vertIndices.Select(vi => vertices[vi]).ToArray();
@@ -156,36 +221,12 @@ namespace OpenSpace.PS1 {
 					s.g / (float)0x80,
 					s.b / (float)0x80,
 					1f)).ToArray();
-				m.SetUVs(0, uvs.Select(s => new Vector4(s.x, s.y, 1f, 0f)).ToList());
+				m.SetUVs(0, uvs.Select(s => new Vector4(s.x, s.y, alpha, 0f)).ToList());
 				m.triangles = triIndices.ToArray();
 				m.RecalculateNormals();
 				mf.mesh = m;
 
-
-				Material baseMaterial;
-				if (vm.IsLight) {
-					baseMaterial = Load.baseLightMaterial;
-				} else if (/*m.colors.Any(c => c.a != 1f) || */vm.IsTransparent) {
-					baseMaterial = Load.baseTransparentMaterial;
-				} else {
-					baseMaterial = Load.baseMaterial;
-				}
-				Material mat = new Material(baseMaterial);
-				mat.SetInt("_NumTextures", 1);
-				string textureName = "_Tex0";
-				Texture2D tex = b.texture;
-				if (vm.ScrollingEnabled) tex.wrapMode = TextureWrapMode.Repeat;
-				mat.SetTexture(textureName, tex);
-				
-				mat.SetVector(textureName + "Params", new Vector4(0,
-					vm.ScrollingEnabled ? 1f : 0f,
-					0f, 0f));
-				mat.SetVector(textureName + "Params2", new Vector4(
-					0f, 0f,
-					vm.ScrollX, vm.ScrollY));
-				mat.SetVector("_AmbientCoef", Vector4.one);
-				mat.SetFloat("_Prelit", 1f);
-				mr.material = mat;
+				mr.material = vm.CreateMaterial();
 			}
 			// Untextured (some skyboxes, etc)
 			if(untextured.Count > 0) {

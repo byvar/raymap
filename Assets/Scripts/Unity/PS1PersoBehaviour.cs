@@ -313,7 +313,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 			anim = null;
 			if (animIndex >= 0 && animIndex < perso.p3dData.family.animations.Length) {
 				anim = perso.p3dData.family.animations[animIndex];
-				//animationSpeed = shAnim.speed;
+				animationSpeed = anim.speed;
 				//print(animCuts.Length);
 				forceAnimUpdate = true;
 				InitAnimation();

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace OpenSpace.PS1 {
 	public class Perso : OpenSpaceStruct { // Animation/state related
 		public Pointer off_p3dData;
-		public Pointer off_04;
+		public Pointer off_superObjectPointer;
 		public Pointer off_08;
 		public Pointer off_0C;
 		public Pointer off_10;
@@ -19,7 +19,7 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			off_p3dData = Pointer.Read(reader);
-			off_04 = Pointer.Read(reader);
+			off_superObjectPointer = Pointer.Read(reader);
 			off_08 = Pointer.Read(reader);
 			off_0C = Pointer.Read(reader);
 			off_10 = Pointer.Read(reader);
@@ -27,7 +27,7 @@ namespace OpenSpace.PS1 {
 			//Load.print(off_00 + " - " + off_04 + " - " + off_08 + " - " + off_0C + " - " + off_10 + " - " + off_14);
 
 			p3dData = Load.FromOffsetOrRead<Perso3dData>(reader, off_p3dData);
-			Pointer.DoAt(ref reader, off_04, () => {
+			Pointer.DoAt(ref reader, off_superObjectPointer, () => {
 				Pointer off_superobject = Pointer.Read(reader);
 				name = reader.ReadNullDelimitedString();
 				Load.print(off_superobject + " - " + name);

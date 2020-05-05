@@ -21,6 +21,10 @@
 		_DiffuseCoef("Diffuse Coef", Vector) = (1,1,1,1)
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
 
+		_BlendOp("Blend Op", Float) = 0 // Add
+		_SrcBlendMode("Src Blend Mode", Float) = 5 // SrcAlpha
+		_DstBlendMode("Dst Blend Mode", Float) = 10 // OneMinusSrcAlpha
+
 		// Lighting
 		[MaterialToggle] _Billboard("Is billboard", Float) = 0
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
@@ -56,7 +60,8 @@
 		Pass{
 			ZWrite Off
 			// pass for ambient light and first light source
-			Blend SrcAlpha OneMinusSrcAlpha
+			BlendOp [_BlendOp]
+			Blend [_SrcBlendMode] [_DstBlendMode]
 
 			CGPROGRAM
 
@@ -80,6 +85,7 @@
 		Pass{
 			ZWrite On
 			// pass for ambient light and first light source
+			BlendOp[_BlendOp]
 			Blend One Zero
 
 			CGPROGRAM

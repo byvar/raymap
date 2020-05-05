@@ -21,6 +21,10 @@
 		_DiffuseCoef("Diffuse Coef", Vector) = (1,1,1,1)
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
 
+		_BlendOp("Blend Op", Float) = 0 // Add
+		_SrcBlendMode("Src Blend Mode", Float) = 5 // SrcAlpha
+		_DstBlendMode("Dst Blend Mode", Float) = 6 // OneMinusSrcColor
+
 		// Lighting
 		[MaterialToggle] _Billboard("Is billboard", Float) = 0
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
@@ -34,7 +38,8 @@
 		Lighting Off
 		Pass{
 			//Tags{ "LightMode" = "ForwardBase" }
-			Blend SrcAlpha OneMinusSrcColor
+			BlendOp [_BlendOp]
+			Blend [_SrcBlendMode] [_DstBlendMode]
 			//Blend One One
 			// pass for ambient light and first light source
 

@@ -21,6 +21,10 @@
 		_DiffuseCoef("Diffuse Coef", Vector) = (1,1,1,1)
 		_AmbientCoef("Ambient Coef", Vector) = (1,1,1,1)
 
+		_BlendOp("Blend Op", Float) = 0 // Add
+		_SrcBlendMode("Src Blend Mode", Float) = 1 // One
+		_DstBlendMode("Dst Blend Mode", Float) = 0 // Zero
+
 		// Lighting
 		[MaterialToggle] _Billboard("Is billboard", Float) = 0
 		//_SectorAmbient("Sector Ambient light", Vector) = (1,1,1,1)
@@ -32,6 +36,8 @@
 		Lighting Off
 		Pass{
 			//Tags{ "LightMode" = "ForwardBase" }
+			BlendOp [_BlendOp]
+			Blend One Zero
 			// pass for ambient light and first light source
 			CGPROGRAM
 
