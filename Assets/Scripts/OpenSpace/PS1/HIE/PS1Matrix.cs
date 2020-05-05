@@ -62,9 +62,9 @@ namespace OpenSpace.PS1 {
 				//Loader.print(scale);
 				//Matrix4x4 matUnity = Matrix4x4.TRS(pos, rot, Vector3.one);
 				Matrix4x4 matUnity = new Matrix4x4();
-				matUnity.SetColumn(0, new Vector4(RotationToFloat(rot_m00), RotationToFloat(rot_m01), RotationToFloat(rot_m02), 0f));
-				matUnity.SetColumn(1, new Vector4(RotationToFloat(rot_m10), RotationToFloat(rot_m11), RotationToFloat(rot_m12), 0f));
-				matUnity.SetColumn(2, new Vector4(RotationToFloat(rot_m20), RotationToFloat(rot_m21), RotationToFloat(rot_m22), 0f));
+				matUnity.SetColumn(0, new Vector4(RotationToFloat(rot_m00), RotationToFloat(rot_m10), RotationToFloat(rot_m20), 0f));
+				matUnity.SetColumn(1, new Vector4(RotationToFloat(rot_m01), RotationToFloat(rot_m11), RotationToFloat(rot_m21), 0f));
+				matUnity.SetColumn(2, new Vector4(RotationToFloat(rot_m02), RotationToFloat(rot_m12), RotationToFloat(rot_m22), 0f));
 				matUnity.SetColumn(3, new Vector4(pos.x, pos.y, pos.z, 1f));
 
 
