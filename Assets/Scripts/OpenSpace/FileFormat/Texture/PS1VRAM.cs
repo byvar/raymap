@@ -293,6 +293,18 @@ namespace OpenSpace.FileFormat.Texture {
 			int pageY = Util.ExtractBits(texturePageInfo, 1, 4);
 			int abr = Util.ExtractBits(texturePageInfo, 2, 5);
 			int tp = Util.ExtractBits(texturePageInfo, 2, 7); // 0: 4-bit, 1: 8-bit, 2: 15-bit direct
+			/*int dtd = Util.ExtractBits(texturePageInfo, 1, 9);
+			int dfe = Util.ExtractBits(texturePageInfo, 1, 10);
+			int md = Util.ExtractBits(texturePageInfo, 1, 11);
+			int me = Util.ExtractBits(texturePageInfo, 1, 12);
+			MapLoader.Loader.print(abr + " - " + dtd + " - " + dfe + " - " + md + " - " + me);*/
+
+			/*
+			 * abr 00 0.5xB +  0.5 x F Semi transparent state
+			 *     01 1.0xB +  1.0 x F
+			 *     10 1.0xB -  1.0 x F
+			 *     11 1.0xB + 0.25 x F
+			 */
 
 			if (pageX < 5)
 				return null;

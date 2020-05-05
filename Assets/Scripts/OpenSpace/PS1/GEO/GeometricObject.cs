@@ -86,7 +86,14 @@ namespace OpenSpace.PS1 {
 			for (int i = 0; i < textures.Length; i++) {
 				VisualMaterial vm = textures[i];
 				TextureBounds b = vm.texture;
-				GameObject gao = new GameObject(Offset.ToString() + " - " + i + " - " + textured[vm].FirstOrDefault()?.Offset + " - " + textured[vm].FirstOrDefault()?.GetType() + " - " + string.Format("{0:X2}",vm.materialFlags) + "|" + string.Format("{0:X2}", vm.scroll));
+				IPS1Polygon pf = textured[vm].FirstOrDefault();
+				GameObject gao = new GameObject(Offset.ToString()
+					+ " - " + i
+					+ " - " + pf?.Offset
+					+ " - " + pf?.GetType()
+					+ " - " + string.Format("{0:X2}",vm.materialFlags)
+					+ "|" + string.Format("{0:X2}", vm.scroll)
+					+ " - " + vm.BlendMode);
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();

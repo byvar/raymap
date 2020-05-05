@@ -11,6 +11,14 @@ namespace OpenSpace.PS1.GLI {
 		public byte materialFlags;
 		public byte scroll;
 
+        public SemiTransparentMode BlendMode {
+            get {
+                if (texture == null) return SemiTransparentMode.One;
+                int abr = Util.ExtractBits(texture.pageInfo, 2, 5);
+                return (SemiTransparentMode)abr;
+            }
+
+        }
 		public float ScrollX {
             get {
                 int scr = (scroll >> 5);
@@ -78,6 +86,13 @@ namespace OpenSpace.PS1.GLI {
             Width128_3,
             Backwards,
             Width128_5,
+        }
+
+        public enum SemiTransparentMode {
+            Point5 = 0,
+            One,
+            MinusOne,
+            Point25
         }
     }
 }
