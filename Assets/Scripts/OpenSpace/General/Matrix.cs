@@ -148,7 +148,8 @@ namespace OpenSpace {
 
 			float tr = m00 + m11 + m22;
             Quaternion q = new Quaternion();
-			if (tr > 0) {
+            float t;
+			/*if (tr > 0) {
 				float S = Mathf.Sqrt(tr + 1.0f) * 2; // S=4*qw 
 				q.w = 0.25f * S;
 				q.x = (m21 - m12) / S;
@@ -172,9 +173,31 @@ namespace OpenSpace {
 				q.x = (m02 + m20) / S;
 				q.y = (m12 + m21) / S;
 				q.z = 0.25f * S;
-			}
+			}*/
+            if (m22 < 0) {
+                if (m00 > m11) {
+                    t = 1 + m00 - m11 - m22;
+                    q = new Quaternion(t, m01 + m10, m20 + m02, m12 - m21);
+                } else {
+                    t = 1 - m00 + m11 - m22;
+                    q = new Quaternion(m01 + m10, t, m12 + m21, m20 - m02);
+                }
+            } else {
+                if (m00 < -m11) {
+                    t = 1 - m00 - m11 + m22;
+                    q = new Quaternion(m20 + m02, m12 + m21, t, m01 - m10);
+                } else {
+                    t = 1 + m00 + m11 + m22;
+                    q = new Quaternion(m12 - m21, m20 - m02, m01 - m10, t);
+                }
+            }
+            float factor = (0.5f / Mathf.Sqrt(t));
+            q.x = q.x * factor;
+            q.y = q.y * factor;
+            q.z = q.z * factor;
+            q.w = q.w * -factor;
 
-			/*Vector3 s = GetScale();
+            /*Vector3 s = GetScale();
 
             // Normalize Scale from Matrix4x4
             float m00 = m[0, 0] / s.x;
@@ -203,7 +226,7 @@ namespace OpenSpace {
             q.y /= qMagnitude;
             q.z /= qMagnitude;*/
 
-			if (convertAxes) {
+            if (convertAxes) {
                 q = new Quaternion(q.x, q.z, q.y, -q.w);
                 //q = q * Quaternion.Euler(new Vector3(0f, 0f, 0f));
                 //Vector3 tempRot = q.eulerAngles;

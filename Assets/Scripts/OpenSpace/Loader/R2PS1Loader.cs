@@ -28,7 +28,9 @@ namespace OpenSpace.Loader {
 		public int CurrentLevel { get; private set; } = -1;
 		public PS1VRAM vram = new PS1VRAM();
 		public LevelHeader levelHeader;
+		public PS1GameInfo game;
 		public ushort maxScaleVector = 0;
+		public PS1Stream[] streams;
 
 		public string[] LoadLevelList() {
 			if (PS1GameInfo.Games.ContainsKey(Settings.s.mode)) {
@@ -48,7 +50,7 @@ namespace OpenSpace.Loader {
 				if (!PS1GameInfo.Games.ContainsKey(Settings.s.mode)) throw new Exception("PS1 info wasn't defined for this mode");
 				loadingState = "Initializing files";
 				//RipRHRLoc();
-				PS1GameInfo game = PS1GameInfo.Games[Settings.s.mode];
+				game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
 				await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.bigfile == "COMBIN"));
 				//await ExtractDAT(game, game.files.FirstOrDefault(f => f.bigfile == "COMBIN"), relocatePointers: true);
@@ -92,8 +94,20 @@ namespace OpenSpace.Loader {
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[CurrentLevel];
 			if (!b.inEngine) return;
 			string levelDir = gameDataBinFolder + lvlName + "/";
-			files_array[Mem.Fix] = new PS1Data(lvlName + ".gpt", levelDir + "level.gpt", Mem.Fix, 0);
-			files_array[Mem.Lvl] = new PS1Data(lvlName + ".dat", levelDir + "level.dat", Mem.Lvl, b.address);
+			Array.Resize(ref files_array, 2 + b.cutscenes.Length + (b.cinedata.size > 0 ? 1 : 0));
+			int curFile = 0;
+			files_array[curFile++] = new PS1Data(lvlName + ".gpt", levelDir + "level.gpt", curFile, 0);
+			files_array[curFile++] = new PS1Data(lvlName + ".dat", levelDir + "level.dat", curFile, b.address);
+			for (int i = 0; i < b.cutscenes.Length; i++) {
+				string cutsceneFramesName = levelDir + "stream_frames_" + i + ".blk";
+				files_array[curFile++] = new LinearFile("stream_frames_" + i +".blk", cutsceneFramesName, curFile);
+			}
+			if (b.cinedata.size > 0) {
+				curFile++;
+				/*files_array[curFile++] = new PS1Data("cine.dat", levelDir + "cine.dat",
+							cineDataBaseAddress + 0x1f800 + 0x32 * 0xc00,
+							curFile);*/
+			}
 			loadingState = "Filling VRAM";
 			await WaitIfNecessary();
 			FillVRAM();
@@ -135,11 +149,23 @@ namespace OpenSpace.Loader {
 			}
 
 			GameObject persoPartsParent = new GameObject("Perso parts");
-            int i = 0;
-            foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
+			int i = 0;
+			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
 				GameObject g = e.GetGameObject();
+				g.name = $"[{i}] {e.off_0} - {g.name}";
 				g.transform.parent = persoPartsParent.transform;
-                g.transform.position = new Vector3(i++ * 4, 1000, 0);
+				g.transform.position = new Vector3(i++ * 4, 1000, 0);
+			}
+
+
+			PS1GameInfo.File fileInfo = game.files.FirstOrDefault(f => f.bigfile == "COMBIN");
+			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[CurrentLevel];
+			streams = new PS1Stream[b.cutscenes.Length];
+			for (int j = 0; j < b.cutscenes.Length; j++) {
+				loadingState = $"Loading cinematic streams : {j+1}/{b.cutscenes.Length}";
+				await WaitIfNecessary();
+				reader = files_array[2 + j].reader;
+				streams[j] = FromOffsetOrRead<PS1Stream>(reader, Pointer.Current(reader), inline: true);
 			}
 		}
 
@@ -181,6 +207,18 @@ namespace OpenSpace.Loader {
 					byte[] cineblock = ExtractBlock(reader, b.cinedata, fileInfo.baseLBA);
 					if (cineblock != null) {
 						FileSystem.AddVirtualFile(levelDir + "cine.dat", cineblock);
+					}
+
+					for (int j = 0; j < b.cutscenes.Length; j++) {
+						string cutsceneAudioName = levelDir + "stream_audio_" + j + ".blk";
+						string cutsceneFramesName = levelDir + "stream_frames_" + j + ".blk";
+						byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
+						if (cutsceneAudioBlk != null) {
+							byte[] cutsceneAudio;
+							byte[] cutsceneFrames;
+							SplitCutsceneStream(cutsceneAudioBlk, out cutsceneAudio, out cutsceneFrames);
+							FileSystem.AddVirtualFile(cutsceneFramesName, cutsceneFrames);
+						}
 					}
 				}
 			}
@@ -298,6 +336,7 @@ namespace OpenSpace.Loader {
 							string cutsceneFramesName = levelDir + "stream_frames_" + j + ".blk";
 							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
 							if (cutsceneAudioBlk != null) {
+								//Util.ByteArrayToFile(levelDir + "stream_full_" + j + ".blk", cutsceneAudioBlk);
 								byte[] cutsceneAudio;
 								byte[] cutsceneFrames;
 								SplitCutsceneStream(cutsceneAudioBlk, out cutsceneAudio, out cutsceneFrames);

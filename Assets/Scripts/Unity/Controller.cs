@@ -15,6 +15,7 @@ using OpenSpace.Exporter;
 using System.Threading.Tasks;
 using Asyncoroutine;
 using Newtonsoft.Json;
+using OpenSpace.Loader;
 
 public class Controller : MonoBehaviour {
 	public Material baseMaterial;
@@ -219,7 +220,7 @@ public class Controller : MonoBehaviour {
 
         /*if (viewCollision)*/
         UpdateViewCollision();
-        if (loader.cinematicsManager != null) {
+        if (loader.cinematicsManager != null || loader is R2PS1Loader) {
             detailedState = "Initializing cinematics";
             await new WaitForEndOfFrame();
             InitCinematics();
@@ -817,6 +818,10 @@ public class Controller : MonoBehaviour {
 
 	public void InitCinematics() {
 		if (loader.cinematicsManager != null && loader.cinematicsManager.cinematics.Count > 0) {
+			cinematicSwitcher = new GameObject("Cinematic Switcher").AddComponent<CinematicSwitcher>();
+			cinematicSwitcher.Init();
+		}
+		if (loader is R2PS1Loader && (loader as R2PS1Loader).streams.Length > 0) {
 			cinematicSwitcher = new GameObject("Cinematic Switcher").AddComponent<CinematicSwitcher>();
 			cinematicSwitcher.Init();
 		}
