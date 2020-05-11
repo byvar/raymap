@@ -26,6 +26,8 @@ namespace OpenSpace.PS1 {
 		public Quaternion quaternion;
 		public Quaternion quaternionCamera;
 
+		public int NTTO => (flags & 0x1ff);
+
 		protected override void ReadInternal(Reader reader) {
 			flags = reader.ReadUInt16();
 			if (!HasFlag(StreamFlags.IntPosition)) {
@@ -53,7 +55,7 @@ namespace OpenSpace.PS1 {
 					qx / (float)Int16.MaxValue,
 					qy / (float)Int16.MaxValue,
 					qz / (float)Int16.MaxValue,
-					qw / (float)Int16.MaxValue);
+					-qw / (float)Int16.MaxValue);
 				if (HasFlag(StreamFlags.Scale)) {
 					// Scale
 					sx = reader.ReadInt16();
@@ -71,6 +73,8 @@ namespace OpenSpace.PS1 {
 			IntPosition = 0x200,
 			Camera = 0x300,
 			Scale = 0x400,
+			Parent = 0x4000,
+			FlipX = 0x8000,
 		}
 
 		public bool HasFlag(StreamFlags flags) {
@@ -95,8 +99,21 @@ namespace OpenSpace.PS1 {
 				return new Vector3(x / factor, y / factor, z / factor);
 			}
 		}
+		public Vector3 GetScale(float factor = 256f, bool switchAxes = true) {
+			if (!HasFlag(StreamFlags.Scale)) {
+				return new Vector3(1f, 1f, 1f);
+			}
+			int x = sx;
+			int y = sy;
+			int z = sz;
+			if (switchAxes) {
+				return new Vector3(x / factor, z / factor, y / factor);
+			} else {
+				return new Vector3(x / factor, y / factor, z / factor);
+			}
+		}
 
-	public Matrix ToMatrix() {
+		public Matrix ToMatrix() {
 		Matrix4x4 m = new Matrix4x4();
 		float x = quaternion.x;
 		float y = quaternion.y;

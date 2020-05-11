@@ -16,6 +16,7 @@ namespace OpenSpace.PS1 {
 			num_channels = reader.ReadInt32();
 
 			channels = Load.ReadArray<PS1StreamFrameChannel>(num_channels, reader);
+			//Load.print(num_frame + " - " + num_channels + " - " + Pointer.Current(reader));
 		}
 	}
 }

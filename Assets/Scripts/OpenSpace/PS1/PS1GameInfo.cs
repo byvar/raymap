@@ -9,6 +9,7 @@ namespace OpenSpace.PS1 {
 	public class PS1GameInfo {
 		public File[] files;
 		public string[] maps;
+		public Dictionary<string, string[]> cines;
 
 
 		public class File {
@@ -43,10 +44,12 @@ namespace OpenSpace.PS1 {
 			public class LBA {
 				public uint lba;
 				public uint size;
+				public string name;
 
-				public LBA(uint lba, uint size) {
+				public LBA(uint lba, uint size, string name = null) {
 					this.lba = lba;
 					this.size = size;
+					this.name = name;
 				}
 			}
 		}
@@ -107,10 +110,52 @@ namespace OpenSpace.PS1 {
 				"boat02",
 				"astro_10",
 				"fan_10",
-				"boss_1",
+				"boss_10",
 				"end",
 				"mapmonde",
 				"menu_st"
+			},
+			cines = new Dictionary<string, string[]>() {
+				{ "jail_10", new string[] { "jail10" } },
+				{ "jail_20", new string[] { "jail201", "jail202", } },
+				{ "learn_10", new string[] { "learn10a", "learn10b", "learn10c", "learn10d", "learn10e", "learn10f" } },
+				{ "learn_30", new string[] { "learn30" } },
+				{ "bast_22", new string[] { "bast22" } },
+				{ "ski_10", new string[] { "ski10" } },
+				{ "ski_60", new string[] { "ski60" } },
+				{ "batam_10", new string[] { "batam10a", "batam10b", "batam10c", "batam10d" } },
+				{ "whale_10", new string[] { "whale10" } },
+				{ "water_20", new string[] { "water20a", "water20b" } },
+				{ "poloc", new string[] { "poloc10", "poloc20", "poloc30", "poloc40" } },
+				{ "rodeo_40", new string[] { "rodeo40a", "rodeo40b", "rodeo40c", "rodeo40d" } },
+				{ "vulca_20", new string[] { "vulca20a", "vulca20b" } },
+				{ "vulca_25", new string[] { "vulca25" } },
+				{ "rodeo_60", new string[] { "rodeo60a" } },
+				{ "glob_10", new string[] { "glob10" } },
+				{ "glob_20", new string[] { "glob20", "glob20b" } },
+				{ "plum_10", new string[] { "plum10" } },
+				{ "plum_15", new string[] { "plum15" } },
+				{ "bast_10", new string[] { "bast10" } },
+				{ "helic_10", new string[] { "helic10" } },
+				{ "helic_20", new string[] { "helic20" } },
+				{ "helic_30", new string[] { "helic30a", "helic30b" } },
+				{ "morb_20", new string[] { "morb201", "morb202" } },
+				{ "learn_40", new string[] { "learn40" } },
+				{ "ball", new string[] { "ball10" } },
+				{ "isle_10", new string[] { "isle10a", "isle10b" } },
+				{ "batam_20", new string[] { "batam20" } },
+				{ "fan_10", new string[] { "fan10" } },
+				{ "boss_10", new string[] { "boss10a", "boss10b", "boss10c" } },
+				{ "end", new string[] { "end10" } },
+				{ "mapmonde", new string[] {
+					"nego10a", "nego10b", "nego10c", "nego10d", "nego11",
+					"nego20a", "nego20b", "nego20c", "nego20d", "nego21",
+					"nego30a", "nego30b", "nego30c", "nego30d", "nego31",
+					"nego40a", "nego40b", "nego40c", "nego40d", "nego41"
+				} },
+				{ "cask_10", new string[] { "cask10" } },
+				{ "boat01", new string[] { "boat10" } },
+				{ "nave_10", new string[] { "nave10" } },
 			},
 			files = new File[] {
 				new File() {

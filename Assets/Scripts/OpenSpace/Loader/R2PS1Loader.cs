@@ -31,6 +31,7 @@ namespace OpenSpace.Loader {
 		public PS1GameInfo game;
 		public ushort maxScaleVector = 0;
 		public PS1Stream[] streams;
+		PS1GameInfo.File.MemoryBlock memoryBlock;
 
 		public string[] LoadLevelList() {
 			if (PS1GameInfo.Games.ContainsKey(Settings.s.mode)) {
@@ -92,6 +93,7 @@ namespace OpenSpace.Loader {
 		public async Task InitFiles(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo) {
 			if (CurrentLevel < 0 || CurrentLevel >= gameInfo.maps.Length) return;
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[CurrentLevel];
+			memoryBlock = b;
 			if (!b.inEngine) return;
 			string levelDir = gameDataBinFolder + lvlName + "/";
 			Array.Resize(ref files_array, 2 + b.cutscenes.Length + (b.cinedata.size > 0 ? 1 : 0));
@@ -124,15 +126,26 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 			levelHeader = FromOffsetOrRead<LevelHeader>(reader, Pointer.Current(reader));
 
-			loadingState = "Calculating texture bounds";
-			await WaitIfNecessary();
-			CalculateTextures();
-
 			loadingState = "Loading superobject hierarchy";
 			await WaitIfNecessary();
 			levelHeader.fatherSector = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_fatherSector, onPreRead: s => s.isDynamic = false);
 			levelHeader.dynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_dynamicWorld, onPreRead: s => s.isDynamic = true);
 			levelHeader.inactiveDynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_inactiveDynamicWorld, onPreRead: s => s.isDynamic = true);
+
+			// Done reading here
+			if (memoryBlock.cinedata.size > 0) {
+				string levelDir = gameDataBinFolder + lvlName + "/";
+				uint cineDataBaseAddress = levelHeader.off_animPositions.offset;
+				files_array[files_array.Length-1] = new PS1Data("cine.dat", levelDir + "cine.dat", files_array.Length - 1,
+								cineDataBaseAddress + 0x1f800u + 0x32 * 0xc00);
+			}
+			if (levelHeader.num_geometricObjectsDynamic_cine != 0) {
+				levelHeader.geometricObjectsDynamic.ReadExtra(reader, levelHeader.num_geometricObjectsDynamic_cine);
+			}
+
+			loadingState = "Calculating texture bounds";
+			await WaitIfNecessary();
+			CalculateTextures();
 
 			loadingState = "Creating gameobjects";
 			await WaitIfNecessary();
@@ -391,12 +404,13 @@ namespace OpenSpace.Loader {
 			List<byte[]> cutsceneFramesList = new List<byte[]>();
 			using (MemoryStream ms = new MemoryStream(cutsceneData)) {
 				using (Reader reader = new Reader(ms, Settings.s.IsLittleEndian)) {
-					uint hdrSize = 1;
-					while (reader.BaseStream.Position < reader.BaseStream.Length && hdrSize > 0) {
-						hdrSize = reader.ReadUInt32();
+					uint size_frame_packet = 1;
+					while (reader.BaseStream.Position < reader.BaseStream.Length && size_frame_packet > 0) {
+						size_frame_packet = reader.ReadUInt32();
 						//print("HDR " + string.Format("{0:X8}", hdrSize));
-						if (hdrSize != 0xFFFFFFFF) {
-							cutsceneFramesList.Add(reader.ReadBytes((int)hdrSize));
+						if (size_frame_packet != 0xFFFFFFFF) {
+							reader.BaseStream.Position -= 4;
+							cutsceneFramesList.Add(reader.ReadBytes((int)size_frame_packet + 4));
 							bool readParts = true;
 							while (readParts && reader.BaseStream.Position < reader.BaseStream.Length) {
 								uint size = reader.ReadUInt32();

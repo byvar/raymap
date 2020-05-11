@@ -39,7 +39,22 @@ namespace OpenSpace.FileFormat {
         }
 
         public override Pointer GetUnsafePointer(uint value) {
-            if (headerOffset != 0 && value >= headerOffset && value < headerOffset + length) {
+            MapLoader l = MapLoader.Loader;
+            for (int i = l.files_array.Length - 1; i >= 0; i--) {
+                PS1Data ps1File = l.files_array[i] as PS1Data;
+                if (ps1File != null && ps1File.headerOffset != 0 && value >= ps1File.headerOffset && value < ps1File.headerOffset + ps1File.length) {
+                    return new Pointer(value, ps1File);
+                }
+            }
+            // Do a second loop over the files. If end and start overlap we want the start (returned by previous loop),
+            // but without the second loop some valid pointers will be null
+            for (int i = l.files_array.Length - 1; i >= 0; i--) {
+                PS1Data ps1File = l.files_array[i] as PS1Data;
+                if (ps1File != null && ps1File.headerOffset != 0 && value == ps1File.headerOffset + ps1File.length) {
+                    return new Pointer(value, ps1File);
+                }
+            }
+            /*if (headerOffset != 0 && value >= headerOffset && value < headerOffset + length) {
                 return new Pointer(value, this);
             } else {
                 MapLoader l = MapLoader.Loader;
@@ -57,7 +72,7 @@ namespace OpenSpace.FileFormat {
                         return new Pointer(value, ps1File);
                     }
                 }
-            }
+            }*/
             return null;
         }
 

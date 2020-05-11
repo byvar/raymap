@@ -9,6 +9,8 @@ using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class LevelHeader : OpenSpaceStruct {
+		public uint num_geometricObjectsDynamic_cine;
+
 		public Pointer off_dynamicWorld;
 		public Pointer off_fatherSector;
 		public Pointer off_inactiveDynamicWorld;
@@ -110,7 +112,9 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			R2PS1Loader l = Load as R2PS1Loader;
-			reader.ReadBytes(0xF0);
+			reader.ReadBytes(0xCC);
+			num_geometricObjectsDynamic_cine = reader.ReadUInt32();
+			reader.ReadBytes(0x20); // after this we're at 0xf0
 			off_dynamicWorld = Pointer.Read(reader);
 			off_fatherSector = Pointer.Read(reader);
 			off_inactiveDynamicWorld = Pointer.Read(reader);

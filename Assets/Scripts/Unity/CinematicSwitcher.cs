@@ -3,6 +3,7 @@ using OpenSpace.Animation;
 using OpenSpace.Cinematics;
 using OpenSpace.Loader;
 using OpenSpace.Object;
+using OpenSpace.PS1;
 using OpenSpace.Visual;
 using System;
 using System.Collections;
@@ -28,6 +29,7 @@ public class CinematicSwitcher : MonoBehaviour {
 	public float animationSpeed = 30f;
 	private float updateCounter = 0f;
 	OpenSpace.PS1.PS1Stream[] ps1Streams;
+	List<GameObject> ntto = new List<GameObject>();
 
 	// Use this for initialization
 	void Start() {
@@ -43,8 +45,14 @@ public class CinematicSwitcher : MonoBehaviour {
 
 			for (int i = 0; i < ps1Streams.Length; i++) {
 				cinematicNames[i + 1] = "Stream " + i;
+				PS1GameInfo game = PS1GameInfo.Games[Settings.s.mode];
+				if (game != null && game.cines !=null && game.cines.ContainsKey(l.lvlName)) {
+					if (game.cines[l.lvlName].Length > i) {
+						cinematicNames[i + 1] += ": " + game.cines[l.lvlName][i];
+					}
+				}
 				if (l.levelHeader.initialStreamID == i) {
-					cinematicNames[i + 1] = "Stream " + i + " (intro)";
+					cinematicNames[i + 1] += " (intro)";
 				}
 			}
 		} else {
@@ -72,6 +80,7 @@ public class CinematicSwitcher : MonoBehaviour {
 
 	public void SetCinematic(int index) {
 		if (ps1Streams != null) {
+			ClearNTTO();
 			if (index < 0 || index > ps1Streams.Length) return;
 			cinematicIndex = index;
 			currentCinematic = index;
@@ -125,17 +134,53 @@ public class CinematicSwitcher : MonoBehaviour {
 		}
 	}
 
+	private void ClearNTTO() {
+		foreach (GameObject gao in ntto) {
+			Destroy(gao);
+		}
+		ntto.Clear();
+	}
+
 	public void UpdatePS1StreamFrame() {
+		ClearNTTO();
 		if (ps1Streams != null && currentCinematic > 0) {
 			OpenSpace.PS1.PS1Stream s = ps1Streams[currentCinematic - 1];
-			OpenSpace.PS1.PS1StreamFrame f = s.frames.LastOrDefault(fr => fr.num_frame >= 0 && fr.num_frame <= currentFrame);
-			if (f != null) {
-				for (int i = 0; i < f.channels.Length; i++) {
-					OpenSpace.PS1.PS1StreamFrameChannel c = f.channels[i];
-					if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.Camera)) {
-						Camera cam = Camera.main;
-						cam.transform.position = c.GetPosition();
-						cam.transform.rotation = c.quaternion * Quaternion.Euler(0,180,0);
+			IEnumerable<OpenSpace.PS1.PS1StreamFrame> fs = s.frames.Where(fr => fr.num_frame == currentFrame);
+			foreach (var f in fs) {
+				if (f != null) {
+					R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
+					Camera cam = Camera.main;
+					for (int i = 0; i < f.channels.Length; i++) {
+						OpenSpace.PS1.PS1StreamFrameChannel c = f.channels[i];
+						if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.Camera)) {
+							cam.transform.position = c.GetPosition();
+							cam.transform.rotation = c.quaternion * Quaternion.Euler(0, 180, 0);
+						}
+						GameObject gao;
+						if (c.NTTO > 0) {
+							gao = l.levelHeader.geometricObjectsDynamic.GetGameObject(c.NTTO);
+							if (gao == null) gao = new GameObject("Empty 2");
+						} else {
+							gao = new GameObject("Empty");
+						}
+						if (gao != null) {
+							Vector3 scale = new Vector3(1f, 1f, 1f);
+							gao.name = string.Format("{0:X4}", c.flags) + " - " + gao.name;
+							gao.transform.SetParent(transform);
+							gao.transform.localPosition = cam.transform.localPosition + c.GetPosition();
+							gao.transform.localRotation = c.quaternion;
+							if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.Scale)) {
+								scale = c.GetScale(0x1000);
+								gao.name = string.Format("{0:X4}", c.sx) + string.Format("{0:X4}", c.sy) + string.Format("{0:X4}", c.sz) + " - " + gao.name;
+							}
+							if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.FlipX)) {
+								gao.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
+							} else {
+								gao.transform.localScale = scale;
+							}
+							//gao.transform.localScale = c.GetScale();
+							ntto.Add(gao);
+						}
 					}
 				}
 			}

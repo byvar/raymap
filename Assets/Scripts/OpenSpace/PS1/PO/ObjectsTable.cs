@@ -21,7 +21,17 @@ namespace OpenSpace.PS1 {
 				entries[i] = new Entry();
 				entries[i].Read(reader);
 			}
+		}
 
+		public void ReadExtra(Reader reader, uint count) {
+			Array.Resize(ref entries, (int)(length + count));
+			Pointer.DoAt(ref reader, Offset + 8 + (8 * length), () => {
+				for (int i = (int)length; i < entries.Length; i++) {
+					entries[i] = new Entry();
+					entries[i].Read(reader);
+				}
+			});
+			length += count;
 		}
 
 		public class Entry {
