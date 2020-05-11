@@ -103,6 +103,9 @@ class MapSelectionDropdown : AdvancedDropdown {
 			);
 		}
 
+        if (Settings.s.levelTranslation!=null)
+            output = Settings.s.levelTranslation.SortAndTranslate(output);
+
 		// Return the output
 		return output;
 	}

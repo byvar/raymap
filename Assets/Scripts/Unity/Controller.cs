@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Asyncoroutine;
 using Newtonsoft.Json;
 using OpenSpace.Loader;
+using System.Text.RegularExpressions;
 
 public class Controller : MonoBehaviour {
 	public Material baseMaterial;
@@ -87,7 +88,13 @@ public class Controller : MonoBehaviour {
 		mode = UnitySettings.GameMode;
 		gameDataBinFolder = UnitySettings.GameDirs.ContainsKey(mode) ? UnitySettings.GameDirs[mode] : "";
 		lvlName = UnitySettings.MapName;
-		ExportPath = UnitySettings.ExportPath;
+
+        var matches = new Regex("<[^>]+>").Matches(lvlName);
+        if (matches.Count>0) {
+            lvlName = matches[0].Value.Substring(1, matches[0].Length - 2); // Extract levelname from <levelname>
+        }
+
+        ExportPath = UnitySettings.ExportPath;
 		ExportAfterLoad = UnitySettings.ExportAfterLoad;
         ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoad;
 		if (FileSystem.mode == FileSystem.Mode.Web) {

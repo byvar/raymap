@@ -4,54 +4,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using static OpenSpace.LevelTranslation;
 using LinkedListType = OpenSpace.LinkedList.Type;
 
 namespace OpenSpace {
     public class Settings {
-        public enum Mode {
-			[Description("Rayman 2 (PC)")] Rayman2PC,
-			[Description("R2 (PC) Demo 1 (1999/08/19)")] Rayman2PCDemo1,
-			[Description("R2 (PC) Demo 2 (1999/09/11)")] Rayman2PCDemo2,
-			[Description("Rayman 2 (DC)")] Rayman2DC,
-			[Description("Rayman 2 (iOS)")] Rayman2IOS,
-			[Description("Rayman 2 (PS1)")] Rayman2PS1,
-			[Description("Rayman 2 (PS2)")] Rayman2PS2,
-			[Description("Rayman 2 (N64)")] Rayman2N64,
-			[Description("Rayman 2 (DS)")] Rayman2DS,
-			[Description("Rayman 2 (3DS)")] Rayman23DS,
-			[Description("Rayman M (PC)")] RaymanMPC,
-			[Description("Rayman M (PS2)")] RaymanMPS2,
-			[Description("RM (PS2) Demo (2001/07/25)")] RaymanMPS2Demo,
-			[Description("Rayman Arena (PC)")] RaymanArenaPC,
-			[Description("Rayman Arena (PS2)")] RaymanArenaPS2,
-			[Description("Rayman Arena (GC)")] RaymanArenaGC,
-			[Description("Rayman Arena Demo (GC)")] RaymanArenaGCDemo,
-			[Description("Rayman Arena (Xbox)")] RaymanArenaXbox,
-			[Description("Rayman Rush (PS1)")] RaymanRushPS1,
-			[Description("Rayman 3 (PC)")] Rayman3PC,
-			[Description("Rayman 3 (GC)")] Rayman3GC,
-			[Description("Rayman 3 (PS2)")] Rayman3PS2,
-			[Description("R3 (PS2) Demo (2002/08/07)")] Rayman3PS2Demo_2002_08_07,
-			[Description("R3 (PS2) Dev Build (2002/09/06)")] Rayman3PS2DevBuild,
-			[Description("R3 (PS2) Demo (2002/10/29)")] Rayman3PS2Demo_2002_10_29,
-			[Description("R3 (PS2) Demo (2002/12/18)")] Rayman3PS2Demo_2002_12_18,
-			[Description("Rayman 3 (Xbox)")] Rayman3Xbox,
-			[Description("Rayman 3 (Xbox 360)")] Rayman3Xbox360,
-			[Description("Rayman 3 (PS3)")] Rayman3PS3,
-			[Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
-			[Description("Tonic Trouble (PC)")] TonicTroublePC,
-			[Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
-			[Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
-			[Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
-			[Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
-			[Description("Donald Duck: PK (GC)")] DonaldDuckPKGC,
-			[Description("Playmobil: Hype (PC)")] PlaymobilHypePC,
-			[Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
-			[Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
-			[Description("Disney's Dinosaur (PC)")] DinosaurPC,
-			[Description("Largo Winch (PC)")] LargoWinchPC,
-		};
-        public Mode mode = Mode.Rayman3PC;
 		
 		public static Dictionary<string, Mode> cmdModeNameDict = new Dictionary<string, Mode>() {
 			{ "r3_gc", Mode.Rayman3GC },
@@ -96,6 +53,50 @@ namespace OpenSpace {
 			{ "largowinch_pc", Mode.LargoWinchPC },
 		};
 
+        #region Enums
+        public enum Mode {
+            [Description("Rayman 2 (PC)")] Rayman2PC,
+            [Description("R2 (PC) Demo 1 (1999/08/19)")] Rayman2PCDemo1,
+            [Description("R2 (PC) Demo 2 (1999/09/11)")] Rayman2PCDemo2,
+            [Description("Rayman 2 (DC)")] Rayman2DC,
+            [Description("Rayman 2 (iOS)")] Rayman2IOS,
+            [Description("Rayman 2 (PS1)")] Rayman2PS1,
+            [Description("Rayman 2 (PS2)")] Rayman2PS2,
+            [Description("Rayman 2 (N64)")] Rayman2N64,
+            [Description("Rayman 2 (DS)")] Rayman2DS,
+            [Description("Rayman 2 (3DS)")] Rayman23DS,
+            [Description("Rayman M (PC)")] RaymanMPC,
+            [Description("Rayman M (PS2)")] RaymanMPS2,
+            [Description("RM (PS2) Demo (2001/07/25)")] RaymanMPS2Demo,
+            [Description("Rayman Arena (PC)")] RaymanArenaPC,
+            [Description("Rayman Arena (PS2)")] RaymanArenaPS2,
+            [Description("Rayman Arena (GC)")] RaymanArenaGC,
+            [Description("Rayman Arena Demo (GC)")] RaymanArenaGCDemo,
+            [Description("Rayman Arena (Xbox)")] RaymanArenaXbox,
+            [Description("Rayman Rush (PS1)")] RaymanRushPS1,
+            [Description("Rayman 3 (PC)")] Rayman3PC,
+            [Description("Rayman 3 (GC)")] Rayman3GC,
+            [Description("Rayman 3 (PS2)")] Rayman3PS2,
+            [Description("R3 (PS2) Demo (2002/08/07)")] Rayman3PS2Demo_2002_08_07,
+            [Description("R3 (PS2) Dev Build (2002/09/06)")] Rayman3PS2DevBuild,
+            [Description("R3 (PS2) Demo (2002/10/29)")] Rayman3PS2Demo_2002_10_29,
+            [Description("R3 (PS2) Demo (2002/12/18)")] Rayman3PS2Demo_2002_12_18,
+            [Description("Rayman 3 (Xbox)")] Rayman3Xbox,
+            [Description("Rayman 3 (Xbox 360)")] Rayman3Xbox360,
+            [Description("Rayman 3 (PS3)")] Rayman3PS3,
+            [Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
+            [Description("Tonic Trouble (PC)")] TonicTroublePC,
+            [Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
+            [Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
+            [Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
+            [Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
+            [Description("Donald Duck: PK (GC)")] DonaldDuckPKGC,
+            [Description("Playmobil: Hype (PC)")] PlaymobilHypePC,
+            [Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
+            [Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
+            [Description("Disney's Dinosaur (PC)")] DinosaurPC,
+            [Description("Largo Winch (PC)")] LargoWinchPC,
+        };
         public enum EngineVersion {
             TT = 0,
             Montreal = 1,
@@ -108,7 +109,10 @@ namespace OpenSpace {
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
 		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB, LMFile, TextureFile };
-        
+        #endregion
+
+        #region Variables
+        public Mode mode = Mode.Rayman3PC;
         public EngineVersion engineVersion;
         public Game game;
         public Platform platform;
@@ -131,11 +135,14 @@ namespace OpenSpace {
         public float luminosity = 0.5f;
         public bool saturate = true;
 		public Dictionary<CapsType, Caps> caps = new Dictionary<CapsType, Caps>();
+        public LevelTranslation levelTranslation = null;
         public bool linkUncategorizedObjectsToScriptFamily = false;
 
         public bool IsLittleEndian {
             get { return endian == Endian.Little; }
         }
+
+        #endregion
 
         public static void Init(Mode mode) {
 			if (settingsDict.ContainsKey(mode)) {
@@ -153,6 +160,9 @@ namespace OpenSpace {
 
 
         public static Settings s = null;
+
+        #region Settings
+
         public static Settings R3PC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.R3,
@@ -165,6 +175,7 @@ namespace OpenSpace {
             textureAnimationSpeedModifier = 10f,
             luminosity = 0.1f,
             saturate = false,
+            levelTranslation = LevelTranslation.levelTranslation_r3,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x007D9A4C },
                 { "dynamicWorld", 0x007D9934 },
@@ -216,7 +227,8 @@ namespace OpenSpace {
             textureAnimationSpeedModifier = -10f,
             luminosity = 0.1f,
             saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -234,7 +246,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
 		};
@@ -250,7 +263,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
 		};
@@ -266,7 +280,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
 		};
@@ -282,7 +297,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
 		};
@@ -298,7 +314,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			hasNames = true,
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            hasNames = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
@@ -315,7 +332,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.1f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -333,7 +351,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.1f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -352,7 +371,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.1f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r3,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -371,7 +391,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.3f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_rarena_pc,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -388,7 +409,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			hasNames = true,
+            levelTranslation = LevelTranslation.levelTranslation_rarena_pc,
+            hasNames = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
@@ -404,7 +426,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			hasNames = true,
+            levelTranslation = LevelTranslation.levelTranslation_rarena_pc,
+            hasNames = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
@@ -420,7 +443,8 @@ namespace OpenSpace {
             textureAnimationSpeedModifier = 10f,
             luminosity = 0.3f,
             saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_rarena_pc,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -437,7 +461,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.5f,
 			saturate = false,
-			hasNames = true,
+            levelTranslation = LevelTranslation.levelTranslation_rarena_pc,
+            hasNames = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
@@ -453,7 +478,8 @@ namespace OpenSpace {
             textureAnimationSpeedModifier = -10f,
             luminosity = 0.1f,
             saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_rarena_xboxgc,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -470,7 +496,8 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = -10f,
 			luminosity = 0.1f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_rarena_xboxgc,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
@@ -487,14 +514,15 @@ namespace OpenSpace {
 			textureAnimationSpeedModifier = 10f,
 			luminosity = 0.1f,
 			saturate = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_rarena_xboxgc,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
 				{ CapsType.Fix, Caps.None },
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
 
-		public static Settings R2PC = new Settings() {
+        public static Settings R2PC = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.PC,
@@ -506,6 +534,7 @@ namespace OpenSpace {
             luminosity = 0.5f,
             saturate = true,
             hasMemorySupport = true,
+            levelTranslation = LevelTranslation.levelTranslation_r2,
             linkUncategorizedObjectsToScriptFamily = true,
             memoryAddresses = new Dictionary<string, uint> {
                 { "actualWorld", 0x005013C8 },
@@ -572,7 +601,8 @@ namespace OpenSpace {
             saturate = true,
             aiTypes = AITypes.R2,
             hasExtraInputData = false,
-			caps = new Dictionary<CapsType, Caps>() {
+            levelTranslation = LevelTranslation.levelTranslation_r2,
+            caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			}
         };
@@ -604,6 +634,7 @@ namespace OpenSpace {
             encryption = Encryption.ReadInit,
             aiTypes = AITypes.R2,
             hasExtraInputData = true,
+            levelTranslation = LevelTranslation.levelTranslation_r2,
             luminosity = 0.5f,
             saturate = true,
 			caps = new Dictionary<CapsType, Caps>() {
@@ -685,7 +716,8 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2ROM,
-			numEntryActions = 1
+            levelTranslation = LevelTranslation.levelTranslation_r2,
+            numEntryActions = 1
 		};
 		public static Settings DDN64 = new Settings() {
 			engineVersion = EngineVersion.R2,
@@ -875,8 +907,10 @@ namespace OpenSpace {
 			hasDeformations = true
 		};
 
+        #endregion
 
-		public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
+
+        public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
 			{ Mode.Rayman2PC, R2PC },
 			{ Mode.Rayman2PCDemo1, R2PCDemo1 },
 			{ Mode.Rayman2PCDemo2, R2PCDemo2 },
