@@ -81,17 +81,21 @@ public class Controller : MonoBehaviour {
 		if (Application.platform == RuntimePlatform.WebGLPlayer) {
 			FileSystem.mode = FileSystem.Mode.Web;
 		}
-		if (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL) {
+        #if UNITY_EDITOR
+        if (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL) {
 			FileSystem.mode = FileSystem.Mode.Web;
 		}
+        #endif
 
-		mode = UnitySettings.GameMode;
+        mode = UnitySettings.GameMode;
 		gameDataBinFolder = UnitySettings.GameDirs.ContainsKey(mode) ? UnitySettings.GameDirs[mode] : "";
 		lvlName = UnitySettings.MapName;
 
-        var matches = new Regex("<[^>]+>").Matches(lvlName);
-        if (matches.Count>0) {
-            lvlName = matches[0].Value.Substring(1, matches[0].Length - 2); // Extract levelname from <levelname>
+        if (lvlName != null) {
+            var matches = new Regex("<[^>]+>").Matches(lvlName);
+            if (matches.Count > 0) {
+                lvlName = matches[0].Value.Substring(1, matches[0].Length - 2); // Extract levelname from <levelname>
+            }
         }
 
         ExportPath = UnitySettings.ExportPath;

@@ -140,8 +140,10 @@ public class UnityWindowSettings : UnityWindow {
 		GUI.EndScrollView();
 
 		if (EditorGUI.EndChangeCheck() || Dirty) {
-			UnitySettings.Save();
-			Dirty = false;
+            #if UNITY_EDITOR
+                UnitySettings.Save();
+            #endif
+            Dirty = false;
 		}
 	}
 	#endregion
