@@ -104,12 +104,8 @@ namespace Assets.Scripts.OpenSpace.AI {
 
                 ScriptNode node = script.scriptNodes[i];
                 ScriptNode nextNode = null;
-                ScriptNode secondNextNode = null;
                 if (i < script.scriptNodes.Count - 1) {
                     nextNode = script.scriptNodes[i + 1];
-                }
-                if (i < script.scriptNodes.Count - 2) {
-                    secondNextNode = script.scriptNodes[i + 2];
                 }
 
                 if (node.nodeType == ScriptNode.NodeType.Procedure) {
@@ -120,17 +116,13 @@ namespace Assets.Scripts.OpenSpace.AI {
                     string procedureType = Settings.s.aiTypes.procedureTable[node.param];
                     if (procedureType == "Proc_ChangeMyComport" || procedureType == "Proc_ChangeMyComportAndMyReflex" ||
                         procedureType == "_fn_p_stChangeMyComportIntelligenceProcedure" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure" || 
-                        procedureType == "ChangeMyComportIntelligenceProcedure" || procedureType == "ChangeMyComportReflexProcedure" || procedureType == "ChangeMyComportIntelligenceAndReflexProcedure" ) {
+                        procedureType == "ChangeMyComportIntelligenceProcedure" ||  procedureType == "ChangeMyComportIntelligenceAndReflexProcedure" ) {
 
                         Behavior transitionBehavior = MapLoader.Loader.FromOffset<Behavior>(nextNode.param_ptr);
                         if (transitionBehavior!=null && !transitionToIndices.Contains(transitionBehavior.index)) {
                             transitionToIndices.Add(transitionBehavior.index);
                         }
 
-                        Behavior transitionBehavior2 = MapLoader.Loader.FromOffset<Behavior>(secondNextNode.param_ptr);
-                        if (transitionBehavior2 != null && !transitionToIndices.Contains(transitionBehavior2.index)) {
-                            transitionToIndices.Add(transitionBehavior2.index);
-                        }
                     }
                 }
 
@@ -171,14 +163,14 @@ namespace Assets.Scripts.OpenSpace.AI {
                         continue;
                     }
                     string procedureType = Settings.s.aiTypes.procedureTable[node.param];
-                    if (procedureType == "Proc_ChangeMyComportReflex" || procedureType == "_fn_p_stChangeMyComportReflexProcedure") {
+                    if (procedureType == "Proc_ChangeMyComportReflex" || procedureType == "_fn_p_stChangeMyComportReflexProcedure" || procedureType == "ChangeMyComportReflexProcedure") {
                         Behavior transitionBehavior = MapLoader.Loader.FromOffset<Behavior>(nextNode.param_ptr);
                         if (transitionBehavior!=null && !transitionToIndices.Contains(transitionBehavior.index)) {
                             transitionToIndices.Add(transitionBehavior.index);
                         }
                     }
 
-                    if (nextNextNode != null && (procedureType == "Proc_ChangeMyComportAndMyReflex" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure")) {
+                    if (nextNextNode != null && (procedureType == "Proc_ChangeMyComportAndMyReflex" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure" || procedureType == "ChangeMyComportIntelligenceAndReflexProcedure" )) {
                         Behavior transitionBehavior = MapLoader.Loader.FromOffset<Behavior>(nextNextNode.param_ptr);
                         if (transitionBehavior != null && !transitionToIndices.Contains(transitionBehavior.index)) {
                             transitionToIndices.Add(transitionBehavior.index);
