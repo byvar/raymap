@@ -30,7 +30,7 @@ namespace OpenSpace.PS1 {
 			Pointer.DoAt(ref reader, off_superObjectPointer, () => {
 				Pointer off_superobject = Pointer.Read(reader);
 				name = reader.ReadNullDelimitedString();
-				Load.print(off_superobject + " - " + name);
+				Load.print(Offset + " - " + off_superobject + " - " + name);
 			});
 			/*Pointer.DoAt(ref reader, off_00, () => {
 				reader.ReadBytes(0x5c);

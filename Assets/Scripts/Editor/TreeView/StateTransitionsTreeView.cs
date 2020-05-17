@@ -14,6 +14,7 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTr
 
 	public PersoBehaviour perso;
 	public ROMPersoBehaviour persoROM;
+	public PS1PersoBehaviour persoPS1;
 	public int stateIndex;
 
 	GUIStyle miniButton;
@@ -153,12 +154,14 @@ public class StateTransitionsTreeView : TreeViewWithTreeModel<StateTransitionsTr
 				if (GUI.Button(cellRect, item.data.targetStateName, MiniButton)) {
 					if (perso != null) perso.SetState(item.data.targetStateIndex);
 					if (persoROM != null) persoROM.SetState(item.data.targetStateIndex);
+					if (persoPS1 != null) persoPS1.SetState(item.data.targetStateIndex);
 				}
 				break;
 			case Columns.StateToGo:
 				if (GUI.Button(cellRect, item.data.stateToGoName, MiniButton)) {
 					if (perso != null) perso.SetState(item.data.stateToGoIndex);
 					if (persoROM != null) persoROM.SetState(item.data.stateToGoIndex);
+					if (persoPS1 != null) persoPS1.SetState(item.data.stateToGoIndex);
 				}
 				break;
 			case Columns.LinkingType:
