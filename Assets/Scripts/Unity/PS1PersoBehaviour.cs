@@ -67,10 +67,26 @@ public class PS1PersoBehaviour : MonoBehaviour {
 		if (perso != null && perso.p3dData != null && perso.p3dData.family != null) {
 			Family fam = perso.p3dData.family;
 			if (fam.animations != null) {
-				states = h.states.pointers
-					.Where(s => s.Value != null && (s.Value.anim?.index == null || s.Value.anim.index < fam.animations.Length))
-					.Select(s => s.Value).ToArray();
-				stateNames = states.Select(s => ((s.anim == null) ? "Null" : fam.animations[s.anim.index].name)).ToArray();
+				State[] tempStates = h.states.pointers.Select(s => s.Value).ToArray();
+				int ind = (int)perso.p3dData.stateIndex;
+				int startInd = 0; // inclusive
+				int endInd = tempStates.Length; // exclusive
+				for (int i = ind; i >= 0; i--) {
+					if (tempStates[i].anim != null && tempStates[i].anim.index >= fam.animations.Length) {
+						startInd = i + 1;
+						break;
+					}
+				}
+				for (int i = ind; i < tempStates.Length; i++) {
+					if (tempStates[i].anim != null && tempStates[i].anim.index >= fam.animations.Length) {
+						endInd = i;
+						break;
+					}
+				}
+				states = new State[endInd - startInd];
+				Array.Copy(tempStates, startInd, states, 0, states.Length);
+
+				stateNames = states.Select(s => ((s.anim == null) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}")).ToArray();
 				hasStates = true;
 				stateIndex = Array.IndexOf(states, h.states.pointers[perso.p3dData.stateIndex].Value);
 				currentState = stateIndex;
@@ -79,6 +95,16 @@ public class PS1PersoBehaviour : MonoBehaviour {
 		}
 		IsLoaded = true;
     }
+
+	public string GetStateName(State state) {
+		int ind = Array.IndexOf(states, state);
+		if (ind >= 0) {
+			return stateNames[ind];
+		} else {
+			return null;
+		}
+
+	}
 
     #region Print debug info
     public void PrintAnimationDebugInfo() {
@@ -150,7 +176,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
         MapLoader l = MapLoader.Loader;
 		//print(name + " - " + state.Index + " - " + perso.p3dData.Value.currentState.index);
 		if (state.anim != null) {
-			animationSpeed = state.speed;
+			//animationSpeed = state.speed;
 			LoadNewAnimation((int)state.anim.index);
 			UpdateAnimation();
 		} else {

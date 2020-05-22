@@ -103,6 +103,23 @@ namespace OpenSpace.PS1 {
 			return type;
 		}
 
+		public OpenSpaceStruct Data {
+			get {
+				LevelHeader h = (Load as R2PS1Loader).levelHeader;
+				if (type == Type.IPO) {
+					if ((dataIndex >> 1) >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
+					return h.geometricObjectsStatic.entries[dataIndex >> 1].geo;
+				} else if (type == Type.Perso) {
+					if (dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
+					return h.persos[dataIndex];
+				} else if (type == Type.Sector) {
+					if (dataIndex >= h.sectors.Length) throw new Exception("Sector SO data index was too high! " + h.sectors.Length + " - " + dataIndex);
+					return h.sectors[dataIndex];
+				}
+				return null;
+			}
+		}
+
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject(type + " @ " + Offset);
 			if (type != Type.IPO) {
@@ -126,16 +143,14 @@ namespace OpenSpace.PS1 {
 				}
 			} else if (type == Type.Perso) {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
-				if(dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
-				gao.name = h.persos[dataIndex].name + " | " + gao.name;
-				if (h.persos[dataIndex]?.p3dData?.family?.name != null) {
-					gao.name = $"[{h.persos[dataIndex]?.p3dData?.family?.name}] {gao.name}";
-				}
+				if (dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
 				gao.name = dataIndex + " - " + gao.name;
-				PS1PersoBehaviour romPerso = gao.AddComponent<PS1PersoBehaviour>();
-				romPerso.perso =  h.persos[dataIndex];
-				romPerso.controller = MapLoader.Loader.controller;
-				romPerso.controller.ps1Persos.Add(romPerso);
+				PS1PersoBehaviour ps1Perso = h.persos[dataIndex].GetGameObject(gao);
+			} else if (type == Type.Sector) {
+				LevelHeader h = (Load as R2PS1Loader).levelHeader;
+				if (dataIndex >= h.sectors.Length) throw new Exception("Sector SO data index was too high! " + h.sectors.Length + " - " + dataIndex);
+				gao.name = dataIndex + " - " + gao.name;
+				SectorComponent sect = h.sectors[dataIndex].GetGameObject(gao);
 			}
 			if (children != null) {
 				foreach (SuperObject so in children) {

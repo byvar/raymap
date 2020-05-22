@@ -29,7 +29,9 @@ public class CinematicSwitcher : MonoBehaviour {
 	public float animationSpeed = 30f;
 	private float updateCounter = 0f;
 	OpenSpace.PS1.PS1Stream[] ps1Streams;
-	List<GameObject> ntto = new List<GameObject>();
+	Dictionary<int, List<GameObject>> objectPool = new Dictionary<int, List<GameObject>>();
+	List<GameObject> allNTTO = new List<GameObject>();
+	List<GameObject> currentNTTO = new List<GameObject>();
 
 	// Use this for initialization
 	void Start() {
@@ -80,12 +82,12 @@ public class CinematicSwitcher : MonoBehaviour {
 
 	public void SetCinematic(int index) {
 		if (ps1Streams != null) {
-			ClearNTTO();
+			DeinitPS1Stream();
 			if (index < 0 || index > ps1Streams.Length) return;
 			cinematicIndex = index;
 			currentCinematic = index;
 			index--;
-			currentFrame = 0;
+			InitPS1Stream();
 			UpdatePS1StreamFrame();
 		} else {
 			if (index < 0 || index > cinematicsManager.cinematics.Count) return;
@@ -115,6 +117,52 @@ public class CinematicSwitcher : MonoBehaviour {
 		}
 	}
 
+	public void InitPS1Stream() {
+		DeinitPS1Stream();
+		currentFrame = 0;
+		if (currentCinematic > 0 && ps1Streams != null) {
+			OpenSpace.PS1.PS1Stream s = ps1Streams[currentCinematic - 1];
+			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
+			foreach (PS1StreamFrame f in s.frames) {
+				Dictionary<int, int> nttoForFrame = new Dictionary<int, int>();
+				for(int i = 0; i < f.num_channels; i++) {
+					PS1StreamFrameChannel c = f.channels[i];
+					int ntto = c.NTTO;
+					/*if (c.HasFlag(PS1StreamFrameChannel.StreamFlags.Parent)) {
+						Debug.Log(string.Format("{0:X4}", c.flags));
+					}*/
+					if (ntto >= 0) {
+						/*if (nttoPerChannel[i] == null) nttoPerChannel[i] = new Dictionary<int, GameObject>();
+
+						if (!nttoPerChannel[i].ContainsKey(ntto)) {
+							GameObject gao = l.levelHeader.geometricObjectsDynamic.GetGameObject(ntto);
+							if (gao == null) gao = new GameObject("Empty 2");
+							gao.name = string.Format("{0:X4}", c.flags) + " - " + gao.name;
+							gao.transform.SetParent(transform);
+							gao.SetActive(false);
+						}*/
+						if (!nttoForFrame.ContainsKey(ntto)) nttoForFrame[ntto] = 0;
+						nttoForFrame[ntto]++;
+						if (!objectPool.ContainsKey(ntto) || objectPool[ntto].Count < nttoForFrame[ntto]) {
+							GameObject gao = l.levelHeader.geometricObjectsDynamic.GetGameObject(ntto);
+							//if (gao == null) gao = new GameObject("Empty 2");
+							if (gao != null) {
+								gao.name = string.Format("{0:X4}", c.flags) + " - " + gao.name;
+								gao.transform.SetParent(transform);
+								gao.SetActive(false);
+								allNTTO.Add(gao);
+								if (!objectPool.ContainsKey(ntto)) {
+									objectPool[ntto] = new List<GameObject>();
+								}
+								objectPool[ntto].Add(gao);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public void UpdatePS1Stream() {
 		if (controller.playAnimations && playAnimation && currentCinematic > 0 && ps1Streams != null) {
 			updateCounter += Time.deltaTime * animationSpeed;
@@ -134,44 +182,67 @@ public class CinematicSwitcher : MonoBehaviour {
 		}
 	}
 
-	private void ClearNTTO() {
-		foreach (GameObject gao in ntto) {
+	private void DeinitPS1Stream() {
+		foreach (GameObject gao in allNTTO) {
 			Destroy(gao);
 		}
-		ntto.Clear();
+		allNTTO.Clear();
+		currentNTTO.Clear();
+		objectPool.Clear();
+	}
+
+	private void ClearCurrentNTTO() {
+		foreach (GameObject gao in currentNTTO) {
+			if (gao != null) gao.SetActive(false);
+		}
+		currentNTTO.Clear();
 	}
 
 	public void UpdatePS1StreamFrame() {
-		ClearNTTO();
+		ClearCurrentNTTO();
 		if (ps1Streams != null && currentCinematic > 0) {
 			OpenSpace.PS1.PS1Stream s = ps1Streams[currentCinematic - 1];
-			IEnumerable<OpenSpace.PS1.PS1StreamFrame> fs = s.frames.Where(fr => fr.num_frame == currentFrame);
-			foreach (var f in fs) {
-				if (f != null) {
-					R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
-					Camera cam = Camera.main;
-					for (int i = 0; i < f.channels.Length; i++) {
-						OpenSpace.PS1.PS1StreamFrameChannel c = f.channels[i];
-						if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.Camera)) {
-							cam.transform.position = c.GetPosition();
-							cam.transform.rotation = c.quaternion * Quaternion.Euler(0, 180, 0);
+			OpenSpace.PS1.PS1StreamFrame f = s.frames.FirstOrDefault(fr => fr.num_frame == currentFrame);
+			if (f != null) {
+				Dictionary<int, int> nttoForFrame = new Dictionary<int, int>();
+				R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
+				Camera cam = Camera.main;
+				for (int i = 0; i < f.channels.Length; i++) {
+					OpenSpace.PS1.PS1StreamFrameChannel c = f.channels[i];
+					if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.Camera)) {
+						cam.transform.position = c.GetPosition();
+						cam.transform.rotation = c.quaternion * Quaternion.Euler(0, 180, 0);
+					} else {
+						GameObject gao = null;
+						int ntto = c.NTTO;
+						if (ntto >= 0) {
+							if (!nttoForFrame.ContainsKey(ntto)) nttoForFrame[ntto] = 0;
+							if (objectPool.ContainsKey(ntto)) {
+								gao = objectPool[ntto][nttoForFrame[ntto]];
+							}
+							if (gao != null) {
+								gao.SetActive(true);
+								currentNTTO.Add(gao);
+								nttoForFrame[ntto]++;
+							}
 						}
-						GameObject gao;
-						if (c.NTTO > 0) {
+						/*if (c.NTTO > 0) {
 							gao = l.levelHeader.geometricObjectsDynamic.GetGameObject(c.NTTO);
 							if (gao == null) gao = new GameObject("Empty 2");
 						} else {
 							gao = new GameObject("Empty");
-						}
+						}*/
+
+						/*if (c.HasFlag(PS1StreamFrameChannel.StreamFlags.Parent)) {
+							Debug.Log(string.Format("{0:X4}", c.flags));
+						}*/
 						if (gao != null) {
 							Vector3 scale = new Vector3(1f, 1f, 1f);
-							gao.name = string.Format("{0:X4}", c.flags) + " - " + gao.name;
-							gao.transform.SetParent(transform);
 							gao.transform.localPosition = cam.transform.localPosition + c.GetPosition();
 							gao.transform.localRotation = c.quaternion;
 							if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.Scale)) {
 								scale = c.GetScale(0x1000);
-								gao.name = string.Format("{0:X4}", c.sx) + string.Format("{0:X4}", c.sy) + string.Format("{0:X4}", c.sz) + " - " + gao.name;
+								//gao.name = string.Format("{0:X4}", c.sx) + string.Format("{0:X4}", c.sy) + string.Format("{0:X4}", c.sz) + " - " + gao.name;
 							}
 							if (c.HasFlag(OpenSpace.PS1.PS1StreamFrameChannel.StreamFlags.FlipX)) {
 								gao.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
@@ -179,7 +250,7 @@ public class CinematicSwitcher : MonoBehaviour {
 								gao.transform.localScale = scale;
 							}
 							//gao.transform.localScale = c.GetScale();
-							ntto.Add(gao);
+							currentNTTO.Add(gao);
 						}
 					}
 				}

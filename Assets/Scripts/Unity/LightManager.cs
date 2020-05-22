@@ -342,6 +342,16 @@ public class LightManager : MonoBehaviour {
 					}
 				}
 			}
+		} else if(MapLoader.Loader is OpenSpace.Loader.R2PS1Loader) {
+			for (int i = 0; i < sectorManager.sectors.Count; i++) {
+				SectorComponent sc = sectorManager.sectors[i];
+				/*if (sc.sectorPS1.lights.Value != null) {
+					sc.lights = new LightBehaviour[sc.sectorPS1.lights.Value.lights.Length];
+					for (int j = 0; j < sc.lights.Length; j++) {
+						sc.lights[j] = Register(sc.sectorPS1.lights.Value.lights[j]);
+					}
+				}*/
+			}
 		} else {
 			for (int i = 0; i < sectorManager.sectors.Count; i++) {
 				SectorComponent sc = sectorManager.sectors[i];
