@@ -10,10 +10,14 @@ public class WayPointBehaviour : MonoBehaviour {
 	public WayPoint wp = null;
 	public List<OpenSpace.ROM.GraphNode> nodesROM = new List<OpenSpace.ROM.GraphNode>();
 	public OpenSpace.ROM.WayPoint wpROM = null;
-	public List<WayPointBehaviour> targets = new List<WayPointBehaviour>();
-	public List<LineRenderer> lines = new List<LineRenderer>();
+	private List<WayPointBehaviour> targets = new List<WayPointBehaviour>();
+	private List<LineRenderer> lines = new List<LineRenderer>();
+    private List<Vector3> targetPositions = new List<Vector3>();
+    private Vector3 currentPosition = Vector3.zero;
+
 
     public void Init() {
+        currentPosition = transform.position;
 		if (nodes.Count > 0) {
 			foreach (GraphNode node in nodes) {
 				for (int i = 0; i < node.arcList.list.Count; i++) {
@@ -37,8 +41,10 @@ public class WayPointBehaviour : MonoBehaviour {
 					lr.widthMultiplier = (arc.weight > 0 ? arc.weight : 30f) / 30f;
 					lines.Add(lr);
 					targets.Add(tar);
-					//DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
-				}
+                    targetPositions.Add(tar.transform.position);
+                    UpdateLine(i);
+                    //DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
+                }
 			}
 		} else if (nodesROM.Count > 0) {
 			foreach (OpenSpace.ROM.GraphNode node in nodesROM) {
@@ -68,6 +74,8 @@ public class WayPointBehaviour : MonoBehaviour {
 					lr.widthMultiplier = (weight > 0 ? weight : 30f) / 30f;
 					lines.Add(lr);
 					targets.Add(tar);
+                    targetPositions.Add(tar.transform.position);
+                    UpdateLine(i);
 					//DrawLineThickness(transform.position, arc.graphNode.Gao.transform.position, arc.weight > 0 ? arc.weight : 100);
 				}
 			}
@@ -109,31 +117,49 @@ public class WayPointBehaviour : MonoBehaviour {
 
     void Update() {
         if (lines == null) return;
-        for(int i = 0; i < lines.Count; i++) {
-            LineRenderer lr = lines[i];
-            if (lr == null) continue;
-            Vector3 ArrowOrigin = transform.position;
-            Vector3 ArrowTarget = targets[i].transform.position;
-            //lr.SetPositions(new Vector3[] { transform.position, arc.graphNode.Gao.transform.position });
-            float AdaptiveSize = 1f / Vector3.Distance(ArrowOrigin, ArrowTarget);
-            if (AdaptiveSize < 0.5f) {
-                lr.widthCurve = new AnimationCurve(
-                    new Keyframe(0, 0f),
-                    new Keyframe(AdaptiveSize, 0.4f),
-                    new Keyframe(0.999f - AdaptiveSize, 0.4f),  // neck of arrow
-                    new Keyframe(1 - AdaptiveSize, 1f), // 20f / (arc.weight > 0 ? arc.weight : 30f)),  // max width of arrow head
-                    new Keyframe(1, 0f)); // tip of arrow
-                lr.positionCount = 5;
-                lr.SetPositions(new Vector3[] {
-                ArrowOrigin,
-                Vector3.Lerp(ArrowOrigin, ArrowTarget, AdaptiveSize),
-                Vector3.Lerp(ArrowOrigin, ArrowTarget, 0.999f - AdaptiveSize),
-                Vector3.Lerp(ArrowOrigin, ArrowTarget, 1 - AdaptiveSize),
-                ArrowTarget });
-            } else {
-                lr.positionCount = 2;
-                lr.SetPositions(new Vector3[] { ArrowOrigin, ArrowTarget });
+        bool updateAll = false;
+        if (currentPosition != transform.position) {
+            currentPosition = transform.position;
+            updateAll = true;
+        }
+        for (int i = 0; i < lines.Count; i++) {
+            bool updateThis = false;
+            if (targetPositions[i] != targets[i].transform.position) {
+                targetPositions[i] = targets[i].transform.position;
+                updateThis = true;
             }
+            if (updateAll || updateThis) {
+                UpdateLine(i);
+            }
+        }
+    }
+
+    void UpdateLine(int i) {
+        LineRenderer lr = lines[i];
+        if (lr == null) return;
+        Vector3 ArrowOrigin = currentPosition;
+        Vector3 ArrowTarget = targetPositions[i];
+        //lr.SetPositions(new Vector3[] { transform.position, arc.graphNode.Gao.transform.position });
+        float AdaptiveSize = 1f / Vector3.Distance(ArrowOrigin, ArrowTarget);
+        if (AdaptiveSize < 0.5f) {
+            lr.widthCurve = new AnimationCurve(
+                new Keyframe(0, 0f),
+                new Keyframe(AdaptiveSize, 0.4f),
+                new Keyframe(0.999f - AdaptiveSize, 0.4f),  // neck of arrow
+                new Keyframe(1 - AdaptiveSize, 1f), // 20f / (arc.weight > 0 ? arc.weight : 30f)),  // max width of arrow head
+                new Keyframe(1, 0f)); // tip of arrow
+            lr.positionCount = 5;
+            lr.SetPositions(new Vector3[] {
+                 ArrowOrigin,
+                 Vector3.Lerp(ArrowOrigin, ArrowTarget, AdaptiveSize),
+                 Vector3.Lerp(ArrowOrigin, ArrowTarget, 0.999f - AdaptiveSize),
+                 Vector3.Lerp(ArrowOrigin, ArrowTarget, 1 - AdaptiveSize),
+                 ArrowTarget });
+            /*lr.positionCount = 2;
+            lr.SetPositions(new Vector3[] { ArrowOrigin, ArrowTarget });*/
+        } else {
+            lr.positionCount = 2;
+            lr.SetPositions(new Vector3[] { ArrowOrigin, ArrowTarget });
         }
     }
 
