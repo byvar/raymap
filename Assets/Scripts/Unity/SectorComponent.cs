@@ -1,5 +1,6 @@
 ﻿using OpenSpace;
 using OpenSpace.Collide;
+using OpenSpace.Loader;
 using OpenSpace.Object;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ public class SectorComponent : MonoBehaviour {
     public SectorManager sectorManager;
     public Sector sector;
 	public OpenSpace.ROM.Sector sectorROM;
+	public OpenSpace.PS1.Sector sectorPS1;
     //public LightBehaviour[] staticLights;
     public SectorComponent[] neighbors;
     public SectorComponent[] sectorTransitions;
@@ -71,18 +73,19 @@ public class SectorComponent : MonoBehaviour {
 							boxSize = vectors[1] - vectors[0],
 							boxCenter = vectors[0] + (vectors[1] - vectors[0]) * 0.5f
 						};
-
-						/*if (bounds != null) {
-							if (bounds.type == BoundingVolume.Type.Box) {
-								BoxCollider collider = gameObject.AddComponent<BoxCollider>();
-
-								collider.center = bounds.Center;
-								collider.center -= transform.position;
-								collider.size = bounds.Size;
-							}
-						}*/
 					}
+				} else if (sectorPS1 != null) {
+					bounds = sectorPS1.BoundingVolume;
 				}
+				/*if (bounds != null) {
+					if (bounds.type == BoundingVolume.Type.Box) {
+						BoxCollider collider = gameObject.AddComponent<BoxCollider>();
+
+						collider.center = bounds.Center;
+						collider.center -= transform.position;
+						collider.size = bounds.Size;
+					}
+				}*/
 			}
 			return bounds;
 		}
@@ -111,6 +114,7 @@ public class SectorComponent : MonoBehaviour {
 		if (gameObject.name.Contains("^Sector:")) {
 			gameObject.name = name.Substring(name.IndexOf("^Sector:") + 8);
 		}
+		gameObject.name = SectorPriority + " - " + gameObject.name;
 		//gameObject.name += " - " + IsSectorVirtual;
 		if (sector != null) {
 			//staticLights = sector.staticLights.Select(l => l.Light).ToArray();
@@ -132,13 +136,31 @@ public class SectorComponent : MonoBehaviour {
 			if (sectorROM.sectors3.Value != null) {
 				sectorTransitions = sectorROM.sectors3.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
 			} else {
-				sectorTransitions = new SectorComponent[0]; 
+				sectorTransitions = new SectorComponent[0];
 			}
 			//name += " - " + sectorROM.byte1E + " " + sectorROM.byte1F;
 			//neighbors = sectorROM.sectors2.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
 			//if (sectorROM.sectors4.Value != null) debugList4 = sectorROM.sectors4.Value.superObjects.Select(s => s.Value.Offset.ToString()).ToArray();
 			//if (sectorROM.sectors5.Value != null) debugList5 = sectorROM.sectors5.Value.superObjects.Select(s => s.Value.Offset.ToString()).ToArray();
 			//BoundingVolume vol = SectorBorder;
+		} else if (sectorPS1 != null) {
+			OpenSpace.PS1.LevelHeader h = (MapLoader.Loader as R2PS1Loader).levelHeader;
+			gameObject.name = sectorPS1.short_46 + " - " + gameObject.name;
+			if (sectorPS1.neighbors != null) {
+				neighbors = sectorPS1.neighbors.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
+			} else {
+				neighbors = new SectorComponent[0];
+			}
+			if (sectorPS1.sectors_unk1 != null) {
+				sectorTransitions = sectorPS1.sectors_unk1.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
+			} else {
+				sectorTransitions = new SectorComponent[0];
+			}
+			if (sectorPS1.sectors_unk2 != null) {
+				sectors_unk2 = sectorPS1.sectors_unk2.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
+			} else {
+				sectors_unk2 = new SectorComponent[0];
+			}
 		}
     }
     

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using OpenSpace.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class Perso : OpenSpaceStruct { // Animation/state related
@@ -49,6 +51,20 @@ namespace OpenSpace.PS1 {
 					}
 				});
 			});*/
+		}
+
+		public PS1PersoBehaviour GetGameObject(GameObject gao) {
+			LevelHeader h = (Load as R2PS1Loader).levelHeader;
+			gao.name = name + " | " + gao.name;
+			if (p3dData?.family?.name != null) {
+				gao.name = $"[{p3dData?.family?.name}] {gao.name}";
+			}
+			gao.name = gao.name;
+			PS1PersoBehaviour romPerso = gao.AddComponent<PS1PersoBehaviour>();
+			romPerso.perso = this;
+			romPerso.controller = MapLoader.Loader.controller;
+			romPerso.controller.ps1Persos.Add(romPerso);
+			return romPerso;
 		}
 	}
 }

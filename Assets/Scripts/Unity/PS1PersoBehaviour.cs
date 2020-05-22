@@ -86,7 +86,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				states = new State[endInd - startInd];
 				Array.Copy(tempStates, startInd, states, 0, states.Length);
 
-				stateNames = states.Select(s => ((s.anim == null) ? "Null" : fam.animations[s.anim.index].name)).ToArray();
+				stateNames = states.Select(s => ((s.anim == null) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}")).ToArray();
 				hasStates = true;
 				stateIndex = Array.IndexOf(states, h.states.pointers[perso.p3dData.stateIndex].Value);
 				currentState = stateIndex;
