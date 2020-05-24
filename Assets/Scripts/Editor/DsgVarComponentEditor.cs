@@ -16,6 +16,7 @@ public class DsgVarComponentEditor : Editor {
     private static LocalizationDropdown localizationDropdown = null;
 
     public Vector2 scrollPosition = new Vector2(0, 0);
+    public string cheatTableString = "";
 
     public override void OnInspectorGUI() {
         DrawDefaultInspector();
@@ -74,6 +75,49 @@ public class DsgVarComponentEditor : Editor {
             }
 
             MapLoader.Loader.print(printResult);
+        }
+
+        if (GUILayout.Button("Print dsgvar value offsets as CheatEngine table")) {
+
+            string printResult = "";
+
+            DsgMem dsgMem = c.dsgMem;
+            foreach (DsgVarComponent.DsgVarEditableEntry dsgVarEntry in c.editableEntries) {
+                Pointer offsetOfValue = (dsgMem.memBuffer + dsgVarEntry.entry.offsetInBuffer);
+
+                string variableType;
+                switch (dsgVarEntry.Type) {
+                    case DsgVarInfoEntry.DsgVarType.Float: variableType = "Float"; break;
+                    case DsgVarInfoEntry.DsgVarType.Byte: variableType = "Byte"; break;
+                    case DsgVarInfoEntry.DsgVarType.UByte: variableType = "Byte"; break;
+                    case DsgVarInfoEntry.DsgVarType.Short: variableType = "2 Bytes"; break;
+                    case DsgVarInfoEntry.DsgVarType.UShort: variableType = "2 Bytes"; break;
+                    case DsgVarInfoEntry.DsgVarType.Vector: variableType = "Float"; break;
+                    default: variableType = "4 Bytes"; break;
+                }
+
+                for (int i = 0; i <= ((dsgVarEntry.Type == DsgVarInfoEntry.DsgVarType.Vector) ? 8 : 0); i += 4) {
+                    printResult += "<CheatEntry>" +
+                                $"<ID>0</ID>" +
+                                $"<Description>\"{dsgVarEntry.entry.NiceVariableName}\"</Description>" +
+                                $"<LastState Value=\"\" RealAddress=\"{(offsetOfValue+i).offset.ToString("X8")}\"/>" +
+                                $"<VariableType>{variableType}</VariableType>" +
+                                $"<Address>{(offsetOfValue + i).offset.ToString("X8")}</Address>" +
+                                "</CheatEntry>";
+                }
+            }
+
+            printResult = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><CheatTable><CheatEntries>{printResult}</CheatEntries></CheatTable>";
+            cheatTableString = printResult;
+
+            TextEditor te = new TextEditor();
+            te.text = cheatTableString;
+            te.SelectAll();
+            te.Copy();
+        }
+
+        if (cheatTableString != "") {
+            GUILayout.TextArea(cheatTableString);
         }
 
         //GUILayout.EndVertical();
