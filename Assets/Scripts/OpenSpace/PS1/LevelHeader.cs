@@ -112,9 +112,19 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			R2PS1Loader l = Load as R2PS1Loader;
-			reader.ReadBytes(0xCC);
-			num_geometricObjectsDynamic_cine = reader.ReadUInt32();
-			reader.ReadBytes(0x20); // after this we're at 0xf0
+			if (Settings.s.game == Settings.Game.RRush) {
+				reader.ReadBytes(0x40);
+			} else if (Settings.s.game == Settings.Game.DD) {
+				reader.ReadBytes(0x58);
+			} else if (Settings.s.game == Settings.Game.VIP) {
+				reader.ReadBytes(0x28);
+			} else if(Settings.s.game == Settings.Game.JungleBook) {
+				reader.ReadBytes(0xEC);
+			} else {
+				reader.ReadBytes(0xCC);
+				num_geometricObjectsDynamic_cine = reader.ReadUInt32();
+				reader.ReadBytes(0x20); // after this we're at 0xf0
+			}
 			off_dynamicWorld = Pointer.Read(reader);
 			off_fatherSector = Pointer.Read(reader);
 			off_inactiveDynamicWorld = Pointer.Read(reader);
@@ -145,28 +155,61 @@ namespace OpenSpace.PS1 {
 			off_animRotations = Pointer.Read(reader); // big array of structs of 0x8 size. 4 ushorts per struct
 			off_animScales = Pointer.Read(reader);
 			Load.print(off_12C + " - " + off_130 + " - " + off_animPositions + " - " + off_animRotations + " - " + off_animScales);
+			Load.print(Pointer.Current(reader));
+			if (Settings.s.game == Settings.Game.DD) {
+				// Also stuff for big textures, but names and amount is stored in exe
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				Pointer.Read(reader);
 
-			// Vignette stuff, big textures
-			num_ui_textures = reader.ReadByte();
-			byte_159 = reader.ReadByte();
-			ushort_15A = reader.ReadUInt16();
-			off_ui_textures_names = Pointer.Read(reader);
-			off_ui_textures_width = Pointer.Read(reader); // num_vignettes * ushort
-			off_ui_textures_height = Pointer.Read(reader); // num_vignettes * ushort
-			off_ui_textures_pageInfo = Pointer.Read(reader); // num_vignettes * ushort
-			off_ui_textures_palette = Pointer.Read(reader);
-			off_ui_textures_xInPage = Pointer.Read(reader);
-			off_ui_textures_yInPage = Pointer.Read(reader); // still related to the vignette stuff
+				off_geometricObjects_dynamic = Pointer.Read(reader);
+				num_geometricObjects_dynamic = reader.ReadUInt32();
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				Pointer.Read(reader);
+				reader.ReadUInt32();
+				off_geometricObjects_static = Pointer.Read(reader);
+				reader.ReadUInt32();
+			} else if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				off_geometricObjects_dynamic = Pointer.Read(reader);
+				off_geometricObjects_static = Pointer.Read(reader);
+				num_geometricObjects_dynamic = reader.ReadUInt32();
+			} else {
+				// Vignette stuff, big textures
+				num_ui_textures = reader.ReadByte();
+				byte_159 = reader.ReadByte();
+				ushort_15A = reader.ReadUInt16();
+				off_ui_textures_names = Pointer.Read(reader);
+				off_ui_textures_width = Pointer.Read(reader); // num_vignettes * ushort
+				off_ui_textures_height = Pointer.Read(reader); // num_vignettes * ushort
+				off_ui_textures_pageInfo = Pointer.Read(reader); // num_vignettes * ushort
+				off_ui_textures_palette = Pointer.Read(reader);
+				off_ui_textures_xInPage = Pointer.Read(reader);
+				off_ui_textures_yInPage = Pointer.Read(reader); // still related to the vignette stuff
 
-			ParseUITextures(reader);
+				ParseUITextures(reader);
 
-			// Something else
-			off_178 = Pointer.Read(reader);
-			int_17C = reader.ReadInt32(); // -1
+				// Something else
+				off_178 = Pointer.Read(reader);
+				int_17C = reader.ReadInt32(); // -1
 
-			off_geometricObjects_dynamic = Pointer.Read(reader);
-			off_geometricObjects_static = Pointer.Read(reader);
-			num_geometricObjects_dynamic = reader.ReadUInt32();
+				off_geometricObjects_dynamic = Pointer.Read(reader);
+				off_geometricObjects_static = Pointer.Read(reader);
+				num_geometricObjects_dynamic = reader.ReadUInt32();
+			}
 
 			ushort_18C = reader.ReadUInt16();
 			ushort_18E = reader.ReadUInt16();
@@ -180,36 +223,40 @@ namespace OpenSpace.PS1 {
 			num_sectors = reader.ReadUInt16(); // actual sectors
 											   //Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
 
-			ushort_1AA = reader.ReadUInt16();
-			uint_1AC = reader.ReadUInt32();
-			uint_1B0 = reader.ReadUInt32();
-			uint_1B4 = reader.ReadUInt32();
-			uint_1B8 = reader.ReadUInt32();
-			off_1BC = Pointer.Read(reader);
-			off_1C0 = Pointer.Read(reader);
-			off_1C4 = Pointer.Read(reader);
-			uint_1C8 = reader.ReadUInt32();
-			uint_1CC = reader.ReadUInt32();
-			ushort_1D0 = reader.ReadUInt16();
-			ushort_1D2 = reader.ReadUInt16();
-			off_1D4 = Pointer.Read(reader);
-			uint_1D8 = reader.ReadUInt32();
-			off_1DC = Pointer.Read(reader);
-			off_1E0 = Pointer.Read(reader);
-			off_1E4 = Pointer.Read(reader);
-			off_1E8 = Pointer.Read(reader);
-			off_1EC = Pointer.Read(reader);
-			off_1F0 = Pointer.Read(reader);
-			uint_1F4 = reader.ReadUInt32();
-			uint_1F8 = reader.ReadUInt32();
-			uint_1FC = reader.ReadUInt32();
+			if (Settings.s.game == Settings.Game.R2) {
+				ushort_1AA = reader.ReadUInt16();
+				uint_1AC = reader.ReadUInt32();
+				uint_1B0 = reader.ReadUInt32();
+				uint_1B4 = reader.ReadUInt32();
+				uint_1B8 = reader.ReadUInt32();
+				off_1BC = Pointer.Read(reader);
+				off_1C0 = Pointer.Read(reader);
+				off_1C4 = Pointer.Read(reader);
+				uint_1C8 = reader.ReadUInt32();
+				uint_1CC = reader.ReadUInt32();
+				ushort_1D0 = reader.ReadUInt16();
+				ushort_1D2 = reader.ReadUInt16();
+				off_1D4 = Pointer.Read(reader);
+				uint_1D8 = reader.ReadUInt32();
+				off_1DC = Pointer.Read(reader);
+				off_1E0 = Pointer.Read(reader);
+				off_1E4 = Pointer.Read(reader);
+				off_1E8 = Pointer.Read(reader);
+				off_1EC = Pointer.Read(reader);
+				off_1F0 = Pointer.Read(reader);
+				uint_1F4 = reader.ReadUInt32();
+				uint_1F8 = reader.ReadUInt32();
+				uint_1FC = reader.ReadUInt32();
+			}
 
 			// Parse
 			states = Load.FromOffsetOrRead<PointerList<State>>(reader, off_states, s => s.length = num_states);
 			persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
 			ParseSectors(reader);
 			geometricObjectsDynamic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_dynamic, onPreRead: t => t.length = num_geometricObjects_dynamic - 2);
-			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => t.length = num_ipos);
+			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => {
+				if (Settings.s.game == Settings.Game.R2) t.length = num_ipos;
+			});
 			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 

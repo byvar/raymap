@@ -11,21 +11,34 @@ namespace OpenSpace.PS1 {
 		public uint unk0;
 		public uint unk1;
 		public Entry[] entries;
-		public uint length;
+		public uint? length;
 
 		protected override void ReadInternal(Reader reader) {
 			unk0 = reader.ReadUInt32();
 			unk1 = reader.ReadUInt32();
-			entries = new Entry[length];
-			for (int i = 0; i < entries.Length; i++) {
-				entries[i] = new Entry();
-				entries[i].Read(reader);
+			if (length.HasValue) {
+				entries = new Entry[length.Value];
+				for (int i = 0; i < entries.Length; i++) {
+					entries[i] = new Entry();
+					entries[i].Read(reader);
+				}
+			} else {
+				List<Entry> entries = new List<Entry>();
+				Entry entry = new Entry();
+				entry.Read(reader);
+				while (entry.off_geo != null) {
+					entries.Add(entry);
+					entry = new Entry();
+					entry.Read(reader);
+				}
+				length = (uint)entries.Count;
+				this.entries = entries.ToArray();
 			}
 		}
 
 		public void ReadExtra(Reader reader, uint count) {
 			Array.Resize(ref entries, (int)(length + count));
-			Pointer.DoAt(ref reader, Offset + 8 + (8 * length), () => {
+			Pointer.DoAt(ref reader, Offset + 8 + (8 * length.Value), () => {
 				for (int i = (int)length; i < entries.Length; i++) {
 					entries[i] = new Entry();
 					entries[i].Read(reader);

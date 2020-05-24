@@ -25,8 +25,10 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			off_sectorSO = Pointer.Read(reader);
-			word04 = reader.ReadInt16();
-			word06 = reader.ReadInt16();
+			if (Settings.s.game != Settings.Game.DD) {
+				word04 = reader.ReadInt16();
+				word06 = reader.ReadInt16();
+			}
 
 			sectorSO = Load.FromOffsetOrRead<SuperObject>(reader, off_sectorSO);
 		}

@@ -298,7 +298,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					subObjects[i] = new GameObject[channelNTTO[i] != null ? channelNTTO[i].Length : 0];
 					for (int k = 0; k < subObjects[i].Length; k++) {
 						int j = (int)channelNTTO[i][k] - 1;
-						if (j == 0xFFFF || j < 0 || j > h.geometricObjectsDynamic.length) {
+						if (j == 0xFFFF || j < 0 || j > h.geometricObjectsDynamic.length.Value) {
 							subObjects[i][k] = new GameObject();
 							subObjects[i][k].transform.parent = channelObjects[i].transform;
 							subObjects[i][k].name = "[" + j + "] Invisible NTTO";

@@ -32,6 +32,12 @@ namespace OpenSpace.PS1 {
 		public int int_4C;
 		public int int_50;
 
+		// VIP
+		public ushort vip_ushort_08;
+		public ushort vip_ushort_0A;
+		public uint vip_uint_0C;
+		public Pointer off_so;
+
 		// Parsed
 		public uint[] persos;
 		public NeighborSector[] neighbors;
@@ -43,11 +49,20 @@ namespace OpenSpace.PS1 {
 			Load.print("Sector @ " + Offset);
 			off_persos = Pointer.Read(reader);
 			off_neighbors = Pointer.Read(reader);
+			if (Settings.s.game != Settings.Game.R2) {
+				vip_ushort_08 = reader.ReadUInt16();
+				vip_ushort_0A = reader.ReadUInt16();
+				vip_uint_0C = reader.ReadUInt32();
+			}
 			off_sectors_unk1 = Pointer.Read(reader);
 			off_sectors_unk2 = Pointer.Read(reader);
 			off_sectors_unk3 = Pointer.Read(reader);
 			off_ipos = Pointer.Read(reader);
-			off_18 = Pointer.Read(reader);
+			if (Settings.s.game != Settings.Game.R2) {
+				int_50 = reader.ReadInt32();
+			} else {
+				off_18 = Pointer.Read(reader);
+			}
 			minX = reader.ReadInt32();
 			minY = reader.ReadInt32();
 			minZ = reader.ReadInt32();
@@ -64,7 +79,11 @@ namespace OpenSpace.PS1 {
 			short_48 = reader.ReadInt16();
 			short_4A = reader.ReadInt16();
 			int_4C = reader.ReadInt32();
-			int_50 = reader.ReadInt32();
+			if (Settings.s.game == Settings.Game.VIP) {
+				off_so = Pointer.Read(reader);
+			} else if(Settings.s.game == Settings.Game.R2) {
+				int_50 = reader.ReadInt32();
+			}
 
 			Pointer.DoAt(ref reader, off_persos, () => {
 				uint length = reader.ReadUInt32();

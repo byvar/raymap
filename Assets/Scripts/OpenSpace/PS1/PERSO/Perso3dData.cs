@@ -25,18 +25,21 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			uint_00 = reader.ReadUInt32();
 			off_family = Pointer.Read(reader);
-			reader.ReadBytes(0x50); // TODO
-			off_58 = Pointer.Read(reader);
-			ushort_5C = reader.ReadUInt16();
-			short_5E = reader.ReadInt16();
-			off_animationBuffer = Pointer.Read(reader);
-			off_64 = Pointer.Read(reader);
-			off_68 = Pointer.Read(reader);
-			uint_6C = reader.ReadUInt32();
-			uint_70 = reader.ReadUInt32();
-			uint_74 = reader.ReadUInt32();
-			stateIndex = reader.ReadUInt32();
-			reader.ReadBytes(0x28); // TODO
+			if (Settings.s.game == Settings.Game.R2) {
+				reader.ReadBytes(0x50); // TODO
+				off_58 = Pointer.Read(reader);
+				ushort_5C = reader.ReadUInt16();
+				short_5E = reader.ReadInt16();
+				off_animationBuffer = Pointer.Read(reader);
+				Load.print(Pointer.Current(reader));
+				off_64 = Pointer.Read(reader);
+				off_68 = Pointer.Read(reader);
+				uint_6C = reader.ReadUInt32();
+				uint_70 = reader.ReadUInt32();
+				uint_74 = reader.ReadUInt32();
+				stateIndex = reader.ReadUInt32();
+				reader.ReadBytes(0x28); // TODO
+			}
 			//Load.print(off_family + " - " + off_animation);
 			/*Pointer.DoAt(ref reader, off_68, () => {
 				for (int i = 0; i < ushort_5C; i++) {

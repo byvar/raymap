@@ -197,7 +197,7 @@ namespace OpenSpace.Loader {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath), isLittleEndian: Settings.s.IsLittleEndian)) {
 					List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.main_compressed, fileInfo.baseLBA);
 					int blockIndex = 0;
-					FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
+					if (Settings.s.game != Settings.Game.RRush && !b.exeOnly) FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
 					if (!b.exeOnly && b.inEngine) {
 						if (b.hasSoundEffects) {
 							FileSystem.AddVirtualFile(levelDir + "sound.vb", mainBlock[blockIndex++]);

@@ -20,6 +20,7 @@ namespace OpenSpace.PS1 {
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
+			//Load.print("Perso @ " + Offset);
 			off_p3dData = Pointer.Read(reader);
 			off_superObjectPointer = Pointer.Read(reader);
 			off_08 = Pointer.Read(reader);

@@ -15,20 +15,51 @@ namespace OpenSpace.PS1 {
 		public Pointer off_hierarchies;
 		public uint uint_18;
 
+		// Non R2
+		public uint flags;
+		public ushort ushort_18;
+		public ushort ushort_1A;
+		public Pointer off_1C;
+
 		// Parsed
 		public PS1AnimationChannel[] channels;
 		public PS1AnimationHierarchy[] hierarchies;
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
-			speed = reader.ReadUInt32();
-			off_channels = Pointer.Read(reader);
-			num_channels = reader.ReadUInt32();
-			num_frames = reader.ReadUInt16();
-			ushort_0E = reader.ReadUInt16();
-			num_hierarchies = reader.ReadUInt32();
-			off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
-			uint_18 = reader.ReadUInt32();
+			Load.print("Anim " + Pointer.Current(reader));
+			if (Settings.s.game == Settings.Game.R2) {
+				speed = reader.ReadUInt32();
+				off_channels = Pointer.Read(reader);
+				num_channels = reader.ReadUInt32();
+				num_frames = reader.ReadUInt16();
+				ushort_0E = reader.ReadUInt16();
+				num_hierarchies = reader.ReadUInt32();
+				off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
+				uint_18 = reader.ReadUInt32();
+			} else {
+				flags = reader.ReadUInt32();
+				off_channels = Pointer.Read(reader);
+				num_channels = reader.ReadUInt32();
+				num_frames = reader.ReadUInt16();
+				ushort_0E = reader.ReadUInt16();
+				num_hierarchies = reader.ReadUInt32();
+				if (Settings.s.game == Settings.Game.VIP) {
+					off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
+					ushort_18 = reader.ReadUInt16();
+					ushort_1A = reader.ReadUInt16();
+					off_1C = Pointer.Read(reader);
+					uint_18 = reader.ReadUInt32();
+					speed = 30;
+				} else {
+					speed = reader.ReadUInt16();
+					ushort_1A = reader.ReadUInt16();
+					off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
+					uint_18 = reader.ReadUInt32();
+					uint_18 = reader.ReadUInt32();
+					uint_18 = reader.ReadUInt32();
+				}
+			}
 
 			
 			channels = Load.ReadArray<PS1AnimationChannel>(num_channels, reader, off_channels);
