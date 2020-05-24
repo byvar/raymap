@@ -53,8 +53,8 @@ namespace OpenSpace.Loader {
 				//RipRHRLoc();
 				game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
-				await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.bigfile == "COMBIN"));
-				//await ExtractDAT(game, game.files.FirstOrDefault(f => f.bigfile == "COMBIN"), relocatePointers: true);
+				await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.fileID == 0));
+				//await ExtractAllFiles(game);
 				await LoadLevel();
 			} finally {
                 for (int i = 0; i < files_array.Length; i++) {
@@ -96,15 +96,15 @@ namespace OpenSpace.Loader {
 			memoryBlock = b;
 			if (!b.inEngine) return;
 			string levelDir = gameDataBinFolder + lvlName + "/";
-			Array.Resize(ref files_array, 2 + b.cutscenes.Length + (b.cinedata.size > 0 ? 1 : 0));
+			Array.Resize(ref files_array, 2 + b.cutscenes.Length + (b.overlay_cine.size > 0 ? 1 : 0));
 			int curFile = 0;
-			files_array[curFile++] = new PS1Data(lvlName + ".gpt", levelDir + "level.gpt", curFile, 0);
-			files_array[curFile++] = new PS1Data(lvlName + ".dat", levelDir + "level.dat", curFile, b.address);
+			files_array[curFile++] = new PS1Data(lvlName + ".sys", levelDir + "level.sys", curFile, 0);
+			files_array[curFile++] = new PS1Data(lvlName + ".img", levelDir + "level.img", curFile, b.address);
 			for (int i = 0; i < b.cutscenes.Length; i++) {
 				string cutsceneFramesName = levelDir + "stream_frames_" + i + ".blk";
 				files_array[curFile++] = new LinearFile("stream_frames_" + i +".blk", cutsceneFramesName, curFile);
 			}
-			if (b.cinedata.size > 0) {
+			if (b.overlay_cine.size > 0) {
 				curFile++;
 				/*files_array[curFile++] = new PS1Data("cine.dat", levelDir + "cine.dat",
 							cineDataBaseAddress + 0x1f800 + 0x32 * 0xc00,
@@ -133,10 +133,10 @@ namespace OpenSpace.Loader {
 			levelHeader.inactiveDynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_inactiveDynamicWorld, onPreRead: s => s.isDynamic = true);
 
 			// Done reading here
-			if (memoryBlock.cinedata.size > 0) {
+			if (memoryBlock.overlay_cine.size > 0) {
 				string levelDir = gameDataBinFolder + lvlName + "/";
 				uint cineDataBaseAddress = levelHeader.off_animPositions.offset;
-				files_array[files_array.Length-1] = new PS1Data("cine.dat", levelDir + "cine.dat", files_array.Length - 1,
+				files_array[files_array.Length-1] = new PS1Data("overlay_cine.img", levelDir + "overlay_cine.img", files_array.Length - 1,
 								cineDataBaseAddress + 0x1f800u + 0x32 * 0xc00);
 			}
 			if (levelHeader.num_geometricObjectsDynamic_cine != 0) {
@@ -171,7 +171,7 @@ namespace OpenSpace.Loader {
 			}
 
 
-			PS1GameInfo.File fileInfo = game.files.FirstOrDefault(f => f.bigfile == "COMBIN");
+			PS1GameInfo.File fileInfo = game.files.FirstOrDefault(f => f.fileID == 0);
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[CurrentLevel];
 			streams = new PS1Stream[b.cutscenes.Length];
 			for (int j = 0; j < b.cutscenes.Length; j++) {
@@ -195,15 +195,15 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 			if (FileSystem.FileExists(bigFilePath)) {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath), isLittleEndian: Settings.s.IsLittleEndian)) {
-					List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.compressed, fileInfo.baseLBA);
+					List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.main_compressed, fileInfo.baseLBA);
 					int blockIndex = 0;
 					FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
-					if (b.inEngine) {
-						if (b.isPlayable) {
-							FileSystem.AddVirtualFile(levelDir + "unk_playable.blk", mainBlock[blockIndex++]);
+					if (!b.exeOnly && b.inEngine) {
+						if (b.hasSoundEffects) {
+							FileSystem.AddVirtualFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
 						}
-						FileSystem.AddVirtualFile(levelDir + "vram.bin", mainBlock[blockIndex++]);
-						FileSystem.AddVirtualFile(levelDir + "level.gpt", mainBlock[blockIndex++]);
+						FileSystem.AddVirtualFile(levelDir + "vram.xtp", mainBlock[blockIndex++]);
+						FileSystem.AddVirtualFile(levelDir + "level.sys", mainBlock[blockIndex++]);
 					}
 					// skip exe
 					byte[] exe = mainBlock[blockIndex++];
@@ -211,15 +211,15 @@ namespace OpenSpace.Loader {
 					/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
 					Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
 					FileSystem.AddVirtualFile(levelDir + "executable.pxe", exe);
-					if (b.inEngine) {
-						FileSystem.AddVirtualFile(levelDir + "level.dat", mainBlock[blockIndex++]);
+					if (!b.exeOnly && b.inEngine) {
+						FileSystem.AddVirtualFile(levelDir + "level.img", mainBlock[blockIndex++]);
 					}
 					if (blockIndex != mainBlock.Count) {
 						Debug.LogWarning("Not all blocks were extracted!");
 					}
-					byte[] cineblock = ExtractBlock(reader, b.cinedata, fileInfo.baseLBA);
+					byte[] cineblock = ExtractBlock(reader, b.overlay_cine, fileInfo.baseLBA);
 					if (cineblock != null) {
-						FileSystem.AddVirtualFile(levelDir + "cine.dat", cineblock);
+						FileSystem.AddVirtualFile(levelDir + "overlay_cine.img", cineblock);
 					}
 
 					for (int j = 0; j < b.cutscenes.Length; j++) {
@@ -238,6 +238,12 @@ namespace OpenSpace.Loader {
 			await InitFiles(gameInfo, fileInfo);
 		}
 
+		public async Task ExtractAllFiles(PS1GameInfo game) {
+			foreach (PS1GameInfo.File f in game.files) {
+				await ExtractDAT(game, f, relocatePointers: true);
+			}
+		}
+
 		public async Task ExtractDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, bool relocatePointers = false) {
 			string bigFile = fileInfo.bigfile;
 			string bigFilePath = gameDataBinFolder + bigFile + "." + fileInfo.extension;
@@ -248,75 +254,87 @@ namespace OpenSpace.Loader {
 					for (int i = 0; i < memoryBlocks.Length; i++) {
 						int gptIndex = 0, lvlIndex = 0;
 						PS1GameInfo.File.MemoryBlock b = memoryBlocks[i];
-						string levelDir = gameDataBinFolder + "ext/" + (i < gameInfo.maps.Length ? gameInfo.maps[i] : (bigFile + "_" + i)) + "/";
-						List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.compressed, fileInfo.baseLBA);
-						int blockIndex = 0;
-						Util.ByteArrayToFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
-						if (b.inEngine) {
-							if (b.isPlayable) {
-								Util.ByteArrayToFile(levelDir + "unk_playable.blk", mainBlock[blockIndex++]);
-							}
-							Util.ByteArrayToFile(levelDir + "vram.bin", mainBlock[blockIndex++]);
-							Util.ByteArrayToFile(levelDir + "level.gpt", mainBlock[blockIndex++]);
-							if (relocatePointers) {
-								gptIndex = blockIndex - 1;
-							}
+						string levelDir = gameDataBinFolder + fileInfo.bigfile + "/";
+						if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+							levelDir += (i < gameInfo.maps.Length ? gameInfo.maps[i] : (bigFile + "_" + i)) + "/";
+						} else {
+							levelDir += i + "/";
 						}
-						byte[] exe = mainBlock[blockIndex++];
-						byte[] exeData = mainBlock[blockIndex++];
-						/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
-						Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
-						Util.ByteArrayToFile(levelDir + "executable.pxe", exe);
-						if (b.inEngine) {
-							Util.ByteArrayToFile(levelDir + "level.dat", mainBlock[blockIndex++]);
-							if (relocatePointers) {
-								lvlIndex = blockIndex - 1;
-								uint length = (uint)mainBlock[lvlIndex].Length;
-								byte[] data = mainBlock[gptIndex];
-								for (int j = 0; j < data.Length; j++) {
-									if (data[j] == 0x80) {
-										int off = j - 3;
-										uint ptr = BitConverter.ToUInt32(data, off);
-										if (ptr >= b.address && ptr < b.address + length) {
-											if (off == 0x14c) {
-												cineDataBaseAddress = ptr;
-											}
-											ptr = (ptr - b.address) + 0xDD000000;
-											byte[] newData = BitConverter.GetBytes(ptr);
-											for (int y = 0; y < 4; y++) {
-												data[off + 3 - y] = newData[y];
-											}
-											j += 3;
-										}
-									}
+						List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.main_compressed, fileInfo.baseLBA);
+						int blockIndex = 0;
+						if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+							if (Settings.s.game != Settings.Game.RRush && !b.exeOnly) Util.ByteArrayToFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
+							if (!b.exeOnly && b.inEngine) {
+								if (b.hasSoundEffects) {
+									Util.ByteArrayToFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
 								}
-								Util.ByteArrayToFile(levelDir + "level_relocated.gpt", data);
-								data = mainBlock[lvlIndex];
-								for (int j = 0; j < data.Length; j++) {
-									if (data[j] == 0x80) {
-										int off = j - 3;
-										uint ptr = BitConverter.ToUInt32(data, off);
-										if (ptr >= b.address && ptr < b.address + length) {
-											ptr = (ptr - b.address) + 0xDD000000;
-											byte[] newData = BitConverter.GetBytes(ptr);
-											for (int y = 0; y < 4; y++) {
-												data[off + 3 - y] = newData[y];
-											}
-											j += 3;
-										}
-									}
+								Util.ByteArrayToFile(levelDir + "vram.xtp", mainBlock[blockIndex++]);
+								Util.ByteArrayToFile(levelDir + "level.sys", mainBlock[blockIndex++]);
+								if (relocatePointers) {
+									gptIndex = blockIndex - 1;
 								}
-								Util.ByteArrayToFile(levelDir + "level_relocated.dat", data);
 							}
+							byte[] exe = mainBlock[blockIndex++];
+							byte[] exeData = mainBlock[blockIndex++];
+							/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
+							Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
+							Util.ByteArrayToFile(levelDir + "executable.pxe", exe);
+							if (!b.exeOnly && b.inEngine) {
+								Util.ByteArrayToFile(levelDir + "level.img", mainBlock[blockIndex++]);
+								if (relocatePointers) {
+									lvlIndex = blockIndex - 1;
+									uint length = (uint)mainBlock[lvlIndex].Length;
+									byte[] data = mainBlock[gptIndex];
+									for (int j = 0; j < data.Length; j++) {
+										if (data[j] == 0x80) {
+											int off = j - 3;
+											uint ptr = BitConverter.ToUInt32(data, off);
+											if (ptr >= b.address && ptr < b.address + length) {
+												if (off == 0x14c) {
+													cineDataBaseAddress = ptr;
+												}
+												ptr = (ptr - b.address) + 0xDD000000;
+												byte[] newData = BitConverter.GetBytes(ptr);
+												for (int y = 0; y < 4; y++) {
+													data[off + 3 - y] = newData[y];
+												}
+												j += 3;
+											}
+										}
+									}
+									Util.ByteArrayToFile(levelDir + "level_relocated.sys", data);
+									data = mainBlock[lvlIndex];
+									for (int j = 0; j < data.Length; j++) {
+										if (data[j] == 0x80) {
+											int off = j - 3;
+											uint ptr = BitConverter.ToUInt32(data, off);
+											if (ptr >= b.address && ptr < b.address + length) {
+												ptr = (ptr - b.address) + 0xDD000000;
+												byte[] newData = BitConverter.GetBytes(ptr);
+												for (int y = 0; y < 4; y++) {
+													data[off + 3 - y] = newData[y];
+												}
+												j += 3;
+											}
+										}
+									}
+									Util.ByteArrayToFile(levelDir + "level_relocated.img", data);
+								}
+							}
+						} else if (fileInfo.type == PS1GameInfo.File.Type.Actor) {
+							Util.ByteArrayToFile(levelDir + "vram.xtp", mainBlock[blockIndex++]);
+							Util.ByteArrayToFile(levelDir + "actor.img", mainBlock[blockIndex++]);
+						} else if (fileInfo.type == PS1GameInfo.File.Type.Sound) {
+							Util.ByteArrayToFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
 						}
 						if (blockIndex != mainBlock.Count) {
 							Debug.LogWarning("Not all blocks were exported!");
 						}
 
 
-						Util.ByteArrayToFile(levelDir + "unk_anims.blk", ExtractBlock(reader, b.filetable, fileInfo.baseLBA));
-						byte[] cineblock = ExtractBlock(reader, b.cinedata, fileInfo.baseLBA);
-						Util.ByteArrayToFile(levelDir + "cine.dat", cineblock);
+						Util.ByteArrayToFile(levelDir + "overlay_game.img", ExtractBlock(reader, b.overlay_game, fileInfo.baseLBA));
+						byte[] cineblock = ExtractBlock(reader, b.overlay_cine, fileInfo.baseLBA);
+						Util.ByteArrayToFile(levelDir + "overlay_cine.img", cineblock);
 						if(cineblock != null) {
 							byte[] data = cineblock;
 							cineDataBaseAddress += 0x1f800 + 0x32 * 0xc00; // magic!
@@ -342,7 +360,7 @@ namespace OpenSpace.Loader {
 									}
 								}
 							}
-							Util.ByteArrayToFile(levelDir + "cine_relocated.dat", data);
+							Util.ByteArrayToFile(levelDir + "overlay_cine_relocated.img", data);
 						}
 						for (int j = 0; j < b.cutscenes.Length; j++) {
 							string cutsceneAudioName = levelDir + "stream_audio_" + j + ".blk";
@@ -357,7 +375,7 @@ namespace OpenSpace.Loader {
 								Util.ByteArrayToFile(cutsceneFramesName, cutsceneFrames);
 							}
 						}
-						//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + "ext/" + bigFile + "_" + i + "_main");
+						//ParseMainBlock(mainBlock, b, i, gameDataBinFolder + fileInfo.bigfile + "/" + bigFile + "_" + i + "_main");
 						await WaitIfNecessary();
 					}
 				}
@@ -376,7 +394,7 @@ namespace OpenSpace.Loader {
 					Util.ByteArrayToFile(basename + "_loading.img", loadingImg);
 					reader.ReadUInt32();
 					if (index < 57) {
-						if (block.isPlayable) {
+						if (block.hasSoundEffects) {
 							uint i = 0;
 							int size = reader.ReadInt32();
 							while (size != 0) {
@@ -501,14 +519,18 @@ namespace OpenSpace.Loader {
 					}
 					uint compressedSize = reader.ReadUInt32();
 					if (httpStream != null) await httpStream.FillCacheForRead((int)compressedSize);
-					//print(decompressedSize + " - " + String.Format("0x{0:X8}", reader.BaseStream.Position));
+					//print(compressedSize + " - " + decompressedSize + " - " + String.Format("0x{0:X8}", reader.BaseStream.Position));
 					byte[] uncompressedData = null;
-					byte[] compressedData = reader.ReadBytes((int)compressedSize);
-					using (var compressedStream = new MemoryStream(compressedData))
-					using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
-					using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
-						lzo.SetLength(decompressedSize);
-						uncompressedData = lzoReader.ReadBytes((int)decompressedSize);
+					if (compressedSize == decompressedSize) {
+						uncompressedData = reader.ReadBytes((int)decompressedSize);
+					} else {
+						byte[] compressedData = reader.ReadBytes((int)compressedSize);
+						using (var compressedStream = new MemoryStream(compressedData))
+						using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
+						using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+							lzo.SetLength(decompressedSize);
+							uncompressedData = lzoReader.ReadBytes((int)decompressedSize);
+						}
 					}
 					if (uncompressedData != null) {
 						int originalDataLength = data.Length;
@@ -527,7 +549,7 @@ namespace OpenSpace.Loader {
 		#region Textures
 		public void FillVRAM() {
 			vram.currentXPage = 5;
-			using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + lvlName + "/vram.bin"))) {
+			using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + lvlName + "/vram.xtp"))) {
 				byte[] data = reader.ReadBytes((int)reader.BaseStream.Length);
 				int width = Mathf.CeilToInt(data.Length / (float)(PS1VRAM.page_height * 2));
 				vram.AddData(data, width);
