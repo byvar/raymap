@@ -10,34 +10,65 @@ namespace OpenSpace.PS1 {
 		public File[] files;
 		public string[] maps;
 		public Dictionary<string, string[]> cines;
+		public string mainFile;
 
 
 		public class File {
+			public enum Type {
+				Map,
+				Actor,
+				Sound,
+				Menu,
+				Single
+			}
+			public int fileID;
 			public string bigfile;
 			public string extension;
 			public MemoryBlock[] memoryBlocks;
 			public uint baseLBA;
+			public Type type = Type.Map;
 
 			public class MemoryBlock {
 				public uint address; // Base address for level data
-				public bool isPlayable;
-				public LBA compressed;
-				public LBA filetable;
-				public LBA cinedata;
+				public bool hasSoundEffects;
+				public LBA main_compressed;
+				public LBA overlay_game;
+				public LBA overlay_cine;
 				public LBA[] cutscenes;
 				public bool inEngine;
+				public bool exeOnly = false;
 
-				public MemoryBlock(uint address, bool isSomething, LBA compressed, LBA filetable, LBA uncompressed, LBA[] cutscenes = null, bool inEngine = true) {
+				public MemoryBlock(uint address, bool hasSoundEffects, LBA main_compressed, LBA overlay_game, LBA overlay_cine, LBA[] cutscenes = null, bool inEngine = true) {
 					this.address = address;
-					this.isPlayable = isSomething;
-					this.compressed = compressed;
-					this.filetable = filetable;
-					this.cinedata = uncompressed;
+					this.hasSoundEffects = hasSoundEffects;
+					this.main_compressed = main_compressed;
+					this.overlay_game = overlay_game;
+					this.overlay_cine = overlay_cine;
 					if (cutscenes == null) {
 						cutscenes = new File.LBA[0];
 					}
 					this.cutscenes = cutscenes;
 					this.inEngine = inEngine;
+				}
+
+				public MemoryBlock(uint address, bool hasSoundEffects, LBA main_compressed, bool inEngine = true) {
+					this.address = address;
+					this.hasSoundEffects = hasSoundEffects;
+					this.main_compressed = main_compressed;
+					this.overlay_cine = new LBA(0, 0);
+					this.overlay_game = new LBA(0, 0);
+					this.cutscenes = new File.LBA[0];
+					this.inEngine = inEngine;
+				}
+
+				public MemoryBlock(LBA main_compressed) {
+					this.address = 0;
+					this.hasSoundEffects = false;
+					this.main_compressed = main_compressed;
+					this.overlay_cine = new LBA(0, 0);
+					this.overlay_game = new LBA(0, 0);
+					this.cutscenes = new File.LBA[0];
+					this.inEngine = false;
 				}
 			}
 
@@ -159,6 +190,7 @@ namespace OpenSpace.PS1 {
 			},
 			files = new File[] {
 				new File() {
+					fileID = 0,
 					bigfile = "COMBIN",
 					extension = "DAT",
 					baseLBA = 0x1F4,
@@ -226,8 +258,471 @@ namespace OpenSpace.PS1 {
 			}
 		};
 
+		public static PS1GameInfo DD_PS1_US = new PS1GameInfo() {
+			maps = new string[] {
+				"warproom",
+				"forjp",
+				"forem",
+				"for2d",
+				"forbonus",
+				"cityjp",
+				"cityem",
+				"city2d",
+				"citybonus",
+				"housejp",
+				"housem",
+				"house2d",
+				"housebonus",
+				"incajp",
+				"incaem",
+				"inca2d",
+				"incabonus",
+				"forboss",
+				"cityboss",
+				"houseboss",
+				"incaboss",
+				"forch",
+				"citych",
+				"housech",
+				"incach",
+				"housejp_2",
+				"incabonus_2",
+				"menu",
+			},
+			files = new File[] {
+				new File() {
+					fileID = 0,
+					bigfile = "COMBIN",
+					extension = "DAT",
+					baseLBA = 0x1F4,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1F4, 0x2DA)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4CE, 0x2E8)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x7B6, 0x2DE)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0xA94, 0x2D5)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0xD69, 0x2EA)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1053, 0x2F4)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1347, 0x301)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1648, 0x2CE)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1916, 0x2D3)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1BE9, 0x2E2)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1ECB, 0x30D)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x21D8, 0x30A)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x24E2, 0x2C2)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x27A4, 0x2EB)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x2A8F, 0x2E6)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x2D75, 0x2EC)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x3061, 0x2BE)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x331F, 0x287)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x35A6, 0x269)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x380F, 0x22D)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x3A3C, 0x217)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x3C53, 0x2EB)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x3F3E, 0x2BF)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x41FD, 0x2DE)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x44DB, 0x293)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x476E, 0x2E9)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4A57, 0x2C7)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4D1E, 0x14B)),
+						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4E69, 0x1B), inEngine: false) { exeOnly = true },
+					}
+				}
+			}
+		};
+
+		public static PS1GameInfo VIP_PS1_US = new PS1GameInfo() {
+			maps = new string[] {
+				"l1m1s1",
+				"l1m1s2",
+				"l1m1s3",
+				"l1m1s4",
+				"l1m1s5",
+				"l1m2s1",
+				"l1m2s2",
+				"l1m2s3",
+				"l1m2s4",
+				"l1m2s5",
+				"l1m3s1",
+				"l2m1s1",
+				"l2m1s2",
+				"l2m1s4",
+				"l2m2s1",
+				"l2m2s2",
+				"l2m2s3",
+				"l2m2s4",
+				"l2m2s5",
+				"l2m2s6",
+				"l2m2s7",
+				"l2m2s8",
+				"l3m2s1",
+				"l3m2s2",
+				"l3m3s1",
+				"l3m4s1",
+				"l3m5s1",
+				"l3m5s2",
+				"l3m5s3",
+				"l3m7s1",
+				"l3m8s1",
+				"l3m8s2",
+				"l3m8s3",
+				"l3m8s4",
+				"l3m8s5",
+				"l4m1s1",
+				"l4m1s2",
+				"l4m1s3",
+				"l4m1s5",
+				"l4m2s1",
+				"l4m2s2",
+				"l4m3s1",
+				"l4m3s2",
+				"l4m3s3",
+				"l4m3s4",
+				"l4m4s1",
+				"l4m4s2",
+				"l4m4s3",
+				"l4m5s1",
+				"l4m5s2",
+				"l4m6s1",
+				"l4m6s2",
+				"menu_st",
+				"menu_sp",
+			},
+			files = new File[] {
+				new File() {
+					fileID = 0,
+					bigfile = "MAPS",
+					extension = "DAT",
+					baseLBA = 0x1F4,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(0x800B8B78, true, new File.LBA(0x1F4, 0x2AB)),
+						new File.MemoryBlock(0x800C6B34, true, new File.LBA(0x49F, 0x294)),
+						new File.MemoryBlock(0x800CBEC8, true, new File.LBA(0x733, 0x26A)),
+						new File.MemoryBlock(0x80116084, true, new File.LBA(0x99D, 0x231)),
+						new File.MemoryBlock(0x800C1314, true, new File.LBA(0xBCE, 0x262)),
+						new File.MemoryBlock(0x800BFBE4, true, new File.LBA(0xE30, 0x252)),
+						new File.MemoryBlock(0x800B6A20, true, new File.LBA(0x1082, 0x25C)),
+						new File.MemoryBlock(0x800BF818, true, new File.LBA(0x12DE, 0x26B)),
+						new File.MemoryBlock(0x800E6328, true, new File.LBA(0x1549, 0x229)),
+						new File.MemoryBlock(0x800C6F1C, true, new File.LBA(0x1772, 0x253)),
+						new File.MemoryBlock(0x800EC8F0, true, new File.LBA(0x19C5, 0x200)),
+						new File.MemoryBlock(0x80102D60, true, new File.LBA(0x1BC5, 0x223)),
+						new File.MemoryBlock(0x8016C6B4, true, new File.LBA(0x1DE8, 0xC9)),
+						new File.MemoryBlock(0x800C6384, true, new File.LBA(0x1EB1, 0x262)),
+						new File.MemoryBlock(0x801179BC, true, new File.LBA(0x2113, 0x1D4)),
+						new File.MemoryBlock(0x8010E970, true, new File.LBA(0x22E7, 0x23E)),
+						new File.MemoryBlock(0x800DC9D0, true, new File.LBA(0x2525, 0x250)),
+						new File.MemoryBlock(0x800CAAFC, true, new File.LBA(0x2775, 0x271)),
+						new File.MemoryBlock(0x800C6924, true, new File.LBA(0x29E6, 0x25D)),
+						new File.MemoryBlock(0x800C42D8, true, new File.LBA(0x2C43, 0x262)),
+						new File.MemoryBlock(0x800FE71C, true, new File.LBA(0x2EA5, 0x216)),
+						new File.MemoryBlock(0x800B5AF4, true, new File.LBA(0x30BB, 0x272)),
+						new File.MemoryBlock(0x800F50EC, true, new File.LBA(0x332D, 0x214)),
+						new File.MemoryBlock(0x800C54EC, true, new File.LBA(0x3541, 0x22F)),
+						new File.MemoryBlock(0x800CA410, true, new File.LBA(0x3770, 0x279)),
+						new File.MemoryBlock(0x8010D0D0, true, new File.LBA(0x39E9, 0x1C1)),
+						new File.MemoryBlock(0x800F7278, true, new File.LBA(0x3BAA, 0x23E)),
+						new File.MemoryBlock(0x800BE9B8, true, new File.LBA(0x3DE8, 0x24F)),
+						new File.MemoryBlock(0x800E1CC4, true, new File.LBA(0x4037, 0x240)),
+						new File.MemoryBlock(0x800E1A40, true, new File.LBA(0x4277, 0x235)),
+						new File.MemoryBlock(0x800B86F8, true, new File.LBA(0x44AC, 0x28A)),
+						new File.MemoryBlock(0x800C4A9C, true, new File.LBA(0x4736, 0x274)),
+						new File.MemoryBlock(0x800EAC64, true, new File.LBA(0x49AA, 0x25E)),
+						new File.MemoryBlock(0x800CD850, true, new File.LBA(0x4C08, 0x25E)),
+						new File.MemoryBlock(0x8016341C, true, new File.LBA(0x4E66, 0x155)),
+						new File.MemoryBlock(0x800AD5E0, true, new File.LBA(0x4FBB, 0x269)),
+						new File.MemoryBlock(0x800CA060, true, new File.LBA(0x5224, 0x254)),
+						new File.MemoryBlock(0x800DA9B4, true, new File.LBA(0x5478, 0x237)),
+						new File.MemoryBlock(0x800BB530, true, new File.LBA(0x56AF, 0x243)),
+						new File.MemoryBlock(0x800BE648, true, new File.LBA(0x58F2, 0x239)),
+						new File.MemoryBlock(0x800FD4EC, true, new File.LBA(0x5B2B, 0x223)),
+						new File.MemoryBlock(0x800C23B0, true, new File.LBA(0x5D4E, 0x270)),
+						new File.MemoryBlock(0x800CE38C, true, new File.LBA(0x5FBE, 0x235)),
+						new File.MemoryBlock(0x800DB1F8, true, new File.LBA(0x61F3, 0x275)),
+						new File.MemoryBlock(0x800EFFAC, true, new File.LBA(0x6468, 0x24C)),
+						new File.MemoryBlock(0x800D40FC, true, new File.LBA(0x66B4, 0x231)),
+						new File.MemoryBlock(0x800C2D84, true, new File.LBA(0x68E5, 0x241)),
+						new File.MemoryBlock(0x800ADC94, true, new File.LBA(0x6B26, 0x277)),
+						new File.MemoryBlock(0x80129E30, true, new File.LBA(0x6D9D, 0x1CA)),
+						new File.MemoryBlock(0x800BBBF8, true, new File.LBA(0x6F67, 0x299)),
+						new File.MemoryBlock(0x800D1D7C, true, new File.LBA(0x7200, 0x2A6)),
+						new File.MemoryBlock(0x800EA5AC, true, new File.LBA(0x74A6, 0x1E3)),
+						new File.MemoryBlock(0x8016BAB8, true, new File.LBA(0x7689, 0x121)),
+						new File.MemoryBlock(0x8015B698, true, new File.LBA(0x77AA, 0x13F)),
+					}
+				}
+			}
+		};
+
+		public static PS1GameInfo JB_PS1_US = new PS1GameInfo() {
+			maps = new string[] {
+				"map0",
+				"map1",
+				"map2",
+				"map3",
+				"map4",
+				"map5",
+				"map6",
+				"map7",
+				"map8",
+				"map9",
+				"map10",
+				"map11",
+				"map12",
+				"map13",
+				"map14",
+				"map15",
+				"map16",
+				"map17",
+				"map18",
+				"map19"
+			},
+			files = new File[] {
+				new File() {
+					fileID = 0,
+					bigfile = "MAPS",
+					extension = "DAT",
+					baseLBA = 0x1F4,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(0x800C1648, false, new File.LBA(0x1F4, 0x115)),
+						new File.MemoryBlock(0x800C98F0, false, new File.LBA(0x309, 0x113)),
+						new File.MemoryBlock(0x800C1DEC, false, new File.LBA(0x41C, 0x111)),
+						new File.MemoryBlock(0x800C8F98, false, new File.LBA(0x52D, 0x10E)),
+						new File.MemoryBlock(0x800BFE60, false, new File.LBA(0x63B, 0x144)),
+						new File.MemoryBlock(0x800C58F4, false, new File.LBA(0x77F, 0x121)),
+						new File.MemoryBlock(0x800C1D68, false, new File.LBA(0x8A0, 0xF6)),
+						new File.MemoryBlock(0x800C2080, false, new File.LBA(0x996, 0xF1)),
+						new File.MemoryBlock(0x800BCEDC, false, new File.LBA(0xA87, 0x11A)),
+						new File.MemoryBlock(0x800C15C0, false, new File.LBA(0xBA1, 0x11C)),
+						new File.MemoryBlock(0x800C9868, false, new File.LBA(0xCBD, 0x11D)),
+						new File.MemoryBlock(0x800C1D64, false, new File.LBA(0xDDA, 0x116)),
+						new File.MemoryBlock(0x800C8F10, false, new File.LBA(0xEF0, 0x118)),
+						new File.MemoryBlock(0x800BFDD8, false, new File.LBA(0x1008, 0x14E)),
+						new File.MemoryBlock(0x800C586C, false, new File.LBA(0x1156, 0x12A)),
+						new File.MemoryBlock(0x800C1CE0, false, new File.LBA(0x1280, 0xFF)),
+						new File.MemoryBlock(0x800C1FF8, false, new File.LBA(0x137F, 0xF9)),
+						new File.MemoryBlock(0x800BF488, false, new File.LBA(0x1478, 0x116)),
+						new File.MemoryBlock(0x800D072C, false, new File.LBA(0x158E, 0x100)),
+						new File.MemoryBlock(0x800BFE60, false, new File.LBA(0x168E, 0x13F))
+					}
+				},
+				new File() {
+					fileID = 1,
+					type = File.Type.Actor,
+					bigfile = "ACTOR1",
+					extension = "DAT",
+					baseLBA = 0x1B198,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1B198, 0xA1)),
+						new File.MemoryBlock(new File.LBA(0x1B2DE, 0xAA)),
+						new File.MemoryBlock(new File.LBA(0x1B388, 0x8E)),
+						new File.MemoryBlock(new File.LBA(0x1B416, 0x95)),
+						new File.MemoryBlock(new File.LBA(0x1B4AB, 0xC0)),
+						new File.MemoryBlock(new File.LBA(0x1B56B, 0x9F)),
+						new File.MemoryBlock(new File.LBA(0x1B60A, 0x97)),
+						new File.MemoryBlock(new File.LBA(0x1B6A1, 0x95)),
+						new File.MemoryBlock(new File.LBA(0x1B736, 0x80)),
+						new File.MemoryBlock(new File.LBA(0x1B7B6, 0x84)),
+						new File.MemoryBlock(new File.LBA(0x1B83A, 0x81)),
+						new File.MemoryBlock(new File.LBA(0x1B8BB, 0x7D)),
+						new File.MemoryBlock(new File.LBA(0x1B938, 0x7E)),
+						new File.MemoryBlock(new File.LBA(0x1B9B6, 0x82)),
+						new File.MemoryBlock(new File.LBA(0x1BA38, 0x81)),
+						new File.MemoryBlock(new File.LBA(0x1BAB9, 0x80)),
+						new File.MemoryBlock(new File.LBA(0x1BB39, 0x80)),
+						new File.MemoryBlock(new File.LBA(0x1BBB9, 0x86)),
+						new File.MemoryBlock(new File.LBA(0x1BC3F, 0x82)),
+						new File.MemoryBlock(new File.LBA(0x1BCC1, 0x7F)),
+						new File.MemoryBlock(new File.LBA(0x1BD40, 0x7F)),
+						new File.MemoryBlock(new File.LBA(0x1BDBF, 0x7C)),
+						new File.MemoryBlock(new File.LBA(0x1BE3B, 0x72)),
+						new File.MemoryBlock(new File.LBA(0x1BEAD, 0x7F)),
+						new File.MemoryBlock(new File.LBA(0x1BF2C, 0x86)),
+						new File.MemoryBlock(new File.LBA(0x1BFB2, 0x85))
+					}
+				},
+				new File() {
+					fileID = 2,
+					type = File.Type.Actor,
+					bigfile = "ACTOR2",
+					extension = "DAT",
+					baseLBA = 0x1C520,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1C520, 0x65)),
+						new File.MemoryBlock(new File.LBA(0x1C585, 0x6C)),
+						new File.MemoryBlock(new File.LBA(0x1C5F1, 0x6E)),
+						new File.MemoryBlock(new File.LBA(0x1C65F, 0x79)),
+						new File.MemoryBlock(new File.LBA(0x1C6D8, 0x7E)),
+						new File.MemoryBlock(new File.LBA(0x1C756, 0x5F)),
+						new File.MemoryBlock(new File.LBA(0x1C7B5, 0x77)),
+						new File.MemoryBlock(new File.LBA(0x1C82C, 0x90)),
+						new File.MemoryBlock(new File.LBA(0x1C8BC, 0x76)),
+						new File.MemoryBlock(new File.LBA(0x1C932, 0x80)),
+						new File.MemoryBlock(new File.LBA(0x1C9B2, 0x85)),
+						new File.MemoryBlock(new File.LBA(0x1CA37, 0x81)),
+						new File.MemoryBlock(new File.LBA(0x1CAB8, 0x7D)),
+						new File.MemoryBlock(new File.LBA(0x1CB35, 0x7F)),
+						new File.MemoryBlock(new File.LBA(0x1CBB4, 0x82)),
+						new File.MemoryBlock(new File.LBA(0x1CC36, 0x82)),
+						new File.MemoryBlock(new File.LBA(0x1CCB8, 0x80)),
+						new File.MemoryBlock(new File.LBA(0x1CD38, 0x81)),
+						new File.MemoryBlock(new File.LBA(0x1CDB9, 0x87)),
+						new File.MemoryBlock(new File.LBA(0x1CE40, 0x83)),
+						new File.MemoryBlock(new File.LBA(0x1CEC3, 0x7F)),
+						new File.MemoryBlock(new File.LBA(0x1CF42, 0x7F)),
+						new File.MemoryBlock(new File.LBA(0x1CFC1, 0x7D)),
+						new File.MemoryBlock(new File.LBA(0x1D03E, 0x73)),
+						new File.MemoryBlock(new File.LBA(0x1D0B1, 0x7E)),
+						new File.MemoryBlock(new File.LBA(0x1D12F, 0x86)),
+						new File.MemoryBlock(new File.LBA(0x1D1B5, 0x85))
+					}
+				},
+				new File() {
+					fileID = 3,
+					type = File.Type.Sound,
+					bigfile = "SNDBANKS",
+					extension = "DAT",
+					baseLBA = 0x1D4C0,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1D4C0, 6)),
+						new File.MemoryBlock(new File.LBA(0x1D4C6, 6)),
+						new File.MemoryBlock(new File.LBA(0x1D4CC, 6)),
+						new File.MemoryBlock(new File.LBA(0x1D4D2, 0xC)),
+						new File.MemoryBlock(new File.LBA(0x1D4DE, 6)),
+						new File.MemoryBlock(new File.LBA(0x1D4E4, 4)),
+						new File.MemoryBlock(new File.LBA(0x1D4E8, 8)),
+						new File.MemoryBlock(new File.LBA(0x1D4F0, 6)),
+						new File.MemoryBlock(new File.LBA(0x1D4F6, 3)),
+						new File.MemoryBlock(new File.LBA(0x1D4F9, 7)),
+						new File.MemoryBlock(new File.LBA(0x1D500, 0xCB)),
+						new File.MemoryBlock(new File.LBA(0x1D5CB, 0x99)),
+						new File.MemoryBlock(new File.LBA(0x1D664, 0xDD)),
+						new File.MemoryBlock(new File.LBA(0x1D741, 0xA1)),
+						new File.MemoryBlock(new File.LBA(0x1D7E2, 0xB3))
+					}
+				},
+			}
+		};
+
+		public static PS1GameInfo RR_PS1_US = new PS1GameInfo() {
+			maps = new string[] {
+				"canopy1",
+				"crypt",
+				"crypt1",
+				"crypt3",
+				"map4",
+				"map5",
+				"map6",
+				"lagoon0",
+				"lagoon1",
+				"lagoon2",
+				"pirate1",
+				"pirate2",
+				"map12",
+			},
+			files = new File[] {
+				new File() {
+					fileID = 0,
+					type = File.Type.Map,
+					bigfile = "MAPS",
+					extension = "DAT",
+					baseLBA = 0x1F4,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(0x800F33F8, false, new File.LBA(0x1F4, 0x16A)),
+						new File.MemoryBlock(0x800DD310, false, new File.LBA(0x35E, 0x190)),
+						new File.MemoryBlock(0x80103214, false, new File.LBA(0x4EE, 0x16E)),
+						new File.MemoryBlock(0x800E8ECC, false, new File.LBA(0x65C, 0x199)),
+						new File.MemoryBlock(0x80115768, false, new File.LBA(0x7F5, 0x131)),
+						new File.MemoryBlock(0x800EBBF4, false, new File.LBA(0x926, 0x15D)),
+						new File.MemoryBlock(0x800E5B78, false, new File.LBA(0xA83, 0x15F)),
+						new File.MemoryBlock(0x801101EC, false, new File.LBA(0xBE2, 0x149)),
+						new File.MemoryBlock(0x800E5B98, false, new File.LBA(0xD2B, 0x186)),
+						new File.MemoryBlock(0x800DAB98, false, new File.LBA(0xEB1, 0x180)),
+						new File.MemoryBlock(0x800FB244, false, new File.LBA(0x1031, 0x166)),
+						new File.MemoryBlock(0x800DF5F0, false, new File.LBA(0x1197, 0x187)),
+						new File.MemoryBlock(0x800C3C4C, false, new File.LBA(0x131E, 0x185)),
+						new File.MemoryBlock(0x80110000, false, new File.LBA(0x14A3, 0x1D), inEngine: false) { exeOnly = true },
+					}
+				},
+				new File() {
+					fileID = 1,
+					type = File.Type.Actor,
+					bigfile = "ACTOR1",
+					extension = "DAT",
+					baseLBA = 0x1770,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1770, 0x35)),
+						new File.MemoryBlock(new File.LBA(0x17A5, 0x3B)),
+						new File.MemoryBlock(new File.LBA(0x17E0, 0x37)),
+						new File.MemoryBlock(new File.LBA(0x1817, 0x33)),
+						new File.MemoryBlock(new File.LBA(0x184A, 0x3B)),
+						new File.MemoryBlock(new File.LBA(0x1885, 0x38)),
+						new File.MemoryBlock(new File.LBA(0x18BD, 0x38)),
+						new File.MemoryBlock(new File.LBA(0x18F5, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x192E, 0x11)),
+						new File.MemoryBlock(new File.LBA(0x193F, 0x11))
+					}
+				},
+				new File() {
+					fileID = 2,
+					type = File.Type.Actor,
+					bigfile = "ACTOR2",
+					extension = "DAT",
+					baseLBA = 0x1B58,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1B58, 0x37)),
+						new File.MemoryBlock(new File.LBA(0x1B8F, 0x3B)),
+						new File.MemoryBlock(new File.LBA(0x1BCA, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x1C03, 0x34)),
+						new File.MemoryBlock(new File.LBA(0x1C37, 0x3B)),
+						new File.MemoryBlock(new File.LBA(0x1C72, 0x38)),
+						new File.MemoryBlock(new File.LBA(0x1CAA, 0x38)),
+						new File.MemoryBlock(new File.LBA(0x1CE2, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x1D1B, 0xE)),
+						new File.MemoryBlock(new File.LBA(0x1D29, 0xE))
+					}
+				},
+				new File() {
+					fileID = 3,
+					type = File.Type.Sound,
+					bigfile = "SNDBANKS",
+					extension = "DAT",
+					baseLBA = 0x1F40,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1F40, 0x1E)),
+						new File.MemoryBlock(new File.LBA(0x1F5E, 0x22)),
+						new File.MemoryBlock(new File.LBA(0x1F80, 0x11)),
+						new File.MemoryBlock(new File.LBA(0x1F91, 0x31)),
+						new File.MemoryBlock(new File.LBA(0x1FC2, 0x20)),
+						new File.MemoryBlock(new File.LBA(0x1FE2, 0x23)),
+						new File.MemoryBlock(new File.LBA(0x2005, 0x31)),
+						new File.MemoryBlock(new File.LBA(0x2036, 0xE)),
+						new File.MemoryBlock(new File.LBA(0x2044, 0x22)),
+						new File.MemoryBlock(new File.LBA(0x2066, 0x29)),
+						new File.MemoryBlock(new File.LBA(0x208F, 0x12)),
+						new File.MemoryBlock(new File.LBA(0x20A1, 0x1B)),
+						new File.MemoryBlock(new File.LBA(0x20BC, 0x6C)),
+						new File.MemoryBlock(new File.LBA(0x2128, 0x20)),
+						new File.MemoryBlock(new File.LBA(0x2148, 0x21)),
+						new File.MemoryBlock(new File.LBA(0x2169, 0x11)),
+						new File.MemoryBlock(new File.LBA(0x217A, 0x15)),
+						new File.MemoryBlock(new File.LBA(0x218F, 0x15)),
+						new File.MemoryBlock(new File.LBA(0x21A4, 0x2D)),
+						new File.MemoryBlock(new File.LBA(0x21D1, 5)),
+						new File.MemoryBlock(new File.LBA(0x21D6, 0x1B)),
+						new File.MemoryBlock(new File.LBA(0x21F1, 0x22)),
+						new File.MemoryBlock(new File.LBA(0x2213, 0x16)),
+						new File.MemoryBlock(new File.LBA(0x2229, 0x27))
+					}
+				},
+			}
+		};
+
 		public static Dictionary<Settings.Mode, PS1GameInfo> Games = new Dictionary<Settings.Mode, PS1GameInfo>() {
 			{ Settings.Mode.Rayman2PS1, R2_PS1_US },
+			{ Settings.Mode.RaymanRushPS1, RR_PS1_US },
+			{ Settings.Mode.DonaldDuckPS1, DD_PS1_US },
+			{ Settings.Mode.VIPPS1, VIP_PS1_US },
+			{ Settings.Mode.JungleBookPS1, JB_PS1_US },
 		};
 	}
 }

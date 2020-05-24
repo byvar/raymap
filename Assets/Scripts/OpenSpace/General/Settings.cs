@@ -9,7 +9,7 @@ using LinkedListType = OpenSpace.LinkedList.Type;
 
 namespace OpenSpace {
     public class Settings {
-		
+
 		public static Dictionary<string, Mode> cmdModeNameDict = new Dictionary<string, Mode>() {
 			{ "r3_gc", Mode.Rayman3GC },
 			{ "r3_pc", Mode.Rayman3PC },
@@ -43,6 +43,7 @@ namespace OpenSpace {
 			{ "dd_pc", Mode.DonaldDuckPC },
 			{ "dd_dc", Mode.DonaldDuckDC },
 			{ "dd_n64", Mode.DonaldDuckN64 },
+			{ "dd_ps1", Mode.DonaldDuckPS1 },
 			{ "ddpk_gc", Mode.DonaldDuckPKGC },
 			{ "tt_pc", Mode.TonicTroublePC },
 			{ "ttse_pc", Mode.TonicTroubleSEPC },
@@ -51,6 +52,8 @@ namespace OpenSpace {
 			{ "playmobil_laura_pc", Mode.PlaymobilLauraPC },
 			{ "dinosaur_pc", Mode.DinosaurPC },
 			{ "largowinch_pc", Mode.LargoWinchPC },
+			{ "jb_ps1", Mode.JungleBookPS1 },
+			{ "vip_ps1", Mode.VIPPS1 },
 		};
 
         #region Enums
@@ -90,12 +93,15 @@ namespace OpenSpace {
             [Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
             [Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
             [Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
-            [Description("Donald Duck: PK (GC)")] DonaldDuckPKGC,
+			[Description("Donald Duck: Quack Attack (PS1)")] DonaldDuckPS1,
+			[Description("Donald Duck: PK (GC)")] DonaldDuckPKGC,
             [Description("Playmobil: Hype (PC)")] PlaymobilHypePC,
             [Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
             [Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
             [Description("Disney's Dinosaur (PC)")] DinosaurPC,
             [Description("Largo Winch (PC)")] LargoWinchPC,
+			[Description("Jungle Book: Groove Party (PS1)")] JungleBookPS1,
+			[Description("VIP (PS1)")] VIPPS1,
         };
         public enum EngineVersion {
             TT = 0,
@@ -103,7 +109,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch };
+        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch, JungleBook, VIP };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2, PS3, Xbox, Xbox360, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
@@ -659,7 +665,7 @@ namespace OpenSpace {
 			game = Game.RRush,
 			platform = Platform.PS1,
 			endian = Endian.Little,
-			linkedListType = LinkedListType.Double,
+			linkedListType = LinkedListType.Single,
 			encryption = Encryption.ReadInit,
 			luminosity = 0.5f,
 			saturate = true,
@@ -762,6 +768,18 @@ namespace OpenSpace {
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			}
+		};
+		public static Settings DDPS1 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.DD,
+			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Single,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
 		};
 
 		public static Settings TTPC = new Settings() {
@@ -906,11 +924,35 @@ namespace OpenSpace {
 			},
 			hasDeformations = true
 		};
+		public static Settings VIPPS1 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.VIP,
+			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Single,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+		public static Settings JungleBookPS1 = new Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.JungleBook,
+			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Single,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
 
-        #endregion
+		#endregion
 
 
-        public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
+		public static Dictionary<Mode, Settings> settingsDict = new Dictionary<Mode, Settings>() {
 			{ Mode.Rayman2PC, R2PC },
 			{ Mode.Rayman2PCDemo1, R2PCDemo1 },
 			{ Mode.Rayman2PCDemo2, R2PCDemo2 },
@@ -946,12 +988,15 @@ namespace OpenSpace {
 			{ Mode.DonaldDuckPC, DDPC },
 			{ Mode.DonaldDuckDC, DDDC },
 			{ Mode.DonaldDuckN64, DDN64 },
+			{ Mode.DonaldDuckPS1, DDPS1 },
 			{ Mode.DonaldDuckPKGC, DDPKGC },
 			{ Mode.PlaymobilHypePC, PlaymobilHypePC },
 			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },
 			{ Mode.PlaymobilAlexPC, PlaymobilAlexPC },
 			{ Mode.DinosaurPC, DinosaurPC },
 			{ Mode.LargoWinchPC, LargoWinchPC },
+			{ Mode.VIPPS1, VIPPS1 },
+			{ Mode.JungleBookPS1, JungleBookPS1 },
 		};
 	}
 }

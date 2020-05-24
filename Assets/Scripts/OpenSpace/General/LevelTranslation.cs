@@ -187,7 +187,7 @@ namespace OpenSpace {
             ("pirate2", "(L3 Race) Zenith Harbour"),
             ("pirate3", "(L3 Race) Treasure Ship"),
             ("factory1", "(L4 Race) Pipe Maze"),
-            ("factory2", "(L4 Race) Lava Factory)"),
+            ("factory2", "(L4 Race) Lava Factory"),
             ("factory3", "(L4 Race) Electric Final"),
             ("Pacbonus", "(Bonus Battle) Pac Arena"),
             ("BGravity01", "(Bonus Battle) Low-Gravity Arena"),
