@@ -107,7 +107,7 @@ namespace OpenSpace.PS1 {
 		public Sector[] sectors;
 
 		public PS1AnimationVector[] animPositions;
-		public PS1AnimationQuaternion[] quaternions;
+		public PS1AnimationQuaternion[] animRotations;
 		public PS1AnimationVector[] animScales;
 
 		protected override void ReadInternal(Reader reader) {
@@ -151,6 +151,7 @@ namespace OpenSpace.PS1 {
 			uint_140 = reader.ReadUInt32();
 			uint_144 = reader.ReadUInt32();
 			initialStreamID = reader.ReadInt32(); // -1
+			Load.print(Pointer.Current(reader));
 			off_animPositions = Pointer.Read(reader); // 0x6 size
 			off_animRotations = Pointer.Read(reader); // big array of structs of 0x8 size. 4 ushorts per struct
 			off_animScales = Pointer.Read(reader);
@@ -261,8 +262,8 @@ namespace OpenSpace.PS1 {
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 
 			animPositions = Load.ReadArray<PS1AnimationVector>((off_animRotations.offset - off_animPositions.offset) / 6, reader, off_animPositions);
-			quaternions = Load.ReadArray<PS1AnimationQuaternion>((off_animScales.offset - off_animRotations.offset) / 8, reader, off_animRotations);
-			animScales = Load.ReadArray<PS1AnimationVector>(l.maxScaleVector + 1, reader, off_animScales);
+			animRotations = Load.ReadArray<PS1AnimationQuaternion>((off_animScales.offset - off_animRotations.offset) / 8, reader, off_animRotations);
+			animScales = Load.ReadArray<PS1AnimationVector>(l.maxScaleVector[0] + 1, reader, off_animScales);
 		}
 
 		public void ParseUITextures(Reader reader) {

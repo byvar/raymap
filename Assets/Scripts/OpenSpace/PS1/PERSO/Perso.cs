@@ -20,7 +20,7 @@ namespace OpenSpace.PS1 {
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
-			//Load.print("Perso @ " + Offset);
+			Load.print("Perso @ " + Offset);
 			off_p3dData = Pointer.Read(reader);
 			off_superObjectPointer = Pointer.Read(reader);
 			off_08 = Pointer.Read(reader);
@@ -32,8 +32,15 @@ namespace OpenSpace.PS1 {
 			p3dData = Load.FromOffsetOrRead<Perso3dData>(reader, off_p3dData);
 			Pointer.DoAt(ref reader, off_superObjectPointer, () => {
 				Pointer off_superobject = Pointer.Read(reader);
-				name = reader.ReadNullDelimitedString();
-				Load.print(Offset + " - " + off_superobject + " - " + name);
+				if (Settings.s.game == Settings.Game.RRush) {
+					Pointer off_name = Pointer.Read(reader);
+					Pointer.DoAt(ref reader, off_name, () => {
+						name = reader.ReadNullDelimitedString();
+					});
+				} else {
+					name = reader.ReadNullDelimitedString();
+				}
+				Load.print(Offset + " - " + off_superObjectPointer + " - " + off_superobject + " - " + name);
 			});
 			/*Pointer.DoAt(ref reader, off_00, () => {
 				reader.ReadBytes(0x5c);

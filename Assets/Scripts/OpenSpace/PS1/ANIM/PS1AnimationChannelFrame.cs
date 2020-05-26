@@ -18,7 +18,7 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			flags = reader.ReadUInt16();
-			if (HasFlag(AnimationFlags.First)) {
+			if (HasFlag(AnimationFlags.NTTO)) {
 				ntto = reader.ReadInt16();
 			}
 			if (HasFlag(AnimationFlags.Position)) {
@@ -32,10 +32,8 @@ namespace OpenSpace.PS1 {
 			}
 			if (HasFlag(AnimationFlags.Scale)) {
 				scl = reader.ReadUInt16();
-				R2PS1Loader l = Load as R2PS1Loader;
-				if(scl > l.maxScaleVector) l.maxScaleVector = scl.Value;
 			}
-			if (HasFlag(AnimationFlags.NTTO)) {
+			if (HasFlag(AnimationFlags.Morph)) {
 				morphNTTO = reader.ReadInt16();
 				morphProgress = reader.ReadInt16();
 			}
@@ -44,12 +42,12 @@ namespace OpenSpace.PS1 {
 		[Flags]
 		public enum AnimationFlags : ushort {
 			None = 0,
-			First = 1 << 0,
+			NTTO = 1 << 0,
 			Position = 1 << 1,
 			Rotation = 1 << 2,
 			Duration = 1 << 3,
 			Scale = 1 << 4,
-			NTTO = 1 << 5,
+			Morph = 1 << 5,
 
 			FlipX = 1 << 6
 		}

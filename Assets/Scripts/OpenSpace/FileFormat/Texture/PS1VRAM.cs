@@ -264,7 +264,7 @@ namespace OpenSpace.FileFormat.Texture {
 				pageX++;
 				x -= page_width;
 			}
-			if (y > page_height) {
+			if (y >= page_height) {
 				pageY++;
 				y -= page_height;
 			}

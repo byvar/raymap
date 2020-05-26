@@ -11,6 +11,8 @@ namespace OpenSpace.PS1 {
 		public string[] maps;
 		public Dictionary<string, string[]> cines;
 		public string mainFile;
+		public uint actor1Address;
+		public uint actor2Address;
 
 
 		public class File {
@@ -37,6 +39,10 @@ namespace OpenSpace.PS1 {
 				public LBA[] cutscenes;
 				public bool inEngine;
 				public bool exeOnly = false;
+				public bool loadActor = false;
+				public bool relocateActor = false;
+				public uint? overrideActor1Address;
+				public uint? overrideActor2Address;
 
 				public MemoryBlock(uint address, bool hasSoundEffects, LBA main_compressed, LBA overlay_game, LBA overlay_cine, LBA[] cutscenes = null, bool inEngine = true) {
 					this.address = address;
@@ -619,6 +625,8 @@ namespace OpenSpace.PS1 {
 				"pirate2",
 				"mainmenu",
 			},
+			actor1Address = 0x80165000,
+			actor2Address = 0x80190C00,
 			files = new File[] {
 				new File() {
 					fileID = 0,
@@ -627,19 +635,24 @@ namespace OpenSpace.PS1 {
 					extension = "DAT",
 					baseLBA = 0x1F4,
 					memoryBlocks = new File.MemoryBlock[] {
-						new File.MemoryBlock(0x800F33F8, false, new File.LBA(0x1F4, 0x16A)),
-						new File.MemoryBlock(0x800DD310, false, new File.LBA(0x35E, 0x190)),
-						new File.MemoryBlock(0x80103214, false, new File.LBA(0x4EE, 0x16E)),
-						new File.MemoryBlock(0x800E8ECC, false, new File.LBA(0x65C, 0x199)),
-						new File.MemoryBlock(0x80115768, false, new File.LBA(0x7F5, 0x131)),
-						new File.MemoryBlock(0x800EBBF4, false, new File.LBA(0x926, 0x15D)),
-						new File.MemoryBlock(0x800E5B78, false, new File.LBA(0xA83, 0x15F)),
-						new File.MemoryBlock(0x801101EC, false, new File.LBA(0xBE2, 0x149)),
-						new File.MemoryBlock(0x800E5B98, false, new File.LBA(0xD2B, 0x186)),
-						new File.MemoryBlock(0x800DAB98, false, new File.LBA(0xEB1, 0x180)),
-						new File.MemoryBlock(0x800FB244, false, new File.LBA(0x1031, 0x166)),
-						new File.MemoryBlock(0x800DF5F0, false, new File.LBA(0x1197, 0x187)),
-						new File.MemoryBlock(0x800C3C4C, false, new File.LBA(0x131E, 0x185)),
+						new File.MemoryBlock(0x800F33F8, false, new File.LBA(0x1F4, 0x16A)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800DD310, false, new File.LBA(0x35E, 0x190)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x80103214, false, new File.LBA(0x4EE, 0x16E)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800E8ECC, false, new File.LBA(0x65C, 0x199)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x80115768, false, new File.LBA(0x7F5, 0x131)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800EBBF4, false, new File.LBA(0x926, 0x15D)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800E5B78, false, new File.LBA(0xA83, 0x15F)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x801101EC, false, new File.LBA(0xBE2, 0x149)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800E5B98, false, new File.LBA(0xD2B, 0x186)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800DAB98, false, new File.LBA(0xEB1, 0x180)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800FB244, false, new File.LBA(0x1031, 0x166)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800DF5F0, false, new File.LBA(0x1197, 0x187)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800C3C4C, false, new File.LBA(0x131E, 0x185)) {
+							loadActor = true,
+							relocateActor = true,
+							overrideActor1Address = 0x8019c000,
+							overrideActor2Address = 0x801ac400
+						}, // menu
 						new File.MemoryBlock(0x80110000, false, new File.LBA(0x14A3, 0x1D), inEngine: false) { exeOnly = true },
 					}
 				},

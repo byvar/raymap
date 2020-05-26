@@ -25,6 +25,7 @@ namespace OpenSpace.PS1 {
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
+			//Load.print("State @ " + Offset);
 			off_anim = Pointer.Read(reader);
 			ushort_04 = reader.ReadUInt16();
 			ushort_06 = reader.ReadUInt16();
@@ -32,7 +33,9 @@ namespace OpenSpace.PS1 {
 			off_transitions = Pointer.Read(reader); // Points to animation data, incl name
 			num_transitions = reader.ReadUInt32();
 			off_state_auto = Pointer.Read(reader);
-			off_18 = Pointer.Read(reader);
+			if (Settings.s.game != Settings.Game.RRush) {
+				off_18 = Pointer.Read(reader);
+			}
 			byte_1C = reader.ReadByte();
 			speed = reader.ReadByte(); // Usually 30, but can also be 20, 40, 60, 35
 			ushort_1E = reader.ReadUInt16();

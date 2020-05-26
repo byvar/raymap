@@ -82,7 +82,15 @@ public class PS1PersoBehaviourEditor : Editor {
 			int id = 0;
 			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
 			LevelHeader h = l.levelHeader;
-			State[] states = h.states.pointers.Select(s => s.Value).ToArray();
+			ActorFileHeader a1h = l.actor1Header;
+			ActorFileHeader a2h = l.actor2Header;
+			PointerList<State> statePtrs = h.states;
+			if (a1h != null && pb.perso.p3dData.HasFlag(Perso3dData.Perso3dDataFlags.Actor1)) {
+				statePtrs = a1h.states;
+			} else if (a2h != null && pb.perso.p3dData.HasFlag(Perso3dData.Perso3dDataFlags.Actor2)) {
+				statePtrs = a2h.states;
+			}
+			State[] states = statePtrs.pointers.Select(s => s.Value).ToArray();
 			foreach (StateTransition t in pb.state.transitions) {
 				State stateToGo = t.stateToGo.Value;
 				State targetState = t.targetState.Value;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenSpace.PS1 {
 	public class Perso3dData : OpenSpaceStruct { // Animation/state related
-		public uint uint_00;
+		public uint flags;
 		public Pointer off_family;
 		public Pointer off_58;
 		public ushort ushort_5C;
@@ -22,8 +22,10 @@ namespace OpenSpace.PS1 {
 		// Parsed
 		public Family family;
 
+
 		protected override void ReadInternal(Reader reader) {
-			uint_00 = reader.ReadUInt32();
+			//Load.print(Offset);
+			flags = reader.ReadUInt32();
 			off_family = Pointer.Read(reader);
 			if (Settings.s.game == Settings.Game.R2) {
 				reader.ReadBytes(0x50); // TODO
@@ -54,6 +56,18 @@ namespace OpenSpace.PS1 {
 			});*/
 
 			family = Load.FromOffsetOrRead<Family>(reader, off_family);
+		}
+
+
+		[Flags]
+		public enum Perso3dDataFlags : uint {
+			None = 0,
+			Actor1 = 0x8000,
+			Actor2 = 0x10000
+		}
+
+		public bool HasFlag(Perso3dDataFlags flags) {
+			return (this.flags & (uint)flags) == (uint)flags;
 		}
 	}
 }

@@ -49,7 +49,7 @@ namespace OpenSpace.PS1 {
 			Load.print("Sector @ " + Offset);
 			off_persos = Pointer.Read(reader);
 			off_neighbors = Pointer.Read(reader);
-			if (Settings.s.game != Settings.Game.R2) {
+			if (Settings.s.game != Settings.Game.R2 && Settings.s.game != Settings.Game.RRush) {
 				vip_ushort_08 = reader.ReadUInt16();
 				vip_ushort_0A = reader.ReadUInt16();
 				vip_uint_0C = reader.ReadUInt32();
@@ -58,7 +58,7 @@ namespace OpenSpace.PS1 {
 			off_sectors_unk2 = Pointer.Read(reader);
 			off_sectors_unk3 = Pointer.Read(reader);
 			off_ipos = Pointer.Read(reader);
-			if (Settings.s.game != Settings.Game.R2) {
+			if (Settings.s.game != Settings.Game.R2 && Settings.s.game != Settings.Game.RRush) {
 				int_50 = reader.ReadInt32();
 			} else {
 				off_18 = Pointer.Read(reader);
@@ -81,7 +81,7 @@ namespace OpenSpace.PS1 {
 			int_4C = reader.ReadInt32();
 			if (Settings.s.game == Settings.Game.VIP) {
 				off_so = Pointer.Read(reader);
-			} else if(Settings.s.game == Settings.Game.R2) {
+			} else if(Settings.s.game == Settings.Game.R2 || Settings.s.game == Settings.Game.RRush) {
 				int_50 = reader.ReadInt32();
 			}
 

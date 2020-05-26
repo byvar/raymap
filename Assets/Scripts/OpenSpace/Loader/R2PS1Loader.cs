@@ -29,9 +29,17 @@ namespace OpenSpace.Loader {
 		public PS1VRAM vram = new PS1VRAM();
 		public LevelHeader levelHeader;
 		public PS1GameInfo game;
-		public ushort maxScaleVector = 0;
+		public ushort[] maxScaleVector = new ushort[3] { 0, 0, 0 };
 		public PS1Stream[] streams;
-		PS1GameInfo.File.MemoryBlock memoryBlock;
+		PS1GameInfo.File.MemoryBlock mainMemoryBlock;
+
+		// Actor
+		public int Actor1Index { get; private set; } = 0;
+		public int Actor2Index { get; private set; } = 1;
+		private FileWithPointers actor1File;
+		private FileWithPointers actor2File;
+		public ActorFileHeader actor1Header;
+		public ActorFileHeader actor2Header;
 
 		public string[] LoadLevelList() {
 			if (PS1GameInfo.Games.ContainsKey(Settings.s.mode)) {
@@ -53,8 +61,10 @@ namespace OpenSpace.Loader {
 				//RipRHRLoc();
 				game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
-				await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.fileID == 0));
+				files_array = new FileWithPointers[0];
+				await LoadAllDataFromDAT(game);
 				//await ExtractAllFiles(game);
+				await InitAllFiles(game);
 				await LoadLevel();
 			} finally {
                 for (int i = 0; i < files_array.Length; i++) {
@@ -90,19 +100,61 @@ namespace OpenSpace.Loader {
 			Util.ByteArrayToFile(gameDataBinFolder + "rhr.json", Encoding.UTF8.GetBytes(json));
 		}*/
 
-		public async Task InitFiles(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo) {
-			if (CurrentLevel < 0 || CurrentLevel >= gameInfo.maps.Length) return;
-			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[CurrentLevel];
-			memoryBlock = b;
-			if (!b.inEngine) return;
-			string levelDir = gameDataBinFolder + lvlName + "/";
-			Array.Resize(ref files_array, 2 + b.cutscenes.Length + (b.overlay_cine.size > 0 ? 1 : 0));
-			int curFile = 0;
-			files_array[curFile++] = new PS1Data(lvlName + ".sys", levelDir + "level.sys", curFile, 0);
-			files_array[curFile++] = new PS1Data(lvlName + ".img", levelDir + "level.img", curFile, b.address);
-			for (int i = 0; i < b.cutscenes.Length; i++) {
-				string cutsceneFramesName = levelDir + "stream_frames_" + i + ".blk";
-				files_array[curFile++] = new LinearFile("stream_frames_" + i +".blk", cutsceneFramesName, curFile);
+		public async Task InitAllFiles(PS1GameInfo game) {
+			if (CurrentLevel < 0 || CurrentLevel >= game.maps.Length) return;
+			PS1GameInfo.File mainFile = game.files.FirstOrDefault(f => f.fileID == 0);
+			await InitFiles(game, mainFile, CurrentLevel);
+			mainMemoryBlock = mainFile.memoryBlocks[CurrentLevel];
+			if (mainFile.memoryBlocks[CurrentLevel].loadActor) {
+				if (game.files.Any(f => f.bigfile == "ACTOR1")) {
+					// Load Actor
+					await InitFiles(game, game.files.FirstOrDefault(f => f.bigfile == "ACTOR1"), Actor1Index);
+				}
+				if (game.files.Any(f => f.bigfile == "ACTOR2")) {
+					// Load Actor
+					await InitFiles(game, game.files.FirstOrDefault(f => f.bigfile == "ACTOR2"), Actor2Index);
+				}
+			}
+			loadingState = "Filling VRAM";
+			await WaitIfNecessary();
+			FillVRAM();
+		}
+
+		public async Task InitFiles(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
+			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
+			string levelDir = gameDataBinFolder + fileInfo.bigfile + "/";
+			if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+				levelDir += (index < gameInfo.maps.Length ? gameInfo.maps[index] : (fileInfo.bigfile + "_" + index)) + "/";
+			} else {
+				levelDir += index + "/";
+			}
+			int curFile = files_array.Length;
+
+
+			if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+				if (!b.inEngine) return;
+				Array.Resize(ref files_array, files_array.Length + 2 + b.cutscenes.Length + (b.overlay_cine.size > 0 ? 1 : 0));
+				files_array[curFile++] = new PS1Data(lvlName + ".sys", levelDir + "level.sys", curFile, 0);
+				files_array[curFile++] = new PS1Data(lvlName + ".img", levelDir + "level.img", curFile, b.address);
+
+				for (int i = 0; i < b.cutscenes.Length; i++) {
+					string cutsceneFramesName = levelDir + "stream_frames_" + i + ".blk";
+					files_array[curFile++] = new LinearFile("stream_frames_" + i + ".blk", cutsceneFramesName, curFile);
+				}
+			} else if(fileInfo.type == PS1GameInfo.File.Type.Actor) {
+				Array.Resize(ref files_array, files_array.Length + 1);
+				FileWithPointers f = null;
+				PS1GameInfo.File mainFile = game.files.FirstOrDefault(fi => fi.fileID == 0);
+				if (fileInfo.bigfile == "ACTOR1") {
+					f = new PS1Data(fileInfo.bigfile + "_" + index + ".img", levelDir + "actor.img", curFile,
+						mainFile.memoryBlocks[CurrentLevel].overrideActor1Address ?? game.actor1Address);
+					actor1File = f;
+				} else if (fileInfo.bigfile == "ACTOR2") {
+					f = new PS1Data(fileInfo.bigfile + "_" + index + ".img", levelDir + "actor.img", curFile,
+						mainFile.memoryBlocks[CurrentLevel].overrideActor2Address ?? game.actor2Address);
+					actor2File = f;
+				}
+				files_array[curFile++] = f;
 			}
 			if (b.overlay_cine.size > 0) {
 				curFile++;
@@ -110,14 +162,67 @@ namespace OpenSpace.Loader {
 							cineDataBaseAddress + 0x1f800 + 0x32 * 0xc00,
 							curFile);*/
 			}
-			loadingState = "Filling VRAM";
-			await WaitIfNecessary();
-			FillVRAM();
+			await Task.CompletedTask;
+		}
+
+		private void RelocateActorFile(int index) {
+			PS1GameInfo.File mainFile = game.files.FirstOrDefault(f => f.fileID == 0);
+			if (!mainFile.memoryBlocks[CurrentLevel].relocateActor) return;
+			
+			Reader reader = files_array[Mem.Fix]?.reader;
+			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
+			FileWithPointers file = null;
+			if (index == 0) {
+				file = actor1File;
+			} else {
+				file = actor2File;
+			}
+			if (file != null) {
+				Pointer soPointer = null;
+				byte[] perso = null, unk = null, unk2 = null;
+				Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file), () => {
+					soPointer = Pointer.Read(reader);
+					perso = reader.ReadBytes(0x18);
+					unk = reader.ReadBytes(4);
+					unk2 = reader.ReadBytes(2);
+				});
+				Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x68, () => {
+					Pointer off_persos = Pointer.Read(reader);
+					Pointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
+						(off_persos.file as PS1Data).OverwriteData(Pointer.Current(reader).FileOffset, perso);
+					});
+				});
+				Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x40, () => {
+					Pointer off_dynamicWorld = Pointer.Read(reader);
+					Pointer.DoAt(ref reader, off_dynamicWorld, () => {
+						reader.ReadBytes(0x8);
+						Pointer firstChild = Pointer.Read(reader);
+						Pointer lastChild = Pointer.Read(reader);
+						uint numChild = reader.ReadUInt32();
+						if (numChild == 0) {
+							firstChild = soPointer;
+							lastChild = soPointer;
+						} else {
+							(lastChild.file as PS1Data).OverwriteData(lastChild.FileOffset + 0x14, soPointer.offset);
+							(soPointer.file as PS1Data).OverwriteData(soPointer.FileOffset + 0x18, lastChild.offset);
+							lastChild = soPointer;
+						}
+						numChild++;
+						(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x8, firstChild.offset);
+						(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0xC, lastChild.offset);
+						(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x10, numChild);
+					});
+				});
+			}
 		}
 
 		public async Task LoadLevel() {
 			Reader reader = files_array[Mem.Fix]?.reader;
 			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
+			if (Settings.s.game == Settings.Game.RRush) {
+				RelocateActorFile(0);
+				RelocateActorFile(1);
+			}
 
 			// TODO: Load header here
 			vram.Export(gameDataBinFolder + "vram.png");
@@ -133,7 +238,7 @@ namespace OpenSpace.Loader {
 			levelHeader.inactiveDynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_inactiveDynamicWorld, onPreRead: s => s.isDynamic = true);
 
 			// Done reading here
-			if (memoryBlock.overlay_cine.size > 0) {
+			if (mainMemoryBlock.overlay_cine.size > 0) {
 				string levelDir = gameDataBinFolder + lvlName + "/";
 				uint cineDataBaseAddress = levelHeader.off_animPositions.offset;
 				files_array[files_array.Length-1] = new PS1Data("overlay_cine.img", levelDir + "overlay_cine.img", files_array.Length - 1,
@@ -141,6 +246,10 @@ namespace OpenSpace.Loader {
 			}
 			if (levelHeader.num_geometricObjectsDynamic_cine != 0) {
 				levelHeader.geometricObjectsDynamic.ReadExtra(reader, levelHeader.num_geometricObjectsDynamic_cine);
+			}
+			if (Settings.s.game == Settings.Game.RRush) {
+				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
+				if (actor2File != null) actor2Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor2File.headerOffset, actor2File), onPreRead: h => h.file_index = 2);
 			}
 
 			loadingState = "Calculating texture bounds";
@@ -183,13 +292,34 @@ namespace OpenSpace.Loader {
 		}
 
 		#region DAT Parsing
-		public async Task LoadDataFromDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo) {
-			if (CurrentLevel < 0 || CurrentLevel >= gameInfo.maps.Length) return;
-			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[CurrentLevel];
+
+		public async Task LoadAllDataFromDAT(PS1GameInfo game) {
+			PS1GameInfo.File mainFile = game.files.FirstOrDefault(f => f.fileID == 0);
+			await LoadDataFromDAT(game, mainFile, CurrentLevel);
+			if (mainFile.memoryBlocks[CurrentLevel].loadActor) {
+				if (game.files.Any(f => f.bigfile == "ACTOR1")) {
+					// Load Actor
+					await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.bigfile == "ACTOR1"), Actor1Index);
+				}
+				if (game.files.Any(f => f.bigfile == "ACTOR2")) {
+					// Load Actor
+					await LoadDataFromDAT(game, game.files.FirstOrDefault(f => f.bigfile == "ACTOR2"), Actor2Index);
+				}
+			}
+		}
+		public async Task LoadDataFromDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
+			if (CurrentLevel < 0 || CurrentLevel >= fileInfo.memoryBlocks.Length) return;
+			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
 			if (!b.inEngine) return;
 			string bigFile = fileInfo.bigfile;
 			string bigFilePath = gameDataBinFolder + bigFile + "." + fileInfo.extension;
-			string levelDir = gameDataBinFolder + lvlName + "/";
+
+			string levelDir = gameDataBinFolder + fileInfo.bigfile + "/";
+			if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+				levelDir += (index < gameInfo.maps.Length ? gameInfo.maps[index] : (bigFile + "_" + index)) + "/";
+			} else {
+				levelDir += index + "/";
+			}
 			await PrepareBigFile(bigFilePath, 2048);
 			loadingState = "Extracting data from bigfile(s)";
 			await WaitIfNecessary();
@@ -197,22 +327,27 @@ namespace OpenSpace.Loader {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath), isLittleEndian: Settings.s.IsLittleEndian)) {
 					List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.main_compressed, fileInfo.baseLBA);
 					int blockIndex = 0;
-					if (Settings.s.game != Settings.Game.RRush && !b.exeOnly) FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
-					if (!b.exeOnly && b.inEngine) {
-						if (b.hasSoundEffects) {
-							FileSystem.AddVirtualFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
+					if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+						if (Settings.s.game != Settings.Game.RRush && !b.exeOnly) FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
+						if (!b.exeOnly && b.inEngine) {
+							if (b.hasSoundEffects) {
+								FileSystem.AddVirtualFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
+							}
+							FileSystem.AddVirtualFile(levelDir + "vram.xtp", mainBlock[blockIndex++]);
+							FileSystem.AddVirtualFile(levelDir + "level.sys", mainBlock[blockIndex++]);
 						}
+						// skip exe
+						byte[] exe = mainBlock[blockIndex++];
+						byte[] exeData = mainBlock[blockIndex++];
+						/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
+						Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
+						FileSystem.AddVirtualFile(levelDir + "executable.pxe", exe);
+						if (!b.exeOnly && b.inEngine) {
+							FileSystem.AddVirtualFile(levelDir + "level.img", mainBlock[blockIndex++]);
+						}
+					} else if(fileInfo.type == PS1GameInfo.File.Type.Actor) {
 						FileSystem.AddVirtualFile(levelDir + "vram.xtp", mainBlock[blockIndex++]);
-						FileSystem.AddVirtualFile(levelDir + "level.sys", mainBlock[blockIndex++]);
-					}
-					// skip exe
-					byte[] exe = mainBlock[blockIndex++];
-					byte[] exeData = mainBlock[blockIndex++];
-					/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
-					Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
-					FileSystem.AddVirtualFile(levelDir + "executable.pxe", exe);
-					if (!b.exeOnly && b.inEngine) {
-						FileSystem.AddVirtualFile(levelDir + "level.img", mainBlock[blockIndex++]);
+						FileSystem.AddVirtualFile(levelDir + "actor.img", mainBlock[blockIndex++]);
 					}
 					if (blockIndex != mainBlock.Count) {
 						Debug.LogWarning("Not all blocks were extracted!");
@@ -235,7 +370,6 @@ namespace OpenSpace.Loader {
 					}
 				}
 			}
-			await InitFiles(gameInfo, fileInfo);
 		}
 
 		public async Task ExtractAllFiles(PS1GameInfo game) {
@@ -549,10 +683,32 @@ namespace OpenSpace.Loader {
 		#region Textures
 		public void FillVRAM() {
 			vram.currentXPage = 5;
-			using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + lvlName + "/vram.xtp"))) {
+
+			PS1GameInfo.File fileInfo = game.files.FirstOrDefault(f => f.fileID == 0);
+			int index = CurrentLevel;
+			string levelDir = gameDataBinFolder + fileInfo.bigfile + "/";
+			if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+				levelDir += (index < game.maps.Length ? game.maps[index] : (fileInfo.bigfile + "_" + index)) + "/";
+			} else {
+				levelDir += index + "/";
+			}
+
+			using (Reader reader = new Reader(FileSystem.GetFileReadStream(levelDir + "vram.xtp"))) {
 				byte[] data = reader.ReadBytes((int)reader.BaseStream.Length);
 				int width = Mathf.CeilToInt(data.Length / (float)(PS1VRAM.page_height * 2));
 				vram.AddData(data, width);
+			}
+			if (game.files.Any(f => f.bigfile == "ACTOR1")) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + "ACTOR1/" + Actor1Index + "/vram.xtp"))) {
+					byte[] data = reader.ReadBytes((int)reader.BaseStream.Length);
+					vram.AddDataAt(5, 0, 0, 0, data, PS1VRAM.page_width);
+				}
+			}
+			if (game.files.Any(f => f.bigfile == "ACTOR2")) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + "ACTOR2/" + Actor2Index + "/vram.xtp"))) {
+					byte[] data = reader.ReadBytes((int)reader.BaseStream.Length);
+					vram.AddDataAt(6, 0, 0, 0, data, PS1VRAM.page_width);
+				}
 			}
 		}
 
@@ -587,6 +743,7 @@ namespace OpenSpace.Loader {
             foreach (TextureBounds b in textureBounds) {
                 int w = b.xMax - b.xMin;
                 int h = b.yMax - b.yMin;
+				//print(w + " - " + h + " - " + b.xMin + " - " + b.yMin + " - " + b.pageInfo + " - " + b.paletteInfo);
                 Texture2D tex = vram.GetTexture((ushort)w, (ushort)h, b.pageInfo, b.paletteInfo, b.xMin, b.yMin);
 				tex.wrapMode = TextureWrapMode.Clamp;
                 b.texture = tex;

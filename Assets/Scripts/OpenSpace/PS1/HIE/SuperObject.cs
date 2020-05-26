@@ -47,35 +47,38 @@ namespace OpenSpace.PS1 {
 		public bool isDynamic = false;
 
 		protected override void ReadInternal(Reader reader) {
+			//Load.print("SuperObject @ " + Offset);
 			typeCode = reader.ReadUInt32();
 			dataIndex = reader.ReadInt32();
 			children = LinkedList<SuperObject>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-			off_next_brother = Pointer.Read(reader);
-			off_prev_brother = Pointer.Read(reader);
-			off_parent = Pointer.Read(reader);
-			off_matrix1 = Pointer.Read(reader);
-			off_matrix2 = Pointer.Read(reader);
-			short_28 = reader.ReadInt16();
-			short_2A = reader.ReadInt16();
-			short_2C = reader.ReadInt16();
-			short_2E = reader.ReadInt16();
-			short_30 = reader.ReadInt16();
-			short_32 = reader.ReadInt16();
-			short_34 = reader.ReadInt16();
-			short_36 = reader.ReadInt16();
-			if (isDynamic) {
-				uint_38 = reader.ReadUInt32();
-			} else {
-				off_38 = Pointer.Read(reader);
+			off_next_brother = Pointer.Read(reader); // 14
+			off_prev_brother = Pointer.Read(reader); // 18
+			off_parent = Pointer.Read(reader); // 1c
+			off_matrix1 = Pointer.Read(reader); //
+			if (Settings.s.game != Settings.Game.RRush) {
+				off_matrix2 = Pointer.Read(reader);
+				short_28 = reader.ReadInt16();
+				short_2A = reader.ReadInt16();
+				short_2C = reader.ReadInt16();
+				short_2E = reader.ReadInt16();
+				short_30 = reader.ReadInt16();
+				short_32 = reader.ReadInt16();
+				short_34 = reader.ReadInt16();
+				short_36 = reader.ReadInt16();
+				if (isDynamic) {
+					uint_38 = reader.ReadUInt32();
+				} else {
+					off_38 = Pointer.Read(reader);
+				}
+				short_3C = reader.ReadInt16();
+				short_3E = reader.ReadInt16();
+				short_40 = reader.ReadInt16();
+				short_42 = reader.ReadInt16();
+				short_44 = reader.ReadInt16();
+				short_46 = reader.ReadInt16();
+				short_48 = reader.ReadInt16();
+				short_4A = reader.ReadInt16();
 			}
-			short_3C = reader.ReadInt16();
-			short_3E = reader.ReadInt16();
-			short_40 = reader.ReadInt16();
-			short_42 = reader.ReadInt16();
-			short_44 = reader.ReadInt16();
-			short_46 = reader.ReadInt16();
-			short_48 = reader.ReadInt16();
-			short_4A = reader.ReadInt16();
 
 			type = GetSOType(typeCode);
 			Load.print(typeCode + "|" + type + " - " + Offset + " - " + children.Count + " - " + dataIndex);

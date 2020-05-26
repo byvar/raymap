@@ -26,6 +26,8 @@ public class PS1PersoBehaviour : MonoBehaviour {
 
 	// Animation
 	LevelHeader h;
+	ActorFileHeader a1h;
+	ActorFileHeader a2h;
 	PS1Animation anim;
 	int animIndex = -1;
     bool forceAnimUpdate = false;
@@ -64,10 +66,18 @@ public class PS1PersoBehaviour : MonoBehaviour {
     public void Init() {
 		R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
 		h = l.levelHeader;
+		a1h = l.actor1Header;
+		a2h = l.actor2Header;
 		if (perso != null && perso.p3dData != null && perso.p3dData.family != null) {
 			Family fam = perso.p3dData.family;
 			if (fam.animations != null) {
-				State[] tempStates = h.states.pointers.Select(s => s.Value).ToArray();
+				PointerList<State> statePtrs = h.states;
+				if (a1h != null && perso.p3dData.HasFlag(Perso3dData.Perso3dDataFlags.Actor1)) {
+					statePtrs = a1h.states;
+				} else if (a2h != null && perso.p3dData.HasFlag(Perso3dData.Perso3dDataFlags.Actor2)) {
+					statePtrs = a2h.states;
+				}
+				State[] tempStates = statePtrs.pointers.Select(s => s.Value).ToArray();
 				int ind = (int)perso.p3dData.stateIndex;
 				int startInd = 0; // inclusive
 				int endInd = tempStates.Length; // exclusive
@@ -85,10 +95,11 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				}
 				states = new State[endInd - startInd];
 				Array.Copy(tempStates, startInd, states, 0, states.Length);
+				//states = tempStates;
 
 				stateNames = states.Select(s => ((s.anim == null) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}")).ToArray();
 				hasStates = true;
-				stateIndex = Array.IndexOf(states, h.states.pointers[perso.p3dData.stateIndex].Value);
+				stateIndex = Array.IndexOf(states, statePtrs.pointers[perso.p3dData.stateIndex].Value);
 				currentState = stateIndex;
 				SetState(stateIndex);
 			}
@@ -296,15 +307,20 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					AddChannelID(id, i);
 					channelNTTO[i] = ch.frames?.SelectMany(f => (f.ntto != null && f.ntto >= 1) ? new short[] { f.ntto.Value } : new short[0]).Distinct().ToArray();
 					subObjects[i] = new GameObject[channelNTTO[i] != null ? channelNTTO[i].Length : 0];
+					ObjectsTable geometricObjectsDynamic = h.geometricObjectsDynamic;
+					switch (anim.file_index) {
+						case 1: geometricObjectsDynamic = a1h?.geometricObjectsDynamic; break;
+						case 2: geometricObjectsDynamic = a2h?.geometricObjectsDynamic; break; 
+					}
 					for (int k = 0; k < subObjects[i].Length; k++) {
 						int j = (int)channelNTTO[i][k] - 1;
-						if (j == 0xFFFF || j < 0 || j > h.geometricObjectsDynamic.length.Value) {
+						if (j == 0xFFFF || j < 0 || j > geometricObjectsDynamic.length.Value) {
 							subObjects[i][k] = new GameObject();
 							subObjects[i][k].transform.parent = channelObjects[i].transform;
 							subObjects[i][k].name = "[" + j + "] Invisible NTTO";
 							subObjects[i][k].SetActive(false);
 						} else {
-							GameObject c = h.geometricObjectsDynamic.GetGameObject(j);
+							GameObject c = geometricObjectsDynamic.GetGameObject(j);
 							subObjects[i][k] = c;
 							/*if (entry.scale.HasValue) {
 								objectIndexScales[ntto.object_index] = new Vector3(entry.scale.Value.x, entry.scale.Value.z, entry.scale.Value.y);
@@ -385,6 +401,21 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				channelObjects[ch_child].transform.localScale = Vector3.one;
 				channelParents[ch_child] = true;
 			}
+			PS1AnimationVector[] animPositions = h.animPositions;
+			PS1AnimationQuaternion[] animRotations = h.animRotations;
+			PS1AnimationVector[] animScales = h.animScales;
+			switch (anim.file_index) {
+				case 1:
+					animPositions = a1h?.animPositions;
+					animRotations = a1h?.animRotations;
+					animScales = a1h?.animScales;
+					break;
+				case 2:
+					animPositions = a2h?.animPositions;
+					animRotations = a2h?.animRotations;
+					animScales = a2h?.animScales;
+					break;
+			}
 			for (int i = 0; i < anim.channels.Length; i++) {
 				PS1AnimationChannel ch = anim.channels[i];
 				if (ch.frames.Length < 1) continue;
@@ -454,23 +485,23 @@ public class PS1PersoBehaviour : MonoBehaviour {
 
 
 					if (posInd.HasValue) {
-						Vector3 pos = h.animPositions[posInd.Value].vector;
+						Vector3 pos = animPositions[posInd.Value].vector;
 						if (interpolation > 0f && nextKF.pos.HasValue) {
-							pos = Vector3.Lerp(pos, h.animPositions[nextKF.pos.Value].vector, interpolation);
+							pos = Vector3.Lerp(pos, animPositions[nextKF.pos.Value].vector, interpolation);
 						}
 						channelObjects[i].transform.localPosition = pos;
 					}
 					if (rotInd.HasValue) {
-						Quaternion rot = h.quaternions[rotInd.Value].quaternion;
+						Quaternion rot = animRotations[rotInd.Value].quaternion;
 						if (interpolation > 0f && nextKF.rot.HasValue) {
-							rot = Quaternion.Lerp(rot, h.quaternions[nextKF.rot.Value].quaternion, interpolation);
+							rot = Quaternion.Lerp(rot, animRotations[nextKF.rot.Value].quaternion, interpolation);
 						}
 						channelObjects[i].transform.localRotation = rot;
 					}
 					if (sclInd.HasValue) {
-						Vector3 scl = h.animScales[sclInd.Value].GetVector(factor: 256f * 16f);
+						Vector3 scl = animScales[sclInd.Value].GetVector(factor: 256f * 16f);
 						if (interpolation > 0f && nextKF.scl.HasValue) {
-							scl = Vector3.Lerp(scl, h.animScales[nextKF.scl.Value].GetVector(factor: 256f * 16f), interpolation);
+							scl = Vector3.Lerp(scl, animScales[nextKF.scl.Value].GetVector(factor: 256f * 16f), interpolation);
 						}
 
 							

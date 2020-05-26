@@ -21,7 +21,12 @@ namespace OpenSpace.FileFormat {
             length = stream.Length;
             headerOffset = baseAddress;
             baseOffset = -headerOffset;
-            reader = new Reader(stream, Settings.s.IsLittleEndian);
+            using (MemoryStream ms = new MemoryStream()) {
+                stream.CopyTo(ms);
+                ms.Position = 0;
+                data = ms.ToArray();
+            }
+            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
         }
 
         public override void CreateWriter() {
