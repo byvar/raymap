@@ -93,11 +93,17 @@ public class PS1PersoBehaviour : MonoBehaviour {
 						break;
 					}
 				}
-				states = new State[endInd - startInd];
-				Array.Copy(tempStates, startInd, states, 0, states.Length);
+				if (startInd >= endInd) {
+					states = new State[1];
+					states[0] = tempStates[ind];
+
+				} else {
+					states = new State[endInd - startInd];
+					Array.Copy(tempStates, startInd, states, 0, states.Length);
+				}
 				//states = tempStates;
 
-				stateNames = states.Select(s => ((s.anim == null) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}")).ToArray();
+				stateNames = states.Select(s => ((s.anim == null || s.anim.index >= fam.animations.Length) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}")).ToArray();
 				hasStates = true;
 				stateIndex = Array.IndexOf(states, statePtrs.pointers[perso.p3dData.stateIndex].Value);
 				currentState = stateIndex;

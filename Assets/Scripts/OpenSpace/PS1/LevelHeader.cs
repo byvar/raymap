@@ -82,16 +82,23 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_1D0;
 		public ushort ushort_1D2;
 		public Pointer off_1D4; // same offset as the first pointer in the first struct of off_1C4
-		public uint uint_1D8;
-		public Pointer off_1DC;
-		public Pointer off_1E0;
-		public Pointer off_1E4;
-		public Pointer off_1E8;
-		public Pointer off_1EC;
-		public Pointer off_1F0;
+		public uint num_ago_textures;
+		public Pointer off_ago_textures_pageInfo;
+		public Pointer off_ago_textures_palette;
+		public Pointer off_ago_textures_xInPage;
+		public Pointer off_ago_textures_yInPage;
+		public Pointer off_ago_textures_unk1;
+		public Pointer off_ago_textures_unk2;
 		public uint uint_1F4;
 		public uint uint_1F8;
 		public uint uint_1FC;
+
+		// Rush
+		public Pointer off_rush_114;
+		public ushort ushort_rush_118;
+		public ushort ushort_rush_11A;
+		public Pointer off_ago_textures_width;
+		public Pointer off_ago_textures_height;
 
 
 
@@ -224,7 +231,7 @@ namespace OpenSpace.PS1 {
 			num_sectors = reader.ReadUInt16(); // actual sectors
 											   //Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
 
-			if (Settings.s.game == Settings.Game.R2) {
+			if (Settings.s.game == Settings.Game.R2 || Settings.s.game == Settings.Game.RRush) {
 				ushort_1AA = reader.ReadUInt16();
 				uint_1AC = reader.ReadUInt32();
 				uint_1B0 = reader.ReadUInt32();
@@ -232,28 +239,42 @@ namespace OpenSpace.PS1 {
 				uint_1B8 = reader.ReadUInt32();
 				off_1BC = Pointer.Read(reader);
 				off_1C0 = Pointer.Read(reader);
+
+				if (Settings.s.game == Settings.Game.RRush) {
+					off_rush_114 = Pointer.Read(reader);
+					ushort_rush_118 = reader.ReadUInt16();
+					ushort_rush_11A = reader.ReadUInt16();
+				}
+
 				off_1C4 = Pointer.Read(reader);
 				uint_1C8 = reader.ReadUInt32();
 				uint_1CC = reader.ReadUInt32();
 				ushort_1D0 = reader.ReadUInt16();
 				ushort_1D2 = reader.ReadUInt16();
 				off_1D4 = Pointer.Read(reader);
-				uint_1D8 = reader.ReadUInt32();
-				off_1DC = Pointer.Read(reader);
-				off_1E0 = Pointer.Read(reader);
-				off_1E4 = Pointer.Read(reader);
-				off_1E8 = Pointer.Read(reader);
-				off_1EC = Pointer.Read(reader);
-				off_1F0 = Pointer.Read(reader);
-				uint_1F4 = reader.ReadUInt32();
-				uint_1F8 = reader.ReadUInt32();
-				uint_1FC = reader.ReadUInt32();
+				num_ago_textures = reader.ReadUInt32();
+				off_ago_textures_pageInfo = Pointer.Read(reader);
+				off_ago_textures_palette = Pointer.Read(reader);
+				off_ago_textures_xInPage = Pointer.Read(reader);
+				off_ago_textures_yInPage = Pointer.Read(reader);
+				off_ago_textures_unk1 = Pointer.Read(reader);
+				off_ago_textures_unk2 = Pointer.Read(reader);
+				if (Settings.s.game == Settings.Game.RRush) {
+					off_ago_textures_width = Pointer.Read(reader);
+					off_ago_textures_height = Pointer.Read(reader);
+					Load.print(Pointer.Current(reader));
+					ParseAGOTextures(reader);
+				} else {
+					uint_1F4 = reader.ReadUInt32();
+					uint_1F8 = reader.ReadUInt32();
+					uint_1FC = reader.ReadUInt32();
+					//ParseAGOTextures(reader);
+				}
 			}
 
 			// Parse
 			states = Load.FromOffsetOrRead<PointerList<State>>(reader, off_states, s => s.length = num_states);
 			persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
-			ParseSectors(reader);
 			geometricObjectsDynamic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_dynamic, onPreRead: t => t.length = num_geometricObjects_dynamic - 2);
 			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => {
 				if (Settings.s.game == Settings.Game.R2) t.length = num_ipos;
@@ -322,64 +343,73 @@ namespace OpenSpace.PS1 {
 				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex/" + t.name + ".png", t.texture.EncodeToPNG());
 			}
 		}
+		public void ParseAGOTextures(Reader reader) {
+			Load.print("Num AGO Textures: " + num_ago_textures);
 
-		public void ParseSectors(Reader reader) {
-			/*Pointer.DoAt(ref reader, off_sectors, () => {
-				for (int i = 0; i < count; i++) {
-					reader.ReadBytes(0x1c);
-					int x = reader.ReadInt32();
-					int y = reader.ReadInt32();
-					int z = reader.ReadInt32();
-					reader.ReadUInt32();
-					int x2 = reader.ReadInt32();
-					int y2 = reader.ReadInt32();
-					int z2 = reader.ReadInt32();
-					reader.ReadBytes(0x1c);
-					if (ipos[i] != null) {
-						GameObject g = ipos[i].CreateGAO();
-						g.transform.localPosition = new Vector3(x / 256f, z / 256f, y / 256f);
-						//g.transform.localEulerAngles = new Vector3(0f, -90f, 0f);
+			UITexture[] textures = new UITexture[num_ago_textures];
+			for (int i = 0; i < textures.Length; i++) {
+				textures[i] = new UITexture();
+			}
+			for (int i = 0; i < textures.Length; i++) {
+				textures[i].name = "Tex_" + i;
+			}
+			Pointer.DoAt(ref reader, off_ago_textures_pageInfo, () => {
+				for (int i = 0; i < textures.Length; i++) {
+					textures[i].pageInfo = reader.ReadUInt16();
+				}
+			});
+			Pointer.DoAt(ref reader, off_ago_textures_palette, () => {
+				for (int i = 0; i < textures.Length; i++) {
+					textures[i].palette = reader.ReadUInt16();
+				}
+			});
+			Pointer.DoAt(ref reader, off_ago_textures_xInPage, () => {
+				for (int i = 0; i < textures.Length; i++) {
+					textures[i].xInPage = reader.ReadByte();
+				}
+			});
+			Pointer.DoAt(ref reader, off_ago_textures_yInPage, () => {
+				for (int i = 0; i < textures.Length; i++) {
+					textures[i].yInPage = reader.ReadByte();
+				}
+			});
+			Pointer.DoAt(ref reader, off_ago_textures_unk1, () => {
+				for (int i = 0; i < textures.Length; i++) {
+					textures[i].unk1 = reader.ReadUInt16();
+				}
+			});
+			Pointer.DoAt(ref reader, off_ago_textures_unk2, () => {
+				for (int i = 0; i < textures.Length; i++) {
+					textures[i].unk2 = reader.ReadUInt16();
+				}
+			});
+			if (Settings.s.game == Settings.Game.RRush) {
+				Pointer.DoAt(ref reader, off_ago_textures_width, () => {
+					for (int i = 0; i < textures.Length; i++) {
+						textures[i].width = reader.ReadUInt16();
 					}
-
+				});
+				Pointer.DoAt(ref reader, off_ago_textures_height, () => {
+					for (int i = 0; i < textures.Length; i++) {
+						textures[i].height = reader.ReadUInt16();
+					}
+				});
+			} else {
+				for (int i = 0; i < textures.Length; i++) {
+					textures[i].width = (ushort)(((textures[i].unk1 & 0x0080) != 0) ? 0x40 : 0x20);
+					textures[i].height = textures[i].width;
 				}
-			});*/
-			/*Pointer.DoAt(ref reader, off_sector_minus_one_things, () => {
-				for (int i = 0; i < count; i++) {
-					ushort type = reader.ReadUInt16();
-					reader.ReadUInt16();
-					reader.ReadUInt16();
-					reader.ReadUInt16();
+			}
 
-					short x = reader.ReadInt16();
-					short y4 = reader.ReadInt16();
-					short x3 = reader.ReadInt16();
-					reader.ReadUInt16();
 
-					short y = reader.ReadInt16();
-					reader.ReadUInt16();
-					short y3 = reader.ReadInt16();
-					reader.ReadUInt16();
-
-					short z = reader.ReadInt16();
-					reader.ReadUInt16();
-					short z3 = reader.ReadInt16();
-					reader.ReadUInt16();
-
-					short x2 = reader.ReadInt16();
-					short y2 = reader.ReadInt16();
-					short z2 = reader.ReadInt16();
-					reader.ReadUInt16();
-
-					Pointer.Read(reader);
-					Pointer.Read(reader);
-					Pointer.Read(reader);
-					Pointer.Read(reader);
-					Pointer.Read(reader);
-
-					GameObject g = ipos[i].CreateGAO();
-					//g.transform.localPosition = new Vector3(x3 / 256f, 0f / 256f, y3 / 256f);
-				}
-			});*/
+			R2PS1Loader l = Load as R2PS1Loader;
+			PS1VRAM vram = l.vram;
+			for (int i = 0; i < textures.Length; i++) {
+				UITexture t = textures[i];
+				//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
+				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, t.xInPage, t.yInPage);
+				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex_2/" + Load.lvlName + "/" + t.name + ".png", t.texture.EncodeToPNG());
+			}
 		}
 
 		public class UITexture {
@@ -390,6 +420,9 @@ namespace OpenSpace.PS1 {
 			public ushort palette;
 			public byte xInPage;
 			public byte yInPage;
+
+			public ushort unk1;
+			public ushort unk2;
 
 			public Texture2D texture;
 		}

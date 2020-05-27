@@ -34,6 +34,8 @@ namespace OpenSpace.Loader {
 		PS1GameInfo.File.MemoryBlock mainMemoryBlock;
 
 		// Actor
+		public string actor1Name;
+		public string actor2Name;
 		public int Actor1Index { get; private set; } = 0;
 		public int Actor2Index { get; private set; } = 1;
 		private FileWithPointers actor1File;
@@ -61,6 +63,8 @@ namespace OpenSpace.Loader {
 				//RipRHRLoc();
 				game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
+				Actor1Index = Array.IndexOf(game.actors, actor1Name);
+				Actor2Index = Array.IndexOf(game.actors, actor2Name);
 				files_array = new FileWithPointers[0];
 				await LoadAllDataFromDAT(game);
 				//await ExtractAllFiles(game);
@@ -239,7 +243,11 @@ namespace OpenSpace.Loader {
 
 			// Done reading here
 			if (mainMemoryBlock.overlay_cine.size > 0) {
-				string levelDir = gameDataBinFolder + lvlName + "/";
+				PS1GameInfo.File file = game.files.FirstOrDefault(f => f.fileID == 0);
+				string levelDir = gameDataBinFolder + file.bigfile + "/";
+				levelDir += (CurrentLevel < game.maps.Length ? game.maps[CurrentLevel] : (file.bigfile + "_" + CurrentLevel)) + "/";
+
+				//string levelDir = gameDataBinFolder + lvlName + "/";
 				uint cineDataBaseAddress = levelHeader.off_animPositions.offset;
 				files_array[files_array.Length-1] = new PS1Data("overlay_cine.img", levelDir + "overlay_cine.img", files_array.Length - 1,
 								cineDataBaseAddress + 0x1f800u + 0x32 * 0xc00);
@@ -310,6 +318,11 @@ namespace OpenSpace.Loader {
 		public async Task LoadDataFromDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
 			if (CurrentLevel < 0 || CurrentLevel >= fileInfo.memoryBlocks.Length) return;
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
+			if (b.loadActor
+				&& (Actor1Index < 0 || Actor2Index < 0
+				|| Actor1Index >= gameInfo.actors.Length || Actor2Index >= gameInfo.actors.Length)) {
+				throw new Exception("Actor could not be found");
+			}
 			if (!b.inEngine) return;
 			string bigFile = fileInfo.bigfile;
 			string bigFilePath = gameDataBinFolder + bigFile + "." + fileInfo.extension;
@@ -748,7 +761,7 @@ namespace OpenSpace.Loader {
 				tex.wrapMode = TextureWrapMode.Clamp;
                 b.texture = tex;
                 if (exportTextures) {
-                    Util.ByteArrayToFile(gameDataBinFolder + "test_tex/" + lvlName + "/" + i++ + $"_{b.xMin}_{b.yMin}_{w}_{h}" + ".png", tex.EncodeToPNG());
+                    Util.ByteArrayToFile(gameDataBinFolder + "test_tex/" + lvlName + "/" + i++ + $"_{string.Format("{0:X4}",b.pageInfo)}_{b.xMin}_{b.yMin}_{w}_{h}" + ".png", tex.EncodeToPNG());
                 }
             }
         }

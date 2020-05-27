@@ -47,6 +47,32 @@ namespace OpenSpace {
 
             return translatedResult;
         }
+        public List<string> Sort(List<string> levels) {
+            List<string> result = new List<string>(levels);
+            result = result.OrderBy((l) => {
+                return items.IndexOf(items.Find(m => { return m.Item1.ToLower() == l.ToLower(); }));
+            }).ToList();
+
+            return result;
+        }
+        public List<string> Translate(List<string> levels) {
+            List<string> result = new List<string>(levels);
+            List<string> translatedResult = new List<string>();
+
+            result.ForEach((l) => {
+                translatedResult.Add(Translate(l));
+            });
+
+            return translatedResult;
+        }
+        public string Translate(string level) {
+            int itemIndex = items.FindIndex(m => { return m.Item1.ToLower() == level.ToLower(); });
+            if(itemIndex != -1) {
+                return items[itemIndex].Item2 + " <" + level + ">";
+            } else {
+                return level;
+            }
+        }
 
         public static LevelTranslation levelTranslation_r2 = new LevelTranslation(new List<(string, string)>() {
             ("MENU", "Main Menu"),

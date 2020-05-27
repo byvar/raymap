@@ -9,6 +9,7 @@ namespace OpenSpace.PS1 {
 	public class PS1GameInfo {
 		public File[] files;
 		public string[] maps;
+		public string[] actors = new string[0];
 		public Dictionary<string, string[]> cines;
 		public string mainFile;
 		public uint actor1Address;
@@ -624,6 +625,18 @@ namespace OpenSpace.PS1 {
 				"pirate1",
 				"pirate2",
 				"mainmenu",
+			},
+			actors = new string[] {
+				"rayman",
+				"globox",
+				"hunchman",
+				"raz",
+				"tily",
+				"mhunch",
+				"wife",
+				"mglobette",
+				"menubox1",
+				"menubox2"
 			},
 			actor1Address = 0x80165000,
 			actor2Address = 0x80190C00,

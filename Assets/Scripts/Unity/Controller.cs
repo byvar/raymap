@@ -76,6 +76,8 @@ public class Controller : MonoBehaviour {
 		string modeString = "";
 		string gameDataBinFolder = "";
 		string lvlName = "";
+		string actor1Name = "";
+		string actor2Name = "";
 		Settings.Mode mode = Settings.Mode.Rayman2PC;
 
 		if (Application.platform == RuntimePlatform.WebGLPlayer) {
@@ -90,13 +92,8 @@ public class Controller : MonoBehaviour {
         mode = UnitySettings.GameMode;
 		gameDataBinFolder = UnitySettings.GameDirs.ContainsKey(mode) ? UnitySettings.GameDirs[mode] : "";
 		lvlName = UnitySettings.MapName;
-
-        if (lvlName != null) {
-            var matches = new Regex("<[^>]+>").Matches(lvlName);
-            if (matches.Count > 0) {
-                lvlName = matches[0].Value.Substring(1, matches[0].Length - 2); // Extract levelname from <levelname>
-            }
-        }
+		actor1Name = UnitySettings.Actor1Name;
+		actor2Name = UnitySettings.Actor2Name;
 
         ExportPath = UnitySettings.ExportPath;
 		ExportAfterLoad = UnitySettings.ExportAfterLoad;
@@ -127,6 +124,16 @@ public class Controller : MonoBehaviour {
 				case "--mode":
 				case "-m":
 					modeString = args[i + 1];
+					i++;
+					break;
+				case "--actor1":
+				case "-a1":
+					actor1Name = args[i + 1];
+					i++;
+					break;
+				case "--actor2":
+				case "-a2":
+					actor2Name = args[i + 1];
 					i++;
 					break;
 				case "--export":
@@ -174,6 +181,14 @@ public class Controller : MonoBehaviour {
 								case "directory":
 								case "dir":
 									gameDataBinFolder = argKeyVal[1]; break;
+								case "actor1":
+								case "act1":
+								case "a1":
+									actor1Name = argKeyVal[1]; break;
+								case "actor2":
+								case "act2":
+								case "a2":
+									actor2Name = argKeyVal[1]; break;
 							}
 						}
 					}
@@ -200,6 +215,11 @@ public class Controller : MonoBehaviour {
 		loader.blockyMode = UnitySettings.BlockyMode;
 		loader.exportTextures = UnitySettings.SaveTextures;
 		ExportText = UnitySettings.ExportText;
+
+		if (loader is R2PS1Loader) {
+			(loader as R2PS1Loader).actor1Name = actor1Name;
+			(loader as R2PS1Loader).actor2Name = actor2Name;
+		}
 
 		await Init();
 	}

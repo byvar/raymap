@@ -21,12 +21,17 @@ public class UnitySettings {
     public static string MapName { get; set; }
 	public static string ProcessName { get; set; }
 
+	// PS1
+	public static string Actor1Name { get; set; }
+	public static string Actor2Name { get; set; }
+
 	// Misc
 	public static string ScreenshotPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/Raymap/";
 	public static bool LoadFromMemory { get; set; }
 	public static bool AllowDeadPointers { get; set; }
 	public static bool ForceDisplayBackfaces { get; set; }
 	public static bool BlockyMode { get; set; }
+	public static bool UseLevelTranslation { get; set; } = true;
 
 	// Export
 	public static bool ExportText { get; set; }
@@ -66,6 +71,10 @@ public class UnitySettings {
 		GameMode = Enum.TryParse(modeString, out Settings.Mode gameMode) ? gameMode : GameMode;
 		MapName = s.SerializeString("MapName", MapName);
 
+		// PS1
+		Actor1Name = s.SerializeString("Actor1Name", Actor1Name);
+		Actor2Name = s.SerializeString("Actor2Name", Actor2Name);
+
 		// Memory loading
 		ProcessName = s.SerializeString("ProcessName", ProcessName);
 		LoadFromMemory = s.SerializeBool("LoadFromMemory", LoadFromMemory);
@@ -83,6 +92,7 @@ public class UnitySettings {
 		BlockyMode = s.SerializeBool("BlockyMode", BlockyMode);
 		SaveTextures = s.SerializeBool("SaveTextures", SaveTextures);
 		ExportText = s.SerializeBool("ExportText", ExportText);
+		UseLevelTranslation = s.SerializeBool("UseLevelTranslation", UseLevelTranslation);
 	}
 
 
@@ -123,6 +133,7 @@ public class UnitySettings {
 	private interface ISerializer {
 		string SerializeString(string key, string value);
 		bool SerializeBool(string key, bool value);
+		int SerializeInt(string key, int value);
 	}
 
 #if UNITY_EDITOR
@@ -134,6 +145,10 @@ public class UnitySettings {
 		public string SerializeString(string key, string value) {
 			return UnityEditor.EditorPrefs.GetString(editorPrefsPrefix + key, value);
 		}
+
+		public int SerializeInt(string key, int value) {
+			return UnityEditor.EditorPrefs.GetInt(editorPrefsPrefix + key, value);
+		}
 	}
 
 	private class EditorWriteSerializer : ISerializer {
@@ -144,6 +159,11 @@ public class UnitySettings {
 
 		public string SerializeString(string key, string value) {
 			UnityEditor.EditorPrefs.SetString(editorPrefsPrefix + key, value);
+			return value;
+		}
+
+		public int SerializeInt(string key, int value) {
+			UnityEditor.EditorPrefs.SetInt(editorPrefsPrefix + key, value);
 			return value;
 		}
 	}
@@ -165,6 +185,11 @@ public class UnitySettings {
 		}
 
 		public string SerializeString(string key, string value) {
+			writer.WriteLine(key + "=" + value.ToString());
+			return value;
+		}
+
+		public int SerializeInt(string key, int value) {
 			writer.WriteLine(key + "=" + value.ToString());
 			return value;
 		}
@@ -195,6 +220,15 @@ public class UnitySettings {
 		public string SerializeString(string key, string value) {
 			if (settings.ContainsKey(key)) {
 				return settings[key];
+			}
+			return value;
+		}
+
+		public int SerializeInt(string key, int value) {
+			if (settings.ContainsKey(key)) {
+				if (int.TryParse(settings[key], out int i)) {
+					return i;
+				}
 			}
 			return value;
 		}

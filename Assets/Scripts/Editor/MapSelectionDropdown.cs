@@ -26,6 +26,7 @@ class MapSelectionDropdown : AdvancedDropdown {
 	public string directory;
 	public Settings.Mode mode;
 	public string[] files;
+	public string[] translatedFiles;
 	public string name;
 	//public SerializedProperty property;
 
@@ -34,7 +35,17 @@ class MapSelectionDropdown : AdvancedDropdown {
 	}
 	public MapSelectionDropdown(AdvancedDropdownState state, string directory) : this(state) {
 		this.directory = directory;
-		files = FindFiles().ToArray();
+		BuildFileList();
+	}
+
+	private void BuildFileList() {
+		List<string> filesUnprocessed = FindFiles();
+		List<string> filesSorted = filesUnprocessed;
+		if (UnitySettings.UseLevelTranslation && Settings.s.levelTranslation != null) {
+			filesSorted = Settings.s.levelTranslation.Sort(filesSorted);
+			translatedFiles = Settings.s.levelTranslation.Translate(filesSorted).ToArray();
+		}
+		files = filesSorted.ToArray();
 	}
 
 	private List<string> FindFiles() {
@@ -103,9 +114,6 @@ class MapSelectionDropdown : AdvancedDropdown {
 			);
 		}
 
-        if (Settings.s.levelTranslation!=null)
-            output = Settings.s.levelTranslation.SortAndTranslate(output);
-
 		// Return the output
 		return output;
 	}
@@ -113,13 +121,13 @@ class MapSelectionDropdown : AdvancedDropdown {
 	protected override AdvancedDropdownItem BuildRoot() {
 		var root = new AdvancedDropdownItem(name);
 		for (int i = 0; i < files.Length; i++) {
-			Add(root, files[i], files[i], i);
+			Add(root, files[i], files[i], translatedFiles?[i], i);
 		}
 
 		return root;
 	}
 
-	protected void Add(AdvancedDropdownItem parent, string path, string fullPath, int id) {
+	protected void Add(AdvancedDropdownItem parent, string path, string fullPath, string translation, int id) {
 		if (path.Contains("/")) {
 			// Folder
 			string folder = path.Substring(0, path.IndexOf("/"));
@@ -129,10 +137,10 @@ class MapSelectionDropdown : AdvancedDropdown {
 				folderNode = new AdvancedDropdownItem(folder);
 				parent.AddChild(folderNode);
 			}
-			Add(folderNode, rest, fullPath, id);
+			Add(folderNode, rest, fullPath, translation, id);
 		} else {
 			// File
-			parent.AddChild(new AdvancedDropdownItem(path) {
+			parent.AddChild(new AdvancedDropdownItem(translation ?? path) {
 				id = id
 			});
 		}

@@ -43,6 +43,9 @@ public class UnityWindowSettings : UnityWindow {
 		string buttonString = "No map selected";
 		if (!string.IsNullOrEmpty(UnitySettings.MapName)) {
 			buttonString = UnitySettings.MapName;
+			if (UnitySettings.UseLevelTranslation && Settings.settingsDict[UnitySettings.GameMode].levelTranslation != null) {
+				buttonString = Settings.settingsDict[UnitySettings.GameMode].levelTranslation.Translate(UnitySettings.MapName);
+			}
 		}
 		Rect rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
 		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Map name"));
@@ -64,20 +67,74 @@ public class UnityWindowSettings : UnityWindow {
 					extension += ".ckd";
 				}*/
 
-				if (Dropdown == null || Dropdown.directory != directory || Dropdown.mode != UnitySettings.GameMode) {
-					Dropdown = new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), directory) {
+				if (MapDropdown == null || MapDropdown.directory != directory || MapDropdown.mode != UnitySettings.GameMode) {
+					MapDropdown = new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), directory) {
 						name = "Maps",
 						mode = UnitySettings.GameMode
 					};
 				}
-				Dropdown.Show(rect);
+				MapDropdown.Show(rect);
 			}
 			EditorGUI.EndDisabledGroup();
 		}
-		if (Dropdown != null && Dropdown.selection != null) {
-			UnitySettings.MapName = Dropdown.selection;
-			Dropdown.selection = null;
+		if (MapDropdown != null && MapDropdown.selection != null) {
+			UnitySettings.MapName = MapDropdown.selection;
+			MapDropdown.selection = null;
 			Dirty = true;
+		}
+		if (Settings.settingsDict[UnitySettings.GameMode].platform == Settings.Platform.PS1) {
+			if (OpenSpace.PS1.PS1GameInfo.Games.ContainsKey(UnitySettings.GameMode) && OpenSpace.PS1.PS1GameInfo.Games[UnitySettings.GameMode].actors?.Length > 0) {
+				rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
+				rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 1"));
+				buttonString = "No actor selected";
+				if (!string.IsNullOrEmpty(UnitySettings.Actor1Name)) {
+					buttonString = UnitySettings.Actor1Name;
+				}
+				if (fileMode == FileSystem.Mode.Web) {
+					UnitySettings.Actor1Name = EditorGUI.TextField(rect, UnitySettings.Actor1Name);
+				} else {
+					EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
+					if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
+						if (ActorDropdown1 == null || ActorDropdown1.mode != UnitySettings.GameMode) {
+							ActorDropdown1 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode) {
+								name = "Actors"
+							};
+						}
+						ActorDropdown1.Show(rect);
+					}
+					EditorGUI.EndDisabledGroup();
+				}
+				if (ActorDropdown1 != null && ActorDropdown1.selection != null) {
+					UnitySettings.Actor1Name = ActorDropdown1.selection;
+					ActorDropdown1.selection = null;
+					Dirty = true;
+				}
+				rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
+				rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 2"));
+				buttonString = "No actor selected";
+				if (!string.IsNullOrEmpty(UnitySettings.Actor2Name)) {
+					buttonString = UnitySettings.Actor2Name;
+				}
+				if (fileMode == FileSystem.Mode.Web) {
+					UnitySettings.Actor2Name = EditorGUI.TextField(rect, UnitySettings.Actor2Name);
+				} else {
+					EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
+					if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
+						if (ActorDropdown2 == null || ActorDropdown2.mode != UnitySettings.GameMode) {
+							ActorDropdown2 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode) {
+								name = "Actors"
+							};
+						}
+						ActorDropdown2.Show(rect);
+					}
+					EditorGUI.EndDisabledGroup();
+				}
+				if (ActorDropdown2 != null && ActorDropdown2.selection != null) {
+					UnitySettings.Actor2Name = ActorDropdown2.selection;
+					ActorDropdown2.selection = null;
+					Dirty = true;
+				}
+			}
 		}
 		if (fileMode != FileSystem.Mode.Web) {
 			rect = GetNextRect(ref yPos);
@@ -134,6 +191,8 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.BlockyMode = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Blocky Mode"), UnitySettings.BlockyMode);
 		UnitySettings.SaveTextures = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Save Textures"), UnitySettings.SaveTextures);
 		UnitySettings.ExportText = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Export Text"), UnitySettings.ExportText);
+		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
+
 
 
 		totalyPos = yPos;
@@ -158,7 +217,9 @@ public class UnityWindowSettings : UnityWindow {
 	/// <summary>
 	/// The file selection dropdown
 	/// </summary>
-	private MapSelectionDropdown Dropdown { get; set; }
+	private MapSelectionDropdown MapDropdown { get; set; }
+	private PS1ActorSelectionDropdown ActorDropdown1 { get; set; }
+	private PS1ActorSelectionDropdown ActorDropdown2 { get; set; }
 
 	private float totalyPos = 0f;
 	private Vector2 scrollPosition = Vector2.zero;
