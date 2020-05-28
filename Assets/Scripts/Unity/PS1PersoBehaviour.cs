@@ -81,6 +81,10 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				int ind = (int)perso.p3dData.stateIndex;
 				int startInd = 0; // inclusive
 				int endInd = tempStates.Length; // exclusive
+				if (ind >= tempStates.Length) {
+					ind = 0;
+				}
+				int stateInd = ind;
 				for (int i = ind; i >= 0; i--) {
 					if (tempStates[i].anim != null && tempStates[i].anim.index >= fam.animations.Length) {
 						startInd = i + 1;
@@ -93,19 +97,23 @@ public class PS1PersoBehaviour : MonoBehaviour {
 						break;
 					}
 				}
-				if (startInd >= endInd) {
-					states = new State[1];
-					states[0] = tempStates[ind];
-
-				} else {
-					states = new State[endInd - startInd];
-					Array.Copy(tempStates, startInd, states, 0, states.Length);
+				if (startInd > endInd) {
+					startInd = endInd;
 				}
-				//states = tempStates;
-
-				stateNames = states.Select(s => ((s.anim == null || s.anim.index >= fam.animations.Length) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}")).ToArray();
+				states = new State[endInd - startInd];
+				Array.Copy(tempStates, startInd, states, 0, states.Length);
+				stateNames = new string[states.Length + 1 + fam.animations.Length];
+				stateNames[0] = "Null";
+				for (int i = 0; i < states.Length; i++) {
+					State s = states[i];
+					stateNames[i + 1] = (s.anim == null || s.anim.index >= fam.animations.Length) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}";
+				}
+				for (int i = 0; i < fam.animations.Length; i++) {
+					stateNames[i + 1 + states.Length] = "(Animation only) " + fam.animations[i].name;
+				}
 				hasStates = true;
-				stateIndex = Array.IndexOf(states, statePtrs.pointers[perso.p3dData.stateIndex].Value);
+				stateIndex = Array.IndexOf(states, statePtrs.pointers[stateInd].Value);
+				stateIndex++; // After null
 				currentState = stateIndex;
 				SetState(stateIndex);
 			}
@@ -114,17 +122,21 @@ public class PS1PersoBehaviour : MonoBehaviour {
     }
 
 	public string GetStateName(State state) {
-		int ind = Array.IndexOf(states, state);
-		if (ind >= 0) {
+		int ind = GetStateIndex(state);
+		if (ind >= 1) {
 			return stateNames[ind];
 		} else {
 			return null;
 		}
-
 	}
 
-    #region Print debug info
-    public void PrintAnimationDebugInfo() {
+	public int GetStateIndex(State state) {
+		int ind = Array.IndexOf(states, state);
+		return ind + 1;
+	}
+
+	#region Print debug info
+	public void PrintAnimationDebugInfo() {
 		if (IsLoaded && hasStates) { }
     }
 	#endregion
@@ -204,11 +216,21 @@ public class PS1PersoBehaviour : MonoBehaviour {
 	public void SetState(int index) {
 		Family fam = perso.p3dData.family;
 		//stateNames = states.Select(s => (s.Value == null ? "Null" : "State " + s.Value.Index)).ToArray();
-		if (index < 0 || index >= states.Length) return;
+		if (index < 0 || index >= stateNames.Length) return;
 		stateIndex = index;
 		currentState = index;
-		state = states[index];
-        SetState(state);
+		if (index < 1) {
+			state = null;
+			UpdateViewCollision(controller.viewCollision);
+			LoadNewAnimation(-1);
+		} else if (index < 1 + states.Length) {
+			state = states[index - 1];
+			SetState(state);
+		} else {
+			state = null;
+			UpdateViewCollision(controller.viewCollision);
+			LoadNewAnimation(index - 1 - states.Length);
+		}
     }
 
     // Update is called once per frame
@@ -721,7 +743,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
             if (state_auto != null) {
 				//int indexOfStateAuto = Array.IndexOf(stateNames, state_auto.ToString());
 				int indexOfStateAuto = Array.IndexOf(states, state_auto);
-				if (indexOfStateAuto > -1) SetState(indexOfStateAuto);
+				if (indexOfStateAuto > -1) SetState(1 + indexOfStateAuto);
             }
         }
     }

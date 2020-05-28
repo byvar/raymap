@@ -19,6 +19,10 @@ namespace OpenSpace.PS1 {
 		public uint uint_74;
 		public uint stateIndex;
 
+		// Rush
+		public Pointer off_6C;
+		public Pointer off_74;
+
 		// Parsed
 		public Family family;
 
@@ -27,18 +31,23 @@ namespace OpenSpace.PS1 {
 			//Load.print(Offset);
 			flags = reader.ReadUInt32();
 			off_family = Pointer.Read(reader);
-			if (Settings.s.game == Settings.Game.R2) {
+			if (Settings.s.game == Settings.Game.R2 || Settings.s.game == Settings.Game.RRush) {
 				reader.ReadBytes(0x50); // TODO
 				off_58 = Pointer.Read(reader);
 				ushort_5C = reader.ReadUInt16();
 				short_5E = reader.ReadInt16();
 				off_animationBuffer = Pointer.Read(reader);
-				Load.print(Pointer.Current(reader));
 				off_64 = Pointer.Read(reader);
 				off_68 = Pointer.Read(reader);
-				uint_6C = reader.ReadUInt32();
-				uint_70 = reader.ReadUInt32();
-				uint_74 = reader.ReadUInt32();
+				if (Settings.s.game == Settings.Game.RRush) {
+					off_6C = Pointer.Read(reader);
+					uint_70 = reader.ReadUInt32();
+					off_74 = Pointer.Read(reader);
+				} else {
+					uint_6C = reader.ReadUInt32();
+					uint_70 = reader.ReadUInt32();
+					uint_74 = reader.ReadUInt32();
+				}
 				stateIndex = reader.ReadUInt32();
 				reader.ReadBytes(0x28); // TODO
 			}

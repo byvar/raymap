@@ -761,7 +761,7 @@ namespace OpenSpace.Loader {
 				tex.wrapMode = TextureWrapMode.Clamp;
                 b.texture = tex;
                 if (exportTextures) {
-                    Util.ByteArrayToFile(gameDataBinFolder + "test_tex/" + lvlName + "/" + i++ + $"_{string.Format("{0:X4}",b.pageInfo)}_{b.xMin}_{b.yMin}_{w}_{h}" + ".png", tex.EncodeToPNG());
+                    Util.ByteArrayToFile(gameDataBinFolder + "textures/main/" + lvlName + "/" + i++ + $"_{string.Format("{0:X4}",b.pageInfo)}_{b.xMin}_{b.yMin}_{w}_{h}" + ".png", tex.EncodeToPNG());
                 }
             }
         }

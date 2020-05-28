@@ -340,7 +340,7 @@ namespace OpenSpace.PS1 {
 				UITexture t = textures[i];
 				//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
 				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, t.xInPage, t.yInPage);
-				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex/" + t.name + ".png", t.texture.EncodeToPNG());
+				Util.ByteArrayToFile(l.gameDataBinFolder + "textures/ui/" + t.name + ".png", t.texture.EncodeToPNG());
 			}
 		}
 		public void ParseAGOTextures(Reader reader) {
@@ -408,7 +408,7 @@ namespace OpenSpace.PS1 {
 				UITexture t = textures[i];
 				//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
 				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, t.xInPage, t.yInPage);
-				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex_2/" + Load.lvlName + "/" + t.name + ".png", t.texture.EncodeToPNG());
+				Util.ByteArrayToFile(l.gameDataBinFolder + "textures/ago/" + Load.lvlName + "/" + t.name + ".png", t.texture.EncodeToPNG());
 			}
 		}
 

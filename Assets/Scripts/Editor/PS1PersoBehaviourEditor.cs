@@ -97,13 +97,15 @@ public class PS1PersoBehaviourEditor : Editor {
 				if (stateToGo == null || targetState == null) continue;
 				string targetStateName = pb.GetStateName(targetState);
 				string stateToGoName = pb.GetStateName(stateToGo);
-				tr.Add(new StateTransitionsTreeElement("State transition " + targetStateName, 0, id) {
-					stateToGoName = stateToGoName,
-					stateToGoIndex = Array.IndexOf(states,stateToGo),
-					targetStateName = targetStateName,
-					targetStateIndex = Array.IndexOf(states, targetState),
-					linkingType = 0
-				});
+				if (targetStateName != null && stateToGoName != null) {
+					tr.Add(new StateTransitionsTreeElement("State transition " + targetStateName, 0, id) {
+						stateToGoName = stateToGoName,
+						stateToGoIndex = pb.GetStateIndex(stateToGo),
+						targetStateName = targetStateName,
+						targetStateIndex = pb.GetStateIndex(targetState),
+						linkingType = 0
+					});
+				}
 				id++;
 			}
 		}
