@@ -87,8 +87,8 @@ namespace OpenSpace.PS1 {
 		public Pointer off_ago_textures_palette;
 		public Pointer off_ago_textures_xInPage;
 		public Pointer off_ago_textures_yInPage;
-		public Pointer off_ago_textures_unk1;
-		public Pointer off_ago_textures_unk2;
+		public Pointer off_ago_textures_globalX;
+		public Pointer off_ago_textures_globalY;
 		public uint uint_1F4;
 		public uint uint_1F8;
 		public uint uint_1FC;
@@ -257,8 +257,8 @@ namespace OpenSpace.PS1 {
 				off_ago_textures_palette = Pointer.Read(reader);
 				off_ago_textures_xInPage = Pointer.Read(reader);
 				off_ago_textures_yInPage = Pointer.Read(reader);
-				off_ago_textures_unk1 = Pointer.Read(reader);
-				off_ago_textures_unk2 = Pointer.Read(reader);
+				off_ago_textures_globalX = Pointer.Read(reader);
+				off_ago_textures_globalY = Pointer.Read(reader);
 				if (Settings.s.game == Settings.Game.RRush) {
 					off_ago_textures_width = Pointer.Read(reader);
 					off_ago_textures_height = Pointer.Read(reader);
@@ -268,7 +268,7 @@ namespace OpenSpace.PS1 {
 					uint_1F4 = reader.ReadUInt32();
 					uint_1F8 = reader.ReadUInt32();
 					uint_1FC = reader.ReadUInt32();
-					//ParseAGOTextures(reader);
+					ParseAGOTextures(reader);
 				}
 			}
 
@@ -288,6 +288,7 @@ namespace OpenSpace.PS1 {
 		}
 
 		public void ParseUITextures(Reader reader) {
+			if (!Load.exportTextures) return;
 			Load.print("Num UI Textures: " + num_ui_textures);
 
 			UITexture[] textures = new UITexture[num_ui_textures];
@@ -340,10 +341,11 @@ namespace OpenSpace.PS1 {
 				UITexture t = textures[i];
 				//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
 				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, t.xInPage, t.yInPage);
-				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex/" + t.name + ".png", t.texture.EncodeToPNG());
+				Util.ByteArrayToFile(l.gameDataBinFolder + "textures/ui/" + t.name + ".png", t.texture.EncodeToPNG());
 			}
 		}
 		public void ParseAGOTextures(Reader reader) {
+			if (!Load.exportTextures) return;
 			Load.print("Num AGO Textures: " + num_ago_textures);
 
 			UITexture[] textures = new UITexture[num_ago_textures];
@@ -373,14 +375,14 @@ namespace OpenSpace.PS1 {
 					textures[i].yInPage = reader.ReadByte();
 				}
 			});
-			Pointer.DoAt(ref reader, off_ago_textures_unk1, () => {
+			Pointer.DoAt(ref reader, off_ago_textures_globalX, () => {
 				for (int i = 0; i < textures.Length; i++) {
-					textures[i].unk1 = reader.ReadUInt16();
+					textures[i].globalX = reader.ReadUInt16();
 				}
 			});
-			Pointer.DoAt(ref reader, off_ago_textures_unk2, () => {
+			Pointer.DoAt(ref reader, off_ago_textures_globalY, () => {
 				for (int i = 0; i < textures.Length; i++) {
-					textures[i].unk2 = reader.ReadUInt16();
+					textures[i].globalY = reader.ReadUInt16();
 				}
 			});
 			if (Settings.s.game == Settings.Game.RRush) {
@@ -394,11 +396,6 @@ namespace OpenSpace.PS1 {
 						textures[i].height = reader.ReadUInt16();
 					}
 				});
-			} else {
-				for (int i = 0; i < textures.Length; i++) {
-					textures[i].width = (ushort)(((textures[i].unk1 & 0x0080) != 0) ? 0x40 : 0x20);
-					textures[i].height = textures[i].width;
-				}
 			}
 
 
@@ -406,9 +403,36 @@ namespace OpenSpace.PS1 {
 			PS1VRAM vram = l.vram;
 			for (int i = 0; i < textures.Length; i++) {
 				UITexture t = textures[i];
-				//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
-				t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, t.xInPage, t.yInPage);
-				Util.ByteArrayToFile(l.gameDataBinFolder + "ui_tex_2/" + Load.lvlName + "/" + t.name + ".png", t.texture.EncodeToPNG());
+				if (t.width != 0) {
+					//Load.print(t.name + " - " + t.width + " - " + t.height + " - " + t.xInPage + " - " + t.yInPage);
+					t.texture = vram.GetTexture(t.width, t.height, t.pageInfo, t.palette, t.xInPage, t.yInPage);
+					Util.ByteArrayToFile(l.gameDataBinFolder + "textures/ago/" + Load.lvlName + "/"
+						+ $"{t.name}.png", t.texture.EncodeToPNG());
+				} else {
+					// Uncomment to extract AGO textures with hardcoded width & height
+					/*int tp = Util.ExtractBits(t.pageInfo, 2, 7); // 0: 4-bit, 1: 8-bit, 2: 15-bit direct
+					int pageW = 64;
+					if (tp == 1) {
+						pageW = 128;
+					} else if (tp == 0) {
+						pageW = 256;
+					}
+					int maxW = pageW - t.xInPage;
+					int maxH = 256 - t.yInPage;
+					for (int x = 0; x < 5; x++) {
+						ushort w = (ushort)(0x10 << x);
+						if (w > maxW) continue;
+						for (int y = 0; y < 5; y++) {
+							ushort h = (ushort)(0x10 << y);
+							if (h > maxH) continue;
+							try {
+								t.texture = vram.GetTexture(w, h, t.pageInfo, t.palette, t.xInPage, t.yInPage);
+								Util.ByteArrayToFile(l.gameDataBinFolder + "textures/ago/" + Load.lvlName + "/"
+									+ $"{t.name}_{w}x{h}.png", t.texture.EncodeToPNG());
+							} catch { }
+						}
+					}*/
+				}
 			}
 		}
 
@@ -421,8 +445,8 @@ namespace OpenSpace.PS1 {
 			public byte xInPage;
 			public byte yInPage;
 
-			public ushort unk1;
-			public ushort unk2;
+			public ushort globalX;
+			public ushort globalY;
 
 			public Texture2D texture;
 		}

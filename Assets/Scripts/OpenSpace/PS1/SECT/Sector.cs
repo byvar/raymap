@@ -11,7 +11,7 @@ namespace OpenSpace.PS1 {
 		public Pointer off_neighbors;
 		public Pointer off_sectors_unk1;
 		public Pointer off_sectors_unk2;
-		public Pointer off_sectors_unk3;
+		public Pointer off_10;
 		public Pointer off_ipos;
 		public Pointer off_18;
 		public int minX;
@@ -43,7 +43,6 @@ namespace OpenSpace.PS1 {
 		public NeighborSector[] neighbors;
 		public NeighborSector[] sectors_unk1;
 		public NeighborSector[] sectors_unk2;
-		public NeighborSector[] sectors_unk3;
 
 		protected override void ReadInternal(Reader reader) {
 			Load.print("Sector @ " + Offset);
@@ -56,7 +55,7 @@ namespace OpenSpace.PS1 {
 			}
 			off_sectors_unk1 = Pointer.Read(reader);
 			off_sectors_unk2 = Pointer.Read(reader);
-			off_sectors_unk3 = Pointer.Read(reader);
+			off_10 = Pointer.Read(reader);
 			off_ipos = Pointer.Read(reader);
 			if (Settings.s.game != Settings.Game.R2 && Settings.s.game != Settings.Game.RRush) {
 				int_50 = reader.ReadInt32();
@@ -118,13 +117,6 @@ namespace OpenSpace.PS1 {
 				if (length > 0) {
 					Pointer off_array = Pointer.Read(reader);
 					sectors_unk2 = Load.ReadArray<NeighborSector>(length, reader, off_array);
-				}
-			});
-			Pointer.DoAt(ref reader, off_sectors_unk3, () => {
-				uint length = reader.ReadUInt32();
-				if (length > 0) {
-					Pointer off_array = Pointer.Read(reader);
-					sectors_unk3 = Load.ReadArray<NeighborSector>(length, reader, off_array);
 				}
 			});
 		}

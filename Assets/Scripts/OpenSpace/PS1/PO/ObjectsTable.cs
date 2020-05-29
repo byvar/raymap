@@ -39,6 +39,7 @@ namespace OpenSpace.PS1 {
 		public void ReadExtra(Reader reader, uint count) {
 			Array.Resize(ref entries, (int)(length + count));
 			Pointer.DoAt(ref reader, Offset + 8 + (8 * length.Value), () => {
+				Load.print(Pointer.Current(reader) + " - " + count);
 				for (int i = (int)length; i < entries.Length; i++) {
 					entries[i] = new Entry();
 					entries[i].Read(reader);

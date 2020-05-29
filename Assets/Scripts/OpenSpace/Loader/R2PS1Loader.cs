@@ -63,8 +63,8 @@ namespace OpenSpace.Loader {
 				//RipRHRLoc();
 				game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
-				Actor1Index = Array.IndexOf(game.actors, actor1Name);
-				Actor2Index = Array.IndexOf(game.actors, actor2Name);
+				Actor1Index = Array.IndexOf(game.actors1, actor1Name);
+				Actor2Index = Array.IndexOf(game.actors2, actor2Name);
 				files_array = new FileWithPointers[0];
 				await LoadAllDataFromDAT(game);
 				//await ExtractAllFiles(game);
@@ -137,7 +137,7 @@ namespace OpenSpace.Loader {
 
 			if (fileInfo.type == PS1GameInfo.File.Type.Map) {
 				if (!b.inEngine) return;
-				Array.Resize(ref files_array, files_array.Length + 2 + b.cutscenes.Length + (b.overlay_cine.size > 0 ? 1 : 0));
+				Array.Resize(ref files_array, files_array.Length + 2 + b.cutscenes.Length);
 				files_array[curFile++] = new PS1Data(lvlName + ".sys", levelDir + "level.sys", curFile, 0);
 				files_array[curFile++] = new PS1Data(lvlName + ".img", levelDir + "level.img", curFile, b.address);
 
@@ -159,12 +159,6 @@ namespace OpenSpace.Loader {
 					actor2File = f;
 				}
 				files_array[curFile++] = f;
-			}
-			if (b.overlay_cine.size > 0) {
-				curFile++;
-				/*files_array[curFile++] = new PS1Data("cine.dat", levelDir + "cine.dat",
-							cineDataBaseAddress + 0x1f800 + 0x32 * 0xc00,
-							curFile);*/
 			}
 			await Task.CompletedTask;
 		}
@@ -223,8 +217,10 @@ namespace OpenSpace.Loader {
 		public async Task LoadLevel() {
 			Reader reader = files_array[Mem.Fix]?.reader;
 			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
-			if (Settings.s.game == Settings.Game.RRush) {
+			if (game.actors1 != null && game.actors1.Length > 0) {
 				RelocateActorFile(0);
+			}
+			if (game.actors2 != null && game.actors2.Length > 0) {
 				RelocateActorFile(1);
 			}
 
@@ -249,8 +245,10 @@ namespace OpenSpace.Loader {
 
 				//string levelDir = gameDataBinFolder + lvlName + "/";
 				uint cineDataBaseAddress = levelHeader.off_animPositions.offset;
+				Array.Resize(ref files_array, files_array.Length + 1);
+				print(cineDataBaseAddress);
 				files_array[files_array.Length-1] = new PS1Data("overlay_cine.img", levelDir + "overlay_cine.img", files_array.Length - 1,
-								cineDataBaseAddress + 0x1f800u + 0x32 * 0xc00);
+								cineDataBaseAddress + 0x1f800u + (uint)mainMemoryBlock.cineOffset * 0xc00);
 			}
 			if (levelHeader.num_geometricObjectsDynamic_cine != 0) {
 				levelHeader.geometricObjectsDynamic.ReadExtra(reader, levelHeader.num_geometricObjectsDynamic_cine);
@@ -320,7 +318,7 @@ namespace OpenSpace.Loader {
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
 			if (b.loadActor
 				&& (Actor1Index < 0 || Actor2Index < 0
-				|| Actor1Index >= gameInfo.actors.Length || Actor2Index >= gameInfo.actors.Length)) {
+				|| Actor1Index >= gameInfo.actors1.Length || Actor2Index >= gameInfo.actors2.Length)) {
 				throw new Exception("Actor could not be found");
 			}
 			if (!b.inEngine) return;
@@ -761,7 +759,7 @@ namespace OpenSpace.Loader {
 				tex.wrapMode = TextureWrapMode.Clamp;
                 b.texture = tex;
                 if (exportTextures) {
-                    Util.ByteArrayToFile(gameDataBinFolder + "test_tex/" + lvlName + "/" + i++ + $"_{string.Format("{0:X4}",b.pageInfo)}_{b.xMin}_{b.yMin}_{w}_{h}" + ".png", tex.EncodeToPNG());
+                    Util.ByteArrayToFile(gameDataBinFolder + "textures/main/" + lvlName + "/" + i++ + $"_{string.Format("{0:X4}",b.pageInfo)}_{b.xMin}_{b.yMin}_{w}_{h}" + ".png", tex.EncodeToPNG());
                 }
             }
         }
