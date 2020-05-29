@@ -2,9 +2,10 @@
 using System.Collections;
 using OpenSpace.AI;
 using OpenSpace.Object;
+using System.Collections.Generic;
 
 public class ScriptComponent : MonoBehaviour {
-    private Script script;
+    public Script script;
     private Perso perso;
     public string offset;
     public string comportOffset;

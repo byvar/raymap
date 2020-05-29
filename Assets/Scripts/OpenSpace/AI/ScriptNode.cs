@@ -74,6 +74,9 @@ namespace OpenSpace.AI {
                     GameMaterial.FromOffsetOrRead(sn.param_ptr, reader);
                 } else if (sn.nodeType == NodeType.VisualMaterial) {
                     VisualMaterial.FromOffsetOrRead(sn.param_ptr, reader);
+                } else if (sn.nodeType == NodeType.ComportRef) {
+                    Behavior comportRef = l.FromOffsetOrRead<Behavior>(reader, sn.param_ptr);
+                    comportRef.referencedBy.Add(script);
                 }
             }
             return sn;
@@ -330,6 +333,22 @@ namespace OpenSpace.AI {
             return "unknown";
         }
 
+        public SearchableString GetSearchableString(Perso p)
+        {
+            GameObject gao = (p.Gao.GetComponentsInChildren<ScriptComponent>().Where(c => c.script == script).FirstOrDefault()?.gameObject) ?? p.Gao;
+            string str = "";
+            string display = script.behaviorOrMacro.ToString();
+            switch (nodeType) {
+                case NodeType.String:
+                    str = MapLoader.Loader.strings[param_ptr];
+                    return new SearchableString(str, gao, display);
+                case NodeType.TextRef:
+                    str = MapLoader.Loader.localization?.GetTextForHandleAndLanguageID((int)param, 0);
+                    return new SearchableString(str??"", gao, display);
+                default:
+                    return null;
+            }
+        }
 
         public enum NodeType {
             Unknown,

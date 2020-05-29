@@ -12,7 +12,6 @@ namespace OpenSpace.AI {
 		public Script script;
 
 		// Custom
-		public AIModel aiModel;
 		public int index;
 
 		public string ShortName {

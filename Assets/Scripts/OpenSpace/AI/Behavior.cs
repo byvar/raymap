@@ -20,9 +20,10 @@ namespace OpenSpace.AI {
 
         // Custom
         public List<Pointer> copies;
-        public AIModel aiModel;
         public BehaviorType type;
         public int index;
+
+        public List<Script> referencedBy = new List<Script>();
 
         public string ShortName {
 			get {

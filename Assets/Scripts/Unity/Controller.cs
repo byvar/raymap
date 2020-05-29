@@ -330,10 +330,14 @@ public class Controller : MonoBehaviour {
 
             Destroy(pb.gameObject);
         }
-	}
 
-	// Update is called once per frame
-	void Update() {
+        // Collect searchable strings
+        loader.searchableStrings.AddRange(loader.persos.SelectMany(p => p.GetSearchableStrings()));
+
+    }
+
+    // Update is called once per frame
+    void Update() {
 		if (loadingScreen.Active) {
 			if (state == State.Error) {
 				loadingScreen.LoadingText = detailedState;

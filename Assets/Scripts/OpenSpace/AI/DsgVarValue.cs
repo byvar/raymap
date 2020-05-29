@@ -358,7 +358,33 @@ namespace OpenSpace.AI {
 				valueArray[i].Read(reader);
 			}
 		}
-		public void WriteArray(Writer writer) {
+
+        public List<SearchableString> GetSearchableString(Perso perso, int dsgVarNum)
+        {
+
+            string locationString = "DsgVar_" + dsgVarNum;
+
+            List<SearchableString> results = new List<SearchableString>();
+
+            switch(type) {
+                case DsgVarInfoEntry.DsgVarType.Text:
+                    results.Add(new SearchableString(MapLoader.Loader.localization.GetTextForHandleAndLanguageID(valueText, 0), perso.Gao, locationString));
+                    break;
+                case DsgVarInfoEntry.DsgVarType.TextArray:
+                case DsgVarInfoEntry.DsgVarType.TextRefArray:
+
+                    foreach (var item in valueArray) {
+                        results.AddRange(item.GetSearchableString(perso, dsgVarNum));
+                    }
+                    break;
+                default:break;
+            }
+
+            return results;
+
+        }
+
+        public void WriteArray(Writer writer) {
 			if (Settings.s.game == Settings.Game.R2Revolution) {
 				Pointer.Goto(ref writer, Pointer.Current(writer) + 4);
 				writer.Write((byte)arrayTypeNumber);

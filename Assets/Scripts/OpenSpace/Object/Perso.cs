@@ -246,6 +246,46 @@ namespace OpenSpace.Object {
             return l.persos.FirstOrDefault(f => f.offset == offset);
         }
 
+        public IEnumerable<SearchableString> GetSearchableStrings()
+        {
+            var sl = new List<SearchableString>();
+
+            var aiModel = brain?.mind?.AI_model;
+            if (aiModel != null) {
+
+                var behaviorNormalScripts = aiModel.behaviors_normal?.SelectMany(b => b.scripts) ?? new List<Script>();
+                var behaviorReflexScripts = aiModel.behaviors_reflex?.SelectMany(b => b.scripts) ?? new List<Script>();
+                var macroScripts = aiModel.macros?.Select(m => m.script) ?? new List<Script>();
+                var scripts = behaviorNormalScripts.Concat(behaviorReflexScripts).Concat(macroScripts).Where(s=>s!=null);
+
+                foreach (ScriptNode scriptNode in scripts.SelectMany(s=>s.scriptNodes)) {
+                    var searchableString = scriptNode.GetSearchableString(this);
+                    if (searchableString!=null) {
+                        sl.Add(searchableString);
+                    }
+                }
+                
+                if (brain?.mind?.dsgMem != null) {
+
+                    int dsgVarNum = 0;
+
+                    var values = (brain.mind.dsgMem.values?.Length > 0) ? brain.mind.dsgMem.values : brain.mind.dsgMem.valuesInitial;
+
+                    if (values != null) {
+                        foreach (var value in values) {
+                            var searchableString = value.GetSearchableString(this, dsgVarNum++);
+                            if (searchableString != null) {
+                                sl.AddRange(searchableString);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return sl;
+
+        }
+
         public void Write(Writer writer) {
             PersoBehaviour persoBehaviour = gao.GetComponent<PersoBehaviour>();
             if (p3dData != null && persoBehaviour != null && persoBehaviour.state!=null && persoBehaviour.state.offset!=null) {

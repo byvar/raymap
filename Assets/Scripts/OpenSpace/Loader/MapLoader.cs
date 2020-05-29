@@ -111,6 +111,7 @@ namespace OpenSpace {
 
 		public Globals globals = null;
         public Settings settings = null;
+        public List<SearchableString> searchableStrings = new List<SearchableString>();
 
         public static class Mem {
             public const int Fix = 0;
