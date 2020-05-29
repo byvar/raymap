@@ -83,7 +83,7 @@ public class UnityWindowSettings : UnityWindow {
 			Dirty = true;
 		}
 		if (Settings.settingsDict[UnitySettings.GameMode].platform == Settings.Platform.PS1) {
-			if (OpenSpace.PS1.PS1GameInfo.Games.ContainsKey(UnitySettings.GameMode) && OpenSpace.PS1.PS1GameInfo.Games[UnitySettings.GameMode].actors?.Length > 0) {
+			if (OpenSpace.PS1.PS1GameInfo.Games.ContainsKey(UnitySettings.GameMode) && OpenSpace.PS1.PS1GameInfo.Games[UnitySettings.GameMode].actors1?.Length > 0) {
 				rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
 				rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 1"));
 				buttonString = "No actor selected";
@@ -96,7 +96,7 @@ public class UnityWindowSettings : UnityWindow {
 					EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
 					if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
 						if (ActorDropdown1 == null || ActorDropdown1.mode != UnitySettings.GameMode) {
-							ActorDropdown1 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode) {
+							ActorDropdown1 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 0) {
 								name = "Actors"
 							};
 						}
@@ -121,7 +121,7 @@ public class UnityWindowSettings : UnityWindow {
 					EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
 					if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
 						if (ActorDropdown2 == null || ActorDropdown2.mode != UnitySettings.GameMode) {
-							ActorDropdown2 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode) {
+							ActorDropdown2 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 1) {
 								name = "Actors"
 							};
 						}

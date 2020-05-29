@@ -109,7 +109,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					stateNames[i + 1] = (s.anim == null || s.anim.index >= fam.animations.Length) ? "Null" : $"State {Array.IndexOf(tempStates, s)}: {fam.animations[s.anim.index].name}";
 				}
 				for (int i = 0; i < fam.animations.Length; i++) {
-					stateNames[i + 1 + states.Length] = "(Animation only) " + fam.animations[i].name;
+					stateNames[i + 1 + states.Length] = $"(Animation {i}) {fam.animations[i].name}";
 				}
 				hasStates = true;
 				stateIndex = Array.IndexOf(states, statePtrs.pointers[stateInd].Value);

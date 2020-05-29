@@ -12,17 +12,23 @@ class PS1ActorSelectionDropdown : AdvancedDropdown {
 	public Settings.Mode mode;
 	public string name;
 	public string[] actors;
+	public int actorIndex;
 	//public SerializedProperty property;
 
-	public PS1ActorSelectionDropdown(AdvancedDropdownState state, Settings.Mode mode) : base(state) {
+	public PS1ActorSelectionDropdown(AdvancedDropdownState state, Settings.Mode mode, int actorIndex) : base(state) {
 		this.mode = mode;
+		this.actorIndex = actorIndex;
 		minimumSize = new UnityEngine.Vector2(50, 300f);
 	}
 
 	protected override AdvancedDropdownItem BuildRoot() {
 		var root = new AdvancedDropdownItem(name);
 		if (OpenSpace.PS1.PS1GameInfo.Games.ContainsKey(mode)) {
-			actors = OpenSpace.PS1.PS1GameInfo.Games[mode].actors;
+			if (actorIndex == 0) {
+				actors = OpenSpace.PS1.PS1GameInfo.Games[mode].actors1;
+			} else if (actorIndex == 1) {
+				actors = OpenSpace.PS1.PS1GameInfo.Games[mode].actors2;
+			}
 			for (int i = 0; i < actors.Length; i++) {
 				Add(root, actors[i], i);
 			}
