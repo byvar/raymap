@@ -93,7 +93,7 @@ namespace Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimatio
 
         private bool IsValidPersoAnimationState(int animationStateIndex)
         {
-            if (animationStateIndex >= family.states.Count)
+            if (animationStateIndex >= family.states.Count || family.states[animationStateIndex].anim_ref == null)
             {
                 return false;
             }
