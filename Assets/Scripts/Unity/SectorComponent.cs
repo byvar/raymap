@@ -13,9 +13,9 @@ public class SectorComponent : MonoBehaviour {
 	public OpenSpace.ROM.Sector sectorROM;
 	public OpenSpace.PS1.Sector sectorPS1;
     //public LightBehaviour[] staticLights;
-    public SectorComponent[] neighbors;
-    public SectorComponent[] sectorTransitions;
-    public SectorComponent[] sectors_unk2;
+    public SectorComponent[] graphicSectors;
+    public SectorComponent[] collisionSectors;
+    public SectorComponent[] activitySectors;
 	public LightBehaviour[] lights;
 	//public string[] debugList4;
 	//public string[] debugList5;
@@ -53,6 +53,33 @@ public class SectorComponent : MonoBehaviour {
 		}
 	}
 
+	public bool ContainsPoint(Vector3 point) {
+		if (SectorBorder != null) {
+			return SectorBorder.ContainsPoint(point);
+		}
+		/*if (sector?.SuperObject?.boundingVolumeTT != null) {
+			GeometricObjectCollide col = sector?.SuperObject?.boundingVolumeTT;
+			return col.ContainsPoint(point);
+		}*/
+		return false;
+	}
+	public Vector3 CenterPoint {
+		get {
+			if (SectorBorder != null) {
+				return SectorBorder.Center;
+			}
+			/*if (sector?.SuperObject?.boundingVolumeTT != null) {
+				if (convertedBoundsTT == null) {
+					GeometricObjectCollide col = sector?.SuperObject?.boundingVolumeTT;
+					convertedBoundsTT = col.BoundingBox;
+				}
+				return convertedBoundsTT.Center;
+			}*/
+			return Vector3.zero;
+		}
+	}
+	//private BoundingVolume convertedBoundsTT;
+
 	private BoundingVolume bounds;
 	public BoundingVolume SectorBorder {
 		get {
@@ -84,6 +111,12 @@ public class SectorComponent : MonoBehaviour {
 						collider.center = bounds.Center;
 						collider.center -= transform.position;
 						collider.size = bounds.Size;
+					} else if (bounds.type == BoundingVolume.Type.Sphere) {
+						SphereCollider collider = gameObject.AddComponent<SphereCollider>();
+
+						collider.center = bounds.Center;
+						collider.center -= transform.position;
+						collider.radius = bounds.sphereRadius;
 					}
 				}*/
 			}
@@ -118,25 +151,25 @@ public class SectorComponent : MonoBehaviour {
 		//gameObject.name += " - " + IsSectorVirtual;
 		if (sector != null) {
 			//staticLights = sector.staticLights.Select(l => l.Light).ToArray();
-			neighbors = sector.neighbors.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
-			sectorTransitions = sector.sectors_unk1.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
-			sectors_unk2 = sector.sectors_unk2.Select(s => sectorManager.sectors.First(ns => ns.sector == s)).ToArray();
+			graphicSectors = sector.graphicSectors.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
+			collisionSectors = sector.collisionSectors.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
+			activitySectors = sector.activitySectors.Select(s => sectorManager.sectors.First(ns => ns.sector == s)).ToArray();
 			//dynamicLights = sector.dynamicLights.Select(l => l.Light).ToArray();
 		} else if (sectorROM != null) {
-			if (sectorROM.neighbors.Value != null) {
-				neighbors = sectorROM.neighbors.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
+			if (sectorROM.graphicSectors.Value != null) {
+				graphicSectors = sectorROM.graphicSectors.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
 			} else {
-				neighbors = new SectorComponent[0];
+				graphicSectors = new SectorComponent[0];
 			}
-			if (sectorROM.sectors2.Value != null) {
-				sectors_unk2 = sectorROM.sectors2.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
+			if (sectorROM.activitySectors.Value != null) {
+				activitySectors = sectorROM.activitySectors.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
 			} else {
-				sectors_unk2 = new SectorComponent[0];
+				activitySectors = new SectorComponent[0];
 			}
-			if (sectorROM.sectors3.Value != null) {
-				sectorTransitions = sectorROM.sectors3.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
+			if (sectorROM.collisionSectors.Value != null) {
+				collisionSectors = sectorROM.collisionSectors.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
 			} else {
-				sectorTransitions = new SectorComponent[0];
+				collisionSectors = new SectorComponent[0];
 			}
 			//name += " - " + sectorROM.byte1E + " " + sectorROM.byte1F;
 			//neighbors = sectorROM.sectors2.Value.superObjects.Select(s => sectorManager.sectors.First(ns => ns.sectorROM == (s.Value.data.Value as OpenSpace.ROM.Sector))).ToArray();
@@ -146,20 +179,20 @@ public class SectorComponent : MonoBehaviour {
 		} else if (sectorPS1 != null) {
 			OpenSpace.PS1.LevelHeader h = (MapLoader.Loader as R2PS1Loader).levelHeader;
 			gameObject.name = sectorPS1.short_46 + " - " + gameObject.name;
-			if (sectorPS1.neighbors != null) {
-				neighbors = sectorPS1.neighbors.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
+			if (sectorPS1.graphicSectors != null) {
+				graphicSectors = sectorPS1.graphicSectors.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
 			} else {
-				neighbors = new SectorComponent[0];
+				graphicSectors = new SectorComponent[0];
 			}
-			if (sectorPS1.sectors_unk1 != null) {
-				sectorTransitions = sectorPS1.sectors_unk1.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
+			if (sectorPS1.collisionSectors != null) {
+				collisionSectors = sectorPS1.collisionSectors.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
 			} else {
-				sectorTransitions = new SectorComponent[0];
+				collisionSectors = new SectorComponent[0];
 			}
-			if (sectorPS1.sectors_unk2 != null) {
-				sectors_unk2 = sectorPS1.sectors_unk2.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
+			if (sectorPS1.activitySectors != null) {
+				activitySectors = sectorPS1.activitySectors.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
 			} else {
-				sectors_unk2 = new SectorComponent[0];
+				activitySectors = new SectorComponent[0];
 			}
 		}
     }

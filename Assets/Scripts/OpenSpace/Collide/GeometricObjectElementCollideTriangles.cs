@@ -130,7 +130,6 @@ namespace OpenSpace.Collide {
         public static GeometricObjectElementCollideTriangles Read(Reader reader, Pointer offset, GeometricObjectCollide geo) {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementCollideTriangles sm = new GeometricObjectElementCollideTriangles(offset, geo);
-            //l.print(offset + " - " + m.num_vertices);
             sm.off_material = Pointer.Read(reader);
 			if (Settings.s.game == Settings.Game.R2Revolution || Settings.s.game == Settings.Game.LargoWinch) {
 				sm.num_triangles = reader.ReadUInt16();
@@ -171,8 +170,11 @@ namespace OpenSpace.Collide {
 					}
 				}
 			}
-
-            if(sm.off_material != null) sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
+            if (!geo.isBoundingVolume) {
+                if (sm.off_material != null) sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
+            } else {
+                // Sector superobject
+            }
             Pointer.Goto(ref reader, sm.off_triangles);
             sm.triangles = new int[sm.num_triangles * 3];
             for (int j = 0; j < sm.num_triangles; j++) {

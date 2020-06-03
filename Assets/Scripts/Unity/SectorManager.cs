@@ -75,8 +75,8 @@ public class SectorManager : MonoBehaviour {
 			}
 		} else {
 			activeSector.Loaded = true;
-			for (int j = 0; j < activeSector.neighbors.Length; j++) {
-				activeSector.neighbors[j].Loaded = true;
+			for (int j = 0; j < activeSector.graphicSectors.Length; j++) {
+				activeSector.graphicSectors[j].Loaded = true;
 			}
 		}
 	}
@@ -90,9 +90,9 @@ public class SectorManager : MonoBehaviour {
 	}
 
 	private SectorComponent GetActiveSectorOld(Vector3 point, SectorComponent currentActiveSector = null, bool allowVirtual = false) {
-        if (currentActiveSector!= null && currentActiveSector.sectorTransitions != null && currentActiveSector.sectorTransitions.Length > 0) {
+        if (currentActiveSector!= null && currentActiveSector.collisionSectors != null && currentActiveSector.collisionSectors.Length > 0) {
 			// We shouldn't really test the sector transitions here, but a lot of "absorbing" sectors have no transitions
-			if (currentActiveSector.SectorBorder != null ? currentActiveSector.SectorBorder.ContainsPoint(point) : false) {
+			if (currentActiveSector.ContainsPoint(point)) {
 				return currentActiveSector;
 			}
         }
@@ -102,10 +102,10 @@ public class SectorManager : MonoBehaviour {
             s.Loaded = false;
 			s.Active = false;
         }
-		if(currentActiveSector != null && currentActiveSector.sectorTransitions != null) {
-			for (int i = 0; i < currentActiveSector.sectorTransitions.Length; i++) {
-				SectorComponent s = currentActiveSector.sectorTransitions[i];
-				bool active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
+		if(currentActiveSector != null && currentActiveSector.collisionSectors != null) {
+			for (int i = 0; i < currentActiveSector.collisionSectors.Length; i++) {
+				SectorComponent s = currentActiveSector.collisionSectors[i];
+				bool active = (allowVirtual || !s.IsSectorVirtual) && (s.ContainsPoint(point));
 				if (active) {
 					activeSector = s;
 					break;
@@ -115,7 +115,7 @@ public class SectorManager : MonoBehaviour {
 		if (activeSector == null) {
 			for (int i = 0; i < sectors.Count; i++) {
 				SectorComponent s = sectors[i];
-				bool active = (allowVirtual || !s.IsSectorVirtual) && (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false);
+				bool active = (allowVirtual || !s.IsSectorVirtual) && (s.ContainsPoint(point));
 				if (active) {
 					activeSector = s;
 					break;
@@ -134,8 +134,8 @@ public class SectorManager : MonoBehaviour {
 		SectorComponent activeSectorVirtual = null;
 		SectorComponent activeSector = null;
 		foreach(SectorComponent s in sectors) {
-			if (s.SectorBorder != null ? s.SectorBorder.ContainsPoint(point) : false) {
-				float dist = Vector3.Distance(s.SectorBorder.Center, point);
+			if (s.ContainsPoint(point)) {
+				float dist = Vector3.Distance(s.CenterPoint, point);
 				if (s.IsSectorVirtual) {
 					if (s.SectorPriority > activeSectorPriorityVirtual || (s.SectorPriority == activeSectorPriorityVirtual && dist < smallestDistanceToSectorVirtual)) {
 						smallestDistanceToSectorVirtual = dist;

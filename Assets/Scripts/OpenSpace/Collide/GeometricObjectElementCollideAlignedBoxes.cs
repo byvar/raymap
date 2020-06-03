@@ -98,7 +98,9 @@ namespace OpenSpace.Collide {
                     s.boxes[i].minPoint = reader.ReadUInt16();
                     s.boxes[i].maxPoint = reader.ReadUInt16();
                     s.boxes[i].off_material = Pointer.Read(reader);
-                    s.boxes[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.boxes[i].off_material, reader);
+                    if (!geo.isBoundingVolume) {
+                        s.boxes[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.boxes[i].off_material, reader);
+                    }
                 }
                 Pointer.Goto(ref reader, off_current);
             }

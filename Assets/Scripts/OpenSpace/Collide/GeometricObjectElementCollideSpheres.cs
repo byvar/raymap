@@ -111,7 +111,9 @@ namespace OpenSpace.Collide {
                         s.spheres[i].radius = reader.ReadSingle();
                         s.spheres[i].off_material = Pointer.Read(reader);
                     }
-                    s.spheres[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.spheres[i].off_material, reader);
+                    if (!geo.isBoundingVolume) {
+                        s.spheres[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.spheres[i].off_material, reader);
+                    }
                 }
                 Pointer.Goto(ref reader, off_current);
             }

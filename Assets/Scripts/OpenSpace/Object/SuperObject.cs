@@ -40,6 +40,7 @@ namespace OpenSpace.Object {
 		public SuperObjectDrawFlags drawFlags;
         public SuperObjectFlags flags;
         public BoundingVolume boundingVolume;
+        public GeometricObjectCollide boundingVolumeTT;
 
         public GameObject Gao {
             get {
@@ -158,9 +159,13 @@ namespace OpenSpace.Object {
             }
 
             Pointer.DoAt(ref reader, off_boundingVolume, () => {
-				//l.print(off_boundingVolume);
-                so.boundingVolume = BoundingVolume.Read(reader, off_boundingVolume, so.flags.HasFlag(SuperObjectFlags.Flags.BoundingBoxInsteadOfSphere) ?
-                    BoundingVolume.Type.Box : BoundingVolume.Type.Sphere);
+				//l.print(so.type + " - " + so.offset + " - " + off_boundingVolume);
+                if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
+                    so.boundingVolumeTT = GeometricObjectCollide.Read(reader, off_boundingVolume, isBoundingVolume: true);
+                } else {
+                    so.boundingVolume = BoundingVolume.Read(reader, off_boundingVolume, so.flags.HasFlag(SuperObjectFlags.Flags.BoundingBoxInsteadOfSphere) ?
+                        BoundingVolume.Type.Box : BoundingVolume.Type.Sphere);
+                }
             });
 
             if (so.Gao != null) {
@@ -168,6 +173,12 @@ namespace OpenSpace.Object {
                 so.Gao.transform.localPosition = pos;
                 so.Gao.transform.localRotation = rot;
                 so.Gao.transform.localScale = scale;
+                if (so.boundingVolumeTT != null) {
+                    so.boundingVolumeTT.gao.transform.SetParent(so.Gao.transform);
+                    so.boundingVolumeTT.gao.transform.localPosition = Vector3.zero;
+                    so.boundingVolumeTT.gao.transform.localRotation = Quaternion.identity;
+                    so.boundingVolumeTT.gao.transform.localScale = Vector3.one;
+                }
 
                 SuperObjectComponent soc = so.Gao.AddComponent<SuperObjectComponent>();
                 so.Gao.layer = LayerMask.NameToLayer("SuperObject");

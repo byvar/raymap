@@ -8,9 +8,9 @@ using UnityEngine;
 namespace OpenSpace.PS1 {
 	public class Sector : OpenSpaceStruct {
 		public Pointer off_persos;
-		public Pointer off_neighbors;
-		public Pointer off_sectors_unk1;
-		public Pointer off_sectors_unk2;
+		public Pointer off_graphicSectors;
+		public Pointer off_collisionSectors;
+		public Pointer off_activitySectors;
 		public Pointer off_10;
 		public Pointer off_ipos;
 		public Pointer off_18;
@@ -40,22 +40,22 @@ namespace OpenSpace.PS1 {
 
 		// Parsed
 		public uint[] persos;
-		public NeighborSector[] neighbors;
-		public NeighborSector[] sectors_unk1;
-		public NeighborSector[] sectors_unk2;
+		public NeighborSector[] graphicSectors;
+		public NeighborSector[] collisionSectors;
+		public NeighborSector[] activitySectors;
 
 		protected override void ReadInternal(Reader reader) {
 			Load.print("Sector @ " + Offset);
 			off_persos = Pointer.Read(reader);
-			off_neighbors = Pointer.Read(reader);
+			off_graphicSectors = Pointer.Read(reader);
 			if (Settings.s.game != Settings.Game.R2 && Settings.s.game != Settings.Game.RRush) {
 				vip_ushort_08 = reader.ReadUInt16();
 				vip_ushort_0A = reader.ReadUInt16();
 				vip_uint_0C = reader.ReadUInt32();
 			}
-			off_sectors_unk1 = Pointer.Read(reader);
-			off_sectors_unk2 = Pointer.Read(reader);
-			off_10 = Pointer.Read(reader);
+			off_collisionSectors = Pointer.Read(reader);
+			off_activitySectors = Pointer.Read(reader);
+			off_10 = Pointer.Read(reader); // Sound sectors?
 			off_ipos = Pointer.Read(reader);
 			if (Settings.s.game != Settings.Game.R2 && Settings.s.game != Settings.Game.RRush) {
 				int_50 = reader.ReadInt32();
@@ -98,25 +98,25 @@ namespace OpenSpace.PS1 {
 					Load.print("IPOs: " + length);
 				}
 			});
-			Pointer.DoAt(ref reader, off_neighbors, () => {
+			Pointer.DoAt(ref reader, off_graphicSectors, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 0) {
 					Pointer off_array = Pointer.Read(reader);
-					neighbors = Load.ReadArray<NeighborSector>(length, reader, off_array);
+					graphicSectors = Load.ReadArray<NeighborSector>(length, reader, off_array);
 				}
 			});
-			Pointer.DoAt(ref reader, off_sectors_unk1, () => {
+			Pointer.DoAt(ref reader, off_collisionSectors, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 0) {
 					Pointer off_array = Pointer.Read(reader);
-					sectors_unk1 = Load.ReadArray<NeighborSector>(length, reader, off_array);
+					collisionSectors = Load.ReadArray<NeighborSector>(length, reader, off_array);
 				}
 			});
-			Pointer.DoAt(ref reader, off_sectors_unk2, () => {
+			Pointer.DoAt(ref reader, off_activitySectors, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 0) {
 					Pointer off_array = Pointer.Read(reader);
-					sectors_unk2 = Load.ReadArray<NeighborSector>(length, reader, off_array);
+					activitySectors = Load.ReadArray<NeighborSector>(length, reader, off_array);
 				}
 			});
 		}

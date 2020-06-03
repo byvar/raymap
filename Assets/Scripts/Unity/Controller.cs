@@ -281,7 +281,7 @@ public class Controller : MonoBehaviour {
             Camera.main.orthographic = true;
 
             var filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 ? true : false);
-
+			
             float minX = filledSectors.Min(v => v.SectorBorder.boxMin.x);
             float minY = filledSectors.Min(v => v.SectorBorder.boxMin.y);
             float minZ = filledSectors.Min(v => v.SectorBorder.boxMin.z);

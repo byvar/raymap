@@ -30,6 +30,8 @@ namespace OpenSpace.Collide {
         public ushort[] element_types = null;
         public IGeometricObjectElementCollide[] elements = null;
 
+        public bool isBoundingVolume = false;
+
         public GeometricObjectCollide(Pointer offset, CollideType type = CollideType.None) {
             this.offset = offset;
             this.type = type;
@@ -52,11 +54,79 @@ namespace OpenSpace.Collide {
             }*/
         }
 
-        public static GeometricObjectCollide Read(Reader reader, Pointer offset, CollideType type = CollideType.None) {
+        public bool ContainsPoint(Vector3 pos) {
+            for (int i = 0; i < elements.Length; i++) {
+                if (elements[i] == null) continue;
+                switch (elements[i]) {
+                    case GeometricObjectElementCollideAlignedBoxes box:
+                        foreach (var b in box.boxes) {
+                            Vector3 boxMin = vertices[b.minPoint];
+                            Vector3 boxMax = vertices[b.maxPoint];
+                            bool contains = pos.x >= boxMin.x && pos.x <= boxMax.x
+                                && pos.y >= boxMin.y && pos.y <= boxMax.y
+                                && pos.z >= boxMin.z && pos.z <= boxMax.z;
+                            if (contains) return true;
+                        }
+                        break;
+                    case GeometricObjectElementCollideSpheres sphere:
+                        foreach (var s in sphere.spheres) {
+                            Vector3 center = vertices[s.centerPoint];
+                            bool contains = Vector3.Distance(pos, center) <= s.radius;
+                            if (contains) return true;
+                        }
+                        break;
+                    case GeometricObjectElementCollideTriangles tris:
+                        break;
+                }
+            }
+            return false;
+        }
+
+        public BoundingVolume BoundingBox {
+            get {
+                float xMin = vertices[0].x, xMax = vertices[0].x;
+                float yMin = vertices[0].y, yMax = vertices[0].y;
+                float zMin = vertices[0].z, zMax = vertices[0].z;
+                void CheckVertex(Vector3 v) {
+                    if (v.x < xMin) xMin = v.x;
+                    if (v.y < yMin) yMin = v.y;
+                    if (v.z < zMin) zMin = v.z;
+                    if (v.x > xMax) xMax = v.x;
+                    if (v.y > yMax) yMax = v.y;
+                    if (v.z > zMax) zMax = v.z;
+                }
+                for (int i = 0; i < vertices.Length; i++) {
+                    CheckVertex(vertices[i]);
+                }
+                for (int i = 0; i < elements.Length; i++) {
+                    if (elements[i] == null) continue;
+                    switch (elements[i]) {
+                        case GeometricObjectElementCollideSpheres sphere:
+                            foreach (var s in sphere.spheres) {
+                                Vector3 center = vertices[s.centerPoint];
+                                CheckVertex(center + Vector3.one * s.radius);
+                                CheckVertex(center - Vector3.one * s.radius);
+                            }
+                            break;
+                    }
+                }
+                Vector3 boxMin = new Vector3(xMin, yMin, zMin);
+                Vector3 boxMax = new Vector3(xMax, yMax, zMax);
+                return new BoundingVolume(null) {
+                    type = BoundingVolume.Type.Box,
+                    boxMin = boxMin,
+                    boxMax = boxMax,
+                    boxSize = boxMax - boxMin,
+                    boxCenter = boxMin + (boxMax - boxMin) / 2,
+                };
+            }
+        }
+
+        public static GeometricObjectCollide Read(Reader reader, Pointer offset, CollideType type = CollideType.None, bool isBoundingVolume = false) {
             MapLoader l = MapLoader.Loader;
 			//l.print("CollideMesh " + offset);
             GeometricObjectCollide m = new GeometricObjectCollide(offset, type);
-            //l.print("Mesh obj: " + offset);
+            m.isBoundingVolume = isBoundingVolume;
             if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_elements = reader.ReadUInt16();
@@ -90,11 +160,13 @@ namespace OpenSpace.Collide {
 				}
 			}
             reader.ReadInt32();
-            reader.ReadSingle();
-            reader.ReadSingle();
-            reader.ReadSingle();
-            reader.ReadSingle();
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
+            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
+                reader.ReadSingle();
+                reader.ReadSingle();
+                reader.ReadSingle();
+                reader.ReadSingle();
+                if (Settings.s.engineVersion == Settings.EngineVersion.R2) reader.ReadUInt32();
+            }
             
             // Vertices
             Pointer off_current = Pointer.Goto(ref reader, m.off_vertices);

@@ -34,7 +34,7 @@ namespace OpenSpace.Exporter {
                 SkyMaterial = sector.skyMaterial,
                 SectorBorder = sector.sectorBorder,
                 LightReferences = sector.staticLights.Select(l => l.Offset.ToString()).ToList(),
-                Neighbours = sector.neighbors.Select(n => n.sector.offset.ToString()).ToList()
+                Neighbours = sector.graphicSectors.Select(n => n.sector.offset.ToString()).ToList()
             };
 
             eSector.Geometry = new Dictionary<string, EGeometry>();

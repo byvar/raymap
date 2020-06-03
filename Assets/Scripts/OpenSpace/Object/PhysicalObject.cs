@@ -163,10 +163,13 @@ namespace OpenSpace.Object {
                     });
                 }
                 if (numberOfLOD > 1) {
-                    float bestLOD = po.visualSet.Min(v => v.LODdistance);
+                    LODComponent lod = po.Gao.AddComponent<LODComponent>();
+                    lod.visualSet = po.visualSet;
+                    lod.gameObjects = po.visualSet.Select(v => v.obj.Gao).ToArray();
+                    /*float bestLOD = po.visualSet.Min(v => v.LODdistance);
                     foreach (VisualSetLOD lod in po.visualSet) {
                         if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
-                    }
+                    }*/
                 }
             });
 
@@ -212,10 +215,13 @@ namespace OpenSpace.Object {
                 }
             }
             if (po.visualSet.Length > 1) {
-                float bestLOD = po.visualSet.Min(v => v.LODdistance);
+                /*float bestLOD = po.visualSet.Min(v => v.LODdistance);
                 foreach (VisualSetLOD lod in po.visualSet) {
                     if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
-                }
+                }*/
+                LODComponent lod = po.Gao.AddComponent<LODComponent>();
+                lod.visualSet = po.visualSet;
+                lod.gameObjects = po.visualSet.Select(v => v.obj.Gao).ToArray();
             }
             if (collideMesh != null) {
                 po.collideMesh = collideMesh.Clone();

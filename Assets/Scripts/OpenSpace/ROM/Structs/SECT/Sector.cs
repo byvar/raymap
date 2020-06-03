@@ -5,10 +5,10 @@ using UnityEngine;
 namespace OpenSpace.ROM {
 	public class Sector : ROMStruct {
 		// size: 52 or 0x34
-		public Reference<SectorSuperObjectArray1> neighbors;
+		public Reference<SectorSuperObjectArray1> graphicSectors;
 		public Reference<SectorSuperObjectArray1Info> neighborsInfo;
-		public Reference<SectorSuperObjectArray2> sectors2;
-		public Reference<SectorSuperObjectArray3> sectors3;
+		public Reference<SectorSuperObjectArray2> activitySectors;
+		public Reference<SectorSuperObjectArray3> collisionSectors;
 		public Reference<LightInfoArray> lights;
 		public Reference<SectorSuperObjectArray4> sectors4;
 		public Reference<SectorSuperObjectArray4Info> sectors4Info;
@@ -34,10 +34,10 @@ namespace OpenSpace.ROM {
 		public ushort word32;
 
 		protected override void ReadInternal(Reader reader) {
-			neighbors = new Reference<SectorSuperObjectArray1>(reader);
+			graphicSectors = new Reference<SectorSuperObjectArray1>(reader);
 			neighborsInfo = new Reference<SectorSuperObjectArray1Info>(reader);
-			sectors2 = new Reference<SectorSuperObjectArray2>(reader);
-			sectors3 = new Reference<SectorSuperObjectArray3>(reader);
+			activitySectors = new Reference<SectorSuperObjectArray2>(reader);
+			collisionSectors = new Reference<SectorSuperObjectArray3>(reader);
 			lights = new Reference<LightInfoArray>(reader);
 			sectors4 = new Reference<SectorSuperObjectArray4>(reader);
 			sectors4Info = new Reference<SectorSuperObjectArray4Info>(reader);
@@ -63,10 +63,10 @@ namespace OpenSpace.ROM {
 			word32 = reader.ReadUInt16();
 
 
-			neighbors.Resolve(reader, s1 => s1.length = num_neighbors);
+			graphicSectors.Resolve(reader, s1 => s1.length = num_neighbors);
 			neighborsInfo.Resolve(reader, s1 => s1.length = num_neighbors);
-			sectors2.Resolve(reader, s2 => s2.length = num_sectors2);
-			sectors3.Resolve(reader, s3 => s3.length = num_sectors3);
+			activitySectors.Resolve(reader, s2 => s2.length = num_sectors2);
+			collisionSectors.Resolve(reader, s3 => s3.length = num_sectors3);
 			lights.Resolve(reader, li => li.length = num_lights);
 			sectors4.Resolve(reader, s4 => s4.length = num_sectors4);
 			sectors4Info.Resolve(reader, s4 => s4.length = num_sectors4);

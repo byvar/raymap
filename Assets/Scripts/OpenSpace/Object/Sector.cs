@@ -15,9 +15,9 @@ namespace OpenSpace.Object {
         public LinkedList<Perso> persos;
         public LinkedList<LightInfo> staticLights;
         public LinkedList<int> dynamicLights; // Stub
-        public LinkedList<NeighborSector> neighbors;
-        public LinkedList<NeighborSector> sectors_unk1;
-        public LinkedList<Sector> sectors_unk2;
+        public LinkedList<NeighborSector> graphicSectors;
+        public LinkedList<NeighborSector> collisionSectors;
+        public LinkedList<Sector> activitySectors;
 
         public byte isSectorVirtual;
 		public byte sectorPriority;
@@ -32,12 +32,17 @@ namespace OpenSpace.Object {
                     gao = new GameObject(name);
 					SectorComponent sc = gao.AddComponent<SectorComponent>();
 					sc.sector = this;
+                    if (collider != null) {
+                        collider.gao.transform.SetParent(gao.transform);
+                        collider.gao.transform.localPosition = Vector3.zero;
+                    }
 					sc.sectorManager = MapLoader.Loader.controller.sectorManager;
 					MapLoader.Loader.controller.sectorManager.AddSector(sc);
 				}
                 return gao;
             }
         }
+        public GeometricObjectCollide collider; // Only for TT & Montreal
 
         private SuperObject superObject;
         public SuperObject SuperObject {
@@ -52,8 +57,8 @@ namespace OpenSpace.Object {
 
         public void ProcessPointers(Reader reader) {
             MapLoader l = MapLoader.Loader;
-            if (neighbors != null && neighbors.Count > 0) {
-                neighbors.ReadEntries(ref reader, (off_element) => {
+            if (graphicSectors != null && graphicSectors.Count > 0) {
+                graphicSectors.ReadEntries(ref reader, (off_element) => {
 					//l.print(off_element);
                     NeighborSector n = new NeighborSector();
 					if (Settings.s.game != Settings.Game.LargoWinch) {
@@ -75,9 +80,9 @@ namespace OpenSpace.Object {
                     return n;
                 });
             }
-            if (sectors_unk1 != null && sectors_unk1.Count > 0) {
+            if (collisionSectors != null && collisionSectors.Count > 0) {
                 //l.print(sectors_unk1.off_head + " - " + sectors_unk1.off_tail + " - " + sectors_unk1.Count);
-                sectors_unk1.ReadEntries(ref reader, (off_element) => {
+                collisionSectors.ReadEntries(ref reader, (off_element) => {
                     NeighborSector n = new NeighborSector();
                     if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                         n.short0 = reader.ReadUInt16();
@@ -98,9 +103,9 @@ namespace OpenSpace.Object {
                     return n;
                 });
             }
-            if (sectors_unk2 != null && sectors_unk2.Count > 0) {
+            if (activitySectors != null && activitySectors.Count > 0) {
                 //l.print(sectors_unk2.off_head + " - " + sectors_unk2.off_tail + " - " + sectors_unk2.Count);
-                sectors_unk2.ReadEntries(ref reader, (off_element) => {
+                activitySectors.ReadEntries(ref reader, (off_element) => {
                     //l.print(Pointer.Current(reader) + " - " + off_element);
                     return Sector.FromSuperObjectOffset(off_element);
                 },
@@ -121,12 +126,17 @@ namespace OpenSpace.Object {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
             s.name = "Sector @ " + offset + ", SPO @ "+so.offset;
-			//l.print(s.name);
+            //l.print(s.name);
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
-                if (Settings.s.game == Settings.Game.TTSE) reader.ReadUInt32(); // always 1 or 0. whether the sector is active or not?
+                if (Settings.s.game == Settings.Game.TTSE) {
+                    s.isSectorVirtual = reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                }
                 Pointer off_collideObj = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_collideObj, () => {
-                    //CollideMeshObject collider = CollideMeshObject.Read(reader, off_collideObj);
+                    s.collider = GeometricObjectCollide.Read(reader, off_collideObj, isBoundingVolume: true);
                     // This has the exact same structure as a CollideMeshObject but with a sector superobject as material for the collieMeshElements
                 });
                 LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // "environments list"
@@ -150,11 +160,11 @@ namespace OpenSpace.Object {
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
                 LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // "streams list", probably related to water
             }
-            s.neighbors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
-            s.sectors_unk1 = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
-            s.sectors_unk2 = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.graphicSectors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.collisionSectors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.activitySectors = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
 
-            LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // Placeholder
+            LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // TT says: Sound Sectors
             LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // Placeholder
 
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
@@ -187,9 +197,16 @@ namespace OpenSpace.Object {
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                     reader.ReadUInt32();
-                    reader.ReadUInt32();
                 }
-                if(Settings.s.game != Settings.Game.TTSE) reader.ReadUInt32();
+                if (Settings.s.game != Settings.Game.TTSE) {
+                    s.isSectorVirtual = reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                    reader.ReadByte();
+                }
+                if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+                    reader.ReadUInt32(); // activation flag
+                }
                 Pointer off_name = Pointer.Read(reader);
                 Pointer.DoAt(ref reader, off_name, () => {
                     s.name = reader.ReadNullDelimitedString() + " @ " + offset;
