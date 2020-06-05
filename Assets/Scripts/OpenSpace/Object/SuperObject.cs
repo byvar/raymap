@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpenSpace.AI;
 using OpenSpace.Collide;
 using OpenSpace.Object.Properties;
 using System;
@@ -8,7 +9,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Object {
-    public class SuperObject : ILinkedListEntry {
+    public class SuperObject : ILinkedListEntry, IReferenceable {
         public enum Type {
             Unknown,
             World,
@@ -41,6 +42,9 @@ namespace OpenSpace.Object {
         public SuperObjectFlags flags;
         public BoundingVolume boundingVolume;
         public GeometricObjectCollide boundingVolumeTT;
+
+        [JsonIgnore]
+        public ReferenceFields References { get; set; } = new ReferenceFields();
 
         public GameObject Gao {
             get {

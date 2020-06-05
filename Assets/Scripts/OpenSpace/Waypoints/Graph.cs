@@ -1,9 +1,15 @@
-﻿namespace OpenSpace.Waypoints {
-    public class Graph {
+﻿using Newtonsoft.Json;
+using OpenSpace.Object;
+
+namespace OpenSpace.Waypoints {
+    public class Graph : IReferenceable {
 
         public Pointer offset;
         public LinkedList<GraphNode> nodes;
         public string name = null;
+
+        [JsonIgnore]
+        public ReferenceFields References { get; set; } = new ReferenceFields();
 
         public Graph(Pointer offset) // MicroStructure for Waypoint stuff, pointer to this is stored in Engine Object
         {

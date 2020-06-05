@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PersoBehaviour : MonoBehaviour {
+public class PersoBehaviour : MonoBehaviour, IReferenceable {
     public bool isLoaded { get; private set; } = false;
     public Perso perso;
     public SectorComponent sector;
@@ -65,6 +65,8 @@ public class PersoBehaviour : MonoBehaviour {
 			controller.UpdatePersoActive(perso);
 		}
 	}
+
+    public ReferenceFields References { get => perso.References; set => perso.References = value; }
 
     // Brain clearance
     public bool clearTheBrain = false;

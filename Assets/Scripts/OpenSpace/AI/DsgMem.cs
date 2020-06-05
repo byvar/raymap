@@ -31,18 +31,24 @@ namespace OpenSpace.AI {
                     // Current MemBuffer is cleared in DC files
                     values = new DsgVarValue[dsgVar.amountOfInfos];
                     for (int i = 0; i < dsgVar.amountOfInfos; i++) {
-                        values[i] = new DsgVarValue(dsgVar.dsgVarInfos[i].type);
+                        values[i] = new DsgVarValue(dsgVar.dsgVarInfos[i].type, this);
                         values[i].ReadFromDsgMemBuffer(reader, dsgVar.dsgVarInfos[i], this);
+                        values[i].RegisterReferences(this);
                     }
                 }
                 if (memBufferInitial != null) {
                     valuesInitial = new DsgVarValue[dsgVar.amountOfInfos];
                     for (int i = 0; i < dsgVar.amountOfInfos; i++) {
-                        valuesInitial[i] = new DsgVarValue(dsgVar.dsgVarInfos[i].type);
+                        valuesInitial[i] = new DsgVarValue(dsgVar.dsgVarInfos[i].type, this);
                         valuesInitial[i].ReadFromDsgMemBufferInitial(reader, dsgVar.dsgVarInfos[i], this);
+                        values[i].RegisterReferences(this);
                     }
                 }
             }
+
+
         }
+
+        public Mind mind { get; internal set; }
     }
 }

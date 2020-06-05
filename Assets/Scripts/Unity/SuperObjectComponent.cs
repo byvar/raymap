@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SuperObjectComponent : MonoBehaviour {
+public class SuperObjectComponent : MonoBehaviour, IReferenceable {
     public SuperObject so;
     public uint matrixType;
     public string flagPreview;
 	public string drawFlagsPreview;
     public string spoOffset;
+
+    public ReferenceFields References { get => ((IReferenceable)so).References; set => ((IReferenceable)so).References = value; }
 
     public void Start() {
         if (so != null) {

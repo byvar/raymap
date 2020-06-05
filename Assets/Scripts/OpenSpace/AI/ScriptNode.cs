@@ -61,6 +61,7 @@ namespace OpenSpace.AI {
 				//l.print("ScriptNode " + offset + " - " + sn.nodeType + " (" + sn.type + ") - " + sn.param_ptr);
 				if (sn.nodeType == NodeType.WayPointRef) {
 					WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);
+                    waypoint.References.referencedByNodes.Add(sn);
 				} else if (sn.nodeType == NodeType.String) {
 					Pointer.DoAt(ref reader, sn.param_ptr, () => {
 						string str = reader.ReadNullDelimitedString();
@@ -79,10 +80,52 @@ namespace OpenSpace.AI {
                     comportRef.referencedBy.Add(script);
                 }
             }
+
+            l.onPostLoad.Add(sn.InitPostLoad);
+
             return sn;
         }
 
-		public bool ContentEquals(ScriptNode sn) {
+        public void InitPostLoad()
+        {
+            switch(nodeType) {
+                case NodeType.GraphRef:
+                    Graph graphRef = Graph.FromOffset(param_ptr);
+                    if (graphRef != null) {
+                        graphRef.References.referencedByNodes.Add(this);
+                    } else {
+                        Debug.LogWarning("Couldn't add ScriptNode reference to Graph offset " + param_ptr);
+                    }
+                    break;
+                case NodeType.PersoRef:
+                    Perso persoRef = Perso.FromOffset(param_ptr);
+                    if (persoRef != null) {
+                        persoRef.References.referencedByNodes.Add(this);
+                    } else {
+                        Debug.LogWarning("Couldn't add ScriptNode reference to Perso offset " + param_ptr);
+                    }
+                    break;
+                case NodeType.SectorRef:
+                    Sector sectorRef = Sector.FromOffset(param_ptr);
+                    if (sectorRef != null) {
+                        sectorRef.References.referencedByNodes.Add(this);
+                    } else {
+                        Debug.LogWarning("Couldn't add ScriptNode reference to Sector offset " + param_ptr);
+                    }
+                    break;
+                case NodeType.SuperObjectRef:
+                    SuperObject superObjectRef = SuperObject.FromOffset(param_ptr);
+                    if (superObjectRef != null) {
+                        superObjectRef.References.referencedByNodes.Add(this);
+                    } else {
+                        Debug.LogWarning("Couldn't add ScriptNode reference to SuperObject offset " + param_ptr);
+                    }
+                    break;
+                default: return;
+            }
+        }
+
+        public bool ContentEquals(ScriptNode sn) {
 			if (sn == null) return false;
 			if (param != sn.param || param_ptr != sn.param_ptr) return false;
 			if (type != sn.type || indent != sn.indent) return false;

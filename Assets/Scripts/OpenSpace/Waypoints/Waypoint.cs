@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenSpace.Object;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace OpenSpace.Waypoints {
-    public class WayPoint {
+    public class WayPoint : IReferenceable{
 
         public Pointer offset;
         public Vector3 position;
@@ -14,6 +15,9 @@ namespace OpenSpace.Waypoints {
 
         [JsonIgnore]
         public List<GraphNode> containingGraphNodes;
+
+        [JsonIgnore]
+        public ReferenceFields References { get; set; } = new ReferenceFields();
 
         // For isolate waypoints
         private GameObject gao = null;

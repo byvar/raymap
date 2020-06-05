@@ -34,7 +34,7 @@ namespace OpenSpace.AI {
                     //l.print(dsgVar.amountOfInfos);
                     for (uint i = 0; i < amountOfInfos; i++) {
                         dsgVarInfos[i] = DsgVarInfoEntry.Read(reader, Pointer.Current(reader), i);
-                        defaultValues[i] = new DsgVarValue(dsgVarInfos[i].type);
+                        defaultValues[i] = new DsgVarValue(dsgVarInfos[i].type, null);
                         defaultValues[i].ReadFromDsgVarBuffer(reader, dsgVarInfos[i], this);
 
                         //l.print(infoEntry.offset + " - " + infoEntry.typeNumber + " - " + infoEntry.type + " - " + infoEntry.offsetInBuffer);

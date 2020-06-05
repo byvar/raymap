@@ -13,6 +13,7 @@ namespace OpenSpace.AI {
     public class DsgVarValue {
         public DsgVarInfoEntry.DsgVarType type;
 		public Pointer offset;
+        public DsgMem dsgMem;
 
 		// Array data
 		public uint arrayTypeNumber;
@@ -47,11 +48,13 @@ namespace OpenSpace.AI {
         public Graph valueGraph;
         public int valueText;
         public SuperObject valueSuperObject;
+
         public uint valueSOLinks;
 		public uint valueWay;
 
-		public DsgVarValue(DsgVarInfoEntry.DsgVarType type) {
+		public DsgVarValue(DsgVarInfoEntry.DsgVarType type, DsgMem dsgMem) {
 			this.type = type;
+            this.dsgMem = dsgMem;
 		}
 
         public void Read(Reader reader) {
@@ -179,7 +182,11 @@ namespace OpenSpace.AI {
 					valueSuperObject = SuperObject.FromOffset(valuePointer);
 					break;
 			}
-		}
+
+            if (dsgMem != null) {
+                RegisterReferences(dsgMem);
+            }
+        }
 
 		public override string ToString() {
 			switch (type) {
@@ -351,7 +358,7 @@ namespace OpenSpace.AI {
 			if (valueArray == null || arrayLength != valueArray.Length) {
 				valueArray = new DsgVarValue[arrayLength];
 				for (int i = 0; i < arrayLength; i++) {
-					valueArray[i] = new DsgVarValue(arrayType);
+					valueArray[i] = new DsgVarValue(arrayType, dsgMem);
 				}
 			}
 			for (uint i = 0; i < arrayLength; i++) {
@@ -527,7 +534,24 @@ namespace OpenSpace.AI {
 			return true;
 		}
 
-		public class List {
+        public void RegisterReferences(DsgMem dsgMem)
+        {
+            switch(type) {
+                case DsgVarInfoEntry.DsgVarType.SuperObject:    valueSuperObject?.References.referencedByDsgMems.Add(dsgMem); break;
+                case DsgVarInfoEntry.DsgVarType.Perso:          valuePerso?.References.referencedByDsgMems.Add(dsgMem); break;
+                case DsgVarInfoEntry.DsgVarType.WayPoint:       valueWayPoint?.References.referencedByDsgMems.Add(dsgMem); break;
+                case DsgVarInfoEntry.DsgVarType.Graph:          valueGraph?.References.referencedByDsgMems.Add(dsgMem); break;
+                // Arrays
+                case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
+                case DsgVarInfoEntry.DsgVarType.PersoArray:
+                case DsgVarInfoEntry.DsgVarType.WayPointArray:
+                case DsgVarInfoEntry.DsgVarType.GraphArray:
+                    valueArray.ToList().ForEach(v => v.RegisterReferences(dsgMem)); break;
+                default: return;
+            }
+        }
+
+        public class List {
 			public byte curLength;
 			public byte maxLength;
 			public Entry[] list;

@@ -7,7 +7,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Object {
-    public class Sector : IEngineObject {
+    public class Sector : IEngineObject, IReferenceable {
 
         public Pointer offset;
         public string name = "Sector";
@@ -49,6 +49,7 @@ namespace OpenSpace.Object {
             get { return superObject; }
         }
 
+        public ReferenceFields References { get; set; } = new ReferenceFields();
 
         public Sector(Pointer offset, SuperObject so) {
             this.offset = offset;

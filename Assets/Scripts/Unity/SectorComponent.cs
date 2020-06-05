@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SectorComponent : MonoBehaviour {
+public class SectorComponent : MonoBehaviour, IReferenceable {
     public SectorManager sectorManager;
     public Sector sector;
 	public OpenSpace.ROM.Sector sectorROM;
@@ -135,7 +135,9 @@ public class SectorComponent : MonoBehaviour {
 		}
 	}
 
-	public void SetGameObjectActive(bool active) {
+    public ReferenceFields References { get => ((IReferenceable)sector).References; set => ((IReferenceable)sector).References = value; }
+
+    public void SetGameObjectActive(bool active) {
 		Gao.SetActive(active);
 	}
 

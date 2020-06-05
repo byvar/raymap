@@ -1,4 +1,5 @@
-﻿using OpenSpace.AI;
+﻿using Newtonsoft.Json;
+using OpenSpace.AI;
 using OpenSpace.Collide;
 using OpenSpace.Object.Properties;
 using OpenSpace.Waypoints;
@@ -12,7 +13,7 @@ namespace OpenSpace.Object {
     /// <summary>
     /// Also called "Actor" in the code which might be a better name, but I'll stick to the R2 one for now
     /// </summary>
-    public class Perso : IEngineObject {
+    public class Perso : IEngineObject, IReferenceable {
         public Pointer offset;
 
         // Struct
@@ -41,6 +42,9 @@ namespace OpenSpace.Object {
         public CollSet collset;
         public PersoSectorInfo sectInfo;
 
+        [JsonIgnore]
+        public ReferenceFields References { get; set; } = new ReferenceFields();
+
         private GameObject gao;
         public GameObject Gao {
             get {
@@ -59,6 +63,7 @@ namespace OpenSpace.Object {
         }
 
         private SuperObject superObject;
+
         public SuperObject SuperObject {
             get {
                 return superObject;

@@ -1,10 +1,11 @@
-﻿using OpenSpace.Waypoints;
+﻿using OpenSpace.Object;
+using OpenSpace.Waypoints;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class WayPointBehaviour : MonoBehaviour {
+public class WayPointBehaviour : MonoBehaviour, IReferenceable {
 	public GraphManager manager;
 	public List<GraphNode> nodes = new List<GraphNode>();
 	public WayPoint wp = null;
@@ -15,6 +16,7 @@ public class WayPointBehaviour : MonoBehaviour {
     private List<Vector3> targetPositions = new List<Vector3>();
     private Vector3 currentPosition = Vector3.zero;
 
+    public ReferenceFields References { get => ((IReferenceable)wp).References; set => ((IReferenceable)wp).References = value; }
 
     public void Init() {
         currentPosition = transform.position;
