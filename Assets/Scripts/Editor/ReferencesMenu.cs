@@ -23,13 +23,13 @@ namespace Assets.Scripts.Editor {
                 var scriptReferences = references.SelectMany(r => r.referencedByNodes);
 
                 var dsgMemPersos = UnityEngine.Object.FindObjectsOfType<PersoBehaviour>().Where(p => dsgMemReferences.Contains(p.perso?.brain?.mind?.dsgMem)).Select(p => p.perso);
-                var scriptList = UnityEngine.Object.FindObjectsOfType<ScriptComponent>().Where(p => p.script.scriptNodes.Intersect(scriptReferences).Any());
+                var scriptList = UnityEngine.Object.FindObjectsOfType<ScriptComponent>().Where(p => p?.script?.scriptNodes!=null ? p.script.scriptNodes.Intersect(scriptReferences).Any() : false);
 
                 ReferencesResultWindow.Init();
 
                 ReferencesResultWindow window = (ReferencesResultWindow)EditorWindow.GetWindow(typeof(ReferencesResultWindow));
                 window.hasResults = true;
-                window.searchTarget = a.name;
+                window.searchTarget = a;
                 window.dsgMemPersosResults = dsgMemPersos.ToList();
                 window.scriptResults = scriptList.ToList();
             }
@@ -40,10 +40,11 @@ namespace Assets.Scripts.Editor {
 
         public List<Perso> dsgMemPersosResults = new List<Perso>();
         public List<ScriptComponent> scriptResults = new List<ScriptComponent>();
-        public string searchTarget = "";
+        public GameObject searchTarget = null;
         public bool hasResults = false;
         public Vector2 scrollPosition1 = Vector2.zero;
         public Vector2 scrollPosition2 = Vector2.zero;
+        private float headerHeight = 50;
 
         [MenuItem("Raymap/Find References")]
         public static void Init()
@@ -62,8 +63,17 @@ namespace Assets.Scripts.Editor {
             }
 
             if (hasResults) {
+
+                GUILayout.BeginHorizontal(GUILayout.Height(headerHeight));
+                if (GUILayout.Button($"Find references to {searchTarget.name}", EditorStyles.linkLabel)) {
+                    EditorGUIUtility.PingObject(searchTarget);
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginVertical();
                 ShowReferencesFromDsgVars();
                 ShowReferencesFromScripts();
+                GUILayout.EndVertical();
 
             } else {
                 EditorGUILayout.HelpBox("Right click an object in the hierarchy and select\nRaymap > Show References to find references.", MessageType.Info);
@@ -72,18 +82,22 @@ namespace Assets.Scripts.Editor {
 
         private void ShowReferencesFromScripts()
         {
-            GUILayout.Label($"References to {searchTarget} from Scripts:");
-
-            scrollPosition2 = GUILayout.BeginScrollView(scrollPosition2);
-
             if (scriptResults.Count == 0) {
-                EditorGUILayout.HelpBox("No references found", MessageType.Info);
+                EditorGUILayout.HelpBox("No references from Scripts", MessageType.Info);
+                return;
             }
+            GUILayout.Label($"References from Scripts:");
+
+            scrollPosition2 = GUILayout.BeginScrollView(scrollPosition2, GUILayout.MinHeight((this.position.height / 2) - headerHeight), GUILayout.ExpandHeight(true));
 
             scriptResults.ForEach(s =>
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(s.script.behaviorOrMacro.ToString());
+                if (s?.script?.behaviorOrMacro != null) {
+                    GUILayout.Label(s.script.behaviorOrMacro.ToString());
+                } else {
+                    GUILayout.Label("Script at offset "+s.script.offset);
+                }
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button("Go")) {
                     EditorGUIUtility.PingObject(s.gameObject);
@@ -95,9 +109,13 @@ namespace Assets.Scripts.Editor {
 
         private void ShowReferencesFromDsgVars()
         {
-            GUILayout.Label($"References to {searchTarget} from Designer Variables:");
+            if (dsgMemPersosResults.Count == 0) {
+                EditorGUILayout.HelpBox("No references to from Designer Variables", MessageType.Info);
+                return;
+            }
+            GUILayout.Label($"References from Designer Variables:");
 
-            scrollPosition1 = GUILayout.BeginScrollView(scrollPosition1);
+            scrollPosition1 = GUILayout.BeginScrollView(scrollPosition1, GUILayout.MinHeight((this.position.height / 2) - headerHeight), GUILayout.ExpandHeight(true));
 
             if (dsgMemPersosResults.Count == 0) {
                 EditorGUILayout.HelpBox("No references found", MessageType.Info);
