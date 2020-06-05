@@ -4,7 +4,7 @@ using UnityEditor;
 using OpenSpace.Waypoints;
 
 [CustomEditor(typeof(WayPointBehaviour))]
-public class WapointBehaviourEditor : Editor {
+public class WayPointBehaviourEditor : Editor {
     
     public override void OnInspectorGUI() {
         DrawDefaultInspector();
