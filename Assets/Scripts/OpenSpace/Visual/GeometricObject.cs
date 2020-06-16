@@ -23,13 +23,10 @@ namespace OpenSpace.Visual {
         public Pointer off_element_types;
         public Pointer off_elements;
         public Pointer off_mapping; // Revolution only
-		public Pointer off_parallelboxes; // Unused
-
-		public uint lookAtMode;
+        public uint lookAtMode;
         public ushort num_vertices;
         public ushort num_elements;
-		public ushort num_parallelboxes; // Unused, always 0
-		[JsonIgnore]
+        [JsonIgnore]
         public string name;
         public Vector3[] vertices = null;
         public Vector3[] normals = null;
@@ -41,9 +38,6 @@ namespace OpenSpace.Visual {
 
 		public Pointer<PS2OptimizedSDCStructure> optimizedObject;
 		public uint ps2IsSinus;
-
-		public Vector3 sphereCenter = Vector3.zero;
-		public float sphereRadius = 0;
         
         private GameObject gao = null;
         public GameObject Gao {
@@ -64,13 +58,6 @@ namespace OpenSpace.Visual {
             gao = new GameObject(name);
             gao.tag = "Visual";
             gao.layer = LayerMask.NameToLayer("Visual");
-
-			if (sphereRadius>0) {
-				var sc = gao.AddComponent<SphereCollider>();
-				sc.radius = sphereRadius;
-				sc.center = sphereCenter;
-			}
-
             if (bones != null) {
                 GameObject child = bones.Gao;
                 child.transform.SetParent(gao.transform);
@@ -151,15 +138,12 @@ namespace OpenSpace.Visual {
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
 				m.off_element_types = Pointer.Read(reader);
 				m.off_elements = Pointer.Read(reader);
-				
+				reader.ReadInt32();
+				reader.ReadInt32();
 				if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
-
-				reader.ReadInt32();
-				m.off_parallelboxes = Pointer.Read(reader); // Unused
-
 				if (Settings.s.game == Settings.Game.Dinosaur) {
 					reader.ReadInt32();
 					reader.ReadInt32();
@@ -170,18 +154,11 @@ namespace OpenSpace.Visual {
 					//if (m.lookAtMode != 0) l.print(m.lookAtMode);
 					m.num_vertices = reader.ReadUInt16();
 					m.num_elements = reader.ReadUInt16();
-
-					reader.ReadUInt16();
-					m.num_parallelboxes = reader.ReadUInt16();
-
-
-					m.sphereRadius = reader.ReadSingle(); // bounding volume radius
-					float sphereX = reader.ReadSingle(); // x
-					float sphereZ = reader.ReadSingle(); // z
-					float sphereY = reader.ReadSingle(); // y
-
-					m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
-
+					reader.ReadInt32();
+					reader.ReadSingle(); // bounding volume radius
+					reader.ReadSingle(); // x
+					reader.ReadSingle(); // z
+					reader.ReadSingle(); // y
 					reader.ReadInt32();
 					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 						reader.ReadInt32();
