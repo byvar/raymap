@@ -24,6 +24,10 @@ namespace OpenSpace.Collide {
         public Pointer off_normals = null;
         public Pointer off_element_types;
         public Pointer off_elements;
+        public Pointer off_parallelBoxes;
+        public ushort num_parallelBoxes;
+        public Vector3 sphereCenter = Vector3.zero;
+        public float sphereRadius = 0;
 
         public Vector3[] vertices = null;
         public Vector3[] normals = null;
@@ -144,27 +148,37 @@ namespace OpenSpace.Collide {
             if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
             m.off_element_types = Pointer.Read(reader);
             m.off_elements = Pointer.Read(reader);
-			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
-				Pointer.Read(reader);
-				if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
-					reader.ReadInt32();
-					reader.ReadInt32();
-					reader.ReadInt32();
-					reader.ReadInt32();
-					m.num_vertices = reader.ReadUInt16();
-					m.num_elements = reader.ReadUInt16();
-				}
-				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
-					reader.ReadInt32();
-					reader.ReadInt32();
-				}
-			}
-            reader.ReadInt32();
+            if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
+                Pointer.Read(reader);
+                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
+                        reader.ReadInt32();
+                        reader.ReadInt32();
+                        reader.ReadInt32();
+                        reader.ReadInt32();
+                        m.num_vertices = reader.ReadUInt16();
+                        m.num_elements = reader.ReadUInt16();
+                    }
+                    if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
+                        reader.ReadInt32();
+                        reader.ReadInt32();
+                    }
+                    reader.ReadUInt16();
+                    m.num_parallelBoxes = reader.ReadUInt16();
+                } else {
+                    //l.print((Pointer.Current(reader).FileOffset - offset.FileOffset));
+                    m.off_parallelBoxes = Pointer.Read(reader);
+                }
+            } else {
+                reader.ReadUInt32();
+            }
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
-                reader.ReadSingle();
-                reader.ReadSingle();
-                reader.ReadSingle();
-                reader.ReadSingle();
+                m.sphereRadius = reader.ReadSingle(); // bounding volume radius
+                float sphereX = reader.ReadSingle(); // x
+                float sphereZ = reader.ReadSingle(); // z
+                float sphereY = reader.ReadSingle(); // y
+                m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
+
                 if (Settings.s.engineVersion == Settings.EngineVersion.R2) reader.ReadUInt32();
             }
             

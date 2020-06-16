@@ -41,7 +41,7 @@ namespace OpenSpace.AI {
                     for (int i = 0; i < dsgVar.amountOfInfos; i++) {
                         valuesInitial[i] = new DsgVarValue(dsgVar.dsgVarInfos[i].type, this);
                         valuesInitial[i].ReadFromDsgMemBufferInitial(reader, dsgVar.dsgVarInfos[i], this);
-                        values[i].RegisterReferences(this);
+                        valuesInitial[i].RegisterReferences(this);
                     }
                 }
             }

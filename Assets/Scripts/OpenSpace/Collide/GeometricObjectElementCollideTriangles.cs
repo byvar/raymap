@@ -20,6 +20,7 @@ namespace OpenSpace.Collide {
         public Pointer off_unk;
         public Pointer off_unk2;
         public ushort num_mapping_entries;
+        public short ind_parallelBox;
 
         public GameMaterial gameMaterial;
         public int[] triangles = null;
@@ -153,13 +154,13 @@ namespace OpenSpace.Collide {
 					if (Settings.s.game != Settings.Game.TTSE) {
 						Pointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
 						reader.ReadUInt16(); // num_unk
-						reader.ReadUInt16();
+						sm.ind_parallelBox = reader.ReadInt16();
 					}
 				} else {
 					sm.off_triangles = Pointer.Read(reader);
 					sm.off_normals = Pointer.Read(reader);
 					sm.num_triangles = reader.ReadUInt16();
-					reader.ReadUInt16();
+					sm.ind_parallelBox = reader.ReadInt16();
 					reader.ReadUInt32();
 					if (Settings.s.game != Settings.Game.Dinosaur) {
 						sm.off_mapping = Pointer.Read(reader);

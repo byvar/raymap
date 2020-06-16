@@ -21,6 +21,7 @@ namespace OpenSpace.Collide {
 		
         public Pointer off_spheres; // called IndexedSprites in the game code
         public ushort num_spheres;
+        public short ind_parallelBox;
         public IndexedSphere[] spheres;
 		
         private GameObject gao = null;
@@ -87,7 +88,7 @@ namespace OpenSpace.Collide {
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.off_spheres = Pointer.Read(reader);
                 s.num_spheres = reader.ReadUInt16();
-                reader.ReadInt16(); // -1
+                s.ind_parallelBox = reader.ReadInt16(); // -1
             } else {
                 s.num_spheres = (ushort)reader.ReadUInt32();
                 s.off_spheres = Pointer.Read(reader);

@@ -20,6 +20,7 @@ namespace OpenSpace.Collide {
 		
         public Pointer off_boxes; // called IndexedSprites in the game code
         public ushort num_boxes;
+        public short ind_parallelBox;
         public IndexedAlignedBox[] boxes;
 		
         private GameObject gao = null;
@@ -84,7 +85,7 @@ namespace OpenSpace.Collide {
             if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 s.off_boxes = Pointer.Read(reader);
                 s.num_boxes = reader.ReadUInt16();
-                reader.ReadInt16(); // -1
+                s.ind_parallelBox = reader.ReadInt16(); // -1
             } else {
                 s.num_boxes = (ushort)reader.ReadUInt32();
                 s.off_boxes = Pointer.Read(reader);

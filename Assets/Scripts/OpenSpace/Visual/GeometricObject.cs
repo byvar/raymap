@@ -26,7 +26,12 @@ namespace OpenSpace.Visual {
         public uint lookAtMode;
         public ushort num_vertices;
         public ushort num_elements;
-        [JsonIgnore]
+		public Pointer off_parallelBoxes;
+		public ushort num_parallelBoxes;
+		public Vector3 sphereCenter = Vector3.zero;
+		public float sphereRadius = 0;
+
+		[JsonIgnore]
         public string name;
         public Vector3[] vertices = null;
         public Vector3[] normals = null;
@@ -100,19 +105,21 @@ namespace OpenSpace.Visual {
 				m.off_elements = Pointer.Read(reader);
 				m.off_vertices = Pointer.Read(reader);
 				m.off_normals = Pointer.Read(reader);
-				reader.ReadSingle();
-				reader.ReadSingle();
-				reader.ReadSingle();
-				reader.ReadSingle();
+				m.sphereRadius = reader.ReadSingle(); // bounding volume radius
+				float sphereX = reader.ReadSingle(); // x
+				float sphereZ = reader.ReadSingle(); // z
+				float sphereY = reader.ReadSingle(); // y
+				m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 				m.lookAtMode = reader.ReadUInt32();
 			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				m.off_element_types = Pointer.Read(reader);
 				m.off_elements = Pointer.Read(reader);
 				uint flags = reader.ReadUInt32();
-				reader.ReadSingle();
-				reader.ReadSingle();
-				reader.ReadSingle();
-				reader.ReadSingle();
+				m.sphereRadius = reader.ReadSingle(); // bounding volume radius
+				float sphereX = reader.ReadSingle(); // x
+				float sphereZ = reader.ReadSingle(); // z
+				float sphereY = reader.ReadSingle(); // y
+				m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 				m.off_mapping = Pointer.Read(reader);
 				m.num_vertices = reader.ReadUInt16();
 				m.num_elements = reader.ReadUInt16();
@@ -138,10 +145,14 @@ namespace OpenSpace.Visual {
 				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
 				m.off_element_types = Pointer.Read(reader);
 				m.off_elements = Pointer.Read(reader);
-				reader.ReadInt32();
-				reader.ReadInt32();
 				if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
 					reader.ReadInt32();
+					reader.ReadInt32();
+				}
+				reader.ReadInt32();
+				if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+					m.off_parallelBoxes = Pointer.Read(reader);
+				} else {
 					reader.ReadInt32();
 				}
 				if (Settings.s.game == Settings.Game.Dinosaur) {
@@ -154,11 +165,13 @@ namespace OpenSpace.Visual {
 					//if (m.lookAtMode != 0) l.print(m.lookAtMode);
 					m.num_vertices = reader.ReadUInt16();
 					m.num_elements = reader.ReadUInt16();
-					reader.ReadInt32();
-					reader.ReadSingle(); // bounding volume radius
-					reader.ReadSingle(); // x
-					reader.ReadSingle(); // z
-					reader.ReadSingle(); // y
+					reader.ReadUInt16();
+					m.num_parallelBoxes = reader.ReadUInt16();
+					m.sphereRadius = reader.ReadSingle(); // bounding volume radius
+					float sphereX = reader.ReadSingle(); // x
+					float sphereZ = reader.ReadSingle(); // z
+					float sphereY = reader.ReadSingle(); // y
+					m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 					reader.ReadInt32();
 					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 						reader.ReadInt32();
@@ -173,10 +186,11 @@ namespace OpenSpace.Visual {
 				} else {
 					reader.ReadInt32();
 					reader.ReadInt32();
-					reader.ReadSingle();
-					reader.ReadSingle();
-					reader.ReadSingle();
-					reader.ReadSingle();
+					m.sphereRadius = reader.ReadSingle(); // bounding volume radius
+					float sphereX = reader.ReadSingle(); // x
+					float sphereZ = reader.ReadSingle(); // z
+					float sphereY = reader.ReadSingle(); // y
+					m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 				}
 			}
             m.name = "Mesh @ " + offset;
