@@ -177,11 +177,12 @@ public class UnityWindowSettings : UnityWindow {
 		rect = PrefixToggle(rect, ref export);
 		UnitySettings.ExportAfterLoad = export;
 
-        UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
+		UnitySettings.ExportPath = DirectoryField(GetNextRect(ref yPos), "Export Path", UnitySettings.ExportPath);
+		UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
 
-        if (UnitySettings.ExportAfterLoad) {
+        /*if (UnitySettings.ExportAfterLoad) {
 			UnitySettings.ExportPath = DirectoryField(rect, "Export Path", UnitySettings.ExportPath, includeLabel: false);
-		}
+		}*/
 
 		// Misc
 		DrawHeader(ref yPos, "Miscellaneous Settings");

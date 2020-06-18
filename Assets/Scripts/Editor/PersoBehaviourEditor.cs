@@ -7,7 +7,7 @@ using System;
 using OpenSpace.Animation.Component;
 using OpenSpace.Object.Properties;
 using UnityEditor.IMGUI.Controls;
-using ModelDataExport.R3.PersoStatesArmatureAnimationsExporting;
+using ModelExport.R3.PersoStatesArmatureAnimationsExporting;
 
 [CustomEditor(typeof(PersoBehaviour))]
 public class PersoBehaviourEditor : Editor {
