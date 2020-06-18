@@ -23,11 +23,11 @@ namespace OpenSpace.Visual.Deform {
                     unityBone.localScale = DefaultScale;
 
                     // Visualization
-                    /*MeshRenderer mr = gao.AddComponent<MeshRenderer>();
+                    MeshRenderer mr = gao.AddComponent<MeshRenderer>();
                     MeshFilter mf = gao.AddComponent<MeshFilter>();
                     Mesh mesh = Util.CreateBox(0.1f);
                     mf.mesh = mesh;
-                    mr.material = MapLoader.Loader.baseMaterial;*/
+                    mr.material = MapLoader.Loader.baseMaterial;
                 }
                 return unityBone;
             }
