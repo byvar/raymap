@@ -110,7 +110,7 @@ namespace OpenSpace.PS1 {
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
-				gao.AddComponent<R3AnimatedMesh>();
+				gao.AddComponent<ExportableModel>();
 				MeshRenderer mr = gao.AddComponent<MeshRenderer>();
 				
 				List<int> vertIndices = new List<int>();
@@ -237,7 +237,7 @@ namespace OpenSpace.PS1 {
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
-				gao.AddComponent<R3AnimatedMesh>();
+				gao.AddComponent<ExportableModel>();
 				MeshRenderer mr = gao.AddComponent<MeshRenderer>();
 				List<int> vertIndices = new List<int>();
 				List<int> triIndices = new List<int>();

@@ -340,7 +340,7 @@ namespace OpenSpace.Visual {
 			}
 			if (geo.bones != null) {
 				OPT_mr = OPT_gao.AddComponent<SkinnedMeshRenderer>();
-				OPT_gao.AddComponent<R3AnimatedMesh>();
+				OPT_gao.AddComponent<ExportableModel>();
 				OPT_s_mr = (SkinnedMeshRenderer)OPT_mr;
 				OPT_s_mr.bones = geo.bones.bones;
 				OPT_s_mr.rootBone = geo.bones.bones[0];
@@ -351,7 +351,7 @@ namespace OpenSpace.Visual {
 				bc.size = OPT_s_mr.bounds.size;
 			} else {
 				MeshFilter mf = OPT_gao.AddComponent<MeshFilter>();
-				OPT_gao.AddComponent<R3AnimatedMesh>();
+				OPT_gao.AddComponent<ExportableModel>();
 				mf.sharedMesh = OPT_unityMesh;
 				OPT_mr = OPT_gao.AddComponent<MeshRenderer>();
 
@@ -475,7 +475,7 @@ namespace OpenSpace.Visual {
 				/*mesh.uv = new_uvs_spe;*/
 				if (new_boneWeights != null) {
 					mr = gao.AddComponent<SkinnedMeshRenderer>();
-					gao.AddComponent<R3AnimatedMesh>();
+					gao.AddComponent<ExportableModel>();
 					s_mr = (SkinnedMeshRenderer)mr;
 					s_mr.bones = geo.bones.bones;
 					s_mr.rootBone = geo.bones.bones[0];
@@ -486,7 +486,7 @@ namespace OpenSpace.Visual {
 					bc.size = s_mr.bounds.size;
 				} else {
 					MeshFilter mf = gao.AddComponent<MeshFilter>();
-					gao.AddComponent<R3AnimatedMesh>();
+					gao.AddComponent<ExportableModel>();
 					mr = gao.AddComponent<MeshRenderer>();
 					mf.sharedMesh = unityMesh;
 					try {
@@ -592,7 +592,7 @@ namespace OpenSpace.Visual {
 				}
 				if (new_boneWeights != null) {
                     OPT_mr = OPT_gao.AddComponent<SkinnedMeshRenderer>();
-					OPT_gao.AddComponent<R3AnimatedMesh>();
+					OPT_gao.AddComponent<ExportableModel>();
 					OPT_s_mr = (SkinnedMeshRenderer)OPT_mr;
                     OPT_s_mr.bones = geo.bones.bones;
                     OPT_s_mr.rootBone = geo.bones.bones[0];
@@ -603,7 +603,7 @@ namespace OpenSpace.Visual {
 					bc.size = OPT_s_mr.bounds.size;
 				} else {
                     MeshFilter mf = OPT_gao.AddComponent<MeshFilter>();
-					OPT_gao.AddComponent<R3AnimatedMesh>();
+					OPT_gao.AddComponent<ExportableModel>();
 					mf.sharedMesh = OPT_unityMesh;
                     OPT_mr = OPT_gao.AddComponent<MeshRenderer>();
 

@@ -42,7 +42,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 	private short[][] channelNTTO;
 	private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
-	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
+	//private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	public Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
 	private bool isAlways = false;
 	public bool IsAlways {

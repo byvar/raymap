@@ -7,6 +7,7 @@ using System;
 using OpenSpace.Animation.Component;
 using OpenSpace.Object.Properties;
 using UnityEditor.IMGUI.Controls;
+using ModelDataExport.R3.PersoStatesArmatureAnimationsExporting;
 
 [CustomEditor(typeof(PersoBehaviour))]
 public class PersoBehaviourEditor : Editor {
@@ -98,8 +99,7 @@ public class PersoBehaviourEditor : Editor {
         GUILayout.EndHorizontal();
 
         if (GUILayout.Button("Print Animation Debug Info")) pb.PrintAnimationDebugInfo();
-        if (GUILayout.Button("Next Frame Of Animation")) pb.NextFrameOfAnimation();
-        if (GUILayout.Button("Export Animations Data")) pb.ExportAnimationsData();
+        if (GUILayout.Button("Export Animations Data")) ExportAnimationsData();
     }
 
 	IList<StateTransitionsTreeElement> GetData() {
@@ -147,5 +147,11 @@ public class PersoBehaviourEditor : Editor {
 				stateIndex = target.stateIndex,
 			};
 		}
+	}
+
+	void ExportAnimationsData() {
+		PersoBehaviour pb = (PersoBehaviour)target;
+		PersoAnimationsDataExporter pade = new PersoAnimationsDataExporter(pb);
+		pade.ExportPersoStatesAnimations();
 	}
 }

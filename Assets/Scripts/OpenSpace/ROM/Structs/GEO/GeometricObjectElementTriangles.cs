@@ -59,7 +59,7 @@ namespace OpenSpace.ROM {
 					gao.name += " " + string.Format("0x{0:X4}", ti.flags) + " " + string.Format("0x{0:X4}", ti.flags2);
 				}*/
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
-				gao.AddComponent<R3AnimatedMesh>();
+				gao.AddComponent<ExportableModel>();
 				Mesh mesh = new Mesh();
 				if (Settings.s.platform == Settings.Platform._3DS) {
 					if (sz_vertices == 0) {

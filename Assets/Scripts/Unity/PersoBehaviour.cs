@@ -1,7 +1,4 @@
-﻿using Assets.Scripts;
-using Assets.Scripts.Unity;
-using Assets.Scripts.Unity.ModelDataExporting.R3.PersoStatesArmatureAnimationsExporting;
-using OpenSpace;
+﻿using OpenSpace;
 using OpenSpace.AI;
 using OpenSpace.Animation;
 using OpenSpace.Animation.Component;
@@ -44,7 +41,6 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
     bool forceAnimUpdate = false;
     public uint currentFrame = 0;
     public bool playAnimation = true;
-    public bool playAnimationFramesAutomatically = true;
     public float animationSpeed = 15f;
     private float updateCounter = 0f;
     public PhysicalObject[][] subObjects { get; private set; } = null; // [channel][ntto]
@@ -73,7 +69,6 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 
     // Brain clearance
     public bool clearTheBrain = false;
-    private PersoAnimationsDataExporter persoAnimationsDataExporter;
 
 
     // Use this for initialization
@@ -110,7 +105,6 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
                     SetState(0);
                 }
             }
-            persoAnimationsDataExporter = new PersoAnimationsDataExporter(this);
         }
         isLoaded = true;
     }
@@ -266,6 +260,10 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
                     }
                 }
 
+                // TODO: replace evalMacro calls by replacing regex "evalMacro\([a-zA-Z0-9_]*\.Macro\[([0-9]+)\]\)" to "yield return Macro_$1()"
+                // TODO: replace Proc_ChangeMyComport\([a-zA-Z0-9_]+\.Rule\[[0-9]+\]\[\"([^"]+)\"\]\)     with     sm.ChangeActiveRuleState("$1")
+                // TODO: replace Cond_IsValidObject\(([^\)]+)\)    with $1 != null
+
                 string startString = "protected override void Start() {" + Environment.NewLine + "base.Start();" + Environment.NewLine + Environment.NewLine;
                 startString += "// Rules" + Environment.NewLine;
                 ruleStatesInitializer.ForEach((s) => { startString += "sm.AddRuleState(State.Create(\"" + s + "\", " + s + "));" + Environment.NewLine; });
@@ -338,16 +336,6 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
                 print(l.animationBanks[bank_index].animations[anim_index] != null);
             }
         }
-    }
-
-    public void NextFrameOfAnimation()
-    {
-        currentFrame += 1;
-    }
-
-    public void ExportAnimationsData()
-    {
-        persoAnimationsDataExporter.ExportPersoStatesAnimations();
     }
     #endregion
 
@@ -498,10 +486,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
             if ((!insideSectors && updateCounter >= 2f) || (insideSectors && updateCounter >= 1f)) {
                 uint passedFrames = (uint)Mathf.FloorToInt(updateCounter);
                 updateCounter %= 1;
-                if (playAnimationFramesAutomatically)
-                {
-                    currentFrame += passedFrames;
-                }                
+                currentFrame += passedFrames;
                 if (a3d != null && currentFrame >= a3d.num_onlyFrames) {
                     if (autoNextState) {
                         AnimA3DGeneral prevAnim = a3d;
@@ -608,6 +593,13 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
                             subObjects[i][j].Gao.transform.parent = channelObjects[i].transform;
                             subObjects[i][j].Gao.name = "[" + j + "] Invisible PO";
                             subObjects[i][j].Gao.SetActive(false);
+                            /*GameObject boneVisualisation = new GameObject("Bone vis");
+                            boneVisualisation.transform.SetParent(subObjects[i][j].Gao.transform);
+                            MeshRenderer mr = boneVisualisation.AddComponent<MeshRenderer>();
+                            MeshFilter mf = boneVisualisation.AddComponent<MeshFilter>();
+                            Mesh mesh = Util.CreateBox(0.1f);
+                            mf.mesh = mesh;
+                            boneVisualisation.transform.localScale = Vector3.one / 4f;*/
                         } else {
                             if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > ntto.object_index) {
                                 PhysicalObject o = perso.p3dData.objectList[ntto.object_index].po;
@@ -764,6 +756,8 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 			this.animLargo = animLargo;
 			currentFrame = 0;
 			if (animLargo != null) {
+				//animationSpeed = a3d.speed;
+				// Init channels & subobjects
 				subObjects = new PhysicalObject[animLargo.num_channels][];
 				channelObjects = new GameObject[animLargo.num_channels];
 				currentActivePO = new int[animLargo.num_channels];
@@ -792,10 +786,18 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 							subObjects[i][j].Gao.transform.parent = channelObjects[i].transform;
 							subObjects[i][j].Gao.name = "[" + j + "] Invisible PO";
 							subObjects[i][j].Gao.SetActive(false);
+							/*GameObject boneVisualisation = new GameObject("Bone vis");
+                            boneVisualisation.transform.SetParent(subObjects[i][j].Gao.transform);
+                            MeshRenderer mr = boneVisualisation.AddComponent<MeshRenderer>();
+                            MeshFilter mf = boneVisualisation.AddComponent<MeshFilter>();
+                            Mesh mesh = Util.CreateBox(0.1f);
+                            mf.mesh = mesh;
+                            boneVisualisation.transform.localScale = Vector3.one / 4f;*/
 						} else {
 							if (perso.p3dData.objectList != null && perso.p3dData.objectList.Count > ntto.object_index) {
 								PhysicalObject o = perso.p3dData.objectList[ntto.object_index].po;
 								if (o != null) {
+									//if (o.visualSetType == 1) print(name);
 									PhysicalObject c = o.Clone();
 									subObjects[i][j] = c;
 									subObjects[i][j].Gao.transform.localScale =
@@ -836,6 +838,22 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 			// First pass: reset TRS for all sub objects
 			for (int i = 0; i < channelParents.Length; i++) {
 				channelParents[i] = false;
+				/*GameObject c = channelObjects[i];
+                if (c != null) {
+                    c.transform.SetParent(perso.Gao.transform);
+                    c.transform.localPosition = Vector3.zero;
+                    c.transform.localEulerAngles = Vector3.zero;
+                    c.transform.localScale = Vector3.one; // prevent float precision errors after a long time, lol
+                }
+               for (int j = 0; j < subObjects[i].Length; j++) {
+                    if (subObjects[i][j] == null) continue;
+                    subObjects[i][j].Gao.transform.parent = c.transform;
+                    subObjects[i][j].Gao.transform.localPosition = Vector3.zero;
+                    subObjects[i][j].Gao.transform.localEulerAngles = Vector3.zero;
+                    subObjects[i][j].Gao.transform.localScale =
+                        subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
+                    //subObjects[i][j].Gao.SetActive(false);
+                }*/
 			}
 			AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
 			// Create hierarchy for this frame
@@ -886,13 +904,18 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 					if (framesDifference == 0) {
 						interpolation = 0;
 					} else {
+						//interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
 						interpolation = framesSinceKF / (float)framesDifference;
 					}
 				} else {
 					nextKF = a3d.keyframes[kfi.kf + 1];
 					framesDifference = (int)nextKF.frame - (int)kf.frame;
+					//interpolation = (float)(nextKF.interpolationFactor * (framesSinceKF / (float)framesDifference) + 1.0 * nextKF.interpolationFactor);
 					interpolation = framesSinceKF / (float)framesDifference;
 				}
+				//print(interpolation);
+				//print(a3d.vectors.Length + " - " + nextKF.positionVector);
+				//print(perso.p3dData.family.animBank);
 				AnimVector pos2 = a3d.vectors[nextKF.positionVector];
 				AnimQuaternion qua2 = a3d.quaternions[nextKF.quaternion];
 				AnimVector scl2 = a3d.vectors[nextKF.scaleVector];
