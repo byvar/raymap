@@ -11,13 +11,18 @@ namespace ModelExport.R3.SkinnedAnimatedMeshesExporting
 {
     public class ObjectsExportLibraryInterface
     {
-        static string ObjectsExportLibraryPath = "D:/exported_rayman_meshes.json";
-
         public static void AddR3AnimatedMeshToLibrary(ExportableModel r3AnimatedMesh)
         {
-            ObjectsExportLibraryModel exportObjectsLibrary = LoadObjectsExportLibraryOrCreateNewIfNotExists(ObjectsExportLibraryPath);
+            string exportObjectsLibraryPath = GetExportObjectsLibraryPath();
+
+            ObjectsExportLibraryModel exportObjectsLibrary = LoadObjectsExportLibraryOrCreateNewIfNotExists(exportObjectsLibraryPath);
             exportObjectsLibrary.AddR3AnimatedMesh(r3AnimatedMesh);
-            SaveObjectsExportLibrary(exportObjectsLibrary, ObjectsExportLibraryPath);
+            SaveObjectsExportLibrary(exportObjectsLibrary, exportObjectsLibraryPath);
+        }
+
+        private static string GetExportObjectsLibraryPath()
+        {
+            return Path.Combine(UnitySettings.ExportPath, "ModelExport", "ExportObjectsLibrary.json");
         }
 
         private static ObjectsExportLibraryModel LoadObjectsExportLibraryOrCreateNewIfNotExists(string objectsExportLibraryPath)
@@ -40,7 +45,8 @@ namespace ModelExport.R3.SkinnedAnimatedMeshesExporting
 
         public static void ClearExportObjectsLibrary()
         {
-            File.Delete(ObjectsExportLibraryPath);
+            string exportObjectsLibraryPath = GetExportObjectsLibraryPath();
+            File.Delete(exportObjectsLibraryPath);
         }
     }
 }
