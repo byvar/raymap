@@ -63,8 +63,11 @@ namespace OpenSpace.Loader {
 				//RipRHRLoc();
 				game = PS1GameInfo.Games[Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
-				Actor1Index = Array.IndexOf(game.actors1, actor1Name);
-				Actor2Index = Array.IndexOf(game.actors2, actor2Name);
+				Actor1Index = Array.FindIndex(game.actors, a => a.Actor1 == actor1Name);
+				Actor2Index = Array.FindIndex(game.actors, a => a.Actor2 == actor2Name);
+				if (Settings.s.game == Settings.Game.JungleBook) {
+					JungleBookSetActor();
+				}
 				files_array = new FileWithPointers[0];
 				await LoadAllDataFromDAT(game);
 				//await ExtractAllFiles(game);
@@ -151,22 +154,65 @@ namespace OpenSpace.Loader {
 				PS1GameInfo.File mainFile = game.files.FirstOrDefault(fi => fi.fileID == 0);
 				if (fileInfo.bigfile == "ACTOR1") {
 					f = new PS1Data(fileInfo.bigfile + "_" + index + ".img", levelDir + "actor.img", curFile,
-						mainFile.memoryBlocks[CurrentLevel].overrideActor1Address ?? game.actor1Address);
+						GetActorAddress(0));
 					actor1File = f;
 				} else if (fileInfo.bigfile == "ACTOR2") {
 					f = new PS1Data(fileInfo.bigfile + "_" + index + ".img", levelDir + "actor.img", curFile,
-						mainFile.memoryBlocks[CurrentLevel].overrideActor2Address ?? game.actor2Address);
+						GetActorAddress(1));
 					actor2File = f;
 				}
 				files_array[curFile++] = f;
 			}
 			await Task.CompletedTask;
 		}
+		private uint GetActorAddress(int i) {
+			PS1GameInfo.File mainFile = game.files.FirstOrDefault(fi => fi.fileID == 0);
+			switch (i) {
+				case 0:
+					return mainFile.memoryBlocks[CurrentLevel].overrideActor1Address ?? game.actor1Address;
+				case 1:
+					if (Settings.s.game == Settings.Game.JungleBook) {
+						return (mainFile.memoryBlocks[CurrentLevel].overrideActor1Address ?? game.actor1Address)
+							+ (uint)actor1File.reader.BaseStream.Length;
+					}
+					return mainFile.memoryBlocks[CurrentLevel].overrideActor2Address ?? game.actor2Address;
+				default: return 0;
+			}
+		}
+		private void JungleBookSetActor() {
+			if (Settings.s.game == Settings.Game.JungleBook) {
+				if (CurrentLevel < 9) {
+					// Story levels
+					Actor1Index = CurrentLevel;
+					Actor2Index = CurrentLevel;
+					/* Base address of Actor2 = act1 base + size of actor 1. Size table:
+					76FB0h, // 0
+					7A000h, // 1
+					7D690h, // 2
+					67314h, // 3
+					6AEF0h, // 4
+					8AAE0h, // 5
+					73F94h, // 6
+					6DBCCh, // 7
+					6B970h  // 8
+					*/
+				} else if (CurrentLevel == 0x13) {
+					// Menu
+					Actor1Index = 22; // "22_Kl"
+					Actor2Index = 13; // "13_mow"
+					// Base address for Act2: 80149400
+
+				} else {
+					// Base address for Act2: 80149400
+					// I guess anything goes between >= 9 && <= 26
+				}
+			}
+		}
 
 		private void RelocateActorFile(int index) {
 			PS1GameInfo.File mainFile = game.files.FirstOrDefault(f => f.fileID == 0);
 			if (!mainFile.memoryBlocks[CurrentLevel].relocateActor) return;
-			
+
 			Reader reader = files_array[Mem.Fix]?.reader;
 			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
 			FileWithPointers file = null;
@@ -178,49 +224,89 @@ namespace OpenSpace.Loader {
 			if (file != null) {
 				Pointer soPointer = null;
 				byte[] perso = null, unk = null, unk2 = null;
-				Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file), () => {
-					soPointer = Pointer.Read(reader);
-					perso = reader.ReadBytes(0x18);
-					unk = reader.ReadBytes(4);
-					unk2 = reader.ReadBytes(2);
-				});
-				Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x68, () => {
-					Pointer off_persos = Pointer.Read(reader);
-					Pointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
-						(off_persos.file as PS1Data).OverwriteData(Pointer.Current(reader).FileOffset, perso);
+				if (Settings.s.game == Settings.Game.RRush) {
+					Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file), () => {
+						soPointer = Pointer.Read(reader);
+						perso = reader.ReadBytes(0x18);
+						unk = reader.ReadBytes(4);
+						unk2 = reader.ReadBytes(2);
 					});
-				});
-				Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x40, () => {
-					Pointer off_dynamicWorld = Pointer.Read(reader);
-					Pointer.DoAt(ref reader, off_dynamicWorld, () => {
-						reader.ReadBytes(0x8);
-						Pointer firstChild = Pointer.Read(reader);
-						Pointer lastChild = Pointer.Read(reader);
-						uint numChild = reader.ReadUInt32();
-						if (numChild == 0) {
-							firstChild = soPointer;
-							lastChild = soPointer;
-						} else {
-							(lastChild.file as PS1Data).OverwriteData(lastChild.FileOffset + 0x14, soPointer.offset);
-							(soPointer.file as PS1Data).OverwriteData(soPointer.FileOffset + 0x18, lastChild.offset);
-							lastChild = soPointer;
-						}
-						numChild++;
-						(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x8, firstChild.offset);
-						(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0xC, lastChild.offset);
-						(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x10, numChild);
+					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x68, () => {
+						Pointer off_persos = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
+							(off_persos.file as PS1Data).OverwriteData(Pointer.Current(reader).FileOffset, perso);
+						});
 					});
-				});
+					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x40, () => {
+						Pointer off_dynamicWorld = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, off_dynamicWorld, () => {
+							reader.ReadBytes(0x8);
+							Pointer firstChild = Pointer.Read(reader);
+							Pointer lastChild = Pointer.Read(reader);
+							uint numChild = reader.ReadUInt32();
+							if (numChild == 0) {
+								firstChild = soPointer;
+								lastChild = soPointer;
+							} else {
+								(lastChild.file as PS1Data).OverwriteData(lastChild.FileOffset + 0x14, soPointer.offset);
+								(soPointer.file as PS1Data).OverwriteData(soPointer.FileOffset + 0x18, lastChild.offset);
+								lastChild = soPointer;
+							}
+							numChild++;
+							(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x8, firstChild.offset);
+							(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0xC, lastChild.offset);
+							(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x10, numChild);
+						});
+					});
+				} else if (Settings.s.game == Settings.Game.JungleBook) {
+					Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file) + 0x98, () => {
+						//soPointer = Pointer.Read(reader);
+						perso = reader.ReadBytes(0x18);
+						/*unk = reader.ReadBytes(4);
+						unk2 = reader.ReadBytes(2);*/
+					});
+					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x114, () => {
+						Pointer off_persos = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
+							(off_persos.file as PS1Data).OverwriteData(Pointer.Current(reader).FileOffset, perso);
+							// Start reading the data we've just overwritten
+							reader.ReadUInt32();
+							Pointer soPointerPointer = Pointer.Read(reader);
+							Pointer.DoAt(ref reader, soPointerPointer, () => {
+								soPointer = Pointer.Read(reader);
+							});
+						});
+					});
+					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0xEC, () => {
+						Pointer off_dynamicWorld = Pointer.Read(reader);
+						Pointer.DoAt(ref reader, off_dynamicWorld, () => {
+							reader.ReadBytes(0x8);
+							Pointer firstChild = Pointer.Read(reader);
+							Pointer lastChild = Pointer.Read(reader);
+							uint numChild = reader.ReadUInt32();
+							if (numChild == 0) {
+								firstChild = soPointer;
+								lastChild = soPointer;
+							} else {
+								(lastChild.file as PS1Data).OverwriteData(lastChild.FileOffset + 0x14, soPointer.offset);
+								(soPointer.file as PS1Data).OverwriteData(soPointer.FileOffset + 0x18, lastChild.offset);
+								lastChild = soPointer;
+							}
+							numChild++;
+							(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x8, firstChild.offset);
+							(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0xC, lastChild.offset);
+							(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x10, numChild);
+						});
+					});
+				}
 			}
 		}
 
 		public async Task LoadLevel() {
 			Reader reader = files_array[Mem.Fix]?.reader;
 			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
-			if (game.actors1 != null && game.actors1.Length > 0) {
+			if (game.actors != null && game.actors.Length > 0) {
 				RelocateActorFile(0);
-			}
-			if (game.actors2 != null && game.actors2.Length > 0) {
 				RelocateActorFile(1);
 			}
 
@@ -253,7 +339,7 @@ namespace OpenSpace.Loader {
 			if (levelHeader.num_geometricObjectsDynamic_cine != 0) {
 				levelHeader.geometricObjectsDynamic.ReadExtra(reader, levelHeader.num_geometricObjectsDynamic_cine);
 			}
-			if (Settings.s.game == Settings.Game.RRush) {
+			if (Settings.s.game == Settings.Game.RRush || Settings.s.game == Settings.Game.JungleBook) {
 				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
 				if (actor2File != null) actor2Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor2File.headerOffset, actor2File), onPreRead: h => h.file_index = 2);
 			}
@@ -318,7 +404,7 @@ namespace OpenSpace.Loader {
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
 			if (b.loadActor
 				&& (Actor1Index < 0 || Actor2Index < 0
-				|| Actor1Index >= gameInfo.actors1.Length || Actor2Index >= gameInfo.actors2.Length)) {
+				|| Actor1Index >= gameInfo.actors.Length || Actor2Index >= gameInfo.actors.Length)) {
 				throw new Exception("Actor could not be found");
 			}
 			if (!b.inEngine) return;
@@ -351,7 +437,7 @@ namespace OpenSpace.Loader {
 						byte[] exe = mainBlock[blockIndex++];
 						byte[] exeData = mainBlock[blockIndex++];
 						/*byte[] newData = new byte[exeHeader.Length + exeData.Length];*/
-						Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
+					Util.AppendArrayAndMergeReferences(ref exe, ref exeData);
 						FileSystem.AddVirtualFile(levelDir + "executable.pxe", exe);
 						if (!b.exeOnly && b.inEngine) {
 							FileSystem.AddVirtualFile(levelDir + "level.img", mainBlock[blockIndex++]);
@@ -693,7 +779,11 @@ namespace OpenSpace.Loader {
 
 		#region Textures
 		public void FillVRAM() {
-			vram.currentXPage = 5;
+			int startXPage = 5;
+			if (Settings.s.game == Settings.Game.JungleBook) {
+				startXPage = 8;
+			}
+			vram.currentXPage = startXPage;
 
 			PS1GameInfo.File fileInfo = game.files.FirstOrDefault(f => f.fileID == 0);
 			int index = CurrentLevel;
@@ -712,13 +802,13 @@ namespace OpenSpace.Loader {
 			if (game.files.Any(f => f.bigfile == "ACTOR1")) {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + "ACTOR1/" + Actor1Index + "/vram.xtp"))) {
 					byte[] data = reader.ReadBytes((int)reader.BaseStream.Length);
-					vram.AddDataAt(5, 0, 0, 0, data, PS1VRAM.page_width);
+					vram.AddDataAt(startXPage, 0, 0, 0, data, PS1VRAM.page_width);
 				}
 			}
 			if (game.files.Any(f => f.bigfile == "ACTOR2")) {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + "ACTOR2/" + Actor2Index + "/vram.xtp"))) {
 					byte[] data = reader.ReadBytes((int)reader.BaseStream.Length);
-					vram.AddDataAt(6, 0, 0, 0, data, PS1VRAM.page_width);
+					vram.AddDataAt(startXPage + 1, 0, 0, 0, data, PS1VRAM.page_width);
 				}
 			}
 		}

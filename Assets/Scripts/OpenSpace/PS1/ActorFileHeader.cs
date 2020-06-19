@@ -35,7 +35,11 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			R2PS1Loader l = Load as R2PS1Loader;
-			off_superObject = Pointer.Read(reader);
+			if (Settings.s.game == Settings.Game.RRush) {
+				off_superObject = Pointer.Read(reader);
+			} else if (Settings.s.game == Settings.Game.JungleBook) {
+				reader.ReadBytes(0x98);
+			}
 			copiedActorData = reader.ReadBytes(0x18);
 			off_states = Pointer.Read(reader);
 			num_states = reader.ReadUInt16();
@@ -45,9 +49,11 @@ namespace OpenSpace.PS1 {
 			off_animScales = Pointer.Read(reader);
 			off_geometricObjects_dynamic = Pointer.Read(reader);
 			num_geometricObjects_dynamic = reader.ReadUInt32();
-			ushort_38 = reader.ReadUInt16();
-			ushort_3A = reader.ReadUInt16();
-			off_state_indices = Pointer.Read(reader);
+			if (Settings.s.game == Settings.Game.RRush) {
+				ushort_38 = reader.ReadUInt16();
+				ushort_3A = reader.ReadUInt16();
+				off_state_indices = Pointer.Read(reader);
+			}
 			// Parse
 			states = Load.FromOffsetOrRead<PointerList<State>>(reader, off_states, s => s.length = num_states);
 			geometricObjectsDynamic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_dynamic, onPreRead: t => t.length = num_geometricObjects_dynamic - 2);

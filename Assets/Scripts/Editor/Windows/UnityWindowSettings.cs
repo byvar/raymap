@@ -83,7 +83,8 @@ public class UnityWindowSettings : UnityWindow {
 			Dirty = true;
 		}
 		if (Settings.settingsDict[UnitySettings.GameMode].platform == Settings.Platform.PS1) {
-			if (OpenSpace.PS1.PS1GameInfo.Games.ContainsKey(UnitySettings.GameMode) && OpenSpace.PS1.PS1GameInfo.Games[UnitySettings.GameMode].actors1?.Length > 0) {
+			if (OpenSpace.PS1.PS1GameInfo.Games.ContainsKey(UnitySettings.GameMode)
+				&& OpenSpace.PS1.PS1GameInfo.Games[UnitySettings.GameMode].actors?.Where(a => a.isSelectable).Count() > 0) {
 				rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
 				rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 1"));
 				buttonString = "No actor selected";

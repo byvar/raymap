@@ -25,9 +25,9 @@ class PS1ActorSelectionDropdown : AdvancedDropdown {
 		var root = new AdvancedDropdownItem(name);
 		if (OpenSpace.PS1.PS1GameInfo.Games.ContainsKey(mode)) {
 			if (actorIndex == 0) {
-				actors = OpenSpace.PS1.PS1GameInfo.Games[mode].actors1;
+				actors = OpenSpace.PS1.PS1GameInfo.Games[mode].actors.Where(a => a.isSelectable).Select(a => a.Actor1).ToArray();
 			} else if (actorIndex == 1) {
-				actors = OpenSpace.PS1.PS1GameInfo.Games[mode].actors2;
+				actors = OpenSpace.PS1.PS1GameInfo.Games[mode].actors.Where(a => a.isSelectable).Select(a => a.Actor2).ToArray();
 			}
 			for (int i = 0; i < actors.Length; i++) {
 				Add(root, actors[i], i);

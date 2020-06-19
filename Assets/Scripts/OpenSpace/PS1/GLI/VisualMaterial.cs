@@ -104,6 +104,10 @@ namespace OpenSpace.PS1.GLI {
             } else {
                 baseMaterial = MapLoader.Loader.baseMaterial;
             }
+            // TODO: Figure out transparency for these games
+            if (Settings.s.game == Settings.Game.JungleBook || Settings.s.game == Settings.Game.DD) {
+                baseMaterial = MapLoader.Loader.baseMaterial;
+            }
             Material mat = new Material(baseMaterial);
             mat.SetInt("_NumTextures", 1);
             string textureName = "_Tex0";

@@ -75,13 +75,18 @@ namespace OpenSpace.PS1 {
 			short_42 = reader.ReadInt16();
 			short_44 = reader.ReadInt16();
 			short_46 = reader.ReadInt16();
-			short_48 = reader.ReadInt16();
-			short_4A = reader.ReadInt16();
-			int_4C = reader.ReadInt32();
-			if (Settings.s.game == Settings.Game.VIP) {
-				off_so = Pointer.Read(reader);
-			} else if(Settings.s.game == Settings.Game.R2 || Settings.s.game == Settings.Game.RRush) {
+			if (Settings.s.game != Settings.Game.JungleBook && Settings.s.game != Settings.Game.VIP) {
+				short_48 = reader.ReadInt16();
+				short_4A = reader.ReadInt16();
+				int_4C = reader.ReadInt32();
+				if (Settings.s.game == Settings.Game.R2
+					|| Settings.s.game == Settings.Game.RRush) {
+					int_50 = reader.ReadInt32();
+				}
+			} else {
+				int_4C = reader.ReadInt32();
 				int_50 = reader.ReadInt32();
+				off_so = Pointer.Read(reader);
 			}
 
 			Pointer.DoAt(ref reader, off_persos, () => {

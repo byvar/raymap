@@ -21,7 +21,7 @@ namespace OpenSpace.PS1 {
 		public ushort file_index;
 		public ushort ushort_18;
 		public ushort ushort_1A;
-		public Pointer off_1C;
+		public Pointer off_bones;
 
 		// Parsed
 		public PS1AnimationChannel[] channels;
@@ -53,15 +53,16 @@ namespace OpenSpace.PS1 {
 				num_channels = reader.ReadUInt32();
 				num_frames = reader.ReadUInt16();
 				ushort_0E = reader.ReadUInt16();
-				num_hierarchies = reader.ReadUInt32();
-				if (Settings.s.game == Settings.Game.VIP) {
-					off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
-					ushort_18 = reader.ReadUInt16();
-					ushort_1A = reader.ReadUInt16();
-					off_1C = Pointer.Read(reader);
+				if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
 					uint_18 = reader.ReadUInt32();
+					off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
+					num_hierarchies = reader.ReadUInt16();
+					ushort_1A = reader.ReadUInt16();
+					off_bones = Pointer.Read(reader); // probably deform related
+					file_index = (ushort)reader.ReadUInt32();
 					speed = 30;
 				} else {
+					num_hierarchies = reader.ReadUInt32();
 					speed = reader.ReadUInt16();
 					ushort_1A = reader.ReadUInt16();
 					off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)

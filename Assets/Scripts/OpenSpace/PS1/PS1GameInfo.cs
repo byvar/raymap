@@ -9,12 +9,21 @@ namespace OpenSpace.PS1 {
 	public class PS1GameInfo {
 		public File[] files;
 		public string[] maps;
-		public string[] actors1 = new string[0];
-		public string[] actors2 = new string[0];
+		public Actor[] actors = new Actor[0];
 		public Dictionary<string, string[]> cines;
 		public string mainFile;
 		public uint actor1Address;
 		public uint actor2Address;
+
+		public class Actor {
+			public string actor;
+			public string actor1;
+			public string actor2;
+			public string Actor1 => actor1 ?? actor;
+			public string Actor2 => actor2 ?? actor;
+
+			public bool isSelectable = true;
+		}
 
 
 		public class File {
@@ -42,6 +51,7 @@ namespace OpenSpace.PS1 {
 				public bool inEngine;
 				public bool exeOnly = false;
 				public bool loadActor = false;
+				public bool canSetActor = true;
 				public bool relocateActor = false;
 				public uint? overrideActor1Address;
 				public uint? overrideActor2Address;
@@ -485,62 +495,34 @@ namespace OpenSpace.PS1 {
 				"map18",
 				"map19"
 			},
-			actors1 = new string[] {
-				"0_mow",
-				"1_mow",
-				"2_mow",
-				"3_mow",
-				"4_mow",
-				"5_mow",
-				"6_mow",
-				"7_mow",
-				"8_mow",
-				"9_mow",
-				"10_mow",
-				"11_mow",
-				"12_mow",
-				"13_mow",
-				"14_mow",
-				"15_mow",
-				"16_mow",
-				"17_bag",
-				"18_ELE",
-				"19_Bal",
-				"20_Mon",
-				"21_Kl",
-				"22_kaa",
-				"23_buz",
-				"24_She",
-				"25_gir",
-			},
-			actors2 = new string[] {
-				"0_bag",
-				"1_ELE",
-				"2_Bal",
-				"3_Mon",
-				"4_Kl",
-				"5_kaa",
-				"6_buz",
-				"7_She",
-				"8_gir",
-				"9_mow",
-				"10_mow",
-				"11_mow",
-				"12_mow",
-				"13_mow",
-				"14_mow",
-				"15_mow",
-				"16_mow",
-				"17_mow",
-				"18_bag",
-				"19_ELE",
-				"20_Bal",
-				"21_Mon",
-				"22_Kl",
-				"23_kaa",
-				"24_buz",
-				"25_She",
-				"26_gir",
+			actors = new Actor[] {
+				new Actor() { actor1 = "0_mow", actor2= "0_bag", isSelectable = false },
+				new Actor() { actor1 = "1_mow", actor2= "1_ELE", isSelectable = false },
+				new Actor() { actor1 = "2_mow", actor2= "2_Bal", isSelectable = false },
+				new Actor() { actor1 = "3_mow", actor2= "3_Mon", isSelectable = false },
+				new Actor() { actor1 = "4_mow", actor2= "4_Kl", isSelectable = false },
+				new Actor() { actor1 = "5_mow", actor2= "5_kaa", isSelectable = false },
+				new Actor() { actor1 = "6_mow", actor2= "6_buz", isSelectable = false },
+				new Actor() { actor1 = "7_mow", actor2= "7_She", isSelectable = false },
+				new Actor() { actor1 = "8_mow", actor2= "8_gir", isSelectable = false },
+				new Actor() { actor = "9_mow" },
+				new Actor() { actor = "10_mow" },
+				new Actor() { actor = "11_mow" },
+				new Actor() { actor = "12_mow" },
+				new Actor() { actor = "13_mow" },
+				new Actor() { actor = "14_mow" },
+				new Actor() { actor = "15_mow" },
+				new Actor() { actor = "16_mow" },
+				new Actor() { actor = "17_mow" },
+				new Actor() { actor = "18_bag" },
+				new Actor() { actor = "19_ELE" },
+				new Actor() { actor = "20_Bal" },
+				new Actor() { actor = "21_Mon" },
+				new Actor() { actor = "22_Kl" },
+				new Actor() { actor = "23_kaa" },
+				new Actor() { actor = "24_buz" },
+				new Actor() { actor = "25_She" },
+				new Actor() { actor = "26_gir" },
 			},
 			actor1Address = 0x800e9000,
 			actor2Address = 0x80149400,
@@ -581,6 +563,7 @@ namespace OpenSpace.PS1 {
 					baseLBA = 0x1B198,
 					memoryBlocks = new File.MemoryBlock[] {
 						new File.MemoryBlock(new File.LBA(0x1B198, 0xA1)),
+						new File.MemoryBlock(new File.LBA(0x1B239, 0xA5)),
 						new File.MemoryBlock(new File.LBA(0x1B2DE, 0xAA)),
 						new File.MemoryBlock(new File.LBA(0x1B388, 0x8E)),
 						new File.MemoryBlock(new File.LBA(0x1B416, 0x95)),
@@ -687,29 +670,17 @@ namespace OpenSpace.PS1 {
 				"pirate2",
 				"mainmenu",
 			},
-			actors1 = new string[] {
-				"rayman",
-				"globox",
-				"hunchman",
-				"raz",
-				"tily",
-				"mhunch",
-				"wife",
-				"mglobette",
-				"menubox1",
-				"menubox2"
-			},
-			actors2 = new string[] {
-				"rayman",
-				"globox",
-				"hunchman",
-				"raz",
-				"tily",
-				"mhunch",
-				"wife",
-				"mglobette",
-				"menubox1",
-				"menubox2"
+			actors = new Actor[] {
+				new Actor() { actor = "rayman" },
+				new Actor() { actor = "globox" },
+				new Actor() { actor = "hunchman" },
+				new Actor() { actor = "raz" },
+				new Actor() { actor = "tily" },
+				new Actor() { actor = "mhunch" },
+				new Actor() { actor = "wife" },
+				new Actor() { actor = "mglobette" },
+				new Actor() { actor = "menubox1" },
+				new Actor() { actor = "menubox2" },
 			},
 			actor1Address = 0x80165000,
 			actor2Address = 0x80190C00,
