@@ -330,6 +330,14 @@ namespace OpenSpace.FileFormat.Texture {
 						// Get the color from the palette
 						if (!palette[paletteIndex].HasValue) {
 							palette[paletteIndex] = GetColor1555(0, 0, paletteX + paletteIndex, paletteY);
+							if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.JungleBook) {
+								Color c = palette[paletteIndex].Value;
+								if (c.r == 0 && c.g == 0 && c.b == 0) {
+									palette[paletteIndex] = new Color(c.r, c.g, c.b, 0f);
+								} else {
+									palette[paletteIndex] = new Color(c.r, c.g, c.b, 1f);
+								}
+							}
 						}
 						/*var palettedByte0 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex, paletteY);
                         var palettedByte1 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex + 1, paletteY);
@@ -354,6 +362,15 @@ namespace OpenSpace.FileFormat.Texture {
 						// Get the color from the palette
 						if (!palette[paletteIndex].HasValue) {
 							palette[paletteIndex] = GetColor1555(0, 0, paletteX + paletteIndex, paletteY);
+
+							if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.JungleBook) {
+								Color c = palette[paletteIndex].Value;
+								if (c.r == 0 && c.g == 0 && c.b == 0) {
+									palette[paletteIndex] = new Color(c.r, c.g, c.b, 0f);
+								} else {
+									palette[paletteIndex] = new Color(c.r, c.g, c.b, 1f);
+								}
+							}
 						}
 						/*var palettedByte0 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex, paletteY);
                         var palettedByte1 = vram.GetPixel8(0, 0, paletteX * 16 + paletteIndex + 1, paletteY);*/

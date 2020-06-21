@@ -400,14 +400,12 @@ namespace OpenSpace.Loader {
 			}
 		}
 		public async Task LoadDataFromDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
-			if (CurrentLevel < 0 || CurrentLevel >= fileInfo.memoryBlocks.Length) return;
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
 			if (b.loadActor
 				&& (Actor1Index < 0 || Actor2Index < 0
 				|| Actor1Index >= gameInfo.actors.Length || Actor2Index >= gameInfo.actors.Length)) {
 				throw new Exception("Actor could not be found");
 			}
-			if (!b.inEngine) return;
 			string bigFile = fileInfo.bigfile;
 			string bigFilePath = gameDataBinFolder + bigFile + "." + fileInfo.extension;
 
@@ -425,6 +423,8 @@ namespace OpenSpace.Loader {
 					List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.main_compressed, fileInfo.baseLBA);
 					int blockIndex = 0;
 					if (fileInfo.type == PS1GameInfo.File.Type.Map) {
+						if (CurrentLevel < 0 || CurrentLevel >= fileInfo.memoryBlocks.Length) return;
+						if (!b.inEngine) return;
 						if (Settings.s.game != Settings.Game.RRush && !b.exeOnly) FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
 						if (!b.exeOnly && b.inEngine) {
 							if (b.hasSoundEffects) {
