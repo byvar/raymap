@@ -342,42 +342,35 @@
     <td class="tg-yw4l">Rayman 2</td>
     <td class="tg-yw4l">R2</td>
     <td class="tg-yw4l">1999</td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">✔️</td>
     <td class="tg-yw4l"></td>
   </tr>
   <tr>
     <td class="tg-yw4l">Donald Duck: Quack Attack</td>
     <td class="tg-yw4l">R2</td>
     <td class="tg-yw4l">2000</td>
-    <td class="tg-yw4l">❌</td>
-    <td class="tg-yw4l"></td>
-  </tr>
-  <tr>
-    <td class="tg-yw4l">Disney's Dinosaur</td>
-    <td class="tg-yw4l">R3</td>
-    <td class="tg-yw4l">2000</td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">✔️</td>
     <td class="tg-yw4l"></td>
   </tr>
   <tr>
     <td class="tg-yw4l">Disney's Jungle Book: Groove Party</td>
     <td class="tg-yw4l">M2</td>
     <td class="tg-yw4l">2000</td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">✔️</td>
     <td class="tg-yw4l"></td>
   </tr>
   <tr>
     <td class="tg-yw4l">VIP</td>
     <td class="tg-yw4l">R2</td>
     <td class="tg-yw4l">2001</td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">✔️</td>
     <td class="tg-yw4l">❌</td>
   </tr>
   <tr>
     <td class="tg-yw4l">Rayman Rush</td>
     <td class="tg-yw4l">R2</td>
     <td class="tg-yw4l">2002</td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l">✔️</td>
     <td class="tg-yw4l"></td>
   </tr>
   <tr>
