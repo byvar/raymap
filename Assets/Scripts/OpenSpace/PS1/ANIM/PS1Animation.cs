@@ -54,17 +54,12 @@ namespace OpenSpace.PS1 {
 				off_channels = Pointer.Read(reader);
 				num_channels = reader.ReadUInt32();
 				num_frames = reader.ReadUInt16();
+				//Load.print("Anim " + Offset + " - " + num_frames);
 				ushort_0E = reader.ReadUInt16();
+				num_hierarchies = reader.ReadUInt32();
 				if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
-					if (Settings.s.game == Settings.Game.VIP) {
-						num_hierarchies = reader.ReadUInt32();
-						off_hierarchies = Pointer.Read(reader);
-						ushort_18 = reader.ReadUInt16();
-					} else {
-						uint_18 = reader.ReadUInt32();
-						off_hierarchies = Pointer.Read(reader);
-						num_hierarchies = reader.ReadUInt16();
-					}
+					off_hierarchies = Pointer.Read(reader);
+					ushort_18 = reader.ReadUInt16();
 					num_bones = reader.ReadUInt16();
 					off_bones = Pointer.Read(reader);
 					/*Load.print("Animation: " + Offset
@@ -74,7 +69,6 @@ namespace OpenSpace.PS1 {
 					file_index = (ushort)reader.ReadUInt32();
 					speed = 30;
 				} else {
-					num_hierarchies = reader.ReadUInt32();
 					speed = reader.ReadUInt16();
 					ushort_1A = reader.ReadUInt16();
 					off_hierarchies = Pointer.Read(reader);

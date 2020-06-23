@@ -110,27 +110,6 @@ namespace OpenSpace.PS1 {
 			gao.transform.localPosition = mat.GetPosition(convertAxes: true);
 			gao.transform.localRotation = mat.GetRotation(convertAxes: true);
 			gao.transform.localScale = mat.GetScale(convertAxes: true);
-			/*gao.transform.localPosition = DefaultPosition;
-			gao.transform.localRotation = DefaultRotation;
-			gao.transform.localScale = DefaultScale;*/
-		}
-
-
-		private Matrix invertedMat;
-		public Matrix TransformedMatrix {
-			get {
-				if (invertedMat == null) invertedMat = Matrix.Invert(Matrix);
-				return invertedMat;
-			}
-		}
-		public Vector3 DefaultPosition {
-			get { return TransformedMatrix.GetPosition(convertAxes: true); }
-		}
-		public Quaternion DefaultRotation {
-			get { return TransformedMatrix.GetRotation(convertAxes: true); }
-		}
-		public Vector3 DefaultScale {
-			get { return TransformedMatrix.GetScale(convertAxes: true); }
 		}
 
 		public Matrix Matrix {
@@ -144,6 +123,7 @@ namespace OpenSpace.PS1 {
 				/*matUnity.SetColumn(0, new Vector4(RotationToFloat(rot_m00), RotationToFloat(rot_m10), RotationToFloat(rot_m20), 0f));
 				matUnity.SetColumn(1, new Vector4(RotationToFloat(rot_m01), RotationToFloat(rot_m11), RotationToFloat(rot_m21), 0f));
 				matUnity.SetColumn(2, new Vector4(RotationToFloat(rot_m02), RotationToFloat(rot_m12), RotationToFloat(rot_m22), 0f));*/
+				// Use rows instead of columns
 				matUnity.SetRow(0, new Vector4(RotationToFloat(rot_m00), RotationToFloat(rot_m10), RotationToFloat(rot_m20), 0f));
 				matUnity.SetRow(1, new Vector4(RotationToFloat(rot_m01), RotationToFloat(rot_m11), RotationToFloat(rot_m21), 0f));
 				matUnity.SetRow(2, new Vector4(RotationToFloat(rot_m02), RotationToFloat(rot_m12), RotationToFloat(rot_m22), 0f));

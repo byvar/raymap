@@ -87,55 +87,59 @@ public class UnityWindowSettings : UnityWindow {
 			if (game != null && game.actors?.Where(a => a.isSelectable).Count() > 0) {
 				int mapIndex = Array.IndexOf(game.maps.Select(s => s.ToLower()).ToArray(), UnitySettings.MapName.ToLower());
 				if (mapIndex != -1 && game.files.FirstOrDefault(f => f.type == OpenSpace.PS1.PS1GameInfo.File.Type.Map).memoryBlocks[mapIndex].isActorSelectable) {
-					rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
-					rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 1"));
-					buttonString = "No actor selected";
-					if (!string.IsNullOrEmpty(UnitySettings.Actor1Name)) {
-						buttonString = UnitySettings.Actor1Name;
-					}
-					if (fileMode == FileSystem.Mode.Web) {
-						UnitySettings.Actor1Name = EditorGUI.TextField(rect, UnitySettings.Actor1Name);
-					} else {
-						EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
-						if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
-							if (ActorDropdown1 == null || ActorDropdown1.mode != UnitySettings.GameMode) {
-								ActorDropdown1 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 0) {
-									name = "Actors"
-								};
-							}
-							ActorDropdown1.Show(rect);
+					if (game.actors?.Where(a => a.isSelectable && a.isSelectableActor1).Count() > 0) {
+						rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
+						rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 1"));
+						buttonString = "No actor selected";
+						if (!string.IsNullOrEmpty(UnitySettings.Actor1Name)) {
+							buttonString = UnitySettings.Actor1Name;
 						}
-						EditorGUI.EndDisabledGroup();
-					}
-					if (ActorDropdown1 != null && ActorDropdown1.selection != null) {
-						UnitySettings.Actor1Name = ActorDropdown1.selection;
-						ActorDropdown1.selection = null;
-						Dirty = true;
-					}
-					rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
-					rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 2"));
-					buttonString = "No actor selected";
-					if (!string.IsNullOrEmpty(UnitySettings.Actor2Name)) {
-						buttonString = UnitySettings.Actor2Name;
-					}
-					if (fileMode == FileSystem.Mode.Web) {
-						UnitySettings.Actor2Name = EditorGUI.TextField(rect, UnitySettings.Actor2Name);
-					} else {
-						EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
-						if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
-							if (ActorDropdown2 == null || ActorDropdown2.mode != UnitySettings.GameMode) {
-								ActorDropdown2 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 1) {
-									name = "Actors"
-								};
+						if (fileMode == FileSystem.Mode.Web) {
+							UnitySettings.Actor1Name = EditorGUI.TextField(rect, UnitySettings.Actor1Name);
+						} else {
+							EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
+							if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
+								if (ActorDropdown1 == null || ActorDropdown1.mode != UnitySettings.GameMode) {
+									ActorDropdown1 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 0) {
+										name = "Actors"
+									};
+								}
+								ActorDropdown1.Show(rect);
 							}
-							ActorDropdown2.Show(rect);
+							EditorGUI.EndDisabledGroup();
 						}
-						EditorGUI.EndDisabledGroup();
+						if (ActorDropdown1 != null && ActorDropdown1.selection != null) {
+							UnitySettings.Actor1Name = ActorDropdown1.selection;
+							ActorDropdown1.selection = null;
+							Dirty = true;
+						}
 					}
-					if (ActorDropdown2 != null && ActorDropdown2.selection != null) {
-						UnitySettings.Actor2Name = ActorDropdown2.selection;
-						ActorDropdown2.selection = null;
-						Dirty = true;
+					if (game.actors?.Where(a => a.isSelectable && a.isSelectableActor2).Count() > 0) {
+						rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
+						rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 2"));
+						buttonString = "No actor selected";
+						if (!string.IsNullOrEmpty(UnitySettings.Actor2Name)) {
+							buttonString = UnitySettings.Actor2Name;
+						}
+						if (fileMode == FileSystem.Mode.Web) {
+							UnitySettings.Actor2Name = EditorGUI.TextField(rect, UnitySettings.Actor2Name);
+						} else {
+							EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
+							if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
+								if (ActorDropdown2 == null || ActorDropdown2.mode != UnitySettings.GameMode) {
+									ActorDropdown2 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 1) {
+										name = "Actors"
+									};
+								}
+								ActorDropdown2.Show(rect);
+							}
+							EditorGUI.EndDisabledGroup();
+						}
+						if (ActorDropdown2 != null && ActorDropdown2.selection != null) {
+							UnitySettings.Actor2Name = ActorDropdown2.selection;
+							ActorDropdown2.selection = null;
+							Dirty = true;
+						}
 					}
 				}
 			}

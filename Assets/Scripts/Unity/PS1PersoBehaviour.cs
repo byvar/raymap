@@ -139,7 +139,9 @@ public class PS1PersoBehaviour : MonoBehaviour {
 
 	#region Print debug info
 	public void PrintAnimationDebugInfo() {
-		if (IsLoaded && hasStates) { }
+		if (IsLoaded && hasStates) {
+			if (anim != null) print("Animation offset: " + anim.Offset);
+		}
     }
 	#endregion
 
@@ -255,7 +257,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
                 uint passedFrames = (uint)Mathf.FloorToInt(updateCounter);
                 updateCounter %= 1;
                 currentFrame += passedFrames;
-                if (anim != null && currentFrame >= anim.num_frames) {
+                if (anim != null && currentFrame >= anim.num_frames && anim.num_frames != 0) {
                     if (autoNextState) {
                         PS1Animation prevAnim = anim;
                         GotoAutoNextState();
@@ -432,7 +434,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 	}
 
 	public void UpdateAnimation() {
-		if (IsLoaded && anim != null && channelObjects != null && subObjects != null) {
+		if (IsLoaded && anim != null && channelObjects != null && subObjects != null && anim.num_frames != 0) {
 			if (currentFrame >= anim.num_frames) {
 				currentFrame %= anim.num_frames;
 			}
