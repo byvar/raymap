@@ -23,9 +23,26 @@ namespace OpenSpace.PS1 {
 		public short currentScrollValue;
 		public short short_1E;
 
+		// VIP & JB
+		public ushort num_bones;
+		public ushort num_boneWeights;
+		public ushort num_boneUnk;
+		public ushort num_unk4;
+		public Pointer off_bones;
+		public Pointer off_boneWeights;
+		public Pointer off_boneUnk;
+		public Pointer off_unk4;
+		public uint off_bones_;
+		public uint off_boneWeights_;
+		public uint off_boneUnk_;
+		public uint off_unk4_;
+
 		// Parsed
 		public Vertex[] vertices;
 		public PolygonList[] triangleLists;
+		public DeformBone[] bones;
+		public DeformVertexWeights[] boneWeights;
+		public DeformVertexUnknown[] boneUnk;
 
 		protected override void ReadInternal(Reader reader) {
 			uint_00 = reader.ReadUInt32();
@@ -37,20 +54,63 @@ namespace OpenSpace.PS1 {
 			ushort_0E = reader.ReadUInt16();
 			off_vertices = Pointer.Read(reader);
 			off_triangleLists = Pointer.Read(reader);
-			short_18 = reader.ReadInt16();
-			short_1A = reader.ReadInt16();
-			currentScrollValue = reader.ReadInt16();
-			short_1E = reader.ReadInt16();
+			if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
+				num_bones = reader.ReadUInt16();
+				num_boneWeights = reader.ReadUInt16();
+				num_boneUnk = reader.ReadUInt16();
+				num_unk4 = reader.ReadUInt16();
+				if (num_bones > 0) {
+					off_bones = Pointer.Read(reader);
+				} else {
+					off_bones_ = reader.ReadUInt32();
+				}
+				if (num_boneWeights > 0) {
+					off_boneWeights = Pointer.Read(reader);
+				} else {
+					off_boneWeights_ = reader.ReadUInt32();
+				}
+				if (num_boneUnk > 0) {
+					off_boneUnk = Pointer.Read(reader);
+				} else {
+					off_boneUnk_ = reader.ReadUInt32();
+				}
+				if (num_unk4 > 0) {
+					off_unk4 = Pointer.Read(reader);
+				} else {
+					off_unk4_ = reader.ReadUInt32();
+				}
+			} else {
+				short_18 = reader.ReadInt16();
+				short_1A = reader.ReadInt16();
+				currentScrollValue = reader.ReadInt16();
+				short_1E = reader.ReadInt16();
+			}
 
 			vertices = Load.ReadArray<Vertex>(num_vertices, reader, off_vertices);
 			triangleLists = Load.ReadArray<PolygonList>(num_triangleLists, reader, off_triangleLists);
+			bones = Load.ReadArray<DeformBone>(num_bones, reader, off_bones);
+			boneWeights = Load.ReadArray<DeformVertexWeights>(num_boneWeights, reader, off_boneWeights);
+			boneUnk = Load.ReadArray<DeformVertexUnknown>(num_boneUnk, reader, off_boneUnk);
 			//CreateGAO();
 		}
 
-		public GameObject GetGameObject() {
+		public GameObject GetGameObject(out GameObject[] boneGaos) {
 			GameObject parentGao = new GameObject(Offset.ToString());
+
+			// Bones
+			boneGaos = null;
+			if (bones != null && bones.Length > 0) {
+				GameObject rootBone = new GameObject("Root bone");
+				boneGaos = new GameObject[] { rootBone };
+				boneGaos[0].transform.SetParent(parentGao.transform);
+				boneGaos[0].transform.localPosition = Vector3.zero;
+				boneGaos[0].transform.localRotation = Quaternion.identity;
+				boneGaos[0].transform.localScale = Vector3.one;
+				boneGaos = boneGaos.Concat(bones.Select(b => b.GetGameObject(parentGao))).ToArray();
+			}
+
 			// First pass
-			
+
 			Dictionary<VisualMaterial, List<IPS1Polygon>> textured = new Dictionary<VisualMaterial, List<IPS1Polygon>>();
 			List<IPS1Polygon> untextured = new List<IPS1Polygon>();
 			for (int i = 0; i < triangleLists.Length; i++) {
@@ -111,7 +171,21 @@ namespace OpenSpace.PS1 {
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
 				gao.AddComponent<ExportableModel>();
-				MeshRenderer mr = gao.AddComponent<MeshRenderer>();
+				MeshRenderer mr = null;
+				SkinnedMeshRenderer smr = null;
+				Matrix4x4[] bindPoses = null;
+				if (bones == null || bones.Length <= 0) {
+					mr = gao.AddComponent<MeshRenderer>();
+				} else {
+					smr = gao.AddComponent<SkinnedMeshRenderer>();
+					//smr = (SkinnedMeshRenderer)mr;
+					smr.bones = boneGaos.Select(bo => bo.transform).ToArray();
+					bindPoses = new Matrix4x4[smr.bones.Length];
+					for (int bi = 0; bi < smr.bones.Length; bi++) {
+						bindPoses[bi] = smr.bones[bi].worldToLocalMatrix * parentGao.transform.localToWorldMatrix;
+					}
+					smr.rootBone = smr.bones[0];
+				}
 				
 				List<int> vertIndices = new List<int>();
 				List<int> triIndices = new List<int>();
@@ -214,6 +288,18 @@ namespace OpenSpace.PS1 {
 					}
 				}
 				Vertex[] v = vertIndices.Select(vi => vertices[vi]).ToArray();
+				BoneWeight[] w = null;
+				if (bones != null && bones.Length > 0 && boneWeights != null) {
+					w = new BoneWeight[vertIndices.Count];
+					for (int vi = 0; vi < w.Length; vi++) {
+						DeformVertexWeights dvw = boneWeights.FirstOrDefault(bw => bw.ind_vertex == vertIndices[vi]);
+						if (dvw != null) {
+							w[vi] = dvw.UnityWeight;
+						} else {
+							w[vi] = new BoneWeight() { boneIndex0 = 0, weight0 = 1f };
+						}
+					}
+				}
 				Mesh m = new Mesh();
 				m.vertices = v.Select(s => new Vector3(
 					s.x / 256f,
@@ -227,9 +313,18 @@ namespace OpenSpace.PS1 {
 				m.SetUVs(0, uvs.Select(s => new Vector4(s.x, s.y, alpha, 0f)).ToList());
 				m.triangles = triIndices.ToArray();
 				m.RecalculateNormals();
+				if (w != null) {
+					m.boneWeights = w;
+					m.bindposes = bindPoses;
+				}
 				mf.mesh = m;
 
-				mr.material = vm.CreateMaterial();
+				if (mr != null) {
+					mr.material = vm.CreateMaterial();
+				} else if (smr != null) {
+					smr.material = vm.CreateMaterial();
+					smr.sharedMesh = m;
+				}
 			}
 			// Untextured (some skyboxes, etc)
 			if(untextured.Count > 0) {
@@ -305,7 +400,7 @@ namespace OpenSpace.PS1 {
 				mat.SetFloat("_Prelit", 1f);
 				mr.material = mat;
 			}
-			
+
 			/*for (int i = 0; i < triangleLists.Length; i++) {
 				PolygonList tris = triangleLists[i];
 				GameObject gao = new GameObject(Offset.ToString() + " - " + tris.Offset + " - " + tris.type);

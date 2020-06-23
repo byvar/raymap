@@ -299,6 +299,16 @@ namespace OpenSpace.Loader {
 						});
 					});
 				}
+				Pointer.DoAt(ref reader, soPointer, () => {
+					reader.ReadBytes(0x20);
+					Pointer off_matrix = Pointer.Read(reader);
+					Pointer.DoAt(ref reader, off_matrix, () => {
+						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset, new byte[0x14]);
+						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x14, (uint)(index * 0x100));
+						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x18, (uint)(1 * 0x100));
+						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x1C, (uint)(0 * 0x100));
+					});
+				});
 			}
 		}
 
@@ -365,7 +375,7 @@ namespace OpenSpace.Loader {
 			GameObject persoPartsParent = new GameObject("Perso parts");
 			int i = 0;
 			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
-				GameObject g = e.GetGameObject();
+				GameObject g = e.GetGameObject(out _);
 				g.name = $"[{i}] {e.off_0} - {g.name}";
 				g.transform.parent = persoPartsParent.transform;
 				g.transform.position = new Vector3(i++ * 4, 1000, 0);
@@ -555,6 +565,26 @@ namespace OpenSpace.Loader {
 						} else if (fileInfo.type == PS1GameInfo.File.Type.Actor) {
 							Util.ByteArrayToFile(levelDir + "vram.xtp", mainBlock[blockIndex++]);
 							Util.ByteArrayToFile(levelDir + "actor.img", mainBlock[blockIndex++]);
+							if (bigFile == "ACTOR1") {
+								byte[] data = mainBlock[blockIndex - 1];
+								uint baseAddress = game.actor1Address;
+								uint length = (uint)data.Length;
+								for (int j = 0; j < data.Length; j++) {
+									if (data[j] == 0x80) {
+										int off = j - 3;
+										uint ptr = BitConverter.ToUInt32(data, off);
+										if (ptr >= baseAddress && ptr < baseAddress + length) {
+											ptr = (ptr - baseAddress) + 0xDD000000;
+											byte[] newData = BitConverter.GetBytes(ptr);
+											for (int y = 0; y < 4; y++) {
+												data[off + 3 - y] = newData[y];
+											}
+											j += 3;
+										}
+									}
+								}
+								Util.ByteArrayToFile(levelDir + "actor_relocated.img", data);
+							}
 						} else if (fileInfo.type == PS1GameInfo.File.Type.Sound) {
 							Util.ByteArrayToFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
 						}

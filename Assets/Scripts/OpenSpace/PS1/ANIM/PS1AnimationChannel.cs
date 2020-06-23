@@ -17,6 +17,8 @@ namespace OpenSpace.PS1 {
 			num_frames = reader.ReadUInt16();
 			id = reader.ReadInt16();
 
+			//Load.print("Channel: " + id + " - " + num_frames + " - " + off_frames);
+
 			frames = Load.ReadArray<PS1AnimationKeyframe>(num_frames, reader, off_frames);
 		}
 	}

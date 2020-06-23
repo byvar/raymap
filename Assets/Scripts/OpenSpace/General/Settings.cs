@@ -966,6 +966,7 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2,
+			hasDeformations = true,
 			numEntryActions = 1
 		};
 		public static Settings JungleBookPS1 = new Settings() {
@@ -978,6 +979,7 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2,
+			hasDeformations = true,
 			numEntryActions = 1
 		};
 

@@ -139,7 +139,7 @@ namespace OpenSpace.PS1 {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				int ind = (dataIndex >> 1);
 				if ((dataIndex >> 1) >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
-				GameObject g = h.geometricObjectsStatic.GetGameObject(dataIndex >> 1);
+				GameObject g = h.geometricObjectsStatic.GetGameObject(dataIndex >> 1, out _);
 				if (g != null) {
 					g.transform.SetParent(gao.transform);
 					g.transform.localPosition = Vector3.zero;

@@ -60,6 +60,8 @@ namespace OpenSpace.PS1 {
 			animPositions = Load.ReadArray<PS1AnimationVector>((off_animRotations.offset - off_animPositions.offset) / 6, reader, off_animPositions);
 			animRotations = Load.ReadArray<PS1AnimationQuaternion>((off_animScales.offset - off_animRotations.offset) / 8, reader, off_animRotations);
 			animScales = Load.ReadArray<PS1AnimationVector>(l.maxScaleVector[file_index] + 1, reader, off_animScales);
+
+			//Load.print(off_geometricObjects_dynamic + " - " + num_geometricObjects_dynamic);
 		}
 	}
 }

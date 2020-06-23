@@ -30,12 +30,14 @@ public class PS1PersoBehaviour : MonoBehaviour {
 	ActorFileHeader a2h;
 	PS1Animation anim;
 	int animIndex = -1;
-    bool forceAnimUpdate = false;
+	bool hasBones = false;
+	bool forceAnimUpdate = false;
     public uint currentFrame = 0;
     public bool playAnimation = true;
     public float animationSpeed = 15f;
     private float updateCounter = 0f;
     public GameObject[][] subObjects { get; private set; } = null; // [channel][ntto]
+	public GameObject[][][] subObjectBones { get; private set; } = null;
     public GameObject[] channelObjects { get; private set; }
 	private int[] currentActivePO = null;
 	private bool[] channelParents = null;
@@ -286,6 +288,20 @@ public class PS1PersoBehaviour : MonoBehaviour {
             }
             subObjects = null;
         }
+		if (subObjectBones != null) {
+			for (int i = 0; i < subObjectBones.Length; i++) {
+				if (subObjectBones[i] == null) continue;
+				for (int j = 0; j < subObjectBones[i].Length; j++) {
+					if (subObjectBones[i][j] == null) continue;
+					for (int k = 0; k < subObjectBones[i][j].Length; k++) {
+						if (subObjectBones[i][j][k] != null) {
+							GameObject.Destroy(subObjectBones[i][j][k]);
+						}
+					}
+				}
+			}
+			subObjectBones = null;
+		}
         if (channelObjects != null) {
             for (int i = 0; i < channelObjects.Length; i++) {
 				if (channelObjects[i] != null) {
@@ -308,7 +324,8 @@ public class PS1PersoBehaviour : MonoBehaviour {
         channelIDDictionary.Clear();
 		objectIndexScales.Clear();
 		channelNTTO = null;
-    }
+		hasBones = false;
+	}
 
 	void InitAnimation() {
 		if (forceAnimUpdate) {
@@ -320,6 +337,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				// Init channels & subobjects
 				subObjects = new GameObject[anim.num_channels][];
 				channelObjects = new GameObject[anim.num_channels];
+				subObjectBones = new GameObject[anim.num_channels][][];
 				//if (anim.a3d.num_morphData > 0) fullMorphPOs = new Dictionary<ushort, GameObject>[anim.a3d.num_channels];
 				currentActivePO = new int[anim.num_channels];
 				channelParents = new bool[anim.num_channels];
@@ -335,6 +353,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					AddChannelID(id, i);
 					channelNTTO[i] = ch.frames?.SelectMany(f => (f.ntto != null && f.ntto >= 1) ? new short[] { f.ntto.Value } : new short[0]).Distinct().ToArray();
 					subObjects[i] = new GameObject[channelNTTO[i] != null ? channelNTTO[i].Length : 0];
+					subObjectBones[i] = new GameObject[subObjects[i].Length][];
 					ObjectsTable geometricObjectsDynamic = h.geometricObjectsDynamic;
 					switch (anim.file_index) {
 						case 1: geometricObjectsDynamic = a1h?.geometricObjectsDynamic; break;
@@ -348,7 +367,15 @@ public class PS1PersoBehaviour : MonoBehaviour {
 							subObjects[i][k].name = "[" + j + "] Invisible NTTO";
 							subObjects[i][k].SetActive(false);
 						} else {
-							GameObject c = geometricObjectsDynamic.GetGameObject(j);
+							GameObject[] bones = null;
+							GameObject c = geometricObjectsDynamic.GetGameObject(j, out bones);
+							if (c != null) {
+								GeometricObject geo = geometricObjectsDynamic.entries[j].geo;
+								if (Settings.s.hasDeformations && bones != null) {
+									subObjectBones[i][k] = bones;
+									hasBones = true;
+								}
+							}
 							subObjects[i][k] = c;
 							/*if (entry.scale.HasValue) {
 								objectIndexScales[ntto.object_index] = new Vector3(entry.scale.Value.x, entry.scale.Value.z, entry.scale.Value.y);
@@ -444,6 +471,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					animScales = a2h?.animScales;
 					break;
 			}
+			int[] channelNttoChanges = new int[anim.channels.Length];
 			for (int i = 0; i < anim.channels.Length; i++) {
 				PS1AnimationChannel ch = anim.channels[i];
 				if (ch.frames.Length < 1) continue;
@@ -457,8 +485,14 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				int nextChannelFrame = 0;
 				int curFrameIndex = 0;
 
+				channelNttoChanges[i] = -1;
+				int? previousNtto = null;
 				for (int f = 0; f < ch.frames.Length; f++) {
-					if (!ch.frames[f].ntto.HasValue || ch.frames[f].ntto >= 0) {
+					if (!ch.frames[f].ntto.HasValue || ch.frames[f].ntto >= 0 || ch.frames[f].ntto == -20) {
+						if (!previousNtto.HasValue || previousNtto.Value != ch.frames[f].ntto) {
+							channelNttoChanges[i]++;
+							previousNtto = ch.frames[f].ntto;
+						}
 						frame = ch.frames[f];
 						curChannelFrame = nextChannelFrame;
 						curFrameIndex = f;
@@ -476,7 +510,8 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				}
 				if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0) {
 					nextKF = ch.frames[curFrameIndex + 1];
-					if (nextKF.ntto.HasValue && nextKF.ntto.Value < 0) nextKF = ch.frames[curFrameIndex + 2];
+					//print(ch.frames[0].Offset);
+					if (nextKF.ntto.HasValue && (nextKF.ntto.Value < 0 && nextKF.ntto.Value != -20)) nextKF = ch.frames[curFrameIndex + 2];
 				}
 				float interpolation = 0f;
 
@@ -485,8 +520,8 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				}
 
 
-				if (!frame.ntto.HasValue || frame.ntto.Value >= 0) {
-					short poNum = frame.ntto.HasValue ? frame.ntto.Value : (short)-1;
+				if (!frame.ntto.HasValue || frame.ntto.Value >= 0 || frame.ntto.Value == -20) {
+					short poNum = (frame.ntto.HasValue && frame.ntto.Value != -20) ? frame.ntto.Value : (short)-1;
 					poNum = (short)Array.IndexOf(channelNTTO[i], poNum);
 					
 					GameObject physicalObject = poNum >= 0 ? subObjects[i][poNum] : null;
@@ -585,6 +620,27 @@ public class PS1PersoBehaviour : MonoBehaviour {
 						(1 / 256f) * (v.z != 0f ? v.z : 256f));
 					channelObjects[i].transform.localScale = v;
 				}*/
+			}
+
+			if (hasBones && anim.bones?.Length > 0) {
+				for (int i = 0; i < anim.channels.Length; i++) {
+					if (currentActivePO[i] >= 0 && subObjectBones[i][currentActivePO[i]] != null) {
+						GameObject[] bones = subObjectBones[i][currentActivePO[i]];
+						int bonesIndex = Array.FindIndex(anim.bones, b => b.ind_ntto_channel == i);
+						if (bonesIndex != -1) {
+							int curFrameIndex = bonesIndex + (channelNttoChanges[i] >= 0 ? channelNttoChanges[i] : 0);
+							PS1AnimationBoneChannelLinks b = anim.bones[curFrameIndex];
+							if (b.ind_ntto_channel != i) print("Channel did not match!");
+							ushort[] indices = b.indices;
+							for (int j = 1; j < bones.Length; j++) {
+								bones[j].transform.SetParent(channelObjects[indices[j-1]].transform);
+								bones[j].transform.localPosition = Vector3.zero;
+								bones[j].transform.localRotation = Quaternion.identity;
+								bones[j].transform.localScale = Vector3.one;
+							}
+						}
+					}
+				}
 			}
 		}
 	}

@@ -22,10 +22,12 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_18;
 		public ushort ushort_1A;
 		public Pointer off_bones;
+		public ushort num_bones;
 
 		// Parsed
 		public PS1AnimationChannel[] channels;
 		public PS1AnimationHierarchy[] hierarchies;
+		public PS1AnimationBoneChannelLinks[] bones;
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
@@ -37,7 +39,7 @@ namespace OpenSpace.PS1 {
 				num_frames = reader.ReadUInt16();
 				ushort_0E = reader.ReadUInt16();
 				num_hierarchies = reader.ReadUInt32();
-				off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
+				off_hierarchies = Pointer.Read(reader);
 				uint_18 = reader.ReadUInt32();
 			} else if(Settings.s.game == Settings.Game.RRush) {
 				off_channels = Pointer.Read(reader);
@@ -54,18 +56,28 @@ namespace OpenSpace.PS1 {
 				num_frames = reader.ReadUInt16();
 				ushort_0E = reader.ReadUInt16();
 				if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
-					uint_18 = reader.ReadUInt32();
-					off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
-					num_hierarchies = reader.ReadUInt16();
-					ushort_1A = reader.ReadUInt16();
-					off_bones = Pointer.Read(reader); // probably deform related
+					if (Settings.s.game == Settings.Game.VIP) {
+						num_hierarchies = reader.ReadUInt32();
+						off_hierarchies = Pointer.Read(reader);
+						ushort_18 = reader.ReadUInt16();
+					} else {
+						uint_18 = reader.ReadUInt32();
+						off_hierarchies = Pointer.Read(reader);
+						num_hierarchies = reader.ReadUInt16();
+					}
+					num_bones = reader.ReadUInt16();
+					off_bones = Pointer.Read(reader);
+					/*Load.print("Animation: " + Offset
+						+ " - " + num_channels
+						+ " - " + num_bones
+						+ " - " + off_bones);*/
 					file_index = (ushort)reader.ReadUInt32();
 					speed = 30;
 				} else {
 					num_hierarchies = reader.ReadUInt32();
 					speed = reader.ReadUInt16();
 					ushort_1A = reader.ReadUInt16();
-					off_hierarchies = Pointer.Read(reader); // Points to uint_10 structs of 0x8 (2 uints. some kind of hierarchy?)
+					off_hierarchies = Pointer.Read(reader);
 					uint_18 = reader.ReadUInt32();
 					uint_18 = reader.ReadUInt32();
 					uint_18 = reader.ReadUInt32();
@@ -81,6 +93,7 @@ namespace OpenSpace.PS1 {
 					//Load.print(Offset + " - " + name);
 				});
 			}
+			bones = Load.ReadArray<PS1AnimationBoneChannelLinks>(num_bones, reader, off_bones);
 
 
 			R2PS1Loader l = Load as R2PS1Loader;

@@ -47,7 +47,7 @@ namespace OpenSpace.PS1 {
 				name = transitions.name;
 				Load.print(Offset + " - " + name);
 			}*/
-			Load.print("State " + anim?.index + " - " + Offset + ": " + off_anim + " - " + off_18);
+			//Load.print("State " + anim?.index + " - " + Offset + ": " + off_anim + " - " + off_18);
 		}
 	}
 }

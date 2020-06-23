@@ -58,14 +58,16 @@ namespace OpenSpace.PS1 {
 				off_geo = Pointer.Read(reader);
 				geo = Load.FromOffsetOrRead<GeometricObject>(reader, off_geo);
 			}
-			public GameObject GetGameObject() {
-				return geo?.GetGameObject();
+			public GameObject GetGameObject(out GameObject[] bones) {
+				bones = null;
+				return geo?.GetGameObject(out bones);
 			}
 		}
 
-		public GameObject GetGameObject(int i) {
+		public GameObject GetGameObject(int i, out GameObject[] bones) {
+			bones = null;
 			if (i < 0 || i >= length) return null;
-			return entries[i]?.GetGameObject();
+			return entries[i]?.GetGameObject(out bones);
 		}
 	}
 }

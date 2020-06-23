@@ -51,7 +51,7 @@ namespace OpenSpace.PS1 {
 				public bool inEngine;
 				public bool exeOnly = false;
 				public bool loadActor = false;
-				public bool canSetActor = true;
+				public bool isActorSelectable = true;
 				public bool relocateActor = false;
 				public uint? overrideActor1Address;
 				public uint? overrideActor2Address;
@@ -533,15 +533,15 @@ namespace OpenSpace.PS1 {
 					extension = "DAT",
 					baseLBA = 0x1F4,
 					memoryBlocks = new File.MemoryBlock[] {
-						new File.MemoryBlock(0x800C1648, false, new File.LBA(0x1F4, 0x115)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800C98F0, false, new File.LBA(0x309, 0x113)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800C1DEC, false, new File.LBA(0x41C, 0x111)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800C8F98, false, new File.LBA(0x52D, 0x10E)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800BFE60, false, new File.LBA(0x63B, 0x144)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800C58F4, false, new File.LBA(0x77F, 0x121)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800C1D68, false, new File.LBA(0x8A0, 0xF6)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800C2080, false, new File.LBA(0x996, 0xF1)) { loadActor = true, relocateActor = true },
-						new File.MemoryBlock(0x800BCEDC, false, new File.LBA(0xA87, 0x11A)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800C1648, false, new File.LBA(0x1F4, 0x115)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800C98F0, false, new File.LBA(0x309, 0x113)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800C1DEC, false, new File.LBA(0x41C, 0x111)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800C8F98, false, new File.LBA(0x52D, 0x10E)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800BFE60, false, new File.LBA(0x63B, 0x144)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800C58F4, false, new File.LBA(0x77F, 0x121)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800C1D68, false, new File.LBA(0x8A0, 0xF6)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800C2080, false, new File.LBA(0x996, 0xF1)) { loadActor = true, relocateActor = true, isActorSelectable = false },
+						new File.MemoryBlock(0x800BCEDC, false, new File.LBA(0xA87, 0x11A)) { loadActor = true, relocateActor = true, isActorSelectable = false },
 						new File.MemoryBlock(0x800C15C0, false, new File.LBA(0xBA1, 0x11C)) { loadActor = true, relocateActor = true },
 						new File.MemoryBlock(0x800C9868, false, new File.LBA(0xCBD, 0x11D)) { loadActor = true, relocateActor = true },
 						new File.MemoryBlock(0x800C1D64, false, new File.LBA(0xDDA, 0x116)) { loadActor = true, relocateActor = true },
