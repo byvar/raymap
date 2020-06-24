@@ -65,9 +65,7 @@ namespace OpenSpace.Loader {
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
 				Actor1Index = Array.FindIndex(game.actors, a => a.Actor1 == actor1Name);
 				Actor2Index = Array.FindIndex(game.actors, a => a.Actor2 == actor2Name);
-				if (Settings.s.game == Settings.Game.JungleBook) {
-					JungleBookSetActor();
-				}
+				SetForcedActor();
 				files_array = new FileWithPointers[0];
 				await LoadAllDataFromDAT(game);
 				//await ExtractAllFiles(game);
@@ -179,7 +177,7 @@ namespace OpenSpace.Loader {
 				default: return 0;
 			}
 		}
-		private void JungleBookSetActor() {
+		private void SetForcedActor() {
 			if (Settings.s.game == Settings.Game.JungleBook) {
 				if (CurrentLevel < 9) {
 					// Story levels
@@ -200,13 +198,60 @@ namespace OpenSpace.Loader {
 					// Menu
 					Actor1Index = 22; // "22_Kl"
 					Actor2Index = 13; // "13_mow"
-					// Base address for Act2: 80149400
+									  // Base address for Act2: 80149400
 
 				} else {
 					// Base address for Act2: 80149400
 					// I guess anything goes between >= 9 && <= 26
 				}
+			} else if (Settings.s.game == Settings.Game.RRush) {
+				if (CurrentLevel == 12) { // mainmenu
+					Actor1Index = 8; // menubox1
+					Actor2Index = 9; // menubox2
+				}
 			}
+		}
+
+		private void RelocateActorMemoryDonaldDuck() {
+			Reader reader = files_array[Mem.Fix]?.reader;
+			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
+			Pointer.DoAt(ref reader, Pointer.Current(reader) + 0xe0, () => {
+				Pointer off_geo_dynamic = Pointer.Read(reader);
+				uint num_skinnableObjects = reader.ReadUInt32();
+				int num_skins = 5;
+				Pointer[] off_skins = new Pointer[num_skins];
+				//skins = new SkinnableGeometricObjectList[num_skins];
+				for (int i = 0; i < num_skins; i++) {
+					off_skins[i] = Pointer.Read(reader);
+					//skins[i] = Load.FromOffsetOrRead<SkinnableGeometricObjectList>(reader, off_skins[i], onPreRead: s => s.length = num_skinnableObjects);
+				}
+				Pointer off_defaultSkin = Pointer.Read(reader);
+				Pointer.DoAt(ref reader, off_skins[Actor1Index], () => {
+					Pointer off_entries = Pointer.Read(reader);
+					Pointer off_memory = Pointer.Read(reader);
+					uint sz_memory = reader.ReadUInt32();
+					byte[] memory = null;
+					Pointer.DoAt(ref reader, off_memory, () => {
+						memory = reader.ReadBytes((int)sz_memory);
+					});
+					((off_defaultSkin.file) as PS1Data).OverwriteData(off_defaultSkin.FileOffset, memory);
+				});
+				reader.ReadUInt32();
+				Pointer off_geo_static = Pointer.Read(reader);
+				uint num_geo_dynamic = reader.ReadUInt32();
+				/*if (num_skinnableObjects > 0) {
+					// Write geometric objects into list
+					uint start_geo_skin = num_geo_dynamic - num_skinnableObjects - 1;
+					Pointer.DoAt(ref reader, off_geo_dynamic + (start_geo_skin * 8), () => {
+						for (int i = 0; i < num_skinnableObjects; i++) {
+							Pointer.Read(reader);
+							Pointer off_cur = Pointer.Current(reader);
+							(off_cur.file as PS1Data).OverwriteData(off_cur.FileOffset, (off_defaultSkin + i * 0x20).offset);
+							Pointer.Read(reader);
+						}
+					});
+				}*/
+			});
 		}
 
 		private void RelocateActorFile(int index) {
@@ -305,8 +350,8 @@ namespace OpenSpace.Loader {
 					Pointer.DoAt(ref reader, off_matrix, () => {
 						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset, new byte[0x14]);
 						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x14, (uint)(index * 0x100));
-						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x18, (uint)(1 * 0x100));
-						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x1C, (uint)(0 * 0x100));
+						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x18, (uint)(0 * 0x100));
+						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x1C, (uint)(2 * 0x100));
 					});
 				});
 			}
@@ -318,6 +363,9 @@ namespace OpenSpace.Loader {
 			if (game.actors != null && game.actors.Length > 0) {
 				RelocateActorFile(0);
 				RelocateActorFile(1);
+			}
+			if (Settings.s.game == Settings.Game.DD) {
+				RelocateActorMemoryDonaldDuck();
 			}
 
 			// TODO: Load header here
@@ -367,18 +415,23 @@ namespace OpenSpace.Loader {
 			GameObject inactiveDynamicWorld = levelHeader.inactiveDynamicWorld?.GetGameObject();
 			inactiveDynamicWorld.name = "Inactive Dynamic World | " + inactiveDynamicWorld.name;
 			GameObject always = new GameObject("Always");
+			always.transform.position = new Vector3(0, -1000, 0);
+			int i = 0;
 			foreach (AlwaysList alw in levelHeader.always) {
 				GameObject alwGao = alw.GetGameObject();
 				alwGao.transform.SetParent(always.transform);
+				alwGao.transform.localPosition = new Vector3(i++ * 10f, 0f, 0f);
+				i++;
 			}
 
 			GameObject persoPartsParent = new GameObject("Perso parts");
-			int i = 0;
+			persoPartsParent.transform.localPosition = new Vector3(0, 1000, 0);
+			i = 0;
 			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
 				GameObject g = e.GetGameObject(out _);
 				g.name = $"[{i}] {e.off_0} - {g.name}";
 				g.transform.parent = persoPartsParent.transform;
-				g.transform.position = new Vector3(i++ * 4, 1000, 0);
+				g.transform.localPosition = new Vector3(i++ * 4, 0, 0);
 			}
 
 

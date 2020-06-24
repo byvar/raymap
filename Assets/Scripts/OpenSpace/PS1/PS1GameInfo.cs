@@ -310,6 +310,13 @@ namespace OpenSpace.PS1 {
 				"incabonus_2",
 				"menu",
 			},
+			actors = new Actor[] {
+				new Actor() { actor = "original", isSelectableActor2 = false },
+				new Actor() { actor = "pajamas", isSelectableActor2 = false },
+				new Actor() { actor = "cowboy", isSelectableActor2 = false },
+				new Actor() { actor = "magician", isSelectableActor2 = false },
+				new Actor() { actor = "tourist", isSelectableActor2 = false },
+			},
 			files = new File[] {
 				new File() {
 					fileID = 0,
@@ -681,8 +688,8 @@ namespace OpenSpace.PS1 {
 				new Actor() { actor = "mhunch" },
 				new Actor() { actor = "wife" },
 				new Actor() { actor = "mglobette" },
-				new Actor() { actor = "menubox1" },
-				new Actor() { actor = "menubox2" },
+				new Actor() { actor = "menubox1", isSelectable = false },
+				new Actor() { actor = "menubox2", isSelectable = false },
 			},
 			actor1Address = 0x80165000,
 			actor2Address = 0x80190C00,
@@ -710,7 +717,8 @@ namespace OpenSpace.PS1 {
 							loadActor = true,
 							relocateActor = true,
 							overrideActor1Address = 0x8019c000,
-							overrideActor2Address = 0x801ac400
+							overrideActor2Address = 0x801ac400,
+							isActorSelectable = false
 						}, // menu
 						new File.MemoryBlock(0x80110000, false, new File.LBA(0x14A3, 0x1D), inEngine: false) { exeOnly = true },
 					}

@@ -31,6 +31,9 @@ namespace OpenSpace.PS1 {
 				if (g != null) {
 					g.name = $"({i}) {g.name}";
 					g.transform.SetParent(gao.transform);
+					g.transform.localPosition = new Vector3(0f, 0f, i * 5f);
+					g.transform.localRotation = Quaternion.identity;
+					g.transform.localScale = Vector3.one;
 				}
 			}
 			return gao;

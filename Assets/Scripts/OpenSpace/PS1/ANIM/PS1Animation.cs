@@ -82,7 +82,7 @@ namespace OpenSpace.PS1 {
 			hierarchies = Load.ReadArray<PS1AnimationHierarchy>(num_hierarchies, reader, off_hierarchies);
 			//Load.print(channels.Max(c => c.frames.Length == 0 ? 0 : c.frames.Max(f => f.ntto >= 1 ? f.frameNumber.GetValueOrDefault(0) : 0)) + " - " + num_frames + " - " + num_channels);
 			if (off_hierarchies != null) {
-				Pointer.DoAt(ref reader, off_hierarchies - 0x10, () => {
+				Pointer.DoAt(ref reader, off_hierarchies - (Settings.s.game == Settings.Game.DD ? 0x14 : 0x10), () => {
 					name = reader.ReadString(0x10);
 					//Load.print(Offset + " - " + name);
 				});

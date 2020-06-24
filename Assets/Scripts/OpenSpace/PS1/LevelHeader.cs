@@ -100,6 +100,10 @@ namespace OpenSpace.PS1 {
 		public Pointer off_ago_textures_width;
 		public Pointer off_ago_textures_height;
 
+		// Donald Duck
+		public uint num_skinnableObjects;
+		public Pointer[] off_skins;
+		public Pointer off_current_skin_memory;
 
 
 		// Parsed
@@ -112,6 +116,7 @@ namespace OpenSpace.PS1 {
 		public Perso[] persos;
 		public AlwaysList[] always;
 		public Sector[] sectors;
+		public SkinnableGeometricObjectList[] skins;
 
 		public PS1AnimationVector[] animPositions;
 		public PS1AnimationQuaternion[] animRotations;
@@ -176,16 +181,18 @@ namespace OpenSpace.PS1 {
 				Pointer.Read(reader);
 
 				off_geometricObjects_dynamic = Pointer.Read(reader);
-				num_geometricObjects_dynamic = reader.ReadUInt32();
-				Pointer.Read(reader);
-				Pointer.Read(reader);
-				Pointer.Read(reader);
-				Pointer.Read(reader);
-				Pointer.Read(reader);
-				Pointer.Read(reader);
-				reader.ReadUInt32();
+				num_skinnableObjects = reader.ReadUInt32();
+				int num_skins = 5;
+				off_skins = new Pointer[num_skins];
+				skins = new SkinnableGeometricObjectList[num_skins];
+				for (int i = 0; i < num_skins; i++) {
+					off_skins[i] = Pointer.Read(reader);
+					skins[i] = Load.FromOffsetOrRead<SkinnableGeometricObjectList>(reader, off_skins[i], onPreRead: s => s.length = num_skinnableObjects);
+				}
+				off_current_skin_memory = Pointer.Read(reader);
+				reader.ReadUInt32(); // total skin memory size?
 				off_geometricObjects_static = Pointer.Read(reader);
-				reader.ReadUInt32();
+				num_geometricObjects_dynamic = reader.ReadUInt32();
 			} else if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
 				reader.ReadUInt32();
 				reader.ReadUInt32();

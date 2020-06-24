@@ -45,6 +45,7 @@ namespace OpenSpace.PS1 {
 		public DeformVertexUnknown[] boneUnk;
 
 		protected override void ReadInternal(Reader reader) {
+			//Load.print(Offset);
 			uint_00 = reader.ReadUInt32();
 			num_vertices = reader.ReadUInt16();
 			num_triangleLists = reader.ReadUInt16();
