@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace OpenSpace.PS1 {
-	public class GeometricObject : OpenSpaceStruct { // Sectors?
+	public class GeometricObject : OpenSpaceStruct {
 		public uint uint_00;
 		public ushort num_vertices;
 		public ushort num_triangleLists;

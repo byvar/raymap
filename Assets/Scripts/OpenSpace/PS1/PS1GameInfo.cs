@@ -325,7 +325,7 @@ namespace OpenSpace.PS1 {
 					baseLBA = 0x1F4,
 					memoryBlocks = new File.MemoryBlock[] {
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1F4, 0x2DA)),
-						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4CE, 0x2E8)),
+						new File.MemoryBlock(0x800c5600, true, new File.LBA(0x4CE, 0x2E8)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x7B6, 0x2DE)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0xA94, 0x2D5)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0xD69, 0x2EA)),
@@ -337,8 +337,8 @@ namespace OpenSpace.PS1 {
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x1ECB, 0x30D)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x21D8, 0x30A)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x24E2, 0x2C2)),
-						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x27A4, 0x2EB)),
-						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x2A8F, 0x2E6)),
+						new File.MemoryBlock(0x800b6600, true, new File.LBA(0x27A4, 0x2EB)),
+						new File.MemoryBlock(0x800b6600, true, new File.LBA(0x2A8F, 0x2E6)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x2D75, 0x2EC)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x3061, 0x2BE)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x331F, 0x287)),
@@ -352,7 +352,7 @@ namespace OpenSpace.PS1 {
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x476E, 0x2E9)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4A57, 0x2C7)),
 						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4D1E, 0x14B)),
-						new File.MemoryBlock(0x800b8e00, true, new File.LBA(0x4E69, 0x1B), inEngine: false) { exeOnly = true },
+						new File.MemoryBlock(0x80100000, true, new File.LBA(0x4E69, 0x1B), inEngine: false) { exeOnly = true },
 					}
 				}
 			}

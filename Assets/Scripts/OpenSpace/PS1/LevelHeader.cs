@@ -225,19 +225,28 @@ namespace OpenSpace.PS1 {
 				off_geometricObjects_static = Pointer.Read(reader);
 				num_geometricObjects_dynamic = reader.ReadUInt32();
 			}
-
-			ushort_18C = reader.ReadUInt16();
-			ushort_18E = reader.ReadUInt16();
-			short_190 = reader.ReadInt16();
-			ushort_192 = reader.ReadUInt16();
-			num_ipos = reader.ReadUInt32(); // y
-			off_ipos = Pointer.Read(reader); // y structs of 0x3c
-			uint_19C = reader.ReadUInt32();
-			bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
+			if (!(Settings.s.game == Settings.Game.VIP && (Load as R2PS1Loader).CurrentLevel == 53)) {
+				ushort_18C = reader.ReadUInt16();
+				ushort_18E = reader.ReadUInt16();
+				short_190 = reader.ReadInt16();
+				ushort_192 = reader.ReadUInt16();
+				num_ipos = reader.ReadUInt32(); // y
+				off_ipos = Pointer.Read(reader); // y structs of 0x3c
+				uint_19C = reader.ReadUInt32();
+				bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
+			} else {
+				ushort_18C = reader.ReadUInt16();
+				ushort_18E = reader.ReadUInt16();
+				short_190 = reader.ReadInt16();
+				ushort_192 = reader.ReadUInt16();
+				reader.ReadUInt32(); // y
+				reader.ReadUInt32();
+				uint_19C = reader.ReadUInt32();
+				bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
+			}
 			off_sectors = Pointer.Read(reader); // num_1A8 structs of 0x54
 			num_sectors = reader.ReadUInt16(); // actual sectors
 											   //Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
-
 			if (Settings.s.game == Settings.Game.R2 || Settings.s.game == Settings.Game.RRush) {
 				ushort_1AA = reader.ReadUInt16();
 				uint_1AC = reader.ReadUInt32();

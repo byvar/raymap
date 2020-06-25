@@ -12,21 +12,21 @@ namespace OpenSpace.PS1 {
 		public Pointer off_superObjectPointer;
 		public Pointer off_08;
 		public Pointer off_0C;
-		public Pointer off_10;
-		public Pointer off_14;
+		public Pointer off_collSet;
+		public Pointer off_sectorSuperObjectPointer;
 
 		// Parsed
 		public Perso3dData p3dData;
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
-			Load.print("Perso @ " + Offset);
+			//Load.print("Perso @ " + Offset);
 			off_p3dData = Pointer.Read(reader);
 			off_superObjectPointer = Pointer.Read(reader);
 			off_08 = Pointer.Read(reader);
-			off_0C = Pointer.Read(reader);
-			off_10 = Pointer.Read(reader);
-			off_14 = Pointer.Read(reader);
+			off_0C = Pointer.Read(reader); // points to struct of 0x18 size
+			off_collSet = Pointer.Read(reader);
+			off_sectorSuperObjectPointer = Pointer.Read(reader); // points to 4 bytes: 00000000. Only filled in at runtime
 			//Load.print(off_00 + " - " + off_04 + " - " + off_08 + " - " + off_0C + " - " + off_10 + " - " + off_14);
 
 			p3dData = Load.FromOffsetOrRead<Perso3dData>(reader, off_p3dData);
@@ -40,7 +40,8 @@ namespace OpenSpace.PS1 {
 				} else {
 					name = reader.ReadNullDelimitedString();
 				}
-				Load.print(Offset + " - " + off_superObjectPointer + " - " + off_superobject + " - " + name);
+				Load.print("Perso:" + Offset + " - SO:" + off_superobject + " - " + name);
+				//Load.print(Offset + " - " + off_08 + " - " + off_collSet + " - " + name);
 			});
 			/*Pointer.DoAt(ref reader, off_00, () => {
 				reader.ReadBytes(0x5c);
