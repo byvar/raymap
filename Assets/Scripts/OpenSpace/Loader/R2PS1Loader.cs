@@ -423,6 +423,11 @@ namespace OpenSpace.Loader {
 				alwGao.transform.localPosition = new Vector3(i++ * 10f, 0f, 0f);
 				i++;
 			}
+			/*if (levelHeader.meshCollision != null) {
+				foreach (PS1.GeometricObjectCollide c in levelHeader.meshCollision) {
+					c.GetGameObject();
+				}
+			}*/
 
 			GameObject persoPartsParent = new GameObject("Perso parts");
 			persoPartsParent.transform.localPosition = new Vector3(0, 1000, 0);

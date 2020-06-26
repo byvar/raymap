@@ -11,7 +11,7 @@ using UnityEngine;
 namespace OpenSpace.PS1 {
 	public class GeometricObjectCollideTriangle : OpenSpaceStruct, IPS1PolygonCollide {
 		public byte flag0;
-		public byte flag1;
+		public byte gameMaterial;
 		public ushort normal;
 
 		// Vertices
@@ -32,7 +32,7 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			flag0 = reader.ReadByte();
-			flag1 = reader.ReadByte();
+			gameMaterial = reader.ReadByte();
 			normal = reader.ReadUInt16();
 			v0 = reader.ReadUInt16();
 			v1 = reader.ReadUInt16();
@@ -48,13 +48,6 @@ namespace OpenSpace.PS1 {
 			z2 = reader.ReadInt16();
 		}
 
-		public CollideMaterial Material {
-			get {
-				return new CollideMaterial() {
-					flag0 = flag0,
-					identifier = flag1
-				};
-			}
-		}
+		public byte MaterialIndex => gameMaterial;
 	}
 }

@@ -65,8 +65,8 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_192;
 		public uint num_ipoCollision;
 		public Pointer off_ipoCollision;
-		public uint uint_19C;
-		public uint bad_off_1A0;
+		public uint num_meshCollision;
+		public uint bad_off_meshCollision;
 		public Pointer off_sectors;
 		public ushort num_sectors;
 		public ushort ushort_1AA;
@@ -76,8 +76,8 @@ namespace OpenSpace.PS1 {
 		public uint uint_1B8;
 		public Pointer off_1BC; // 0x28 structs of 0x38 size
 		public Pointer off_1C0; // 0x28 structs of 0x68 size. starts with 0x5.
-		public Pointer off_1C4; // b structs of 0x10
-		public uint uint_1C8; // b
+		public Pointer off_gameMaterials; // b structs of 0x10
+		public uint num_gameMaterials; // b
 		public uint uint_1CC;
 		public ushort ushort_1D0;
 		public ushort ushort_1D2;
@@ -118,6 +118,8 @@ namespace OpenSpace.PS1 {
 		public Sector[] sectors;
 		public SkinnableGeometricObjectList[] skins;
 		public GeometricObjectCollide[] ipoCollision;
+		//public GeometricObjectCollide[] meshCollision;
+		public GameMaterial[] gameMaterials;
 
 		public PS1AnimationVector[] animPositions;
 		public PS1AnimationQuaternion[] animRotations;
@@ -234,8 +236,8 @@ namespace OpenSpace.PS1 {
 				num_ipoCollision = reader.ReadUInt32(); // y
 				off_ipoCollision = Pointer.Read(reader); // y structs of 0x3c
 				Load.print(off_ipoCollision + " - " + num_ipoCollision);
-				uint_19C = reader.ReadUInt32();
-				bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
+				num_meshCollision = reader.ReadUInt32();
+				bad_off_meshCollision = reader.ReadUInt32();
 			} else {
 				ushort_18C = reader.ReadUInt16();
 				ushort_18E = reader.ReadUInt16();
@@ -243,31 +245,35 @@ namespace OpenSpace.PS1 {
 				ushort_192 = reader.ReadUInt16();
 				reader.ReadUInt32(); // y
 				reader.ReadUInt32();
-				uint_19C = reader.ReadUInt32();
-				bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
+				reader.ReadUInt32();
+				reader.ReadUInt32(); //Pointer.Read(reader);
 			}
 			off_sectors = Pointer.Read(reader); // num_1A8 structs of 0x54
 			num_sectors = reader.ReadUInt16(); // actual sectors
 											   //Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
+
+			ushort_1AA = reader.ReadUInt16();
 			if (Settings.s.game == Settings.Game.R2
 				|| Settings.s.game == Settings.Game.RRush
-				|| Settings.s.game == Settings.Game.JungleBook) {
-				ushort_1AA = reader.ReadUInt16();
-				uint_1AC = reader.ReadUInt32();
-				uint_1B0 = reader.ReadUInt32();
-				uint_1B4 = reader.ReadUInt32();
-				uint_1B8 = reader.ReadUInt32();
-				off_1BC = Pointer.Read(reader);
-				off_1C0 = Pointer.Read(reader);
+				|| Settings.s.game == Settings.Game.JungleBook
+				|| Settings.s.game == Settings.Game.DD) {
+				if (Settings.s.game != Settings.Game.DD) {
+					uint_1AC = reader.ReadUInt32();
+					uint_1B0 = reader.ReadUInt32();
+					uint_1B4 = reader.ReadUInt32();
+					uint_1B8 = reader.ReadUInt32();
+					off_1BC = Pointer.Read(reader);
+					off_1C0 = Pointer.Read(reader);
 
-				if (Settings.s.game == Settings.Game.RRush) {
-					off_rush_114 = Pointer.Read(reader);
-					ushort_rush_118 = reader.ReadUInt16();
-					ushort_rush_11A = reader.ReadUInt16();
+					if (Settings.s.game == Settings.Game.RRush) {
+						off_rush_114 = Pointer.Read(reader);
+						ushort_rush_118 = reader.ReadUInt16();
+						ushort_rush_11A = reader.ReadUInt16();
+					}
 				}
 
-				off_1C4 = Pointer.Read(reader);
-				uint_1C8 = reader.ReadUInt32();
+				off_gameMaterials = Pointer.Read(reader);
+				num_gameMaterials = reader.ReadUInt32();
 				uint_1CC = reader.ReadUInt32();
 				ushort_1D0 = reader.ReadUInt16();
 				ushort_1D2 = reader.ReadUInt16();
@@ -300,6 +306,8 @@ namespace OpenSpace.PS1 {
 				if (Settings.s.game == Settings.Game.R2) t.length = num_ipoCollision;
 			});
 			ipoCollision = Load.ReadArray<GeometricObjectCollide>(num_ipoCollision, reader, off_ipoCollision);
+			//meshCollision = Load.ReadArray<GeometricObjectCollide>(num_meshCollision, reader, off_meshCollision);
+			gameMaterials = Load.ReadArray<GameMaterial>(num_gameMaterials, reader, off_gameMaterials);
 			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OpenSpace.PS1 {
 	public interface IPS1PolygonCollide {
-		CollideMaterial Material { get; }
+		byte MaterialIndex { get; }
 		Pointer Offset { get; }
 	}
 }

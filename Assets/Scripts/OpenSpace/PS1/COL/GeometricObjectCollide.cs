@@ -52,29 +52,33 @@ namespace OpenSpace.PS1 {
 
 			// First pass
 
-			Dictionary<CollideMaterial, List<IPS1PolygonCollide>> elementsDict = new Dictionary<CollideMaterial, List<IPS1PolygonCollide>>();
+			Dictionary<byte, List<IPS1PolygonCollide>> elementsDict = new Dictionary<byte, List<IPS1PolygonCollide>>();
 			foreach (GeometricObjectCollideTriangle t in triangles) {
-				CollideMaterial cm = t.Material;
-				if (!elementsDict.ContainsKey(cm)) elementsDict[cm] = new List<IPS1PolygonCollide>();
-				elementsDict[cm].Add(t);
+				byte gmi = t.MaterialIndex;
+				if (!elementsDict.ContainsKey(gmi)) elementsDict[gmi] = new List<IPS1PolygonCollide>();
+				elementsDict[gmi].Add(t);
 			}
 			foreach (GeometricObjectCollideQuad q in quads) {
-				CollideMaterial cm = q.Material;
-				if (!elementsDict.ContainsKey(cm)) elementsDict[cm] = new List<IPS1PolygonCollide>();
-				elementsDict[cm].Add(q);
+				byte gmi = q.MaterialIndex;
+				if (!elementsDict.ContainsKey(gmi)) elementsDict[gmi] = new List<IPS1PolygonCollide>();
+				elementsDict[gmi].Add(q);
 			}
 
 			// Second pass
-			CollideMaterial[] elements = elementsDict.Keys.ToArray();
+			byte[] elements = elementsDict.Keys.ToArray();
 			for (int i = 0; i < elements.Length; i++) {
-				CollideMaterial cm = elements[i];
+				byte gmi = elements[i];
+				GameMaterial gm = (Load as R2PS1Loader).levelHeader.gameMaterials?[gmi];
+				CollideMaterial cm = gm?.collideMaterial;
 
-				IPS1PolygonCollide pf = elementsDict[cm].FirstOrDefault();
-				GameObject gao = new GameObject(Offset.ToString()
-					+ " - " + i
-					+ " - " + pf?.Offset
-					+ " - " + string.Format("{0:X2}", cm.flag0)
-					+ "|" + string.Format("{0:X2}", cm.identifier));
+				IPS1PolygonCollide pf = elementsDict[gmi].FirstOrDefault();
+				GameObject gao = new GameObject(Offset.ToString());
+				if (cm != null) {
+					/*+ " - " + i
+					+ " - " + pf?.Offset*/
+					gao.name += " - " + string.Format("{0:X2}", cm.type)
+					+ "|" + string.Format("{0:X2}", cm.identifier);
+				}
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
@@ -84,7 +88,7 @@ namespace OpenSpace.PS1 {
 				List<int> triIndices = new List<int>();
 				List<int> normalIndices = new List<int>();
 				List<Vector3> normals2 = new List<Vector3>();
-				foreach (IPS1PolygonCollide p in elementsDict[cm]) {
+				foreach (IPS1PolygonCollide p in elementsDict[gmi]) {
 					int currentCount = vertIndices.Count;
 					switch (p) {
 						case GeometricObjectCollideTriangle t:
@@ -170,7 +174,7 @@ namespace OpenSpace.PS1 {
 
 				mf.mesh = m;
 
-				mr.material = cm.CreateMaterial();
+				mr.material = gm.CreateMaterial();
 			}
 			return parentGao;
 		}

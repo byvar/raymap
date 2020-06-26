@@ -8,15 +8,15 @@ using UnityEngine;
 using Colors = OpenSpace.Collide.CollideMaterial.Colors;
 
 namespace OpenSpace.PS1 {
-	public class CollideMaterial : IEquatable<CollideMaterial> {
-		public byte flag0;
-        public byte identifier;
+	public class CollideMaterial : OpenSpaceStruct, IEquatable<CollideMaterial> {
+		public ushort type;
+        public ushort identifier;
 
         public override bool Equals(System.Object obj) {
             return obj is CollideMaterial && this == (CollideMaterial)obj;
         }
         public override int GetHashCode() {
-            return flag0.GetHashCode() ^ identifier.GetHashCode();
+            return type.GetHashCode() ^ identifier.GetHashCode();
         }
 
         public bool Equals(CollideMaterial other) {
@@ -27,14 +27,14 @@ namespace OpenSpace.PS1 {
             if (ReferenceEquals(x, y)) return true;
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
-            return x.flag0 == y.flag0 && x.identifier == y.identifier;
+            return x.type == y.type && x.identifier == y.identifier;
         }
         public static bool operator !=(CollideMaterial x, CollideMaterial y) {
             return !(x == y);
         }
 
         public Material CreateMaterial() {
-            Material mat = new Material(MapLoader.Loader.collideMaterial); ;
+            Material mat = new Material(MapLoader.Loader.collideMaterial);
             if (NoCollision) {
                 mat = MapLoader.Loader.collideTransparentMaterial;
                 //mat.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
@@ -46,6 +46,9 @@ namespace OpenSpace.PS1 {
                 //mat.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                 mat.color = Colors.Water;
             }
+            if (WaterSplash) {
+                mat.color = Colors.Water;
+            }
             if (ClimbableWall || HangableCeiling) {
                 mat.color = Colors.Climbable;
             }
@@ -53,12 +56,12 @@ namespace OpenSpace.PS1 {
                 mat.color = Colors.DeathWarp;
             }
             if (HurtTrigger) mat.color = Colors.HurtTrigger;
-            if (FallTrigger) mat.color = Colors.FallTrigger;
+            //if (FallTrigger) mat.color = Colors.FallTrigger;
             if (Trampoline) mat.color = Colors.Trampoline;
             if (Electric) mat.color = Colors.Electric;
             if (Wall) mat.color = Colors.Wall;
             if (GrabbableLedge) mat.color = Colors.GrabbableLedge;
-            if (FlagUnknown || FlagUnk2 || FlagUnk3) mat.color = Colors.FlagUnknown;
+            if (FlagUnk2) mat.color = Colors.FlagUnknown;
             return mat;
         }
 
@@ -66,7 +69,7 @@ namespace OpenSpace.PS1 {
         public bool Trampoline { get { return GetFlag(01); } set { SetFlag(01, value); } }
         public bool GrabbableLedge { get { return GetFlag(02); } set { SetFlag(02, value); } }
         public bool Wall { get { return GetFlag(03); } set { SetFlag(03, value); } }
-        public bool FlagUnknown { get { return GetFlag(04); } set { SetFlag(04, value); } }
+        public bool WaterSplash { get { return GetFlag(04); } set { SetFlag(04, value); } }
         public bool HangableCeiling { get { return GetFlag(05); } set { SetFlag(05, value); } }
         public bool ClimbableWall { get { return GetFlag(06); } set { SetFlag(06, value); } }
         public bool Electric { get { return GetFlag(07); } set { SetFlag(07, value); } }
@@ -90,6 +93,11 @@ namespace OpenSpace.PS1 {
         public bool GetFlag(int index) {
             BitArray bitArray = new BitArray(BitConverter.GetBytes(identifier));
             return bitArray.Get(index);
+        }
+
+        protected override void ReadInternal(Reader reader) {
+            type = reader.ReadUInt16();
+            identifier = reader.ReadUInt16();
         }
     }
 }
