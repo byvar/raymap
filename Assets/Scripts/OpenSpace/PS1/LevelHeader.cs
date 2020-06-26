@@ -63,8 +63,8 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_18E;
 		public short short_190;
 		public ushort ushort_192;
-		public uint num_ipos;
-		public Pointer off_ipos;
+		public uint num_ipoCollision;
+		public Pointer off_ipoCollision;
 		public uint uint_19C;
 		public uint bad_off_1A0;
 		public Pointer off_sectors;
@@ -117,6 +117,7 @@ namespace OpenSpace.PS1 {
 		public AlwaysList[] always;
 		public Sector[] sectors;
 		public SkinnableGeometricObjectList[] skins;
+		public GeometricObjectCollide[] ipoCollision;
 
 		public PS1AnimationVector[] animPositions;
 		public PS1AnimationQuaternion[] animRotations;
@@ -225,13 +226,14 @@ namespace OpenSpace.PS1 {
 				off_geometricObjects_static = Pointer.Read(reader);
 				num_geometricObjects_dynamic = reader.ReadUInt32();
 			}
-			if (!(Settings.s.game == Settings.Game.VIP && (Load as R2PS1Loader).CurrentLevel == 53)) {
+			if (Settings.s.game != Settings.Game.VIP) {
 				ushort_18C = reader.ReadUInt16();
 				ushort_18E = reader.ReadUInt16();
 				short_190 = reader.ReadInt16();
 				ushort_192 = reader.ReadUInt16();
-				num_ipos = reader.ReadUInt32(); // y
-				off_ipos = Pointer.Read(reader); // y structs of 0x3c
+				num_ipoCollision = reader.ReadUInt32(); // y
+				off_ipoCollision = Pointer.Read(reader); // y structs of 0x3c
+				Load.print(off_ipoCollision + " - " + num_ipoCollision);
 				uint_19C = reader.ReadUInt32();
 				bad_off_1A0 = reader.ReadUInt32(); //Pointer.Read(reader);
 			} else {
@@ -247,7 +249,9 @@ namespace OpenSpace.PS1 {
 			off_sectors = Pointer.Read(reader); // num_1A8 structs of 0x54
 			num_sectors = reader.ReadUInt16(); // actual sectors
 											   //Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
-			if (Settings.s.game == Settings.Game.R2 || Settings.s.game == Settings.Game.RRush) {
+			if (Settings.s.game == Settings.Game.R2
+				|| Settings.s.game == Settings.Game.RRush
+				|| Settings.s.game == Settings.Game.JungleBook) {
 				ushort_1AA = reader.ReadUInt16();
 				uint_1AC = reader.ReadUInt32();
 				uint_1B0 = reader.ReadUInt32();
@@ -280,7 +284,7 @@ namespace OpenSpace.PS1 {
 					off_ago_textures_height = Pointer.Read(reader);
 					Load.print(Pointer.Current(reader));
 					ParseAGOTextures(reader);
-				} else {
+				} else if(Settings.s.game == Settings.Game.R2) {
 					uint_1F4 = reader.ReadUInt32();
 					uint_1F8 = reader.ReadUInt32();
 					uint_1FC = reader.ReadUInt32();
@@ -293,8 +297,9 @@ namespace OpenSpace.PS1 {
 			persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
 			geometricObjectsDynamic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_dynamic, onPreRead: t => t.length = num_geometricObjects_dynamic - 2);
 			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => {
-				if (Settings.s.game == Settings.Game.R2) t.length = num_ipos;
+				if (Settings.s.game == Settings.Game.R2) t.length = num_ipoCollision;
 			});
+			ipoCollision = Load.ReadArray<GeometricObjectCollide>(num_ipoCollision, reader, off_ipoCollision);
 			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 

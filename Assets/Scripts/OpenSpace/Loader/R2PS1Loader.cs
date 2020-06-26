@@ -390,7 +390,7 @@ namespace OpenSpace.Loader {
 				//string levelDir = gameDataBinFolder + lvlName + "/";
 				uint cineDataBaseAddress = levelHeader.off_animPositions.offset;
 				Array.Resize(ref files_array, files_array.Length + 1);
-				print(cineDataBaseAddress);
+				//print(cineDataBaseAddress);
 				files_array[files_array.Length-1] = new PS1Data("overlay_cine.img", levelDir + "overlay_cine.img", files_array.Length - 1,
 								cineDataBaseAddress + 0x1f800u + (uint)mainMemoryBlock.cineOffset * 0xc00);
 			}

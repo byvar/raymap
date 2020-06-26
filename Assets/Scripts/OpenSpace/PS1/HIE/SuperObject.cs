@@ -136,15 +136,27 @@ namespace OpenSpace.PS1 {
 				}
 			}*/
 			if (type == Type.IPO) {
+				PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				int ind = (dataIndex >> 1);
 				if ((dataIndex >> 1) >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
 				GameObject g = h.geometricObjectsStatic.GetGameObject(dataIndex >> 1, out _);
 				if (g != null) {
+					poc.visual = g;
 					g.transform.SetParent(gao.transform);
 					g.transform.localPosition = Vector3.zero;
 					g.transform.localRotation = Quaternion.identity;
 				}
+				if (h.ipoCollision != null && h.ipoCollision.Length > dataIndex >> 1) {
+					GameObject c = h.ipoCollision[dataIndex >> 1].GetGameObject();
+					if (c != null) {
+						poc.collide = c;
+						c.transform.SetParent(gao.transform);
+						c.transform.localPosition = Vector3.zero;
+						c.transform.localRotation = Quaternion.identity;
+					}
+				}
+				poc.Init(MapLoader.Loader.controller);
 			} else if (type == Type.Perso) {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				if (dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
