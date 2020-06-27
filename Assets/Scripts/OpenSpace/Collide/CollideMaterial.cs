@@ -130,15 +130,15 @@ namespace OpenSpace.Collide {
         }
 
         public void SetMaterial(MeshRenderer mr) {
-            mr.material = MapLoader.Loader.collideMaterial;
+            mr.material = new Material(MapLoader.Loader.collideMaterial);
             if (NoCollision) {
-                mr.material = MapLoader.Loader.collideTransparentMaterial;
+                mr.material = new Material(MapLoader.Loader.collideTransparentMaterial);
                 //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                 mr.material.color = Colors.NoCollision;
             }
             if (Slide) mr.material.color = Colors.Slide;
             if (Water) {
-                mr.material = MapLoader.Loader.collideTransparentMaterial;
+                mr.material = new Material(MapLoader.Loader.collideTransparentMaterial);
                 //mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                 mr.material.color = Colors.Water;
             }

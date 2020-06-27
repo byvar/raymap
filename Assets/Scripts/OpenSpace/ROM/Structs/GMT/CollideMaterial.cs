@@ -45,15 +45,15 @@ namespace OpenSpace.ROM {
 		}
 
 		public void SetMaterial(MeshRenderer mr) {
-			mr.material = MapLoader.Loader.collideMaterial;
+			mr.material = new Material(MapLoader.Loader.collideMaterial);
 			if (NoCollision) {
-				mr.material = MapLoader.Loader.collideTransparentMaterial;
+				mr.material = new Material(MapLoader.Loader.collideTransparentMaterial);
 				//mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
 				mr.material.color = new Color(1, 1, 1, 0.3f); // transparent cyan
 			}
 			if (Slide) mr.material.color = Color.blue;
 			if (Water) {
-				mr.material = MapLoader.Loader.collideTransparentMaterial;
+				mr.material = new Material(MapLoader.Loader.collideTransparentMaterial);
 				//mr.material.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
 				mr.material.color = new Color(0, 1, 1, 0.5f); // transparent cyan
 			}

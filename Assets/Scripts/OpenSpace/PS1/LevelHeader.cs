@@ -16,10 +16,10 @@ namespace OpenSpace.PS1 {
 		public Pointer off_inactiveDynamicWorld;
 		public uint num_always;
 		public Pointer off_always;
-		public uint uint_104;
-		public uint uint_108;
-		public Pointer off_10C;
-		public Pointer off_110;
+		public uint num_wayPoints;
+		public uint num_graphs;
+		public Pointer off_wayPoints;
+		public Pointer off_graphs;
 		public ushort num_persos;
 		public ushort ushort_116;
 		public Pointer off_persos;
@@ -66,7 +66,8 @@ namespace OpenSpace.PS1 {
 		public uint num_ipoCollision;
 		public Pointer off_ipoCollision;
 		public uint num_meshCollision;
-		public uint bad_off_meshCollision;
+		public Pointer off_meshCollision;
+		public uint off_meshCollision_;
 		public Pointer off_sectors;
 		public ushort num_sectors;
 		public ushort ushort_1AA;
@@ -118,7 +119,7 @@ namespace OpenSpace.PS1 {
 		public Sector[] sectors;
 		public SkinnableGeometricObjectList[] skins;
 		public GeometricObjectCollide[] ipoCollision;
-		//public GeometricObjectCollide[] meshCollision;
+		public GeometricObjectCollide[] meshCollision;
 		public GameMaterial[] gameMaterials;
 
 		public PS1AnimationVector[] animPositions;
@@ -145,14 +146,14 @@ namespace OpenSpace.PS1 {
 			off_inactiveDynamicWorld = Pointer.Read(reader);
 			num_always = reader.ReadUInt32();
 			off_always = Pointer.Read(reader); //
-			uint_104 = reader.ReadUInt32(); // x
-			uint_108 = reader.ReadUInt32();
-			off_10C = Pointer.Read(reader); // x structs of 0x14
-			off_110 = Pointer.Read(reader);
+			num_wayPoints = reader.ReadUInt32(); // x
+			num_graphs = reader.ReadUInt32();
+			off_wayPoints = Pointer.Read(reader); // x structs of 0x14 waypoints
+			off_graphs = Pointer.Read(reader); // graphs. structs of 0x68
 			num_persos = reader.ReadUInt16();
 			ushort_116 = reader.ReadUInt16();
 			off_persos = Pointer.Read(reader);
-			Load.print(off_dynamicWorld + " - " + off_fatherSector + " - " + off_inactiveDynamicWorld + " - " + off_always + " - " + off_10C + " - " + off_110 + " - " + off_persos);
+			Load.print(off_dynamicWorld + " - " + off_fatherSector + " - " + off_inactiveDynamicWorld + " - " + off_always + " - " + off_wayPoints + " - " + off_graphs + " - " + off_persos);
 			off_states = Pointer.Read(reader);
 			num_states = reader.ReadUInt16();
 			ushort_122 = reader.ReadUInt16();
@@ -237,7 +238,11 @@ namespace OpenSpace.PS1 {
 				off_ipoCollision = Pointer.Read(reader); // y structs of 0x3c
 				Load.print(off_ipoCollision + " - " + num_ipoCollision);
 				num_meshCollision = reader.ReadUInt32();
-				bad_off_meshCollision = reader.ReadUInt32();
+				if (num_meshCollision > 0) {
+					off_meshCollision = Pointer.Read(reader);
+				} else {
+					off_meshCollision_ = reader.ReadUInt32();
+				}
 			} else {
 				ushort_18C = reader.ReadUInt16();
 				ushort_18E = reader.ReadUInt16();
@@ -306,7 +311,7 @@ namespace OpenSpace.PS1 {
 				if (Settings.s.game == Settings.Game.R2) t.length = num_ipoCollision;
 			});
 			ipoCollision = Load.ReadArray<GeometricObjectCollide>(num_ipoCollision, reader, off_ipoCollision);
-			//meshCollision = Load.ReadArray<GeometricObjectCollide>(num_meshCollision, reader, off_meshCollision);
+			meshCollision = Load.ReadArray<GeometricObjectCollide>(num_meshCollision, reader, off_meshCollision);
 			gameMaterials = Load.ReadArray<GameMaterial>(num_gameMaterials, reader, off_gameMaterials);
 			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);

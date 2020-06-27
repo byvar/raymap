@@ -14,14 +14,13 @@ namespace OpenSpace.PS1 {
 		public Pointer off_animationBuffer;
 		public Pointer off_64;
 		public Pointer off_68;
-		public uint uint_6C;
-		public uint uint_70;
+		public Pointer off_6C;
+		public int num_collisionObjects;
 		public uint uint_74;
 		public uint stateIndex;
 
 		// Rush
-		public Pointer off_6C;
-		public Pointer off_74;
+		public Pointer off_collisionObjects;
 
 		// Parsed
 		public Family family;
@@ -39,13 +38,11 @@ namespace OpenSpace.PS1 {
 				off_animationBuffer = Pointer.Read(reader);
 				off_64 = Pointer.Read(reader);
 				off_68 = Pointer.Read(reader);
-				if (Settings.s.game == Settings.Game.RRush) {
-					off_6C = Pointer.Read(reader);
-					uint_70 = reader.ReadUInt32();
-					off_74 = Pointer.Read(reader);
+				off_6C = Pointer.Read(reader); // same as col
+				num_collisionObjects = reader.ReadInt32();
+				if (num_collisionObjects > 0) {
+					off_collisionObjects = Pointer.Read(reader); // mapping: off_collisionObject, off_poListEntry
 				} else {
-					uint_6C = reader.ReadUInt32();
-					uint_70 = reader.ReadUInt32();
 					uint_74 = reader.ReadUInt32();
 				}
 				stateIndex = reader.ReadUInt32();
