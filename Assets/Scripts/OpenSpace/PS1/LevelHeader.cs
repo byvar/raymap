@@ -121,6 +121,8 @@ namespace OpenSpace.PS1 {
 		public GeometricObjectCollide[] ipoCollision;
 		public GeometricObjectCollide[] meshCollision;
 		public GameMaterial[] gameMaterials;
+		public WayPoint[] wayPoints;
+		public Graph[] graphs;
 
 		public PS1AnimationVector[] animPositions;
 		public PS1AnimationQuaternion[] animRotations;
@@ -236,13 +238,14 @@ namespace OpenSpace.PS1 {
 				ushort_192 = reader.ReadUInt16();
 				num_ipoCollision = reader.ReadUInt32(); // y
 				off_ipoCollision = Pointer.Read(reader); // y structs of 0x3c
-				Load.print(off_ipoCollision + " - " + num_ipoCollision);
+				//Load.print(off_ipoCollision + " - " + num_ipoCollision);
 				num_meshCollision = reader.ReadUInt32();
-				if (num_meshCollision > 0) {
+				/*if (num_meshCollision > 0) {
+					Load.print(num_meshCollision);
 					off_meshCollision = Pointer.Read(reader);
-				} else {
+				} else {*/
 					off_meshCollision_ = reader.ReadUInt32();
-				}
+				//}
 			} else {
 				ushort_18C = reader.ReadUInt16();
 				ushort_18E = reader.ReadUInt16();
@@ -313,6 +316,8 @@ namespace OpenSpace.PS1 {
 			ipoCollision = Load.ReadArray<GeometricObjectCollide>(num_ipoCollision, reader, off_ipoCollision);
 			meshCollision = Load.ReadArray<GeometricObjectCollide>(num_meshCollision, reader, off_meshCollision);
 			gameMaterials = Load.ReadArray<GameMaterial>(num_gameMaterials, reader, off_gameMaterials);
+			wayPoints = Load.ReadArray<WayPoint>(num_wayPoints, reader, off_wayPoints);
+			graphs = Load.ReadArray<Graph>(num_graphs, reader, off_graphs);
 			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 

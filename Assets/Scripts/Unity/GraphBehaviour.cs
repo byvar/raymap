@@ -9,6 +9,7 @@ public class GraphBehaviour : MonoBehaviour, IReferenceable {
 	public GraphManager manager;
     public List<WayPointBehaviour> nodes = new List<WayPointBehaviour>();
     public OpenSpace.ROM.Graph graphROM;
+    public OpenSpace.PS1.Graph graphPS1;
     public OpenSpace.Waypoints.Graph graph;
 
     public ReferenceFields References { get => ((IReferenceable)graph).References; set => ((IReferenceable)graph).References = value; }

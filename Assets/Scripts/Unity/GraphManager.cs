@@ -13,6 +13,7 @@ public class GraphManager : MonoBehaviour {
     public List<WayPointBehaviour> waypoints;
 	public List<GraphBehaviour> graphs;
 	public Dictionary<Graph, GraphBehaviour> graphDict = new Dictionary<Graph, GraphBehaviour>();
+	public Dictionary<OpenSpace.PS1.Graph, GraphBehaviour> graphPS1Dict = new Dictionary<OpenSpace.PS1.Graph, GraphBehaviour>();
 	public Dictionary<OpenSpace.ROM.Graph, GraphBehaviour> graphROMDict = new Dictionary<OpenSpace.ROM.Graph, GraphBehaviour>();
 	private GameObject graphRoot = null;
 	private GameObject isolateWaypointRoot = null;
@@ -71,6 +72,55 @@ public class GraphManager : MonoBehaviour {
 					}
 				}
 			}
+		} else if(MapLoader.Loader is OpenSpace.Loader.R2PS1Loader) {
+			OpenSpace.Loader.R2PS1Loader l = MapLoader.Loader as OpenSpace.Loader.R2PS1Loader;
+			if (l.levelHeader?.wayPoints != null) {
+				foreach (OpenSpace.PS1.WayPoint wp in l.levelHeader.wayPoints) {
+					AddWaypoint(wp.GetGameObject());
+				}
+			}
+			if (l.levelHeader?.graphs != null) {
+				if (graphRoot == null && l.levelHeader?.graphs.Length > 0) {
+					graphRoot = new GameObject("Graphs");
+					graphRoot.transform.SetParent(transform);
+					graphRoot.SetActive(false);
+				}
+				foreach (OpenSpace.PS1.Graph graph in l.levelHeader?.graphs) {
+					GameObject go_graph = new GameObject("Graph " + graph.Offset);
+					go_graph.transform.SetParent(graphRoot.transform);
+					GraphBehaviour gb = go_graph.AddComponent<GraphBehaviour>();
+					gb.graphPS1 = graph;
+					graphPS1Dict[graph] = gb;
+
+					for (int i = 0; i < graph.arcs.Length; i++) {
+						OpenSpace.PS1.Arc arc = graph.arcs[i];
+						if (arc.node1 != null) {
+							WayPointBehaviour wp = waypoints.FirstOrDefault(w => w.wpPS1 == arc.node1);
+							if (wp != null) {
+								if(!gb.nodes.Contains(wp)) gb.nodes.Add(wp);
+								wp.arcsPS1.Add(arc);
+								wp.name = "GraphNode[" + i + "].WayPoint (" + wp.wpPS1.Offset + ")";
+								if (i == 0) {
+									go_graph.transform.position = wp.transform.position;
+								}
+								wp.transform.SetParent(go_graph.transform);
+							}
+						}
+						if (arc.node2 != null) {
+							WayPointBehaviour wp = waypoints.FirstOrDefault(w => w.wpPS1 == arc.node2);
+							if (wp != null) {
+								if (!gb.nodes.Contains(wp)) gb.nodes.Add(wp);
+								wp.arcsPS1.Add(arc);
+								wp.name = "GraphNode[" + i + "].WayPoint (" + wp.wpPS1.Offset + ")";
+								if (i == 0) {
+									go_graph.transform.position = wp.transform.position;
+								}
+								wp.transform.SetParent(go_graph.transform);
+							}
+						}
+					}
+				}
+			}
 		} else {
 			MapLoader l = MapLoader.Loader;
 			foreach (WayPoint wp in l.waypoints) {
@@ -107,14 +157,15 @@ public class GraphManager : MonoBehaviour {
 			}
 		}
 
-		List<WayPointBehaviour> isolateWaypoints = waypoints.Where(w => w.nodes.Count == 0 && w.nodesROM.Count == 0).ToList();
+		List<WayPointBehaviour> isolateWaypoints = waypoints.Where(w => w.nodes.Count == 0 && w.nodesROM.Count == 0 && w.arcsPS1.Count == 0).ToList();
 		if (isolateWaypointRoot == null && isolateWaypoints.Count > 0) {
 			isolateWaypointRoot = new GameObject("Isolate WayPoints");
 			isolateWaypointRoot.transform.SetParent(transform);
 			isolateWaypointRoot.SetActive(false);
 		}
 		foreach (WayPointBehaviour wp in isolateWaypoints) {
-			wp.name = "Isolate WayPoint @" + (wp.wpROM != null ? wp.wpROM.Offset : wp.wp.offset);
+			Pointer offset = (wp.wpROM != null ? wp.wpROM.Offset : (wp.wpPS1 != null ? wp.wpPS1.Offset : wp.wp.offset));
+			wp.name = "Isolate WayPoint @" + offset;
 			wp.transform.SetParent(isolateWaypointRoot.transform);
 		}
 		foreach (WayPointBehaviour wp in waypoints) {
