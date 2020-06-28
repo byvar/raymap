@@ -40,11 +40,11 @@ public class Controller : MonoBehaviour {
 	bool playTextureAnimations_ = true; public bool playTextureAnimations = true;
 	bool showPersos_ = true; public bool showPersos = true;
 	bool livePreview_ = false; public bool livePreview = false;
-	bool levelGeometryCorruptions_ = false; public bool levelGeometryCorruptions = false;
+	
 	float livePreviewUpdateCounter = 0;
 
 	private CinematicSwitcher cinematicSwitcher = null;
-	private LevelGeometryCorruptor levelGeometryCorruptor = null;
+	
 	private System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
 	private bool ExportAfterLoad { get; set; }
@@ -391,9 +391,7 @@ public class Controller : MonoBehaviour {
 				livePreview_ = livePreview;
 				//updatedSettings = true;
 			}
-			if (levelGeometryCorruptions != levelGeometryCorruptions_) {
-				levelGeometryCorruptions_ = levelGeometryCorruptions;
-			}
+			
 			if (playAnimations != playAnimations_ || playTextureAnimations != playTextureAnimations_) {
 				playTextureAnimations_ = playTextureAnimations;
 				playAnimations_ = playAnimations;
@@ -414,13 +412,6 @@ public class Controller : MonoBehaviour {
 			}
 		}
 
-		if (levelGeometryCorruptions) {
-			if (levelGeometryCorruptor == null) {
-				levelGeometryCorruptor = new LevelGeometryCorruptor(this);
-			}
-
-			levelGeometryCorruptor.DoCorruptions();
-		}
 	}
 
 	async Task InitPersos() {
