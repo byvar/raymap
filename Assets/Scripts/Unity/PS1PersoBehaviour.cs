@@ -510,7 +510,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 						}
 					}
 				}
-				if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0) {
+				if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0 && curFrameIndex + 1 < ch.frames.Length) {
 					nextKF = ch.frames[curFrameIndex + 1];
 					//print(ch.frames[0].Offset);
 					if (nextKF.ntto.HasValue && (nextKF.ntto.Value < 0 && nextKF.ntto.Value != -20)) nextKF = ch.frames[curFrameIndex + 2];
