@@ -96,6 +96,7 @@ namespace OpenSpace {
         public static Pointer Read(Reader reader, bool allowMinusOne = false) {
             MapLoader l = MapLoader.Loader;
             uint current_off = (uint)(reader.BaseStream.Position);
+            Pointer readFrom = Pointer.Current(reader);
             uint value = reader.ReadUInt32();
             FileWithPointers file = l.GetFileByReader(reader);
             if (file == null) throw new PointerException("Reader wasn't recognized.", "Pointer.Read");
@@ -110,23 +111,31 @@ namespace OpenSpace {
                     if (ptr == null) {
                         throw new PointerException("Not a valid pointer at " + (Pointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
                     }
-                    return LogPointer(ptr, l);
+                    return LogPointer(ptr, readFrom, l);
                 }
                 return null;
             }
             // Hack for R3GC US
             if (l.allowDeadPointers && file.name == "test" && file.pointers[fileOff].file.name == "fix") return null;
-            return LogPointer(file.pointers[fileOff], l);
+            return LogPointer(file.pointers[fileOff], readFrom, l);
         }
 
-        public static Pointer LogPointer(Pointer pointer, MapLoader loader)
+        public static Pointer LogPointer(Pointer pointer, Pointer readFrom, MapLoader loader)
         {
             if (UnitySettings.TracePointers)
             {
                 if (!loader.pointerTraces.ContainsKey(pointer))
                 {
                     var sf = new StackFrame(2, true);
-                    loader.pointerTraces.Add(pointer, $"{sf.GetMethod()},{Environment.NewLine}{sf.GetFileName()}:{sf.GetFileLineNumber()}:{sf.GetFileColumnNumber()}");
+                    loader.pointerTraces.Add(pointer, new PointerTrace()
+                    {
+                        lineNumber = sf.GetFileLineNumber(),
+                        column = sf.GetFileColumnNumber(),
+                        fileName = sf.GetFileName(),
+                        methodName = sf.GetMethod().ToString(),
+                        code = File.ReadAllLines(sf.GetFileName())[sf.GetFileLineNumber()-1].Trim(),
+                        readFrom = readFrom,
+                    });
                 }
             }
             return pointer;
@@ -205,6 +214,21 @@ namespace OpenSpace {
         {
             if (newPos != null) newPos.DoAt(ref writer, action);
         }
+
+        public struct PointerTrace
+        {
+            public string methodName;
+            public string fileName;
+            public int column;
+            public int lineNumber;
+            public string code;
+            public Pointer readFrom;
+
+            public override string ToString()
+            {
+                return $"from {readFrom}, method {methodName}{Environment.NewLine}{fileName}:{lineNumber}:{column}{Environment.NewLine}{code}";
+            }
+        }
     }
 
     public class Pointer<T> where T : OpenSpaceStruct, new() {
@@ -250,5 +274,6 @@ namespace OpenSpace {
                 return new Pointer<T>(t.Offset, t);
             }
         }
+
     }
 }
