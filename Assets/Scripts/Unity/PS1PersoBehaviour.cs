@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using CollideType = OpenSpace.Collide.CollideType;
+using CollideType = OpenSpace.PS1.CollSet.CollideType;
 
 public class PS1PersoBehaviour : MonoBehaviour {
     public bool IsLoaded { get; private set; } = false;
@@ -44,7 +44,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 	private short[][] channelNTTO;
 	private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
-	//private Dictionary<CollideType, GameObject[]> collSetObjects = null;
+	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	public Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
 	private bool isAlways = false;
 	public bool IsAlways {
@@ -73,37 +73,15 @@ public class PS1PersoBehaviour : MonoBehaviour {
 		if (perso != null && perso.p3dData != null && perso.p3dData.family != null) {
 			Family fam = perso.p3dData.family;
 			if (fam.animations != null) {
-				PointerList<State> statePtrs = h.states;
-				if (a1h != null && perso.p3dData.HasFlag(Perso3dData.Perso3dDataFlags.Actor1)) {
-					statePtrs = a1h.states;
-				} else if (a2h != null && perso.p3dData.HasFlag(Perso3dData.Perso3dDataFlags.Actor2)) {
-					statePtrs = a2h.states;
-				}
+				PointerList<State> statePtrs = l.GetStates(perso.p3dData);
 				State[] tempStates = statePtrs.pointers.Select(s => s.Value).ToArray();
 				int ind = (int)perso.p3dData.stateIndex;
-				int startInd = 0; // inclusive
-				int endInd = tempStates.Length; // exclusive
 				if (ind >= tempStates.Length) {
 					ind = 0;
 				}
 				int stateInd = ind;
-				for (int i = ind; i >= 0; i--) {
-					if (tempStates[i].anim != null && tempStates[i].anim.index >= fam.animations.Length) {
-						startInd = i + 1;
-						break;
-					}
-				}
-				for (int i = ind; i < tempStates.Length; i++) {
-					if (tempStates[i].anim != null && tempStates[i].anim.index >= fam.animations.Length) {
-						endInd = i;
-						break;
-					}
-				}
-				if (startInd > endInd) {
-					startInd = endInd;
-				}
-				states = new State[endInd - startInd];
-				Array.Copy(tempStates, startInd, states, 0, states.Length);
+
+				states = fam.states;
 				stateNames = new string[states.Length + 1 + fam.animations.Length];
 				stateNames[0] = "Null";
 				for (int i = 0; i < states.Length; i++) {
@@ -114,7 +92,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					stateNames[i + 1 + states.Length] = $"(Animation {i}) {fam.animations[i].name}";
 				}
 				hasStates = true;
-				stateIndex = Array.IndexOf(states, statePtrs.pointers[stateInd].Value);
+				stateIndex = stateInd - (int)fam.startState;
 				stateIndex++; // After null
 				currentState = stateIndex;
 				SetState(stateIndex);
@@ -146,25 +124,22 @@ public class PS1PersoBehaviour : MonoBehaviour {
 	#endregion
 
 	public void UpdateViewCollision(bool viewCollision) {
-		/*if (perso.collset.Value != null) {
-			CollSet c = perso.collset.Value;
+		if (perso.collSet != null) {
+			CollSet c = perso.collSet;
 			if (collSetObjects == null) {
 				collSetObjects = new Dictionary<CollideType, GameObject[]>();
-				foreach (KeyValuePair<CollideType, Reference<ZdxList>> entry in c.zdxList) {
-					if (entry.Value.Value != null) {
-						ZdxList zdx = entry.Value.Value;
-						collSetObjects[entry.Key] = new GameObject[zdx.num_objects];
-						if (zdx.num_objects > 0 && zdx.objects.Value != null) {
-							for (int i = 0; i < zdx.objects.Value.objects.Length; i++) {
-								GeometricObject geo = zdx.objects.Value.objects[i].Value;
-								if (geo == null) continue;
-								collSetObjects[entry.Key][i] = geo.GetGameObject(GeometricObject.Type.Collide, entry.Key);
-								collSetObjects[entry.Key][i].transform.SetParent(transform);
-								collSetObjects[entry.Key][i].transform.localPosition = Vector3.zero;
-								collSetObjects[entry.Key][i].transform.localRotation = Quaternion.identity;
-								collSetObjects[entry.Key][i].transform.localScale = Vector3.one;
-							}
-						}
+				foreach (KeyValuePair<CollideType, ZdxList> zdxListKV in c.zdxList) {
+					CollideType type = zdxListKV.Key;
+					ZdxList zdxList = zdxListKV.Value;
+					if (zdxList == null) continue;
+					collSetObjects[type] = new GameObject[zdxList.entries?.Length ?? 0];
+					for (int i = 0; i < zdxList.entries?.Length; i++) {
+						ZdxEntry zdx = zdxList.entries[i];
+						collSetObjects[type][i] = zdx.GetGameObject(type);
+						collSetObjects[type][i].transform.SetParent(transform);
+						collSetObjects[type][i].transform.localPosition = Vector3.zero;
+						collSetObjects[type][i].transform.localRotation = Quaternion.identity;
+						collSetObjects[type][i].transform.localScale = Vector3.one;
 					}
 				}
 			}
@@ -176,29 +151,25 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				}
 			}
 			if (viewCollision) {
-				foreach (KeyValuePair<CollideType, Reference<ActivationList>> entry in c.activationList) {
-					if (!collSetObjects.ContainsKey(entry.Key)) continue;
-					if (entry.Value.Value != null && entry.Value.Value.num_objects > 0 && entry.Value.Value.objects.Value != null) {
-						ActivationZoneArray azr = entry.Value.Value.objects.Value;
-						if (azr.elements.Length == 0) continue;
-						for (int i = 0; i < azr.elements.Length; i++) {
-							if (azr.elements[i].state.Value == state) {
-								ActivationZone zone = azr.elements[i].activationList.Value;
-								if (zone != null && zone.num_objects > 0 && zone.objects.Value != null) {
-									foreach (ushort act in zone.objects.Value.objects) {
-										if (collSetObjects[entry.Key].Length > act
-											&& collSetObjects[entry.Key][act] != null) {
-											collSetObjects[entry.Key][act].SetActive(true);
-										}
-									}
-								}
-								break;
-							}
+				if (state != null && c.activationList != null) {
+					foreach (KeyValuePair<CollideType, short> activationZone in state.zoneZdx) {
+						CollideType type = activationZone.Key;
+						short cur_activation = activationZone.Value;
+						if (cur_activation == -1) continue;
+						if (!collSetObjects.ContainsKey(type) || collSetObjects[type] == null) continue;
+						if (cur_activation < 0 || cur_activation >= c.activationList.num_activationZones) continue;
+						if (c.activationList.activationZones[cur_activation].num_activations == 0) continue;
+						for (int i = 0; i < c.activationList.activationZones[cur_activation].activations.Length; i++) {
+							uint ind_zdx = c.activationList.activationZones[cur_activation].activations[i];
+							if (collSetObjects[type].Length <= ind_zdx) continue;
+							GameObject gao = collSetObjects[type][ind_zdx];
+							if (gao == null) continue;
+							gao.SetActive(true);
 						}
 					}
 				}
 			}
-		}*/
+		}
 	}
 
 	private void SetState(State state)
@@ -370,7 +341,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 							subObjects[i][k].SetActive(false);
 						} else {
 							GameObject[] bones = null;
-							GameObject c = geometricObjectsDynamic.GetGameObject(j, out bones);
+							GameObject c = geometricObjectsDynamic.GetGameObject(j, perso.p3dData?.collisionMapping, out bones);
 							if (c != null) {
 								GeometricObject geo = geometricObjectsDynamic.entries[j].geo;
 								if (Settings.s.hasDeformations && bones != null) {

@@ -19,6 +19,11 @@ namespace OpenSpace.PS1 {
 		public PS1Animation[] animations;
 		public string name;
 
+		// Added for easier access later
+		public uint startState; // inclusive
+		public uint endState; // exclusive
+		public State[] states;
+
 		protected override void ReadInternal(Reader reader) {
 			Pointer.DoAt(ref reader, Offset - 0x24, () => { // Hack
 				name = reader.ReadString(0x24);

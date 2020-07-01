@@ -144,7 +144,7 @@ public class CinematicSwitcher : MonoBehaviour {
 						if (!nttoForFrame.ContainsKey(ntto)) nttoForFrame[ntto] = 0;
 						nttoForFrame[ntto]++;
 						if (!objectPool.ContainsKey(ntto) || objectPool[ntto].Count < nttoForFrame[ntto]) {
-							GameObject gao = l.levelHeader.geometricObjectsDynamic.GetGameObject(ntto, out _);
+							GameObject gao = l.levelHeader.geometricObjectsDynamic.GetGameObject(ntto, null, out _);
 							//if (gao == null) gao = new GameObject("Empty 2");
 							if (gao != null) {
 								gao.name = string.Format("{0:X4}", c.flags) + " - " + gao.name;

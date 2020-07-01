@@ -30,6 +30,11 @@ namespace OpenSpace.Loader {
 		public LevelHeader levelHeader;
 		public PS1GameInfo game;
 		public ushort[] maxScaleVector = new ushort[3] { 0, 0, 0 };
+		public List<Tuple<PS1.Perso3dData, uint>>[] familyStates = new List<Tuple<PS1.Perso3dData, uint>>[3] {
+			new List<Tuple<PS1.Perso3dData, uint>>(),
+			new List<Tuple<PS1.Perso3dData, uint>>(),
+			new List<Tuple<PS1.Perso3dData, uint>>()
+		};
 		public PS1Stream[] streams;
 		PS1GameInfo.File.MemoryBlock mainMemoryBlock;
 
@@ -357,6 +362,137 @@ namespace OpenSpace.Loader {
 			}
 		}
 
+
+		public PointerList<PS1.State> GetStates(PS1.Perso3dData p3dData) {
+			LevelHeader h = levelHeader;
+			ActorFileHeader a1h = actor1Header;
+			ActorFileHeader a2h = actor2Header;
+			uint fileIndex = p3dData.GetFileIndex();
+			switch (fileIndex) {
+				case 1:
+					if (a1h.states != null) { 
+						return a1h.states;
+					}
+					break;
+				case 2:
+					if (a2h.states != null) {
+						return a2h.states;
+					}
+					break;
+			}
+			return h.states;
+		}
+		public void CalculateNumberOfStatesPerFamily() {
+			// Sort familyStates array. So we can determine which states belong to which family
+			for (uint i = 0; i < 3; i++) {
+				familyStates[i].Sort((t1, t2) => t1.Item2.CompareTo(t2.Item2));
+			}
+			HashSet<PS1.Family> completedFams = new HashSet<PS1.Family>();
+			LevelHeader h = levelHeader;
+			ActorFileHeader a1h = actor1Header;
+			ActorFileHeader a2h = actor2Header;
+
+			// First pass
+			for (uint fi = 0; fi < 3; fi++) {
+				for (int fs = 0; fs < familyStates[fi].Count; fs++) {
+					var t = familyStates[fi][fs];
+					var p3dData = t.Item1;
+					int ind = (int)p3dData.stateIndex;
+					PS1.Family fam = p3dData.family;
+					if (fam == null) continue;
+
+					PointerList<PS1.State> statePtrs = GetStates(p3dData);
+					int numStates = statePtrs.Count;
+
+
+
+					if (completedFams.Contains(p3dData.family)) {
+						if (ind < numStates) {
+							if (p3dData.family.startState > ind) p3dData.family.startState = (uint)ind;
+							if (p3dData.family.endState < ind) p3dData.family.endState = (uint)ind;
+						}
+						continue;
+					}
+					completedFams.Add(fam);
+					int startInd = 0; // inclusive
+					int endInd = numStates; // exclusive
+					if (ind >= numStates) {
+						ind = 0;
+					}
+					int stateInd = ind;
+					int famIndStart = fs;
+					int famIndEnd = familyStates[fi].FindLastIndex(tup => tup.Item1.family == fam);
+					if (famIndStart > 0) {
+						startInd = (int)Math.Min(familyStates[fi][famIndStart - 1].Item2 + 1, ind);
+					}
+					if (famIndEnd < familyStates[fi].Count - 1) {
+						endInd = (int)Math.Min(familyStates[fi][famIndEnd + 1].Item2, numStates);
+					}
+					for (int i = ind; i >= 0; i--) {
+						if (i + 1 == startInd) break;
+						if (statePtrs[i].anim != null && statePtrs[i].anim.index >= fam.animations.Length) {
+							startInd = i + 1;
+							break;
+						}
+					}
+					for (int i = ind; i < endInd; i++) {
+						if (statePtrs[i].anim != null && statePtrs[i].anim.index >= fam.animations.Length) {
+							endInd = i;
+							break;
+						}
+					}
+					if (startInd > endInd) {
+						startInd = endInd;
+					}
+					fam.startState = (uint)startInd;
+					fam.endState = (uint)endInd;
+				}
+			}
+			// Second pass
+			for (uint fi = 0; fi < 3; fi++) {
+				for (int fs = 0; fs < familyStates[fi].Count; fs++) {
+					var t = familyStates[fi][fs];
+					var p3dData = t.Item1;
+					PS1.Family fam = p3dData.family;
+					if (fam == null || fam.states != null) continue;
+
+					PointerList<PS1.State> statePtrs = GetStates(p3dData);
+					// Set states
+					fam.states = new PS1.State[fam.endState - fam.startState];
+					for (int i = 0; i < fam.states.Length; i++) {
+						fam.states[i] = statePtrs[(int)fam.startState + i];
+					}
+				}
+			}
+		}
+		public void ReadCollSetsR2(Reader reader) {
+			if (Settings.s.game != Settings.Game.R2) return;
+			Dictionary<PS1.CollSet, HashSet<PS1.Family>> collSets = new Dictionary<PS1.CollSet, HashSet<PS1.Family>>();
+			Dictionary<PS1.Family, HashSet<PS1.CollSet>> fcollSets = new Dictionary<PS1.Family, HashSet<PS1.CollSet>>();
+			foreach (PS1.Perso p in levelHeader.persos) {
+				if (p.collSet == null || p.p3dData?.family == null) continue;
+				if (CurrentLevel == Array.IndexOf(game.maps, "vulca_15")) { // Hack
+					if (p.name == "OLD_Main_PF_I2") continue;
+					//if (p.collSet.Offset.offset == 0x8013DF84) print(p.p3dData.stateIndex + " - " + levelHeader.states[(int)p.p3dData.stateIndex].Offset + " - " + p.name);
+				}
+				if (!collSets.ContainsKey(p.collSet)) collSets[p.collSet] = new HashSet<PS1.Family>();
+				if (!fcollSets.ContainsKey(p.p3dData?.family)) fcollSets[p.p3dData.family] = new HashSet<PS1.CollSet>();
+				collSets[p.collSet].Add(p.p3dData.family);
+				fcollSets[p.p3dData.family].Add(p.collSet);
+			}
+			foreach (PS1.CollSet c in collSets.Keys) {
+				/*foreach (PS1.Family f in collSets[c]) {
+					print(fcollSets[f].Count);
+					foreach (PS1.CollSet c2 in fcollSets[f]) {
+						print(c2.Offset);
+					}
+				}*/
+				PS1.State[] states = collSets[c].SelectMany(f => f.states).ToArray();
+				//Array.Sort(states, (s1, s2) => s1.Offset.offset.CompareTo(s2.Offset.offset));
+				c.ReadZdxListDependingOnStates(reader, states);
+			}
+		}
+
 		public async Task LoadLevel() {
 			Reader reader = files_array[Mem.Fix]?.reader;
 			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
@@ -381,6 +517,14 @@ namespace OpenSpace.Loader {
 			levelHeader.dynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_dynamicWorld, onPreRead: s => s.isDynamic = true);
 			levelHeader.inactiveDynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_inactiveDynamicWorld, onPreRead: s => s.isDynamic = true);
 
+			if (Settings.s.game == Settings.Game.RRush || Settings.s.game == Settings.Game.JungleBook) {
+				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
+				if (actor2File != null) actor2Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor2File.headerOffset, actor2File), onPreRead: h => h.file_index = 2);
+			}
+			CalculateNumberOfStatesPerFamily();
+			ReadCollSetsR2(reader);
+
+
 			// Done reading here
 			if (mainMemoryBlock.overlay_cine.size > 0) {
 				PS1GameInfo.File file = game.files.FirstOrDefault(f => f.fileID == 0);
@@ -396,10 +540,6 @@ namespace OpenSpace.Loader {
 			}
 			if (levelHeader.num_geometricObjectsDynamic_cine != 0) {
 				levelHeader.geometricObjectsDynamic.ReadExtra(reader, levelHeader.num_geometricObjectsDynamic_cine);
-			}
-			if (Settings.s.game == Settings.Game.RRush || Settings.s.game == Settings.Game.JungleBook) {
-				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
-				if (actor2File != null) actor2Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor2File.headerOffset, actor2File), onPreRead: h => h.file_index = 2);
 			}
 
 			loadingState = "Calculating texture bounds";
@@ -433,7 +573,7 @@ namespace OpenSpace.Loader {
 			persoPartsParent.transform.localPosition = new Vector3(0, 1000, 0);
 			i = 0;
 			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
-				GameObject g = e.GetGameObject(out _);
+				GameObject g = e.GetGameObject(null, out _);
 				g.name = $"[{i}] {e.off_0} - {g.name}";
 				g.transform.parent = persoPartsParent.transform;
 				g.transform.localPosition = new Vector3(i++ * 4, 0, 0);
