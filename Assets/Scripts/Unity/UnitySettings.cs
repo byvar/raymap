@@ -32,6 +32,7 @@ public class UnitySettings {
 	public static bool ForceDisplayBackfaces { get; set; }
 	public static bool BlockyMode { get; set; }
 	public static bool UseLevelTranslation { get; set; } = true;
+	public static bool TracePointers { get; set; } = false;
 
 	// Export
 	public static bool ExportText { get; set; }
@@ -90,6 +91,7 @@ public class UnitySettings {
 		AllowDeadPointers = s.SerializeBool("AllowDeadPointers", AllowDeadPointers);
 		ForceDisplayBackfaces = s.SerializeBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
 		BlockyMode = s.SerializeBool("BlockyMode", BlockyMode);
+		TracePointers = s.SerializeBool("TracePointers", TracePointers);
 		SaveTextures = s.SerializeBool("SaveTextures", SaveTextures);
 		ExportText = s.SerializeBool("ExportText", ExportText);
 		UseLevelTranslation = s.SerializeBool("UseLevelTranslation", UseLevelTranslation);

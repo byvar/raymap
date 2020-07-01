@@ -1,6 +1,7 @@
 ﻿using OpenSpace.FileFormat;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -109,13 +110,26 @@ namespace OpenSpace {
                     if (ptr == null) {
                         throw new PointerException("Not a valid pointer at " + (Pointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
                     }
-                    return ptr;
+                    return LogPointer(ptr, l);
                 }
                 return null;
             }
             // Hack for R3GC US
             if (l.allowDeadPointers && file.name == "test" && file.pointers[fileOff].file.name == "fix") return null;
-            return file.pointers[fileOff];
+            return LogPointer(file.pointers[fileOff], l);
+        }
+
+        public static Pointer LogPointer(Pointer pointer, MapLoader loader)
+        {
+            if (UnitySettings.TracePointers)
+            {
+                if (!loader.pointerTraces.ContainsKey(pointer))
+                {
+                    var sf = new StackFrame(2, true);
+                    loader.pointerTraces.Add(pointer, $"{sf.GetMethod()},{Environment.NewLine}{sf.GetFileName()}:{sf.GetFileLineNumber()}:{sf.GetFileColumnNumber()}");
+                }
+            }
+            return pointer;
         }
 
         public static void Write(Writer writer, Pointer pointer) {

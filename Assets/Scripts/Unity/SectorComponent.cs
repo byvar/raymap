@@ -17,6 +17,7 @@ public class SectorComponent : MonoBehaviour, IReferenceable {
     public SectorComponent[] collisionSectors;
     public SectorComponent[] activitySectors;
 	public LightBehaviour[] lights;
+	public GameObject[] persos;
 	//public string[] debugList4;
 	//public string[] debugList5;
 	//public LightBehaviour[] dynamicLights;
@@ -156,6 +157,7 @@ public class SectorComponent : MonoBehaviour, IReferenceable {
 			graphicSectors = sector.graphicSectors.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
 			collisionSectors = sector.collisionSectors.Select(s => sectorManager.sectors.First(ns => ns.sector == s.sector)).ToArray();
 			activitySectors = sector.activitySectors.Select(s => sectorManager.sectors.First(ns => ns.sector == s)).ToArray();
+			persos = sector.persos.Select(p => p.Gao).ToArray();
 			//dynamicLights = sector.dynamicLights.Select(l => l.Light).ToArray();
 		} else if (sectorROM != null) {
 			if (sectorROM.graphicSectors.Value != null) {
