@@ -122,7 +122,7 @@ namespace OpenSpace {
 
         public static Pointer LogPointer(Pointer pointer, Pointer readFrom, MapLoader loader)
         {
-            if (UnitySettings.TracePointers)
+            if (UnitySettings.TracePointers && pointer!=null)
             {
                 if (!loader.pointerTraces.ContainsKey(pointer))
                 {
