@@ -169,6 +169,7 @@ namespace OpenSpace.PS1 {
 					+ "|" + string.Format("{0:X2}", vm.scroll)
 					+ " - " + vm.BlendMode);
 				gao.transform.SetParent(parentGao.transform);
+				gao.layer = LayerMask.NameToLayer("Visual");
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
 				gao.AddComponent<ExportableModel>();

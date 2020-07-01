@@ -831,6 +831,9 @@ public class Controller : MonoBehaviour {
 			foreach (ROMPersoBehaviour perso in romPersos) {
 				if (perso != null) { perso.UpdateViewCollision(viewCollision); }
 			}
+			foreach (PS1PersoBehaviour perso in ps1Persos) {
+				if (perso != null) { perso.UpdateViewCollision(viewCollision); }
+			}
 			foreach (SuperObject so in loader.superObjects) {
 				if (so.Gao != null) {
 					if (so.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible)) {

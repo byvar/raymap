@@ -17,6 +17,7 @@ namespace OpenSpace.PS1 {
 
 		// Parsed
 		public Perso3dData p3dData;
+		public CollSet collSet;
 		public string name;
 
 		protected override void ReadInternal(Reader reader) {
@@ -43,6 +44,7 @@ namespace OpenSpace.PS1 {
 				Load.print("Perso:" + Offset + " - SO:" + off_superobject + " - " + name);
 				//Load.print(Offset + " - " + off_08 + " - " + off_collSet + " - " + name);
 			});
+			collSet = Load.FromOffsetOrRead<CollSet>(reader, off_collSet);
 			/*Pointer.DoAt(ref reader, off_00, () => {
 				reader.ReadBytes(0x5c);
 				ushort num_unk = reader.ReadUInt16();

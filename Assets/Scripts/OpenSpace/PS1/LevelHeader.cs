@@ -174,7 +174,7 @@ namespace OpenSpace.PS1 {
 			off_animRotations = Pointer.Read(reader); // big array of structs of 0x8 size. 4 ushorts per struct
 			off_animScales = Pointer.Read(reader);
 			Load.print(off_12C + " - " + off_130 + " - " + off_animPositions + " - " + off_animRotations + " - " + off_animScales);
-			Load.print(Pointer.Current(reader));
+			//Load.print(Pointer.Current(reader));
 			if (Settings.s.game == Settings.Game.DD) {
 				// Also stuff for big textures, but names and amount is stored in exe
 				Pointer.Read(reader);
@@ -261,49 +261,50 @@ namespace OpenSpace.PS1 {
 											   //Load.print(off_sector_minus_one_things + " - " + bad_off_1A0 + " - " + off_sectors);
 
 			ushort_1AA = reader.ReadUInt16();
-			if (Settings.s.game == Settings.Game.R2
-				|| Settings.s.game == Settings.Game.RRush
-				|| Settings.s.game == Settings.Game.JungleBook
-				|| Settings.s.game == Settings.Game.DD) {
-				if (Settings.s.game != Settings.Game.DD) {
-					uint_1AC = reader.ReadUInt32();
-					uint_1B0 = reader.ReadUInt32();
-					uint_1B4 = reader.ReadUInt32();
-					uint_1B8 = reader.ReadUInt32();
-					off_1BC = Pointer.Read(reader);
+			Load.print(Pointer.Current(reader));
+			if (Settings.s.game != Settings.Game.DD) {
+				uint_1AC = reader.ReadUInt32();
+				uint_1B0 = reader.ReadUInt32();
+				uint_1B4 = reader.ReadUInt32();
+				uint_1B8 = reader.ReadUInt32();
+				if (Settings.s.game != Settings.Game.VIP) {
+					off_1BC = Pointer.Read(reader); // uint_1B4 * 0x70
 					off_1C0 = Pointer.Read(reader);
-
-					if (Settings.s.game == Settings.Game.RRush) {
-						off_rush_114 = Pointer.Read(reader);
-						ushort_rush_118 = reader.ReadUInt16();
-						ushort_rush_11A = reader.ReadUInt16();
-					}
+				} else {
+					reader.ReadUInt32();
+					reader.ReadUInt32();
 				}
 
-				off_gameMaterials = Pointer.Read(reader);
-				num_gameMaterials = reader.ReadUInt32();
-				uint_1CC = reader.ReadUInt32();
-				ushort_1D0 = reader.ReadUInt16();
-				ushort_1D2 = reader.ReadUInt16();
-				off_1D4 = Pointer.Read(reader);
-				num_ago_textures = reader.ReadUInt32();
-				off_ago_textures_pageInfo = Pointer.Read(reader);
-				off_ago_textures_palette = Pointer.Read(reader);
-				off_ago_textures_xInPage = Pointer.Read(reader);
-				off_ago_textures_yInPage = Pointer.Read(reader);
-				off_ago_textures_globalX = Pointer.Read(reader);
-				off_ago_textures_globalY = Pointer.Read(reader);
 				if (Settings.s.game == Settings.Game.RRush) {
-					off_ago_textures_width = Pointer.Read(reader);
-					off_ago_textures_height = Pointer.Read(reader);
-					Load.print(Pointer.Current(reader));
-					ParseAGOTextures(reader);
-				} else if(Settings.s.game == Settings.Game.R2) {
-					uint_1F4 = reader.ReadUInt32();
-					uint_1F8 = reader.ReadUInt32();
-					uint_1FC = reader.ReadUInt32();
-					ParseAGOTextures(reader);
+					off_rush_114 = Pointer.Read(reader);
+					ushort_rush_118 = reader.ReadUInt16();
+					ushort_rush_11A = reader.ReadUInt16();
 				}
+			}
+
+			off_gameMaterials = Pointer.Read(reader);
+			num_gameMaterials = reader.ReadUInt32();
+			uint_1CC = reader.ReadUInt32();
+			ushort_1D0 = reader.ReadUInt16();
+			ushort_1D2 = reader.ReadUInt16();
+			off_1D4 = Pointer.Read(reader);
+			num_ago_textures = reader.ReadUInt32();
+			off_ago_textures_pageInfo = Pointer.Read(reader);
+			off_ago_textures_palette = Pointer.Read(reader);
+			off_ago_textures_xInPage = Pointer.Read(reader);
+			off_ago_textures_yInPage = Pointer.Read(reader);
+			off_ago_textures_globalX = Pointer.Read(reader);
+			off_ago_textures_globalY = Pointer.Read(reader);
+			if (Settings.s.game == Settings.Game.RRush) {
+				off_ago_textures_width = Pointer.Read(reader);
+				off_ago_textures_height = Pointer.Read(reader);
+				//Load.print(Pointer.Current(reader));
+				ParseAGOTextures(reader);
+			} else if(Settings.s.game == Settings.Game.R2) {
+				uint_1F4 = reader.ReadUInt32();
+				uint_1F8 = reader.ReadUInt32();
+				uint_1FC = reader.ReadUInt32();
+				ParseAGOTextures(reader);
 			}
 
 			// Parse

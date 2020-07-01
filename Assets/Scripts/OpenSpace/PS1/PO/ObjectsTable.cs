@@ -39,7 +39,7 @@ namespace OpenSpace.PS1 {
 		public void ReadExtra(Reader reader, uint count) {
 			Array.Resize(ref entries, (int)(length + count));
 			Pointer.DoAt(ref reader, Offset + 8 + (8 * length.Value), () => {
-				Load.print(Pointer.Current(reader) + " - " + count);
+				//Load.print(Pointer.Current(reader) + " - " + count);
 				for (int i = (int)length; i < entries.Length; i++) {
 					entries[i] = new Entry();
 					entries[i].Read(reader);
@@ -49,25 +49,51 @@ namespace OpenSpace.PS1 {
 		}
 
 		public class Entry {
+			public Pointer offset;
+
 			public Pointer off_0; // object of 0x50, 5 rows of 0x10
 			public Pointer off_geo;
 			public GeometricObject geo;
 
 			public void Read(Reader reader) {
+				offset = Pointer.Current(reader);
+
 				off_0 = Pointer.Read(reader);
 				off_geo = Pointer.Read(reader);
 				geo = Load.FromOffsetOrRead<GeometricObject>(reader, off_geo);
 			}
-			public GameObject GetGameObject(out GameObject[] bones) {
+			public GameObject GetGameObject(PhysicalObjectCollisionMapping[] collision, out GameObject[] bones) {
 				bones = null;
-				return geo?.GetGameObject(out bones);
+				GameObject gao = geo?.GetGameObject(out bones);
+				if (gao != null) {
+					GameObject wrapper = new GameObject(gao.name + " - Wrapper");
+					gao.transform.SetParent(wrapper.transform);
+					gao.transform.localPosition = Vector3.zero;
+					gao.transform.localRotation = Quaternion.identity;
+					gao.transform.localScale = Vector3.one;
+					PhysicalObjectComponent poc = wrapper.AddComponent<PhysicalObjectComponent>();
+					poc.visual = gao;
+					if (collision != null) {
+						PhysicalObjectCollisionMapping cm = collision.FirstOrDefault(c => c.off_poListEntry == offset);
+						if (cm != null && cm.geo_collide != null) {
+							GameObject cgao = cm.geo_collide.GetGameObject();
+							cgao.transform.SetParent(wrapper.transform);
+							cgao.transform.localPosition = Vector3.zero;
+							cgao.transform.localRotation = Quaternion.identity;
+							cgao.transform.localScale = Vector3.one;
+							poc.collide = cgao;
+						}
+					}
+					poc.Init(MapLoader.Loader.controller);
+					return wrapper;
+				} else return gao;
 			}
 		}
 
-		public GameObject GetGameObject(int i, out GameObject[] bones) {
+		public GameObject GetGameObject(int i, PhysicalObjectCollisionMapping[] collision, out GameObject[] bones) {
 			bones = null;
 			if (i < 0 || i >= length) return null;
-			return entries[i]?.GetGameObject(out bones);
+			return entries[i]?.GetGameObject(collision, out bones);
 		}
 	}
 }

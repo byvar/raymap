@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CollideType = OpenSpace.PS1.CollSet.CollideType;
 
 namespace OpenSpace.PS1 {
 	public class State : OpenSpaceStruct { // Animation/state related
 		public Pointer off_anim;
-		public ushort ushort_04;
-		public ushort ushort_06;
-		public int int_08;
+		public Dictionary<CollideType, short> zoneZdx = new Dictionary<CollideType, short>();
 		public Pointer off_transitions;
 		public uint num_transitions;
 		public Pointer off_state_auto;
@@ -27,9 +26,10 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			//Load.print("State @ " + Offset);
 			off_anim = Pointer.Read(reader);
-			ushort_04 = reader.ReadUInt16();
-			ushort_06 = reader.ReadUInt16();
-			int_08 = reader.ReadInt32();
+			zoneZdx[CollideType.ZDM] = reader.ReadInt16();
+			zoneZdx[CollideType.ZDE] = reader.ReadInt16();
+			zoneZdx[CollideType.ZDD] = reader.ReadInt16();
+			zoneZdx[CollideType.ZDR] = reader.ReadInt16();
 			off_transitions = Pointer.Read(reader); // Points to animation data, incl name
 			num_transitions = reader.ReadUInt32();
 			off_state_auto = Pointer.Read(reader);
