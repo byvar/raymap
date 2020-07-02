@@ -16,7 +16,7 @@ namespace Assets.Scripts.Editor
 
         Vector2 scrollPos = new Vector2();
         string searchString = "";
-        private List<KeyValuePair<Pointer, string>> results;
+        private List<KeyValuePair<Pointer, Pointer.PointerTrace>> results;
         private bool searched = false;
         private int resultCount = 0;
         private static int resultLimit = 1000;
@@ -76,7 +76,7 @@ namespace Assets.Scripts.Editor
             foreach (var pair in results)
             {
                 GUILayout.Label($"Pointer {pair.Key}", EditorStyles.boldLabel);
-                GUILayout.Label($"Read at {pair.Value}");
+                GUILayout.Label(pair.Value.ToString());
             }
 
             GUILayout.EndScrollView();

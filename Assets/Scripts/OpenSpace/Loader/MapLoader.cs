@@ -112,7 +112,7 @@ namespace OpenSpace {
 		public Globals globals = null;
         public Settings settings = null;
         public List<SearchableString> searchableStrings = new List<SearchableString>();
-		public Dictionary<Pointer, string> pointerTraces = new Dictionary<Pointer, string>();
+		public Dictionary<Pointer, Pointer.PointerTrace> pointerTraces = new Dictionary<Pointer, Pointer.PointerTrace>();
 
         public static class Mem {
             public const int Fix = 0;
