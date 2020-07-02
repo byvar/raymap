@@ -71,12 +71,12 @@ namespace OpenSpace.PS1 {
 		public Pointer off_sectors;
 		public ushort num_sectors;
 		public ushort ushort_1AA;
-		public uint uint_1AC;
+		public uint num_cameraModifiers;
 		public uint uint_1B0;
 		public uint uint_1B4;
 		public uint uint_1B8;
-		public Pointer off_1BC; // 0x28 structs of 0x38 size
-		public Pointer off_1C0; // 0x28 structs of 0x68 size. starts with 0x5.
+		public Pointer off_cameraModifiers_volumes; // 0x28 structs of 0x38 size
+		public Pointer off_cameraModifiers; // 0x28 structs of 0x68 size. starts with 0x5.
 		public Pointer off_gameMaterials; // b structs of 0x10
 		public uint num_gameMaterials; // b
 		public uint uint_1CC;
@@ -123,6 +123,8 @@ namespace OpenSpace.PS1 {
 		public GameMaterial[] gameMaterials;
 		public WayPoint[] wayPoints;
 		public Graph[] graphs;
+		public CameraModifier[] cameraModifiers;
+		public CameraModifierVolume[] cameraModifierVolumes;
 
 		public PS1AnimationVector[] animPositions;
 		public PS1AnimationQuaternion[] animRotations;
@@ -263,13 +265,13 @@ namespace OpenSpace.PS1 {
 			ushort_1AA = reader.ReadUInt16();
 			Load.print(Pointer.Current(reader));
 			if (Settings.s.game != Settings.Game.DD) {
-				uint_1AC = reader.ReadUInt32();
+				num_cameraModifiers = reader.ReadUInt32();
 				uint_1B0 = reader.ReadUInt32();
 				uint_1B4 = reader.ReadUInt32();
 				uint_1B8 = reader.ReadUInt32();
 				if (Settings.s.game != Settings.Game.VIP) {
-					off_1BC = Pointer.Read(reader); // uint_1B4 * 0x70
-					off_1C0 = Pointer.Read(reader);
+					off_cameraModifiers_volumes = Pointer.Read(reader); // uint_1B4 * 0x70
+					off_cameraModifiers = Pointer.Read(reader); // uint_1ac * 0x68. lights? first with type (first byte) = 9 is camera related? position is at 0x14, 0x18, 0x1c?
 				} else {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -319,6 +321,8 @@ namespace OpenSpace.PS1 {
 			gameMaterials = Load.ReadArray<GameMaterial>(num_gameMaterials, reader, off_gameMaterials);
 			wayPoints = Load.ReadArray<WayPoint>(num_wayPoints, reader, off_wayPoints);
 			graphs = Load.ReadArray<Graph>(num_graphs, reader, off_graphs);
+			cameraModifiers = Load.ReadArray<CameraModifier>(num_cameraModifiers, reader, off_cameraModifiers);
+			cameraModifierVolumes = Load.ReadArray<CameraModifierVolume>(num_cameraModifiers, reader, off_cameraModifiers_volumes);
 			always = Load.ReadArray<AlwaysList>(num_always, reader, off_always);
 			sectors = Load.ReadArray<Sector>(num_sectors, reader, off_sectors);
 

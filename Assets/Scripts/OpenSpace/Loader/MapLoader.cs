@@ -1178,6 +1178,7 @@ MonoBehaviour.print(str);
 		}
 
 		public T[] ReadArray<T>(decimal length, Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+			if (!inline && pointer == null) return new T[0];
 			T[] ts = new T[(int)length];
 			Pointer curPointer = pointer != null ? pointer : Pointer.Current(reader);
 			if (inline) {

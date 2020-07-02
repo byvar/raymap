@@ -100,9 +100,9 @@ public class GraphManager : MonoBehaviour {
 								if(!gb.nodes.Contains(wp)) gb.nodes.Add(wp);
 								wp.arcsPS1.Add(arc);
 								wp.name = "GraphNode[" + i + "].WayPoint (" + wp.wpPS1.Offset + ")";
-								if (i == 0) {
+								/*if (i == 0) {
 									go_graph.transform.position = wp.transform.position;
-								}
+								}*/
 								wp.transform.SetParent(go_graph.transform);
 							}
 						}
@@ -112,9 +112,9 @@ public class GraphManager : MonoBehaviour {
 								if (!gb.nodes.Contains(wp)) gb.nodes.Add(wp);
 								wp.arcsPS1.Add(arc);
 								wp.name = "GraphNode[" + i + "].WayPoint (" + wp.wpPS1.Offset + ")";
-								if (i == 0) {
+								/*if (i == 0) {
 									go_graph.transform.position = wp.transform.position;
-								}
+								}*/
 								wp.transform.SetParent(go_graph.transform);
 							}
 						}

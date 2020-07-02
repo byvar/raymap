@@ -563,6 +563,13 @@ namespace OpenSpace.Loader {
 				alwGao.transform.localPosition = new Vector3(i++ * 10f, 0f, 0f);
 				i++;
 			}
+			// Uncomment to show camera modifiers
+			/*if (levelHeader.cameraModifiers != null) {
+				for(int cm = 0; cm < levelHeader.num_cameraModifiers; cm++) {
+					PS1.CameraModifier c = levelHeader.cameraModifiers[cm];
+					c.GetGameObject(levelHeader.cameraModifierVolumes[cm]);
+				}
+			}*/
 			/*if (levelHeader.meshCollision != null) {
 				foreach (PS1.GeometricObjectCollide c in levelHeader.meshCollision) {
 					c.GetGameObject();
