@@ -52,6 +52,9 @@ namespace OpenSpace.PS1 {
 			stateIndex = reader.ReadUInt32();
 			off_currentState = Pointer.Read(reader); // only at runtime
 			reader.ReadBytes(0x24); // TODO
+
+			// at 0x92: scale shorts
+
 			//Load.print(off_family + " - " + off_animation);
 			/*Pointer.DoAt(ref reader, off_68, () => {
 				for (int i = 0; i < ushort_5C; i++) {

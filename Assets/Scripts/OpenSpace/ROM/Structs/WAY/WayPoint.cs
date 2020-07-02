@@ -38,7 +38,7 @@ namespace OpenSpace.ROM {
 				// No collider necessary
 				GameObject.Destroy(sphere.GetComponent<SphereCollider>());
 				MeshRenderer sphereRenderer = sphere.GetComponent<MeshRenderer>();
-				sphereRenderer.material = MapLoader.Loader.collideTransparentMaterial;
+				sphereRenderer.material = new Material(MapLoader.Loader.collideTransparentMaterial);
 				sphereRenderer.material.color = new Color(0.7f, 0f, 0.7f, 0.5f);
 			}
 			return wpBehaviour;

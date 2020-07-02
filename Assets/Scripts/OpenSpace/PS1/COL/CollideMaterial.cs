@@ -36,13 +36,13 @@ namespace OpenSpace.PS1 {
         public Material CreateMaterial() {
             Material mat = new Material(MapLoader.Loader.collideMaterial);
             if (NoCollision) {
-                mat = MapLoader.Loader.collideTransparentMaterial;
+                mat = new Material(MapLoader.Loader.collideTransparentMaterial);
                 //mat.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                 mat.color = Colors.NoCollision;
             }
             if (Slide) mat.color = Colors.Slide;
             if (Water) {
-                mat = MapLoader.Loader.collideTransparentMaterial;
+                mat = new Material(MapLoader.Loader.collideTransparentMaterial);
                 //mat.SetTexture("_MainTex", Util.CreateDummyCheckerTexture());
                 mat.color = Colors.Water;
             }

@@ -66,7 +66,7 @@ namespace OpenSpace.Collide {
                 }
                 if (geo.type != CollideType.None) {
                     Color col = mr.material.color;
-                    mr.material = MapLoader.Loader.collideTransparentMaterial;
+                    mr.material = new Material(MapLoader.Loader.collideTransparentMaterial);
                     mr.material.color = new Color(col.r, col.g, col.b, col.a * 0.7f);
                     switch (geo.type) {
                         case CollideType.ZDD:

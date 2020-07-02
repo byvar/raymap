@@ -47,7 +47,7 @@ namespace OpenSpace.ROM {
 						}
 						if (collideType != CollideType.None) {
 							Color col = mr.material.color;
-							mr.material = MapLoader.Loader.collideTransparentMaterial;
+							mr.material = new Material(MapLoader.Loader.collideTransparentMaterial);
 							mr.material.color = new Color(col.r, col.g, col.b, col.a * 0.7f);
 							switch (collideType) {
 								case CollideType.ZDD:

@@ -12,6 +12,7 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			off_collision = Pointer.Read(reader);
 			off_poListEntry = Pointer.Read(reader);
+			reader.ReadBytes(0x24);
 
 			if (off_collision != null) {
 				Pointer.DoAt(ref reader, off_collision + 0x10, () => {
