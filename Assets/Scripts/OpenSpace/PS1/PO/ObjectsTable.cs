@@ -62,11 +62,14 @@ namespace OpenSpace.PS1 {
 				off_geo = Pointer.Read(reader);
 				geo = Load.FromOffsetOrRead<GeometricObject>(reader, off_geo);
 			}
-			public GameObject GetGameObject(PhysicalObjectCollisionMapping[] collision, out GameObject[] bones) {
+			public GameObject GetGameObject(PhysicalObjectCollisionMapping[] collision, out GameObject[] bones, Entry morphEntry = null, float morphProgress = 0f) {
 				bones = null;
-				GameObject gao = geo?.GetGameObject(out bones);
+				GameObject gao = geo?.GetGameObject(out bones, morphObject: morphEntry?.geo, morphProgress: morphProgress);
 				if (gao != null) {
 					GameObject wrapper = new GameObject(gao.name + " - Wrapper");
+					if (morphProgress > 0 || morphEntry != null) {
+						gao.name += " - Morph Progress: " + morphProgress;
+					}
 					gao.transform.SetParent(wrapper.transform);
 					gao.transform.localPosition = Vector3.zero;
 					gao.transform.localRotation = Quaternion.identity;
@@ -90,10 +93,14 @@ namespace OpenSpace.PS1 {
 			}
 		}
 
-		public GameObject GetGameObject(int i, PhysicalObjectCollisionMapping[] collision, out GameObject[] bones) {
+		public GameObject GetGameObject(int i, PhysicalObjectCollisionMapping[] collision, out GameObject[] bones, int? morphI = null, float morphProgress = 0f) {
 			bones = null;
 			if (i < 0 || i >= length) return null;
-			return entries[i]?.GetGameObject(collision, out bones);
+			return entries[i]?.GetGameObject(
+				collision,
+				out bones,
+				morphEntry: ((morphI != null && morphI.Value >= 0 && morphI.Value < length) ? entries[morphI.Value] : null),
+				morphProgress: morphProgress);
 		}
 	}
 }

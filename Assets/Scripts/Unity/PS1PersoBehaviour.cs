@@ -38,12 +38,12 @@ public class PS1PersoBehaviour : MonoBehaviour {
     private float updateCounter = 0f;
     public GameObject[][] subObjects { get; private set; } = null; // [channel][ntto]
 	public GameObject[][][] subObjectBones { get; private set; } = null;
+	public GameObject[][] subObjectMorph { get; private set; } = null;
     public GameObject[] channelObjects { get; private set; }
 	private int[] currentActivePO = null;
 	private bool[] channelParents = null;
 	private short[][] channelNTTO;
 	private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
-	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
 	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	public Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
 	private bool isAlways = false;
@@ -275,7 +275,17 @@ public class PS1PersoBehaviour : MonoBehaviour {
 			}
 			subObjectBones = null;
 		}
-        if (channelObjects != null) {
+		if (subObjectMorph != null) {
+			for (int i = 0; i < subObjectMorph.Length; i++) {
+				if (subObjectMorph[i] == null) continue;
+				for (int j = 0; j < subObjectMorph[i].Length; j++) {
+					if (subObjectMorph[i][j] == null) continue;
+					GameObject.Destroy(subObjectMorph[i][j]);
+				}
+			}
+			subObjectMorph = null;
+		}
+		if (channelObjects != null) {
             for (int i = 0; i < channelObjects.Length; i++) {
 				if (channelObjects[i] != null) {
 					Destroy(channelObjects[i]);
@@ -283,17 +293,6 @@ public class PS1PersoBehaviour : MonoBehaviour {
             }
             channelObjects = null;
         }
-		if (fullMorphPOs != null) {
-			for (int i = 0; i < fullMorphPOs.Length; i++) {
-				if (fullMorphPOs[i] != null) {
-					foreach (GameObject po in fullMorphPOs[i].Values) {
-						GameObject.Destroy(po);
-					}
-					fullMorphPOs[i].Clear();
-				}
-			}
-			fullMorphPOs = null;
-		}
         channelIDDictionary.Clear();
 		objectIndexScales.Clear();
 		channelNTTO = null;
@@ -311,6 +310,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 				subObjects = new GameObject[anim.num_channels][];
 				channelObjects = new GameObject[anim.num_channels];
 				subObjectBones = new GameObject[anim.num_channels][][];
+				subObjectMorph = new GameObject[anim.num_channels][];
 				//if (anim.a3d.num_morphData > 0) fullMorphPOs = new Dictionary<ushort, GameObject>[anim.a3d.num_channels];
 				currentActivePO = new int[anim.num_channels];
 				channelParents = new bool[anim.num_channels];
@@ -327,6 +327,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					channelNTTO[i] = ch.frames?.SelectMany(f => (f.ntto != null && f.ntto >= 1) ? new short[] { f.ntto.Value } : new short[0]).Distinct().ToArray();
 					subObjects[i] = new GameObject[channelNTTO[i] != null ? channelNTTO[i].Length : 0];
 					subObjectBones[i] = new GameObject[subObjects[i].Length][];
+					subObjectMorph[i] = new GameObject[anim.num_frames];
 					ObjectsTable geometricObjectsDynamic = h.geometricObjectsDynamic;
 					switch (anim.file_index) {
 						case 1: geometricObjectsDynamic = a1h?.geometricObjectsDynamic; break;
@@ -343,7 +344,7 @@ public class PS1PersoBehaviour : MonoBehaviour {
 							GameObject[] bones = null;
 							GameObject c = geometricObjectsDynamic.GetGameObject(j, perso.p3dData?.collisionMapping, out bones);
 							if (c != null) {
-								GeometricObject geo = geometricObjectsDynamic.entries[j].geo;
+								//GeometricObject geo = geometricObjectsDynamic.entries[j].geo;
 								if (Settings.s.hasDeformations && bones != null) {
 									subObjectBones[i][k] = bones;
 									hasBones = true;
@@ -359,6 +360,63 @@ public class PS1PersoBehaviour : MonoBehaviour {
 							c.SetActive(false);
 						}
 						subObjects[i][k].transform.localPosition = Vector3.zero;
+						subObjects[i][k].transform.localRotation = Quaternion.identity;
+						subObjects[i][k].transform.localScale = Vector3.one;
+					}
+
+					// Calculate morph objects
+					int nextChannelFrame = 0;
+					int curChannelFrame = 0;
+					for (int f = 0; f < ch.frames.Length; f++) {
+						if (!ch.frames[f].ntto.HasValue || ch.frames[f].ntto >= 0 || ch.frames[f].ntto == -20) {
+							PS1AnimationKeyframe frame = ch.frames[f];
+							curChannelFrame = nextChannelFrame;
+							nextChannelFrame++;
+							if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0) {
+								nextChannelFrame += frame.extraDuration.Value;
+							}
+							int curFrameIndex = f;
+							PS1AnimationKeyframe nextKF = null;
+							if (frame.extraDuration.HasValue && frame.extraDuration.Value > 0 && curFrameIndex + 1 < ch.frames.Length) {
+								nextKF = ch.frames[curFrameIndex + 1];
+								//print(ch.frames[0].Offset);
+								if (nextKF.ntto.HasValue && (nextKF.ntto.Value < 0 && nextKF.ntto.Value != -20)) nextKF = ch.frames[curFrameIndex + 2];
+							}
+							if (ch.frames[f].HasFlag(PS1AnimationKeyframe.AnimationFlags.Morph) && ch.frames[f].HasFlag(PS1AnimationKeyframe.AnimationFlags.NTTO)) {
+								int j = ch.frames[f].ntto.Value - 1;
+								int morphJ = ch.frames[f].morphNTTO.Value - 1;
+								if (j < 0 || j > geometricObjectsDynamic.length.Value || morphJ < 0 || morphJ > geometricObjectsDynamic.length.Value) {
+								} else {
+									int duration = nextChannelFrame - curChannelFrame;
+									if (duration < 2 || nextKF == null || nextKF.ntto != frame.ntto || nextKF.morphNTTO != frame.morphNTTO || nextKF.morphProgress == frame.morphProgress) {
+										if (frame.morphProgress.Value == 0) continue;
+										float morphProgress = frame.morphProgress.Value / 100f;
+										GameObject c = geometricObjectsDynamic.GetGameObject(j, perso.p3dData?.collisionMapping, out _, morphI: morphJ, morphProgress: morphProgress);
+										for (int d = 0; d < duration; d++) {
+											subObjectMorph[i][curChannelFrame + d] = c;
+										}
+										c.transform.parent = channelObjects[i].transform;
+										c.name = "[" + j + "] " + c.name + " - " + morphJ;
+										c.SetActive(false);
+										c.transform.localPosition = Vector3.zero;
+										c.transform.localRotation = Quaternion.identity;
+										c.transform.localScale = Vector3.one;
+									} else {
+										for (int d = 0; d < duration; d++) {
+											float interpolation = d / (float)duration;
+											float morphProgress = Mathf.Lerp(frame.morphProgress.Value / 100f, nextKF.morphProgress.Value / 100f, interpolation);
+											GameObject c = geometricObjectsDynamic.GetGameObject(j, perso.p3dData?.collisionMapping, out _, morphI: morphJ, morphProgress: morphProgress);
+											subObjectMorph[i][curChannelFrame + d] = c;
+											c.transform.parent = channelObjects[i].transform;
+											c.SetActive(false);
+											c.transform.localPosition = Vector3.zero;
+											c.transform.localRotation = Quaternion.identity;
+											c.transform.localScale = Vector3.one;
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 
@@ -492,18 +550,27 @@ public class PS1PersoBehaviour : MonoBehaviour {
 					interpolation = (currentFrame - curChannelFrame) / (float)(nextChannelFrame - curChannelFrame);
 				}
 
+				if (currentActivePO[i] == -2) {
+					for (int j = 0; j < subObjectMorph[i].Length; j++) {
+						GameObject morphGao = subObjectMorph[i][j];
+						if (morphGao != null && morphGao.activeSelf) morphGao.SetActive(false);
+					}
+				}
 
 				if (!frame.ntto.HasValue || frame.ntto.Value >= 0 || frame.ntto.Value == -20) {
-					short poNum = (frame.ntto.HasValue && frame.ntto.Value != -20) ? frame.ntto.Value : (short)-1;
-					poNum = (short)Array.IndexOf(channelNTTO[i], poNum);
-					
-					GameObject physicalObject = poNum >= 0 ? subObjects[i][poNum] : null;
+					GameObject physicalObject = null;
+					short poNum;
+					if (subObjectMorph?[i]?[currentFrame] != null) {
+						physicalObject = subObjectMorph[i][currentFrame];
+						poNum = -2;
+						physicalObject.SetActive(true);
+					} else {
+						poNum = (frame.ntto.HasValue && frame.ntto.Value != -20) ? frame.ntto.Value : (short)-1;
+						poNum = (short)Array.IndexOf(channelNTTO[i], poNum);
+
+						physicalObject = poNum >= 0 ? subObjects[i][poNum] : null;
+					}
 					if (poNum != currentActivePO[i]) {
-						if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
-							foreach (GameObject morphPO in fullMorphPOs[i].Values) {
-								if (morphPO.activeSelf) morphPO.SetActive(false);
-							}
-						}
 						if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
 							subObjects[i][currentActivePO[i]].SetActive(false);
 						}

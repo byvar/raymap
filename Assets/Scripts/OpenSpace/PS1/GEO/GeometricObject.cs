@@ -95,7 +95,7 @@ namespace OpenSpace.PS1 {
 			//CreateGAO();
 		}
 
-		public GameObject GetGameObject(out GameObject[] boneGaos) {
+		public GameObject GetGameObject(out GameObject[] boneGaos, GeometricObject morphObject = null, float morphProgress = 0f) {
 			GameObject parentGao = new GameObject(Offset.ToString());
 
 			// Bones
@@ -108,6 +108,32 @@ namespace OpenSpace.PS1 {
 				boneGaos[0].transform.localRotation = Quaternion.identity;
 				boneGaos[0].transform.localScale = Vector3.one;
 				boneGaos = boneGaos.Concat(bones.Select(b => b.GetGameObject(parentGao))).ToArray();
+			}
+
+			// Morph
+			Vector3[] mainVertices = vertices.Select(s => new Vector3(
+					s.x / 256f,
+					s.z / 256f,
+					s.y / 256f)).ToArray();
+			Color[] mainColors = vertices.Select(s => new Color(
+					s.r / (float)0x80,
+					s.g / (float)0x80,
+					s.b / (float)0x80,
+					1f)).ToArray();
+			if (morphProgress > 0f && morphObject != null && morphObject.vertices.Length == vertices.Length) {
+				Vector3[] morphVertices = morphObject.vertices.Select(s => new Vector3(
+					s.x / 256f,
+					s.z / 256f,
+					s.y / 256f)).ToArray();
+				Color[] morphColors = morphObject.vertices.Select(s => new Color(
+					s.r / (float)0x80,
+					s.g / (float)0x80,
+					s.b / (float)0x80,
+					1f)).ToArray();
+				for (int i = 0; i < vertices.Length; i++) {
+					mainVertices[i] = Vector3.Lerp(mainVertices[i], morphVertices[i], morphProgress);
+					mainColors[i] = Color.Lerp(mainColors[i], morphColors[i], morphProgress);
+				}
 			}
 
 			// First pass
@@ -237,8 +263,7 @@ namespace OpenSpace.PS1 {
 
                             GameObject spr_gao = new GameObject("Sprite");
                             spr_gao.transform.SetParent(gao.transform);
-							Vertex spr_v = this.vertices[s.v0];
-							spr_gao.transform.localPosition = new Vector3(spr_v.x / 256, spr_v.z / 256f, spr_v.y / 256f);
+							spr_gao.transform.localPosition = mainVertices[s.v0];
                             BillboardBehaviour billboard = spr_gao.AddComponent<BillboardBehaviour>();
                             billboard.mode = BillboardBehaviour.LookAtMode.ViewRotation;
                             MeshFilter sprites_mf = spr_gao.AddComponent<MeshFilter>();
@@ -289,7 +314,7 @@ namespace OpenSpace.PS1 {
                             break;
 					}
 				}
-				Vertex[] v = vertIndices.Select(vi => vertices[vi]).ToArray();
+				//Vertex[] v = vertIndices.Select(vi => vertices[vi]).ToArray();
 				BoneWeight[] w = null;
 				if (bones != null && bones.Length > 0 && boneWeights != null) {
 					w = new BoneWeight[vertIndices.Count];
@@ -303,15 +328,8 @@ namespace OpenSpace.PS1 {
 					}
 				}
 				Mesh m = new Mesh();
-				m.vertices = v.Select(s => new Vector3(
-					s.x / 256f,
-					s.z / 256f,
-					s.y / 256f)).ToArray();
-				m.colors = v.Select(s => new Color(
-					s.r / (float)0x80,
-					s.g / (float)0x80,
-					s.b / (float)0x80,
-					1f)).ToArray();
+				m.vertices = vertIndices.Select(vi => mainVertices[vi]).ToArray();
+				m.colors = vertIndices.Select(vi => mainColors[vi]).ToArray();
 				m.SetUVs(0, uvs.Select(s => new Vector4(s.x, s.y, alpha, 0f)).ToList());
 				m.triangles = triIndices.ToArray();
 				m.RecalculateNormals();
@@ -369,19 +387,11 @@ namespace OpenSpace.PS1 {
 							Debug.LogWarning(p.GetType()); break;
 					}
 				}
-				Vertex[] v = vertIndices.Select(vi => vertices[vi]).ToArray();
+				//Vertex[] v = vertIndices.Select(vi => vertices[vi]).ToArray();
 				Mesh m = new Mesh();
-				m.vertices = v.Select(s => new Vector3(
-					s.x / 256f,
-					s.z / 256f,
-					s.y / 256f)).ToArray();
-				m.colors = v.Select(s => new Color(
-					s.r / (float)0x80,
-					s.g / (float)0x80,
-					s.b / (float)0x80,
-					1f)).ToArray();
-
-				m.SetUVs(0, v.Select(s => new Vector4(0.5f, 0.5f, 1f, 1f)).ToList());
+				m.vertices = vertIndices.Select(vi => mainVertices[vi]).ToArray();
+				m.colors = vertIndices.Select(vi => mainColors[vi]).ToArray();
+				m.SetUVs(0, vertIndices.Select(s => new Vector4(0.5f, 0.5f, 1f, 1f)).ToList());
 				m.triangles = triIndices.ToArray();
 				m.RecalculateNormals();
 				mf.mesh = m;
