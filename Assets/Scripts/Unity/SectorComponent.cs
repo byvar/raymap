@@ -104,24 +104,35 @@ public class SectorComponent : MonoBehaviour, IReferenceable {
 					}
 				} else if (sectorPS1 != null) {
 					bounds = sectorPS1.BoundingVolume;
-				}
-				/*if (bounds != null) {
-					if (bounds.type == BoundingVolume.Type.Box) {
-						BoxCollider collider = gameObject.AddComponent<BoxCollider>();
+                }
 
-						collider.center = bounds.Center;
-						collider.center -= transform.position;
-						collider.size = bounds.Size;
-					} else if (bounds.type == BoundingVolume.Type.Sphere) {
-						SphereCollider collider = gameObject.AddComponent<SphereCollider>();
+                if (UnitySettings.VisualizeSectorBorders) {
+                    if (bounds != null) {
+                        if (bounds.Center.IsValid()) {
+                            if (bounds.type == BoundingVolume.Type.Box) {
+                                if (bounds.Size.IsValid()) {
+                                    BoxCollider collider = gameObject.AddComponent<BoxCollider>();
 
-						collider.center = bounds.Center;
-						collider.center -= transform.position;
-						collider.radius = bounds.sphereRadius;
-					}
-				}*/
-			}
-			return bounds;
+                                    collider.center = bounds.Center;
+                                    collider.center -= transform.position;
+                                    collider.size = bounds.Size;
+                                } else {
+									Debug.LogWarning($"Invalid Sector Bounds Size for sector {sector.Gao}");
+                                }
+                            } else if (bounds.type == BoundingVolume.Type.Sphere) {
+                                SphereCollider collider = gameObject.AddComponent<SphereCollider>();
+
+                                collider.center = bounds.Center;
+                                collider.center -= transform.position;
+                                collider.radius = bounds.sphereRadius;
+                            }
+                        } else {
+							Debug.LogWarning($"Invalid Sector Bounds Center for sector {sector.Gao}");
+						}
+                    }
+                }
+            }
+            return bounds;
 		}
 	}
 
