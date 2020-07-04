@@ -9,57 +9,22 @@ using System.Linq;
 using UnityEngine;
 using CollideType = OpenSpace.Collide.CollideType;
 
-public class ROMPersoBehaviour : MonoBehaviour {
-    public bool IsLoaded { get; private set; } = false;
+public class ROMPersoBehaviour : BasePersoBehaviour {
     public Perso perso;
-    public SectorComponent sector;
-    public Controller controller;
 
     // States
-    bool hasStates = false;
     public State state { get; private set; } = null;
-    public string[] stateNames = { "Placeholder" };
-	public int currentState { get; private set; } = 0; // Follows "stateIndex", sometimes with a small delay.
-	public int stateIndex = 0; // Set this variable
-	public bool autoNextState = false;
-
-    // Physical object lists
-    public string[] poListNames = { "Null" };
-    int currentPOList = 0;
-    public int poListIndex = 0;
 
 	// Animation
 	ushort currentShAnim = 0xFFFF;
 	ROMShAnimation shAnim;
 	ROMAnimationCutTable.AnimationCut[] animCuts;
 	int currentAnimCut;
-    bool forceAnimUpdate = false;
-    public uint currentFrame = 0;
-    public bool playAnimation = true;
-    public float animationSpeed = 15f;
-    private float updateCounter = 0f;
     public GameObject[][] subObjects { get; private set; } = null; // [channel][ntto]
-    public GameObject[] channelObjects { get; private set; }
-	private int[] currentActivePO = null;
-	private bool[] channelParents = null;
     public AnimMorphData[,] morphDataArray;
-    private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
 	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
-	public Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
-	private bool isAlways = false;
-	public bool IsAlways {
-		get { return isAlways; }
-		set { isAlways = value; }
-	}
-	private bool isEnabled = true;
-	public bool IsEnabled {
-		get { return isEnabled; }
-		set {
-			isEnabled = value;
-			//controller.UpdatePersoActive(perso);
-		}
-	}
+	private Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
 	
 
     // Use this for initialization
@@ -221,8 +186,8 @@ public class ROMPersoBehaviour : MonoBehaviour {
 			}
 		}
         bool sectorActive = false, insideSectors = false;
-		if (sector == null || isAlways || sector.Loaded) sectorActive = true;
-		if (sector == null || isAlways || controller.sectorManager.activeSector != null) insideSectors = true;
+		if (sector == null || IsAlways || sector.Loaded) sectorActive = true;
+		if (sector == null || IsAlways || controller.sectorManager.activeSector != null) insideSectors = true;
         if (controller.playAnimations && playAnimation && sectorActive) {
             updateCounter += Time.deltaTime * animationSpeed;
             // If the camera is not inside a sector, animations will only update 1 out of 2 times (w/ frameskip) to avoid lag
@@ -406,7 +371,7 @@ public class ROMPersoBehaviour : MonoBehaviour {
 				}
 
 				// Keep lighting last so that it is applied to all new sub objects
-				if (!isAlways) {
+				if (!IsAlways) {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, OpenSpace.Visual.LightInfo.ObjectLightedFlag.Perso);
 				} else {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, OpenSpace.Visual.LightInfo.ObjectLightedFlag.None);

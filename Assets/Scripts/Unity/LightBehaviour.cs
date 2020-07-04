@@ -25,7 +25,11 @@ public class LightBehaviour : MonoBehaviour {
 	public bool IsActive {
 		get {
 			if (li != null) {
-				return li.turnedOn != 0;
+				if (Settings.s.game == Settings.Game.TTSE) {
+					return true;
+				} else {
+					return li.turnedOn != 0;
+				}
 			} else if (liROM != null) {
 				return liROM.IsActive;
 			} else return false;

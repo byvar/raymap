@@ -15,55 +15,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PersoBehaviour : MonoBehaviour, IReferenceable {
-    public bool isLoaded { get; private set; } = false;
+public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
     public Perso perso;
-    public SectorComponent sector;
-    public Controller controller;
 
     // States
-    bool hasStates = false;
     public State state { get; private set; } = null;
-    public string[] stateNames = { "Placeholder" };
-    public int currentState { get; private set; } = 0; // Follows "stateIndex", sometimes with a small delay.
-    public int stateIndex = 0; // Set this variable
-    public bool autoNextState = false;
-
-    // Physical object lists
-    public string[] poListNames = { "Null" };
-    int currentPOList = 0;
-    public int poListIndex = 0;
 
     // Animation
     public AnimA3DGeneral a3d = null;
     public AnimationMontreal animMontreal = null;
 	public AnimA3DLargo animLargo = null;
-    bool forceAnimUpdate = false;
-    public uint currentFrame = 0;
-    public bool playAnimation = true;
-    public float animationSpeed = 15f;
-    private float updateCounter = 0f;
     public PhysicalObject[][] subObjects { get; private set; } = null; // [channel][ntto]
-    public GameObject[] channelObjects { get; private set; }
-	private int[] currentActivePO = null;
-	private bool[] channelParents = null;
     public AnimMorphData[,] morphDataArray;
-    private Dictionary<short, List<int>> channelIDDictionary = new Dictionary<short, List<int>>();
 	private Dictionary<ushort, PhysicalObject>[] fullMorphPOs = null;
-	bool hasBones = false; // We can optimize a tiny bit if this object doesn't have bones
-	private bool isAlways = false;
-	public bool IsAlways {
-		get { return isAlways; }
-		set { isAlways = value; }
-	}
-	private bool isEnabled = true;
-	public bool IsEnabled {
-		get { return isEnabled; }
-		set {
-			isEnabled = value;
-			controller.UpdatePersoActive(perso);
-		}
-	}
 
     public ReferenceFields References { get => perso.References; set => perso.References = value; }
 
@@ -106,12 +70,12 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
                 }
             }
         }
-        isLoaded = true;
+        IsLoaded = true;
     }
 
     #region Print debug info
     public void PrintDsgVar() {
-        if (isLoaded && hasStates) {
+        if (IsLoaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
                 DsgVar dsgVar = perso.brain.mind.AI_model.dsgVar;
                 if (dsgVar != null) {
@@ -131,7 +95,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 
     public void PrintDsgVarFromMindMem() {
         MapLoader l = MapLoader.Loader;
-        if (isLoaded && hasStates) {
+        if (IsLoaded && hasStates) {
             if (perso.brain != null && perso.brain.mind != null) {
 
                 DsgMem dsgMem = perso.brain.mind.dsgMem;
@@ -155,7 +119,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
     }
 
     public void PrintScripts() {
-        if (isLoaded && hasStates) {
+        if (IsLoaded && hasStates) {
             if (perso.brain != null
                 && perso.brain.mind != null
                 && perso.brain.mind.AI_model != null) {
@@ -195,7 +159,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 
     public void PrintTranslatedScripts()
     {
-        if (isLoaded && hasStates)
+        if (IsLoaded && hasStates)
         {
             if (perso.brain != null
                 && perso.brain.mind != null
@@ -277,7 +241,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
     }
 
     public void PrintAnimationDebugInfo() {
-        if (isLoaded && hasStates) {
+        if (IsLoaded && hasStates) {
 			if (a3d != null) {
 				for (int i = 0; i < a3d.num_NTTO; i++) {
 					AnimNTTO ntto = a3d.ntto[i + a3d.start_NTTO];
@@ -453,7 +417,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 
     // Update is called once per frame
     void Update() {
-        if (isLoaded) {
+        if (IsLoaded) {
             if (hasStates) {
                 if (stateIndex != currentState) {
                     currentState = stateIndex;
@@ -478,8 +442,8 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 			}
 		}
         bool sectorActive = false, insideSectors = false;
-        if (sector == null || isAlways || sector.Loaded) sectorActive = true;
-        if (sector == null || isAlways || controller.sectorManager.activeSector != null) insideSectors = true;
+        if (sector == null || IsAlways || sector.Loaded) sectorActive = true;
+        if (sector == null || IsAlways || controller.sectorManager.activeSector != null) insideSectors = true;
         if (controller.playAnimations && playAnimation && sectorActive) {
             updateCounter += Time.deltaTime * animationSpeed;
             // If the camera is not inside a sector, animations will only update 1 out of 2 times (w/ frameskip) to avoid lag
@@ -519,7 +483,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
     }
 
     void DeinitAnimation() {
-        isLoaded = false;
+        IsLoaded = false;
         // Destroy currently loaded subobjects
         if (subObjects != null) {
             for (int i = 0; i < subObjects.Length; i++) {
@@ -668,13 +632,13 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 				}
 
 				// Keep lighting last so that it is applied to all new sub objects
-				if (!isAlways) {
+				if (!IsAlways) {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
 				} else {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
 				}
 			}
-            isLoaded = true;
+            IsLoaded = true;
         }
     }
 
@@ -738,13 +702,13 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
                         }
                     }
 				}
-				if (!isAlways) {
+				if (!IsAlways) {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
 				} else {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
 				}
 			}
-            isLoaded = true;
+            IsLoaded = true;
         }
     }
 
@@ -822,18 +786,18 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 				morphDataArray = null;
 
 				// Keep lighting last so that it is applied to all new sub objects
-				if (!isAlways) {
+				if (!IsAlways) {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.Perso);
 				} else {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, LightInfo.ObjectLightedFlag.None);
 				}
 			}
-			isLoaded = true;
+			IsLoaded = true;
 		}
 	}
 
 	public void UpdateAnimation() {
-		if (isLoaded && a3d != null && channelObjects != null & subObjects != null) {
+		if (IsLoaded && a3d != null && channelObjects != null & subObjects != null) {
 			if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
 			// First pass: reset TRS for all sub objects
 			for (int i = 0; i < channelParents.Length; i++) {
@@ -1033,15 +997,15 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 			}
             /* */
 			//this.currentFrame = (currentFrame + 1) % a3d.num_onlyFrames;
-		} else if (isLoaded && animMontreal != null && channelObjects != null & subObjects != null) {
+		} else if (IsLoaded && animMontreal != null && channelObjects != null & subObjects != null) {
 			UpdateFrameMontreal();
-		} else if (isLoaded && animLargo != null && channelObjects != null && subObjects != null) {
+		} else if (IsLoaded && animLargo != null && channelObjects != null && subObjects != null) {
 			UpdateFrameLargo();
 		}
     }
 
     void UpdateFrameMontreal() {
-        if (isLoaded && animMontreal != null && channelObjects != null & subObjects != null) {
+        if (IsLoaded && animMontreal != null && channelObjects != null & subObjects != null) {
             if (currentFrame >= animMontreal.num_frames) currentFrame %= animMontreal.num_frames;
             // First pass: reset TRS for all sub objects
             for (int i = 0; i < channelParents.Length; i++) {
@@ -1089,7 +1053,7 @@ public class PersoBehaviour : MonoBehaviour, IReferenceable {
 
 
 	public void UpdateFrameLargo() {
-		if (isLoaded && animLargo != null && channelObjects != null & subObjects != null) {
+		if (IsLoaded && animLargo != null && channelObjects != null & subObjects != null) {
 			if (currentFrame >= animLargo.num_onlyFrames) currentFrame %= animLargo.num_onlyFrames;
 			// First pass: reset TRS for all sub objects
 			for (int i = 0; i < channelParents.Length; i++) {

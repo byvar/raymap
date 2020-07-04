@@ -58,26 +58,28 @@ namespace OpenSpace.AI {
             if (Settings.s.aiTypes != null) sn.nodeType = Settings.s.aiTypes.GetNodeType(sn.type);
 			
             if (sn.param_ptr != null && sn.nodeType != NodeType.Unknown) {
-				//l.print("ScriptNode " + offset + " - " + sn.nodeType + " (" + sn.type + ") - " + sn.param_ptr);
-				if (sn.nodeType == NodeType.WayPointRef) {
-					WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);
+                //l.print("ScriptNode " + offset + " - " + sn.nodeType + " (" + sn.type + ") - " + sn.param_ptr);
+                if (sn.nodeType == NodeType.WayPointRef) {
+                    WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);
                     waypoint.References.referencedByNodes.Add(sn);
-				} else if (sn.nodeType == NodeType.String) {
-					Pointer.DoAt(ref reader, sn.param_ptr, () => {
-						string str = reader.ReadNullDelimitedString();
-						l.strings[sn.param_ptr] = str;
-					});
-				} else if (sn.nodeType == NodeType.ObjectTableRef) {
-					// In R2 some objects have object tables that aren't listed normally, but are referenced through scripts.
-				} else if (sn.nodeType == NodeType.Button) {
-					EntryAction.FromOffsetOrRead(sn.param_ptr, reader);
-				} else if (sn.nodeType == NodeType.GameMaterialRef) {
+                } else if (sn.nodeType == NodeType.String) {
+                    Pointer.DoAt(ref reader, sn.param_ptr, () => {
+                        string str = reader.ReadNullDelimitedString();
+                        l.strings[sn.param_ptr] = str;
+                    });
+                } else if (sn.nodeType == NodeType.ObjectTableRef) {
+                    // In R2 some objects have object tables that aren't listed normally, but are referenced through scripts.
+                } else if (sn.nodeType == NodeType.Button) {
+                    EntryAction.FromOffsetOrRead(sn.param_ptr, reader);
+                } else if (sn.nodeType == NodeType.GameMaterialRef) {
                     GameMaterial.FromOffsetOrRead(sn.param_ptr, reader);
                 } else if (sn.nodeType == NodeType.VisualMaterial) {
                     VisualMaterial.FromOffsetOrRead(sn.param_ptr, reader);
                 } else if (sn.nodeType == NodeType.ComportRef) {
                     Behavior comportRef = l.FromOffsetOrRead<Behavior>(reader, sn.param_ptr);
                     comportRef.referencedBy.Add(script);
+                } else if (sn.nodeType == NodeType.GraphRef) {
+                    Graph.FromOffsetOrRead(sn.param_ptr, reader);
                 }
             }
 

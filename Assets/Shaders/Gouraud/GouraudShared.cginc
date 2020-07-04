@@ -90,7 +90,7 @@ float CalcNormalFactor(float3 normalDirection, float3 lightDirection) {
 }
 
 float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
-	if(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0) return float4(1.0, 1.0, 1.0, 1.0);
+	if(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0 || _Prelit == 1.0) return float4(1.0, 1.0, 1.0, 1.0);
 
 	/* Alpha light flags:
 	    0 = Affect color and alpha
@@ -123,7 +123,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 		float4 lightDir = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightDir)[i];
 		float4 lightCol = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightCol)[i];
 		float4 lightParams = UNITY_ACCESS_INSTANCED_PROP(Props, _StaticLightParams)[i];
-		if (lightPos.w == 1) {
+		if (lightPos.w == 1 && _Prelit != 2) {
 			attenuation = 1.0; // no attenuation
 			lightDirection = normalize(lightDir.xyz);
 			/*if (lightParams.z == 0) {
@@ -133,7 +133,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 			if (lightParams.w != 1) diffuseReflection = diffuseReflection + attenuation * lightCol.xyz * normalFactor;
 			//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
 			if (lightParams.w != 2) alpha = alpha + lightCol.w * normalFactor;// * _DiffuseCoef.w;
-		} else if (lightPos.w == 2) {
+		} else if (lightPos.w == 2 && _Prelit != 2) {
 			vertexToLightSource = lightPos.xyz - multipliedPosition;
 			distance = length(vertexToLightSource);
 			far = lightParams.y;
@@ -154,7 +154,7 @@ float4 ApplyStaticLights(float3 normalDirection, float3 multipliedPosition) {
 			if (lightParams.w != 1) ambient.xyz = ambient.xyz + lightCol.xyz * _DiffuseCoef.xyz;
 			//* colRgb * _DiffuseCoef.xyz //* _DiffuseCoef.w
 			if (lightParams.w != 2) ambient.w = ambient.w + lightCol.w * _DiffuseCoef.w;// * _DiffuseCoef.w;
-		} else if (lightPos.w == 7) {
+		} else if (lightPos.w == 7 && _Prelit != 2) {
 			vertexToLightSource = lightPos.xyz - multipliedPosition;
 			distance = length(vertexToLightSource);
 			far = lightParams.y;
@@ -257,10 +257,15 @@ v2f process_vert(appdata_full v, float isLight, float isAdd) {
 	o.normal = normalDirection;
 	o.multipliedPosition = multipliedPosition;
 	o.diffuseColor = float4(ambientLighting + diffuseReflection, alpha);
-	if (_Prelit == 1 && !(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0)) {
-		// Prelit
-		//o.diffuseColor = v.texcoord2; // RGBA, so both need to be vector4
-		o.diffuseColor = _DiffuseCoef * v.color; // RGBA, so both need to be vector4
+	if (_Prelit != 0 && !(_DisableLighting == 1.0 || _DisableLightingLocal == 1.0)) {
+		if (_Prelit == 1) {
+			// Prelit
+			//o.diffuseColor = v.texcoord2; // RGBA, so both need to be vector4
+			o.diffuseColor = _DiffuseCoef * v.color; // RGBA, so both need to be vector4
+		} else if (_Prelit == 2) {
+			o.diffuseColor = float4(o.diffuseColor.xyz, _AmbientCoef.w);
+			o.diffuseColor += _DiffuseCoef * v.color; // RGBA, so both need to be vector4
+		}
 	}
 	// Process mirror or portal, this weird construction is so that it's faster
 	if (_NumTextures > 0) {

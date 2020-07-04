@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Visual.ISI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,10 @@ namespace OpenSpace.Object {
         public Pointer off_data;
         public Pointer off_radiosity;
 		public Pointer off_portalCamera;
+
         public PhysicalObject data;
+        public Radiosity radiosity;
+
         public string name = "";
         private GameObject gao;
         public GameObject Gao {
@@ -43,6 +47,10 @@ namespace OpenSpace.Object {
             ipo.off_data = Pointer.Read(reader);
             ipo.off_radiosity = Pointer.Read(reader);
 			ipo.name = "IPO @ " + offset;
+
+            // TODO: Read radiosity on all platforms. Currently crashes on Xbox 360
+            //ipo.radiosity = l.FromOffsetOrRead<Radiosity>(reader, ipo.off_radiosity);
+
 			if (Settings.s.engineVersion >= Settings.EngineVersion.R3) {
 				reader.ReadUInt32();
 				ipo.off_portalCamera = Pointer.Read(reader);
@@ -52,7 +60,7 @@ namespace OpenSpace.Object {
 				if (Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
 			}
 			Pointer.DoAt(ref reader, ipo.off_data, () => {
-				ipo.data = PhysicalObject.Read(reader, ipo.off_data);
+				ipo.data = PhysicalObject.Read(reader, ipo.off_data, radiosity: ipo.radiosity);
 				if (ipo.data != null) {
 					/*if (ipo.data.visualSet != null) {
 						foreach (Visual.VisualSetLOD lod in ipo.data.visualSet) {

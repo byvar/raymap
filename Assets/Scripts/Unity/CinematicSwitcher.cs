@@ -123,6 +123,7 @@ public class CinematicSwitcher : MonoBehaviour {
 		if (currentCinematic > 0 && ps1Streams != null) {
 			OpenSpace.PS1.PS1Stream s = ps1Streams[currentCinematic - 1];
 			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
+			l.gao_dynamicWorld.SetActive(false);
 			foreach (PS1StreamFrame f in s.frames) {
 				Dictionary<int, int> nttoForFrame = new Dictionary<int, int>();
 				for(int i = 0; i < f.num_channels; i++) {
@@ -189,6 +190,8 @@ public class CinematicSwitcher : MonoBehaviour {
 		allNTTO.Clear();
 		currentNTTO.Clear();
 		objectPool.Clear();
+		R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
+		l.gao_dynamicWorld.SetActive(true);
 	}
 
 	private void ClearCurrentNTTO() {

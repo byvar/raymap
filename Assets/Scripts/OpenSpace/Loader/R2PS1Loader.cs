@@ -48,6 +48,12 @@ namespace OpenSpace.Loader {
 		public ActorFileHeader actor1Header;
 		public ActorFileHeader actor2Header;
 
+		// GameObjects
+		public GameObject gao_fatherSector;
+		public GameObject gao_dynamicWorld;
+		public GameObject gao_inactiveDynamicWorld;
+		public GameObject gao_always;
+
 		public string[] LoadLevelList() {
 			if (PS1GameInfo.Games.ContainsKey(Settings.s.mode)) {
 				return PS1GameInfo.Games[Settings.s.mode].maps;
@@ -548,18 +554,18 @@ namespace OpenSpace.Loader {
 
 			loadingState = "Creating gameobjects";
 			await WaitIfNecessary();
-			GameObject fatherSector = levelHeader.fatherSector?.GetGameObject();
-			fatherSector.name = "Father Sector | " + fatherSector.name;
-			GameObject dynamicWorld = levelHeader.dynamicWorld?.GetGameObject();
-			dynamicWorld.name = "Dynamic World | " + dynamicWorld.name;
-			GameObject inactiveDynamicWorld = levelHeader.inactiveDynamicWorld?.GetGameObject();
-			inactiveDynamicWorld.name = "Inactive Dynamic World | " + inactiveDynamicWorld.name;
-			GameObject always = new GameObject("Always");
-			always.transform.position = new Vector3(0, -1000, 0);
+			gao_fatherSector = levelHeader.fatherSector?.GetGameObject();
+			gao_fatherSector.name = "Father Sector | " + gao_fatherSector.name;
+			gao_dynamicWorld = levelHeader.dynamicWorld?.GetGameObject();
+			gao_dynamicWorld.name = "Dynamic World | " + gao_dynamicWorld.name;
+			gao_inactiveDynamicWorld = levelHeader.inactiveDynamicWorld?.GetGameObject();
+			gao_inactiveDynamicWorld.name = "Inactive Dynamic World | " + gao_inactiveDynamicWorld.name;
+			gao_always = new GameObject("Always");
+			gao_always.transform.position = new Vector3(0, -1000, 0);
 			int i = 0;
 			foreach (AlwaysList alw in levelHeader.always) {
 				GameObject alwGao = alw.GetGameObject();
-				alwGao.transform.SetParent(always.transform);
+				alwGao.transform.SetParent(gao_always.transform);
 				alwGao.transform.localPosition = new Vector3(i++ * 10f, 0f, 0f);
 				i++;
 			}

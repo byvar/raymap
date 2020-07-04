@@ -10,6 +10,7 @@ namespace OpenSpace.Waypoints {
 
         public Pointer off_nextNode;
         public Pointer off_prevNode;
+        public Pointer off_graph;
         public Pointer off_node;
         public Pointer off_wayPoint;
 
@@ -57,12 +58,12 @@ namespace OpenSpace.Waypoints {
             node.off_nextNode = Pointer.Read(reader);
             node.off_prevNode = Pointer.Read(reader);
 
-            //node.off_node = Pointer.Read(reader);
-            reader.ReadUInt32();
-
+            node.off_graph = Pointer.Read(reader);
             node.off_wayPoint = Pointer.Read(reader);
-            reader.ReadUInt32();
-            reader.ReadUInt32();
+            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
+                reader.ReadUInt32();
+                reader.ReadUInt32();
+            }
             node.off_arcList = Pointer.Read(reader);
 
             //MapLoader.Loader.print("ArcList: "+node.off_arcList);

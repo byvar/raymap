@@ -791,19 +791,37 @@ public class Controller : MonoBehaviour {
 			foreach (Perso perso in loader.persos) {
 				UpdatePersoActive(perso);
 			}
+			foreach (PS1PersoBehaviour perso in ps1Persos) {
+				UpdatePersoActive(perso);
+			}
+			foreach (ROMPersoBehaviour perso in romPersos) {
+				UpdatePersoActive(perso);
+			}
 		}
 	}
 
 	public void UpdatePersoActive(Perso perso) {
 		if (perso != null && perso.Gao != null) {
 			PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
-			if (pb != null) {
-				bool isVisible = true;
-				if (perso.SuperObject != null) {
-					isVisible = !perso.SuperObject.flags.HasFlag(OpenSpace.Object.Properties.SuperObjectFlags.Flags.Invisible);
-				}
-				perso.Gao.SetActive(showPersos && pb.IsEnabled && (isVisible || (viewCollision || viewInvisible)));
+			UpdatePersoActive(pb);
+		}
+	}
+
+	public void UpdatePersoActive(BasePersoBehaviour perso) {
+		if (perso != null) {
+			bool isVisible = true;
+			switch (perso) {
+				case PersoBehaviour pb:
+					if (pb.perso?.SuperObject != null) {
+						isVisible = !pb.perso.SuperObject.flags.HasFlag(SuperObjectFlags.Flags.Invisible);
+					}
+					break;
+				case ROMPersoBehaviour rpb:
+					break;
+				case PS1PersoBehaviour ps1pb:
+					break;
 			}
+			perso.gameObject.SetActive(showPersos && perso.IsEnabled && (isVisible || (viewCollision || viewInvisible)));
 		}
 	}
 

@@ -7,6 +7,8 @@ namespace OpenSpace.Waypoints {
         public Pointer offset;
         public LinkedList<GraphNode> nodes;
         public string name = null;
+        public Pointer off_name;
+        public Pointer off_wayPointName;
 
         [JsonIgnore]
         public ReferenceFields References { get; set; } = new ReferenceFields();
@@ -22,7 +24,15 @@ namespace OpenSpace.Waypoints {
             graph.nodes = LinkedList<GraphNode>.Read(ref reader, Pointer.Current(reader), (off_element) => {
                 return GraphNode.FromOffsetOrRead(off_element, reader);
             }, flags: LinkedList.Flags.HasHeaderPointers, type: LinkedList.Type.Double);
-
+            if (Settings.s.engineVersion < Settings.EngineVersion.R3
+                && Settings.s.platform != Settings.Platform.DC
+                && Settings.s.platform != Settings.Platform.PS2) {
+                graph.off_name = Pointer.Read(reader);
+                graph.off_wayPointName = Pointer.Read(reader);
+                Pointer.DoAt(ref reader, graph.off_name, () => {
+                    graph.name = reader.ReadNullDelimitedString();
+                });
+            }
             return graph;
         }
 

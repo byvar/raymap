@@ -57,7 +57,7 @@ public class PersoBehaviourEditor : Editor {
         GUI.enabled = true;
         GUILayout.EndHorizontal();
 
-		if (pb.isLoaded) {
+		if (pb.IsLoaded) {
 			Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 100f);
 			InitTransitionsTreeIfNeeded(rect, pb);
 			if (treeViewStateTransitions.stateIndex != pb.currentState

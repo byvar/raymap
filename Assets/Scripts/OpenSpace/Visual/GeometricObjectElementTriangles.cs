@@ -383,6 +383,7 @@ namespace OpenSpace.Visual {
 			if (sdc != null) {
 				CreateUnityMeshFromSDC();
 			}
+			Color[] rli = null;
 
 
 			// Create mesh from unoptimized data
@@ -390,6 +391,9 @@ namespace OpenSpace.Visual {
 				Vector3[] new_vertices = new Vector3[num_triangles * 3];
 				Vector3[] new_normals = new Vector3[num_triangles * 3];
 				Vector3[][] new_uvs = new Vector3[num_textures][];
+				/*if (geo.radiosity != null) {
+					rli = new Color[num_triangles * 3];
+				}*/
 				BoneWeight[] new_boneWeights = geo.bones != null ? new BoneWeight[num_triangles * 3] : null;
 				for (int um = 0; um < num_textures; um++) {
 					new_uvs[um] = new Vector3[num_triangles * 3];
@@ -421,6 +425,11 @@ namespace OpenSpace.Visual {
 					new_vertices[m0] = geo.vertices[i0];
 					new_vertices[m1] = geo.vertices[i1];
 					new_vertices[m2] = geo.vertices[i2];
+					if (rli != null) {
+						if (i0 < geo.radiosity.colors.Length) rli[m0] = geo.radiosity.colors[i0].Color;
+						if (i1 < geo.radiosity.colors.Length) rli[m1] = geo.radiosity.colors[i1].Color;
+						if (i2 < geo.radiosity.colors.Length) rli[m2] = geo.radiosity.colors[i2].Color;
+					}
 
 					if (geo.normals != null) {
 						new_normals[m0] = geo.normals[i0];
@@ -461,6 +470,7 @@ namespace OpenSpace.Visual {
 					unityMesh.vertices = new_vertices;
 					unityMesh.normals = new_normals;
 					unityMesh.triangles = unityTriangles;
+					if (rli != null) unityMesh.colors = rli;
 					if (new_boneWeights != null) {
 						unityMesh.boneWeights = new_boneWeights;
 						unityMesh.bindposes = geo.bones.bindPoses;
@@ -618,7 +628,9 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
-				if (((sdc != null && (sdc.geo.Type != 6 || (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3))) || vertexColors != null) && unityMat != null) unityMat.SetFloat("_Prelit", 1f);
+				if(rli != null && unityMat != null) unityMat.SetFloat("_Prelit", 2f);
+				if (((sdc != null && (sdc.geo.Type != 6 || (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3)))
+					|| vertexColors != null) && unityMat != null) unityMat.SetFloat("_Prelit", 1f);
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
                 /*if (num_uvMaps > 1) {

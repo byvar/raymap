@@ -2,6 +2,7 @@
 using OpenSpace.Collide;
 using OpenSpace.Visual;
 using OpenSpace.Visual.Deform;
+using OpenSpace.Visual.ISI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +71,7 @@ namespace OpenSpace.Object {
             return !(x == y);
         }
 
-        public static PhysicalObject Read(Reader reader, Pointer offset, SuperObject so = null) {
+        public static PhysicalObject Read(Reader reader, Pointer offset, SuperObject so = null, Radiosity radiosity = null) {
             PhysicalObject po = new PhysicalObject(offset, so);
 			//MapLoader.Loader.print("PO @ " + offset);
 			// Header
@@ -140,11 +141,12 @@ namespace OpenSpace.Object {
 						po.visualSet[0].LODdistance = 5f;
 					}
 				}
+                int radiosityLODIndex = 0;
                 for (uint i = 0; i < numberOfLOD; i++) {
                     Pointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
                         switch (po.visualSetType) {
                             case 0:
-                                if(po.visualSet[i].obj == null) po.visualSet[i].obj = GeometricObject.Read(reader, po.visualSet[i].off_data);
+                                if(po.visualSet[i].obj == null) po.visualSet[i].obj = GeometricObject.Read(reader, po.visualSet[i].off_data, radiosity: radiosity?.lod?[radiosityLODIndex++]);
                                 GeometricObject m = ((GeometricObject)po.visualSet[i].obj);
                                 if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
                                 break;

@@ -2,6 +2,7 @@
 using OpenSpace.Loader;
 using OpenSpace.Object;
 using OpenSpace.Visual.Deform;
+using OpenSpace.Visual.ISI;
 using OpenSpace.Visual.PS2Optimized;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,7 @@ namespace OpenSpace.Visual {
 
 		public Pointer<PS2OptimizedSDCStructure> optimizedObject;
 		public uint ps2IsSinus;
+		public RadiosityLOD radiosity;
         
         private GameObject gao = null;
         public GameObject Gao {
@@ -93,10 +95,11 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public static GeometricObject Read(Reader reader, Pointer offset) {
+        public static GeometricObject Read(Reader reader, Pointer offset, RadiosityLOD radiosity = null) {
             MapLoader l = MapLoader.Loader;
 			//l.print("Geometric Object: " + offset);
             GeometricObject m = new GeometricObject(offset);
+			m.radiosity = radiosity;
 			if (Settings.s.game == Settings.Game.LargoWinch) {
 				uint flags = reader.ReadUInt32();
 				m.num_vertices = reader.ReadUInt16();
