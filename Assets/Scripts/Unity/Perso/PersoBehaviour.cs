@@ -31,12 +31,18 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 
     public ReferenceFields References { get => perso.References; set => perso.References = value; }
 
-    // Brain clearance
-    public bool clearTheBrain = false;
+	// Brain clearance
+	public bool clearTheBrain = false;
+
+	// Abstract properties
+	public override Pointer Offset => perso?.offset;
+	public override string NameFamily => perso?.nameFamily;
+	public override string NameModel => perso?.nameModel;
+	public override string NameInstance => perso?.namePerso;
 
 
-    // Use this for initialization
-    void Start() {
+	// Use this for initialization
+	void Start() {
     }
 
     public void Init() {

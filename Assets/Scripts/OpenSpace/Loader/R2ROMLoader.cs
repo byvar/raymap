@@ -231,8 +231,12 @@ namespace OpenSpace.Loader {
                     }
 
                     if (correctInfo != null) {
-						perso.gameObject.name = "[" + correctInfo.familyName + "] " + correctInfo.modelName + " | " + correctInfo.instanceName;
+						//perso.gameObject.name = "[" + correctInfo.familyName + "] " + correctInfo.modelName + " | " + correctInfo.instanceName;
 						//perso.gameObject.name = "[" + correctInfo.familyName + "] " + perso.gameObject.name;
+						perso._nameFamily = correctInfo.familyName;
+						perso._nameModel = correctInfo.modelName;
+						perso._nameInstance = correctInfo.instanceName;
+						perso.gameObject.name = $"[{perso.NameFamily}] {perso.NameModel} | { perso.NameInstance}";
 
 					}
                 }

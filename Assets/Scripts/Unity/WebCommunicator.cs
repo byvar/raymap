@@ -21,8 +21,8 @@ public class WebCommunicator : MonoBehaviour {
 
     public Controller controller;
     public ObjectSelector selector;
-    private PersoBehaviour highlightedPerso_;
-    private PersoBehaviour selectedPerso_;
+    private BasePersoBehaviour highlightedPerso_;
+    private BasePersoBehaviour selectedPerso_;
 	private int selectedPersoStateIndex_;
     bool sentHierarchy = false;
     string allJSON = null;
@@ -159,8 +159,8 @@ public class WebCommunicator : MonoBehaviour {
         }
         familyJSON["objectLists"] = objectLists;
         return familyJSON;
-    }
-    private JSONObject GetPersoJSON(Perso perso) {
+	}
+	private JSONObject GetPersoJSON(Perso perso) {
         JSONObject persoJSON = new JSONObject();
         PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
         persoJSON["offset"] = perso.offset.ToString();
@@ -177,7 +177,25 @@ public class WebCommunicator : MonoBehaviour {
 			persoJSON["autoNextState"] = pb.autoNextState;
         }
         return persoJSON;
-    }
+	}
+	private JSONObject GetPersoJSON(BasePersoBehaviour pb, bool includeLists = false) {
+		JSONObject persoJSON = new JSONObject();
+		persoJSON["offset"] = pb.Offset.ToString();
+		persoJSON["nameFamily"] = pb.NameFamily;
+		persoJSON["nameModel"] = pb.NameModel;
+		persoJSON["nameInstance"] = pb.NameInstance;
+		persoJSON["enabled"] = pb.IsEnabled;
+		persoJSON["state"] = pb.stateIndex;
+		persoJSON["objectList"] = pb.poListIndex;
+		persoJSON["playAnimation"] = pb.playAnimation;
+		persoJSON["animationSpeed"] = pb.animationSpeed;
+		persoJSON["autoNextState"] = pb.autoNextState;
+
+		if (includeLists) {
+			// TODO: Add states, state transitions, object lists. everything that is in family, but from PersoBehaviour instead
+		}
+		return persoJSON;
+	}
 	private JSONObject GetBrainJSON(Perso perso, bool includeScriptContents = false) {
 		JSONObject brainJSON = new JSONObject();
 		PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
@@ -376,7 +394,7 @@ public class WebCommunicator : MonoBehaviour {
         JSONObject selectionJSON = new JSONObject();
         selectionJSON["type"] = "highlight";
         if (highlightedPerso_ != null) {
-            selectionJSON["perso"] = GetPersoJSON(highlightedPerso_.perso);
+            selectionJSON["perso"] = GetPersoJSON(highlightedPerso_);
         }
         return selectionJSON;
     }

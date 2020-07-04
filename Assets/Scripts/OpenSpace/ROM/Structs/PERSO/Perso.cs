@@ -30,13 +30,14 @@ namespace OpenSpace.ROM {
 			_18 = reader.ReadUInt16();
 		}
 		public ROMPersoBehaviour GetGameObject(GameObject gao) {
-			string aiModelName = "Model_" + (brain.Value?.aiModel.Value?.IndexString ?? "null");
+			/*string aiModelName = "Model_" + (brain.Value?.aiModel.Value?.IndexString ?? "null");
 			gao.name = "[Family_" + stdGame.Value.family.Value.IndexString
 				+ "] " + aiModelName +
-				" | " + "Instance_" + IndexString + " - " + Offset;
+				" | " + "Instance_" + IndexString + " - " + Offset;*/
 			//gao.name += " - P3dData @ " + Offset;
 			ROMPersoBehaviour romPerso = gao.AddComponent<ROMPersoBehaviour>();
 			romPerso.perso = this;
+			gao.name = $"[{romPerso.NameFamily}] {romPerso.NameModel} | { romPerso.NameInstance} - {Offset}";
 			romPerso.controller = MapLoader.Loader.controller;
 			romPerso.controller.romPersos.Add(romPerso);
 			//if (camera.Value != null) Loader.print(gao.name);

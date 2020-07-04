@@ -21,14 +21,23 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 	ROMAnimationCutTable.AnimationCut[] animCuts;
 	int currentAnimCut;
     public GameObject[][] subObjects { get; private set; } = null; // [channel][ntto]
-    public AnimMorphData[,] morphDataArray;
+	public AnimMorphData[,] morphDataArray;
 	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
 	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	private Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
-	
 
-    // Use this for initialization
-    void Start() {
+	// Abstract properties
+	public override Pointer Offset => perso?.Offset;
+	public override string NameFamily => _nameFamily ?? $"Family_{perso.stdGame.Value.family.Value.IndexString}";
+	public override string NameModel => _nameModel ?? $"Model_{(perso.brain.Value?.aiModel.Value?.IndexString ?? "null")}";
+	public override string NameInstance => _nameInstance ?? $"Instance_{perso.stdGame.Value.family.Value.IndexString}";
+	public string _nameFamily { get; set; }
+	public string _nameModel { get; set; }
+	public string _nameInstance { get; set; }
+
+
+	// Use this for initialization
+	void Start() {
     }
 
     public void Init() {

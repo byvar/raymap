@@ -1,11 +1,12 @@
-﻿using System;
+﻿using OpenSpace;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class BasePersoBehaviour : MonoBehaviour {
+public abstract class BasePersoBehaviour : MonoBehaviour {
     public bool IsLoaded { get; protected set; } = false;
     public Controller controller { get; set; }
     public SectorComponent sector;
@@ -48,4 +49,10 @@ public class BasePersoBehaviour : MonoBehaviour {
             controller.UpdatePersoActive(this);
         }
     }
+
+    // Abstract properties
+    public abstract Pointer Offset { get; }
+    public abstract string NameFamily { get; }
+    public abstract string NameModel { get; }
+    public abstract string NameInstance { get; }
 }

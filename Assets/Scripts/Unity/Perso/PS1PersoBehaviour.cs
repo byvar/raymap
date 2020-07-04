@@ -30,10 +30,16 @@ public class PS1PersoBehaviour : BasePersoBehaviour {
 	private short[][] channelNTTO;
 	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	private Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
-	
 
-    // Use this for initialization
-    void Start() {
+	// Abstract properties
+	public override Pointer Offset => perso?.Offset;
+	public override string NameFamily => perso?.p3dData?.family?.name;
+	public override string NameModel => null;
+	public override string NameInstance => perso?.name;
+
+
+	// Use this for initialization
+	void Start() {
     }
 
     public void Init() {
