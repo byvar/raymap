@@ -28,7 +28,14 @@ namespace OpenSpace.ROM {
 		public GameObject GetGameObject() {
 			if (perso.Value != null) {
 				GameObject gao = new GameObject("SOD_" + IndexString + " @ " + Offset);
+
+				SuperObjectComponent soc = gao.AddComponent<SuperObjectComponent>();
+				gao.layer = LayerMask.NameToLayer("SuperObject");
+				soc.soROMDynamic = this;
+				MapLoader.Loader.controller.superObjects.Add(soc);
+
 				ROMPersoBehaviour rpb = perso.Value.GetGameObject(gao);
+				rpb.superObject = this;
 				return gao;
 			}
 			return null;

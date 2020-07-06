@@ -5,8 +5,8 @@ using UnityEngine;
 public class ObjectSelector : MonoBehaviour {
     public Controller controller;
     public CameraComponent cam;
-    public PersoBehaviour highlightedPerso = null;
-    public PersoBehaviour selectedPerso = null;
+    public BasePersoBehaviour highlightedPerso = null;
+    public BasePersoBehaviour selectedPerso = null;
 	private GameObject tooFarLimitDiamond = null;
 
     private void HandleCollision() {
@@ -22,7 +22,7 @@ public class ObjectSelector : MonoBehaviour {
 			System.Array.Sort(hits, (x, y) => (x.distance.CompareTo(y.distance)));
 			for (int i = 0; i < hits.Length; i++) {
                 // the object identified by hit.transform was clicked
-                PersoBehaviour pb = hits[i].transform.GetComponentInParent<PersoBehaviour>();
+                BasePersoBehaviour pb = hits[i].transform.GetComponentInParent<BasePersoBehaviour>();
                 if (pb != null) {
                     highlightedPerso = pb;
                     if (Input.GetMouseButtonDown(0)) {
@@ -54,7 +54,7 @@ public class ObjectSelector : MonoBehaviour {
         }*/
     }
 
-    public void Select(PersoBehaviour pb, bool view = false) {
+    public void Select(BasePersoBehaviour pb, bool view = false) {
         //print(pb.name);
         if (selectedPerso != pb || view) {
             selectedPerso = pb;
@@ -62,8 +62,8 @@ public class ObjectSelector : MonoBehaviour {
         }
     }
 
-	public void Select(SuperObject so) {
-		cam.JumpTo(so.Gao);
+	public void Select(SuperObjectComponent so) {
+		cam.JumpTo(so.gameObject);
 	}
 
     public void Deselect() {
@@ -81,10 +81,11 @@ public class ObjectSelector : MonoBehaviour {
 
 	void UpdateTooFarLimit() {
 		if (tooFarLimitDiamond == null) InitTooFarLimit();
-		if (selectedPerso != null && controller.viewCollision && selectedPerso.perso != null
-			&& selectedPerso.perso.stdGame != null && selectedPerso.perso.stdGame.tooFarLimit > 0) {
+        PersoBehaviour pb = selectedPerso == null ? null : selectedPerso as PersoBehaviour;
+		if (pb != null && controller.viewCollision && pb.perso != null
+			&& pb.perso.stdGame != null && pb.perso.stdGame.tooFarLimit > 0) {
 			if (!tooFarLimitDiamond.activeSelf) tooFarLimitDiamond.SetActive(true);
-			tooFarLimitDiamond.transform.localScale = Vector3.one * selectedPerso.perso.stdGame.tooFarLimit;
+			tooFarLimitDiamond.transform.localScale = Vector3.one * pb.perso.stdGame.tooFarLimit;
 			tooFarLimitDiamond.transform.localRotation = Quaternion.identity;
 			tooFarLimitDiamond.transform.position = selectedPerso.transform.position;
 		} else {

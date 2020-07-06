@@ -27,10 +27,10 @@ namespace OpenSpace.ROM {
 			}
 		}
 
-		public string Lookup(int index) {
+		public string Lookup(int index, int languageIndex = 1) {
 			if (languageTables == null || languageTables.Length == 0) return null;
 			if (index < 0) return null;
-			LanguageTable table = languageTables[1];
+			LanguageTable table = languageTables[languageIndex];
 			if (index >= table.num_txtTable + table.num_binaryTable) {
 				index = index - (table.num_txtTable + table.num_binaryTable);
 				table = languageTables[0]; // Common table

@@ -11,6 +11,7 @@ using CollideType = OpenSpace.Collide.CollideType;
 
 public class ROMPersoBehaviour : BasePersoBehaviour {
     public Perso perso;
+	public SuperObjectDynamic superObject;
 
     // States
     public State state { get; private set; } = null;

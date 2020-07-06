@@ -50,6 +50,9 @@ public abstract class BasePersoBehaviour : MonoBehaviour {
         }
     }
 
+    // AI
+    public BrainComponent brain;
+
     // Abstract properties
     public abstract Pointer Offset { get; }
     public abstract string NameFamily { get; }

@@ -1,4 +1,5 @@
-﻿using OpenSpace.FileFormat;
+﻿using Newtonsoft.Json;
+using OpenSpace.FileFormat;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 
 namespace OpenSpace {
+    [JsonConverter(typeof(PointerJsonConverter))]
     public class Pointer : IEquatable<Pointer> {
         public uint offset;
         public FileWithPointers file;

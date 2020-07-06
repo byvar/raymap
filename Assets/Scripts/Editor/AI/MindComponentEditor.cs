@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System;
 
 [CustomEditor(typeof(MindComponent))]
-public class MindEditor : Editor {
+public class MindComponentEditor : Editor {
 
     public override void OnInspectorGUI() {
         MindComponent c = (MindComponent)target;

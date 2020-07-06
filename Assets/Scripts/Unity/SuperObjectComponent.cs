@@ -8,7 +8,12 @@ using UnityEngine;
 
 public class SuperObjectComponent : MonoBehaviour, IReferenceable {
     public SuperObject so;
-    public uint matrixType;
+	public OpenSpace.ROM.SuperObject soROM;
+	public OpenSpace.ROM.SuperObjectDynamic soROMDynamic;
+	public OpenSpace.PS1.SuperObject soPS1;
+	public List<SuperObjectComponent> Children { get; set; } = new List<SuperObjectComponent>();
+
+	public uint matrixType;
     public string flagPreview;
 	public string drawFlagsPreview;
     public string spoOffset;
@@ -46,6 +51,31 @@ public class SuperObjectComponent : MonoBehaviour, IReferenceable {
 			} else {
 				r.gameObject.layer = LayerMask.NameToLayer("VisualNotInMirror");
 			}
+		}
+	}
+
+	public SuperObject.Type Type {
+		get {
+			if (so != null) return so.type;
+			if (soROMDynamic != null) return SuperObject.Type.Perso;
+			if (soPS1 != null) return soPS1.type;
+			if (soROM != null) {
+				if (soROM.data?.Value is OpenSpace.ROM.Sector) {
+					return SuperObject.Type.Sector;
+				} else {
+					return SuperObject.Type.IPO;
+				}
+			}
+			return SuperObject.Type.Unknown;
+		}
+	}
+	public Pointer Offset {
+		get {
+			if (so != null) return so.offset;
+			if (soROMDynamic != null) return soROMDynamic.Offset;
+			if (soPS1 != null) return soPS1.Offset;
+			if (soROM != null) return soROM.Offset;
+			return null;
 		}
 	}
 }

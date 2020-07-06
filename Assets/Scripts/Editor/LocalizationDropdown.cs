@@ -47,24 +47,6 @@ class LocalizationDropdown : AdvancedDropdown {
 			OpenSpace.ROM.LanguageTable[] langs = l.localizationROM?.languageTables;
 			if (langs != null && langs.Length > 0) {
 				int i = 0;
-				AdvancedDropdownItem misc = new AdvancedDropdownItem(langs[0].name);
-				root.AddChild(misc);
-				for (int j = 0; j < langs[0].num_txtTable; j++) {
-					misc.AddChild(new AdvancedDropdownItem(
-							i.ToString() // ID
-							+ " - "
-							+ langs[0].textTable.Value.strings[j].Value?.ToString().Replace("\n", "\\n") // Text
-						));
-					i++;
-				}
-				for (int j = 0; j < langs[0].num_binaryTable; j++) {
-					misc.AddChild(new AdvancedDropdownItem(
-							i.ToString() // ID
-							+ " - "
-							+ langs[0].binaryTable.Value.strings[j].Value?.ToString().Replace("\n", "\\n") // Text
-						));
-					i++;
-				}
 				if (langs.Length > 1) {
 					AdvancedDropdownItem lang = new AdvancedDropdownItem(langs[1].name);
 					root.AddChild(lang);
@@ -84,6 +66,24 @@ class LocalizationDropdown : AdvancedDropdown {
 							));
 						i++;
 					}
+				}
+				AdvancedDropdownItem misc = new AdvancedDropdownItem(langs[0].name);
+				root.AddChild(misc);
+				for (int j = 0; j < langs[0].num_txtTable; j++) {
+					misc.AddChild(new AdvancedDropdownItem(
+							i.ToString() // ID
+							+ " - "
+							+ langs[0].textTable.Value.strings[j].Value?.ToString().Replace("\n", "\\n") // Text
+						));
+					i++;
+				}
+				for (int j = 0; j < langs[0].num_binaryTable; j++) {
+					misc.AddChild(new AdvancedDropdownItem(
+							i.ToString() // ID
+							+ " - "
+							+ langs[0].binaryTable.Value.strings[j].Value?.ToString().Replace("\n", "\\n") // Text
+						));
+					i++;
 				}
 			}
 		}

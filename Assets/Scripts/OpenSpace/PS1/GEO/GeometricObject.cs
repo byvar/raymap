@@ -345,6 +345,12 @@ namespace OpenSpace.PS1 {
 					smr.material = vm.CreateMaterial();
 					smr.sharedMesh = m;
 				}
+				try {
+					MeshCollider mc = gao.AddComponent<MeshCollider>();
+					mc.isTrigger = false;
+					//mc.cookingOptions = MeshColliderCookingOptions.None;
+					//mc.sharedMesh = mesh;
+				} catch (Exception) { }
 			}
 			// Untextured (some skyboxes, etc)
 			if(untextured.Count > 0) {
@@ -396,7 +402,6 @@ namespace OpenSpace.PS1 {
 				m.RecalculateNormals();
 				mf.mesh = m;
 
-
 				Material baseMaterial;
 				/*if (m.colors.Any(c => c.a != 1f)) {
 					baseMaterial = Load.baseTransparentMaterial;
@@ -411,103 +416,15 @@ namespace OpenSpace.PS1 {
 				mat.SetVector("_AmbientCoef", Vector4.one);
 				mat.SetFloat("_Prelit", 1f);
 				mr.material = mat;
+
+				try {
+					MeshCollider mc = gao.AddComponent<MeshCollider>();
+					mc.isTrigger = false;
+					//mc.cookingOptions = MeshColliderCookingOptions.None;
+					//mc.sharedMesh = mesh;
+				} catch (Exception) { }
 			}
 
-			/*for (int i = 0; i < triangleLists.Length; i++) {
-				PolygonList tris = triangleLists[i];
-				GameObject gao = new GameObject(Offset.ToString() + " - " + tris.Offset + " - " + tris.type);
-				gao.transform.SetParent(parentGao.transform);
-				gao.transform.localPosition = Vector3.zero;
-				MeshFilter mf = gao.AddComponent<MeshFilter>();
-				MeshRenderer mr = gao.AddComponent<MeshRenderer>();
-				//mr.material = Load.collideMaterial;
-				Material mat = new Material(Load.baseMaterial);
-				mat.SetInt("_NumTextures", 1);
-				string textureName = "_Tex0";
-				Texture2D tex = new Texture2D(1, 1);
-				tex.SetPixel(0, 0, Color.white);
-				tex.Apply();
-				mat.SetTexture(textureName, tex);
-				mat.SetVector("_AmbientCoef", Vector4.one);
-				mat.SetFloat("_Prelit", 1f);
-				mr.material = mat;
-				//mr.material.color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f, 1f, 1f); //UnityEngine.Random.ColorHSV(
-				Mesh m = new Mesh();
-				m.vertices = vertices.Select(s => new Vector3(
-					s.x / 256f,
-					s.z / 256f,
-					s.y / 256f)).ToArray();
-				m.colors = vertices.Select(s => new Color(
-					s.r / (float)0x80,
-					s.g / (float)0x80,
-					s.b / (float)0x80,
-					1f)).ToArray();
-				m.SetUVs(0,vertices.Select(s => new Vector4(0.5f, 0.5f, 0.5f, 1f)).ToList());
-				List<int> triangles = new List<int>();
-				if (tris.type == 6) {
-					for (int j = 0; j < tris.length; j++) {
-						Quad q = tris.polygons[j] as Quad;
-						triangles.Add(q.v0);
-						triangles.Add(q.v1);
-						triangles.Add(q.v2);
-
-						triangles.Add(q.v2);
-						triangles.Add(q.v1);
-						triangles.Add(q.v3);
-					}
-				} else if (tris.type == 1) {
-					for (int j = 0; j < tris.length; j++) {
-						QuadLOD q = tris.polygons[j] as QuadLOD;
-						if (q.length > 0) {
-							for (int k = 0; k < q.quads.Length; k++) {
-								triangles.Add(q.quads[k].v0);
-								triangles.Add(q.quads[k].v1);
-								triangles.Add(q.quads[k].v2);
-
-								triangles.Add(q.quads[k].v1);
-								triangles.Add(q.quads[k].v3);
-								triangles.Add(q.quads[k].v2);
-							}
-						} else {
-							triangles.Add(q.v0);
-							triangles.Add(q.v1);
-							triangles.Add(q.v2);
-
-							triangles.Add(q.v1);
-							triangles.Add(q.v3);
-							triangles.Add(q.v2);
-						}
-					}
-				} else if (tris.type == 3) {
-					for (int j = 0; j < tris.length; j++) {
-						TriangleNoTexture t = tris.polygons[j] as TriangleNoTexture;
-						triangles.Add(t.v0);
-						triangles.Add(t.v1);
-						triangles.Add(t.v2);
-					}
-				} else if(tris.type == 4) {
-					for (int j = 0; j < tris.length; j++) {
-						QuadNoTexture q = tris.polygons[j] as QuadNoTexture;
-						triangles.Add(q.v0);
-						triangles.Add(q.v1);
-						triangles.Add(q.v2);
-
-						triangles.Add(q.v2);
-						triangles.Add(q.v1);
-						triangles.Add(q.v3);
-					}
-				} else if (tris.type == 5) {
-					for (int j = 0; j < tris.length; j++) {
-						Triangle t = tris.polygons[j] as Triangle;
-						triangles.Add(t.v0);
-						triangles.Add(t.v1);
-						triangles.Add(t.v2);
-					}
-				}
-				m.triangles = triangles.ToArray();
-				m.RecalculateNormals();
-				mf.mesh = m;
-			}*/
 			return parentGao;
 		}
 	}

@@ -11,6 +11,7 @@ using CollideType = OpenSpace.PS1.CollSet.CollideType;
 
 public class PS1PersoBehaviour : BasePersoBehaviour {
     public Perso perso;
+	public SuperObject superObject;
 
     // States
 	public State[] states;

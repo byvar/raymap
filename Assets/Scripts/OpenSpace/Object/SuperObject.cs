@@ -187,6 +187,7 @@ namespace OpenSpace.Object {
                 SuperObjectComponent soc = so.Gao.AddComponent<SuperObjectComponent>();
                 so.Gao.layer = LayerMask.NameToLayer("SuperObject");
                 soc.so = so;
+                MapLoader.Loader.controller.superObjects.Add(soc);
 
                 if (so.boundingVolume != null) {
                     if (so.boundingVolume.type == BoundingVolume.Type.Box) {
@@ -209,6 +210,17 @@ namespace OpenSpace.Object {
                     child.parent = so;
                     return child;
                 }, LinkedList.Flags.HasHeaderPointers);
+
+                if (so.Gao != null) {
+                    SuperObjectComponent soc = so.Gao.GetComponent<SuperObjectComponent>();
+                    foreach (SuperObject ch in so.children) {
+                        if (soc != null && ch.Gao != null) {
+                            SuperObjectComponent soc_ch = ch.Gao.GetComponent<SuperObjectComponent>();
+                            if (soc_ch == null) continue;
+                            soc.Children.Add(soc_ch);
+                        }
+                    }
+                }
             }
             return so;
         }

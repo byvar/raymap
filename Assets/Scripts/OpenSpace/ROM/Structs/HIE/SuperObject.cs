@@ -36,6 +36,12 @@ namespace OpenSpace.ROM {
 
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject("SO @ " + Offset + " - " + type);
+
+			SuperObjectComponent soc = gao.AddComponent<SuperObjectComponent>();
+			gao.layer = LayerMask.NameToLayer("SuperObject");
+			soc.soROM = this;
+			MapLoader.Loader.controller.superObjects.Add(soc);
+
 			if (data.Value != null) {
 				if (data.Value is PhysicalObject) {
 					PhysicalObjectComponent poc = ((PhysicalObject)data.Value).GetGameObject(gao);
@@ -48,6 +54,7 @@ namespace OpenSpace.ROM {
 					if (so.Value != null) {
 						GameObject soGao = so.Value.GetGameObject();
 						if (soGao != null) {
+							soc.Children.Add(soGao.GetComponent<SuperObjectComponent>());
 							soGao.transform.SetParent(gao.transform);
 							ROMTransform.Apply(so.Value.transform, soGao);
 						}

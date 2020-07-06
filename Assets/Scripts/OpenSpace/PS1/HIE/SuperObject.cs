@@ -125,6 +125,12 @@ namespace OpenSpace.PS1 {
 
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject(type + " @ " + Offset);
+
+			SuperObjectComponent soc = gao.AddComponent<SuperObjectComponent>();
+			gao.layer = LayerMask.NameToLayer("SuperObject");
+			soc.soPS1 = this;
+			MapLoader.Loader.controller.superObjects.Add(soc);
+
 			if (type != Type.IPO) {
 				matrix1?.Apply(gao);
 			}
@@ -162,6 +168,7 @@ namespace OpenSpace.PS1 {
 				if (dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
 				gao.name = dataIndex + " - " + gao.name;
 				PS1PersoBehaviour ps1Perso = h.persos[dataIndex].GetGameObject(gao);
+				ps1Perso.superObject = this;
 			} else if (type == Type.Sector) {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				if (dataIndex >= h.sectors.Length) throw new Exception("Sector SO data index was too high! " + h.sectors.Length + " - " + dataIndex);
@@ -173,6 +180,7 @@ namespace OpenSpace.PS1 {
 					if (so != null) {
 						GameObject soGao = so.GetGameObject();
 						if (soGao != null) {
+							soc.Children.Add(soGao.GetComponent<SuperObjectComponent>());
 							soGao.transform.SetParent(gao.transform);
 							if (so.type != Type.IPO) {
 								so.matrix1?.Apply(soGao);
