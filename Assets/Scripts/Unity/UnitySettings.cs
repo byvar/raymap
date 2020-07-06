@@ -24,6 +24,7 @@ public class UnitySettings {
 	// PS1
 	public static string Actor1Name { get; set; }
 	public static string Actor2Name { get; set; }
+	public static bool ExportPS1Files { get; set; } = false;
 
 	// Misc
 	public static string ScreenshotPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/Raymap/";
@@ -33,6 +34,7 @@ public class UnitySettings {
 	public static bool BlockyMode { get; set; }
 	public static bool UseLevelTranslation { get; set; } = true;
 	public static bool TracePointers { get; set; } = false;
+	public static bool VisualizeSectorBorders { get; set; } = false;
 
 	// Export
 	public static bool ExportText { get; set; }
@@ -75,6 +77,7 @@ public class UnitySettings {
 		// PS1
 		Actor1Name = s.SerializeString("Actor1Name", Actor1Name);
 		Actor2Name = s.SerializeString("Actor2Name", Actor2Name);
+		ExportPS1Files = s.SerializeBool("ExportPS1Files", ExportPS1Files);
 
 		// Memory loading
 		ProcessName = s.SerializeString("ProcessName", ProcessName);
@@ -95,6 +98,7 @@ public class UnitySettings {
 		SaveTextures = s.SerializeBool("SaveTextures", SaveTextures);
 		ExportText = s.SerializeBool("ExportText", ExportText);
 		UseLevelTranslation = s.SerializeBool("UseLevelTranslation", UseLevelTranslation);
+		VisualizeSectorBorders = s.SerializeBool("VisualizeSectorBorders", VisualizeSectorBorders);
 	}
 
 

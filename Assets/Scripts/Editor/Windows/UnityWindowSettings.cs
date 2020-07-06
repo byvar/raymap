@@ -143,6 +143,8 @@ public class UnityWindowSettings : UnityWindow {
 					}
 				}
 			}
+
+			UnitySettings.ExportPS1Files = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Export PS1 Files"), UnitySettings.ExportPS1Files);
 		}
 		if (fileMode != FileSystem.Mode.Web) {
 			rect = GetNextRect(ref yPos);
@@ -202,8 +204,7 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.SaveTextures = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Save Textures"), UnitySettings.SaveTextures);
 		UnitySettings.ExportText = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Export Text"), UnitySettings.ExportText);
 		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
-
-
+		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Visualize Sector Borders"), UnitySettings.UseLevelTranslation);
 
 		totalyPos = yPos;
 		GUI.EndScrollView();

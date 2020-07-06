@@ -200,5 +200,14 @@ namespace OpenSpace {
 
 			return string.Format("{0:n" + decimalPlaces + "} {1}", dValue, SizeSuffixes[i]);
 		}
+
+        /// <summary>
+        /// Returns true if all components of this vector are a floating point number that's not NaN or an infinity.
+        /// </summary>
+        /// <returns>true for vectors with valid components, false otherwise</returns>
+        public static bool IsValid(this Vector3 v)
+        {
+            return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z) || float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
+        }
     }
 }

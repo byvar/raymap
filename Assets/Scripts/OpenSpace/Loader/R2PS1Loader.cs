@@ -79,7 +79,12 @@ namespace OpenSpace.Loader {
 				SetForcedActor();
 				files_array = new FileWithPointers[0];
 				await LoadAllDataFromDAT(game);
-				//await ExtractAllFiles(game);
+
+				if (UnitySettings.ExportPS1Files)
+				{
+					await ExtractAllFiles(game);
+				}
+
 				await InitAllFiles(game);
 				await LoadLevel();
 			} finally {
