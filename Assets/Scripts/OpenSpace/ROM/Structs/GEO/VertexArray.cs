@@ -62,7 +62,7 @@ namespace OpenSpace.ROM {
 				b = reader.ReadByte();
 				a = reader.ReadByte();
 				color = new Color(r / 255f, g / 255f, b / 255f, a / 255f);
-				normal = new Vector3(r - 128, g - 128, b - 128);
+				normal = new Vector3(r - 128f, g - 128f, b - 128f);
 				normal = new Vector3(
 					normal.x < 0 ? normal.x / 128f : normal.x / 127f,
 					normal.y < 0 ? normal.y / 128f : normal.y / 127f,

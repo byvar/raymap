@@ -55,7 +55,7 @@ namespace OpenSpace.ROM.DS3D {
 					x = reader.ReadInt16();
 					y = reader.ReadInt16();
 					z = reader.ReadInt16();
-					reader.ReadInt16();
+					reader.ReadInt16(); // always 0
 					scale = 1f;
 					break;
 				case Type.VTX_XY:

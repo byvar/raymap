@@ -289,9 +289,9 @@ namespace OpenSpace.ROM.DS3D {
 								v3 = lastVertexCount + i + 1,
 							});
 							triangles.Add(new Triangle() {
-								v1 = lastVertexCount + i + 2,
-								v2 = lastVertexCount + i + 1,
-								v3 = lastVertexCount + i + 3,
+								v1 = lastVertexCount + i + 0,
+								v2 = lastVertexCount + i + 3,
+								v3 = lastVertexCount + i + 2,
 							});
 						}
 						break;

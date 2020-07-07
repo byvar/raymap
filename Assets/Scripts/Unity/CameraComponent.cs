@@ -32,16 +32,33 @@ public class CameraComponent : MonoBehaviour {
 
     public void JumpTo(GameObject gao) {
         Vector3? center = null, size = null;
-        PersoBehaviour pb = gao.GetComponent<PersoBehaviour>();
-        if (pb != null) {
-            //print(pb.perso.SuperObject.boundingVolume.Center + " - " + pb.perso.SuperObject.boundingVolume.Size);
-            center = (pb.perso.SuperObject != null && pb.perso.SuperObject.boundingVolume != null) ? (pb.transform.position + pb.perso.SuperObject.boundingVolume.Center) : pb.transform.position;
-            size = (pb.perso.SuperObject != null && pb.perso.SuperObject.boundingVolume != null) ? Vector3.Scale(pb.perso.SuperObject.boundingVolume.Size, pb.transform.lossyScale) : pb.transform.lossyScale;
+        BasePersoBehaviour bpb = gao.GetComponent<BasePersoBehaviour>();
+        if (bpb != null) {
+			switch (bpb) {
+				case PersoBehaviour pb:
+					//print(pb.perso.SuperObject.boundingVolume.Center + " - " + pb.perso.SuperObject.boundingVolume.Size);
+					center = (pb.perso.SuperObject != null && pb.perso.SuperObject.boundingVolume != null) ? (pb.transform.position + pb.perso.SuperObject.boundingVolume.Center) : pb.transform.position;
+					size = (pb.perso.SuperObject != null && pb.perso.SuperObject.boundingVolume != null) ? Vector3.Scale(pb.perso.SuperObject.boundingVolume.Size, pb.transform.lossyScale) : pb.transform.lossyScale;
+					break;
+				case ROMPersoBehaviour rpb:
+					center = rpb.transform.position;
+					size = rpb.transform.lossyScale;
+					break;
+				case PS1PersoBehaviour ppb:
+					center = ppb.transform.position;
+					size = ppb.transform.lossyScale;
+					break;
+			}
         } else {
             SuperObjectComponent sc = gao.GetComponent<SuperObjectComponent>();
             if (sc != null) {
-				center = (gao.transform.position + sc.so.boundingVolume.Center);
-				size = Vector3.Scale(sc.so.boundingVolume.Size, gao.transform.lossyScale);
+				if (sc.so != null) {
+					center = (gao.transform.position + sc.so.boundingVolume.Center);
+					size = Vector3.Scale(sc.so.boundingVolume.Size, gao.transform.lossyScale);
+				} else {
+					center = gao.transform.position;
+					size = gao.transform.lossyScale;
+				}
 			}
         }
         if (center.HasValue) {

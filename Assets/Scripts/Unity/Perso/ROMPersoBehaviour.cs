@@ -21,11 +21,17 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 	ROMShAnimation shAnim;
 	ROMAnimationCutTable.AnimationCut[] animCuts;
 	int currentAnimCut;
-    public GameObject[][] subObjects { get; private set; } = null; // [channel][ntto]
-	public AnimMorphData[,] morphDataArray;
-	private Dictionary<ushort, GameObject>[] fullMorphPOs = null;
+
+	// Arrays
+    public GameObject[][][] subObjects { get; private set; } = null; // [cut][channel][ntto]
+	public AnimMorphData[][,] morphDataArray;
+	private Dictionary<ushort, GameObject>[][] fullMorphPOs = null;
 	private Dictionary<CollideType, GameObject[]> collSetObjects = null;
 	private Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
+	public new GameObject[][] channelObjects { get; protected set; }
+	protected new int[][] currentActivePO = null;
+	protected new bool[][] channelParents = null;
+	protected new Dictionary<short, List<int>>[] channelIDDictionary;
 
 	// Abstract properties
 	public override Pointer Offset => perso?.Offset;
@@ -231,8 +237,11 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
             for (int i = 0; i < subObjects.Length; i++) {
                 if (subObjects[i] == null) continue;
                 for (int j = 0; j < subObjects[i].Length; j++) {
-					if (subObjects[i][j] != null) {
-						GameObject.Destroy(subObjects[i][j]);
+					if (subObjects[i][j] == null) continue;
+					for (int k = 0; k < subObjects[i][j].Length; k++) {
+						if (subObjects[i][j][k] != null) {
+							GameObject.Destroy(subObjects[i][j][k]);
+						}
 					}
                 }
             }
@@ -240,8 +249,11 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
         }
         if (channelObjects != null) {
             for (int i = 0; i < channelObjects.Length; i++) {
-				if (channelObjects[i] != null) {
-					Destroy(channelObjects[i]);
+				if (channelObjects[i] == null) continue;
+				for (int j = 0; j < channelObjects[i].Length; j++) {
+					if (channelObjects[i][j] != null) {
+						Destroy(channelObjects[i][j]);
+					}
 				}
             }
             channelObjects = null;
@@ -249,15 +261,25 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 		if (fullMorphPOs != null) {
 			for (int i = 0; i < fullMorphPOs.Length; i++) {
 				if (fullMorphPOs[i] != null) {
-					foreach (GameObject po in fullMorphPOs[i].Values) {
-						GameObject.Destroy(po);
+					for (int j = 0; j < fullMorphPOs[i].Length; j++) {
+						if (fullMorphPOs[i][j] != null) {
+							foreach (GameObject po in fullMorphPOs[i][j].Values) {
+								GameObject.Destroy(po);
+							}
+							fullMorphPOs[i][j].Clear();
+						}
 					}
-					fullMorphPOs[i].Clear();
 				}
 			}
 			fullMorphPOs = null;
 		}
-        channelIDDictionary.Clear();
+		if (channelIDDictionary != null) {
+			for (int i = 0; i < channelIDDictionary.Length; i++) {
+				if (channelIDDictionary[i] == null) continue;
+				channelIDDictionary[i].Clear();
+			}
+			channelIDDictionary = null;
+		}
 		objectIndexScales.Clear();
     }
 
@@ -278,26 +300,28 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 	void SwitchAnimationCut(int newAnimCut) {
 		if (currentAnimCut != newAnimCut || forceAnimUpdate) {
 			forceAnimUpdate = false;
-			DeinitAnimation();
 			// Init animation
 			this.currentAnimCut = newAnimCut;
 
 			ROMAnimation anim = ROMStruct.Loader.romAnims[animCuts[currentAnimCut].index];
-			if (anim != null) {
+			bool newCut = subObjects[currentAnimCut] == null;
+			if (anim != null && newCut) {
 				//animationSpeed = a3d.speed;
 				// Init channels & subobjects
-				subObjects = new GameObject[anim.a3d.num_channels][];
-				channelObjects = new GameObject[anim.a3d.num_channels];
-				if (anim.a3d.num_morphData > 0) fullMorphPOs = new Dictionary<ushort, GameObject>[anim.a3d.num_channels];
-				currentActivePO = new int[anim.a3d.num_channels];
-				channelParents = new bool[anim.a3d.num_channels];
+				channelObjects[currentAnimCut] = new GameObject[anim.a3d.num_channels];
+				currentActivePO[currentAnimCut] = new int[anim.a3d.num_channels];
+				channelParents[currentAnimCut] = new bool[anim.a3d.num_channels];
+				subObjects[currentAnimCut] = new GameObject[anim.a3d.num_channels][];
+				if (anim.a3d.num_morphData > 0) fullMorphPOs[currentAnimCut] = new Dictionary<ushort, GameObject>[anim.a3d.num_channels];
 				for (int i = 0; i < anim.a3d.num_channels; i++) {
 					short id = anim.channels[i].id;
-					channelObjects[i] = new GameObject("Channel " + id);
-					channelObjects[i].transform.SetParent(transform);
-					currentActivePO[i] = -1;
+					channelObjects[currentAnimCut][i] = new GameObject($"[Cut {currentAnimCut}] Channel {id}");
+					channelObjects[currentAnimCut][i].transform.SetParent(transform);
+					currentActivePO[currentAnimCut][i] = -1;
 					AddChannelID(id, i);
-					subObjects[i] = new GameObject[anim.a3d.num_NTTO];
+					if (newCut) {
+						subObjects[currentAnimCut][i] = new GameObject[anim.a3d.num_NTTO];
+					}
 					AnimChannel ch = anim.channels[i];
 					List<ushort> listOfNTTOforChannel = new List<ushort>();
 					for (int j = 0; j < anim.onlyFrames.Length; j++) {
@@ -308,30 +332,32 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 							listOfNTTOforChannel.Add(numOfNTTO.numOfNTTO);
 						}
 					}
-					for (int k = 0; k < listOfNTTOforChannel.Count; k++) {
-						int j = listOfNTTOforChannel[k];
-						AnimNTTO ntto = anim.ntto[j];
-						if (ntto.IsInvisibleNTTO) {
-							subObjects[i][j] = new GameObject();
-							subObjects[i][j].transform.parent = channelObjects[i].transform;
-							subObjects[i][j].name = "[" + j + "] Invisible NTTO";
-							subObjects[i][j].SetActive(false);
-						} else {
-							if (perso.p3dData.Value.objectsTable.Value != null
-								&& perso.p3dData.Value.objectsTable.Value.length > ntto.object_index) {
-								ObjectsTableData.Entry entry = perso.p3dData.Value.objectsTable.Value.data.Value.entries[ntto.object_index];
-								PhysicalObject o = entry.obj.Value;
-								if (o != null) {
-									//if (o.visualSetType == 1) print(name);
-									GameObject c = o.GetGameObject().gameObject;
-									subObjects[i][j] = c;
-									if (entry.scale.HasValue) {
-										objectIndexScales[ntto.object_index] = new Vector3(entry.scale.Value.x, entry.scale.Value.z, entry.scale.Value.y);
-										subObjects[i][j].transform.localScale = objectIndexScales[ntto.object_index];
+					if (newCut) {
+						for (int k = 0; k < listOfNTTOforChannel.Count; k++) {
+							int j = listOfNTTOforChannel[k];
+							AnimNTTO ntto = anim.ntto[j];
+							if (ntto.IsInvisibleNTTO) {
+								subObjects[currentAnimCut][i][j] = new GameObject();
+								subObjects[currentAnimCut][i][j].transform.parent = channelObjects[currentAnimCut][i].transform;
+								subObjects[currentAnimCut][i][j].name = "[" + j + "] Invisible NTTO";
+								subObjects[currentAnimCut][i][j].SetActive(false);
+							} else {
+								if (perso.p3dData.Value.objectsTable.Value != null
+									&& perso.p3dData.Value.objectsTable.Value.length > ntto.object_index) {
+									ObjectsTableData.Entry entry = perso.p3dData.Value.objectsTable.Value.data.Value.entries[ntto.object_index];
+									PhysicalObject o = entry.obj.Value;
+									if (o != null) {
+										//if (o.visualSetType == 1) print(name);
+										GameObject c = o.GetGameObject().gameObject;
+										subObjects[currentAnimCut][i][j] = c;
+										if (entry.scale.HasValue) {
+											objectIndexScales[ntto.object_index] = new Vector3(entry.scale.Value.x, entry.scale.Value.z, entry.scale.Value.y);
+											subObjects[currentAnimCut][i][j].transform.localScale = objectIndexScales[ntto.object_index];
+										}
+										c.transform.parent = channelObjects[currentAnimCut][i].transform;
+										c.name = "[" + j + "] " + c.name;
+										c.SetActive(false);
 									}
-									c.transform.parent = channelObjects[i].transform;
-									c.name = "[" + j + "] " + c.name;
-									c.SetActive(false);
 								}
 							}
 						}
@@ -340,7 +366,7 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 
 
 				if (anim.a3d.num_morphData > 0 && anim.morphData != null) {
-					morphDataArray = new AnimMorphData[anim.channels.Length, anim.onlyFrames.Length];
+					morphDataArray[currentAnimCut] = new AnimMorphData[anim.channels.Length, anim.onlyFrames.Length];
 					// Iterate over morph data to find the correct channel and keyframe
 					for (int i = 0; i < anim.a3d.num_morphData; i++) {
 						AnimMorphData m = anim.morphData[i];
@@ -348,26 +374,26 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 							/*print("F:" + a3d.num_onlyFrames + " - C:" + a3d.num_channels + " - CF" + (a3d.num_onlyFrames * a3d.num_channels) + " - " +
 								m.channel + " - " + m.frame + " - " + m.morphProgress + " - " + m.objectIndexTo + " - " + m.byte5 + " - " + m.byte6 + " - " + m.byte7);*/
 							int channelIndex = this.GetChannelByID(m.channel)[0];
-							if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
-								morphDataArray[channelIndex, m.frame] = m;
+							if (channelIndex < morphDataArray[currentAnimCut].GetLength(0) && m.frame < morphDataArray[currentAnimCut].GetLength(1)) {
+								morphDataArray[currentAnimCut][channelIndex, m.frame] = m;
 								if (m.morphProgress == 100 && perso.p3dData.Value.objectsTable.Value != null
 								&& perso.p3dData.Value.objectsTable.Value.length > m.objectIndexTo) {
 
-									if (fullMorphPOs[channelIndex] == null) fullMorphPOs[channelIndex] = new Dictionary<ushort, GameObject>();
-									if (!fullMorphPOs[channelIndex].ContainsKey(m.objectIndexTo)) {
+									if (fullMorphPOs[currentAnimCut][channelIndex] == null) fullMorphPOs[currentAnimCut][channelIndex] = new Dictionary<ushort, GameObject>();
+									if (!fullMorphPOs[currentAnimCut][channelIndex].ContainsKey(m.objectIndexTo)) {
 										ObjectsTableData.Entry entry = perso.p3dData.Value.objectsTable.Value.data.Value.entries[m.objectIndexTo];
 										PhysicalObject o = entry.obj.Value;
 										if (o != null) {
 											//if (o.visualSetType == 1) print(name);
 											GameObject c = o.GetGameObject().gameObject;
-											fullMorphPOs[channelIndex][m.objectIndexTo] = c;
+											fullMorphPOs[currentAnimCut][channelIndex][m.objectIndexTo] = c;
 											if (entry.scale.HasValue) {
 												objectIndexScales[m.objectIndexTo] = new Vector3(entry.scale.Value.x, entry.scale.Value.z, entry.scale.Value.y);
 												c.transform.localScale = objectIndexScales[m.objectIndexTo];
 											}
 											/*subObjects[i][j].transform.localScale =
 												subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;*/
-											c.transform.parent = channelObjects[channelIndex].transform;
+											c.transform.parent = channelObjects[currentAnimCut][channelIndex].transform;
 											c.name = "[Morph] " + c.name;
 											c.SetActive(false);
 										}
@@ -385,6 +411,21 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, OpenSpace.Visual.LightInfo.ObjectLightedFlag.Perso);
 				} else {
 					controller.sectorManager.ApplySectorLighting(sector, gameObject, OpenSpace.Visual.LightInfo.ObjectLightedFlag.None);
+				}
+			}
+			if (channelObjects != null) {
+				for (int i = 0; i < animCuts.Length; i++) {
+					if (channelObjects[i] != null) {
+						if (currentAnimCut == i) {
+							foreach (GameObject g in channelObjects[i]) {
+								g.SetActive(true);
+							}
+						} else {
+							foreach (GameObject g in channelObjects[i]) {
+								g.SetActive(false);
+							}
+						}
+					}
 				}
 			}
 			IsLoaded = true;
@@ -405,18 +446,33 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 				animCuts = ROMStruct.Loader.cutTable.GetAnimationChain(shAnimIndex);
 				//print(animCuts.Length);
 				forceAnimUpdate = true;
+				InitAnimationCuts();
 				SwitchAnimationCut(0);
 			}
 		}
 	}
 
+	private void InitAnimationCuts() {
+		int cuts = animCuts.Length;
+		channelObjects = new GameObject[cuts][];
+		subObjects = new GameObject[cuts][][];
+		fullMorphPOs = new Dictionary<ushort, GameObject>[cuts][];
+		morphDataArray = new AnimMorphData[cuts][,];
+		channelParents = new bool[cuts][];
+		channelIDDictionary = new Dictionary<short, List<int>>[cuts];
+		currentActivePO = new int[cuts][];
+		for (int i = 0; i < cuts; i++) {
+			channelIDDictionary[i] = new Dictionary<short, List<int>>();
+		}
+}
+
 	public void UpdateAnimation() {
-		if (IsLoaded && shAnim != null && animCuts != null && animCuts.Length > 0 && channelObjects != null & subObjects != null) {
+		if (IsLoaded && shAnim != null && animCuts != null && animCuts.Length > 0 && channelObjects != null && subObjects != null) {
 			if (currentFrame >= shAnim.num_frames) currentFrame %= shAnim.num_frames;
 			UpdateAnimationCut();
 			// First pass: reset TRS for all sub objects
-			for (int i = 0; i < channelParents.Length; i++) {
-				channelParents[i] = false;
+			for (int i = 0; i < channelParents[currentAnimCut].Length; i++) {
+				channelParents[currentAnimCut][i] = false;
 			}
 			ROMAnimation anim = ROMStruct.Loader.romAnims[animCuts[currentAnimCut].index];
 			uint currentRelativeFrame = currentFrame - anim.a3d.this_start_onlyFrames;
@@ -426,15 +482,15 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 				i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
 				AnimHierarchy h = anim.hierarchies[i];
 
-				if (!channelIDDictionary.ContainsKey(h.childChannelID) || !channelIDDictionary.ContainsKey(h.parentChannelID)) {
+				if (!channelIDDictionary[currentAnimCut].ContainsKey(h.childChannelID) || !channelIDDictionary[currentAnimCut].ContainsKey(h.parentChannelID)) {
 					continue;
 				}
 				List<int> ch_child_list = GetChannelByID(h.childChannelID);
 				List<int> ch_parent_list = GetChannelByID(h.parentChannelID);
 				foreach (int ch_child in ch_child_list) {
 					foreach (int ch_parent in ch_parent_list) {
-						channelObjects[ch_child].transform.SetParent(channelObjects[ch_parent].transform);
-						channelParents[ch_child] = true;
+						channelObjects[currentAnimCut][ch_child].transform.SetParent(channelObjects[currentAnimCut][ch_parent].transform);
+						channelParents[currentAnimCut][ch_child] = true;
 					}
 				}
 
@@ -467,7 +523,7 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 				if (numOfNTTO.numOfNTTO != 0xFFFF) {
 					poNum = numOfNTTO.numOfNTTO;
 					ntto = anim.ntto[poNum];
-					physicalObject = subObjects[i][poNum];
+					physicalObject = subObjects[currentAnimCut][i][poNum];
 				}
 				Vector3 vector = pos.vector;
 				Quaternion quaternion = qua.quaternion;
@@ -506,25 +562,29 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 				scale = Vector3.Lerp(scl.vector, scl2.vector, interpolation);
 				//float positionMultiplier = Mathf.Lerp(kf.positionMultiplier, nextKF.positionMultiplier, interpolation);
 
-				if (poNum != currentActivePO[i]) {
-					if (currentActivePO[i] == -2 && fullMorphPOs != null && fullMorphPOs[i] != null) {
-						foreach (GameObject morphPO in fullMorphPOs[i].Values) {
+				if (poNum != currentActivePO[currentAnimCut][i]) {
+					if (currentActivePO[currentAnimCut][i] == -2 && fullMorphPOs[currentAnimCut] != null && fullMorphPOs[currentAnimCut][i] != null) {
+						foreach (GameObject morphPO in fullMorphPOs[currentAnimCut][i].Values) {
 							if (morphPO.activeSelf) morphPO.SetActive(false);
 						}
 					}
-					if (currentActivePO[i] >= 0 && subObjects[i][currentActivePO[i]] != null) {
-						subObjects[i][currentActivePO[i]].SetActive(false);
+					if (currentActivePO[currentAnimCut][i] >= 0 && subObjects[currentAnimCut][i][currentActivePO[currentAnimCut][i]] != null) {
+						subObjects[currentAnimCut][i][currentActivePO[currentAnimCut][i]].SetActive(false);
 					}
-					currentActivePO[i] = poNum;
+					currentActivePO[currentAnimCut][i] = poNum;
 					if (physicalObject != null) physicalObject.SetActive(true);
 				}
-				if (!channelParents[i]) channelObjects[i].transform.SetParent(transform);
-				channelObjects[i].transform.localPosition = vector;// * positionMultiplier;
-				channelObjects[i].transform.localRotation = quaternion;
-				channelObjects[i].transform.localScale = scale;
+				if (!channelParents[currentAnimCut][i]) channelObjects[currentAnimCut][i].transform.SetParent(transform);
+				channelObjects[currentAnimCut][i].transform.localPosition = vector;// * positionMultiplier;
+				channelObjects[currentAnimCut][i].transform.localRotation = quaternion;
+				channelObjects[currentAnimCut][i].transform.localScale = scale;
 
-				if (physicalObject != null && anim.a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentRelativeFrame < morphDataArray.GetLength(1)) {
-					AnimMorphData morphData = morphDataArray[i, currentRelativeFrame];
+				if (physicalObject != null
+					&& anim.a3d.num_morphData > 0 
+					&& morphDataArray[currentAnimCut] != null 
+					&& i < morphDataArray[currentAnimCut].GetLength(0) 
+					&& currentRelativeFrame < morphDataArray[currentAnimCut].GetLength(1)) {
+					AnimMorphData morphData = morphDataArray[currentAnimCut][i, currentRelativeFrame];
 					GeometricObject ogPO = perso.p3dData.Value.objectsTable.Value.data.Value.entries[anim.ntto[poNum].object_index].obj.Value.visual.Value;
 					if (morphData != null && morphData.morphProgress != 0 && morphData.morphProgress != 100) {
 						//print("morphing " + physicalObject.name);
@@ -532,12 +592,12 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 						ogPO.MorphVertices(physicalObject, morphToPO, morphData.morphProgress / 100f);
 					} else if (morphData != null && morphData.morphProgress == 100) {
 						physicalObject.SetActive(false);
-						GameObject c = fullMorphPOs[i][morphData.objectIndexTo];
+						GameObject c = fullMorphPOs[currentAnimCut][i][morphData.objectIndexTo];
 						c.transform.localScale = objectIndexScales.ContainsKey(morphData.objectIndexTo) ? objectIndexScales[morphData.objectIndexTo] : Vector3.one;
 						c.transform.localPosition = Vector3.zero;
 						c.transform.localRotation = Quaternion.identity;
 						c.SetActive(true);
-						currentActivePO[i] = -2;
+						currentActivePO[currentAnimCut][i] = -2;
 					} else {
 						ogPO.ResetMorph(physicalObject);
 					}
@@ -547,17 +607,17 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
     }
 
 	List<int> GetChannelByID(short id) {
-        if (channelIDDictionary.ContainsKey(id)) {
-            return channelIDDictionary[id];
+        if (channelIDDictionary[currentAnimCut].ContainsKey(id)) {
+            return channelIDDictionary[currentAnimCut][id];
         } else return new List<int>();
     }
 
     void AddChannelID(short id, int index) {
         // Apparently there can be multiple channels with the ID -1, so this requires a list
-        if (!channelIDDictionary.ContainsKey(id) || channelIDDictionary[id] == null) {
-            channelIDDictionary[id] = new List<int>();
+        if (!channelIDDictionary[currentAnimCut].ContainsKey(id) || channelIDDictionary[currentAnimCut][id] == null) {
+            channelIDDictionary[currentAnimCut][id] = new List<int>();
         }
-        channelIDDictionary[id].Add(index);
+        channelIDDictionary[currentAnimCut][id].Add(index);
     }
 
     void GotoAutoNextState() {
