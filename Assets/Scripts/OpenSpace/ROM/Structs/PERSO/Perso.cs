@@ -10,7 +10,7 @@ namespace OpenSpace.ROM {
 		public Reference<CameraInfo> camera;
 		public Reference<CollSet> collset;
 		public ushort _8;
-		public ushort _10;
+		public Reference<PersoMatrixAndVector> matrixAndVector;
 		public Reference<StdGame> stdGame;
 		public ushort _14;
 		public ushort _16;
@@ -23,7 +23,7 @@ namespace OpenSpace.ROM {
 			camera = new Reference<CameraInfo>(reader, true);
 			collset = new Reference<CollSet>(reader, true);
 			_8 = reader.ReadUInt16();
-			_10 = reader.ReadUInt16();
+			matrixAndVector = new Reference<PersoMatrixAndVector>(reader, true);
 			stdGame = new Reference<StdGame>(reader, true);
 			_14 = reader.ReadUInt16();
 			_16 = reader.ReadUInt16();
@@ -41,6 +41,7 @@ namespace OpenSpace.ROM {
 			romPerso.controller = MapLoader.Loader.controller;
 			romPerso.controller.romPersos.Add(romPerso);
 			//if (camera.Value != null) Loader.print(gao.name);
+
 			return romPerso;
 		}
 	}

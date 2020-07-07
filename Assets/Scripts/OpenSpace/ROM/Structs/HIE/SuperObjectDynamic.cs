@@ -20,7 +20,6 @@ namespace OpenSpace.ROM {
 			unkByte = reader.ReadUInt16();
 			unk = reader.ReadUInt32();
 
-
 			transform = new ROMTransform(transformIndex);
 			perso.Resolve(reader);
 		}

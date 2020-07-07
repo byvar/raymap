@@ -197,23 +197,6 @@ namespace OpenSpace.PS1 {
 				gao.transform.SetParent(parentGao.transform);
 				gao.layer = LayerMask.NameToLayer("Visual");
 				gao.transform.localPosition = Vector3.zero;
-				MeshFilter mf = gao.AddComponent<MeshFilter>();
-				gao.AddComponent<ExportableModel>();
-				MeshRenderer mr = null;
-				SkinnedMeshRenderer smr = null;
-				Matrix4x4[] bindPoses = null;
-				if (bones == null || bones.Length <= 0) {
-					mr = gao.AddComponent<MeshRenderer>();
-				} else {
-					smr = gao.AddComponent<SkinnedMeshRenderer>();
-					//smr = (SkinnedMeshRenderer)mr;
-					smr.bones = boneGaos.Select(bo => bo.transform).ToArray();
-					bindPoses = new Matrix4x4[smr.bones.Length];
-					for (int bi = 0; bi < smr.bones.Length; bi++) {
-						bindPoses[bi] = smr.bones[bi].worldToLocalMatrix * parentGao.transform.localToWorldMatrix;
-					}
-					smr.rootBone = smr.bones[0];
-				}
 				
 				List<int> vertIndices = new List<int>();
 				List<int> triIndices = new List<int>();
@@ -285,7 +268,10 @@ namespace OpenSpace.PS1 {
                             scale_x = ((float)s.height / 256f) / 2.0f;
                             scale_y = ((float)s.width / 256f) / 2.0f;
 
-                            vertices[0] = new Vector3(0, -scale_y, -scale_x);
+							BoxCollider bc = spr_gao.AddComponent<BoxCollider>();
+							bc.size = new Vector3(0, scale_y * 2, scale_x * 2);
+
+							vertices[0] = new Vector3(0, -scale_y, -scale_x);
                             vertices[1] = new Vector3(0, -scale_y, scale_x);
                             vertices[2] = new Vector3(0, scale_y, -scale_x);
                             vertices[3] = new Vector3(0, scale_y, scale_x);
@@ -327,30 +313,50 @@ namespace OpenSpace.PS1 {
 						}
 					}
 				}
-				Mesh m = new Mesh();
-				m.vertices = vertIndices.Select(vi => mainVertices[vi]).ToArray();
-				m.colors = vertIndices.Select(vi => mainColors[vi]).ToArray();
-				m.SetUVs(0, uvs.Select(s => new Vector4(s.x, s.y, alpha, 0f)).ToList());
-				m.triangles = triIndices.ToArray();
-				m.RecalculateNormals();
-				if (w != null) {
-					m.boneWeights = w;
-					m.bindposes = bindPoses;
-				}
-				mf.mesh = m;
+				if (vertIndices.Any()) {
+					MeshFilter mf = gao.AddComponent<MeshFilter>();
+					gao.AddComponent<ExportableModel>();
+					MeshRenderer mr = null;
+					SkinnedMeshRenderer smr = null;
+					Matrix4x4[] bindPoses = null;
+					if (bones == null || bones.Length <= 0) {
+						mr = gao.AddComponent<MeshRenderer>();
+					} else {
+						smr = gao.AddComponent<SkinnedMeshRenderer>();
+						//smr = (SkinnedMeshRenderer)mr;
+						smr.bones = boneGaos.Select(bo => bo.transform).ToArray();
+						bindPoses = new Matrix4x4[smr.bones.Length];
+						for (int bi = 0; bi < smr.bones.Length; bi++) {
+							bindPoses[bi] = smr.bones[bi].worldToLocalMatrix * parentGao.transform.localToWorldMatrix;
+						}
+						smr.rootBone = smr.bones[0];
+					}
 
-				if (mr != null) {
-					mr.material = vm.CreateMaterial();
-				} else if (smr != null) {
-					smr.material = vm.CreateMaterial();
-					smr.sharedMesh = m;
+					Mesh m = new Mesh();
+					m.vertices = vertIndices.Select(vi => mainVertices[vi]).ToArray();
+					m.colors = vertIndices.Select(vi => mainColors[vi]).ToArray();
+					m.SetUVs(0, uvs.Select(s => new Vector4(s.x, s.y, alpha, 0f)).ToList());
+					m.triangles = triIndices.ToArray();
+					m.RecalculateNormals();
+					if (w != null) {
+						m.boneWeights = w;
+						m.bindposes = bindPoses;
+					}
+					mf.mesh = m;
+
+					if (mr != null) {
+						mr.material = vm.CreateMaterial();
+					} else if (smr != null) {
+						smr.material = vm.CreateMaterial();
+						smr.sharedMesh = m;
+					}
+					try {
+						MeshCollider mc = gao.AddComponent<MeshCollider>();
+						mc.isTrigger = false;
+						//mc.cookingOptions = MeshColliderCookingOptions.None;
+						//mc.sharedMesh = mesh;
+					} catch (Exception) { }
 				}
-				try {
-					MeshCollider mc = gao.AddComponent<MeshCollider>();
-					mc.isTrigger = false;
-					//mc.cookingOptions = MeshColliderCookingOptions.None;
-					//mc.sharedMesh = mesh;
-				} catch (Exception) { }
 			}
 			// Untextured (some skyboxes, etc)
 			if(untextured.Count > 0) {

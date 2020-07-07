@@ -82,6 +82,7 @@ namespace OpenSpace.ROM {
             { 66, Type.Brain },
 			{ 67, Type.Camera },
 			{ 68, Type.CollSet },
+			{ 70, Type.PersoMatrixAndVector },
 			{ 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
 			{ 76, Type.DsgVarInfo },
@@ -190,6 +191,7 @@ namespace OpenSpace.ROM {
             { 66, Type.Brain },
 			{ 67, Type.Camera },
 			{ 68, Type.CollSet },
+			{ 70, Type.PersoMatrixAndVector },
 			{ 71, Type.StdGame },
 			{ 75, Type.ObjectsTableData },
 			{ 76, Type.DsgVarInfo },
@@ -297,6 +299,7 @@ namespace OpenSpace.ROM {
             { 62, Type.Brain },
 			{ 63, Type.Camera },
 			{ 64, Type.CollSet },
+			{ 66, Type.PersoMatrixAndVector },
 			{ 67, Type.StdGame },
 			{ 71, Type.ObjectsTableData },
 			{ 72, Type.DsgVarInfo },
@@ -458,6 +461,7 @@ namespace OpenSpace.ROM {
 			DsgMemInfoArray,
 			PersosInFixList,
 			Camera,
+			PersoMatrixAndVector,
 		}
 
 		public static Dictionary<System.Type, Type> types = new Dictionary<System.Type, Type>() {
@@ -567,6 +571,7 @@ namespace OpenSpace.ROM {
 			{ typeof(PersoArray), Type.SectorSuperObjectArray1_and_PersoArray },
 			{ typeof(PersosInFixList), Type.PersosInFixList },
 			{ typeof(CameraInfo), Type.Camera },
+			{ typeof(PersoMatrixAndVector), Type.PersoMatrixAndVector },
 		};
 
 		public Type EntryType {
