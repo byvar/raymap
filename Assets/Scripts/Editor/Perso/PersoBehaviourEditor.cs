@@ -106,21 +106,18 @@ public class PersoBehaviourEditor : Editor {
 		PersoBehaviour pb = (PersoBehaviour)target;
 		List<StateTransitionsTreeElement> tr = new List<StateTransitionsTreeElement>();
 		tr.Add(new StateTransitionsTreeElement("Hidden root", -1, -1));
-		if (pb.state != null && pb.state.stateTransitions != null && pb.state.stateTransitions.Count > 0) {
+		BasePersoBehaviour.StateTransition[] transitions = pb.GetStateTransitions(pb.currentState);
+		if (transitions != null) {
 			int id = 0;
-			foreach (State.Transition t in pb.state.stateTransitions) {
-				if (t != null && t.off_targetState != null && t.off_stateToGo != null) {
-					State stateToGo = State.FromOffset(t.off_stateToGo);
-					State targetState = State.FromOffset(t.off_targetState);
-					tr.Add(new StateTransitionsTreeElement("State transition " + targetState.ToString(), 0, id) {
-						stateToGoName = stateToGo.ToString(),
-						stateToGoIndex = stateToGo.index,
-						targetStateName = targetState.ToString(),
-						targetStateIndex = targetState.index,
-						linkingType = t.linkingType
-					});
-					id++;
-				}
+			foreach (var t in transitions) {
+				tr.Add(new StateTransitionsTreeElement("State transition " + t.TargetStateName, 0, id) {
+					stateToGoName = t.StateToGoName,
+					stateToGoIndex = t.StateToGoIndex,
+					targetStateName = t.TargetStateName,
+					targetStateIndex = t.TargetStateIndex,
+					linkingType = t.LinkingType
+				});
+				id++;
 			}
 		}
 		return tr;

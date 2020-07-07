@@ -69,9 +69,19 @@ public class WebJSON {
 		public bool? AutoNextState { get; set; }
 
 		// Extra lists
-		public string[] States { get; set; }
+		public State[] States { get; set; }
 		public string[] ObjectLists { get; set; }
 		public Brain Brain { get; set; }
+	}
+	public class State {
+		public string Name { get; set; }
+		public Transition[] Transitions { get; set; }
+
+		public class Transition {
+			public int StateToGo { get; set; }
+			public int TargetState { get; set; }
+			public int LinkingType { get; set; }
+		}
 	}
 	public class Brain {
 		public Comport[] Intelligence { get; set; }
@@ -137,6 +147,10 @@ public class WebJSON {
 		public WayPoint AsWayPoint { get; set; }
 		public Graph AsGraph { get; set; }
 		public DsgVarValue[] AsArray { get; set; }
+		public DsgState AsAction { get; set; }
+	}
+	public class DsgState {
+		public string Name { get; set; }
 	}
 	public class WayPoint {
 		public string Name { get; set; }

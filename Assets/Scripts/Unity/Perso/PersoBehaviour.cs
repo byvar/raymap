@@ -1231,4 +1231,27 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
             }
         }
     }
+
+	public override StateTransition[] GetStateTransitions(int index) {
+		if (index < 0 || index >= perso?.p3dData?.family?.states?.Count) return null;
+		State state = perso.p3dData.family.states[index];
+		if (state != null && state.stateTransitions != null && state.stateTransitions.Count > 0) {
+			List<StateTransition> tr = new List<StateTransition>();
+			foreach (State.Transition t in state.stateTransitions) {
+				if (t != null && t.off_targetState != null && t.off_stateToGo != null) {
+					State stateToGo = State.FromOffset(t.off_stateToGo);
+					State targetState = State.FromOffset(t.off_targetState);
+					tr.Add(new StateTransition() {
+						StateToGoName = stateToGo.ToString(),
+						StateToGoIndex = stateToGo.index,
+						TargetStateName = targetState.ToString(),
+						TargetStateIndex = targetState.index,
+						LinkingType = t.linkingType
+					});
+				}
+			}
+			return tr.ToArray();
+		}
+		return null;
+	}
 }

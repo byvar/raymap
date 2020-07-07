@@ -697,4 +697,29 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
         }
     }
 
+	public override StateTransition[] GetStateTransitions(int index) {
+		State[] states = perso?.stdGame?.Value?.family?.Value?.states?.Value?.states?.Value?.states?.Select(s => s.Value).ToArray();
+		//stateNames = states.Select(s => (s.Value == null ? "Null" : "State " + s.Value.Index)).ToArray();
+		if (index < 0 || index >= states.Length) return null; ;
+		State state = states[index];
+		if (state != null && state.transitions.Value != null && state.transitions.Value.length > 0) {
+			List<StateTransition> tr = new List<StateTransition>();
+			int id = 0;
+			foreach (StateTransitionArray.StateTransition t in state.transitions.Value.transitions) {
+				State stateToGo = t.stateToGo.Value;
+				State targetState = t.targetState.Value;
+				if (stateToGo == null || targetState == null) continue;
+				tr.Add(new StateTransition() {
+					StateToGoName = stateToGo.ToString(),
+					StateToGoIndex = Array.IndexOf(states, stateToGo),
+					TargetStateName = targetState.ToString(),
+					TargetStateIndex = Array.IndexOf(states, targetState),
+					LinkingType = t.linkingType
+				});
+				id++;
+			}
+			return tr.ToArray();
+		}
+		return null;
+	}
 }

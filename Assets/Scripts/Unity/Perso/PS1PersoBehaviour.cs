@@ -821,4 +821,34 @@ public class PS1PersoBehaviour : BasePersoBehaviour {
             }
         }
     }
+
+
+	public override StateTransition[] GetStateTransitions(int index) {
+		if (index < 1 || index >= 1 + states.Length) return null;
+		State state = states[index - 1];
+		if (state != null && state.transitions != null && state.transitions.Length > 0) {
+			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
+			PointerList<State> statePtrs = l.GetStates(perso.p3dData);
+			State[] states = statePtrs.pointers.Select(s => s.Value).ToArray();
+			List<StateTransition> tr = new List<StateTransition>();
+			foreach (OpenSpace.PS1.StateTransition t in state.transitions) {
+				State stateToGo = t.stateToGo.Value;
+				State targetState = t.targetState.Value;
+				if (stateToGo == null || targetState == null) continue;
+				string targetStateName = GetStateName(targetState);
+				string stateToGoName = GetStateName(stateToGo);
+				if (targetStateName != null && stateToGoName != null) {
+					tr.Add(new StateTransition() {
+						StateToGoName = stateToGoName,
+						StateToGoIndex = GetStateIndex(stateToGo),
+						TargetStateName = targetStateName,
+						TargetStateIndex = GetStateIndex(targetState),
+						LinkingType = 0
+					});
+				}
+			}
+			return tr.ToArray();
+		}
+		return null;
+	}
 }

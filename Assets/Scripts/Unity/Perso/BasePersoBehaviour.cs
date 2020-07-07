@@ -58,4 +58,13 @@ public abstract class BasePersoBehaviour : MonoBehaviour {
     public abstract string NameFamily { get; }
     public abstract string NameModel { get; }
     public abstract string NameInstance { get; }
+    public abstract StateTransition[] GetStateTransitions(int stateIndex);
+
+    public class StateTransition {
+        public string StateToGoName { get; set; }
+        public int StateToGoIndex { get; set; }
+        public string TargetStateName { get; set; }
+        public int TargetStateIndex { get; set; }
+        public int LinkingType { get; set; }
+    }
 }

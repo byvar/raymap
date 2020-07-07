@@ -77,19 +77,16 @@ public class ROMPersoBehaviourEditor : Editor {
 		ROMPersoBehaviour pb = (ROMPersoBehaviour)target;
 		List<StateTransitionsTreeElement> tr = new List<StateTransitionsTreeElement>();
 		tr.Add(new StateTransitionsTreeElement("Hidden root", -1, -1));
-		if (pb.state != null && pb.state.transitions.Value != null && pb.state.transitions.Value.length > 0) {
+		BasePersoBehaviour.StateTransition[] transitions = pb.GetStateTransitions(pb.currentState);
+		if (transitions != null) {
 			int id = 0;
-			State[] states = pb.perso.stdGame.Value.family.Value.states.Value.states.Value.states.Select(s => s.Value).ToArray();
-			foreach (StateTransitionArray.StateTransition t in pb.state.transitions.Value.transitions) {
-				State stateToGo = t.stateToGo.Value;
-				State targetState = t.targetState.Value;
-				if (stateToGo == null || targetState == null) continue;
-				tr.Add(new StateTransitionsTreeElement("State transition " + targetState.ToString(), 0, id) {
-					stateToGoName = stateToGo.ToString(),
-					stateToGoIndex = Array.IndexOf(states,stateToGo),
-					targetStateName = targetState.ToString(),
-					targetStateIndex = Array.IndexOf(states, targetState),
-					linkingType = t.linkingType
+			foreach (var t in transitions) {
+				tr.Add(new StateTransitionsTreeElement("State transition " + t.TargetStateName, 0, id) {
+					stateToGoName = t.StateToGoName,
+					stateToGoIndex = t.StateToGoIndex,
+					targetStateName = t.TargetStateName,
+					targetStateIndex = t.TargetStateIndex,
+					linkingType = t.LinkingType
 				});
 				id++;
 			}

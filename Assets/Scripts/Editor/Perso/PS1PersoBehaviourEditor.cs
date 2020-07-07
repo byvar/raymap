@@ -78,26 +78,18 @@ public class PS1PersoBehaviourEditor : Editor {
 		PS1PersoBehaviour pb = (PS1PersoBehaviour)target;
 		List<StateTransitionsTreeElement> tr = new List<StateTransitionsTreeElement>();
 		tr.Add(new StateTransitionsTreeElement("Hidden root", -1, -1));
-		if (pb.state != null && pb.state.transitions != null && pb.state.transitions.Length > 0) {
+
+		BasePersoBehaviour.StateTransition[] transitions = pb.GetStateTransitions(pb.currentState);
+		if (transitions != null) {
 			int id = 0;
-			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
-			PointerList<State> statePtrs = l.GetStates(pb.perso.p3dData);
-			State[] states = statePtrs.pointers.Select(s => s.Value).ToArray();
-			foreach (StateTransition t in pb.state.transitions) {
-				State stateToGo = t.stateToGo.Value;
-				State targetState = t.targetState.Value;
-				if (stateToGo == null || targetState == null) continue;
-				string targetStateName = pb.GetStateName(targetState);
-				string stateToGoName = pb.GetStateName(stateToGo);
-				if (targetStateName != null && stateToGoName != null) {
-					tr.Add(new StateTransitionsTreeElement("State transition " + targetStateName, 0, id) {
-						stateToGoName = stateToGoName,
-						stateToGoIndex = pb.GetStateIndex(stateToGo),
-						targetStateName = targetStateName,
-						targetStateIndex = pb.GetStateIndex(targetState),
-						linkingType = 0
-					});
-				}
+			foreach (var t in transitions) {
+				tr.Add(new StateTransitionsTreeElement("State transition " + t.TargetStateName, 0, id) {
+					stateToGoName = t.StateToGoName,
+					stateToGoIndex = t.StateToGoIndex,
+					targetStateName = t.TargetStateName,
+					targetStateIndex = t.TargetStateIndex,
+					linkingType = t.LinkingType
+				});
 				id++;
 			}
 		}

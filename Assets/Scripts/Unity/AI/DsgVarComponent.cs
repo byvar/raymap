@@ -117,6 +117,22 @@ public class DsgVarComponent : MonoBehaviour {
                     }
                 }
             }
+            public OpenSpace.Object.Properties.State AsAction {
+                get {
+                    if (type != DsgVarInfoEntry.DsgVarType.Action) return null;
+                    if (val != null) {
+                        if (val.valueAction == null && val.valuePointer != null) {
+                            OpenSpace.Object.Properties.State a = OpenSpace.Object.Properties.State.FromOffset(val.valuePointer);
+                            if (a != null) {
+                                val.valueAction = a;
+                            }
+                        }
+                        return val.valueAction;
+                    }
+                    return null;
+                }
+                /*set {}*/
+            }
 
             public ROMPersoBehaviour AsPersoROM {
                 get {

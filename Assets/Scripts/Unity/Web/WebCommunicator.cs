@@ -240,8 +240,16 @@ public class WebCommunicator : MonoBehaviour {
 		persoJSON.Scale = pb.transform.localScale;
 
 		if (includeLists) {
-			// TODO: Add state transitions
-			persoJSON.States = pb.stateNames;
+			if (pb.stateNames != null) {
+				persoJSON.States = Enumerable.Range(0, pb.stateNames.Length).Select(i => new WebJSON.State() {
+					Name = pb.stateNames[i],
+					Transitions = pb.GetStateTransitions(i)?.Select(t => new WebJSON.State.Transition() {
+						LinkingType = t.LinkingType,
+						StateToGo = t.StateToGoIndex,
+						TargetState = t.TargetStateIndex
+					}).ToArray(),
+				}).ToArray();
+			}
 			persoJSON.ObjectLists = pb.poListNames;
 		}
 		if (includeBrain) {
@@ -320,11 +328,15 @@ public class WebCommunicator : MonoBehaviour {
 				case DsgVarInfoEntry.DsgVarType.SuperObject:
 					dsgObj.AsSuperObject = GetSuperObjectJSON(value.AsSuperObject, includeChildren: false);
 					break;
-					// TODO:
-					// waypoint
-					// graph
-					// action?
-					// those are left
+				case DsgVarInfoEntry.DsgVarType.WayPoint:
+					dsgObj.AsWayPoint = new WebJSON.WayPoint() { Name = value.AsWayPoint?.gameObject?.name };
+					break;
+				case DsgVarInfoEntry.DsgVarType.Graph:
+					dsgObj.AsGraph = new WebJSON.Graph() { Name = value.AsGraph?.gameObject?.name };
+					break;
+				case DsgVarInfoEntry.DsgVarType.Action:
+					dsgObj.AsAction = new WebJSON.DsgState() { Name = value.AsAction?.ToString() };
+					break;
 			}
 		}
 		return dsgObj;
