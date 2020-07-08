@@ -13,10 +13,10 @@ using OpenSpace.Waypoints;
 using OpenSpace.Object.Properties;
 using OpenSpace.Exporter;
 using System.Threading.Tasks;
-using Asyncoroutine;
 using Newtonsoft.Json;
 using OpenSpace.Loader;
 using System.Text.RegularExpressions;
+using Cysharp.Threading.Tasks;
 
 public class Controller : MonoBehaviour {
 	public Material baseMaterial;
@@ -74,7 +74,7 @@ public class Controller : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	async void Start() {
+	public async UniTaskVoid Start() {
 		// Read command line arguments
 		string[] args = System.Environment.GetCommandLineArgs();
 		string modeString = "";
@@ -167,7 +167,8 @@ public class Controller : MonoBehaviour {
 
 		if (Application.platform == RuntimePlatform.WebGLPlayer) {
 			//Application.logMessageReceived += communicator.WebLog;
-			UnityEngine.Debug.unityLogger.logEnabled = false; // We don't need prints here
+			//UnityEngine.Debug.unityLogger.logEnabled = false; // We don't need prints here
+			UnityEngine.Debug.unityLogger.filterLogType = LogType.Assert;
 			string url = Application.absoluteURL;
 			if (url.IndexOf('?') > 0) {
 				string urlArgsStr = url.Split('?')[1].Split('#')[0];
@@ -228,7 +229,7 @@ public class Controller : MonoBehaviour {
 		await Init();
 	}
 
-    async Task Init() {
+    async UniTask Init() {
         state = State.Loading;
         await loader.LoadWrapper();
         if (state == State.Error) return;
@@ -257,7 +258,7 @@ public class Controller : MonoBehaviour {
         UpdateViewCollision();
         if (loader.cinematicsManager != null || loader is R2PS1Loader) {
             detailedState = "Initializing cinematics";
-            await new WaitForEndOfFrame();
+            await UniTask.WaitForEndOfFrame();
             InitCinematics();
         }
         detailedState = "Finished";
@@ -418,7 +419,7 @@ public class Controller : MonoBehaviour {
 
 	}
 
-	async Task InitPersos() {
+	async UniTask InitPersos() {
 		if (loader != null) {
 			for (int i = 0; i < loader.persos.Count; i++) {
 				detailedState = "Initializing persos: " + i + "/" + loader.persos.Count;
@@ -1025,13 +1026,13 @@ public class Controller : MonoBehaviour {
 				break;
 		}
 	}
-	public async Task WaitFrame() {
-		await new WaitForEndOfFrame();
+	public async UniTask WaitFrame() {
+		await UniTask.WaitForEndOfFrame();
 		if (stopwatch.IsRunning) {
 			stopwatch.Restart();
 		}
 	}
-	public async Task WaitIfNecessary() {
+	public async UniTask WaitIfNecessary() {
 		if (stopwatch.ElapsedMilliseconds > 16) {
 			await WaitFrame();
 		}

@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using OpenSpace.PS1;
 using OpenSpace.PS1.GLI;
 using System.Text;
+using Cysharp.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2PS1Loader : MapLoader {
@@ -61,7 +62,7 @@ namespace OpenSpace.Loader {
 			return new string[] { "<no map>" };
 		}
 
-		protected override async Task Load() {
+		protected override async UniTask Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -121,7 +122,7 @@ namespace OpenSpace.Loader {
 			Util.ByteArrayToFile(gameDataBinFolder + "rhr.json", Encoding.UTF8.GetBytes(json));
 		}*/
 
-		public async Task InitAllFiles(PS1GameInfo game) {
+		public async UniTask InitAllFiles(PS1GameInfo game) {
 			if (CurrentLevel < 0 || CurrentLevel >= game.maps.Length) return;
 			PS1GameInfo.File mainFile = game.files.FirstOrDefault(f => f.fileID == 0);
 			await InitFiles(game, mainFile, CurrentLevel);
@@ -141,7 +142,7 @@ namespace OpenSpace.Loader {
 			FillVRAM();
 		}
 
-		public async Task InitFiles(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
+		public async UniTask InitFiles(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
 			string levelDir = gameDataBinFolder + fileInfo.bigfile + "/";
 			if (fileInfo.type == PS1GameInfo.File.Type.Map) {
@@ -177,7 +178,7 @@ namespace OpenSpace.Loader {
 				}
 				files_array[curFile++] = f;
 			}
-			await Task.CompletedTask;
+			await UniTask.CompletedTask;
 		}
 		private uint GetActorAddress(int i) {
 			PS1GameInfo.File mainFile = game.files.FirstOrDefault(fi => fi.fileID == 0);
@@ -504,7 +505,7 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public async Task LoadLevel() {
+		public async UniTask LoadLevel() {
 			Reader reader = files_array[Mem.Fix]?.reader;
 			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
 			if (game.actors != null && game.actors.Length > 0) {
@@ -611,7 +612,7 @@ namespace OpenSpace.Loader {
 
 		#region DAT Parsing
 
-		public async Task LoadAllDataFromDAT(PS1GameInfo game) {
+		public async UniTask LoadAllDataFromDAT(PS1GameInfo game) {
 			PS1GameInfo.File mainFile = game.files.FirstOrDefault(f => f.fileID == 0);
 			await LoadDataFromDAT(game, mainFile, CurrentLevel);
 			if (mainFile.memoryBlocks[CurrentLevel].loadActor) {
@@ -625,7 +626,7 @@ namespace OpenSpace.Loader {
 				}
 			}
 		}
-		public async Task LoadDataFromDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
+		public async UniTask LoadDataFromDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
 			if (b.loadActor
 				&& (Actor1Index < 0 || Actor2Index < 0
@@ -646,7 +647,11 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 			if (FileSystem.FileExists(bigFilePath)) {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath), isLittleEndian: Settings.s.IsLittleEndian)) {
+
+					loadingState = "Extracting data from bigfile(s): main data";
+					await WaitIfNecessary();
 					List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.main_compressed, fileInfo.baseLBA);
+					await WaitIfNecessary();
 					int blockIndex = 0;
 					if (fileInfo.type == PS1GameInfo.File.Type.Map) {
 						if (CurrentLevel < 0 || CurrentLevel >= fileInfo.memoryBlocks.Length) return;
@@ -675,12 +680,15 @@ namespace OpenSpace.Loader {
 					if (blockIndex != mainBlock.Count) {
 						Debug.LogWarning("Not all blocks were extracted!");
 					}
+					loadingState = "Extracting data from bigfile(s): cinematic overlay";
+					await WaitIfNecessary();
 					byte[] cineblock = await ExtractBlock(reader, b.overlay_cine, fileInfo.baseLBA);
 					if (cineblock != null) {
 						FileSystem.AddVirtualFile(levelDir + "overlay_cine.img", cineblock);
 					}
-
 					for (int j = 0; j < b.cutscenes.Length; j++) {
+						loadingState = $"Extracting data from bigfile(s): streams ({j+1}/{b.cutscenes.Length})";
+						await WaitIfNecessary();
 						string cutsceneAudioName = levelDir + "stream_audio_" + j + ".blk";
 						string cutsceneFramesName = levelDir + "stream_frames_" + j + ".blk";
 						byte[] cutsceneAudioBlk = await ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
@@ -695,13 +703,13 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public async Task ExtractAllFiles(PS1GameInfo game) {
+		public async UniTask ExtractAllFiles(PS1GameInfo game) {
 			foreach (PS1GameInfo.File f in game.files) {
 				await ExtractDAT(game, f, relocatePointers: true);
 			}
 		}
 
-		public async Task ExtractDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, bool relocatePointers = false) {
+		public async UniTask ExtractDAT(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, bool relocatePointers = false) {
 			string bigFile = fileInfo.bigfile;
 			string bigFilePath = gameDataBinFolder + bigFile + "." + fileInfo.extension;
 			uint cineDataBaseAddress = 0;
@@ -933,7 +941,7 @@ namespace OpenSpace.Loader {
 			cutsceneFrames = cutsceneFramesList.SelectMany(i => i).ToArray();
 		}
 
-		public async Task<byte[]> ExtractBlock(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {
+		public async UniTask<byte[]> ExtractBlock(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {
 			byte[] data;
 			if (lba.lba < baseLBA || lba.size <= 0) return null;
 			reader.BaseStream.Seek((lba.lba - baseLBA) * 0x800, SeekOrigin.Begin);
@@ -943,7 +951,7 @@ namespace OpenSpace.Loader {
 			data = reader.ReadBytes((int)lba.size);
 			return data;
 		}
-		public async Task<List<byte[]>> ExtractPackedBlocks(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {
+		public async UniTask<List<byte[]>> ExtractPackedBlocks(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 			List<byte[]> datas = new List<byte[]>();
 			byte[] data;

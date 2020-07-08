@@ -1,4 +1,5 @@
-﻿using OpenSpace.Loader;
+﻿using Cysharp.Threading.Tasks;
+using OpenSpace.Loader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace OpenSpace.ROM {
 		public NumLanguages numLanguages;
 		public LanguageTable[] languageTables = null;
 
-		public async Task Read(Reader reader) {
+		public async UniTask Read(Reader reader) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
 			l.loadingState = "Loading language tables";
 			await MapLoader.WaitIfNecessary();

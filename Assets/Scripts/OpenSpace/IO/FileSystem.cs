@@ -1,4 +1,4 @@
-﻿using Asyncoroutine;
+﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -74,7 +74,7 @@ namespace OpenSpace {
             }
         }
 
-        public static async Task DownloadFile(string path) {
+        public static async UniTask DownloadFile(string path) {
 			if (virtualFiles.ContainsKey(path) && virtualFiles[path] != null) return;
 			Debug.Log("Downloading " + path);
 			await MapLoader.WaitIfNecessary();
@@ -90,27 +90,35 @@ namespace OpenSpace {
             }
         }
 
-		public static async Task CheckDirectory(string path) {
+		public static async UniTask CheckDirectory(string path) {
 			if (existingDirectories.ContainsKey(path)) return;
 			await MapLoader.WaitIfNecessary();
-			UnityWebRequest www = UnityWebRequest.Head(serverAddress + path + "/");
-			await www.SendWebRequest();
-			while (!www.isDone) {
-				await new WaitForEndOfFrame();
-			}
-			if (!www.isHttpError && !www.isNetworkError) {
-				existingDirectories.Add(path, true);
+			if (FileSystem.mode == FileSystem.Mode.Web) {
+				UnityWebRequest www = UnityWebRequest.Head(serverAddress + path + "/");
+				await www.SendWebRequest();
+				while (!www.isDone) {
+					await UniTask.WaitForEndOfFrame();
+				}
+				if (!www.isHttpError && !www.isNetworkError) {
+					existingDirectories.Add(path, true);
+				} else {
+					existingDirectories.Add(path, false);
+				}
 			} else {
-				existingDirectories.Add(path, false);
+				if (Directory.Exists(path)) {
+					existingDirectories.Add(path, true);
+				} else {
+					existingDirectories.Add(path, false);
+				}
 			}
 		}
 
-		public static async Task InitBigFile(string path, int cacheLength) {
+		public static async UniTask InitBigFile(string path, int cacheLength) {
 			UnityWebRequest www = UnityWebRequest.Head(serverAddress + path);
 			await MapLoader.WaitIfNecessary();
 			await www.SendWebRequest();
 			while (!www.isDone) {
-				await new WaitForEndOfFrame();
+				await UniTask.WaitForEndOfFrame();
 			}
 			if (!www.isHttpError && !www.isNetworkError) {
 				long contentLength;

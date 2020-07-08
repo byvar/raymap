@@ -19,13 +19,14 @@ using OpenSpace.Cinematics;
 using System.IO.Compression;
 using lzo.net;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace OpenSpace.Loader {
 	public class LWLoader : MapLoader {
 		public PBT[] pbt = new PBT[2];
 		public LMS lms;
 
-		protected override async Task Load() {
+		protected override async UniTask Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
 				if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -150,7 +151,7 @@ namespace OpenSpace.Loader {
 
 		#region FIX
 		Pointer off_animBankFix;
-		async Task LoadFIX() {
+		async UniTask LoadFIX() {
 			textures = new TextureInfo[0];
 			loadingState = "Loading fixed memory";
 			await WaitIfNecessary();
@@ -232,7 +233,7 @@ namespace OpenSpace.Loader {
 		#endregion
 
 		#region LVL
-		async Task LoadLVL() {
+		async UniTask LoadLVL() {
 			loadingState = "Loading level memory";
 			await WaitIfNecessary();
 			files_array[Mem.Lvl].GotoHeader();

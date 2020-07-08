@@ -16,10 +16,11 @@ using UnityEngine;
 using OpenSpace.Object.Properties;
 using System.Collections;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2Loader : MapLoader {
-		protected override async Task Load() {
+		protected override async UniTask Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -279,7 +280,7 @@ namespace OpenSpace.Loader {
         }
 
         #region FIXSNA
-        async Task LoadFIXSNA() {
+        async UniTask LoadFIXSNA() {
             loadingState = "Loading fixed memory";
             await WaitIfNecessary();
             files_array[Mem.Fix].GotoHeader();
@@ -476,7 +477,7 @@ namespace OpenSpace.Loader {
         #endregion
 
         #region LVLSNA
-        async Task LoadLVLSNA() {
+        async UniTask LoadLVLSNA() {
             loadingState = "Loading level memory";
             await WaitIfNecessary();
             Reader reader = files_array[Mem.Lvl].reader;

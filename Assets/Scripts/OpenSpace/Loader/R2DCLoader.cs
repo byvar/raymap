@@ -17,10 +17,11 @@ using OpenSpace.Object.Properties;
 using System.Collections;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2DCLoader : MapLoader {
-		protected override async Task Load() {
+		protected override async UniTask Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -111,7 +112,7 @@ namespace OpenSpace.Loader {
         }
 
         #region Dreamcast
-        async Task LoadDreamcast() {
+        async UniTask LoadDreamcast() {
             textures = new TextureInfo[0];
 
             loadingState = "Loading fixed memory";

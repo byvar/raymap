@@ -1,13 +1,13 @@
-using Asyncoroutine;
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class TransparencyCaptureBehaviour : MonoBehaviour
 {
-    public async Task<byte[]> Capture(int width, int height)
+    public async UniTask<byte[]> Capture(int width, int height)
     {
-        await new WaitForEndOfFrame();
+        await UniTask.WaitForEndOfFrame();
 		//After Unity4,you have to do this function after WaitForEndOfFrame in Coroutine
 		//Or you will get the error:"ReadPixels was called to read pixels from system frame buffer, while not inside drawing frame"
 		//zzTransparencyCapture.captureScreenshot("capture.png");

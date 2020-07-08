@@ -1,4 +1,5 @@
-﻿using lzo.net;
+﻿using Cysharp.Threading.Tasks;
+using lzo.net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -85,7 +86,7 @@ namespace OpenSpace.FileFormat {
 			this.path = path;
         }
 
-		public async Task Init() {
+		public async UniTask Init() {
 			if (FileSystem.FileExists(path)) {
 				await Load(FileSystem.GetFileReadStream(path), false);
 			} else if (dat != null) {
@@ -93,7 +94,7 @@ namespace OpenSpace.FileFormat {
 			}
 		}
 
-        private async Task Load(Stream stream, bool masking) {
+        private async UniTask Load(Stream stream, bool masking) {
             using (Reader reader = new Reader(stream, isLittleEndian)) {
                 if (Settings.s.encryptPointerFiles) {
                     reader.InitMask();
@@ -124,7 +125,7 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        private async Task LoadFromDAT() {
+        private async UniTask LoadFromDAT() {
             Reader reader = dat.reader;
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 			
@@ -160,7 +161,7 @@ namespace OpenSpace.FileFormat {
             return null;
         }
 
-        async Task Read(Reader reader) {
+        async UniTask Read(Reader reader) {
             MapLoader l = MapLoader.Loader;
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 

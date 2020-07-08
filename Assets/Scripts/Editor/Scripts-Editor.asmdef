@@ -2,7 +2,8 @@
     "name": "Scripts-Editor",
     "references": [
         "GUID:4f01c1e5f95f3dc458cbdea7c023e9ce",
-        "GUID:cbbffa87cf8bee147b9a60437a128d88"
+        "GUID:cbbffa87cf8bee147b9a60437a128d88",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [
         "Editor"

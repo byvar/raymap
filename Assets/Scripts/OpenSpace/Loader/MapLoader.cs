@@ -19,8 +19,8 @@ using OpenSpace.Loader;
 using OpenSpace.Cinematics;
 using OpenSpace.Animation.ComponentLargo;
 using System.Threading.Tasks;
-using Asyncoroutine;
 using System.Diagnostics;
+using Cysharp.Threading.Tasks;
 
 namespace OpenSpace {
     public class MapLoader {
@@ -169,19 +169,19 @@ namespace OpenSpace {
 		protected void StopLoad() {
 			stopwatch.Stop();
 		}
-		public static async Task WaitFrame() {
-			await new WaitForEndOfFrame();
+		public static async UniTask WaitFrame() {
+			await UniTask.WaitForEndOfFrame();
 			if (loader != null && loader.stopwatch.IsRunning) {
 				loader.stopwatch.Restart();
 			}
 		}
-		public static async Task WaitIfNecessary() {
+		public static async UniTask WaitIfNecessary() {
 			if (loader.stopwatch.ElapsedMilliseconds > 16) {
 				await WaitFrame();
 			}
 		}
 
-		public async Task LoadWrapper() {
+		public async UniTask LoadWrapper() {
 			StartLoad();
 			await Load();
 			for (int i = 0; i < onPostLoad.Count; i++) {
@@ -190,7 +190,7 @@ namespace OpenSpace {
 			}
 			StopLoad();
 		}
-		protected virtual async Task Load() {
+		protected virtual async UniTask Load() {
 			await MapLoader.WaitIfNecessary();
 		}
 
@@ -434,7 +434,7 @@ MonoBehaviour.print(str);
             }
         }
 
-		protected async Task CreateCNT() {
+		protected async UniTask CreateCNT() {
 			await WaitIfNecessary();
 			if (Settings.s.game == Settings.Game.LargoWinch) {
 				cntPaths = new string[1];
@@ -586,7 +586,7 @@ MonoBehaviour.print(str);
             }
         }
 
-		protected async Task ReadTexturesFix(Reader reader, Pointer off_textures) {
+		protected async UniTask ReadTexturesFix(Reader reader, Pointer off_textures) {
             uint num_textureMemoryChannels = 0;
             if (Settings.s.engineVersion <= Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
             uint num_textures = reader.ReadUInt32();
@@ -596,7 +596,7 @@ MonoBehaviour.print(str);
 			textures = new TextureInfo[num_textures];
             if (num_textures > 0) {
 				loadingState = "Loading fixed textures";
-				await new WaitForEndOfFrame();
+				await UniTask.WaitForEndOfFrame();
                 for (uint i = 0; i < num_textures; i++) {
                     Pointer off_texture = Pointer.Read(reader);
                     Pointer.DoAt(ref reader, off_texture, () => {
@@ -741,7 +741,7 @@ MonoBehaviour.print(str);
 			loadingState = state;
 		}
 
-		protected async Task ReadTexturesLvl(Reader reader, Pointer off_textures) {
+		protected async UniTask ReadTexturesLvl(Reader reader, Pointer off_textures) {
             uint num_textures_fix = (uint)textures.Length,
                 num_memoryChannels = 0,
                 num_textures_lvl = 0,
@@ -1094,7 +1094,7 @@ MonoBehaviour.print(str);
             objList.Gao.transform.SetParent(familiesRoot.transform);
         }
 
-        protected async Task PrepareFile(string path) {
+        protected async UniTask PrepareFile(string path) {
             if (FileSystem.mode == FileSystem.Mode.Web && !string.IsNullOrEmpty(path)) {
                 string state = loadingState;
                 loadingState = state + "\nDownloading file: " + path;
@@ -1104,7 +1104,7 @@ MonoBehaviour.print(str);
 			}
 		}
 
-		protected async Task PrepareBigFile(string path, int cacheLength) {
+		protected async UniTask PrepareBigFile(string path, int cacheLength) {
 			if (FileSystem.mode == FileSystem.Mode.Web) {
 				string state = loadingState;
 				loadingState = state + "\nInitializing bigfile: " + path + " (Cache size: " + Util.SizeSuffix(cacheLength, 0) + ")";

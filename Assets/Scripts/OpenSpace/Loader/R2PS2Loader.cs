@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using OpenSpace.FileFormat.RenderWare;
 using System.Text;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace OpenSpace.Loader {
     public class R2PS2Loader : MapLoader {
@@ -29,7 +30,7 @@ namespace OpenSpace.Loader {
 		public VisualMaterial lightCookieMaterial;
 		public Color[] lightCookieColors;
 
-		protected override async Task Load() {
+		protected override async UniTask Load() {
             try {
                 if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
                 if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -99,7 +100,7 @@ namespace OpenSpace.Loader {
         }
 
         #region PS2
-        async Task LoadPS2() {
+        async UniTask LoadPS2() {
 			await WaitIfNecessary();
             textures = new TextureInfo[0];
 

@@ -1,4 +1,4 @@
-﻿using Asyncoroutine;
+﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -261,7 +261,7 @@ namespace OpenSpace {
 			caches.Add(position, cache);
 		}
 
-		public async Task FillCacheForRead(int count) {
+		public async UniTask FillCacheForRead(int count) {
 			if (count <= 0) return;
 			await MapLoader.WaitIfNecessary();
 
@@ -365,7 +365,7 @@ namespace OpenSpace {
 			return (int)(Position - lastPosition);*/
 		}
 
-		private async Task HttpRead(byte[] buffer, int offset, int count, long startPosition) {
+		private async UniTask HttpRead(byte[] buffer, int offset, int count, long startPosition) {
 			HttpRequestsCount++;
 			UnityWebRequest www = UnityWebRequest.Get(Url);
 			string state = MapLoader.Loader.loadingState;
@@ -375,7 +375,7 @@ namespace OpenSpace {
 			www.SetRequestHeader("Range", string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1));
 			await www.SendWebRequest();
 			while (!www.isDone) {
-				await new WaitForEndOfFrame();
+				await UniTask.WaitForEndOfFrame();
 			}
 			if (!www.isHttpError && !www.isNetworkError) {
 				byte[] data = www.downloadHandler.data;

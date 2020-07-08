@@ -1,4 +1,5 @@
-﻿using OpenSpace.Animation;
+﻿using Cysharp.Threading.Tasks;
+using OpenSpace.Animation;
 using OpenSpace.Cinematics;
 using OpenSpace.FileFormat;
 using OpenSpace.Input;
@@ -14,7 +15,7 @@ using UnityEngine;
 
 namespace OpenSpace.Loader {
 	public class R3Loader : MapLoader {
-		protected override async Task Load() {
+		protected override async UniTask Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
 				if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -320,7 +321,7 @@ namespace OpenSpace.Loader {
 		#region FIX
 		Pointer off_animBankFix;
 
-		async Task LoadFIX() {
+		async UniTask LoadFIX() {
 			loadingState = "Loading fixed memory";
 			await WaitIfNecessary();
 			files_array[Mem.Fix].GotoHeader();
@@ -571,7 +572,7 @@ namespace OpenSpace.Loader {
 		#endregion
 
 		#region LVL
-		async Task LoadLVL() {
+		async UniTask LoadLVL() {
 			loadingState = "Loading level memory";
 			await WaitIfNecessary();
 			files_array[Mem.Lvl].GotoHeader();
@@ -998,7 +999,7 @@ namespace OpenSpace.Loader {
 		}
 		#endregion
 
-		protected async Task ReadSettingsForPersoInFix(Reader reader) {
+		protected async UniTask ReadSettingsForPersoInFix(Reader reader) {
 			// Parse transformation matrices and other settings(state? :o) for fix characters
 			loadingState = "Loading settings for persos in fix";
 			await WaitIfNecessary();

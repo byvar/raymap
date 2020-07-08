@@ -10,6 +10,7 @@ using OpenSpace.FileFormat.Texture;
 using OpenSpace.FileFormat.Texture.DS;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Cysharp.Threading.Tasks;
 
 namespace OpenSpace.Loader {
 	public class R2ROMLoader : MapLoader {
@@ -67,7 +68,7 @@ namespace OpenSpace.Loader {
 		}
 
 
-		protected override async Task Load() {
+		protected override async UniTask Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
 				if (lvlName == null || lvlName.Trim() == "") throw new Exception("No level name specified!");
@@ -244,7 +245,7 @@ namespace OpenSpace.Loader {
             }
         }
 
-        public async Task LoadFat() {
+        public async UniTask LoadFat() {
 			data = files_array[SMem.Data] as ROMBIN;
 			fat = files_array[SMem.Fat] as ROMBIN;
 			Reader reader = files_array[SMem.Fat].reader;
@@ -265,7 +266,7 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 		}
 
-		public async Task LoadFatLevel(bool loadAll = false) {
+		public async UniTask LoadFatLevel(bool loadAll = false) {
 			Reader reader = files_array[SMem.Fat].reader;
 			for (uint i = 2; i < fatTables.Length; i++) {
 				bool loadCurrent = loadAll || (i == CurrentLevel+2);
@@ -277,7 +278,7 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public async Task LoadFix() {
+		public async UniTask LoadFix() {
 			data = files_array[SMem.Data] as ROMBIN;
 			Reader reader = files_array[SMem.Data].reader;
 
@@ -357,7 +358,7 @@ namespace OpenSpace.Loader {
 			}
 		}
 
-		public async Task LoadData() {
+		public async UniTask LoadData() {
 			Reader reader = files_array[SMem.Data].reader;
 			if (exportTextures) {
 				string state = loadingState;
@@ -453,10 +454,10 @@ namespace OpenSpace.Loader {
 			}*/
 		}
 
-		public async Task LoadAnims() {
+		public async UniTask LoadAnims() {
 			// Read anims.bin
 			Reader reader = files_array[SMem.Anims].reader;
-			loadingState = "Loading animations";
+			loadingState = "Loading animations: anims";
 			await WaitIfNecessary();
 			uint num_anims = reader.ReadUInt32();
 			reader.ReadUInt32();
@@ -480,11 +481,17 @@ namespace OpenSpace.Loader {
 				romAnims[num_anims - 1].compressedSize = eof.offset - romAnims[num_anims - 1].Offset.offset;
 			}
 			for (uint i = 0; i < num_anims; i++) {
+				if (i % 16 == 15) {
+					loadingState = $"Loading animations: anims ({i + 1}/{num_anims})";
+					await WaitIfNecessary();
+				}
 				romAnims[i].Read(reader);
 			}
 
 			// Read shAnims.bin
 			reader = files_array[SMem.ShAnims].reader;
+			loadingState = "Loading animations: shAnims";
+			await WaitIfNecessary();
 			List<ROMShAnimation> shAnimsList = new List<ROMShAnimation>();
 			while (reader.BaseStream.Position < reader.BaseStream.Length) {
 				ROMShAnimation shAnim = new ROMShAnimation();
@@ -496,6 +503,8 @@ namespace OpenSpace.Loader {
 
 			// Read cuttable.bin
 			reader = files_array[SMem.CutTable].reader;
+			loadingState = "Loading animations: cuttable";
+			await WaitIfNecessary();
 			cutTable = new ROMAnimationCutTable();
 			cutTable.Init(Pointer.Current(reader));
 			cutTable.length = (ushort)num_anims;

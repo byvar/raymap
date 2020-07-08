@@ -1,6 +1,7 @@
 ﻿// Adapted from Rayman2Lib by szymski
 // https://github.com/szymski/Rayman2Lib/blob/master/csharp_tools/Rayman2Lib/CNTFile.cs
 
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -81,13 +82,13 @@ namespace OpenSpace.FileFormat.Texture {
             readers = new Reader[1];
         }
 
-		public async Task Init() {
+		public async UniTask Init() {
 			for (int i = 0; i < readers.Length; i++) {
 				await Init(i, readers[i]);
 			}
 		}
 
-        public async Task Init(int readerIndex, Reader reader) {
+        public async UniTask Init(int readerIndex, Reader reader) {
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 			if(httpStream != null) await httpStream.FillCacheForRead(11);
             int localDirCount = reader.ReadInt32();
@@ -214,7 +215,7 @@ namespace OpenSpace.FileFormat.Texture {
             return gf;
         }
 
-		public async Task<GF> PrepareGFByTGAName(string tgaName) {
+		public async UniTask<GF> PrepareGFByTGAName(string tgaName) {
 			FileStruct file = fileList.FirstOrDefault(f => f.TGAName.ToLower().Replace('/', '\\').Equals(tgaName.ToLower().Replace('/', '\\')));
 			if (file == null) {
 				return null;

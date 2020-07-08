@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +29,7 @@ namespace OpenSpace.FileFormat {
             reader = new Reader(stream, Settings.s.IsLittleEndian);
         }
 
-        public async Task GetOffset(RelocationTableReference rtref) {
+        public async UniTask GetOffset(RelocationTableReference rtref) {
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 			reader.MaskingOff();
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
