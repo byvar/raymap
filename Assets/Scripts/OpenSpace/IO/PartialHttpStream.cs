@@ -373,17 +373,21 @@ namespace OpenSpace {
 			MapLoader.Loader.loadingState = state + "\nDownloading part of bigfile: " + Url.Replace(FileSystem.serverAddress, "") + " (New size: " + Util.SizeSuffix(totalSize + count,0) + "/" + Util.SizeSuffix(Length, 0) + ")";
 			UnityEngine.Debug.Log("Requesting range: " + string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1) + " - " + Url);
 			www.SetRequestHeader("Range", string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1));
-			await www.SendWebRequest();
-			while (!www.isDone) {
-				await UniTask.WaitForEndOfFrame();
-			}
-			if (!www.isHttpError && !www.isNetworkError) {
-				byte[] data = www.downloadHandler.data;
-				int nread = Math.Min(data.Length, count);
-				Array.Copy(data, 0, buffer, offset, nread);
-				lastRequestRead = nread;
-			} else {
-				lastRequestRead = 0;
+			try {
+				await www.SendWebRequest();
+				while (!www.isDone) {
+					await UniTask.WaitForEndOfFrame();
+				}
+			} catch (UnityWebRequestException) {
+			} finally {
+				if (!www.isHttpError && !www.isNetworkError) {
+					byte[] data = www.downloadHandler.data;
+					int nread = Math.Min(data.Length, count);
+					Array.Copy(data, 0, buffer, offset, nread);
+					lastRequestRead = nread;
+				} else {
+					lastRequestRead = 0;
+				}
 			}
 
 			MapLoader.Loader.loadingState = state;

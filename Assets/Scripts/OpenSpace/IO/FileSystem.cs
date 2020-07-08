@@ -79,15 +79,18 @@ namespace OpenSpace {
 			Debug.Log("Downloading " + path);
 			await MapLoader.WaitIfNecessary();
 			UnityWebRequest www = UnityWebRequest.Get(serverAddress + path);
-            await www.SendWebRequest();
-
-            if (www.isNetworkError || www.isHttpError) {
-                Debug.Log(www.error);
-                virtualFiles[path] = null;
-            } else {
-                // Or retrieve results as binary data
-                AddVirtualFile(path, www.downloadHandler.data);
-            }
+			try {
+				await www.SendWebRequest();
+			} catch(UnityWebRequestException) {
+			} finally {
+				if (www.isNetworkError || www.isHttpError) {
+					Debug.Log(www.error);
+					virtualFiles[path] = null;
+				} else {
+					// Or retrieve results as binary data
+					AddVirtualFile(path, www.downloadHandler.data);
+				}
+			}
         }
 
 		public static async UniTask CheckDirectory(string path) {
@@ -95,14 +98,18 @@ namespace OpenSpace {
 			await MapLoader.WaitIfNecessary();
 			if (FileSystem.mode == FileSystem.Mode.Web) {
 				UnityWebRequest www = UnityWebRequest.Head(serverAddress + path + "/");
-				await www.SendWebRequest();
-				while (!www.isDone) {
-					await UniTask.WaitForEndOfFrame();
-				}
-				if (!www.isHttpError && !www.isNetworkError) {
-					existingDirectories.Add(path, true);
-				} else {
-					existingDirectories.Add(path, false);
+				try {
+					await www.SendWebRequest();
+					while (!www.isDone) {
+						await UniTask.WaitForEndOfFrame();
+					}
+				} catch (UnityWebRequestException) {
+				} finally {
+					if (!www.isHttpError && !www.isNetworkError) {
+						existingDirectories.Add(path, true);
+					} else {
+						existingDirectories.Add(path, false);
+					}
 				}
 			} else {
 				if (Directory.Exists(path)) {
@@ -116,14 +123,18 @@ namespace OpenSpace {
 		public static async UniTask InitBigFile(string path, int cacheLength) {
 			UnityWebRequest www = UnityWebRequest.Head(serverAddress + path);
 			await MapLoader.WaitIfNecessary();
-			await www.SendWebRequest();
-			while (!www.isDone) {
-				await UniTask.WaitForEndOfFrame();
-			}
-			if (!www.isHttpError && !www.isNetworkError) {
-				long contentLength;
-				if (long.TryParse(www.GetResponseHeader("Content-Length"), out contentLength)) {
-					AddVirtualBigFile(path, contentLength, cacheLength);
+			try {
+				await www.SendWebRequest();
+				while (!www.isDone) {
+					await UniTask.WaitForEndOfFrame();
+				}
+			} catch (UnityWebRequestException) {
+			} finally {
+				if (!www.isHttpError && !www.isNetworkError) {
+					long contentLength;
+					if (long.TryParse(www.GetResponseHeader("Content-Length"), out contentLength)) {
+						AddVirtualBigFile(path, contentLength, cacheLength);
+					}
 				}
 			}
 		}
