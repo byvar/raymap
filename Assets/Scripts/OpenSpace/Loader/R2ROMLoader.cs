@@ -109,7 +109,7 @@ namespace OpenSpace.Loader {
 				if (Settings.s.game == Settings.Game.R2
 					&& (Settings.s.platform == Settings.Platform.N64 || Settings.s.platform == Settings.Platform.DS)) {
                     string objectNamesFileName = "objectNames_" + lvlName.ToLower() + ".json";
-                    string objectNamesPath = gameDataBinFolder + objectNamesFileName;
+                    string objectNamesPath = gameDataBinFolder + "objectNames/" + objectNamesFileName;
 					await PrepareFile(objectNamesPath);
 
 					if (!FileSystem.FileExists(objectNamesPath)) {
