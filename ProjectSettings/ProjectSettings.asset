@@ -527,7 +527,7 @@ PlayerSettings:
   blurSplashScreenBackground: 1
   spritePackerPolicy: 
   webGLMemorySize: 1024
-  webGLExceptionSupport: 1
+  webGLExceptionSupport: 2
   webGLNameFilesAsHashes: 0
   webGLDataCaching: 0
   webGLDebugSymbols: 0

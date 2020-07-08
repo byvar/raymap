@@ -675,7 +675,7 @@ namespace OpenSpace.Loader {
 					if (blockIndex != mainBlock.Count) {
 						Debug.LogWarning("Not all blocks were extracted!");
 					}
-					byte[] cineblock = ExtractBlock(reader, b.overlay_cine, fileInfo.baseLBA);
+					byte[] cineblock = await ExtractBlock(reader, b.overlay_cine, fileInfo.baseLBA);
 					if (cineblock != null) {
 						FileSystem.AddVirtualFile(levelDir + "overlay_cine.img", cineblock);
 					}
@@ -683,7 +683,7 @@ namespace OpenSpace.Loader {
 					for (int j = 0; j < b.cutscenes.Length; j++) {
 						string cutsceneAudioName = levelDir + "stream_audio_" + j + ".blk";
 						string cutsceneFramesName = levelDir + "stream_frames_" + j + ".blk";
-						byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
+						byte[] cutsceneAudioBlk = await ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
 						if (cutsceneAudioBlk != null) {
 							byte[] cutsceneAudio;
 							byte[] cutsceneFrames;
@@ -809,8 +809,8 @@ namespace OpenSpace.Loader {
 						}
 
 
-						Util.ByteArrayToFile(levelDir + "overlay_game.img", ExtractBlock(reader, b.overlay_game, fileInfo.baseLBA));
-						byte[] cineblock = ExtractBlock(reader, b.overlay_cine, fileInfo.baseLBA);
+						Util.ByteArrayToFile(levelDir + "overlay_game.img", await ExtractBlock(reader, b.overlay_game, fileInfo.baseLBA));
+						byte[] cineblock = await ExtractBlock(reader, b.overlay_cine, fileInfo.baseLBA);
 						Util.ByteArrayToFile(levelDir + "overlay_cine.img", cineblock);
 						if(cineblock != null) {
 							byte[] data = cineblock;
@@ -842,7 +842,7 @@ namespace OpenSpace.Loader {
 						for (int j = 0; j < b.cutscenes.Length; j++) {
 							string cutsceneAudioName = levelDir + "stream_audio_" + j + ".blk";
 							string cutsceneFramesName = levelDir + "stream_frames_" + j + ".blk";
-							byte[] cutsceneAudioBlk = ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
+							byte[] cutsceneAudioBlk = await ExtractBlock(reader, b.cutscenes[j], fileInfo.baseLBA);
 							if (cutsceneAudioBlk != null) {
 								//Util.ByteArrayToFile(levelDir + "stream_full_" + j + ".blk", cutsceneAudioBlk);
 								byte[] cutsceneAudio;
@@ -933,11 +933,13 @@ namespace OpenSpace.Loader {
 			cutsceneFrames = cutsceneFramesList.SelectMany(i => i).ToArray();
 		}
 
-		public byte[] ExtractBlock(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {
+		public async Task<byte[]> ExtractBlock(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {
 			byte[] data;
 			if (lba.lba < baseLBA || lba.size <= 0) return null;
 			reader.BaseStream.Seek((lba.lba - baseLBA) * 0x800, SeekOrigin.Begin);
-			
+
+			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
+			if (httpStream != null) await httpStream.FillCacheForRead((int)lba.size);
 			data = reader.ReadBytes((int)lba.size);
 			return data;
 		}
