@@ -11,7 +11,7 @@ namespace OpenSpace {
     public class PointerJsonConverter : JsonConverter {
         const string PointerPattern = @"^(?<file>.*)|0x(?<offset>[a-fA-F0-9]{8})(\[0x(?<offsetInFile>[a-fA-F0-9]{8})\])?$";
         public override bool CanConvert(Type objectType) {
-            return true;
+            return objectType == typeof(Pointer);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {

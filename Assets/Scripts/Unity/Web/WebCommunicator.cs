@@ -33,8 +33,14 @@ public class WebCommunicator : MonoBehaviour {
 				_settings = new Newtonsoft.Json.JsonSerializerSettings() {
 					Formatting = Newtonsoft.Json.Formatting.None,
 					NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
-					MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore
+					MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore,
+					
 				};
+				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.Vector3Converter());
+				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.Vector2Converter());
+				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.Vector4Converter());
+				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.QuaternionConverter());
+				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.ColorConverter());
 			}
 			return _settings;
 		}
@@ -149,7 +155,7 @@ public class WebCommunicator : MonoBehaviour {
 					LanguageStart = 0,
 					CommonStart = commonStart,
 					Common = GetLanguage(0),
-					Languages = Enumerable.Range(1, rloc.languageTables.Length).Select(ind => GetLanguage(ind)).ToArray()
+					Languages = Enumerable.Range(1, rloc.languageTables.Length-1).Select(ind => GetLanguage(ind)).ToArray()
 				};
 			}
 		} else if (l is OpenSpace.Loader.R2PS1Loader) {
@@ -357,7 +363,7 @@ public class WebCommunicator : MonoBehaviour {
 		switch (l) {
 			case OpenSpace.Loader.R2ROMLoader roml:
 				if (roml.level?.spawnablePersos?.Value != null && roml.level?.spawnablePersos?.Value.superObjects.Length > 0) {
-					alwaysJSON.SpawnablePersos = controller.ps1Persos.Where(p => p.IsAlways).Select(p => GetPersoJSON(p)).ToArray();
+					alwaysJSON.SpawnablePersos = controller.romPersos.Where(p => p.IsAlways).Select(p => GetPersoJSON(p)).ToArray();
 				}
 				break;
 			case OpenSpace.Loader.R2PS1Loader ps1l:

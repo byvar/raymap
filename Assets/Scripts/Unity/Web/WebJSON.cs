@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -186,11 +187,6 @@ public class WebJSON {
 		Selection,
 		Request,
 		Script
-	}
-	public enum SelectionType {
-		None,
-		SuperObject,
-		Always
 	}
 	public enum PersoType {
 		Instance,

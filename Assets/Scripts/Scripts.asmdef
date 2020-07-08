@@ -1,9 +1,9 @@
 {
     "name": "Scripts",
     "references": [
-        "GUID:38b879a5db1d9eb49a0944135c8a2590"
+        "GUID:38b879a5db1d9eb49a0944135c8a2590",
+        "GUID:c55d28459d9c4444ebb4788be912e1f1"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -11,5 +11,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
