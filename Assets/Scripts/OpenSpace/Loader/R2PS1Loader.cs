@@ -566,6 +566,11 @@ namespace OpenSpace.Loader {
 			gao_dynamicWorld.name = "Dynamic World | " + gao_dynamicWorld.name;
 			gao_inactiveDynamicWorld = levelHeader.inactiveDynamicWorld?.GetGameObject();
 			gao_inactiveDynamicWorld.name = "Inactive Dynamic World | " + gao_inactiveDynamicWorld.name;
+			if (FileSystem.mode == FileSystem.Mode.Web) {
+				gao_fatherSector.name = "Father Sector";
+				gao_dynamicWorld.name = "Dynamic World";
+				gao_inactiveDynamicWorld.name = "Inactive Dynamic World";
+			}
 			gao_always = new GameObject("Always");
 			gao_always.transform.position = new Vector3(0, -1000, 0);
 			int i = 0;

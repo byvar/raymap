@@ -125,6 +125,9 @@ namespace OpenSpace.PS1 {
 
 		public GameObject GetGameObject() {
 			GameObject gao = new GameObject(type + " @ " + Offset);
+			if (FileSystem.mode == FileSystem.Mode.Web) {
+				gao.name = type.ToString();
+			}
 
 			SuperObjectComponent soc = gao.AddComponent<SuperObjectComponent>();
 			gao.layer = LayerMask.NameToLayer("SuperObject");
@@ -145,16 +148,17 @@ namespace OpenSpace.PS1 {
 				PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				int ind = (dataIndex >> 1);
-				if ((dataIndex >> 1) >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
-				GameObject g = h.geometricObjectsStatic.GetGameObject(dataIndex >> 1, null, out _);
+				if (ind >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
+				gao.name = gao.name + " - " + ind;
+				GameObject g = h.geometricObjectsStatic.GetGameObject(ind, null, out _);
 				if (g != null) {
 					poc.visual = g;
 					g.transform.SetParent(gao.transform);
 					g.transform.localPosition = Vector3.zero;
 					g.transform.localRotation = Quaternion.identity;
 				}
-				if (h.ipoCollision != null && h.ipoCollision.Length > dataIndex >> 1) {
-					GameObject c = h.ipoCollision[dataIndex >> 1].GetGameObject();
+				if (h.ipoCollision != null && h.ipoCollision.Length > ind) {
+					GameObject c = h.ipoCollision[ind].GetGameObject();
 					if (c != null) {
 						poc.collide = c;
 						c.transform.SetParent(gao.transform);
@@ -166,13 +170,13 @@ namespace OpenSpace.PS1 {
 			} else if (type == Type.Perso) {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				if (dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
-				gao.name = dataIndex + " - " + gao.name;
+				gao.name = gao.name + " - " + dataIndex;
 				PS1PersoBehaviour ps1Perso = h.persos[dataIndex].GetGameObject(gao);
 				ps1Perso.superObject = this;
 			} else if (type == Type.Sector) {
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				if (dataIndex >= h.sectors.Length) throw new Exception("Sector SO data index was too high! " + h.sectors.Length + " - " + dataIndex);
-				gao.name = dataIndex + " - " + gao.name;
+				gao.name = gao.name + " - " + dataIndex;
 				SectorComponent sect = h.sectors[dataIndex].GetGameObject(gao);
 			}
 			if (children != null) {

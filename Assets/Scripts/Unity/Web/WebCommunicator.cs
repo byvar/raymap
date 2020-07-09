@@ -121,7 +121,9 @@ public class WebCommunicator : MonoBehaviour {
 				break;
 			default:
 				message.Hierarchy.ActualWorld = GetSuperObjectJSON(controller.superObjects.FirstOrDefault(s => s.Offset == l.actualWorld.offset));
-				message.Hierarchy.TransitDynamicWorld = GetSuperObjectJSON(controller.superObjects.FirstOrDefault(s => s.Offset == l.transitDynamicWorld.offset));
+				if (l.transitDynamicWorld != null) {
+					message.Hierarchy.TransitDynamicWorld = GetSuperObjectJSON(controller.superObjects.FirstOrDefault(s => s.Offset == l.transitDynamicWorld.offset));
+				}
 				break;
 		}
 		return message;

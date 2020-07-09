@@ -77,6 +77,9 @@ namespace OpenSpace.ROM {
 
 		public SectorComponent GetGameObject(GameObject gao) {
 			gao.name += " - Sector @ " + Offset; // + " - " + isSectorVirtual + " - " + byte2D + " - " + sectorPriority + " - " + byte31 + " - " + byte1E + " - " + byte1F;
+			if (FileSystem.mode == FileSystem.Mode.Web) {
+				gao.name = "Sector @ " + Offset;
+			}
 			SectorComponent sc = gao.AddComponent<SectorComponent>();
 			sc.sectorROM = this;
 			sc.sectorManager = MapLoader.Loader.controller.sectorManager;

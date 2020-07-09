@@ -66,11 +66,14 @@ namespace OpenSpace.PS1 {
 
 		public PS1PersoBehaviour GetGameObject(GameObject gao) {
 			LevelHeader h = (Load as R2PS1Loader).levelHeader;
-			gao.name = name + " | " + gao.name;
+			if (FileSystem.mode == FileSystem.Mode.Web) {
+				gao.name = name;
+			} else {
+				gao.name = name + " | " + gao.name;
+			}
 			if (p3dData?.family?.name != null) {
 				gao.name = $"[{p3dData?.family?.name}] {gao.name}";
 			}
-			gao.name = gao.name;
 			PS1PersoBehaviour romPerso = gao.AddComponent<PS1PersoBehaviour>();
 			romPerso.perso = this;
 			romPerso.controller = MapLoader.Loader.controller;

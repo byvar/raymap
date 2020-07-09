@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OpenSpace {
     public class PointerJsonConverter : JsonConverter {
-        const string PointerPattern = @"^(?<file>.*)|0x(?<offset>[a-fA-F0-9]{8})(\[0x(?<offsetInFile>[a-fA-F0-9]{8})\])?$";
+        const string PointerPattern = @"^(?<file>[^\|]*)\|0x(?<offset>[a-fA-F0-9]{8})(\[0x(?<offsetInFile>[a-fA-F0-9]{8})\])?$";
         public override bool CanConvert(Type objectType) {
             return objectType == typeof(Pointer);
         }
@@ -27,7 +27,7 @@ namespace OpenSpace {
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
-            string str = reader.ReadAsString();
+            string str = reader.Value as string;
             if (str != null) {
                 Match match = Regex.Match(str, PointerPattern);
                 if (match.Success) {

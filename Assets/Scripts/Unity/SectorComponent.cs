@@ -161,7 +161,7 @@ public class SectorComponent : MonoBehaviour, IReferenceable {
 		if (gameObject.name.Contains("^Sector:")) {
 			gameObject.name = name.Substring(name.IndexOf("^Sector:") + 8);
 		}
-		gameObject.name = SectorPriority + " - " + gameObject.name;
+		//gameObject.name = SectorPriority + " - " + gameObject.name;
 		//gameObject.name += " - " + IsSectorVirtual;
 		if (sector != null) {
 			//staticLights = sector.staticLights.Select(l => l.Light).ToArray();
@@ -193,7 +193,7 @@ public class SectorComponent : MonoBehaviour, IReferenceable {
 			//BoundingVolume vol = SectorBorder;
 		} else if (sectorPS1 != null) {
 			OpenSpace.PS1.LevelHeader h = (MapLoader.Loader as R2PS1Loader).levelHeader;
-			gameObject.name = sectorPS1.short_46 + " - " + gameObject.name;
+			//gameObject.name = sectorPS1.short_46 + " - " + gameObject.name;
 			if (sectorPS1.graphicSectors != null) {
 				graphicSectors = sectorPS1.graphicSectors.Select(s => sectorManager.sectors.First(ns => ns.sectorPS1 == s.Sector)).ToArray();
 			} else {

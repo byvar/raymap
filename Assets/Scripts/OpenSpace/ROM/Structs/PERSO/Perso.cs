@@ -37,7 +37,11 @@ namespace OpenSpace.ROM {
 			//gao.name += " - P3dData @ " + Offset;
 			ROMPersoBehaviour romPerso = gao.AddComponent<ROMPersoBehaviour>();
 			romPerso.perso = this;
-			gao.name = $"[{romPerso.NameFamily}] {romPerso.NameModel} | { romPerso.NameInstance} - {Offset}";
+			if (FileSystem.mode == FileSystem.Mode.Web) {
+				gao.name = $"[{romPerso.NameFamily}] {romPerso.NameModel} | { romPerso.NameInstance}";
+			} else {
+				gao.name = $"[{romPerso.NameFamily}] {romPerso.NameModel} | { romPerso.NameInstance} - {Offset}";
+			}
 			romPerso.controller = MapLoader.Loader.controller;
 			romPerso.controller.romPersos.Add(romPerso);
 			//if (camera.Value != null) Loader.print(gao.name);

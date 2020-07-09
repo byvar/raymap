@@ -17,6 +17,9 @@ namespace OpenSpace.ROM {
 				gao = new GameObject("PO @ " + Offset);
 			} else {
 				gao.name += " - PO @ " + Offset;
+				if (FileSystem.mode == FileSystem.Mode.Web) {
+					gao.name = "PO @ " + Offset;
+				}
 			}
 			PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
 			if (visual.Value != null) {
