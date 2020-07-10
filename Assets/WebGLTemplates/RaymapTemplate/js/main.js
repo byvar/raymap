@@ -74,6 +74,7 @@ let inputHasFocus = false;
 let mode, lvl, folder;
 
 let currentBehavior = null;
+let currentBehaviorType = "";
 let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
 let btn_close_description, stateSelector, objectListSelector, perso_tooltip;
@@ -81,6 +82,7 @@ let btn_close_description, stateSelector, objectListSelector, perso_tooltip;
 // FUNCTIONS
 function sendMessage(jsonObj) {
 	if(gameInstance != null) {
+		console.log("Message: " + JSON.stringify(jsonObj));
 		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 	}
 }
@@ -226,38 +228,38 @@ function parseSuperObject(so, level) {
 	let items = [];
 	objectsList.push(so);
 	let type = "Unknown";
-	if(so.hasOwnProperty("type")) {
-		type = so.type;
+	if(so.hasOwnProperty("Type")) {
+		type = so.Type;
 	}
 	switch(type) {
 		case "World":
-			items.push("<div class='objects-item object-world level-" + level + "' alt='" + so.name + "'>" + so.name + "</div>");
+			items.push("<div class='objects-item object-world level-" + level + "' alt='" + so.Name + "'>" + so.Name + "</div>");
 			break;
 		case "Perso":
 			let family = "Family";
 			let model = "Model";
 			let instance = "Instance";
-			if(so.hasOwnProperty("perso")) {
-				family = so.perso.nameFamily;
-				model = so.perso.nameModel;
-				instance = so.perso.nameInstance;
+			if(so.hasOwnProperty("Perso")) {
+				family = so.Perso.NameFamily;
+				model = so.Perso.NameModel;
+				instance = so.Perso.NameInstance;
 			}
-			items.push("<div class='objects-item object-perso' title='" + so.name + "'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
+			items.push("<div class='objects-item object-perso' title='" + so.Name + "'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
 			break;
 		case "Sector":
-			items.push("<div class='objects-item object-sector level-" + level + "' title='" + so.name + "'>" + so.name + "</div>");
+			items.push("<div class='objects-item object-sector level-" + level + "' title='" + so.Name + "'>" + so.Name + "</div>");
 			break;
 		case "IPO":
 		case "IPO_2":
-			items.push("<div class='objects-item object-IPO level-" + level + "' title='" + so.name + "'>" + so.name + "</div>");
+			items.push("<div class='objects-item object-IPO level-" + level + "' title='" + so.Name + "'>" + so.Name + "</div>");
 			break;
 		default:
-			items.push("<div class='objects-item object-regular' title='" + so.name + "'>" + so.name + "</div>");
+			items.push("<div class='objects-item object-regular' title='" + so.Name + "'>" + so.Name + "</div>");
 			break;
 			
 	}
-	if(so.hasOwnProperty("children")) {
-		$.each(so.children, function(i, child) {
+	if(so.hasOwnProperty("Children")) {
+		$.each(so.Children, function(i, child) {
 			items = items.concat(parseSuperObject(child, level+1));
 		});
 	}
@@ -266,106 +268,155 @@ function parseSuperObject(so, level) {
 function parseAlways(alwaysData) {
 	let items = [];
 	let so = {
-		offset: "null",
-		type: "AlwaysWorld",
-		position: [0,0,0],
-		rotation: [0,0,0],
-		scale:    [0,0,0]
+		Offset: "null",
+		Type: "AlwaysWorld",
+		Position: { x: 0, y: 0, z: 0 },
+		Rotation: { x: 0, y: 0, z: 0 },
+		Scale:    { x: 0, y: 0, z: 0 }
 	};
 	objectsList.push(so);
 	items.push("<div class='objects-item object-world level-0' alt='Spawnable objects'>Spawnable objects</div>");
 	
-	if(alwaysData.hasOwnProperty("spawnablePersos")) {
-		$.each(alwaysData.spawnablePersos, function(i, child) {
-			let family = alwaysData.spawnablePersos[i].nameFamily;
-			let model = alwaysData.spawnablePersos[i].nameModel;
-			let instance = alwaysData.spawnablePersos[i].nameInstance;
+	if(alwaysData.hasOwnProperty("SpawnablePersos")) {
+		$.each(alwaysData.SpawnablePersos, function(i, child) {
+			let family = alwaysData.SpawnablePersos[i].NameFamily;
+			let model = alwaysData.SpawnablePersos[i].NameModel;
+			let instance = alwaysData.SpawnablePersos[i].NameInstance;
 			items.push("<div class='objects-item object-always object-perso' title='Spawnable'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
 			let persoSO = {
-				offset: alwaysData.spawnablePersos[i].offset,
-				type: "Always",
-				perso: alwaysData.spawnablePersos[i],
-				position: alwaysData.spawnablePersos[i].position,
-				rotation: alwaysData.spawnablePersos[i].rotation,
-				scale:    alwaysData.spawnablePersos[i].scale
+				Offset: alwaysData.SpawnablePersos[i].Offset,
+				Type: "Perso",
+				Perso: alwaysData.SpawnablePersos[i],
+				Position: alwaysData.SpawnablePersos[i].Position,
+				Rotation: alwaysData.SpawnablePersos[i].Rotation,
+				Scale:    alwaysData.SpawnablePersos[i].Scale
 			};
 			objectsList.push(persoSO);
 		});
 	}
 	return items;
 }
+
+function parseDynamicSuperObjects(dynamicSO) {
+	let items = [];
+	let so = {
+		Offset: "null",
+		Type: "World",
+		Position: { x: 0, y: 0, z: 0 },
+		Rotation: { x: 0, y: 0, z: 0 },
+		Scale:    { x: 0, y: 0, z: 0 }
+	};
+	objectsList.push(so);
+	items.push("<div class='objects-item object-world level-0' alt='Dynamic World'>Dynamic World</div>");
+	
+	$.each(dynamicSO, function(i, child) {
+		items = items.concat(parseSuperObject(child, 1));
+	});
+	return items;
+}
 function handleMessage_settings(msg) {
-	if(msg.hasOwnProperty("settings")) {
-		$(".settings-toggle").removeClass("disabled-button");
-		$("#btn-lighting").removeClass("disabled-button");
-		if(msg.settings.enableLighting) {
-			$(".lighting-settings").removeClass("disabled-button");
-		} else {
-			$(".lighting-settings").addClass("disabled-button");
-		}
-		selectButton($("#btn-lighting"), msg.settings.enableLighting);
-		selectButton($("#btn-saturate"), !msg.settings.saturate);
-		selectButton($("#btn-fog"), msg.settings.enableFog);
-		selectButton($("#btn-viewCollision"), msg.settings.viewCollision);
-		selectButton($("#btn-viewGraphs"), msg.settings.viewGraphs);
-		selectButton($("#btn-viewInvisible"), msg.settings.viewInvisible);
-		selectButton($("#btn-displayInactive"), msg.settings.displayInactive);
-		selectButton($("#btn-showPersos"), msg.settings.showPersos);
-		selectButton($("#btn-playAnimations"), msg.settings.playAnimations);
-		selectButton($("#btn-playTextureAnimations"), msg.settings.playTextureAnimations);
-		$("#range-luminosity").val(msg.settings.luminosity);
+	$(".settings-toggle").removeClass("disabled-button");
+	$("#btn-lighting").removeClass("disabled-button");
+	if(msg.EnableLighting) {
+		$(".lighting-settings").removeClass("disabled-button");
+	} else {
+		$(".lighting-settings").addClass("disabled-button");
 	}
+	selectButton($("#btn-lighting"), msg.EnableLighting);
+	selectButton($("#btn-saturate"), !msg.Saturate);
+	selectButton($("#btn-fog"), msg.EnableFog);
+	selectButton($("#btn-viewCollision"), msg.ViewCollision);
+	selectButton($("#btn-viewGraphs"), msg.ViewGraphs);
+	selectButton($("#btn-viewInvisible"), msg.ViewInvisible);
+	selectButton($("#btn-displayInactive"), msg.DisplayInactive);
+	selectButton($("#btn-showPersos"), msg.ShowPersos);
+	selectButton($("#btn-playAnimations"), msg.PlayAnimations);
+	selectButton($("#btn-playTextureAnimations"), msg.PlayTextureAnimations);
+	$("#range-luminosity").val(msg.Luminosity);
 }
 function setAllJSON(jsonString) {
 	//alert(jsonString);
-	//console.log(jsonString); 
-	fullData = $.parseJSON(jsonString);
-	if(fullData != null) {
-		let totalWorld = [];
-		if(fullData.hasOwnProperty("always")) {
-			let fakeAlwaysWorld = parseAlways(fullData.always);
-			totalWorld = totalWorld.concat(fakeAlwaysWorld);
-		}
-		if(fullData.hasOwnProperty("transitDynamicWorld")) {
-			let transitDynamicWorld = parseSuperObject(fullData.transitDynamicWorld, 0);
-			totalWorld = totalWorld.concat(transitDynamicWorld);
-		}
-		if(fullData.hasOwnProperty("actualWorld")) {
-			let actualWorld = parseSuperObject(fullData.actualWorld, 0);
-			totalWorld = totalWorld.concat(actualWorld);
-		}
-		if(totalWorld.length > 0) {
-			let api = objects_content.data('jsp');
-			api.getContentPane().append(totalWorld.join(""));
-			// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
-			setTimeout(function(){
-				api.reinitialise();
-			}, 100);
-		}
-		if(fullData.hasOwnProperty("settings")) {
-			handleMessage_settings(fullData.settings);
+	console.log(JSON.stringify(jsonString)); 
+	let msg = $.parseJSON(jsonString);
+	if(msg.hasOwnProperty("Hierarchy")) {
+		fullData = msg.Hierarchy;
+		if(fullData != null) {
+			let totalWorld = [];
+			if(fullData.hasOwnProperty("Always")) {
+				let fakeAlwaysWorld = parseAlways(fullData.Always);
+				totalWorld = totalWorld.concat(fakeAlwaysWorld);
+			}
+			if(fullData.hasOwnProperty("TransitDynamicWorld")) {
+				let transitDynamicWorld = parseSuperObject(fullData.TransitDynamicWorld, 0);
+				totalWorld = totalWorld.concat(transitDynamicWorld);
+			}
+			if(fullData.hasOwnProperty("ActualWorld")) {
+				let actualWorld = parseSuperObject(fullData.ActualWorld, 0);
+				totalWorld = totalWorld.concat(actualWorld);
+			}
+			if(fullData.hasOwnProperty("DynamicWorld")) {
+				let dynamicWorld = parseSuperObject(fullData.DynamicWorld, 0);
+				totalWorld = totalWorld.concat(dynamicWorld);
+			}
+			if(fullData.hasOwnProperty("DynamicSuperObjects")) {
+				let dynamicWorld = parseDynamicSuperObjects(fullData.DynamicSuperObjects);
+				totalWorld = totalWorld.concat(dynamicWorld);
+			}
+			if(fullData.hasOwnProperty("FatherSector")) {
+				let fatherSector = parseSuperObject(fullData.FatherSector, 0);
+				totalWorld = totalWorld.concat(fatherSector);
+			}
+			if(totalWorld.length > 0) {
+				let api = objects_content.data('jsp');
+				api.getContentPane().append(totalWorld.join(""));
+				// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
+				setTimeout(function(){
+					api.reinitialise();
+				}, 100);
+			}
 		}
 	}
+	if(msg.hasOwnProperty("Settings")) {
+		handleMessage_settings(msg.Settings);
+	}
 }
-
 // SCRIPT
 function setBehavior(behaviorIndex) {
-	if(currentSO != null && currentSO.hasOwnProperty("perso") && currentSO.perso.hasOwnProperty("brain") && behaviorIndex >= 0) {
-		let allBehaviors = [];
-		let brain = currentSO.perso.brain;
-		if(brain.hasOwnProperty("ruleBehaviors") && brain.ruleBehaviors.length > 0) {
-			allBehaviors = allBehaviors.concat(brain.ruleBehaviors);
+	if(currentSO != null && currentSO.hasOwnProperty("Perso") && currentSO.Perso.hasOwnProperty("Brain") && behaviorIndex >= 0) {
+		let brain = currentSO.Perso.Brain;
+		currentBehavior = null;
+		let curIndex = behaviorIndex;
+		if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
+			if(curIndex < brain.Intelligence.length) {
+				currentBehavior = brain.Intelligence[curIndex];
+				currentBehaviorType = "Intelligence";
+			} else {
+				curIndex -= brain.Intelligence.length;
+			}
 		}
-		if(brain.hasOwnProperty("reflexBehaviors") && brain.reflexBehaviors.length > 0) {
-			allBehaviors = allBehaviors.concat(brain.reflexBehaviors);
+		if(brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
+			if(curIndex < brain.Reflex.length) {
+				currentBehavior = brain.Reflex[curIndex];
+				currentBehaviorType = "Reflex";
+			} else {
+				curIndex -= brain.Reflex.length;
+			}
 		}
-		if(brain.hasOwnProperty("macros") && brain.macros.length > 0) {
-			allBehaviors = allBehaviors.concat(brain.macros);
+		if(brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
+			if(curIndex < brain.Macros.length) {
+				currentBehavior = brain.Macros[curIndex];
+				currentBehaviorType = "Macro";
+			} else {
+				curIndex -= brain.Macros.length;
+			}
 		}
-		if(behaviorIndex < allBehaviors.length) {
-			currentBehavior = allBehaviors[behaviorIndex];
+		if(currentBehavior != null) {
 			currentScriptIndex = 0;
-			$("#header-script-text").text(currentBehavior.name + ".Scripts[0]");
+			if(currentBehaviorType == "Macro") {
+				$("#header-script-text").text(currentBehavior.Name + ".Script");
+			} else {
+				$("#header-script-text").text(currentBehavior.Name + ".Scripts[0]");
+			}
 			$("#content-script-code").text("");
 		}
 	}
@@ -374,14 +425,14 @@ function setBehavior(behaviorIndex) {
 function setScript(scriptIndex) {
 	if(currentBehavior != null) {
 		let scripts = [];
-		if(currentBehavior.hasOwnProperty("script")) {
-			scripts.push(currentBehavior.script);
+		if(currentBehavior.hasOwnProperty("Script")) {
+			scripts.push(currentBehavior.Script);
 		}
-		if(currentBehavior.hasOwnProperty("firstScript")) {
-			scripts.push(currentBehavior.firstScript);
+		if(currentBehavior.hasOwnProperty("FirstScript")) {
+			scripts.push(currentBehavior.FirstScript);
 		}
-		if(currentBehavior.hasOwnProperty("scripts")) {
-			scripts = scripts.concat(currentBehavior.scripts);
+		if(currentBehavior.hasOwnProperty("Scripts")) {
+			scripts = scripts.concat(currentBehavior.Scripts);
 		}
 		$("#content-script-code").text("");
 		let api = $("#content-script").data('jsp');
@@ -395,13 +446,13 @@ function setScript(scriptIndex) {
 			$('#btn-next-script').addClass('disabled-button');
 			$('#btn-prev-script').addClass('disabled-button');
 			currentScriptIndex = scriptIndex;
-			$("#header-script-text").text(currentBehavior.name + ".Scripts[" + scriptIndex + "]");
+			$("#header-script-text").text(currentBehavior.Name + ".Scripts[" + scriptIndex + "]");
 			
 			let jsonObj = {
-				request: {
-					type: "script",
-					scriptOffset: scripts[scriptIndex].offset,
-					behaviorType: currentBehavior.type
+				Request: {
+					Type: "Script",
+					ScriptOffset: scripts[scriptIndex].Offset,
+					BehaviorType: currentBehaviorType
 				}
 			};
 			sendMessage(jsonObj);
@@ -412,8 +463,8 @@ function setScript(scriptIndex) {
 function handleMessage_script(msg) {
 	if(currentBehavior != null) {
 		let scripts = [];
-		if(msg.hasOwnProperty("translation")) {
-			$("#content-script-code").text(msg.translation);
+		if(msg.hasOwnProperty("Translation")) {
+			$("#content-script-code").text(msg.Translation);
 			hljs.highlightBlock($("#content-script-code").get(0));
 			let api = $("#content-script").data('jsp');
 			api.scrollTo(0,0, false);
@@ -422,14 +473,14 @@ function handleMessage_script(msg) {
 			}, 3, "highlight");*/
 			refreshScroll();
 		}
-		if(currentBehavior.hasOwnProperty("script")) {
-			scripts.push(currentBehavior.script);
+		if(currentBehavior.hasOwnProperty("Script")) {
+			scripts.push(currentBehavior.Script);
 		}
-		if(currentBehavior.hasOwnProperty("firstScript")) {
-			scripts.push(currentBehavior.firstScript);
+		if(currentBehavior.hasOwnProperty("FirstScript")) {
+			scripts.push(currentBehavior.FirstScript);
 		}
-		if(currentBehavior.hasOwnProperty("scripts")) {
-			scripts = scripts.concat(currentBehavior.scripts);
+		if(currentBehavior.hasOwnProperty("Scripts")) {
+			scripts = scripts.concat(currentBehavior.Scripts);
 		}
 		if(currentScriptIndex < scripts.length-1) {
 			$('#btn-next-script').removeClass('disabled-button');
@@ -446,116 +497,106 @@ function handleMessage_script(msg) {
 
 // PERSO OBJECT DESCRIPTION
 function showObjectDescription(so) {
-	$('#posX').val(so.position[0]);
-	$('#posY').val(so.position[1]);
-	$('#posZ').val(so.position[2]);
+	$('#posX').val(so.Position.x);
+	$('#posY').val(so.Position.y);
+	$('#posZ').val(so.Position.z);
 	
-	$('#rotX').val(so.rotation[0]);
-	$('#rotY').val(so.rotation[1]);
-	$('#rotZ').val(so.rotation[2]);
+	$('#rotX').val(so.Rotation.x);
+	$('#rotY').val(so.Rotation.y);
+	$('#rotZ').val(so.Rotation.z);
 	
-	$('#sclX').val(so.scale[0]);
-	$('#sclY').val(so.scale[1]);
-	$('#sclZ').val(so.scale[2]);
+	$('#sclX').val(so.Scale.x);
+	$('#sclY').val(so.Scale.y);
+	$('#sclZ').val(so.Scale.z);
 	
-	if(so.hasOwnProperty("perso")) {
+	if(so.hasOwnProperty("Perso")) {
+		let perso = so.Perso;
+
 		$('.perso-description').removeClass('invisible');
 		stateSelector.empty();
 		objectListSelector.empty();
-		objectListSelector.append("<option value='0'>None</option>");
-		let family = fullData.families[so.perso.family];
-		if(family != null) {
-			if(family.hasOwnProperty("states")) {
-				$.each(family.states, function (idx, val) {
-					stateSelector.append("<option value='" + idx + "'>" + val + "</option>");
-				});
-				stateSelector.prop("selectedIndex", so.perso.state);
-			}
-			if(family.hasOwnProperty("objectLists")) {
-				$.each(family.objectLists, function (idx, val) {
-					objectListSelector.append("<option value='" + idx + "'>" + val + "</option>");
-				});
-			}
-		}
-		if(fullData.hasOwnProperty("uncategorizedObjectLists")) {
-			$.each(fullData.uncategorizedObjectLists, function (idx, val) {
-				objectListSelector.append("<option value='" + idx + "'>" + val + "</option>");
+		//objectListSelector.append("<option value='0'>None</option>");
+
+		if(perso.hasOwnProperty("States")) {
+			$.each(perso.States, function (idx, state) {
+				stateSelector.append("<option value='" + idx + "'>" + state.Name + "</option>");
 			});
+			stateSelector.prop("selectedIndex", perso.State);
 		}
-		objectListSelector.prop("selectedIndex", so.perso.objectList);
+		if(perso.hasOwnProperty("ObjectLists")) {
+			$.each(perso.ObjectLists, function (idx, poList) {
+				objectListSelector.append("<option value='" + idx + "'>" + poList + "</option>");
+			});
+			objectListSelector.prop("selectedIndex", perso.ObjectList);
+		}
 		
-		selectButton($("#btn-enabled"), so.perso.enabled);
-		$("#objectName").html("<div class='name-family'>" + so.perso.nameFamily + "</div><div class='name-model'>" + so.perso.nameModel + "</div><div class='name-instance'>" + so.perso.nameInstance + "</div>");
+		selectButton($("#btn-enabled"), perso.IsEnabled);
+		$("#objectName").html(
+			"<div class='name-family'>" + perso.NameFamily +
+			"</div><div class='name-model'>" + perso.NameModel +
+			"</div><div class='name-instance'>" + perso.NameInstance + "</div>");
 		
 		// Animation stuff
-		selectButton($("#btn-playAnimation"), so.perso.playAnimation);
-		selectButton($("#btn-autoNextState"), so.perso.autoNextState);
-		$('#animationSpeed').val(so.perso.animationSpeed);
+		selectButton($("#btn-playAnimation"), perso.PlayAnimation);
+		selectButton($("#btn-autoNextState"), perso.AutoNextState);
+		$('#animationSpeed').val(perso.AnimationSpeed);
 		
 		// Scripts
 		$("#content-brain").empty();
-		if(so.perso.hasOwnProperty("brain")) {
+		if(perso.hasOwnProperty("Brain")) {
 			let allBehaviors = [];
-			let brain = so.perso.brain;
+			let brain = perso.Brain;
 			let reg = /^.*\.(.*?)\[(\d*?)\](?:\[\"(.*?)\"\])?$/;
-			if(brain.hasOwnProperty("ruleBehaviors") && brain.ruleBehaviors.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category' data-collapse='behaviors-rule-collapse'><div class='collapse-sign'>+</div>Rule behaviors</div><div id='behaviors-rule-collapse' style='display: none;'>");
-				$.each(brain.ruleBehaviors, function (idx, val) {
-					let match = reg.exec(val.name);
+			if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
+				allBehaviors.push("<div class='behaviors-item category' data-collapse='behaviors-intelligence-collapse'><div class='collapse-sign'>+</div>Intelligence behaviors</div><div id='behaviors-intelligence-collapse' style='display: none;'>");
+				$.each(brain.Intelligence, function (idx, val) {
+					let match = reg.exec(val.Name);
 					if (match != null) {
 						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
 					} else {
-						allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+						allBehaviors.push("<div class='behaviors-item behavior'>" + val.Name + "</div>");
 					}
 				});
 				allBehaviors.push("</div>");
 			}
-			if(brain.hasOwnProperty("reflexBehaviors") && brain.reflexBehaviors.length > 0) {
+			if(brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
 				allBehaviors.push("<div class='behaviors-item category' data-collapse='behaviors-reflex-collapse'><div class='collapse-sign'>+</div>Reflex behaviors</div><div id='behaviors-reflex-collapse' style='display: none;'>");
-				$.each(brain.reflexBehaviors, function (idx, val) {
-					let match = reg.exec(val.name);
+				$.each(brain.Reflex, function (idx, val) {
+					let match = reg.exec(val.Name);
 					if (match != null) {
 						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
 					} else {
-						allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+						allBehaviors.push("<div class='behaviors-item behavior'>" + val.Name + "</div>");
 					}
 				});
 				allBehaviors.push("</div>");
 			}
-			if(brain.hasOwnProperty("macros") && brain.macros.length > 0) {
+			if(brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
 				allBehaviors.push("<div class='behaviors-item category' data-collapse='macros-collapse'><div class='collapse-sign'>+</div>Macros</div><div id='macros-collapse' style='display: none;'>");
-				$.each(brain.macros, function (idx, val) {
-					let match = reg.exec(val.name);
+				$.each(brain.Macros, function (idx, val) {
+					let match = reg.exec(val.Name);
 					if (match != null) {
 						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
 					} else {
-						allBehaviors.push("<div class='behaviors-item behavior'>" + val.name + "</div>");
+						allBehaviors.push("<div class='behaviors-item behavior'>" + val.Name + "</div>");
 					}
 				});
 				allBehaviors.push("</div>");
 			}
-			if(brain.hasOwnProperty("dsgVars") && brain.dsgVars.length > 0) {
+			if(brain.hasOwnProperty("DsgVars") && brain.DsgVars.length > 0) {
 				allBehaviors.push("<div class='behaviors-item category' data-collapse='dsgvars-collapse'><div class='collapse-sign'>+</div>DSG Variables</div><div id='dsgvars-collapse' style='display: none;'>");
-				$.each(brain.dsgVars, function (idx, dsg) {
-					let dsgString = "<div class='dsgvars-item dsgvar'><div class='dsgvar-name'>" + dsg.name + "</div><div class='dsgvar-value "
-					if(dsg.hasOwnProperty("value")) {
-						if(dsg.type === 'Perso') {
-							dsgString += " perso' data-offset='" + dsg.value.offset + "'>" + dsg.value.nameInstance;
-						} else if(dsg.type === 'SuperObject') {
-							if(dsg.value.type === 'Perso') {
-								dsgString += " perso' data-offset='" + dsg.value.perso.offset + "'>" + dsg.value.perso.nameInstance;
-							} else {
-								dsgString += " superObject' data-offset='" + dsg.value.offset + "'>" +dsg.value.name;
-							}
-						} else if(dsg.type === 'Vector') {
-							dsgString += " vector'>" + dsg.value[0] + ", " + dsg.value[1] + ", " + dsg.value[2];
-						} else {
-							dsgString += " main'>" +dsg.value;
-						}
-					} else {
-						dsgString += " null'>"
-					}
-					dsgString += "</div></div>"
+				let hasCurrent = brain.DsgVars.some(d => d.hasOwnProperty("ValueCurrent"));
+				let hasInitial = brain.DsgVars.some(d => d.hasOwnProperty("ValueInitial"));
+				let hasModel = brain.DsgVars.some(d => d.hasOwnProperty("ValueModel"));
+				// Header
+				allBehaviors.push("<div class='dsgvars-item dsgvars-header'><div class='dsgvar-type'></div><div class='dsgvar-name'></div>")
+				if(hasCurrent) allBehaviors.push("<div class='dsgvar-value'>Current</div>");
+				if(hasInitial) allBehaviors.push("<div class='dsgvar-value'>Initial</div>");
+				if(hasModel) allBehaviors.push("<div class='dsgvar-value'>Model</div>");
+				allBehaviors.push("</div>")
+				// DsgVars
+				$.each(brain.DsgVars, function (idx, dsg) {
+					let dsgString = getDsgVarString(idx, dsg, hasCurrent, hasInitial, hasModel);
 					allBehaviors.push(dsgString);
 				});
 				allBehaviors.push("</div>");
@@ -574,18 +615,169 @@ function showObjectDescription(so) {
 	description_column.removeClass('invisible');
 }
 
+function getDsgVarString(index, dsg, hasCurrent, hasInitial, hasModel) {
+	let dsgString = "<div class='dsgvars-item dsgvar'><div class='dsgvar-type dsgvar-type-" + dsg.Type + "'>" + getDsgVarIcon(dsg.Type) + "</div>";
+	dsgString += "<div class='dsgvar-name'>" + dsg.Name + "</div>";
+	if(hasCurrent) dsgString += getDsgVarTypeString("current", dsg.ValueCurrent);
+	if(hasInitial) dsgString += getDsgVarTypeString("initial", dsg.ValueInitial);
+	if(hasModel) dsgString += getDsgVarTypeString("model", dsg.ValueModel);
+	dsgString += "</div>";
+	return dsgString;
+}
+
+function getDsgVarIcon(type) {
+	let dsgString = "<div class='dsgvar-icon'>";
+	switch(type) {
+		case "Boolean":
+			//dsgString += "<i class='icon-input-checked'></i>";
+			break;
+		case "Byte":
+			break;
+		case "UByte":
+			break;
+		case "Short":
+			break;
+		case "UShort":
+			break;
+		case "Int":
+			break;
+		case "UInt":
+			break;
+		case "Float":
+			break;
+		case "Caps":
+			break;
+		case "Text":
+			dsgString += "<i class='icon-commenting'></i>";
+			break;
+		case "Vector":
+			break;
+		case "Perso":
+			dsgString += "<i class='icon-user'></i>";
+			break;
+		case "SuperObject":
+			break;
+		case "WayPoint":
+			dsgString += "<i class='icon-location-pin'></i>";
+			break;
+		case "Graph":
+			dsgString += "<i class='icon-flow-children'></i>";
+			break;
+		case "Action":
+			dsgString += "<i class='icon-media-play'></i>";
+			break;
+		case "SoundEvent":
+			dsgString += "<i class='icon-volume-medium'></i>";
+		default:
+			break;
+	}
+	dsgString += "</div>";
+	return dsgString;
+}
+
+function getDsgVarTypeString(valueType, val) {
+	if(val === undefined || val === null) {
+		let dsgString = "<div class='dsgvar-value dsgvar-value-null'></div>";
+		return dsgString;
+	}
+	let dsgString = "<div class='dsgvar-value dsgvar-value-" + valueType + " dsgvar-value-" + val.Type;
+	if(val.hasOwnProperty("AsArray")) {
+		dsgString += " dsgvar-value-array'>"
+	} else {
+		switch(val.Type) {
+			case "Boolean":
+				dsgString += "'>" + val.AsBoolean;
+				break;
+			case "Byte":
+				dsgString += "'>" + val.AsByte;
+				break;
+			case "UByte":
+				dsgString += "'>" + val.AsUByte;
+				break;
+			case "Short":
+				dsgString += "'>" + val.AsShort;
+				break;
+			case "UShort":
+				dsgString += "'>" + val.AsUShort;
+				break;
+			case "Int":
+				dsgString += "'>" + val.AsInt;
+				break;
+			case "UInt":
+				dsgString += "'>" + val.AsUInt;
+				break;
+			case "Float":
+				dsgString += "'>" + val.AsFloat;
+				break;
+			case "Caps":
+				dsgString += "'>" + val.AsCaps;
+				break;
+			case "Text":
+				dsgString += "'>" + val.AsText;
+				break;
+			case "Vector":
+				dsgString += " vector'>(" + val.AsVector.x + ", " + val.AsVector.y + ", " + val.AsVector.z + ")";
+				break;
+			case "Perso":
+				if(val.hasOwnProperty("AsPerso")) {
+					dsgString += "perso' data-offset='" + val.AsPerso.Offset + "'>" + val.AsPerso.NameInstance;
+				} else {
+					dsgString +="'>"
+				}
+				break;
+			case "SuperObject":
+				dsgString += "'>";
+				if(val.hasOwnProperty("AsSuperObject")) {
+					if(val.AsSuperObject.hasOwnProperty("Name")) {
+						dsgString += val.AsSuperObject.Name;
+					}
+				}
+				break;
+			case "WayPoint":
+				dsgString += "'>";
+				if(val.hasOwnProperty("AsWayPoint")) {
+					if(val.AsWayPoint.hasOwnProperty("Name")) {
+						dsgString += val.AsWayPoint.Name;
+					}
+				}
+				break;
+			case "Graph":
+				dsgString += "'>";
+				if(val.hasOwnProperty("AsGraph")) {
+					if(val.AsGraph.hasOwnProperty("Name")) {
+						dsgString += val.AsGraph.Name;
+					}
+				}
+				break;
+			case "Action":
+				dsgString += "'>";
+				if(val.hasOwnProperty("AsAction")) {
+					if(val.AsAction.hasOwnProperty("Name")) {
+						dsgString += val.AsAction.Name;
+					}
+				}
+				break;
+			default:
+				dsgString += "'>";
+				break;
+		}
+	}
+	dsgString += "</div>";
+	return dsgString;
+}
+
 function sendPerso() {
-	if(currentSO != null && currentSO.hasOwnProperty("perso")) {
+	if(currentSO != null && currentSO.hasOwnProperty("Perso")) {
 		let animationSpeed = $('#animationSpeed').val();
 		let jsonObj = {
-			perso: {
-				offset: currentSO.perso.offset,
-				objectList: $("#objectList").prop('selectedIndex'),
-				state: $("#state").prop('selectedIndex'),
-				enabled: $("#btn-enabled").hasClass("selected"),
-				playAnimation: $("#btn-playAnimation").hasClass("selected"),
-				autoNextState: $("#btn-autoNextState").hasClass("selected"),
-				animationSpeed: $.isNumeric(animationSpeed) ? animationSpeed : currentSO.perso.animationSpeed
+			Perso: {
+				Offset: currentSO.Perso.Offset,
+				ObjectList: $("#objectList").prop('selectedIndex'),
+				State: $("#state").prop('selectedIndex'),
+				IsEnabled: $("#btn-enabled").hasClass("selected"),
+				PlayAnimation: $("#btn-playAnimation").hasClass("selected"),
+				AutoNextState: $("#btn-autoNextState").hasClass("selected"),
+				AnimationSpeed: $.isNumeric(animationSpeed) ? animationSpeed : currentSO.Perso.AnimationSpeed
 			}
 		}
 		sendMessage(jsonObj);
@@ -609,12 +801,12 @@ function setObjectTransform() {
 		   $.isNumeric(rotX) && $.isNumeric(rotY) && $.isNumeric(rotZ) &&
 		   $.isNumeric(sclX) && $.isNumeric(sclY) && $.isNumeric(sclZ)) {
 			let jsonObj = {
-				superobject: {
-					offset:   currentSO.offset,
-					type:     currentSO.type,
-					position: [posX, posY, posZ],
-					rotation: [rotX, rotY, rotZ],
-					scale:    [sclX, sclY, sclZ]
+				Superobject: {
+					Offset:   currentSO.Offset,
+					Type:     currentSO.Type,
+					Position: { x: posX, y: posY, z: posZ},
+					Rotation: { x: rotX, y: rotY, z: rotZ},
+					Scale:    { x: sclX, y: sclY, z: sclZ}
 				}
 			}
 			sendMessage(jsonObj);
@@ -625,62 +817,61 @@ function setObjectTransform() {
 // SELECTION
 function setSelectionPerso(perso) {
 	let jsonObj = {
-		selection: {
-			offset: perso.offset,
-			type: "Perso",
-			view: true
+		Selection: {
+			Perso: {
+				Offset: perso.Offset
+			},
+			View: true
 		}
 	}
 	sendMessage(jsonObj);
 }
 function setSelection(so) {
-	let jsonObj = {
-		selection: {
-			offset: so.hasOwnProperty("perso") ? so.perso.offset : so.offset,
-			type: so.type,
-			view: true
+	if(so.hasOwnProperty("Perso")) {
+		setSelectionPerso(so.Perso);
+	} else {
+		let jsonObj = {
+			Selection: {
+				SuperObject: {
+					Offset: so.Offset
+				},
+				View: true
+			}
 		}
+		sendMessage(jsonObj);
 	}
-	sendMessage(jsonObj);
 }
 function clearSelection() {
 	description_column.addClass('invisible');
 	$(".objects-item").removeClass("current-objects-item");
 	currentSO = null;
 	let jsonObj = {
-		selection: {
-			offset: "null"
+		Selection: {
+			//Offset: "null"
 		}
 	}
 	sendMessage(jsonObj);
 }
+// TODO
 function handleMessage_selection(msg) {
-	if(msg.selectionType === "superobject") {
-		let so_selection, index_selection = -1;
-		if(fullData != null) {
-			for (let i = 0; i < objectsList.length; i++) {
-				if(objectsList[i].offset === msg.selection.offset) {
-					objectsList[i] = msg.selection;
-					index_selection = i;
-					break;
-				}
-			}
-		}
-		if(index_selection > -1) {
-			$(".objects-item").removeClass("current-objects-item");
-			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
-			currentSO = msg.selection;
-			showObjectDescription(currentSO);
-		}
-	} else if(msg.selectionType === "always") {
+	let selection = msg;
+	if(!selection.hasOwnProperty("Perso")) {
+		// Deselection. Can only happen from web version, so do nothing
+		return;
+	}
+	let perso = selection.Perso;
+	if(perso.IsAlways) {
 		let perso_selection, index_selection = -1;
 		if(fullData != null) {
 			for (let i = 0; i < objectsList.length; i++) {
-				if(objectsList[i].offset === msg.selection.offset) {
-					objectsList[i].perso = msg.selection;
-					objectsList[i].position = msg.selection.position;
-					objectsList[i].rotation = msg.selection.rotation;
-					objectsList[i].scale = msg.selection.scale;
+				if(!objectsList[i].hasOwnProperty("Perso")) {
+					continue;
+				}
+				if(objectsList[i].Perso.Offset === perso.Offset) {
+					objectsList[i].Perso = perso;
+					objectsList[i].Position = perso.Position;
+					objectsList[i].Rotation = perso.Rotation;
+					objectsList[i].Scale = perso.Scale;
 					index_selection = i;
 					break;
 				}
@@ -692,11 +883,34 @@ function handleMessage_selection(msg) {
 			currentSO = objectsList[index_selection];
 			showObjectDescription(currentSO);
 		}
+	} else {
+		let so_selection, index_selection = -1;
+		if(fullData != null) {
+			for (let i = 0; i < objectsList.length; i++) {
+				if(!objectsList[i].hasOwnProperty("Perso")) {
+					continue;
+				}
+				if(objectsList[i].Perso.Offset === perso.Offset) {
+					objectsList[i].Perso = perso;
+					objectsList[i].Position = perso.Position;
+					objectsList[i].Rotation = perso.Rotation;
+					objectsList[i].Scale = perso.Scale;
+					index_selection = i;
+					break;
+				}
+			}
+		}
+		if(index_selection > -1) {
+			$(".objects-item").removeClass("current-objects-item");
+			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
+			currentSO = objectsList[index_selection];
+			showObjectDescription(currentSO);
+		}
 	}
 }
 function handleMessage_highlight(msg) {
-	if(msg.hasOwnProperty("perso")) {
-		perso_tooltip.html("<div class='name-family'>" + msg.perso.nameFamily + "</div><div class='name-model'>" + msg.perso.nameModel + "</div><div class='name-instance'>" + msg.perso.nameInstance + "</div>");
+	if(msg.hasOwnProperty("Perso")) {
+		perso_tooltip.html("<div class='name-family'>" + msg.Perso.NameFamily + "</div><div class='name-model'>" + msg.Perso.NameModel + "</div><div class='name-instance'>" + msg.Perso.NameInstance + "</div>");
 		perso_tooltip.removeClass("hidden-tooltip");
 	} else {
 		perso_tooltip.addClass("hidden-tooltip");
@@ -706,18 +920,18 @@ function handleMessage_highlight(msg) {
 // SETTINGS
 function sendSettings() {
 	let jsonObj = {
-		settings: {
-			enableLighting: $("#btn-lighting").hasClass("selected"),
-			enableFog: $("#btn-fog").hasClass("selected"),
-			luminosity: $("#range-luminosity").val(),
-			saturate: !$("#btn-saturate").hasClass("selected"),
-			viewCollision: $("#btn-viewCollision").hasClass("selected"),
-			viewGraphs: $("#btn-viewGraphs").hasClass("selected"),
-			viewInvisible: $("#btn-viewInvisible").hasClass("selected"),
-			displayInactive: $("#btn-displayInactive").hasClass("selected"),
-			showPersos: $("#btn-showPersos").hasClass("selected"),
-			playAnimations: $("#btn-playAnimations").hasClass("selected"),
-			playTextureAnimations: $("#btn-playTextureAnimations").hasClass("selected")
+		Settings: {
+			EnableLighting: $("#btn-lighting").hasClass("selected"),
+			EnableFog: $("#btn-fog").hasClass("selected"),
+			Luminosity: $("#range-luminosity").val(),
+			Saturate: !$("#btn-saturate").hasClass("selected"),
+			ViewCollision: $("#btn-viewCollision").hasClass("selected"),
+			ViewGraphs: $("#btn-viewGraphs").hasClass("selected"),
+			ViewInvisible: $("#btn-viewInvisible").hasClass("selected"),
+			DisplayInactive: $("#btn-displayInactive").hasClass("selected"),
+			ShowPersos: $("#btn-showPersos").hasClass("selected"),
+			PlayAnimations: $("#btn-playAnimations").hasClass("selected"),
+			PlayTextureAnimations: $("#btn-playTextureAnimations").hasClass("selected")
 		}
 	}
 	sendMessage(jsonObj);
@@ -726,16 +940,16 @@ function sendSettings() {
 // MESSAGE
 function handleMessage(jsonString) {
 	let msg = $.parseJSON(jsonString);
-	if(msg != null && msg.hasOwnProperty("type")) {
-		switch(msg.type) {
-			case "highlight":
-				handleMessage_highlight(msg); break;
-			case "selection":
-				handleMessage_selection(msg); break;
-			case "settings":
-				handleMessage_settings(msg); break;
-			case "script":
-				handleMessage_script(msg); break;
+	if(msg != null && msg.hasOwnProperty("Type")) {
+		switch(msg.Type) {
+			case "Highlight":
+				handleMessage_highlight(msg.Highlight); break;
+			case "Selection":
+				handleMessage_selection(msg.Selection); break;
+			case "Settings":
+				handleMessage_settings(msg.Settings); break;
+			case "Script":
+				handleMessage_script(msg.Script); break;
 			default:
 				console.log('default');break;
 		}
@@ -826,7 +1040,7 @@ function hideDialogue() {
 }
 
 function startGame() {
-	gameInstance = UnityLoader.instantiate("gameContainer", "Build/WebGL.json", {onProgress: UnityProgress});
+	gameInstance = UnityLoader.instantiate("gameContainer", "Build/WebGL_2020_07_08.json", {onProgress: UnityProgress});
 }
 
 function showLevelSelect() {
@@ -887,8 +1101,8 @@ $(function() {
 		//$(".objects-item").removeClass("current-objects-item");
 		//$(this).addClass("current-objects-item");
 		let so = getSuperObjectByIndex(index);
-		if(so.hasOwnProperty("perso")) {
-			setSelectionPerso(so.perso);
+		if(so.hasOwnProperty("Perso")) {
+			setSelectionPerso(so.Perso);
 			//currentSO = so;
 			//showObjectDescription(so);
 		}

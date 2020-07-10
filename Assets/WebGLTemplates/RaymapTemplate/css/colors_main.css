@@ -71,6 +71,13 @@ body {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
+.dsgvars-item > .dsgvar-name,
+.dsgvars-item > .dsgvar-type {
+	background-color: rgba(3,61,82,1);
+}
+.dsgvars-item.dsgvars-header {
+	background-color: rgba(3,61,82,1);
+}
 .objects-item.object-sector:hover,
 .behaviors-item.category:hover {
 	background-color: rgba(1,33,45,1);

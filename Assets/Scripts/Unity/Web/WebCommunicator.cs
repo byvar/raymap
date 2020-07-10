@@ -289,7 +289,7 @@ public class WebCommunicator : MonoBehaviour {
 	}
 	private WebJSON.DsgVar[] GetDsgVarsJSON(BasePersoBehaviour perso) {
 		DsgVarComponent dsgComponent = perso?.brain?.dsgVars;
-		if (dsgComponent != null && dsgComponent.dsgVarEntries != null && dsgComponent.dsgVarEntries.Length > 0) {
+		if (dsgComponent != null && dsgComponent.editableEntries != null && dsgComponent.editableEntries.Length > 0) {
 			return dsgComponent.editableEntries.Select(e => GetDsgVarJSON(e)).ToArray();
 		}
 		return null;
