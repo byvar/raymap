@@ -24,6 +24,7 @@ namespace OpenSpace.PS1 {
 			//Load.print("Perso @ " + Offset);
 			off_p3dData = Pointer.Read(reader);
 			off_superObjectPointer = Pointer.Read(reader);
+			off_08 = Pointer.Read(reader); // Probably Dynamics!
 			off_0C = Pointer.Read(reader); // points to struct of 0x18 size
 			off_collSet = Pointer.Read(reader);
 			off_sectorSuperObjectPointer = Pointer.Read(reader); // points to 4 bytes: 00000000. Only filled in at runtime
