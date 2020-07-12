@@ -1,3 +1,5 @@
+using OpenSpace;
+using System;
 using UnityEngine;
 
 // Very simple smooth mouselook modifier for the MainCamera in Unity
@@ -24,8 +26,13 @@ public class CameraComponent : MonoBehaviour {
     Vector3? targetPos = null;
     Quaternion? targetRot = null;
 
+	private Vector3 lastMousePosition = Vector3.zero;
+	private bool panning = false;
 
-    void Start() {
+	public WebJSON.CameraPos debugCameraPos = WebJSON.CameraPos.Initial;
+	private WebJSON.CameraPos lastDebugCameraPos = WebJSON.CameraPos.Initial;
+
+	void Start() {
         // Set target direction to the camera's initial orientation.
         targetDirection = transform.localRotation.eulerAngles;
     }
@@ -79,7 +86,15 @@ public class CameraComponent : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyUp(KeyCode.LeftShift) & _shifted)
+
+		if (lastDebugCameraPos!=debugCameraPos) {
+			lastDebugCameraPos = debugCameraPos;
+			MapLoader.Loader.controller.SetCameraPosition(debugCameraPos);
+        }
+
+		bool orthographic = cam.GetComponent<Camera>().orthographic;
+
+		if (Input.GetKeyUp(KeyCode.LeftShift) & _shifted)
             _shifted = false;
 
         if ((Input.GetKeyDown(KeyCode.LeftShift) & !_shifted) |
@@ -115,6 +130,46 @@ public class CameraComponent : MonoBehaviour {
 					transform.rotation = Quaternion.Lerp(transform.rotation, targetRot.Value, 0.05f * lerpFactor);
 				}
 			}
+
+			Vector3 mouseDelta = Input.mousePosition - lastMousePosition;
+			lastMousePosition = Input.mousePosition;
+
+			if (orthographic) {
+
+				float orthoFlySpeedMult = (float)Math.Sqrt(Camera.main.orthographicSize);
+
+				if (Input.GetMouseButton(0)) {
+
+					if (panning) {
+
+						float xFactor = Camera.main.orthographicSize * 2.0f / Camera.main.pixelHeight;
+						float yFactor = Camera.main.orthographicSize * 2.0f / Camera.main.pixelHeight;
+
+						transform.Translate(Vector3.right * xFactor * -mouseDelta.x, Space.Self);
+						transform.Translate(Vector3.up * yFactor * -mouseDelta.y, Space.Self);
+					} else {
+						panning = true;
+                    }
+				} else {
+					panning = false;
+                }
+
+				if (Input.GetAxis("Mouse ScrollWheel") != 0) {
+					Camera.main.orthographicSize *= (float)Math.Pow(2, (-Input.GetAxis("Mouse ScrollWheel")));
+				}
+
+				if (Input.GetAxis("Vertical") != 0) {
+					transform.Translate(Vector3.up * flySpeed * orthoFlySpeedMult * Time.deltaTime * Input.GetAxis("Vertical"), Space.Self);
+				}
+				if (Input.GetAxis("Horizontal") != 0) {
+					transform.Translate(Vector3.right * flySpeed * orthoFlySpeedMult * Time.deltaTime * Input.GetAxis("Horizontal"), Space.Self);
+				}
+				if (Input.GetAxis("HeightAndZoom") != 0) {
+					Camera.main.orthographicSize *= (float)Math.Pow(2, (Input.GetAxis("HeightAndZoom") * Time.deltaTime));
+				}
+
+			}
+
 		} else {
 			targetPos = null;
 			targetRot = null;
@@ -147,19 +202,41 @@ public class CameraComponent : MonoBehaviour {
 			if (clampInDegrees.y < 360)
 				_mouseAbsolute.y = Mathf.Clamp(_mouseAbsolute.y, -clampInDegrees.y * 0.5f, clampInDegrees.y * 0.5f);
 
-			var xRotation = Quaternion.AngleAxis(-_mouseAbsolute.y, targetOrientation * Vector3.right);
-			transform.localRotation = xRotation * targetOrientation;
+			if (!orthographic) {
+				var xRotation = Quaternion.AngleAxis(-_mouseAbsolute.y, targetOrientation * Vector3.right);
+				transform.localRotation = xRotation * targetOrientation;
 
-			// If there's a character body that acts as a parent to the camera
-			var yRotation = Quaternion.AngleAxis(_mouseAbsolute.x, transform.InverseTransformDirection(Vector3.up));
-			transform.localRotation *= yRotation;
+				// If there's a character body that acts as a parent to the camera
+				var yRotation = Quaternion.AngleAxis(_mouseAbsolute.x, transform.InverseTransformDirection(Vector3.up));
+				transform.localRotation *= yRotation;
+			}
 
 			//movement
-			if (Input.GetAxis("Vertical") != 0) {
-				transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
+			if (orthographic) {
+
+				float orthoFlySpeedMult = (float)Math.Sqrt(Camera.main.orthographicSize);
+
+				if (Input.GetAxis("Vertical") != 0) {
+					transform.Translate(Vector3.up * flySpeed * orthoFlySpeedMult * Time.deltaTime * Input.GetAxis("Vertical"), Space.Self);
+				}
+				if (Input.GetAxis("Horizontal") != 0) {
+					transform.Translate(Vector3.right * flySpeed * orthoFlySpeedMult * Time.deltaTime * Input.GetAxis("Horizontal"), Space.Self);
+				}
+				if (Input.GetAxis("HeightAndZoom") != 0) {
+					Camera.main.orthographicSize *= (float)Math.Pow(2, (Input.GetAxis("HeightAndZoom") * Time.deltaTime)); 
+				}
+
 			}
-			if (Input.GetAxis("Horizontal") != 0) {
-				transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
+			else {
+				if (Input.GetAxis("Vertical") != 0) {
+					transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
+				}
+				if (Input.GetAxis("Horizontal") != 0) {
+					transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
+				}
+				if (Input.GetAxis("HeightAndZoom") != 0) {
+					transform.Translate(Vector3.up * flySpeed * Time.deltaTime * Input.GetAxis("HeightAndZoom"), Space.World);
+				}
 			}
 			if (Input.GetKey(KeyCode.Keypad8)) {
 				transform.Translate(Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);

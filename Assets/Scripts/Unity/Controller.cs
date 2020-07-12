@@ -830,6 +830,31 @@ public class Controller : MonoBehaviour {
 		Vector3 worldSize = (worldMax - worldMin);
 		Vector3 center = worldMin + worldSize * 0.5f;
 
+		Camera.main.orthographic = true;
+		Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
+
+		for (int i = 0; i < 4; i++) {
+			Camera.main.transform.rotation = Quaternion.Euler(0, (90 * i), 0);
+			Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
+
+			cameraSettings[WebJSON.CameraPos.Front + i] = communicator.GetCameraJSON(includeTransform: true);
+		}
+
+		var pitch = Mathf.Rad2Deg * Mathf.Atan(Mathf.Sin(Mathf.Deg2Rad * 45));
+		for (int i = 0; i < 4; i++) {
+			Camera.main.transform.rotation = Quaternion.Euler(pitch, 45 + (90 * i), 0);
+			Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
+
+			cameraSettings[WebJSON.CameraPos.IsometricFront + i] = communicator.GetCameraJSON(includeTransform: true);
+		}
+
+		for (int i = 0; i < 2; i++) {
+			Camera.main.transform.rotation = Quaternion.Euler(90 - 180*i, 0, 0);
+			Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
+			cameraSettings[WebJSON.CameraPos.Top + i] = communicator.GetCameraJSON(includeTransform: true);
+		}
+
+		ApplyCameraSettings(cameraSettings[WebJSON.CameraPos.Initial]);
 		// TODO: fill in cameraSettings dictionary with all other possible cameraPos (isometric different angles, and all straight view angles)
 	}
 

@@ -239,17 +239,18 @@ public class WebJSON {
 		Macro
 	}
 
+	// Order is important!
 	public enum CameraPos {
-		Front,
-		Right,
-		Back,
-		Left,
-		Top,
-		Bottom,
-		IsometricFront,
-		IsometricBack,
-		IsometricLeft,
-		IsometricRight,
+		Front = 0,
+		Left = 1,
+		Back = 2,
+		Right = 3,
+		Top = 4,
+		Bottom = 5,
+		IsometricFront = 6,
+		IsometricLeft = 7,
+		IsometricBack = 8,
+		IsometricRight = 9,
 		Initial
 	}
 	#endregion
