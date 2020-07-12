@@ -1,10 +1,10 @@
 ﻿using OpenSpace.Loader;
 using System.Collections.Generic;
 using UnityEngine;
-using CollideType = OpenSpace.PS1.CollSet.CollideType;
+using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.PS1 {
-	public class ZdxBox : OpenSpaceStruct {
+	public class ZdxBox : OpenSpaceStruct, IGeometricObjectElementCollide {
 		public short x0;
 		public short y0;
 		public short z0;
@@ -39,11 +39,6 @@ namespace OpenSpace.PS1 {
 			gao.transform.localScale = maxVertex - minVertex;
 			gao.layer = LayerMask.NameToLayer("Collide");
 
-			/*CollideComponent cc = sphere_gao.AddComponent<CollideComponent>();
-			cc.collideROM = this;
-			cc.type = collideType;
-			cc.index = i;*/
-
 			GameMaterial gm = (Load as R2PS1Loader).levelHeader.gameMaterials?[gameMaterial];
 			CollideMaterial cm = gm?.collideMaterial;
 			if (cm != null) {
@@ -66,7 +61,17 @@ namespace OpenSpace.PS1 {
 						mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdr")); break;
 				}
 			}
+
+			CollideComponent cc = gao.AddComponent<CollideComponent>();
+			cc.collidePS1 = this;
+			cc.type = collideType;
+
 			return gao;
+		}
+
+		public GameMaterial GetMaterial(int? index) {
+			GameMaterial gm = (Load as R2PS1Loader).levelHeader.gameMaterials?[gameMaterial];
+			return gm;
 		}
 	}
 }

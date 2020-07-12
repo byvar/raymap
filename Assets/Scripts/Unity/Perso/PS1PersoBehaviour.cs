@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using CollideType = OpenSpace.PS1.CollSet.CollideType;
+using CollideType = OpenSpace.Collide.CollideType;
 
 public class PS1PersoBehaviour : BasePersoBehaviour {
     public Perso perso;

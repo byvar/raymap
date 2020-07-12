@@ -7,6 +7,8 @@ public class ObjectSelector : MonoBehaviour {
     public CameraComponent cam;
     public BasePersoBehaviour highlightedPerso = null;
     public BasePersoBehaviour selectedPerso = null;
+    public CollideComponent highlightedCollision = null;
+    public WayPointBehaviour highlightedWayPoint = null;
 	private GameObject tooFarLimitDiamond = null;
 
     private void HandleCollision() {
@@ -16,19 +18,42 @@ public class ObjectSelector : MonoBehaviour {
         } else {
             layerMask |= 1 << LayerMask.NameToLayer("Visual");
         }
+        if (controller.viewGraphs) {
+            layerMask |= 1 << LayerMask.NameToLayer("Graph");
+        }
         Ray ray = cam.cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit[] hits = Physics.RaycastAll(ray, Mathf.Infinity, layerMask, QueryTriggerInteraction.Ignore);
 		if (hits != null && hits.Length > 0) {
 			System.Array.Sort(hits, (x, y) => (x.distance.CompareTo(y.distance)));
-			for (int i = 0; i < hits.Length; i++) {
-                // the object identified by hit.transform was clicked
-                BasePersoBehaviour pb = hits[i].transform.GetComponentInParent<BasePersoBehaviour>();
-                if (pb != null) {
-                    highlightedPerso = pb;
-                    if (Input.GetMouseButtonDown(0)) {
-                        Select(pb, view: true);
+            if (controller.showPersos) {
+                for (int i = 0; i < hits.Length; i++) {
+                    // the object identified by hit.transform was clicked
+                    BasePersoBehaviour pb = hits[i].transform.GetComponentInParent<BasePersoBehaviour>();
+                    if (pb != null) {
+                        highlightedPerso = pb;
+                        if (Input.GetMouseButtonDown(0)) {
+                            Select(pb, view: true);
+                        }
+                        break;
                     }
-                    return;
+                }
+            }
+            if (controller.viewCollision) {
+                for (int i = 0; i < hits.Length; i++) {
+                    CollideComponent cc = hits[i].transform.GetComponent<CollideComponent>();
+                    if (cc != null) {
+                        highlightedCollision = cc;
+                        break;
+                    }
+                }
+            }
+            if (controller.viewGraphs) {
+                for (int i = 0; i < hits.Length; i++) {
+                    WayPointBehaviour wp = hits[i].transform.GetComponent<WayPointBehaviour>();
+                    if (wp != null) {
+                        highlightedWayPoint = wp;
+                        break;
+                    }
                 }
             }
             /*SectorComponent sector = hit.transform.GetComponentInParent<SectorComponent>();
@@ -72,6 +97,8 @@ public class ObjectSelector : MonoBehaviour {
 
     void Update() {
         highlightedPerso = null;
+        highlightedCollision = null;
+        highlightedWayPoint = null;
 		Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
 		if (!cam.mouseLookEnabled
 			&& controller.LoadState == Controller.State.Finished

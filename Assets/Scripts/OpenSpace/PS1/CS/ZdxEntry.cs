@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using CollideType = OpenSpace.PS1.CollSet.CollideType;
+using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.PS1 {
 	public class ZdxEntry : OpenSpaceStruct {

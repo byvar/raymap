@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CollideType = OpenSpace.PS1.CollSet.CollideType;
+using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.PS1 {
 	public class State : OpenSpaceStruct { // Animation/state related

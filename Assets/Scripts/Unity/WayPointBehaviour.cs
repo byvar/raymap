@@ -10,6 +10,7 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
 	public List<GraphNode> nodes = new List<GraphNode>();
 	public List<OpenSpace.ROM.GraphNode> nodesROM = new List<OpenSpace.ROM.GraphNode>();
     public List<OpenSpace.PS1.Arc> arcsPS1 = new List<OpenSpace.PS1.Arc>();
+    public List<GraphBehaviour> graphs = new List<GraphBehaviour>();
     public WayPoint wp = null;
     public OpenSpace.ROM.WayPoint wpROM = null;
     public OpenSpace.PS1.WayPoint wpPS1 = null;
@@ -17,6 +18,7 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
 	private List<LineRenderer> lines = new List<LineRenderer>();
     private List<Vector3> targetPositions = new List<Vector3>();
     private Vector3 currentPosition = Vector3.zero;
+    public float radius;
 
     public ReferenceFields References { get => ((IReferenceable)wp).References; set => ((IReferenceable)wp).References = value; }
 
@@ -119,6 +121,8 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
         MeshFilter mf = gameObject.AddComponent<MeshFilter>();
         MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
         Material unityMat = Resources.Load("Material_WP") as Material;
+        SphereCollider sc = gameObject.AddComponent<SphereCollider>();
+        sc.radius = radius > 1f ? radius : 1f;
         mr.material = unityMat;
         Mesh meshUnity = new Mesh();
         Vector3[] vertices = new Vector3[4];
@@ -145,6 +149,19 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
 
 
         mf.mesh = meshUnity;
+
+
+        if (radius > 1) {
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.transform.localScale = new Vector3(radius * 2, radius * 2, radius * 2);
+            sphere.transform.parent = transform;
+            sphere.transform.localPosition = Vector3.zero;
+            // No collider necessary
+            GameObject.Destroy(sphere.GetComponent<SphereCollider>());
+            MeshRenderer sphereRenderer = sphere.GetComponent<MeshRenderer>();
+            sphereRenderer.material = new Material(manager.controller.collideTransparentMaterial);
+            sphereRenderer.material.color = new Color(0.7f, 0f, 0.7f, 0.5f);
+        }
     }
 
     void Update() {

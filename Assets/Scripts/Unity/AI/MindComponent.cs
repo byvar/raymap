@@ -3,7 +3,7 @@ using System.Collections;
 using OpenSpace.AI;
 using OpenSpace.Object;
 using OpenSpace;
-using Assets.Scripts.OpenSpace.AI;
+using OpenSpace.Exporter;
 
 public class MindComponent : MonoBehaviour {
 

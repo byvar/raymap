@@ -11,6 +11,6 @@ public class CinematicSwitcherEditor : Editor {
         DrawDefaultInspector();
 
         CinematicSwitcher pb = (CinematicSwitcher)target;
-        pb.cinematicIndex = EditorGUILayout.Popup("Current cinematic", pb.cinematicIndex, pb.cinematicNames);
+        pb.CinematicIndex = EditorGUILayout.Popup("Current cinematic", pb.CinematicIndex, pb.CinematicNames);
     }
 }

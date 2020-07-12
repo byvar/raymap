@@ -31,6 +31,18 @@ namespace OpenSpace.AI {
 			shortName = model.name + ".Macro[" + index + "]" + shortName;
 			return shortName;
 		}
+		public string NameSubstring {
+			get {
+				string shortName = "";
+				if (name != null) {
+					shortName = name;
+					if (shortName.Contains("^CreateMacro:")) {
+						shortName = shortName.Substring(shortName.LastIndexOf("^CreateMacro:") + 13);
+					}
+				}
+				return shortName;
+			}
+		}
 
 
 		protected override void ReadInternal(Reader reader) {
