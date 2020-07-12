@@ -1,5 +1,4 @@
-﻿using Assets.Scripts.OpenSpace.AI;
-using OpenSpace;
+﻿using OpenSpace;
 using OpenSpace.AI;
 using System;
 using System.Collections.Generic;

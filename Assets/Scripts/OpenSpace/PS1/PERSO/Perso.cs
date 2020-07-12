@@ -10,7 +10,7 @@ namespace OpenSpace.PS1 {
 	public class Perso : OpenSpaceStruct { // Animation/state related
 		public Pointer off_p3dData;
 		public Pointer off_superObjectPointer;
-		public Pointer off_08;
+		public Pointer off_08; // dynamics
 		public Pointer off_0C;
 		public Pointer off_collSet;
 		public Pointer off_sectorSuperObjectPointer;

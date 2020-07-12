@@ -21,6 +21,25 @@ public class WebJSON {
 		public SuperObject SuperObject { get; set; }
 		public Perso Perso { get; set; }
 		public Script Script { get; set; }
+		public CineData CineData { get; set; }
+		public string TransitionExport { get; set; }
+		public CameraSettings Camera { get; set; }
+	}
+	public class CineData {
+		public string[] CinematicNames { get; set; }
+		public int? CinematicIndex { get; set; }
+		public float? AnimationSpeed { get; set; }
+		public Perso[] Actors { get; set; }
+	}
+	public class CameraSettings {
+		public bool? IsOrthographic { get; set; }
+		public float? FieldOfView { get; set; }
+		public float? ClipNear { get; set; }
+		public float? ClipFar { get; set; }
+		public float? OrthographicSize { get; set; }
+		public CameraPos? CameraPos { get; set; }
+		public Vector3? Position { get; set; }
+		public Vector3? Rotation { get; set; }
 	}
 	public class Settings {
 		public bool? ViewCollision { get; set; }
@@ -111,6 +130,11 @@ public class WebJSON {
 	}
 	public class Highlight {
 		public Perso Perso { get; set; }
+		public WayPoint WayPoint { get; set; }
+		public Collider Collider { get; set; }
+	}
+	public class Collider {
+		public string[] CollideTypes { get; set; }
 	}
 	public class Hierarchy {
 		public SuperObject ActualWorld { get; set; }
@@ -126,6 +150,8 @@ public class WebJSON {
 	public class DsgVar {
 		public string Name { get; set; }
 		public OpenSpace.AI.DsgVarInfoEntry.DsgVarType Type { get; set; }
+		public bool IsArray { get; set; }
+		public int? ArrayLength { get; set; }
 		public DsgVarValue ValueCurrent { get; set; }
 		public DsgVarValue ValueInitial { get; set; }
 		public DsgVarValue ValueModel { get; set; }
@@ -155,6 +181,7 @@ public class WebJSON {
 	}
 	public class WayPoint {
 		public string Name { get; set; }
+		public Graph[] Graphs { get; set; }
 	}
 	public class Graph {
 		public string Name { get; set; }
@@ -165,6 +192,7 @@ public class WebJSON {
 		// Optional
 		public OpenSpace.Pointer ScriptOffset { get; set; }
 		public BehaviorType? BehaviorType { get; set; }
+		public Screenshot Screenshot { get; set; }
 	}
 	public class Localization {
 		public Language Common { get; set; }
@@ -178,6 +206,11 @@ public class WebJSON {
 			public string[] Entries { get; set; }
 		}
 	}
+	public class Screenshot {
+		public int? Width { get; set; }
+		public int? Height { get; set; }
+		public bool? IsTransparent { get; set; }
+	}
 
 	#region Enums
 	public enum MessageType {
@@ -186,7 +219,9 @@ public class WebJSON {
 		Highlight,
 		Selection,
 		Request,
-		Script
+		Script,
+		CineData,
+		TransitionExport
 	}
 	public enum PersoType {
 		Instance,
@@ -194,12 +229,28 @@ public class WebJSON {
 	}
 	public enum RequestType {
 		None,
-		Script
+		Script,
+		TransitionExport,
+		Screenshot
 	}
 	public enum BehaviorType {
 		Intelligence,
 		Reflex,
 		Macro
+	}
+
+	public enum CameraPos {
+		Front,
+		Right,
+		Back,
+		Left,
+		Top,
+		Bottom,
+		IsometricFront,
+		IsometricBack,
+		IsometricLeft,
+		IsometricRight,
+		Initial
 	}
 	#endregion
 }

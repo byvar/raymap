@@ -17,9 +17,9 @@ public class CinematicSwitcher : MonoBehaviour {
 	CinematicsManager cinematicsManager;
 	Cinematic cinematic;
 	
-	public string[] cinematicNames = { "Null" };
+	public string[] CinematicNames { get; private set; } = { "Null" };
 	int currentCinematic = 0;
-	public int cinematicIndex = 0;
+	public int CinematicIndex { get; set; } = 0;
 
 	public PersoBehaviour[] actors;
 
@@ -43,35 +43,39 @@ public class CinematicSwitcher : MonoBehaviour {
 		if (MapLoader.Loader is R2PS1Loader) {
 			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
 			ps1Streams = l.streams;
+			string[] cinematicNames = CinematicNames;
 			Array.Resize(ref cinematicNames, ps1Streams.Length + 1);
+			CinematicNames = cinematicNames;
 
 			for (int i = 0; i < ps1Streams.Length; i++) {
-				cinematicNames[i + 1] = "Stream " + i;
+				CinematicNames[i + 1] = "Stream " + i;
 				PS1GameInfo game = PS1GameInfo.Games[Settings.s.mode];
 				if (game != null && game.cines !=null && game.cines.ContainsKey(l.lvlName)) {
 					if (game.cines[l.lvlName].Length > i) {
-						cinematicNames[i + 1] += ": " + game.cines[l.lvlName][i];
+						CinematicNames[i + 1] += ": " + game.cines[l.lvlName][i];
 					}
 				}
 				if (l.levelHeader.initialStreamID == i) {
-					cinematicNames[i + 1] += " (intro)";
+					CinematicNames[i + 1] += " (intro)";
 				}
 			}
 		} else {
 			cinematicsManager = MapLoader.Loader.cinematicsManager;
+			string[] cinematicNames = CinematicNames;
 			Array.Resize(ref cinematicNames, cinematicsManager.cinematics.Count + 1);
-			Array.Copy(cinematicsManager.cinematics.Select(c => (c == null ? "Null" : c.name)).ToArray(), 0, cinematicNames, 1, cinematicsManager.cinematics.Count);
+			CinematicNames = cinematicNames;
+			Array.Copy(cinematicsManager.cinematics.Select(c => (c == null ? "Null" : c.name)).ToArray(), 0, CinematicNames, 1, cinematicsManager.cinematics.Count);
 		}
 		if (currentCinematic == -1) currentCinematic = 0;
-		cinematicIndex = currentCinematic;
+		CinematicIndex = currentCinematic;
 		loaded = true;
 	}
 
 	// Update is called once per frame
 	void Update() {
 		if (loaded) {
-			if (cinematicIndex != currentCinematic) {
-				currentCinematic = cinematicIndex;
+			if (CinematicIndex != currentCinematic) {
+				currentCinematic = CinematicIndex;
 				SetCinematic(currentCinematic);
 			}
 			if (ps1Streams != null && currentCinematic > 0) {
@@ -84,14 +88,14 @@ public class CinematicSwitcher : MonoBehaviour {
 		if (ps1Streams != null) {
 			DeinitPS1Stream();
 			if (index < 0 || index > ps1Streams.Length) return;
-			cinematicIndex = index;
+			CinematicIndex = index;
 			currentCinematic = index;
 			index--;
 			InitPS1Stream();
 			UpdatePS1StreamFrame();
 		} else {
 			if (index < 0 || index > cinematicsManager.cinematics.Count) return;
-			cinematicIndex = index;
+			CinematicIndex = index;
 			currentCinematic = index;
 			index--;
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace OpenSpace.PS1 {
-	public class GeometricObjectCollide : OpenSpaceStruct {
+	public class GeometricObjectCollide : OpenSpaceStruct, IGeometricObjectElementCollide {
 		public ushort num_vertices;
 		public ushort num_normals;
 		public ushort num_triangles;
@@ -81,6 +81,7 @@ namespace OpenSpace.PS1 {
 				}
 				gao.transform.SetParent(parentGao.transform);
 				gao.transform.localPosition = Vector3.zero;
+				gao.layer = LayerMask.NameToLayer("Collide");
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
 				MeshRenderer mr = gao.AddComponent<MeshRenderer>();
 
@@ -175,8 +176,27 @@ namespace OpenSpace.PS1 {
 				mf.mesh = m;
 
 				mr.material = gm.CreateMaterial();
+
+				try {
+					MeshCollider mc = gao.AddComponent<MeshCollider>();
+					//mc.cookingOptions = MeshColliderCookingOptions.None;
+					//mc.sharedMesh = mf.sharedMesh;
+				} catch (Exception) { }
+
+				CollideComponent cc = gao.AddComponent<CollideComponent>();
+				cc.collidePS1 = this;
+				cc.index = gmi; // Abuse the index for the game material index
 			}
 			return parentGao;
+		}
+
+		public GameMaterial GetMaterial(int? index) {
+			if (!index.HasValue) {
+				return null;
+			} else {
+				GameMaterial gm = (Load as R2PS1Loader).levelHeader.gameMaterials?[index.Value];
+				return gm;
+			}
 		}
 	}
 }

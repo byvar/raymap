@@ -62,7 +62,8 @@ namespace OpenSpace.ROM {
                 if ((behavior.scripts?.Value == null || behavior.scripts?.Value.length == 0) && behavior.firstScript?.Value == null) {
                     behaviorGao.name += " (Empty)";
                 }
-                c.Name = behaviorGao.name;
+                c.GaoName = behaviorGao.name;
+                c.Name = behavior.IndexString;
                 switch (type) {
                     case AI.Behavior.BehaviorType.Intelligence: brain.Intelligence.Add(c); break;
                     case AI.Behavior.BehaviorType.Reflex: brain.Reflex.Add(c); break;

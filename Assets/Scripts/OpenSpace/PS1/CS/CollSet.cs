@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-//using CollideType = OpenSpace.Collide.CollideType;
+using CollideType = OpenSpace.Collide.CollideType;
 
 namespace OpenSpace.PS1 {
 	public class CollSet : OpenSpaceStruct {
@@ -72,14 +72,6 @@ namespace OpenSpace.PS1 {
 					zdxList[key] = Load.FromOffsetOrRead<ZdxList>(reader, off_zdxList[key]);
 				}
 			}
-		}
-
-		public enum CollideType {
-			None = -1,
-			ZDD = 0,
-			ZDM = 1,
-			ZDE = 2,
-			ZDR = 3
 		}
 	}
 }

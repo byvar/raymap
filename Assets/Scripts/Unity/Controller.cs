@@ -40,10 +40,12 @@ public class Controller : MonoBehaviour {
 	bool playTextureAnimations_ = true; public bool playTextureAnimations = true;
 	bool showPersos_ = true; public bool showPersos = true;
 	bool livePreview_ = false; public bool livePreview = false;
+
+	private Dictionary<WebJSON.CameraPos, WebJSON.CameraSettings> cameraSettings = new Dictionary<WebJSON.CameraPos, WebJSON.CameraSettings>();
 	
 	float livePreviewUpdateCounter = 0;
 
-	private CinematicSwitcher cinematicSwitcher = null;
+	public CinematicSwitcher CinematicSwitcher { get; private set; } = null;
 	
 	private System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
 
@@ -491,7 +493,8 @@ public class Controller : MonoBehaviour {
 							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
 								behaviorGao.name += " (Empty)";
 							}
-							c.Name = behaviorGao.name;
+							c.GaoName = behaviorGao.name;
+							c.Name = behavior.NameSubstring;
 							brain.Intelligence.Add(c);
 							iter++;
 						}
@@ -521,7 +524,8 @@ public class Controller : MonoBehaviour {
 							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
 								behaviorGao.name += " (Empty)";
 							}
-							c.Name = behaviorGao.name;
+							c.GaoName = behaviorGao.name;
+							c.Name = behavior.NameSubstring;
 							brain.Reflex.Add(c);
 							iter++;
 						}
@@ -538,7 +542,8 @@ public class Controller : MonoBehaviour {
 							ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
 							scriptComponent.SetScript(macro.script, p);
 							brain.Macros.Add(new BrainComponent.Macro() {
-								Name = behaviorGao.name,
+								GaoName = behaviorGao.name,
+								Name = macro.NameSubstring,
 								Script = scriptComponent
 							});
 							iter++;
@@ -806,6 +811,51 @@ public class Controller : MonoBehaviour {
 				}
 			}
 		}
+		cameraSettings[WebJSON.CameraPos.Initial] = communicator.GetCameraJSON(includeTransform: true);
+
+		// Calculate world size
+		var filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 ? true : false);
+
+		float minX = filledSectors.Min(v => v.SectorBorder.boxMin.x);
+		float minY = filledSectors.Min(v => v.SectorBorder.boxMin.y);
+		float minZ = filledSectors.Min(v => v.SectorBorder.boxMin.z);
+
+		float maxX = filledSectors.Max(v => v.SectorBorder.boxMax.x);
+		float maxY = filledSectors.Max(v => v.SectorBorder.boxMax.y);
+		float maxZ = filledSectors.Max(v => v.SectorBorder.boxMax.z);
+
+		Vector3 worldMin = new Vector3(minX, minY, minZ);
+		Vector3 worldMax = new Vector3(maxX, maxY, maxZ);
+
+		Vector3 worldSize = (worldMax - worldMin);
+		Vector3 center = worldMin + worldSize * 0.5f;
+
+		// TODO: fill in cameraSettings dictionary with all other possible cameraPos (isometric different angles, and all straight view angles)
+	}
+
+	public void SetCameraPosition(WebJSON.CameraPos cameraPos) {
+		if (cameraSettings.ContainsKey(cameraPos)) {
+			ApplyCameraSettings(cameraSettings[cameraPos], applyCameraPos: false);
+		}
+	}
+
+	public void ApplyCameraSettings(WebJSON.CameraSettings camSettings, bool applyCameraPos = true, bool applyTransform = true) {
+		if (camSettings == null) return;
+		Camera c = Camera.main;
+		if (camSettings.ClipFar.HasValue) c.farClipPlane = camSettings.ClipFar.Value;
+		if (camSettings.ClipNear.HasValue) c.nearClipPlane = camSettings.ClipNear.Value;
+		if (camSettings.FieldOfView.HasValue) c.fieldOfView = camSettings.FieldOfView.Value;
+		if (camSettings.IsOrthographic.HasValue) c.orthographic = camSettings.IsOrthographic.Value;
+		if (camSettings.OrthographicSize.HasValue) c.orthographicSize = camSettings.OrthographicSize.Value;
+		if (applyCameraPos) {
+			if (camSettings.CameraPos.HasValue) {
+				SetCameraPosition(camSettings.CameraPos.Value);
+			}
+		}
+		if (applyTransform) {
+			if (camSettings.Position.HasValue) c.transform.localPosition = camSettings.Position.Value;
+			if (camSettings.Rotation.HasValue) c.transform.localEulerAngles = camSettings.Rotation.Value;
+		}
 	}
 
 	public void UpdateViewGraphs() {
@@ -912,12 +962,12 @@ public class Controller : MonoBehaviour {
 
 	public void InitCinematics() {
 		if (loader.cinematicsManager != null && loader.cinematicsManager.cinematics.Count > 0) {
-			cinematicSwitcher = new GameObject("Cinematic Switcher").AddComponent<CinematicSwitcher>();
-			cinematicSwitcher.Init();
+			CinematicSwitcher = new GameObject("Cinematic Switcher").AddComponent<CinematicSwitcher>();
+			CinematicSwitcher.Init();
 		}
 		if (loader is R2PS1Loader && (loader as R2PS1Loader).streams.Length > 0) {
-			cinematicSwitcher = new GameObject("Cinematic Switcher").AddComponent<CinematicSwitcher>();
-			cinematicSwitcher.Init();
+			CinematicSwitcher = new GameObject("Cinematic Switcher").AddComponent<CinematicSwitcher>();
+			CinematicSwitcher.Init();
 		}
 	}
 

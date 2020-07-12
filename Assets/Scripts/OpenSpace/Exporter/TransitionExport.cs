@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Scripts.OpenSpace.AI {
+namespace OpenSpace.Exporter {
     public class TransitionExport {
 
         [Serializable]

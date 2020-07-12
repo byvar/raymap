@@ -143,6 +143,9 @@ namespace OpenSpace.Loader {
 		}
 
 		public async UniTask InitFiles(PS1GameInfo gameInfo, PS1GameInfo.File fileInfo, int index) {
+			loadingState = "Initializing file: " + fileInfo.bigfile;
+			await WaitIfNecessary();
+
 			PS1GameInfo.File.MemoryBlock b = fileInfo.memoryBlocks[index];
 			string levelDir = gameDataBinFolder + fileInfo.bigfile + "/";
 			if (fileInfo.type == PS1GameInfo.File.Type.Map) {
@@ -178,7 +181,6 @@ namespace OpenSpace.Loader {
 				}
 				files_array[curFile++] = f;
 			}
-			await UniTask.CompletedTask;
 		}
 		private uint GetActorAddress(int i) {
 			PS1GameInfo.File mainFile = game.files.FirstOrDefault(fi => fi.fileID == 0);
@@ -516,8 +518,9 @@ namespace OpenSpace.Loader {
 				RelocateActorMemoryDonaldDuck();
 			}
 
-			// TODO: Load header here
-			vram.Export(gameDataBinFolder + "vram.png");
+			if (FileSystem.mode != FileSystem.Mode.Web) {
+				vram.Export(gameDataBinFolder + "vram.png");
+			}
 
 			loadingState = "Loading level header";
 			await WaitIfNecessary();
@@ -530,6 +533,8 @@ namespace OpenSpace.Loader {
 			levelHeader.inactiveDynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_inactiveDynamicWorld, onPreRead: s => s.isDynamic = true);
 
 			if (Settings.s.game == Settings.Game.RRush || Settings.s.game == Settings.Game.JungleBook) {
+				loadingState = "Loading actor files";
+				await WaitIfNecessary();
 				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
 				if (actor2File != null) actor2Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor2File.headerOffset, actor2File), onPreRead: h => h.file_index = 2);
 			}
@@ -539,6 +544,8 @@ namespace OpenSpace.Loader {
 
 			// Done reading here
 			if (mainMemoryBlock.overlay_cine.size > 0) {
+				loadingState = "Loading cinematic overlay";
+				await WaitIfNecessary();
 				PS1GameInfo.File file = game.files.FirstOrDefault(f => f.fileID == 0);
 				string levelDir = gameDataBinFolder + file.bigfile + "/";
 				levelDir += (CurrentLevel < game.maps.Length ? game.maps[CurrentLevel] : (file.bigfile + "_" + CurrentLevel)) + "/";
@@ -954,6 +961,7 @@ namespace OpenSpace.Loader {
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
 			if (httpStream != null) await httpStream.FillCacheForRead((int)lba.size);
 			data = reader.ReadBytes((int)lba.size);
+			await WaitIfNecessary();
 			return data;
 		}
 		public async UniTask<List<byte[]>> ExtractPackedBlocks(Reader reader, PS1GameInfo.File.LBA lba, uint baseLBA) {

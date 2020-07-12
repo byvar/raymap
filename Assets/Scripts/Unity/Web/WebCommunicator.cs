@@ -21,6 +21,8 @@ public class WebCommunicator : MonoBehaviour {
     public Controller controller;
     public ObjectSelector selector;
     private BasePersoBehaviour highlightedPerso_;
+	private CollideComponent highlightedCollision_;
+	private WayPointBehaviour highlightedWayPoint_;
     private BasePersoBehaviour selectedPerso_;
 	private int selectedPersoStateIndex_;
     bool sentHierarchy = false;
@@ -55,20 +57,24 @@ public class WebCommunicator : MonoBehaviour {
             sentHierarchy = true;
         }
         if (controller.LoadState == Controller.State.Finished) {
-            if (highlightedPerso_ != selector.highlightedPerso) {
+            if (highlightedPerso_ != selector.highlightedPerso ||
+				highlightedCollision_ != selector.highlightedCollision ||
+				highlightedWayPoint_ != selector.highlightedWayPoint) {
                 highlightedPerso_ = selector.highlightedPerso;
+				highlightedCollision_ = selector.highlightedCollision;
+				highlightedWayPoint_ = selector.highlightedWayPoint;
                 Send(GetHighlightMessageJSON());
             }
             if (selectedPerso_ != selector.selectedPerso) {
                 selectedPerso_ = selector.selectedPerso;
 				if (selectedPerso_ != null) {
-					selectedPersoStateIndex_ = selectedPerso_.stateIndex;
-					Send(GetSelectionMessageJSON());
+					selectedPersoStateIndex_ = selectedPerso_.currentState;
+					Send(GetSelectionMessageJSON(true, true));
 				}
             }
-			if (selectedPerso_ != null && selectedPersoStateIndex_ != selectedPerso_.stateIndex) {
-				selectedPersoStateIndex_ = selectedPerso_.stateIndex;
-				Send(GetSelectionMessageJSON());
+			if (selectedPerso_ != null && selectedPersoStateIndex_ != selectedPerso_.currentState) {
+				selectedPersoStateIndex_ = selectedPerso_.currentState;
+				Send(GetSelectionMessageJSON(false, false));
 			}
         }
     }
@@ -98,6 +104,18 @@ public class WebCommunicator : MonoBehaviour {
 		string json = Newtonsoft.Json.JsonConvert.SerializeObject(obj, Settings);
 		return json;
 	}
+	public WebJSON.CameraSettings GetCameraJSON(bool includeTransform = false) {
+		Camera c = Camera.main;
+		return new WebJSON.CameraSettings() {
+			ClipFar = c.farClipPlane,
+			ClipNear = c.nearClipPlane,
+			FieldOfView = c.fieldOfView,
+			IsOrthographic = c.orthographic,
+			OrthographicSize = c.orthographicSize,
+			Position = includeTransform ? (Vector3?)c.transform.localPosition : null,
+			Rotation = includeTransform ? (Vector3?)c.transform.localEulerAngles : null
+		};
+	}
 
 	private WebJSON.Message GetHierarchyMessageJSON() {
         MapLoader l = MapLoader.Loader;
@@ -105,9 +123,11 @@ public class WebCommunicator : MonoBehaviour {
 			Type = WebJSON.MessageType.Hierarchy,
 			Settings = GetSettingsJSON(),
 			Localization = GetLocalizationJSON(),
+			CineData = GetCineDataJSON(),
 			Hierarchy = new WebJSON.Hierarchy() {
 				Always = GetAlwaysJSON()
-			}
+			},
+			Camera = GetCameraJSON()
 		};
 		switch (l) {
 			case OpenSpace.Loader.R2ROMLoader rl:
@@ -128,6 +148,17 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		return message;
     }
+	public WebJSON.CineData GetCineDataJSON() {
+		if (controller.CinematicSwitcher != null && controller.CinematicSwitcher.CinematicNames.Length > 1) {
+			return new WebJSON.CineData() {
+				CinematicNames = controller.CinematicSwitcher.CinematicNames,
+				CinematicIndex = controller.CinematicSwitcher.CinematicIndex,
+				Actors = controller.CinematicSwitcher.actors == null || controller.CinematicSwitcher.actors.Length == 0 ? null : controller.CinematicSwitcher.actors.Select(a => GetPersoJSON(a, includeDetails: false)).ToArray(),
+				AnimationSpeed = OpenSpace.Settings.s.platform == OpenSpace.Settings.Platform.PS1 ? (float?)controller.CinematicSwitcher.animationSpeed : null
+			};
+		}
+		return null;
+	}
 	public WebJSON.Localization GetLocalizationJSON() {
 		MapLoader l = MapLoader.Loader;
 		if (l is OpenSpace.Loader.R2ROMLoader) {
@@ -234,7 +265,7 @@ public class WebCommunicator : MonoBehaviour {
 		persoJSON.NameInstance = pb.NameInstance;
 		if (includeDetails) {
 			persoJSON.IsEnabled = pb.IsEnabled;
-			persoJSON.State = pb.stateIndex;
+			persoJSON.State = pb.currentState;
 			persoJSON.ObjectList = pb.poListIndex;
 			persoJSON.PlayAnimation = pb.playAnimation;
 			persoJSON.AnimationSpeed = pb.animationSpeed;
@@ -289,7 +320,7 @@ public class WebCommunicator : MonoBehaviour {
 	}
 	private WebJSON.DsgVar[] GetDsgVarsJSON(BasePersoBehaviour perso) {
 		DsgVarComponent dsgComponent = perso?.brain?.dsgVars;
-		if (dsgComponent != null && dsgComponent.dsgVarEntries != null && dsgComponent.dsgVarEntries.Length > 0) {
+		if (dsgComponent != null && dsgComponent.editableEntries != null && dsgComponent.editableEntries.Length > 0) {
 			return dsgComponent.editableEntries.Select(e => GetDsgVarJSON(e)).ToArray();
 		}
 		return null;
@@ -300,6 +331,8 @@ public class WebCommunicator : MonoBehaviour {
 		WebJSON.DsgVar dsgObj = new WebJSON.DsgVar() {
 			Name = dsg.Name,
 			Type = dsg.Type,
+			IsArray = isArray,
+			ArrayLength = isArray ? (int?)dsg.ArrayLength : null,
 			ValueCurrent = GetDsgVarValueJSON(dsg.valueCurrent, isArray),
 			ValueInitial = GetDsgVarValueJSON(dsg.valueInitial, isArray),
 			ValueModel = GetDsgVarValueJSON(dsg.valueModel, isArray)
@@ -337,10 +370,10 @@ public class WebCommunicator : MonoBehaviour {
 					dsgObj.AsSuperObject = GetSuperObjectJSON(value.AsSuperObject, includeChildren: false);
 					break;
 				case DsgVarInfoEntry.DsgVarType.WayPoint:
-					dsgObj.AsWayPoint = new WebJSON.WayPoint() { Name = value.AsWayPoint?.gameObject?.name };
+					dsgObj.AsWayPoint = GetWayPointJSON(value.AsWayPoint, false);
 					break;
 				case DsgVarInfoEntry.DsgVarType.Graph:
-					dsgObj.AsGraph = new WebJSON.Graph() { Name = value.AsGraph?.gameObject?.name };
+					dsgObj.AsGraph = GetGraphJSON(value.AsGraph);
 					break;
 				case DsgVarInfoEntry.DsgVarType.Action:
 					dsgObj.AsAction = new WebJSON.DsgState() { Name = value.AsAction?.ToString() };
@@ -381,12 +414,12 @@ public class WebCommunicator : MonoBehaviour {
 		}
         return alwaysJSON;
     }
-    private WebJSON.Message GetSelectionMessageJSON() {
+    private WebJSON.Message GetSelectionMessageJSON(bool includeLists, bool includeBrain) {
         MapLoader l = MapLoader.Loader;
 		WebJSON.Message selectionJSON = new WebJSON.Message() {
 			Type = WebJSON.MessageType.Selection,
 			Selection = new WebJSON.Selection() {
-				Perso = GetPersoJSON(selector.selectedPerso, includeLists: true, includeBrain: true)
+				Perso = GetPersoJSON(selector.selectedPerso, includeLists: includeLists, includeBrain: includeBrain)
 			}
 		};
         return selectionJSON;
@@ -395,11 +428,39 @@ public class WebCommunicator : MonoBehaviour {
 		WebJSON.Message selectionJSON = new WebJSON.Message() {
 			Type = WebJSON.MessageType.Highlight,
 			Highlight = new WebJSON.Highlight() {
-				Perso = GetPersoJSON(highlightedPerso_)
+				Perso = GetPersoJSON(highlightedPerso_),
+				WayPoint = GetWayPointJSON(highlightedWayPoint_, true),
+				Collider = GetColliderJSON(highlightedCollision_)
 			}
 		};
         return selectionJSON;
     }
+
+	private WebJSON.WayPoint GetWayPointJSON(WayPointBehaviour wp, bool includeGraphs) {
+		if (wp == null) return null;
+		return new WebJSON.WayPoint() {
+			Name = wp.gameObject.name,
+			Graphs = includeGraphs ? wp.graphs.Select(g => GetGraphJSON(g)).ToArray() : null
+		};
+	}
+	private WebJSON.Graph GetGraphJSON(GraphBehaviour gb) {
+		if (gb == null) return null;
+		return new WebJSON.Graph() { Name = gb.gameObject.name };
+	}
+
+	public WebJSON.Collider GetColliderJSON(CollideComponent cc) {
+		if (cc == null) return null;
+		var flags = cc.CollisionFlagsR2;
+		List<string> flagsList = new List<string>();
+
+		foreach (CollideMaterial.CollisionFlags_R2 r in Enum.GetValues(typeof(CollideMaterial.CollisionFlags_R2))) {
+			if ((flags & r) != 0) flagsList.Add(r.ToString());
+		}
+
+		return new WebJSON.Collider() {
+			CollideTypes = flagsList.ToArray()
+		};
+	}
 
     public void ParseMessage(string msgString) {
 		WebJSON.Message msg = Newtonsoft.Json.JsonConvert.DeserializeObject<WebJSON.Message>(msgString, Settings);
@@ -417,6 +478,9 @@ public class WebCommunicator : MonoBehaviour {
         }
 		if (msg.Request != null) {
 			ParseRequestJSON(msg.Request);
+		}
+		if (msg.CineData != null) {
+			ParseCineDataJSON(msg.CineData);
 		}
     }
     private void ParseSelectionJSON(WebJSON.Selection msg) {
@@ -458,9 +522,9 @@ public class WebCommunicator : MonoBehaviour {
 			if (msg.IsEnabled.HasValue) pb.IsEnabled = msg.IsEnabled.Value;
 			if (msg.State.HasValue) {
 				pb.stateIndex = msg.State.Value;
-				if (pb == selectedPerso_) {
+				/*if (pb == selectedPerso_) {
 					selectedPersoStateIndex_ = msg.State.Value;
-				}
+				}*/
 			}
 			if (msg.ObjectList.HasValue) pb.poListIndex = msg.ObjectList.Value;
 			if (msg.PlayAnimation.HasValue) pb.playAnimation = msg.PlayAnimation.Value;
@@ -473,6 +537,10 @@ public class WebCommunicator : MonoBehaviour {
 			if (msg.Scale.HasValue) pb.transform.localScale = msg.Scale.Value;
 		}
     }
+	private void ParseCameraJSON(WebJSON.CameraSettings msg) {
+		if (msg == null) return;
+		controller.ApplyCameraSettings(msg, applyCameraPos: true, applyTransform: true);
+	}
     private void ParseSettingsJSON(WebJSON.Settings msg) {
 		if (msg.ViewCollision.HasValue) controller.viewCollision = msg.ViewCollision.Value;
 		if (msg.Luminosity.HasValue) controller.lightManager.luminosity = msg.Luminosity.Value;
@@ -486,6 +554,12 @@ public class WebCommunicator : MonoBehaviour {
 		if (msg.PlayTextureAnimations.HasValue) controller.playTextureAnimations = msg.PlayTextureAnimations.Value;
 		if (msg.ShowPersos.HasValue) controller.showPersos = msg.ShowPersos.Value;
 	}
+	private void ParseCineDataJSON(WebJSON.CineData msg) {
+		if (msg != null && controller.CinematicSwitcher != null) {
+			if (msg.CinematicIndex.HasValue) controller.CinematicSwitcher.CinematicIndex = msg.CinematicIndex.Value;
+			if (msg.AnimationSpeed.HasValue) controller.CinematicSwitcher.animationSpeed = msg.AnimationSpeed.Value;
+		}
+	}
 	private void ParseRequestJSON(WebJSON.Request msg) {
 		switch (msg.Type) {
 			case WebJSON.RequestType.Script:
@@ -494,6 +568,22 @@ public class WebCommunicator : MonoBehaviour {
 					Type = WebJSON.MessageType.Script,
 					Script = GetScriptJSON(s, true)
 				});
+				break;
+			case WebJSON.RequestType.TransitionExport:
+				if (selectedPerso_ != null && selectedPerso_ is PersoBehaviour) {
+					MindComponent mc = selectedPerso_.GetComponent<MindComponent>();
+					if (mc != null) {
+						try {
+							var export = mc.TransitionExport;
+							if (export != null) {
+								Send(new WebJSON.Message() {
+									Type = WebJSON.MessageType.TransitionExport,
+									TransitionExport = export
+								});
+							}
+						} catch (Exception) { }
+					}
+				}
 				break;
 		}
 	}

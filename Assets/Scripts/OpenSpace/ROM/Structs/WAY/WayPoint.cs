@@ -29,18 +29,9 @@ namespace OpenSpace.ROM {
 
 			gao.transform.position = pos;
 			WayPointBehaviour wpBehaviour = gao.AddComponent<WayPointBehaviour>();
+			gao.layer = LayerMask.NameToLayer("Graph");
 			wpBehaviour.wpROM = this;
-			if (radius_conv > 1) {
-				GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-				sphere.transform.localScale = new Vector3(radius_conv * 2, radius_conv * 2, radius_conv * 2);
-				sphere.transform.parent = gao.transform;
-				sphere.transform.localPosition = Vector3.zero;
-				// No collider necessary
-				GameObject.Destroy(sphere.GetComponent<SphereCollider>());
-				MeshRenderer sphereRenderer = sphere.GetComponent<MeshRenderer>();
-				sphereRenderer.material = new Material(MapLoader.Loader.collideTransparentMaterial);
-				sphereRenderer.material.color = new Color(0.7f, 0f, 0.7f, 0.5f);
-			}
+			wpBehaviour.radius = radius_conv;
 			return wpBehaviour;
 		}
 		public Vector3 Position {

@@ -33,19 +33,9 @@ namespace OpenSpace.Waypoints {
             gao = new GameObject("WayPoint ("+this.offset+")");
             gao.transform.position = new Vector3(position.x, position.z, position.y);
             WayPointBehaviour wpBehaviour = gao.AddComponent<WayPointBehaviour>();
-			wpBehaviour.wp = this;
-
-            if (radius > 1) {
-                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere.transform.position = new Vector3(position.x, position.z, position.y);
-                sphere.transform.localScale = new Vector3(radius * 2, radius * 2, radius * 2);
-                sphere.transform.parent = gao.transform;
-                // No collider necessary
-                GameObject.Destroy(sphere.GetComponent<SphereCollider>());
-                MeshRenderer sphereRenderer = sphere.GetComponent<MeshRenderer>();
-                sphereRenderer.material = new Material(MapLoader.Loader.collideTransparentMaterial);
-                sphereRenderer.material.color = new Color(0.7f, 0f, 0.7f, 0.5f);
-            }
+            gao.layer = LayerMask.NameToLayer("Graph");
+            wpBehaviour.wp = this;
+            wpBehaviour.radius = radius;
         }
         // ^ for isolate waypoints
 
