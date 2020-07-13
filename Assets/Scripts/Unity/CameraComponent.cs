@@ -8,13 +8,14 @@ using UnityEngine;
 
 
 public class CameraComponent : MonoBehaviour {
+	public Controller controller;
     Vector2 _mouseAbsolute;
     Vector2 _smoothMouse;
 
     public Vector2 clampInDegrees = new Vector2(360, 180);
     public Vector2 sensitivity = new Vector2(2, 2);
     public Vector2 smoothing = new Vector2(3, 3);
-    public Vector2 targetDirection;
+    public Quaternion? targetDirection;
     public Vector2 targetCharacterDirection;
     
     public bool mouseLookEnabled = false;
@@ -25,6 +26,7 @@ public class CameraComponent : MonoBehaviour {
     public float lerpFactor = 1f;
     Vector3? targetPos = null;
     Quaternion? targetRot = null;
+	float? targetOrthoSize = null;
 
 	private Vector3 lastMousePosition = Vector3.zero;
 	private bool panning = false;
@@ -33,8 +35,6 @@ public class CameraComponent : MonoBehaviour {
 	private WebJSON.CameraPos lastDebugCameraPos = WebJSON.CameraPos.Initial;
 
 	void Start() {
-        // Set target direction to the camera's initial orientation.
-        targetDirection = transform.localRotation.eulerAngles;
     }
 
     public void JumpTo(GameObject gao) {
@@ -69,30 +69,48 @@ public class CameraComponent : MonoBehaviour {
 			}
         }
         if (center.HasValue) {
-            float cameraDistance = 4.0f; // Constant factor
-            float objectSize = Mathf.Min(5f, Mathf.Max(size.Value.x, size.Value.y, size.Value.z));
-            float cameraView = 2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * cam.fieldOfView); // Visible height 1 meter in front
-            float distance = cameraDistance * objectSize / cameraView; // Combined wanted distance from the object
-            distance += objectSize; // Estimated offset from the center to the outside of the object * 2
-            /*transform.position = center.Value + -transform.right * distance;
-            transform.LookAt(center.Value, Vector3.up);*/
-            //transform.LookAt(center.Value, Vector3.up);
-            //transform.position = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
-			targetPos = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
-			if (center.Value - transform.position != Vector3.zero) {
-				targetRot = Quaternion.LookRotation(center.Value - transform.position, Vector3.up);
+			float objectSize = Mathf.Min(5f, Mathf.Max(size.Value.x, size.Value.y, size.Value.z));
+			bool orthographic = cam.orthographic;
+			if (orthographic) {
+				targetOrthoSize = objectSize * 2f * 1.5f;
+				Vector3 target = cam.transform.InverseTransformPoint(center.Value);
+				targetPos = cam.transform.TransformPoint(new Vector3(target.x, target.y, 0f));
+			} else {
+				float cameraDistance = 4.0f; // Constant factor
+				float cameraView = 2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * cam.fieldOfView); // Visible height 1 meter in front
+				float distance = cameraDistance * objectSize / cameraView; // Combined wanted distance from the object
+				distance += objectSize; // Estimated offset from the center to the outside of the object * 2
+				/*transform.position = center.Value + -transform.right * distance;
+				transform.LookAt(center.Value, Vector3.up);*/
+				//transform.LookAt(center.Value, Vector3.up);
+				//transform.position = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
+				targetPos = center.Value + Vector3.Normalize(transform.position - center.Value) * distance;
+				if (center.Value - transform.position != Vector3.zero) {
+					targetRot = Quaternion.LookRotation(center.Value - transform.position, Vector3.up);
+				}
 			}
 		}
     }
 
+	public void StopLerp() {
+		targetPos = null;
+		targetRot = null;
+		targetOrthoSize = null;
+	}
+
     void Update() {
+		if (controller.LoadState != Controller.State.Finished && controller.LoadState != Controller.State.Error) return;
+		if (!targetDirection.HasValue) {
+			// Set target direction to the camera's initial orientation.
+			targetDirection = transform.localRotation;
+		}
 
 		if (lastDebugCameraPos!=debugCameraPos) {
 			lastDebugCameraPos = debugCameraPos;
-			MapLoader.Loader.controller.SetCameraPosition(debugCameraPos);
+			controller.SetCameraPosition(debugCameraPos);
         }
 
-		bool orthographic = cam.GetComponent<Camera>().orthographic;
+		bool orthographic = cam.orthographic;
 
 		if (Input.GetKeyUp(KeyCode.LeftShift) & _shifted)
             _shifted = false;
@@ -135,10 +153,21 @@ public class CameraComponent : MonoBehaviour {
 			lastMousePosition = Input.mousePosition;
 
 			if (orthographic) {
+				if (targetOrthoSize.HasValue) {
+					if (Mathf.Abs(targetOrthoSize.Value - cam.orthographicSize) < 0.04f) {
+						targetOrthoSize = null;
+					} else {
+						cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetOrthoSize.Value, 0.05f * lerpFactor);
+					}
+				}
 
 				float orthoFlySpeedMult = (float)Math.Sqrt(Camera.main.orthographicSize);
 
-				if (Input.GetMouseButton(0)) {
+				if (Input.GetMouseButton(1)) {
+					StopLerp();
+
+
+					Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
 
 					if (panning) {
 
@@ -147,7 +176,7 @@ public class CameraComponent : MonoBehaviour {
 
 						transform.Translate(Vector3.right * xFactor * -mouseDelta.x, Space.Self);
 						transform.Translate(Vector3.up * yFactor * -mouseDelta.y, Space.Self);
-					} else {
+					} else if(Input.GetMouseButtonDown(1) && screenRect.Contains(Input.mousePosition)) { // Only start panning if within game window when you click
 						panning = true;
                     }
 				} else {
@@ -155,30 +184,42 @@ public class CameraComponent : MonoBehaviour {
                 }
 
 				if (Input.GetAxis("Mouse ScrollWheel") != 0) {
+					StopLerp();
 					Camera.main.orthographicSize *= (float)Math.Pow(2, (-Input.GetAxis("Mouse ScrollWheel")));
 				}
 
 				if (Input.GetAxis("Vertical") != 0) {
+					StopLerp();
 					transform.Translate(Vector3.up * flySpeed * orthoFlySpeedMult * Time.deltaTime * Input.GetAxis("Vertical"), Space.Self);
 				}
 				if (Input.GetAxis("Horizontal") != 0) {
+					StopLerp();
 					transform.Translate(Vector3.right * flySpeed * orthoFlySpeedMult * Time.deltaTime * Input.GetAxis("Horizontal"), Space.Self);
 				}
 				if (Input.GetAxis("HeightAndZoom") != 0) {
+					StopLerp();
 					Camera.main.orthographicSize *= (float)Math.Pow(2, (Input.GetAxis("HeightAndZoom") * Time.deltaTime));
 				}
 
 			}
 
 		} else {
-			targetPos = null;
-			targetRot = null;
+			StopLerp();
 			//ensure these stay this way
 			Cursor.lockState = CursorLockMode.Locked;
 			Cursor.visible = false;
 
 			// Allow the script to clamp based on a desired target value.
-			var targetOrientation = Quaternion.Euler(targetDirection);
+			Vector3 eulerTargetDir = targetDirection.Value.eulerAngles;
+			if (eulerTargetDir.z != 0) {
+				if (Mathf.Abs(eulerTargetDir.z) < 0.04f) {
+					eulerTargetDir = new Vector3(eulerTargetDir.x, eulerTargetDir.y, 0f);
+				} else {
+					eulerTargetDir = new Vector3(eulerTargetDir.x, eulerTargetDir.y, Mathf.Lerp(eulerTargetDir.z, 0f, 0.05f * lerpFactor));
+				}
+				targetDirection = Quaternion.Euler(eulerTargetDir);
+			}
+			var targetOrientation = targetDirection.Value;
 			var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
 
 			// Get raw mouse input for a cleaner reading on more sensitive mice.
@@ -215,6 +256,10 @@ public class CameraComponent : MonoBehaviour {
 			if (orthographic) {
 
 				float orthoFlySpeedMult = (float)Math.Sqrt(Camera.main.orthographicSize);
+
+				if (Input.GetAxis("Mouse ScrollWheel") != 0) {
+					Camera.main.orthographicSize *= (float)Math.Pow(2, (-Input.GetAxis("Mouse ScrollWheel")));
+				}
 
 				if (Input.GetAxis("Vertical") != 0) {
 					transform.Translate(Vector3.up * flySpeed * orthoFlySpeedMult * Time.deltaTime * Input.GetAxis("Vertical"), Space.Self);

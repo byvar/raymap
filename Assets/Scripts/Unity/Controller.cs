@@ -881,6 +881,8 @@ public class Controller : MonoBehaviour {
 			if (camSettings.Position.HasValue) c.transform.localPosition = camSettings.Position.Value;
 			if (camSettings.Rotation.HasValue) c.transform.localEulerAngles = camSettings.Rotation.Value;
 		}
+		CameraComponent cc = c.GetComponent<CameraComponent>();
+		if(cc != null) cc.StopLerp();
 	}
 
 	public void UpdateViewGraphs() {

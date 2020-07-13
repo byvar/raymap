@@ -1271,15 +1271,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e299af12c352f5946992ee99caef6463, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 1701416321}
   clampInDegrees: {x: 360, y: 180}
   sensitivity: {x: 2, y: 2}
   smoothing: {x: 3, y: 3}
-  targetDirection: {x: 0, y: 0}
   targetCharacterDirection: {x: 0, y: 0}
   mouseLookEnabled: 0
   flySpeed: 15
   cam: {fileID: 1488385697}
   lerpFactor: 3
+  debugCameraPos: 10
 --- !u!114 &1488385700
 MonoBehaviour:
   m_ObjectHideFlags: 0
