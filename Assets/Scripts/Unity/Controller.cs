@@ -31,6 +31,7 @@ public class Controller : MonoBehaviour {
 	public LoadingScreen loadingScreen;
 	public WebCommunicator communicator;
     public GameObject spawnableParent;
+	public GameObject persoPartsParent;
 
     public MapLoader loader = null;
 	bool viewCollision_ = false; public bool viewCollision = false;
@@ -375,6 +376,13 @@ public class Controller : MonoBehaviour {
 		}
 		if (Input.GetKeyDown(KeyCode.U)) {
 			showPersos = !showPersos;
+		}
+		if (Camera.main.orthographic) {
+			if(spawnableParent != null) spawnableParent.SetActive(false);
+			if(persoPartsParent != null) persoPartsParent.SetActive(false);
+		} else {
+			if (spawnableParent != null) spawnableParent.SetActive(true);
+			if (persoPartsParent != null) persoPartsParent.SetActive(true);
 		}
 		bool updatedSettings = false;
 		if (loader != null) {
@@ -817,10 +825,10 @@ public class Controller : MonoBehaviour {
 		IEnumerable<SectorComponent> filledSectors;
 		switch (loader) {
 			case R2PS1Loader pl:
-				filledSectors = sectorManager.sectors;
+				filledSectors = sectorManager.sectors.TakeAllButLast();
 				break;
 			case R2ROMLoader rl:
-				filledSectors = sectorManager.sectors.Where(s => s.SectorBorder != null);
+				filledSectors = sectorManager.sectors.TakeAllButLast().Where(s => s.SectorBorder != null);
 				break;
 			default:
 				filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 && s.SectorBorder != null);

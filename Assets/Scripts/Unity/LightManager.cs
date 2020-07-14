@@ -183,7 +183,7 @@ public class LightManager : MonoBehaviour {
 				}
 			}
 		}
-		if (skyMaterial != null && !controller.viewCollision) {
+		if (skyMaterial != null && !controller.viewCollision && !Camera.main.orthographic) {
 			backgroundPanel.gameObject.SetActive(true);
 			if (backgroundMaterial != skyMaterial) {
 				backgroundMaterial = skyMaterial;
@@ -263,7 +263,7 @@ public class LightManager : MonoBehaviour {
 				}
 			}
 		}
-		if(!controller.viewCollision) {
+		if(!controller.viewCollision && !Camera.main.orthographic) {
 			if (skyMaterial != null) {
 				backgroundPanel.gameObject.SetActive(true);
 				if (backgroundMaterialROM != skyMaterial) {

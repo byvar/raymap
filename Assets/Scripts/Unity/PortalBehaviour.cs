@@ -73,9 +73,11 @@ public class PortalBehaviour : MonoBehaviour {
 			reflectionCamera.transform.position = newpos;
 			Vector3 euler = cam.transform.eulerAngles;
 			reflectionCamera.transform.eulerAngles = new Vector3(0, euler.y, euler.z);
-			try {
-				reflectionCamera.Render();
-			} catch {
+			if (reflectionCamera.rect.x != 0 && reflectionCamera.rect.y != 0) {
+				try {
+					reflectionCamera.Render();
+				} catch {
+				}
 			}
 			reflectionCamera.transform.position = oldpos;
 			GL.invertCulling = false;
@@ -135,9 +137,11 @@ public class PortalBehaviour : MonoBehaviour {
 			reflectionCamera.cullingMask = ~(1 << 4) & m_ReflectLayers.value; // never render water layer
 			reflectionCamera.targetTexture = m_ReflectionTexture;
 
-			try {
-				reflectionCamera.Render();
-			} catch {
+			if (reflectionCamera.rect.x != 0 && reflectionCamera.rect.y != 0) {
+				try {
+					reflectionCamera.Render();
+				} catch {
+				}
 			}
 
 			//Material[] materials = rend.sharedMaterials;

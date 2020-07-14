@@ -204,7 +204,7 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.SaveTextures = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Save Textures"), UnitySettings.SaveTextures);
 		UnitySettings.ExportText = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Export Text"), UnitySettings.ExportText);
 		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
-		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Visualize Sector Borders"), UnitySettings.UseLevelTranslation);
+		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Visualize Sector Borders"), UnitySettings.VisualizeSectorBorders);
 
 		totalyPos = yPos;
 		GUI.EndScrollView();

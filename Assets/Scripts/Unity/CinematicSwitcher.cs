@@ -79,10 +79,6 @@ public class CinematicSwitcher : MonoBehaviour {
 				SetCinematic(currentCinematic);
 			}
 			if (ps1Streams != null && currentCinematic > 0) {
-				if (Camera.main.orthographic) {
-					CinematicIndex = 0;
-					return;
-				}
 				UpdatePS1Stream();
 			}
 		}
