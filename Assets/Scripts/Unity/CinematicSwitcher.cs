@@ -79,6 +79,10 @@ public class CinematicSwitcher : MonoBehaviour {
 				SetCinematic(currentCinematic);
 			}
 			if (ps1Streams != null && currentCinematic > 0) {
+				if (Camera.main.orthographic) {
+					CinematicIndex = 0;
+					return;
+				}
 				UpdatePS1Stream();
 			}
 		}
@@ -125,6 +129,10 @@ public class CinematicSwitcher : MonoBehaviour {
 		DeinitPS1Stream();
 		currentFrame = 0;
 		if (currentCinematic > 0 && ps1Streams != null) {
+			Camera cam = Camera.main;
+			if (cam.orthographic) {
+				controller.ApplyCameraSettings(controller.CameraSettings[WebJSON.CameraPos.Initial]);
+			}
 			OpenSpace.PS1.PS1Stream s = ps1Streams[currentCinematic - 1];
 			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;
 			l.gao_dynamicWorld.SetActive(false);
@@ -207,6 +215,10 @@ public class CinematicSwitcher : MonoBehaviour {
 
 	public void UpdatePS1StreamFrame() {
 		ClearCurrentNTTO();
+		if (Camera.main.orthographic) {
+			CinematicIndex = 0;
+			return;
+		}
 		if (ps1Streams != null && currentCinematic > 0) {
 			OpenSpace.PS1.PS1Stream s = ps1Streams[currentCinematic - 1];
 			OpenSpace.PS1.PS1StreamFrame f = s.frames.FirstOrDefault(fr => fr.num_frame == currentFrame);

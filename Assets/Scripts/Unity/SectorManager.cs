@@ -15,9 +15,10 @@ public class SectorManager : MonoBehaviour {
     //public List<Sector> activeSectors = new List<Sector>();
     public SectorComponent activeSector = null;
     Vector3 camPosPrevious;
+	bool _isOrthographic = false;
 
-    // Use this for initialization
-    void Start() {
+	// Use this for initialization
+	void Start() {
 
     }
 
@@ -30,19 +31,27 @@ public class SectorManager : MonoBehaviour {
 			if (Input.GetKeyDown(KeyCode.Y)) {
 				displayInactiveSectors = !displayInactiveSectors;
 			}
-
+			bool updateSectors = false;
 			if (_displayInactiveSectors != displayInactiveSectors) {
+				updateSectors = true;
 				_displayInactiveSectors = displayInactiveSectors;
-				UpdateSectors();
-			} else if (camPos != camPosPrevious) {
+			}
+			if (camPos != camPosPrevious) {
+				updateSectors = true;
 				camPosPrevious = camPos;
+			}
+			if (_isOrthographic != Camera.main.orthographic) {
+				_isOrthographic = Camera.main.orthographic;
+				updateSectors = true;
+			}
+			if (updateSectors) {
 				UpdateSectors();
 			}
         }
     }
 
 	private void UpdateSectors() {
-		if (!displayInactiveSectors) {
+		if (!displayInactiveSectors && !_isOrthographic) {
 			for (int i = 0; i < sectors.Count; i++) {
 				SectorComponent sc = sectors[i];
 				if (sc.Loaded) {

@@ -41,7 +41,7 @@ public class Controller : MonoBehaviour {
 	bool showPersos_ = true; public bool showPersos = true;
 	bool livePreview_ = false; public bool livePreview = false;
 
-	private Dictionary<WebJSON.CameraPos, WebJSON.CameraSettings> cameraSettings = new Dictionary<WebJSON.CameraPos, WebJSON.CameraSettings>();
+	public Dictionary<WebJSON.CameraPos, WebJSON.CameraSettings> CameraSettings = new Dictionary<WebJSON.CameraPos, WebJSON.CameraSettings>();
 	
 	float livePreviewUpdateCounter = 0;
 
@@ -811,56 +811,78 @@ public class Controller : MonoBehaviour {
 				}
 			}
 		}
-		cameraSettings[WebJSON.CameraPos.Initial] = communicator.GetCameraJSON(includeTransform: true);
+		CameraSettings[WebJSON.CameraPos.Initial] = communicator.GetCameraJSON(includeTransform: true);
 
 		// Calculate world size
-		var filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 ? true : false);
+		IEnumerable<SectorComponent> filledSectors;
+		switch (loader) {
+			case R2PS1Loader pl:
+				filledSectors = sectorManager.sectors;
+				break;
+			case R2ROMLoader rl:
+				filledSectors = sectorManager.sectors.Where(s => s.SectorBorder != null);
+				break;
+			default:
+				filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 && s.SectorBorder != null);
+				break;
+		}
+		Vector3 center;
+		float orthoSize;
+		if (filledSectors.Count() == 0) {
+			center = Vector3.zero;
+			orthoSize = 100f / 6.0f;
+		} else {
+			float minX = filledSectors.Min(v => v.SectorBorder.boxMin.x);
+			float minY = filledSectors.Min(v => v.SectorBorder.boxMin.y);
+			float minZ = filledSectors.Min(v => v.SectorBorder.boxMin.z);
 
-		float minX = filledSectors.Min(v => v.SectorBorder.boxMin.x);
-		float minY = filledSectors.Min(v => v.SectorBorder.boxMin.y);
-		float minZ = filledSectors.Min(v => v.SectorBorder.boxMin.z);
+			float maxX = filledSectors.Max(v => v.SectorBorder.boxMax.x);
+			float maxY = filledSectors.Max(v => v.SectorBorder.boxMax.y);
+			float maxZ = filledSectors.Max(v => v.SectorBorder.boxMax.z);
 
-		float maxX = filledSectors.Max(v => v.SectorBorder.boxMax.x);
-		float maxY = filledSectors.Max(v => v.SectorBorder.boxMax.y);
-		float maxZ = filledSectors.Max(v => v.SectorBorder.boxMax.z);
+			Vector3 worldMin = new Vector3(minX, minY, minZ);
+			Vector3 worldMax = new Vector3(maxX, maxY, maxZ);
 
-		Vector3 worldMin = new Vector3(minX, minY, minZ);
-		Vector3 worldMax = new Vector3(maxX, maxY, maxZ);
-
-		Vector3 worldSize = (worldMax - worldMin);
-		Vector3 center = worldMin + worldSize * 0.5f;
-
-		Camera.main.orthographic = true;
-		Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
+			Vector3 worldSize = (worldMax - worldMin);
+			center = worldMin + worldSize * 0.5f;
+			orthoSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
+		}
 
 		for (int i = 0; i < 4; i++) {
-			Camera.main.transform.rotation = Quaternion.Euler(0, (90 * i), 0);
-			Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
-
-			cameraSettings[WebJSON.CameraPos.Front + i] = communicator.GetCameraJSON(includeTransform: true);
+			Quaternion rot = Quaternion.Euler(0, (90 * i), 0);
+			CameraSettings[WebJSON.CameraPos.Front + i] = new WebJSON.CameraSettings() {
+				IsOrthographic = true,
+				OrthographicSize = orthoSize,
+				Position = center - rot * Vector3.forward * Camera.main.farClipPlane * 0.5f,
+				Rotation = rot.eulerAngles
+			};
 		}
 
 		var pitch = Mathf.Rad2Deg * Mathf.Atan(Mathf.Sin(Mathf.Deg2Rad * 45));
 		for (int i = 0; i < 4; i++) {
-			Camera.main.transform.rotation = Quaternion.Euler(pitch, 45 + (90 * i), 0);
-			Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
-
-			cameraSettings[WebJSON.CameraPos.IsometricFront + i] = communicator.GetCameraJSON(includeTransform: true);
+			Vector3 rot = new Vector3(pitch, 45 + (90 * i), 0);
+			CameraSettings[WebJSON.CameraPos.IsometricFront + i] = new WebJSON.CameraSettings() {
+				IsOrthographic = true,
+				OrthographicSize = orthoSize,
+				Position = center - Quaternion.Euler(rot) * Vector3.forward * Camera.main.farClipPlane * 0.5f,
+				Rotation = rot
+			};
 		}
 
 		for (int i = 0; i < 2; i++) {
-			Camera.main.transform.rotation = Quaternion.Euler(90 - 180*i, 0, 0);
-			Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
-			cameraSettings[WebJSON.CameraPos.Top + i] = communicator.GetCameraJSON(includeTransform: true);
+			Vector3 rot = new Vector3(90 - 180 * i, 0, 0); ;
+			CameraSettings[WebJSON.CameraPos.Top + i] = new WebJSON.CameraSettings() {
+				IsOrthographic = true,
+				OrthographicSize = orthoSize,
+				Position = center - Quaternion.Euler(rot) * Vector3.forward * Camera.main.farClipPlane * 0.5f,
+				Rotation = rot
+			};
 		}
-
-		ApplyCameraSettings(cameraSettings[WebJSON.CameraPos.Initial]);
-		// TODO: fill in cameraSettings dictionary with all other possible cameraPos (isometric different angles, and all straight view angles)
 	}
 
 	public void SetCameraPosition(WebJSON.CameraPos cameraPos) {
-		if (cameraSettings.ContainsKey(cameraPos)) {
-			ApplyCameraSettings(cameraSettings[cameraPos], applyCameraPos: false);
+		if (CameraSettings.ContainsKey(cameraPos)) {
+			ApplyCameraSettings(CameraSettings[cameraPos], applyCameraPos: false);
 		}
 	}
 

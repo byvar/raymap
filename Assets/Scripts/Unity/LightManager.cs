@@ -18,8 +18,9 @@ public class LightManager : MonoBehaviour {
 	private OpenSpace.ROM.VisualMaterial[] backgroundMaterialsDDROM;
 	private SectorComponent previousActiveBackgroundSector = null;
 	List<LightBehaviour> lights;
+	bool _isOrthographic = false;
 
-    [Range(0.0f, 1.0f)]
+	[Range(0.0f, 1.0f)]
     public float luminosity = 0.5f;
     private float _luminosity = 0.5f;
 
@@ -61,10 +62,15 @@ public class LightManager : MonoBehaviour {
 			Shader.SetGlobalFloat("_DisableLighting", enableLighting ? 0f : 1f);
 			controller.communicator.SendSettings();
 		}
-		if (_enableFog != enableFog) {
-			_enableFog = enableFog;
-			Shader.SetGlobalFloat("_DisableFog", enableFog ? 0f : 1f);
-			controller.communicator.SendSettings();
+		if (_enableFog != enableFog || _isOrthographic != Camera.main.orthographic) {
+			if (_enableFog != enableFog) {
+				_enableFog = enableFog;
+				controller.communicator.SendSettings();
+			}
+			if (_isOrthographic != Camera.main.orthographic) {
+				_isOrthographic = Camera.main.orthographic;
+			}
+			Shader.SetGlobalFloat("_DisableFog", (enableFog && !_isOrthographic) ? 0f : 1f);
 		}
 		if (_luminosity != luminosity) {
 			_luminosity = luminosity;
