@@ -10,6 +10,8 @@ public class ObjectSelector : MonoBehaviour {
     public CollideComponent highlightedCollision = null;
     public WayPointBehaviour highlightedWayPoint = null;
 	private GameObject tooFarLimitDiamond = null;
+    public bool IsSelecting { get; private set; }  = false;
+    public OutlineManager outline;
 
     private void HandleCollision() {
         int layerMask = 0;
@@ -32,6 +34,10 @@ public class ObjectSelector : MonoBehaviour {
                     if (pb != null) {
                         highlightedPerso = pb;
                         if (Input.GetMouseButtonDown(0)) {
+                            IsSelecting = true;
+                        }
+                        UpdateHighlight();
+                        if (IsSelecting && Input.GetMouseButtonUp(0)) {
                             Select(pb, view: true);
                         }
                         break;
@@ -79,6 +85,11 @@ public class ObjectSelector : MonoBehaviour {
         }*/
     }
 
+    private void UpdateHighlight() {
+        outline.Highlight = highlightedPerso != null ? highlightedPerso.gameObject : null;
+        outline.selecting = IsSelecting;
+    }
+
     public void Select(BasePersoBehaviour pb, bool view = false) {
         //print(pb.name);
         if (selectedPerso != pb || view) {
@@ -97,6 +108,7 @@ public class ObjectSelector : MonoBehaviour {
 
     void Update() {
         highlightedPerso = null;
+        UpdateHighlight();
         highlightedCollision = null;
         highlightedWayPoint = null;
 		Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
@@ -104,7 +116,10 @@ public class ObjectSelector : MonoBehaviour {
 			&& controller.LoadState == Controller.State.Finished
 			&& screenRect.Contains(Input.mousePosition)) HandleCollision();
 		if (controller.LoadState == Controller.State.Finished) UpdateTooFarLimit();
-	}
+        if (IsSelecting && (!Input.GetMouseButton(0) || highlightedPerso == null)) {
+            IsSelecting = false;
+        }
+    }
 
 	void UpdateTooFarLimit() {
 		if (tooFarLimitDiamond == null) InitTooFarLimit();

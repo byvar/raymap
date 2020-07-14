@@ -1118,6 +1118,8 @@ GameObject:
   - component: {fileID: 1488385699}
   - component: {fileID: 1488385696}
   - component: {fileID: 1488385700}
+  - component: {fileID: 1488385701}
+  - component: {fileID: 1488385702}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1279,7 +1281,7 @@ MonoBehaviour:
   mouseLookEnabled: 0
   flySpeed: 15
   cam: {fileID: 1488385697}
-  lerpFactor: 3
+  lerpFactor: 2.5
   debugCameraPos: 10
 --- !u!114 &1488385700
 MonoBehaviour:
@@ -1293,6 +1295,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b54b537353efab4b93b691e568d1bcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1488385701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1488385693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a78da3f00f3328541b4526c0b0b5ec5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineThickness: 3
+  lineIntensity: 1
+  fillAmount: 0.25
+  lineColor0: {r: 1, g: 0.80784315, b: 0, a: 1}
+  lineColor1: {r: 0, g: 1, b: 0, a: 1}
+  lineColor2: {r: 0, g: 0, b: 1, a: 1}
+  additiveRendering: 0
+  backfaceCulling: 1
+  cornerOutlines: 1
+  addLinesBetweenColors: 0
+  scaleWithScreenSize: 1
+  alphaCutoff: 0.5
+  flipY: 0
+  sourceCamera: {fileID: 1488385697}
+  outlineCamera: {fileID: 0}
+  outlineShaderMaterial: {fileID: 0}
+  renderTexture: {fileID: 0}
+  extraRenderTexture: {fileID: 0}
+--- !u!114 &1488385702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1488385693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b32321a5731cb944bfb744c52be488e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outline: {fileID: 1488385701}
+  highlightColor: {r: 1, g: 0.80784315, b: 0, a: 1}
+  selectColor: {r: 1, g: 0.14003491, b: 0, a: 1}
+  fadeInSpeed: 10
+  fadeOutSpeed: 3
+  selecting: 0
+  curLerp: 0
 --- !u!1 &1503682887
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,8 +1444,10 @@ MonoBehaviour:
   graphManager: {fileID: 486948330}
   portalManager: {fileID: 469719539}
   loadingScreen: {fileID: 1109753673}
+  selector: {fileID: 1701416324}
   communicator: {fileID: 1701416323}
   spawnableParent: {fileID: 0}
+  persoPartsParent: {fileID: 0}
   viewCollision: 0
   viewInvisible: 0
   viewGraphs: 0
@@ -1448,6 +1501,7 @@ MonoBehaviour:
   selectedPerso: {fileID: 0}
   highlightedCollision: {fileID: 0}
   highlightedWayPoint: {fileID: 0}
+  outline: {fileID: 1488385702}
 --- !u!114 &1701416325
 MonoBehaviour:
   m_ObjectHideFlags: 0

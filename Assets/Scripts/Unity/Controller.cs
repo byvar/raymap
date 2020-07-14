@@ -29,6 +29,7 @@ public class Controller : MonoBehaviour {
 	public GraphManager graphManager;
 	public PortalManager portalManager;
 	public LoadingScreen loadingScreen;
+	public ObjectSelector selector;
 	public WebCommunicator communicator;
     public GameObject spawnableParent;
 	public GameObject persoPartsParent;

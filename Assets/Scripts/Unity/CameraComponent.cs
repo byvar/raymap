@@ -163,7 +163,7 @@ public class CameraComponent : MonoBehaviour {
 
 				float orthoFlySpeedMult = (float)Math.Sqrt(Camera.main.orthographicSize);
 
-				if (Input.GetMouseButton(1)) {
+				if (Input.GetMouseButton(1) || (Input.GetMouseButton(0) && !controller.selector.IsSelecting)) {
 					StopLerp();
 
 
@@ -176,7 +176,7 @@ public class CameraComponent : MonoBehaviour {
 
 						transform.Translate(Vector3.right * xFactor * -mouseDelta.x, Space.Self);
 						transform.Translate(Vector3.up * yFactor * -mouseDelta.y, Space.Self);
-					} else if(Input.GetMouseButtonDown(1) && screenRect.Contains(Input.mousePosition)) { // Only start panning if within game window when you click
+					} else if(Input.GetMouseButtonDown(1) || (Input.GetMouseButtonDown(0) && !controller.selector.IsSelecting) && screenRect.Contains(Input.mousePosition)) { // Only start panning if within game window when you click
 						panning = true;
                     }
 				} else {
