@@ -318,7 +318,7 @@ public class Controller : MonoBehaviour {
 
                 Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
 
-                screenshotBytes = await pb.Capture(res.width * 8, res.height * 8);
+                screenshotBytes = await pb.Capture(res.width * 8, res.height * 8, true);
                 OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
 
             }
@@ -331,7 +331,7 @@ public class Controller : MonoBehaviour {
                     Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
 
                     Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
-                    screenshotBytes = await pb.Capture(res.width * 8, res.height * 8);
+                    screenshotBytes = await pb.Capture(res.width * 8, res.height * 8, true);
                     OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
 
                 }

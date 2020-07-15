@@ -11,14 +11,17 @@ using OpenSpace.Collide;
 using System.Collections;
 using OpenSpace.Object.Properties;
 using System.Runtime.InteropServices;
+using Cysharp.Threading.Tasks;
 
 public class WebCommunicator : MonoBehaviour {
     [DllImport("__Internal")]
     private static extern void SetAllJSON(string jsonString);
     [DllImport("__Internal")]
     private static extern void UnityJSMessage(string jsonString);
+	[DllImport("__Internal")]
+	private static extern void SaveFile(byte[] array, int size, string filename);
 
-    public Controller controller;
+	public Controller controller;
     public ObjectSelector selector;
     private BasePersoBehaviour highlightedPerso_;
 	private CollideComponent highlightedCollision_;
@@ -585,6 +588,28 @@ public class WebCommunicator : MonoBehaviour {
 					}
 				}
 				break;
+			case WebJSON.RequestType.Screenshot:
+				TakeScreenshot(msg.Screenshot).Forget(); // Start the async task for taking a screenshot
+				break;
+		}
+	}
+	async UniTaskVoid TakeScreenshot(WebJSON.Screenshot msg) {
+		if (msg != null) {
+			TransparencyCaptureBehaviour tcb = Camera.main.GetComponent<TransparencyCaptureBehaviour>();
+			if (tcb != null) {
+				try {
+					Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
+					int height = msg.Width ?? Mathf.RoundToInt(res.height * (msg.SizeFactor ?? 1));
+					int width = msg.Height ?? Mathf.RoundToInt(res.width * (msg.SizeFactor ?? 1));
+					if (width > 0 && height > 0) {
+						System.DateTime dateTime = System.DateTime.Now;
+						byte[] screenshotBytes = await tcb.Capture(width, height, msg.IsTransparent ?? true);
+						SaveFile(screenshotBytes, screenshotBytes.Length, $"Screenshot_{dateTime.ToString("yyyy_MM_dd HH_mm_ss")}.png");
+					}
+				} catch (Exception) {
+					Debug.Log("Screenshot failed");
+				}
+			}
 		}
 	}
 	private BaseScriptComponent GetScriptFromRequest(WebJSON.Request msg) {

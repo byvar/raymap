@@ -3,53 +3,62 @@ using System.IO;
 
 public class zzTransparencyCapture
 {
-    public static Texture2D  capture(Rect pRect)
+    public static Texture2D  capture(Rect pRect, bool isTransparent)
     {
         Camera lCamera = Camera.main;
 		RenderTexture renderTexture = new RenderTexture((int)pRect.width, (int)pRect.height, 32);
         Texture2D lOut;
-        var lPreClearFlags = lCamera.clearFlags;
-        var lPreBackgroundColor = lCamera.backgroundColor;
-		// Texture.ReadPixels reads from whatever texture is active. Ours needs to
-		// be active. But let's remember the old one so we can restore it later.
-		RenderTexture oldRenderTexture = RenderTexture.active;
-		{
-            lCamera.clearFlags = CameraClearFlags.Color;
-			lCamera.targetTexture = renderTexture;
-			RenderTexture.active = renderTexture;
-
-			//make two captures with black and white background
-			lCamera.backgroundColor = Color.black;
-            lCamera.Render();
-            var lBlackBackgroundCapture = captureView(pRect);
-
-            lCamera.backgroundColor = Color.white;
-            lCamera.Render();
-            var lWhiteBackgroundCapture = captureView(pRect);
-
-            for (int x = 0; x < lWhiteBackgroundCapture.width; ++x)
+        if (isTransparent) {
+            var lPreClearFlags = lCamera.clearFlags;
+            var lPreBackgroundColor = lCamera.backgroundColor;
+            // Texture.ReadPixels reads from whatever texture is active. Ours needs to
+            // be active. But let's remember the old one so we can restore it later.
+            RenderTexture oldRenderTexture = RenderTexture.active;
             {
-                for (int y = 0; y < lWhiteBackgroundCapture.height; ++y)
-                {
-                    Color lColorWhenBlack = lBlackBackgroundCapture.GetPixel(x, y);
-                    Color lColorWhenWhite = lWhiteBackgroundCapture.GetPixel(x, y);
-                    if (lColorWhenBlack != Color.clear)
-                    {
-                        //set real color
-                        lWhiteBackgroundCapture.SetPixel(x, y,
-                            getColor(lColorWhenBlack, lColorWhenWhite));
+                lCamera.clearFlags = CameraClearFlags.Color;
+                lCamera.targetTexture = renderTexture;
+                RenderTexture.active = renderTexture;
+
+                //make two captures with black and white background
+                lCamera.backgroundColor = Color.black;
+                lCamera.Render();
+                var lBlackBackgroundCapture = captureView(pRect);
+
+                lCamera.backgroundColor = Color.white;
+                lCamera.Render();
+                var lWhiteBackgroundCapture = captureView(pRect);
+
+                for (int x = 0; x < lWhiteBackgroundCapture.width; ++x) {
+                    for (int y = 0; y < lWhiteBackgroundCapture.height; ++y) {
+                        Color lColorWhenBlack = lBlackBackgroundCapture.GetPixel(x, y);
+                        Color lColorWhenWhite = lWhiteBackgroundCapture.GetPixel(x, y);
+                        if (lColorWhenBlack != Color.clear) {
+                            //set real color
+                            lWhiteBackgroundCapture.SetPixel(x, y,
+                                getColor(lColorWhenBlack, lColorWhenWhite));
+                        }
                     }
                 }
+                lWhiteBackgroundCapture.Apply();
+                lOut = lWhiteBackgroundCapture;
+                Object.DestroyImmediate(lBlackBackgroundCapture);
             }
-            lWhiteBackgroundCapture.Apply();
-            lOut = lWhiteBackgroundCapture;
-            Object.DestroyImmediate(lBlackBackgroundCapture);
-		}
-		// Restore previous settings.
-		Camera.main.targetTexture = null;
-		RenderTexture.active = oldRenderTexture;
-		lCamera.backgroundColor = lPreBackgroundColor;
-        lCamera.clearFlags = lPreClearFlags;
+            // Restore previous settings.
+            Camera.main.targetTexture = null;
+            RenderTexture.active = oldRenderTexture;
+            lCamera.backgroundColor = lPreBackgroundColor;
+            lCamera.clearFlags = lPreClearFlags;
+        } else {
+            RenderTexture oldRenderTexture = RenderTexture.active;
+            lCamera.targetTexture = renderTexture;
+            RenderTexture.active = renderTexture;
+            // Render
+            lCamera.Render();
+            lOut = captureView(pRect);
+            // Restore previous settings.
+            Camera.main.targetTexture = null;
+            RenderTexture.active = oldRenderTexture;
+        }
         return lOut;
     }
 
@@ -57,9 +66,9 @@ public class zzTransparencyCapture
     /// Capture a screenshot(not include GUI)
     /// </summary>
     /// <returns></returns>
-    public static Texture2D captureScreenshot(int width, int height)
+    public static Texture2D captureScreenshot(int width, int height, bool isTransparent)
     {
-        return capture(new Rect(0f, 0f, width, height));
+        return capture(new Rect(0f, 0f, width, height), isTransparent);
     }
 
     /// <summary>
@@ -68,9 +77,9 @@ public class zzTransparencyCapture
     /// </summary>
     /// <param name="pFileName"></param>
     /// <returns></returns>
-    public static void captureScreenshot(string pFileName)
+    public static void captureScreenshot(string pFileName, bool isTransparent)
     {
-        var lScreenshot = captureScreenshot(Screen.width, Screen.height);
+        var lScreenshot = captureScreenshot(Screen.width, Screen.height, isTransparent);
         try
         {
             using (var lFile = new FileStream(pFileName, FileMode.Create))
