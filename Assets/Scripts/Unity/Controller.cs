@@ -31,10 +31,10 @@ public class Controller : MonoBehaviour {
 	public LoadingScreen loadingScreen;
 	public ObjectSelector selector;
 	public WebCommunicator communicator;
-    public GameObject spawnableParent;
-	public GameObject persoPartsParent;
+    public GameObject SpawnableParent { get; set; }
+	public GameObject PersoPartsParent { get; set; }
 
-    public MapLoader loader = null;
+	public MapLoader loader = null;
 	bool viewCollision_ = false; public bool viewCollision = false;
 	bool viewInvisible_ = false; public bool viewInvisible = false;
 	bool viewGraphs_ = false; public bool viewGraphs = false;
@@ -307,7 +307,7 @@ public class Controller : MonoBehaviour {
 
             sectorManager.displayInactiveSectors = true;
             lightManager.luminosity = Settings.s.luminosity * 2.0f;
-            spawnableParent?.SetActive(false);
+            SpawnableParent?.SetActive(false);
 
             byte[] screenshotBytes;
 
@@ -379,11 +379,11 @@ public class Controller : MonoBehaviour {
 			showPersos = !showPersos;
 		}
 		if (Camera.main.orthographic) {
-			if(spawnableParent != null) spawnableParent.SetActive(false);
-			if(persoPartsParent != null) persoPartsParent.SetActive(false);
+			if(SpawnableParent != null) SpawnableParent.SetActive(false);
+			if(PersoPartsParent != null) PersoPartsParent.SetActive(false);
 		} else {
-			if (spawnableParent != null) spawnableParent.SetActive(true);
-			if (persoPartsParent != null) persoPartsParent.SetActive(true);
+			if (SpawnableParent != null) SpawnableParent.SetActive(true);
+			if (PersoPartsParent != null) PersoPartsParent.SetActive(true);
 		}
 		bool updatedSettings = false;
 		if (loader != null) {
@@ -644,7 +644,7 @@ public class Controller : MonoBehaviour {
 				}
 			}
 			if (romLoader.level != null && romLoader.level.spawnablePersos.Value != null && romLoader.level.num_spawnablepersos > 0) {
-				spawnableParent = new GameObject("Spawnable persos");
+				SpawnableParent = new GameObject("Spawnable persos");
 				for (int i = 0; i < romLoader.level.num_spawnablepersos; i++) {
 					detailedState = "Initializing spawnable persos: " + i + "/" + romLoader.level.num_spawnablepersos;
 					await WaitIfNecessary();
@@ -654,7 +654,7 @@ public class Controller : MonoBehaviour {
 						ROMPersoBehaviour unityBehaviour = sodGao.GetComponent<ROMPersoBehaviour>();
 						unityBehaviour.controller = this;
 						unityBehaviour.IsAlways = true;
-						unityBehaviour.transform.SetParent(spawnableParent.transform);
+						unityBehaviour.transform.SetParent(SpawnableParent.transform);
 						unityBehaviour.transform.position = new Vector3(i * 10, -1000, 0);
 						unityBehaviour.transform.rotation = Quaternion.identity;
 						unityBehaviour.transform.localScale = Vector3.one;

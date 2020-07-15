@@ -580,7 +580,7 @@ namespace OpenSpace.Loader {
 			}
 			gao_always = new GameObject("Always");
 			gao_always.transform.position = new Vector3(0, -1000, 0);
-			controller.spawnableParent = gao_always;
+			controller.SpawnableParent = gao_always;
 			int i = 0;
 			foreach (AlwaysList alw in levelHeader.always) {
 				GameObject alwGao = alw.GetGameObject();
@@ -601,13 +601,13 @@ namespace OpenSpace.Loader {
 				}
 			}*/
 
-			controller.persoPartsParent = new GameObject("Perso parts");
-			controller.persoPartsParent.transform.localPosition = new Vector3(0, 1000, 0);
+			controller.PersoPartsParent = new GameObject("Perso parts");
+			controller.PersoPartsParent.transform.localPosition = new Vector3(0, 1000, 0);
 			i = 0;
 			foreach (ObjectsTable.Entry e in levelHeader.geometricObjectsDynamic.entries) {
 				GameObject g = e.GetGameObject(null, out _);
 				g.name = $"[{i}] {e.off_0} - {g.name}";
-				g.transform.parent = controller.persoPartsParent.transform;
+				g.transform.parent = controller.PersoPartsParent.transform;
 				g.transform.localPosition = new Vector3(i++ * 4, 0, 0);
 			}
 

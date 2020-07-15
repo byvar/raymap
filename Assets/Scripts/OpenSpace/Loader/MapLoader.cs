@@ -1005,7 +1005,7 @@ MonoBehaviour.print(str);
         public void ReadAlways(Reader reader) {
             // Parse spawnable SO's
             if (globals.spawnablePersos != null && globals.spawnablePersos.Count > 0) {
-                controller.spawnableParent = new GameObject("Spawnable persos");
+                controller.SpawnableParent = new GameObject("Spawnable persos");
                 globals.spawnablePersos.ReadEntries(ref reader, (offset) => {
 					uint index;
 					Pointer off_spawnable_perso;
@@ -1020,7 +1020,7 @@ MonoBehaviour.print(str);
                     Pointer.DoAt(ref reader, off_spawnable_perso, () => {
                         perso = Perso.Read(reader, off_spawnable_perso, null);
                         if (perso != null) {
-                            perso.Gao.transform.parent = controller.spawnableParent.transform;
+                            perso.Gao.transform.parent = controller.SpawnableParent.transform;
                         }
                     });
                     return perso;
