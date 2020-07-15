@@ -1281,7 +1281,7 @@ MonoBehaviour:
   mouseLookEnabled: 0
   flySpeed: 15
   cam: {fileID: 1488385697}
-  lerpFactor: 2.5
+  lerpFactor: 6
   debugCameraPos: 10
 --- !u!114 &1488385700
 MonoBehaviour:
@@ -1446,8 +1446,6 @@ MonoBehaviour:
   loadingScreen: {fileID: 1109753673}
   selector: {fileID: 1701416324}
   communicator: {fileID: 1701416323}
-  spawnableParent: {fileID: 0}
-  persoPartsParent: {fileID: 0}
   viewCollision: 0
   viewInvisible: 0
   viewGraphs: 0

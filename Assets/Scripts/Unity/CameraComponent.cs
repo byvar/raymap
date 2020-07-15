@@ -21,6 +21,7 @@ public class CameraComponent : MonoBehaviour {
     public bool mouseLookEnabled = false;
     private bool _shifted = false;
     public float flySpeed = 20f;
+	private float flySpeedFactor = 30f;
     public Camera cam;
 
     public float lerpFactor = 1f;
@@ -138,14 +139,14 @@ public class CameraComponent : MonoBehaviour {
 				if (Vector3.Distance(transform.position, targetPos.Value) < 0.4f) {
 					targetPos = null;
 				} else {
-					transform.position = Vector3.Lerp(transform.position, targetPos.Value, 0.05f * lerpFactor);
+					transform.position = Vector3.Lerp(transform.position, targetPos.Value, Time.deltaTime * lerpFactor);
 				}
 			}
 			if (targetRot.HasValue) {
 				if (Mathf.Abs(Quaternion.Angle(transform.rotation, targetRot.Value)) < 10) {
 					targetRot = null;
 				} else {
-					transform.rotation = Quaternion.Lerp(transform.rotation, targetRot.Value, 0.05f * lerpFactor);
+					transform.rotation = Quaternion.Lerp(transform.rotation, targetRot.Value, Time.deltaTime * lerpFactor);
 				}
 			}
 
@@ -157,7 +158,7 @@ public class CameraComponent : MonoBehaviour {
 					if (Mathf.Abs(targetOrthoSize.Value - cam.orthographicSize) < 0.04f) {
 						targetOrthoSize = null;
 					} else {
-						cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetOrthoSize.Value, 0.05f * lerpFactor);
+						cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetOrthoSize.Value, Time.deltaTime * lerpFactor);
 					}
 				}
 
@@ -235,6 +236,9 @@ public class CameraComponent : MonoBehaviour {
 		}
 	}
 	void CameraControlsPerspective() {
+		if (Input.GetAxis("Mouse ScrollWheel") != 0) {
+			flySpeed = Mathf.Max(0, flySpeed + Time.deltaTime * Input.GetAxis("Mouse ScrollWheel") * 100f * flySpeedFactor);
+		}
 		if (Input.GetAxis("Vertical") != 0) {
 			transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
 		}
@@ -252,9 +256,9 @@ public class CameraComponent : MonoBehaviour {
 	}
 	void CameraControlsSpeed() {
 		if (Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.KeypadPlus)) {
-			flySpeed += 1f;
+			flySpeed += Time.deltaTime * flySpeedFactor;
 		} else if (Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.KeypadMinus)) {
-			if (flySpeed > 0) flySpeed -= 1f;
+			flySpeed = Mathf.Max(0, flySpeed - Time.deltaTime * flySpeedFactor);
 		}
 	}
 	#endregion
@@ -266,7 +270,7 @@ public class CameraComponent : MonoBehaviour {
 			if (Mathf.Abs(eulerTargetDir.z) < 0.04f) {
 				eulerTargetDir = new Vector3(eulerTargetDir.x, eulerTargetDir.y, 0f);
 			} else {
-				eulerTargetDir = new Vector3(eulerTargetDir.x, eulerTargetDir.y, Mathf.Lerp(eulerTargetDir.z, 0f, 0.05f * lerpFactor));
+				eulerTargetDir = new Vector3(eulerTargetDir.x, eulerTargetDir.y, Mathf.Lerp(eulerTargetDir.z, 0f, Time.deltaTime * lerpFactor));
 			}
 			targetDirection = Quaternion.Euler(eulerTargetDir);
 		}
