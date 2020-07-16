@@ -1275,11 +1275,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 1701416321}
   clampInDegrees: {x: 360, y: 180}
-  sensitivity: {x: 2, y: 2}
+  sensitivity: {x: 1.6, y: 1.6}
   smoothing: {x: 3, y: 3}
   targetCharacterDirection: {x: 0, y: 0}
   mouseLookEnabled: 0
   flySpeed: 15
+  flySpeedShiftMultiplier: 3
   cam: {fileID: 1488385697}
   lerpFactor: 6
   debugCameraPos: 10
