@@ -77,7 +77,7 @@ let currentBehavior = null;
 let currentBehaviorType = "";
 let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description, stateSelector, objectListSelector, perso_tooltip;
+let btn_close_description, stateSelector, objectListSelector, highlight_tooltip, objectListInputGroup;
 
 // FUNCTIONS
 function sendMessage(jsonObj) {
@@ -224,6 +224,13 @@ function selectButton(button, selected) {
 function getSuperObjectByIndex(index) {
 	return objectsList[index];
 }
+function getPersoNameHTML(perso) {
+	let nameStr = "";
+	if(perso.hasOwnProperty("NameFamily")) nameStr += "<div class='name-family'>" + perso.NameFamily + "</div>";
+	if(perso.hasOwnProperty("NameModel")) nameStr += "<div class='name-model'>" + perso.NameModel + "</div>";
+	if(perso.hasOwnProperty("NameInstance")) nameStr += "<div class='name-instance'>" + perso.NameInstance + "</div>";
+	return nameStr;
+}
 function parseSuperObject(so, level) {
 	let items = [];
 	objectsList.push(so);
@@ -236,15 +243,11 @@ function parseSuperObject(so, level) {
 			items.push("<div class='objects-item object-world level-" + level + "' alt='" + so.Name + "'>" + so.Name + "</div>");
 			break;
 		case "Perso":
-			let family = "Family";
-			let model = "Model";
-			let instance = "Instance";
+			items.push("<div class='objects-item object-perso' title='" + so.Name + "'>");
 			if(so.hasOwnProperty("Perso")) {
-				family = so.Perso.NameFamily;
-				model = so.Perso.NameModel;
-				instance = so.Perso.NameInstance;
+				items.push(getPersoNameHTML(so.Perso));
 			}
-			items.push("<div class='objects-item object-perso' title='" + so.Name + "'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
+			items.push("</div>");
 			break;
 		case "Sector":
 			items.push("<div class='objects-item object-sector level-" + level + "' title='" + so.Name + "'>" + so.Name + "</div>");
@@ -279,17 +282,18 @@ function parseAlways(alwaysData) {
 	
 	if(alwaysData.hasOwnProperty("SpawnablePersos")) {
 		$.each(alwaysData.SpawnablePersos, function(i, child) {
-			let family = alwaysData.SpawnablePersos[i].NameFamily;
-			let model = alwaysData.SpawnablePersos[i].NameModel;
-			let instance = alwaysData.SpawnablePersos[i].NameInstance;
-			items.push("<div class='objects-item object-always object-perso' title='Spawnable'><div class='name-family'>" + family + "</div><div class='name-model'>" + model + "</div><div class='name-instance'>" + instance + "</div></div>");
+			let perso = alwaysData.SpawnablePersos[i];
+			let family = perso.NameFamily;
+			let model = perso.NameModel;
+			let instance = perso.NameInstance;
+			items.push("<div class='objects-item object-always object-perso' title='Spawnable'>" + getPersoNameHTML(perso) + "</div>");
 			let persoSO = {
-				Offset: alwaysData.SpawnablePersos[i].Offset,
-				Type: "Perso",
-				Perso: alwaysData.SpawnablePersos[i],
-				Position: alwaysData.SpawnablePersos[i].Position,
-				Rotation: alwaysData.SpawnablePersos[i].Rotation,
-				Scale:    alwaysData.SpawnablePersos[i].Scale
+				Offset:   perso.Offset,
+				Type:     "Perso",
+				Perso:    perso,
+				Position: perso.Position,
+				Rotation: perso.Rotation,
+				Scale:    perso.Scale
 			};
 			objectsList.push(persoSO);
 		});
@@ -496,7 +500,7 @@ function handleMessage_script(msg) {
 }
 
 // PERSO OBJECT DESCRIPTION
-function showObjectDescription(so) {
+function showObjectDescription(so, isSOChanged) {
 	$('#posX').val(so.Position.x);
 	$('#posY').val(so.Position.y);
 	$('#posZ').val(so.Position.z);
@@ -513,28 +517,34 @@ function showObjectDescription(so) {
 		let perso = so.Perso;
 
 		$('.perso-description').removeClass('invisible');
-		stateSelector.empty();
-		objectListSelector.empty();
-		//objectListSelector.append("<option value='0'>None</option>");
+		if(isSOChanged) {
+			stateSelector.empty();
+			objectListSelector.empty();
+			//objectListSelector.append("<option value='0'>None</option>");
 
-		if(perso.hasOwnProperty("States")) {
-			$.each(perso.States, function (idx, state) {
-				stateSelector.append("<option value='" + idx + "'>" + state.Name + "</option>");
-			});
+			if(perso.hasOwnProperty("States")) {
+				$.each(perso.States, function (idx, state) {
+					stateSelector.append("<option value='" + idx + "'>" + state.Name + "</option>");
+				});
+				stateSelector.prop("selectedIndex", perso.State);
+			}
+			if(perso.hasOwnProperty("ObjectLists")) {
+				$.each(perso.ObjectLists, function (idx, poList) {
+					objectListSelector.append("<option value='" + idx + "'>" + poList + "</option>");
+				});
+				objectListSelector.prop("selectedIndex", perso.ObjectList);
+			}
+		} else {
 			stateSelector.prop("selectedIndex", perso.State);
-		}
-		if(perso.hasOwnProperty("ObjectLists")) {
-			$.each(perso.ObjectLists, function (idx, poList) {
-				objectListSelector.append("<option value='" + idx + "'>" + poList + "</option>");
-			});
 			objectListSelector.prop("selectedIndex", perso.ObjectList);
+		}
+		if(!perso.hasOwnProperty("ObjectLists") || perso.ObjectLists.length == 0 || (perso.ObjectLists.length == 1 && perso.ObjectLists[0] == "Null")) {
+			objectListInputGroup.addClass('invisible');
 		}
 		
 		selectButton($("#btn-enabled"), perso.IsEnabled);
-		$("#objectName").html(
-			"<div class='name-family'>" + perso.NameFamily +
-			"</div><div class='name-model'>" + perso.NameModel +
-			"</div><div class='name-instance'>" + perso.NameInstance + "</div>");
+
+		$("#objectName").html(getPersoNameHTML(perso));
 		
 		// Animation stuff
 		selectButton($("#btn-playAnimation"), perso.PlayAnimation);
@@ -542,66 +552,60 @@ function showObjectDescription(so) {
 		$('#animationSpeed').val(perso.AnimationSpeed);
 		
 		// Scripts
-		$("#content-brain").empty();
-		if(perso.hasOwnProperty("Brain")) {
-			let allBehaviors = [];
-			let brain = perso.Brain;
-			let reg = /^.*\.(.*?)\[(\d*?)\](?:\[\"(.*?)\"\])?$/;
-			if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category' data-collapse='behaviors-intelligence-collapse'><div class='collapse-sign'>+</div>Intelligence behaviors</div><div id='behaviors-intelligence-collapse' style='display: none;'>");
-				$.each(brain.Intelligence, function (idx, val) {
-					let match = reg.exec(val.Name);
-					if (match != null) {
-						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
-					} else {
-						allBehaviors.push("<div class='behaviors-item behavior'>" + val.Name + "</div>");
-					}
-				});
-				allBehaviors.push("</div>");
+		if(isSOChanged) {
+			$("#content-brain").empty();
+			if(perso.hasOwnProperty("Brain")) {
+				let allBehaviors = [];
+				let brain = perso.Brain;
+				//let reg = /^.*\.(.*?)\[(\d*?)\](?:\[\"(.*?)\"\])?$/;
+				if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
+					allBehaviors.push("<div class='behaviors-item category collapsible' data-collapse='behaviors-intelligence-collapse'><div class='collapse-sign'>+</div>Intelligence behaviors</div><div id='behaviors-intelligence-collapse' style='display: none;'>");
+					$.each(brain.Intelligence, function (idx, val) {
+						let name = val.hasOwnProperty("Name") ? val.Name : "";
+						//if(idx == 0) name += (name === "" ? "" : " ") + "(Init)";
+						if(!val.hasOwnProperty("FirstScript") && (!val.hasOwnProperty("Scripts") || val.Scripts.length == 0)) name += (name === "" ? "" : " ") + "(Empty)";
+						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>Intelligence " + idx + "</div><div class='behavior-name'>" + name + "</div></div>");
+					});
+					allBehaviors.push("</div>");
+				}
+				if(brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
+					allBehaviors.push("<div class='behaviors-item category collapsible' data-collapse='behaviors-reflex-collapse'><div class='collapse-sign'>+</div>Reflex behaviors</div><div id='behaviors-reflex-collapse' style='display: none;'>");
+					$.each(brain.Reflex, function (idx, val) {
+						let name = val.hasOwnProperty("Name") ? val.Name : "";
+						if(!val.hasOwnProperty("FirstScript") && (!val.hasOwnProperty("Scripts") || val.Scripts.length == 0)) name += (name === "" ? "" : " ") + "(Empty)";
+						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>Reflex " + idx + "</div><div class='behavior-name'>" + name + "</div></div>");
+					});
+					allBehaviors.push("</div>");
+				}
+				if(brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
+					allBehaviors.push("<div class='behaviors-item category collapsible' data-collapse='macros-collapse'><div class='collapse-sign'>+</div>Macros</div><div id='macros-collapse' style='display: none;'>");
+					$.each(brain.Macros, function (idx, val) {
+						let name = val.hasOwnProperty("Name") ? val.Name : "";
+						if(!val.hasOwnProperty("Script")) name += (name === "" ? "" : " ") + "(Empty)";
+						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>Macro " + idx + "</div><div class='behavior-name'>" + name + "</div></div>");
+					});
+					allBehaviors.push("</div>");
+				}
+				if(brain.hasOwnProperty("DsgVars") && brain.DsgVars.length > 0) {
+					allBehaviors.push("<div class='behaviors-item category collapsible' data-collapse='dsgvars-collapse'><div class='collapse-sign'>+</div>DSG Variables</div><div id='dsgvars-collapse' style='display: none;'>");
+					let hasCurrent = brain.DsgVars.some(d => d.hasOwnProperty("ValueCurrent"));
+					let hasInitial = brain.DsgVars.some(d => d.hasOwnProperty("ValueInitial"));
+					let hasModel = brain.DsgVars.some(d => d.hasOwnProperty("ValueModel"));
+					// Header
+					allBehaviors.push("<div class='dsgvars-item dsgvars-header'><div class='dsgvar-type'></div><div class='dsgvar-name'></div>")
+					if(hasCurrent) allBehaviors.push("<div class='dsgvar-value'>Current</div>");
+					if(hasInitial) allBehaviors.push("<div class='dsgvar-value'>Initial</div>");
+					if(hasModel) allBehaviors.push("<div class='dsgvar-value'>Model</div>");
+					allBehaviors.push("</div>")
+					// DsgVars
+					$.each(brain.DsgVars, function (idx, dsg) {
+						let dsgString = getDsgVarString(idx, dsg, hasCurrent, hasInitial, hasModel);
+						allBehaviors.push(dsgString);
+					});
+					allBehaviors.push("</div>");
+				}
+				$("#content-brain").append(allBehaviors.join(""));
 			}
-			if(brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category' data-collapse='behaviors-reflex-collapse'><div class='collapse-sign'>+</div>Reflex behaviors</div><div id='behaviors-reflex-collapse' style='display: none;'>");
-				$.each(brain.Reflex, function (idx, val) {
-					let match = reg.exec(val.Name);
-					if (match != null) {
-						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
-					} else {
-						allBehaviors.push("<div class='behaviors-item behavior'>" + val.Name + "</div>");
-					}
-				});
-				allBehaviors.push("</div>");
-			}
-			if(brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category' data-collapse='macros-collapse'><div class='collapse-sign'>+</div>Macros</div><div id='macros-collapse' style='display: none;'>");
-				$.each(brain.Macros, function (idx, val) {
-					let match = reg.exec(val.Name);
-					if (match != null) {
-						allBehaviors.push("<div class='behaviors-item behavior'><div class='behavior-number'>" + match[1] + " " + (parseInt(match[2])+1)  + "</div>" + (match[3] != null ? ("<div class='behavior-name'>" + match[3] + "</div>") : "") + "</div>");
-					} else {
-						allBehaviors.push("<div class='behaviors-item behavior'>" + val.Name + "</div>");
-					}
-				});
-				allBehaviors.push("</div>");
-			}
-			if(brain.hasOwnProperty("DsgVars") && brain.DsgVars.length > 0) {
-				allBehaviors.push("<div class='behaviors-item category' data-collapse='dsgvars-collapse'><div class='collapse-sign'>+</div>DSG Variables</div><div id='dsgvars-collapse' style='display: none;'>");
-				let hasCurrent = brain.DsgVars.some(d => d.hasOwnProperty("ValueCurrent"));
-				let hasInitial = brain.DsgVars.some(d => d.hasOwnProperty("ValueInitial"));
-				let hasModel = brain.DsgVars.some(d => d.hasOwnProperty("ValueModel"));
-				// Header
-				allBehaviors.push("<div class='dsgvars-item dsgvars-header'><div class='dsgvar-type'></div><div class='dsgvar-name'></div>")
-				if(hasCurrent) allBehaviors.push("<div class='dsgvar-value'>Current</div>");
-				if(hasInitial) allBehaviors.push("<div class='dsgvar-value'>Initial</div>");
-				if(hasModel) allBehaviors.push("<div class='dsgvar-value'>Model</div>");
-				allBehaviors.push("</div>")
-				// DsgVars
-				$.each(brain.DsgVars, function (idx, dsg) {
-					let dsgString = getDsgVarString(idx, dsg, hasCurrent, hasInitial, hasModel);
-					allBehaviors.push(dsgString);
-				});
-				allBehaviors.push("</div>");
-			}
-			$("#content-brain").append(allBehaviors.join(""));
 		}
 		
 	} else {
@@ -616,13 +620,34 @@ function showObjectDescription(so) {
 }
 
 function getDsgVarString(index, dsg, hasCurrent, hasInitial, hasModel) {
-	let dsgString = "<div class='dsgvars-item dsgvar'><div class='dsgvar-type dsgvar-type-" + dsg.Type + "'>" + getDsgVarIcon(dsg.Type) + "</div>";
-	dsgString += "<div class='dsgvar-name'>" + dsg.Name + "</div>";
-	if(hasCurrent) dsgString += getDsgVarTypeString("current", dsg.ValueCurrent);
-	if(hasInitial) dsgString += getDsgVarTypeString("initial", dsg.ValueInitial);
-	if(hasModel) dsgString += getDsgVarTypeString("model", dsg.ValueModel);
-	dsgString += "</div>";
-	return dsgString;
+	if(dsg.IsArray && dsg.ArrayLength > 0) {
+		let dsgString = "<div class='dsgvars-item dsgvar dsgvar-array collapsible' data-collapse='dsgvar-" + index + "-collapse'><div class='dsgvar-type collapse-sign'>+</div>";
+		dsgString += "<div class='dsgvar-name'>" + dsg.Name + " (Length: " + dsg.ArrayLength + ")</div></div>";
+		dsgString += "<div id='dsgvar-" + index + "-collapse' style='display: none;'>"
+		for (let i = 0; i < dsg.ArrayLength; i++) {
+			dsgString += "<div class='dsgvars-item dsgvar'><div class='dsgvar-type dsgvar-type-" + dsg.Type + "'>" + getDsgVarIcon(dsg.ArrayType) + "</div>";
+			dsgString += "<div class='dsgvar-name'>" +  "[" + i + "]</div>";
+			if(hasCurrent) dsgString += getDsgVarTypeString("current", dsg.ValueCurrent, i);
+			if(hasInitial) dsgString += getDsgVarTypeString("initial", dsg.ValueInitial, i);
+			if(hasModel) dsgString += getDsgVarTypeString("model", dsg.ValueModel, i);
+			dsgString += "</div>";
+		}
+		dsgString += "</div>";
+		return dsgString;
+	} else if(dsg.IsArray) {
+		let dsgString = "<div class='dsgvars-item dsgvar'><div class='dsgvar-type dsgvar-type-" + dsg.Type + "'>" + getDsgVarIcon(dsg.Type) + "</div>";
+		dsgString += "<div class='dsgvar-name'>" + dsg.Name + " (Length: 0)</div>";
+		dsgString += "</div>";
+		return dsgString;
+	} else {
+		let dsgString = "<div class='dsgvars-item dsgvar'><div class='dsgvar-type dsgvar-type-" + dsg.Type + "'>" + getDsgVarIcon(dsg.Type) + "</div>";
+		dsgString += "<div class='dsgvar-name'>" + dsg.Name + "</div>";
+		if(hasCurrent) dsgString += getDsgVarTypeString("current", dsg.ValueCurrent, 0);
+		if(hasInitial) dsgString += getDsgVarTypeString("initial", dsg.ValueInitial, 0);
+		if(hasModel) dsgString += getDsgVarTypeString("model", dsg.ValueModel, 0);
+		dsgString += "</div>";
+		return dsgString;
+	}
 }
 
 function getDsgVarIcon(type) {
@@ -675,92 +700,96 @@ function getDsgVarIcon(type) {
 	return dsgString;
 }
 
-function getDsgVarTypeString(valueType, val) {
+function getDsgVarTypeString(valueType, val, idx) {
 	if(val === undefined || val === null) {
 		let dsgString = "<div class='dsgvar-value dsgvar-value-null'></div>";
 		return dsgString;
 	}
-	let dsgString = "<div class='dsgvar-value dsgvar-value-" + valueType + " dsgvar-value-" + val.Type;
 	if(val.hasOwnProperty("AsArray")) {
-		dsgString += " dsgvar-value-array'>"
-	} else {
-		switch(val.Type) {
-			case "Boolean":
-				dsgString += "'>" + val.AsBoolean;
-				break;
-			case "Byte":
-				dsgString += "'>" + val.AsByte;
-				break;
-			case "UByte":
-				dsgString += "'>" + val.AsUByte;
-				break;
-			case "Short":
-				dsgString += "'>" + val.AsShort;
-				break;
-			case "UShort":
-				dsgString += "'>" + val.AsUShort;
-				break;
-			case "Int":
-				dsgString += "'>" + val.AsInt;
-				break;
-			case "UInt":
-				dsgString += "'>" + val.AsUInt;
-				break;
-			case "Float":
-				dsgString += "'>" + val.AsFloat;
-				break;
-			case "Caps":
-				dsgString += "'>" + val.AsCaps;
-				break;
-			case "Text":
-				dsgString += "'>" + val.AsText;
-				break;
-			case "Vector":
-				dsgString += " vector'>(" + val.AsVector.x + ", " + val.AsVector.y + ", " + val.AsVector.z + ")";
-				break;
-			case "Perso":
-				if(val.hasOwnProperty("AsPerso")) {
-					dsgString += "perso' data-offset='" + val.AsPerso.Offset + "'>" + val.AsPerso.NameInstance;
-				} else {
-					dsgString +="'>"
-				}
-				break;
-			case "SuperObject":
-				dsgString += "'>";
-				if(val.hasOwnProperty("AsSuperObject")) {
-					if(val.AsSuperObject.hasOwnProperty("Name")) {
-						dsgString += val.AsSuperObject.Name;
-					}
-				}
-				break;
-			case "WayPoint":
-				dsgString += "'>";
-				if(val.hasOwnProperty("AsWayPoint")) {
-					if(val.AsWayPoint.hasOwnProperty("Name")) {
-						dsgString += val.AsWayPoint.Name;
-					}
-				}
-				break;
-			case "Graph":
-				dsgString += "'>";
-				if(val.hasOwnProperty("AsGraph")) {
-					if(val.AsGraph.hasOwnProperty("Name")) {
-						dsgString += val.AsGraph.Name;
-					}
-				}
-				break;
-			case "Action":
-				dsgString += "'>";
-				if(val.hasOwnProperty("AsAction")) {
-					if(val.AsAction.hasOwnProperty("Name")) {
-						dsgString += val.AsAction.Name;
-					}
-				}
-				break;
-			default:
-				dsgString += "'>";
-				break;
+		if(idx >= val.AsArray.length) {
+			let dsgString = "<div class='dsgvar-value dsgvar-value-null'></div>";
+			return dsgString;
+		} else {
+			return getDsgVarTypeString(valueType, val.AsArray[idx], idx);
 		}
+	}
+	let dsgString = "<div class='dsgvar-value dsgvar-value-" + valueType + " dsgvar-value-" + val.Type;
+	switch(val.Type) {
+		case "Boolean":
+			dsgString += "'>" + val.AsBoolean;
+			break;
+		case "Byte":
+			dsgString += "'>" + val.AsByte;
+			break;
+		case "UByte":
+			dsgString += "'>" + val.AsUByte;
+			break;
+		case "Short":
+			dsgString += "'>" + val.AsShort;
+			break;
+		case "UShort":
+			dsgString += "'>" + val.AsUShort;
+			break;
+		case "Int":
+			dsgString += "'>" + val.AsInt;
+			break;
+		case "UInt":
+			dsgString += "'>" + val.AsUInt;
+			break;
+		case "Float":
+			dsgString += "'>" + val.AsFloat;
+			break;
+		case "Caps":
+			dsgString += "'>" + val.AsCaps;
+			break;
+		case "Text":
+			dsgString += "'>" + val.AsText;
+			break;
+		case "Vector":
+			dsgString += " vector'>(" + val.AsVector.x + ", " + val.AsVector.y + ", " + val.AsVector.z + ")";
+			break;
+		case "Perso":
+			if(val.hasOwnProperty("AsPerso")) {
+				dsgString += "perso' data-offset='" + val.AsPerso.Offset + "'>" + val.AsPerso.NameInstance;
+			} else {
+				dsgString +="'>"
+			}
+			break;
+		case "SuperObject":
+			dsgString += "'>";
+			if(val.hasOwnProperty("AsSuperObject")) {
+				if(val.AsSuperObject.hasOwnProperty("Name")) {
+					dsgString += val.AsSuperObject.Name;
+				}
+			}
+			break;
+		case "WayPoint":
+			dsgString += "'>";
+			if(val.hasOwnProperty("AsWayPoint")) {
+				if(val.AsWayPoint.hasOwnProperty("Name")) {
+					dsgString += val.AsWayPoint.Name;
+				}
+			}
+			break;
+		case "Graph":
+			dsgString += "'>";
+			if(val.hasOwnProperty("AsGraph")) {
+				if(val.AsGraph.hasOwnProperty("Name")) {
+					dsgString += val.AsGraph.Name;
+				}
+			}
+			break;
+		case "Action":
+			dsgString += "'>";
+			if(val.hasOwnProperty("AsAction")) {
+				if(val.AsAction.hasOwnProperty("Name")) {
+					dsgString += val.AsAction.Name;
+				}
+			}
+			break;
+		default:
+			dsgString += "'>";
+			break;
 	}
 	dsgString += "</div>";
 	return dsgString;
@@ -852,6 +881,22 @@ function clearSelection() {
 	}
 	sendMessage(jsonObj);
 }
+function handleMessage_selection_updatePerso(oldPerso, newPerso) {
+	if(newPerso.hasOwnProperty("IsEnabled")) { // IncludeDetails
+		oldPerso.IsEnabled = newPerso.IsEnabled;
+		oldPerso.State = newPerso.State;
+		oldPerso.ObjectList = newPerso.ObjectList;
+		oldPerso.PlayAnimation = newPerso.PlayAnimation;
+		oldPerso.AnimationSpeed = newPerso.AnimationSpeed;
+		oldPerso.AutoNextState = newPerso.AutoNextState;
+	}
+	oldPerso.Position = newPerso.Position;
+	oldPerso.Rotation = newPerso.Rotation;
+	oldPerso.Scale = newPerso.Scale;
+	if(newPerso.hasOwnProperty("States")) oldPerso.States = newPerso.States;
+	if(newPerso.hasOwnProperty("ObjectLists")) oldPerso.ObjectLists = newPerso.ObjectLists;
+	if(newPerso.hasOwnProperty("Brain")) oldPerso.Brain = newPerso.Brain;
+}
 // TODO
 function handleMessage_selection(msg) {
 	let selection = msg;
@@ -868,7 +913,7 @@ function handleMessage_selection(msg) {
 					continue;
 				}
 				if(objectsList[i].Perso.Offset === perso.Offset) {
-					objectsList[i].Perso = perso;
+					handleMessage_selection_updatePerso(objectsList[i].Perso, perso);
 					objectsList[i].Position = perso.Position;
 					objectsList[i].Rotation = perso.Rotation;
 					objectsList[i].Scale = perso.Scale;
@@ -880,8 +925,10 @@ function handleMessage_selection(msg) {
 		if(index_selection > -1) {
 			$(".objects-item").removeClass("current-objects-item");
 			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
-			currentSO = objectsList[index_selection];
-			showObjectDescription(currentSO);
+			let newcurrentSO = objectsList[index_selection];
+			let isSOChanged = newcurrentSO != currentSO;
+			currentSO = newcurrentSO;
+			showObjectDescription(currentSO, isSOChanged);
 		}
 	} else {
 		let so_selection, index_selection = -1;
@@ -891,7 +938,7 @@ function handleMessage_selection(msg) {
 					continue;
 				}
 				if(objectsList[i].Perso.Offset === perso.Offset) {
-					objectsList[i].Perso = perso;
+					handleMessage_selection_updatePerso(objectsList[i].Perso, perso);
 					objectsList[i].Position = perso.Position;
 					objectsList[i].Rotation = perso.Rotation;
 					objectsList[i].Scale = perso.Scale;
@@ -903,17 +950,55 @@ function handleMessage_selection(msg) {
 		if(index_selection > -1) {
 			$(".objects-item").removeClass("current-objects-item");
 			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
-			currentSO = objectsList[index_selection];
-			showObjectDescription(currentSO);
+			let newcurrentSO = objectsList[index_selection];
+			let isSOChanged = newcurrentSO != currentSO;
+			currentSO = newcurrentSO;
+			showObjectDescription(currentSO, isSOChanged);
 		}
 	}
 }
 function handleMessage_highlight(msg) {
+	let highlight = "";
+	highlight_tooltip.removeClass("perso");
+	highlight_tooltip.removeClass("waypoint");
+	highlight_tooltip.removeClass("collider");
 	if(msg.hasOwnProperty("Perso")) {
-		perso_tooltip.html("<div class='name-family'>" + msg.Perso.NameFamily + "</div><div class='name-model'>" + msg.Perso.NameModel + "</div><div class='name-instance'>" + msg.Perso.NameInstance + "</div>");
-		perso_tooltip.removeClass("hidden-tooltip");
+		highlight_tooltip.addClass("perso");
+		highlight += "<div class='highlight-perso'>" + getPersoNameHTML(msg.Perso) + "</div>";
+	}
+	if(msg.hasOwnProperty("WayPoint")) {
+		if(msg.WayPoint.hasOwnProperty("Graphs")) {
+			highlight_tooltip.addClass("waypoint");
+			highlight += "<div class='highlight-header'>Graph:</div><div class='highlight-waypoint'>";
+			$.each(msg.WayPoint.Graphs, function (idx, graph) {
+				if(graph !== null) {
+					highlight += "<div class='highlight-graphName'>" + graph.Name + "</div>";
+				}
+			});
+			highlight += "</div>";
+		}
+	}
+	if(msg.hasOwnProperty("Collider")) {
+		highlight_tooltip.addClass("collider");
+		highlight += "<div class='highlight-header'>Collide Type:</div><div class='highlight-collider'>";
+		if(msg.Collider.hasOwnProperty("CollideTypes")) {
+			if(msg.Collider.CollideTypes.length > 0) {
+				$.each(msg.Collider.CollideTypes, function (idx, col) {
+					highlight += "<div class='highlight-collideType'>" + col + "</div>";
+				});
+			} else {
+				highlight += "<div class='highlight-collideType'>Default</div>"
+			}
+		} else {
+			highlight += "<div class='highlight-collideType'>Default</div>"
+		}
+		highlight += "</div>";
+	}
+	if(highlight !== "") {
+		highlight_tooltip.html(highlight);
+		highlight_tooltip.removeClass("hidden-tooltip");
 	} else {
-		perso_tooltip.addClass("hidden-tooltip");
+		highlight_tooltip.addClass("hidden-tooltip");
 	}
 }
 
@@ -1086,14 +1171,15 @@ $(function() {
 	btn_close_description = $('#btn-close-description');
 	stateSelector = $('#state');
 	objectListSelector = $('#objectList');
-	perso_tooltip = $("#perso-tooltip");
+	objectListInputGroup = $('#objectListInputGroup')
+	highlight_tooltip = $("#highlight-tooltip");
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
 	}
 	
 	$(document).mousemove(function( event ) {
-		perso_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
+		highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
 	});
 	
 	$(document).on('click', ".objects-item.object-perso", function() {
@@ -1215,7 +1301,7 @@ $(function() {
 		skipDialogue();
 		return false;
 	});
-	$(document).on('click', ".behaviors-item.category", function() {
+	$(document).on('click', ".collapsible", function() {
 		let collapse_id = $(this).attr('data-collapse');
 		let collapse = $("#"+collapse_id);
 		if(collapse.is(":hidden")) {

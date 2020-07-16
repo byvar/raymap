@@ -23,6 +23,7 @@ public class WebCommunicator : MonoBehaviour {
 
 	public Controller controller;
     public ObjectSelector selector;
+	public MeshCollider preventMeshColliderStrip;
     private BasePersoBehaviour highlightedPerso_;
 	private CollideComponent highlightedCollision_;
 	private WayPointBehaviour highlightedWayPoint_;
@@ -335,6 +336,7 @@ public class WebCommunicator : MonoBehaviour {
 			Name = dsg.Name,
 			Type = dsg.Type,
 			IsArray = isArray,
+			ArrayType = isArray ? (DsgVarInfoEntry.DsgVarType?)DsgVarInfoEntry.GetDsgVarTypeFromArrayType(dsg.Type) : null,
 			ArrayLength = isArray ? (int?)dsg.ArrayLength : null,
 			ValueCurrent = GetDsgVarValueJSON(dsg.valueCurrent, isArray),
 			ValueInitial = GetDsgVarValueJSON(dsg.valueInitial, isArray),
@@ -457,7 +459,8 @@ public class WebCommunicator : MonoBehaviour {
 		List<string> flagsList = new List<string>();
 
 		foreach (CollideMaterial.CollisionFlags_R2 r in Enum.GetValues(typeof(CollideMaterial.CollisionFlags_R2))) {
-			if ((flags & r) != 0) flagsList.Add(r.ToString());
+			if (r == CollideMaterial.CollisionFlags_R2.None) continue;
+			if ((flags & r) == r) flagsList.Add(r.ToString());
 		}
 
 		return new WebJSON.Collider() {

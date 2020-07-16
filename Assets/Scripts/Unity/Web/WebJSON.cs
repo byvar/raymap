@@ -151,6 +151,7 @@ public class WebJSON {
 		public string Name { get; set; }
 		public OpenSpace.AI.DsgVarInfoEntry.DsgVarType Type { get; set; }
 		public bool IsArray { get; set; }
+		public OpenSpace.AI.DsgVarInfoEntry.DsgVarType? ArrayType { get; set; }
 		public int? ArrayLength { get; set; }
 		public DsgVarValue ValueCurrent { get; set; }
 		public DsgVarValue ValueInitial { get; set; }

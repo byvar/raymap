@@ -1481,6 +1481,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 1701416321}
   selector: {fileID: 1701416324}
+  preventMeshColliderStrip: {fileID: 1692088995759454567, guid: 81b8fe060320d4641bc40ca15ccb070b,
+    type: 3}
 --- !u!114 &1701416324
 MonoBehaviour:
   m_ObjectHideFlags: 0

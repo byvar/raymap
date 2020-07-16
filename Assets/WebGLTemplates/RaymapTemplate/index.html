@@ -84,7 +84,7 @@
 								<div class="input vector3"><div class="label main">Rotation</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="rotX" class="input-typing input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="rotY" class="input-typing input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="rotZ" class="input-typing input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
 								<div class="input vector3"><div class="label main">Scale</div><div class="fields"><div class="field"><div class="label sub">X</div><input id="sclX" class="input-typing input-transform" type="number" step="any" name="x" placeholder="0"></input></div><div class="field"><div class="label sub">Y</div><input id="sclY" class="input-typing input-transform" type="number" step="any" name="y" placeholder="0"></input></div><div class="field"><div class="label sub">Z</div><input id="sclZ" class="input-typing input-transform" type="number" step="any" name="z" placeholder="0"></input></div></div></div>
 							</div>
-							<div class="input-group small perso-description invisible">
+							<div id="objectListInputGroup" class="input-group small perso-description invisible">
 								<div class="input dropdown">
 									<div class="label main">Object List</div><div class="fields"><div class="field"><select id="objectList">
 									  <option value="none">None</option>
@@ -127,9 +127,7 @@
 				</div>-->
 			</div>
 			<div id="popup-overlay" class="hidden-overlay" onclick=""></div>
-			<div id="perso-tooltip" class="hidden-tooltip">
-				<div class='name-family'>family</div><div class='name-model'>model</div><div class='name-instance'>instance</div>
-			</div>
+			<div id="highlight-tooltip" class="hidden-tooltip"></div>
 			<div id="dialogue-popup" class="hidden-popup"><div id="dialogue-image"></div><div id="dialogue-content"></div></div>
 			<div id="script-popup" class="hidden-popup">
 				<div class="column-header"><span id="header-script-text">Script</span>

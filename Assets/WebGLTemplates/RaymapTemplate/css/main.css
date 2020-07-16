@@ -200,6 +200,7 @@ a:focus {
 .behaviors-item.behavior {
 	padding: 0 0.5em 0 0.5em;
 	cursor: pointer;
+	display: flex;
 }
 .levels-item.level {
 	padding: 0 2.5em 0 2.5em;
@@ -244,7 +245,8 @@ a:focus {
 }
 .objects-item.object-IPO,
 .objects-item.object-sector,
-.behaviors-item.category {
+.behaviors-item.category,
+.dsgvar-array {
 	cursor: pointer;
 }
 
@@ -306,7 +308,7 @@ a:focus {
 }
 
 .objects-item > .name-family,
-#perso-tooltip > .name-family,
+.highlight-perso > .name-family,
 #objectName > .name-family,
 .dsgvar-value > .name-family {
 	text-align: right;
@@ -319,9 +321,10 @@ a:focus {
     text-decoration: inherit; /* no underline */
 	text-overflow: ellipsis;
 	flex: 1 1 auto;
+	padding: 0 0.5em 0 0;
 }
 .objects-item > .name-model,
-#perso-tooltip > .name-model,
+.highlight-perso > .name-model,
 #objectName > .name-model,
 .dsgvar-value > .name-model {
 	padding: 0 0.5em 0 0.5em;
@@ -338,7 +341,7 @@ a:focus {
 	
 }
 .objects-item > .name-instance,
-#perso-tooltip > .name-instance,
+.highlight-perso > .name-instance,
 #objectName > .name-instance,
 .dsgvar-value > .name-instance {
 	text-align: left;
@@ -350,6 +353,7 @@ a:focus {
     text-decoration: inherit; /* no underline */
 	text-overflow: ellipsis;
 	flex: 1 1 auto;
+	padding: 0 0 0 0.5em;
 }
 .behaviors-item > .behavior-number {
 	text-align: center;
@@ -404,6 +408,9 @@ a:focus {
 	text-overflow: ellipsis;
 	flex: 1 1 auto;
 }
+.dsgvars-item.dsgvar-array > .dsgvar-name {
+	text-align: center;
+}
 .dsgvars-item > .dsgvar-value {
 	text-align: left;
 	display: inline-block;
@@ -416,28 +423,51 @@ a:focus {
 	flex: 1 1 auto;
 	padding-left: 1em;
 }
-#perso-tooltip > *,
+.highlight-perso > *,
 #objectName > * {
 	width: auto !important;
 }
 
-#perso-tooltip {
+#highlight-tooltip {
     display: flex;
+	flex-flow: column;
 	align-items: center;
 	box-sizing: border-box;
 	padding: 0 0.5em 0 0.5em;
     margin-left: 15px;
     position: absolute;
     z-index: 100;
-    width: 25em;
-    height: 2.5em;
+    line-height: 2.5em;
     border-radius: 0.75em;
     pointer-events: none;
+	justify-content: space-around;
 }
 
-#perso-tooltip.hidden-tooltip {
+#highlight-tooltip.hidden-tooltip {
     display: none;
 }
+.highlight-header {
+	font-weight: bold;
+}
+
+.highlight-perso {
+    display: flex;
+	flex-flow: row;
+	justify-content: space-around;
+}
+.highlight-collider,
+.highlight-waypoint {
+    display: flex;
+	flex-flow: row;
+	justify-content: space-around;
+	max-width: 28em;
+}
+.highlight-collideType,
+.highlight-graphName {
+	padding: 0 1em 0 1em;
+	flex: 1 1 auto;
+}
+
 
 
 /* ============================== OBJECT DESCRIPTION ============================== */
@@ -536,7 +566,6 @@ a:focus {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
-
 
 
 /* ============================== RAYMAP ===================================== */
