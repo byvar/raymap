@@ -21,7 +21,10 @@ public class CameraComponent : MonoBehaviour {
     public bool mouseLookEnabled = false;
     private bool _shifted = false;
     public float flySpeed = 20f;
+	public float flySpeedShiftMultiplier = 2.0f;
 	private float flySpeedFactor = 30f;
+	private float _flySpeedShiftMultiplier = 1.0f;
+	private Vector3 panStart;
     public Camera cam;
 
     public float lerpFactor = 1f;
@@ -116,7 +119,7 @@ public class CameraComponent : MonoBehaviour {
 		if (Input.GetKeyUp(KeyCode.LeftShift) & _shifted)
             _shifted = false;
 
-        if ((Input.GetKeyDown(KeyCode.LeftShift) & !_shifted) |
+        if ((Input.GetKeyDown(KeyCode.LeftShift) & !_shifted && !Input.GetMouseButton(1)) |
             (Input.GetKeyDown(KeyCode.Escape) & mouseLookEnabled)) {
             _shifted = true;
 
@@ -162,10 +165,12 @@ public class CameraComponent : MonoBehaviour {
 					}
 				}
 
-				if (Input.GetMouseButton(1) || (Input.GetMouseButton(0) && !controller.selector.IsSelecting)) {
+				if (Input.GetMouseButton(1) || (Input.GetMouseButton(0))) {
 					StopLerp();
 
-
+					if (panStart == Vector3.zero) {
+						panStart = Input.mousePosition;
+					}
 					Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
 
 					if (panning) {
@@ -179,6 +184,7 @@ public class CameraComponent : MonoBehaviour {
 						panning = true;
 					}
 				} else {
+					panStart = Vector3.zero;
 					panning = false;
 				}
 				CameraControlsOrthographic();
@@ -187,9 +193,24 @@ public class CameraComponent : MonoBehaviour {
 				if (Input.GetMouseButton(1)) {
 					StopLerp();
 
+					Cursor.lockState = CursorLockMode.Locked;
+					Cursor.visible = false;
+
 					CalculateMouseLook(orthographic, false);
 
+					if (Input.GetKey(KeyCode.LeftShift)) {
+						_flySpeedShiftMultiplier = flySpeedShiftMultiplier;
+					} else {
+						_flySpeedShiftMultiplier = 1.0f;
+					}
+
 					CameraControlsPerspective();
+				}
+
+				if (Input.GetMouseButtonUp(1)) {
+					Cursor.lockState = CursorLockMode.None;
+					Cursor.visible = true;
+					_flySpeedShiftMultiplier = 1.0f;
 				}
 			}
 			CameraControlsSpeed();
@@ -217,6 +238,12 @@ public class CameraComponent : MonoBehaviour {
 	void CameraControlsOrthographic() {
 		float orthoFlySpeedMult = (float)Math.Sqrt(Camera.main.orthographicSize);
 
+		if (Input.GetKey(KeyCode.LeftShift)) {
+			_flySpeedShiftMultiplier = flySpeedShiftMultiplier;
+		} else {
+			_flySpeedShiftMultiplier = 1.0f;
+		}
+
 		if (Input.GetAxis("Mouse ScrollWheel") != 0) {
 			StopLerp();
 			Camera.main.orthographicSize *= (float)Math.Pow(2, (-Input.GetAxis("Mouse ScrollWheel")));
@@ -240,13 +267,13 @@ public class CameraComponent : MonoBehaviour {
 			flySpeed = Mathf.Max(0, flySpeed + Time.deltaTime * Input.GetAxis("Mouse ScrollWheel") * 100f * flySpeedFactor);
 		}
 		if (Input.GetAxis("Vertical") != 0) {
-			transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * Input.GetAxis("Vertical"), Space.World);
+			transform.Translate(cam.transform.forward * flySpeed * Time.deltaTime * _flySpeedShiftMultiplier * Input.GetAxis("Vertical"), Space.World);
 		}
 		if (Input.GetAxis("Horizontal") != 0) {
-			transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * Input.GetAxis("Horizontal"), Space.World);
+			transform.Translate(cam.transform.right * flySpeed * Time.deltaTime * _flySpeedShiftMultiplier * Input.GetAxis("Horizontal"), Space.World);
 		}
 		if (Input.GetAxis("HeightAndZoom") != 0) {
-			transform.Translate(Vector3.up * flySpeed * Time.deltaTime * Input.GetAxis("HeightAndZoom"), Space.World);
+			transform.Translate(Vector3.up * flySpeed * Time.deltaTime * _flySpeedShiftMultiplier * Input.GetAxis("HeightAndZoom"), Space.World);
 		}
 		if (Input.GetKey(KeyCode.Keypad8)) {
 			transform.Translate(Vector3.up * flySpeed * Time.deltaTime * 0.5f, Space.World);
@@ -310,4 +337,9 @@ public class CameraComponent : MonoBehaviour {
 			transform.localRotation *= yRotation;
 		}
 	}
+
+	public bool IsPanningWithThreshold()
+	{
+		return panning && (Input.mousePosition - panStart).magnitude > 1;
+    }
 }

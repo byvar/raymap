@@ -37,8 +37,12 @@ public class ObjectSelector : MonoBehaviour {
                             IsSelecting = true;
                         }
                         UpdateHighlight();
-                        if (IsSelecting && Input.GetMouseButtonUp(0)) {
-                            Select(pb, view: true);
+                        if (IsSelecting) {
+                            if (cam.IsPanningWithThreshold()) {
+                                IsSelecting = false;
+                            } else if (Input.GetMouseButtonUp(0)) {
+                                Select(pb, view: true);
+                            }
                         }
                         break;
                     }
