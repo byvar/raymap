@@ -116,7 +116,7 @@ public class ObjectSelector : MonoBehaviour {
         highlightedCollision = null;
         highlightedWayPoint = null;
 		Rect screenRect = new Rect(0, 0, Screen.width, Screen.height);
-		if (!cam.mouseLookEnabled
+		if (!cam.MouseLookEnabled && !cam.MouseLookRMBEnabled 
 			&& controller.LoadState == Controller.State.Finished
 			&& screenRect.Contains(Input.mousePosition)) HandleCollision();
 		if (controller.LoadState == Controller.State.Finished) UpdateTooFarLimit();

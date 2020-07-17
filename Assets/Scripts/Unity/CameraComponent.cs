@@ -14,16 +14,19 @@ public class CameraComponent : MonoBehaviour {
 
     public Vector2 clampInDegrees = new Vector2(360, 180);
     public Vector2 sensitivity = new Vector2(2, 2);
+	public Vector2 sensitivityRMB = new Vector2(1.6f, 1.6f);
     public Vector2 smoothing = new Vector2(3, 3);
     public Quaternion? targetDirection;
     public Vector2 targetCharacterDirection;
     
-    public bool mouseLookEnabled = false;
+    public bool MouseLookEnabled { get; private set; } = false;
+	public bool MouseLookRMBEnabled { get; private set; } = false;
     private bool _shifted = false;
     public float flySpeed = 20f;
 	public float flySpeedShiftMultiplier = 2.0f;
 	private float flySpeedFactor = 30f;
 	private float _flySpeedShiftMultiplier = 1.0f;
+	public float panningThreshold = 10f;
 	private Vector3 panStart;
     public Camera cam;
 
@@ -103,6 +106,7 @@ public class CameraComponent : MonoBehaviour {
 	}
 
     void Update() {
+		MouseLookRMBEnabled = false;
 		if (controller.LoadState != Controller.State.Finished && controller.LoadState != Controller.State.Error) return;
 		if (!targetDirection.HasValue) {
 			// Set target direction to the camera's initial orientation.
@@ -120,24 +124,24 @@ public class CameraComponent : MonoBehaviour {
             _shifted = false;
 
         if ((Input.GetKeyDown(KeyCode.LeftShift) & !_shifted && !Input.GetMouseButton(1)) |
-            (Input.GetKeyDown(KeyCode.Escape) & mouseLookEnabled)) {
+            (Input.GetKeyDown(KeyCode.Escape) & MouseLookEnabled)) {
             _shifted = true;
 
-            if (!mouseLookEnabled) {
-                mouseLookEnabled = true;
+            if (!MouseLookEnabled) {
+                MouseLookEnabled = true;
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             } else {
                 if (Input.GetKeyDown(KeyCode.Escape))
                     _shifted = false;
 
-                mouseLookEnabled = false;
+                MouseLookEnabled = false;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
         }
 
-		if (!mouseLookEnabled) {
+		if (!MouseLookEnabled) {
 			if (targetPos.HasValue) {
 				if (Vector3.Distance(transform.position, targetPos.Value) < 0.4f) {
 					targetPos = null;
@@ -191,6 +195,7 @@ public class CameraComponent : MonoBehaviour {
 			} else {
 				// Right click: drag also works
 				if (Input.GetMouseButton(1)) {
+					MouseLookRMBEnabled = true;
 					StopLerp();
 
 					Cursor.lockState = CursorLockMode.Locked;
@@ -308,6 +313,7 @@ public class CameraComponent : MonoBehaviour {
 		var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
 		// Scale input against the sensitivity setting and multiply that against the smoothing value.
+		var sensitivity = smooth ? this.sensitivity : sensitivityRMB;
 		mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
 
 		if (smooth) {
@@ -340,6 +346,6 @@ public class CameraComponent : MonoBehaviour {
 
 	public bool IsPanningWithThreshold()
 	{
-		return panning && (Input.mousePosition - panStart).magnitude > 1;
+		return panning && (Input.mousePosition - panStart).magnitude > panningThreshold;
     }
 }

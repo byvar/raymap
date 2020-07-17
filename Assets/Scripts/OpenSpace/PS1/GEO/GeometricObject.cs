@@ -362,6 +362,7 @@ namespace OpenSpace.PS1 {
 			if(untextured.Count > 0) {
 				GameObject gao = new GameObject(Offset.ToString() + " - Untextured");
 				gao.transform.SetParent(parentGao.transform);
+				gao.layer = LayerMask.NameToLayer("Visual");
 				gao.transform.localPosition = Vector3.zero;
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
 				gao.AddComponent<ExportableModel>();

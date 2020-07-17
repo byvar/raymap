@@ -1116,6 +1116,12 @@ namespace OpenSpace.Loader {
                 int h = b.yMax - b.yMin;
 				//print(w + " - " + h + " - " + b.xMin + " - " + b.yMin + " - " + b.pageInfo + " - " + b.paletteInfo);
                 Texture2D tex = vram.GetTexture((ushort)w, (ushort)h, b.pageInfo, b.paletteInfo, b.xMin, b.yMin);
+				if (tex == null) {
+					Debug.LogWarning($"Corrupted texture found! Details: {w}x{h} - ({b.xMin},{b.yMin}) - Page:{b.pageInfo} - Pal:{b.paletteInfo}");
+					tex = new Texture2D(w, h);
+					tex.SetPixels(Enumerable.Repeat(Color.clear, w*h).ToArray());
+					tex.Apply();
+				}
 				tex.wrapMode = TextureWrapMode.Clamp;
                 b.texture = tex;
                 if (exportTextures) {
