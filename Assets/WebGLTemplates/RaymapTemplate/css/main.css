@@ -161,7 +161,8 @@ a:focus {
 .objects-item,
 .levels-item,
 .behaviors-item,
-.dsgvars-item {
+.dsgvars-item,
+.transitions-item {
 	font-size: 0.9em;
 	display: block;
 	width: 100%;
@@ -195,6 +196,15 @@ a:focus {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.dsgvars-item.dsgvar-array > *,
+.selectState {
+	-o-transition: color .4s, background-color .4s, font-weight .4s, opacity .5s;
+    -ms-transition: color .4s, background-color .4s, font-weight .4s, opacity .5s;
+    -moz-transition: color .4s, background-color .4s, font-weight .4s, opacity .5s;
+    -webkit-transition: color .4s, background-color .4s, font-weight .4s, opacity .5s;
+    transition: color .4s, background-color .4s, font-weight .4s, opacity .5s;
+	background-color: transparent;
 }
 .objects-item.object-perso,
 .behaviors-item.behavior {
@@ -240,13 +250,19 @@ a:focus {
 	padding: 0 0 0 0;
 	display: flex;
 }
-.dsgvars-item.dsgvars-header {
+.transitions-item {
+	padding: 0 0 0 0;
+}
+.dsgvars-item.dsgvars-header,
+.transitions-item.transitions-header {
 	font-weight: bold;
 }
 .objects-item.object-IPO,
 .objects-item.object-sector,
 .behaviors-item.category,
-.dsgvar-array {
+.transitions-item.category,
+.dsgvar-array,
+.selectState {
 	cursor: pointer;
 }
 
@@ -257,12 +273,16 @@ a:focus {
 	padding: 0;
 	margin: 0;
 }
-#content-brain {
+.transitions-item > * {
+	display: inline-block;
+}
+#content-state-transitions {
 	margin-top: 1em;
 }
 .objects-item.object-world,
 .levels-item.game,
-.behaviors-item.category {
+.behaviors-item.category,
+.transitions-item.category {
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
@@ -271,7 +291,8 @@ a:focus {
 	height: 3em;
 	line-height: 3em;
 }
-.behaviors-item.category > .collapse-sign {
+.behaviors-item.category > .collapse-sign,
+.transitions-item.category > .collapse-sign {
 	display: inline-block;
 	width: 2em;
 }
@@ -422,6 +443,29 @@ a:focus {
 	text-overflow: ellipsis;
 	flex: 1 1 auto;
 	padding-left: 1em;
+}
+.transitions-item > .transitions-targetstate,
+.transitions-item > .transitions-linkingtype,
+.transitions-item > .transitions-statetogo {
+	box-sizing: border-box;
+	overflow: hidden;
+    text-decoration: inherit; /* no underline */
+	text-overflow: ellipsis;
+}
+.transitions-item > .transitions-targetstate {
+	text-align: right;
+	width: 45%;
+	padding: 0 0.5em 0 0;
+}
+.transitions-item > .transitions-linkingtype {
+	text-align: center;
+	padding: 0 0.5em 0 0.5em;
+	width: 10%;
+}
+.transitions-item > .transitions-statetogo {
+	text-align: left;
+	width: 45%;
+	padding: 0 0 0 0.5em;
 }
 .highlight-perso > *,
 #objectName > * {

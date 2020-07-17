@@ -67,7 +67,8 @@ body {
 .objects-item.object-world,
 .objects-item.object-sector,
 .levels-item.game,
-.behaviors-item.category {
+.behaviors-item.category,
+.transitions-item.category {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
@@ -75,11 +76,17 @@ body {
 .dsgvars-item > .dsgvar-type {
 	background-color: rgba(3,61,82,1);
 }
-.dsgvars-item.dsgvars-header {
+.dsgvars-item.dsgvar-array:hover > .dsgvar-name,
+.dsgvars-item.dsgvar-array:hover > .dsgvar-type {
+	background-color: rgba(1,33,45,1);
+}
+.dsgvars-item.dsgvars-header,
+.transitions-item.transitions-header {
 	background-color: rgba(3,61,82,1);
 }
 .objects-item.object-sector:hover,
-.behaviors-item.category:hover {
+.behaviors-item.category:hover,
+.transitions-item.category:hover {
 	background-color: rgba(1,33,45,1);
 }
 .objects-item.object-world.current-objects-item,
@@ -91,7 +98,8 @@ body {
 .objects-item.object-IPO:hover,
 .levels-item.level:hover,
 .behaviors-item.behavior:hover,
-.dsgvars-item:hover {
+.dsgvars-item:hover,
+.selectState:hover {
 	background-color: rgba(3,61,82,1);
 }
 

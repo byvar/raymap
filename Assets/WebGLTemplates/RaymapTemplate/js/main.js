@@ -46,7 +46,21 @@ function basename(str) {
         base = base.substring(0, base.lastIndexOf("."));
    return base;
 }
-
+var entityMap = {
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;',
+	'"': '&quot;',
+	"'": '&#39;',
+	'/': '&#x2F;',
+	'`': '&#x60;',
+	'=': '&#x3D;'
+  };
+function escapeHTML (string) {
+	return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+		return entityMap[s];
+	});
+}
 
 // Animation support
 let transEndEventNames = {
@@ -78,6 +92,7 @@ let currentBehaviorType = "";
 let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
 let btn_close_description, stateSelector, objectListSelector, highlight_tooltip, objectListInputGroup;
+let previousState = -1;
 
 // FUNCTIONS
 function sendMessage(jsonObj) {
@@ -515,7 +530,6 @@ function showObjectDescription(so, isSOChanged) {
 	
 	if(so.hasOwnProperty("Perso")) {
 		let perso = so.Perso;
-
 		$('.perso-description').removeClass('invisible');
 		if(isSOChanged) {
 			stateSelector.empty();
@@ -524,13 +538,13 @@ function showObjectDescription(so, isSOChanged) {
 
 			if(perso.hasOwnProperty("States")) {
 				$.each(perso.States, function (idx, state) {
-					stateSelector.append("<option value='" + idx + "'>" + state.Name + "</option>");
+					stateSelector.append("<option value='" + idx + "'>" + escapeHTML(state.Name) + "</option>");
 				});
 				stateSelector.prop("selectedIndex", perso.State);
 			}
 			if(perso.hasOwnProperty("ObjectLists")) {
 				$.each(perso.ObjectLists, function (idx, poList) {
-					objectListSelector.append("<option value='" + idx + "'>" + poList + "</option>");
+					objectListSelector.append("<option value='" + idx + "'>" + escapeHTML(poList) + "</option>");
 				});
 				objectListSelector.prop("selectedIndex", perso.ObjectList);
 			}
@@ -550,6 +564,34 @@ function showObjectDescription(so, isSOChanged) {
 		selectButton($("#btn-playAnimation"), perso.PlayAnimation);
 		selectButton($("#btn-autoNextState"), perso.AutoNextState);
 		$('#animationSpeed').val(perso.AnimationSpeed);
+
+		if(isSOChanged || previousState !== perso.State) {
+			// State transitions
+			$("#content-state-transitions").empty();
+			if(perso.hasOwnProperty("States") && perso.States[perso.State].hasOwnProperty("Transitions") && perso.States[perso.State].Transitions.length > 0) {
+				let state = perso.States[perso.State];
+				let transitionsHTML = [];
+				transitionsHTML.push("<div class='transitions-item category collapsible' data-collapse='transitions-collapse'><div class='collapse-sign'>+</div>State transitions</div><div id='transitions-collapse' style='display: none;'>");
+				
+				transitionsHTML.push("<div class='transitions-item transitions-header'><div class='transitions-targetstate'>Target state</div><div class='transitions-linkingtype'></div><div class='transitions-statetogo'>Redirect to</div></div>");
+				$.each(state.Transitions, function (idx, val) {
+					transitionsHTML.push("<div class='transitions-item'>")
+					transitionsHTML.push("<div class='transitions-targetstate selectState' data-select-state='" + val.TargetState + "'>" + escapeHTML(perso.States[val.TargetState].Name) + "</div>");
+					if(val.LinkingType === 1) {
+						transitionsHTML.push("<div class='transitions-linkingtype'><i class='icon-media-fast-forward'></i></div>");
+					} else {
+						transitionsHTML.push("<div class='transitions-linkingtype'><i class='icon-media-play'></i></div>");
+					}
+					transitionsHTML.push("<div class='transitions-statetogo selectState' data-select-state='" + val.StateToGo + "'>" + escapeHTML(perso.States[val.StateToGo].Name) + "</div>");
+					transitionsHTML.push("</div>");
+				});
+				transitionsHTML.push("</div>");
+				$("#content-state-transitions").append(transitionsHTML.join(""));
+			} else {
+				
+			}
+		}
+		previousState = perso.State;
 		
 		// Scripts
 		if(isSOChanged) {
@@ -1251,6 +1293,17 @@ $(function() {
 		//let selectedIndex = $(this).prop('selectedIndex');
 		//setObjectList(selectedIndex);
 		sendPerso();
+		$(this).blur();
+		return false;
+	});
+	$(document).on('click', ".selectState", function() {
+		//let selectedIndex = $(this).prop('selectedIndex');
+		//setState(selectedIndex);
+		let newState = parseInt($(this).data("selectState"));
+		if(currentSO != null && currentSO.hasOwnProperty("Perso") && currentSO.Perso.State != newState) {
+			stateSelector.prop("selectedIndex", newState);
+			sendPerso();
+		}
 		$(this).blur();
 		return false;
 	});
