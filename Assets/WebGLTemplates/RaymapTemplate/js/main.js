@@ -361,7 +361,7 @@ function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
 }
 function formatOpenSpaceText(text) {
-	return text.replace(/\/L:/g, "<br/>");
+	return text.replace(/\/L:/gi, "<br/>");
 }
 function getLanguageHTML(lang, langStart) {
 	let fullHTML = [];
