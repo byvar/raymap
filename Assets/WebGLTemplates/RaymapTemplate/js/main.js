@@ -92,7 +92,7 @@ let currentBehavior = null;
 let currentBehaviorType = "";
 let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description, stateSelector, objectListSelector, languageSelector, highlight_tooltip, objectListInputGroup;
+let btn_close_description, stateSelector, objectListSelector, languageSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
 let previousState = -1;
 
 // FUNCTIONS
@@ -361,13 +361,13 @@ function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
 }
 function formatOpenSpaceText(text) {
-	return text.replace(/&#x2F;L:/g, "<br/>");
+	return text.replace(/\/L:/g, "<br/>");
 }
 function getLanguageHTML(lang, langStart) {
 	let fullHTML = [];
 	fullHTML.push("<div class='localization-item category'>" + lang.Name + " (" + lang.NameLocalized + ")</div>");
 	$.each(lang.Entries, function (idx, val) {
-		fullHTML.push("<div class='localization-item' data-loc-item='" + (idx + langStart) + "'><div class='localization-item-index'>" + (idx + langStart) + "</div><div class='localization-item-text'>" + formatOpenSpaceText(escapeHTML(val)) + "</div></div>");
+		fullHTML.push("<div class='localization-item localization-item-highlight' data-loc-item='" + (idx + langStart) + "'><div class='localization-item-index'>" + (idx + langStart) + "</div><div class='localization-item-text'>" + escapeHTML(val) + "</div></div>");
 	});
 	fullHTML.push("</div>");
 	return fullHTML.join("");
@@ -388,6 +388,7 @@ function updateLanguageDisplayed() {
 }
 function handleMessage_localization(msg) {
 	$("#btn-localization").removeClass("disabled-button");
+	text_highlight_tooltip.addClass("rayman-2");
 	let fullHTML = [];
 	let api = $("#content-localization").data('jsp');	
 	if(msg.hasOwnProperty("Languages")) {
@@ -1294,6 +1295,8 @@ $(function() {
 	languageSelector = $('#languageSelector');
 	objectListInputGroup = $('#objectListInputGroup')
 	highlight_tooltip = $("#highlight-tooltip");
+	text_highlight_tooltip = $('#text-highlight-tooltip');
+	text_highlight_content = $('#text-highlight-content');
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
@@ -1301,8 +1304,17 @@ $(function() {
 	
 	$(document).mousemove(function( event ) {
 		highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
+		text_highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
 	});
-	
+	$(document).on('mouseenter', ".localization-item-highlight", function() {
+		let text = $(this).find(".localization-item-text").text();
+		text_highlight_content.html(formatOpenSpaceText(text));
+		text_highlight_tooltip.removeClass("hidden-tooltip");
+	});
+	$(document).on('mouseleave', ".localization-item-highlight", function() {
+		text_highlight_content.html("");
+		text_highlight_tooltip.addClass("hidden-tooltip");
+	});
 	$(document).on('click', ".objects-item.object-perso", function() {
 		let index = $(".objects-item").index(this);
 		//$(".objects-item").removeClass("current-objects-item");

@@ -515,8 +515,41 @@ a:focus {
     pointer-events: none;
 	justify-content: space-around;
 }
+#text-highlight-tooltip {
+    display: flex;
+	flex-flow: column;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 1em 1em 1em 1em;
+    margin-left: 15px;
+    position: absolute;
+    z-index: 200;
+    line-height: 2.5em;
+    border-radius: 0.75em;
+    pointer-events: none;
+	justify-content: space-around;
+}
+#text-highlight-tooltip.rayman-2 {
+	font-weight: 300;
+	font-family: 'Rayman 2', sans-serif;
+    line-height: 1.5em;
+	text-transform: lowercase;
+	font-size: 1.2em;
+}
+#text-highlight-tooltip.rayman-2 > #text-highlight-content {
+	background: repeating-linear-gradient(to bottom, white, #ffff67 1.5em);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+#text-highlight-tooltip.rayman-3 {
+	font-weight: 300;
+	font-family: 'Rayman 3', sans-serif;
+    line-height: 1.5em;
+	font-size: 1.2em;
+}
 
-#highlight-tooltip.hidden-tooltip {
+#highlight-tooltip.hidden-tooltip,
+#text-highlight-tooltip.hidden-tooltip {
     display: none;
 }
 .highlight-header {
