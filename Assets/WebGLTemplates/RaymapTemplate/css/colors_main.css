@@ -51,7 +51,8 @@ body {
 .objects-item,
 .levels-item,
 .behaviors-item,
-.dsgvars-item {
+.dsgvars-item,
+.localization-item {
 	color: #9ed9a0;
 }
 
@@ -68,12 +69,14 @@ body {
 .objects-item.object-sector,
 .levels-item.game,
 .behaviors-item.category,
-.transitions-item.category {
+.transitions-item.category,
+.localization-item.category {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
 .dsgvars-item > .dsgvar-name,
-.dsgvars-item > .dsgvar-type {
+.dsgvars-item > .dsgvar-type,
+.localization-item > .localization-item-index {
 	background-color: rgba(3,61,82,1);
 }
 .dsgvars-item.dsgvar-array:hover > .dsgvar-name,
@@ -99,7 +102,8 @@ body {
 .levels-item.level:hover,
 .behaviors-item.behavior:hover,
 .dsgvars-item:hover,
-.selectState:hover {
+.selectState:hover,
+.localization-item:hover {
 	background-color: rgba(3,61,82,1);
 }
 
@@ -265,7 +269,8 @@ input[type=range]:focus::-ms-fill-upper {
     background-color: rgba(3,61,82,1);
 }
 #levelselect-popup,
-#script-popup {
+#script-popup,
+#localization-popup {
     background-color: rgba(6,86,109,1);
 }
 .style-item.current-style-item {

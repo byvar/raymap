@@ -81,6 +81,7 @@ let baseTitle = "Raymap"
 let notificationTimeout = null;
 let dialogueMsg = null;
 let fullData = null;
+let hierarchy = null;
 let objectsList = [];
 let currentSO = null;
 let gameInstance = null;
@@ -91,7 +92,7 @@ let currentBehavior = null;
 let currentBehaviorType = "";
 let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description, stateSelector, objectListSelector, highlight_tooltip, objectListInputGroup;
+let btn_close_description, stateSelector, objectListSelector, languageSelector, highlight_tooltip, objectListInputGroup;
 let previousState = -1;
 
 // FUNCTIONS
@@ -353,36 +354,97 @@ function handleMessage_settings(msg) {
 	selectButton($("#btn-playTextureAnimations"), msg.PlayTextureAnimations);
 	$("#range-luminosity").val(msg.Luminosity);
 }
+function handleMessage_cineData(msg) {
+	$("#btn-cine").removeClass("disabled-button");
+}
+function handleMessage_camera(msg) {
+	$("#btn-camera").removeClass("disabled-button");
+}
+function formatOpenSpaceText(text) {
+	return text.replace(/&#x2F;L:/g, "<br/>");
+}
+function getLanguageHTML(lang, langStart) {
+	let fullHTML = [];
+	fullHTML.push("<div class='localization-item category'>" + lang.Name + " (" + lang.NameLocalized + ")</div>");
+	$.each(lang.Entries, function (idx, val) {
+		fullHTML.push("<div class='localization-item' data-loc-item='" + (idx + langStart) + "'><div class='localization-item-index'>" + (idx + langStart) + "</div><div class='localization-item-text'>" + formatOpenSpaceText(escapeHTML(val)) + "</div></div>");
+	});
+	fullHTML.push("</div>");
+	return fullHTML.join("");
+}
+function updateLanguageDisplayed() {
+	if(fullData != null && fullData.hasOwnProperty("Localization")) {
+		let loc = fullData.Localization;
+		let selectedLanguage = languageSelector.prop("selectedIndex");
+		if(loc.hasOwnProperty("Languages") && loc.Languages.length > selectedLanguage) {
+			$("#language-localized").html(getLanguageHTML(loc.Languages[selectedLanguage], loc.LanguageStart));
+			
+			let api = $("#content-localization").data('jsp');
+			setTimeout(function(){
+				api.reinitialise();
+			}, 100);
+		}
+	}
+}
+function handleMessage_localization(msg) {
+	$("#btn-localization").removeClass("disabled-button");
+	let fullHTML = [];
+	let api = $("#content-localization").data('jsp');	
+	if(msg.hasOwnProperty("Languages")) {
+		languageSelector.empty();
+		$.each(msg.Languages, function (idx, language) {
+			languageSelector.append("<option value='" + idx + "'>" + escapeHTML(language.Name) + " (" + escapeHTML(language.NameLocalized)+")</option>");
+		});
+		languageSelector.prop("selectedIndex", 0);
+
+		
+		fullHTML.push("<div id='language-localized'>");
+		if(msg.Languages.length > 0) {
+			fullHTML.push(getLanguageHTML(msg.Languages[0], msg.LanguageStart));
+		}
+		fullHTML.push("</div>");
+	}
+	if(msg.hasOwnProperty("Common")) {
+		fullHTML.push("<div id='language-common'>");
+		fullHTML.push(getLanguageHTML(msg.Common, msg.CommonStart));
+		fullHTML.push("</div>");
+	}
+	api.getContentPane().append(fullHTML.join(""));
+	setTimeout(function(){
+		api.reinitialise();
+	}, 100);
+}
 function setAllJSON(jsonString) {
 	//alert(jsonString);
 	console.log(JSON.stringify(jsonString)); 
 	let msg = $.parseJSON(jsonString);
+	fullData = msg;
 	if(msg.hasOwnProperty("Hierarchy")) {
-		fullData = msg.Hierarchy;
-		if(fullData != null) {
+		hierarchy = msg.Hierarchy;
+		if(hierarchy != null) {
 			let totalWorld = [];
-			if(fullData.hasOwnProperty("Always")) {
-				let fakeAlwaysWorld = parseAlways(fullData.Always);
+			if(hierarchy.hasOwnProperty("Always")) {
+				let fakeAlwaysWorld = parseAlways(hierarchy.Always);
 				totalWorld = totalWorld.concat(fakeAlwaysWorld);
 			}
-			if(fullData.hasOwnProperty("TransitDynamicWorld")) {
-				let transitDynamicWorld = parseSuperObject(fullData.TransitDynamicWorld, 0);
+			if(hierarchy.hasOwnProperty("TransitDynamicWorld")) {
+				let transitDynamicWorld = parseSuperObject(hierarchy.TransitDynamicWorld, 0);
 				totalWorld = totalWorld.concat(transitDynamicWorld);
 			}
-			if(fullData.hasOwnProperty("ActualWorld")) {
-				let actualWorld = parseSuperObject(fullData.ActualWorld, 0);
+			if(hierarchy.hasOwnProperty("ActualWorld")) {
+				let actualWorld = parseSuperObject(hierarchy.ActualWorld, 0);
 				totalWorld = totalWorld.concat(actualWorld);
 			}
-			if(fullData.hasOwnProperty("DynamicWorld")) {
-				let dynamicWorld = parseSuperObject(fullData.DynamicWorld, 0);
+			if(hierarchy.hasOwnProperty("DynamicWorld")) {
+				let dynamicWorld = parseSuperObject(hierarchy.DynamicWorld, 0);
 				totalWorld = totalWorld.concat(dynamicWorld);
 			}
-			if(fullData.hasOwnProperty("DynamicSuperObjects")) {
-				let dynamicWorld = parseDynamicSuperObjects(fullData.DynamicSuperObjects);
+			if(hierarchy.hasOwnProperty("DynamicSuperObjects")) {
+				let dynamicWorld = parseDynamicSuperObjects(hierarchy.DynamicSuperObjects);
 				totalWorld = totalWorld.concat(dynamicWorld);
 			}
-			if(fullData.hasOwnProperty("FatherSector")) {
-				let fatherSector = parseSuperObject(fullData.FatherSector, 0);
+			if(hierarchy.hasOwnProperty("FatherSector")) {
+				let fatherSector = parseSuperObject(hierarchy.FatherSector, 0);
 				totalWorld = totalWorld.concat(fatherSector);
 			}
 			if(totalWorld.length > 0) {
@@ -397,6 +459,15 @@ function setAllJSON(jsonString) {
 	}
 	if(msg.hasOwnProperty("Settings")) {
 		handleMessage_settings(msg.Settings);
+	}
+	if(msg.hasOwnProperty("Camera")) {
+		handleMessage_camera(msg.Camera);
+	}
+	if(msg.hasOwnProperty("CineData")) {
+		handleMessage_cineData(msg.CineData);
+	}
+	if(msg.hasOwnProperty("Localization")) {
+		handleMessage_localization(msg.Localization);
 	}
 }
 // SCRIPT
@@ -949,7 +1020,7 @@ function handleMessage_selection(msg) {
 	let perso = selection.Perso;
 	if(perso.IsAlways) {
 		let perso_selection, index_selection = -1;
-		if(fullData != null) {
+		if(hierarchy != null) {
 			for (let i = 0; i < objectsList.length; i++) {
 				if(!objectsList[i].hasOwnProperty("Perso")) {
 					continue;
@@ -974,7 +1045,7 @@ function handleMessage_selection(msg) {
 		}
 	} else {
 		let so_selection, index_selection = -1;
-		if(fullData != null) {
+		if(hierarchy != null) {
 			for (let i = 0; i < objectsList.length; i++) {
 				if(!objectsList[i].hasOwnProperty("Perso")) {
 					continue;
@@ -1160,8 +1231,10 @@ function hideDialogue() {
 	if(gameInstance != null) {
 		$('#popup-overlay').addClass('hidden-overlay');
 		$('#levelselect-popup').addClass('hidden-popup');
+		$('#localization-popup').addClass('hidden-popup');
 		$('#script-popup').addClass('hidden-popup');
 		selectButton($('#btn-levelselect'), false);
+		selectButton($('#btn-localization'), false);
 	}
 	dialogueMsg = null;
 }
@@ -1174,6 +1247,11 @@ function showLevelSelect() {
 	$('#popup-overlay').removeClass('hidden-overlay');
 	$("#levelselect-popup").removeClass('hidden-popup');
 	selectButton($('#btn-levelselect'), true);
+}
+function showLocalizationWindow() {
+	$('#popup-overlay').removeClass('hidden-overlay');
+	$("#localization-popup").removeClass('hidden-popup');
+	selectButton($('#btn-localization'), true);
 }
 
 function showScript() {
@@ -1213,6 +1291,7 @@ $(function() {
 	btn_close_description = $('#btn-close-description');
 	stateSelector = $('#state');
 	objectListSelector = $('#objectList');
+	languageSelector = $('#languageSelector');
 	objectListInputGroup = $('#objectListInputGroup')
 	highlight_tooltip = $("#highlight-tooltip");
 	
@@ -1259,6 +1338,10 @@ $(function() {
 	
 	$(document).on('click', "#btn-levelselect", function() {
 		showLevelSelect();
+		return false;
+	});
+	$(document).on('click', "#btn-localization", function() {
+		showLocalizationWindow();
 		return false;
 	});
 	
@@ -1311,6 +1394,11 @@ $(function() {
 		//let selectedIndex = $(this).prop('selectedIndex');
 		//setState(selectedIndex);
 		sendPerso();
+		$(this).blur();
+		return false;
+	});
+	$(document).on('change', "#languageSelector", function() {
+		updateLanguageDisplayed();
 		$(this).blur();
 		return false;
 	});
