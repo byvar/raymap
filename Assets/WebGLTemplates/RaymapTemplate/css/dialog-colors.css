@@ -1,0 +1,22 @@
+.dialog-color {
+    background: repeating-linear-gradient(to bottom, white, transparent 1em);
+    -webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.color-0 {
+    background-color: #6EBEFF;
+}
+
+.color-200 {
+    background-color: #FA4646;
+}
+
+.color-400 {
+    background-color: #FFFF78;
+}
+
+.color-600 {
+    background-color: #6EBEFF;
+}

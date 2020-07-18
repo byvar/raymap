@@ -360,8 +360,39 @@ function handleMessage_cineData(msg) {
 function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
 }
+
+var formattedTexts = {};
+
 function formatOpenSpaceText(text) {
-	return text.replace(/\/L:/gi, "<br/>");
+
+	if (formattedTexts[text]!==undefined) {
+		// Regexes are expen$ive - RTS
+		return formattedTexts[text];
+	}
+
+	var orgText = text;
+
+	var regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
+
+	text = text.replace(regexColors, (match, p1, p2, offset, string, groups) => {
+		return `<span class="dialog-color color-${p1.toLowerCase()}">${p2}</span>`;
+	});
+	text = text.replace(/\/L:/gi, "<br/>"); // New Lines
+
+	var regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
+	var regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
+
+	text = text.replace(regexEvent, ""); // Replace event characters
+	text = text.replace(regexMisc, ""); // Replace non-visible control characters
+
+	text = text.replace(":", ""); // remove :
+
+	var equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
+	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only)
+
+	formattedTexts[orgText] = text;
+
+	return text;
 }
 function getLanguageHTML(lang, langStart) {
 	let fullHTML = [];

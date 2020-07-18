@@ -537,8 +537,10 @@ a:focus {
 	font-size: 1.2em;
 }
 #text-highlight-tooltip.rayman-2 > #text-highlight-content {
-	background: repeating-linear-gradient(to bottom, white, #ffff67 1.5em);
+	background: repeating-linear-gradient(to bottom, white,transparent 1.5em);
+	background-color: #6EBEFF;
 	-webkit-background-clip: text;
+	background-clip: text;
 	-webkit-text-fill-color: transparent;
 }
 #text-highlight-tooltip.rayman-3 {
