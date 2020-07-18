@@ -356,9 +356,12 @@ namespace OpenSpace {
 
             Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["inputStructure"], mem));
             inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+
+			string entryActions = "EntryActions" + Environment.NewLine;
 			foreach (EntryAction ea in inputStruct.entryActions) {
-				print(ea.ToString());
+				entryActions += ea.ToString() + Environment.NewLine;
 			}
+			print(entryActions);
 
 			Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["localizationStructure"], mem));
 			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);

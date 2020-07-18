@@ -193,9 +193,13 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading input structure";
 			await WaitIfNecessary();
 			inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+
+			string entryActions = "EntryActions" + Environment.NewLine;
 			foreach (EntryAction ea in inputStruct.entryActions) {
-				print(ea.ToString());
+				entryActions += ea.ToString() + Environment.NewLine;
 			}
+			print(entryActions);
+
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
