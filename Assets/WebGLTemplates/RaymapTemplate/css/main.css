@@ -529,6 +529,14 @@ a:focus {
     pointer-events: none;
 	justify-content: space-around;
 }
+#text-highlight-tooltip:not(.right) {
+	right: auto !important;
+}
+#text-highlight-tooltip.right {
+	margin-left: 0;
+    margin-right: 15px;
+	left: auto !important;
+}
 #text-highlight-tooltip.rayman-2 {
 	font-weight: 300;
 	font-family: 'Rayman 2', sans-serif;

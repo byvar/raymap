@@ -892,14 +892,18 @@ function getDsgVarTypeString(valueType, val, idx) {
 			dsgString += "'>" + val.AsCaps;
 			break;
 		case "Text":
-			dsgString += "'>" + val.AsText;
+			dsgString += " text' data-localization-item='" + val.AsText + "'>" + val.AsText;
+			let text = $("#content-localization").find(`.localization-item[data-loc-item='${val.AsText}']`).find(".localization-item-text").text();
+			if(text !== undefined && text != null) {
+				dsgString += " - " + escapeHTML(text);
+			}
 			break;
 		case "Vector":
 			dsgString += " vector'>(" + val.AsVector.x + ", " + val.AsVector.y + ", " + val.AsVector.z + ")";
 			break;
 		case "Perso":
 			if(val.hasOwnProperty("AsPerso")) {
-				dsgString += "perso' data-offset='" + val.AsPerso.Offset + "'>" + val.AsPerso.NameInstance;
+				dsgString += " perso' data-offset='" + val.AsPerso.Offset + "'>" + val.AsPerso.NameInstance;
 			} else {
 				dsgString +="'>"
 			}
@@ -1339,14 +1343,38 @@ $(function() {
 	
 	$(document).mousemove(function( event ) {
 		highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
-		text_highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
+		text_highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'right': ($(window).width() - event.pageX - 3) + 'px', 'top': (event.pageY + 25) + 'px'});
 	});
 	$(document).on('mouseenter', ".localization-item-highlight", function() {
 		let text = $(this).find(".localization-item-text").text();
-		text_highlight_content.html(formatOpenSpaceText(text));
-		text_highlight_tooltip.removeClass("hidden-tooltip");
+		let formatted = formatOpenSpaceText(text);
+		if(/\S/.test(formatted)) {
+			// found something other than a space or line break
+			text_highlight_content.html(formatOpenSpaceText(text));
+			text_highlight_tooltip.removeClass("hidden-tooltip");
+			text_highlight_tooltip.removeClass("right");
+		}
 	});
 	$(document).on('mouseleave', ".localization-item-highlight", function() {
+		text_highlight_content.html("");
+		text_highlight_tooltip.addClass("hidden-tooltip");
+	});
+	$(document).on('mouseenter', ".dsgvar-value-Text", function() {
+		let locItem = $(this).data("localizationItem");
+		if(locItem !== undefined && locItem != null) {
+			let text = $("#content-localization").find(`.localization-item[data-loc-item='${locItem}']`).find(".localization-item-text").text();
+			if(text !== undefined && text != null) {
+				let formatted = formatOpenSpaceText(text);
+				if(/\S/.test(formatted)) {
+					// found something other than a space or line break
+					text_highlight_content.html(formatOpenSpaceText(text));
+					text_highlight_tooltip.removeClass("hidden-tooltip");
+					text_highlight_tooltip.addClass("right");
+				}
+			}
+		}
+	});
+	$(document).on('mouseleave', ".dsgvar-value-Text", function() {
 		text_highlight_content.html("");
 		text_highlight_tooltip.addClass("hidden-tooltip");
 	});
