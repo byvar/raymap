@@ -500,13 +500,9 @@ namespace OpenSpace.Loader {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
 				inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-
-				string entryActions = "EntryActions" + Environment.NewLine;
 				foreach (EntryAction ea in inputStruct.entryActions) {
-					entryActions += ea.ToString() + Environment.NewLine;
+					print(ea.ToString());
 				}
-				print(entryActions);
-
 				if (Settings.s.platform == Settings.Platform.PC
 					|| Settings.s.platform == Settings.Platform.Xbox
 					|| Settings.s.platform == Settings.Platform.Xbox360
@@ -530,13 +526,9 @@ namespace OpenSpace.Loader {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
 				inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-
-				string entryActions = "EntryActions" + Environment.NewLine;
 				foreach (EntryAction ea in inputStruct.entryActions) {
-					entryActions += ea.ToString() + Environment.NewLine;
+					print(ea.ToString());
 				}
-				print(entryActions);
-
 				reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
 			}
 			if (Settings.s.game == Settings.Game.R3) {

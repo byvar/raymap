@@ -117,13 +117,9 @@ namespace OpenSpace.Loader {
 			}
 
 			inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
-
-			string entryActions = "EntryActions" + Environment.NewLine;
 			foreach (EntryAction ea in inputStruct.entryActions) {
-				entryActions += ea.ToString() + Environment.NewLine;
+				print(ea.ToString());
 			}
-			print(entryActions);
-
 			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
 
 			/*
