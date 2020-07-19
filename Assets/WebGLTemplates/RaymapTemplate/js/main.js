@@ -361,7 +361,7 @@ function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
 }
 
-var formattedTexts = {};
+let formattedTexts = {};
 
 function formatOpenSpaceText(text) {
 
@@ -370,24 +370,28 @@ function formatOpenSpaceText(text) {
 		return formattedTexts[text];
 	}
 
-	var orgText = text;
+	let orgText = text;
 
-	var regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
+	let regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
 
-	text = text.replace(regexColors, (match, p1, p2, offset, string, groups) => {
+	text = text.replace(regexColors, function (match, p1, p2, offset, string, groups) {
 		return `<span class="dialog-color color-${p1.toLowerCase()}">${p2}</span>`;
 	});
 	text = text.replace(/\/L:/gi, "<br/>"); // New Lines
 
-	var regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
-	var regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
+	let regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
+	let regexCenter = RegExp("/C:(.*)$", 'gi');
+	let regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
 
 	text = text.replace(regexEvent, ""); // Replace event characters
+	text = text.replace(regexCenter, function (match, p1, p2, offset, string, groups) { // Center text if necessary
+		return `<div class="center">${p1}</div>`;
+	});
 	text = text.replace(regexMisc, ""); // Replace non-visible control characters
 
 	text = text.replace(":", ""); // remove :
 
-	var equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
+	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
 	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only)
 
 	formattedTexts[orgText] = text;
