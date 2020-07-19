@@ -360,6 +360,24 @@ function handleMessage_cineData(msg) {
 function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
 }
+function toggleCinePopup() {
+	if($("#btn-cine").hasClass("selected")) {
+		$("#cine-popup").addClass("hidden-popup");
+		$("#btn-cine").removeClass("selected");
+	} else {
+		$("#cine-popup").removeClass("hidden-popup");
+		$("#btn-cine").addClass("selected");
+	}
+}
+function toggleCameraPopup() {
+	if($("#btn-camera").hasClass("selected")) {
+		$("#camera-popup").addClass("hidden-popup");
+		$("#btn-camera").removeClass("selected");
+	} else {
+		$("#camera-popup").removeClass("hidden-popup");
+		$("#btn-camera").addClass("selected");
+	}
+}
 
 let formattedTexts = {};
 
@@ -1547,7 +1565,22 @@ $(function() {
 		setScript(currentScriptIndex-1);
 		return false;
 	});
-	
+
+	$(document).on('click', "#btn-cine", function() {
+		toggleCinePopup();
+		if($("#btn-camera").hasClass("selected")) {
+			toggleCameraPopup();
+		}
+		return false;		
+	});
+	$(document).on('click', "#btn-camera", function() {
+		toggleCameraPopup();
+		if($("#btn-cine").hasClass("selected")) {
+			toggleCinePopup();
+		}
+		return false;		
+	});
+
 	$(document).on('click', ".sidebar-button", function() {
 		let butt = jQuery(this);
 		let buttIndex = $(".sidebar-button").index(butt);

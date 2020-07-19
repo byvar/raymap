@@ -274,7 +274,9 @@ input[type=range]:focus::-ms-fill-upper {
 }
 #levelselect-popup,
 #script-popup,
-#localization-popup {
+#localization-popup,
+#camera-popup,
+#cine-popup {
     background-color: rgba(6,86,109,1);
 }
 .style-item.current-style-item {

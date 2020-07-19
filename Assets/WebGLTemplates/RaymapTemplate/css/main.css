@@ -1123,6 +1123,36 @@ input[type=range]::-ms-fill-upper {
 	pointer-events: none;
 	bottom: -9em;
 }
+#cine-popup {
+	display: block;
+	position: absolute;
+	bottom: 3em;
+	right: 2em;
+	width: 16em;
+	height: 6em;
+	border-radius: 4em;
+	padding: 1em;
+	line-height: 1.5em;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+#camera-popup {
+	display: block;
+	position: absolute;
+	bottom: 3em;
+	right: 0.5em;
+	width: 16em;
+	height: 6em;
+	border-radius: 4em;
+	padding: 1em;
+	line-height: 1.5em;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+#cine-popup.hidden-popup,
+#camera-popup.hidden-popup {
+	display: none;
+}
 #dialogue-image {
 	float: left;
 	padding: 0em;
