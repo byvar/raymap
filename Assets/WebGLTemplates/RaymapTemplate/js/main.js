@@ -86,11 +86,11 @@ let objectsList = [];
 let currentSO = null;
 let gameInstance = null;
 let inputHasFocus = false;
+let gameSettings = null;
 let mode, lvl, folder;
 
 let currentBehavior = null;
 let currentBehaviorType = "";
-let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
 let btn_close_description, stateSelector, objectListSelector, languageSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
 let previousState = -1;
@@ -381,13 +381,7 @@ function toggleCameraPopup() {
 
 let formattedTexts = {};
 
-function formatOpenSpaceText(text) {
-
-	if (formattedTexts[text]!==undefined) {
-		// Regexes are expen$ive - RTS
-		return formattedTexts[text];
-	}
-
+function formatOpenSpaceTextR2(text) {
 	let orgText = text;
 
 	let regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
@@ -402,7 +396,7 @@ function formatOpenSpaceText(text) {
 	let regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
 
 	text = text.replace(regexEvent, ""); // Replace event characters
-	text = text.replace(regexCenter, function (match, p1, p2, offset, string, groups) { // Center text if necessary
+	text = text.replace(regexCenter, function (match, p1, offset, string, groups) { // Center text if necessary
 		return `<div class="center">${p1}</div>`;
 	});
 	text = text.replace(regexMisc, ""); // Replace non-visible control characters
@@ -410,8 +404,53 @@ function formatOpenSpaceText(text) {
 	text = text.replace(":", ""); // remove :
 
 	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
-	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only)
+	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only
 
+	return text;
+}
+function formatOpenSpaceTextR3(text) {
+	let regexColors = RegExp("\\\\[cC]([0-9]{1,3}):([0-9]{1,3}):([0-9]{1,3}):(.*?(?=\\\\[cC]|$))", 'g');
+
+	text = text.replace(regexColors, function (match, p1, p2, p3, p4, offset, string, groups) {
+		return `<span style="color: rgba(${p1}, ${p2}, ${p3}, 1);">${p4}</span>`;
+	});
+	text = text.replace(/\\L/gi, "<br/>"); // New Lines
+
+	//let regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
+	let regexCenter = RegExp("\\\\jc(.*)$", 'gi');
+	//let regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
+
+	//text = text.replace(regexEvent, ""); // Replace event characters
+	text = text.replace(regexCenter, function (match, p1, offset, string, groups) { // Center text if necessary
+		return `<div class="center">${p1}</div>`;
+	});
+	//text = text.replace(regexMisc, ""); // Replace non-visible control characters
+
+	//text = text.replace(":", ""); // remove :
+
+	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
+	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only
+
+	return text;
+}
+function formatOpenSpaceText(text) {
+	let orgText = text;
+	if (formattedTexts[text]!==undefined) {
+		// Regexes are expen$ive - RTS
+		return formattedTexts[text];
+	}
+	if(gameSettings != null){
+		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush") {
+			text = formatOpenSpaceTextR2(text);
+		} else if(gameSettings.Game === "R3" || gameSettings.Game === "RA" || gameSettings.Game === "RM") {
+			
+			text = formatOpenSpaceTextR3(text);
+		} else {
+			text = formatOpenSpaceTextR2(text);
+		}
+	} else {
+		text = formatOpenSpaceTextR2(text);
+	}
 	formattedTexts[orgText] = text;
 
 	return text;
@@ -441,7 +480,13 @@ function updateLanguageDisplayed() {
 }
 function handleMessage_localization(msg) {
 	$("#btn-localization").removeClass("disabled-button");
-	text_highlight_tooltip.addClass("rayman-2");
+	if(gameSettings != null){
+		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush") {
+			text_highlight_tooltip.addClass("rayman-2");
+		} else if(gameSettings.Game === "R3" || gameSettings.Game === "RA" || gameSettings.Game === "RM") {
+			text_highlight_tooltip.addClass("rayman-3");
+		}
+	}
 	let fullHTML = [];
 	let api = $("#content-localization").data('jsp');	
 	if(msg.hasOwnProperty("Languages")) {
@@ -473,6 +518,9 @@ function setAllJSON(jsonString) {
 	console.log(JSON.stringify(jsonString)); 
 	let msg = $.parseJSON(jsonString);
 	fullData = msg;
+	if(msg.hasOwnProperty("GameSettings")) {
+		gameSettings = msg.GameSettings;
+	}
 	if(msg.hasOwnProperty("Hierarchy")) {
 		hierarchy = msg.Hierarchy;
 		if(hierarchy != null) {
@@ -528,114 +576,99 @@ function setAllJSON(jsonString) {
 function setBehavior(behaviorIndex) {
 	if(currentSO != null && currentSO.hasOwnProperty("Perso") && currentSO.Perso.hasOwnProperty("Brain") && behaviorIndex >= 0) {
 		let brain = currentSO.Perso.Brain;
+		let modelname = currentSO.Perso.hasOwnProperty("NameModel") ? currentSO.Perso.NameModel : currentSO.Perso.NameInstance;
 		currentBehavior = null;
 		let curIndex = behaviorIndex;
-		if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
+		if(currentBehavior == null && brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
 			if(curIndex < brain.Intelligence.length) {
 				currentBehavior = brain.Intelligence[curIndex];
+				$("#header-script-text").text(modelname + ".Intelligence[" + curIndex + "]: " + currentBehavior.Name);
 				currentBehaviorType = "Intelligence";
 			} else {
 				curIndex -= brain.Intelligence.length;
 			}
 		}
-		if(brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
+		if(currentBehavior == null && brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
 			if(curIndex < brain.Reflex.length) {
 				currentBehavior = brain.Reflex[curIndex];
+				$("#header-script-text").text(modelname + ".Reflex[" + curIndex + "]: " + currentBehavior.Name);
 				currentBehaviorType = "Reflex";
 			} else {
 				curIndex -= brain.Reflex.length;
 			}
 		}
-		if(brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
+		if(currentBehavior == null && brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
 			if(curIndex < brain.Macros.length) {
 				currentBehavior = brain.Macros[curIndex];
+				$("#header-script-text").text(modelname + ".Macros[" + curIndex + "]: " + currentBehavior.Name);
 				currentBehaviorType = "Macro";
 			} else {
 				curIndex -= brain.Macros.length;
 			}
 		}
 		if(currentBehavior != null) {
-			currentScriptIndex = 0;
-			if(currentBehaviorType == "Macro") {
-				$("#header-script-text").text(currentBehavior.Name + ".Script");
-			} else {
-				$("#header-script-text").text(currentBehavior.Name + ".Scripts[0]");
-			}
-			$("#content-script-code").text("");
+			requestComport();
 		}
 	}
 }
 
-function setScript(scriptIndex) {
+function requestComport() {
+	let api = $("#content-script").data('jsp');
+	api.getContentPane().html("");
+	api.scrollTo(0,0, false);
+	refreshScroll();
+	$('#btn-next-script').addClass('disabled-button');
+	$('#btn-prev-script').addClass('disabled-button');
+	
+	if(currentBehaviorType == "Macro") {
+		let jsonObj = {
+			Request: {
+				Type: "Macro",
+				Offset: currentBehavior.Offset,
+				BehaviorType: currentBehaviorType
+			}
+		};
+		sendMessage(jsonObj);
+	} else {
+		let jsonObj = {
+			Request: {
+				Type: "Comport",
+				Offset: currentBehavior.Offset,
+				BehaviorType: currentBehaviorType
+			}
+		};
+		sendMessage(jsonObj);
+	}
+}
+
+function getScriptHTML(title, script) {
+	let scriptHTML = "";
+	scriptHTML += "<div class='script-item category'><div class='script-item-name'>" + escapeHTML(title) + " - " + escapeHTML(script.Offset) + "</div></div>";
+	scriptHTML += "<div class='script-item script'><pre><code class='script-item-code cs'>" + escapeHTML(script.Translation) + "</code></pre></div>";
+	return scriptHTML;
+}
+function handleMessage_comport(msg) {
 	if(currentBehavior != null) {
-		let scripts = [];
+		currentBehavior = msg;
+		let comportHTML = "";
 		if(currentBehavior.hasOwnProperty("Script")) {
-			scripts.push(currentBehavior.Script);
+			comportHTML += getScriptHTML("Script", currentBehavior.Script);
 		}
 		if(currentBehavior.hasOwnProperty("FirstScript")) {
-			scripts.push(currentBehavior.FirstScript);
+			comportHTML += getScriptHTML("First Script", currentBehavior.FirstScript);
 		}
 		if(currentBehavior.hasOwnProperty("Scripts")) {
-			scripts = scripts.concat(currentBehavior.Scripts);
+			$.each(currentBehavior.Scripts, function (idx, script) {
+				comportHTML += getScriptHTML("Scripts[" + idx + "]", script);
+			});
 		}
-		$("#content-script-code").text("");
 		let api = $("#content-script").data('jsp');
+		api.getContentPane().html(comportHTML);
+		$(".script-item-code").each(function() {
+			hljs.highlightBlock($(this).get(0));
+		})
 		api.scrollTo(0,0, false);
 		refreshScroll();
-		if(scriptIndex < 0 || scriptIndex >= scripts.length) {
-			$('#btn-next-script').addClass('disabled-button');
-			$('#btn-prev-script').addClass('disabled-button');
-			currentScriptIndex = 0;
-		} else {
-			$('#btn-next-script').addClass('disabled-button');
-			$('#btn-prev-script').addClass('disabled-button');
-			currentScriptIndex = scriptIndex;
-			$("#header-script-text").text(currentBehavior.Name + ".Scripts[" + scriptIndex + "]");
-			
-			let jsonObj = {
-				Request: {
-					Type: "Script",
-					ScriptOffset: scripts[scriptIndex].Offset,
-					BehaviorType: currentBehaviorType
-				}
-			};
-			sendMessage(jsonObj);
-		}
-	}
-}
-
-function handleMessage_script(msg) {
-	if(currentBehavior != null) {
-		let scripts = [];
-		if(msg.hasOwnProperty("Translation")) {
-			$("#content-script-code").text(msg.Translation);
-			hljs.highlightBlock($("#content-script-code").get(0));
-			let api = $("#content-script").data('jsp');
-			api.scrollTo(0,0, false);
-			/*waitForFinalEvent(function(){
-				hljs.highlightBlock($("#content-script-code").get(0));
-			}, 3, "highlight");*/
-			refreshScroll();
-		}
-		if(currentBehavior.hasOwnProperty("Script")) {
-			scripts.push(currentBehavior.Script);
-		}
-		if(currentBehavior.hasOwnProperty("FirstScript")) {
-			scripts.push(currentBehavior.FirstScript);
-		}
-		if(currentBehavior.hasOwnProperty("Scripts")) {
-			scripts = scripts.concat(currentBehavior.Scripts);
-		}
-		if(currentScriptIndex < scripts.length-1) {
-			$('#btn-next-script').removeClass('disabled-button');
-		} else {
-			$('#btn-next-script').addClass('disabled-button');
-		}
-		if(currentScriptIndex > 0) {
-			$('#btn-prev-script').removeClass('disabled-button');
-		} else {
-			$('#btn-prev-script').addClass('disabled-button');
-		}
 	}
 }
 
@@ -1204,8 +1237,10 @@ function handleMessage(jsonString) {
 				handleMessage_selection(msg.Selection); break;
 			case "Settings":
 				handleMessage_settings(msg.Settings); break;
-			case "Script":
-				handleMessage_script(msg.Script); break;
+			case "Macro":
+				handleMessage_comport(msg.Macro); break;
+			case "Comport":
+				handleMessage_comport(msg.Comport); break;
 			default:
 				console.log('default');break;
 		}
@@ -1551,18 +1586,7 @@ $(function() {
 	$(document).on('click', ".behaviors-item.behavior", function() {
 		let index = $(".behaviors-item.behavior").index(this);
 		setBehavior(index);
-		setScript(0);
 		showScript();
-		return false;
-	});
-	
-	$(document).on('click', "#btn-next-script", function() {
-		setScript(currentScriptIndex+1);
-		return false;
-	});
-	
-	$(document).on('click', "#btn-prev-script", function() {
-		setScript(currentScriptIndex-1);
 		return false;
 	});
 

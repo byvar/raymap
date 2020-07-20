@@ -70,7 +70,8 @@ body {
 .levels-item.game,
 .behaviors-item.category,
 .transitions-item.category,
-.localization-item.category {
+.localization-item.category,
+.script-item.category {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
