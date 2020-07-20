@@ -105,6 +105,11 @@ public class CameraComponent : MonoBehaviour {
 		targetOrthoSize = null;
 	}
 
+	public void UpdateDebugCameraPos(WebJSON.CameraPos cameraPos) {
+		debugCameraPos = cameraPos;
+		lastDebugCameraPos = debugCameraPos;
+	}
+
     void Update() {
 		MouseLookRMBEnabled = false;
 		if (controller.LoadState != Controller.State.Finished && controller.LoadState != Controller.State.Error) return;

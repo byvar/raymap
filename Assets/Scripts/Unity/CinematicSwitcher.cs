@@ -127,7 +127,7 @@ public class CinematicSwitcher : MonoBehaviour {
 		if (currentCinematic > 0 && ps1Streams != null) {
 			Camera cam = Camera.main;
 			if (cam.orthographic) {
-				controller.ApplyCameraSettings(controller.CameraSettings[WebJSON.CameraPos.Initial]);
+				controller.SetCameraPosition(WebJSON.CameraPos.Initial);
 			}
 			OpenSpace.PS1.PS1Stream s = ps1Streams[currentCinematic - 1];
 			R2PS1Loader l = MapLoader.Loader as R2PS1Loader;

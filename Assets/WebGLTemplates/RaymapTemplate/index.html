@@ -31,6 +31,7 @@
         <link rel="stylesheet" type="text/css" href="css/icomoon.css" />
 		<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css" media="all" />
 		<link rel="stylesheet" type="text/css" href="css/highlight.css">
+		<link rel="stylesheet" type="text/css" href="css/camera-cube.css" />
 		<link rel="stylesheet" type="text/css" href="css/main.css?1" />
 		
 		<!-- colors -->
@@ -124,7 +125,18 @@
 								<div id="btn-camera" class="header-button disabled-button" title="Camera settings"><i class="icon-video1"></i></div>
 								<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-fullscreen"></i></div>
 							</div>
-							<div id="camera-popup" class="hidden-popup"></div>
+							<div id="camera-popup" class="hidden-popup">
+								<div id="camera-cube" class="cube-container">
+									<div class="cube">
+										<div class="cube__face cube__face--front" data-view="front">front</div>
+										<div class="cube__face cube__face--back" data-view="back">back</div>
+										<div class="cube__face cube__face--right" data-view="right">right</div>
+										<div class="cube__face cube__face--left" data-view="left">left</div>
+										<div class="cube__face cube__face--top" data-view="top">top</div>
+										<div class="cube__face cube__face--bottom" data-view="bottom">bottom</div>
+									</div>
+								</div>
+							</div>
 							<div id="cine-popup" class="hidden-popup"></div>
 						</div>
 					</div>

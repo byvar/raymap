@@ -131,6 +131,8 @@ namespace OpenSpace.ROM {
                 return true;
             }
 
+            private string ParamString => string.Format("0x{0:X4}", param);
+
             public string ToString(Perso perso, TranslatedROMScript.TranslationSettings ts, bool advanced = false)
             {
                 R2ROMLoader l = Loader;
@@ -243,15 +245,15 @@ namespace OpenSpace.ROM {
                         return "LipsSynchroRef: " + param;
                     case NodeType.FamilyRef:
                         
-                        return "Family.FromOffset(\"" + param + "\")";
+                        return "Family.FromIndex(" + ParamString + ")";
                     case NodeType.PersoRef:
-                        return "Perso.FromOffset(\"" + param + "\")";
+                        return "Perso.FromIndex(" + ParamString + ")";
                     case NodeType.ActionRef:
-                        return "GetAction(" + param + ")";
+                        return "GetAction(" + ParamString + ")";
                     case NodeType.SuperObjectRef:
-                        return "SuperObject.FromOffset(\"" + param + "\")";
+                        return "SuperObject.FromIndex(" + ParamString + ")";
                     case NodeType.WayPointRef:
-                        return "WayPoint.FromOffset(\"" + param + "\")";
+                        return "WayPoint.FromIndex(" + ParamString + ")";
                     case NodeType.TextRef:
                         if (param == 0xFFFF || l.localizationROM == null) return "TextRef.Null";
                         /*if (advanced) return "TextRef: " + param + " (" + l.localizationROM.GetTextForHandleAndLanguageID((int)param, 0) + ")";
@@ -269,24 +271,24 @@ namespace OpenSpace.ROM {
                         }
                     case NodeType.ComportRef:
 
-                        return "Comport.FromOffset(\"" + param + "\")";
+                        return "Comport.FromIndex(" + ParamString + ")";
                     case NodeType.SoundEventRef:
                         if (advanced) return "SoundEventRef: " + (int)param;
                         return "SoundEvent.FromID(0x" + ((int)param).ToString("X8") + ")";
                     case NodeType.ObjectTableRef:
                         
 
-                        return "ObjectTable.FromOffset(\"" + param + "\")";
+                        return "ObjectTable.FromIndex(" + ParamString + ")";
                     case NodeType.GameMaterialRef:
            
-                        return "GameMaterial.FromOffset(\"" + param + "\")";
+                        return "GameMaterial.FromIndex(" + ParamString + ")";
                     case NodeType.ParticleGenerator:
                         return "ParticleGenerator: " + "0x" + (param).ToString("x8");
                     case NodeType.VisualMaterial:
-                        return "VisualMaterial.FromOffset(\"" + param + "\")";
+                        return "VisualMaterial.FromIndex(" + ParamString + ")";
                     case NodeType.ModelRef: // ModelCast
 
-                        return "AIModel.FromOffset(\"" + param + "\")";
+                        return "AIModel.FromIndex(" + ParamString + ")";
                     case NodeType.DataType42:
                         if (advanced) return "EvalDataType42: " + "0x" + (param).ToString("x8");
                         return "EvalDataType42(" + "0x" + (param).ToString("x8") + ")";
@@ -313,7 +315,7 @@ namespace OpenSpace.ROM {
                         return "null";
                     case NodeType.GraphRef:
                         if (advanced) return "Graph: " + "0x" + (param).ToString("x8");
-                        return "Graph.FromOffset(\"" + param + "\")";
+                        return "Graph.FromIndex(" + ParamString + ")";
                 }
 
                 return "unknown";

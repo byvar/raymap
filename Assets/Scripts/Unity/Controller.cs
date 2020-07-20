@@ -502,6 +502,7 @@ public class Controller : MonoBehaviour {
 							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
 								behaviorGao.name += " (Empty)";
 							}
+							c.Offset = behavior.Offset;
 							c.GaoName = behaviorGao.name;
 							c.Name = behavior.NameSubstring;
 							brain.Intelligence.Add(c);
@@ -533,6 +534,7 @@ public class Controller : MonoBehaviour {
 							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
 								behaviorGao.name += " (Empty)";
 							}
+							c.Offset = behavior.Offset;
 							c.GaoName = behaviorGao.name;
 							c.Name = behavior.NameSubstring;
 							brain.Reflex.Add(c);
@@ -551,6 +553,7 @@ public class Controller : MonoBehaviour {
 							ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
 							scriptComponent.SetScript(macro.script, p);
 							brain.Macros.Add(new BrainComponent.Macro() {
+								Offset = macro.Offset,
 								GaoName = behaviorGao.name,
 								Name = macro.NameSubstring,
 								Script = scriptComponent
@@ -892,6 +895,9 @@ public class Controller : MonoBehaviour {
 	public void SetCameraPosition(WebJSON.CameraPos cameraPos) {
 		if (CameraSettings.ContainsKey(cameraPos)) {
 			ApplyCameraSettings(CameraSettings[cameraPos], applyCameraPos: false);
+			CameraComponent cc = Camera.main.GetComponent<CameraComponent>();
+			if (cc != null) cc.UpdateDebugCameraPos(cameraPos);
+			communicator.SendChangedCameraMode(cameraPos);
 		}
 	}
 

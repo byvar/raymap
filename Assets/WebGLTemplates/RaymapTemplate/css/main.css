@@ -544,6 +544,9 @@ a:focus {
 	text-transform: lowercase;
 	font-size: 1.2em;
 }
+#text-highlight-content {
+	white-space: pre-wrap;
+}
 #text-highlight-tooltip.rayman-2 > #text-highlight-content {
 	background: repeating-linear-gradient(to bottom, white 0em, white 0.25em, transparent 1.25em, transparent 1.5em);
 	background-color: #6EBEFF !important;

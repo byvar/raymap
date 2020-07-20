@@ -62,6 +62,7 @@ namespace OpenSpace.ROM {
                 if ((behavior.scripts?.Value == null || behavior.scripts?.Value.length == 0) && behavior.firstScript?.Value == null) {
                     behaviorGao.name += " (Empty)";
                 }
+                c.Offset = behavior.Offset;
                 c.GaoName = behaviorGao.name;
                 c.Name = behavior.IndexString;
                 switch (type) {

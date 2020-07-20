@@ -11,6 +11,7 @@ namespace OpenSpace {
             Window
         }
         public delegate void ReadAction(Reader reader, Pointer offset);
+        Encoding wind1252 = Encoding.GetEncoding(1252);
         bool isLittleEndian = true;
         MaskingMode masking = MaskingMode.Off;
         uint mask = 0;
@@ -102,7 +103,10 @@ namespace OpenSpace {
 
         public string ReadNullDelimitedString(Encoding encoding = null) {
             string result = "";
-            if (encoding != null) {
+            if (encoding == null) {
+                encoding = wind1252;
+            }
+            //if (encoding != null) {
                 List<byte> bytes = new List<byte>();
                 byte b = ReadByte();
                 while (b != 0x0) {
@@ -112,13 +116,13 @@ namespace OpenSpace {
                 if (bytes.Count > 0) {
                     return encoding.GetString(bytes.ToArray());
                 }
-            } else {
+            /*} else {
                 char c = Convert.ToChar(ReadByte());
                 while (c != 0x0) {
                     result += c;
                     c = Convert.ToChar(ReadByte());
                 }
-            }
+            }*/
             return result;
         }
 
@@ -129,7 +133,7 @@ namespace OpenSpace {
 				if(firstIndexOf == 0) return "";
 				Array.Resize(ref bytes, firstIndexOf);
 			}
-			return System.Text.Encoding.UTF8.GetString(bytes);
+			return wind1252.GetString(bytes);
 			//return System.Text.Encoding.UTF8.GetString(ReadBytes(size)).TrimEnd('\0');
 		}
 
