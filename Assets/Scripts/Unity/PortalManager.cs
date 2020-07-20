@@ -56,12 +56,16 @@ public class PortalManager : MonoBehaviour {
 			Vector3 oldpos = cam.transform.position;
 			Vector3 newpos = reflection.MultiplyPoint(oldpos);
 			reflectionCamera.worldToCameraMatrix = cam.worldToCameraMatrix * reflection;
-			// Setup oblique projection matrix so that near plane is our reflection
-			// plane. This way we clip everything below/above it for free.
-			Vector4 clipPlane = CameraSpacePlane(reflectionCamera, pos, normal, 1.0f);
-			//Matrix4x4 projection = cam.projectionMatrix;
-			Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
-			reflectionCamera.projectionMatrix = projection;
+
+			if (cam.orthographic) {
+				reflectionCamera.projectionMatrix = cam.projectionMatrix; // projection;
+			} else {
+				// Setup oblique projection matrix so that near plane is our reflection
+				// plane. This way we clip everything below/above it for free.
+				Vector4 clipPlane = CameraSpacePlane(reflectionCamera, pos, normal, 1.0f);
+				Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
+				reflectionCamera.projectionMatrix = projection;
+			}
 
 			//reflectionCamera.cullingMask = ~(1 << 4) & m_ReflectLayers.value; // never render water layer
 			//reflectionCamera.targetTexture = m_ReflectionTexture;
@@ -70,7 +74,12 @@ public class PortalManager : MonoBehaviour {
 			reflectionCamera.transform.position = newpos;
 			Vector3 euler = cam.transform.eulerAngles;
 			reflectionCamera.transform.eulerAngles = new Vector3(0, euler.y, euler.z);
-			reflectionCamera.Render();
+			if (reflectionCamera.rect.width != 0 && reflectionCamera.rect.height != 0) {
+				try {
+					reflectionCamera.Render();
+				} catch {
+				}
+			}
 			GL.invertCulling = false;
 			reflectionCamera.transform.position = oldpos;
 		}
