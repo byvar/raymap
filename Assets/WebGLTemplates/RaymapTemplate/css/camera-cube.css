@@ -1,11 +1,13 @@
 .cube-container {
-  float: left;
-  width: 5em;
-  height: 5em;
-  margin: 1em;
-  perspective: 10em;
-  box-sizing: border-box;
-  font-size: 0.6em;
+	display: block;
+	width: 5em;
+	height: 5em;
+	float: left;
+	perspective: none;
+	box-sizing: border-box;
+	font-size: 0.6em;
+	margin-top: 0.833em;
+	margin-bottom: 0.833em;
 }
 
 .cube {
@@ -19,16 +21,17 @@
 .cube-container.show-initial {
 	perspective: 10em;
 }
+.cube-container.show-initial  > .cube { transform: translateZ(-1em) rotateX(-33deg) rotateY(   33deg); }
 .cube-container.show-front  > .cube { transform: translateZ(-1em) rotateY(   0deg); }
 .cube-container.show-right  > .cube { transform: translateZ(-1em) rotateY( -90deg); }
 .cube-container.show-back   > .cube { transform: translateZ(-1em) rotateY(-180deg); }
 .cube-container.show-left   > .cube { transform: translateZ(-1em) rotateY(  90deg); }
 .cube-container.show-top    > .cube { transform: translateZ(-1em) rotateX( -90deg); }
 .cube-container.show-bottom > .cube { transform: translateZ(-1em) rotateX(  90deg); }
-.cube-container.show-isometric-front > .cube { transform: translateZ(-1em) rotateX(-45deg) rotateY(   45deg); }
-.cube-container.show-isometric-right > .cube { transform: translateZ(-1em) rotateX(-45deg) rotateY(   -45deg); }
-.cube-container.show-isometric-back  > .cube { transform: translateZ(-1em) rotateX(-45deg) rotateY(   -135deg); }
-.cube-container.show-isometric-left  > .cube { transform: translateZ(-1em) rotateX(-45deg) rotateY(    135deg); }
+.cube-container.show-isometric-front > .cube { transform: translateZ(-1em) rotateX(-35.264deg) rotateY(   45deg); }
+.cube-container.show-isometric-right > .cube { transform: translateZ(-1em) rotateX(-35.264deg) rotateY(   -45deg); }
+.cube-container.show-isometric-back  > .cube { transform: translateZ(-1em) rotateX(-35.264deg) rotateY(   -135deg); }
+.cube-container.show-isometric-left  > .cube { transform: translateZ(-1em) rotateX(-35.264deg) rotateY(    135deg); }
 
 .cube__face {
   position: absolute;

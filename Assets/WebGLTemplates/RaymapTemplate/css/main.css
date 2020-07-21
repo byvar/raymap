@@ -545,9 +545,9 @@ a:focus {
 	text-transform: lowercase;
 	font-size: 1.2em;
 }
-#text-highlight-content {
+/*#text-highlight-content {
 	white-space: pre-wrap;
-}
+}*/
 #text-highlight-tooltip.rayman-2 > #text-highlight-content {
 	background: repeating-linear-gradient(to bottom, white 0em, white 0.25em, transparent 1.25em, transparent 1.5em);
 	background-color: #6EBEFF !important;
@@ -1145,10 +1145,10 @@ input[type=range]::-ms-fill-upper {
 	position: absolute;
 	bottom: 3em;
 	right: 0.5em;
-	width: 16em;
+	width: 20em;
 	height: 6em;
 	border-radius: 4em;
-	padding: 1em;
+	padding: 1em 2em 1em 2em;
 	line-height: 1.5em;
 	box-sizing: border-box;
 	overflow: hidden;
@@ -1156,6 +1156,13 @@ input[type=range]::-ms-fill-upper {
 #cine-popup.hidden-popup,
 #camera-popup.hidden-popup {
 	display: none;
+}
+.camera-options {
+	display: block;
+	float: right;
+	width: 14em;
+	text-align: left;
+	font-size: 0.8em;
 }
 #dialogue-image {
 	float: left;

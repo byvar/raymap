@@ -126,7 +126,7 @@
 								<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-fullscreen"></i></div>
 							</div>
 							<div id="camera-popup" class="hidden-popup">
-								<div id="camera-cube" class="cube-container">
+								<div id="camera-cube" class="cube-container show-initial">
 									<div class="cube">
 										<div class="cube__face cube__face--front" data-view="front">front</div>
 										<div class="cube__face cube__face--back" data-view="back">back</div>
@@ -134,6 +134,23 @@
 										<div class="cube__face cube__face--left" data-view="left">left</div>
 										<div class="cube__face cube__face--top" data-view="top">top</div>
 										<div class="cube__face cube__face--bottom" data-view="bottom">bottom</div>
+									</div>
+								</div>
+								<div class="camera-options">
+									<div class="input dropdown">
+										<div class="label main">View</div><div class="fields"><div class="field"><select id="cameraPosSelector">
+										  <option value="Initial">Perspective - Initial</option>
+										  <option value="Front">Orthographic - Front</option>
+										  <option value="Left">Orthographic - Left</option>
+										  <option value="Back">Orthographic - Back</option>
+										  <option value="Right">Orthographic - Right</option>
+										  <option value="Top">Orthographic - Top</option>
+										  <option value="Bottom">Orthographic - Bottom</option>
+										  <option value="IsometricFront">Isometric - Front</option>
+										  <option value="IsometricLeft">Isometric - Left</option>
+										  <option value="IsometricBack">Isometric - Back</option>
+										  <option value="IsometricRight">Isometric - Right</option>
+										</select></div></div>
 									</div>
 								</div>
 							</div>

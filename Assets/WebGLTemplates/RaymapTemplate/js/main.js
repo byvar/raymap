@@ -92,7 +92,7 @@ let mode, lvl, folder;
 let currentBehavior = null;
 let currentBehaviorType = "";
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description, stateSelector, objectListSelector, languageSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
+let btn_close_description, stateSelector, objectListSelector, languageSelector, cameraPosSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
 let previousState = -1;
 
 // FUNCTIONS
@@ -357,8 +357,63 @@ function handleMessage_settings(msg) {
 function handleMessage_cineData(msg) {
 	$("#btn-cine").removeClass("disabled-button");
 }
+function updateCameraPos() {
+	let selectedCameraPos = cameraPosSelector.val();
+	let classString = "";
+	switch(selectedCameraPos) {
+		case "Front":
+			classString = "front";
+			break;
+		case "Back":
+			classString = "back";
+			break;
+		case "Left":
+			classString = "left";
+			break;
+		case "Right":
+			classString = "right";
+			break;
+		case "Top":
+			classString = "top";
+			break;
+		case "Bottom":
+			classString = "bottom";
+			break;
+		case "Initial":
+			classString = "initial";
+			break;
+		case "IsometricFront":
+			classString = "isometric-front";
+			break;
+		case "IsometricBack":
+			classString = "isometric-back";
+			break;
+		case "IsometricLeft":
+			classString = "isometric-left";
+			break;
+		case "IsometricRight":
+			classString = "isometric-right";
+			break;
+	}
+	if(classString !== "") {
+		$("#camera-cube").removeClass (function (index, className) {
+			return (className.match (/(^|\s)show-\S+/g) || []).join(' ');
+		});
+		$("#camera-cube").addClass("show-" + classString);
+		let jsonObj = {
+			Type: "Camera",
+			Camera: {
+				CameraPos: selectedCameraPos
+			}
+		};
+		sendMessage(jsonObj);
+	}
+}
 function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
+	if(msg.hasOwnProperty("CameraPos")) {
+		let cameraPos = msg.CameraPos;
+	}
 }
 function toggleCinePopup() {
 	if($("#btn-cine").hasClass("selected")) {
@@ -1241,6 +1296,8 @@ function handleMessage(jsonString) {
 				handleMessage_comport(msg.Macro); break;
 			case "Comport":
 				handleMessage_comport(msg.Comport); break;
+			case "Camera":
+				handleMessage_camera(msg.Camera); break;
 			default:
 				console.log('default');break;
 		}
@@ -1385,6 +1442,7 @@ $(function() {
 	stateSelector = $('#state');
 	objectListSelector = $('#objectList');
 	languageSelector = $('#languageSelector');
+	cameraPosSelector = $('#cameraPosSelector');
 	objectListInputGroup = $('#objectListInputGroup')
 	highlight_tooltip = $("#highlight-tooltip");
 	text_highlight_tooltip = $('#text-highlight-tooltip');
@@ -1527,6 +1585,11 @@ $(function() {
 	});
 	$(document).on('change', "#languageSelector", function() {
 		updateLanguageDisplayed();
+		$(this).blur();
+		return false;
+	});
+	$(document).on('change', "#cameraPosSelector", function() {
+		updateCameraPos();
 		$(this).blur();
 		return false;
 	});
