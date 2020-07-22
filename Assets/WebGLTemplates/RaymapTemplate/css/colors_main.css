@@ -70,7 +70,8 @@ body {
 .levels-item.game,
 .behaviors-item.category,
 .transitions-item.category,
-.localization-item.category {
+.localization-item.category,
+.script-item.category {
 	color: #9ed9a0;
 	background-color: rgba(3,61,82,1);
 }
@@ -276,6 +277,10 @@ input[type=range]:focus::-ms-fill-upper {
 #script-popup,
 #localization-popup {
     background-color: rgba(6,86,109,1);
+}
+#camera-popup,
+#cine-popup {
+	background-color: rgba(3, 61, 82, 1);
 }
 .style-item.current-style-item {
 	background-color: rgba(3,61,82,0.7);

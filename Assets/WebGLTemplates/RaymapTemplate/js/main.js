@@ -86,13 +86,13 @@ let objectsList = [];
 let currentSO = null;
 let gameInstance = null;
 let inputHasFocus = false;
+let gameSettings = null;
 let mode, lvl, folder;
 
 let currentBehavior = null;
 let currentBehaviorType = "";
-let currentScriptIndex = 0;
 let wrapper, objects_content, unity_content, description_content, description_column;
-let btn_close_description, stateSelector, objectListSelector, languageSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
+let btn_close_description, stateSelector, objectListSelector, languageSelector, cameraPosSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
 let previousState = -1;
 
 // FUNCTIONS
@@ -357,39 +357,155 @@ function handleMessage_settings(msg) {
 function handleMessage_cineData(msg) {
 	$("#btn-cine").removeClass("disabled-button");
 }
+function updateCameraPos() {
+	let selectedCameraPos = cameraPosSelector.val();
+	let classString = "";
+	switch(selectedCameraPos) {
+		case "Front":
+			classString = "front";
+			break;
+		case "Back":
+			classString = "back";
+			break;
+		case "Left":
+			classString = "left";
+			break;
+		case "Right":
+			classString = "right";
+			break;
+		case "Top":
+			classString = "top";
+			break;
+		case "Bottom":
+			classString = "bottom";
+			break;
+		case "Initial":
+			classString = "initial";
+			break;
+		case "IsometricFront":
+			classString = "isometric-front";
+			break;
+		case "IsometricBack":
+			classString = "isometric-back";
+			break;
+		case "IsometricLeft":
+			classString = "isometric-left";
+			break;
+		case "IsometricRight":
+			classString = "isometric-right";
+			break;
+	}
+	if(classString !== "") {
+		$("#camera-cube").removeClass (function (index, className) {
+			return (className.match (/(^|\s)show-\S+/g) || []).join(' ');
+		});
+		$("#camera-cube").addClass("show-" + classString);
+		let jsonObj = {
+			Type: "Camera",
+			Camera: {
+				CameraPos: selectedCameraPos
+			}
+		};
+		sendMessage(jsonObj);
+	}
+}
 function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
+	if(msg.hasOwnProperty("CameraPos")) {
+		let cameraPos = msg.CameraPos;
+	}
+}
+function toggleCinePopup() {
+	if($("#btn-cine").hasClass("selected")) {
+		$("#cine-popup").addClass("hidden-popup");
+		$("#btn-cine").removeClass("selected");
+	} else {
+		$("#cine-popup").removeClass("hidden-popup");
+		$("#btn-cine").addClass("selected");
+	}
+}
+function toggleCameraPopup() {
+	if($("#btn-camera").hasClass("selected")) {
+		$("#camera-popup").addClass("hidden-popup");
+		$("#btn-camera").removeClass("selected");
+	} else {
+		$("#camera-popup").removeClass("hidden-popup");
+		$("#btn-camera").addClass("selected");
+	}
 }
 
-var formattedTexts = {};
+let formattedTexts = {};
 
-function formatOpenSpaceText(text) {
+function formatOpenSpaceTextR2(text) {
+	let orgText = text;
 
-	if (formattedTexts[text]!==undefined) {
-		// Regexes are expen$ive - RTS
-		return formattedTexts[text];
-	}
+	let regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
 
-	var orgText = text;
-
-	var regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
-
-	text = text.replace(regexColors, (match, p1, p2, offset, string, groups) => {
+	text = text.replace(regexColors, function (match, p1, p2, offset, string, groups) {
 		return `<span class="dialog-color color-${p1.toLowerCase()}">${p2}</span>`;
 	});
 	text = text.replace(/\/L:/gi, "<br/>"); // New Lines
 
-	var regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
-	var regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
+	let regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
+	let regexCenter = RegExp("/C:(.*)$", 'gi');
+	let regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
 
 	text = text.replace(regexEvent, ""); // Replace event characters
+	text = text.replace(regexCenter, function (match, p1, offset, string, groups) { // Center text if necessary
+		return `<div class="center">${p1}</div>`;
+	});
 	text = text.replace(regexMisc, ""); // Replace non-visible control characters
 
 	text = text.replace(":", ""); // remove :
 
-	var equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
-	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only)
+	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
+	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only
 
+	return text;
+}
+function formatOpenSpaceTextR3(text) {
+	let regexColors = RegExp("\\\\[cC]([0-9]{1,3}):([0-9]{1,3}):([0-9]{1,3}):(.*?(?=\\\\[cC]|$))", 'g');
+
+	text = text.replace(regexColors, function (match, p1, p2, p3, p4, offset, string, groups) {
+		return `<span style="color: rgba(${p1}, ${p2}, ${p3}, 1);">${p4}</span>`;
+	});
+	text = text.replace(/\\L/gi, "<br/>"); // New Lines
+
+	//let regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
+	let regexCenter = RegExp("\\\\jc(.*)$", 'gi');
+	//let regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
+
+	//text = text.replace(regexEvent, ""); // Replace event characters
+	text = text.replace(regexCenter, function (match, p1, offset, string, groups) { // Center text if necessary
+		return `<div class="center">${p1}</div>`;
+	});
+	//text = text.replace(regexMisc, ""); // Replace non-visible control characters
+
+	//text = text.replace(":", ""); // remove :
+
+	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
+	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only
+
+	return text;
+}
+function formatOpenSpaceText(text) {
+	let orgText = text;
+	if (formattedTexts[text]!==undefined) {
+		// Regexes are expen$ive - RTS
+		return formattedTexts[text];
+	}
+	if(gameSettings != null){
+		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush") {
+			text = formatOpenSpaceTextR2(text);
+		} else if(gameSettings.Game === "R3" || gameSettings.Game === "RA" || gameSettings.Game === "RM") {
+			
+			text = formatOpenSpaceTextR3(text);
+		} else {
+			text = formatOpenSpaceTextR2(text);
+		}
+	} else {
+		text = formatOpenSpaceTextR2(text);
+	}
 	formattedTexts[orgText] = text;
 
 	return text;
@@ -419,7 +535,13 @@ function updateLanguageDisplayed() {
 }
 function handleMessage_localization(msg) {
 	$("#btn-localization").removeClass("disabled-button");
-	text_highlight_tooltip.addClass("rayman-2");
+	if(gameSettings != null){
+		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush") {
+			text_highlight_tooltip.addClass("rayman-2");
+		} else if(gameSettings.Game === "R3" || gameSettings.Game === "RA" || gameSettings.Game === "RM") {
+			text_highlight_tooltip.addClass("rayman-3");
+		}
+	}
 	let fullHTML = [];
 	let api = $("#content-localization").data('jsp');	
 	if(msg.hasOwnProperty("Languages")) {
@@ -451,6 +573,9 @@ function setAllJSON(jsonString) {
 	console.log(JSON.stringify(jsonString)); 
 	let msg = $.parseJSON(jsonString);
 	fullData = msg;
+	if(msg.hasOwnProperty("GameSettings")) {
+		gameSettings = msg.GameSettings;
+	}
 	if(msg.hasOwnProperty("Hierarchy")) {
 		hierarchy = msg.Hierarchy;
 		if(hierarchy != null) {
@@ -506,114 +631,99 @@ function setAllJSON(jsonString) {
 function setBehavior(behaviorIndex) {
 	if(currentSO != null && currentSO.hasOwnProperty("Perso") && currentSO.Perso.hasOwnProperty("Brain") && behaviorIndex >= 0) {
 		let brain = currentSO.Perso.Brain;
+		let modelname = currentSO.Perso.hasOwnProperty("NameModel") ? currentSO.Perso.NameModel : currentSO.Perso.NameInstance;
 		currentBehavior = null;
 		let curIndex = behaviorIndex;
-		if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
+		if(currentBehavior == null && brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
 			if(curIndex < brain.Intelligence.length) {
 				currentBehavior = brain.Intelligence[curIndex];
+				$("#header-script-text").text(modelname + ".Intelligence[" + curIndex + "]: " + currentBehavior.Name);
 				currentBehaviorType = "Intelligence";
 			} else {
 				curIndex -= brain.Intelligence.length;
 			}
 		}
-		if(brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
+		if(currentBehavior == null && brain.hasOwnProperty("Reflex") && brain.Reflex.length > 0) {
 			if(curIndex < brain.Reflex.length) {
 				currentBehavior = brain.Reflex[curIndex];
+				$("#header-script-text").text(modelname + ".Reflex[" + curIndex + "]: " + currentBehavior.Name);
 				currentBehaviorType = "Reflex";
 			} else {
 				curIndex -= brain.Reflex.length;
 			}
 		}
-		if(brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
+		if(currentBehavior == null && brain.hasOwnProperty("Macros") && brain.Macros.length > 0) {
 			if(curIndex < brain.Macros.length) {
 				currentBehavior = brain.Macros[curIndex];
+				$("#header-script-text").text(modelname + ".Macros[" + curIndex + "]: " + currentBehavior.Name);
 				currentBehaviorType = "Macro";
 			} else {
 				curIndex -= brain.Macros.length;
 			}
 		}
 		if(currentBehavior != null) {
-			currentScriptIndex = 0;
-			if(currentBehaviorType == "Macro") {
-				$("#header-script-text").text(currentBehavior.Name + ".Script");
-			} else {
-				$("#header-script-text").text(currentBehavior.Name + ".Scripts[0]");
-			}
-			$("#content-script-code").text("");
+			requestComport();
 		}
 	}
 }
 
-function setScript(scriptIndex) {
+function requestComport() {
+	let api = $("#content-script").data('jsp');
+	api.getContentPane().html("");
+	api.scrollTo(0,0, false);
+	refreshScroll();
+	$('#btn-next-script').addClass('disabled-button');
+	$('#btn-prev-script').addClass('disabled-button');
+	
+	if(currentBehaviorType == "Macro") {
+		let jsonObj = {
+			Request: {
+				Type: "Macro",
+				Offset: currentBehavior.Offset,
+				BehaviorType: currentBehaviorType
+			}
+		};
+		sendMessage(jsonObj);
+	} else {
+		let jsonObj = {
+			Request: {
+				Type: "Comport",
+				Offset: currentBehavior.Offset,
+				BehaviorType: currentBehaviorType
+			}
+		};
+		sendMessage(jsonObj);
+	}
+}
+
+function getScriptHTML(title, script) {
+	let scriptHTML = "";
+	scriptHTML += "<div class='script-item category'><div class='script-item-name'>" + escapeHTML(title) + " - " + escapeHTML(script.Offset) + "</div></div>";
+	scriptHTML += "<div class='script-item script'><pre><code class='script-item-code cs'>" + escapeHTML(script.Translation) + "</code></pre></div>";
+	return scriptHTML;
+}
+function handleMessage_comport(msg) {
 	if(currentBehavior != null) {
-		let scripts = [];
+		currentBehavior = msg;
+		let comportHTML = "";
 		if(currentBehavior.hasOwnProperty("Script")) {
-			scripts.push(currentBehavior.Script);
+			comportHTML += getScriptHTML("Script", currentBehavior.Script);
 		}
 		if(currentBehavior.hasOwnProperty("FirstScript")) {
-			scripts.push(currentBehavior.FirstScript);
+			comportHTML += getScriptHTML("First Script", currentBehavior.FirstScript);
 		}
 		if(currentBehavior.hasOwnProperty("Scripts")) {
-			scripts = scripts.concat(currentBehavior.Scripts);
+			$.each(currentBehavior.Scripts, function (idx, script) {
+				comportHTML += getScriptHTML("Scripts[" + idx + "]", script);
+			});
 		}
-		$("#content-script-code").text("");
 		let api = $("#content-script").data('jsp');
+		api.getContentPane().html(comportHTML);
+		$(".script-item-code").each(function() {
+			hljs.highlightBlock($(this).get(0));
+		})
 		api.scrollTo(0,0, false);
 		refreshScroll();
-		if(scriptIndex < 0 || scriptIndex >= scripts.length) {
-			$('#btn-next-script').addClass('disabled-button');
-			$('#btn-prev-script').addClass('disabled-button');
-			currentScriptIndex = 0;
-		} else {
-			$('#btn-next-script').addClass('disabled-button');
-			$('#btn-prev-script').addClass('disabled-button');
-			currentScriptIndex = scriptIndex;
-			$("#header-script-text").text(currentBehavior.Name + ".Scripts[" + scriptIndex + "]");
-			
-			let jsonObj = {
-				Request: {
-					Type: "Script",
-					ScriptOffset: scripts[scriptIndex].Offset,
-					BehaviorType: currentBehaviorType
-				}
-			};
-			sendMessage(jsonObj);
-		}
-	}
-}
-
-function handleMessage_script(msg) {
-	if(currentBehavior != null) {
-		let scripts = [];
-		if(msg.hasOwnProperty("Translation")) {
-			$("#content-script-code").text(msg.Translation);
-			hljs.highlightBlock($("#content-script-code").get(0));
-			let api = $("#content-script").data('jsp');
-			api.scrollTo(0,0, false);
-			/*waitForFinalEvent(function(){
-				hljs.highlightBlock($("#content-script-code").get(0));
-			}, 3, "highlight");*/
-			refreshScroll();
-		}
-		if(currentBehavior.hasOwnProperty("Script")) {
-			scripts.push(currentBehavior.Script);
-		}
-		if(currentBehavior.hasOwnProperty("FirstScript")) {
-			scripts.push(currentBehavior.FirstScript);
-		}
-		if(currentBehavior.hasOwnProperty("Scripts")) {
-			scripts = scripts.concat(currentBehavior.Scripts);
-		}
-		if(currentScriptIndex < scripts.length-1) {
-			$('#btn-next-script').removeClass('disabled-button');
-		} else {
-			$('#btn-next-script').addClass('disabled-button');
-		}
-		if(currentScriptIndex > 0) {
-			$('#btn-prev-script').removeClass('disabled-button');
-		} else {
-			$('#btn-prev-script').addClass('disabled-button');
-		}
 	}
 }
 
@@ -888,14 +998,18 @@ function getDsgVarTypeString(valueType, val, idx) {
 			dsgString += "'>" + val.AsCaps;
 			break;
 		case "Text":
-			dsgString += "'>" + val.AsText;
+			dsgString += " text' data-localization-item='" + val.AsText + "'>" + val.AsText;
+			let text = $("#content-localization").find(`.localization-item[data-loc-item='${val.AsText}']`).find(".localization-item-text").text();
+			if(text !== undefined && text != null) {
+				dsgString += " - " + escapeHTML(text);
+			}
 			break;
 		case "Vector":
 			dsgString += " vector'>(" + val.AsVector.x + ", " + val.AsVector.y + ", " + val.AsVector.z + ")";
 			break;
 		case "Perso":
 			if(val.hasOwnProperty("AsPerso")) {
-				dsgString += "perso' data-offset='" + val.AsPerso.Offset + "'>" + val.AsPerso.NameInstance;
+				dsgString += " perso' data-offset='" + val.AsPerso.Offset + "'>" + val.AsPerso.NameInstance;
 			} else {
 				dsgString +="'>"
 			}
@@ -1178,8 +1292,12 @@ function handleMessage(jsonString) {
 				handleMessage_selection(msg.Selection); break;
 			case "Settings":
 				handleMessage_settings(msg.Settings); break;
-			case "Script":
-				handleMessage_script(msg.Script); break;
+			case "Macro":
+				handleMessage_comport(msg.Macro); break;
+			case "Comport":
+				handleMessage_comport(msg.Comport); break;
+			case "Camera":
+				handleMessage_camera(msg.Camera); break;
 			default:
 				console.log('default');break;
 		}
@@ -1324,6 +1442,7 @@ $(function() {
 	stateSelector = $('#state');
 	objectListSelector = $('#objectList');
 	languageSelector = $('#languageSelector');
+	cameraPosSelector = $('#cameraPosSelector');
 	objectListInputGroup = $('#objectListInputGroup')
 	highlight_tooltip = $("#highlight-tooltip");
 	text_highlight_tooltip = $('#text-highlight-tooltip');
@@ -1335,14 +1454,38 @@ $(function() {
 	
 	$(document).mousemove(function( event ) {
 		highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
-		text_highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'top': (event.pageY + 25) + 'px'});
+		text_highlight_tooltip.css({'left': (event.pageX + 3) + 'px', 'right': ($(window).width() - event.pageX - 3) + 'px', 'top': (event.pageY + 25) + 'px'});
 	});
 	$(document).on('mouseenter', ".localization-item-highlight", function() {
 		let text = $(this).find(".localization-item-text").text();
-		text_highlight_content.html(formatOpenSpaceText(text));
-		text_highlight_tooltip.removeClass("hidden-tooltip");
+		let formatted = formatOpenSpaceText(text);
+		if(/\S/.test(formatted)) {
+			// found something other than a space or line break
+			text_highlight_content.html(formatOpenSpaceText(text));
+			text_highlight_tooltip.removeClass("hidden-tooltip");
+			text_highlight_tooltip.removeClass("right");
+		}
 	});
 	$(document).on('mouseleave', ".localization-item-highlight", function() {
+		text_highlight_content.html("");
+		text_highlight_tooltip.addClass("hidden-tooltip");
+	});
+	$(document).on('mouseenter', ".dsgvar-value-Text", function() {
+		let locItem = $(this).data("localizationItem");
+		if(locItem !== undefined && locItem != null) {
+			let text = $("#content-localization").find(`.localization-item[data-loc-item='${locItem}']`).find(".localization-item-text").text();
+			if(text !== undefined && text != null) {
+				let formatted = formatOpenSpaceText(text);
+				if(/\S/.test(formatted)) {
+					// found something other than a space or line break
+					text_highlight_content.html(formatOpenSpaceText(text));
+					text_highlight_tooltip.removeClass("hidden-tooltip");
+					text_highlight_tooltip.addClass("right");
+				}
+			}
+		}
+	});
+	$(document).on('mouseleave', ".dsgvar-value-Text", function() {
 		text_highlight_content.html("");
 		text_highlight_tooltip.addClass("hidden-tooltip");
 	});
@@ -1445,6 +1588,11 @@ $(function() {
 		$(this).blur();
 		return false;
 	});
+	$(document).on('change', "#cameraPosSelector", function() {
+		updateCameraPos();
+		$(this).blur();
+		return false;
+	});
 	$(document).on('focusin', ".input-typing", function() {
 		if(!inputHasFocus && gameInstance != null) {
 			for (var i in gameInstance.Module.getJSEvents().eventHandlers) {
@@ -1501,21 +1649,25 @@ $(function() {
 	$(document).on('click', ".behaviors-item.behavior", function() {
 		let index = $(".behaviors-item.behavior").index(this);
 		setBehavior(index);
-		setScript(0);
 		showScript();
 		return false;
 	});
-	
-	$(document).on('click', "#btn-next-script", function() {
-		setScript(currentScriptIndex+1);
-		return false;
+
+	$(document).on('click', "#btn-cine", function() {
+		toggleCinePopup();
+		if($("#btn-camera").hasClass("selected")) {
+			toggleCameraPopup();
+		}
+		return false;		
 	});
-	
-	$(document).on('click', "#btn-prev-script", function() {
-		setScript(currentScriptIndex-1);
-		return false;
+	$(document).on('click', "#btn-camera", function() {
+		toggleCameraPopup();
+		if($("#btn-cine").hasClass("selected")) {
+			toggleCinePopup();
+		}
+		return false;		
 	});
-	
+
 	$(document).on('click', ".sidebar-button", function() {
 		let butt = jQuery(this);
 		let buttIndex = $(".sidebar-button").index(butt);

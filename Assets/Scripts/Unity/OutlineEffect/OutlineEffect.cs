@@ -369,6 +369,7 @@ namespace cakeslice
         void UpdateOutlineCameraFromSource()
         {
             outlineCamera.CopyFrom(sourceCamera);
+            outlineCamera.tag = "Untagged";
             outlineCamera.renderingPath = RenderingPath.Forward;
             outlineCamera.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
             outlineCamera.clearFlags = CameraClearFlags.SolidColor;

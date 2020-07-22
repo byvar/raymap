@@ -24,6 +24,16 @@ public class WebJSON {
 		public CineData CineData { get; set; }
 		public string TransitionExport { get; set; }
 		public CameraSettings Camera { get; set; }
+		public GameSettings GameSettings { get; set; }
+		public Macro Macro { get; set; }
+		public Comport Comport { get; set; }
+	}
+	public class GameSettings {
+		public OpenSpace.Settings.EngineVersion EngineVersion { get; set; }
+		public OpenSpace.Settings.Game Game { get; set; }
+		public OpenSpace.Settings.Platform Platform { get; set; }
+		public OpenSpace.Settings.Mode Mode { get; set; }
+		public EngineMode EngineMode { get; set; }
 	}
 	public class CineData {
 		public string[] CinematicNames { get; set; }
@@ -87,6 +97,7 @@ public class WebJSON {
 		public bool? PlayAnimation { get; set; }
 		public float? AnimationSpeed { get; set; }
 		public bool? AutoNextState { get; set; }
+		public bool? StateTransitionExportAvailable { get; set; }
 
 		// Extra lists
 		public State[] States { get; set; }
@@ -110,11 +121,13 @@ public class WebJSON {
 		public DsgVar[] DsgVars { get; set; }
 	}
 	public class Comport {
+		public OpenSpace.Pointer Offset { get; set; }
 		public string Name { get; set; }
 		public Script FirstScript { get; set; }
 		public Script[] Scripts { get; set; }
 	}
 	public class Macro {
+		public OpenSpace.Pointer Offset { get; set; }
 		public string Name { get; set; }
 		public Script Script { get; set; }
 	}
@@ -191,7 +204,7 @@ public class WebJSON {
 		public RequestType Type { get; set; }
 
 		// Optional
-		public OpenSpace.Pointer ScriptOffset { get; set; }
+		public OpenSpace.Pointer Offset { get; set; }
 		public BehaviorType? BehaviorType { get; set; }
 		public Screenshot Screenshot { get; set; }
 	}
@@ -221,9 +234,12 @@ public class WebJSON {
 		Highlight,
 		Selection,
 		Request,
+		Comport,
+		Macro,
 		Script,
 		CineData,
-		TransitionExport
+		TransitionExport,
+		Camera
 	}
 	public enum PersoType {
 		Instance,
@@ -232,6 +248,8 @@ public class WebJSON {
 	public enum RequestType {
 		None,
 		Script,
+		Comport,
+		Macro,
 		TransitionExport,
 		Screenshot
 	}
@@ -254,6 +272,11 @@ public class WebJSON {
 		IsometricBack = 8,
 		IsometricRight = 9,
 		Initial
+	}
+	public enum EngineMode {
+		Main,
+		PS1,
+		ROM,
 	}
 	#endregion
 }

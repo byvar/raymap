@@ -60,7 +60,7 @@ public class WebCommunicator : MonoBehaviour {
             SendHierarchy();
             sentHierarchy = true;
         }
-        if (controller.LoadState == Controller.State.Finished) {
+        if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
             if (highlightedPerso_ != selector.highlightedPerso ||
 				highlightedCollision_ != selector.highlightedCollision ||
 				highlightedWayPoint_ != selector.highlightedWayPoint) {
@@ -84,16 +84,22 @@ public class WebCommunicator : MonoBehaviour {
     }
 
     public void SendHierarchy() {
-        if (Application.platform == RuntimePlatform.WebGLPlayer) {
-            if (controller.LoadState == Controller.State.Finished) {
-                allJSON = SerializeMessage(GetHierarchyMessageJSON());
-                SetAllJSON(allJSON);
-            }
+        if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
+            allJSON = SerializeMessage(GetHierarchyMessageJSON());
+            SetAllJSON(allJSON);
         }
     }
 	public void SendSettings() {
 		if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
 			Send(GetSettingsMessageJSON());
+		}
+	}
+	public void SendChangedCameraMode(WebJSON.CameraPos cameraPos) {
+		if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
+			Send(new WebJSON.Message() {
+				Type = WebJSON.MessageType.Camera,
+				Camera = new WebJSON.CameraSettings() { CameraPos = cameraPos }
+			});
 		}
 	}
     public void Send(WebJSON.Message obj) {
@@ -131,7 +137,8 @@ public class WebCommunicator : MonoBehaviour {
 			Hierarchy = new WebJSON.Hierarchy() {
 				Always = GetAlwaysJSON()
 			},
-			Camera = GetCameraJSON()
+			Camera = GetCameraJSON(),
+			GameSettings = GetGameSettingsJSON()
 		};
 		switch (l) {
 			case OpenSpace.Loader.R2ROMLoader rl:
@@ -152,6 +159,21 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		return message;
     }
+	public WebJSON.GameSettings GetGameSettingsJSON() {
+		MapLoader l = controller.loader;
+		WebJSON.EngineMode mode = WebJSON.EngineMode.Main;
+		if (l is OpenSpace.Loader.R2PS1Loader) {
+			mode = WebJSON.EngineMode.PS1;
+		} else if (l is OpenSpace.Loader.R2ROMLoader) {
+			mode = WebJSON.EngineMode.ROM;
+		}
+		return new WebJSON.GameSettings() {
+			EngineMode = mode,
+			EngineVersion = OpenSpace.Settings.s.engineVersion,
+			Game = OpenSpace.Settings.s.game,
+			Mode = OpenSpace.Settings.s.mode
+		};
+	}
 	public WebJSON.CineData GetCineDataJSON() {
 		if (controller.CinematicSwitcher != null && controller.CinematicSwitcher.CinematicNames.Length > 1) {
 			return new WebJSON.CineData() {
@@ -297,30 +319,38 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		if (includeBrain) {
 			persoJSON.Brain = GetBrainJSON(selector.selectedPerso);
+			persoJSON.StateTransitionExportAvailable =
+				selector.selectedPerso is PersoBehaviour
+				&& pb.stateNames?.Length > 1
+				&& (persoJSON.Brain?.Intelligence?.Length > 0 || persoJSON.Brain?.Reflex?.Length > 0 || persoJSON.Brain?.Macros?.Length > 0);
 		}
 		return persoJSON;
 	}
 	private WebJSON.Brain GetBrainJSON(BasePersoBehaviour perso, bool includeScriptContents = false) {
 		WebJSON.Brain brainJSON = new WebJSON.Brain();
 		if (perso.brain != null) {
-			brainJSON.Intelligence = perso.brain.Intelligence.Select(i => new WebJSON.Comport() {
-				Name = i.Name,
-				Scripts = i.Scripts.Select(s => GetScriptJSON(s, includeScriptContents: includeScriptContents)).ToArray(),
-				FirstScript = GetScriptJSON(i.FirstScript, includeScriptContents: includeScriptContents)
-			}).ToArray();
-			brainJSON.Reflex = perso.brain.Reflex.Select(i => new WebJSON.Comport() {
-				Name = i.Name,
-				Scripts = i.Scripts.Select(s => GetScriptJSON(s, includeScriptContents: includeScriptContents)).ToArray(),
-				FirstScript = GetScriptJSON(i.FirstScript, includeScriptContents: includeScriptContents)
-			}).ToArray();
-			brainJSON.Macros = perso.brain.Macros.Select(i => new WebJSON.Macro() {
-				Name = i.Name,
-				Script = GetScriptJSON(i.Script, includeScriptContents: includeScriptContents)
-			}).ToArray();
+			brainJSON.Intelligence = perso.brain.Intelligence.Select(i => GetComportJSON(i, includeScriptContents: includeScriptContents)).ToArray();
+			brainJSON.Reflex = perso.brain.Reflex.Select(i => GetComportJSON(i, includeScriptContents: includeScriptContents)).ToArray();
+			brainJSON.Macros = perso.brain.Macros.Select(i => GetMacroJSON(i, includeScriptContents: includeScriptContents)).ToArray();
 			brainJSON.DsgVars = GetDsgVarsJSON(perso);
 		}
 		
 		return brainJSON;
+	}
+	private WebJSON.Comport GetComportJSON(BrainComponent.Comport c, bool includeScriptContents = false) {
+		return new WebJSON.Comport() {
+			Offset = c.Offset,
+			Name = c.Name,
+			Scripts = c.Scripts.Select(s => GetScriptJSON(s, includeScriptContents: includeScriptContents)).ToArray(),
+			FirstScript = GetScriptJSON(c.FirstScript, includeScriptContents: includeScriptContents)
+		};
+	}
+	private WebJSON.Macro GetMacroJSON(BrainComponent.Macro m, bool includeScriptContents = false) {
+		return new WebJSON.Macro() {
+			Offset = m.Offset,
+			Name = m.Name,
+			Script = GetScriptJSON(m.Script, includeScriptContents: includeScriptContents)
+		};
 	}
 	private WebJSON.DsgVar[] GetDsgVarsJSON(BasePersoBehaviour perso) {
 		DsgVarComponent dsgComponent = perso?.brain?.dsgVars;
@@ -479,6 +509,9 @@ public class WebCommunicator : MonoBehaviour {
 		if (msg.Settings != null) {
             ParseSettingsJSON(msg.Settings);
         }
+		if (msg.Camera != null) {
+			ParseCameraJSON(msg.Camera);
+		}
         if (msg.Selection != null) {
             ParseSelectionJSON(msg.Selection);
         }
@@ -575,6 +608,21 @@ public class WebCommunicator : MonoBehaviour {
 					Script = GetScriptJSON(s, true)
 				});
 				break;
+			case WebJSON.RequestType.Comport:
+				BrainComponent.Comport c = GetComportFromRequest(msg);
+				if (c != null) Send(new WebJSON.Message() {
+					Type = WebJSON.MessageType.Comport,
+					Comport = GetComportJSON(c, includeScriptContents: true)
+				});
+				break;
+			case WebJSON.RequestType.Macro:
+				BrainComponent.Macro m = GetMacroFromRequest(msg);
+				if (m != null) Send(new WebJSON.Message() {
+					Type = WebJSON.MessageType.Macro,
+					Macro = GetMacroJSON(m, includeScriptContents: true)
+				});
+				break;
+				break;
 			case WebJSON.RequestType.TransitionExport:
 				if (selectedPerso_ != null && selectedPerso_ is PersoBehaviour) {
 					MindComponent mc = selectedPerso_.GetComponent<MindComponent>();
@@ -618,7 +666,7 @@ public class WebCommunicator : MonoBehaviour {
 	private BaseScriptComponent GetScriptFromRequest(WebJSON.Request msg) {
 		if (selector.selectedPerso == null || selector.selectedPerso.brain == null) return null;
 		BrainComponent brain = selector.selectedPerso.brain;
-		Pointer offset = msg.ScriptOffset;
+		Pointer offset = msg.Offset;
 		switch (msg.BehaviorType) {
 			case WebJSON.BehaviorType.Intelligence:
 				if (brain.Intelligence == null) return null;
@@ -642,6 +690,40 @@ public class WebCommunicator : MonoBehaviour {
 				if (brain.Macros == null) return null;
 				foreach (var m in brain.Macros) {
 					if (m.Script != null && m.Script.Offset == offset) return m.Script;
+				}
+				break;
+		}
+		return null;
+	}
+	private BrainComponent.Comport GetComportFromRequest(WebJSON.Request msg) {
+		if (selector.selectedPerso == null || selector.selectedPerso.brain == null) return null;
+		BrainComponent brain = selector.selectedPerso.brain;
+		Pointer offset = msg.Offset;
+		switch (msg.BehaviorType) {
+			case WebJSON.BehaviorType.Intelligence:
+				if (brain.Intelligence == null) return null;
+				foreach (var be in brain.Intelligence) {
+					if (be.Offset == offset) return be;
+				}
+				break;
+			case WebJSON.BehaviorType.Reflex:
+				if (brain.Reflex == null) return null;
+				foreach (var be in brain.Reflex) {
+					if (be.Offset == offset) return be;
+				}
+				break;
+		}
+		return null;
+	}
+	private BrainComponent.Macro GetMacroFromRequest(WebJSON.Request msg) {
+		if (selector.selectedPerso == null || selector.selectedPerso.brain == null) return null;
+		BrainComponent brain = selector.selectedPerso.brain;
+		Pointer offset = msg.Offset;
+		switch (msg.BehaviorType) {
+			case WebJSON.BehaviorType.Macro:
+				if (brain.Macros == null) return null;
+				foreach (var m in brain.Macros) {
+					if (m.Offset == offset) return m;
 				}
 				break;
 		}

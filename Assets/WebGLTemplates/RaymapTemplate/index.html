@@ -31,6 +31,7 @@
         <link rel="stylesheet" type="text/css" href="css/icomoon.css" />
 		<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css" media="all" />
 		<link rel="stylesheet" type="text/css" href="css/highlight.css">
+		<link rel="stylesheet" type="text/css" href="css/camera-cube.css" />
 		<link rel="stylesheet" type="text/css" href="css/main.css?1" />
 		
 		<!-- colors -->
@@ -124,6 +125,53 @@
 								<div id="btn-camera" class="header-button disabled-button" title="Camera settings"><i class="icon-video1"></i></div>
 								<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-fullscreen"></i></div>
 							</div>
+							<div id="camera-popup" class="hidden-popup">
+								<div id="camera-cube" class="cube-container show-initial">
+									<div class="cube">
+										<div class="cube__face cube__face--front" data-view="front">front</div>
+										<div class="cube__face cube__face--back" data-view="back">back</div>
+										<div class="cube__face cube__face--right" data-view="right">right</div>
+										<div class="cube__face cube__face--left" data-view="left">left</div>
+										<div class="cube__face cube__face--top" data-view="top">top</div>
+										<div class="cube__face cube__face--bottom" data-view="bottom">bottom</div>
+									</div>
+								</div>
+								<div class="camera-options">
+									<div class="input dropdown">
+										<div class="label main">View</div><div class="fields"><div class="field"><select id="cameraPosSelector">
+										  <option value="Initial">Perspective - Initial</option>
+										  <option value="Front">Orthographic - Front</option>
+										  <option value="Left">Orthographic - Left</option>
+										  <option value="Back">Orthographic - Back</option>
+										  <option value="Right">Orthographic - Right</option>
+										  <option value="Top">Orthographic - Top</option>
+										  <option value="Bottom">Orthographic - Bottom</option>
+										  <option value="IsometricFront">Isometric - Front</option>
+										  <option value="IsometricLeft">Isometric - Left</option>
+										  <option value="IsometricBack">Isometric - Back</option>
+										  <option value="IsometricRight">Isometric - Right</option>
+										</select></div></div>
+									</div>
+									<div class="input-before-big-button">
+										<div class="input-group small right input-flex">
+											<div class="radio-padding"><input type="radio" id="screenshotSizeFactorRadio" class="radio-padding" name="screenshotRadio" value="sizeFactor"></div>
+											<div class="label main label-flex">Resolution factor</div>
+											<div class="field flexible"><input id="screenshotSizeFactor" class="input-typing" type="number" step="0.5" name="Screenshot size factor" placeholder="1" min="0.5"></div>
+										</div>
+										<div class="input-group small right input-flex">
+											<div class="radio-padding"><input type="radio" id="screenshotResolutionRadio" class="radio-padding" name="screenshotRadio" value="resolution"></div>
+											<div class="label main label-flex">Resolution</div>
+											<div class="field flexible"><input id="screenshotResolutionW" class="input-typing" type="number" step="any" name="Screenshot resolution (width)" placeholder="1920" min="1"></div>
+											<div class="label sub label-flex">x</div>
+											<div class="field flexible"><input id="screenshotResolutionH" class="input-typing" type="number" step="any" name="Screenshot resolution (height)" placeholder="1080" min="1"></div>
+										</div>
+									</div>
+									<div class="input-big-button">
+										<div id="btn-photo" class="header-button big" title="Screenshot"><i class="icon-camera_alt"></i></div>
+									</div>
+								</div>
+							</div>
+							<div id="cine-popup" class="hidden-popup"></div>
 						</div>
 					</div>
 				</div>
@@ -137,9 +185,9 @@
 			<div id="dialogue-popup" class="hidden-popup"><div id="dialogue-image"></div><div id="dialogue-content"></div></div>
 			<div id="script-popup" class="hidden-popup">
 				<div class="column-header"><span id="header-script-text">Script</span>
-					<div class="header-buttons-right"><div id="btn-prev-script" class="header-button disabled-button" title="Previous script"><i class="icon-chevron-left"></i></div><div id="btn-next-script" class="header-button disabled-button" title="Next script"><i class="icon-chevron-right"></i></div></div>
+					<!--<div class="header-buttons-right"><div id="btn-prev-script" class="header-button disabled-button" title="Previous script"><i class="icon-chevron-left"></i></div><div id="btn-next-script" class="header-button disabled-button" title="Next script"><i class="icon-chevron-right"></i></div></div>-->
 				</div>
-				<div id="content-script" class="column-content column-content-scroll"><pre><code id="content-script-code" class="cs"></code></pre></div>
+				<div id="content-script" class="column-content column-content-scroll"></div>
 				<div class="column-footer"></div>
 			</div>
 			<div id="levelselect-popup" class="hidden-popup">

@@ -60,12 +60,15 @@ public class PortalBehaviour : MonoBehaviour {
 			Vector3 newpos = reflection.MultiplyPoint(oldpos);
 			reflectionCamera.worldToCameraMatrix = cam.worldToCameraMatrix * reflection;
 
-			// Setup oblique projection matrix so that near plane is our reflection
-			// plane. This way we clip everything below/above it for free.
-			Vector4 clipPlane = CameraSpacePlane(reflectionCamera, pos, normal, 1.0f);
-			//Matrix4x4 projection = cam.projectionMatrix;
-			Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
-			reflectionCamera.projectionMatrix = projection;
+			if (cam.orthographic) {
+				reflectionCamera.projectionMatrix = cam.projectionMatrix; // projection;
+			} else {
+				// Setup oblique projection matrix so that near plane is our reflection
+				// plane. This way we clip everything below/above it for free.
+				Vector4 clipPlane = CameraSpacePlane(reflectionCamera, pos, normal, 1.0f);
+				Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
+				reflectionCamera.projectionMatrix = projection;
+			}
 
 			reflectionCamera.cullingMask = ~(1 << 4) & m_ReflectLayers.value; // never render water layer
 			reflectionCamera.targetTexture = m_ReflectionTexture;
@@ -73,7 +76,7 @@ public class PortalBehaviour : MonoBehaviour {
 			reflectionCamera.transform.position = newpos;
 			Vector3 euler = cam.transform.eulerAngles;
 			reflectionCamera.transform.eulerAngles = new Vector3(0, euler.y, euler.z);
-			if (reflectionCamera.rect.x != 0 && reflectionCamera.rect.y != 0) {
+			if (reflectionCamera.rect.width != 0 && reflectionCamera.rect.height != 0) {
 				try {
 					reflectionCamera.Render();
 				} catch {
@@ -137,7 +140,7 @@ public class PortalBehaviour : MonoBehaviour {
 			reflectionCamera.cullingMask = ~(1 << 4) & m_ReflectLayers.value; // never render water layer
 			reflectionCamera.targetTexture = m_ReflectionTexture;
 
-			if (reflectionCamera.rect.x != 0 && reflectionCamera.rect.y != 0) {
+			if (reflectionCamera.rect.width != 0 && reflectionCamera.rect.height != 0) {
 				try {
 					reflectionCamera.Render();
 				} catch {

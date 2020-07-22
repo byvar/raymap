@@ -10,6 +10,7 @@ namespace OpenSpace.ROM {
         protected override void ReadInternal(Reader reader) {
 			if (!isBytes) {
 				str = reader.ReadString(length);
+				//Loader.print(Offset + " - " + str);
 			} else {
 				bytes = reader.ReadBytes(length);
 			}

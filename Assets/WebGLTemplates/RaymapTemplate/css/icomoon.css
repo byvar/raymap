@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon/icomoon.eot?xn2duo');
-  src:  url('../fonts/icomoon/icomoon.eot?xn2duo#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon/icomoon.ttf?xn2duo') format('truetype'),
-    url('../fonts/icomoon/icomoon.woff?xn2duo') format('woff'),
-    url('../fonts/icomoon/icomoon.svg?xn2duo#icomoon') format('svg');
+  src:  url('../fonts/icomoon/icomoon.eot?b2nll3');
+  src:  url('../fonts/icomoon/icomoon.eot?b2nll3#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?b2nll3') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?b2nll3') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?b2nll3#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -84,6 +84,12 @@
 }
 .icon-film:before {
   content: "\e914";
+}
+.icon-camera_alt:before {
+  content: "\e937";
+}
+.icon-3d_rotation:before {
+  content: "\e936";
 }
 .icon-fullscreen:before {
   content: "\e908";

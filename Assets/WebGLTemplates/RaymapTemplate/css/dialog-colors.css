@@ -1,22 +1,26 @@
-.dialog-color {
-    background: repeating-linear-gradient(to bottom, white, transparent 1em);
+#text-highlight-tooltip.rayman-2 .dialog-color {
+	/* Font height = 1em. Span surrounds font with no padding. Line height = 1.5em */
+	background: repeating-linear-gradient(to bottom, white 0em, transparent 1em, transparent 1.25em, white 1.25em, white 1.5em);
     -webkit-background-clip: text;
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
 }
 
 .color-0 {
-    background-color: #6EBEFF;
+    background-color: #6EBEFF !important;
 }
 
 .color-200 {
-    background-color: #FA4646;
+    background-color: #FA4646 !important;
 }
 
 .color-400 {
-    background-color: #FFFF78;
+    background-color: #FFFF78 !important;
 }
 
 .color-600 {
-    background-color: #6EBEFF;
+    background-color: #6EBEFF !important;
+}
+.center {
+	text-align: center;
 }

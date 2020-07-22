@@ -311,7 +311,8 @@ a:focus {
 .levels-item.game,
 .behaviors-item.category,
 .transitions-item.category,
-.localization-item.category {
+.localization-item.category,
+.script-item.category {
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
@@ -529,6 +530,14 @@ a:focus {
     pointer-events: none;
 	justify-content: space-around;
 }
+#text-highlight-tooltip:not(.right) {
+	right: auto !important;
+}
+#text-highlight-tooltip.right {
+	margin-left: 0;
+    margin-right: 15px;
+	left: auto !important;
+}
 #text-highlight-tooltip.rayman-2 {
 	font-weight: 300;
 	font-family: 'Rayman 2', sans-serif;
@@ -536,9 +545,12 @@ a:focus {
 	text-transform: lowercase;
 	font-size: 1.2em;
 }
+/*#text-highlight-content {
+	white-space: pre-wrap;
+}*/
 #text-highlight-tooltip.rayman-2 > #text-highlight-content {
-	background: repeating-linear-gradient(to bottom, white,transparent 1.5em);
-	background-color: #6EBEFF;
+	background: repeating-linear-gradient(to bottom, white 0em, white 0.25em, transparent 1.25em, transparent 1.5em);
+	background-color: #6EBEFF !important;
 	-webkit-background-clip: text;
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
@@ -587,6 +599,9 @@ a:focus {
 .input-group.small {
 	padding: 0.45em 0.5em 0.45em 1em;
 }
+.input-group.small.right {
+	padding: 0.25em 0 0.25em 0;
+}
 .input-group.input-flex {
 	display: flex;
 	align-items: center;
@@ -594,6 +609,9 @@ a:focus {
 }
 .input-group.invisible {
 	display: none;
+}
+.radio-padding {
+	padding-right: 0.5em;
 }
 .input {
 	display: block;
@@ -635,6 +653,11 @@ a:focus {
 	box-sizing: border-box;
 	display: block;
 	flex: 0 0 auto;
+}
+.input-flex > .label.main.label-flex {
+	flex: 1 0 auto;
+	width: auto;
+	margin-right: 0.5em;
 }
 .input-flex > .header-button {
 	flex: 0 0 auto;
@@ -850,7 +873,14 @@ canvas + * {
 	height: 0em;
 }
 
-
+.input-before-big-button {
+	width: 75%;
+	display: inline-block;
+}
+.input-big-button {
+	width: 20%;
+	float: right;
+}
 
 
 .loading {
@@ -970,6 +1000,9 @@ canvas + * {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.header-button.big {
+	font-size: 2em;
 }
 .header-button.invisible-button {
 	opacity: 0;
@@ -1114,6 +1147,51 @@ input[type=range]::-ms-fill-upper {
 #dialogue-popup.hidden-popup {
 	pointer-events: none;
 	bottom: -9em;
+}
+#cine-popup {
+	display: block;
+	position: absolute;
+	bottom: 3em;
+	right: 0em;
+	width: 16em;
+	height: 6em;
+	border-radius: 2em 0em 0em 0em;
+	padding: 1em;
+	line-height: 1.5em;
+	box-sizing: border-box;
+	overflow: hidden;
+	transition:visibility 0s linear, transform 0.3s;
+	transform-origin: 50% 100%;
+	transform: scaleY(100%);
+}
+#camera-popup {
+	display: block;
+	position: absolute;
+	bottom: 3em;
+	right: 0em;
+	width: 24em;
+	height: 6em;
+	border-radius: 2em 0em 0em 0em;
+	padding: 1em 2em 1em 2em;
+	line-height: 1.5em;
+	box-sizing: border-box;
+	overflow: hidden;
+	transition:visibility 0s linear, transform 0.3s;
+	transform-origin: 50% 100%;
+	transform: scaleY(100%);
+}
+#cine-popup.hidden-popup,
+#camera-popup.hidden-popup {
+	visibility: 0;
+	transition:visibility 0s linear, transform 0.3s;
+	transform: scaleY(0%);
+}
+.camera-options {
+	display: block;
+	float: right;
+	width: 19em;
+	text-align: left;
+	font-size: 0.8em;
 }
 #dialogue-image {
 	float: left;
@@ -1352,12 +1430,11 @@ input[type=range]::-ms-fill-upper {
 }
 #content-script {
 	text-align: left;
-	padding: 0em 1em 0em 1em;
 }
-#content-script-code {
+.script-item-code {
 	text-align: left;
 	white-space: pre;
-	padding-right: 2em;
+	padding: 1em 2em 1em 2em;
 	box-sizing: border-box;
 }
 #header-script-text {
