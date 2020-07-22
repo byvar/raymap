@@ -5,9 +5,9 @@
 	float: left;
 	perspective: none;
 	box-sizing: border-box;
-	font-size: 0.6em;
-	margin-top: 0.833em;
-	margin-bottom: 0.833em;
+	font-size: 0.5em;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 }
 
 .cube {
@@ -15,7 +15,7 @@
   height: 5em;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 1s;
+  transition: transform 0.5s;
 }
 
 .cube-container.show-initial {
@@ -37,12 +37,12 @@
   position: absolute;
   width: 5em;
   height: 5em;
-  border: 2px solid black;
-  border-color: black;
+  /*! border: 2px solid rgb(3, 61, 82); */
+  /*! border-color: rgba(3,61,82,1); */
   line-height: 5em;
   font-size: 1em;
   font-weight: bold;
-  color: white;
+  color: #9ed9a0;
   text-align: center;
   box-sizing: border-box;
 	
@@ -53,19 +53,19 @@
     -ms-user-select: none;
     user-select: none;
   cursor: pointer;
-  transition: color 0.4s, border-color 0.4s;
+  transition: color 0.2s, border-color 0.2s;
 }
 .cube__face:hover {
   color: orange;
   border-color: orange;
 }
 
-.cube__face--front  { background: hsla(  0, 100%, 50%, 0.7); }
-.cube__face--right  { background: hsla( 60, 100%, 50%, 0.7); }
-.cube__face--back   { background: hsla(120, 100%, 50%, 0.7); }
-.cube__face--left   { background: hsla(180, 100%, 50%, 0.7); }
-.cube__face--top    { background: hsla(240, 100%, 50%, 0.7); }
-.cube__face--bottom { background: hsla(300, 100%, 50%, 0.7); }
+.cube__face--front  { background: hsl(193, 90%, 30%); }
+.cube__face--right  { background: hsl(193, 90%, 40%); }
+.cube__face--back   { background: hsl(193, 90%, 20%); }
+.cube__face--left   { background: hsl(193, 90%, 10%); }
+.cube__face--top    { background: hsl(193, 90%, 35%); }
+.cube__face--bottom { background: hsl(193, 90%, 15%); }
 
 .cube__face--front  { transform: rotateY(  0deg) translateZ(2.5em); }
 .cube__face--right  { transform: rotateY( 90deg) translateZ(2.5em); }

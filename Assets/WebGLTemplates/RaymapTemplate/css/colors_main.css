@@ -275,10 +275,12 @@ input[type=range]:focus::-ms-fill-upper {
 }
 #levelselect-popup,
 #script-popup,
-#localization-popup,
+#localization-popup {
+    background-color: rgba(6,86,109,1);
+}
 #camera-popup,
 #cine-popup {
-    background-color: rgba(6,86,109,1);
+	background-color: rgba(3, 61, 82, 1);
 }
 .style-item.current-style-item {
 	background-color: rgba(3,61,82,0.7);

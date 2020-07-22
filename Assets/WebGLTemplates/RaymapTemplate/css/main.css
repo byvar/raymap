@@ -599,6 +599,9 @@ a:focus {
 .input-group.small {
 	padding: 0.45em 0.5em 0.45em 1em;
 }
+.input-group.small.right {
+	padding: 0.25em 0 0.25em 0;
+}
 .input-group.input-flex {
 	display: flex;
 	align-items: center;
@@ -606,6 +609,9 @@ a:focus {
 }
 .input-group.invisible {
 	display: none;
+}
+.radio-padding {
+	padding-right: 0.5em;
 }
 .input {
 	display: block;
@@ -647,6 +653,11 @@ a:focus {
 	box-sizing: border-box;
 	display: block;
 	flex: 0 0 auto;
+}
+.input-flex > .label.main.label-flex {
+	flex: 1 0 auto;
+	width: auto;
+	margin-right: 0.5em;
 }
 .input-flex > .header-button {
 	flex: 0 0 auto;
@@ -862,7 +873,14 @@ canvas + * {
 	height: 0em;
 }
 
-
+.input-before-big-button {
+	width: 75%;
+	display: inline-block;
+}
+.input-big-button {
+	width: 20%;
+	float: right;
+}
 
 
 .loading {
@@ -982,6 +1000,9 @@ canvas + * {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.header-button.big {
+	font-size: 2em;
 }
 .header-button.invisible-button {
 	opacity: 0;
@@ -1131,36 +1152,44 @@ input[type=range]::-ms-fill-upper {
 	display: block;
 	position: absolute;
 	bottom: 3em;
-	right: 2em;
+	right: 0em;
 	width: 16em;
 	height: 6em;
-	border-radius: 4em;
+	border-radius: 2em 0em 0em 0em;
 	padding: 1em;
 	line-height: 1.5em;
 	box-sizing: border-box;
 	overflow: hidden;
+	transition:visibility 0s linear, transform 0.3s;
+	transform-origin: 50% 100%;
+	transform: scaleY(100%);
 }
 #camera-popup {
 	display: block;
 	position: absolute;
 	bottom: 3em;
-	right: 0.5em;
-	width: 20em;
+	right: 0em;
+	width: 24em;
 	height: 6em;
-	border-radius: 4em;
+	border-radius: 2em 0em 0em 0em;
 	padding: 1em 2em 1em 2em;
 	line-height: 1.5em;
 	box-sizing: border-box;
 	overflow: hidden;
+	transition:visibility 0s linear, transform 0.3s;
+	transform-origin: 50% 100%;
+	transform: scaleY(100%);
 }
 #cine-popup.hidden-popup,
 #camera-popup.hidden-popup {
-	display: none;
+	visibility: 0;
+	transition:visibility 0s linear, transform 0.3s;
+	transform: scaleY(0%);
 }
 .camera-options {
 	display: block;
 	float: right;
-	width: 14em;
+	width: 19em;
 	text-align: left;
 	font-size: 0.8em;
 }
