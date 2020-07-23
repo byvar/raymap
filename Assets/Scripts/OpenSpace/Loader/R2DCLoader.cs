@@ -131,13 +131,10 @@ namespace OpenSpace.Loader {
             Pointer off_inputStructure = Pointer.Read(reader);
             Pointer.DoAt(ref reader, off_inputStructure, () => {
                 inputStruct = InputStructure.Read(reader, off_inputStructure);
-
-                string entryActions = "EntryActions" + Environment.NewLine;
-                foreach (EntryAction ea in inputStruct.entryActions) {
-                    entryActions += ea.ToString() + Environment.NewLine;
-                }
-                print(entryActions);
-            });
+				foreach (EntryAction ea in inputStruct.entryActions) {
+					print(ea.ToString());
+				}
+			});
 
             await WaitIfNecessary();
             Pointer.Read(reader);
