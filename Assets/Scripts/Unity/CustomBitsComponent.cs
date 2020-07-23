@@ -41,9 +41,9 @@ public class CustomBitsComponent : MonoBehaviour {
         BitArray bitArray = bits[(int)type];
         if (bitArray.Get(index) != value) {
             bitArray.Set(index, value);
-            uint[] array = new uint[1];
+            int[] array = new int[1];
             bitArray.CopyTo(array, 0);
-            SetRawFlags(type, array[0]);
+            SetRawFlags(type, (uint)array[0]);
         }
     }
 
