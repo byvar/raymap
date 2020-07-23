@@ -8,6 +8,7 @@ using OpenSpace.Animation.Component;
 using OpenSpace.Object.Properties;
 using UnityEditor.IMGUI.Controls;
 using ModelExport.R3.PersoStatesArmatureAnimationsExporting;
+using ModelExport.R3.SkinnedAnimatedMeshesExporting;
 
 [CustomEditor(typeof(PersoBehaviour))]
 public class PersoBehaviourEditor : Editor {
@@ -99,7 +100,9 @@ public class PersoBehaviourEditor : Editor {
         GUILayout.EndHorizontal();
 
         if (GUILayout.Button("Print Animation Debug Info")) pb.PrintAnimationDebugInfo();
-        if (GUILayout.Button("Export Animations Data")) ExportAnimationsData();
+		if (GUILayout.Button("Export Meshes and Animations Data (including cleanup)")) ExportMeshesAndAnimationsData();
+		if (GUILayout.Button("Export Meshes Data")) ExportMeshesData();
+		if (GUILayout.Button("Export Animations Data")) ExportAnimationsData();
     }
 
 	IList<StateTransitionsTreeElement> GetData() {
@@ -144,6 +147,27 @@ public class PersoBehaviourEditor : Editor {
 				stateIndex = target.stateIndex,
 			};
 		}
+	}
+
+	void ExportMeshesAndAnimationsData()
+	{
+		ObjectsExportLibraryInterface.ClearExportObjectsLibrary();
+		ExportMeshesData();
+		ExportAnimationsData();
+	}
+
+	void ExportMeshesData()
+    {
+		PersoBehaviour pb = (PersoBehaviour)target;
+		var meshes = pb.gameObject.GetComponentsInChildren<ExportableModel>();
+		foreach(var m in meshes) {
+			if (m.gameObject.activeInHierarchy) {
+				if (m != m.gameObject.transform.parent.GetComponentsInChildren<ExportableModel>()[0]) { // Ignore any ExportableModel that's not the first of its siblinngs
+					continue;
+				}
+				m.AddToExportObjectsLibrary();
+			}
+        }
 	}
 
 	void ExportAnimationsData() {
