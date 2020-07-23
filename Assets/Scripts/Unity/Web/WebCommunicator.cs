@@ -650,8 +650,8 @@ public class WebCommunicator : MonoBehaviour {
 			if (tcb != null) {
 				try {
 					Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
-					int height = msg.Width ?? Mathf.RoundToInt(res.height * (msg.SizeFactor ?? 1));
-					int width = msg.Height ?? Mathf.RoundToInt(res.width * (msg.SizeFactor ?? 1));
+					int height = msg.Height ?? Mathf.RoundToInt(res.height * (msg.SizeFactor ?? 1));
+					int width = msg.Width ?? Mathf.RoundToInt(res.width * (msg.SizeFactor ?? 1));
 					if (width > 0 && height > 0) {
 						System.DateTime dateTime = System.DateTime.Now;
 						byte[] screenshotBytes = await tcb.Capture(width, height, msg.IsTransparent ?? true);

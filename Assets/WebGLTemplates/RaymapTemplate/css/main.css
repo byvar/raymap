@@ -443,7 +443,7 @@ a:focus {
 	text-overflow: ellipsis;
 	flex: 0 0 auto;
 }
-.dsgvar-type > ..dsgvar-icon {
+.dsgvar-type > .dsgvar-icon {
 	font-size: 1.5em;
 }
 .dsgvars-item > .dsgvar-name {
@@ -711,6 +711,10 @@ a:focus {
 #gameContainer {
 	display: block;
 	position: relative;
+	height: 100%;
+}
+#game-content {
+	box-sizing: border-box;
 }
 canvas {
 	width: 100%;
@@ -880,6 +884,15 @@ canvas + * {
 .input-big-button {
 	width: 20%;
 	float: right;
+	position: relative;
+}
+.header-button.small {
+	font-size: 0.7em;
+}
+.lowerright {
+	position: absolute;
+	right: -0.5em;
+	bottom: 0;
 }
 
 
@@ -1192,6 +1205,10 @@ input[type=range]::-ms-fill-upper {
 	width: 19em;
 	text-align: left;
 	font-size: 0.8em;
+}
+.icon-transparency.hidden,
+.icon-opaque.hidden {
+	display: none;
 }
 #dialogue-image {
 	float: left;

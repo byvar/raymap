@@ -92,6 +92,8 @@ let mode, lvl, folder;
 let currentBehavior = null;
 let currentBehaviorType = "";
 let wrapper, objects_content, unity_content, description_content, description_column;
+let gameColumnContent, screenshotResolutionRadio, screenshotSizeFactorRadio, screenshotResolutionW, screenshotResolutionH, screenshotSizeFactor = null;
+let screenshotResolutionSelected = false;
 let btn_close_description, stateSelector, objectListSelector, languageSelector, cameraPosSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
 let previousState = -1;
 
@@ -155,6 +157,7 @@ function refreshScroll() {
 			api.reinitialise();
 		});
 		sidebarUpdateArrows($(".column-sidebar-content"));
+		recalculateAspectRatio();
 	}, 3, "some unique string");
 }
 
@@ -409,6 +412,94 @@ function updateCameraPos() {
 		sendMessage(jsonObj);
 	}
 }
+function recalculateAspectRatio() {
+	if(!$("#camera-popup").hasClass("hidden-popup") && $("input[name='screenshotRadio']:checked").val() === "resolution") {
+		let resW = screenshotResolutionW.val();
+		let resH = screenshotResolutionH.val();
+		if($.isNumeric(resW) && $.isNumeric(resH) && resW > 0 && resH > 0) {
+			let width = gameColumnContent.outerWidth();
+			let height = gameColumnContent.outerHeight();
+			if(width > 0 && height > 0) {
+				let aspectRatio = width*1.0 / height;
+				let resAspectRatio = resW*1.0 / resH;
+				if(aspectRatio !== 0 && resAspectRatio !== 0) {
+					if(resAspectRatio > aspectRatio) {
+						let paddingY = (height - (width*1.0 / resAspectRatio)) / 2.0;
+						gameColumnContent.css('padding', paddingY + "px 0 " + paddingY + "px 0");
+					} else if(resAspectRatio < aspectRatio) {
+						let paddingX = (width - (height*1.0 * resAspectRatio)) / 2.0;
+						gameColumnContent.css('padding', "0 " + paddingX + "px 0 " + paddingX + "px");
+					} else {
+						gameColumnContent.css('padding', "");
+					}
+				}
+			}
+		}
+	} else {
+		gameColumnContent.css('padding', "");
+	}
+
+}
+function updateResolutionSelection() {
+	let radioValue = $("input:radio[name='screenshotRadio']:checked").val();
+
+	if(radioValue) {
+		switch(radioValue) {
+			case "sizeFactor":
+				screenshotResolutionW.prop('disabled', 'true');
+				screenshotResolutionH.prop('disabled', 'true');
+				screenshotSizeFactor.removeProp('disabled');
+				break;
+			case "resolution":
+				screenshotResolutionW.removeProp('disabled');
+				screenshotResolutionH.removeProp('disabled');
+				screenshotSizeFactor.prop('disabled', 'true');
+				break;
+		}
+	}
+	recalculateAspectRatio();
+}
+function takeScreenshot() {
+	let radioValue = $("input:radio[name='screenshotRadio']:checked").val();
+	let isTransparent = $("#btn-photo-transparency").hasClass("selected");
+
+	if(radioValue) {
+		switch(radioValue) {
+			case "sizeFactor":
+				let fact = screenshotSizeFactor.val();
+				if($.isNumeric(fact) && fact > 0) {
+					let jsonObj = {
+						Request: {
+							Type: "Screenshot",
+							Screenshot: {
+								SizeFactor: fact,
+								IsTransparent: isTransparent
+							}
+						}
+					};
+					sendMessage(jsonObj);
+				}
+				break;
+			case "resolution":
+				let resW = screenshotResolutionW.val();
+				let resH = screenshotResolutionH.val();
+				if($.isNumeric(resW) && $.isNumeric(resH) && parseInt(resW) > 0 && parseInt(resH) > 0) {
+					let jsonObj = {
+						Request: {
+							Type: "Screenshot",
+							Screenshot: {
+								Width: parseInt(resW),
+								Height: parseInt(resH),
+								IsTransparent: isTransparent
+							}
+						}
+					};
+					sendMessage(jsonObj);
+				}
+				break;
+		}
+	}
+}
 function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
 	if(msg.hasOwnProperty("CameraPos")) {
@@ -432,6 +523,7 @@ function toggleCameraPopup() {
 		$("#camera-popup").removeClass("hidden-popup");
 		$("#btn-camera").addClass("selected");
 	}
+	recalculateAspectRatio();
 }
 
 let formattedTexts = {};
@@ -869,6 +961,7 @@ function showObjectDescription(so, isSOChanged) {
 	let api = description_content.data('jsp');
 	setTimeout(function(){
 		api.reinitialise();
+		recalculateAspectRatio();
 	}, 100);
 	btn_close_description.removeClass('disabled-button');
 	description_column.removeClass('invisible');
@@ -1132,6 +1225,9 @@ function setSelection(so) {
 function clearSelection() {
 	description_column.addClass('invisible');
 	$(".objects-item").removeClass("current-objects-item");
+	setTimeout(function(){
+		recalculateAspectRatio();
+	}, 100);
 	currentSO = null;
 	let jsonObj = {
 		Selection: {
@@ -1447,6 +1543,12 @@ $(function() {
 	highlight_tooltip = $("#highlight-tooltip");
 	text_highlight_tooltip = $('#text-highlight-tooltip');
 	text_highlight_content = $('#text-highlight-content');
+	gameColumnContent = $('#game-content');
+	screenshotResolutionRadio = $('#screenshotResolutionRadio');
+	screenshotSizeFactorRadio = $('#screenshotSizeFactorRadio');
+	screenshotResolutionW = $('#screenshotResolutionW');
+	screenshotResolutionH = $('#screenshotResolutionH');
+	screenshotSizeFactor = $('#screenshotSizeFactor');
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
@@ -1531,6 +1633,17 @@ $(function() {
 		return false;
 	});
 	
+	$(document).on('click', "#btn-photo-transparency", function() {
+		selectButton($(this), !$(this).hasClass("selected"));
+		if($(this).hasClass("selected")) {
+			$(".icon-transparency").removeClass("hidden");
+			$(".icon-opaque").addClass("hidden");
+		} else {
+			$(".icon-transparency").addClass("hidden");
+			$(".icon-opaque").removeClass("hidden");
+		}
+		return false;
+	});
 	$(document).on('click', "#btn-lighting", function() {
 		if($(this).hasClass("selected")) {
 			$(".lighting-settings").addClass("disabled-button");
@@ -1555,6 +1668,19 @@ $(function() {
 	$(document).on('click', "#btn-enabled, #btn-autoNextState, #btn-playAnimation", function() {
 		selectButton($(this), !$(this).hasClass("selected"));
 		sendPerso();
+		return false;
+	});
+	$(document).on('click', "#btn-photo", function() {
+		takeScreenshot();
+		return false;
+	});
+	$("input:radio[name='screenshotRadio']").change(function(){
+		updateResolutionSelection();
+		return false;
+    });
+	
+	$(document).on('input', "#screenshotResolutionW, #screenshotResolutionH", function() {
+		recalculateAspectRatio();
 		return false;
 	});
 	

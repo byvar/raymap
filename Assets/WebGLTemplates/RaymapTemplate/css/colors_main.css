@@ -40,6 +40,9 @@ body {
 	color: #9ed9a0;
     background-color: rgba(3,61,82,1);
 }
+#game-content {
+	background-color: rgba(3,61,82,1);
+}
 
 /*.song-item:active,
 .playlist-item:active,

@@ -110,7 +110,7 @@
 					</div>
 					<div class="column column-unity">
 						<div class="column-header"><span id="header-unity-text">Raymap</span></div>
-						<div id="gameContainer" class="column-content"></div>
+						<div id="game-content" class="column-content"><div id="gameContainer"></div></div>
 						<div class="column-footer">
 							<div class="header-buttons-left">
 								<div id="btn-lighting" class="header-button disabled-button selected" title="Lighting on/off (L)"><i class="icon-lightbulb-o"></i></div>
@@ -154,20 +154,21 @@
 									</div>
 									<div class="input-before-big-button">
 										<div class="input-group small right input-flex">
-											<div class="radio-padding"><input type="radio" id="screenshotSizeFactorRadio" class="radio-padding" name="screenshotRadio" value="sizeFactor"></div>
+											<div class="radio-padding"><input type="radio" id="screenshotSizeFactorRadio" class="radio-padding" name="screenshotRadio" value="sizeFactor" checked></div>
 											<div class="label main label-flex">Resolution factor</div>
-											<div class="field flexible"><input id="screenshotSizeFactor" class="input-typing" type="number" step="0.5" name="Screenshot size factor" placeholder="1" min="0.5"></div>
+											<div class="field flexible"><input id="screenshotSizeFactor" class="input-typing" type="number" step="0.5" name="Screenshot size factor" placeholder="1" value="1" min="0.5"></div>
 										</div>
 										<div class="input-group small right input-flex">
 											<div class="radio-padding"><input type="radio" id="screenshotResolutionRadio" class="radio-padding" name="screenshotRadio" value="resolution"></div>
 											<div class="label main label-flex">Resolution</div>
-											<div class="field flexible"><input id="screenshotResolutionW" class="input-typing" type="number" step="any" name="Screenshot resolution (width)" placeholder="1920" min="1"></div>
+											<div class="field flexible"><input id="screenshotResolutionW" class="input-typing" type="number" step="any" name="Screenshot resolution (width)" placeholder="1920" value="1920" min="1" disabled></div>
 											<div class="label sub label-flex">x</div>
-											<div class="field flexible"><input id="screenshotResolutionH" class="input-typing" type="number" step="any" name="Screenshot resolution (height)" placeholder="1080" min="1"></div>
+											<div class="field flexible"><input id="screenshotResolutionH" class="input-typing" type="number" step="any" name="Screenshot resolution (height)" placeholder="1080" value="1080" min="1" disabled></div>
 										</div>
 									</div>
 									<div class="input-big-button">
-										<div id="btn-photo" class="header-button big" title="Screenshot"><i class="icon-camera_alt"></i></div>
+										<div id="btn-photo" class="header-button big" title="Screenshot"><i class="icon-camera icon-opaque"></i><i class="icon-camera-outline icon-transparency hidden"></i></div>
+										<div id="btn-photo-transparency" class="header-button lowerright" title="Transparency"><i class="icon-image icon-opaque"></i><i class="icon-image-outline icon-transparency hidden"></i></div>
 									</div>
 								</div>
 							</div>

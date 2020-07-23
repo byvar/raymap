@@ -346,7 +346,7 @@
         {
           "order": 1,
           "id": 0,
-          "name": "camera, movie, video, record, film",
+          "name": "camera-2, movie, video, record, film",
           "prevSize": 32,
           "code": 59668,
           "tempChar": ""
@@ -396,11 +396,19 @@
       "selection": [
         {
           "order": 1,
+          "id": 3,
+          "prevSize": 24,
+          "code": 59703,
+          "name": "camera_alt",
+          "tempChar": ""
+        },
+        {
+          "order": 1,
           "id": 2,
           "name": "3d_rotation",
           "prevSize": 24,
           "code": 59702,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -408,7 +416,7 @@
           "name": "fullscreen",
           "prevSize": 24,
           "code": 59656,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -416,7 +424,7 @@
           "name": "remove_red_eye, visibility",
           "prevSize": 24,
           "code": 59663,
-          "tempChar": ""
+          "tempChar": ""
         }
       ],
       "id": 5,
@@ -436,6 +444,23 @@
       "height": 1024,
       "prevSize": 24,
       "icons": [
+        {
+          "id": 3,
+          "paths": [
+            "M512 726q88 0 151-63t63-151-63-151-151-63-151 63-63 151 63 151 151 63zM384 86h256l78 84h136q34 0 59 26t25 60v512q0 34-25 60t-59 26h-684q-34 0-59-26t-25-60v-512q0-34 25-60t59-26h136zM376 512q0-56 40-96t96-40 96 40 40 96-40 96-96 40-96-40-40-96z"
+          ],
+          "attrs": [
+            {}
+          ],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "camera_alt",
+            "photo_camera",
+            "local_see"
+          ],
+          "grid": 24
+        },
         {
           "id": 2,
           "paths": [
@@ -494,7 +519,7 @@
           "prevSize": 20,
           "code": 59666,
           "name": "location-pin",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 0,
@@ -510,7 +535,7 @@
           "name": "flow-tree",
           "prevSize": 20,
           "code": 59654,
-          "tempChar": ""
+          "tempChar": ""
         }
       ],
       "id": 4,
@@ -583,11 +608,43 @@
       "selection": [
         {
           "order": 1,
+          "id": 32,
+          "prevSize": 24,
+          "code": 59704,
+          "name": "camera-outline",
+          "tempChar": ""
+        },
+        {
+          "order": 2,
+          "id": 31,
+          "prevSize": 24,
+          "code": 59705,
+          "name": "image-outline",
+          "tempChar": ""
+        },
+        {
+          "order": 3,
+          "id": 30,
+          "prevSize": 24,
+          "code": 59706,
+          "name": "image",
+          "tempChar": ""
+        },
+        {
+          "order": 4,
+          "id": 29,
+          "prevSize": 24,
+          "code": 59707,
+          "name": "camera",
+          "tempChar": ""
+        },
+        {
+          "order": 1,
           "id": 28,
           "prevSize": 24,
           "code": 59653,
           "name": "world",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -595,7 +652,7 @@
           "name": "input-checked-outline",
           "prevSize": 24,
           "code": 59695,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 2,
@@ -603,7 +660,7 @@
           "name": "tick-outline",
           "prevSize": 24,
           "code": 59696,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 3,
@@ -611,7 +668,7 @@
           "name": "input-checked",
           "prevSize": 24,
           "code": 59697,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 4,
@@ -619,7 +676,7 @@
           "name": "tick",
           "prevSize": 24,
           "code": 59698,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -627,7 +684,7 @@
           "prevSize": 24,
           "code": 59688,
           "name": "video-outline",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -635,7 +692,7 @@
           "prevSize": 24,
           "code": 59687,
           "name": "media-play-outline",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -643,7 +700,7 @@
           "name": "lightbulb",
           "prevSize": 24,
           "code": 59683,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -651,7 +708,7 @@
           "prevSize": 24,
           "code": 59681,
           "name": "flash-outline",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 2,
@@ -659,7 +716,7 @@
           "prevSize": 24,
           "code": 59682,
           "name": "flash",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -667,7 +724,7 @@
           "name": "media-fast-forward",
           "prevSize": 24,
           "code": 59669,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 2,
@@ -675,7 +732,7 @@
           "name": "media-play",
           "prevSize": 24,
           "code": 59670,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 3,
@@ -683,7 +740,7 @@
           "name": "media-record1",
           "prevSize": 24,
           "code": 59671,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 4,
@@ -691,7 +748,7 @@
           "name": "media-stop",
           "prevSize": 24,
           "code": 59672,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 5,
@@ -699,7 +756,7 @@
           "name": "media-rewind",
           "prevSize": 24,
           "code": 59673,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 6,
@@ -707,7 +764,7 @@
           "name": "media-pause",
           "prevSize": 24,
           "code": 59674,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 7,
@@ -715,7 +772,7 @@
           "name": "film2",
           "prevSize": 24,
           "code": 59675,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 8,
@@ -723,7 +780,7 @@
           "name": "video1",
           "prevSize": 24,
           "code": 59676,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -731,7 +788,7 @@
           "name": "media-record",
           "prevSize": 24,
           "code": 59677,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -739,7 +796,7 @@
           "name": "adjust-brightness",
           "prevSize": 24,
           "code": 59678,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -747,7 +804,7 @@
           "prevSize": 24,
           "code": 59667,
           "name": "pin",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -755,7 +812,7 @@
           "name": "eye",
           "prevSize": 24,
           "code": 59664,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -763,7 +820,7 @@
           "name": "cancel",
           "prevSize": 24,
           "code": 59665,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -771,7 +828,7 @@
           "prevSize": 24,
           "code": 59662,
           "name": "globe",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -779,7 +836,7 @@
           "name": "user",
           "prevSize": 24,
           "code": 59655,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 0,
@@ -795,7 +852,7 @@
           "name": "flow-merge",
           "prevSize": 24,
           "code": 59657,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 2,
@@ -803,7 +860,7 @@
           "name": "flow-children",
           "prevSize": 24,
           "code": 59658,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -811,7 +868,7 @@
           "prevSize": 24,
           "code": 59649,
           "name": "times",
-          "tempChar": ""
+          "tempChar": ""
         }
       ],
       "id": 3,
@@ -831,6 +888,78 @@
       "height": 1024,
       "prevSize": 24,
       "icons": [
+        {
+          "id": 32,
+          "paths": [
+            "M810.667 853.333h-597.333c-70.571 0-128-57.429-128-128v-341.333c0-70.571 57.429-128 128-128h67.669l42.667-42.667c24.704-24.704 68.096-42.667 102.997-42.667h170.667c34.901 0 78.293 17.963 102.997 42.667l42.667 42.667h67.669c70.571 0 128 57.429 128 128v341.333c0 70.571-57.429 128-128 128zM213.333 341.333c-23.552 0-42.667 19.115-42.667 42.667v341.333c0 23.552 19.115 42.667 42.667 42.667h597.333c23.552 0 42.667-19.115 42.667-42.667v-341.333c0-23.552-19.115-42.667-42.667-42.667h-85.333c-11.349 0-22.187-4.48-30.165-12.501l-55.168-55.168c-8.576-8.576-30.507-17.664-42.667-17.664h-170.667c-12.16 0-34.091 9.088-42.667 17.664l-55.168 55.168c-7.979 8.021-18.816 12.501-30.165 12.501h-85.333z",
+            "M512 426.667c58.837 0 106.667 47.829 106.667 106.667s-47.829 106.667-106.667 106.667-106.667-47.829-106.667-106.667 47.829-106.667 106.667-106.667zM512 384c-82.517 0-149.333 66.816-149.333 149.333 0 82.432 66.816 149.333 149.333 149.333s149.333-66.901 149.333-149.333c0-82.517-66.816-149.333-149.333-149.333z",
+            "M768 371.157c-30.677 0-55.467 24.832-55.467 55.509s24.789 55.424 55.467 55.424 55.467-24.747 55.467-55.424-24.789-55.509-55.467-55.509z"
+          ],
+          "attrs": [
+            {},
+            {},
+            {}
+          ],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "camera-outline"
+          ],
+          "grid": 24
+        },
+        {
+          "id": 31,
+          "paths": [
+            "M362.667 341.291c35.285 0 64 28.715 64 64s-28.715 64-64 64-64-28.715-64-64 28.715-64 64-64zM362.667 298.624c-58.923 0-106.667 47.744-106.667 106.667s47.744 106.667 106.667 106.667 106.667-47.744 106.667-106.667-47.744-106.667-106.667-106.667z",
+            "M682.667 511.957c19.2 2.176 54.187 76.971 75.904 170.709h-486.059c18.517-44.117 45.013-85.376 68.779-85.376 34.389 0 48 7.893 65.28 17.92 19.072 11.008 42.923 24.747 84.053 24.747 48.555 0 82.859-37.76 113.195-71.083 26.752-29.312 51.968-56.917 78.848-56.917zM682.667 469.291c-85.333 0-128 128-192 128s-63.957-42.667-149.333-42.667c-85.333 0-128.043 170.667-128.043 170.667h597.376c0 0-42.667-256-128-256z",
+            "M938.667 256c0-47.104-38.229-85.333-85.333-85.333h-682.667c-47.104 0-85.333 38.229-85.333 85.333v512c0 47.104 38.229 85.333 85.333 85.333h682.667c47.104 0 85.333-38.229 85.333-85.333v-512zM853.333 768h-682.667v-512h682.795l-0.128 512z"
+          ],
+          "attrs": [
+            {},
+            {},
+            {}
+          ],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "image-outline"
+          ],
+          "grid": 24
+        },
+        {
+          "id": 30,
+          "paths": [
+            "M469.333 362.709c0 58.91-47.756 106.667-106.667 106.667-58.91 0-106.667-47.756-106.667-106.667 0-58.91 47.756-106.667 106.667-106.667s106.667 47.756 106.667 106.667z",
+            "M682.667 426.667c-85.333 0-128 128-192 128s-63.957-42.667-149.333-42.667c-85.333 0-128.043 170.667-128.043 170.667h597.376c0 0-42.667-256-128-256z",
+            "M853.333 128h-682.667c-47.061 0-85.333 38.272-85.333 85.333v512c0 47.061 38.272 85.333 85.333 85.333h682.667c47.061 0 85.333-38.272 85.333-85.333v-512c0-47.061-38.272-85.333-85.333-85.333zM853.333 725.333h-682.667v-512h682.667v512z"
+          ],
+          "attrs": [
+            {},
+            {},
+            {}
+          ],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "image"
+          ],
+          "grid": 24
+        },
+        {
+          "id": 29,
+          "paths": [
+            "M810.667 256h-67.669l-42.667-42.667c-24.704-24.704-68.053-42.667-102.997-42.667h-170.667c-34.944 0-78.293 17.963-102.997 42.667l-42.667 42.667h-67.669c-70.571 0-128 57.429-128 128v341.333c0 70.571 57.429 128 128 128h597.333c70.571 0 128-57.429 128-128v-341.333c0-70.571-57.429-128-128-128zM512 682.667c-82.475 0-149.333-66.901-149.333-149.333 0-82.517 66.859-149.333 149.333-149.333s149.333 66.816 149.333 149.333c0 82.432-66.859 149.333-149.333 149.333zM768 482.091c-30.677 0-55.467-24.747-55.467-55.424s24.789-55.509 55.467-55.509 55.467 24.832 55.467 55.509-24.789 55.424-55.467 55.424z"
+          ],
+          "attrs": [
+            {}
+          ],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "camera"
+          ],
+          "grid": 24
+        },
         {
           "id": 28,
           "paths": [
@@ -1314,7 +1443,7 @@
           "name": "commenting-o",
           "prevSize": 28,
           "code": 59699,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 2,
@@ -1322,7 +1451,7 @@
           "name": "commenting",
           "prevSize": 28,
           "code": 59700,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 3,
@@ -1330,7 +1459,7 @@
           "name": "comment-o",
           "prevSize": 28,
           "code": 59701,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -1338,7 +1467,7 @@
           "name": "lightbulb-o",
           "prevSize": 28,
           "code": 59684,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -1346,7 +1475,7 @@
           "name": "video-camera",
           "prevSize": 28,
           "code": 59679,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 2,
@@ -1354,7 +1483,7 @@
           "name": "film1",
           "prevSize": 28,
           "code": 59680,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 0,
@@ -1370,7 +1499,7 @@
           "name": "minus",
           "prevSize": 28,
           "code": 59660,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -1378,7 +1507,7 @@
           "name": "plus",
           "prevSize": 28,
           "code": 59661,
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 1,
@@ -1386,7 +1515,7 @@
           "prevSize": 28,
           "code": 59648,
           "name": "chevron-right",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 2,
@@ -1394,7 +1523,7 @@
           "prevSize": 28,
           "code": 59650,
           "name": "chevron-left",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 3,
@@ -1402,7 +1531,7 @@
           "prevSize": 28,
           "code": 59651,
           "name": "chevron-down",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 4,
@@ -1410,7 +1539,7 @@
           "prevSize": 28,
           "code": 59652,
           "name": "chevron-up",
-          "tempChar": ""
+          "tempChar": ""
         },
         {
           "order": 0,

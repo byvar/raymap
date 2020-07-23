@@ -172,7 +172,7 @@ public class LightManager : MonoBehaviour {
 						activeBackgroundSector = s;
 						break;
 					} else {
-						if (!s.Active) continue;
+						if (!s.Loaded) continue;
 						foreach (LightInfo li in s.sector.staticLights) {
 							if (li.type == 6) {
 								backgroundColor = li.background_color;
