@@ -500,10 +500,53 @@ function takeScreenshot() {
 		}
 	}
 }
+function clickCameraCube(view) {
+	let selectedCameraPos = cameraPosSelector.val();
+	if(selectedCameraPos === view) {
+		switch(selectedCameraPos) {
+			case "Front":
+				view = "IsometricFront";
+				break;
+			case "Back":
+				view = "IsometricBack";
+				break;
+			case "Left":
+				view = "IsometricLeft";
+				break;
+			case "Right":
+				view = "IsometricRight";
+				break;
+			case "Top":
+				view = "Initial";
+				break;
+			case "Bottom":
+				view = "Initial";
+				break;
+			case "Initial":
+				view = "IsometricFront";
+				break;
+			case "IsometricFront":
+				view= "Front";
+				break;
+			case "IsometricBack":
+				view = "Back";
+				break;
+			case "IsometricLeft":
+				view = "Left";
+				break;
+			case "IsometricRight":
+				view = "Right";
+				break;
+		}
+	}
+	cameraPosSelector.val(view);
+	updateCameraPos();
+}
 function handleMessage_camera(msg) {
 	$("#btn-camera").removeClass("disabled-button");
 	if(msg.hasOwnProperty("CameraPos")) {
 		let cameraPos = msg.CameraPos;
+		cameraPosSelector.val(cameraPos);
 	}
 }
 function toggleCinePopup() {
@@ -531,11 +574,19 @@ let formattedTexts = {};
 function formatOpenSpaceTextR2(text) {
 	let orgText = text;
 
-	let regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
-
-	text = text.replace(regexColors, function (match, p1, p2, offset, string, groups) {
-		return `<span class="dialog-color color-${p1.toLowerCase()}">${p2}</span>`;
-	});
+	if(gameSettings.Game === "RRR") {
+		let regexColors = RegExp("\\/[oO]([0-9]{1,3}):([0-9]{1,3}):([0-9]{1,3}):(.*?(?=\\/[oO]|$))", 'g');
+	
+		text = text.replace(regexColors, function (match, p1, p2, p3, p4, offset, string, groups) {
+			return `<span style="color: rgba(${p1}, ${p2}, ${p3}, 1);">${p4}</span>`;
+		});
+	} else {
+		let regexColors = RegExp("\/[oO]([0-9]{1,3}):(.*?(?=\/[oO]|$))", 'g');
+	
+		text = text.replace(regexColors, function (match, p1, p2, offset, string, groups) {
+			return `<span class="dialog-color color-${p1.toLowerCase()}">${p2}</span>`;
+		});
+	}
 	text = text.replace(/\/L:/gi, "<br/>"); // New Lines
 
 	let regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
@@ -547,8 +598,10 @@ function formatOpenSpaceTextR2(text) {
 		return `<div class="center">${p1}</div>`;
 	});
 	text = text.replace(regexMisc, ""); // Replace non-visible control characters
-
-	text = text.replace(":", ""); // remove :
+	
+	if(gameSettings.Game !== "RRR") {
+		text = text.replace(":", ""); // remove :
+	}
 
 	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
 	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only
@@ -565,11 +618,15 @@ function formatOpenSpaceTextR3(text) {
 
 	//let regexEvent = RegExp("/[eE][0-9]{0,5}: (.*?(?=\/|$|<))", 'g');
 	let regexCenter = RegExp("\\\\jc(.*)$", 'gi');
+	let regexBold = RegExp("\\\\b(.*)$", 'gi');
 	//let regexMisc = RegExp("/[a-zA-Z][0-9]{0,5}:", 'g');
 
 	//text = text.replace(regexEvent, ""); // Replace event characters
 	text = text.replace(regexCenter, function (match, p1, offset, string, groups) { // Center text if necessary
 		return `<div class="center">${p1}</div>`;
+	});
+	text = text.replace(regexBold, function (match, p1, offset, string, groups) { // Bold text
+		return `<b>${p1}</b>`;
 	});
 	//text = text.replace(regexMisc, ""); // Replace non-visible control characters
 
@@ -577,6 +634,7 @@ function formatOpenSpaceTextR3(text) {
 
 	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
 	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only
+	text = text.replaceAll('$', '"'); // Special character, apparently.
 
 	return text;
 }
@@ -629,9 +687,21 @@ function handleMessage_localization(msg) {
 	$("#btn-localization").removeClass("disabled-button");
 	if(gameSettings != null){
 		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush") {
-			text_highlight_tooltip.addClass("rayman-2");
+			if(gameSettings.EngineMode === "PS1" || gameSettings.EngineMode === "ROM") {
+				text_highlight_tooltip.addClass("rom");
+				if(gameSettings.Game === "RRR") {
+					text_highlight_tooltip.addClass("rrr");
+				} else {
+					text_highlight_tooltip.addClass("rayman-2");
+				}
+			} else {
+				text_highlight_tooltip.addClass("rayman-2");
+			}
 		} else if(gameSettings.Game === "R3" || gameSettings.Game === "RA" || gameSettings.Game === "RM") {
 			text_highlight_tooltip.addClass("rayman-3");
+			if(gameSettings.Game === "R3") {
+				text_highlight_tooltip.addClass("blue");
+			}
 		}
 	}
 	let fullHTML = [];
@@ -961,7 +1031,7 @@ function showObjectDescription(so, isSOChanged) {
 	let api = description_content.data('jsp');
 	setTimeout(function(){
 		api.reinitialise();
-		recalculateAspectRatio();
+		//recalculateAspectRatio();
 	}, 100);
 	btn_close_description.removeClass('disabled-button');
 	description_column.removeClass('invisible');
@@ -1225,9 +1295,9 @@ function setSelection(so) {
 function clearSelection() {
 	description_column.addClass('invisible');
 	$(".objects-item").removeClass("current-objects-item");
-	setTimeout(function(){
+	/*setTimeout(function(){
 		recalculateAspectRatio();
-	}, 100);
+	}, 100);*/
 	currentSO = null;
 	let jsonObj = {
 		Selection: {
@@ -1677,7 +1747,13 @@ $(function() {
 	$("input:radio[name='screenshotRadio']").change(function(){
 		updateResolutionSelection();
 		return false;
-    });
+	});
+	description_column.on('transitionend', function () {
+		// your event handler
+		waitForFinalEvent(function(){
+			recalculateAspectRatio();
+		}, 3, "eventWaiterTransitionEnd");
+	});
 	
 	$(document).on('input', "#screenshotResolutionW, #screenshotResolutionH", function() {
 		recalculateAspectRatio();
@@ -1717,6 +1793,11 @@ $(function() {
 	$(document).on('change', "#cameraPosSelector", function() {
 		updateCameraPos();
 		$(this).blur();
+		return false;
+	});
+	$(document).on('click', '.cube__face', function() {
+		let view = $(this).data('view');
+		clickCameraCube(view);
 		return false;
 	});
 	$(document).on('focusin', ".input-typing", function() {

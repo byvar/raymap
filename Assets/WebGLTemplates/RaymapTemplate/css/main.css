@@ -538,7 +538,8 @@ a:focus {
     margin-right: 15px;
 	left: auto !important;
 }
-#text-highlight-tooltip.rayman-2 {
+#text-highlight-tooltip.rayman-2,
+#text-highlight-tooltip.rrr {
 	font-weight: 300;
 	font-family: 'Rayman 2', sans-serif;
     line-height: 1.5em;
@@ -554,6 +555,9 @@ a:focus {
 	-webkit-background-clip: text;
 	background-clip: text;
 	-webkit-text-fill-color: transparent;
+}
+#text-highlight-tooltip.rrr > #text-highlight-content {
+	color: #6EBEFF !important;
 }
 #text-highlight-tooltip.rayman-3 {
 	font-weight: 300;

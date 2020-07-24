@@ -6,20 +6,36 @@
 	-webkit-text-fill-color: transparent;
 }
 
-.color-0 {
+#text-highlight-tooltip.rayman-2 .color-0 {
     background-color: #6EBEFF !important;
 }
 
-.color-200 {
+#text-highlight-tooltip.rayman-2 .color-200 {
     background-color: #FA4646 !important;
 }
 
-.color-400 {
+#text-highlight-tooltip.rayman-2 .color-400 {
     background-color: #FFFF78 !important;
 }
 
-.color-600 {
+#text-highlight-tooltip.rayman-2 .color-600 {
     background-color: #6EBEFF !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-0 {
+    color: #6EBEFF !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-200 {
+    color: #FA4646 !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-400 {
+    color: #FFFF78 !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-600 {
+    color: #6EBEFF !important;
 }
 .center {
 	text-align: center;

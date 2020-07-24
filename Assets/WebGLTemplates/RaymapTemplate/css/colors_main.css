@@ -119,6 +119,10 @@ body {
     background-color: rgba(0,0,0,0.8);
 	color: white;
 }
+#text-highlight-tooltip.blue {
+	background-color: rgba(27, 48, 115, 0.85);
+	box-shadow: 5px 5px 10px 0px rgba(0,0,0,0.38);
+}
 
 .song-buttons > .song-button {
 	color: rgba(6,86,109,1);
