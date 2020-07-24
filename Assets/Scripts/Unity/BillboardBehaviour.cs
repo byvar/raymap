@@ -14,6 +14,7 @@ public class BillboardBehaviour : MonoBehaviour {
         CameraPosXYZ = 4
     }
     public LookAtMode mode = LookAtMode.None;
+    public Vector3 rotationOffset = Vector3.zero;
 
     private Camera Cam {
         get {
@@ -70,6 +71,8 @@ public class BillboardBehaviour : MonoBehaviour {
                     transform.Rotate(new Vector3(-addRotation, -90, 0), Space.Self);*/
                     break;
             }
+
+            transform.localRotation *= Quaternion.Euler(rotationOffset);
         }
     }
 }

@@ -95,5 +95,36 @@ namespace OpenSpace.Collide {
 
             return volume;
         }
+
+        public static BoundingVolume CombineBoxes(BoundingVolume[] volumes)
+        {
+            Vector3 min = volumes[0].boxMin;
+            Vector3 max = volumes[0].boxMax;
+
+            for(int i=1;i<volumes.Length;i++) {
+                var bMin = volumes[i].boxMin;
+                var bMax = volumes[i].boxMax;
+
+                if (bMin.x < min.x) min.x = bMin.x;
+                if (bMin.y < min.y) min.y = bMin.y;
+                if (bMin.z < min.z) min.z = bMin.z;
+
+                if (bMax.x > max.x) max.x = bMax.x;
+                if (bMax.y > max.y) max.y = bMax.y;
+                if (bMax.z > max.z) max.z = bMax.z;
+            }
+
+            BoundingVolume v = new BoundingVolume(null)
+            {
+                type = Type.Box,
+
+                boxMin = min,
+                boxMax = max,
+            };
+            v.boxSize = max - min;
+            v.boxCenter = min + (v.boxSize * 0.5f);
+
+            return v;
+        }
     }
 }
