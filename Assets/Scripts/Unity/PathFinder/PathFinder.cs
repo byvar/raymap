@@ -1,8 +1,10 @@
-﻿using OpenSpace;
+﻿using Newtonsoft.Json;
+using OpenSpace;
 using OpenSpace.Collide;
 using OpenSpace.Loader;
 using OpenSpace.Object;
 using OpenSpace.Object.Properties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.PackageManager;
@@ -10,7 +12,8 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class PathFinder : MonoBehaviour {
-    
+
+    public bool AddMultiple = true;
     public GameObject markerPrefab;
     public float agentRadius = 0.8f;
     public float agentHeight = 0.8f;
@@ -19,6 +22,7 @@ public class PathFinder : MonoBehaviour {
 
     public List<GameObject> waypoints = new List<GameObject>();
     private List<Vector3> waypointPositions = new List<Vector3>();
+    private GameObject newMarker;
 
     [HideInInspector]
     public State state = State.Default;
@@ -40,53 +44,95 @@ public class PathFinder : MonoBehaviour {
         });
     }
 
+    private Vector3 GetMouseCoordinate()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        var hits = Physics.RaycastAll(ray, 10000, 1 << LayerMask.NameToLayer("Collide") | 1 << LayerMask.NameToLayer("Visual")).ToList();
+
+        // closest hits first
+        hits.Sort((a, b) =>
+        {
+            var distA = (a.point - Camera.main.transform.position).sqrMagnitude;
+            var distB = (b.point - Camera.main.transform.position).sqrMagnitude;
+            return distA < distB ? -1 : distA > distB ? 1 : 0;
+        })
+;
+        foreach (var hit in hits) {
+            if (!(hit.collider is MeshCollider)) {
+                continue;
+            }
+
+            return hit.point;
+        }
+        return Vector3.zero;
+    }
+
+    public void ImportJSON(string json)
+    {
+        List<ImportVec3> positions = JsonConvert.DeserializeObject<List<ImportVec3>>(json);
+
+        CreateNavMesh();
+
+        foreach (ImportVec3 p in positions) {
+            AddWayPoint(p.ToVector3());
+        }
+
+        ForceUpdate();
+    }
+
     // Update is called once per frame
     void Update()
     {
-        List<Vector3> newWayPointPositions = waypoints.Select(wp => wp.transform.position).ToList();
+        List<Vector3> newWayPointPositions = GetWayPointPositions();
         if (!newWayPointPositions.SequenceEqual(waypointPositions)) {
             waypointPositions = newWayPointPositions;
             ForceUpdate();
         }
 
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            state = State.Default;
+        }
+
         if (state == State.BeginAdd) {
             if (Input.GetMouseButtonDown(0)) {
-                state = State.Adding;
+                Vector3 mc = GetMouseCoordinate();
+                if (mc != Vector3.zero) {
+                    state = State.Adding;
+                    AddWayPoint(mc);
+
+                    ForceUpdate();
+                }
             }
         } else if (state == State.Adding) {
 
-            if (Input.GetMouseButton(1)) {
-                state = State.Default;
-            }
+            Vector3 mc = GetMouseCoordinate();
+            if (mc != Vector3.zero)
+                newMarker.transform.position = mc;
 
             if (Input.GetMouseButtonUp(0)) {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                var hits = Physics.RaycastAll(ray, 10000, 1 << LayerMask.NameToLayer("Collide") | 1 << LayerMask.NameToLayer("Visual")).ToList();
-
-                // closest hits first
-                hits.Sort((a, b) =>
-                {
-                    var distA = (a.point - Camera.main.transform.position).sqrMagnitude;
-                    var distB = (b.point - Camera.main.transform.position).sqrMagnitude;
-                    return distA < distB ? 1 : distA > distB ? -1 : 0;
-                })
-;
-                foreach (var hit in hits) {
-                    if (!(hit.collider is MeshCollider)) {
-                        continue;
-                    }
-
-                    GameObject marker = GameObject.Instantiate(markerPrefab);
-                    marker.transform.parent = transform;
-                    marker.transform.position = hit.point;
-                    waypoints.Add(marker);
-                    
-                    ForceUpdate();
-                    break;
-                }
+                ForceUpdate();
+                if (AddMultiple)
+                    state = State.BeginAdd;
+                else
+                    state = State.Default;
             }
         }
+    }
+
+    public void AddWayPoint(Vector3 position)
+    {
+        newMarker = GameObject.Instantiate(markerPrefab);
+        newMarker.transform.parent = transform;
+        newMarker.transform.position = position;
+        waypoints.Add(newMarker);
+    }
+
+    public List<Vector3> GetWayPointPositions()
+    {
+        return waypoints.Select(wp => wp.transform.position).ToList();
     }
 
     private Bounds GetBoundsForUniverse()
@@ -177,5 +223,16 @@ public class PathFinder : MonoBehaviour {
             })
             .Select(cc => cc.gameObject.GetComponent<MeshCollider>())
             .Where(c=>c!=null).ToList();
+    }
+
+    public struct ImportVec3 {
+        public float x;
+        public float y;
+        public float z;
+
+        public Vector3 ToVector3()
+        {
+            return new Vector3(x, y, z);
+        }
     }
 }
