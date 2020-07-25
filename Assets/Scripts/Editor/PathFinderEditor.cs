@@ -49,7 +49,10 @@ public class PathFinderEditor : Editor {
         if (GUILayout.Button("Export waypoints to JSON")) {
             json = JsonConvert.SerializeObject(pf.GetWayPointPositions());
         }
-        if (GUILayout.Button("Import waypoints from JSON")) {
+        if (GUILayout.Button("Export corners to JSON")) {
+            json = JsonConvert.SerializeObject(pf.corners);
+        }
+        if (GUILayout.Button("Import waypoints/corners from JSON")) {
             RemoveAllWayPoints();
             pf.ImportJSON(json);
         }

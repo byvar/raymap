@@ -20,7 +20,12 @@ public class PathFinder : MonoBehaviour {
     public float agentMaxStep = 5;
     public float agentSlope = 45;
 
+    [HideInInspector]
     public List<GameObject> waypoints = new List<GameObject>();
+
+    [HideInInspector]
+    public List<Vector3> corners = new List<Vector3>();
+
     private List<Vector3> waypointPositions = new List<Vector3>();
     private GameObject newMarker;
 
@@ -78,7 +83,7 @@ public class PathFinder : MonoBehaviour {
             AddWayPoint(p.ToVector3());
         }
 
-        ForceUpdate();
+        waypointPositions = new List<Vector3>();
     }
 
     // Update is called once per frame
@@ -183,7 +188,7 @@ public class PathFinder : MonoBehaviour {
 
     public void ForceUpdate()
     {
-        List<Vector3> corners = new List<Vector3>();
+        corners = new List<Vector3>();
 
         for (int i = 0; i < waypointPositions.Count-1; i++) {
 
@@ -209,8 +214,8 @@ public class PathFinder : MonoBehaviour {
             }
         }
         var r = GetComponent<LineRenderer>();
-        r.SetPositions(corners.ToArray());
         r.positionCount = corners.Count;
+        r.SetPositions(corners.ToArray());
     }
 
     private static List<MeshCollider> GetRelevantMeshColliders()
