@@ -732,26 +732,42 @@ canvas + * {
 .logo {
 	z-index: 3;
 	display: block;
-	/*width: 50%;
-	height: 50%;*/
-	background-color: white;
+	width: 100%;
+	height: 100%;
+	background-color: black;
 	position: absolute;
-	top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);
+	top: 0;
+	left: 0;
+	background-image: url('../preview.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 50% 30%;
 }
 .progress {
-	z-index: 3;
-	margin: 1.5em;
+	z-index: 4;
 	border: 1px solid white;
 	position: absolute;
-	top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);
-	width: 25%;
-	
+	bottom: 10%;
+	left: 50%;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
+	width: 75%;
+	font-size: 1.7em;
 }
 .progress .full {
 	margin: 2px;
-	background: white;
 	height: 1em;
 	transform-origin: top left;
+	width: calc(100% - 4px) !important;
+}
+.progress .empty {
+	width: 10%;
+	top: 0;
+	z-index: 4;
+	position: absolute;
+	background-color: black;
+	right: 0;
+	height: 100%;
 }
 .spinner,
 .spinner:after {
@@ -1179,7 +1195,7 @@ input[type=range]::-ms-fill-upper {
 	overflow: hidden;
 	transition:visibility 0s linear, transform 0.3s;
 	transform-origin: 50% 100%;
-	transform: scaleY(100%);
+	transform: scaleY(1);
 }
 #camera-popup {
 	display: block;
@@ -1195,18 +1211,23 @@ input[type=range]::-ms-fill-upper {
 	overflow: hidden;
 	transition:visibility 0s linear, transform 0.3s;
 	transform-origin: 50% 100%;
-	transform: scaleY(100%);
+	transform: scaleY(1);
 }
 #cine-popup.hidden-popup,
 #camera-popup.hidden-popup {
 	visibility: 0;
 	transition:visibility 0s linear, transform 0.3s;
-	transform: scaleY(0%);
+	transform: scaleY(0);
 }
 .camera-options {
 	display: block;
 	float: right;
 	width: 19em;
+	text-align: left;
+	font-size: 0.8em;
+}
+.cine-options {
+	display: block;
 	text-align: left;
 	font-size: 0.8em;
 }

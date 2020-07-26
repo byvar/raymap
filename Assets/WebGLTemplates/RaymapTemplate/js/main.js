@@ -94,7 +94,7 @@ let currentBehaviorType = "";
 let wrapper, objects_content, unity_content, description_content, description_column;
 let gameColumnContent, screenshotResolutionRadio, screenshotSizeFactorRadio, screenshotResolutionW, screenshotResolutionH, screenshotSizeFactor = null;
 let screenshotResolutionSelected = false;
-let btn_close_description, stateSelector, objectListSelector, languageSelector, cameraPosSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
+let btn_close_description, stateSelector, objectListSelector, languageSelector, cameraPosSelector, cinematicSelector, cinematicActorSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
 let previousState = -1;
 
 // FUNCTIONS
@@ -357,8 +357,74 @@ function handleMessage_settings(msg) {
 	selectButton($("#btn-playTextureAnimations"), msg.PlayTextureAnimations);
 	$("#range-luminosity").val(msg.Luminosity);
 }
+function updateCinematic() {
+	let index = cinematicSelector.prop("selectedIndex");
+	
+	let jsonObj = {
+		CineData: {
+			CinematicIndex: index
+		}
+	};
+	let animationSpeed = $('#cinematicSpeed').val();
+	if($.isNumeric(animationSpeed) && parseInt(animationSpeed) >= 0) {
+		jsonObj.CineData.AnimationSpeed = parseInt(animationSpeed);
+	}
+	sendMessage(jsonObj);
+}
+function selectCinematicActor() {
+	let index = cinematicActorSelector.prop("selectedIndex");
+	if(index !== 0) {
+		let persoIndex = cinematicActorSelector.val();
+		cinematicActorSelector.prop("selectedIndex", 0);
+		if($.isNumeric(persoIndex) && persoIndex > -1) {
+			let so = getSuperObjectByIndex(persoIndex);
+			if(so.hasOwnProperty("Perso")) {
+				setSelectionPerso(so.Perso);
+			}
+		}
+	}
+}
+function getIndexFromPerso(perso) {
+	if(hierarchy != null) {
+		for (let i = 0; i < objectsList.length; i++) {
+			if(!objectsList[i].hasOwnProperty("Perso")) {
+				continue;
+			}
+			if(objectsList[i].Perso.Offset === perso.Offset) {
+				return i;
+			}
+		}
+	}
+	return -1;
+}
 function handleMessage_cineData(msg) {
 	$("#btn-cine").removeClass("disabled-button");
+	if(msg.hasOwnProperty("CinematicNames")) {
+		cinematicSelector.empty();
+		$.each(msg.CinematicNames, function (idx, cine) {
+			cinematicSelector.append("<option value='" + idx + "'>" + escapeHTML(cine) + "</option>");
+		});
+	}
+	if(msg.hasOwnProperty("CinematicIndex")) {
+		cinematicSelector.prop("selectedIndex", msg.CinematicIndex);
+	}
+	if(msg.hasOwnProperty("AnimationSpeed")) {
+		$('#cinematicSpeed').val(msg.AnimationSpeed);
+		$("#cine-speed-group").removeClass("invisible");
+	} else {
+		$("#cine-speed-group").addClass("invisible");
+	}
+	cinematicActorSelector.empty();
+	cinematicActorSelector.append("<option value='null'>Select an actor...</option>");
+	if(msg.hasOwnProperty("Actors")) {
+		$("#cine-actor-group").removeClass("invisible");
+		$.each(msg.CinematicNames, function (idx, act) {
+			cinematicActorSelector.append("<option value='" + getIndexFromPerso(act) + "'>" + escapeHTML(act.NameInstance) + "</option>");
+		});
+	} else {
+		$("#cine-actor-group").addClass("invisible");
+	}
+	cinematicActorSelector.prop("selectedIndex", 0);
 }
 function updateCameraPos() {
 	let selectedCameraPos = cameraPosSelector.val();
@@ -461,7 +527,7 @@ function updateResolutionSelection() {
 }
 function takeScreenshot() {
 	let radioValue = $("input:radio[name='screenshotRadio']:checked").val();
-	let isTransparent = $("#btn-photo-transparency").hasClass("selected");
+	let isTransparent = !($("#btn-photo-transparency").hasClass("selected"));
 
 	if(radioValue) {
 		switch(radioValue) {
@@ -634,7 +700,7 @@ function formatOpenSpaceTextR3(text) {
 
 	let equalsSignRegex = RegExp("(?<!<[^>]*)=", 'g');
 	text = text.replace(equalsSignRegex, ":"); // = becomes : unless in a html tag :) (TODO: check if Rayman 2 only
-	text = text.replaceAll('$', '"'); // Special character, apparently.
+	text = text.replace(/\$/g, "\""); // Special character, apparently.
 
 	return text;
 }
@@ -1322,7 +1388,6 @@ function handleMessage_selection_updatePerso(oldPerso, newPerso) {
 	if(newPerso.hasOwnProperty("ObjectLists")) oldPerso.ObjectLists = newPerso.ObjectLists;
 	if(newPerso.hasOwnProperty("Brain")) oldPerso.Brain = newPerso.Brain;
 }
-// TODO
 function handleMessage_selection(msg) {
 	let selection = msg;
 	if(!selection.hasOwnProperty("Perso")) {
@@ -1330,56 +1395,19 @@ function handleMessage_selection(msg) {
 		return;
 	}
 	let perso = selection.Perso;
-	if(perso.IsAlways) {
-		let perso_selection, index_selection = -1;
-		if(hierarchy != null) {
-			for (let i = 0; i < objectsList.length; i++) {
-				if(!objectsList[i].hasOwnProperty("Perso")) {
-					continue;
-				}
-				if(objectsList[i].Perso.Offset === perso.Offset) {
-					handleMessage_selection_updatePerso(objectsList[i].Perso, perso);
-					objectsList[i].Position = perso.Position;
-					objectsList[i].Rotation = perso.Rotation;
-					objectsList[i].Scale = perso.Scale;
-					index_selection = i;
-					break;
-				}
-			}
-		}			
-		if(index_selection > -1) {
-			$(".objects-item").removeClass("current-objects-item");
-			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
-			let newcurrentSO = objectsList[index_selection];
-			let isSOChanged = newcurrentSO != currentSO;
-			currentSO = newcurrentSO;
-			showObjectDescription(currentSO, isSOChanged);
-		}
-	} else {
-		let so_selection, index_selection = -1;
-		if(hierarchy != null) {
-			for (let i = 0; i < objectsList.length; i++) {
-				if(!objectsList[i].hasOwnProperty("Perso")) {
-					continue;
-				}
-				if(objectsList[i].Perso.Offset === perso.Offset) {
-					handleMessage_selection_updatePerso(objectsList[i].Perso, perso);
-					objectsList[i].Position = perso.Position;
-					objectsList[i].Rotation = perso.Rotation;
-					objectsList[i].Scale = perso.Scale;
-					index_selection = i;
-					break;
-				}
-			}
-		}
-		if(index_selection > -1) {
-			$(".objects-item").removeClass("current-objects-item");
-			$(".objects-item:eq(" + index_selection + ")").addClass("current-objects-item");
-			let newcurrentSO = objectsList[index_selection];
-			let isSOChanged = newcurrentSO != currentSO;
-			currentSO = newcurrentSO;
-			showObjectDescription(currentSO, isSOChanged);
-		}
+	let perso_index = getIndexFromPerso(perso);
+	if(perso_index > -1) {
+		handleMessage_selection_updatePerso(objectsList[perso_index].Perso, perso);
+		objectsList[perso_index].Position = perso.Position;
+		objectsList[perso_index].Rotation = perso.Rotation;
+		objectsList[perso_index].Scale = perso.Scale;
+
+		$(".objects-item").removeClass("current-objects-item");
+		$(".objects-item:eq(" + perso_index + ")").addClass("current-objects-item");
+		let newcurrentSO = objectsList[perso_index];
+		let isSOChanged = newcurrentSO != currentSO;
+		currentSO = newcurrentSO;
+		showObjectDescription(currentSO, isSOChanged);
 	}
 }
 function handleMessage_highlight(msg) {
@@ -1464,6 +1492,8 @@ function handleMessage(jsonString) {
 				handleMessage_comport(msg.Comport); break;
 			case "Camera":
 				handleMessage_camera(msg.Camera); break;
+			case "CineData":
+				handleMessage_cineData(msg.CineData); break;
 			default:
 				console.log('default');break;
 		}
@@ -1609,6 +1639,8 @@ $(function() {
 	objectListSelector = $('#objectList');
 	languageSelector = $('#languageSelector');
 	cameraPosSelector = $('#cameraPosSelector');
+	cinematicSelector = $('#cinematicSelector');
+	cinematicActorSelector = $('#cinematicActorSelector');
 	objectListInputGroup = $('#objectListInputGroup')
 	highlight_tooltip = $("#highlight-tooltip");
 	text_highlight_tooltip = $('#text-highlight-tooltip');
@@ -1795,6 +1827,16 @@ $(function() {
 		$(this).blur();
 		return false;
 	});
+	$(document).on('change', "#cinematicSelector", function() {
+		updateCinematic();
+		$(this).blur();
+		return false;
+	});
+	$(document).on('change', "#cinematicActorSelector", function() {
+		selectCinematicActor();
+		$(this).blur();
+		return false;
+	});
 	$(document).on('click', '.cube__face', function() {
 		let view = $(this).data('view');
 		clickCameraCube(view);
@@ -1829,6 +1871,11 @@ $(function() {
 	
 	$(document).on('input', "#animationSpeed", function() {
 		sendPerso();
+		return false;
+	});
+	
+	$(document).on('input', "#cinematicSpeed", function() {
+		updateCinematic();
 		return false;
 	});
 	

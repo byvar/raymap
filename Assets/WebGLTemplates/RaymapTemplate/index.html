@@ -172,7 +172,24 @@
 									</div>
 								</div>
 							</div>
-							<div id="cine-popup" class="hidden-popup"></div>
+							<div id="cine-popup" class="hidden-popup">
+								<div class="cine-options">
+									<div class="input-group dropdown input-flex">
+										<div class="label main label-flex">Cinematic</div><div class="field flexible"><select id="cinematicSelector">
+										  <option value="null">None</option>
+										</select></div>
+									</div>
+									<div id="cine-speed-group" class="input-group small input-flex invisible">
+										<div class="label main label-flex">Animation Speed</div>
+										<div class="field flexible"><input id="cinematicSpeed" class="input-typing" type="number" step="any" name="x" placeholder="0" min="0"></input></div>
+									</div>
+									<div id="cine-actor-group" class="input-group dropdown input-flex invisible">
+										<div class="label main label-flex">Actors</div><div class="field flexible"><select id="cinematicActorSelector">
+										  <option value="null">Select an actor...</option>
+										</select></div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

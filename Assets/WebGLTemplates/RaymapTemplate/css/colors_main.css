@@ -44,6 +44,11 @@ body {
 	background-color: rgba(3,61,82,1);
 }
 
+.progress .full {
+	background: rgb(3,61,82);
+	background: linear-gradient(95deg, rgb(3, 61, 82) 0%, rgb(158, 217, 160) 78%, rgb(25, 200, 195) 100%);
+}
+
 /*.song-item:active,
 .playlist-item:active,
 .game-item:active,
