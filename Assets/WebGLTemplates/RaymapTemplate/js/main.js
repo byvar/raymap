@@ -1040,6 +1040,9 @@ function showObjectDescription(so, isSOChanged) {
 			if(perso.hasOwnProperty("Brain")) {
 				let allBehaviors = [];
 				let brain = perso.Brain;
+				if(perso.hasOwnProperty("StateTransitionExportAvailable") && perso.StateTransitionExportAvailable) {
+					allBehaviors.push('<div class="behaviors-item category stateTransitionExport"><div class="collapse-sign">+</div>Script state transition diagram</div>');
+				}
 				//let reg = /^.*\.(.*?)\[(\d*?)\](?:\[\"(.*?)\"\])?$/;
 				if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
 					allBehaviors.push("<div class='behaviors-item category collapsible' data-collapse='behaviors-intelligence-collapse'><div class='collapse-sign'>+</div>Intelligence behaviors</div><div id='behaviors-intelligence-collapse' style='display: none;'>");
@@ -1387,6 +1390,7 @@ function handleMessage_selection_updatePerso(oldPerso, newPerso) {
 	if(newPerso.hasOwnProperty("States")) oldPerso.States = newPerso.States;
 	if(newPerso.hasOwnProperty("ObjectLists")) oldPerso.ObjectLists = newPerso.ObjectLists;
 	if(newPerso.hasOwnProperty("Brain")) oldPerso.Brain = newPerso.Brain;
+	if(newPerso.hasOwnProperty("StateTransitionExportAvailable")) oldPerso.StateTransitionExportAvailable = newPerso.StateTransitionExportAvailable;
 }
 function handleMessage_selection(msg) {
 	let selection = msg;
@@ -1454,6 +1458,17 @@ function handleMessage_highlight(msg) {
 		highlight_tooltip.addClass("hidden-tooltip");
 	}
 }
+function requestTransitionExport() {
+	let jsonObj = {
+		Request: {
+			Type: "TransitionExport"
+		}
+	}
+	sendMessage(jsonObj);
+}
+function handleMessage_transitionExport(msg) {
+	console.log(msg);
+}
 
 // SETTINGS
 function sendSettings() {
@@ -1494,6 +1509,8 @@ function handleMessage(jsonString) {
 				handleMessage_camera(msg.Camera); break;
 			case "CineData":
 				handleMessage_cineData(msg.CineData); break;
+			case "TransitionExport":
+				handleMessage_transitionExport(msg.TransitionExport); break;
 			default:
 				console.log('default');break;
 		}
@@ -1897,6 +1914,10 @@ $(function() {
 			collapse.hide("fast", refreshScroll);
 			$(this).find(".collapse-sign").text("+");
 		}
+		return false;
+	});
+	$(document).on('click', ".stateTransitionExport", function () {
+		requestTransitionExport();
 		return false;
 	});
 	
