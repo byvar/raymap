@@ -1,0 +1,404 @@
+<html>
+	<head>
+		<script type="text/javascript">
+		
+			g_data = null; // global variable to store info
+			g_filter = null; // if not null, render only one box and lines
+			g_filterShowIncoming = false;
+			g_filterShowOutgoing = true;
+		
+			function getMousePos(canvas, evt) {
+				var rect = canvas.getBoundingClientRect();
+				return {
+					x: evt.clientX - rect.left,
+					y: evt.clientY - rect.top
+				};
+			}
+		
+			function CreateVector(val_x, val_y) {
+				return {
+					x: val_x,
+					y: val_y
+				};
+			}
+		
+			function checkLineIntersection(v1_a, v1_b, v2_a, v2_b) {
+				return checkLineIntersectionCoords(v1_a.x, v1_a.y, v1_b.x, v1_b.y, v2_a.x, v2_a.y, v2_b.x, v2_b.y);
+			}
+			
+			function checkLineIntersectionCoords(line1StartX, line1StartY, line1EndX, line1EndY, line2StartX, line2StartY, line2EndX, line2EndY) {
+				// if the lines intersect, the result contains the x and y of the intersection (treating the lines as infinite) and booleans for whether line segment 1 or line segment 2 contain the point
+				var denominator, a, b, numerator1, numerator2, result = {
+					x: null,
+					y: null,
+					onLine1: false,
+					onLine2: false
+				};
+				denominator = ((line2EndY - line2StartY) * (line1EndX - line1StartX)) - ((line2EndX - line2StartX) * (line1EndY - line1StartY));
+				if (denominator == 0) {
+					return result;
+				}
+				a = line1StartY - line2StartY;
+				b = line1StartX - line2StartX;
+				numerator1 = ((line2EndX - line2StartX) * a) - ((line2EndY - line2StartY) * b);
+				numerator2 = ((line1EndX - line1StartX) * a) - ((line1EndY - line1StartY) * b);
+				a = numerator1 / denominator;
+				b = numerator2 / denominator;
+
+				result.x = line1StartX + (a * (line1EndX - line1StartX));
+				result.y = line1StartY + (a * (line1EndY - line1StartY));
+
+				if (a > 0 && a < 1) {
+					result.onLine1 = true;
+				}
+				if (b > 0 && b < 1) {
+					result.onLine2 = true;
+				}
+				return result;
+			};
+		
+			function drawArrow(ctx, fromx, fromy, tox, toy, color){
+                //variables to be used when creating the arrow
+                var headlen = 10;
+
+                var angle = Math.atan2(toy-fromy,tox-fromx);
+
+                //starting path of the arrow from the start square to the end square and drawing the stroke
+                ctx.beginPath();
+                ctx.moveTo(fromx, fromy);
+                ctx.lineTo(tox, toy);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                //starting a new path from the head of the arrow to one of the sides of the point
+                ctx.beginPath();
+                ctx.moveTo(tox, toy);
+                ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
+
+                //path from the side point of the arrow, to the other side point
+                ctx.lineTo(tox-headlen*Math.cos(angle+Math.PI/7),toy-headlen*Math.sin(angle+Math.PI/7));
+
+                //path from the side point back to the tip of the arrow, and then again to the opposite side point
+                ctx.lineTo(tox, toy);
+                ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
+
+                //draws the paths created above
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.fillStyle = color;
+                ctx.fill();
+            }
+			
+			function CreateBehaviorDiagram() {
+				g_data = JSON.parse(inputJSON);
+				
+				var showNormalBehaviors = document.getElementById("ShowNormalBehaviors").checked ? true : false;
+				var showReflexBehaviors = document.getElementById("ShowReflexBehaviors").checked ? true : false;
+				
+				CreateDiagram(g_data.normalStates, g_data.reflexStates, showNormalBehaviors, showReflexBehaviors);
+			}
+			
+			function GetArrowDestCoordinates(stateFrom, stateTo) {
+				var xFrom = stateFrom.x;
+				var yFrom = stateFrom.y;
+				var xTo = stateTo.x;
+				var yTo = stateTo.y;
+				
+				var boxMinX = stateTo.x - stateTo.width / 2;
+				var boxMaxX = stateTo.x + stateTo.width / 2;
+				var boxMinY = stateTo.y - stateTo.height / 2;
+				var boxMaxY = stateTo.y + stateTo.height / 2;
+				
+				var vFrom = CreateVector(xFrom,yFrom);
+				var vTo = CreateVector(xTo,yTo);
+				
+				var intersections = [];
+				
+				var intersection_top = checkLineIntersection(vFrom,vTo,CreateVector(boxMinX,boxMinY),CreateVector(boxMaxX,boxMinY));
+				if (intersection_top.onLine2) {intersections.push(intersection_top);}
+				
+				var intersection_bottom = checkLineIntersection(vFrom,vTo,CreateVector(boxMinX,boxMaxY),CreateVector(boxMaxX,boxMaxY));
+				if (intersection_bottom.onLine2) {intersections.push(intersection_bottom);}
+				
+				var intersection_left = checkLineIntersection(vFrom,vTo,CreateVector(boxMinX,boxMinY),CreateVector(boxMinX,boxMaxY));
+				if (intersection_left.onLine2) {intersections.push(intersection_left);}
+				
+				var intersection_right = checkLineIntersection(vFrom,vTo,CreateVector(boxMaxX,boxMinY),CreateVector(boxMaxX,boxMaxY));
+				if (intersection_right.onLine2) {intersections.push(intersection_right);}
+				
+				intersections.sort(function(a, b) {
+					  var distA = (a.x-xFrom)*(a.x-xFrom) + (a.y-yFrom)*(a.y-yFrom);
+					  var distB = (b.x-xFrom)*(b.x-xFrom) + (b.y-yFrom)*(b.y-yFrom);
+					  return distA>distB ? 1 : -1;
+					}.bind(this))
+				
+				if (intersections.length > 0) {
+					return intersections[0];
+				}
+				
+				return CreateVector(xTo, yTo);
+				
+			}
+		
+			function CreateDiagram(normalStates, reflexStates, showNormalBehaviors, showReflexBehaviors) {
+			
+				var c_red = "#cc0000";
+				var c_blue = "#0000cc";
+			
+				var normalStateCount = normalStates.length;
+				var reflexStateCount = reflexStates.length;
+				
+				var scale = (normalStateCount + reflexStateCount)*10;
+			
+				var canvas = document.getElementById("canvas");
+				var cw = 1200 + scale * 3;
+				var ch = 600 + scale;
+				var radius = ch/2.5;
+				
+				canvas.width = cw;
+				canvas.height = ch;
+				var ctx = canvas.getContext("2d");
+				ctx.fillStyle = "white";
+				ctx.fillRect(0,0,cw,ch);
+				
+				ctx.beginPath();
+				ctx.arc(cw/2, ch/2, radius, 0, 2 * Math.PI);
+				ctx.strokeStyle = "gray";
+				// center circle
+				//ctx.stroke();
+				
+				var currentState = 0;
+				
+				if (showNormalBehaviors) {
+					normalStates.forEach(function(state) {
+					
+						var stateName = (state.name!="") ? (state.name + "(" +state.index + ")" ) : "Normal #"+state.index;
+						state.text = stateName;
+						state.width = ctx.measureText(stateName).width * 1.25; 
+						state.height = 24;
+					
+						var angle = - Math.PI / 2 + (currentState / normalStateCount) * Math.PI * 2; // circle
+						var dist = radius // circle
+						var sx = cw/4 + dist * Math.cos(angle);
+						var sy = ch/2 + dist * Math.sin(angle);
+						
+						// bring items closer to the center vertically cuz they are flat
+						var factor = Math.abs(Math.cos(angle));
+						sy += (ch/2 - sy) * 0.25 * factor; 
+						
+						state.x = sx;
+						state.y = sy;
+						currentState++;
+					
+					});
+				}
+				
+				currentState = 0;
+				
+				if (showReflexBehaviors) {
+					reflexStates.forEach(function(state) {
+					
+						var stateName = (state.name!="") ? (state.name + "(" +state.index + ")" ) : "Reflex #"+state.index;
+						state.text = stateName;
+						state.width = ctx.measureText(stateName).width * 1.25; 
+						state.height = 24;
+					
+						var angle = - Math.PI / 2 + (currentState / reflexStateCount) * Math.PI * 2; // circle
+						var dist = radius // circle
+						var sx = cw/2 + cw/4 + dist * Math.cos(angle);
+						var sy = ch/2 + dist * Math.sin(angle);
+						
+						// bring items closer to the center vertically cuz they are flat
+						var factor = Math.abs(Math.cos(angle));
+						sy += (ch/2 - sy) * 0.25 * factor; 
+						
+						state.x = sx;
+						state.y = sy;
+						currentState++;
+					
+					});
+				}
+				
+				// draw lines
+				if (showNormalBehaviors) {
+					normalStates.forEach(function(state) {
+						
+						if (g_filter != null && state.offset != g_filter.offset && !g_filterShowIncoming) {
+							return;
+						}
+						
+						state.transitionToNormal.forEach(function(transitionToIndex) {
+							var stateTo = normalStates[transitionToIndex];
+							
+							if (g_filter != null && stateTo.offset != g_filter.offset && !g_filterShowOutgoing) {
+								return;
+							}
+							
+							var arrowDest = GetArrowDestCoordinates(state, stateTo);
+							drawArrow(ctx, state.x, state.y, arrowDest.x, arrowDest.y, c_red);
+						}.bind(this));
+						
+						if (showReflexBehaviors) {
+							state.transitionToReflex.forEach(function(transitionToIndex) {
+								var stateTo = reflexStates[transitionToIndex];
+								
+								if (g_filter != null && stateTo.offset != g_filter.offset && !g_filterShowOutgoing) {
+									return;
+								}
+								
+								var arrowDest = GetArrowDestCoordinates(state, stateTo);
+								drawArrow(ctx, state.x, state.y, arrowDest.x, arrowDest.y, c_blue);
+							}.bind(this));
+						}
+					}.bind(this));
+				}
+				
+				if (showReflexBehaviors) {
+					reflexStates.forEach(function(state) {
+						
+						if (g_filter != null && state.offset != g_filter.offset && !g_filterShowIncoming) {
+							return;
+						}
+						
+						if (showNormalBehaviors) {
+							state.transitionToNormal.forEach(function(transitionToIndex) {
+								var stateTo = normalStates[transitionToIndex];
+								
+								if (g_filter != null && stateTo.offset != g_filter.offset && !g_filterShowOutgoing) {
+									return;
+								}
+								
+								var arrowDest = GetArrowDestCoordinates(state, stateTo);
+								drawArrow(ctx, state.x, state.y, arrowDest.x, arrowDest.y, c_red);
+							}.bind(this));
+						}
+						
+						state.transitionToReflex.forEach(function(transitionToIndex) {
+							var stateTo = reflexStates[transitionToIndex];
+							
+							if (g_filter != null && stateTo.offset != g_filter.offset && !g_filterShowOutgoing) {
+								return;
+							}
+							
+							var arrowDest = GetArrowDestCoordinates(state, stateTo);
+							drawArrow(ctx, state.x, state.y, arrowDest.x, arrowDest.y, c_blue);
+						}.bind(this));
+					
+					}.bind(this));
+				}
+				// draw text boxes
+				
+				ctx.strokeStyle = c_red;
+				ctx.fillStyle = "black";
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.font="12px Arial";
+				ctx.lineWidth = 1;
+				
+				drawState = function(state) {
+				// check if in filter
+						var inFilter = !(g_filter != null && state.offset != g_filter.offset);
+						
+						if (inFilter)
+						ctx.fillStyle = "white";
+						else
+						ctx.fillStyle = "rgba(255,255,255,0.2)";
+						
+						ctx.fillRect(state.x-state.width/2, state.y-state.height/2, state.width, state.height);
+						
+						if (inFilter) {
+							ctx.fillStyle = "black";
+						} else {
+							ctx.fillStyle = "rgba(0,0,0,0.5)";
+						}
+						ctx.strokeRect(state.x-state.width/2, state.y-state.height/2, state.width, state.height);
+						
+						ctx.fillText(state.text, state.x, state.y);
+				}
+				
+				if (showNormalBehaviors) {
+					normalStates.forEach(drawState.bind(this));
+				}
+				
+				ctx.strokeStyle = c_blue;
+				
+				if (showReflexBehaviors) {
+					reflexStates.forEach(drawState.bind(this));
+				}
+			}
+			
+			function PointInBox(x, y, box) {
+				var xDiff = (box.x-x);
+				var yDiff = (box.y-y);
+				return (xDiff < box.width/2 && xDiff>-box.width/2 && yDiff < box.height/2 && yDiff>-box.height/2);
+			}
+			
+			function CanvasClicked(event) {
+				var canvas = document.getElementById("canvas");
+				var coords = getMousePos(canvas, event);
+				
+				if (g_data==null) {
+					return;
+				}
+				
+				var clicked = null;
+				
+				g_data.normalStates.forEach(function(state){
+					if (PointInBox(coords.x,coords.y, state)) {
+						clicked = state;
+					}
+				});
+			
+				g_data.reflexStates.forEach(function(state){
+					if (PointInBox(coords.x,coords.y, state)) {
+						clicked = state;
+					}
+				});
+				
+				if (event.which==1) {
+					g_filterShowIncoming = false;
+					g_filterShowOutgoing = true;
+				}
+				if (event.which==2) {
+					return true;
+				}
+				if (event.which==3) {
+					g_filterShowIncoming = true;
+					g_filterShowOutgoing = false;
+				}
+				
+				if (clicked!=null) {
+					g_filter = clicked;
+					CreateBehaviorDiagram();
+				} else {
+					g_filter = null;
+					CreateBehaviorDiagram();
+				}
+				
+				event.preventDefault();
+				
+			}
+			
+			function CanvasDoubleClicked(event) {
+			
+				if (g_filter!=null) {
+					alert("Double clicked: "+g_filter.offset);
+				}
+			
+			}
+			
+		</script>
+	</head>
+	<body style="background-color: #ddd;">
+		<div>
+			<label><input type="checkbox" id="ShowNormalBehaviors" checked="checked"/>Show Normal Behaviors</label><br>
+			<label><input type="checkbox" id="ShowReflexBehaviors" checked="checked"/>Show Reflex Behaviors</label><br>
+			<input type="button" onclick="CreateBehaviorDiagram()" value="Create State Diagram"/><br>
+		</div>
+		<div>
+		<canvas id="canvas" onmousedown="CanvasClicked(event)" ondblclick="CanvasDoubleClicked(event)" oncontextmenu="event.preventDefault();"></canvas>
+		</div>
+	</body>
+</html>

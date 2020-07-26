@@ -1468,6 +1468,11 @@ function requestTransitionExport() {
 }
 function handleMessage_transitionExport(msg) {
 	console.log(msg);
+	let popupWin = window.open('statediagram.html','transitionExport','');
+	popupWin.inputJSON = msg;
+	popupWin.addEventListener('load', (event) => {
+		popupWin.CreateBehaviorDiagram();
+	});
 }
 
 // SETTINGS
