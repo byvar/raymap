@@ -103,7 +103,7 @@ public class Controller : MonoBehaviour {
 		actor1Name = UnitySettings.Actor1Name;
 		actor2Name = UnitySettings.Actor2Name;
 
-        ExportPath = UnitySettings.ExportPath;
+		ExportPath = UnitySettings.ExportPath;
 		ExportAfterLoad = UnitySettings.ExportAfterLoad;
         ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoad;
 		if (FileSystem.mode == FileSystem.Mode.Web) {
@@ -165,6 +165,9 @@ public class Controller : MonoBehaviour {
                     }
                     i++;
                     break;
+				case "--allowDeadPointers":
+					UnitySettings.AllowDeadPointers = true;
+					break;
             }
 		}
 		Application.logMessageReceived += Log;
@@ -198,6 +201,8 @@ public class Controller : MonoBehaviour {
 								case "act2":
 								case "a2":
 									actor2Name = argKeyVal[1]; break;
+								case "allowDeadPointers":
+									UnitySettings.AllowDeadPointers = true; break;
 							}
 						}
 					}

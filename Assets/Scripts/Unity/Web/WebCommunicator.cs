@@ -29,6 +29,7 @@ public class WebCommunicator : MonoBehaviour {
 	private WayPointBehaviour highlightedWayPoint_;
     private BasePersoBehaviour selectedPerso_;
 	private int selectedPersoStateIndex_;
+	private int cinematicIndex_;
     bool sentHierarchy = false;
     string allJSON = null;
 
@@ -79,6 +80,10 @@ public class WebCommunicator : MonoBehaviour {
 			if (selectedPerso_ != null && selectedPersoStateIndex_ != selectedPerso_.currentState) {
 				selectedPersoStateIndex_ = selectedPerso_.currentState;
 				Send(GetSelectionMessageJSON(false, false));
+			}
+			if (controller.CinematicSwitcher != null && cinematicIndex_ != controller.CinematicSwitcher.CinematicIndex) {
+				cinematicIndex_ = controller.CinematicSwitcher.CinematicIndex;
+				Send(GetCineDataMessageJSON());
 			}
         }
     }
@@ -172,6 +177,12 @@ public class WebCommunicator : MonoBehaviour {
 			EngineVersion = OpenSpace.Settings.s.engineVersion,
 			Game = OpenSpace.Settings.s.game,
 			Mode = OpenSpace.Settings.s.mode
+		};
+	}
+	public WebJSON.Message GetCineDataMessageJSON() {
+		return new WebJSON.Message() {
+			Type = WebJSON.MessageType.CineData,
+			CineData = GetCineDataJSON(),
 		};
 	}
 	public WebJSON.CineData GetCineDataJSON() {
@@ -621,7 +632,6 @@ public class WebCommunicator : MonoBehaviour {
 					Type = WebJSON.MessageType.Macro,
 					Macro = GetMacroJSON(m, includeScriptContents: true)
 				});
-				break;
 				break;
 			case WebJSON.RequestType.TransitionExport:
 				if (selectedPerso_ != null && selectedPerso_ is PersoBehaviour) {

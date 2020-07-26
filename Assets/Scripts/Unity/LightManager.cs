@@ -17,6 +17,7 @@ public class LightManager : MonoBehaviour {
 	private OpenSpace.ROM.VisualMaterial backgroundMaterialROM;
 	private OpenSpace.ROM.VisualMaterial[] backgroundMaterialsDDROM;
 	private SectorComponent previousActiveBackgroundSector = null;
+	private Color? previousActiveBackgroundColor = null;
 	List<LightBehaviour> lights;
 	bool _isOrthographic = false;
 
@@ -163,16 +164,45 @@ public class LightManager : MonoBehaviour {
 		if (MapLoader.Loader.globals != null && MapLoader.Loader.globals.backgroundGameMaterial != null && MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial != null) {
 			skyMaterial = MapLoader.Loader.globals.backgroundGameMaterial.visualMaterial;
 		} else {
-			if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
+			bool foundMaterialSector = false;
+			if (sectorManager != null && sectorManager.activeSector != null) {
+				// Process loaded sectors in the right order.
+				{
+					SectorComponent s = sectorManager.activeSector;
+					if (s.sector.skyMaterial != null && s.sector.skyMaterial.textures.Count > 0 && s.sector.skyMaterial.textures.Where(t => t.texture != null).Count() > 0) {
+						skyMaterial = s.sector.skyMaterial;
+						activeBackgroundSector = s;
+						foundMaterialSector = true;
+					} else {
+						foreach (LightInfo li in s.sector.staticLights) {
+							if (li.type == 6) {
+								backgroundColor = li.background_color;
+								break;
+							}
+						}
+					}
+				}
+				if (sectorManager.activeSector.graphicSectors != null && !foundMaterialSector) {
+					foreach (SectorComponent s in sectorManager.activeSector.graphicSectors) {
+						if (s.sector.skyMaterial != null && s.sector.skyMaterial.textures.Count > 0 && s.sector.skyMaterial.textures.Where(t => t.texture != null).Count() > 0) {
+							skyMaterial = s.sector.skyMaterial;
+							activeBackgroundSector = s;
+							foundMaterialSector = true;
+							break;
+						}
+					}
+				}
+			} else if (sectorManager != null && sectorManager.sectors != null && sectorManager.sectors.Count > 0) {
 				foreach (SectorComponent s in sectorManager.sectors) {
 					if (!s.Loaded) continue;
 					if (s.sector == null) continue;
 					if (s.sector.skyMaterial != null && s.sector.skyMaterial.textures.Count > 0 && s.sector.skyMaterial.textures.Where(t => t.texture != null).Count() > 0) {
 						skyMaterial = s.sector.skyMaterial;
 						activeBackgroundSector = s;
+						foundMaterialSector = true;
 						break;
 					} else {
-						if (!s.Loaded) continue;
+						if (!s.Active) continue;
 						foreach (LightInfo li in s.sector.staticLights) {
 							if (li.type == 6) {
 								backgroundColor = li.background_color;
@@ -208,8 +238,11 @@ public class LightManager : MonoBehaviour {
 			//RenderSettings.skybox = null;
 			//Camera.main.clearFlags = CameraClearFlags.SolidColor;
 		}
-		if (backgroundColor.HasValue && !controller.viewCollision) {
-			Camera.main.backgroundColor = backgroundColor.Value;
+		if (backgroundColor.HasValue) {
+			previousActiveBackgroundColor = backgroundColor;
+		}
+		if (previousActiveBackgroundColor.HasValue && !controller.viewCollision) {
+			Camera.main.backgroundColor = previousActiveBackgroundColor.Value;
 			//Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, backgroundColor.Value, 0.5f * Time.deltaTime);
 		} else {
 			Camera.main.backgroundColor = Color.black;
@@ -327,8 +360,11 @@ public class LightManager : MonoBehaviour {
 			//RenderSettings.skybox = null;
 			//Camera.main.clearFlags = CameraClearFlags.SolidColor;
 		}
-		if (backgroundColor.HasValue && !controller.viewCollision) {
-			Camera.main.backgroundColor = backgroundColor.Value;
+		if (backgroundColor.HasValue) {
+			previousActiveBackgroundColor = backgroundColor;
+		}
+		if (previousActiveBackgroundColor.HasValue && !controller.viewCollision) {
+			Camera.main.backgroundColor = previousActiveBackgroundColor.Value;
 			//Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, backgroundColor.Value, 0.5f * Time.deltaTime);
 		} else {
 			Camera.main.backgroundColor = Color.black;
