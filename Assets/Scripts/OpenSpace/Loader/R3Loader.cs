@@ -892,6 +892,7 @@ namespace OpenSpace.Loader {
 			ReadAlways(reader);
 
 
+			await WaitIfNecessary();
 			Pointer.DoAt(ref reader, off_cineManager, () => {
 				cinematicsManager = CinematicsManager.Read(reader, off_cineManager);
 			});
@@ -919,6 +920,7 @@ namespace OpenSpace.Loader {
 						animationBanks[0] = AnimationBank.Read(reader, off_animBankFix, 0, 1, files_array[Mem.FixKeyFrames])[0];
 					});
 				}
+				await WaitIfNecessary();
 				Pointer.DoAt(ref reader, off_animBankLvl, () => {
 					AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 1, 4, files_array[Mem.LvlKeyFrames]);
 					for (int i = 0; i < 4; i++) {

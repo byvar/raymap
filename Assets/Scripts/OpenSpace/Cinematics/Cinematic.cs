@@ -15,7 +15,6 @@ namespace OpenSpace.Cinematics {
 		public Pointer off_next;
 		public Pointer off_previous;
 		public Pointer off_header;
-		public Matrix matrix;
 		public uint unk;
         public string name = null;
 

@@ -31,6 +31,7 @@ namespace OpenSpace.Cinematics {
 		public Pointer off_comport1, off_comport2;
 		public byte[] hasSnd;
 		public uint[] snd = new uint[4]; // CEventResData
+		public Pointer off_cinematic;
 
 		public Pointer off_next;
 		public Pointer off_previous;
@@ -103,7 +104,7 @@ namespace OpenSpace.Cinematics {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			Pointer.Read(reader);
+			ca.off_cinematic = Pointer.Read(reader);
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();

@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 using System.IO;
+using cakeslice;
 
 public class zzTransparencyCapture
 {
     public static Texture2D  capture(Rect pRect, bool isTransparent)
     {
         Camera lCamera = Camera.main;
+        OutlineEffect outline = lCamera.GetComponent<OutlineEffect>();
+        if (outline != null) outline.enabled = false;
 		RenderTexture renderTexture = new RenderTexture((int)pRect.width, (int)pRect.height, 32);
         Texture2D lOut;
         if (isTransparent) {
@@ -59,6 +62,7 @@ public class zzTransparencyCapture
             Camera.main.targetTexture = null;
             RenderTexture.active = oldRenderTexture;
         }
+        if (outline != null) outline.enabled = true;
         return lOut;
     }
 
