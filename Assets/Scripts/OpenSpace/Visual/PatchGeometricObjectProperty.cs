@@ -5,8 +5,8 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.Visual {
-    public struct MeshModificationProperty {
-        public ushort id;
+    public struct PatchGeometricObjectProperty {
+        public ushort ind_vertex;
         public ushort unk;
         public Vector3 pos;
     }

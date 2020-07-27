@@ -270,6 +270,10 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 					print("Channel " + i + ": ID:" + ch.id + " - U0:" + ch.unk0 + " - V:" + ch.vector + " - ");
 					print("Current keyframe: Flags:" + kf.flags + " - Q2:" + kf.quaternion2 + " - Frame:" + kf.frame);
 				}
+				for (int i = 0; i < a3d.num_morphData; i++) {
+					AnimMorphData md = a3d.morphData[i + a3d.start_morphData];
+					print("MorphData " + i + ": " + md.Offset);
+				}
 
 				//AnimOnlyFrame of = a3d.onlyFrames[a3d.start_onlyFrames + currentFrame];
 				print("POs offset: " + perso.p3dData.family.objectLists.off_head);
@@ -597,7 +601,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
                     }
                 }
 
-				if (a3d.num_morphData > 0 && a3d.morphData != null && Settings.s.engineVersion < Settings.EngineVersion.R3) {
+				if (a3d.num_morphData > 0 && a3d.morphData != null) {
 					morphDataArray = new AnimMorphData[a3d.num_channels, a3d.num_onlyFrames];
 					// Iterate over morph data to find the correct channel and keyframe
 					for (int i = 0; i < a3d.num_morphData; i++) {
@@ -609,7 +613,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 							int channelIndex = this.GetChannelByID(m.channel)[0];
 							if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
 								morphDataArray[channelIndex, m.frame] = m;
-								if (m.morphProgress == 100 && perso.p3dData.objectList != null && perso.p3dData.objectList.Count > m.objectIndexTo) {
+								if (Settings.s.engineVersion < Settings.EngineVersion.R3 && m.morphProgress == 100 && perso.p3dData.objectList != null && perso.p3dData.objectList.Count > m.objectIndexTo) {
 									if (fullMorphPOs[channelIndex] == null) fullMorphPOs[channelIndex] = new Dictionary<ushort, PhysicalObject>();
 									if (!fullMorphPOs[channelIndex].ContainsKey(m.objectIndexTo)) {
 										PhysicalObject o = perso.p3dData.objectList[m.objectIndexTo].po;
@@ -915,30 +919,48 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 				if (physicalObject != null && a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
 					AnimMorphData morphData = morphDataArray[i, currentFrame];
 
-					if (morphData != null && morphData.morphProgress != 0 && morphData.morphProgress != 100) {
-						PhysicalObject morphToPO = perso.p3dData.objectList[morphData.objectIndexTo].po;
-						Vector3[] morphVerts = null;
-
+					if (morphData != null && (Settings.s.engineVersion >= Settings.EngineVersion.R3 || (morphData.morphProgress != 0 && morphData.morphProgress != 100))) {
+						int numMorphs = Math.Max(1, (int)morphData.numMorphs);
 						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
 							IGeometricObject obj = physicalObject.visualSet[j].obj;
 							if (obj == null || obj as GeometricObject == null) continue;
 							GeometricObject fromM = obj as GeometricObject;
-							GeometricObject toM = morphToPO.visualSet[j].obj as GeometricObject;
-							if (toM == null) continue;
-							if (fromM.vertices.Length != toM.vertices.Length) {
-								// For those special cases like the mistake in the Clark cinematic
-								continue;
-							}
 							int numVertices = fromM.vertices.Length;
-							morphVerts = new Vector3[numVertices];
-							for (int vi = 0; vi < numVertices; vi++) {
-								morphVerts[vi] = Vector3.Lerp(fromM.vertices[vi], toM.vertices[vi], morphData.morphProgressFloat);
+							Vector3[] morphVerts = new Vector3[numVertices];
+							Array.Copy(fromM.vertices, 0, morphVerts, 0, numVertices);
+							/*for (int vi = 0; vi < numVertices; vi++) {
+								morphVerts[vi] = fromM.vertices[vi];
+							}*/
+
+							for (int m = 0; m < numMorphs; m++) {
+								ushort objectIndexTo = morphData.objectIndexTo;
+								float morphProgress = morphData.morphProgressFloat;
+								if (Settings.s.engineVersion >= Settings.EngineVersion.R3) {
+									objectIndexTo = morphData.objectIndexToArray[m];
+									morphProgress = morphData.GetMorphProgressFloat(m);
+								}
+								PhysicalObject morphToPO = perso.p3dData.objectList[objectIndexTo].po;
+								if (morphToPO.visualSet[j].obj == null) continue;
+								switch (morphToPO.visualSet[j].obj) {
+									case GeometricObject toM:
+										if (fromM.vertices.Length != toM.vertices.Length) {
+											// For those special cases like the mistake in the Clark cinematic
+											continue;
+										}
+										for (int vi = 0; vi < numVertices; vi++) {
+											morphVerts[vi] = Vector3.Lerp(morphVerts[vi], toM.vertices[vi], morphProgress);
+										}
+										break;
+									case PatchGeometricObject meshmodM:
+										//print("yooo");
+										for (int mi = 0; mi < meshmodM.num_properties; mi++) {
+											int vi = meshmodM.properties[mi].ind_vertex;
+											morphVerts[vi] = Vector3.Lerp(morphVerts[vi], morphVerts[vi] + meshmodM.properties[mi].pos, morphProgress);
+										}
+										break;
+								}
 							}
-							for (int k = 0; k < fromM.num_elements; k++) {
-								if (fromM.elements[k] == null || fromM.element_types[k] != 1) continue;
-								GeometricObjectElementTriangles el = (GeometricObjectElementTriangles)fromM.elements[k];
-								if (el != null) el.UpdateMeshVertices(morphVerts);
-							}
+							fromM.MorphedVertices = morphVerts;
 						}
 					} else if (morphData != null && morphData.morphProgress == 100) {
 						physicalObject.Gao.SetActive(false);

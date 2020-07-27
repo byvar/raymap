@@ -45,8 +45,27 @@ namespace OpenSpace.Visual {
 		public Pointer<PS2OptimizedSDCStructure> optimizedObject;
 		public uint ps2IsSinus;
 		public RadiosityLOD radiosity;
-        
-        private GameObject gao = null;
+
+		private Vector3[] morphedVertices = null;
+		public Vector3[] MorphedVertices {
+			get {
+				if (morphedVertices == null) {
+					return vertices;
+				}
+				return morphedVertices;
+			}
+			set {
+				morphedVertices = value;
+				// Update elements
+				for (int k = 0; k < num_elements; k++) {
+					if (elements[k] == null || element_types[k] != 1) continue;
+					GeometricObjectElementTriangles el = (GeometricObjectElementTriangles)elements[k];
+					if (el != null) el.UpdateMeshVertices(MorphedVertices);
+				}
+			}
+		}
+
+		private GameObject gao = null;
         public GameObject Gao {
             get {
                 if (gao == null) InitGameObject();
@@ -95,7 +114,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public static GeometricObject Read(Reader reader, Pointer offset, RadiosityLOD radiosity = null) {
+        public static GeometricObject Read(Reader reader, Pointer offset, RadiosityLOD radiosity = null, PatchGeometricObject mod = null) {
             MapLoader l = MapLoader.Loader;
 			//l.print("Geometric Object: " + offset);
             GeometricObject m = new GeometricObject(offset);
@@ -219,6 +238,14 @@ namespace OpenSpace.Visual {
 					m.vertices[i] = new Vector3(x, y, z);
 				}
 			});
+			if (mod != null) {
+				for (int i = 0; i < mod.num_properties; i++) {
+					PatchGeometricObjectProperty prop = mod.properties[i];
+					if (prop.ind_vertex < m.vertices.Length) {
+						m.vertices[prop.ind_vertex] += prop.pos;
+					}
+				}
+			}
 			// Normals
 			Pointer.DoAt(ref reader, m.off_normals, () => {
 				m.normals = new Vector3[m.num_vertices];

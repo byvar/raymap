@@ -713,7 +713,7 @@ namespace OpenSpace.Visual {
 						if (mapping_i >= sdc_mapping.Length) break;
 						for (int j = 0; j < length; j++) {
 							ushort vertIndexInSdc = (ushort)(sdc_mapping[mapping_i] & 0x7FFF);
-							if (vertIndexInSdc < vertices.Length) {
+							if (vertIndexInSdc < new_vertices.Length) {
 								new_vertices[vertIndexInSdc] = vertices[i];
 							}
 							mapping_i++;
@@ -727,6 +727,7 @@ namespace OpenSpace.Visual {
 					}
 				}
 				OPT_unityMesh.vertices = new_vertices;
+				if (OPT_s_mr != null) OPT_s_mr.sharedMesh = OPT_unityMesh;
 			}
 			if (unityMesh != null) {
 				Vector3[] new_vertices = unityMesh.vertices;
@@ -739,6 +740,7 @@ namespace OpenSpace.Visual {
 					new_vertices[m2] = vertices[i2];
 				}
 				unityMesh.vertices = new_vertices;
+				if (s_mr != null) s_mr.sharedMesh = unityMesh;
 			}
 		}
 		public void ResetVertices() {

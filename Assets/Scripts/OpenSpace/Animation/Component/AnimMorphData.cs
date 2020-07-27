@@ -17,6 +17,18 @@ namespace OpenSpace.Animation.Component {
                 return ((float)morphProgress) / 100.0f;
             }
         }
+		public float GetMorphProgressFloat(int i) {
+			if (Settings.s.engineVersion >= Settings.EngineVersion.R3 && i < morphProgressArray.Length) {
+				return ((float)morphProgressArray[i]) / 100.0f;
+			} else {
+				return morphProgressFloat;
+			}
+		}
+
+		// Rayman 3
+		public byte numMorphs;
+		public byte[] morphProgressArray;
+		public ushort[] objectIndexToArray;
 
 		protected override void ReadInternal(Reader reader) {
 			if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
@@ -29,15 +41,18 @@ namespace OpenSpace.Animation.Component {
 			} else {
 				channel = reader.ReadInt16(); // the channel for which this morph data is relevant
 				frame = reader.ReadUInt16(); // the frame for which this morph data is relevant
+				numMorphs = reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
-				reader.ReadByte();
-				objectIndexTo = reader.ReadUInt16(); // 5
-				reader.ReadUInt16();
-				reader.ReadBytes(0x10); // Haven't deciphered this yet
-				morphProgress = reader.ReadByte();
-				reader.ReadBytes(0x9);
+				objectIndexToArray = new ushort[10];
+				for (int i = 0; i < objectIndexToArray.Length; i++) {
+					objectIndexToArray[i] = reader.ReadUInt16();
+				}
+				morphProgressArray = new byte[10];
+				for (int i = 0; i < morphProgressArray.Length; i++) {
+					morphProgressArray[i] = reader.ReadByte();
+				}
 			}
 		}
 

@@ -151,11 +151,12 @@ namespace OpenSpace.Object {
                                 if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
                                 break;
                             case 1:
-								if (po.visualSet[i].obj == null) po.visualSet[i].obj = MeshModificationObject.Read(reader, po, po.visualSet[i].off_data);
-                                MeshModificationObject mod = po.visualSet[i].obj as MeshModificationObject;
+								if (po.visualSet[i].obj == null) po.visualSet[i].obj = PatchGeometricObject.Read(reader, po, po.visualSet[i].off_data);
+                                PatchGeometricObject mod = po.visualSet[i].obj as PatchGeometricObject;
                                 if (mod != null && mod.mesh != null && mod.mesh.name != "Mesh") {
                                     po.Gao.name = "[PO] " + mod.mesh.name;
                                 }
+                                po.Gao.name += " - MeshMod";
                                 break;
                             default:
                                 MapLoader.Loader.print("unknown type " + po.visualSetType + " at offset: " + offset);

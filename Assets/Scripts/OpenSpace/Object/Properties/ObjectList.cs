@@ -106,7 +106,7 @@ namespace OpenSpace.Object.Properties {
 						}
 					}
                     // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
-                    if (ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || Settings.s.engineVersion == Settings.EngineVersion.TT) {
+                    if (/*ol.entries[i].unk0 == 0 || ol.entries[i].unk0 == 4*/ ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || Settings.s.engineVersion == Settings.EngineVersion.TT) {
                         ol.entries[i].po = null;
                         ol.entries[i].scale = null;
                         Pointer.DoAt(ref reader, ol.entries[i].off_scale, () => {
