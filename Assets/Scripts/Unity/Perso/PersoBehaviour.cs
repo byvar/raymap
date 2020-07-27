@@ -447,6 +447,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
                 SetState(currentState);
 			}
 		}
+		if (!IsLoaded || !(controller.LoadState == Controller.State.Finished || controller.LoadState == Controller.State.Error)) return;
         bool sectorActive = false, insideSectors = false;
         if (sector == null || IsAlways || sector.Loaded) sectorActive = true;
         if (sector == null || IsAlways || controller.sectorManager.activeSector != null) insideSectors = true;

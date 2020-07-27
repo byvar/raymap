@@ -41,7 +41,7 @@ namespace OpenSpace.ROM {
 			} else {
 				data = compressedBytes;
 			}
-			ReadData();
+			//ReadData();
 		}
 
 		public void ReadData() {
