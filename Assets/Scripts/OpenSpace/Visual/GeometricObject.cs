@@ -46,22 +46,20 @@ namespace OpenSpace.Visual {
 		public uint ps2IsSinus;
 		public RadiosityLOD radiosity;
 
-		private Vector3[] morphedVertices = null;
+		public bool morphed = false;
 		public Vector3[] MorphedVertices {
 			get {
-				if (morphedVertices == null) {
-					return vertices;
-				}
-				return morphedVertices;
+				return vertices;
 			}
 			set {
-				if (morphedVertices != value) {
-					morphedVertices = value;
+				if ((value != null) || morphed) {
+					morphed = (value != null);
+					Vector3[] morphedVerts = morphed ? value : vertices;
 					// Update elements
 					for (int k = 0; k < num_elements; k++) {
 						if (elements[k] == null || element_types[k] != 1) continue;
 						GeometricObjectElementTriangles el = (GeometricObjectElementTriangles)elements[k];
-						if (el != null) el.UpdateMeshVertices(MorphedVertices);
+						if (el != null) el.UpdateMeshVertices(morphedVerts);
 					}
 				}
 			}

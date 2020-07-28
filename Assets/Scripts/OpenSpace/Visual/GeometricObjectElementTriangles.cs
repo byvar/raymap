@@ -370,7 +370,7 @@ namespace OpenSpace.Visual {
 				OPT_s_mr = (SkinnedMeshRenderer)OPT_mr;
 				OPT_s_mr.bones = geo.bones.bones;
 				OPT_s_mr.rootBone = geo.bones.bones[0];
-				OPT_s_mr.sharedMesh = CopyMesh(OPT_unityMesh);
+				OPT_s_mr.sharedMesh = OPT_unityMesh; //CopyMesh(OPT_unityMesh);
 
 				BoxCollider bc = OPT_gao.AddComponent<BoxCollider>();
 				bc.center = OPT_s_mr.bounds.center;
@@ -515,7 +515,7 @@ namespace OpenSpace.Visual {
 					s_mr = (SkinnedMeshRenderer)mr;
 					s_mr.bones = geo.bones.bones;
 					s_mr.rootBone = geo.bones.bones[0];
-					s_mr.sharedMesh = CopyMesh(unityMesh);
+					s_mr.sharedMesh = unityMesh; //CopyMesh(unityMesh);
 
 					BoxCollider bc = gao.AddComponent<BoxCollider>();
 					bc.center = s_mr.bounds.center;
@@ -632,7 +632,7 @@ namespace OpenSpace.Visual {
 					OPT_s_mr = (SkinnedMeshRenderer)OPT_mr;
                     OPT_s_mr.bones = geo.bones.bones;
                     OPT_s_mr.rootBone = geo.bones.bones[0];
-                    OPT_s_mr.sharedMesh = CopyMesh(OPT_unityMesh);
+					OPT_s_mr.sharedMesh = OPT_unityMesh; //CopyMesh(OPT_unityMesh);
 					
 					BoxCollider bc = OPT_gao.AddComponent<BoxCollider>();
 					bc.center = OPT_s_mr.bounds.center;
@@ -753,7 +753,12 @@ namespace OpenSpace.Visual {
 					}
 				}
 				OPT_unityMesh.vertices = new_vertices;
-				if (OPT_s_mr != null) OPT_s_mr.sharedMesh = CopyMesh(OPT_unityMesh);
+				if (OPT_s_mr != null) OPT_s_mr.sharedMesh = OPT_unityMesh;
+				/*if (OPT_s_mr != null) {
+					Mesh m = OPT_s_mr.sharedMesh;
+					OPT_s_mr.sharedMesh = CopyMesh(OPT_unityMesh);
+					if (m != null) UnityEngine.Object.DestroyImmediate(m);
+				}*/
 			}
 			if (unityMesh != null) {
 				Vector3[] new_vertices = unityMesh.vertices;
@@ -766,7 +771,13 @@ namespace OpenSpace.Visual {
 					new_vertices[m2] = vertices[i2];
 				}
 				unityMesh.vertices = new_vertices;
-				if (s_mr != null) s_mr.sharedMesh = CopyMesh(unityMesh);
+				if (s_mr != null) s_mr.sharedMesh = unityMesh;
+				/*if (s_mr != null) {
+					Mesh m = s_mr.sharedMesh;
+					s_mr.sharedMesh = CopyMesh(unityMesh);
+					if (m != null) UnityEngine.Object.DestroyImmediate(m);
+				}*/
+				//if (s_mr != null) s_mr.sharedMesh = unityMesh; //CopyMesh(unityMesh);
 			}
 		}
 		public void ResetVertices() {

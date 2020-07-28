@@ -52,6 +52,12 @@ public class zzTransparencyCapture
             lCamera.backgroundColor = lPreBackgroundColor;
             lCamera.clearFlags = lPreClearFlags;
         } else {
+            var lPreClearFlags = lCamera.clearFlags;
+            var lPreBackgroundColor = lCamera.backgroundColor;
+
+            lCamera.clearFlags = CameraClearFlags.Color;
+            lCamera.backgroundColor = new Color(lPreBackgroundColor.r, lPreBackgroundColor.g, lPreBackgroundColor.b, 1f);
+
             RenderTexture oldRenderTexture = RenderTexture.active;
             lCamera.targetTexture = renderTexture;
             RenderTexture.active = renderTexture;
@@ -61,6 +67,8 @@ public class zzTransparencyCapture
             // Restore previous settings.
             Camera.main.targetTexture = null;
             RenderTexture.active = oldRenderTexture;
+            lCamera.backgroundColor = lPreBackgroundColor;
+            lCamera.clearFlags = lPreClearFlags;
         }
         if (outline != null) outline.enabled = true;
         return lOut;
