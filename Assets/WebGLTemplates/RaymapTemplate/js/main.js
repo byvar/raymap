@@ -418,7 +418,7 @@ function handleMessage_cineData(msg) {
 	cinematicActorSelector.append("<option value='null'>Select an actor...</option>");
 	if(msg.hasOwnProperty("Actors")) {
 		$("#cine-actor-group").removeClass("invisible");
-		$.each(msg.CinematicNames, function (idx, act) {
+		$.each(msg.Actors, function (idx, act) {
 			cinematicActorSelector.append("<option value='" + getIndexFromPerso(act) + "'>" + escapeHTML(act.NameInstance) + "</option>");
 		});
 	} else {
@@ -527,7 +527,7 @@ function updateResolutionSelection() {
 }
 function takeScreenshot() {
 	let radioValue = $("input:radio[name='screenshotRadio']:checked").val();
-	let isTransparent = !($("#btn-photo-transparency").hasClass("selected"));
+	let isTransparent = $("#btn-photo-transparency").hasClass("selected");
 
 	if(radioValue) {
 		switch(radioValue) {

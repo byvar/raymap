@@ -81,8 +81,8 @@ public class WebCommunicator : MonoBehaviour {
 				selectedPersoStateIndex_ = selectedPerso_.currentState;
 				Send(GetSelectionMessageJSON(false, false));
 			}
-			if (controller.CinematicSwitcher != null && cinematicIndex_ != controller.CinematicSwitcher.CinematicIndex) {
-				cinematicIndex_ = controller.CinematicSwitcher.CinematicIndex;
+			if (controller.CinematicSwitcher != null && cinematicIndex_ != controller.CinematicSwitcher.currentCinematic) {
+				cinematicIndex_ = controller.CinematicSwitcher.currentCinematic;
 				Send(GetCineDataMessageJSON());
 			}
         }

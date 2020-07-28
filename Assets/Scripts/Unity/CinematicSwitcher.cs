@@ -18,7 +18,7 @@ public class CinematicSwitcher : MonoBehaviour {
 	Cinematic cinematic;
 	
 	public string[] CinematicNames { get; private set; } = { "Null" };
-	int currentCinematic = 0;
+	public int currentCinematic { get; private set; } = 0;
 	public int CinematicIndex { get; set; } = 0;
 
 	public PersoBehaviour[] actors;
