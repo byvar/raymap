@@ -55,12 +55,14 @@ namespace OpenSpace.Visual {
 				return morphedVertices;
 			}
 			set {
-				morphedVertices = value;
-				// Update elements
-				for (int k = 0; k < num_elements; k++) {
-					if (elements[k] == null || element_types[k] != 1) continue;
-					GeometricObjectElementTriangles el = (GeometricObjectElementTriangles)elements[k];
-					if (el != null) el.UpdateMeshVertices(MorphedVertices);
+				if (morphedVertices != value) {
+					morphedVertices = value;
+					// Update elements
+					for (int k = 0; k < num_elements; k++) {
+						if (elements[k] == null || element_types[k] != 1) continue;
+						GeometricObjectElementTriangles el = (GeometricObjectElementTriangles)elements[k];
+						if (el != null) el.UpdateMeshVertices(MorphedVertices);
+					}
 				}
 			}
 		}
@@ -480,6 +482,7 @@ namespace OpenSpace.Visual {
                     if (m.elements[i] is DeformSet) m.bones = (DeformSet)m.elements[i];
                 }
             }
+			m.MorphedVertices = null;
             return m;
         }
     }
