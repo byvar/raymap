@@ -1608,7 +1608,7 @@ function hideDialogue() {
 }
 
 function startGame() {
-	gameInstance = UnityLoader.instantiate("gameContainer", "Build/Raymap.json", {onProgress: UnityProgress});
+	gameInstance = UnityLoader.instantiate("gameContainer", "Build/raymap.json", {onProgress: UnityProgress});
 }
 
 function showLevelSelect() {

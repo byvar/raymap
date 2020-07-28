@@ -1,5 +1,4 @@
 using OpenSpace.Object;
-using UnityEditor;
 using UnityEngine;
 
 
@@ -98,8 +97,10 @@ public class ObjectSelector : MonoBehaviour {
     public void Select(BasePersoBehaviour pb, bool view = false) {
         //print(pb.name);
         if (selectedPerso != pb || view) {
+#if UNITY_EDITOR
             if (pb?.gameObject!=null)
-                Selection.activeGameObject = pb.gameObject;
+                UnityEditor.Selection.activeGameObject = pb.gameObject;
+#endif
             selectedPerso = pb;
             cam.JumpTo(pb.gameObject);
         }
