@@ -170,8 +170,9 @@
 				var scale = (normalStateCount + reflexStateCount)*10;
 			
 				var canvas = document.getElementById("canvas");
-				var cw = window.innerWidth / 4 + scale * 3;
-				var ch = window.innerHeight / 3 + scale;
+				var container = document.getElementById("container");
+				var cw = container.offsetWidth;
+				var ch = container.offsetHeight;
 				var radius = ch/2.5;
 				
 				canvas.width = cw;
@@ -198,14 +199,14 @@
 					
 						var angle = - Math.PI / 2 + (currentState / normalStateCount) * Math.PI * 2; // circle
 						var dist = radius // circle
-						var sx = cw/4 + dist * Math.cos(angle);
+						var sx = cw/3 + dist * Math.cos(angle);
 						var sy = ch/2 + dist * Math.sin(angle);
 						
 						// bring items closer to the center vertically cuz they are flat
 						var factor = Math.abs(Math.cos(angle));
 						sy += (ch/2 - sy) * 0.25 * factor; 
 						
-						state.x = sx;
+						state.x = RestrictHorizontalPositionLeft(sx, state.width, cw);
 						state.y = sy;
 						currentState++;
 					
@@ -224,14 +225,14 @@
 					
 						var angle = - Math.PI / 2 + (currentState / reflexStateCount) * Math.PI * 2; // circle
 						var dist = radius * 0.3 // circle
-						var sx = cw/3 + cw/4 + dist * Math.cos(angle);
-						var sy = ch/2 + dist * Math.sin(angle);
+						var sx = cw - cw/6 + dist * Math.cos(angle);
+						var sy = ch/2 + dist * 2 * Math.sin(angle);
 						
 						// bring items closer to the center vertically cuz they are flat
 						var factor = Math.abs(Math.cos(angle));
 						sy += (ch/2 - sy) * 0.25 * factor; 
 						
-						state.x = sx;
+						state.x = RestrictHorizontalPositionRight(sx, state.width, cw);
 						state.y = sy;
 						currentState++;
 					
@@ -355,6 +356,25 @@
 				var yDiff = (box.y-y);
 				return (xDiff < box.width/2 && xDiff>-box.width/2 && yDiff < box.height/2 && yDiff>-box.height/2);
 			}
+
+			function RestrictHorizontalPositionLeft(x, stateWidth, canvasWidth) {
+				if (x < stateWidth/2) {
+					return stateWidth/2;
+				}
+				if (x+stateWidth/2 > canvasWidth / 1.5) {
+					return canvasWidth/1.5 - stateWidth/2;
+				}
+				return x;
+			}
+			function RestrictHorizontalPositionRight(x, stateWidth, canvasWidth) {
+				if (x > canvasWidth-stateWidth/2) {
+					return canvasWidth-stateWidth/2;
+				}
+				if (x-stateWidth/2 < canvasWidth / 1.5) {
+					return canvasWidth/1.5 + stateWidth/2;
+				}
+				return x;
+			}
 			
 			function CanvasClicked(event) {
 				var canvas = document.getElementById("canvas");
@@ -409,20 +429,26 @@
 				}
 			
 			}
+
+			window.onresize = function() {
+				g_filter = null;
+				CreateBehaviorDiagram();
+			}
 			
 		</script>
 	</head>
 	<body>
-		<div class="column state-diagram-container">
-			<div style="float: left;">
-				<label><input type="checkbox" id="ShowNormalBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Normal Behaviors</label><br>
-				<label><input type="checkbox" id="ShowReflexBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Reflex Behaviors</label><br>
+		<div class="column state-diagram-container" id="container">
+			<div class="state-diagram-header">
+				<div style="float: left;">
+					<label><input type="checkbox" id="ShowNormalBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Normal Behaviors</label><br>
+					<label><input type="checkbox" id="ShowReflexBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Reflex Behaviors</label><br>
+				</div>
+				<div style="float: right; text-align: right;">
+					Left Click a state to show transitions from that state<br>
+					Right Click a state to show transitions to that state
+				</div>
 			</div>
-			<div style="float: right; text-align: right;">
-				Left Click a state to show transitions from that state<br>
-				Right Click a state to show transitions to that state
-			</div>
-
 			<div>
 			<canvas id="canvas" class="state-diagram-canvas" onmousedown="CanvasClicked(event)" ondblclick="CanvasDoubleClicked(event)" oncontextmenu="event.preventDefault();"></canvas>
 			</div>
