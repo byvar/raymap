@@ -172,7 +172,7 @@
 				var canvas = document.getElementById("canvas");
 				var container = document.getElementById("container");
 				var cw = container.offsetWidth;
-				var ch = container.offsetHeight;
+				var ch = container.offsetHeight - document.getElementById("header").offsetHeight;
 				var radius = ch/2.5;
 				
 				canvas.width = cw;
@@ -439,7 +439,7 @@
 	</head>
 	<body>
 		<div class="column state-diagram-container" id="container">
-			<div class="state-diagram-header">
+			<div class="state-diagram-header" id="header">
 				<div style="float: left;">
 					<label><input type="checkbox" id="ShowNormalBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Normal Behaviors</label><br>
 					<label><input type="checkbox" id="ShowReflexBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Reflex Behaviors</label><br>
