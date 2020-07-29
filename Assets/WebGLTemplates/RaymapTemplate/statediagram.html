@@ -1,11 +1,24 @@
 <html>
 	<head>
+		<link rel="stylesheet" type="text/css" href="css/main.css?1">
+		<link rel="stylesheet" type="text/css" href="css/colors_main.css?1">
+		<link rel="stylesheet" type="text/css" href="css/statediagram.css?1">
 		<script type="text/javascript">
 		
 			g_data = null; // global variable to store info
 			g_filter = null; // if not null, render only one box and lines
 			g_filterShowIncoming = false;
 			g_filterShowOutgoing = true;
+
+			function GetPropertyFromClass(className, propertyName) {
+				var el = document.createElement('div');
+				document.body.appendChild(el);
+				el.className = className;
+				var computedStyle = getComputedStyle(el);
+				var result = computedStyle[propertyName];
+				document.body.removeChild(el);
+				return result;
+			}
 		
 			function getMousePos(canvas, evt) {
 				var rect = canvas.getBoundingClientRect();
@@ -144,8 +157,12 @@
 		
 			function CreateDiagram(normalStates, reflexStates, showNormalBehaviors, showReflexBehaviors) {
 			
-				var c_red = "#cc0000";
-				var c_blue = "#0000cc";
+				var c_red = GetPropertyFromClass("state-transition-arrow-normal", "color");
+				var c_blue = GetPropertyFromClass("state-transition-arrow-reflex", "color");
+				var c_statebackground = GetPropertyFromClass("state-diagram-state", "background-color");
+				var c_statetext = GetPropertyFromClass("state-diagram-state", "color");
+				var c_statebackground_selected = GetPropertyFromClass("state-diagram-state-selected", "background-color");
+				var c_statetext_selected = GetPropertyFromClass("state-diagram-state-selected", "color");
 			
 				var normalStateCount = normalStates.length;
 				var reflexStateCount = reflexStates.length;
@@ -153,14 +170,14 @@
 				var scale = (normalStateCount + reflexStateCount)*10;
 			
 				var canvas = document.getElementById("canvas");
-				var cw = 1200 + scale * 3;
-				var ch = 600 + scale;
+				var cw = window.innerWidth / 4 + scale * 3;
+				var ch = window.innerHeight / 3 + scale;
 				var radius = ch/2.5;
 				
 				canvas.width = cw;
 				canvas.height = ch;
 				var ctx = canvas.getContext("2d");
-				ctx.fillStyle = "white";
+				ctx.fillStyle = "transparent";
 				ctx.fillRect(0,0,cw,ch);
 				
 				ctx.beginPath();
@@ -206,8 +223,8 @@
 						state.height = 24;
 					
 						var angle = - Math.PI / 2 + (currentState / reflexStateCount) * Math.PI * 2; // circle
-						var dist = radius // circle
-						var sx = cw/2 + cw/4 + dist * Math.cos(angle);
+						var dist = radius * 0.3 // circle
+						var sx = cw/3 + cw/4 + dist * Math.cos(angle);
 						var sy = ch/2 + dist * Math.sin(angle);
 						
 						// bring items closer to the center vertically cuz they are flat
@@ -302,16 +319,16 @@
 						var inFilter = !(g_filter != null && state.offset != g_filter.offset);
 						
 						if (inFilter)
-						ctx.fillStyle = "white";
+						ctx.fillStyle = c_statebackground_selected;
 						else
-						ctx.fillStyle = "rgba(255,255,255,0.2)";
+						ctx.fillStyle = c_statebackground;
 						
 						ctx.fillRect(state.x-state.width/2, state.y-state.height/2, state.width, state.height);
 						
 						if (inFilter) {
-							ctx.fillStyle = "black";
+							ctx.fillStyle = c_statetext_selected;
 						} else {
-							ctx.fillStyle = "rgba(0,0,0,0.5)";
+							ctx.fillStyle = c_statetext;
 						}
 						ctx.strokeRect(state.x-state.width/2, state.y-state.height/2, state.width, state.height);
 						
@@ -326,6 +343,10 @@
 				
 				if (showReflexBehaviors) {
 					reflexStates.forEach(drawState.bind(this));
+				}
+
+				if (g_filter!=null) {
+					drawState(g_filter);
 				}
 			}
 			
@@ -391,14 +412,20 @@
 			
 		</script>
 	</head>
-	<body style="background-color: #ddd;">
-		<div>
-			<label><input type="checkbox" id="ShowNormalBehaviors" checked="checked"/>Show Normal Behaviors</label><br>
-			<label><input type="checkbox" id="ShowReflexBehaviors" checked="checked"/>Show Reflex Behaviors</label><br>
-			<input type="button" onclick="CreateBehaviorDiagram()" value="Create State Diagram"/><br>
-		</div>
-		<div>
-		<canvas id="canvas" onmousedown="CanvasClicked(event)" ondblclick="CanvasDoubleClicked(event)" oncontextmenu="event.preventDefault();"></canvas>
+	<body>
+		<div class="column state-diagram-container">
+			<div style="float: left;">
+				<label><input type="checkbox" id="ShowNormalBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Normal Behaviors</label><br>
+				<label><input type="checkbox" id="ShowReflexBehaviors" checked="checked" onclick="CreateBehaviorDiagram()" />Show Reflex Behaviors</label><br>
+			</div>
+			<div style="float: right; text-align: right;">
+				Left Click a state to show transitions from that state<br>
+				Right Click a state to show transitions to that state
+			</div>
+
+			<div>
+			<canvas id="canvas" class="state-diagram-canvas" onmousedown="CanvasClicked(event)" ondblclick="CanvasDoubleClicked(event)" oncontextmenu="event.preventDefault();"></canvas>
+			</div>
 		</div>
 	</body>
 </html>
