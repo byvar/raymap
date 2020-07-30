@@ -1,0 +1,24 @@
+.state-diagram-container {
+    background-color: rgba(3,61,82, 1);
+}
+
+/* Following classes are only read from javascript, in statediagram.html */
+.state-diagram-arrow-normal {
+	color: #9ed9a0;
+}
+.state-diagram-arrow-reflex {
+	color: #9ed9a0;
+}
+.state-diagram-state-selected {
+    background-color: rgba(6,86,109,1);
+    color: rgba(158, 217, 160, 1);
+}
+.state-diagram-state {
+    background-color: rgba(3,61,82, 0.5);
+    color: rgba(158, 217, 160, 0.5);
+}
+.state-diagram-header {
+    height: 2.5em;
+    padding: 1em;
+    background-color: rgba(6,86,109,1);
+}
