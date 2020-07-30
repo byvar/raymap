@@ -1601,8 +1601,12 @@ function hideDialogue() {
 		$('#levelselect-popup').addClass('hidden-popup');
 		$('#localization-popup').addClass('hidden-popup');
 		$('#script-popup').addClass('hidden-popup');
+		$('#config-popup').addClass('hidden-popup');
+		$('#info-popup').addClass('hidden-popup');
 		selectButton($('#btn-levelselect'), false);
 		selectButton($('#btn-localization'), false);
+		selectButton($('#btn-info'), false);
+		selectButton($('#btn-config'), false);
 	}
 	dialogueMsg = null;
 }
@@ -1626,6 +1630,16 @@ function showScript() {
 	$('#popup-overlay').removeClass('hidden-overlay');
 	$("#script-popup").removeClass('hidden-popup');
 }
+function showConfig() {
+	$('#popup-overlay').removeClass('hidden-overlay');
+	$("#config-popup").removeClass('hidden-popup');
+	selectButton($('#btn-config'), true);
+}
+function showInfo() {
+	$('#popup-overlay').removeClass('hidden-overlay');
+	$("#info-popup").removeClass('hidden-popup');
+	selectButton($('#btn-info'), true);
+}
 
 function init() {
 	initContent();
@@ -1636,6 +1650,7 @@ function init() {
 	if(mode != null && lvl != null && folder != null) {
 		startGame();
 	} else {
+		//showConfig();
 		showLevelSelect();
 	}
 }

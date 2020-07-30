@@ -1,0 +1,43 @@
+{
+    "name": "Donald Duck: Quack Attack / Goin' Quackers (Dreamcast)",
+    "image": ".\/img\/logo\/dd_dc.png",
+    "mode": "dd_dc",
+    "folder": "dd_dc",
+    "levels": [
+        { "level": "MENU", "name": "Main Menu" },
+        { "level": "MAPMONDE", "name": "Gyro's Lab" },
+        
+        { "level": "THEHIKE", "name": "The Gorge" },
+        { "level": "TRAIL", "name": "Forest Edge" },
+        { "level": "BRUSH", "name": "Dangerous Cliff" },
+        { "level": "FOREST_1_B", "name": "The Track" },
+        { "level": "FOREST_BOSS", "name": "Boss (Bernadette Bird)" },
+        { "level": "FOREST_CHASE", "name": "Bear's Path" },
+        
+        
+        { "level": "EDGE", "name": "Urban High-Rises" },
+        { "level": "CITY_2_B", "name": "Roof Tops" },
+        { "level": "SIDEWALK", "name": "First Avenue" },
+        { "level": "ROOF", "name": "The Roofs" },
+        { "level": "CITY_BOSS", "name": "Boss (Beagle Boys)" },
+        { "level": "CITY_CHASE", "name": "Main Street)" },
+        
+        { "level": "HAUNTED_3_1", "name": "Haunted Hall" },
+        { "level": "HAUNTED_3_2", "name": "Earie Alley" },
+        { "level": "HAUNTED_3_3", "name": "Ghostly Path" },
+        { "level": "HAUNTED_3_B", "name": "Creepy Corridor" },
+        { "level": "HAUNTED_BOSS", "name": "Boss (Magica De Spell)" },
+        { "level": "HAUNTED_3_4", "name": "Under'hand'ed" },
+        
+        { "level": "INCA_4_1", "name": "Temple's Entrance" },
+        { "level": "INCA_4_2", "name": "Artifact Way" },
+        { "level": "INCA_4_3", "name": "Ancient Fate" },
+        { "level": "INCA_4_B", "name": "Murky Way" },
+        { "level": "INCA_BOSS", "name": "Boss (Merlock)" },
+        { "level": "INCA_4_4", "name": "Head Alley" },
+        
+        { "level": "CREDITS", "name": "Credits" }
+        
+        
+    ]
+}

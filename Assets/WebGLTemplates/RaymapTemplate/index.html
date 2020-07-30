@@ -36,6 +36,12 @@
 		
 		<!-- colors -->
 		<link rel="stylesheet" type="text/css" href="css/colors_main.css" title="Home" />
+		<!--<link rel="alternate stylesheet" type="text/css" href="css/colors_ray1map.css" title="Ray1Map" />
+		<link rel="alternate stylesheet" type="text/css" href="css/colors_rpc.css" title="Pirate-Community" />
+		<link rel="alternate stylesheet" type="text/css" href="css/colors_light.css" title="Light" />
+		<link rel="alternate stylesheet" type="text/css" href="css/colors_dark.css" title="Dark" />-->
+
+
 		<link rel="stylesheet" type="text/css" href="css/dialog-colors.css"/>
 		<!-- javascript -->
 		<script type="text/javascript" src="js/UnityProgress.js"></script>
@@ -66,7 +72,7 @@
 							<div id="btn-viewCollision" class="header-button disabled-button settings-toggle" title="View collision (C)"><i class="icon-flash"></i></div>
 							<div id="btn-viewGraphs" class="header-button disabled-button settings-toggle" title="View graphs (G)"><i class="icon-flow-children"></i></div>
 							<div id="btn-viewInvisible" class="header-button disabled-button settings-toggle" title="View invisible objects (I)"><i class="icon-eye"></i></div>
-							<div id="btn-displayInactive" class="header-button disabled-button settings-toggle" title="Display inactive sectors"><i class="icon-globe"></i></div>
+							<div id="btn-displayInactive" class="header-button disabled-button settings-toggle" title="Display inactive sectors (Y)"><i class="icon-globe"></i></div>
 							<div id="btn-showPersos" class="header-button disabled-button settings-toggle" title="Show persos (U)"><i class="icon-user"></i></div>
 							<div id="btn-playAnimations" class="header-button disabled-button settings-toggle" title="Enable 3D animations (P)"><i class="icon-media-play"></i></div>
 							<div id="btn-playTextureAnimations" class="header-button disabled-button settings-toggle" title="Enable texture animations (T)"><i class="icon-media-play-outline"></i></div>
@@ -109,7 +115,11 @@
 						<div class="column-footer"></div>
 					</div>
 					<div class="column column-unity">
-						<div class="column-header"><span id="header-unity-text">Raymap</span></div>
+						<div class="column-header"><span id="header-unity-text">Raymap</span>
+							<div class="header-buttons-right">
+								<div id="btn-info" class="header-button" title="Info"><i class="icon-info"></i></div>
+								<div id="btn-config" class="header-button" title="Style chooser"><i class="icon-paint-brush"></i></div>
+							</div></div>
 						<div id="game-content" class="column-content"><div id="gameContainer"></div></div>
 						<div class="column-footer">
 							<div class="header-buttons-left">
@@ -209,16 +219,80 @@
 				<div class="column-footer"></div>
 			</div>
 			<div id="levelselect-popup" class="hidden-popup">
-				<div class="column-header">Level selection</div>
-				<div id="sidebar-levels" class="column-sidebar hidden-sidebar">
-					<div id="sidebar-levels-content" class="column-sidebar-content">
-						<div id="sidebar-levels-slider" class="sidebar-slider"></div>
+				<div class="column column-games">
+					<div class="column-header">Game</div>
+					<div id="content-games" class="column-content">
 					</div>
-					<div class="sidebar-arrow sidebar-arrow-up sidebar-arrow-disabled"></div>
-					<div class="sidebar-arrow sidebar-arrow-down sidebar-arrow-disabled"></div>
+					<div class="column-footer"></div>
 				</div>
-				<div id="content-levels" class="column-content column-content-scroll"></div>
-				<div class="column-footer"></div>
+				<div class="column column-versions">
+					<div class="column-header">Version</div>
+					<div id="content-versions" class="column-content">
+					</div>
+					<div class="column-footer"></div>
+				</div>
+				<div class="column column-levels">
+					<div class="column-header">Level selection</div>
+					<div id="sidebar-levels" class="column-sidebar hidden-sidebar">
+						<div id="sidebar-levels-content" class="column-sidebar-content">
+							<div id="sidebar-levels-slider" class="sidebar-slider"></div>
+						</div>
+						<div class="sidebar-arrow sidebar-arrow-up sidebar-arrow-disabled"></div>
+						<div class="sidebar-arrow sidebar-arrow-down sidebar-arrow-disabled"></div>
+					</div>
+					<div id="content-levels" class="column-content column-content-scroll"></div>
+					<div class="column-footer"></div>
+				</div>
+			</div>
+			<div id="config-popup" class="hidden-popup">
+				<div class="column-header">Settings</div>
+				<div class="config-header">Style</div>
+				<div class="style-items">
+				<div class="style-item current-style-item"><div class="style-item-color" style="background-color: #19c8c3;"></div><div class="style-item-text">Home</div></div>
+				<div class="style-item"><div class="style-item-color" style="background-color: rgb(159, 0, 134);"></div><div class="style-item-text">Ray1Map</div></div>
+				<div class="style-item"><div class="style-item-color" style="background-color: #ffe74a;"></div><div class="style-item-text">Pirate-Community</div></div>
+				<div class="style-item"><div class="style-item-color" style="background-color: #a3a3a3;"></div><div class="style-item-text">Light</div></div>
+				<div class="style-item"><div class="style-item-color" style="background-color: #303030;"></div><div class="style-item-text">Dark</div></div>
+				</div>
+			</div>
+			<div id="info-popup" class="hidden-popup">
+				<div class="column-header">About</div>
+				<div class="column-content column-content-scroll">
+					<img class="header-image" src="https://raym.app/maps/preview.png" />
+					<div class="config-header">Controls</div>
+					<div class="info-content">
+						<div class="info-content-column"><b>Camera</b><br/><br/>
+							SHIFT to toggle camera movement on/off<br/>
+							or hold the right mouse button<br/><br/>
+							WASD: Move around<br/>
+							Q/E or NumPad8/2: Move up/down<br/>
+							+/-: Change camera speed<br/>
+							SHIFT in hold mode: Temporary speed boost</br></br>
+							In orthographic view:<br/>
+							Left/right mouse button: pan<br/>
+							Q/E: Zoom<br/>
+							Mousewheel: Zoom<br/>
+						</div>
+						<div class="info-content-column"><b>Toggle shortcuts (on/off)</b><br/><br/>
+							C: Collision view<br/>
+							G: Display graphs<br/>
+							Y: Display inactive sectors<br/>
+							I: View invisible objects<br/>
+							U: Show persos<br/>
+							P: Enable 3D animations<br/>
+							T: Enable texture animations<br/>
+							L: Lighting<br/>
+							F: Fog<br/>
+						</div>
+					</div>
+					<a class="config-header" href="https://github.com/byvar/raymap">Find us on GitHub!</a>
+				</div>
+				<div class="column-footer footer-text">
+					<div class="footer-content">
+						raym.app is developed by <a href="https://github.com/byvar/">Droolie</a> and <a href="https://github.com/rtsonneveld/">Robin</a><br/>
+						This site and its contents are intended strictly to be used for non-commercial purposes.
+					</div>
+				</div>
 			</div>
 			<div id="localization-popup" class="hidden-popup">
 				<div class="column-header">Localization viewer</div>

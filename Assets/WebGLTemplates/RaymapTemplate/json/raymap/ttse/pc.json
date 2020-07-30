@@ -1,0 +1,19 @@
+{
+    "name": "Tonic Trouble: Special Edition (PC)",
+    "image": ".\/img\/logo\/ttse_pc.png",
+    "mode": "ttse_pc",
+    "folder": "ttse_pc",
+    "levels": [
+        { "level": "TotalSki", "name": "Ski Slope" },
+        { "level": "sud0", "name": "South Plain" },
+        { "level": "Cavedoc", "name": "Doc's Cave" },
+        { "level": "Carota", "name": "Vegetable HQ" },
+        { "level": "north", "name": "North Plain" },
+        { "level": "LeCanyon", "name": "The Canyon" },
+        { "level": "cock01", "name": "Glacier Cocktail" },
+        { "level": "pyramide", "name": "Pyramide" },
+        { "level": "marmite", "name": "Pressure Cooker" },
+        { "level": "Land", "name": "Grogh's Land" },
+        { "level": "outro", "name": "Credits" }
+    ]
+}

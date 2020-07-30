@@ -1,0 +1,29 @@
+{
+    "name": "Tonic Trouble (PC)",
+    "image": ".\/img\/logo\/tt_pc.png",
+    "mode": "tt_pc",
+    "folder": "tt_pc",
+    "levels": [
+        { "level": "TotalSki", "name": "Ski Slope" },
+        { "level": "sud0", "name": "South Plain" },
+        { "level": "cavedoc", "name": "Doc's Cave" },
+        { "level": "Spycarota", "name": "XYZ Prelude - Vegetable HQ" },
+        { "level": "carota", "name": "Vegetable HQ" },
+        { "level": "Spynorth", "name": "XYZ Prelude - North Plain" },
+        { "level": "North", "name": "North Plain" },
+        { "level": "transit", "name": "XYZ Flying Course" },
+        { "level": "Mammyon", "name": "Mammoth Prelude" },
+        { "level": "lecanyon", "name": "The Canyon" },
+        { "level": "bar", "name": "Barman Prelude" },
+        { "level": "cock01", "name": "Glacier Cocktail" },
+        { "level": "Pyr_fou", "name": "Nutcase Prelude" },
+        { "level": "pyramide", "name": "Pyramide" },
+        { "level": "Pharmmap", "name": "Pharmasist prelude" },
+        { "level": "marmite", "name": "Pressure Cooker" },
+        { "level": "Skymap", "name": "Crazy Slide" },
+        { "level": "land", "name": "Grogh's HQ" },
+        { "level": "BigBoss", "name": "Grogh Boss Battle" },
+        { "level": "Outro", "name": "Ending" },
+        { "level": "death", "name": "Game Over" }
+    ]
+}
