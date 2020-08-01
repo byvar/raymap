@@ -1599,6 +1599,13 @@ input[type=range]::-ms-fill-upper {
 	-moz-transition: opacity .4s;
 	-webkit-transition: opacity .4s;
 }
+#header-versions,
+#header-levels,
+#header-games {
+	transition: color .4s;
+	-moz-transition: color .4s;
+	-webkit-transition: color .4s;
+}
 #script-popup,
 #localization-popup {
 	max-width: 80em;

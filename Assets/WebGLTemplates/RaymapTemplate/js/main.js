@@ -100,6 +100,7 @@ let screenshotResolutionSelected = false;
 let btn_close_description, stateSelector, objectListSelector, languageSelector, cameraPosSelector, cinematicSelector, cinematicActorSelector, highlight_tooltip, text_highlight_tooltip, text_highlight_content, objectListInputGroup;
 let previousState = -1;
 let games_content, versions_content, levels_content, levels_sidebar = null;
+let games_header, versions_header, levels_header = null;
 let current_game, current_version = null;
 
 // FUNCTIONS
@@ -143,6 +144,7 @@ function initContent() {
 		api.getContentPane().append(items.join(""));
 		// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
 		setTimeout(function(){
+			games_header.removeClass('loading-header');
 			games_content.removeClass('loading');
 			api.reinitialise();
 		}, 100);
@@ -1584,6 +1586,7 @@ function initGame(gameJSON) {
 	// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
 	if(versionsReinitTimeout != null) clearTimeout(versionsReinitTimeout);
 	versionsReinitTimeout = setTimeout(function(){
+		versions_header.removeClass('loading-header');
 		versions_content.removeClass('loading');
 		api.reinitialise();
 		api.scrollToPercentY(0, false);
@@ -1600,7 +1603,7 @@ function initVersion(versionJSON) {
 	api.getContentPane().empty();
 	let items = [];
 	let totalEm = 0;
-
+	levels_header.text(levelsJSON.name);
 	if(levelsJSON.hasOwnProperty("levels")) {
 		let levels = levelsJSON.levels;
 		$.each( levels, function(index, value) {
@@ -1640,6 +1643,7 @@ function initVersion(versionJSON) {
 	// hack, but append (in chrome) is asynchronous so we could reinit with non-full scrollpane
 	if(levelsReinitTimeout != null) clearTimeout(levelsReinitTimeout);
 	levelsReinitTimeout = setTimeout(function(){
+		levels_header.removeClass('loading-header');
 		levels_sidebar.removeClass('loading-sidebar');
 		levels_content.removeClass('loading');
 		api.reinitialise();
@@ -1660,6 +1664,7 @@ function clickVersion_onEndLoading(versionItem) {
 function clickVersion(versionItem) {
 	if( !support || levels_content.hasClass('loading')) {
 		levels_sidebar.addClass('loading-sidebar');
+		levels_header.addClass('loading-header');
 		clickVersion_onEndLoading(versionItem);
 	} else {
 		levels_content.off(transEndEventName);
@@ -1668,6 +1673,7 @@ function clickVersion(versionItem) {
 		});
 		levels_content.addClass('loading');
 		levels_sidebar.addClass('loading-sidebar');
+		levels_header.addClass('loading-header');
 	}
 }
 
@@ -1697,16 +1703,19 @@ function clickGame(gameItem) {
 	if( !support || versions_content.hasClass('loading')) {
 		levels_content.addClass('loading');
 		levels_sidebar.addClass('loading-sidebar');
+		levels_header.addClass('loading-header');
 		clickGame_onEndLoading(gameItem);
 	} else {
 		levels_content.addClass('loading');
 		levels_sidebar.addClass('loading-sidebar');
+		levels_header.addClass('loading-header');
 		versions_content.off(transEndEventName);
 		levels_content.off(transEndEventName);
 		versions_content.on(transEndEventName, function() {
 			clickGame_onEndLoading(gameItem);
 		});
 		versions_content.addClass('loading');
+		versions_header.addClass('loading-header');
 	}
 }
 
@@ -1861,6 +1870,9 @@ $(function() {
 	versions_content = $('#content-versions');
 	levels_content = $('#content-levels');
 	levels_sidebar = $('#sidebar-levels');
+	levels_header = $('#header-levels');
+	games_header = $('#header-games');
+	versions_header = $('#header-versions');
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
