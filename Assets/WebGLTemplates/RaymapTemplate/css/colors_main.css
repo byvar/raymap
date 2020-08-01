@@ -68,6 +68,41 @@ body {
 	background-color: rgba(3,61,82,1);
 }
 
+.game-item:hover,
+.version-item:hover {
+	background-color: rgba(3,61,82,1);
+}
+
+.game-item,
+.version-item {
+	color: #9ed9a0;
+}
+
+.current-game-item,
+.current-version-item {
+	color: #19c8c3;
+	background-color: rgba(3,61,82,0.7);
+}
+
+.game-category-item {
+	color: #9ed9a0;
+	background-color: rgba(3,61,82,1);
+}
+.column-versions,
+.column-levels,
+.column-games {
+	background-color: rgba(3,61,82,1);
+}
+
+/*#content-versions,*/
+#content-levels,
+#content-games {
+    background-color: rgba(6,86,109,1);
+}
+#content-versions {
+	background-color: rgb(0, 77, 101);
+}
+
 .progress .full {
 	background: rgb(3, 61, 82);
 	background: linear-gradient(95deg, rgb(3, 61, 82) 0%, rgb(158, 217, 160) 78%, rgb(25, 200, 195) 100%);

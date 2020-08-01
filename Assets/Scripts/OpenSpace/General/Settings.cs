@@ -114,7 +114,11 @@ namespace OpenSpace {
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window };
 		public enum Caps { All, AllExceptExtension, Normal, None };
-		public enum CapsType { All, LevelFolder, LevelFile, Fix, FixLvl, FixRelocation, LangFix, LangLevelFolder, LangLevelFile, DSB, LMFile, TextureFile };
+		public enum CapsType { All,
+			LevelFolder, LevelFile, LevelRelocation,
+			Fix, FixLvl, FixRelocation,
+			LangFix, LangLevelFolder, LangLevelFile, LangLevelRelocation,
+			DSB, LMFile, TextureFile };
         #endregion
 
         #region Variables
@@ -613,8 +617,12 @@ namespace OpenSpace {
             luminosity = 0.5f,
             saturate = true,
             aiTypes = AITypes.R2Demo,
-            numEntryActions = 1
-        };
+            numEntryActions = 1,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.FixRelocation, Caps.AllExceptExtension },
+				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
+			}
+		};
         public static Settings R2PCDemo2 = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
@@ -625,8 +633,12 @@ namespace OpenSpace {
             aiTypes = AITypes.R2,
             encryption = Encryption.ReadInit,
             luminosity = 0.5f,
-            saturate = true
-        };
+            saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.FixRelocation, Caps.AllExceptExtension },
+				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
+			}
+		};
         public static Settings R2DC = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
@@ -898,6 +910,7 @@ namespace OpenSpace {
 				{ CapsType.FixRelocation, Caps.None },
 				{ CapsType.LangFix, Caps.None },
 				{ CapsType.LangLevelFile, Caps.None },
+				{ CapsType.LangLevelRelocation, Caps.None },
 				{ CapsType.LangLevelFolder, Caps.None }
 			}
         };

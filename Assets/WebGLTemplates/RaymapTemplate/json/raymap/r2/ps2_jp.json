@@ -3,6 +3,24 @@
     "image": ".\/img\/logo\/r2_ps2_jp.png",
     "mode": "r2_ps2",
     "folder": "r2_ps2_jp",
+	"icons": [
+		{
+			"image": ".\/img\/icon\/R2\/mask1.png",
+			"level": 0
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask2.png",
+			"level": 32
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask3.png",
+			"level": 66
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask4.png",
+			"level": 91
+		}
+	],
     "levels": [
         { "level": "Menu", "name": "Main Menu" },
         { "level": "Jail_10", "name": "Prologue (Stormy Seas)" },

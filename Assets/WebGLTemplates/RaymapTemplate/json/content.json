@@ -4,139 +4,123 @@
 			"name": "Rayman series",
 			"games": [
 				{
-					"title": "Rayman 2",
+					"title": "Rayman 2 / Revolution",
 					"viewer": "raymap",
 					"json": "r2",
-					"image": ".\/img\/logo\/r2.png",
+					"image": ".\/img\/logo\/r2rev.png",
 					"versions": [
 						{
 							"json": "dc",
 							"image": ".\/img\/version\/dc.png",
-							"name:" "Dreamcast"
+							"name": "Dreamcast"
 						},
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						},
 						{
 							"json": "ps1",
 							"image": ".\/img\/version\/ps1.png",
-							"name:" "PS1"
+							"name": "PlayStation"
 						},
 						{
 							"json": "ps2",
 							"image": ".\/img\/version\/ps2.png",
-							"name:" "PS2: Revolution"
+							"name": "PS2: Revolution"
 						},
 						{
 							"json": "n64",
 							"image": ".\/img\/version\/n64.png",
-							"name:" "N64"
+							"name": "Nintendo 64"
 						},
 						{
 							"json": "ds",
 							"image": ".\/img\/version\/ds.png",
-							"name:" "DS"
+							"name": "Nintendo DS"
 						},
 						{
 							"json": "3ds",
 							"image": ".\/img\/version\/3ds.png",
-							"name:" "3DS"
+							"name": "Nintendo 3DS"
 						},
 						{
 							"json": "ios",
 							"image": ".\/img\/version\/ios.png",
-							"name:" "iOS"
+							"name": "iOS"
 						},
 						{
 							"json": "dc_jp",
-							"image": ".\/img\/version\/dc_jp.png",
-							"name:" "Dreamcast (Dreamcast)"
+							"image": ".\/img\/version\/dc.png",
+							"name": "Dreamcast (Japanese)"
 						},
 						{
 							"json": "ps2_jp",
-							"image": ".\/img\/version\/ps2_jp.png",
-							"name:" "PS2: Revolution (Japanese)"
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2: Revolution (Japanese)"
 						},
 						{
 							"json": "pc_demo1",
-							"image": ".\/img\/version\/pc_demo.png",
-							"name:" "PC: Demo 1"
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo 1"
 						},
 						{
 							"json": "pc_demo2",
-							"image": ".\/img\/version\/pc_demo.png",
-							"name:" "PC: Demo 2"
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo 2"
 						}
 					]
 				},
 				{
-					"title": "Rayman M",
+					"title": "Rayman M \/ Arena \/ Rush",
 					"viewer": "raymap",
 					"json": "rm",
-					"image": ".\/img\/logo\/rm.png",
+					"image": ".\/img\/logo\/rm_a_rush.png",
 					"versions": [
 						{
-							"json": "pc",
+							"json": "m\/pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "M - PC"
 						},
 						{
-							"json": "ps2",
+							"json": "m\/ps2",
 							"image": ".\/img\/version\/ps2.png",
-							"name:" "PS2"
+							"name": "M - PlayStation 2"
 						},
 						{
-							"json": "ps2_demo",
-							"image": ".\/img\/version\/ps2_demo.png",
-							"name:" "PS2 Demo"
-						}
-					]
-				},
-				{
-					"title": "Rayman Arena",
-					"viewer": "raymap",
-					"json": "ra",
-					"image": ".\/img\/logo\/ra.png",
-					"versions": [
+							"json": "m\/ps2_demo",
+							"image": ".\/img\/version\/ps2.png",
+							"name": "M - PS2 Demo"
+						},
 						{
-							"json": "gc",
+							"json": "arena\/gc",
 							"image": ".\/img\/version\/gc.png",
-							"name:" "GameCube"
+							"name": "Arena - GameCube"
 						},
 						{
-							"json": "xbox",
+							"json": "arena\/xbox",
 							"image": ".\/img\/version\/xbox.png",
-							"name:" "Xbox"
+							"name": "Arena - Xbox"
 						},
 						{
-							"json": "pc",
+							"json": "arena\/pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "Arena - PC"
 						},
 						{
-							"json": "ps2",
+							"json": "arena\/ps2",
 							"image": ".\/img\/version\/ps2.png",
-							"name:" "PS2"
+							"name": "Arena - PlayStation 2"
 						},
 						{
-							"json": "gc_demo",
-							"image": ".\/img\/version\/gc_demo.png",
-							"name:" "GameCube Demo"
-						}
-					]
-				},
-				{
-					"title": "Rayman Rush",
-					"viewer": "raymap",
-					"json": "rr",
-					"image": ".\/img\/logo\/rr.png",
-					"versions": [
+							"json": "arena\/gc_demo",
+							"image": ".\/img\/version\/gc.png",
+							"name": "Arena - GameCube Demo"
+						},
 						{
-							"json": "ps1",
+							"json": "rush\/ps1",
 							"image": ".\/img\/version\/ps1.png",
-							"name:" "PS1"
+							"name": "Rush - PlayStation"
 						}
 					]
 				},
@@ -149,52 +133,52 @@
 						{
 							"json": "gc",
 							"image": ".\/img\/version\/gc.png",
-							"name:" "GameCube"
+							"name": "GameCube"
 						},
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						},
 						{
 							"json": "ps2",
 							"image": ".\/img\/version\/ps2.png",
-							"name:" "PS2"
+							"name": "PlayStation 2"
 						},
 						{
 							"json": "xbox",
 							"image": ".\/img\/version\/xbox.png",
-							"name:" "Xbox"
+							"name": "Xbox"
 						},
 						{
 							"json": "x360",
 							"image": ".\/img\/version\/x360.png",
-							"name:" "Xbox 360"
+							"name": "Xbox 360"
 						},
 						{
 							"json": "ps3",
 							"image": ".\/img\/version\/ps3.png",
-							"name:" "PS3"
+							"name": "PlayStation 3"
 						},
 						{
 							"json": "ps2_demo_20020807",
-							"image": ".\/img\/version\/ps2_demo.png",
-							"name:" "PS2 Demo (2002\/08\/07)"
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2 Demo (2002\/08\/07)"
 						},
 						{
 							"json": "ps2_devbuild",
-							"image": ".\/img\/version\/ps2_demo.png",
-							"name:" "PS2 Dev Build"
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2 Dev Build"
 						},
 						{
 							"json": "ps2_demo_20021029",
-							"image": ".\/img\/version\/ps2_demo.png",
-							"name:" "PS2 Demo (2002\/10\/29)"
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2 Demo (2002\/10\/29)"
 						},
 						{
 							"json": "ps2_demo_20021218",
-							"image": ".\/img\/version\/ps2_demo.png",
-							"name:" "PS2 Demo (2002\/12\/18)"
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2 Demo (2002\/12\/18)"
 						}
 					]
 				},
@@ -207,10 +191,10 @@
 						{
 							"json": "ds",
 							"image": ".\/img\/version\/ds.png",
-							"name:" "DS"
+							"name": "Nintendo DS"
 						}
 					]
-				},
+				}
 			]
 		},
 		{
@@ -225,7 +209,7 @@
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						}
 					]
 				},
@@ -238,10 +222,10 @@
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						}
 					]
-				},
+				}
 			]
 		},
 		{
@@ -256,22 +240,22 @@
 						{
 							"json": "dc",
 							"image": ".\/img\/version\/dc.png",
-							"name:" "Dreamcast"
+							"name": "Dreamcast"
 						},
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						},
 						{
 							"json": "ps1",
 							"image": ".\/img\/version\/ps1.png",
-							"name:" "PS1"
+							"name": "PlayStation"
 						},
 						{
 							"json": "n64",
 							"image": ".\/img\/version\/n64.png",
-							"name:" "N64"
+							"name": "Nintendo 64"
 						}
 					]
 				},
@@ -284,7 +268,7 @@
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						}
 					]
 				},
@@ -297,7 +281,7 @@
 						{
 							"json": "ps1",
 							"image": ".\/img\/version\/ps1.png",
-							"name:" "PS1"
+							"name": "PlayStation"
 						}
 					]
 				},
@@ -310,7 +294,7 @@
 						{
 							"json": "gc",
 							"image": ".\/img\/version\/gc.png",
-							"name:" "GameCube"
+							"name": "GameCube"
 						}
 					]
 				}
@@ -328,7 +312,7 @@
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						}
 					]
 				},
@@ -341,7 +325,7 @@
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						}
 					]
 				},
@@ -354,7 +338,7 @@
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						}
 					]
 				}
@@ -372,7 +356,7 @@
 						{
 							"json": "pc",
 							"image": ".\/img\/version\/pc.png",
-							"name:" "PC"
+							"name": "PC"
 						}
 					]
 				},
@@ -385,7 +369,7 @@
 						{
 							"json": "ps1",
 							"image": ".\/img\/version\/ps1.png",
-							"name:" "PS1"
+							"name": "PlayStation"
 						}
 					]
 				}

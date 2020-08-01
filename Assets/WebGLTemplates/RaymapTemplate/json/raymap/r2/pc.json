@@ -3,6 +3,24 @@
     "image": ".\/img\/logo\/r2_pc.png",
     "mode": "r2_pc",
     "folder": "r2_pc",
+	"icons": [
+		{
+			"image": ".\/img\/icon\/R2\/mask1.png",
+			"level": 0
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask2.png",
+			"level": 20
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask3.png",
+			"level": 35
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask4.png",
+			"level": 52
+		}
+	],
     "levels": [
         { "level": "Menu", "name": "Main Menu" },
         { "level": "Jail_10", "name": "Prologue (Stormy Seas)" },

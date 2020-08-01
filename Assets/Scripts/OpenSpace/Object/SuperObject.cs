@@ -214,7 +214,7 @@ namespace OpenSpace.Object {
                 if (so.Gao != null) {
                     SuperObjectComponent soc = so.Gao.GetComponent<SuperObjectComponent>();
                     foreach (SuperObject ch in so.children) {
-                        if (soc != null && ch.Gao != null) {
+                        if (soc != null && ch != null && ch.Gao != null) {
                             SuperObjectComponent soc_ch = ch.Gao.GetComponent<SuperObjectComponent>();
                             if (soc_ch == null) continue;
                             soc.Children.Add(soc_ch);

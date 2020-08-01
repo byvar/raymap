@@ -1032,12 +1032,13 @@ MonoBehaviour.print(str);
             if (families.Count > 0) {
                 familiesRoot = new GameObject("Families");
                 familiesRoot.SetActive(false); // Families do not need to be visible
+
                 families.ReadEntries(ref reader, (off_element) => {
                     Family f = Family.Read(reader, off_element);
                     f.Gao.transform.SetParent(familiesRoot.transform, false);
                     return f;
                 }, LinkedList.Flags.HasHeaderPointers);
-            }
+			}
         }
 
         public void ReadCrossReferences(Reader reader) {

@@ -130,9 +130,9 @@ namespace OpenSpace.Loader {
 					paths["lvl.gpt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".gpt", Settings.CapsType.LevelFile);
 					paths["lvl.ptx"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".ptx", Settings.CapsType.LevelFile);
 					if (hasRelocationFiles) {
-						paths["lvl.rtb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtb", Settings.CapsType.LevelFile);
-						paths["lvl.rtp"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtp", Settings.CapsType.LevelFile);
-						paths["lvl.rtt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtt", Settings.CapsType.LevelFile);
+						paths["lvl.rtb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtb", Settings.CapsType.LevelRelocation);
+						paths["lvl.rtp"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtp", Settings.CapsType.LevelRelocation);
+						paths["lvl.rtt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtt", Settings.CapsType.LevelRelocation);
 					} else {
 						paths["lvl.rtb"] = null;
 						paths["lvl.rtp"] = null;
@@ -143,7 +143,7 @@ namespace OpenSpace.Loader {
 						paths["lvl.lng"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".lng", Settings.CapsType.LangLevelFile);
 						paths["lvl.rtg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtg", Settings.CapsType.LangLevelFile);
 						paths["lvl.dlg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".dlg", Settings.CapsType.LangLevelFile);
-						paths["lvl.rtd"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtd", Settings.CapsType.LangLevelFile);
+						paths["lvl.rtd"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtd", Settings.CapsType.LangLevelRelocation);
 					} else {
 						paths["lvl.sda"] = null;
 						paths["lvl.lng"] = null;

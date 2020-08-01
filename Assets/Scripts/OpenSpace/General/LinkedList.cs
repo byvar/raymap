@@ -156,6 +156,50 @@ namespace OpenSpace {
             }
         }
 
+        public void ReadEntriesBackwards(ref Reader reader, ReadElement readElement, LinkedList.Flags flags = LinkedList.Flags.None) {
+            Pointer off_next = off_tail;
+            bool elementPointerFirst = ((flags & LinkedList.Flags.ElementPointerFirst) != 0);
+            bool hasHeaderPointers = ((flags & LinkedList.Flags.HasHeaderPointers) != 0);
+            bool readAtPointer = ((flags & LinkedList.Flags.ReadAtPointer) != 0);
+            bool noPreviousPointers = ((flags & LinkedList.Flags.NoPreviousPointersForDouble) != 0);
+            if (off_tail != null) {
+                Pointer off_current = Pointer.Goto(ref reader, off_tail);
+                for (int i = 0; i < num_elements; i++) {
+                    Pointer off_element = off_next;
+                    if (elementPointerFirst) off_element = Pointer.Read(reader);
+                    if (type != Type.SingleNoElementPointers && type != Type.DoubleNoElementPointers && !customEntries) {
+                        off_next = Pointer.Read(reader);
+                        if (type == Type.Double && !noPreviousPointers) off_next = Pointer.Read(reader); // previous element pointer
+                        if (hasHeaderPointers) Pointer.Read(reader); // header struct pointer
+                    }
+                    if (readAtPointer && !elementPointerFirst) off_element = Pointer.Read(reader);
+                    // Read element
+                    if (!readAtPointer) {
+                        list[i] = readElement(off_element);
+                    } else {
+                        Pointer.DoAt(ref reader, off_element, () => {
+                            list[i] = readElement(off_element);
+                        });
+                    }
+
+                    // Goto next element
+                    if (customEntries) {
+                        off_next = ((ILinkedListEntry)list[i]).PreviousEntry;
+                    }
+                    if (i < num_elements - 1 && (customEntries || (type != Type.SingleNoElementPointers && type != Type.DoubleNoElementPointers))) {
+                        if (off_next == null) {
+                            num_elements = (uint)i + 1;
+                            break;
+                        }
+                        Pointer.Goto(ref reader, off_next);
+                    } else {
+                        off_next = Pointer.Current(reader);
+                    }
+                }
+                Pointer.Goto(ref reader, off_current);
+            }
+        }
+
         public static LinkedList<T> Read(ref Reader reader, Pointer offset, ReadElement readElement,
             LinkedList.Flags flags = LinkedList.Flags.None,
             Type type = Type.Default) {
