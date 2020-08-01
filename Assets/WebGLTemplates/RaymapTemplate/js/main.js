@@ -1604,7 +1604,10 @@ function initVersion(versionJSON) {
 	if(levelsJSON.hasOwnProperty("levels")) {
 		let levels = levelsJSON.levels;
 		$.each( levels, function(index, value) {
-			let levelFolder = value.hasOwnProperty("folder") ? value.folder : levelsJSON.folder;
+			let levelFolder = levelsJSON.folder;
+			if(value.hasOwnProperty("folder")) {
+				levelFolder += "/" + value.folder;
+			}
 			//items.push("<a class='logo-item' href='#" + value.json + "' title='" + value.title + "'><img src='" + encodeURI(value.image) + "' alt='" + value.title + "'></a>");
 			if(levelsJSON.mode === mode && folder === levelFolder && value.level === lvl) {
 				items.push("<div class='levels-item level current-levels-item' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></div>");

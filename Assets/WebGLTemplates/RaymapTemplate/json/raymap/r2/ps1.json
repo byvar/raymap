@@ -1,0 +1,83 @@
+{
+	"name": "Rayman 2 (PS1)",
+	"image": ".\/img\/logo\/r2_ps1.png",
+	"mode": "r2_ps1",
+	"folder": "r2_ps1",
+	"icons": [
+		{
+			"image": ".\/img\/icon\/R2\/mask1.png",
+			"level": 0
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask2.png",
+			"level": 18
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask3.png",
+			"level": 32
+		},
+		{
+			"image": ".\/img\/icon\/R2\/mask4.png",
+			"level": 44
+		}
+	],
+	"levels": [
+        { "level": "menu_st", "name": "Main Menu" },
+        { "level": "jail_10", "name": "Prologue (Stormy Seas)" },
+        { "level": "jail_20", "name": "Prologue (Jail)" },
+        { "level": "learn_10", "name": "The Clearing" },
+        { "level": "mapmonde", "name": "The Hall of Doors" },
+        { "level": "learn_30", "name": "The Fairy Glade 1" },
+        { "level": "bast_20", "name": "The Fairy Glade 2" },
+        { "level": "bast_22", "name": "The Fairy Glade 3" },
+        { "level": "ski_10", "name": "The Marshes of Awakening 1" },
+        { "level": "ski_60", "name": "The Marshes of Awakening 2" },
+        { "level": "batam_10", "name": "Meanwhile, on the Prison Ship" },
+        { "level": "chase_10", "name": "The Bayou 1" },
+        { "level": "chase_22", "name": "The Bayou 2" },
+        { "level": "ly_10", "name": "The Walk of Life" },
+        { "level": "whale_00", "name": "The Whale Bay 1" },
+        { "level": "whale_10", "name": "The Whale Bay 2" },
+        { "level": "water_20", "name": "The Whale Bay 3" },
+        { "level": "poloc", "name": "Polokus" },
+        { "level": "rodeo_40", "name": "The Menhir Hills 1" },
+        { "level": "rodeo_60", "name": "The Menhir Hills 2" },
+        { "level": "vulca_10", "name": "The Cave of Bad Dreams 1" },
+        { "level": "vulca_15", "name": "The Cave of Bad Dreams 2" },
+        { "level": "vulca_20", "name": "The Cave of Bad Dreams 3" },
+        { "level": "vulca_25", "name": "The Cave of Bad Dreams 4" },
+        { "level": "glob_30", "name": "The Canopy 1" },
+        { "level": "glob_10", "name": "The Canopy 2" },
+        { "level": "glob_20", "name": "The Canopy 3" },
+        { "level": "plum_00", "name": "The Sanctuary of Stone and Fire 1" },
+        { "level": "plum_20", "name": "The Sanctuary of Stone and Fire 2" },
+        { "level": "plum_30", "name": "The Sanctuary of Stone and Fire 3" },
+        { "level": "plum_10", "name": "The Sanctuary of Stone and Fire 4" },
+        { "level": "plum_15", "name": "The Sanctuary of Stone and Fire 5" },
+        { "level": "bast_10", "name": "The Echoing Caves 1" },
+        { "level": "cask_10", "name": "The Echoing Caves 2" },
+        { "level": "cask_30", "name": "The Echoing Caves 3" },
+        { "level": "nave_10", "name": "The Precipice 1" },
+        { "level": "nave_15", "name": "The Precipice 2" },
+        { "level": "nave_20", "name": "The Precipice 3" },
+        { "level": "earth_20", "name": "The Sanctuary of Rock and Lava 1" },
+        { "level": "earth_30", "name": "The Sanctuary of Rock and Lava 2" },
+        { "level": "ly_20", "name": "The Walk of Power" },
+        { "level": "helic_10", "name": "Beneath the Sanctuary of Rock and Lava 1" },
+        { "level": "helic_20", "name": "Beneath the Sanctuary of Rock and Lava 2" },
+        { "level": "helic_30", "name": "Beneath the Sanctuary of Rock and Lava 3" },
+        { "level": "morb_10", "name": "Tomb of the Ancients 1" },
+        { "level": "morb_15", "name": "Tomb of the Ancients 2" },
+        { "level": "morb_20", "name": "Tomb of the Ancients 3" },
+        { "level": "learn_40", "name": "The Gloomy Island 1" },
+        { "level": "ball", "name": "The Gloomy Island (Balloon Flight)" },
+        { "level": "isle_10", "name": "The Gloomy Island 2" },
+        { "level": "batam_20", "name": "Meanwhile, on the Prison Ship (The Grolgoth)" },
+        { "level": "boat01", "name": "The Prison Ship 1" },
+        { "level": "boat02", "name": "The Prison Ship 2" },
+        { "level": "astro_10", "name": "The Prison Ship 3" },
+        { "level": "fan_10", "name": "Freeing the Slaves" },
+        { "level": "boss_10", "name": "The Crow's Nest" },
+        { "level": "end", "name": "Ending" }
+	]
+}

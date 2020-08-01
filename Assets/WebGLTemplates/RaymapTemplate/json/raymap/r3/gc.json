@@ -67,6 +67,7 @@
         { "level": "roadrun_4", "name": "Arcade - Wheelis" },
         { "level": "toudi_10", "name": "Arcade - 2D Nightmare" },
         { "level": "BonusTXT", "name": "Bonus (Empty)" },
-        { "level": "endgame", "name": "Endgame (Empty)" }
+        { "level": "endgame", "name": "Endgame (Empty)" },
+        { "level": "test", "name": "Mad Trax Test map (Broken)", "folder": "US" }
     ]
 }
