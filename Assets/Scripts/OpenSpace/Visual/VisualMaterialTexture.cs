@@ -166,14 +166,18 @@ namespace OpenSpace.Visual {
             get {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatU;
 				if (Settings.s.game == Settings.Game.Dinosaur || Settings.s.game == Settings.Game.LargoWinch) return true;
-				return (properties & 1) != 0;
+                // Hack for R3GC US
+                if (Settings.s.mode == Settings.Mode.Rayman3GC && MapLoader.Loader.allowDeadPointers && offset?.file.name == "test") return true;
+                return (properties & 1) != 0;
             }
         }
         public bool IsRepeatV {
             get {
                 if (Settings.s.engineVersion < Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatV;
 				if (Settings.s.game == Settings.Game.Dinosaur || Settings.s.game == Settings.Game.LargoWinch) return true;
-				return (properties & 2) != 0;
+                // Hack for R3GC US
+                if (Settings.s.mode == Settings.Mode.Rayman3GC && MapLoader.Loader.allowDeadPointers && offset?.file.name == "test") return true;
+                return (properties & 2) != 0;
             }
         }
         public uint Format {

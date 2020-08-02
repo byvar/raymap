@@ -90,7 +90,7 @@ public class WebCommunicator : MonoBehaviour {
 
     public void SendHierarchy() {
         if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
-            allJSON = SerializeMessage(GetHierarchyMessageJSON());
+			allJSON = SerializeMessage(GetHierarchyMessageJSON());
             SetAllJSON(allJSON);
         }
     }
@@ -454,7 +454,7 @@ public class WebCommunicator : MonoBehaviour {
 				break;
 			default:
 				if (l.globals.spawnablePersos != null) {
-					alwaysJSON.SpawnablePersos = l.globals.spawnablePersos.Select(p => GetPersoJSON(p.Gao.GetComponent<BasePersoBehaviour>())).ToArray();
+					alwaysJSON.SpawnablePersos = l.globals.spawnablePersos.Select(p => GetPersoJSON(p?.Gao?.GetComponent<BasePersoBehaviour>())).ToArray();
 				}
 				break;
 		}
