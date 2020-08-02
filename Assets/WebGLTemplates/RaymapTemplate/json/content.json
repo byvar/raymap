@@ -372,6 +372,19 @@
 							"name": "PlayStation"
 						}
 					]
+				},
+				{
+					"title": "Donald_BinRP",
+					"viewer": "raymap",
+					"json": "donald_binrp",
+					"image": ".\/img\/logo\/donald_binrp.png",
+					"versions": [
+						{
+							"json": "pc",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC"
+						}
+					]
 				}
 			]
 		}

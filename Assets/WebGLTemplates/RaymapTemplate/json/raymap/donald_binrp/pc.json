@@ -1,0 +1,9 @@
+{
+    "name": "Donald_BinRP",
+    "image": ".\/img\/logo\/donald_binrp_pc.png",
+    "mode": "donald_binrp_pc",
+    "folder": "donald_binrp_pc",
+    "levels": [
+        { "level": "Piste2", "name": "Track 2" }
+    ]
+}
