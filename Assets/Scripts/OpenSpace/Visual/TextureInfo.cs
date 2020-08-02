@@ -151,12 +151,14 @@ namespace OpenSpace.Visual {
         public bool IsRepeatU {
             get {
                 if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
+                if (Settings.s.game == Settings.Game.Donald_BinRP) return true;
                 return (flagsByte & 2) != 0;
             }
         }
         public bool IsRepeatV {
             get {
                 if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
+                if (Settings.s.game == Settings.Game.Donald_BinRP) return true;
                 return (flagsByte & 1) != 0;
             }
         }
@@ -219,6 +221,7 @@ namespace OpenSpace.Visual {
                     reader.ReadByte();
                     tex.name = "Texture @ " + offset;
                 } else {
+                    //MapLoader.Loader.print("tex @ " + offset);
                     tex.field0 = reader.ReadUInt32(); // 888 or 8888
 					if (Settings.s.game == Settings.Game.Dinosaur) {
 						reader.ReadUInt32();

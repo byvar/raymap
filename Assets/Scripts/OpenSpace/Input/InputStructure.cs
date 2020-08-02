@@ -35,7 +35,9 @@ namespace OpenSpace.Input {
 						reader.ReadBytes(0x418);
 						break;
 					case Settings.Platform.PC:
-						if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
+						if (Settings.s.game == Settings.Game.Donald_BinRP) {
+							reader.ReadBytes(0x32CC);
+						} else if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
 							reader.ReadBytes(0x700);
 						} else if (Settings.s.game == Settings.Game.Dinosaur) {
 							reader.ReadBytes(0xC58);
@@ -44,7 +46,11 @@ namespace OpenSpace.Input {
 						}
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
-						reader.ReadBytes(0x418);
+						if (Settings.s.game == Settings.Game.Donald_BinRP) {
+							reader.ReadBytes(0x14);
+						} else {
+							reader.ReadBytes(0x418);
+						}
 						break;
 					case Settings.Platform.Xbox:
 					case Settings.Platform.Xbox360:

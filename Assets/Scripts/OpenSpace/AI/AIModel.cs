@@ -22,7 +22,7 @@ namespace OpenSpace.AI {
         protected override void ReadInternal(Reader reader) {
             MapLoader l = MapLoader.Loader;
             l.aiModels.Add(this);
-
+            //l.print("AIModel @ " + Offset);
             off_behaviors_normal = Pointer.Read(reader);
             off_behaviors_reflex = Pointer.Read(reader);
             off_dsgVar = Pointer.Read(reader);

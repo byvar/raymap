@@ -167,7 +167,7 @@ namespace OpenSpace.FileFormat {
 
 			if (httpStream != null) await httpStream.FillCacheForRead(5);
 			byte count = reader.ReadByte();
-            if (Settings.s.game != Settings.Game.R2Demo
+            if (Settings.s.game != Settings.Game.R2Demo && Settings.s.game != Settings.Game.Donald_BinRP
                 && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
             }

@@ -64,7 +64,11 @@ namespace OpenSpace.Text {
 				num_languages = reader.ReadUInt16();
 				reader.ReadUInt16();
 				off_text_languages = Pointer.Read(reader);
-				off_text_misc = Pointer.Read(reader);
+				if (Settings.s.game != Settings.Game.Donald_BinRP) {
+					off_text_misc = Pointer.Read(reader);
+				} else {
+					misc.entries = new string[0];
+				}
 
 				// Read language table
 				languages = new TextTable[num_languages];

@@ -23,7 +23,7 @@ namespace OpenSpace.Animation.Component {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 			} else {
-				if (Settings.s.platform != Settings.Platform.DC) {
+				if (Settings.s.platform != Settings.Platform.DC && Settings.s.game != Settings.Game.Donald_BinRP) {
 					if (Settings.s.platform != Settings.Platform.iOS) {
 						unk0 = reader.ReadUInt32();
 					}

@@ -431,7 +431,6 @@ namespace OpenSpace.Loader {
                 uint matrixInStack = reader.ReadUInt32();
                 Pointer off_collisionGeoObj = Pointer.Read(reader);
                 Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
-
                 loadingState = "Loading input structure";
                 await WaitIfNecessary();
                 for (int i = 0; i < Settings.s.numEntryActions; i++) {
@@ -697,6 +696,7 @@ namespace OpenSpace.Loader {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
+                if (Settings.s.game == Settings.Game.Donald_BinRP) reader.ReadUInt32();
                 Pointer off_languages = Pointer.Read(reader);
                 reader.ReadUInt32();
 
@@ -740,11 +740,12 @@ namespace OpenSpace.Loader {
                     Pointer off_elementForShadow = Pointer.Read(reader);
                     Pointer off_geometricShadowObject = Pointer.Read(reader);
                 }
-                Pointer.Read(reader);
-                if (Settings.s.game == Settings.Game.R2Demo) {
+                Pointer.Read(reader); // DemoSOList
+                if (Settings.s.game == Settings.Game.R2Demo || Settings.s.game == Settings.Game.Donald_BinRP) {
                     Pointer.Read(reader);
                 }
                 loadingState = "Loading level animation bank";
+                //print("Animation bank: " + Pointer.Current(reader));
                 await WaitIfNecessary();
                 AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, files_array[Mem.LvlKeyFrames], append: true);
                 animationBanks[1] = animationBanks[0];
