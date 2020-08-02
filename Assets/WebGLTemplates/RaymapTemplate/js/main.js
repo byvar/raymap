@@ -121,18 +121,29 @@ function initContent() {
 		let items = [];
 		let categories = data.categories;
 		let isLoading = false;
+		let gameSelected = false;
 		$.each( categories, function(index_cat, value_cat) {
-			var games = value_cat.games;
+			let games = value_cat.games;
 			items.push("<div class='game-category-item' alt='" + value_cat.name + "'>" + value_cat.name + "</div>");
 			$.each( games, function(index, value) {
-				//items.push("<a class='logo-item' href='#" + value.json + "' title='" + value.title + "'><img src='" + encodeURI(value.image) + "' alt='" + value.title + "'></a>");
-				/*if(locationHash != null && locationHash == value.json) {
-					isLoading = true;
-					clickGame("./json/" + locationHash + ".json");
-					items.push("<a class='game-item current-game-item' href='#" + value.json + "' title='" + value.title + "' data-logo='" + encodeURI(value.image) + "'>");
-				} else {*/
+				let thisGameSelected = false;
+				if(!gameSelected) {
+					$.each( value.versions, function(idx_ver, val_ver) {
+						if(!gameSelected && folder !== null && val_ver.hasOwnProperty("folder") && (folder === val_ver.folder || val_ver.folder.startsWith(folder + "/"))) {
+							gameSelected = true;
+							thisGameSelected = true;
+							return false;
+						}
+					});
+				}
+				if(thisGameSelected) {
+					versions_content.off(transEndEventName);
+					initGame(value);
+					$(".current-game-item").removeClass("current-game-item");
+					items.push("<div class='game-item current-game-item' data-game='" + value.json + "' title='" + value.title + "' data-logo='" + encodeURI(value.image) + "'>");
+				} else {
 					items.push("<div class='game-item' data-game='" + value.json + "' title='" + value.title + "' data-logo='" + encodeURI(value.image) + "'>");
-				//}
+				}
 				items.push("<div class='game-item-logo' style='background-image: url(\"" + encodeURI(value.image) + "\");' alt='" + value.title + "'></div>");
 				items.push("<div class='game-item-title'>" + value.title + "</div></div>");
 			});
@@ -1573,8 +1584,22 @@ function initGame(gameJSON) {
 	api.getContentPane().empty();
 	let items = [];
 	let versions = gameJSON.versions;
+	let versionSelected = false;
 	$.each(versions, function(index_version, value) {
-		items.push("<div class='version-item' data-version='" + value.json + "' title='" + value.name + "' data-logo='" + encodeURI(value.image) + "'>");
+		let thisVersionSelected = false;
+		if(!versionSelected && folder !== null && value.hasOwnProperty("folder") && (folder === value.folder || value.folder.startsWith(folder + "/"))) {
+			versionSelected = true;
+			thisVersionSelected = true;
+		}
+		if(thisVersionSelected) {
+			levels_sidebar.addClass('loading-sidebar');
+			levels_header.addClass('loading-header');
+			clickVersion_onEndLoading(value.json);
+			$(".current-version-item").removeClass("current-version-item");
+			items.push("<div class='version-item current-version-item' data-version='" + value.json + "' title='" + value.name + "' data-logo='" + encodeURI(value.image) + "'>");
+		} else {
+			items.push("<div class='version-item' data-version='" + value.json + "' title='" + value.name + "' data-logo='" + encodeURI(value.image) + "'>");
+		}
 		items.push("<div class='version-item-image' style='background-image: url(\"" + encodeURI(value.image) + "\");' alt='" + value.name + "'></div>");
 		items.push("<div class='version-item-name'>" + value.name + "</div></div>");
 	});
@@ -1611,12 +1636,19 @@ function initVersion(versionJSON) {
 			if(value.hasOwnProperty("folder")) {
 				levelFolder += "/" + value.folder;
 			}
+			let urlParams = "?mode=" + levelsJSON.mode + "&folder=" + levelFolder + "&lvl=" + value.level;
+			if(value.hasOwnProperty("additionalParams")) {
+				$.each(value.additionalParams, function(inx_param, val_param) {
+					urlParams += "&" + val_param.key + "=" + val_param.value;
+				});
+			}
+
 			//items.push("<a class='logo-item' href='#" + value.json + "' title='" + value.title + "'><img src='" + encodeURI(value.image) + "' alt='" + value.title + "'></a>");
 			if(levelsJSON.mode === mode && folder === levelFolder && value.level === lvl) {
 				items.push("<div class='levels-item level current-levels-item' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></div>");
 				document.title = " [" + levelsJSON.name + "] " + value.name + " - " + baseTitle;
 			} else {
-				items.push("<a class='levels-item level' href='index.html?mode=" + levelsJSON.mode + "&folder=" + levelFolder + "&lvl=" + value.level + "' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></a>");
+				items.push("<a class='levels-item level' href='index.html" + urlParams + "' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></a>");
 			}
 			totalEm += 2;
 		});
@@ -1954,6 +1986,14 @@ $(function() {
 	});
 	$(document).on('click', "#btn-localization", function() {
 		showLocalizationWindow();
+		return false;
+	});
+	$(document).on('click', "#btn-info", function() {
+		showInfo();
+		return false;
+	});
+	$(document).on('click', "#btn-config", function() {
+		showConfig();
 		return false;
 	});
 	

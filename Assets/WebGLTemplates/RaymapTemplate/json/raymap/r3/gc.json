@@ -68,6 +68,6 @@
         { "level": "toudi_10", "name": "Arcade - 2D Nightmare" },
         { "level": "BonusTXT", "name": "Bonus (Empty)" },
         { "level": "endgame", "name": "Endgame (Empty)" },
-        { "level": "test", "name": "Mad Trax Test map (Broken)", "folder": "US" }
+        { "level": "test", "name": "Mad Trax Test map (Broken)", "folder": "US", "additionalParams": [ { "key": "allowDeadPointers", "value": "true" } ] }
     ]
 }
