@@ -937,6 +937,7 @@ MonoBehaviour.print(str);
 					loadingState = "Loading level textures: " + (i - num_textures_fix + 1) + "/" + (num_textures_total - num_textures_fix);
 					await WaitIfNecessary();
 					string texturePath = gameDataBinFolder + "World/Graphics/Textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".gf";
+					texturePath = texturePath.Replace('\\', '/');
 					if (Settings.s.platform == Settings.Platform.iOS) {
 						texturePath = texturePath.ToUpper();
 					}
