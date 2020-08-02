@@ -930,7 +930,7 @@ MonoBehaviour.print(str);
 					textures[i].Texture = tex;
 					texturesSeenFile[file_texture]++;
 				}
-			} else if (Settings.s.platform == Settings.Platform.iOS || Settings.s.game == Settings.Game.Donald_BinRP) {
+			} else if (Settings.s.platform == Settings.Platform.iOS || Settings.s.game == Settings.Game.RedPlanet) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					if (textures[i] == null) continue;

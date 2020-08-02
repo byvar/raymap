@@ -696,7 +696,7 @@ namespace OpenSpace.Loader {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                if (Settings.s.game == Settings.Game.Donald_BinRP) reader.ReadUInt32();
+                if (Settings.s.game == Settings.Game.RedPlanet) reader.ReadUInt32();
                 Pointer off_languages = Pointer.Read(reader);
                 reader.ReadUInt32();
 
@@ -741,7 +741,7 @@ namespace OpenSpace.Loader {
                     Pointer off_geometricShadowObject = Pointer.Read(reader);
                 }
                 Pointer.Read(reader); // DemoSOList
-                if (Settings.s.game == Settings.Game.R2Demo || Settings.s.game == Settings.Game.Donald_BinRP) {
+                if (Settings.s.game == Settings.Game.R2Demo || Settings.s.game == Settings.Game.RedPlanet) {
                     Pointer.Read(reader);
                 }
                 loadingState = "Loading level animation bank";

@@ -35,7 +35,7 @@ namespace OpenSpace.Input {
 						reader.ReadBytes(0x418);
 						break;
 					case Settings.Platform.PC:
-						if (Settings.s.game == Settings.Game.Donald_BinRP) {
+						if (Settings.s.game == Settings.Game.RedPlanet) {
 							reader.ReadBytes(0x32CC);
 						} else if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
 							reader.ReadBytes(0x700);
@@ -46,7 +46,7 @@ namespace OpenSpace.Input {
 						}
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
-						if (Settings.s.game == Settings.Game.Donald_BinRP) {
+						if (Settings.s.game == Settings.Game.RedPlanet) {
 							reader.ReadBytes(0x14);
 						} else {
 							reader.ReadBytes(0x418);

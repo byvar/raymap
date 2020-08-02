@@ -11,7 +11,7 @@ namespace OpenSpace.Animation.Component {
 		protected override void ReadInternal(Reader reader) {
 			if (Settings.s.engineVersion == Settings.EngineVersion.TT ||
 				Settings.s.game == Settings.Game.R2Demo ||
-				Settings.s.game == Settings.Game.Donald_BinRP ||
+				Settings.s.game == Settings.Game.RedPlanet ||
 				Settings.s.game == Settings.Game.R2Revolution) {
 				kf = reader.ReadUInt16();
 			} else {
@@ -34,7 +34,7 @@ namespace OpenSpace.Animation.Component {
 
 				if (Settings.s.engineVersion == Settings.EngineVersion.TT ||
 					Settings.s.game == Settings.Game.R2Demo ||
-					Settings.s.game == Settings.Game.Donald_BinRP ||
+					Settings.s.game == Settings.Game.RedPlanet ||
 					Settings.s.game == Settings.Game.R2Revolution) {
 					return false;
 				} else {

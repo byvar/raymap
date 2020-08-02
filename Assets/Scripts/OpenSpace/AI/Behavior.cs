@@ -102,7 +102,7 @@ namespace OpenSpace.AI {
             off_scripts = Pointer.Read(reader);
             off_firstScript = Pointer.Read(reader);
             if (Settings.s.platform == Settings.Platform.DC || 
-                Settings.s.game == Settings.Game.Donald_BinRP
+                Settings.s.game == Settings.Game.RedPlanet
                 || Settings.s.game == Settings.Game.R2Demo) {
                 reader.ReadUInt32();
             }

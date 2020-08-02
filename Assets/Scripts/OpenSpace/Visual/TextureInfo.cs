@@ -151,14 +151,14 @@ namespace OpenSpace.Visual {
         public bool IsRepeatU {
             get {
                 if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
-                if (Settings.s.game == Settings.Game.Donald_BinRP) return true;
+                if (Settings.s.game == Settings.Game.RedPlanet) return true;
                 return (flagsByte & 2) != 0;
             }
         }
         public bool IsRepeatV {
             get {
                 if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
-                if (Settings.s.game == Settings.Game.Donald_BinRP) return true;
+                if (Settings.s.game == Settings.Game.RedPlanet) return true;
                 return (flagsByte & 1) != 0;
             }
         }

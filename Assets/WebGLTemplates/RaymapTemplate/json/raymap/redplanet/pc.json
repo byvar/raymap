@@ -1,0 +1,9 @@
+{
+    "name": "Red Planet (PC) - Developer hobby project",
+    "image": ".\/img\/logo\/redplanet_pc.png",
+    "mode": "redplanet_pc",
+    "folder": "redplanet_pc",
+    "levels": [
+        { "level": "Piste2", "name": "Track 2" }
+    ]
+}

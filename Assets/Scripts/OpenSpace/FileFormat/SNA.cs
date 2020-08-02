@@ -541,7 +541,7 @@ namespace OpenSpace.FileFormat {
                     for (uint i = 0; i < pf.size / 4; i++) {
                         uint ptrValue = reader.ReadUInt32();
                         RelocationPointerInfo info = null;
-                        if (Settings.s.engineVersion == Settings.EngineVersion.Montreal ||Settings.s.game == Settings.Game.Donald_BinRP) {
+                        if (Settings.s.engineVersion == Settings.EngineVersion.Montreal ||Settings.s.game == Settings.Game.RedPlanet) {
                             foreach (RelocationPointerInfo info_new in ptrList.pointers) {
                                 if (info_new.offsetInMemory == ptrValue) {
                                     info = info_new;
@@ -565,7 +565,7 @@ namespace OpenSpace.FileFormat {
                             } else {
                                 l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
                             }
-                            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal && Settings.s.game != Settings.Game.Donald_BinRP) {
+                            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal && Settings.s.game != Settings.Game.RedPlanet) {
                                 listIndex++;
                                 if (listIndex >= ptrList.pointers.Length) break;
                             }

@@ -72,7 +72,7 @@ namespace OpenSpace.Animation.Component {
 				num_keyframes = reader.ReadUInt16();
 				if (Settings.s.engineVersion >= Settings.EngineVersion.R2
 					&& Settings.s.game != Settings.Game.R2Demo
-					&& Settings.s.game != Settings.Game.Donald_BinRP) {
+					&& Settings.s.game != Settings.Game.RedPlanet) {
 					unk_14 = reader.ReadUInt16();
 				}
 				num_events = reader.ReadUInt16();
@@ -94,7 +94,7 @@ namespace OpenSpace.Animation.Component {
 				start_morphData = reader.ReadUInt16();
 				if (Settings.s.engineVersion >= Settings.EngineVersion.R2
 					&& Settings.s.game != Settings.Game.R2Demo
-					&& Settings.s.game != Settings.Game.Donald_BinRP) {
+					&& Settings.s.game != Settings.Game.RedPlanet) {
 					reader.ReadUInt16(); // padding?
 				}
 				if (Settings.s.engineVersion == Settings.EngineVersion.TT) {

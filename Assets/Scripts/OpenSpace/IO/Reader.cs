@@ -9,7 +9,7 @@ namespace OpenSpace {
             Off,
             Number,
             Window,
-            RP
+            RedPlanet
         }
         public delegate void ReadAction(Reader reader, Pointer offset);
         Encoding wind1252 = Encoding.GetEncoding(1252);
@@ -74,7 +74,7 @@ namespace OpenSpace {
             byte[] bytes = base.ReadBytes(count);
             if(autoAlignOn) bytesReadSinceAlignStart += (uint)bytes.Length;
             if (masking != MaskingMode.Off) {
-                if (masking == MaskingMode.Number || masking == MaskingMode.RP) {
+                if (masking == MaskingMode.Number || masking == MaskingMode.RedPlanet) {
                     for (int i = 0; i < count; i++) {
                         bytes[i] = DecodeByte(bytes[i], mask);
                         mask = GetNextMask(mask);
@@ -92,7 +92,7 @@ namespace OpenSpace {
             byte result = base.ReadByte();
             if(autoAlignOn) bytesReadSinceAlignStart++;
             if (masking != MaskingMode.Off) {
-                if (masking == MaskingMode.Number || masking == MaskingMode.RP) {
+                if (masking == MaskingMode.Number || masking == MaskingMode.RedPlanet) {
                     result = DecodeByte(result, mask);
                     mask = GetNextMask(mask);
                 } else if (masking == MaskingMode.Window) {
@@ -185,7 +185,7 @@ namespace OpenSpace {
         }
 
         byte DecodeByte(byte toDecode, uint mask) {
-            if (masking == MaskingMode.RP) {
+            if (masking == MaskingMode.RedPlanet) {
                 //return (byte)((toDecode + (mask & 0xFF)) ^ ((mask >> 8) & 0xFF));
                 //return (byte)(toDecode ^ (((mask & 0xFF) + ((mask >> 8) & 0xFF))));
                 //return (byte)(((mask & 0xFF) + (toDecode ^ ((mask >> 8) & 0xFF))) & 0xFF);
@@ -204,7 +204,7 @@ namespace OpenSpace {
         }
 
         uint GetNextMask(uint currentMask) {
-            if (masking == MaskingMode.RP) {
+            if (masking == MaskingMode.RedPlanet) {
                 byte mask0 = (byte)(((mask & 0xFF) + ((mask >> 16) & 0xFF)) & 0xFF);
                 byte mask1 = (byte)((((mask >> 8) & 0xFF) + ((mask >> 24) & 0xFF)) & 0xFF);
                 return (uint)((mask & 0xFFFF0000) + (mask1 << 8) + (mask0));
@@ -226,10 +226,10 @@ namespace OpenSpace {
                     InitWindowMask(); return 0;
                 case Settings.Encryption.FixedInit:
                     mask = 0x6AB5CC79; return 0;
-                case Settings.Encryption.RP:
+                case Settings.Encryption.RedPlanet:
                     ReadUInt32();
                     mask = 0x6AB5CC79;
-                    masking = MaskingMode.RP;
+                    masking = MaskingMode.RedPlanet;
                     return 4;
                 case Settings.Encryption.CalculateInit:
                     uint currentMask = 0xFFFFFFFF;

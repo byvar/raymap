@@ -64,7 +64,7 @@ namespace OpenSpace.Text {
 				num_languages = reader.ReadUInt16();
 				reader.ReadUInt16();
 				off_text_languages = Pointer.Read(reader);
-				if (Settings.s.game != Settings.Game.Donald_BinRP) {
+				if (Settings.s.game != Settings.Game.RedPlanet) {
 					off_text_misc = Pointer.Read(reader);
 				} else {
 					misc.entries = new string[0];

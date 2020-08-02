@@ -54,7 +54,7 @@ namespace OpenSpace {
 			{ "largowinch_pc", Mode.LargoWinchPC },
 			{ "jb_ps1", Mode.JungleBookPS1 },
 			{ "vip_ps1", Mode.VIPPS1 },
-			{ "donald_binrp_pc", Mode.DonaldBinRP },
+			{ "redplanet_pc", Mode.RedPlanetPC },
 		};
 
         #region Enums
@@ -103,7 +103,7 @@ namespace OpenSpace {
             [Description("Largo Winch (PC)")] LargoWinchPC,
 			[Description("Jungle Book: Groove Party (PS1)")] JungleBookPS1,
 			[Description("VIP (PS1)")] VIPPS1,
-			[Description("Donald BinRP (PC)")] DonaldBinRP,
+			[Description("Red Planet (PC)")] RedPlanetPC,
         };
         public enum EngineVersion {
             TT = 0,
@@ -111,10 +111,10 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch, JungleBook, VIP, Donald_BinRP };
+        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch, JungleBook, VIP, RedPlanet };
         public enum Platform { PC, iOS, GC, DC, PS1, PS2, PS3, Xbox, Xbox360, DS, _3DS, N64 };
         public enum Endian { Little, Big };
-        public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window, RP };
+        public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window, RedPlanet };
 		public enum Caps { All, AllExceptExtension, Normal, None };
 		public enum CapsType { All,
 			LevelFolder, LevelFile, LevelRelocation,
@@ -828,15 +828,15 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
-		public static Settings DonaldBinRPPC = new Settings() {
+		public static Settings RedPlanetPC = new Settings() {
 			engineVersion = EngineVersion.R2,
-			game = Game.Donald_BinRP,
+			game = Game.RedPlanet,
 			platform = Platform.PC,
 			endian = Endian.Little,
 			numEntryActions = 31,
 			linkedListType = LinkedListType.Double,
 			aiTypes = AITypes.R2,
-			encryption = Encryption.RP,
+			encryption = Encryption.RedPlanet,
 			luminosity = 0.5f,
 			saturate = true,
 			hasMemorySupport = false,
@@ -1066,7 +1066,7 @@ namespace OpenSpace {
 			{ Mode.LargoWinchPC, LargoWinchPC },
 			{ Mode.VIPPS1, VIPPS1 },
 			{ Mode.JungleBookPS1, JungleBookPS1 },
-			{ Mode.DonaldBinRP, DonaldBinRPPC },
+			{ Mode.RedPlanetPC, RedPlanetPC },
 		};
 	}
 }
