@@ -842,6 +842,10 @@ namespace OpenSpace {
 			hasMemorySupport = false,
 			hasExtraInputData = true,
 			linkUncategorizedObjectsToScriptFamily = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.FixRelocation, Caps.AllExceptExtension },
+				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
+			}
 		};
 
 		public static Settings TTPC = new Settings() {
