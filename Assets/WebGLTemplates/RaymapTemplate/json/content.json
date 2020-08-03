@@ -69,16 +69,16 @@
 							"folder": "r2_ps2_jp"
 						},
 						{
-							"json": "pc_demo1",
+							"json": "pc_demo_19990818",
 							"image": ".\/img\/version\/pc.png",
-							"name": "PC Demo 1 (1999\/08\/18)",
-							"folder": "r2_pc_demo1"
+							"name": "PC Demo (1999\/08\/18)",
+							"folder": "r2_pc_demo_19990818"
 						},
 						{
-							"json": "pc_demo2",
+							"json": "pc_demo_19990904",
 							"image": ".\/img\/version\/pc.png",
-							"name": "PC Demo 2 (1999\/09\/04)",
-							"folder": "r2_pc_demo2"
+							"name": "PC Demo (1999\/09\/04)",
+							"folder": "r2_pc_demo_19990904"
 						}
 					]
 				},
@@ -101,10 +101,10 @@
 							"folder": "rm_ps2"
 						},
 						{
-							"json": "m\/ps2_demo",
+							"json": "m\/ps2_demo_20010725",
 							"image": ".\/img\/version\/ps2.png",
-							"name": "M - PS2 Demo",
-							"folder": "rm_ps2_demo"
+							"name": "M - PS2 Demo (2001\/07\/25)",
+							"folder": "rm_ps2_demo_20010725"
 						},
 						{
 							"json": "arena\/gc",
@@ -131,10 +131,10 @@
 							"folder": "ra_ps2"
 						},
 						{
-							"json": "arena\/gc_demo",
+							"json": "arena\/gc_demo_20020307",
 							"image": ".\/img\/version\/gc.png",
-							"name": "Arena - GameCube Demo",
-							"folder": "ra_gc_demo"
+							"name": "Arena - GC Demo (2002\/03\/07)",
+							"folder": "ra_gc_demo_20020307"
 						},
 						{
 							"json": "rush\/ps1",
@@ -229,10 +229,10 @@
 							"folder": "r3_ps2_demo_20020807"
 						},
 						{
-							"json": "ps2_devbuild",
+							"json": "ps2_devbuild_20020906",
 							"image": ".\/img\/version\/ps2.png",
 							"name": "PS2 Dev Build (2002\/09\/06)",
-							"folder": "r3_ps2_devbuild"
+							"folder": "r3_ps2_devbuild_20020906"
 						},
 						{
 							"json": "ps2_demo_20021029",

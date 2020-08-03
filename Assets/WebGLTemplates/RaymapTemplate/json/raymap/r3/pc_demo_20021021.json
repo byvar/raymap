@@ -1,7 +1,7 @@
 {
     "name": "Rayman 3 (PC) Demo (2002\/10\/21)",
     "image": ".\/img\/logo\/r3_pc.png",
-    "mode": "r3_demo_pc_20021021",
+    "mode": "r3_pc_demo_20021021",
     "folder": "r3_pc_demo_20021021",
     "levels": [
         { "level": "menu_40", "name": "Main Menu" },

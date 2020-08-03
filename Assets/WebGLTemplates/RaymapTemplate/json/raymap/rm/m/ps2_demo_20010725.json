@@ -1,0 +1,11 @@
+{
+    "name": "Rayman M (PS2) Demo (2001\/07\/25)",
+    "image": ".\/img\/logo\/rm_ps2.png",
+    "mode": "rm_ps2_demo_20010725",
+    "folder": "rm_ps2_demo_20010725",
+    "levels": [
+        { "level": "MENU", "name": "Main Menu", "folder": "MENUBIN" },
+        { "level": "1SHADOW", "name": "(L1 Battle) Shadow Plain", "folder": "FISHBIN" },
+        { "level": "CRYPT2", "name": "(L1 Race) Nebulous Tower", "folder": "TRIBEBIN" }
+    ]
+}

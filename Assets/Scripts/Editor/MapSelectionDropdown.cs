@@ -66,6 +66,7 @@ class MapSelectionDropdown : AdvancedDropdown {
 			case Settings.Platform.Xbox:
 			case Settings.Platform.Xbox360:
 			case Settings.Platform.PS3:
+			case Settings.Platform.MacOS:
 				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
 					extension = "*.sna";
 				} else {

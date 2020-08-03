@@ -1,7 +1,7 @@
 {
     "name": "Rayman 3 (PS2) Demo (2002\/10\/29)",
     "image": ".\/img\/logo\/r3_ps2.png",
-    "mode": "r3_demo_ps2_20021029",
+    "mode": "r3_ps2_demo_20021029",
     "folder": "r3_ps2_demo_20021029",
     "levels": [
         { "level": "MENU_40", "name": "Main Menu" },

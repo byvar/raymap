@@ -99,7 +99,7 @@ namespace OpenSpace.Object.Properties {
 				f.off_physical_list_default = Pointer.Read(reader); // Default objects table
 				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader));
 			}
-            if ((Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild
+            if ((Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild_2002_09_06
                 || f.objectLists.off_head == f.objectLists.off_tail)
                 && f.objectLists.Count > 1) f.objectLists.Count = 1; // Correction for Rayman 2
             f.off_bounding_volume = Pointer.Read(reader);

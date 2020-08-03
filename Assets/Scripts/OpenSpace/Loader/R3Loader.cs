@@ -452,7 +452,7 @@ namespace OpenSpace.Loader {
 				sz_entryActions = 0xE8;
 				sz_binDataForMenu = 0x01F0;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaGC
-				|| Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
+				|| Settings.s.mode == Settings.Mode.RaymanArenaGCDemo_2002_03_07) {
 				sz_entryActions = 0xC4;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaPC
 				|| Settings.s.mode == Settings.Mode.RaymanMPC) {
@@ -481,7 +481,7 @@ namespace OpenSpace.Loader {
 				if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
 					sz_entryActions = 0xE8;
 				} else if (Settings.s.game == Settings.Game.R3) {
-					if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild) {
+					if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild_2002_09_06) {
 						sz_entryActions = 0xF8;
 						sz_binDataForMenu = 0x78;
 					} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_08_07) {
@@ -839,7 +839,7 @@ namespace OpenSpace.Loader {
 
 			if (Settings.s.platform != Settings.Platform.PS2
 				&& Settings.s.mode != Settings.Mode.RaymanArenaGC
-				&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
+				&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo_2002_03_07
 				&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC) {
 				Pointer off_dynamic_so_list = Pointer.Read(reader);
 
@@ -959,7 +959,7 @@ namespace OpenSpace.Loader {
 			}
 			// Load additional animation banks
 			string extraAnimFolder = "Anim/";
-			if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo || Settings.s.platform == Settings.Platform.PS2) {
+			if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo_2002_03_07 || Settings.s.platform == Settings.Platform.PS2) {
 				extraAnimFolder = lvlName + "/";
 			}
 			for (int i = 0; i < families.Count; i++) {
@@ -968,7 +968,7 @@ namespace OpenSpace.Loader {
 					loadingState = "Loading additional animation bank " + animBank;
 					await WaitIfNecessary();
 					int animFileID = objectTypes[0][families[i].family_index].id;
-					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo || Settings.s.platform == Settings.Platform.PS2) {
+					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo_2002_03_07 || Settings.s.platform == Settings.Platform.PS2) {
 						animFileID = animBank - 5;
 					}
 					string animName = extraAnimFolder + "ani" + animFileID.ToString();

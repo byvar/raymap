@@ -158,7 +158,7 @@ namespace OpenSpace.Visual {
 					m.off_blendWeights = Pointer.Read(reader);
 				}
 				if (Settings.s.mode != Settings.Mode.RaymanArenaGC 
-					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
+					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo_2002_03_07
 					&& Settings.s.game != Settings.Game.RM
 					&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC
 					&& !(Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion == Settings.EngineVersion.R3)) {

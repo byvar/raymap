@@ -1,0 +1,15 @@
+{
+    "name": "Rayman Arena (Gamecube) Demo (2002\/03\/07)",
+    "image": ".\/img\/logo\/ra_gc.png",
+    "mode": "ra_gc_demo_20020307",
+    "folder": "ra_gc_demo_20020307",
+    "levels": [
+        { "level": "podium", "name": "The Podium", "folder": "MENUbin" },
+        { "level": "1Shadow", "name": "(L1 Battle) Shadow Plain", "folder": "FISHbin" },
+        { "level": "1Shrine", "name": "(L1 Battle) Rise and Shrine", "folder": "FISHbin" },
+        { "level": "1Sunset", "name": "(L1 Battle) Sunset Coast", "folder": "FISHbin" },
+        { "level": "crypt1", "name": "(L1 Race) First Ruins", "folder": "TRIBebin" },
+        { "level": "crypt2", "name": "(L1 Race) Nebulous Tower", "folder": "TRIBebin" },
+        { "level": "crypt3", "name": "(L1 Race) Dark Sewer", "folder": "TRIBebin" }
+    ]
+}

@@ -87,7 +87,8 @@ public class LightManager : MonoBehaviour {
 	void Update () {
         if (loaded) {
 			CheckKeys();
-			if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
+			if (MapLoader.Loader is OpenSpace.Loader.R2PS1Loader) {
+			} else if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
 				UpdateBackgroundROM();
 			} else {
 				UpdateBackground();

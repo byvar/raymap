@@ -855,7 +855,7 @@ namespace OpenSpace.Visual {
             if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
 				if (Settings.s.game != Settings.Game.Dinosaur
 					&& Settings.s.game != Settings.Game.LargoWinch
-					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo
+					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo_2002_03_07
 					&& Settings.s.platform != Settings.Platform.PS2) {
 					sm.isVisibleInPortal = reader.ReadByte();
 					reader.ReadByte();
@@ -892,7 +892,7 @@ namespace OpenSpace.Visual {
 					sm.OPT_off_triangleStrip = null;
 					sm.OPT_off_disconnectedTriangles = null;
 					sm.isVisibleInPortal = 1;
-					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo) {
+					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo_2002_03_07) {
 						sm.isVisibleInPortal = reader.ReadByte();
 						reader.ReadByte();
 						sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts
