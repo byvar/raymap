@@ -1,0 +1,111 @@
+{
+    "name": "Rayman 3 (PS2)",
+    "image": ".\/img\/logo\/r3_ps2.png",
+    "mode": "r3_ps2",
+    "folder": "r3_ps2",
+	"icons": [
+		{
+			"image": ".\/img\/icon\/R3\/mnu_jard.png",
+			"level": 0
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_fore.png",
+			"level": 7
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_mara.png",
+			"level": 13
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_land.png",
+			"level": 19
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_dese.png",
+			"level": 25
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_abra.png",
+			"level": 33
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_mont.png",
+			"level": 36
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_blac.png",
+			"level": 39
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_donj.png",
+			"level": 44
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_arca.png",
+			"level": 50
+		}
+	],
+    "levels": [
+        { "level": "MENUMAP", "name": "Main Menu" },
+        { "level": "INTRO_10", "name": "The Fairy Council 1 (Murfy)" },
+        { "level": "INTRO_15", "name": "The Fairy Council 2 (Finding Globox)" },
+        { "level": "INTRO_17", "name": "The Fairy Council 3 (Inside)" },
+        { "level": "INTRO_20", "name": "The Fairy Council 4" },
+        { "level": "MENU_00", "name": "The Fairy Council 5 (Heart of the World)" },
+        { "level": "SK8_00", "name": "The Fairy Council 6 (Teensie Highway)" },
+        { "level": "WOOD_11", "name": "Clearleaf Forest 1" },
+        { "level": "WOOD_10", "name": "Clearleaf Forest 2" },
+        { "level": "WOOD_19", "name": "Clearleaf Forest 3" },
+        { "level": "WOOD_50", "name": "Clearleaf Forest 4 (Master Kaag)" },
+        { "level": "MENU_10", "name": "Clearleaf Forest 5 (Doctor's Office)" },
+        { "level": "SK8_10", "name": "Clearleaf Forest 6 (Teensie Highway)" },
+        { "level": "SWAMP_60", "name": "The Bog of Murk 1 (Bégoniax)" },
+        { "level": "SWAMP_82", "name": "The Bog of Murk 2" },
+        { "level": "SWAMP_81", "name": "The Bog of Murk 3" },
+        { "level": "SWAMP_83", "name": "The Bog of Murk 4" },
+        { "level": "SWAMP_50", "name": "The Bog of Murk 5 (Razoff's Mansion)" },
+        { "level": "SWAMP_51", "name": "The Bog of Murk 6 (Razoff's Basement)" },
+        { "level": "MOOR_00", "name": "The Land of the Livid Dead 1" },
+        { "level": "MOOR_30", "name": "The Land of the Livid Dead 2" },
+        { "level": "MOOR_60", "name": "The Land of the Livid Dead 3 (Tower)" },
+        { "level": "MOOR_19", "name": "The Land of the Livid Dead 4 (Céloche)" },
+        { "level": "MENU_20", "name": "The Land of the Livid Dead 5 (Doctor's Office)" },
+        { "level": "SK8_20", "name": "The Land of the Livid Dead 6 (Teensie Highway)" },
+        { "level": "KNAAR_10", "name": "The Desert of the Knaaren 1" },
+        { "level": "KNAAR_20", "name": "The Desert of the Knaaren 2 (The Great Hall)" },
+        { "level": "KNAAR_30", "name": "The Desert of the Knaaren 3 (Tower)" },
+        { "level": "KNAAR_45", "name": "The Desert of the Knaaren 4" },
+        { "level": "KNAAR_60", "name": "The Desert of the Knaaren 5 (Arena)" },
+        { "level": "KNAAR_69", "name": "The Desert of the Knaaren 6 (Grimace Room)" },
+        { "level": "KNAAR_70", "name": "The Desert of the Knaaren 7" },
+        { "level": "MENU_30", "name": "The Desert of the Knaaren 8 (Doctor's Office)" },
+        { "level": "FLASH_20", "name": "The Longest Shortcut 1" },
+        { "level": "FLASH_30", "name": "The Longest Shortcut 2" },
+        { "level": "FLASH_10", "name": "The Longest Shortcut 3" },
+        { "level": "SEA_10", "name": "The Summit Beyond the Clouds 1 (The Looming Sea)" },
+        { "level": "MOUNT_50", "name": "The Summit Beyond the Clouds 2" },
+        { "level": "MOUNT_4X", "name": "The Summit Beyond the Clouds 3 (Snowboard)" },
+        { "level": "FACT_40", "name": "Hoodlum Headquarters 1" },
+        { "level": "FACT_50", "name": "Hoodlum Headquarters 2 (Firing Range)" },
+        { "level": "FACT_55", "name": "Hoodlum Headquarters 3" },
+        { "level": "FACT_34", "name": "Hoodlum Headquarters 4 (Horrible Machine)" },
+        { "level": "FACT_22", "name": "Hoodlum Headquarters 5 (Rising Lava)" },
+        { "level": "TOWER_10", "name": "The Tower of the Leptys 1" },
+        { "level": "TOWER_20", "name": "The Tower of the Leptys 2" },
+        { "level": "TOWER_30", "name": "The Tower of the Leptys 3" },
+        { "level": "TOWER_40", "name": "The Tower of the Leptys 4" },
+        { "level": "LEPT_15", "name": "The Tower of the Leptys 5 (Final Battle)" },
+        { "level": "STAFF", "name": "Staff Roll" },
+        { "level": "TOUDI_00", "name": "Arcade - 2D Madness" },
+        { "level": "TEN_MAP", "name": "Arcade - Racket Jump" },
+        { "level": "CRUSH", "name": "Arcade - Crush" },
+        { "level": "RAZ_MAP", "name": "Arcade - Razoff Circus" },
+        { "level": "SENTINEL", "name": "Arcade - Sentinel" },
+        { "level": "SNIPE_00", "name": "Arcade - Missile Command" },
+        { "level": "BALLMAP", "name": "Arcade - Balloons" },
+        { "level": "SHIP_MAP", "name": "Arcade - Special Invaders" },
+        { "level": "COMMANDO", "name": "Arcade - Commando" },
+        { "level": "BONUSTXT", "name": "Bonus (Empty)" },
+        { "level": "ENDGAME", "name": "Endgame (Empty)" }
+    ]
+}

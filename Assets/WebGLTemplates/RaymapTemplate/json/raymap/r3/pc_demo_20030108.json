@@ -1,8 +1,8 @@
 {
-    "name": "Rayman 3 (PC) Demo (2003\/01\/06)",
+    "name": "Rayman 3 (PC) Demo (2003\/01\/08)",
     "image": ".\/img\/logo\/r3_pc.png",
-    "mode": "r3_demo_pc_20030106",
-    "folder": "r3_pc_demo_20030106",
+    "mode": "r3_demo_pc_20030108",
+    "folder": "r3_pc_demo_20030108",
     "levels": [
         { "level": "menu_40", "name": "Main Menu" },
         { "level": "intro_17", "name": "The Fairy Council 3 (Inside)" },

@@ -193,10 +193,10 @@
 							"folder": "r3_macos"
 						},
 						{
-							"json": "pc_demo_20021001",
+							"json": "pc_demo_20021004",
 							"image": ".\/img\/version\/pc.png",
-							"name": "PC Demo (2002\/10\/01)",
-							"folder": "r3_pc_demo_20021001"
+							"name": "PC Demo (2002\/10\/04)",
+							"folder": "r3_pc_demo_20021004"
 						},
 						{
 							"json": "pc_demo_20021021",
@@ -205,16 +205,22 @@
 							"folder": "r3_pc_demo_20021021"
 						},
 						{
-							"json": "pc_demo_20021209",
+							"json": "pc_demo_20021210",
 							"image": ".\/img\/version\/pc.png",
-							"name": "PC Demo (2002\/12\/09)",
-							"folder": "r3_pc_demo_20021209"
+							"name": "PC Demo (2002\/12\/10)",
+							"folder": "r3_pc_demo_20021210"
 						},
 						{
-							"json": "pc_demo_20030106",
+							"json": "pc_demo_20030108",
 							"image": ".\/img\/version\/pc.png",
-							"name": "PC Demo (2003\/01\/06)",
-							"folder": "r3_pc_demo_20030106"
+							"name": "PC Demo (2003\/01\/08)",
+							"folder": "r3_pc_demo_20030108"
+						},
+						{
+							"json": "pc_demo_20030129",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo (2003\/01\/29)",
+							"folder": "r3_pc_demo_20030129"
 						},
 						{
 							"json": "ps2_demo_20020807",

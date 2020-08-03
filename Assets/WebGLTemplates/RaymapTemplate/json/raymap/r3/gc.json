@@ -3,6 +3,48 @@
     "image": ".\/img\/logo\/r3_gc.png",
     "mode": "r3_gc",
     "folder": "r3_gc",
+	"icons": [
+		{
+			"image": ".\/img\/icon\/R3\/mnu_jard.png",
+			"level": 0
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_fore.png",
+			"level": 7
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_mara.png",
+			"level": 13
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_land.png",
+			"level": 19
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_dese.png",
+			"level": 25
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_abra.png",
+			"level": 33
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_mont.png",
+			"level": 36
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_blac.png",
+			"level": 39
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_donj.png",
+			"level": 44
+		},
+		{
+			"image": ".\/img\/icon\/R3\/mnu_arca.png",
+			"level": 50
+		}
+	],
     "levels": [
         { "level": "menumap", "name": "Main Menu" },
         { "level": "intro_10", "name": "The Fairy Council 1 (Murfy)" },
