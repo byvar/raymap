@@ -1,0 +1,12 @@
+{
+    "name": "Rayman 3 (PC) Demo (2003\/01\/06)",
+    "image": ".\/img\/logo\/r3_pc.png",
+    "mode": "r3_demo_pc_20030106",
+    "folder": "r3_pc_demo_20030106",
+    "levels": [
+        { "level": "menu_40", "name": "Main Menu" },
+        { "level": "intro_17", "name": "The Fairy Council 3 (Inside)" },
+        { "level": "moor_30", "name": "The Land of the Livid Dead 2" },
+        { "level": "flash_10", "name": "The Longest Shortcut 3" }
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "name": "Rayman 3 (PS2) Demo (2002\/10\/29)",
+    "image": ".\/img\/logo\/r3_ps2.png",
+    "mode": "r3_demo_ps2_20021029",
+    "folder": "r3_ps2_demo_20021029",
+    "levels": [
+        { "level": "MENU_40", "name": "Main Menu" },
+        { "level": "WOOD_19", "name": "Clearleaf Forest 3" },
+        { "level": "TOWER_30", "name": "The Tower of the Leptys 3" }
+    ]
+}

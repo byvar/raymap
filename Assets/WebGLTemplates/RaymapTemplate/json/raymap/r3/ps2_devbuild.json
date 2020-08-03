@@ -1,0 +1,14 @@
+{
+    "name": "Rayman 3 (PS2) Dev Build (2002\/09\/06)",
+    "image": ".\/img\/logo\/r3_ps2.png",
+    "mode": "r3_devbuild_ps2",
+    "folder": "r3_ps2_devbuild",
+    "levels": [
+        { "level": "INTRO_10", "name": "The Fairy Council 1 (Murfy)" },
+        { "level": "SK8_00", "name": "The Fairy Council 6 (Teensie Highway)" },
+        { "level": "WOOD_19", "name": "Clearleaf Forest 3" },
+        { "level": "MOOR_60", "name": "The Land of the Livid Dead 3 (Tower)" },
+        { "level": "FLASH_10", "name": "The Longest Shortcut 3" },
+        { "level": "TOWER_30", "name": "The Tower of the Leptys 3" }
+    ]
+}

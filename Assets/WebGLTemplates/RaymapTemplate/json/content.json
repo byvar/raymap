@@ -187,6 +187,36 @@
 							"folder": "r3_ps3"
 						},
 						{
+							"json": "macos",
+							"image": ".\/img\/version\/macos.png",
+							"name": "Mac OS",
+							"folder": "r3_macos"
+						},
+						{
+							"json": "pc_demo_20021001",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo (2002\/10\/01)",
+							"folder": "r3_pc_demo_20021001"
+						},
+						{
+							"json": "pc_demo_20021021",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo (2002\/10\/21)",
+							"folder": "r3_pc_demo_20021021"
+						},
+						{
+							"json": "pc_demo_20021209",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo (2002\/12\/09)",
+							"folder": "r3_pc_demo_20021209"
+						},
+						{
+							"json": "pc_demo_20030106",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo (2003\/01\/06)",
+							"folder": "r3_pc_demo_20030106"
+						},
+						{
 							"json": "ps2_demo_20020807",
 							"image": ".\/img\/version\/ps2.png",
 							"name": "PS2 Demo (2002\/08\/07)",
@@ -195,7 +225,7 @@
 						{
 							"json": "ps2_devbuild",
 							"image": ".\/img\/version\/ps2.png",
-							"name": "PS2 Dev Build",
+							"name": "PS2 Dev Build (2002\/09\/06)",
 							"folder": "r3_ps2_devbuild"
 						},
 						{

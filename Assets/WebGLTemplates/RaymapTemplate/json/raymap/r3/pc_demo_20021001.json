@@ -1,0 +1,11 @@
+{
+    "name": "Rayman 3 (PC) Demo (2002\/10\/01)",
+    "image": ".\/img\/logo\/r3_pc.png",
+    "mode": "r3_demo_pc_20021001",
+    "folder": "r3_pc_demo_20021001",
+    "levels": [
+        { "level": "menu_40", "name": "Main Menu" },
+        { "level": "wood_19", "name": "Clearleaf Forest 3" },
+        { "level": "tower_30", "name": "The Tower of the Leptys 3" }
+    ]
+}

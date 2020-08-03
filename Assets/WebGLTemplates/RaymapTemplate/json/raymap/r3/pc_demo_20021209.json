@@ -1,0 +1,12 @@
+{
+    "name": "Rayman 3 (PC) Demo (2002\/12\/09)",
+    "image": ".\/img\/logo\/r3_pc.png",
+    "mode": "r3_demo_pc_20021209",
+    "folder": "r3_pc_demo_20021209",
+    "levels": [
+        { "level": "menu_40", "name": "Main Menu" },
+        { "level": "intro_17", "name": "The Fairy Council 3 (Inside)" },
+        { "level": "wood_19", "name": "Clearleaf Forest 3" },
+        { "level": "tower_30", "name": "The Tower of the Leptys 3" }
+    ]
+}
