@@ -1,8 +1,8 @@
 {
-    "name": "Rayman Arena (Gamecube)",
-    "image": ".\/img\/logo\/ra_gc.png",
-    "mode": "ra_gc",
-    "folder": "ra_gc",
+    "name": "Rayman Arena (Xbox)",
+    "image": ".\/img\/logo\/ra_xbox.png",
+    "mode": "ra_xbox",
+    "folder": "ra_xbox",
 	"icons": [
 		{
 			"image": ".\/img\/icon\/RM\/ic_fight.png",

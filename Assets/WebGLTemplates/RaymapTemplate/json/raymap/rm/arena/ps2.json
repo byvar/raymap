@@ -1,0 +1,48 @@
+{
+    "name": "Rayman Arena (PS2)",
+    "image": ".\/img\/logo\/ra_ps2.png",
+    "mode": "ra_ps2",
+    "folder": "ra_ps2",
+	"icons": [
+		{
+			"image": ".\/img\/icon\/RM\/icona_shoot.png",
+			"level": 0
+		},
+		{
+			"image": ".\/img\/icon\/RM\/icona_race.png",
+			"level": 14
+		}
+	],
+    "levels": [
+        { "level": "MENU", "name": "Main Menu", "folder": "MENUBIN" },
+        { "level": "1SHADOW", "name": "(L1 Battle) Shadow Plain", "folder": "FISHBIN" },
+        { "level": "1SHRINE", "name": "(L1 Battle) Rise and Shrine", "folder": "FISHBIN" },
+        { "level": "1SUNSET", "name": "(L1 Battle) Sunset Coast", "folder": "FISHBIN" },
+        { "level": "2HAUNTED", "name": "(L2 Battle) Haunted Yard", "folder": "FISHBIN" },
+        { "level": "2PALM", "name": "(L2 Battle) Palm Beach", "folder": "FISHBIN" },
+        { "level": "2TIMBER", "name": "(L2 Battle) Timber Wood", "folder": "FISHBIN" },
+        { "level": "3COCONUT", "name": "(L3 Battle) Coconut Island", "folder": "FISHBIN" },
+        { "level": "3LY", "name": "(L3 Battle) Ly's Palace", "folder": "FISHBIN" },
+        { "level": "3SPELL", "name": "(L3 Battle) Spellbound Forest", "folder": "FISHBIN" },
+        { "level": "4FORGOT", "name": "(L4 Battle) Forgotten Dungeon", "folder": "FISHBIN" },
+        { "level": "4GEM", "name": "(L4 Battle) Gemstone Temple", "folder": "FISHBIN" },
+        { "level": "4GHASTLY", "name": "(L4 Battle) Ghastly Trees", "folder": "FISHBIN" },
+        { "level": "BSPOOKY", "name": "(Bonus Battle) Spooky Towers", "folder": "FISHBIN" },
+        { "level": "CRYPT1", "name": "(L1 Race) First Ruins", "folder": "TRIBEBIN" },
+        { "level": "CRYPT2", "name": "(L1 Race) Nebulous Tower", "folder": "TRIBEBIN" },
+        { "level": "CRYPT3", "name": "(L1 Race) Dark Sewer", "folder": "TRIBEBIN" },
+        { "level": "LAGOON1", "name": "(L2 Race) Dawn Sand", "folder": "TRIBEBIN" },
+        { "level": "LAGOON2", "name": "(L2 Race) Water Canyon", "folder": "TRIBEBIN" },
+        { "level": "LAGOON3", "name": "(L2 Race) Thousand Waterfalls", "folder": "TRIBEBIN" },
+        { "level": "PIRATE1", "name": "(L3 Race) Forest Jump", "folder": "TRIBEBIN" },
+        { "level": "PIRATE2", "name": "(L3 Race) Zenith Harbour", "folder": "TRIBEBIN" },
+        { "level": "PIRATE3", "name": "(L3 Race) Treasure Ship", "folder": "TRIBEBIN" },
+        { "level": "FACTORY1", "name": "(L4 Race) Pipe Maze", "folder": "TRIBEBIN" },
+        { "level": "FACTORY2", "name": "(L4 Race) Lava Factory", "folder": "TRIBEBIN" },
+        { "level": "FACTORY3", "name": "(L4 Race) Electric Final", "folder": "TRIBEBIN" },
+        { "level": "BONUS01", "name": "(Bonus Race) Big Bang", "folder": "TRIBEBIN" },
+        { "level": "BONUS", "name": "(Bonus Race) Future", "folder": "TRIBEBIN" },
+        { "level": "SCROL", "name": "(Bonus Race) Born To Slide", "folder": "TRIBEBIN" },
+        { "level": "BONUS2", "name": "(Bonus Race) Speed Stress", "folder": "TRIBEBIN" }
+    ]
+}

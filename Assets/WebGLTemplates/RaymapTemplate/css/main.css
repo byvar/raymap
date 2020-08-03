@@ -999,14 +999,14 @@ a:focus {
 	top: 0px;
 }
 .sidebar-arrow-up:before {
-    content: "\e924";
+    content: "\e904";
 }
 
 .sidebar-arrow-down {
 	bottom: 0px;
 }
 .sidebar-arrow-down:before {
-	content: "\e923";
+	content: "\e903";
 }
 
 .sidebar-arrow-disabled {

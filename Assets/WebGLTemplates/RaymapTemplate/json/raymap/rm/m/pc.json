@@ -1,8 +1,8 @@
 {
-    "name": "Rayman Arena (PC)",
-    "image": ".\/img\/logo\/ra_pc.png",
-    "mode": "ra_pc",
-    "folder": "ra_pc",
+    "name": "Rayman M (PC)",
+    "image": ".\/img\/logo\/rm_pc.png",
+    "mode": "rm_pc",
+    "folder": "rm_pc",
 	"icons": [
 		{
 			"image": ".\/img\/icon\/RM\/icona_shoot.png",
