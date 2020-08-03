@@ -13,6 +13,11 @@ namespace OpenSpace {
 		public static Dictionary<string, Mode> cmdModeNameDict = new Dictionary<string, Mode>() {
 			{ "r3_gc", Mode.Rayman3GC },
 			{ "r3_pc", Mode.Rayman3PC },
+			{ "r3_demo_pc_20021001", Mode.Rayman3PCDemo_2002_10_01 },
+			{ "r3_demo_pc_20021021", Mode.Rayman3PCDemo_2002_10_21 },
+			{ "r3_demo_pc_20021209", Mode.Rayman3PCDemo_2002_12_09 },
+			{ "r3_demo_pc_20030106", Mode.Rayman3PCDemo_2003_01_06 },
+			{ "r3_macos", Mode.Rayman3MacOS },
 			{ "r3_ps2", Mode.Rayman3PS2 },
 			{ "r3_demo_ps2_20020807", Mode.Rayman3PS2Demo_2002_08_07 },
 			{ "r3_devbuild_ps2", Mode.Rayman3PS2DevBuild },
@@ -79,7 +84,12 @@ namespace OpenSpace {
             [Description("Rayman Arena (Xbox)")] RaymanArenaXbox,
             [Description("Rayman Rush (PS1)")] RaymanRushPS1,
             [Description("Rayman 3 (PC)")] Rayman3PC,
-            [Description("Rayman 3 (GC)")] Rayman3GC,
+			[Description("R3 (PC) Demo (2002/10/01)")] Rayman3PCDemo_2002_10_01,
+			[Description("R3 (PC) Demo (2002/10/21)")] Rayman3PCDemo_2002_10_21,
+			[Description("R3 (PC) Demo (2002/12/09)")] Rayman3PCDemo_2002_12_09,
+			[Description("R3 (PC) Demo (2003/01/06)")] Rayman3PCDemo_2003_01_06,
+			[Description("Rayman 3 (MacOS)")] Rayman3MacOS,
+			[Description("Rayman 3 (GC)")] Rayman3GC,
             [Description("Rayman 3 (PS2)")] Rayman3PS2,
             [Description("R3 (PS2) Demo (2002/08/07)")] Rayman3PS2Demo_2002_08_07,
             [Description("R3 (PS2) Dev Build (2002/09/06)")] Rayman3PS2DevBuild,
@@ -112,7 +122,7 @@ namespace OpenSpace {
             R3 = 3
         };
         public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch, JungleBook, VIP, RedPlanet };
-        public enum Platform { PC, iOS, GC, DC, PS1, PS2, PS3, Xbox, Xbox360, DS, _3DS, N64 };
+        public enum Platform { PC, MacOS, iOS, GC, DC, PS1, PS2, PS3, Xbox, Xbox360, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window, RedPlanet };
 		public enum Caps { All, AllExceptExtension, Normal, None };
@@ -225,7 +235,104 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-        public static Settings R3GC = new Settings() {
+
+		public static Settings R3PCDemo20021001 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.1f,
+			saturate = false,
+			levelTranslation = LevelTranslation.levelTranslation_r3,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+		public static Settings R3PCDemo20021021 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.1f,
+			saturate = false,
+			levelTranslation = LevelTranslation.levelTranslation_r3,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+		public static Settings R3PCDemo20021209 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.1f,
+			saturate = false,
+			levelTranslation = LevelTranslation.levelTranslation_r3,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+		public static Settings R3PCDemo20030106 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.1f,
+			saturate = false,
+			levelTranslation = LevelTranslation.levelTranslation_r3,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+		public static Settings R3MacOS = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.MacOS,
+			endian = Endian.Big,
+			linkedListType = LinkedListType.Double,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.1f,
+			saturate = false,
+			levelTranslation = LevelTranslation.levelTranslation_r3,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+
+		public static Settings R3GC = new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.R3,
             platform = Platform.GC,
@@ -1042,6 +1149,11 @@ namespace OpenSpace {
 			{ Mode.RaymanArenaXbox, RAXbox },
 			{ Mode.RaymanRushPS1, RRushPS1 },
 			{ Mode.Rayman3PC, R3PC },
+			{ Mode.Rayman3PCDemo_2002_10_01, R3PCDemo20021001 },
+			{ Mode.Rayman3PCDemo_2002_10_21, R3PCDemo20021021 },
+			{ Mode.Rayman3PCDemo_2002_12_09, R3PCDemo20021209 },
+			{ Mode.Rayman3PCDemo_2003_01_06, R3PCDemo20030106 },
+			{ Mode.Rayman3MacOS, R3MacOS },
 			{ Mode.Rayman3GC, R3GC },
 			{ Mode.Rayman3PS2, R3PS2 },
 			{ Mode.Rayman3PS2Demo_2002_08_07, R3PS2Demo_20020807 },

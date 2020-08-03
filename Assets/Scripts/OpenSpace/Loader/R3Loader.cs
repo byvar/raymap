@@ -333,11 +333,12 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			if (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.MacOS
 				|| Settings.s.platform == Settings.Platform.Xbox
 				|| Settings.s.platform == Settings.Platform.Xbox360
 				|| Settings.s.platform == Settings.Platform.PS3
 				|| Settings.s.platform == Settings.Platform.PS2) {
-				if (Settings.s.game == Settings.Game.R3) {
+				if (Settings.s.game == Settings.Game.R3 && (Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_01 && Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_21)) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -346,7 +347,7 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
-				} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.Dinosaur) {
+				} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.Dinosaur ||Settings.s.game == Settings.Game.R3) {
 					if (Settings.s.platform == Settings.Platform.PS2) {
 						string timeStamp = reader.ReadString(0x14);
 						reader.ReadUInt32();
@@ -374,6 +375,7 @@ namespace OpenSpace.Loader {
 				}
 				ReadLevelNames(reader, Pointer.Current(reader), num_lvlNames);
 				if (Settings.s.platform == Settings.Platform.PC
+					|| Settings.s.platform == Settings.Platform.MacOS
 					|| Settings.s.platform == Settings.Platform.Xbox
 					|| Settings.s.platform == Settings.Platform.Xbox360
 					|| Settings.s.platform == Settings.Platform.PS3) {
@@ -462,6 +464,17 @@ namespace OpenSpace.Loader {
 				sz_entryActions = 0xC0;
 			} else if (Settings.s.mode == Settings.Mode.RaymanArenaXbox) {
 				sz_entryActions = 0xF0;
+			} else if (Settings.s.mode == Settings.Mode.Rayman3PCDemo_2003_01_06) {
+				sz_binDataForMenu = 0x1a4;
+			} else if (Settings.s.mode == Settings.Mode.Rayman3PCDemo_2002_12_09) {
+				sz_binDataForMenu = 0x1ac;
+			} else if (Settings.s.mode == Settings.Mode.Rayman3PCDemo_2002_10_21) {
+				sz_entryActions = 0xFC;
+				sz_binDataForMenu = 0x1F4;
+			} else if (Settings.s.mode == Settings.Mode.Rayman3PCDemo_2002_10_01) {
+				sz_entryActions = 0xFC;
+				sz_binDataForMenu = 0x10C;
+				num_menuPages = 25;
 			}
 			if (Settings.s.platform == Settings.Platform.PS2) {
 				sz_videoStructure = 0x108;
@@ -499,11 +512,13 @@ namespace OpenSpace.Loader {
 			if (Settings.s.platform != Settings.Platform.PS2) {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
+
 				inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
 				foreach (EntryAction ea in inputStruct.entryActions) {
 					print(ea.ToString());
 				}
 				if (Settings.s.platform == Settings.Platform.PC
+					|| Settings.s.platform == Settings.Platform.MacOS
 					|| Settings.s.platform == Settings.Platform.Xbox
 					|| Settings.s.platform == Settings.Platform.Xbox360
 					|| Settings.s.platform == Settings.Platform.PS3) {
@@ -538,13 +553,16 @@ namespace OpenSpace.Loader {
 				}
 				reader.ReadBytes(sz_binDataForMenu);
 				if (Settings.s.platform == Settings.Platform.PC
+					|| Settings.s.platform == Settings.Platform.MacOS
 					|| Settings.s.platform == Settings.Platform.Xbox
 					|| Settings.s.platform == Settings.Platform.Xbox360
 					|| Settings.s.platform == Settings.Platform.PS3) {
 					Pointer off_bgMaterialForMenu2D = Pointer.Read(reader);
 					Pointer off_fixMaterialForMenu2D = Pointer.Read(reader);
-					Pointer off_fixMaterialForSelectedFilms = Pointer.Read(reader);
-					Pointer off_fixMaterialForArcadeAndFilms = Pointer.Read(reader);
+					if (Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_01 && Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_21) {
+						Pointer off_fixMaterialForSelectedFilms = Pointer.Read(reader);
+						Pointer off_fixMaterialForArcadeAndFilms = Pointer.Read(reader);
+					}
 					for (int i = 0; i < num_menuPages; i++) {
 						Pointer off_menuPage = Pointer.Read(reader);
 					}
@@ -581,6 +599,7 @@ namespace OpenSpace.Loader {
 			//reader.ReadUInt32();
 			if (Settings.s.game == Settings.Game.R3
 				&& (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.MacOS
 				|| Settings.s.platform == Settings.Platform.Xbox
 				|| Settings.s.platform == Settings.Platform.Xbox360
 				|| Settings.s.platform == Settings.Platform.PS3
@@ -596,11 +615,12 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			if (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.MacOS
 				|| Settings.s.platform == Settings.Platform.Xbox
 				|| Settings.s.platform == Settings.Platform.Xbox360
 				|| Settings.s.platform == Settings.Platform.PS3
 				|| Settings.s.platform == Settings.Platform.PS2) {
-				if (Settings.s.game == Settings.Game.R3) {
+				if (Settings.s.game == Settings.Game.R3 && (Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_01 && Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_21)) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -611,7 +631,8 @@ namespace OpenSpace.Loader {
 					if(Settings.s.platform != Settings.Platform.PS2) reader.ReadUInt32();
 				} else if (Settings.s.game == Settings.Game.RM
 					|| Settings.s.game == Settings.Game.RA
-					|| Settings.s.game == Settings.Game.Dinosaur) {
+					|| Settings.s.game == Settings.Game.Dinosaur
+					|| Settings.s.game == Settings.Game.R3) {
 					if (Settings.s.platform == Settings.Platform.PS2) {
 						string timeStamp = reader.ReadString(0x18);
 						reader.ReadUInt32();
@@ -621,7 +642,9 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 				}
 			}
-			if (Settings.s.platform != Settings.Platform.PS2) {
+			if (Settings.s.platform == Settings.Platform.MacOS) {
+				reader.ReadBytes(0x404); // vignette
+			} else if (Settings.s.platform != Settings.Platform.PS2) {
 				reader.ReadBytes(0x104); // vignette
 				if (Settings.s.game != Settings.Game.Dinosaur) {
 					reader.ReadUInt32();
@@ -630,6 +653,7 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading level textures";
 			await ReadTexturesLvl(reader, Pointer.Current(reader));
 			if ((Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.MacOS
 				|| Settings.s.platform == Settings.Platform.Xbox
 				|| Settings.s.platform == Settings.Platform.Xbox360
 				|| Settings.s.platform == Settings.Platform.PS3)
@@ -661,6 +685,7 @@ namespace OpenSpace.Loader {
 			globals.off_dynamicWorld = Pointer.Read(reader);
 			if (Settings.s.game == Settings.Game.R3
 				&& (Settings.s.platform == Settings.Platform.PC
+				|| Settings.s.platform == Settings.Platform.MacOS
 				|| Settings.s.platform == Settings.Platform.Xbox
 				|| Settings.s.platform == Settings.Platform.Xbox360
 				|| Settings.s.platform == Settings.Platform.PS3)) {
@@ -859,6 +884,7 @@ namespace OpenSpace.Loader {
 				Pointer off_transit = new Pointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
 				Pointer.DoAt(ref reader, off_transit, () => {
 					if (Settings.s.platform == Settings.Platform.PC
+					|| Settings.s.platform == Settings.Platform.MacOS
 					|| Settings.s.platform == Settings.Platform.Xbox
 					|| Settings.s.platform == Settings.Platform.Xbox360
 					|| Settings.s.platform == Settings.Platform.PS3) {

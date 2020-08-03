@@ -18,7 +18,8 @@ Map viewer/editor for OpenSpace games:
 * Rayman Arena (PS2)
 * Rayman Arena (GC) + Prototype
 * Rayman Arena (Xbox)
-* Rayman 3 (PC)
+* Rayman 3 (PC) + Demos
+* Rayman 3 (Mac OS)
 * Rayman 3 (GC)
 * Rayman 3 (PS2) + Demos & Dev Build
 * Rayman 3 (Xbox)

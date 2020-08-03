@@ -458,8 +458,8 @@ MonoBehaviour.print(str);
 					}
 				}
             } else {
-                if (Settings.s.platform == Settings.Platform.PC) {
-					if (Settings.s.game == Settings.Game.R3) {
+                if (Settings.s.platform == Settings.Platform.PC || Settings.s.platform == Settings.Platform.MacOS) {
+					if (Settings.s.game == Settings.Game.R3 && Settings.s.mode == Settings.Mode.Rayman3PC) {
 						cntPaths = new string[3];
 						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
 						cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
@@ -468,7 +468,7 @@ MonoBehaviour.print(str);
 							await PrepareBigFile(path, 512 * 1024);
 						}
 						cnt = new CNT(cntPaths);
-					} else if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+					} else if (Settings.s.game == Settings.Game.R3 || Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
 						cntPaths = new string[2];
 						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
 						cntPaths[1] = gameDataBinFolder + "tex32.cnt";

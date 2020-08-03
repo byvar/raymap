@@ -35,6 +35,7 @@ namespace OpenSpace.Input {
 						reader.ReadBytes(0x418);
 						break;
 					case Settings.Platform.PC:
+					case Settings.Platform.MacOS:
 						if (Settings.s.game == Settings.Game.RedPlanet) {
 							reader.ReadBytes(0x32CC);
 						} else if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
