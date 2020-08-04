@@ -1115,6 +1115,33 @@ a:focus {
 	padding-right: 1em;
 	text-align: right;
 }
+.levels-actor-input-group {
+	font-size: 0.6em;
+	padding: 0.25em 3em 0 3em;
+	text-align: center;
+	justify-content: center;
+	display: flex;
+}
+.levels-actor-input {
+	display: flex;
+	width: 50%;
+	flex: 0 1 auto;
+	box-sizing: border-box;
+}
+.levels-actor-input.invisible {
+	display: none;
+}
+.levels-actor-input-group {
+	transition: opacity .4s;
+	-moz-transition: opacity .4s;
+	-webkit-transition: opacity .4s;
+	opacity: 1;
+}
+.levels-actor-input-group.loading,
+.levels-actor-input-group.hidden {
+	opacity: 0;
+	pointer-events: none;
+}
 .small-footer-right {
 	display: block;
 	position: absolute;

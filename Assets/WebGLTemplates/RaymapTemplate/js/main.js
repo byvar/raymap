@@ -27,6 +27,11 @@ function formatBytes(bytes,decimals) {
 	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+
+function getRandomInt(max) {
+	return Math.floor(Math.random() * Math.floor(max));
+}  
+
 let waitForFinalEvent = (function () {
   let timers = {};
   return function (callback, ms, uniqueId) {
@@ -102,6 +107,7 @@ let previousState = -1;
 let games_content, versions_content, levels_content, levels_sidebar = null;
 let games_header, versions_header, levels_header = null;
 let current_game, current_version = null;
+let levels_actors_group, actor1_group, actor2_group, actor1_selector, actor2_selector = null;
 
 // FUNCTIONS
 function getNoCacheURL() {
@@ -1594,6 +1600,7 @@ function initGame(gameJSON) {
 		if(thisVersionSelected) {
 			levels_sidebar.addClass('loading-sidebar');
 			levels_header.addClass('loading-header');
+			levels_actors_group.addClass('loading');
 			clickVersion_onEndLoading(value.json);
 			$(".current-version-item").removeClass("current-version-item");
 			items.push("<div class='version-item current-version-item' data-version='" + value.json + "' title='" + value.name + "' data-logo='" + encodeURI(value.image) + "'>");
@@ -1618,6 +1625,68 @@ function initGame(gameJSON) {
 	}, 100);
 }
 
+function initActors() {
+	if(levelsJSON.hasOwnProperty("numActors")) {
+		if(levelsJSON.numActors >= 1) {
+			let actors = levelsJSON.hasOwnProperty("actors1") ? levelsJSON.actors1 : levelsJSON.actors;
+
+			let actorItems = "";
+			$.each(actors, function (idx, act) {
+				actorItems += "<option value='" + act.actor + "'>" + escapeHTML(act.name) + "</option>";
+			});
+
+
+			actor1_selector.html(actorItems);
+			actor1_group.removeClass("invisible");
+			let actorIndex = getRandomInt(actors.length);
+			actor1_selector.val(actors[actorIndex].actor);
+		} else {
+			actor1_group.addClass("invisible");
+		}
+		if(levelsJSON.numActors == 2) {
+			let actors = levelsJSON.hasOwnProperty("actors2") ? levelsJSON.actors2 : levelsJSON.actors;
+
+			let actorItems = "";
+			$.each(actors, function (idx, act) {
+				actorItems += "<option value='" + act.actor + "'>" + escapeHTML(act.name) + "</option>";
+			});
+
+			actor2_selector.html(actorItems);
+			actor2_group.removeClass("invisible");
+			let actorIndex = getRandomInt(actors.length);
+			actor2_selector.val(actors[actorIndex].actor);
+		} else {
+			actor2_group.addClass("invisible");
+		}
+		levels_actors_group.removeClass("hidden");
+	} else {
+		levels_actors_group.addClass("hidden");
+	}
+}
+
+function updateLevelLinksActors() {
+	$("a.levels-item.level").each(function( index ) {
+		let lastActor1 = $( this ).data("actor1");
+		let lastActor2 = $( this ).data("actor2");
+		let urlParams = $(this).data("urlParams");
+		let newActor1 = actor1_selector.val();
+		let newActor2 = actor2_selector.val();
+
+		let newActorString = "";
+		if(lastActor1 !== undefined) {
+			$(this).data("actor1", newActor1);
+			newActorString += "&a1=" + newActor1;
+		}
+		if(lastActor2 !== undefined) {
+			$(this).data("actor2", newActor2);
+			newActorString += "&a2=" + newActor2;
+		}
+		if(urlParams !== undefined) {
+			$(this).attr("href", urlParams + newActorString);
+		}
+	});
+}
+
 function initVersion(versionJSON) {
 	$('.sidebar-button').remove();
 	$('#sidebar-levels-slider').css('top','0px');
@@ -1629,6 +1698,11 @@ function initVersion(versionJSON) {
 	let items = [];
 	let totalEm = 0;
 	levels_header.text(levelsJSON.name);
+
+	// Fill in actors
+	initActors();
+
+	// Fill in levels
 	if(levelsJSON.hasOwnProperty("levels")) {
 		let levels = levelsJSON.levels;
 		$.each( levels, function(index, value) {
@@ -1642,13 +1716,27 @@ function initVersion(versionJSON) {
 					urlParams += "&" + val_param.key + "=" + val_param.value;
 				});
 			}
+			let actorParams = "";
+			let requiresActor1 = value.hasOwnProperty("actor1") && value.actor1;
+			let requiresActor2 = value.hasOwnProperty("actor2") && value.actor2;
+
+			if(levelsJSON.hasOwnProperty("numActors")) {
+				if(requiresActor1) actorParams += "&a1=" + actor1_selector.val();
+				if(requiresActor2) actorParams += "&a2=" + actor2_selector.val();
+			}
 
 			//items.push("<a class='logo-item' href='#" + value.json + "' title='" + value.title + "'><img src='" + encodeURI(value.image) + "' alt='" + value.title + "'></a>");
 			if(levelsJSON.mode === mode && folder === levelFolder && value.level === lvl) {
 				items.push("<div class='levels-item level current-levels-item' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></div>");
 				document.title = " [" + levelsJSON.name + "] " + value.name + " - " + baseTitle;
 			} else {
-				items.push("<a class='levels-item level' href='index.html" + urlParams + "' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></a>");
+				let actorHTML = "";
+				if(levelsJSON.hasOwnProperty("numActors")) {
+					if(requiresActor1) actorHTML += "data-actor1='" + actor1_selector.val() + "' ";
+					if(requiresActor2) actorHTML += "data-actor2='" + actor2_selector.val() + "' ";
+					if(requiresActor1 || requiresActor2) actorHTML += "' data-url-params='" + escapeHTML(urlParams) + "' ";
+				}
+				items.push("<a class='levels-item level' " + actorHTML + "href='index.html" + urlParams + actorParams + "' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></a>");
 			}
 			totalEm += 2;
 		});
@@ -1678,6 +1766,7 @@ function initVersion(versionJSON) {
 		levels_header.removeClass('loading-header');
 		levels_sidebar.removeClass('loading-sidebar');
 		levels_content.removeClass('loading');
+		levels_actors_group.removeClass('loading');
 		api.reinitialise();
 		api.scrollToPercentY(0, false);
 	}, 100);
@@ -1697,6 +1786,7 @@ function clickVersion(versionItem) {
 	if( !support || levels_content.hasClass('loading')) {
 		levels_sidebar.addClass('loading-sidebar');
 		levels_header.addClass('loading-header');
+		levels_actors_group.addClass('loading');
 		clickVersion_onEndLoading(versionItem);
 	} else {
 		levels_content.off(transEndEventName);
@@ -1706,6 +1796,7 @@ function clickVersion(versionItem) {
 		levels_content.addClass('loading');
 		levels_sidebar.addClass('loading-sidebar');
 		levels_header.addClass('loading-header');
+		levels_actors_group.addClass('loading');
 	}
 }
 
@@ -1736,11 +1827,13 @@ function clickGame(gameItem) {
 		levels_content.addClass('loading');
 		levels_sidebar.addClass('loading-sidebar');
 		levels_header.addClass('loading-header');
+		levels_actors_group.addClass('loading');
 		clickGame_onEndLoading(gameItem);
 	} else {
 		levels_content.addClass('loading');
 		levels_sidebar.addClass('loading-sidebar');
 		levels_header.addClass('loading-header');
+		levels_actors_group.addClass('loading');
 		versions_content.off(transEndEventName);
 		levels_content.off(transEndEventName);
 		versions_content.on(transEndEventName, function() {
@@ -1905,6 +1998,12 @@ $(function() {
 	levels_header = $('#header-levels');
 	games_header = $('#header-games');
 	versions_header = $('#header-versions');
+
+	levels_actors_group = $('#levels-actors-group');
+	actor1_group = $('#actor1-group');
+	actor2_group = $('#actor2-group');
+	actor1_selector = $('#actor1Selector');
+	actor2_selector = $('#actor2Selector');
 	
 	if(window.location.protocol == "file:") {
 		baseURL = baseURL_local;
@@ -2078,6 +2177,9 @@ $(function() {
 		sendPerso();
 		$(this).blur();
 		return false;
+	});
+	$(document).on('change', "#actor1Selector, #actor2Selector", function() {
+		updateLevelLinksActors();
 	});
 	$(document).on('change', "#languageSelector", function() {
 		updateLanguageDisplayed();

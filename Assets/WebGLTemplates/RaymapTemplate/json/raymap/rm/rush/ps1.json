@@ -3,19 +3,30 @@
     "image": ".\/img\/logo\/rr_ps1.png",
     "mode": "rr_ps1",
     "folder": "rr_ps1",
+    "numActors": 2,
     "levels": [
         { "level": "mainmenu", "name": "Main Menu" },
-        { "level": "canopy1", "name": "Canopy" },
-        { "level": "crypt", "name": "Nebulous Tower" },
-        { "level": "crypt1", "name": "First Ruins" },
-        { "level": "crypt3", "name": "Dark Sewer" },
-        { "level": "factory0", "name": "Electric Tunnel" },
-        { "level": "factory1", "name": "Lava Factory" },
-        { "level": "factory2", "name": "Pipe Maze" },
-        { "level": "lagoon0", "name": "Water Canyon" },
-        { "level": "lagoon1", "name": "Dawn Sand" },
-        { "level": "lagoon2", "name": "Thousand Waterfalls" },
-        { "level": "pirate1", "name": "Forest Jump" },
-        { "level": "pirate2", "name": "Zenith Harbour" }
+        { "actor1": true, "actor2": true, "level": "canopy1", "name": "Canopy" },
+        { "actor1": true, "actor2": true, "level": "crypt", "name": "Nebulous Tower" },
+        { "actor1": true, "actor2": true, "level": "crypt1", "name": "First Ruins" },
+        { "actor1": true, "actor2": true, "level": "crypt3", "name": "Dark Sewer" },
+        { "actor1": true, "actor2": true, "level": "factory0", "name": "Electric Tunnel" },
+        { "actor1": true, "actor2": true, "level": "factory1", "name": "Lava Factory" },
+        { "actor1": true, "actor2": true, "level": "factory2", "name": "Pipe Maze" },
+        { "actor1": true, "actor2": true, "level": "lagoon0", "name": "Water Canyon" },
+        { "actor1": true, "actor2": true, "level": "lagoon1", "name": "Dawn Sand" },
+        { "actor1": true, "actor2": true, "level": "lagoon2", "name": "Thousand Waterfalls" },
+        { "actor1": true, "actor2": true, "level": "pirate1", "name": "Forest Jump" },
+        { "actor1": true, "actor2": true, "level": "pirate2", "name": "Zenith Harbour" }
+    ],
+    "actors": [
+        { "actor": "rayman", "name": "Rayman" },
+        { "actor": "globox", "name": "Globox" },
+        { "actor": "hunchman", "name": "Henchman 800" },
+        { "actor": "raz", "name": "Razorbeard" },
+        { "actor": "tily", "name": "Tily" },
+        { "actor": "mhunch", "name": "Henchman 1000" },
+        { "actor": "wife", "name": "Razorwife" },
+        { "actor": "mglobette", "name": "Globette" }
     ]
 }
