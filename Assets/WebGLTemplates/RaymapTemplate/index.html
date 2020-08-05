@@ -130,6 +130,7 @@
 							</div>
 							<!--<div class="small-text">Camera controls: Shift + WASD</div>-->
 							<div class="header-buttons-right">
+								<div id="btn-entryactions" class="header-button disabled-button" title="Browse entry actions"><i class="icon-gamepad"></i></div>
 								<div id="btn-localization" class="header-button disabled-button" title="Browse localization"><i class="icon-commenting"></i></div>
 								<div id="btn-cine" class="header-button disabled-button" title="Cinematic switcher"><i class="icon-film1"></i></div>
 								<div id="btn-camera" class="header-button disabled-button" title="Camera settings"><i class="icon-video1"></i></div>
@@ -315,6 +316,11 @@
 						</div>
 					</div>
 				</div>
+			</div>
+			<div id="entryactions-popup" class="hidden-popup">
+				<div class="column-header">Entry actions viewer</div>
+				<div id="content-entryactions" class="column-content column-content-scroll"></div>
+				<div class="column-footer"></div>
 			</div>
 			<div id="notification-popup" class="hidden-popup"></div>
 		</div>

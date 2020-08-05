@@ -278,7 +278,8 @@ a:focus {
 .behaviors-item,
 .dsgvars-item,
 .transitions-item,
-.localization-item {
+.localization-item,
+.entryactions-item {
 	font-size: 0.9em;
 	display: block;
 	width: 100%;
@@ -313,7 +314,8 @@ a:focus {
     -ms-user-select: none;
     user-select: none;
 }
-.localization-item {
+.localization-item,
+.entryactions-item {
 	min-height: 2em;
 	height: auto;
 }
@@ -372,6 +374,28 @@ a:focus {
     user-select: text;
 	height: 100%;
 }
+.entryactions-item > .entryactions-item-input {
+	font-family: Consolas, monaco, monospace;
+	font-size: 0.85em;
+	flex: 1 1 auto;
+	text-align: left;
+	padding: 0 0.5em 0 0.5em;
+	box-sizing: border-box;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+	height: 100%;
+	
+}
+.entryactions-item > .entryactions-item-name {
+	flex: 0 0 auto;
+	text-align: right;
+	width: 10em;
+	padding: 0 0.5em 0 0.5em;
+	box-sizing: border-box;
+}
 .localization-item > .localization-item-index {
 	flex: 0 0 auto;
 	text-align: right;
@@ -389,7 +413,8 @@ a:focus {
 	padding: 0 0 0 0;
 	display: flex;
 }
-.localization-item {
+.localization-item,
+.entryactions-item {
 	padding: 0 0 0 0;
 	display: flex;
 }
@@ -1583,7 +1608,8 @@ input[type=range]::-ms-fill-upper {
 #levelselect-popup,
 #script-popup,
 #localization-popup,
-#info-popup {
+#info-popup,
+#entryactions-popup {
 	position: absolute;
 	bottom: 50%;
 	left: 50%;
@@ -1634,14 +1660,16 @@ input[type=range]::-ms-fill-upper {
 	-webkit-transition: color .4s;
 }
 #script-popup,
-#localization-popup {
+#localization-popup,
+#entryactions-popup {
 	max-width: 80em;
 }
 #levelselect-popup.hidden-popup,
 #script-popup.hidden-popup,
 #localization-popup.hidden-popup,
 #config-popup.hidden-popup,
-#info-popup.hidden-popup {
+#info-popup.hidden-popup,
+#entryactions-popup.hidden-popup {
 	pointer-events: none;
 	bottom: -50%;
 }

@@ -772,9 +772,9 @@ function formatOpenSpaceText(text) {
 		return formattedTexts[text];
 	}
 	if(gameSettings != null){
-		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush") {
+		if(gameSettings.EngineVersion === "R2") {
 			text = formatOpenSpaceTextR2(text);
-		} else if(gameSettings.Game === "R3" || gameSettings.Game === "RA" || gameSettings.Game === "RM") {
+		} else if(gameSettings.EngineVersion === "R3") {
 			
 			text = formatOpenSpaceTextR3(text);
 		} else {
@@ -793,7 +793,7 @@ function getLanguageHTML(lang, langStart) {
 	$.each(lang.Entries, function (idx, val) {
 		fullHTML.push("<div class='localization-item localization-item-highlight' data-loc-item='" + (idx + langStart) + "'><div class='localization-item-index'>" + (idx + langStart) + "</div><div class='localization-item-text'>" + escapeHTML(val) + "</div></div>");
 	});
-	fullHTML.push("</div>");
+	//fullHTML.push("</div>");
 	return fullHTML.join("");
 }
 function updateLanguageDisplayed() {
@@ -813,7 +813,7 @@ function updateLanguageDisplayed() {
 function handleMessage_localization(msg) {
 	$("#btn-localization").removeClass("disabled-button");
 	if(gameSettings != null){
-		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush") {
+		if(gameSettings.Game === "R2" || gameSettings.Game === "R2Demo" || gameSettings.Game === "R2Revolution" || gameSettings.Game === "RRR" || gameSettings.Game === "RRush" || gameSettings.Game === "RedPlanet" || gameSettings.Game === "DD") {
 			if(gameSettings.EngineMode === "PS1" || gameSettings.EngineMode === "ROM") {
 				text_highlight_tooltip.addClass("rom");
 				if(gameSettings.Game === "RRR") {
@@ -851,6 +851,20 @@ function handleMessage_localization(msg) {
 		fullHTML.push("<div id='language-common'>");
 		fullHTML.push(getLanguageHTML(msg.Common, msg.CommonStart));
 		fullHTML.push("</div>");
+	}
+	api.getContentPane().append(fullHTML.join(""));
+	setTimeout(function(){
+		api.reinitialise();
+	}, 100);
+}
+function handleMessage_input(msg) {
+	$("#btn-entryactions").removeClass("disabled-button");
+	let fullHTML = [];
+	let api = $("#content-entryactions").data('jsp');	
+	if(msg.hasOwnProperty("EntryActions")) {
+		$.each(msg.EntryActions, function (idx, val) {
+			fullHTML.push("<div class='entryactions-item'><div class='entryactions-item-name'>" + escapeHTML(val.Name) + "</div><div class='entryactions-item-input'>" + escapeHTML(val.Input) + "</div></div>");
+		});
 	}
 	api.getContentPane().append(fullHTML.join(""));
 	setTimeout(function(){
@@ -914,6 +928,9 @@ function setAllJSON(jsonString) {
 	}
 	if(msg.hasOwnProperty("Localization")) {
 		handleMessage_localization(msg.Localization);
+	}
+	if(msg.hasOwnProperty("Input")) {
+		handleMessage_input(msg.Input);
 	}
 }
 // SCRIPT
@@ -1902,11 +1919,13 @@ function hideDialogue() {
 		$('#popup-overlay').addClass('hidden-overlay');
 		$('#levelselect-popup').addClass('hidden-popup');
 		$('#localization-popup').addClass('hidden-popup');
+		$('#entryactions-popup').addClass('hidden-popup');
 		$('#script-popup').addClass('hidden-popup');
 		$('#config-popup').addClass('hidden-popup');
 		$('#info-popup').addClass('hidden-popup');
 		selectButton($('#btn-levelselect'), false);
 		selectButton($('#btn-localization'), false);
+		selectButton($('#btn-entryactions'), false);
 		selectButton($('#btn-info'), false);
 		selectButton($('#btn-config'), false);
 	}
@@ -1926,6 +1945,11 @@ function showLocalizationWindow() {
 	$('#popup-overlay').removeClass('hidden-overlay');
 	$("#localization-popup").removeClass('hidden-popup');
 	selectButton($('#btn-localization'), true);
+}
+function showEntryActionsWindow() {
+	$('#popup-overlay').removeClass('hidden-overlay');
+	$("#entryactions-popup").removeClass('hidden-popup');
+	selectButton($('#btn-entryactions'), true);
 }
 
 function showScript() {
@@ -2085,6 +2109,10 @@ $(function() {
 	});
 	$(document).on('click', "#btn-localization", function() {
 		showLocalizationWindow();
+		return false;
+	});
+	$(document).on('click', "#btn-entryactions", function() {
+		showEntryActionsWindow();
 		return false;
 	});
 	$(document).on('click', "#btn-info", function() {

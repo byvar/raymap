@@ -138,6 +138,7 @@ public class WebCommunicator : MonoBehaviour {
 			Type = WebJSON.MessageType.Hierarchy,
 			Settings = GetSettingsJSON(),
 			Localization = GetLocalizationJSON(),
+			Input = GetInputJSON(),
 			CineData = GetCineDataJSON(),
 			Hierarchy = new WebJSON.Hierarchy() {
 				Always = GetAlwaysJSON()
@@ -250,7 +251,37 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		return null;
 	}
-    private WebJSON.Message GetSettingsMessageJSON() {
+	public WebJSON.InputStruct GetInputJSON() {
+		switch (MapLoader.Loader) {
+			case OpenSpace.Loader.R2ROMLoader roml:
+				OpenSpace.ROM.EngineStruct es = roml.Get<OpenSpace.ROM.EngineStruct>(0 | (ushort)OpenSpace.ROM.FATEntry.Flag.Fix);
+				OpenSpace.ROM.EntryActionArray eaa = es?.inputStruct?.Value?.entryActions?.Value;
+				if (eaa != null && eaa.length > 0) {
+					return new WebJSON.InputStruct() {
+						EntryActions = eaa.entryActions.Select(ea => ea?.Value != null ? new WebJSON.EntryAction() {
+							Name = ea?.Value.GetNameString(),
+							Input = ea?.Value.GetValueOnlyString()
+						} : null).ToArray()
+					};
+				}
+				break;
+			case OpenSpace.Loader.R2PS1Loader ps1l:
+				return null;
+			default:
+				MapLoader l = MapLoader.Loader;
+				if (l.entryActions?.Count > 0) {
+					return new WebJSON.InputStruct() {
+						EntryActions = l.entryActions.Select(ea => ea != null ? new WebJSON.EntryAction() {
+							Name = ea.ExportName,
+							Input = ea?.GetValueOnlyString()
+						} : null).ToArray()
+					};
+				}
+				break;
+		}
+		return null;
+	}
+	private WebJSON.Message GetSettingsMessageJSON() {
 		WebJSON.Message message = new WebJSON.Message() {
 			Type = WebJSON.MessageType.Settings,
 			Settings = GetSettingsJSON()

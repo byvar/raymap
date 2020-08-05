@@ -147,6 +147,13 @@ namespace OpenSpace.Input {
             return result;
         }
 
+        public string GetValueOnlyString() {
+            if (keywords != null && keywords.Count > 0) {
+                return keywords[0].ToString();
+            }
+            return "";
+        }
+
         public static EntryAction FromOffset(Pointer offset) {
             if (offset == null) return null;
             return MapLoader.Loader.entryActions.FirstOrDefault(a => a.offset == offset);

@@ -17,6 +17,7 @@ public class WebJSON {
 		public Selection Selection { get; set; }
 		public Hierarchy Hierarchy { get; set; }
 		public Localization Localization { get; set; }
+		public InputStruct Input { get; set; }
 		public Request Request { get; set; }
 		public SuperObject SuperObject { get; set; }
 		public Perso Perso { get; set; }
@@ -225,6 +226,13 @@ public class WebJSON {
 		public int? Height { get; set; }
 		public bool? IsTransparent { get; set; }
 		public float? SizeFactor { get; set; }
+	}
+	public class InputStruct {
+		public EntryAction[] EntryActions { get; set; }
+	}
+	public class EntryAction {
+		public string Name { get; set; }
+		public string Input { get; set; }
 	}
 
 	#region Enums

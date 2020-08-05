@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon/icomoon.eot?r1vowi');
-  src:  url('../fonts/icomoon/icomoon.eot?r1vowi#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon/icomoon.ttf?r1vowi') format('truetype'),
-    url('../fonts/icomoon/icomoon.woff?r1vowi') format('woff'),
-    url('../fonts/icomoon/icomoon.svg?r1vowi#icomoon') format('svg');
+  src:  url('../fonts/icomoon/icomoon.eot?9eh556');
+  src:  url('../fonts/icomoon/icomoon.eot?9eh556#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?9eh556') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?9eh556') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?9eh556#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -76,6 +76,9 @@
 .icon-file-numbers1:before {
   content: "\e92e";
 }
+.icon-gamepad1:before {
+  content: "\e945";
+}
 .icon-camera-2:before {
   content: "\e914";
 }
@@ -90,6 +93,9 @@
 }
 .icon-film:before {
   content: "\e914";
+}
+.icon-videogame_asset:before {
+  content: "\e944";
 }
 .icon-camera_alt:before {
   content: "\e937";
@@ -208,6 +214,9 @@
 .icon-times:before {
   content: "\e901";
 }
+.icon-game-controller:before {
+  content: "\e942";
+}
 .icon-help:before {
   content: "\e93e";
 }
@@ -216,6 +225,9 @@
 }
 .icon-flow-tree:before {
   content: "\e906";
+}
+.icon-gamepad:before {
+  content: "\e943";
 }
 .icon-info:before {
   content: "\e940";

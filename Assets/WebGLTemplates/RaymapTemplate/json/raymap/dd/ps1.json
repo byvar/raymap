@@ -1,0 +1,51 @@
+{
+	"name": "Donald Duck: Quack Attack / Goin' Quackers (PS1)",
+	"image": ".\/img\/logo\/dd_ps1.png",
+	"mode": "dd_ps1",
+	"folder": "dd_ps1",
+    "numActors": 1,
+    "levels": [
+        { "actor1": true, "level": "menu", "name": "Main Menu" },
+        { "actor1": true, "level": "warproom", "name": "Gyro's Lab" },
+
+        { "actor1": true, "level": "forjp", "name": "Forest Edge" },
+        { "actor1": true, "level": "forem", "name": "The Gorge" },
+        { "actor1": true, "level": "for2d", "name": "Dangerous Cliff" },
+        { "actor1": true, "level": "forbonus", "name": "Huey's Track" },
+        
+        { "actor1": true, "level": "cityjp", "name": "First Avenue" },
+        { "actor1": true, "level": "cityem", "name": "The Roofs" },
+        { "actor1": true, "level": "city2d", "name": "Urban High-Rises" },
+        { "actor1": true, "level": "citybonus", "name": "Dewey's Rooftops" },
+        
+        { "actor1": true, "level": "housejp", "name": "Haunted Hall" },
+        { "actor1": true, "level": "housem", "name": "Earie Alley" },
+        { "actor1": true, "level": "house2d", "name": "Ghostly Path" },
+        { "actor1": true, "level": "housebonus", "name": "Louie's Creepy Corridor" },
+        
+        { "actor1": true, "level": "incajp", "name": "Temple's Entrance" },
+        { "actor1": true, "level": "incaem", "name": "Artifact Way" },
+        { "actor1": true, "level": "inca2d", "name": "Ancient Fate" },
+        { "actor1": true, "level": "incabonus", "name": "The Nephews' Murky Way" },
+        
+        { "actor1": true, "level": "forboss", "name": "(Boss) Bernadette's Peak" },
+        { "actor1": true, "level": "cityboss", "name": "(Boss) Beagle Boy's Tower" },
+        { "actor1": true, "level": "houseboss", "name": "(Boss) Magica's Devilish Dome" },
+        { "actor1": true, "level": "incaboss", "name": "(Boss) Ceremonial Room" },
+        
+        { "actor1": true, "level": "forch", "name": "(Chase) Bears' Path" },
+        { "actor1": true, "level": "citych", "name": "(Chase) Main Street" },
+        { "actor1": true, "level": "housech", "name": "(Chase) Under'Hand'ed" },
+        { "actor1": true, "level": "incach", "name": "(Chase) Head Alley" },
+
+        { "actor1": true, "level": "housejp_2", "name": "Haunted Hall (Old)" },
+        { "actor1": true, "level": "incabonus_2", "name": "The Nephews' Murky Way (Old)" }
+    ],
+    "actors": [
+        { "actor": "original", "name": "Classic" },
+        { "actor": "pajamas", "name": "Pajamas" },
+        { "actor": "cowboy", "name": "Cowboy" },
+        { "actor": "magician", "name": "Magician" },
+        { "actor": "tourist", "name": "Tourist" }
+    ]
+}

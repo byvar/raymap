@@ -80,7 +80,7 @@ namespace OpenSpace.Loader {
 
 				loadingState = "Loading level files";
 				await WaitIfNecessary();
-				LVL fix = new LVL(lvlName, paths["fix.lv2"], 0);
+				LVL fix = new LVL("fix", paths["fix.lv2"], 0);
 				LVL lvl = new LVL(lvlName, paths["lvl.lv2"], 1);
 				files_array[0] = fix;
 				files_array[1] = lvl;
