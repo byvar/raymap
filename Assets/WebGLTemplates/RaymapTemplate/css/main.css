@@ -392,7 +392,7 @@ a:focus {
 .entryactions-item > .entryactions-item-name {
 	flex: 0 0 auto;
 	text-align: right;
-	width: 10em;
+	width: 20em;
 	padding: 0 0.5em 0 0.5em;
 	box-sizing: border-box;
 }
