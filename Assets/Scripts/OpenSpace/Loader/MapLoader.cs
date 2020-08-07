@@ -716,10 +716,12 @@ MonoBehaviour.print(str);
                     for (int i = 0; i < num_textures; i++) {
 						loadingState = "Loading fixed textures: " + (i+1) + "/" + num_textures;
 						await WaitIfNecessary();
-						string texturePath = gameDataBinFolder + "World/Graphics/Textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".gf";
+						string texturePath = "World/Graphics/Textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".gf";
+						texturePath = texturePath.Replace('\\', '/');
 						if (Settings.s.platform == Settings.Platform.iOS) {
 							texturePath = texturePath.ToUpper();
 						}
+						texturePath = gameDataBinFolder + texturePath;
 						await PrepareFile(texturePath);
                         if (FileSystem.FileExists(texturePath)) {
                             GF gf = new GF(texturePath);
@@ -936,11 +938,12 @@ MonoBehaviour.print(str);
 					if (textures[i] == null) continue;
 					loadingState = "Loading level textures: " + (i - num_textures_fix + 1) + "/" + (num_textures_total - num_textures_fix);
 					await WaitIfNecessary();
-					string texturePath = gameDataBinFolder + "World/Graphics/Textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".gf";
+					string texturePath = "World/Graphics/Textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".gf";
 					texturePath = texturePath.Replace('\\', '/');
 					if (Settings.s.platform == Settings.Platform.iOS) {
 						texturePath = texturePath.ToUpper();
 					}
+					texturePath = gameDataBinFolder + texturePath;
 					await PrepareFile(texturePath);
 					if (FileSystem.FileExists(texturePath)) {
                         GF gf = new GF(texturePath);
