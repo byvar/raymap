@@ -28,6 +28,11 @@ public class WebJSON {
 		public GameSettings GameSettings { get; set; }
 		public Macro Macro { get; set; }
 		public Comport Comport { get; set; }
+		public OutlineColors Outline { get; set; }
+	}
+	public class OutlineColors {
+		public Color? HighlightColor { get; set; }
+		public Color? SelectColor { get; set; }
 	}
 	public class GameSettings {
 		public OpenSpace.Settings.EngineVersion EngineVersion { get; set; }
@@ -247,7 +252,8 @@ public class WebJSON {
 		Script,
 		CineData,
 		TransitionExport,
-		Camera
+		Camera,
+		Outline
 	}
 	public enum PersoType {
 		Instance,

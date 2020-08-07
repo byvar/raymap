@@ -563,6 +563,9 @@ public class WebCommunicator : MonoBehaviour {
 		if (msg.CineData != null) {
 			ParseCineDataJSON(msg.CineData);
 		}
+		if (msg.Outline != null) {
+			ParseOutlineJSON(msg.Outline);
+		}
     }
     private void ParseSelectionJSON(WebJSON.Selection msg) {
         MapLoader l = MapLoader.Loader;
@@ -579,6 +582,10 @@ public class WebCommunicator : MonoBehaviour {
 		} else {
             selector.Deselect();
         }
+	}
+	private void ParseOutlineJSON(WebJSON.OutlineColors msg) {
+		if (msg.HighlightColor.HasValue) selector.outline.highlightColor = msg.HighlightColor.Value;
+		if (msg.SelectColor.HasValue) selector.outline.selectColor = msg.SelectColor.Value;
 	}
 	private void ParseSuperObjectJSON(WebJSON.SuperObject msg) {
 		MapLoader l = MapLoader.Loader;

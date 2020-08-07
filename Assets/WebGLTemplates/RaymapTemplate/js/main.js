@@ -115,7 +115,7 @@ function getNoCacheURL() {
 }
 function sendMessage(jsonObj) {
 	if(gameInstance != null) {
-		console.log("Message: " + JSON.stringify(jsonObj));
+		//console.log("Message: " + JSON.stringify(jsonObj));
 		gameInstance.SendMessage("Loader", "ParseMessage", JSON.stringify(jsonObj));
 	}
 }
@@ -873,7 +873,7 @@ function handleMessage_input(msg) {
 }
 function setAllJSON(jsonString) {
 	//alert(jsonString);
-	console.log(JSON.stringify(jsonString)); 
+	//console.log(JSON.stringify(jsonString)); 
 	let msg = $.parseJSON(jsonString);
 	fullData = msg;
 	if(msg.hasOwnProperty("GameSettings")) {
@@ -1545,7 +1545,7 @@ function requestTransitionExport() {
 	sendMessage(jsonObj);
 }
 function handleMessage_transitionExport(msg) {
-	console.log(msg);
+	//console.log(msg);
 	let popupWin = window.open('statediagram.html','transitionExport','');
 	popupWin.inputJSON = msg;
 	popupWin.addEventListener('load', (event) => {
