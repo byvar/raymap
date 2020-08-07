@@ -1966,6 +1966,15 @@ function showInfo() {
 	$("#info-popup").removeClass('hidden-popup');
 	selectButton($('#btn-info'), true);
 }
+function selectNewStyleItem(styleName) {
+	if(styleName != null) {
+		let styleItem = $('.style-item[data-style=' + styleName + ']');
+		if(styleItem.length > 0) {
+			$(".current-style-item").removeClass("current-style-item");
+			styleItem.addClass("current-style-item");
+		}
+	}
+}
 
 function init() {
 	initContent();
@@ -2331,6 +2340,18 @@ $(function() {
 		clickVersion(json);
 		return false;
 	});
+	$(document).on('click', ".style-item", function() {
+		let styleName = $(this).data("style");
+		setActiveStyleSheet(styleName);
+		selectNewStyleItem(styleName);
+		$(".current-style-item").removeClass("current-style-item");
+		$(this).addClass("current-style-item");
+		
+		waitForFinalEvent(function(){
+			setStyleCookie();
+		}, 100, "styleChange");
+		return false;
+	});
 
 	$(document).on('click', ".sidebar-button", function() {
 		let butt = jQuery(this);
@@ -2403,6 +2424,11 @@ $(function() {
 		animateEase: "swing"
 	};
 	pane.jScrollPane(settings);
+
+	
+	// Select the right style item
+	let styleName = getActiveStyleSheet();
+	selectNewStyleItem(styleName);
 	
 	init();
 	

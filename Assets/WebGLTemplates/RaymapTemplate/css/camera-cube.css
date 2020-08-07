@@ -42,7 +42,6 @@
   line-height: 5em;
   font-size: 1em;
   font-weight: bold;
-  color: #9ed9a0;
   text-align: center;
   box-sizing: border-box;
 	
@@ -55,17 +54,6 @@
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s;
 }
-.cube__face:hover {
-  color: orange;
-  border-color: orange;
-}
-
-.cube__face--front  { background: hsl(193, 90%, 30%); }
-.cube__face--right  { background: hsl(193, 90%, 40%); }
-.cube__face--back   { background: hsl(193, 90%, 20%); }
-.cube__face--left   { background: hsl(193, 90%, 10%); }
-.cube__face--top    { background: hsl(193, 90%, 35%); }
-.cube__face--bottom { background: hsl(193, 90%, 15%); }
 
 .cube__face--front  { transform: rotateY(  0deg) translateZ(2.5em); }
 .cube__face--right  { transform: rotateY( 90deg) translateZ(2.5em); }

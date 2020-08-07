@@ -7,7 +7,7 @@
 					"title": "Rayman 2 / Revolution",
 					"viewer": "raymap",
 					"json": "r2",
-					"image": ".\/img\/logo\/r2rev.png",
+					"image": ".\/img\/logo\/r2.png",
 					"versions": [
 						{
 							"json": "dc",
@@ -86,7 +86,7 @@
 					"title": "Rayman M \/ Arena \/ Rush",
 					"viewer": "raymap",
 					"json": "rm",
-					"image": ".\/img\/logo\/rm_a_rush.png",
+					"image": ".\/img\/logo\/rm.png",
 					"versions": [
 						{
 							"json": "m\/pc",

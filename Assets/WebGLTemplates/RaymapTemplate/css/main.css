@@ -1775,6 +1775,7 @@ a.config-header {
 	width: 2em;
 	height: 2em;
 	background-color: #000;
+    filter: drop-shadow(0px 0px 4px #0006);
 }
 
 .style-item-text {
@@ -1825,6 +1826,10 @@ a.config-header {
 
 
 
+.state-diagram-header {
+    height: 2.5em;
+    padding: 1em;
+}
 
 
 

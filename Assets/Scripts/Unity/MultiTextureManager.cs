@@ -50,10 +50,15 @@ public class MultiTextureManager : MonoBehaviour {
 						if (vm.animTextures.Count > 0 && !vm.IsLockedAnimatedTexture) {
 							vm.currentAnimTexture %= vm.animTextures.Count;
 							vm.animTextures[vm.currentAnimTexture].currentTime += updateCounter * modifier;
-							while (vm.animTextures[vm.currentAnimTexture].currentTime > vm.animTextures[vm.currentAnimTexture].time) {
-								float rest = vm.animTextures[vm.currentAnimTexture].currentTime - vm.animTextures[vm.currentAnimTexture].time;
+							float time = vm.animTextures[vm.currentAnimTexture].time;
+							if (time <= 0) time = 20f;
+							while (vm.animTextures[vm.currentAnimTexture].currentTime > time) {
+								time = vm.animTextures[vm.currentAnimTexture].time;
+								if (time <= 0) time = 20f;
+
+								float rest = vm.animTextures[vm.currentAnimTexture].currentTime - time;
 								vm.animTextures[vm.currentAnimTexture].currentTime = 0;
-								if (vm.animTextures[vm.currentAnimTexture].time <= 0) break;
+								if (time <= 0) break;
 								vm.currentAnimTexture = (vm.currentAnimTexture + 1) % vm.animTextures.Count;
 								vm.animTextures[vm.currentAnimTexture].currentTime = rest;
 							}
@@ -76,6 +81,7 @@ public class MultiTextureManager : MonoBehaviour {
 					}
 				}
 			}
+			materials.RemoveAll(m => m == null || m.gameObject == null);
 		}
 	}
 

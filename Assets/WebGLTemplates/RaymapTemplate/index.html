@@ -35,11 +35,12 @@
 		<link rel="stylesheet" type="text/css" href="css/main.css?1" />
 		
 		<!-- colors -->
-		<link rel="stylesheet" type="text/css" href="css/colors_main.css" title="Home" />
-		<!--<link rel="alternate stylesheet" type="text/css" href="css/colors_ray1map.css" title="Ray1Map" />
-		<link rel="alternate stylesheet" type="text/css" href="css/colors_rpc.css" title="Pirate-Community" />
-		<link rel="alternate stylesheet" type="text/css" href="css/colors_light.css" title="Light" />
-		<link rel="alternate stylesheet" type="text/css" href="css/colors_dark.css" title="Dark" />-->
+		<link rel="stylesheet" type="text/css" href="css/themes/theme_main.css" title="Home" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_ray1map.css" title="Ray1Map" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_rpc.css" title="Pirate-Community" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_rcp.css" title="RCP" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_light.css" title="Light" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_dark.css" title="Dark" />
 
 
 		<link rel="stylesheet" type="text/css" href="css/dialog-colors.css"/>
@@ -54,6 +55,7 @@
 		<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
 		<script type="text/javascript" src="js/modernizr.custom.js"></script>
 		<script type="text/javascript" src="js/jquery.mobile.custom.min.js"></script>
+		<script type="text/javascript" src="js/styleswitcher.js"></script>
 		<script type="text/javascript" src="highlight/highlight.pack.js"></script>
 		<script type="text/javascript" src="js/main.js?1"></script>
 		
@@ -258,17 +260,19 @@
 				<div class="column-header">Settings</div>
 				<div class="config-header">Style</div>
 				<div class="style-items">
-				<div class="style-item current-style-item"><div class="style-item-color" style="background-color: #19c8c3;"></div><div class="style-item-text">Home</div></div>
-				<div class="style-item"><div class="style-item-color" style="background-color: rgb(159, 0, 134);"></div><div class="style-item-text">Ray1Map</div></div>
-				<div class="style-item"><div class="style-item-color" style="background-color: #ffe74a;"></div><div class="style-item-text">Pirate-Community</div></div>
-				<div class="style-item"><div class="style-item-color" style="background-color: #a3a3a3;"></div><div class="style-item-text">Light</div></div>
-				<div class="style-item"><div class="style-item-color" style="background-color: #303030;"></div><div class="style-item-text">Dark</div></div>
+				<div class="style-item current-style-item" data-style="Home"><div class="style-item-color" style="background-color: #19c8c3;"></div><div class="style-item-text">Home</div></div>
+				<div class="style-item" data-style="Ray1Map"><div class="style-item-color" style="background-color: rgb(159, 0, 134);"></div><div class="style-item-text">Ray1Map</div></div>
+				<div class="style-item" data-style="Pirate-Community"><div class="style-item-color" style="background-color: #ffe74a;"></div><div class="style-item-text">Pirate-Community</div></div>
+				<div class="style-item" data-style="RCP"><div class="style-item-color" style="background-color: #574eb9; border-color: #252525;"></div><div class="style-item-text">Control Panel</div></div>
+				<div class="style-item" data-style="Light"><div class="style-item-color" style="background-color: #a3a3a3; border-color: grey;"></div><div class="style-item-text">Unity Light</div></div>
+				<div class="style-item" data-style="Dark"><div class="style-item-color" style="background-color: #303030; border-color: darkslategray;"></div><div class="style-item-text">Pro Dark</div></div>
 				</div>
 			</div>
 			<div id="info-popup" class="hidden-popup">
 				<div class="column-header">About</div>
 				<div class="column-content column-content-scroll">
 					<img class="header-image" src="https://raym.app/maps/preview.png" />
+					<a class="config-header" href="https://github.com/byvar/raymap">Find us on GitHub!</a>
 					<div class="config-header">Controls</div>
 					<div class="info-content">
 						<div class="info-content-column"><b>Camera</b><br/><br/>
@@ -295,7 +299,6 @@
 							F: Fog<br/>
 						</div>
 					</div>
-					<a class="config-header" href="https://github.com/byvar/raymap">Find us on GitHub!</a>
 				</div>
 				<div class="column-footer footer-text">
 					<div class="footer-content">
