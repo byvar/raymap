@@ -90,6 +90,16 @@ namespace OpenSpace.Visual {
             this.offset = offset;
         }
 
+		// Reimplemented from R3 code
+		private Vector3 ComputeNormalWeightedBySurf(Vector3 v0, Vector3 v1, Vector3 v2) {
+			Vector3 v10 = v1 - v0;
+			Vector3 v20 = v2 - v0;
+			return new Vector3(
+				v10.z * v20.y - v10.y * v20.z,
+				v10.x * v20.z - v10.z * v20.x,
+				v10.y * v20.x - v10.x * v20.y);
+		}
+
 		private void CreateUnityMeshFromSDC() {
 			/*if (sdc.geo.Type == 6) {
 				// Just fill in things based on mapping
@@ -104,7 +114,10 @@ namespace OpenSpace.Visual {
 				if (sdc.geo.Type == 4 || sdc.geo.Type == 5 || sdc.geo.Type == 6) {
 					int[] triangles = new int[triangle_size * sdc.geo.num_triangles[sdc.index]];
 					OPT_unityMesh = new Mesh();
-					Vector3[] vertices = sdc.vertices.Select(v => new Vector3(v.x, v.z, v.y)).ToArray();
+					Vector3[] vertices = new Vector3[sdc.num_vertices_actual];
+					for (int i = 0; i < vertices.Length && i < sdc.vertices.Length; i++) {
+						vertices[i] = new Vector3(sdc.vertices[i].x, sdc.vertices[i].z, sdc.vertices[i].y);
+					}
 					Array.Resize(ref vertices, (int)sdc.num_vertices_actual);
 					OPT_unityMesh.vertices = vertices;
 					new_boneWeights = (geo.bones == null || sdc_mapping == null) ? null : new BoneWeight[vertices.Length];
@@ -174,35 +187,23 @@ namespace OpenSpace.Visual {
 						Vector3[] calculatedNormals = null;
 						if (sdc.normals == null && geo.normals == null) {
 							calculatedNormals = new Vector3[geo.num_vertices];
+							//MapLoader.Loader.print("sdc_el:" + sdc.offset + " - sdc_geo:" + sdc.geo.Offset + " - geo:" + geo.offset + " - el:" + offset);
+
 							// Calculate normals here
-							Mesh tempMesh = new Mesh();
-							Vector3[] new_vertices = new Vector3[num_triangles * 3];
 							int triangles_index = 0;
-							int[] unityTriangles = new int[num_triangles * 3];
 							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
-								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
-								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
-								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
-								new_vertices[m0] = geo.vertices[i0];
-								new_vertices[m1] = geo.vertices[i1];
-								new_vertices[m2] = geo.vertices[i2];
-								unityTriangles[triangles_index + 0] = m0;
-								unityTriangles[triangles_index + 1] = m2;
-								unityTriangles[triangles_index + 2] = m1;
+								int i0 = this.triangles[(j * 3) + 0]; // Old index
+								int i1 = this.triangles[(j * 3) + 1];
+								int i2 = this.triangles[(j * 3) + 2];
+								Vector3 v0 = geo.vertices[i0];
+								Vector3 v1 = geo.vertices[i1];
+								Vector3 v2 = geo.vertices[i2];
+								Vector3 calcNormal = ComputeNormalWeightedBySurf(v0, v1, v2);
+
+								calculatedNormals[i0] += calcNormal;
+								calculatedNormals[i1] += calcNormal;
+								calculatedNormals[i2] += calcNormal;
 							}
-							tempMesh.vertices = new_vertices;
-							tempMesh.triangles = unityTriangles;
-							tempMesh.RecalculateNormals();
-							triangles_index = 0;
-							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
-								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
-								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
-								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
-								calculatedNormals[i0] = tempMesh.normals[m0];
-								calculatedNormals[i1] = tempMesh.normals[m1];
-								calculatedNormals[i2] = tempMesh.normals[m2];
-							}
-							UnityEngine.Object.DestroyImmediate(tempMesh);
 
 						}
 						if (sdc.normals == null) normals = new Vector3[vertices.Length];
@@ -289,34 +290,20 @@ namespace OpenSpace.Visual {
 						if (sdc.normals == null && geo.normals == null) {
 							calculatedNormals = new Vector3[geo.num_vertices];
 							// Calculate normals here
-							Mesh tempMesh = new Mesh();
-							Vector3[] new_vertices = new Vector3[num_triangles * 3];
 							int triangles_index = 0;
-							int[] unityTriangles = new int[num_triangles * 3];
 							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
-								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
-								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
-								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
-								new_vertices[m0] = geo.vertices[i0];
-								new_vertices[m1] = geo.vertices[i1];
-								new_vertices[m2] = geo.vertices[i2];
-								unityTriangles[triangles_index + 0] = m0;
-								unityTriangles[triangles_index + 1] = m2;
-								unityTriangles[triangles_index + 2] = m1;
+								int i0 = this.triangles[(j * 3) + 0]; // Old index
+								int i1 = this.triangles[(j * 3) + 1];
+								int i2 = this.triangles[(j * 3) + 2];
+								Vector3 v0 = geo.vertices[i0];
+								Vector3 v1 = geo.vertices[i1];
+								Vector3 v2 = geo.vertices[i2];
+								Vector3 calcNormal = ComputeNormalWeightedBySurf(v0, v1, v2);
+
+								calculatedNormals[i0] += calcNormal;
+								calculatedNormals[i1] += calcNormal;
+								calculatedNormals[i2] += calcNormal;
 							}
-							tempMesh.vertices = new_vertices;
-							tempMesh.triangles = unityTriangles;
-							tempMesh.RecalculateNormals();
-							triangles_index = 0;
-							for (int j = 0; j < num_triangles; j++, triangles_index += 3) {
-								int i0 = this.triangles[(j * 3) + 0], m0 = (j * 3) + 0; // Old index, mapped index
-								int i1 = this.triangles[(j * 3) + 1], m1 = (j * 3) + 1;
-								int i2 = this.triangles[(j * 3) + 2], m2 = (j * 3) + 2;
-								calculatedNormals[i0] = tempMesh.normals[m0];
-								calculatedNormals[i1] = tempMesh.normals[m1];
-								calculatedNormals[i2] = tempMesh.normals[m2];
-							}
-							UnityEngine.Object.DestroyImmediate(tempMesh);
 						}
 						if(sdc.normals == null) normals = new Vector3[vertices.Length];
 						// Also set bone weights

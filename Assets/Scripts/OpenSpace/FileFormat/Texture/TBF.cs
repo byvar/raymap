@@ -36,7 +36,6 @@ namespace OpenSpace.FileFormat.Texture {
 						ReadTexture(reader, h: headers[i]);
 					}
 				} else {
-					List<Texture2D> textures = new List<Texture2D>();
 					List<TBFHeader> headers = new List<TBFHeader>();
 					while (reader.BaseStream.Position < reader.BaseStream.Length) {
 						TBFHeader h = ReadTexture(reader);
@@ -69,10 +68,9 @@ namespace OpenSpace.FileFormat.Texture {
 						Color[] palette = ReadPalette(reader, 16, h.HasAlpha);
 						byte[] texData = reader.ReadBytes((int)(h.height * h.width / 2));
 						if (Settings.s.game == Settings.Game.R3) {
-							ezSwizzle s = new ezSwizzle();
-							s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 4, texData);
-							texData = new byte[h.height * h.width];
-							s.readTexPSMT4_mod(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
+							ezSwizzle.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 4, texData);
+							Array.Resize<byte>(ref texData, (int)(h.height * h.width));
+							ezSwizzle.readTexPSMT4_mod(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
 						} else {
 							texData = texData.SelectMany(b => new byte[] { (byte)(b & 0xF), (byte)(b >> 4) }).ToArray();
 						}
@@ -84,10 +82,9 @@ namespace OpenSpace.FileFormat.Texture {
 						Color[] palette = ReadPalette(reader, 256, h.HasAlpha);
 						byte[] texData = reader.ReadBytes((int)(h.height * h.width));
 						if (Settings.s.game == Settings.Game.R3) {
-							ezSwizzle s = new ezSwizzle();
-							s.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 2, texData);
-							texData = new byte[h.height * h.width];
-							s.readTexPSMT8(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
+							ezSwizzle.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 2, texData);
+							//texData = new byte[h.height * h.width];
+							ezSwizzle.readTexPSMT8(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
 						}
 						h.texture = CreateTexture(palette, texData, h.width, h.height);
 					}

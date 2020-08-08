@@ -135,7 +135,7 @@ function initContent() {
 				let thisGameSelected = false;
 				if(!gameSelected) {
 					$.each( value.versions, function(idx_ver, val_ver) {
-						if(!gameSelected && folder !== null && val_ver.hasOwnProperty("folder") && (folder === val_ver.folder || val_ver.folder.startsWith(folder + "/"))) {
+						if(!gameSelected && folder !== null && val_ver.hasOwnProperty("folder") && (folder === val_ver.folder || folder.startsWith(val_ver.folder + "/"))) {
 							gameSelected = true;
 							thisGameSelected = true;
 							return false;
@@ -1610,7 +1610,7 @@ function initGame(gameJSON) {
 	let versionSelected = false;
 	$.each(versions, function(index_version, value) {
 		let thisVersionSelected = false;
-		if(!versionSelected && folder !== null && value.hasOwnProperty("folder") && (folder === value.folder || value.folder.startsWith(folder + "/"))) {
+		if(!versionSelected && folder !== null && value.hasOwnProperty("folder") && (folder === value.folder || folder.startsWith(value.folder + "/"))) {
 			versionSelected = true;
 			thisVersionSelected = true;
 		}

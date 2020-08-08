@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenSpace.FileFormat.Texture {
-	public class ezSwizzle {
+	public static class ezSwizzle {
 		static byte[] gs = new byte[1024 * 1024 * 4];
 
 		#region Constants
@@ -113,7 +113,7 @@ namespace OpenSpace.FileFormat.Texture {
 		};
 		#endregion
 
-		public void writeTexPSMT4(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
+		public static void writeTexPSMT4(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
 			dbw >>= 1;
 			int src = 0;
 			int startBlockPos = dbp * 64;
@@ -165,7 +165,7 @@ namespace OpenSpace.FileFormat.Texture {
 	}
 }
 
-		public void readTexPSMT4(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
+		public static void readTexPSMT4(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
 			dbw >>= 1;
 			//unsigned char* src = (unsigned char*)data;
 			int src = 0;
@@ -220,7 +220,7 @@ namespace OpenSpace.FileFormat.Texture {
 		}
 
 
-		public void readTexPSMT4_mod(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
+		public static void readTexPSMT4_mod(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
 			dbw >>= 1;
 			//unsigned char* src = (unsigned char*)data;
 			int src = 0;
@@ -274,7 +274,7 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 		}
 
-		public void readTexPSMT8(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
+		public static void readTexPSMT8(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
 			dbw >>= 1;
 			int src = 0;
 			int startBlockPos = dbp * 64;
@@ -309,7 +309,7 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 		}
 
-		public void writeTexPSMT8(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
+		public static void writeTexPSMT8(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
 			dbw >>= 1;
 			int src = 0;
 			int startBlockPos = dbp * 64;
@@ -344,7 +344,7 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 		}
 
-		public void writeTexPSMCT16(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
+		public static void writeTexPSMCT16(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
 			//dbw >>= 1;
 			int src = 0;
 			int startBlockPos = dbp * 64;
@@ -381,7 +381,7 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 		}
 
-		void readTexPSMCT16(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
+		static void readTexPSMCT16(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
 			//dbw >>= 1;
 			int src = 0;
 			int startBlockPos = dbp * 64;
@@ -418,7 +418,7 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 		}
 
-		public void writeTexPSMCT32(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
+		public static void writeTexPSMCT32(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, byte[] data) {
 			int src = 0;
 			int startBlockPos = dbp * 64;
 
@@ -453,7 +453,7 @@ namespace OpenSpace.FileFormat.Texture {
 			}
 		}
 
-		public void readTexPSMCT32(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
+		public static void readTexPSMCT32(int dbp, int dbw, int dsax, int dsay, int rrw, int rrh, ref byte[] data) {
 			int src = 0;
 			int startBlockPos = dbp * 64;
 

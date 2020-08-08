@@ -671,6 +671,7 @@ namespace OpenSpace.Loader {
 				}
 			}
 			Pointer off_animBankLvl = null;
+			await WaitIfNecessary();
 			if (Settings.s.game == Settings.Game.Dinosaur) {
 				// animation bank is read right here.
 				off_animBankLvl = Pointer.Current(reader); // Note: only one 0x104 bank in fix.
@@ -711,6 +712,7 @@ namespace OpenSpace.Loader {
 
 				ReadObjectNamesTable(reader, off_names_first, num_names, i);
 			}
+			await WaitIfNecessary();
 
 			Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
 			Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
