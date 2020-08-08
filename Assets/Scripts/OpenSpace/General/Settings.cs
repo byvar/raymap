@@ -24,7 +24,7 @@ namespace OpenSpace {
 			{ "r3_ps2_demo_20021029", Mode.Rayman3PS2Demo_2002_10_29 },
 			{ "r3_ps2_demo_20021218", Mode.Rayman3PS2Demo_2002_12_18 },
 			{ "r3_xbox", Mode.Rayman3Xbox },
-			{ "r3_xbox360", Mode.Rayman3Xbox360 },
+			{ "r3_x360", Mode.Rayman3Xbox360 },
 			{ "r3_ps3", Mode.Rayman3PS3 },
 			{ "ra_gc", Mode.RaymanArenaGC },
 			{ "ra_gc_demo_20020307", Mode.RaymanArenaGCDemo_2002_03_07 },
