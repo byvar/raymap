@@ -108,8 +108,8 @@ namespace OpenSpace.Loader {
 
 					// Level
 					lvlNames[1] = lvlName;
-					lvlPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".lvl";
-					ptrPaths[1] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + ".ptr";
+					lvlPaths[1] = paths["lvl.lvl"];
+					ptrPaths[1] = paths["lvl.ptr"];
 					await PrepareFile(lvlPaths[1]);
 					if (FileSystem.FileExists(lvlPaths[1])) {
 						await PrepareFile(ptrPaths[1]);
@@ -126,8 +126,8 @@ namespace OpenSpace.Loader {
 
 					// Transit
 					lvlNames[2] = "transit";
-					lvlPaths[2] = gameDataBinFolder + lvlName + "/transit.lvl";
-					ptrPaths[2] = gameDataBinFolder + lvlName + "/transit.ptr";
+					lvlPaths[2] = paths["transit.lvl"];
+					ptrPaths[2] = paths["transit.ptr"];
 					await PrepareFile(lvlPaths[2]);
 					if (FileSystem.FileExists(lvlPaths[2])) {
 						await PrepareFile(ptrPaths[2]);
@@ -145,8 +145,8 @@ namespace OpenSpace.Loader {
 
 					// Vertex buffer
 					lvlNames[4] = lvlName + "_vb";
-					lvlPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "_vb.lvl";
-					ptrPaths[4] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "_vb.ptr";
+					lvlPaths[4] = paths["lvl_vb.lvl"];
+					ptrPaths[4] = paths["lvl_vb.ptr"];
 					await PrepareFile(lvlPaths[4]);
 					if (FileSystem.FileExists(lvlPaths[4])) {
 						await PrepareFile(ptrPaths[4]);
@@ -154,8 +154,8 @@ namespace OpenSpace.Loader {
 
 					// Fix Keyframes
 					lvlNames[5] = "fixkf";
-					lvlPaths[5] = gameDataBinFolder + "fixkf.lvl";
-					ptrPaths[5] = gameDataBinFolder + "fixkf.ptr";
+					lvlPaths[5] = paths["fixkf.lvl"];
+					ptrPaths[5] = paths["fixkf.ptr"];
 					await PrepareFile(lvlPaths[5]);
 					if (FileSystem.FileExists(lvlPaths[5])) {
 						await PrepareFile(ptrPaths[5]);
@@ -163,8 +163,8 @@ namespace OpenSpace.Loader {
 
 					// Level Keyframes
 					lvlNames[6] = lvlName + "kf";
-					lvlPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "kf.lvl";
-					ptrPaths[6] = gameDataBinFolder + lvlName + "/" + lvlName.ToLower() + "kf.ptr";
+					lvlPaths[6] = paths["lvlkf.lvl"];
+					ptrPaths[6] = paths["lvlkf.ptr"];
 					await PrepareFile(lvlPaths[6]);
 					if (FileSystem.FileExists(lvlPaths[6])) {
 						await PrepareFile(ptrPaths[6]);
@@ -415,15 +415,16 @@ namespace OpenSpace.Loader {
 				for (int i = 0; i < localization.num_languages; i++) {
 					if (localization.languages[i].off_textTable == null) {
 						// Load text from file
-						string fileName = "TEXTS/LANG" + i;
+						string filePath = ConvertCase("Texts/", Settings.CapsType.LangLevelFolder);
+						string fileName = "Lang" + i;
 						loadingState = "Loading text files: " + (i + 1) + "/" + localization.num_languages;
-						paths["lang" + i + ".lvl"] = gameDataBinFolder + fileName + ".LVL";
-						paths["lang" + i + ".ptr"] = gameDataBinFolder + fileName + ".PTR";
+						paths["lang" + i + ".lvl"] = gameDataBinFolder + ConvertCase(fileName + ".lvl", Settings.CapsType.LangLevelFile);
+						paths["lang" + i + ".ptr"] = gameDataBinFolder + ConvertCase(fileName + ".ptr", Settings.CapsType.LangLevelFile);
 						await PrepareFile(paths["lang" + i + ".lvl"]);
 						if (FileSystem.FileExists(paths["lang" + i + ".lvl"])) {
 							await PrepareFile(paths["lang" + i + ".ptr"]);
 							int fileId = i + 207;
-							FileWithPointers f = InitExtraLVL(fileName, fileId);
+							FileWithPointers f = InitExtraLVL(fileName, paths["lang" + i + ".lvl"], paths["lang" + i + ".ptr"], fileId);
 							Pointer.DoAt(ref reader, new Pointer(0, f), () => {
 
 								string timeStamp = reader.ReadString(0x18);
@@ -962,6 +963,7 @@ namespace OpenSpace.Loader {
 			if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo_2002_03_07 || Settings.s.platform == Settings.Platform.PS2) {
 				extraAnimFolder = lvlName + "/";
 			}
+			extraAnimFolder = ConvertCase(extraAnimFolder, Settings.CapsType.LevelFolder);
 			for (int i = 0; i < families.Count; i++) {
 				if (families[i] != null && families[i].animBank > 4 && objectTypes[0][families[i].family_index].id != 0xFF) {
 					int animBank = families[i].animBank;
@@ -971,8 +973,8 @@ namespace OpenSpace.Loader {
 					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo_2002_03_07 || Settings.s.platform == Settings.Platform.PS2) {
 						animFileID = animBank - 5;
 					}
-					string animName = extraAnimFolder + "ani" + animFileID.ToString();
-					string kfName = extraAnimFolder + "key" + animFileID.ToString() + "kf";
+					string animName = "ani" + animFileID.ToString();
+					string kfName = "key" + animFileID.ToString() + "kf";
 
 					//print(animBank + " - " + objectTypes[0][families[i].family_index].id);
 					int fileID = animBank + 102;
@@ -982,10 +984,10 @@ namespace OpenSpace.Loader {
 					}
 
 					// Prepare files for WebGL
-					string animFileLvl = gameDataBinFolder + animName + ".lvl";
-					string animFilePtr = gameDataBinFolder + animName + ".ptr";
-					string kfFileLvl = gameDataBinFolder + kfName + ".lvl";
-					string kfFilePtr = gameDataBinFolder + kfName + ".ptr";
+					string animFileLvl = gameDataBinFolder + extraAnimFolder + ConvertCase(animName + ".lvl", Settings.CapsType.LevelFile);
+					string animFilePtr = gameDataBinFolder + extraAnimFolder + ConvertCase(animName + ".ptr", Settings.CapsType.LevelFile);
+					string kfFileLvl = gameDataBinFolder + extraAnimFolder + ConvertCase(kfName + ".lvl", Settings.CapsType.LevelFile);
+					string kfFilePtr = gameDataBinFolder + extraAnimFolder + ConvertCase(kfName + ".ptr", Settings.CapsType.LevelFile);
 					await PrepareFile(animFileLvl);
 					if (FileSystem.FileExists(animFileLvl)) {
 						await PrepareFile(animFilePtr);
@@ -995,8 +997,8 @@ namespace OpenSpace.Loader {
 						await PrepareFile(kfFilePtr);
 					}
 
-					FileWithPointers animFile = InitExtraLVL(animName, fileID);
-					FileWithPointers kfFile = InitExtraLVL(kfName, fileID);
+					FileWithPointers animFile = InitExtraLVL(animName, animFileLvl, animFilePtr, fileID);
+					FileWithPointers kfFile = InitExtraLVL(kfName, kfFileLvl, kfFilePtr, fileID);
 					if (animFile != null) {
 						if (animBank >= animationBanks.Length) {
 							Array.Resize(ref animationBanks, animBank + 1);

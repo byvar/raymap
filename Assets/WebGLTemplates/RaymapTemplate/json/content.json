@@ -36,7 +36,8 @@
 						{
 							"json": "n64",
 							"image": ".\/img\/version\/n64.png",
-							"name": "Nintendo 64"
+							"name": "Nintendo 64",
+							"folder": "r2_n64"
 						},
 						{
 							"json": "ds",

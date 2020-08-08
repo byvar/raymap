@@ -473,9 +473,7 @@ namespace OpenSpace {
 			saturate = false,
             levelTranslation = LevelTranslation.levelTranslation_r3,
             caps = new Dictionary<CapsType, Caps>() {
-				{ CapsType.LevelFile, Caps.None },
-				{ CapsType.Fix, Caps.None },
-				{ CapsType.TextureFile, Caps.Normal },
+				{ CapsType.All, Caps.None }
 			},
 			hasNames = true,
 		};
@@ -493,9 +491,7 @@ namespace OpenSpace {
 			saturate = false,
             levelTranslation = LevelTranslation.levelTranslation_r3,
             caps = new Dictionary<CapsType, Caps>() {
-				{ CapsType.LevelFile, Caps.None },
-				{ CapsType.Fix, Caps.None },
-				{ CapsType.TextureFile, Caps.Normal },
+				{ CapsType.All, Caps.None }
 			},
 			hasNames = true,
 		};

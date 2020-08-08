@@ -416,11 +416,8 @@ MonoBehaviour.print(str);
             return null;
         }
 
-        public FileWithPointers InitExtraLVL(string relativePath, int id) {
-            string path = gameDataBinFolder + relativePath;
-            string lvlName = relativePath;
-            string lvlPath = path + ".lvl";
-            string ptrPath = path + ".ptr";
+        public FileWithPointers InitExtraLVL(string name, string lvlPath, string ptrPath, int id) {
+			string lvlName = name;
             if (FileSystem.FileExists(lvlPath)) {
                 Array.Resize(ref files_array, files_array.Length + 1);
 				LVL lvl = new LVL(lvlName, lvlPath, id);

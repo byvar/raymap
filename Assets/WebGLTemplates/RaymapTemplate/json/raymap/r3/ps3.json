@@ -2,7 +2,7 @@
     "name": "Rayman 3 HD (PS3)",
     "image": ".\/img\/logo\/r3_ps3.png",
     "mode": "r3_ps3",
-    "folder": "r3_ps3",
+    "folder": "r3_ps3/GamedataBIN",
 	"icons": [
 		{
 			"image": ".\/img\/icon\/R3\/mnu_jard.png",
