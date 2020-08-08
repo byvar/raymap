@@ -696,7 +696,7 @@ namespace OpenSpace.Loader {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                if (Settings.s.game == Settings.Game.RedPlanet) reader.ReadUInt32();
+                if (Settings.s.game == Settings.Game.RedPlanet ||Settings.s.game == Settings.Game.R2Demo) reader.ReadUInt32();
                 Pointer off_languages = Pointer.Read(reader);
                 reader.ReadUInt32();
 
@@ -719,7 +719,7 @@ namespace OpenSpace.Loader {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
 
-                if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.R2Demo) {
+                if (Settings.s.game == Settings.Game.DD) {
                     reader.ReadUInt32();
                 }
 

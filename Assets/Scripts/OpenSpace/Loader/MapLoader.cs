@@ -580,6 +580,7 @@ MonoBehaviour.print(str);
             for (uint i = 0; i < num_languages; i++) {
                 languages[i] = reader.ReadString(0x14);
                 languages_loc[i] = reader.ReadString(0x14);
+				//print(languages[i] + " - " + languages_loc[i]);
             }
         }
 
