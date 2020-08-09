@@ -1119,7 +1119,7 @@ function showObjectDescription(so, isSOChanged) {
 				let allBehaviors = [];
 				let brain = perso.Brain;
 				if(perso.hasOwnProperty("StateTransitionExportAvailable") && perso.StateTransitionExportAvailable) {
-					allBehaviors.push('<div class="behaviors-item category stateTransitionExport"><div class="collapse-sign">+</div>Script state transition diagram</div>');
+					allBehaviors.push('<div class="behaviors-item category stateTransitionExport"><div class="collapse-sign">+</div>Behavior transition diagram</div>');
 				}
 				//let reg = /^.*\.(.*?)\[(\d*?)\](?:\[\"(.*?)\"\])?$/;
 				if(brain.hasOwnProperty("Intelligence") && brain.Intelligence.length > 0) {
