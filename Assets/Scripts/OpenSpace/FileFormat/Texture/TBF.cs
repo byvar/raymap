@@ -109,6 +109,9 @@ namespace OpenSpace.FileFormat.Texture {
 				byte g = reader.ReadByte();
 				byte b = reader.ReadByte();
 				byte a = reader.ReadByte();
+				if (a >= 121) {
+					a = 128; // Fix weird textures on ps2
+				}
 				palette[i] = new Color(r / 255f, g / 255f, b / 255f, hasAlpha ? (a / 128f) : 1f);
 			}
 			Color[] pal = palette;
