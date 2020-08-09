@@ -33,8 +33,8 @@ namespace OpenSpace.Object {
 					SectorComponent sc = gao.AddComponent<SectorComponent>();
 					sc.sector = this;
                     if (collider != null) {
-                        collider.gao.transform.SetParent(gao.transform);
-                        collider.gao.transform.localPosition = Vector3.zero;
+                        collider.Gao.transform.SetParent(gao.transform);
+                        collider.Gao.transform.localPosition = Vector3.zero;
                     }
 					sc.sectorManager = MapLoader.Loader.controller.sectorManager;
 					MapLoader.Loader.controller.sectorManager.AddSector(sc);

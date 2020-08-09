@@ -205,6 +205,7 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.ExportText = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Export Text"), UnitySettings.ExportText);
 		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
 		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Visualize Sector Borders"), UnitySettings.VisualizeSectorBorders);
+		UnitySettings.CreateFamilyGameObjects = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Create Family GameObjects"), UnitySettings.CreateFamilyGameObjects);
 
 		totalyPos = yPos;
 		GUI.EndScrollView();

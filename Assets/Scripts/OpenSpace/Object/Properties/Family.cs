@@ -63,7 +63,7 @@ namespace OpenSpace.Object.Properties {
         public void AddNewPhysicalList(ObjectList ol, bool alreadyAdded = false) {
 			if (ol == null) return;
 			if (ol.containingFamilies.Count == 0) {
-				ol.Gao.transform.SetParent(Gao.transform);
+				if(UnitySettings.CreateFamilyGameObjects) ol.Gao.transform.SetParent(Gao.transform);
 			}
 			if (!ol.containingFamilies.Contains(this)) ol.containingFamilies.Add(this);
 			if (!alreadyAdded && !objectLists.Contains(ol)) objectLists.Add(ol);

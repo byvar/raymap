@@ -366,7 +366,7 @@ namespace OpenSpace.Loader {
 			//print("Families: " + families.Count);
             loadingState = "Loading superobject hierarchy";
             await WaitIfNecessary();
-            ReadSuperObjects(reader);
+			await ReadSuperObjects(reader);
             loadingState = "Loading always structure";
             await WaitIfNecessary();
             ReadAlways(reader);

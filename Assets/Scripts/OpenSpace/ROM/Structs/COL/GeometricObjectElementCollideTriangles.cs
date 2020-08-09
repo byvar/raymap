@@ -1,5 +1,6 @@
 ﻿using OpenSpace.Loader;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using CollideType = OpenSpace.Collide.CollideType;
@@ -67,13 +68,21 @@ namespace OpenSpace.ROM {
 				mesh.RecalculateNormals();
 
                 Vector2[] uvs = new Vector2[mesh.vertexCount];
-                
-                // Generate simple UVs for collision checkerboard (basically a box projection)
-                for (int j = 0; j < mesh.vertexCount; j++) {
-                    Vector3 normal = mesh.normals[j];
-                    float biggestNorm = Mathf.Max(Mathf.Max(Mathf.Abs(normal.x), Mathf.Abs(normal.y)), Mathf.Abs(normal.z));
 
-                    float uvX = (mesh.vertices[j].x / 20.0f);
+				// Generate simple UVs for collision checkerboard (basically a box projection)
+				Vector3[] normals = null;
+				{
+					List<Vector3> norm = new List<Vector3>();
+					mesh.GetNormals(norm);
+					normals = norm.ToArray();
+					// Norm can be GC'd after these curly braces
+				}
+				for (int j = 0; j < uvs.Length; j++) {
+                    Vector3 normal = normals[j];
+					normal = new Vector3(Mathf.Abs(normal.x), Mathf.Abs(normal.y), Mathf.Abs(normal.z));
+					float biggestNorm = Mathf.Max(normal.x, normal.y, normal.z);
+
+					float uvX = (mesh.vertices[j].x / 20.0f);
                     float uvY = (mesh.vertices[j].y / 20.0f);
                     float uvZ = (mesh.vertices[j].z / 20.0f);
 

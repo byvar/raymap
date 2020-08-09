@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using OpenSpace.AI;
 using OpenSpace.Collide;
 using OpenSpace.Object.Properties;
@@ -46,11 +47,85 @@ namespace OpenSpace.Object {
         [JsonIgnore]
         public ReferenceFields References { get; set; } = new ReferenceFields();
 
+        private bool isGameObjectInitialized = false;
         public GameObject Gao {
             get {
                 if (data != null) {
                     return data.Gao;
                 } else return null;
+            }
+        }
+
+        public async UniTask InitGameObject() {
+            if (isGameObjectInitialized) return;
+            isGameObjectInitialized = true;
+            GameObject gao = data.Gao;
+
+            if (gao != null) {
+
+
+                //SuperObjectComponent soc = so.Gao.GetComponent<SuperObjectComponent>();
+                foreach (SuperObject ch in children) {
+                    if (ch != null) await ch.InitGameObject();
+                }
+                string previousLoadingState = MapLoader.Loader.loadingState;
+                MapLoader.Loader.loadingState = previousLoadingState + "\nInitializing SuperObject: " + gao.name;
+                await MapLoader.WaitIfNecessary();
+                //await MapLoader.WaitFrame();
+
+                Vector3 pos = Vector3.zero;
+                Vector3 scale = Vector3.one;
+                Quaternion rot = Quaternion.identity;
+                if (matrix != null) {
+                    pos = matrix.GetPosition(convertAxes: true);
+                    rot = matrix.GetRotation(convertAxes: true);
+                    scale = matrix.GetScale(convertAxes: true);
+                }
+
+                if (parent != null && parent.Gao != null) Gao.transform.parent = parent.Gao.transform;
+                Gao.transform.localPosition = pos;
+                Gao.transform.localRotation = rot;
+                Gao.transform.localScale = scale;
+                if (boundingVolumeTT != null) {
+                    boundingVolumeTT.Gao.transform.SetParent(Gao.transform);
+                    boundingVolumeTT.Gao.transform.localPosition = Vector3.zero;
+                    boundingVolumeTT.Gao.transform.localRotation = Quaternion.identity;
+                    boundingVolumeTT.Gao.transform.localScale = Vector3.one;
+                }
+
+                SuperObjectComponent soc = Gao.AddComponent<SuperObjectComponent>();
+                Gao.layer = LayerMask.NameToLayer("SuperObject");
+                soc.so = this;
+                MapLoader.Loader.controller.superObjects.Add(soc);
+
+                if (boundingVolume != null) {
+                    if (boundingVolume.type == BoundingVolume.Type.Box) {
+                        BoxCollider collider = Gao.AddComponent<BoxCollider>();
+
+                        collider.center = boundingVolume.Center;
+                        collider.center -= Gao.transform.position;
+                        collider.size = boundingVolume.Size;
+                    } else {
+                        SphereCollider collider = Gao.AddComponent<SphereCollider>();
+
+                        collider.center = boundingVolume.Center;
+                        collider.radius = boundingVolume.sphereRadius;
+                    }
+                }
+                
+                MapLoader.Loader.loadingState = previousLoadingState;
+                await MapLoader.WaitIfNecessary();
+
+
+                //SuperObjectComponent soc = so.Gao.GetComponent<SuperObjectComponent>();
+                foreach (SuperObject ch in children) {
+                    //if (ch != null) await ch.InitGameObject();
+                    if (soc != null && ch != null && ch.Gao != null) {
+                        SuperObjectComponent soc_ch = ch.Gao.GetComponent<SuperObjectComponent>();
+                        if (soc_ch == null) continue;
+                        soc.Children.Add(soc_ch);
+                    }
+                }
             }
         }
 
@@ -94,15 +169,8 @@ namespace OpenSpace.Object {
             Pointer off_boundingVolume = Pointer.Read(reader);
             //l.print("SuperObject T" + so.typeCode + ": " + off_so + " - " + so.off_matrix);
 
-            //R3Pointer.Read(reader); // a copy of the matrix right after, at least in R3GC
-            Vector3 pos = Vector3.zero;
-            Vector3 scale = Vector3.one;
-            Quaternion rot = Quaternion.identity;
             Pointer.DoAt(ref reader, so.off_matrix, () => {
                 so.matrix = Matrix.Read(reader, so.off_matrix);
-                pos = so.matrix.GetPosition(convertAxes: true);
-                rot = so.matrix.GetRotation(convertAxes: true);
-                scale = so.matrix.GetScale(convertAxes: true);
             });
 			/*Pointer.DoAt(ref reader, so.off_matrix2, () => {
 				so.matrix2 = Matrix.Read(reader, so.off_matrix2);
@@ -172,55 +240,12 @@ namespace OpenSpace.Object {
                 }
             });
 
-            if (so.Gao != null) {
-                if (parent != null && parent.Gao != null) so.Gao.transform.parent = parent.Gao.transform;
-                so.Gao.transform.localPosition = pos;
-                so.Gao.transform.localRotation = rot;
-                so.Gao.transform.localScale = scale;
-                if (so.boundingVolumeTT != null) {
-                    so.boundingVolumeTT.gao.transform.SetParent(so.Gao.transform);
-                    so.boundingVolumeTT.gao.transform.localPosition = Vector3.zero;
-                    so.boundingVolumeTT.gao.transform.localRotation = Quaternion.identity;
-                    so.boundingVolumeTT.gao.transform.localScale = Vector3.one;
-                }
-
-                SuperObjectComponent soc = so.Gao.AddComponent<SuperObjectComponent>();
-                so.Gao.layer = LayerMask.NameToLayer("SuperObject");
-                soc.so = so;
-                MapLoader.Loader.controller.superObjects.Add(soc);
-
-                if (so.boundingVolume != null) {
-                    if (so.boundingVolume.type == BoundingVolume.Type.Box) {
-                        BoxCollider collider = so.Gao.AddComponent<BoxCollider>();
-
-                        collider.center = so.boundingVolume.Center;
-                        collider.center -= so.Gao.transform.position;
-                        collider.size = so.boundingVolume.Size;
-                    } else {
-                        SphereCollider collider = so.Gao.AddComponent<SphereCollider>();
-
-                        collider.center = so.boundingVolume.Center;
-                        collider.radius = so.boundingVolume.sphereRadius;
-                    }
-                }
-            }
             if (isValidNode) {
                 so.children.ReadEntries(ref reader, (off_child) => {
-                    SuperObject child = SuperObject.Read(reader, off_child, so);
+                    SuperObject child = SuperObject.FromOffsetOrRead(off_child, reader, parent: so);
                     child.parent = so;
                     return child;
                 }, LinkedList.Flags.HasHeaderPointers);
-
-                if (so.Gao != null) {
-                    SuperObjectComponent soc = so.Gao.GetComponent<SuperObjectComponent>();
-                    foreach (SuperObject ch in so.children) {
-                        if (soc != null && ch != null && ch.Gao != null) {
-                            SuperObjectComponent soc_ch = ch.Gao.GetComponent<SuperObjectComponent>();
-                            if (soc_ch == null) continue;
-                            soc.Children.Add(soc_ch);
-                        }
-                    }
-                }
             }
             return so;
         }
@@ -238,6 +263,8 @@ namespace OpenSpace.Object {
                 Pointer.DoAt(ref reader, offset, () => {
                     so = SuperObject.Read(reader, offset, parent: parent);
                 });
+            } else {
+                if (parent != null && so.parent != parent) so.parent = parent;
             }
             return so;
         }

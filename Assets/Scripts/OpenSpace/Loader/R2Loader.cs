@@ -58,7 +58,7 @@ namespace OpenSpace.Loader {
                     MemoryFile mem = new MemoryFile(lvlName);
                     files_array[0] = mem;
                     await WaitIfNecessary();
-                    LoadMemory();
+                    await LoadMemory();
                 } else {
                     hasTransit = false;
                     DAT dat = null;
@@ -803,7 +803,7 @@ namespace OpenSpace.Loader {
 
             loadingState = "Loading superobject hierarchy";
             await WaitIfNecessary();
-            ReadSuperObjects(reader);
+            await ReadSuperObjects(reader);
             loadingState = "Loading always structure";
             await WaitIfNecessary();
             ReadAlways(reader);

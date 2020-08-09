@@ -29,9 +29,18 @@ namespace OpenSpace.Object.Properties {
         public GameObject Gao {
             get {
                 if (gao == null) {
-                    gao = new GameObject("Object List @ " + offset.ToString());
+                    gao = new GameObject(ToString());
+                    InitGameObject();
                 }
                 return gao;
+            }
+        }
+        private void InitGameObject() {
+            if (entries == null) return;
+            for (int i = 0; i < entries.Length; i++) {
+                if (entries[i].po != null && entries[i].po.Gao != null) {
+                    entries[i].po.Gao.transform.SetParent(Gao.transform);
+                }
             }
         }
 
@@ -148,7 +157,7 @@ namespace OpenSpace.Object.Properties {
 				if (entries[i].po != null && entries[i].scale.HasValue) {
 					entries[i].po.scaleMultiplier = entries[i].scale.Value;
 				}
-				if (entries[i].po != null && entries[i].po.Gao != null) {
+				if (gao != null && entries[i].po != null && entries[i].po.Gao != null) {
 					entries[i].po.Gao.transform.SetParent(Gao.transform);
 				}
 			});
@@ -213,7 +222,9 @@ namespace OpenSpace.Object.Properties {
                     perso.p3dData.family.AddNewPhysicalList(this);
                 } else {
                     MapLoader.Loader.AddUncategorizedObjectList(this);
-                    Gao.name = "[" + unknownFamilyName + "] Uncategorized Object List @ " + offset.ToString();
+                    if (gao != null) {
+                        gao.name = "[" + unknownFamilyName + "] Uncategorized Object List @ " + offset.ToString();
+                    }
                 }
             }
         }

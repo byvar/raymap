@@ -260,7 +260,7 @@ namespace OpenSpace {
         }
 
         #region Memory
-        public void LoadMemory() {
+        public async UniTask LoadMemory() {
             MemoryFile mem = (MemoryFile)files_array[0];
             if (mem == null || mem.reader == null) throw new NullReferenceException("File not initialized!");
             Reader reader = mem.reader;
@@ -365,7 +365,7 @@ namespace OpenSpace {
 
 			// Parse actual world & always structure
 			ReadFamilies(reader);
-            ReadSuperObjects(reader);
+			await ReadSuperObjects(reader);
             ReadAlways(reader);
             ReadCrossReferences(reader);
 
@@ -996,19 +996,57 @@ MonoBehaviour.print(str);
 			loadingState = state;
 		}
 
-        public void ReadSuperObjects(Reader reader) {
-            actualWorld = SuperObject.FromOffsetOrRead(globals.off_actualWorld, reader);
-            dynamicWorld = SuperObject.FromOffsetOrRead(globals.off_dynamicWorld, reader);
-            inactiveDynamicWorld = SuperObject.FromOffsetOrRead(globals.off_inactiveDynamicWorld, reader);
-            transitDynamicWorld = SuperObject.FromOffsetOrRead(globals.off_transitDynamicWorld, reader);
-            fatherSector = SuperObject.FromOffsetOrRead(globals.off_fatherSector, reader);
+        public async UniTask ReadSuperObjects(Reader reader) {
+			loadingState = "Reading SuperObject hierarchy: Dynamic World";
+			await WaitIfNecessary();
+			dynamicWorld = SuperObject.FromOffsetOrRead(globals.off_dynamicWorld, reader);
 
-            if (actualWorld != null) actualWorld.Gao.name = "Actual World";
-            if (dynamicWorld != null) dynamicWorld.Gao.name = "Dynamic World";
-            if (inactiveDynamicWorld != null) inactiveDynamicWorld.Gao.name = "Inactive Dynamic World";
-            if (transitDynamicWorld != null) transitDynamicWorld.Gao.name = "Transit Dynamic World (perso in fix)";
-            if (fatherSector != null) fatherSector.Gao.name = "Father Sector";
-        }
+			loadingState = "Reading SuperObject hierarchy: Inactive Dynamic World";
+			await WaitIfNecessary();
+			inactiveDynamicWorld = SuperObject.FromOffsetOrRead(globals.off_inactiveDynamicWorld, reader);
+
+			loadingState = "Reading SuperObject hierarchy: Transit Dynamic World";
+			await WaitIfNecessary();
+			transitDynamicWorld = SuperObject.FromOffsetOrRead(globals.off_transitDynamicWorld, reader);
+
+			loadingState = "Reading SuperObject hierarchy: Father Sector";
+			await WaitIfNecessary();
+			fatherSector = SuperObject.FromOffsetOrRead(globals.off_fatherSector, reader);
+
+			// Load this last, otherwise its children, the other worlds are read immediately with no awaits in-between
+			loadingState = "Reading SuperObject hierarchy: Actual World";
+			await WaitIfNecessary();
+			actualWorld = SuperObject.FromOffsetOrRead(globals.off_actualWorld, reader);
+
+			loadingState = "Initializing SuperObject hierarchy";
+			await WaitIfNecessary();
+			if (dynamicWorld != null) {
+				dynamicWorld.Gao.name = "Dynamic World";
+				await dynamicWorld.InitGameObject();
+			}
+			await WaitIfNecessary();
+			if (inactiveDynamicWorld != null) {
+				inactiveDynamicWorld.Gao.name = "Inactive Dynamic World";
+				await inactiveDynamicWorld.InitGameObject();
+			}
+			await WaitIfNecessary();
+			if (transitDynamicWorld != null) {
+				transitDynamicWorld.Gao.name = "Transit Dynamic World (perso in fix)";
+				await transitDynamicWorld.InitGameObject();
+			}
+			await WaitIfNecessary();
+			if (fatherSector != null) {
+				fatherSector.Gao.name = "Father Sector";
+				await fatherSector.InitGameObject();
+			}
+
+			await WaitIfNecessary();
+			if (actualWorld != null) {
+				actualWorld.Gao.name = "Actual World";
+				await actualWorld.InitGameObject();
+			}
+			await WaitIfNecessary();
+		}
 
         public void ReadAlways(Reader reader) {
             // Parse spawnable SO's
@@ -1038,12 +1076,16 @@ MonoBehaviour.print(str);
 
         public void ReadFamilies(Reader reader) {
             if (families.Count > 0) {
-                familiesRoot = new GameObject("Families");
-                familiesRoot.SetActive(false); // Families do not need to be visible
+				if (UnitySettings.CreateFamilyGameObjects) {
+					familiesRoot = new GameObject("Families");
+					familiesRoot.SetActive(false); // Families do not need to be visible
+				}
 
                 families.ReadEntries(ref reader, (off_element) => {
                     Family f = Family.Read(reader, off_element);
-                    f.Gao.transform.SetParent(familiesRoot.transform, false);
+					if (UnitySettings.CreateFamilyGameObjects) {
+						f.Gao.transform.SetParent(familiesRoot.transform, false);
+					}
                     return f;
                 }, LinkedList.Flags.HasHeaderPointers);
 			}
@@ -1100,7 +1142,7 @@ MonoBehaviour.print(str);
 
         public void AddUncategorizedObjectList(ObjectList objList) {
             if (!uncategorizedObjectLists.Contains(objList)) uncategorizedObjectLists.Add(objList);
-            objList.Gao.transform.SetParent(familiesRoot.transform);
+            if(familiesRoot != null) objList.Gao.transform.SetParent(familiesRoot.transform);
         }
 
         protected async UniTask PrepareFile(string path) {

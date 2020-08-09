@@ -14,8 +14,6 @@ namespace OpenSpace.Collide {
         public PhysicalObject po;
         public Pointer offset;
         public CollideType type;
-
-        public GameObject gao = null;
 		
         public Pointer off_modelstart;
         public ushort num_vertices;
@@ -35,6 +33,48 @@ namespace OpenSpace.Collide {
         public IGeometricObjectElementCollide[] elements = null;
 
         public bool isBoundingVolume = false;
+
+        private GameObject gao = null;
+        public GameObject Gao {
+            get {
+                if (gao == null) InitGameObject();
+                return gao;
+            }
+        }
+        private void InitGameObject() {
+            gao = new GameObject("Collide Set " + (type != CollideType.None ? type + " " : "") + "@ " + offset);
+            gao.tag = "Collide";
+            gao.layer = LayerMask.NameToLayer("Collide");
+
+            for (uint i = 0; i < num_elements; i++) {
+                if (elements[i] != null) {
+                    /*System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
+                    w.Start();*/
+                    GameObject child = elements[i].Gao;
+                    child.transform.SetParent(gao.transform);
+                    child.transform.localPosition = Vector3.zero;
+
+
+                    /*MapLoader.Loader.print("COL: " + elements[i].GetType() + " - " + w.ElapsedMilliseconds);
+                    w.Stop();*/
+                    /*if (m.subblocks[i] is CollideMeshElement) {
+                        GameObject child = ((CollideMeshElement)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (m.subblocks[i] is CollideSpheresElement) {
+                        GameObject child = ((CollideSpheresElement)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    } else if (m.subblocks[i] is CollideAlignedBoxesElement) {
+                        GameObject child = ((CollideAlignedBoxesElement)m.subblocks[i]).Gao;
+                        child.transform.SetParent(m.gao.transform);
+                        child.transform.localPosition = Vector3.zero;
+                    }*/
+                }
+            }
+            SetVisualsActive(false); // Invisible by default
+                                     //m.gao.SetActive(false); // Invisible by default
+        }
 
         public GeometricObjectCollide(Pointer offset, CollideType type = CollideType.None) {
             this.offset = offset;
@@ -210,9 +250,7 @@ namespace OpenSpace.Collide {
             for (uint i = 0; i < m.num_elements; i++) {
                 m.element_types[i] = reader.ReadUInt16();
             }
-            m.gao = new GameObject("Collide Set "+ (type != CollideType.None ? type + " " : "") +"@ " + offset);
-            m.gao.tag = "Collide";
-            m.gao.layer = LayerMask.NameToLayer("Collide");
+
             for (uint i = 0; i < m.num_elements; i++) {
                 Pointer.Goto(ref reader, m.off_elements + (i * 4));
                 Pointer block_offset = Pointer.Read(reader);
@@ -244,64 +282,16 @@ namespace OpenSpace.Collide {
                         break;
                 }
             }
-
-            for (uint i = 0; i < m.num_elements; i++) {
-                if (m.elements[i] != null) {
-                    GameObject child = m.elements[i].Gao;
-                    child.transform.SetParent(m.gao.transform);
-                    child.transform.localPosition = Vector3.zero;
-                    /*if (m.subblocks[i] is CollideMeshElement) {
-                        GameObject child = ((CollideMeshElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    } else if (m.subblocks[i] is CollideSpheresElement) {
-                        GameObject child = ((CollideSpheresElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    } else if (m.subblocks[i] is CollideAlignedBoxesElement) {
-                        GameObject child = ((CollideAlignedBoxesElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    }*/
-                }
-            }
-            m.SetVisualsActive(false); // Invisible by default
-            //m.gao.SetActive(false); // Invisible by default
             return m;
         }
 
         public GeometricObjectCollide Clone() {
             GeometricObjectCollide m = (GeometricObjectCollide)MemberwiseClone();
-            m.gao = new GameObject("Collide Set @ " + offset);
-            m.gao.tag = "Collide";
-            m.elements = new IGeometricObjectElementCollide[num_elements];
             for (uint i = 0; i < m.num_elements; i++) {
                 if (elements[i] != null) {
                     m.elements[i] = elements[i].Clone(m);
                 }
             }
-            for (uint i = 0; i < m.num_elements; i++) {
-                if (m.elements[i] != null) {
-                    GameObject child = m.elements[i].Gao;
-                    child.transform.SetParent(m.gao.transform);
-                    child.transform.localPosition = Vector3.zero;
-                    /*if (m.subblocks[i] is CollideMeshElement) {
-                        GameObject child = ((CollideMeshElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    } else if (m.subblocks[i] is CollideSpheresElement) {
-                        GameObject child = ((CollideSpheresElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    } else if (m.subblocks[i] is CollideAlignedBoxesElement) {
-                        GameObject child = ((CollideAlignedBoxesElement)m.subblocks[i]).Gao;
-                        child.transform.SetParent(m.gao.transform);
-                        child.transform.localPosition = Vector3.zero;
-                    }*/
-                }
-            }
-            m.SetVisualsActive(false); // Invisible by default
-            //m.gao.SetActive(false); // Invisible by default
             return m;
         }
     }

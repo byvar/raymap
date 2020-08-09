@@ -35,6 +35,7 @@ public class UnitySettings {
 	public static bool UseLevelTranslation { get; set; } = true;
 	public static bool TracePointers { get; set; } = false;
 	public static bool VisualizeSectorBorders { get; set; } = false;
+	public static bool CreateFamilyGameObjects { get; set; } = false;
 
 	// Export
 	public static bool ExportText { get; set; }
@@ -99,6 +100,7 @@ public class UnitySettings {
 		ExportText = s.SerializeBool("ExportText", ExportText);
 		UseLevelTranslation = s.SerializeBool("UseLevelTranslation", UseLevelTranslation);
 		VisualizeSectorBorders = s.SerializeBool("VisualizeSectorBorders", VisualizeSectorBorders);
+		CreateFamilyGameObjects = s.SerializeBool("CreateFamilyGameObjects", CreateFamilyGameObjects);
 	}
 
 

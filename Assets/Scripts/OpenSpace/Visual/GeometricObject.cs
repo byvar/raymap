@@ -80,8 +80,11 @@ namespace OpenSpace.Visual {
             this.offset = offset;
         }
 
-        public void InitGameObject() {
+        private void InitGameObject() {
             gao = new GameObject(name);
+			/*System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
+			w.Start();*/
+
             gao.tag = "Visual";
             gao.layer = LayerMask.NameToLayer("Visual");
             if (bones != null) {
@@ -99,8 +102,10 @@ namespace OpenSpace.Visual {
             if (lookAtMode != 0) {
                 BillboardBehaviour billboard = gao.AddComponent<BillboardBehaviour>();
                 billboard.mode = (BillboardBehaviour.LookAtMode)lookAtMode;
-            }
-        }
+			}
+			/*MapLoader.Loader.print("GEO: " + offset + " - " + w.ElapsedMilliseconds);
+			w.Stop();*/
+		}
 
         public void ReinitBindposes() {
             if (bones != null) {
@@ -343,7 +348,7 @@ namespace OpenSpace.Visual {
 				m.optimizedObject?.Resolve(reader, onPreRead: opt => opt.isSinus = m.ps2IsSinus);
 				m.ReadMeshFromSDC();
 			}
-			m.InitGameObject();
+			//m.InitGameObject();
             return m;
         }
 

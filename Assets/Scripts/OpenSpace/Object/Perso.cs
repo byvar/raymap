@@ -118,7 +118,8 @@ namespace OpenSpace.Object {
 					if (p.p3dData != null && p.p3dData.family != null && p.p3dData.family.name == null) {
 						p.p3dData.family.name = p.nameFamily;
 						p.p3dData.family.family_index = p.stdGame.objectTypes[0];
-						if (p.p3dData.family.Gao != null) {
+
+                        if (UnitySettings.CreateFamilyGameObjects && p.p3dData.family.Gao != null) {
 							p.p3dData.family.Gao.name = "[Family] " + p.nameFamily;
 						}
 					}

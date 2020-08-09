@@ -17,7 +17,6 @@ public class CameraComponent : MonoBehaviour {
 	public Vector2 sensitivityRMB = new Vector2(1.6f, 1.6f);
     public Vector2 smoothing = new Vector2(3, 3);
     public Quaternion? targetDirection;
-    public Vector2 targetCharacterDirection;
     
     public bool MouseLookEnabled { get; private set; } = false;
 	public bool MouseLookRMBEnabled { get; private set; } = false;
@@ -303,16 +302,32 @@ public class CameraComponent : MonoBehaviour {
 	void CalculateMouseLook(bool orthographic, bool smooth) {
 		// Allow the script to clamp based on a desired target value.
 		Vector3 eulerTargetDir = targetDirection.Value.eulerAngles;
+		/*bool eulerDirChanged = false;
+
 		if (eulerTargetDir.z != 0) {
 			if (Mathf.Abs(eulerTargetDir.z) < 0.04f) {
 				eulerTargetDir = new Vector3(eulerTargetDir.x, eulerTargetDir.y, 0f);
 			} else {
 				eulerTargetDir = new Vector3(eulerTargetDir.x, eulerTargetDir.y, Mathf.Lerp(eulerTargetDir.z, 0f, Time.deltaTime * lerpFactor));
 			}
-			targetDirection = Quaternion.Euler(eulerTargetDir);
+			eulerDirChanged = true;
+		} else if (eulerTargetDir.x != 0) {
+			//eulerTargetDir = new Vector3(0f, eulerTargetDir.y, eulerTargetDir.z);
+			if (Mathf.Abs(eulerTargetDir.x) < 0.04f) {
+				eulerTargetDir = new Vector3(0f, eulerTargetDir.y, eulerTargetDir.z);
+			} else {
+				eulerTargetDir = new Vector3(Mathf.Lerp(eulerTargetDir.x, 0f, Time.deltaTime * lerpFactor), eulerTargetDir.y, eulerTargetDir.z);
+			}
+			eulerDirChanged = true;
+		}*/
+		if (eulerTargetDir.x != 0 || eulerTargetDir.z != 0) {
+			if (Mathf.Abs(eulerTargetDir.x) < 0.04f && Mathf.Abs(eulerTargetDir.z) < 0.04f) {
+				targetDirection = Quaternion.Euler(0f, eulerTargetDir.y, 0f);
+			} else {
+				targetDirection = Quaternion.Lerp(targetDirection.Value, Quaternion.Euler(0, eulerTargetDir.y, 0), Time.deltaTime * lerpFactor);
+			}
 		}
 		var targetOrientation = targetDirection.Value;
-		var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
 
 		// Get raw mouse input for a cleaner reading on more sensitive mice.
 		var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));

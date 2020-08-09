@@ -24,9 +24,26 @@ namespace OpenSpace.Object {
             get {
                 if (gao == null) {
                     gao = new GameObject(name);
+                    InitGameObject();
                 }
                 return gao;
             }
+        }
+        private void InitGameObject() {
+            if (data != null) {
+                /*if (ipo.data.visualSet != null) {
+                    foreach (Visual.VisualSetLOD lod in ipo.data.visualSet) {
+                        if (lod.obj.Gao != null) {
+                            StaticBatchingUtility.Combine(lod.obj.Gao);
+                        }
+                    }
+                }*/
+            }
+            /*System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
+            w.Start();*/
+            if (data != null) data.Gao.transform.parent = Gao.transform;
+            /*MapLoader.Loader.print("IPO: " + offset + " - " + w.ElapsedMilliseconds);
+            w.Stop();*/
         }
 
         private SuperObject superObject;
@@ -61,26 +78,10 @@ namespace OpenSpace.Object {
 			}
 			Pointer.DoAt(ref reader, ipo.off_data, () => {
 				ipo.data = PhysicalObject.Read(reader, ipo.off_data, radiosity: ipo.radiosity);
-				if (ipo.data != null) {
-					/*if (ipo.data.visualSet != null) {
-						foreach (Visual.VisualSetLOD lod in ipo.data.visualSet) {
-							if (lod.obj.Gao != null) {
-								StaticBatchingUtility.Combine(lod.obj.Gao);
-							}
-						}
-					}*/
-					ipo.data.Gao.transform.parent = ipo.Gao.transform;
-				}
 			});
 			/*Pointer.DoAt(ref reader, ipo.off_portalCamera, () => {
 				ipo.portalCamera = SuperObject.FromOffsetOrRead(reader, 
 			});*/
-            /*if (ipo.data != null && ipo.data.visualSet.Count > 0) {
-                if (ipo.data.visualSet[0].obj is R3Mesh) {
-                    GameObject meshGAO = ((R3Mesh)ipo.data.visualSet[0].obj).gao;
-                    meshGAO.transform.parent = ipo.Gao.transform;
-                }
-            }*/
             return ipo;
         }
 

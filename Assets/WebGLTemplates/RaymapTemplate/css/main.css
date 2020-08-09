@@ -395,6 +395,9 @@ a:focus {
 	width: 20em;
 	padding: 0 0.5em 0 0.5em;
 	box-sizing: border-box;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .localization-item > .localization-item-index {
 	flex: 0 0 auto;

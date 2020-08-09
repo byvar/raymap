@@ -77,7 +77,7 @@ namespace OpenSpace.Collide {
 					c.zdxList[entry.Key] = LinkedList<GeometricObjectCollide>.Read(ref reader, entry.Value,
 						(off_element) => {
 							GeometricObjectCollide col = GeometricObjectCollide.Read(reader, off_element, type: entry.Key);
-							col.gao.transform.SetParent(perso.Gao.transform);
+							col.Gao.transform.SetParent(perso.Gao.transform);
 							return col;
 						},
 						flags: LinkedList.Flags.ReadAtPointer
@@ -129,7 +129,7 @@ namespace OpenSpace.Collide {
 				LinkedList<GeometricObjectCollide> geos = new LinkedList<GeometricObjectCollide>(kv.Value.offset, kv.Value.off_head, kv.Value.off_tail, (uint)kv.Value.Count, kv.Value.type);
 				for (int i = 0; i < kv.Value.Count; i++) {
 					geos[i] = kv.Value[i].Clone();
-					geos[i].gao.transform.SetParent(parent);
+					geos[i].Gao.transform.SetParent(parent);
 				}
 				m.zdxList.Add(kv.Key, geos);
 			}

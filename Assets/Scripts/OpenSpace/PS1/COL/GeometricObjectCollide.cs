@@ -153,7 +153,8 @@ namespace OpenSpace.PS1 {
 				// Generate simple UVs for collision checkerboard (basically a box projection)
 				for (int j = 0; j < m.vertexCount; j++) {
 					Vector3 normal = m.normals[j];
-					float biggestNorm = Mathf.Max(Mathf.Max(Mathf.Abs(normal.x), Mathf.Abs(normal.y)), Mathf.Abs(normal.z));
+					normal = new Vector3(Mathf.Abs(normal.x), Mathf.Abs(normal.y), Mathf.Abs(normal.z));
+					float biggestNorm = Mathf.Max(normal.x, normal.y, normal.z);
 
 					float uvX = (m.vertices[j].x / 20.0f);
 					float uvY = (m.vertices[j].y / 20.0f);

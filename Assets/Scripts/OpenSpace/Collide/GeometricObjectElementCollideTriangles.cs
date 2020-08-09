@@ -48,7 +48,8 @@ namespace OpenSpace.Collide {
         private void CreateUnityMesh() {
             if(num_triangles > 0) {
                 Vector3[] new_vertices = new Vector3[num_triangles * 3];
-                Vector3[] new_normals = new Vector3[num_triangles * 3];
+                Vector3[] new_normals = null;
+                if(normals != null) new_normals = new Vector3[num_triangles * 3];
                 Vector2[] new_uvs = new Vector2[num_triangles * 3];
 
                 for (int j = 0; j < num_triangles * 3; j++) {
@@ -71,11 +72,18 @@ namespace OpenSpace.Collide {
 				if (normals == null) meshUnity.RecalculateNormals();
 
                 // If no UVs exist for collide mesh, generate simple UVs (basically a box projection)
+                /*System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
+                w.Start();*/
                 if (uvs == null) {
-
-                    for (int j = 0; j < num_triangles * 3; j++) {
-                        Vector3 normal = meshUnity.normals[j];
-                        double biggestNorm = Math.Max(Math.Max(Math.Abs(normal.x), Math.Abs(normal.y)), Math.Abs(normal.z));
+                    if (normals == null) {
+                        List<Vector3> norm = new List<Vector3>();
+                        meshUnity.GetNormals(norm);
+                        new_normals = norm.ToArray();
+                    }
+                    for (int j = 0; j < new_uvs.Length; j++) {
+                        Vector3 normal = new_normals[j];
+                        normal = new Vector3(Mathf.Abs(normal.x), Mathf.Abs(normal.y), Mathf.Abs(normal.z));
+                        float biggestNorm = Mathf.Max(normal.x, normal.y, normal.z);
                         
                         float uvX = (new_vertices[j].x / 20.0f);
                         float uvY = (new_vertices[j].y / 20.0f);
@@ -90,6 +98,8 @@ namespace OpenSpace.Collide {
                         }
                     }
                 }
+                /*MapLoader.Loader.print("UV Code: " + offset + " - " + num_triangles + " - " + w.ElapsedMilliseconds);
+                w.Stop();*/
 
                 meshUnity.uv = new_uvs;
 

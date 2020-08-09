@@ -23,9 +23,7 @@ namespace OpenSpace.Object {
         private GameObject gao = null;
         public GameObject Gao {
             get {
-                if (gao == null) {
-                    gao = new GameObject("[PO]");
-				}
+                if (gao == null) InitGameObject();
                 return gao;
             }
         }
@@ -39,6 +37,42 @@ namespace OpenSpace.Object {
                 return null;
             }
 		}
+
+        private void InitGameObject() {
+            gao = new GameObject("[PO]");
+            for (int i = 0; i < visualSet.Length; i++) {
+                if (visualSet[i].obj == null) continue;
+
+                switch (visualSet[i].obj) {
+                    case GeometricObject m:
+                        if (m.name != "Mesh") Gao.name = "[PO] " + m.name;
+                        break;
+                    case PatchGeometricObject mod:
+                        if (mod.mesh != null && mod.mesh.name != "Mesh") {
+                            Gao.name = "[PO] " + mod.mesh.name;
+                        }
+                        Gao.name += " - Patch";
+                        break;
+                }
+                // Initialize children
+                if (visualSet[i].obj.Gao != null) {
+                    visualSet[i].obj.Gao.transform.parent = Gao.transform;
+                }
+            }
+
+            if (visualSet.Length > 1) { // = number of LOD
+                LODComponent lod = Gao.AddComponent<LODComponent>();
+                lod.visualSet = visualSet;
+                lod.gameObjects = visualSet.Select(v => v.obj.Gao).ToArray();
+                /*float bestLOD = po.visualSet.Min(v => v.LODdistance);
+                foreach (VisualSetLOD lod in po.visualSet) {
+                    if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
+                }*/
+            }
+            if (collideMesh != null && collideMesh.Gao != null) {
+                collideMesh.Gao.transform.parent = Gao.transform;
+            }
+        }
 
 		private SuperObject superObject;
 		public SuperObject SuperObject {
@@ -147,32 +181,15 @@ namespace OpenSpace.Object {
                         switch (po.visualSetType) {
                             case 0:
                                 if(po.visualSet[i].obj == null) po.visualSet[i].obj = GeometricObject.Read(reader, po.visualSet[i].off_data, radiosity: radiosity?.lod?[radiosityLODIndex++]);
-                                GeometricObject m = ((GeometricObject)po.visualSet[i].obj);
-                                if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
                                 break;
                             case 1:
 								if (po.visualSet[i].obj == null) po.visualSet[i].obj = PatchGeometricObject.Read(reader, po, po.visualSet[i].off_data);
-                                PatchGeometricObject mod = po.visualSet[i].obj as PatchGeometricObject;
-                                if (mod != null && mod.mesh != null && mod.mesh.name != "Mesh") {
-                                    po.Gao.name = "[PO] " + mod.mesh.name;
-                                }
-                                po.Gao.name += " - MeshMod";
                                 break;
                             default:
                                 MapLoader.Loader.print("unknown type " + po.visualSetType + " at offset: " + offset);
                                 break;
                         }
-                        if (po.visualSet[i].obj.Gao != null) po.visualSet[i].obj.Gao.transform.parent = po.Gao.transform;
                     });
-                }
-                if (numberOfLOD > 1) {
-                    LODComponent lod = po.Gao.AddComponent<LODComponent>();
-                    lod.visualSet = po.visualSet;
-                    lod.gameObjects = po.visualSet.Select(v => v.obj.Gao).ToArray();
-                    /*float bestLOD = po.visualSet.Min(v => v.LODdistance);
-                    foreach (VisualSetLOD lod in po.visualSet) {
-                        if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
-                    }*/
                 }
             });
 
@@ -181,7 +198,6 @@ namespace OpenSpace.Object {
 				if (Settings.s.game == Settings.Game.R2Revolution) {
 					// Read collide mesh object here directly
 					po.collideMesh = GeometricObjectCollide.Read(reader, po.off_collideSet);
-					po.collideMesh.gao.transform.parent = po.Gao.transform;
 				} else {
 					// Read collide set containing collide mesh
 					uint u1 = reader.ReadUInt32(); // 0, zdm
@@ -190,7 +206,6 @@ namespace OpenSpace.Object {
 					Pointer off_zdr = Pointer.Read(reader);
 					Pointer.DoAt(ref reader, off_zdr, () => {
 						po.collideMesh = GeometricObjectCollide.Read(reader, off_zdr);
-						po.collideMesh.gao.transform.parent = po.Gao.transform;
 					});
 				}
             });
@@ -211,24 +226,9 @@ namespace OpenSpace.Object {
                 po.visualSet[i].LODdistance = visualSet[i].LODdistance;
                 po.visualSet[i].off_data = visualSet[i].off_data;
                 po.visualSet[i].obj = visualSet[i].obj.Clone();
-                if (po.visualSet[i].obj is GeometricObject) {
-                    GeometricObject m = ((GeometricObject)po.visualSet[i].obj);
-                    if (m.name != "Mesh") po.Gao.name = "[PO] " + m.name;
-                    m.Gao.transform.parent = po.Gao.transform;
-                }
-            }
-            if (po.visualSet.Length > 1) {
-                /*float bestLOD = po.visualSet.Min(v => v.LODdistance);
-                foreach (VisualSetLOD lod in po.visualSet) {
-                    if (lod.obj.Gao != null && lod.LODdistance != bestLOD) lod.obj.Gao.SetActive(false);
-                }*/
-                LODComponent lod = po.Gao.AddComponent<LODComponent>();
-                lod.visualSet = po.visualSet;
-                lod.gameObjects = po.visualSet.Select(v => v.obj.Gao).ToArray();
             }
             if (collideMesh != null) {
                 po.collideMesh = collideMesh.Clone();
-                po.collideMesh.gao.transform.parent = po.Gao.transform;
             }
             return po;
         }
@@ -241,6 +241,7 @@ namespace OpenSpace.Object {
         }
 
 		public void UpdateViewCollision(bool viewCollision) {
+            if (gao == null) return;
 			foreach (VisualSetLOD l in visualSet) {
 				if (l.obj != null) {
 					GameObject gao = l.obj.Gao;
