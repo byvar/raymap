@@ -246,6 +246,12 @@
 							"image": ".\/img\/version\/ps2.png",
 							"name": "PS2 Demo (2002\/12\/18)",
 							"folder": "r3_ps2_demo_20021218"
+						},
+						{
+							"json": "gc_demo",
+							"image": ".\/img\/version\/gc.png",
+							"name": "GameCube Demo",
+							"folder": "r3_gc_demo"
 						}
 					]
 				},

@@ -1,0 +1,11 @@
+{
+    "name": "Rayman 3 (Gamecube) Demo",
+    "image": ".\/img\/logo\/r3_gc.png",
+    "mode": "r3_gc",
+    "folder": "r3_gc_demo",
+    "levels": [
+        { "level": "menumap", "name": "Main Menu" },
+        { "level": "sk8_00", "name": "The Fairy Council 6 (Teensie Highway)" },
+        { "level": "Wood_10", "name": "Clearleaf Forest 2" }
+    ]
+}
