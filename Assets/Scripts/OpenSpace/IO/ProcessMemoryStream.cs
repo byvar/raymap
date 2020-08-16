@@ -87,7 +87,7 @@ namespace OpenSpace {
                 Process[] wineProcesses = Process.GetProcessesByName("wine-preloader");
                 foreach (var wineProcess in wineProcesses) {
                     string cmdLine = File.ReadAllLines($"/proc/{wineProcess.Id}/cmdline")[0].Split(new Char[] {'\0'})[0];
-                    string realName = cmdLine.Split(new Char[] {'/'}).Last();
+                    string realName = cmdLine.Split(new Char[] {'/', '\\'}).Last();
                     if (String.Equals(realName,name)) {
                         processes = new Process[] {wineProcess};
                         if (cmdLine.StartsWith("/"))
@@ -105,7 +105,7 @@ namespace OpenSpace {
                 Process[] wineProcesses = Process.GetProcessesByName("wine64-preloader");
                 foreach (var wineProcess in wineProcesses) {
                     string cmdLine = File.ReadAllLines($"/proc/{wineProcess.Id}/cmdline")[0].Split(new Char[] {'\0'})[0];
-                    string realName = cmdLine.Split(new Char[] {'/'}).Last();
+                    string realName = cmdLine.Split(new Char[] {'/', '\\'}).Last();
                     if (String.Equals(realName,name)) {
                         processes = new Process[] {wineProcess};
                         if (cmdLine.StartsWith("/"))
