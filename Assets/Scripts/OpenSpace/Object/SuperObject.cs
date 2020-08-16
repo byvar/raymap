@@ -59,10 +59,10 @@ namespace OpenSpace.Object {
         public async UniTask InitGameObject() {
             if (isGameObjectInitialized) return;
             isGameObjectInitialized = true;
-            GameObject gao = data.Gao;
 
-            if (gao != null) {
+            try {
 
+                GameObject gao = data.Gao;
 
                 //SuperObjectComponent soc = so.Gao.GetComponent<SuperObjectComponent>();
                 foreach (SuperObject ch in children) {
@@ -126,6 +126,8 @@ namespace OpenSpace.Object {
                         soc.Children.Add(soc_ch);
                     }
                 }
+            } catch (NullReferenceException) {
+                // Do nothing.
             }
         }
 
