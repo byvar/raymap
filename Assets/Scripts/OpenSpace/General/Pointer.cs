@@ -45,11 +45,11 @@ namespace OpenSpace {
         public static bool operator !=(Pointer x, Pointer y) {
             return !(x == y);
         }
-        public static Pointer operator +(Pointer x, Decimal y) {
-            return new Pointer((uint)((Decimal)x.offset + y), x.file);
+        public static Pointer operator +(Pointer x, long y) {
+            return new Pointer((uint)((long)x.offset + y), x.file);
         }
-        public static Pointer operator -(Pointer x, Decimal y) {
-            return new Pointer((uint)((Decimal)x.offset - y), x.file);
+        public static Pointer operator -(Pointer x, long y) {
+            return new Pointer((uint)((long)x.offset - y), x.file);
         }
         public override string ToString() {
             if (file != null && file.baseOffset != 0) {

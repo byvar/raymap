@@ -1228,7 +1228,7 @@ MonoBehaviour.print(str);
 			return rs;
 		}
 
-		public T[] ReadArray<T>(decimal length, Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+		public T[] ReadArray<T>(long length, Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
 			if (!inline && pointer == null) return new T[0];
 			T[] ts = new T[(int)length];
 			Pointer curPointer = pointer != null ? pointer : Pointer.Current(reader);
@@ -1250,7 +1250,7 @@ MonoBehaviour.print(str);
 		}
 
 		// Read array in place
-		public T[] ReadArray<T>(decimal length, Reader reader, Action<T> onPreRead = null) where T : OpenSpaceStruct, new() {
+		public T[] ReadArray<T>(long length, Reader reader, Action<T> onPreRead = null) where T : OpenSpaceStruct, new() {
 			return ReadArray<T>(length, reader, null, onPreRead: onPreRead, inline: true);
 		}
 
