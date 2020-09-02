@@ -60,9 +60,9 @@ namespace OpenSpace.Object {
             if (isGameObjectInitialized) return;
             isGameObjectInitialized = true;
 
-            try {
+            GameObject gao = data?.Gao;
 
-                GameObject gao = data.Gao;
+            if(gao != null) {
 
                 //SuperObjectComponent soc = so.Gao.GetComponent<SuperObjectComponent>();
                 foreach (SuperObject ch in children) {
@@ -126,8 +126,6 @@ namespace OpenSpace.Object {
                         soc.Children.Add(soc_ch);
                     }
                 }
-            } catch (NullReferenceException) {
-                // Do nothing.
             }
         }
 
