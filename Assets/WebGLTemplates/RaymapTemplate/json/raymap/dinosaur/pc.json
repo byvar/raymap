@@ -1,0 +1,28 @@
+{
+    "name": "Disney's Dinosaur (PC)",
+    "image": ".\/img\/logo\/dinosaur_pc.png",
+    "mode": "dinosaur_pc",
+    "folder": "dinosaur_pc",
+    "levels": [
+		{ "level": "MENUMAP", "name": "Main Menu" },
+        { "level": "TUTORIAL", "name": "Tutorial" },
+		{ "level": "ENCYCLO1", "name": "(Encyclopedia) Herbivores" },
+		{ "level": "ENCYCLO2", "name": "(Encyclopedia) Carnivores" },
+		{ "level": "M1PLAGE", "name": "Mission 1: Beach" },
+		{ "level": "M2FOG", "name": "Mission 2: Fog" },
+		{ "level": "M3DESERT", "name": "Mission 3: Desert" },
+		{ "level": "M4DUNE", "name": "Mission 4: Dune" },
+		{ "level": "M5LAC", "name": "Mission 5: Lake" },
+		{ "level": "M6CANYON", "name": "Mission 6: Canyon" },
+		{ "level": "M7GROT", "name": "Mission 7: Cave" },
+		{ "level": "M8CANYON", "name": "Mission 8: Canyon" },
+		{ "level": "M9GROT", "name": "Mission 9: Cave" },
+		{ "level": "M10GROT", "name": "Mission 10: Cave" },
+		{ "level": "M11MONT", "name": "Mission 11: Mountain" },
+		{ "level": "M12KRON", "name": "Mission 12: Kron" },
+		{ "level": "M13HORDE", "name": "Mission 13: Horde" },
+		{ "level": "M14MONT", "name": "Mission 14: Mountain" },
+		{ "level": "MAPINTER", "name": "Score Recap" },
+		{ "level": "GENERIK", "name": "Staff Roll" }
+    ]
+}

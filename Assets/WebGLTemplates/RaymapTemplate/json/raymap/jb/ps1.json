@@ -1,0 +1,51 @@
+{
+    "name": "The Jungle Book: Groove Party (PS1)",
+    "image": ".\/img\/logo\/jb_ps1.png",
+    "mode": "jb_ps1",
+    "folder": "jb_ps1",
+    "numActors": 2,
+    "levels": [
+        { "level": "map0", "name": "(Story Mode) The Jungle's No Place for a Boy (Bagheera)" },
+        { "level": "map1", "name": "(Story Mode) Join the Ranks (Hathi Jr.)" },
+        { "level": "map2", "name": "(Story Mode) The Bare Necessities (Baloo)" },
+        { "level": "map3", "name": "(Story Mode) Go Bananas in the Coconut Tree (Monkey)" },
+        { "level": "map4", "name": "(Story Mode) I Wan'na Be Like You (King Louie)" },
+        { "level": "map5", "name": "(Story Mode) A Mood for Food (Kaa)" },
+        { "level": "map6", "name": "(Story Mode) We Are the Vultures (Buzzy)" },
+        { "level": "map7", "name": "(Story Mode) Run (Shere Khan)" },
+        { "level": "map8", "name": "(Story Mode) A Brand New Day (Shanti)" },
+        { "actor1": true, "actor2": true, "level": "map9", "name": "(Vs Mode) The Jungle's No Place for a Boy (Bagheera)" },
+        { "actor1": true, "actor2": true, "level": "map10", "name": "(Vs Mode) Join the Ranks (Hathi Jr.)" },
+        { "actor1": true, "actor2": true, "level": "map11", "name": "(Vs Mode) The Bare Necessities (Baloo)" },
+        { "actor1": true, "actor2": true, "level": "map12", "name": "(Vs Mode) Go Bananas in the Coconut Tree (Monkey)" },
+        { "actor1": true, "actor2": true, "level": "map13", "name": "(Vs Mode) I Wan'na Be Like You (King Louie)" },
+        { "actor1": true, "actor2": true, "level": "map14", "name": "(Vs Mode) A Mood for Food (Kaa)" },
+        { "actor1": true, "actor2": true, "level": "map15", "name": "(Vs Mode) We Are the Vultures (Buzzy)" },
+        { "actor1": true, "actor2": true, "level": "map16", "name": "(Vs Mode) Run (Shere Khan)" },
+        { "actor1": true, "actor2": true, "level": "map17", "name": "(Vs Mode) A Brand New Day (Shanti)" },
+        { "actor1": true, "actor2": true, "level": "map18", "name": "Dancing Stage" },
+        { "actor1": true, "actor2": true, "level": "map19", "name": "Lou Bega's Challenge (King Louie)" }
+    ],
+	"actors1": [
+		{ "actor": "9_mow_bag", "name": "Mowgli (Bagheera)" },
+		{ "actor": "10_mow_ELE", "name": "Mowgli (Hathi Jr.)" },
+		{ "actor": "11_mow_Bal", "name": "Mowgli (Baloo)" },
+		{ "actor": "12_mow_Mon", "name": "Mowgli (Monkey)" },
+		{ "actor": "13_mow_Kl", "name": "Mowgli (King Louie)" },
+		{ "actor": "14_mow_kaa", "name": "Mowgli (Kaa)" },
+		{ "actor": "15_mow_buz", "name": "Mowgli (Buzzy)" },
+		{ "actor": "16_mow_She", "name": "Mowgli (Shere Khan)" },
+		{ "actor": "17_mow_gir", "name": "Mowgli (Shanti)" }
+	],
+    "actors2": [
+		{ "actor": "18_bag", "name": "Bagheera" },
+		{ "actor": "19_ELE", "name": "Hathi Jr." },
+		{ "actor": "20_Bal", "name": "Baloo" },
+		{ "actor": "21_Mon", "name": "Monkey" },
+		{ "actor": "22_Kl", "name": "King Louie" },
+		{ "actor": "23_kaa", "name": "Kaa" },
+		{ "actor": "24_buz", "name": "Buzzy" },
+		{ "actor": "25_She", "name": "Shere Khan" },
+		{ "actor": "26_gir", "name": "Shanti" }
+	]
+}

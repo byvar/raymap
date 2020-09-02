@@ -1220,7 +1220,7 @@ namespace OpenSpace.AI {
                 ScriptNode.NodeType.SubRoutine, // 40
 				ScriptNode.NodeType.Null,
                 ScriptNode.NodeType.Null,
-                ScriptNode.NodeType.GraphRef
+                ScriptNode.NodeType.Unknown
             }
             #endregion
         };

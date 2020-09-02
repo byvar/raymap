@@ -942,6 +942,7 @@ namespace OpenSpace.Loader {
 			await WaitIfNecessary();
 			if (Settings.s.game != Settings.Game.Dinosaur) {
 				off_animBankLvl = Pointer.Read(reader); // Note: 4 0x104 banks in lvl.
+				//print(Pointer.Current(reader));
 				print("Lvl animation bank address: " + off_animBankLvl);
 				animationBanks = new AnimationBank[5];
 				if (off_animBankFix != off_animBankLvl) {
@@ -1059,6 +1060,7 @@ namespace OpenSpace.Loader {
 					so = SuperObject.FromOffset(off_perso_so_with_settings_in_fix);
 				} else if (Settings.s.game == Settings.Game.RA
 					|| Settings.s.game == Settings.Game.RM
+					|| Settings.s.game == Settings.Game.DDPK
 					|| Settings.s.game == Settings.Game.Dinosaur) {
 					off_matrix = Pointer.Current(reader);
 					mat = Matrix.Read(reader, off_matrix);

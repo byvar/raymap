@@ -1,0 +1,23 @@
+{
+    "name": "PK: Out of the Shadows (Gamecube)",
+    "image": ".\/img\/logo\/ddpk_gc.png",
+    "mode": "ddpk_gc",
+    "folder": "ddpk_gc",
+    "levels": [
+		{ "level": "wld1lv1", "name": "Observatory" },
+		{ "level": "wld1lv2", "name": "Science Lab" },
+		{ "level": "wld1lv3", "name": "Machinery" },
+		{ "level": "wld1lv4", "name": "Frozen Mine" },
+		{ "level": "wld2lv1", "name": "Canyon" },
+		{ "level": "wld2lv2", "name": "Area 52" },
+		{ "level": "wld2lv3", "name": "Underground" },
+		{ "level": "boss6", "name": "Zoster" },
+		{ "level": "Wld3Lv1", "name": "Sewers" },
+		{ "level": "Wld3Lv2", "name": "Channel 00" },
+		{ "level": "Wld3Lv3", "name": "Backstage" },
+		{ "level": "wld4lv1", "name": "Mothership" },
+		{ "level": "ZonMap", "name": "Zondag" },
+		{ "level": "credits", "name": "Staff Roll" },
+		{ "level": "Map1", "name": "Map 1" }
+    ]
+}
