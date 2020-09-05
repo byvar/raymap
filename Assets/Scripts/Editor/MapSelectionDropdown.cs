@@ -108,12 +108,14 @@ class MapSelectionDropdown : AdvancedDropdown {
 			output.AddRange(
 				from file in Directory.EnumerateFiles(directory, extension, SearchOption.AllDirectories)
 				let filename = Path.GetFileNameWithoutExtension(file)
+				let dirname = new DirectoryInfo(file).Parent.Name
 				where ((!filterPaths.Contains(filename.ToLower()))
-				&& new DirectoryInfo(file).Parent.Name.ToLower() == filename.ToLower())
-				select filename
+				&& dirname.ToLower() == filename.ToLower())
+				select dirname
 				
 			);
 		}
+		Debug.Log(string.Join("\n",output));
 
 		// Return the output
 		return output;

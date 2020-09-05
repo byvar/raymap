@@ -949,7 +949,7 @@ a:focus {
 	height: 12em;
 	opacity: 0.1;
 	font-size: 0.9em;
-	background-size: 100%;
+	background-size: contain;
 	background-repeat: no-repeat;
 }
 
@@ -980,6 +980,18 @@ a:focus {
     -ms-user-select: none;
     user-select: none;
 }
+.sidebar-button-image {
+	box-sizing: border-box;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 3.5em;
+	height: 3.5em;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
 
 .sidebar-slider {
 	position: absolute;
@@ -988,9 +1000,9 @@ a:focus {
 	width: 5em;
 	height: 4em;
 	z-index: 0;
-	transition: top .2s ease-out;
-	-moz-transition: top .2s ease-out;
-	-webkit-transition: top .2s ease-out;
+	transition: top .2s ease-out, height .2s ease-out;
+	-moz-transition: top .2s ease-out, height .2s ease-out;
+	-webkit-transition: top .2s ease-out, height .2s ease-out;
 }
 
 .sidebar-arrow {

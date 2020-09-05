@@ -130,7 +130,7 @@ function initContent() {
 		let gameSelected = false;
 		$.each( categories, function(index_cat, value_cat) {
 			let games = value_cat.games;
-			items.push("<div class='game-category-item' alt='" + value_cat.name + "'>" + value_cat.name + "</div>");
+			items.push("<div class='game-category-item' alt='" + escapeHTML(value_cat.name) + "'>" + escapeHTML(value_cat.name) + "</div>");
 			$.each( games, function(index, value) {
 				let thisGameSelected = false;
 				if(!gameSelected) {
@@ -142,16 +142,17 @@ function initContent() {
 						}
 					});
 				}
+				let titleHTML = escapeHTML(value.title);
 				if(thisGameSelected) {
 					versions_content.off(transEndEventName);
 					initGame(value);
 					$(".current-game-item").removeClass("current-game-item");
-					items.push("<div class='game-item current-game-item' data-game='" + value.json + "' title='" + value.title + "' data-logo='" + encodeURI(value.image) + "'>");
+					items.push("<div class='game-item current-game-item' data-game='" + value.json + "' title='" + titleHTML + "' data-logo='" + encodeURI(value.image) + "'>");
 				} else {
-					items.push("<div class='game-item' data-game='" + value.json + "' title='" + value.title + "' data-logo='" + encodeURI(value.image) + "'>");
+					items.push("<div class='game-item' data-game='" + value.json + "' title='" + titleHTML + "' data-logo='" + encodeURI(value.image) + "'>");
 				}
-				items.push("<div class='game-item-logo' style='background-image: url(\"" + encodeURI(value.image) + "\");' alt='" + value.title + "'></div>");
-				items.push("<div class='game-item-title'>" + value.title + "</div></div>");
+				items.push("<div class='game-item-logo' style='background-image: url(\"" + encodeURI(value.image) + "\");' alt='" + titleHTML + "'></div>");
+				items.push("<div class='game-item-title'>" + titleHTML + "</div></div>");
 			});
 		});
 		/*if(!isLoading) {
@@ -221,7 +222,7 @@ function refreshScroll() {
 	}, 3, "some unique string");
 }
 
-function setLevelsSidebarSlider(pos) {
+function setLevelsSidebarSlider(pos, isAtTop, isAtBottom) {
 	if(levelsJSON != null && levelsJSON.hasOwnProperty("icons") && $(".levels-item.level").length > 0) {
 		// Find which section you're scrolling in
 		let i = 0;
@@ -236,11 +237,26 @@ function setLevelsSidebarSlider(pos) {
 				break;
 			}
 		}
+		// Calculate height for special cases
+		let height = 1;
+		if(isAtBottom && isAtTop) {
+			highlight_i = 0;
+			height = levelsJSON.icons.length;
+		} else if(isAtTop && highlight_i !== 0) {
+			height = 1 + highlight_i;
+			highlight_i = 0;
+		} else if(isAtBottom && highlight_i !== levelsJSON.icons.length - 1) {
+			height = levelsJSON.icons.length - highlight_i;
+		}
+
 		// Add class
 		//let butt = $(".sidebar-button").eq(highlight_i);
 		//let buttPos = butt.position().top;
 		//$('#sidebar-soundtrack-slider').css('top',buttPos + 'px');
-		$('#sidebar-levels-slider').css('top',(highlight_i * 4) + 'em');
+		$('#sidebar-levels-slider').css({
+			'top': (highlight_i * 4) + 'em',
+			'height': (height * 4) + 'em'
+		});
 		/*if(!butt.hasClass('sidebar-button-active')) {
 			$(".sidebar-button").removeClass('sidebar-button-active');
 			butt.addClass('sidebar-button-active');
@@ -318,26 +334,27 @@ function parseSuperObject(so, level) {
 	if(so.hasOwnProperty("Type")) {
 		type = so.Type;
 	}
+	let nameHTML = escapeHTML(so.Name);
 	switch(type) {
 		case "World":
-			items.push("<div class='objects-item object-world level-" + level + "' alt='" + so.Name + "'>" + so.Name + "</div>");
+			items.push("<div class='objects-item object-world level-" + level + "' alt='" + nameHTML + "'>" + nameHTML + "</div>");
 			break;
 		case "Perso":
-			items.push("<div class='objects-item object-perso' title='" + so.Name + "'>");
+			items.push("<div class='objects-item object-perso' title='" + nameHTML + "'>");
 			if(so.hasOwnProperty("Perso")) {
 				items.push(getPersoNameHTML(so.Perso));
 			}
 			items.push("</div>");
 			break;
 		case "Sector":
-			items.push("<div class='objects-item object-sector level-" + level + "' title='" + so.Name + "'>" + so.Name + "</div>");
+			items.push("<div class='objects-item object-sector level-" + level + "' title='" + nameHTML + "'>" + nameHTML + "</div>");
 			break;
 		case "IPO":
 		case "IPO_2":
-			items.push("<div class='objects-item object-IPO level-" + level + "' title='" + so.Name + "'>" + so.Name + "</div>");
+			items.push("<div class='objects-item object-IPO level-" + level + "' title='" + nameHTML + "'>" + nameHTML + "</div>");
 			break;
 		default:
-			items.push("<div class='objects-item object-regular' title='" + so.Name + "'>" + so.Name + "</div>");
+			items.push("<div class='objects-item object-regular' title='" + nameHTML + "'>" + nameHTML + "</div>");
 			break;
 			
 	}
@@ -1507,7 +1524,7 @@ function handleMessage_highlight(msg) {
 			highlight += "<div class='highlight-header'>Graph:</div><div class='highlight-waypoint'>";
 			$.each(msg.WayPoint.Graphs, function (idx, graph) {
 				if(graph !== null) {
-					highlight += "<div class='highlight-graphName'>" + graph.Name + "</div>";
+					highlight += "<div class='highlight-graphName'>" + escapeHTML(graph.Name) + "</div>";
 				}
 			});
 			highlight += "</div>";
@@ -1614,18 +1631,19 @@ function initGame(gameJSON) {
 			versionSelected = true;
 			thisVersionSelected = true;
 		}
+		let nameHTML = escapeHTML(value.name);
 		if(thisVersionSelected) {
 			levels_sidebar.addClass('loading-sidebar');
 			levels_header.addClass('loading-header');
 			levels_actors_group.addClass('loading');
 			clickVersion_onEndLoading(value.json);
 			$(".current-version-item").removeClass("current-version-item");
-			items.push("<div class='version-item current-version-item' data-version='" + value.json + "' title='" + value.name + "' data-logo='" + encodeURI(value.image) + "'>");
+			items.push("<div class='version-item current-version-item' data-version='" + value.json + "' title='" + nameHTML + "' data-logo='" + encodeURI(value.image) + "'>");
 		} else {
-			items.push("<div class='version-item' data-version='" + value.json + "' title='" + value.name + "' data-logo='" + encodeURI(value.image) + "'>");
+			items.push("<div class='version-item' data-version='" + value.json + "' title='" + nameHTML + "' data-logo='" + encodeURI(value.image) + "'>");
 		}
-		items.push("<div class='version-item-image' style='background-image: url(\"" + encodeURI(value.image) + "\");' alt='" + value.name + "'></div>");
-		items.push("<div class='version-item-name'>" + value.name + "</div></div>");
+		items.push("<div class='version-item-image' style='background-image: url(\"" + encodeURI(value.image) + "\");' alt='" + nameHTML + "'></div>");
+		items.push("<div class='version-item-name'>" + nameHTML + "</div></div>");
 	});
 	/*if(!isLoading) {
 		$("#btn-home").addClass("current-game-item");
@@ -1742,9 +1760,11 @@ function initVersion(versionJSON) {
 				if(requiresActor2) actorParams += "&a2=" + actor2_selector.val();
 			}
 
+			let nameHTML = escapeHTML(value.name);
+
 			//items.push("<a class='logo-item' href='#" + value.json + "' title='" + value.title + "'><img src='" + encodeURI(value.image) + "' alt='" + value.title + "'></a>");
 			if(levelsJSON.mode === mode && folder === levelFolder && value.level === lvl) {
-				items.push("<div class='levels-item level current-levels-item' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></div>");
+				items.push("<div class='levels-item level current-levels-item' title='" + nameHTML + "'><div class='name'>" + nameHTML + "</div><div class='internal-name'>" + value.level + "</div></div>");
 				document.title = " [" + levelsJSON.name + "] " + value.name + " - " + baseTitle;
 			} else {
 				let actorHTML = "";
@@ -1753,7 +1773,7 @@ function initVersion(versionJSON) {
 					if(requiresActor2) actorHTML += "data-actor2='" + actor2_selector.val() + "' ";
 					if(requiresActor1 || requiresActor2) actorHTML += "' data-url-params='" + escapeHTML(urlParams) + "' ";
 				}
-				items.push("<a class='levels-item level' " + actorHTML + "href='index.html" + urlParams + actorParams + "' title='" + value.name + "'><div class='name'>" + value.name + "</div><div class='internal-name'>" + value.level + "</div></a>");
+				items.push("<a class='levels-item level' " + actorHTML + "href='index.html" + urlParams + actorParams + "' title='" + nameHTML + "'><div class='name'>" + nameHTML + "</div><div class='internal-name'>" + value.level + "</div></a>");
 			}
 			totalEm += 2;
 		});
@@ -1766,7 +1786,7 @@ function initVersion(versionJSON) {
 			if(levelsJSON.icons.length > index+1 && levelsJSON.icons[index+1].level < value.level+7) {
 				iconClass = iconClass + " small";
 			}
-			let iconSidebar = "<div class='sidebar-button' style='background-image: url(\"" + encodeURI(value.image) + "\");'></div>";
+			let iconSidebar = "<div class='sidebar-button'><div class='sidebar-button-image' style='background-image: url(\"" + encodeURI(value.image) + "\");'></div></div>";
 			items.push("<div class='" + iconClass + "' style='background-image: url(\"" + encodeURI(value.image) + "\"); top: " + emDistance*(value.level) + "em;'></div>");
 			sidebarItems.push(iconSidebar);
 		});
@@ -2412,7 +2432,7 @@ $(function() {
 	
 	$('#content-levels').bind('jsp-scroll-y', function(event, scrollPositionY, isAtTop, isAtBottom) {
 		waitForFinalEvent(function(){
-				setLevelsSidebarSlider(scrollPositionY);
+				setLevelsSidebarSlider(scrollPositionY, isAtTop, isAtBottom);
 			}, 20, "scrolly scrolly");
 		}
 	)
