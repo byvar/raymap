@@ -1856,6 +1856,36 @@ a.config-header {
 
 
 
+/* ============================== HIGHLIGHT.JS ============================= */
+
+
+.hljs {
+	display: block;
+}
+  
+
+.hljs-keyword,
+.hljs-attribute,
+.hljs-selector-tag,
+.hljs-meta-keyword,
+.hljs-doctag,
+.hljs-name {
+	font-weight: 900;
+}
+.hljs-title,
+.hljs-section {
+	font-weight: 900;
+}
+/* Misc effects */
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: 900;
+}
+
 /* ============================== MOBILE ONLY ============================== */
 .mobile-tabswitch-button {
 	display: none;

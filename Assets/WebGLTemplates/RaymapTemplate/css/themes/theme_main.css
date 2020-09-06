@@ -518,6 +518,65 @@ a.config-header:hover {
   background-color: #06566d;
 }
 
+/* ============================= HIGHLIGHT.JS ============================= */
+/* Base color: saturation 0; */
+.hljs,
+.hljs-subst {
+  color: #9ed9a0;
+}
+
+.hljs-comment {
+  color: #888888;
+}
+
+/* User color: hue: 0 */
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #19c8c3;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #880000;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #BC6060;
+}
+
+/* Language color: hue: 90; */
+.hljs-literal {
+  color: #78a960;
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #397300;
+}
+
+/* Meta color: hue: 200 */
+.hljs-meta {
+  color: #1f7199;
+}
+
+.hljs-meta-string {
+  color: #4d99bf;
+}
+
 .game-item-logo,
 .version-item-image {
   filter: drop-shadow(2px 2px 0.5px #0004);
