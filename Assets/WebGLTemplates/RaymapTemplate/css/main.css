@@ -1071,9 +1071,29 @@ a:focus {
 	bottom: 0;
 }
 
-
-.loading {
+.loadable {
+	opacity: 1;
+	visibility: visible;
+	transition: visibility 0s, opacity .4s;
+	-moz-transition: visibility 0s, opacity .4s;
+	-webkit-transition: visibility 0s, opacity .4s;
+}
+.loadable-header {
+	transition: color .4s;
+	-moz-transition: color .4s;
+	-webkit-transition: color .4s;
+}
+.loading-header {
+	pointer-events: none;
+}
+.loading,
+.levels-actor-input-group.hidden {
 	opacity: 0 !important;
+	visibility: hidden !important;
+	transition: visibility 0s .4s, opacity .4s;
+	-moz-transition: visibility 0s .4s, opacity .4s;
+	-webkit-transition: visibility 0s .4s, opacity .4s;
+	pointer-events: none;
 }
 
 .loading-sidebar {
@@ -1176,11 +1196,6 @@ a:focus {
 	-moz-transition: opacity .4s;
 	-webkit-transition: opacity .4s;
 	opacity: 1;
-}
-.levels-actor-input-group.loading,
-.levels-actor-input-group.hidden {
-	opacity: 0;
-	pointer-events: none;
 }
 .small-footer-right {
 	display: block;
@@ -1658,21 +1673,6 @@ input[type=range]::-ms-fill-upper {
 .column-levels {
 	flex: 1 1 auto;
 	width: 50%;
-}
-#content-versions,
-#content-levels,
-#content-games {
-	opacity: 1;
-	transition: opacity .4s;
-	-moz-transition: opacity .4s;
-	-webkit-transition: opacity .4s;
-}
-#header-versions,
-#header-levels,
-#header-games {
-	transition: color .4s;
-	-moz-transition: color .4s;
-	-webkit-transition: color .4s;
 }
 #script-popup,
 #localization-popup,

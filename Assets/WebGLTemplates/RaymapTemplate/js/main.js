@@ -1805,6 +1805,7 @@ function initVersion(versionJSON) {
 		levels_content.removeClass('loading');
 		levels_actors_group.removeClass('loading');
 		api.reinitialise();
+		setLevelsSidebarSlider(0, true, api.getContentPane().height() <= levels_content.height());
 		api.scrollToPercentY(0, false);
 	}, 100);
 }
