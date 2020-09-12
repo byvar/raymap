@@ -26,6 +26,9 @@ namespace OpenSpace.Loader {
 		public PBT[] pbt = new PBT[2];
 		public LMS lms;
 
+		public string[] languages_voice;
+		public string[] languages_voice_loc;
+
 		protected override async UniTask Load() {
 			try {
 				if (gameDataBinFolder == null || gameDataBinFolder.Trim().Equals("")) throw new Exception("GAMEDATABIN folder doesn't exist");
@@ -149,6 +152,18 @@ namespace OpenSpace.Loader {
 			return null;
 		}
 
+
+
+		public void ReadLanguagesVoice(Reader reader, Pointer off_languages, uint num_languages) {
+			languages_voice = new string[num_languages];
+			languages_voice_loc = new string[num_languages];
+			for (uint i = 0; i < num_languages; i++) {
+				languages_voice[i] = reader.ReadString(0x14);
+				languages_voice_loc[i] = reader.ReadString(0x14);
+				//print(languages[i] + " - " + languages_loc[i]);
+			}
+		}
+
 		#region FIX
 		Pointer off_animBankFix;
 		async UniTask LoadFIX() {
@@ -179,7 +194,7 @@ namespace OpenSpace.Loader {
 				ReadLanguages(reader, off_languages_subtitles, num_languages_subtitles);
 			});
 			Pointer.DoAt(ref reader, off_languages_voice, () => {
-				ReadLanguages(reader, off_languages_voice, num_languages_voice);
+				ReadLanguagesVoice(reader, off_languages_voice, num_languages_voice);
 			});
 
 			int sz_entryActions = 0xC0;
