@@ -1723,7 +1723,7 @@ input[type=range]::-ms-fill-upper {
 	transform: translate(-50%,50%);
 	font-size: 1.1em;
 	height: auto;
-	width: 51.1em;
+	width: 60em;
 	z-index: 140;
 	transition: 0.6s;
 	border-radius: 2em;

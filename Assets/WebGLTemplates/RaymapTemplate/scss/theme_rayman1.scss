@@ -1,11 +1,11 @@
 @use 'colors' with (
     // Colors
-    $color:            hsl(32, 60%, 80%),
-    $color_highlight:  hsl(32, 100%, 55%),
-    $color_bg_light:   hsl(282, 40%, 25%),
-    $color_bg_dark:    hsl(282, 40%, 16%),
-    $color_bg_darker:  hsl(282, 40%, 22%),
-    $color_bg_darkest: hsl(282, 40%, 3%),
+    $color:            hsl(32, 100%, 80%),
+    $color_highlight:  hsl(359, 100%, 90%),
+    $color_bg_light:   hsl(320, 70%, 26%),
+    $color_bg_dark:    hsl(320, 70%, 16%),
+    $color_bg_darker:  hsl(320, 70%, 22%),
+    $color_bg_darkest: hsl(320, 70%, 8%),
     $color_range_blue: #2a6495,
 
     $color_cube_selection: orange,
