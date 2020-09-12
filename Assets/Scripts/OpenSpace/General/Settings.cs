@@ -1078,9 +1078,7 @@ namespace OpenSpace {
 			luminosity = 0.3f,
 			saturate = false,
 			caps = new Dictionary<CapsType, Caps>() {
-				{ CapsType.LevelFile, Caps.None },
-				{ CapsType.Fix, Caps.None },
-				{ CapsType.TextureFile, Caps.Normal },
+				{ CapsType.All, Caps.All }
 			},
 		};
 		public static Settings LargoWinchPC = new Settings() {

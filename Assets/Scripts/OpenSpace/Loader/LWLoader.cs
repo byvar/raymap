@@ -79,11 +79,11 @@ namespace OpenSpace.Loader {
 					}
 					ReadLargoLVL(Mem.Fix, fixFolder + ConvertCase("Fix.dmp", Settings.CapsType.LevelFile));
 					ReadLargoLVL(Mem.Lvl, lvlFolder + ConvertCase(lvlName + ".dmp", Settings.CapsType.LevelFile));
-					if (FileSystem.mode != FileSystem.Mode.Web) {
-						pbt[Mem.Fix] = ReadPBT(paths["fix.pbt"], fixFolder + ConvertCase("Fix_PBT.dmp", Settings.CapsType.LevelFile));
-						pbt[Mem.Lvl] = ReadPBT(paths["lvl.pbt"], lvlFolder + ConvertCase(lvlName + "_PBT.dmp", Settings.CapsType.LevelFile));
-						lms = ReadLMS(paths["lvl.lms"]);
-					}
+					
+					pbt[Mem.Fix] = ReadPBT(paths["fix.pbt"], fixFolder + ConvertCase("Fix_PBT.dmp", Settings.CapsType.LevelFile));
+					pbt[Mem.Lvl] = ReadPBT(paths["lvl.pbt"], lvlFolder + ConvertCase(lvlName + "_PBT.dmp", Settings.CapsType.LevelFile));
+					lms = ReadLMS(paths["lvl.lms"]);
+
 					for (int i = 0; i < loadOrder.Length; i++) {
 						int j = loadOrder[i];
 						if (files_array[j] != null && FileSystem.FileExists(ptrPaths[j])) {
