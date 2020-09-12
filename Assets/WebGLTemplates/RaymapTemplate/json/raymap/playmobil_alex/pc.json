@@ -1,0 +1,22 @@
+{
+	"name": "Alex Builds His Farm (PC)",
+	"image": ".\/img\/logo\/alex_pc.png",
+	"mode": "playmobil_alex_pc",
+	"folder": "alex_pc/gamedata",
+	"levels": [
+		{ "level": "bkgd", "name": "Main Menu" },
+		{ "level": "env_intro", "name": "Intro" },
+		{ "level": "envir_maison_lac", "name": "Pond" },
+		{ "level": "1etage", "name": "(House) First Floor" },
+		{ "level": "2etage", "name": "(House) Second Floor" },
+		{ "level": "Labyrinth", "name": "Maze" },
+		{ "level": "env_poulailler", "name": "Henhouse" },
+		{ "level": "env_ecurie", "name": "Outside the Stable" },
+		{ "level": "ecurie_int", "name": "Stable" },
+		{ "level": "Course", "name": "Race" },
+		{ "level": "env_etable", "name": "Outside the Barn" },
+		{ "level": "barn_test", "name": "Barn" },
+		{ "level": "jardin", "name": "Garden" },
+		{ "level": "Conclusion", "name": "Ending" }
+	]
+}

@@ -116,7 +116,7 @@ namespace OpenSpace.Loader {
 						paths["fix.rtg"] = langDataPath + ConvertCase("Fix.rtg", Settings.CapsType.FixRelocation);
 						paths["fix.dlg"] = langDataPath + ConvertCase("Fix.dlg", Settings.CapsType.LangFix);
 						paths["fix.rtd"] = langDataPath + ConvertCase("Fix.rtd", Settings.CapsType.FixRelocation);
-						paths["fixlvl.rtg"] = langDataPath + lvlFolder + ConvertCase("FixLvl.rtg", Settings.CapsType.FixLvl);
+						paths["fixlvl.rtg"] = langDataPath + langLvlFolder + ConvertCase("FixLvl.rtg", Settings.CapsType.FixLvl);
 					} else {
 						paths["fix.sda"] = null;
 						paths["fix.lng"] = null;
@@ -153,8 +153,8 @@ namespace OpenSpace.Loader {
 					}
 					paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsb", Settings.CapsType.DSB);
 					if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
-						paths["lvl.dsb"] = levelsFolder + lvlFolder + lvlName + ".DSC";
-					}
+						paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsc", Settings.CapsType.DSB);
+                    }
 
 					// Download files
 					foreach (KeyValuePair<string, string> path in paths) {

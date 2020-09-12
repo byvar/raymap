@@ -1,0 +1,19 @@
+{
+	"name": "Laura's Happy Adventures (PC)",
+	"image": ".\/img\/logo\/laura_pc.png",
+	"mode": "playmobil_laura_pc",
+	"folder": "laura_pc/GameData",
+	"levels": [
+		{ "level": "Marelle_4", "name": "Main Menu - Hopscotch" },
+		{ "level": "Intro", "name": "Intro" },
+		{ "level": "1etage", "name": "First Floor" },
+		{ "level": "2etage", "name": "Second Floor" },
+		{ "level": "3rdfloor", "name": "Third Floor" },
+		{ "level": "Grenier", "name": "Attic" },
+		{ "level": "Jardin", "name": "Garden" },
+		{ "level": "Village", "name": "Village" },
+		{ "level": "Cave", "name": "Cellar" },
+		{ "level": "Caverne", "name": "Old Mine" },
+		{ "level": "Fin", "name": "Ending" }
+	]
+}

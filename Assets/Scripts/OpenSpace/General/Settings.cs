@@ -1016,7 +1016,13 @@ namespace OpenSpace {
             luminosity = 0.5f,
             saturate = true,
 			caps = new Dictionary<CapsType, Caps>() {
-				{ CapsType.All, Caps.All }
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.LevelRelocation, Caps.None },
+				{ CapsType.FixRelocation, Caps.None },
+				{ CapsType.LangFix, Caps.None },
+				{ CapsType.LangLevelFile, Caps.None },
+				{ CapsType.LangLevelRelocation, Caps.None },
+				{ CapsType.LangLevelFolder, Caps.None }
 			}
 		};
         public static Settings PlaymobilLauraPC = new Settings() {
@@ -1033,6 +1039,7 @@ namespace OpenSpace {
             saturate = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.LevelRelocation, Caps.None },
 				{ CapsType.FixRelocation, Caps.None },
 				{ CapsType.LangFix, Caps.None },
 				{ CapsType.LangLevelFile, Caps.None },

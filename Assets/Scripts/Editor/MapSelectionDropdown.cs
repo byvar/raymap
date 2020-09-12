@@ -115,7 +115,7 @@ class MapSelectionDropdown : AdvancedDropdown {
 				
 			);
 		}
-		Debug.Log(string.Join("\n",output));
+		//Debug.Log(string.Join("\n",output));
 
 		// Return the output
 		return output;
