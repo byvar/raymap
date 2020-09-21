@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -16,19 +15,19 @@ namespace OpenSpace {
 
 		// Cache for short requests.
 		//private readonly byte[] cache;
-		private int cacheLen;
+		private long cacheLen;
 		//private Stream stream;
 		//private long position = 0;
 		private long? length;
 		//private long cachePosition;
 		//private int cacheCount;
-		private int lastRequestRead = 0;
+		private long lastRequestRead = 0;
 
-		public PartialHttpStream(string url, int cacheLen = CacheLen, long? length = null) {
+		public PartialHttpStream(string url, long cacheLen = CacheLen, long? length = null) {
 			if (string.IsNullOrEmpty(url))
 				throw new ArgumentException("url empty");
-			if (cacheLen <= 0)
-				throw new ArgumentException("cacheLen must be greater than 0");
+			if (cacheLen < 0)
+				throw new ArgumentException("cacheLen must not be less than 0");
 
 			Url = url;
 			this.cacheLen = cacheLen;
@@ -62,7 +61,7 @@ namespace OpenSpace {
 		public int HttpRequestsCount { get; private set; }
 
 		public override void SetLength(long value) { throw new NotImplementedException(); }
-		public void SetCacheLength(int value) {
+		public void SetCacheLength(long value) {
 			cacheLen = value;
 		}
 
@@ -227,7 +226,7 @@ namespace OpenSpace {
 			bool checkIfCanAddCache = true;
 			while (checkIfCanAddCache) {
 				checkIfCanAddCache = false;
-				for(int i = 0; i < caches.Count; i++) {
+				for (int i = 0; i < caches.Count; i++) {
 					byte[] curCache = caches.Values[i];
 					long curPos = caches.Keys[i];
 					if (curPos == position + cache.Length) {
@@ -261,14 +260,14 @@ namespace OpenSpace {
 			caches.Add(position, cache);
 		}
 
-		public async UniTask FillCacheForRead(int count) {
+		public async UniTask FillCacheForRead(long count) {
 			if (count <= 0) return;
 			await MapLoader.WaitIfNecessary();
 
 			// Try to read parts from cache
 			long lastPosition = Position;
 			int numRead = 0;
-			int countInitial = count;
+			long countInitial = count;
 			SortedList<int, int> filledRanges = new SortedList<int, int>();
 			/*IEnumerable<KeyValuePair<long, byte[]>> biggerCache = caches.Where((pair) => (pair.Key >= Position + count));
 			IEnumerable<KeyValuePair<long, byte[]>> smallerCache = caches.Where((pair) => (pair.Key + pair.Value.Length <= Position));
@@ -306,7 +305,7 @@ namespace OpenSpace {
 			}
 			if (count > 0 && Position < Length) {
 				// Need to request from web
-				SortedList<int, int> downloadRanges = new SortedList<int, int>(); // range start relative to Position, range length
+				SortedList<long, long> downloadRanges = new SortedList<long, long>(); // range start relative to Position, range length
 				if (filledRanges.Count > 0) {
 					downloadRanges.Add(0, filledRanges.First().Key);
 					KeyValuePair<int, int> lastFilledRange = filledRanges.Last();
@@ -323,24 +322,25 @@ namespace OpenSpace {
 				} else {
 					downloadRanges.Add(0, count);
 				}
-				foreach (KeyValuePair<int, int> range in downloadRanges) {
+				foreach (KeyValuePair<long, long> range in downloadRanges) {
 					//UnityEngine.Debug.Log("Download range: " + range.Key + " - " + range.Value);
-					if (range.Value > cacheLen) cacheLen = range.Value;
+					long curCacheLen = Math.Max(cacheLen, range.Value);
+					//if (range.Value > cacheLen) cacheLen = range.Value;
 					long rangePos = Position + range.Key;
 					IEnumerable<KeyValuePair<long, byte[]>> biggerCache = caches.Where(c => (c.Key >= rangePos + range.Value));
 					IEnumerable<KeyValuePair<long, byte[]>> smallerCache = caches.Where(c => (c.Key + c.Value.Length <= rangePos));
-					long newDataLength = Math.Min(cacheLen, Length - rangePos);
+					long newDataLength = Math.Min(curCacheLen, Length - rangePos);
 					long startPosition = rangePos;
 					long addLengthBefore = 0;
 					if (biggerCache.Count() > 0) {
-						newDataLength = Math.Min(cacheLen, biggerCache.First().Key - rangePos);
+						newDataLength = Math.Min(curCacheLen, biggerCache.First().Key - rangePos);
 					}
 					long addLengthAfter = newDataLength - range.Value;
-					if (newDataLength < cacheLen && rangePos > 0) {
+					if (newDataLength < curCacheLen && rangePos > 0) {
 						if (smallerCache.Count() > 0) {
-							addLengthBefore = Math.Min(cacheLen, rangePos - (smallerCache.Last().Key + smallerCache.Last().Value.Length));
+							addLengthBefore = Math.Min(curCacheLen, rangePos - (smallerCache.Last().Key + smallerCache.Last().Value.Length));
 						} else {
-							addLengthBefore = Math.Min(cacheLen, rangePos);
+							addLengthBefore = Math.Min(curCacheLen, rangePos);
 						}
 						startPosition -= addLengthBefore;
 						newDataLength += addLengthBefore;
@@ -348,8 +348,8 @@ namespace OpenSpace {
 					//UnityEngine.Debug.Log(range.Key + " - " + range.Value + ": " + Length + " - " + rangePos + " - " + newDataLength);
 					byte[] newData = new byte[newDataLength];
 					await HttpRead(newData, 0, (int)newDataLength, startPosition);
-					int dataRead = lastRequestRead;
-					Array.Resize(ref newData, dataRead);
+					long dataRead = lastRequestRead;
+					Array.Resize(ref newData, (int)dataRead);
 					int numReadLocal = (int)Math.Min(range.Value, dataRead - addLengthBefore);
 					//Array.Copy(newData, addLengthBefore, buffer, offset + range.Key, numReadLocal);
 					AddCache(startPosition, newData);
@@ -370,7 +370,7 @@ namespace OpenSpace {
 			UnityWebRequest www = UnityWebRequest.Get(Url);
 			string state = MapLoader.Loader.loadingState;
 			int totalSize = caches.Sum(c => c.Value.Length);
-			MapLoader.Loader.loadingState = state + "\nDownloading part of bigfile: " + Url.Replace(FileSystem.serverAddress, "") + " (New size: " + Util.SizeSuffix(totalSize + count,0) + "/" + Util.SizeSuffix(Length, 0) + ")";
+			MapLoader.Loader.loadingState = state + "\nDownloading part of bigfile: " + Url.Replace(FileSystem.serverAddress, "") + " (New size: " + Util.SizeSuffix(totalSize + count, 0) + "/" + Util.SizeSuffix(Length, 0) + ")";
 			UnityEngine.Debug.Log("Requesting range: " + string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1) + " - " + Url);
 			www.SetRequestHeader("Range", string.Format("bytes={0}-{1}", startPosition, startPosition + count - 1));
 			try {
