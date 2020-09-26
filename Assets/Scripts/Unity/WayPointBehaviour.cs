@@ -20,6 +20,8 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
     private Vector3 currentPosition = Vector3.zero;
     public float radius;
 
+    public List<WayPointBehaviour> Targets => targets;
+
     public ReferenceFields References { get => ((IReferenceable)wp).References; set => ((IReferenceable)wp).References = value; }
 
     public void Init() {

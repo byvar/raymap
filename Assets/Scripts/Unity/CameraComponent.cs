@@ -44,6 +44,9 @@ public class CameraComponent : MonoBehaviour {
     }
 
     public void JumpTo(GameObject gao) {
+		if (UnitySettings.IsRaymapGame) {
+			return;
+		}
         Vector3? center = null, size = null;
         BasePersoBehaviour bpb = gao.GetComponent<BasePersoBehaviour>();
         if (bpb != null) {

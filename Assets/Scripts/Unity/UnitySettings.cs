@@ -12,6 +12,7 @@ using System.IO;
 public class UnitySettings {
 	private const string editorPrefsPrefix = "Raymap.";
 	private const string settingsFile = "Settings.txt";
+	public static bool IsRaymapGame { get; set; } = false;
 
 	public static Dictionary<Settings.Mode, string> GameDirs = new Dictionary<Settings.Mode, string>();
 	public static Dictionary<Settings.Mode, string> GameDirsWeb = new Dictionary<Settings.Mode, string>();

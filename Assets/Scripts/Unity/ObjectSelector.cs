@@ -115,6 +115,9 @@ public class ObjectSelector : MonoBehaviour {
     }
 
     void Update() {
+        if (UnitySettings.IsRaymapGame) {
+            return;
+        }
         highlightedPerso = null;
         UpdateHighlight();
         highlightedCollision = null;
