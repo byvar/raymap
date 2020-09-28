@@ -81,24 +81,12 @@ public class Controller : MonoBehaviour {
 	public async UniTaskVoid Start() {
 		// Read command line arguments
 		string[] args = System.Environment.GetCommandLineArgs();
-		string modeString = "";
 		string gameDataBinFolder = "";
 		string lvlName = "";
 		string actor1Name = "";
 		string actor2Name = "";
-		Settings.Mode mode = Settings.Mode.Rayman2PC;
-
-		if (Application.platform == RuntimePlatform.WebGLPlayer) {
-			FileSystem.mode = FileSystem.Mode.Web;
-		}
-        #if UNITY_EDITOR
-        if (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL) {
-			FileSystem.mode = FileSystem.Mode.Web;
-		}
-        #endif
-
-        mode = UnitySettings.GameMode;
-		gameDataBinFolder = UnitySettings.GameDirs.ContainsKey(mode) ? UnitySettings.GameDirs[mode] : "";
+		Settings.Mode mode = UnitySettings.GameMode;
+		gameDataBinFolder = UnitySettings.CurrentDirectory;
 		lvlName = UnitySettings.MapName;
 		actor1Name = UnitySettings.Actor1Name;
 		actor2Name = UnitySettings.Actor2Name;
@@ -106,69 +94,10 @@ public class Controller : MonoBehaviour {
 		ExportPath = UnitySettings.ExportPath;
 		ExportAfterLoad = UnitySettings.ExportAfterLoad;
         ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoad;
-		if (FileSystem.mode == FileSystem.Mode.Web) {
-			gameDataBinFolder = UnitySettings.GameDirsWeb.ContainsKey(mode) ? UnitySettings.GameDirsWeb[mode] : "";
-		} else {
+		if (FileSystem.mode != FileSystem.Mode.Web) {
 			if (UnitySettings.LoadFromMemory) {
 				lvlName = UnitySettings.ProcessName + ".exe";
 			}
-		}
-
-		// Override loaded settings with args
-		for (int i = 0; i < args.Length; i++) {
-			switch (args[i]) {
-				case "--lvl":
-				case "-l":
-					lvlName = args[i + 1];
-					i++;
-					break;
-				case "--folder":
-				case "--directory":
-				case "-d":
-				case "-f":
-					gameDataBinFolder = args[i + 1];
-					i++;
-					break;
-				case "--mode":
-				case "-m":
-					modeString = args[i + 1];
-					i++;
-					break;
-				case "--actor1":
-				case "-a1":
-					actor1Name = args[i + 1];
-					i++;
-					break;
-				case "--actor2":
-				case "-a2":
-					actor2Name = args[i + 1];
-					i++;
-					break;
-				case "--export":
-					ExportPath = args[i + 1];
-					if (!string.IsNullOrEmpty(ExportPath)) {
-						ExportAfterLoad = true;
-					}
-					i++;
-					break;
-                case "--screenshot":
-                    UnitySettings.ScreenshotPath = args[i + 1];
-                    if (!string.IsNullOrEmpty(UnitySettings.ScreenshotPath)) {
-                        ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic;
-                    }
-                    i++;
-                    break;
-                case "--screenshot-topdown":
-                    UnitySettings.ScreenshotPath = args[i + 1];
-                    if (!string.IsNullOrEmpty(UnitySettings.ScreenshotPath)) {
-                        ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic;
-                    }
-                    i++;
-                    break;
-				case "--allowDeadPointers":
-					UnitySettings.AllowDeadPointers = true;
-					break;
-            }
 		}
 		Application.logMessageReceived += Log;
 
@@ -176,41 +105,6 @@ public class Controller : MonoBehaviour {
 			//Application.logMessageReceived += communicator.WebLog;
 			//UnityEngine.Debug.unityLogger.logEnabled = false; // We don't need prints here
 			UnityEngine.Debug.unityLogger.filterLogType = LogType.Assert;
-			string url = Application.absoluteURL;
-			if (url.IndexOf('?') > 0) {
-				string urlArgsStr = url.Split('?')[1].Split('#')[0];
-				if (urlArgsStr.Length > 0) {
-					string[] urlArgs = urlArgsStr.Split('&');
-					foreach (string arg in urlArgs) {
-						string[] argKeyVal = arg.Split('=');
-						if (argKeyVal.Length > 1) {
-							switch (argKeyVal[0]) {
-								case "lvl":
-									lvlName = argKeyVal[1]; break;
-								case "mode":
-									modeString = argKeyVal[1]; break;
-								case "folder":
-								case "directory":
-								case "dir":
-									gameDataBinFolder = argKeyVal[1]; break;
-								case "actor1":
-								case "act1":
-								case "a1":
-									actor1Name = argKeyVal[1]; break;
-								case "actor2":
-								case "act2":
-								case "a2":
-									actor2Name = argKeyVal[1]; break;
-								case "allowDeadPointers":
-									UnitySettings.AllowDeadPointers = true; break;
-							}
-						}
-					}
-				}
-			}
-		}
-		if (Settings.cmdModeNameDict.ContainsKey(modeString)) {
-			mode = Settings.cmdModeNameDict[modeString];
 		}
 		loadingScreen.Active = true;
 		Settings.Init(mode);

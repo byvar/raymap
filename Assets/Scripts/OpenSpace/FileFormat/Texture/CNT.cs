@@ -90,7 +90,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public async UniTask Init(int readerIndex, Reader reader) {
 			PartialHttpStream httpStream = reader.BaseStream as PartialHttpStream;
-			if(httpStream != null) await httpStream.FillCacheForRead(11);
+			if(httpStream != null) await httpStream.FillCacheForRead(11 + 4);
             int localDirCount = reader.ReadInt32();
             int localFileCount = reader.ReadInt32();
             directoryCount += localDirCount;
@@ -105,8 +105,9 @@ namespace OpenSpace.FileFormat.Texture {
 			if (httpStream != null) await httpStream.FillCacheForRead(300 * localDirCount);
 			await MapLoader.WaitIfNecessary();
 			for (int i = 0; i < localDirCount; i++) {
-				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4));
-				int strLen = reader.ReadInt32();
+                //if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(4));
+                int strLen = reader.ReadInt32();
+                if (httpStream != null) await httpStream.FillCacheForRead(4 + strLen);
                 string directory = "";
 
                 if (isXor != 0 || isChecksum != 0) {
@@ -128,6 +129,7 @@ namespace OpenSpace.FileFormat.Texture {
             }
 
             // Load and check version
+            if (httpStream != null) await httpStream.FillCacheForRead(1 + 8);
             //if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(1));
             byte directoryChecksum = reader.ReadByte();
             if (directoryChecksum != curChecksum) {
@@ -141,6 +143,7 @@ namespace OpenSpace.FileFormat.Texture {
 				//if (httpStream != null) yield return c.StartCoroutine(httpStream.FillCacheForRead(8));
 				int dirIndex = reader.ReadInt32();
                 int strLen = reader.ReadInt32();
+                if (httpStream != null) await httpStream.FillCacheForRead(8 + strLen + 16);
 
                 string file = "";
 
@@ -154,9 +157,7 @@ namespace OpenSpace.FileFormat.Texture {
                 } else {
                     file = reader.ReadString(strLen);
                 }
-
-                byte[] fileXorKey = new byte[4];
-                reader.Read(fileXorKey, 0, 4);
+                byte[] fileXorKey = reader.ReadBytes(4);
 
                 uint fileChecksum = reader.ReadUInt32();
 
