@@ -1,0 +1,89 @@
+{
+	"categories": [
+		{
+			"name": "Rayman series",
+			"games": [
+				{
+					"title": "Rayman 2 / Revolution",
+					"viewer": "raymap",
+					"json": "r2",
+					"image": ".\/img\/logo\/r2.png",
+					"versions": [
+						{
+							"json": "dc",
+							"image": ".\/img\/version\/dc.png",
+							"name": "Dreamcast",
+							"folder": "r2_dc"
+						},
+						{
+							"json": "pc",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC",
+							"folder": "r2_pc"
+						},
+						{
+							"json": "ps1",
+							"image": ".\/img\/version\/ps1.png",
+							"name": "PlayStation",
+							"folder": "r2_ps1"
+						},
+						{
+							"json": "ps2",
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2: Revolution",
+							"folder": "r2_ps2"
+						},
+						{
+							"json": "n64",
+							"image": ".\/img\/version\/n64.png",
+							"name": "Nintendo 64",
+							"folder": "r2_n64"
+						},
+						{
+							"json": "ds",
+							"image": ".\/img\/version\/ds.png",
+							"name": "Nintendo DS",
+							"folder": "r2_ds"
+						},
+						{
+							"json": "3ds",
+							"image": ".\/img\/version\/3ds.png",
+							"name": "Nintendo 3DS",
+							"folder": "r2_3ds"
+						},
+						{
+							"json": "ios",
+							"image": ".\/img\/version\/ios.png",
+							"name": "iOS",
+							"folder": "r2_ios"
+						},
+						{
+							"json": "dc_jp",
+							"image": ".\/img\/version\/dc.png",
+							"name": "Dreamcast (Japanese)",
+							"folder": "r2_dc_jp"
+						},
+						{
+							"json": "ps2_jp",
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2: Revolution (Japanese)",
+							"folder": "r2_ps2_jp"
+						},
+						{
+							"json": "pc_demo_19990818",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo (1999\/08\/18)",
+							"folder": "r2_pc_demo_19990818"
+						},
+						{
+							"json": "pc_demo_19990904",
+							"image": ".\/img\/version\/pc.png",
+							"name": "PC Demo (1999\/09\/04)",
+							"folder": "r2_pc_demo_19990904"
+						}
+					]
+				}
+			]
+		}
+	]
+}

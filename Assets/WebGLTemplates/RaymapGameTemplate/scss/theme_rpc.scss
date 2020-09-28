@@ -1,0 +1,19 @@
+@use 'colors' with (
+    // Colors
+    $color: #cef582,
+    $color_highlight: #ffe74a,
+    $color_bg_light: rgba(35,52,55,1),
+    $color_bg_dark: rgba(27,38,40,1),
+    $color_bg_darker: rgb(17,22,23),
+    $color_bg_darkest: rgb(17,22,23),
+    $color_range_blue: #2a6495,
+
+    $color_cube_selection: orange,
+
+    $color_cube_front:  hsl(189, 90%, 30%),
+    $color_cube_right:  hsl(189, 90%, 40%),
+    $color_cube_back:   hsl(189, 90%, 20%),
+    $color_cube_left:   hsl(189, 90%, 10%),
+    $color_cube_top:    hsl(189, 90%, 35%),
+    $color_cube_bottom: hsl(189, 90%, 15%)
+);

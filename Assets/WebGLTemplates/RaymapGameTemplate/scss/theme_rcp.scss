@@ -1,0 +1,25 @@
+@use 'colors' with (
+    // Colors
+    $color: #dcddd4,
+    $color_highlight: #9085ff,
+    $color_bg_light: #36393f,
+    $color_bg_dark: #2c2c2c,
+    $color_bg_darker: #252525,
+    $color_bg_darkest: #1a1a1a,
+    $color_range_blue: #2a6495,
+
+    $color_cube_selection: orange,
+
+    $color_cube_front:  hsl(245, 43%, 30%),
+    $color_cube_right:  hsl(245, 43%, 40%),
+    $color_cube_back:   hsl(245, 43%, 20%),
+    $color_cube_left:   hsl(245, 43%, 10%),
+    $color_cube_top:    hsl(245, 43%, 35%),
+    $color_cube_bottom: hsl(245, 43%, 15%)
+);
+
+$color_header: #5950b9;
+
+.column-header {
+    background-color: $color_header;
+}

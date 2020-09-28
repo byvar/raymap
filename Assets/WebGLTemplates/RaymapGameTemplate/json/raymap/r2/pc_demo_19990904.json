@@ -1,0 +1,10 @@
+{
+    "name": "Rayman 2 (PC) - Demo (1999\/09\/04)",
+    "image": ".\/img\/logo\/r2_pc.png",
+    "mode": "r2_pc_demo_19990904",
+    "folder": "r2_pc_demo_19990904",
+    "levels": [
+        { "level": "Bast_20", "name": "The Fairy Glade 3" },
+        { "level": "Bast_22", "name": "The Fairy Glade 4" }
+    ]
+}

@@ -1,0 +1,42 @@
+#text-highlight-tooltip.rayman-2 .dialog-color {
+	/* Font height = 1em. Span surrounds font with no padding. Line height = 1.5em */
+	background: repeating-linear-gradient(to bottom, white 0em, transparent 1em, transparent 1.25em, white 1.25em, white 1.5em);
+    -webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+#text-highlight-tooltip.rayman-2 .color-0 {
+    background-color: #6EBEFF !important;
+}
+
+#text-highlight-tooltip.rayman-2 .color-200 {
+    background-color: #FA4646 !important;
+}
+
+#text-highlight-tooltip.rayman-2 .color-400 {
+    background-color: #FFFF78 !important;
+}
+
+#text-highlight-tooltip.rayman-2 .color-600 {
+    background-color: #6EBEFF !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-0 {
+    color: #6EBEFF !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-200 {
+    color: #FA4646 !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-400 {
+    color: #FFFF78 !important;
+}
+
+#text-highlight-tooltip:not(rayman-2) .color-600 {
+    color: #6EBEFF !important;
+}
+.center {
+	text-align: center;
+}

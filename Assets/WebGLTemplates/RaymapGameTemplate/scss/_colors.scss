@@ -1,0 +1,559 @@
+// Colors
+$color: rgb(158, 217, 160) !default;
+$color_highlight: rgb(25, 200, 195) !default;
+$color_bg_light: rgb(6, 86, 109) !default;
+$color_bg_dark: rgb(3, 61, 82) !default;
+$color_bg_darker: rgb(0, 77, 101) !default;
+$color_bg_darkest: rgb(1, 33, 45) !default;
+$color_range_blue: #2a6495 !default;
+
+$color_0: rgba($color, 0) !default;
+$color_05: rgba($color, 0.5) !default;
+$color_highlight_0: rgba($color_highlight, 0) !default;
+$color_bg_dark_05: rgba($color_bg_dark, 0.5) !default;
+$color_bg_dark_07:	rgba($color_bg_dark, 0.7) !default;
+$color_bg_darkest_05: rgba($color_bg_darkest, 0.5) !default;
+$color_bg_darkest_07: rgba($color_bg_darkest, 0.7) !default;
+$color_bg_light_07: rgba($color_bg_light, 0.7) !default;
+
+$color_text_bg_normal:	rgba(0,0,0,0.8) !default;
+$color_text_bg_blue:	rgba(27, 48, 115, 0.85) !default;
+$color_text_bg_blue_sh: rgba(0,0,0,0.38) !default;
+
+$color_popup_overlay: rgba(0,0,0,0.5) !default;
+$color_shadow: rgba(0,0,0,0.4) !default;
+$color_cube_selection: orange !default;
+
+$color_cube_front: hsl(193, 90%, 30%) !default;
+$color_cube_right: hsl(193, 90%, 40%) !default;
+$color_cube_back: hsl(193, 90%, 20%) !default;
+$color_cube_left: hsl(193, 90%, 10%) !default;
+$color_cube_top: hsl(193, 90%, 35%) !default;
+$color_cube_bottom: hsl(193, 90%, 15%) !default;
+
+$color_hljs_comment: #888888 !default;
+
+html {
+	/*background: url('../img/background.jpg') no-repeat center center fixed;*/
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+body {
+	/* background: #444; */
+	color: $color;
+}
+
+#header h1 {
+	color: $color_highlight;
+}
+
+#header h1 span {
+	color: $color;
+}
+
+#container {
+    background-color: $color_bg_dark;
+}
+
+#footer a,
+.footer-content a {
+	color: $color_highlight;
+}
+
+#footer a:hover,
+.footer-content a:hover {
+	background: $color_bg_darkest_05;
+}
+
+.column {
+    background-color: $color_bg_light;
+}
+.column-header,
+.column-footer,
+.column-sidebar {
+	color: $color;
+    background-color: $color_bg_dark;
+}
+#game-content {
+	background-color: $color_bg_dark;
+}
+
+.game-item:hover,
+.version-item:hover {
+	background-color: $color_bg_dark;
+}
+
+.game-item,
+.version-item {
+	color: $color;
+}
+
+.current-game-item,
+.current-version-item {
+	color: $color_highlight;
+	background-color: $color_bg_dark_07;
+}
+
+.game-category-item {
+	color: $color;
+	background-color: $color_bg_dark;
+}
+.column-versions,
+.column-levels,
+.column-games {
+	background-color: $color_bg_dark;
+}
+
+/*#content-versions,*/
+#content-levels,
+#content-games {
+    background-color: $color_bg_light;
+}
+#content-versions {
+	background-color: $color_bg_darker;
+}
+
+.progress .full {
+	background: $color_bg_dark;
+	background: linear-gradient(95deg, $color_bg_dark 0%, $color 78%, $color_highlight 100%);
+}
+
+/*.song-item:active,
+.playlist-item:active,
+.game-item:active,
+.custom-active {
+	background-color: $color_bg_darkest_07;
+}*/
+
+.objects-item,
+.levels-item,
+.behaviors-item,
+.dsgvars-item,
+.localization-item,
+.entryactions-item {
+	color: $color;
+}
+
+.current-objects-item {
+	color: $color_highlight;
+	background-color: $color_bg_dark_07;
+}
+.current-levels-item {
+	color: $color_highlight;
+	background-color: $color_bg_dark;
+}
+
+.objects-item.object-world,
+.objects-item.object-sector,
+.levels-item.game,
+.behaviors-item.category,
+.transitions-item.category,
+.localization-item.category,
+.script-item.category {
+	color: $color;
+	background-color: $color_bg_dark;
+}
+.dsgvars-item > .dsgvar-name,
+.dsgvars-item > .dsgvar-type,
+.localization-item > .localization-item-index,
+.entryactions-item > .entryactions-item-name {
+	background-color: $color_bg_dark;
+}
+.dsgvars-item.dsgvar-array:hover > .dsgvar-name,
+.dsgvars-item.dsgvar-array:hover > .dsgvar-type {
+	background-color: $color_bg_darkest;
+}
+.dsgvars-item.dsgvars-header,
+.transitions-item.transitions-header {
+	background-color: $color_bg_dark;
+}
+.objects-item.object-sector:hover,
+.behaviors-item.category:hover,
+.transitions-item.category:hover {
+	background-color: $color_bg_darkest;
+}
+.objects-item.object-world.current-objects-item,
+.objects-item.object-sector.current-objects-item {
+	color: $color_highlight;
+	background-color: $color_bg_darkest;
+}
+.objects-item.object-perso:hover,
+.objects-item.object-IPO:hover,
+.levels-item.level:hover,
+.behaviors-item.behavior:hover,
+.entryactions-item:hover
+.dsgvars-item:hover,
+.selectState:hover,
+.localization-item:hover {
+	background-color: $color_bg_dark;
+}
+
+#highlight-tooltip {
+    background-color: $color_bg_light;
+	color: $color;
+}
+#text-highlight-tooltip {
+    background-color: $color_text_bg_normal;
+	color: white;
+}
+#text-highlight-tooltip.blue {
+	background-color: $color_text_bg_blue;
+	box-shadow: 5px 5px 10px 0px $color_text_bg_blue_sh;
+}
+
+.song-buttons > .song-button {
+	color: $color_bg_light;
+}
+
+.sidebar-button:hover {
+	background-color: $color_bg_darkest_05;
+}
+
+.sidebar-button.sidebar-button-active {
+	background-color: $color_bg_darkest_07;
+}
+
+.sidebar-slider {
+	background-color: $color_bg_darkest_07;
+}
+
+.sidebar-arrow {
+	background-color: $color_bg_light_07;
+}
+
+.playlist-item > .song-remove,
+.faux-playlist-item > .faux-song-remove,
+.playlist-item > .song-handle,
+.faux-playlist-item > .song-handle {
+	color: $color_bg_light;
+}
+
+.playlist-item-placeholder {
+	border: 3px dotted $color_bg_dark;
+	background-color: $color_bg_dark_05;
+}
+
+.ui-sortable-helper,
+.ui-draggable-dragging {
+	background-color: $color_bg_dark !important;
+}
+
+.played {
+	color: $color_highlight;
+}
+
+.current-song {
+	color: $color_highlight;
+	background-color: $color_bg_dark_07;
+}
+
+#footer-soundtrack a {
+	color: $color_highlight;
+}
+
+#footer-soundtrack.loading-header a {
+	color: $color_highlight_0;
+}
+
+#footer-soundtrack:not(.loading-header) a:hover {
+	background: $color_bg_darkest_05;
+}
+
+#footer-playlist {
+	color: $color;
+}
+
+/* ============================== PLAYER ============================== */
+#player-cover {
+	border-color: $color;
+}
+#player-cover.cover-loaded {
+	border-color: $color_bg_dark;
+}
+
+.loading-header {
+	color: $color_0 !important;
+}
+
+/* ============================== HEADER BUTTONS ============================== */
+.header-button {
+	color: $color;
+}
+
+.header-button:hover {
+	background: $color_bg_darkest_05;
+}
+.header-button.selected {
+	color: $color_highlight;
+	background-color: $color_bg_darkest;
+}
+.header-button.disabled-button {
+	color: $color_bg_light;
+	background-color: transparent;
+}
+input[type=range]::-webkit-slider-thumb {
+    background: $color; /* Green background */
+}
+
+input[type=range]::-moz-range-thumb {
+    background: $color; /* Green background */
+}
+input[type=range]::-webkit-slider-runnable-track {
+  background: $color_bg_darkest;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: $color_bg_darkest;
+}
+
+input[type=range]::-moz-range-track {
+  background: $color_bg_darkest;
+}
+input[type=range]::-ms-fill-lower {
+  background: $color_range_blue;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: $color_bg_darkest;
+}
+input[type=range]::-ms-fill-upper {
+  background: $color_bg_darkest;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: $color_bg_darkest;
+}
+
+#header-playlist-info {
+	color: $color;
+}
+
+#popup-overlay {
+	background-color: $color_popup_overlay;
+}
+#dialogue-content {
+    background-color: $color_bg_dark;
+}
+.share-button {
+	background-color: $color_bg_dark;
+	color: $color;
+}
+.share-button:hover {
+	background: $color_bg_darkest;
+}
+#cover-popup {
+    background-color: $color_bg_dark;	
+}
+.cover-button {
+	background-color: $color_bg_dark;
+}
+.cover-button:hover {
+	background: $color_bg_darkest;
+}
+.cover-button.disabled-button {
+	color: $color_bg_light;
+}
+#notification-popup {
+	-webkit-box-shadow: $color_shadow 0px 0 10px;
+	-moz-box-shadow: $color_shadow 0 0 10px;
+	box-shadow: $color_shadow 0 0 10px;
+    background-color: $color_bg_dark;
+}
+.config-header {
+	color: $color;
+	background-color: $color_bg_dark;
+}
+a.config-header:hover {
+	color: $color_highlight;
+	background-color: $color_bg_darkest;
+}
+#levelselect-popup,
+#script-popup,
+#localization-popup,
+#config-popup,
+#entryactions-popup,
+.info-content {
+    background-color: $color_bg_light;
+}
+#camera-popup,
+#cine-popup,
+#info-popup {
+	background-color: $color_bg_dark;
+}
+.style-item.current-style-item {
+	background-color: $color_bg_dark_07;
+	color: $color_highlight;
+}
+.style-item:hover {
+	background-color: $color_bg_dark;
+}
+/* ============================== MOBILE ONLY ============================== */
+.mobile-tabswitch-button {
+	background: $color_bg_darkest_05;
+	color: $color;
+}
+.mobile-tabswitch-button:hover {
+	background: $color_bg_darkest;
+}
+.mobile-tabswitch-button.disabled-button {
+	color: $color_bg_light;
+}
+.mobile-tabswitch-button.highlighted-button {
+	color: $color_highlight;
+}
+
+/* MEDIA QUERIES */
+@media only screen and (max-width: 900px) {
+    html {
+		background-color: $color_bg_dark;
+		background-image: none;
+    }
+	#container {
+		background-color: transparent;
+	}
+	
+	#container:before {
+	  background-image: none;
+	}
+
+	.column-content {
+		background-color: $color_bg_light;
+	}
+	.song-buttons > .song-button,
+    .playlist-item > .song-remove,
+	.faux-playlist-item > .faux-song-remove,
+    .playlist-item > .song-handle,
+	.faux-playlist-item > .song-handle {
+		color: inherit;
+	}
+}
+
+
+/* ============================== JSCROLLPANE ============================== */
+.jspTrack {
+	background: $color_bg_dark_07;
+}
+.jspDrag {
+	background: $color_bg_darkest_07;
+}
+.jspArrow {
+	background: #50506d;
+}
+.jspArrow.jspDisabled {
+	background: #80808d;
+}
+.jspCorner {
+	background: #eeeef4;
+}
+
+/* ============================== CAMERA CUBE ============================== */
+.cube__face {
+  color: $color;
+}
+.cube__face:hover {
+  color: $color_cube_selection;
+  border-color: $color_cube_selection;
+}
+
+.cube__face--front  { background: $color_cube_front; }
+.cube__face--right  { background: $color_cube_right; }
+.cube__face--back   { background: $color_cube_back; }
+.cube__face--left   { background: $color_cube_left; }
+.cube__face--top    { background: $color_cube_top; }
+.cube__face--bottom { background: $color_cube_bottom; }
+
+
+/* ============================== STATE DIAGRAM ============================== */
+
+.state-diagram-container {
+    background-color: $color_bg_dark;
+}
+
+/* Following classes are only read from javascript, in statediagram.html */
+.state-diagram-arrow-normal {
+	color: $color;
+}
+.state-diagram-arrow-reflex {
+	color: $color;
+}
+.state-diagram-state-selected {
+    background-color: $color_bg_light;
+    color: $color;
+}
+.state-diagram-state {
+    background-color: $color_bg_dark_05;
+    color: $color_05;
+}
+.state-diagram-header {
+    background-color: $color_bg_light;
+}
+
+
+
+/* ============================= HIGHLIGHT.JS ============================= */
+
+/* Base color: saturation 0; */
+
+.hljs,
+.hljs-subst {
+  color: $color;
+}
+
+.hljs-comment {
+  color: $color_hljs_comment;
+}
+
+
+/* User color: hue: 0 */
+
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: $color_highlight;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #880000;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #BC6060;
+}
+
+
+/* Language color: hue: 90; */
+
+.hljs-literal {
+  color: rgb(120, 169, 96);
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #397300;
+}
+
+
+/* Meta color: hue: 200 */
+
+.hljs-meta {
+  color: #1f7199;
+}
+
+.hljs-meta-string {
+  color: #4d99bf;
+}

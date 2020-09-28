@@ -1,0 +1,580 @@
+html {
+  /*background: url('../img/background.jpg') no-repeat center center fixed;*/
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body {
+  /* background: #444; */
+  color: #cef582;
+}
+
+#header h1 {
+  color: #ffe74a;
+}
+
+#header h1 span {
+  color: #cef582;
+}
+
+#container {
+  background-color: #1b2628;
+}
+
+#footer a,
+.footer-content a {
+  color: #ffe74a;
+}
+
+#footer a:hover,
+.footer-content a:hover {
+  background: rgba(17, 22, 23, 0.5);
+}
+
+.column {
+  background-color: #233437;
+}
+
+.column-header,
+.column-footer,
+.column-sidebar {
+  color: #cef582;
+  background-color: #1b2628;
+}
+
+#game-content {
+  background-color: #1b2628;
+}
+
+.game-item:hover,
+.version-item:hover {
+  background-color: #1b2628;
+}
+
+.game-item,
+.version-item {
+  color: #cef582;
+}
+
+.current-game-item,
+.current-version-item {
+  color: #ffe74a;
+  background-color: rgba(27, 38, 40, 0.7);
+}
+
+.game-category-item {
+  color: #cef582;
+  background-color: #1b2628;
+}
+
+.column-versions,
+.column-levels,
+.column-games {
+  background-color: #1b2628;
+}
+
+/*#content-versions,*/
+#content-levels,
+#content-games {
+  background-color: #233437;
+}
+
+#content-versions {
+  background-color: #111617;
+}
+
+.progress .full {
+  background: #1b2628;
+  background: linear-gradient(95deg, #1b2628 0%, #cef582 78%, #ffe74a 100%);
+}
+
+/*.song-item:active,
+.playlist-item:active,
+.game-item:active,
+.custom-active {
+	background-color: $color_bg_darkest_07;
+}*/
+.objects-item,
+.levels-item,
+.behaviors-item,
+.dsgvars-item,
+.localization-item,
+.entryactions-item {
+  color: #cef582;
+}
+
+.current-objects-item {
+  color: #ffe74a;
+  background-color: rgba(27, 38, 40, 0.7);
+}
+
+.current-levels-item {
+  color: #ffe74a;
+  background-color: #1b2628;
+}
+
+.objects-item.object-world,
+.objects-item.object-sector,
+.levels-item.game,
+.behaviors-item.category,
+.transitions-item.category,
+.localization-item.category,
+.script-item.category {
+  color: #cef582;
+  background-color: #1b2628;
+}
+
+.dsgvars-item > .dsgvar-name,
+.dsgvars-item > .dsgvar-type,
+.localization-item > .localization-item-index,
+.entryactions-item > .entryactions-item-name {
+  background-color: #1b2628;
+}
+
+.dsgvars-item.dsgvar-array:hover > .dsgvar-name,
+.dsgvars-item.dsgvar-array:hover > .dsgvar-type {
+  background-color: #111617;
+}
+
+.dsgvars-item.dsgvars-header,
+.transitions-item.transitions-header {
+  background-color: #1b2628;
+}
+
+.objects-item.object-sector:hover,
+.behaviors-item.category:hover,
+.transitions-item.category:hover {
+  background-color: #111617;
+}
+
+.objects-item.object-world.current-objects-item,
+.objects-item.object-sector.current-objects-item {
+  color: #ffe74a;
+  background-color: #111617;
+}
+
+.objects-item.object-perso:hover,
+.objects-item.object-IPO:hover,
+.levels-item.level:hover,
+.behaviors-item.behavior:hover,
+.entryactions-item:hover .dsgvars-item:hover,
+.selectState:hover,
+.localization-item:hover {
+  background-color: #1b2628;
+}
+
+#highlight-tooltip {
+  background-color: #233437;
+  color: #cef582;
+}
+
+#text-highlight-tooltip {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+#text-highlight-tooltip.blue {
+  background-color: rgba(27, 48, 115, 0.85);
+  box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.38);
+}
+
+.song-buttons > .song-button {
+  color: #233437;
+}
+
+.sidebar-button:hover {
+  background-color: rgba(17, 22, 23, 0.5);
+}
+
+.sidebar-button.sidebar-button-active {
+  background-color: rgba(17, 22, 23, 0.7);
+}
+
+.sidebar-slider {
+  background-color: rgba(17, 22, 23, 0.7);
+}
+
+.sidebar-arrow {
+  background-color: rgba(35, 52, 55, 0.7);
+}
+
+.playlist-item > .song-remove,
+.faux-playlist-item > .faux-song-remove,
+.playlist-item > .song-handle,
+.faux-playlist-item > .song-handle {
+  color: #233437;
+}
+
+.playlist-item-placeholder {
+  border: 3px dotted #1b2628;
+  background-color: rgba(27, 38, 40, 0.5);
+}
+
+.ui-sortable-helper,
+.ui-draggable-dragging {
+  background-color: #1b2628 !important;
+}
+
+.played {
+  color: #ffe74a;
+}
+
+.current-song {
+  color: #ffe74a;
+  background-color: rgba(27, 38, 40, 0.7);
+}
+
+#footer-soundtrack a {
+  color: #ffe74a;
+}
+
+#footer-soundtrack.loading-header a {
+  color: rgba(255, 231, 74, 0);
+}
+
+#footer-soundtrack:not(.loading-header) a:hover {
+  background: rgba(17, 22, 23, 0.5);
+}
+
+#footer-playlist {
+  color: #cef582;
+}
+
+/* ============================== PLAYER ============================== */
+#player-cover {
+  border-color: #cef582;
+}
+
+#player-cover.cover-loaded {
+  border-color: #1b2628;
+}
+
+.loading-header {
+  color: rgba(206, 245, 130, 0) !important;
+}
+
+/* ============================== HEADER BUTTONS ============================== */
+.header-button {
+  color: #cef582;
+}
+
+.header-button:hover {
+  background: rgba(17, 22, 23, 0.5);
+}
+
+.header-button.selected {
+  color: #ffe74a;
+  background-color: #111617;
+}
+
+.header-button.disabled-button {
+  color: #233437;
+  background-color: transparent;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  background: #cef582;
+  /* Green background */
+}
+
+input[type=range]::-moz-range-thumb {
+  background: #cef582;
+  /* Green background */
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  background: #111617;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #111617;
+}
+
+input[type=range]::-moz-range-track {
+  background: #111617;
+}
+
+input[type=range]::-ms-fill-lower {
+  background: #2a6495;
+}
+
+input[type=range]:focus::-ms-fill-lower {
+  background: #111617;
+}
+
+input[type=range]::-ms-fill-upper {
+  background: #111617;
+}
+
+input[type=range]:focus::-ms-fill-upper {
+  background: #111617;
+}
+
+#header-playlist-info {
+  color: #cef582;
+}
+
+#popup-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#dialogue-content {
+  background-color: #1b2628;
+}
+
+.share-button {
+  background-color: #1b2628;
+  color: #cef582;
+}
+
+.share-button:hover {
+  background: #111617;
+}
+
+#cover-popup {
+  background-color: #1b2628;
+}
+
+.cover-button {
+  background-color: #1b2628;
+}
+
+.cover-button:hover {
+  background: #111617;
+}
+
+.cover-button.disabled-button {
+  color: #233437;
+}
+
+#notification-popup {
+  -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0px 0 10px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.4) 0 0 10px;
+  box-shadow: rgba(0, 0, 0, 0.4) 0 0 10px;
+  background-color: #1b2628;
+}
+
+.config-header {
+  color: #cef582;
+  background-color: #1b2628;
+}
+
+a.config-header:hover {
+  color: #ffe74a;
+  background-color: #111617;
+}
+
+#levelselect-popup,
+#script-popup,
+#localization-popup,
+#config-popup,
+#entryactions-popup,
+.info-content {
+  background-color: #233437;
+}
+
+#camera-popup,
+#cine-popup,
+#info-popup {
+  background-color: #1b2628;
+}
+
+.style-item.current-style-item {
+  background-color: rgba(27, 38, 40, 0.7);
+  color: #ffe74a;
+}
+
+.style-item:hover {
+  background-color: #1b2628;
+}
+
+/* ============================== MOBILE ONLY ============================== */
+.mobile-tabswitch-button {
+  background: rgba(17, 22, 23, 0.5);
+  color: #cef582;
+}
+
+.mobile-tabswitch-button:hover {
+  background: #111617;
+}
+
+.mobile-tabswitch-button.disabled-button {
+  color: #233437;
+}
+
+.mobile-tabswitch-button.highlighted-button {
+  color: #ffe74a;
+}
+
+/* MEDIA QUERIES */
+@media only screen and (max-width: 900px) {
+  html {
+    background-color: #1b2628;
+    background-image: none;
+  }
+
+  #container {
+    background-color: transparent;
+  }
+
+  #container:before {
+    background-image: none;
+  }
+
+  .column-content {
+    background-color: #233437;
+  }
+
+  .song-buttons > .song-button,
+.playlist-item > .song-remove,
+.faux-playlist-item > .faux-song-remove,
+.playlist-item > .song-handle,
+.faux-playlist-item > .song-handle {
+    color: inherit;
+  }
+}
+/* ============================== JSCROLLPANE ============================== */
+.jspTrack {
+  background: rgba(27, 38, 40, 0.7);
+}
+
+.jspDrag {
+  background: rgba(17, 22, 23, 0.7);
+}
+
+.jspArrow {
+  background: #50506d;
+}
+
+.jspArrow.jspDisabled {
+  background: #80808d;
+}
+
+.jspCorner {
+  background: #eeeef4;
+}
+
+/* ============================== CAMERA CUBE ============================== */
+.cube__face {
+  color: #cef582;
+}
+
+.cube__face:hover {
+  color: orange;
+  border-color: orange;
+}
+
+.cube__face--front {
+  background: #087d91;
+}
+
+.cube__face--right {
+  background: #0aa6c2;
+}
+
+.cube__face--back {
+  background: #055361;
+}
+
+.cube__face--left {
+  background: #032a30;
+}
+
+.cube__face--top {
+  background: #0991aa;
+}
+
+.cube__face--bottom {
+  background: #043e49;
+}
+
+/* ============================== STATE DIAGRAM ============================== */
+.state-diagram-container {
+  background-color: #1b2628;
+}
+
+/* Following classes are only read from javascript, in statediagram.html */
+.state-diagram-arrow-normal {
+  color: #cef582;
+}
+
+.state-diagram-arrow-reflex {
+  color: #cef582;
+}
+
+.state-diagram-state-selected {
+  background-color: #233437;
+  color: #cef582;
+}
+
+.state-diagram-state {
+  background-color: rgba(27, 38, 40, 0.5);
+  color: rgba(206, 245, 130, 0.5);
+}
+
+.state-diagram-header {
+  background-color: #233437;
+}
+
+/* ============================= HIGHLIGHT.JS ============================= */
+/* Base color: saturation 0; */
+.hljs,
+.hljs-subst {
+  color: #cef582;
+}
+
+.hljs-comment {
+  color: #888888;
+}
+
+/* User color: hue: 0 */
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #ffe74a;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #880000;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #BC6060;
+}
+
+/* Language color: hue: 90; */
+.hljs-literal {
+  color: #78a960;
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #397300;
+}
+
+/* Meta color: hue: 200 */
+.hljs-meta {
+  color: #1f7199;
+}
+
+.hljs-meta-string {
+  color: #4d99bf;
+}
+
+/*# sourceMappingURL=theme_rpc.css.map */

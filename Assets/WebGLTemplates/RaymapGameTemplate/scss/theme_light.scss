@@ -1,0 +1,29 @@
+@use 'colors' with (
+    // Colors
+    $color: #333333,
+    $color_highlight: black,
+    $color_bg_light: #c2c2c2,
+    $color_bg_dark: #aeaeae,
+    $color_bg_darker: #9f9f9f,
+    $color_bg_darkest: #8a8a8a,
+    $color_range_blue: #2a6495,
+
+    $color_cube_selection: orange,
+
+    $color_cube_front:  hsl(0, 0%, 50%),
+    $color_cube_right:  hsl(0, 0%, 60%),
+    $color_cube_back:   hsl(0, 0%, 40%),
+    $color_cube_left:   hsl(0, 0%, 30%),
+    $color_cube_top:    hsl(0, 0%, 55%),
+    $color_cube_bottom: hsl(0, 0%, 35%)
+);
+body {
+	font-weight: 400;
+}
+.game-item-logo,
+.version-item-imag {
+    filter: drop-shadow(2px 2px 0.5px #0004);
+}
+.sidebar-button-image  {
+    filter: drop-shadow(2px 2px 0px #0004);
+}

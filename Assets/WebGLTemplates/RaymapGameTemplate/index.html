@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>RaymapGame</title>
+		<meta name="description" content="Play a recreation of Rayman 2 in Raymap online!">
+		<meta name="keywords" content="Rayman, level, unity, map">
+		
+		<!-- facebook open graph tags -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://raym.app/raymapgame/"/>
+		<meta property="og:title" content="RaymapGame - Rayman 2 Online"/>
+		<meta property="og:description" content="Play a recreation of Rayman 2 in Raymap online!"/>
+		<meta property="og:site_name" content="Raymap"/>
+		<meta property="og:image" content="https://raym.app/raymapgame/preview.png" />
+		
+		<!-- twitter card tags -->
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" value="RaymapGame - Rayman 2 Online" />
+		<meta name="twitter:description" value="Play a recreation of Rayman 2 in Raymap online!" />
+		<meta name="twitter:image" content="https://raym.app/raymapgame/preview.png" />
+		<meta name="twitter:url" value="https://raym.app/raymapgame/" />
+		
+		
+		<!-- style sheets -->
+		<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+		<link rel="stylesheet" type="text/css" href="css/rayman-fonts.css" />
+		<link rel="stylesheet" type="text/css" href="css/source-sans-pro.css" />
+        <link rel="stylesheet" type="text/css" href="css/icomoon.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery.jscrollpane.css" media="all" />
+		<link rel="stylesheet" type="text/css" href="css/camera-cube.css" />
+		<link rel="stylesheet" type="text/css" href="css/main.css?1" />
+		
+		<!-- colors -->
+		<link rel="stylesheet" type="text/css" href="css/themes/theme_main.css" title="Home" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_ray1map.css" title="Ray1Map" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_rpc.css" title="Pirate-Community" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_rcp.css" title="RCP" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_rayman1.css" title="1995" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_light.css" title="Light" />
+		<link rel="alternate stylesheet" type="text/css" href="css/themes/theme_dark.css" title="Dark" />
+
+
+		<link rel="stylesheet" type="text/css" href="css/dialog-colors.css"/>
+		<!-- javascript -->
+		<script type="text/javascript" src="js/UnityProgress.js"></script>
+		<script src="Build/UnityLoader.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="js/jquery-1.12.4.min.js">\x3C/script>')</script>
+		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+		<script type="text/javascript" src="js/jquery.jscrollpane.js"></script>
+		<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
+		<script type="text/javascript" src="js/modernizr.custom.js"></script>
+		<script type="text/javascript" src="js/jquery.mobile.custom.min.js"></script>
+		<script type="text/javascript" src="js/styleswitcher.js"></script>
+		<script type="text/javascript" src="highlight/highlight.pack.js"></script>
+		<script type="text/javascript" src="js/main.js?1"></script>
+		
+		<link rel="icon" type="image/png" href="img/favicon/favicon-32x32.png" sizes="32x32" />
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="container">
+				<div id="columns">
+					<div class="column column-unity">
+						<div class="column-header"><span id="header-unity-text">RaymapGame</span>
+							<div class="header-buttons-left">
+								<div id="btn-levelselect" class="header-button" title="Select a new level"><i class="icon-world"></i></div>
+							</div>
+							<div class="header-buttons-right">
+								<div id="btn-info" class="header-button" title="Info"><i class="icon-info"></i></div>
+								<div id="btn-config" class="header-button" title="Style chooser"><i class="icon-paint-brush"></i></div>
+							</div></div>
+						<div id="game-content" class="column-content"><div id="gameContainer"></div></div>
+						<div class="column-footer">
+							<div class="header-buttons-left">
+								<div id="btn-viewCollision" class="header-button disabled-button settings-toggle" title="View collision (C)"><i class="icon-flash"></i></div>
+								<div id="btn-viewGraphs" class="header-button disabled-button settings-toggle" title="View graphs (G)"><i class="icon-flow-children"></i></div>
+								<div id="btn-viewInvisible" class="header-button disabled-button settings-toggle" title="View invisible objects (I)"><i class="icon-eye"></i></div>
+								<div id="btn-displayInactive" class="header-button disabled-button settings-toggle" title="Display inactive sectors (Y)"><i class="icon-globe"></i></div>
+								<div id="btn-showPersos" class="header-button disabled-button settings-toggle" title="Show persos (U)"><i class="icon-user"></i></div>
+								<div id="btn-playAnimations" class="header-button disabled-button settings-toggle" title="Enable 3D animations (P)"><i class="icon-media-play"></i></div>
+								<div id="btn-playTextureAnimations" class="header-button disabled-button settings-toggle" title="Enable texture animations (T)"><i class="icon-media-play-outline"></i></div>
+								<div id="btn-lighting" class="header-button disabled-button selected" title="Lighting on/off (L)"><i class="icon-lightbulb-o"></i></div>
+								<div class="header-slider-container"><input id="range-luminosity" class="header-slider disabled-button lighting-settings" type="range" min="0" max="1" value="0.5" step="0.01"></div>
+								<div id="btn-saturate" class="header-button disabled-button lighting-settings settings-toggle" title="Allow overlight"><i class="icon-adjust-brightness"></i></div>
+								<div id="btn-fog" class="header-button disabled-button lighting-settings settings-toggle selected" title="Enable fog (F)"><i class="icon-windy"></i></div>
+							</div>
+							<!--<div class="small-text">Camera controls: Shift + WASD</div>-->
+							<div class="header-buttons-right">
+								<div id="btn-entryactions" class="header-button disabled-button" title="Browse entry actions"><i class="icon-gamepad"></i></div>
+								<div id="btn-localization" class="header-button disabled-button" title="Browse localization"><i class="icon-commenting"></i></div>
+								<div id="btn-camera" class="header-button disabled-button" title="Camera settings"><i class="icon-video1"></i></div>
+								<div id="btn-fullscreen" class="header-button" title="Fullscreen mode"><i class="icon-fullscreen"></i></div>
+							</div>
+							<div id="camera-popup" class="hidden-popup">
+								<div id="camera-cube" class="cube-container show-initial">
+									<div class="cube">
+										<div class="cube__face cube__face--front" data-view="Front">front</div>
+										<div class="cube__face cube__face--back" data-view="Back">back</div>
+										<div class="cube__face cube__face--right" data-view="Right">right</div>
+										<div class="cube__face cube__face--left" data-view="Left">left</div>
+										<div class="cube__face cube__face--top" data-view="Top">top</div>
+										<div class="cube__face cube__face--bottom" data-view="Bottom">bottom</div>
+									</div>
+								</div>
+								<div class="camera-options">
+									<div class="input dropdown">
+										<div class="label main">View</div><div class="fields"><div class="field"><select id="cameraPosSelector">
+										  <option value="Initial">Perspective - Initial</option>
+										  <option value="Front">Orthographic - Front</option>
+										  <option value="Left">Orthographic - Left</option>
+										  <option value="Back">Orthographic - Back</option>
+										  <option value="Right">Orthographic - Right</option>
+										  <option value="Top">Orthographic - Top</option>
+										  <option value="Bottom">Orthographic - Bottom</option>
+										  <option value="IsometricFront">Isometric - Front</option>
+										  <option value="IsometricLeft">Isometric - Left</option>
+										  <option value="IsometricBack">Isometric - Back</option>
+										  <option value="IsometricRight">Isometric - Right</option>
+										</select></div></div>
+									</div>
+									<div class="input-before-big-button">
+										<div class="input-group small right input-flex">
+											<div class="radio-padding"><input type="radio" id="screenshotSizeFactorRadio" class="radio-padding" name="screenshotRadio" value="sizeFactor" checked></div>
+											<div class="label main label-flex">Resolution factor</div>
+											<div class="field flexible"><input id="screenshotSizeFactor" class="input-typing" type="number" step="0.5" name="Screenshot size factor" placeholder="1" value="1" min="0.5"></div>
+										</div>
+										<div class="input-group small right input-flex">
+											<div class="radio-padding"><input type="radio" id="screenshotResolutionRadio" class="radio-padding" name="screenshotRadio" value="resolution"></div>
+											<div class="label main label-flex">Resolution</div>
+											<div class="field flexible"><input id="screenshotResolutionW" class="input-typing" type="number" step="any" name="Screenshot resolution (width)" placeholder="1920" value="1920" min="1" disabled></div>
+											<div class="label sub label-flex">x</div>
+											<div class="field flexible"><input id="screenshotResolutionH" class="input-typing" type="number" step="any" name="Screenshot resolution (height)" placeholder="1080" value="1080" min="1" disabled></div>
+										</div>
+									</div>
+									<div class="input-big-button">
+										<div id="btn-photo" class="header-button big" title="Screenshot"><i class="icon-camera icon-opaque"></i><i class="icon-camera-outline icon-transparency hidden"></i></div>
+										<div id="btn-photo-transparency" class="header-button lowerright" title="Transparency"><i class="icon-image icon-opaque"></i><i class="icon-image-outline icon-transparency hidden"></i></div>
+									</div>
+								</div>
+							</div>
+							<div id="cine-popup" class="hidden-popup">
+								<div class="cine-options">
+									<div class="input-group dropdown input-flex">
+										<div class="label main label-flex">Cinematic</div><div class="field flexible"><select id="cinematicSelector">
+										  <option value="null">None</option>
+										</select></div>
+									</div>
+									<div id="cine-speed-group" class="input-group small input-flex invisible">
+										<div class="label main label-flex">Animation Speed</div>
+										<div class="field flexible"><input id="cinematicSpeed" class="input-typing" type="number" step="any" name="x" placeholder="0" min="0"></input></div>
+									</div>
+									<div id="cine-actor-group" class="input-group dropdown input-flex invisible">
+										<div class="label main label-flex">Actors</div><div class="field flexible"><select id="cinematicActorSelector">
+										  <option value="null">Select an actor...</option>
+										</select></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--<div id="footer">
+					<span id="footer-text">Rayman © Ubisoft Entertainment</span>
+				</div>-->
+			</div>
+			<div id="popup-overlay" class="hidden-overlay" onclick=""></div>
+			<div id="highlight-tooltip" class="hidden-tooltip"></div>
+			<div id="text-highlight-tooltip" class="hidden-tooltip"><div id="text-highlight-content"></div></div>
+			<div id="dialogue-popup" class="hidden-popup"><div id="dialogue-image"></div><div id="dialogue-content"></div></div>
+			<div id="script-popup" class="hidden-popup">
+				<div class="column-header"><span id="header-script-text">Script</span>
+					<!--<div class="header-buttons-right"><div id="btn-prev-script" class="header-button disabled-button" title="Previous script"><i class="icon-chevron-left"></i></div><div id="btn-next-script" class="header-button disabled-button" title="Next script"><i class="icon-chevron-right"></i></div></div>-->
+				</div>
+				<div id="content-script" class="column-content column-content-scroll"></div>
+				<div class="column-footer"></div>
+			</div>
+			<div id="levelselect-popup" class="hidden-popup">
+				<div class="column column-games">
+					<div id="header-games" class="loadable-header loading-header column-header">Game</div>
+					<div id="content-games" class="loadable loading column-content column-content-scroll">
+					</div>
+					<div class="column-footer"></div>
+				</div>
+				<div class="column column-versions">
+					<div id="header-versions" class="loadable-header loading-header column-header">Version</div>
+					<div id="content-versions" class="loadable loading column-content column-content-scroll">
+					</div>
+					<div class="column-footer"></div>
+				</div>
+				<div class="column column-levels">
+					<div id="header-levels" class="loadable-header loading-header column-header">Level selection</div>
+					<div id="sidebar-levels" class="column-sidebar hidden-sidebar">
+						<div id="sidebar-levels-content" class="column-sidebar-content">
+							<div id="sidebar-levels-slider" class="sidebar-slider"></div>
+						</div>
+						<div class="sidebar-arrow sidebar-arrow-up sidebar-arrow-disabled"></div>
+						<div class="sidebar-arrow sidebar-arrow-down sidebar-arrow-disabled"></div>
+					</div>
+					<div id="content-levels" class="loadable loading column-content column-content-scroll"></div>
+					<div class="column-footer">
+						<div id="levels-actors-group" class="loadable loading levels-actor-input-group input-group dropdown input-flex">
+							<div id="actor1-group" class="levels-actor-input input-flex"><div class="label main label-flex">Actor 1</div><div class="field flexible"><select id="actor1Selector">
+							  <option value="null">Select an actor...</option>
+							</select></div></div>
+							<div id="actor2-group" class="levels-actor-input input-flex"><div class="label main label-flex">Actor 2</div><div class="field flexible"><select id="actor2Selector">
+							  <option value="null">Select an actor...</option>
+							</select></div></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="config-popup" class="hidden-popup">
+				<div class="column-header">Settings</div>
+				<div class="config-header">Style</div>
+				<div class="style-items">
+				<div class="style-item current-style-item" data-style="Home"><div class="style-item-color" style="background-color: #19c8c3;"></div><div class="style-item-text">Home</div></div>
+				<div class="style-item" data-style="Ray1Map"><div class="style-item-color" style="background-color: #b75eda;"></div><div class="style-item-text">Ray1Map</div></div>
+				<div class="style-item" data-style="Pirate-Community"><div class="style-item-color" style="background-color: #ffe74a;"></div><div class="style-item-text">Pirate-Community</div></div>
+				<div class="style-item" data-style="RCP"><div class="style-item-color" style="background-color: #574eb9; border-color: #252525;"></div><div class="style-item-text">Control Panel</div></div>
+				<div class="style-item" data-style="1995"><div class="style-item-color" style="background-color: #b41c80;"></div><div class="style-item-text">1995</div></div>
+				<div class="style-item" data-style="Light"><div class="style-item-color" style="background-color: #a3a3a3; border-color: grey;"></div><div class="style-item-text">Unity Light</div></div>
+				<div class="style-item" data-style="Dark"><div class="style-item-color" style="background-color: #303030; border-color: darkslategray;"></div><div class="style-item-text">Pro Dark</div></div>
+				</div>
+			</div>
+			<div id="info-popup" class="hidden-popup">
+				<div class="column-header">About</div>
+				<div class="column-content column-content-scroll">
+					<img class="header-image" src="https://raym.app/maps/preview.png" />
+					<a class="config-header" href="https://github.com/Adsolution/RaymapGame">Find RaymapGame on GitHub!</a>
+					<div class="config-header">Controls</div>
+					<div class="info-content">
+						<div class="info-content-column"><b>RaymapGame Controls</b><br/><br/>
+							Arrow keys: Move around<br/>
+							Jump: A<br/>
+							Strafe: Left Ctrl<br/>
+							J: Toggle Swim mode<br/>
+							S (while in the air): Moonjump<br />
+							H: Toggle Super Helicopter<br />
+							T (during object mouseover): Teleport<br/>
+							A/Z: Move up/down in swim mode<br />
+							E: Toggle Perso List<br/>
+							D: Debug Info<br/>
+							R: Despawn<br/>
+						</div>
+						<div class="info-content-column"><b>Raymap: Shortcuts (on/off)</b><br/><br/>
+							C: Collision view<br/>
+							G: Display graphs<br/>
+							Y: Display inactive sectors<br/>
+							I: View invisible objects<br/>
+							U: Show persos<br/>
+							P: Enable 3D animations<br/>
+							T: Enable texture animations<br/>
+							L: Lighting<br/>
+							F: Fog<br/>
+						</div>
+					</div>
+				</div>
+				<div class="column-footer footer-text">
+					<div class="footer-content">
+						RaymapGame is developed by <a href="https://github.com/Adsolution/">Adsolution</a> and <a href="https://github.com/Shrooblord/">Shrooblord</a><br/>
+						This site and its contents are intended strictly to be used for non-commercial purposes.
+					</div>
+				</div>
+			</div>
+			<div id="localization-popup" class="hidden-popup">
+				<div class="column-header">Localization viewer</div>
+				<div id="content-localization" class="column-content column-content-scroll"></div>
+				<div class="column-footer">
+					<div id="currentLanguageInputGroup" class="small-footer-right">
+						<div class="input dropdown">
+							<div class="label main">Current language</div><div class="fields"><div class="field"><select id="languageSelector">
+							  <option value="none">None</option>
+							</select></div></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="entryactions-popup" class="hidden-popup">
+				<div class="column-header">Entry actions viewer</div>
+				<div id="content-entryactions" class="column-content column-content-scroll"></div>
+				<div class="column-footer"></div>
+			</div>
+			<div id="notification-popup" class="hidden-popup"></div>
+		</div>
+	</body>
+</html>

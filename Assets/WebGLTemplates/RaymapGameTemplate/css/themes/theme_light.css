@@ -1,0 +1,593 @@
+html {
+  /*background: url('../img/background.jpg') no-repeat center center fixed;*/
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body {
+  /* background: #444; */
+  color: #333333;
+}
+
+#header h1 {
+  color: black;
+}
+
+#header h1 span {
+  color: #333333;
+}
+
+#container {
+  background-color: #aeaeae;
+}
+
+#footer a,
+.footer-content a {
+  color: black;
+}
+
+#footer a:hover,
+.footer-content a:hover {
+  background: rgba(138, 138, 138, 0.5);
+}
+
+.column {
+  background-color: #c2c2c2;
+}
+
+.column-header,
+.column-footer,
+.column-sidebar {
+  color: #333333;
+  background-color: #aeaeae;
+}
+
+#game-content {
+  background-color: #aeaeae;
+}
+
+.game-item:hover,
+.version-item:hover {
+  background-color: #aeaeae;
+}
+
+.game-item,
+.version-item {
+  color: #333333;
+}
+
+.current-game-item,
+.current-version-item {
+  color: black;
+  background-color: rgba(174, 174, 174, 0.7);
+}
+
+.game-category-item {
+  color: #333333;
+  background-color: #aeaeae;
+}
+
+.column-versions,
+.column-levels,
+.column-games {
+  background-color: #aeaeae;
+}
+
+/*#content-versions,*/
+#content-levels,
+#content-games {
+  background-color: #c2c2c2;
+}
+
+#content-versions {
+  background-color: #9f9f9f;
+}
+
+.progress .full {
+  background: #aeaeae;
+  background: linear-gradient(95deg, #aeaeae 0%, #333333 78%, black 100%);
+}
+
+/*.song-item:active,
+.playlist-item:active,
+.game-item:active,
+.custom-active {
+	background-color: $color_bg_darkest_07;
+}*/
+.objects-item,
+.levels-item,
+.behaviors-item,
+.dsgvars-item,
+.localization-item,
+.entryactions-item {
+  color: #333333;
+}
+
+.current-objects-item {
+  color: black;
+  background-color: rgba(174, 174, 174, 0.7);
+}
+
+.current-levels-item {
+  color: black;
+  background-color: #aeaeae;
+}
+
+.objects-item.object-world,
+.objects-item.object-sector,
+.levels-item.game,
+.behaviors-item.category,
+.transitions-item.category,
+.localization-item.category,
+.script-item.category {
+  color: #333333;
+  background-color: #aeaeae;
+}
+
+.dsgvars-item > .dsgvar-name,
+.dsgvars-item > .dsgvar-type,
+.localization-item > .localization-item-index,
+.entryactions-item > .entryactions-item-name {
+  background-color: #aeaeae;
+}
+
+.dsgvars-item.dsgvar-array:hover > .dsgvar-name,
+.dsgvars-item.dsgvar-array:hover > .dsgvar-type {
+  background-color: #8a8a8a;
+}
+
+.dsgvars-item.dsgvars-header,
+.transitions-item.transitions-header {
+  background-color: #aeaeae;
+}
+
+.objects-item.object-sector:hover,
+.behaviors-item.category:hover,
+.transitions-item.category:hover {
+  background-color: #8a8a8a;
+}
+
+.objects-item.object-world.current-objects-item,
+.objects-item.object-sector.current-objects-item {
+  color: black;
+  background-color: #8a8a8a;
+}
+
+.objects-item.object-perso:hover,
+.objects-item.object-IPO:hover,
+.levels-item.level:hover,
+.behaviors-item.behavior:hover,
+.entryactions-item:hover .dsgvars-item:hover,
+.selectState:hover,
+.localization-item:hover {
+  background-color: #aeaeae;
+}
+
+#highlight-tooltip {
+  background-color: #c2c2c2;
+  color: #333333;
+}
+
+#text-highlight-tooltip {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+#text-highlight-tooltip.blue {
+  background-color: rgba(27, 48, 115, 0.85);
+  box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.38);
+}
+
+.song-buttons > .song-button {
+  color: #c2c2c2;
+}
+
+.sidebar-button:hover {
+  background-color: rgba(138, 138, 138, 0.5);
+}
+
+.sidebar-button.sidebar-button-active {
+  background-color: rgba(138, 138, 138, 0.7);
+}
+
+.sidebar-slider {
+  background-color: rgba(138, 138, 138, 0.7);
+}
+
+.sidebar-arrow {
+  background-color: rgba(194, 194, 194, 0.7);
+}
+
+.playlist-item > .song-remove,
+.faux-playlist-item > .faux-song-remove,
+.playlist-item > .song-handle,
+.faux-playlist-item > .song-handle {
+  color: #c2c2c2;
+}
+
+.playlist-item-placeholder {
+  border: 3px dotted #aeaeae;
+  background-color: rgba(174, 174, 174, 0.5);
+}
+
+.ui-sortable-helper,
+.ui-draggable-dragging {
+  background-color: #aeaeae !important;
+}
+
+.played {
+  color: black;
+}
+
+.current-song {
+  color: black;
+  background-color: rgba(174, 174, 174, 0.7);
+}
+
+#footer-soundtrack a {
+  color: black;
+}
+
+#footer-soundtrack.loading-header a {
+  color: rgba(0, 0, 0, 0);
+}
+
+#footer-soundtrack:not(.loading-header) a:hover {
+  background: rgba(138, 138, 138, 0.5);
+}
+
+#footer-playlist {
+  color: #333333;
+}
+
+/* ============================== PLAYER ============================== */
+#player-cover {
+  border-color: #333333;
+}
+
+#player-cover.cover-loaded {
+  border-color: #aeaeae;
+}
+
+.loading-header {
+  color: rgba(51, 51, 51, 0) !important;
+}
+
+/* ============================== HEADER BUTTONS ============================== */
+.header-button {
+  color: #333333;
+}
+
+.header-button:hover {
+  background: rgba(138, 138, 138, 0.5);
+}
+
+.header-button.selected {
+  color: black;
+  background-color: #8a8a8a;
+}
+
+.header-button.disabled-button {
+  color: #c2c2c2;
+  background-color: transparent;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  background: #333333;
+  /* Green background */
+}
+
+input[type=range]::-moz-range-thumb {
+  background: #333333;
+  /* Green background */
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  background: #8a8a8a;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #8a8a8a;
+}
+
+input[type=range]::-moz-range-track {
+  background: #8a8a8a;
+}
+
+input[type=range]::-ms-fill-lower {
+  background: #2a6495;
+}
+
+input[type=range]:focus::-ms-fill-lower {
+  background: #8a8a8a;
+}
+
+input[type=range]::-ms-fill-upper {
+  background: #8a8a8a;
+}
+
+input[type=range]:focus::-ms-fill-upper {
+  background: #8a8a8a;
+}
+
+#header-playlist-info {
+  color: #333333;
+}
+
+#popup-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#dialogue-content {
+  background-color: #aeaeae;
+}
+
+.share-button {
+  background-color: #aeaeae;
+  color: #333333;
+}
+
+.share-button:hover {
+  background: #8a8a8a;
+}
+
+#cover-popup {
+  background-color: #aeaeae;
+}
+
+.cover-button {
+  background-color: #aeaeae;
+}
+
+.cover-button:hover {
+  background: #8a8a8a;
+}
+
+.cover-button.disabled-button {
+  color: #c2c2c2;
+}
+
+#notification-popup {
+  -webkit-box-shadow: rgba(0, 0, 0, 0.4) 0px 0 10px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.4) 0 0 10px;
+  box-shadow: rgba(0, 0, 0, 0.4) 0 0 10px;
+  background-color: #aeaeae;
+}
+
+.config-header {
+  color: #333333;
+  background-color: #aeaeae;
+}
+
+a.config-header:hover {
+  color: black;
+  background-color: #8a8a8a;
+}
+
+#levelselect-popup,
+#script-popup,
+#localization-popup,
+#config-popup,
+#entryactions-popup,
+.info-content {
+  background-color: #c2c2c2;
+}
+
+#camera-popup,
+#cine-popup,
+#info-popup {
+  background-color: #aeaeae;
+}
+
+.style-item.current-style-item {
+  background-color: rgba(174, 174, 174, 0.7);
+  color: black;
+}
+
+.style-item:hover {
+  background-color: #aeaeae;
+}
+
+/* ============================== MOBILE ONLY ============================== */
+.mobile-tabswitch-button {
+  background: rgba(138, 138, 138, 0.5);
+  color: #333333;
+}
+
+.mobile-tabswitch-button:hover {
+  background: #8a8a8a;
+}
+
+.mobile-tabswitch-button.disabled-button {
+  color: #c2c2c2;
+}
+
+.mobile-tabswitch-button.highlighted-button {
+  color: black;
+}
+
+/* MEDIA QUERIES */
+@media only screen and (max-width: 900px) {
+  html {
+    background-color: #aeaeae;
+    background-image: none;
+  }
+
+  #container {
+    background-color: transparent;
+  }
+
+  #container:before {
+    background-image: none;
+  }
+
+  .column-content {
+    background-color: #c2c2c2;
+  }
+
+  .song-buttons > .song-button,
+.playlist-item > .song-remove,
+.faux-playlist-item > .faux-song-remove,
+.playlist-item > .song-handle,
+.faux-playlist-item > .song-handle {
+    color: inherit;
+  }
+}
+/* ============================== JSCROLLPANE ============================== */
+.jspTrack {
+  background: rgba(174, 174, 174, 0.7);
+}
+
+.jspDrag {
+  background: rgba(138, 138, 138, 0.7);
+}
+
+.jspArrow {
+  background: #50506d;
+}
+
+.jspArrow.jspDisabled {
+  background: #80808d;
+}
+
+.jspCorner {
+  background: #eeeef4;
+}
+
+/* ============================== CAMERA CUBE ============================== */
+.cube__face {
+  color: #333333;
+}
+
+.cube__face:hover {
+  color: orange;
+  border-color: orange;
+}
+
+.cube__face--front {
+  background: gray;
+}
+
+.cube__face--right {
+  background: #999999;
+}
+
+.cube__face--back {
+  background: #666666;
+}
+
+.cube__face--left {
+  background: #4d4d4d;
+}
+
+.cube__face--top {
+  background: #8c8c8c;
+}
+
+.cube__face--bottom {
+  background: #595959;
+}
+
+/* ============================== STATE DIAGRAM ============================== */
+.state-diagram-container {
+  background-color: #aeaeae;
+}
+
+/* Following classes are only read from javascript, in statediagram.html */
+.state-diagram-arrow-normal {
+  color: #333333;
+}
+
+.state-diagram-arrow-reflex {
+  color: #333333;
+}
+
+.state-diagram-state-selected {
+  background-color: #c2c2c2;
+  color: #333333;
+}
+
+.state-diagram-state {
+  background-color: rgba(174, 174, 174, 0.5);
+  color: rgba(51, 51, 51, 0.5);
+}
+
+.state-diagram-header {
+  background-color: #c2c2c2;
+}
+
+/* ============================= HIGHLIGHT.JS ============================= */
+/* Base color: saturation 0; */
+.hljs,
+.hljs-subst {
+  color: #333333;
+}
+
+.hljs-comment {
+  color: #888888;
+}
+
+/* User color: hue: 0 */
+.hljs-type,
+.hljs-string,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: black;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #880000;
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-link,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #BC6060;
+}
+
+/* Language color: hue: 90; */
+.hljs-literal {
+  color: #78a960;
+}
+
+.hljs-built_in,
+.hljs-bullet,
+.hljs-code,
+.hljs-addition {
+  color: #397300;
+}
+
+/* Meta color: hue: 200 */
+.hljs-meta {
+  color: #1f7199;
+}
+
+.hljs-meta-string {
+  color: #4d99bf;
+}
+
+body {
+  font-weight: 400;
+}
+
+.game-item-logo,
+.version-item-imag {
+  filter: drop-shadow(2px 2px 0.5px #0004);
+}
+
+.sidebar-button-image {
+  filter: drop-shadow(2px 2px 0px #0004);
+}
+
+/*# sourceMappingURL=theme_light.css.map */
