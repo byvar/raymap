@@ -566,20 +566,24 @@ namespace OpenSpace.Loader {
                             Pointer off_newSOengineObject = Pointer.Read(reader);
                             if (SuperObject.GetSOType(newSOtype) == SuperObject.Type.Perso) {
                                 persoInFixPointers[i] = off_newSOengineObject;
+                                Pointer.Goto(ref reader, off_newSOengineObject);
+								Pointer off_p3dData = Pointer.Read(reader);
+                                if (Settings.s.game == Settings.Game.R2Demo) {
+                                    ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x1C, matrixData);
+                                } else {
+                                    ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x18, matrixData);
+                                }
+
+                                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                                    FileWithPointers file = off_newSuperObject.file;
+                                    file.AddPointer(off_newSuperObject.FileOffset + 0x14, off_nextBrother);
+                                    file.AddPointer(off_newSuperObject.FileOffset + 0x18, off_prevBrother);
+                                    file.AddPointer(off_newSuperObject.FileOffset + 0x1C, off_father);
+                                    ((SNA)file).OverwriteData(off_newSuperObject.FileOffset + 0x30, renderBits);
+                                    ((SNA)file).OverwriteData(off_newSuperObject.FileOffset + 0x38, floatData);
+                                }
                             } else {
                                 persoInFixPointers[i] = null;
-                            }
-                            Pointer.Goto(ref reader, off_newSOengineObject);
-                            Pointer off_p3dData = Pointer.Read(reader);
-                            ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x18, matrixData);
-
-                            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
-                                FileWithPointers file = off_newSuperObject.file;
-                                file.AddPointer(off_newSuperObject.FileOffset + 0x14, off_nextBrother);
-                                file.AddPointer(off_newSuperObject.FileOffset + 0x18, off_prevBrother);
-                                file.AddPointer(off_newSuperObject.FileOffset + 0x1C, off_father);
-                                ((SNA)file).OverwriteData(off_newSuperObject.FileOffset + 0x30, renderBits);
-                                ((SNA)file).OverwriteData(off_newSuperObject.FileOffset + 0x38, floatData);
                             }
 
                         }
