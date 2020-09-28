@@ -53,6 +53,7 @@ public class GraphManager : MonoBehaviour {
 				GameObject go_graph = new GameObject("Graph " + graph.Offset);
 				go_graph.transform.SetParent(graphRoot.transform);
 				GraphBehaviour gb = go_graph.AddComponent<GraphBehaviour>();
+				graphs.Add(gb);
 				gb.graphROM = graph;
 				graphROMDict[graph] = gb;
 
@@ -90,6 +91,7 @@ public class GraphManager : MonoBehaviour {
 					GameObject go_graph = new GameObject("Graph " + graph.Offset);
 					go_graph.transform.SetParent(graphRoot.transform);
 					GraphBehaviour gb = go_graph.AddComponent<GraphBehaviour>();
+					graphs.Add(gb);
 					gb.graphPS1 = graph;
 					graphPS1Dict[graph] = gb;
 
@@ -138,6 +140,7 @@ public class GraphManager : MonoBehaviour {
 				GameObject go_graph = new GameObject(graph.name ?? "Graph " + graph.offset.ToString());
 				go_graph.transform.SetParent(graphRoot.transform);
 				GraphBehaviour gb = go_graph.AddComponent<GraphBehaviour>();
+				graphs.Add(gb);
 				gb.graph = graph;
 				graphDict[graph] = gb;
 
