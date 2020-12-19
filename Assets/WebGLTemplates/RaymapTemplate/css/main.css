@@ -1208,6 +1208,20 @@ a:focus {
 	text-align: right;
 	width: 30%;
 }
+.header-buttons-text {
+	display: inline-block;
+	height: 1.3em;
+    font-size: 0.9em;
+    vertical-align: top;
+	padding: 0.15em 0.3em 0.3em 0.3em;
+}
+.header-button .text {
+	font-weight: bold;
+	font-size: 0.8em;
+	text-align: center;
+	margin-top: -0.15em;
+	margin-left: -0.1em;
+}
 .header-button {
 	display: inline-block;
 	width: 1.3em;
@@ -1231,6 +1245,21 @@ a:focus {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.header-button.header-button-withtext {
+	padding: 0.3em 0.5em 0.3em 0.5em;
+	width: auto;
+	border-radius: 1em;
+}
+#btn-backToHub {
+	opacity: 0.5;
+}
+#btn-backToHub:hover {
+	opacity: 1;
+}
+.header-button.header-button-withtext .header-buttons-text {
+	padding: 0 0.5em 0 0.5em;
+	line-height: 1.3em;
 }
 .header-button.big {
 	font-size: 2em;
