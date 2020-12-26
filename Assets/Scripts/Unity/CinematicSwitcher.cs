@@ -24,6 +24,7 @@ public class CinematicSwitcher : MonoBehaviour {
 	public PersoBehaviour[] actors;
 
 	// PS1
+	public bool HasControlOfCamera => ps1Streams != null && ps1Streams.Length > 0 && CinematicIndex != 0;
 	public uint currentFrame = 0;
 	public bool playAnimation = true;
 	public float animationSpeed = 30f;

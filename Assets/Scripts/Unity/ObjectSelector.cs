@@ -102,12 +102,16 @@ public class ObjectSelector : MonoBehaviour {
                 UnityEditor.Selection.activeGameObject = pb.gameObject;
 #endif
             selectedPerso = pb;
-            cam.JumpTo(pb.gameObject);
+            if (controller.CinematicSwitcher == null || !controller.CinematicSwitcher.HasControlOfCamera) {
+                cam.JumpTo(pb.gameObject);
+            }
         }
     }
 
 	public void Select(SuperObjectComponent so) {
-		cam.JumpTo(so.gameObject);
+        if (controller.CinematicSwitcher == null || !controller.CinematicSwitcher.HasControlOfCamera) {
+            cam.JumpTo(so.gameObject);
+        }
 	}
 
     public void Deselect() {

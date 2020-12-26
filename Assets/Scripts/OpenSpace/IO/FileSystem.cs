@@ -28,7 +28,7 @@ namespace OpenSpace {
 		private static Dictionary<string, byte[]> virtualFiles = new Dictionary<string, byte[]>();
 		private static Dictionary<string, BigFileEntry> virtualBigFiles = new Dictionary<string, BigFileEntry>();
 		private static Dictionary<string, bool> existingDirectories = new Dictionary<string, bool>();
-        public static string serverAddress = "https://raym.app/maps/data/";
+        public static string serverAddress = "https://raym.app/data/raymap/";
 
         public static bool DirectoryExists(string path) {
 			if (path == null || path.Trim() == "") return false;
