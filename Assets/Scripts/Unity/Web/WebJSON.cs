@@ -103,7 +103,7 @@ public class WebJSON {
 		public bool? PlayAnimation { get; set; }
 		public float? AnimationSpeed { get; set; }
 		public bool? AutoNextState { get; set; }
-		public bool? StateTransitionExportAvailable { get; set; }
+		public bool? BehaviorTransitionExportAvailable { get; set; }
 
 		// Extra lists
 		public State[] States { get; set; }

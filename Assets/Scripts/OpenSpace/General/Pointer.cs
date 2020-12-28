@@ -25,6 +25,12 @@ namespace OpenSpace {
             }
         }
 
+        public uint AbsoluteOffset {
+            get {
+                return offset;
+            }
+        }
+
         public override bool Equals(System.Object obj) {
             return obj is Pointer && this == (Pointer)obj;
         }
@@ -62,6 +68,12 @@ namespace OpenSpace {
         public string StringFileOffset {
             get {
                 return String.Format("{0:X8}", FileOffset);
+            }
+        }
+
+        public string StringAbsoluteOffset {
+            get {
+                return String.Format("{0:X8}", AbsoluteOffset);
             }
         }
 

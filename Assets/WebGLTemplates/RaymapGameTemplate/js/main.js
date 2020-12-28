@@ -1094,7 +1094,7 @@ function showObjectDescription(so, isSOChanged) {
 			if(perso.hasOwnProperty("Brain")) {
 				let allBehaviors = [];
 				let brain = perso.Brain;
-				if(perso.hasOwnProperty("StateTransitionExportAvailable") && perso.StateTransitionExportAvailable) {
+				if(perso.hasOwnProperty("BehaviorTransitionExportAvailable") && perso.BehaviorTransitionExportAvailable) {
 					allBehaviors.push('<div class="behaviors-item category stateTransitionExport"><div class="collapse-sign">+</div>Behavior transition diagram</div>');
 				}
 				//let reg = /^.*\.(.*?)\[(\d*?)\](?:\[\"(.*?)\"\])?$/;
@@ -1444,7 +1444,7 @@ function handleMessage_selection_updatePerso(oldPerso, newPerso) {
 	if(newPerso.hasOwnProperty("States")) oldPerso.States = newPerso.States;
 	if(newPerso.hasOwnProperty("ObjectLists")) oldPerso.ObjectLists = newPerso.ObjectLists;
 	if(newPerso.hasOwnProperty("Brain")) oldPerso.Brain = newPerso.Brain;
-	if(newPerso.hasOwnProperty("StateTransitionExportAvailable")) oldPerso.StateTransitionExportAvailable = newPerso.StateTransitionExportAvailable;
+	if(newPerso.hasOwnProperty("BehaviorTransitionExportAvailable")) oldPerso.BehaviorTransitionExportAvailable = newPerso.BehaviorTransitionExportAvailable;
 }
 function handleMessage_selection(msg) {
 	let selection = msg;

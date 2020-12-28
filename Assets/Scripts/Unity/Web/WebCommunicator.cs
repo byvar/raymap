@@ -361,9 +361,8 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		if (includeBrain) {
 			persoJSON.Brain = GetBrainJSON(selector.selectedPerso);
-			persoJSON.StateTransitionExportAvailable =
+			persoJSON.BehaviorTransitionExportAvailable =
 				selector.selectedPerso is PersoBehaviour
-				&& pb.stateNames?.Length > 1
 				&& (persoJSON.Brain?.Intelligence?.Length > 0 || persoJSON.Brain?.Reflex?.Length > 0 || persoJSON.Brain?.Macros?.Length > 0);
 		}
 		return persoJSON;
