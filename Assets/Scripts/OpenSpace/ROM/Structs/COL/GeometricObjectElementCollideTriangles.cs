@@ -22,7 +22,7 @@ namespace OpenSpace.ROM {
 			num_triangles = reader.ReadUInt16();
 			unk = reader.ReadUInt16();
 			type_material = reader.ReadUInt16();
-			
+
 			triangles.Resolve(reader, t => t.length = num_triangles);
 			material = new GenericReference(type_material, ind_material, reader, true);
 		}
@@ -60,11 +60,15 @@ namespace OpenSpace.ROM {
 							mr.material.SetTexture("_MainTex", Resources.Load<Texture2D>("Textures/zdr")); break;
 					}
 				}
+				Vector3[] vertices = go.verticesCollide.Value.GetVectors(go.ScaleFactor);
+				int[] tris = triangles.Value.triangles.SelectMany(t => new int[] { t.v2, t.v1, t.v3 }).ToArray();
+
+
 				Mesh mesh = new Mesh();
-				mesh.vertices = go.verticesCollide.Value.GetVectors(go.ScaleFactor);
+				mesh.vertices = tris.Select(t => vertices[t]).ToArray();
 				//mesh.normals = go.normals.Value.GetVectors(Int16.MaxValue);
 				//mesh.SetUVs(0, triangles.Value.uvs.Select(u => new Vector3(u.x, u.y, 1f)).ToList());
-				mesh.triangles = triangles.Value.triangles.SelectMany(t => new int[] { t.v2, t.v1, t.v3 }).ToArray();
+				mesh.triangles = Enumerable.Range(0,tris.Length).ToArray();
 				mesh.RecalculateNormals();
 
                 Vector2[] uvs = new Vector2[mesh.vertexCount];
