@@ -70,6 +70,7 @@ namespace OpenSpace.Visual {
 			SphereOtherType = 8 // ignores persos?
 		}
 
+        [JsonIgnore]
         public LightBehaviour light; // very dirty
 
         public LightInfo() : base() {
