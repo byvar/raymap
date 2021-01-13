@@ -188,6 +188,49 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.ExportAfterLoad = export;
 
 		UnitySettings.ExportPath = DirectoryField(GetNextRect(ref yPos), "Export Path", UnitySettings.ExportPath);
+        
+        if (GUI.Button(GetNextRect(ref yPos), "Copy export commands for all levels to clipboard...")) {
+			TextEditor te = new TextEditor();
+
+			Settings.Init(UnitySettings.GameMode);
+            string commands = "";
+
+			var tempDropDown = new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), CurrentGameDataDir)
+            {
+                name = "Maps",
+                mode = UnitySettings.GameMode
+            };
+
+            foreach (var f in tempDropDown.files) {
+                commands += $"Raymap.exe -batchmode --export {UnitySettings.ExportPath} --mode {UnitySettings.GameMode} --dir \"{UnitySettings.GameDirs[UnitySettings.GameMode]}\" --level {f}" + Environment.NewLine;
+            }
+			
+            te.text = commands;
+            te.SelectAll();
+            te.Copy();
+		}
+
+		if (GUI.Button(GetNextRect(ref yPos), "Copy blend export commands for all levels to clipboard...")) {
+            TextEditor te = new TextEditor();
+
+            Settings.Init(UnitySettings.GameMode);
+            string commands = "";
+
+            var tempDropDown = new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), CurrentGameDataDir)
+            {
+                name = "Maps",
+                mode = UnitySettings.GameMode
+            };
+
+            foreach (var f in tempDropDown.files) {
+                commands += $"blender --background --python generate_maps_blend.py -- {UnitySettings.ExportPath} {f} {UnitySettings.ExportPath}/BlendFiles/Levels" + Environment.NewLine;
+            }
+
+            te.text = commands;
+            te.SelectAll();
+            te.Copy();
+        }
+
 		UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
 
 		/*if (UnitySettings.ExportAfterLoad) {

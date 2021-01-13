@@ -15,27 +15,27 @@ MonoBehaviour:
   useUnityContractResolver: 1
   useAllOutsideConverters: 0
   outsideConverters:
-  - enabled: 1
+  - enabled: 0
     converterName: OpenSpace.Exporter.UnityConverter, Scripts, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
     settings: []
-  - enabled: 1
+  - enabled: 0
     converterName: OpenSpace.GameMaterial+GameMaterialReferenceJsonConverter, Scripts,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     settings: []
-  - enabled: 1
+  - enabled: 0
     converterName: OpenSpace.Object.Properties.ObjectList+ObjectListReferenceJsonConverter,
       Scripts, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     settings: []
-  - enabled: 1
+  - enabled: 0
     converterName: OpenSpace.PointerJsonConverter, Scripts, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
     settings: []
-  - enabled: 1
+  - enabled: 0
     converterName: OpenSpace.Visual.VisualMaterial+VisualMaterialReferenceJsonConverter,
       Scripts, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     settings: []
-  - enabled: 1
+  - enabled: 0
     converterName: OpenSpace.Waypoints.WayPoint+WayPointReferenceJsonConverter, Scripts,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     settings: []

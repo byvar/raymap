@@ -114,15 +114,15 @@ public class UnitySettings {
 		LoadFromMemory = s.SerializeBool("LoadFromMemory", LoadFromMemory);
 
         // Export
+        ExportPath = s.SerializeString("ExportPath", ExportPath, "export");
+		ExportAfterLoad = s.SerializeBool("ExportAfterLoad", ExportAfterLoad);
+
         if (cmdLine) {
-            string p = s.SerializeString("export", null);
-            if (!string.IsNullOrEmpty(p)) {
+
+            if (!string.IsNullOrEmpty(ExportPath)) {
                 ExportAfterLoad = true;
-                ExportPath = p;
             }
         }
-        ExportPath = s.SerializeString("ExportPath", ExportPath);
-		ExportAfterLoad = s.SerializeBool("ExportAfterLoad", ExportAfterLoad);
 
         if (cmdLine) {
             string p = s.SerializeString("screenshot", null);
