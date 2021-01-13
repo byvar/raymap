@@ -209,7 +209,6 @@ namespace OpenSpace.Exporter {
                 if (texture == null) {
                     continue;
                 }
-                string textureName = texture.name != null ? texture.name : texture.offset.offset.ToString("X8");
                 string path = Path.Combine(texturePath, texture.name + ".png");
                 if (!Directory.Exists(Path.GetDirectoryName(path))) {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));

@@ -40,7 +40,7 @@ namespace OpenSpace.AI {
                 }
                 shortName = "[\"" + shortName + "\"]";
             }
-            shortName = model.name + "." + type.ToString() + "[" + index + "]" + shortName;
+            shortName = (model!=null?model.name:"") + "." + type + "[" + index + "]" + shortName;
             return shortName;
         }
 

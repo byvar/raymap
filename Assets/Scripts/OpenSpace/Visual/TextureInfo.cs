@@ -219,7 +219,7 @@ namespace OpenSpace.Visual {
                     reader.ReadByte();
                     reader.ReadByte();
                     reader.ReadByte();
-                    tex.name = "Texture @ " + offset;
+                    tex.name = "Texture_" + offset.AbsoluteOffset.ToString("X8");
                 } else {
                     //MapLoader.Loader.print("tex @ " + offset);
                     tex.field0 = reader.ReadUInt32(); // 888 or 8888
