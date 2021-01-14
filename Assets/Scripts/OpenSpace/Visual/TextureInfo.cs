@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using OpenSpace.Exporter;
 using UnityEngine;
 
 namespace OpenSpace.Visual {
@@ -67,6 +69,11 @@ namespace OpenSpace.Visual {
             get { return texture; }
             set {
                 texture = value;
+
+                if (Settings.s.platform == Settings.Platform.DC) {
+                    name = HashUtils.MD5Hash(value.GetRawTextureData());
+                }
+
                 if (texture != null) {
 					if (!IsRepeatU) {
 						texture.wrapModeU = TextureWrapMode.Clamp;
@@ -219,7 +226,7 @@ namespace OpenSpace.Visual {
                     reader.ReadByte();
                     reader.ReadByte();
                     reader.ReadByte();
-                    tex.name = "Texture_" + offset.AbsoluteOffset.ToString("X8");
+                    // tex.name is set when setting Texture
                 } else {
                     //MapLoader.Loader.print("tex @ " + offset);
                     tex.field0 = reader.ReadUInt32(); // 888 or 8888
