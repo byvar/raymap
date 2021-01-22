@@ -43,8 +43,8 @@ Map viewer/editor for OpenSpace games:
 
 ## How to use
 
-1. Download and install Unity (current version is 
-2. Clone this project and open it with Unity (as of this writing, version 2019.4.10f1)
+1. Download and install Unity (as of this writing, version 2019.4.10f1)
+2. Clone this project and open it with Unity
 3. In Unity, open the MapViewer scene (located in Assets/Scenes/).
 4. Open the Raymap settings window (located under Raymap in the toolbar)
 5. Select a Game and a Map to load
