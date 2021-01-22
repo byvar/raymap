@@ -44,9 +44,12 @@ Map viewer/editor for OpenSpace games:
 ## How to use
 
 1. Download and install Unity (as of this writing, version 2019.4.10f1)
-2. Clone this project and open it with Unity
-3. In Unity, open the MapViewer scene (located in Assets/Scenes/).
+2. Download the .zip file of this project from GitHub and extract it to a folder.
+3. In Unity, open the MapViewer scene, located in Assets/Scenes.
 4. Open the Raymap settings window (located under Raymap in the toolbar)
+
+![Raymap Settings](/Wiki/RaymapSettings.png)
+
 5. Select a Game and a Map to load
 6. Select the game data folder for the game you have chosen (for most versions of Rayman 2 and 3, this folder contains a file called "game.dsb" or "fix.lvl")
 7. In the Game View tab, make sure "Maximize on Play" is unchecked (you will want to see the hierarchy and inspector).
