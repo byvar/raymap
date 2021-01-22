@@ -50,8 +50,8 @@ Map viewer/editor for OpenSpace games:
 
 ![Raymap Settings](/Wiki/RaymapSettings.png)
 
-5. Select a Game and a Map to load
-6. Select the game data folder for the game you have chosen (for most versions of Rayman 2 and 3, this folder contains a file called "game.dsb" or "fix.lvl")
+5. Select the game data folder for the game you'd like to load (for most versions of Rayman 2 and 3, this folder contains a file called "game.dsb" or "fix.lvl")
+6. Select the Game and a Map to load
 7. In the Game View tab, make sure "Maximize on Play" is unchecked (you will want to see the hierarchy and inspector).
 8. Click the play button and wait for it to load.
 9. Enjoy!
