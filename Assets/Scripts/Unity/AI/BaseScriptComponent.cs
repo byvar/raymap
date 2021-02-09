@@ -3,6 +3,7 @@ using System.Collections;
 using OpenSpace.AI;
 using OpenSpace.Object;
 using System.Collections.Generic;
+using OpenSpace;
 
 public abstract class BaseScriptComponent : MonoBehaviour {
     public OpenSpace.Pointer Offset;
@@ -17,6 +18,12 @@ public abstract class BaseScriptComponent : MonoBehaviour {
     protected bool _showOffset = false;
     protected bool _expandMacros = false;
     protected bool forceUpdateScript = false;
+
+    public void Awake()
+    {
+        MapLoader.Loader.scriptComponents.Add(this);
+    }
+
     public void Update()
     {
         if (showOffset!=_showOffset)

@@ -22,6 +22,10 @@ namespace OpenSpace.Exporter {
 
         public static string MD5Hash(string input)
         {
+            if (input == null) {
+                return string.Empty;
+            }
+
             StringBuilder hash = new StringBuilder();
             MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
             byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes(input));

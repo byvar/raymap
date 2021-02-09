@@ -1,5 +1,6 @@
 ﻿using OpenSpace.Object;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace OpenSpace.Collide {
     public class CollSet {
@@ -20,6 +21,8 @@ namespace OpenSpace.Collide {
 		public Dictionary<CollideType, LinkedList<GeometricObjectCollide>> zdxList = new Dictionary<CollideType, LinkedList<GeometricObjectCollide>>();
 		public Dictionary<CollideType, LinkedList<CollideActivation>> activationList = new Dictionary<CollideType, LinkedList<CollideActivation>>();
 		public Dictionary<CollideType, LinkedList<CollideActivationZone>> zones = new Dictionary<CollideType, LinkedList<CollideActivationZone>>();
+
+        public byte colliderType;
 
         public CollSet(Perso perso, Pointer offset) {
             this.perso = perso;
@@ -117,7 +120,10 @@ namespace OpenSpace.Collide {
 				});
 			}
 
-            return c;
+            Pointer.Goto(ref reader, offset + 0x64);
+            c.colliderType = reader.ReadByte();
+
+			return c;
         }
 
 

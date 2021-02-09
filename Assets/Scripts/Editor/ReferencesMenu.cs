@@ -22,8 +22,11 @@ namespace Assets.Scripts.Editor {
                 var dsgMemReferences = references.SelectMany(r => r.referencedByDsgMems);
                 var scriptReferences = references.SelectMany(r => r.referencedByNodes);
 
-                var dsgMemPersos = UnityEngine.Object.FindObjectsOfType<PersoBehaviour>().Where(p => dsgMemReferences.Contains(p.perso?.brain?.mind?.dsgMem)).Select(p => p.perso);
-                var scriptList = UnityEngine.Object.FindObjectsOfType<ScriptComponent>().Where(p => p?.script?.scriptNodes!=null ? p.script.scriptNodes.Intersect(scriptReferences).Any() : false);
+                var persoBehaviours = MapLoader.Loader.persos.Select(p => p.Gao.GetComponent<PersoBehaviour>());
+                var scriptComponents = MapLoader.Loader.scriptComponents.OfType<ScriptComponent>();
+
+                var dsgMemPersos = persoBehaviours.Where(p => dsgMemReferences.Contains(p.perso?.brain?.mind?.dsgMem)).Select(p => p.perso);
+                var scriptList = scriptComponents.Where(p => p?.script?.scriptNodes?.Intersect(scriptReferences).Any() ?? false);
 
                 ReferencesResultWindow.Init();
 

@@ -77,6 +77,7 @@ namespace OpenSpace {
         public List<PhysicalObject> physicalObjects = new List<PhysicalObject>(); // only required for quick switching between visual & collision geometry
         public List<AIModel> aiModels = new List<AIModel>();
         public List<Behavior> behaviors = new List<Behavior>();
+        public List<BaseScriptComponent> scriptComponents = new List<BaseScriptComponent>();
 		public List<Macro> macros = new List<Macro>();
         public List<Perso> persos = new List<Perso>();
         public List<State> states = new List<State>();
