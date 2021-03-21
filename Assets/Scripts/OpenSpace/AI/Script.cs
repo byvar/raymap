@@ -78,5 +78,24 @@ namespace OpenSpace.AI {
             }
             l.print(builder.ToString());
         }
+
+        /**
+         * Get nodes as an array of bytes, with each node consisting of the following:
+         * struct node {
+         *  int param
+         *  short padding
+         *  byte indent
+         *  byte type
+         * }
+         */
+        public byte[] GetNodeBytes()
+        {
+            List<byte> bytes = new List<byte>();
+            foreach (var n in scriptNodes) {
+                bytes.AddRange(n.bytes);
+            }
+
+            return bytes.ToArray();
+        }
     }
 }

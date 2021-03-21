@@ -221,7 +221,11 @@ namespace OpenSpace.Exporter {
                 using (FileStream fileStream = File.Create(path)) {
 
                     byte[] pngData = ImageConversion.EncodeToPNG(texture.Texture);
-                    fileStream.Write(pngData, 0, pngData.Length);
+
+                    if (pngData != null) {
+                        fileStream.Write(pngData, 0, pngData.Length);
+                    }
+
                     fileStream.Flush();
                     fileStream.Close();
                 }
@@ -345,7 +349,6 @@ namespace OpenSpace.Exporter {
                 string filePath = Path.Combine(path, aiModel.name + ".cs");
                 if (File.Exists(filePath)) {
                     File.Delete(filePath);
-
                 }
 
                 using (StreamWriter aiModelFileStream = File.CreateText(filePath)) {
@@ -354,6 +357,43 @@ namespace OpenSpace.Exporter {
                     aiModelFileStream.Flush();
                     aiModelFileStream.Close();
                 }
+
+                if (aiModel.behaviors_normal != null) {
+                    foreach (var b in aiModel.behaviors_normal) {
+                        int i = 0;
+                        foreach (var s in b.scripts) {
+                            string filePathRaw =
+                                Path.Combine(path, aiModel.name, "rule", b.name + "." + (i++) + ".osb");
+                            if (File.Exists(filePathRaw)) {
+                                File.Delete(filePathRaw);
+                            }
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(filePathRaw));
+
+                            File.WriteAllBytes(filePathRaw, s.GetNodeBytes());
+                        }
+
+                    }
+                }
+
+                if (aiModel.behaviors_reflex != null) {
+                    foreach (var b in aiModel.behaviors_reflex) {
+                        int i = 0;
+                        foreach (var s in b.scripts) {
+                            string filePathRaw = Path.Combine(path, aiModel.name, "reflex",
+                                b.name + "." + (i++) + ".osb");
+                            if (File.Exists(filePathRaw)) {
+                                File.Delete(filePathRaw);
+                            }
+
+                            Directory.CreateDirectory(Path.GetDirectoryName(filePathRaw));
+
+                            File.WriteAllBytes(filePathRaw, s.GetNodeBytes());
+                        }
+
+                    }
+                }
+
             }
         }
 
