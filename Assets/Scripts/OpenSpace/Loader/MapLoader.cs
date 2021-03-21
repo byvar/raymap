@@ -434,7 +434,7 @@ MonoBehaviour.print(str);
 
 		protected async UniTask CreateCNT() {
 			await WaitIfNecessary();
-			if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+			if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17 && exportTextures) {
 				List<string> cntPaths = new List<string>();
 				cntPaths.Add(gameDataBinFolder + ConvertCase("TEXTURES.CNT", Settings.CapsType.All));
 				if (cntPaths.Count > 0) {
@@ -442,6 +442,11 @@ MonoBehaviour.print(str);
 						await PrepareBigFile(path, 512 * 1024);
 					}
 					cnt = new CNT(cntPaths.ToArray());
+				}
+				TBF tbf = new TBF(gameDataBinFolder + ConvertCase("TEXTURES.TXC", Settings.CapsType.All), hasNames: true);
+				string textureFolder = "textures_txc/";
+				for (int i = 0; i < tbf.headers.Length; i++) {
+					Util.ByteArrayToFile(gameDataBinFolder + textureFolder + tbf.headers[i].name.ToLower().Substring(0, tbf.headers[i].name.LastIndexOf('.')) + ".png", tbf.headers[i].texture.EncodeToPNG());
 				}
 			}
 			if (Settings.s.game == Settings.Game.LargoWinch) {
@@ -503,9 +508,11 @@ MonoBehaviour.print(str);
 					loadingState = "Exporting textures";
 					await MapLoader.WaitIfNecessary();
 					// Export all textures in cnt
+					string textureFolder = "textures/";
+					if(Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) textureFolder = "textures_cnt/";
 					foreach (CNT.FileStruct file in cnt.fileList) {
 						GF gf = cnt.GetGF(file);
-						Util.ByteArrayToFile(gameDataBinFolder + "textures/" + file.FullName.Replace(".gf", ".png"), gf.GetTexture().EncodeToPNG());
+						Util.ByteArrayToFile(gameDataBinFolder + textureFolder + file.FullName.Replace(".gf", ".png"), gf.GetTexture().EncodeToPNG());
 					}
 					loadingState = state;
 					await MapLoader.WaitIfNecessary();
@@ -771,7 +778,8 @@ MonoBehaviour.print(str);
             } else {
 				if (Settings.s.platform == Settings.Platform.PS2
 					&& (Settings.s.game == Settings.Game.R3
-					|| Settings.s.game == Settings.Game.DDPK)) {
+					|| Settings.s.game == Settings.Game.DDPK)
+					&& Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 					num_textures_lvl = reader.ReadUInt32();
 					num_textures_fix = (uint)textures.Length;
 					num_textures_total = num_textures_fix + num_textures_lvl;

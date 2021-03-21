@@ -85,10 +85,14 @@ namespace OpenSpace.Input {
 							reader.ReadUInt32(); // 0F00020000040100
 							reader.ReadBytes(0x300);
 						} else {
-							reader.ReadBytes(0x1250);
-							if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM
-								|| Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18) {
-								reader.ReadBytes(0x10);
+							if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+								reader.ReadBytes(0x1368);
+							} else {
+								reader.ReadBytes(0x1250);
+								if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM
+									|| Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18) {
+									reader.ReadBytes(0x10);
+								}
 							}
 							input.num_entryActions = reader.ReadUInt32();
 							input.off_entryActions = Pointer.Read(reader);

@@ -389,6 +389,7 @@ namespace OpenSpace {
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
+			hasNames = true
 		};
 		public static Settings R3PS2Demo_20020807 = new Settings() {
 			engineVersion = EngineVersion.R3,

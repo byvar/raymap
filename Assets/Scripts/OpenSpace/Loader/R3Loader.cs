@@ -338,15 +338,19 @@ namespace OpenSpace.Loader {
 				|| Settings.s.platform == Settings.Platform.Xbox360
 				|| Settings.s.platform == Settings.Platform.PS3
 				|| Settings.s.platform == Settings.Platform.PS2) {
-				if (Settings.s.game == Settings.Game.R3 && (Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_01 && Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_21)) {
+				if (Settings.s.game == Settings.Game.R3
+					&& (Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_01
+					&& Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_21)) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
-					reader.ReadUInt32();
-					reader.ReadUInt32();
+					if (Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+						reader.ReadUInt32();
+						reader.ReadUInt32();
+					}
 				} else if (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.Dinosaur ||Settings.s.game == Settings.Game.R3) {
 					if (Settings.s.platform == Settings.Platform.PS2) {
 						string timeStamp = reader.ReadString(0x14);
@@ -402,7 +406,7 @@ namespace OpenSpace.Loader {
 				for (uint i = 0; i < num_fixEntries1; i++) {
 					string savMapName = new string(reader.ReadChars(0xC));
 				}
-				if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM) {
+				if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 					reader.Align(4);
 				}
 			}
@@ -411,7 +415,7 @@ namespace OpenSpace.Loader {
 			Pointer.DoAt(ref reader, off_languages, () => {
 				ReadLanguages(reader, off_languages, num_languages);
 			});
-			if (Settings.s.platform == Settings.Platform.PS2 && localization != null && Settings.s.game == Settings.Game.R3) {
+			if (Settings.s.platform == Settings.Platform.PS2 && localization != null && Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 				for (int i = 0; i < localization.num_languages; i++) {
 					if (localization.languages[i].off_textTable == null) {
 						// Load text from file
@@ -486,7 +490,8 @@ namespace OpenSpace.Loader {
 						sz_entryActions = 0xF8;
 						sz_binDataForMenu = 0x78;
 					} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
-						sz_entryActions = 0xF8;
+						sz_videoStructure = 0x18;
+						sz_entryActions = 0xCC;
 						sz_binDataForMenu = 0;
 					} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_08_07) {
 						sz_entryActions = 0xF8;
@@ -540,7 +545,9 @@ namespace OpenSpace.Loader {
 			uint soundEventTableIndexInFix = reader.ReadUInt32();
 			Pointer off_soundEventTable = Pointer.Read(reader);
 			fonts = FromOffsetOrRead<FontStructure>(reader, Pointer.Current(reader), inline: true);
-			reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
+			if (Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+				reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
+			}
 			if (Settings.s.platform == Settings.Platform.PS2) {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
@@ -550,7 +557,10 @@ namespace OpenSpace.Loader {
 				}
 				reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
 			}
-			if (Settings.s.game == Settings.Game.R3) {
+			if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+				reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
+			}
+			if (Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 				uint num_musicMarkerSlots = reader.ReadUInt32();
 				for (int i = 0; i < num_musicMarkerSlots; i++) {
 					reader.ReadBytes(sz_musicMarkerSlot);
@@ -624,7 +634,10 @@ namespace OpenSpace.Loader {
 				|| Settings.s.platform == Settings.Platform.Xbox360
 				|| Settings.s.platform == Settings.Platform.PS3
 				|| Settings.s.platform == Settings.Platform.PS2) {
-				if (Settings.s.game == Settings.Game.R3 && (Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_01 && Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_21)) {
+				if (Settings.s.game == Settings.Game.R3
+					&& (Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_01
+					&& Settings.s.mode != Settings.Mode.Rayman3PCDemo_2002_10_21
+					&& Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -729,7 +742,7 @@ namespace OpenSpace.Loader {
 			}
 
 			LinkedList<int> unknown = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
-			
+
 			families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
 
 			LinkedList<int> alwaysActiveCharacters = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
@@ -789,6 +802,7 @@ namespace OpenSpace.Loader {
 
 			uint num_internalStructure = num_ptrsTable;
 			if (Settings.s.mode == Settings.Mode.Rayman3GC
+				|| Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17
 				|| Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18
 				|| (Settings.s.platform == Settings.Platform.PS2 && (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM))) {
 				reader.ReadUInt32();

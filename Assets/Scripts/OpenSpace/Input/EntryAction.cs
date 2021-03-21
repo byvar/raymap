@@ -73,7 +73,8 @@ namespace OpenSpace.Input {
                 if (Settings.s.platform == Settings.Platform.PS2 &&
                     (Settings.s.game == Settings.Game.RM
                     || Settings.s.game == Settings.Game.RA
-                    || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18)) {
+                    || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18
+                    || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
                     reader.ReadBytes(0x8);
                 }
                 ea.num_keywords = reader.ReadUInt32();

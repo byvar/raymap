@@ -11,7 +11,6 @@ namespace OpenSpace.FileFormat.Texture {
 	// PS2 TBF Textures file
 	public class TBF {
 		public uint Count { get; } = 0;
-
 		public string path;
 
 		public Texture2D[] textures = null;
@@ -67,7 +66,7 @@ namespace OpenSpace.FileFormat.Texture {
 				case 0x1: {
 						Color[] palette = ReadPalette(reader, 16, h.HasAlpha);
 						byte[] texData = reader.ReadBytes((int)(h.height * h.width / 2));
-						if (Settings.s.game == Settings.Game.R3) {
+						if (Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 							ezSwizzle.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 4, texData);
 							Array.Resize<byte>(ref texData, (int)(h.height * h.width));
 							ezSwizzle.readTexPSMT4_mod(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
@@ -81,7 +80,7 @@ namespace OpenSpace.FileFormat.Texture {
 				case 0x2: {
 						Color[] palette = ReadPalette(reader, 256, h.HasAlpha);
 						byte[] texData = reader.ReadBytes((int)(h.height * h.width));
-						if (Settings.s.game == Settings.Game.R3) {
+						if (Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 							ezSwizzle.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 2, texData);
 							//texData = new byte[h.height * h.width];
 							ezSwizzle.readTexPSMT8(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
@@ -115,7 +114,7 @@ namespace OpenSpace.FileFormat.Texture {
 				palette[i] = new Color(r / 255f, g / 255f, b / 255f, hasAlpha ? (a / 128f) : 1f);
 			}
 			Color[] pal = palette;
-			if (length == 256 && Settings.s.game == Settings.Game.R3) {
+			if (length == 256 && (Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
 				// Tile
 				pal = new Color[palette.Length];
 				for (int i = 0; i < length; i++) {
