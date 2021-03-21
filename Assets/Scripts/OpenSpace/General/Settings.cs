@@ -19,6 +19,7 @@ namespace OpenSpace {
 			{ "r3_pc_demo_20030106", Mode.Rayman3PCDemo_2003_01_06 },
 			{ "r3_macos", Mode.Rayman3MacOS },
 			{ "r3_ps2", Mode.Rayman3PS2 },
+			{ "r3_ps2_demo_20020517", Mode.Rayman3PS2Demo_2002_05_17 },
 			{ "r3_ps2_demo_20020807", Mode.Rayman3PS2Demo_2002_08_07 },
 			{ "r3_ps2_devbuild_20020906", Mode.Rayman3PS2DevBuild_2002_09_06 },
 			{ "r3_ps2_demo_20021029", Mode.Rayman3PS2Demo_2002_10_29 },
@@ -92,7 +93,8 @@ namespace OpenSpace {
 			[Description("Rayman 3 (MacOS)")] Rayman3MacOS,
 			[Description("Rayman 3 (GC)")] Rayman3GC,
             [Description("Rayman 3 (PS2)")] Rayman3PS2,
-            [Description("R3 (PS2) Demo (2002/08/07)")] Rayman3PS2Demo_2002_08_07,
+			[Description("R3 (PS2) Demo (2002/05/17)")] Rayman3PS2Demo_2002_05_17,
+			[Description("R3 (PS2) Demo (2002/08/07)")] Rayman3PS2Demo_2002_08_07,
             [Description("R3 (PS2) Dev Build (2002/09/06)")] Rayman3PS2DevBuild_2002_09_06,
             [Description("R3 (PS2) Demo (2002/10/29)")] Rayman3PS2Demo_2002_10_29,
             [Description("R3 (PS2) Demo (2002/12/18)")] Rayman3PS2Demo_2002_12_18,
@@ -368,6 +370,23 @@ namespace OpenSpace {
 			saturate = false,
             levelTranslation = LevelTranslation.levelTranslation_r3,
             caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			},
+		};
+		public static Settings R3PS2Demo_20020517 = new Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.R3,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			hasMemorySupport = false,
+			textureAnimationSpeedModifier = 10f,
+			luminosity = 0.5f,
+			saturate = false,
+			levelTranslation = LevelTranslation.levelTranslation_r3,
+			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.All }
 			},
 		};
@@ -1158,6 +1177,7 @@ namespace OpenSpace {
 			{ Mode.Rayman3MacOS, R3MacOS },
 			{ Mode.Rayman3GC, R3GC },
 			{ Mode.Rayman3PS2, R3PS2 },
+			{ Mode.Rayman3PS2Demo_2002_05_17, R3PS2Demo_20020517 },
 			{ Mode.Rayman3PS2Demo_2002_08_07, R3PS2Demo_20020807 },
 			{ Mode.Rayman3PS2DevBuild_2002_09_06, R3PS2DevBuild },
 			{ Mode.Rayman3PS2Demo_2002_10_29, R3PS2Demo_20021029 },

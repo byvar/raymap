@@ -485,6 +485,9 @@ namespace OpenSpace.Loader {
 					if (Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild_2002_09_06) {
 						sz_entryActions = 0xF8;
 						sz_binDataForMenu = 0x78;
+					} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+						sz_entryActions = 0xF8;
+						sz_binDataForMenu = 0;
 					} else if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_08_07) {
 						sz_entryActions = 0xF8;
 						sz_binDataForMenu = 0;

@@ -433,6 +433,16 @@ MonoBehaviour.print(str);
 
 		protected async UniTask CreateCNT() {
 			await WaitIfNecessary();
+			if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+				List<string> cntPaths = new List<string>();
+				cntPaths.Add(gameDataBinFolder + ConvertCase("TEXTURES.CNT", Settings.CapsType.All));
+				if (cntPaths.Count > 0) {
+					foreach (string path in cntPaths) {
+						await PrepareBigFile(path, 512 * 1024);
+					}
+					cnt = new CNT(cntPaths.ToArray());
+				}
+			}
 			if (Settings.s.game == Settings.Game.LargoWinch) {
 				cntPaths = new string[1];
 				cntPaths[0] = gameDataBinFolder + "Vignette.cnt";

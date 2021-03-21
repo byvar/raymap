@@ -48,18 +48,25 @@ namespace OpenSpace.FileFormat.Texture {
 
         public GF(byte[] bytes) : this(new MemoryStream(bytes)) {}
         /*public GF(byte[] bytes) {
-            Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "hi" + bytes.Length + ".lol", bytes);
-            GF gf = new GF(new MemoryStream(bytes));
-            pixels = gf.pixels;
-            throw new Exception("exported");
+            try {
+                GF gf = new GF(new MemoryStream(bytes));
+                pixels = gf.pixels;
+            } catch (Exception) {
+                Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "hi" + bytes.Length + ".lol", bytes);
+                throw;
+            }
         }*/
 
         public GF(string filePath) : this(FileSystem.GetFileReadStream(filePath)) { }
 
         public GF(Stream stream) {
             MapLoader l = MapLoader.Loader;
+            bool isR3PS2Proto = Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17;
             Reader reader = new Reader(stream, isLittleEndian);
-            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+            /*var pos = reader.BaseStream.Position;
+            reader.ReadBytes(*/
+            if (isR3PS2Proto) {
+            } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
                 byte version = reader.ReadByte();
                 format = 1555;
             } else {
@@ -70,50 +77,74 @@ namespace OpenSpace.FileFormat.Texture {
             width = reader.ReadUInt32();
             height = reader.ReadUInt32();
             channelPixels = width * height;
+            if(isR3PS2Proto) channelPixels = reader.ReadUInt32();
 
-            channels = reader.ReadByte();
-            byte enlargeByte = 0;
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) enlargeByte = reader.ReadByte();
-			if (enlargeByte > 1) {
-                uint w = width, h = height, e = enlargeByte;
-                if (w != 1) w >>= 1;
-                if (h != 1) h >>= 1;
-                while(e > 1) {
-					channelPixels += (w * h);
+            if (!isR3PS2Proto) {
+                channels = reader.ReadByte();
+                byte enlargeByte = 0;
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) enlargeByte = reader.ReadByte();
+                if (enlargeByte > 1) {
+                    uint w = width, h = height, e = enlargeByte;
                     if (w != 1) w >>= 1;
                     if (h != 1) h >>= 1;
-                    e --;
+                    while (e > 1) {
+                        channelPixels += (w * h);
+                        if (w != 1) w >>= 1;
+                        if (h != 1) h >>= 1;
+                        e--;
+                    }
                 }
-			}
-            repeatByte = reader.ReadByte();
-            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+            } else {
+                reader.ReadUInt32();
+            }
+            if(!isR3PS2Proto) repeatByte = reader.ReadByte();
+            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal || isR3PS2Proto) {
                 paletteNumColors = reader.ReadUInt16();
                 paletteBytesPerColor = reader.ReadByte();
-                byte1 = reader.ReadByte();
-                byte2 = reader.ReadByte();
-                byte3 = reader.ReadByte();
-                num4 = reader.ReadUInt32();
-                channelPixels = reader.ReadUInt32(); // Hype has mipmaps
-                montrealType = reader.ReadByte();
+                if (isR3PS2Proto) {
+                    channels = reader.ReadByte();
+                    repeatByte = reader.ReadByte();
+                    reader.ReadBytes(7);
+                    format = 8888;
+                } else {
+                    byte1 = reader.ReadByte();
+                    byte2 = reader.ReadByte();
+                    byte3 = reader.ReadByte();
+                    num4 = reader.ReadUInt32();
+                    channelPixels = reader.ReadUInt32(); // Hype has mipmaps
+                    montrealType = reader.ReadByte();
+                    switch (montrealType) {
+                        case 5: format = 0; break; // palette
+                        case 10: format = 565; break; // unsure
+                        case 11: format = 1555; break;
+                        case 12: format = 4444; break; // unsure
+                        default: throw new Exception("unknown Montreal GF format " + montrealType + "!");
+                    }
+                }
                 if (paletteNumColors != 0 && paletteBytesPerColor != 0) {
                     palette = reader.ReadBytes(paletteBytesPerColor * paletteNumColors);
-                }
-                switch (montrealType) {
-                    case 5: format = 0; break; // palette
-                    case 10: format = 565; break; // unsure
-                    case 11: format = 1555; break;
-                    case 12: format = 4444; break; // unsure
-                    default: throw new Exception("unknown Montreal GF format " + montrealType + "!");
                 }
             }
 
             pixels = new Color[width * height];
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && channels == 1) {
-                paletteBytesPerColor = 4;
-                paletteNumColors = 256;
-                palette = reader.ReadBytes(paletteBytesPerColor * paletteNumColors);
+            if (!isR3PS2Proto) {
+                if (Settings.s.engineVersion == Settings.EngineVersion.R3 && channels == 1) {
+                    paletteBytesPerColor = 4;
+                    paletteNumColors = 256;
+                    palette = reader.ReadBytes(paletteBytesPerColor * paletteNumColors);
+                }
             }
             byte[] pixelData = ReadChannels(reader);
+            if (isR3PS2Proto && palette != null && paletteNumColors <= 16) {
+                var newPixelData = new byte[pixelData.Length*2];
+                height *= 2;
+                for (int i = 0; i < pixelData.Length; i++) {
+                    newPixelData[i*2] = (byte)(pixelData[i] & 0xF);
+                    newPixelData[i*2+1] = (byte)(pixelData[i] >> 4);
+                }
+                pixelData = newPixelData;
+                pixels = new Color[width * height];
+            }
 
             if (channels >= 3) {
                 if (channels == 4) isTransparent = true;
@@ -208,6 +239,14 @@ namespace OpenSpace.FileFormat.Texture {
                         g = pixelData[i];
                         b = pixelData[i];
                     }
+                    if (isR3PS2Proto) {
+                        byte newR, newG, newB, newA;
+                        newR = b;
+                        newG = g;
+                        newB = r;
+                        newA = a;
+                        r = newR; g = newG; b = newB; a = newA;
+                    }
                     pixels[i] = new Color(r / 255f, g / 255f, b / 255f, a / 255f);
                 }
             }
@@ -215,6 +254,7 @@ namespace OpenSpace.FileFormat.Texture {
 
             if (reader.BaseStream.Position != reader.BaseStream.Length) {
                 Debug.LogError("Assertion failed: GF not fully read! Remaining bytes: " + (reader.BaseStream.Length - reader.BaseStream.Position));
+                throw new Exception();
             }
             /*if (r.BaseStream.Position != r.BaseStream.Length) {
                 Debug.LogError((r.BaseStream.Length - r.BaseStream.Position));
@@ -231,6 +271,7 @@ namespace OpenSpace.FileFormat.Texture {
             int channel = 0;
             while(channel < channels) {
                 int pixel = 0;
+                //UnityEngine.Debug.Log($"{reader.BaseStream.Position:X8} - {pixel}");
                 while (pixel < channelPixels) {
                     byte b1 = reader.ReadByte();
                     if (b1 == repeatByte) {
@@ -248,6 +289,7 @@ namespace OpenSpace.FileFormat.Texture {
                 }
                 channel++;
             }
+            //UnityEngine.Debug.Log($"{reader.BaseStream.Position:X8}");
             return data;
         }
 
