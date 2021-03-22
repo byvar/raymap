@@ -1,0 +1,13 @@
+{
+    "name": "Rayman 3 (PS2) Demo (2002\/05\/17)",
+    "image": ".\/img\/logo\/r3_ps2.png",
+    "mode": "r3_ps2_demo_20020517",
+    "folder": "r3_ps2_demo_20020517",
+    "levels": [
+        { "level": "MENU_40", "name": "Main Menu" },
+        { "level": "SWAMP_60", "name": "The Bog of Murk 1 (Bégoniax)" },
+        { "level": "SWAMP_50", "name": "The Bog of Murk 5 (Razoff's Mansion)" },
+        { "level": "MOOR_30", "name": "The Land of the Livid Dead 2" },
+        { "level": "TOWER_30", "name": "The Tower of the Leptys 3" }
+    ]
+}
