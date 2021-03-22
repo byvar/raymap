@@ -109,6 +109,10 @@ let games_header, versions_header, levels_header = null;
 let current_game, current_version = null;
 let levels_actors_group, actor1_group, actor2_group, actor1_selector, actor2_selector = null;
 
+let unity_logo = null;
+let unity_progress = null;
+let unity_container = null;
+
 // FUNCTIONS
 function getNoCacheURL() {
 	return '?nocache=' + (new Date()).getTime();
@@ -1953,8 +1957,66 @@ function hideDialogue() {
 	dialogueMsg = null;
 }
 
+function unityProgress(progress) {
+	if(unity_logo === null) {
+		unity_logo = document.createElement("div");
+		unity_logo.className = "logo-container dark";
+		unity_logo.logo = document.createElement("div");
+		unity_logo.logo.className = "logo dark";
+		unity_logo.appendChild(unity_logo.logo);
+		unity_container.appendChild(unity_logo);
+	}
+	if (unity_progress === null) {    
+		unity_progress = document.createElement("div");
+		unity_progress.className = "progress dark";
+		unity_progress.empty = document.createElement("div");
+		unity_progress.empty.className = "empty";
+		unity_progress.appendChild(unity_progress.empty);
+		unity_progress.full = document.createElement("div");
+		unity_progress.full.className = "full";
+		unity_progress.appendChild(unity_progress.full);
+		unity_container.appendChild(unity_progress);
+	}
+	unity_progress.full.style.width = (100 * progress) + "%";
+	unity_progress.empty.style.width = (100 * (1 - progress)) + "%";
+	if (progress == 1) {
+		unity_logo.style.display = unity_progress.style.display = "none";
+	}
+}
+
 function startGame() {
-	gameInstance = UnityLoader.instantiate("gameContainer", "Build/raymap.json", {onProgress: UnityProgress});
+	
+	let buildUrl = "Build";
+	let loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+	let config = {
+	  dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+	  frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+	  codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#if MEMORY_FILENAME
+	  memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+	  symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+	  streamingAssetsUrl: "StreamingAssets",
+	  companyName: "{{{ COMPANY_NAME }}}",
+	  productName: "{{{ PRODUCT_NAME }}}",
+	  productVersion: "{{{ PRODUCT_VERSION }}}",
+	};
+	unity_container = document.querySelector("#gameContainer");
+	container.canvas = document.createElement("canvas");
+	unity_container.appendChild(container.canvas);
+
+	createUnityInstance(container.canvas, config, (progress) => {
+		unityProgress(progress);
+	}).then((unityInstance) => {
+		gameInstance = unityInstance;
+		unityProgress(1);
+	}).catch((message) => {
+		alert(message);
+	});
+	
+	//gameInstance = UnityLoader.instantiate("gameContainer", "Build/ray1map.json", {onProgress: UnityProgress});
 }
 
 function showLevelSelect() {
