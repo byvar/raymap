@@ -70,7 +70,7 @@ namespace OpenSpace.Visual {
             set {
                 texture = value;
 
-                if (Settings.s.platform == Settings.Platform.DC) {
+                if (Application.platform != RuntimePlatform.WebGLPlayer && Settings.s.platform == Settings.Platform.DC) {
                     name = HashUtils.MD5Hash(value.GetRawTextureData());
                 }
 

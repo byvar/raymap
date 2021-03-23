@@ -21,7 +21,9 @@ public abstract class BaseScriptComponent : MonoBehaviour {
 
     public void Awake()
     {
-        MapLoader.Loader.scriptComponents.Add(this);
+        if (Application.platform != RuntimePlatform.WebGLPlayer) {
+            MapLoader.Loader.scriptComponents.Add(this);
+        }
     }
 
     public void Update()

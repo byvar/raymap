@@ -239,8 +239,10 @@ public class Controller : MonoBehaviour {
             Destroy(pb.gameObject);
         }
 
-        // Collect searchable strings
-        loader.searchableStrings.AddRange(loader.persos.SelectMany(p => p.GetSearchableStrings()));
+		// Collect searchable strings
+		if (Application.platform != RuntimePlatform.WebGLPlayer) {
+			loader.searchableStrings.AddRange(loader.persos.SelectMany(p => p.GetSearchableStrings()));
+		}
 
     }
 

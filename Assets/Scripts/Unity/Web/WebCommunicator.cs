@@ -33,6 +33,8 @@ public class WebCommunicator : MonoBehaviour {
     bool sentHierarchy = false;
     string allJSON = null;
 
+	public bool testMessages = false;
+
 	private Newtonsoft.Json.JsonSerializerSettings _settings;
 	public Newtonsoft.Json.JsonSerializerSettings Settings {
 		get {
@@ -43,11 +45,11 @@ public class WebCommunicator : MonoBehaviour {
 					MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore,
 					
 				};
+				_settings.Converters.Add(new OpenSpace.PointerJsonConverter());
 				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.Vector3Converter());
-				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.Vector2Converter());
-				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.Vector4Converter());
-				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.QuaternionConverter());
 				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.ColorConverter());
+				/*_settings.Converters.Add(new JsonConverters.Vector3JsonConverter());
+				_settings.Converters.Add(new JsonConverters.ColorJsonConverter());*/
 			}
 			return _settings;
 		}
@@ -61,7 +63,7 @@ public class WebCommunicator : MonoBehaviour {
             SendHierarchy();
             sentHierarchy = true;
         }
-        if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
+        if ((Application.platform == RuntimePlatform.WebGLPlayer || testMessages) && controller.LoadState == Controller.State.Finished) {
             if (highlightedPerso_ != selector.highlightedPerso ||
 				highlightedCollision_ != selector.highlightedCollision ||
 				highlightedWayPoint_ != selector.highlightedWayPoint) {
@@ -89,18 +91,22 @@ public class WebCommunicator : MonoBehaviour {
     }
 
     public void SendHierarchy() {
-        if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
+        if ((Application.platform == RuntimePlatform.WebGLPlayer || testMessages) && controller.LoadState == Controller.State.Finished) {
 			allJSON = SerializeMessage(GetHierarchyMessageJSON());
-            SetAllJSON(allJSON);
+			if (Application.platform == RuntimePlatform.WebGLPlayer) {
+				SetAllJSON(allJSON);
+			} else if (testMessages) {
+				Debug.Log(allJSON);
+			}
         }
     }
 	public void SendSettings() {
-		if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
+		if ((Application.platform == RuntimePlatform.WebGLPlayer || testMessages) && controller.LoadState == Controller.State.Finished) {
 			Send(GetSettingsMessageJSON());
 		}
 	}
 	public void SendChangedCameraMode(WebJSON.CameraPos cameraPos) {
-		if (Application.platform == RuntimePlatform.WebGLPlayer && controller.LoadState == Controller.State.Finished) {
+		if ((Application.platform == RuntimePlatform.WebGLPlayer || testMessages) && controller.LoadState == Controller.State.Finished) {
 			Send(new WebJSON.Message() {
 				Type = WebJSON.MessageType.Camera,
 				Camera = new WebJSON.CameraSettings() { CameraPos = cameraPos }
@@ -108,10 +114,14 @@ public class WebCommunicator : MonoBehaviour {
 		}
 	}
     public void Send(WebJSON.Message obj) {
-        if (Application.platform == RuntimePlatform.WebGLPlayer) {
+        if (Application.platform == RuntimePlatform.WebGLPlayer || testMessages) {
             if (controller.LoadState == Controller.State.Finished) {
 				string json = SerializeMessage(obj);
-                UnityJSMessage(json);
+				if (Application.platform == RuntimePlatform.WebGLPlayer) {
+					UnityJSMessage(json);
+				} else if (testMessages) {
+					Debug.Log(json);
+				}
             }
         }
     }

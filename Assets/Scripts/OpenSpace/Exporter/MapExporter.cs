@@ -358,7 +358,7 @@ namespace OpenSpace.Exporter {
                     aiModelFileStream.Close();
                 }
 
-                if (aiModel.behaviors_normal != null) {
+                /*if (aiModel.behaviors_normal != null) {
                     foreach (var b in aiModel.behaviors_normal) {
                         int i = 0;
                         foreach (var s in b.scripts) {
@@ -392,7 +392,7 @@ namespace OpenSpace.Exporter {
                         }
 
                     }
-                }
+                }*/
 
             }
         }
