@@ -46,6 +46,7 @@ public class WebCommunicator : MonoBehaviour {
 					
 				};
 				_settings.Converters.Add(new OpenSpace.PointerJsonConverter());
+				_settings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
 				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.Vector3Converter());
 				_settings.Converters.Add(new Newtonsoft.Json.UnityConverters.Math.ColorConverter());
 				/*_settings.Converters.Add(new JsonConverters.Vector3JsonConverter());
