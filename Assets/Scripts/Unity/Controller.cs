@@ -937,6 +937,7 @@ public class Controller : MonoBehaviour {
 	}
 
 	public void UpdateLivePreview() {
+		if (loader == null || LoadState != State.Finished) return;
 		Reader reader = MapLoader.Loader.livePreviewReader;
 
 		foreach (SuperObject so in MapLoader.Loader.superObjects) {
