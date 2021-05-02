@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+﻿#pragma warning disable CS1591
 
 using Cysharp.Threading.Tasks.Internal;
 using System;
@@ -8,6 +8,10 @@ using System.Runtime.CompilerServices;
 
 namespace Cysharp.Threading.Tasks.CompilerServices
 {
+    // #ENABLE_IL2CPP in this file is to avoid bug of IL2CPP VM.
+    // Issue is tracked on https://issuetracker.unity3d.com/issues/il2cpp-incorrect-results-when-calling-a-method-from-outside-class-in-a-struct
+    // but currently it is labeled `Won't Fix`.
+
     internal interface IStateMachineRunner
     {
         Action MoveNext { get; }
@@ -83,7 +87,8 @@ namespace Cysharp.Threading.Tasks.CompilerServices
             TaskPool.RegisterSizeGetter(typeof(AsyncUniTaskVoid<TStateMachine>), () => pool.Size);
         }
 
-        public AsyncUniTaskVoid<TStateMachine> NextNode { get; set; }
+        AsyncUniTaskVoid<TStateMachine> nextNode;
+        public ref AsyncUniTaskVoid<TStateMachine> NextNode => ref nextNode;
 
         public void Return()
         {
@@ -153,7 +158,8 @@ namespace Cysharp.Threading.Tasks.CompilerServices
             result.stateMachine = stateMachine; // copy struct StateMachine(in release build).
         }
 
-        public AsyncUniTask<TStateMachine> NextNode { get; set; }
+        AsyncUniTask<TStateMachine> nextNode;
+        public ref AsyncUniTask<TStateMachine> NextNode => ref nextNode;
 
         static AsyncUniTask()
         {
@@ -275,7 +281,8 @@ namespace Cysharp.Threading.Tasks.CompilerServices
             result.stateMachine = stateMachine; // copy struct StateMachine(in release build).
         }
 
-        public AsyncUniTask<TStateMachine, T> NextNode { get; set; }
+        AsyncUniTask<TStateMachine, T> nextNode;
+        public ref AsyncUniTask<TStateMachine, T> NextNode => ref nextNode;
 
         static AsyncUniTask()
         {

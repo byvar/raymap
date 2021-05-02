@@ -189,6 +189,174 @@ namespace Cysharp.Threading.Tasks
             return new AsyncLazy<T>(task);
         }
 
+        /// <summary>
+        /// Ignore task result when cancel raised first.
+        /// </summary>
+        public static UniTask AttachExternalCancellation(this UniTask task, CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.CanBeCanceled)
+            {
+                return task;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return UniTask.FromCanceled(cancellationToken);
+            }
+
+            if (task.Status.IsCompleted())
+            {
+                return task;
+            }
+
+            return new UniTask(new AttachExternalCancellationSource(task, cancellationToken), 0);
+        }
+
+        /// <summary>
+        /// Ignore task result when cancel raised first.
+        /// </summary>
+        public static UniTask<T> AttachExternalCancellation<T>(this UniTask<T> task, CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.CanBeCanceled)
+            {
+                return task;
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return UniTask.FromCanceled<T>(cancellationToken);
+            }
+
+            if (task.Status.IsCompleted())
+            {
+                return task;
+            }
+
+            return new UniTask<T>(new AttachExternalCancellationSource<T>(task, cancellationToken), 0);
+        }
+
+        sealed class AttachExternalCancellationSource : IUniTaskSource
+        {
+            static readonly Action<object> cancellationCallbackDelegate = CancellationCallback;
+
+            CancellationToken cancellationToken;
+            CancellationTokenRegistration tokenRegistration;
+            UniTaskCompletionSourceCore<AsyncUnit> core;
+
+            public AttachExternalCancellationSource(UniTask task, CancellationToken cancellationToken)
+            {
+                this.cancellationToken = cancellationToken;
+                this.tokenRegistration = cancellationToken.RegisterWithoutCaptureExecutionContext(cancellationCallbackDelegate, this);
+                RunTask(task).Forget();
+            }
+
+            async UniTaskVoid RunTask(UniTask task)
+            {
+                try
+                {
+                    await task;
+                    core.TrySetResult(AsyncUnit.Default);
+                }
+                catch (Exception ex)
+                {
+                    core.TrySetException(ex);
+                }
+                finally
+                {
+                    tokenRegistration.Dispose();
+                }
+            }
+
+            static void CancellationCallback(object state)
+            {
+                var self = (AttachExternalCancellationSource)state;
+                self.core.TrySetCanceled(self.cancellationToken);
+            }
+
+            public void GetResult(short token)
+            {
+                core.GetResult(token);
+            }
+
+            public UniTaskStatus GetStatus(short token)
+            {
+                return core.GetStatus(token);
+            }
+
+            public void OnCompleted(Action<object> continuation, object state, short token)
+            {
+                core.OnCompleted(continuation, state, token);
+            }
+
+            public UniTaskStatus UnsafeGetStatus()
+            {
+                return core.UnsafeGetStatus();
+            }
+        }
+
+        sealed class AttachExternalCancellationSource<T> : IUniTaskSource<T>
+        {
+            static readonly Action<object> cancellationCallbackDelegate = CancellationCallback;
+
+            CancellationToken cancellationToken;
+            CancellationTokenRegistration tokenRegistration;
+            UniTaskCompletionSourceCore<T> core;
+
+            public AttachExternalCancellationSource(UniTask<T> task, CancellationToken cancellationToken)
+            {
+                this.cancellationToken = cancellationToken;
+                this.tokenRegistration = cancellationToken.RegisterWithoutCaptureExecutionContext(cancellationCallbackDelegate, this);
+                RunTask(task).Forget();
+            }
+
+            async UniTaskVoid RunTask(UniTask<T> task)
+            {
+                try
+                {
+                    core.TrySetResult(await task);
+                }
+                catch (Exception ex)
+                {
+                    core.TrySetException(ex);
+                }
+                finally
+                {
+                    tokenRegistration.Dispose();
+                }
+            }
+
+            static void CancellationCallback(object state)
+            {
+                var self = (AttachExternalCancellationSource<T>)state;
+                self.core.TrySetCanceled(self.cancellationToken);
+            }
+
+            void IUniTaskSource.GetResult(short token)
+            {
+                core.GetResult(token);
+            }
+
+            public T GetResult(short token)
+            {
+                return core.GetResult(token);
+            }
+
+            public UniTaskStatus GetStatus(short token)
+            {
+                return core.GetStatus(token);
+            }
+
+            public void OnCompleted(Action<object> continuation, object state, short token)
+            {
+                core.OnCompleted(continuation, state, token);
+            }
+
+            public UniTaskStatus UnsafeGetStatus()
+            {
+                return core.UnsafeGetStatus();
+            }
+        }
+
 #if UNITY_2018_3_OR_NEWER
 
         public static IEnumerator ToCoroutine<T>(this UniTask<T> task, Action<T> resultHandler = null, Action<Exception> exceptionHandler = null)
@@ -393,21 +561,23 @@ namespace Cysharp.Threading.Tasks
                     UniTaskScheduler.PublishUnobservedTaskException(ex);
                 }
             }
-
-            awaiter.SourceOnCompleted(state =>
+            else
             {
-                using (var t = (StateTuple<UniTask.Awaiter>)state)
+                awaiter.SourceOnCompleted(state =>
                 {
-                    try
+                    using (var t = (StateTuple<UniTask.Awaiter>)state)
                     {
-                        t.Item1.GetResult();
+                        try
+                        {
+                            t.Item1.GetResult();
+                        }
+                        catch (Exception ex)
+                        {
+                            UniTaskScheduler.PublishUnobservedTaskException(ex);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        UniTaskScheduler.PublishUnobservedTaskException(ex);
-                    }
-                }
-            }, StateTuple.Create(awaiter));
+                }, StateTuple.Create(awaiter));
+            }
         }
 
         public static void Forget(this UniTask task, Action<Exception> exceptionHandler, bool handleExceptionOnMainThread = true)
@@ -461,21 +631,23 @@ namespace Cysharp.Threading.Tasks
                     UniTaskScheduler.PublishUnobservedTaskException(ex);
                 }
             }
-
-            awaiter.SourceOnCompleted(state =>
+            else
             {
-                using (var t = (StateTuple<UniTask<T>.Awaiter>)state)
+                awaiter.SourceOnCompleted(state =>
                 {
-                    try
+                    using (var t = (StateTuple<UniTask<T>.Awaiter>)state)
                     {
-                        t.Item1.GetResult();
+                        try
+                        {
+                            t.Item1.GetResult();
+                        }
+                        catch (Exception ex)
+                        {
+                            UniTaskScheduler.PublishUnobservedTaskException(ex);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        UniTaskScheduler.PublishUnobservedTaskException(ex);
-                    }
-                }
-            }, StateTuple.Create(awaiter));
+                }, StateTuple.Create(awaiter));
+            }
         }
 
         public static void Forget<T>(this UniTask<T> task, Action<Exception> exceptionHandler, bool handleExceptionOnMainThread = true)
@@ -564,9 +736,49 @@ namespace Cysharp.Threading.Tasks
             return await await task;
         }
 
-        public static async UniTask Unwrap<T>(this UniTask<UniTask> task)
+        public static async UniTask Unwrap(this UniTask<UniTask> task)
         {
             await await task;
+        }
+
+        public static async UniTask<T> Unwrap<T>(this Task<UniTask<T>> task)
+        {
+            return await await task;
+        }
+
+        public static async UniTask<T> Unwrap<T>(this Task<UniTask<T>> task, bool continueOnCapturedContext)
+        {
+            return await await task.ConfigureAwait(continueOnCapturedContext);
+        }
+
+        public static async UniTask Unwrap(this Task<UniTask> task)
+        {
+            await await task;
+        }
+
+        public static async UniTask Unwrap(this Task<UniTask> task, bool continueOnCapturedContext)
+        {
+            await await task.ConfigureAwait(continueOnCapturedContext);
+        }
+
+        public static async UniTask<T> Unwrap<T>(this UniTask<Task<T>> task)
+        {
+            return await await task;
+        }
+
+        public static async UniTask<T> Unwrap<T>(this UniTask<Task<T>> task, bool continueOnCapturedContext)
+        {
+            return await (await task).ConfigureAwait(continueOnCapturedContext);
+        }
+
+        public static async UniTask Unwrap(this UniTask<Task> task)
+        {
+            await await task;
+        }
+
+        public static async UniTask Unwrap(this UniTask<Task> task, bool continueOnCapturedContext)
+        {
+            await (await task).ConfigureAwait(continueOnCapturedContext);
         }
 
 #if UNITY_2018_3_OR_NEWER

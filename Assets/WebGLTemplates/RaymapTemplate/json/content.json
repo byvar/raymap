@@ -224,6 +224,12 @@
 							"folder": "r3_pc_demo_20030129"
 						},
 						{
+							"json": "ps2_demo_20020517",
+							"image": ".\/img\/version\/ps2.png",
+							"name": "PS2 Demo (2002\/05\/17)",
+							"folder": "r3_ps2_demo_20020517"
+						},
+						{
 							"json": "ps2_demo_20020807",
 							"image": ".\/img\/version\/ps2.png",
 							"name": "PS2 Demo (2002\/08\/07)",

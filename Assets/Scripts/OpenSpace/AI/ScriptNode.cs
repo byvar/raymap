@@ -25,8 +25,6 @@ namespace OpenSpace.AI {
 
         public Script script;
 
-        public byte[] bytes;
-
         public ScriptNode(Pointer offset) {
             this.offset = offset;
         }
@@ -35,37 +33,26 @@ namespace OpenSpace.AI {
             MapLoader l = MapLoader.Loader;
             ScriptNode sn = new ScriptNode(offset);
 
-            List<byte> byteList = new List<byte>();
-
             sn.script = script;
             sn.param = reader.ReadUInt32();
             sn.param_ptr = Pointer.GetPointerAtOffset(offset); // if parameter is pointer
-
-            byteList.AddRange(BitConverter.GetBytes(sn.param));
-
-            if (Settings.s.platform == Settings.Platform.DC) {
-                byteList.AddRange(BitConverter.GetBytes(reader.ReadUInt32()));
-            }
+            if (Settings.s.platform == Settings.Platform.DC) reader.ReadUInt32();
 
             if (Settings.s.mode == Settings.Mode.Rayman3GC) {
-                byteList.Add(reader.ReadByte());
-                byteList.Add(reader.ReadByte());
-                byteList.Add(reader.ReadByte());
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
                 sn.type = reader.ReadByte();
-                byteList.Add(sn.type);
 
-                byteList.Add(reader.ReadByte());
-                byteList.Add(reader.ReadByte());
+                reader.ReadByte();
+                reader.ReadByte();
                 sn.indent = reader.ReadByte();
-                byteList.Add(sn.indent);
-                byteList.Add(reader.ReadByte());
+                reader.ReadByte();
             } else {
-                byteList.Add(reader.ReadByte());
-                byteList.Add(reader.ReadByte());
+                reader.ReadByte();
+                reader.ReadByte();
                 sn.indent = reader.ReadByte();
-                byteList.Add(sn.indent);
                 sn.type = reader.ReadByte();
-                byteList.Add(sn.type);
             }
             sn.nodeType = NodeType.Unknown;
             if (Settings.s.aiTypes != null) sn.nodeType = Settings.s.aiTypes.GetNodeType(sn.type);
@@ -97,8 +84,6 @@ namespace OpenSpace.AI {
             }
 
             l.onPostLoad.Add(sn.InitPostLoad);
-
-            sn.bytes = byteList.ToArray();
 
             return sn;
         }

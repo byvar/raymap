@@ -32,10 +32,24 @@ namespace Cysharp.Threading.Tasks
             return new UniTask(EnumeratorPromise.Create(enumerator, timing, cancellationToken, out var token), token);
         }
 
+        public static UniTask ToUniTask(this IEnumerator enumerator, MonoBehaviour coroutineRunner)
+        {
+            var source = AutoResetUniTaskCompletionSource.Create();
+            coroutineRunner.StartCoroutine(Core(enumerator, coroutineRunner, source));
+            return source.Task;
+        }
+
+        static IEnumerator Core(IEnumerator inner, MonoBehaviour coroutineRunner, AutoResetUniTaskCompletionSource source)
+        {
+            yield return coroutineRunner.StartCoroutine(inner);
+            source.TrySetResult();
+        }
+
         sealed class EnumeratorPromise : IUniTaskSource, IPlayerLoopItem, ITaskPoolNode<EnumeratorPromise>
         {
             static TaskPool<EnumeratorPromise> pool;
-            public EnumeratorPromise NextNode { get; set; }
+            EnumeratorPromise nextNode;
+            public ref EnumeratorPromise NextNode => ref nextNode;
 
             static EnumeratorPromise()
             {
@@ -44,6 +58,9 @@ namespace Cysharp.Threading.Tasks
 
             IEnumerator innerEnumerator;
             CancellationToken cancellationToken;
+            int initialFrame;
+            bool loopRunning;
+            bool calledGetResult;
 
             UniTaskCompletionSourceCore<object> core;
 
@@ -66,10 +83,18 @@ namespace Cysharp.Threading.Tasks
 
                 result.innerEnumerator = ConsumeEnumerator(innerEnumerator);
                 result.cancellationToken = cancellationToken;
-
-                PlayerLoopHelper.AddAction(timing, result);
+                result.loopRunning = true;
+                result.calledGetResult = false;
+                result.initialFrame = -1;
 
                 token = result.core.Version;
+
+                // run immediately.
+                if (result.MoveNext())
+                {
+                    PlayerLoopHelper.AddAction(timing, result);
+                }
+                
                 return result;
             }
 
@@ -77,11 +102,15 @@ namespace Cysharp.Threading.Tasks
             {
                 try
                 {
+                    calledGetResult = true;
                     core.GetResult(token);
                 }
                 finally
                 {
-                    TryReturn();
+                    if (!loopRunning)
+                    {
+                        TryReturn();
+                    }
                 }
             }
 
@@ -102,10 +131,36 @@ namespace Cysharp.Threading.Tasks
 
             public bool MoveNext()
             {
+                if (calledGetResult)
+                {
+                    loopRunning = false;
+                    TryReturn();
+                    return false;
+                }
+
+                if (innerEnumerator == null) // invalid status, returned but loop running?
+                {
+                    return false;
+                }
+
                 if (cancellationToken.IsCancellationRequested)
                 {
+                    loopRunning = false;
                     core.TrySetCanceled(cancellationToken);
                     return false;
+                }
+
+                if (initialFrame == -1)
+                {
+                    // Time can not touch in threadpool.
+                    if (PlayerLoopHelper.IsMainThread)
+                    {
+                        initialFrame = Time.frameCount;
+                    }
+                }
+                else if (initialFrame == Time.frameCount)
+                {
+                    return true; // already executed in first frame, skip.
                 }
 
                 try
@@ -117,10 +172,12 @@ namespace Cysharp.Threading.Tasks
                 }
                 catch (Exception ex)
                 {
+                    loopRunning = false;
                     core.TrySetException(ex);
                     return false;
                 }
 
+                loopRunning = false;
                 core.TrySetResult(null);
                 return false;
             }
@@ -131,6 +188,7 @@ namespace Cysharp.Threading.Tasks
                 core.Reset();
                 innerEnumerator = default;
                 cancellationToken = default;
+
                 return pool.TryPush(this);
             }
 
@@ -145,11 +203,10 @@ namespace Cysharp.Threading.Tasks
                     {
                         yield return null;
                     }
-                    else if (current is CustomYieldInstruction)
+                    else if (current is CustomYieldInstruction cyi)
                     {
                         // WWW, WaitForSecondsRealtime
-                        var e2 = UnwrapWaitCustomYieldInstruction((CustomYieldInstruction)current);
-                        while (e2.MoveNext())
+                        while (cyi.keepWaiting)
                         {
                             yield return null;
                         }
@@ -175,7 +232,7 @@ namespace Cysharp.Threading.Tasks
                         }
                         else
                         {
-                            yield return null;
+                            goto WARN;
                         }
                     }
                     else if (current is IEnumerator e3)
@@ -188,17 +245,14 @@ namespace Cysharp.Threading.Tasks
                     }
                     else
                     {
-                        // WaitForEndOfFrame, WaitForFixedUpdate, others.
-                        yield return null;
+                        goto WARN;
                     }
-                }
-            }
 
-            // WWW and others as CustomYieldInstruction.
-            static IEnumerator UnwrapWaitCustomYieldInstruction(CustomYieldInstruction yieldInstruction)
-            {
-                while (yieldInstruction.keepWaiting)
-                {
+                    continue;
+
+                    WARN:
+                    // WaitForEndOfFrame, WaitForFixedUpdate, others.
+                    UnityEngine.Debug.LogWarning($"yield {current.GetType().Name} is not supported on await IEnumerator or IEnumerator.ToUniTask(), please use ToUniTask(MonoBehaviour coroutineRunner) instead.");
                     yield return null;
                 }
             }
@@ -208,12 +262,12 @@ namespace Cysharp.Threading.Tasks
             static IEnumerator UnwrapWaitForSeconds(WaitForSeconds waitForSeconds)
             {
                 var second = (float)waitForSeconds_Seconds.GetValue(waitForSeconds);
-                var startTime = DateTimeOffset.UtcNow;
+                var elapsed = 0.0f;
                 while (true)
                 {
                     yield return null;
 
-                    var elapsed = (DateTimeOffset.UtcNow - startTime).TotalSeconds;
+                    elapsed += Time.deltaTime;
                     if (elapsed >= second)
                     {
                         break;
@@ -231,4 +285,3 @@ namespace Cysharp.Threading.Tasks
         }
     }
 }
-

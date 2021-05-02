@@ -1,6 +1,7 @@
-﻿#if ENABLE_UNITYWEBREQUEST
+﻿#if ENABLE_UNITYWEBREQUEST && (!UNITY_2019_1_OR_NEWER || UNITASK_WEBREQUEST_SUPPORT)
 
 using System;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 
 namespace Cysharp.Threading.Tasks
@@ -17,6 +18,7 @@ namespace Cysharp.Threading.Tasks
         public string Error { get; }
         public string Text { get; }
         public long ResponseCode { get; }
+        public Dictionary<string, string> ResponseHeaders { get; }
 
         string msg;
 
@@ -31,7 +33,14 @@ namespace Cysharp.Threading.Tasks
 #endif
             this.Error = unityWebRequest.error;
             this.ResponseCode = unityWebRequest.responseCode;
-            this.Text = unityWebRequest.downloadHandler?.text;
+            if (UnityWebRequest.downloadHandler != null)
+            {
+                if (unityWebRequest.downloadHandler is DownloadHandlerBuffer dhb)
+                {
+                    this.Text = dhb.text;
+                }
+            }
+            this.ResponseHeaders = unityWebRequest.GetResponseHeaders();
         }
 
         public override string Message
@@ -40,7 +49,14 @@ namespace Cysharp.Threading.Tasks
             {
                 if (msg == null)
                 {
-                    msg = Error + Environment.NewLine + Text;
+                    if (Text != null)
+                    {
+                        msg = Error + Environment.NewLine + Text;
+                    }
+                    else
+                    {
+                        msg = Error;
+                    }
                 }
                 return msg;
             }
