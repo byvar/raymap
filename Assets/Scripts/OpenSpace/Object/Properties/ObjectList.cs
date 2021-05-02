@@ -40,6 +40,7 @@ namespace OpenSpace.Object.Properties {
             for (int i = 0; i < entries.Length; i++) {
                 if (entries[i].po != null && entries[i].po.Gao != null) {
                     entries[i].po.Gao.transform.SetParent(Gao.transform);
+                    entries[i].po.Gao.transform.localPosition = new Vector3(0, i*5.0f, 0);
                 }
             }
         }

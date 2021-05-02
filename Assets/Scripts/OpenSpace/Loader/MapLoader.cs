@@ -1100,11 +1100,14 @@ MonoBehaviour.print(str);
 					familiesRoot.SetActive(false); // Families do not need to be visible
 				}
 
-                families.ReadEntries(ref reader, (off_element) => {
+                int i = 0;
+
+				families.ReadEntries(ref reader, (off_element) => {
                     Family f = Family.Read(reader, off_element);
-					if (UnitySettings.CreateFamilyGameObjects) {
+                    if (UnitySettings.CreateFamilyGameObjects) {
 						f.Gao.transform.SetParent(familiesRoot.transform, false);
-					}
+                        f.Gao.transform.localPosition = new Vector3((i++)*20, 0,0);
+                    }
                     return f;
                 }, LinkedList.Flags.HasHeaderPointers);
 			}
