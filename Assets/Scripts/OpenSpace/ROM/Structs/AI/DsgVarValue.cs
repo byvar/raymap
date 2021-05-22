@@ -293,8 +293,8 @@ namespace OpenSpace.ROM {
 				case DsgVarType.VectorArray:
 				case DsgVarType.WayPointArray:
 				case DsgVarType.GraphArray:
-				case DsgVarType.Array11:
-				case DsgVarType.Array9:
+				case DsgVarType.VisualMatArray:
+				case DsgVarType.SOLinksArray:
 					if (ValueArrayLength != other.ValueArrayLength) return false;
 					return true;
 			}

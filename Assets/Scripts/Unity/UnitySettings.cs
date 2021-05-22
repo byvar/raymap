@@ -1,7 +1,9 @@
 ﻿using OpenSpace;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using OpenSpace.Exporter;
 using UnityEngine;
 
 /// <summary>
@@ -57,7 +59,11 @@ public class UnitySettings {
 	public static bool SaveTextures { get; set; }
 	public static string ExportPath { get; set; } = "./exports/";
 	public static bool ExportAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
-    public static ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
+    public static MapExporter.ExportFlags ExportFlags { get; set; }
+    public static ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; } // If set to true, screenshots the map after loading is finished and quits Raymap.
+    public static float ScreenshotScale { get; set; }
+    public static string HighlightObjectsFilter { get; set; }
+    public static string HighlightObjectsTextFormat { get; set; }
 
     /// <summary>
     /// Static constructor loads in editor data at editor startup.
@@ -115,14 +121,22 @@ public class UnitySettings {
 
         // Export
         if (cmdLine) {
-            string p = s.SerializeString("export", null);
+            string p = s.SerializeString("export", null, "export");
             if (!string.IsNullOrEmpty(p)) {
                 ExportAfterLoad = true;
                 ExportPath = p;
+                ExportFlags = MapExporter.ExportFlags.All;
+
+                string f = s.SerializeString("flags", null, "flags");
+                if (!string.IsNullOrEmpty(f)) {
+                    int.TryParse(f, out var flagsInt);
+                    ExportFlags = (MapExporter.ExportFlags) flagsInt;
+                }
             }
         }
         ExportPath = s.SerializeString("ExportPath", ExportPath);
 		ExportAfterLoad = s.SerializeBool("ExportAfterLoad", ExportAfterLoad);
+        ExportFlags = (MapExporter.ExportFlags)s.SerializeInt("ExportFlags", (int)ExportFlags);
 
         if (cmdLine) {
             string p = s.SerializeString("screenshot", null);
@@ -131,11 +145,17 @@ public class UnitySettings {
                 ScreenshotPath = p;
             }
         }
-        string screenshotAfterLoadString = s.SerializeString("ScreenshotAfterLoad", ScreenshotAfterLoad.ToString());
+        string screenshotAfterLoadString = s.SerializeString("ScreenshotAfterLoad", ScreenshotAfterLoad.ToString(), "ScreenshotAfterLoad");
         ScreenshotAfterLoad = Enum.TryParse(screenshotAfterLoadString, out ScreenshotAfterLoadSetting setting) ? setting : ScreenshotAfterLoad;
 
+        float.TryParse(s.SerializeString("ScreenshotScale", ScreenshotScale.ToString(CultureInfo.InvariantCulture), "ScreenshotScale"), out float screenshotScale);
+        ScreenshotScale = screenshotScale;
+
+        HighlightObjectsFilter = s.SerializeString("HighlightObjectsFilter", HighlightObjectsFilter, "HighlightObjectsFilter");
+        HighlightObjectsTextFormat = s.SerializeString("HighlightObjectsTextFormat", HighlightObjectsTextFormat, "HighlightObjectsTextFormat");
+
         // Misc
-        ScreenshotPath = s.SerializeString("ScreenshotPath", ScreenshotPath);
+        ScreenshotPath = s.SerializeString("ScreenshotPath", ScreenshotPath, "ScreenshotPath");
 		AllowDeadPointers = s.SerializeBool("AllowDeadPointers", AllowDeadPointers, "allowDeadPointers");
 		ForceDisplayBackfaces = s.SerializeBool("ForceDisplayBackfaces", ForceDisplayBackfaces);
 		BlockyMode = s.SerializeBool("BlockyMode", BlockyMode);

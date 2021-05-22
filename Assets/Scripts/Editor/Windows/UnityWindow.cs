@@ -27,6 +27,13 @@ public class UnityWindow : EditorWindow {
 		value = EditorGUI.Toggle(new Rect(rect.x, rect.y, rect.height, rect.height), value);
 		return new Rect(rect.x + rect.height, rect.y, rect.width - rect.height, rect.height);
 	}
+
+    protected Rect EnumFlagsToggle(Rect rect, ref Enum value)
+    {
+        value = EditorGUI.EnumFlagsField(new Rect(rect.x, rect.y, 200, rect.height), value);
+        return new Rect(rect.x + rect.height, rect.y, rect.width - rect.height, rect.height);
+    }
+
 	protected Rect BrowseButton(Rect rect, string name, GUIContent content, Action action) {
 		GUIStyle butStyle = EditorStyles.miniButtonRight;
 		Rect buttonRect = new Rect(rect.x + rect.width - 24, rect.y, 24, rect.height);

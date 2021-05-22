@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using OpenSpace;
+using OpenSpace.Exporter;
 using UnityEditor;
 using UnityEngine;
 using Path = System.IO.Path;
@@ -187,55 +189,56 @@ public class UnityWindowSettings : UnityWindow {
 		rect = PrefixToggle(rect, ref export);
 		UnitySettings.ExportAfterLoad = export;
 
-		UnitySettings.ExportPath = DirectoryField(GetNextRect(ref yPos), "Export Path", UnitySettings.ExportPath);
+        rect = GetNextRect(ref yPos);
+		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Export Flags"));
+		Enum exportFlags = UnitySettings.ExportFlags;
+        rect = EnumFlagsToggle(rect, ref exportFlags);
+        UnitySettings.ExportFlags = (MapExporter.ExportFlags) exportFlags;
+
+        UnitySettings.ExportPath = DirectoryField(GetNextRect(ref yPos), "Export Path", UnitySettings.ExportPath);
         
         if (GUI.Button(GetNextRect(ref yPos), "Copy export commands for all levels to clipboard...")) {
-			TextEditor te = new TextEditor();
-
-			Settings.Init(UnitySettings.GameMode);
-            string commands = "";
-
-			var tempDropDown = new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), CurrentGameDataDir)
-            {
-                name = "Maps",
-                mode = UnitySettings.GameMode
-            };
-
-            foreach (var f in tempDropDown.files) {
-                commands += $"Raymap.exe -batchmode --export {UnitySettings.ExportPath} --mode {UnitySettings.GameMode} --dir \"{UnitySettings.GameDirs[UnitySettings.GameMode]}\" --level {f}" + Environment.NewLine;
-            }
-			
-            te.text = commands;
-            te.SelectAll();
-            te.Copy();
-		}
+            GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"Raymap.exe -batchmode " +
+				$"--export {UnitySettings.ExportPath} " +
+				$"--flags {(int) UnitySettings.ExportFlags} " +
+				$"--mode {UnitySettings.GameMode} " +
+				$"--dir \"{UnitySettings.GameDirs[UnitySettings.GameMode]}\" " +
+				$"--level {f}");
+        }
 
 		if (GUI.Button(GetNextRect(ref yPos), "Copy blend export commands for all levels to clipboard...")) {
-            TextEditor te = new TextEditor();
-
-            Settings.Init(UnitySettings.GameMode);
-            string commands = "";
-
-            var tempDropDown = new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), CurrentGameDataDir)
-            {
-                name = "Maps",
-                mode = UnitySettings.GameMode
-            };
-
-            foreach (var f in tempDropDown.files) {
-                commands += $"blender --background --python generate_maps_blend.py -- {UnitySettings.ExportPath} {f} {UnitySettings.ExportPath}/BlendFiles/Levels" + Environment.NewLine;
-            }
-
-            te.text = commands;
-            te.SelectAll();
-            te.Copy();
+			GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"blender --background --python generate_maps_blend.py -- {UnitySettings.ExportPath} {f} {UnitySettings.ExportPath}/BlendFiles/Levels");
         }
 
 		UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
 
+        string screenShotScaleString = EditorGUI.TextField(GetNextRect(ref yPos), "Screenshot Scale", UnitySettings.ScreenshotScale.ToString(CultureInfo.InvariantCulture));
+        if (float.TryParse(screenShotScaleString, out var screenshotScale)) {
+            UnitySettings.ScreenshotScale = screenshotScale;
+        } else {
+            UnitySettings.ScreenshotScale = 1;
+        }
+
+        UnitySettings.HighlightObjectsFilter = EditorGUI.TextField(GetNextRect(ref yPos), "Highlight objects filter", UnitySettings.HighlightObjectsFilter);
+        EditorGUI.LabelField(GetNextRect(ref yPos), "Comma separated list of Model/Family names, or * to highlight all");
+		UnitySettings.HighlightObjectsTextFormat = EditorGUI.TextField(GetNextRect(ref yPos), "Highlight format string", UnitySettings.HighlightObjectsTextFormat);
+        EditorGUI.LabelField(GetNextRect(ref yPos), "($f=family, $m=model, $i=instance name, $c=count)");
+
+        if (GUI.Button(GetNextRect(ref yPos), "Copy screenshot commands for all levels to clipboard...")) {
+            GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"Raymap.exe -batchmode " +
+                $"--mode {UnitySettings.GameMode} " +
+				$"--dir \"{UnitySettings.GameDirs[UnitySettings.GameMode]}\" " +
+                $"--level {f} " +
+                $"--ScreenshotPath \"{UnitySettings.ScreenshotPath}\" " +
+                $"--ScreenshotAfterLoad {UnitySettings.ScreenshotAfterLoad} " +
+                $"--ScreenshotScale {UnitySettings.ScreenshotScale} " +
+                $"--HighlightObjectsFilter \"{UnitySettings.HighlightObjectsFilter}\" " +
+                $"--HighlightObjectsTextFormat \"{UnitySettings.HighlightObjectsTextFormat}\"");
+		}
+
 		/*if (UnitySettings.ExportAfterLoad) {
-			UnitySettings.ExportPath = DirectoryField(rect, "Export Path", UnitySettings.ExportPath, includeLabel: false);
-		}*/
+            UnitySettings.ExportPath = DirectoryField(rect, "Export Path", UnitySettings.ExportPath, includeLabel: false);
+        }*/
 
 		// Misc
 		DrawHeader(ref yPos, "Miscellaneous Settings");
@@ -260,7 +263,27 @@ public class UnityWindowSettings : UnityWindow {
 			Dirty = false;
 		}
 	}
-	#endregion
+
+    private string GenerateExportScript(Func<string, string> lineDelegate)
+    {
+        Settings.Init(UnitySettings.GameMode);
+        string commands = "";
+
+        var tempDropDown =
+            new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), CurrentGameDataDir)
+            {
+                name = "Maps",
+                mode = UnitySettings.GameMode
+            };
+
+        foreach (var f in tempDropDown.files) {
+            commands += lineDelegate.Invoke(f) + Environment.NewLine;
+        }
+
+        return commands;
+    }
+
+    #endregion
 
 	#region Properties
 

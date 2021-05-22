@@ -343,7 +343,7 @@ namespace OpenSpace {
             linkedListType = LinkedListType.Double,
             hasNames = true,
             hasDeformations = true,
-            aiTypes = AITypes.R3,
+            aiTypes = AITypes.R3_GC,
             hasExtraInputData = true,
             hasLinkedListHeaderPointers = true,
             textureAnimationSpeedModifier = -10f,

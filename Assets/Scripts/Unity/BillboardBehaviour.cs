@@ -13,7 +13,17 @@ public class BillboardBehaviour : MonoBehaviour {
         Unknown = 3,
         CameraPosXYZ = 4
     }
+
+    public enum ScaleMode
+    {
+        None = 0,
+        KeepSize = 1,
+    }
+
     public LookAtMode mode = LookAtMode.None;
+    public ScaleMode scaleMode = ScaleMode.None;
+    public float ScaleMultiplier = 1.0f;
+    public Quaternion RotationOffset = Quaternion.identity;
 
     private Camera Cam {
         get {
@@ -69,6 +79,18 @@ public class BillboardBehaviour : MonoBehaviour {
                     /*transform.LookAt(cam.transform.position);
                     transform.Rotate(new Vector3(-addRotation, -90, 0), Space.Self);*/
                     break;
+            }
+
+            transform.localRotation *= RotationOffset;
+        }
+
+        if (Cam != null && scaleMode != ScaleMode.None) {
+            if (scaleMode == ScaleMode.KeepSize) {
+                if (Cam.orthographic) {
+                    transform.localScale = Vector3.one * ScaleMultiplier * Cam.orthographicSize;
+                } else {
+                    transform.localScale = Vector3.one * ScaleMultiplier * Vector3.Distance(transform.position,Cam.transform.position);
+                }
             }
         }
     }

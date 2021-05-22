@@ -307,9 +307,9 @@ public class DsgVarComponentEditor : Editor {
                 break;
             case DsgVarInfoEntry.DsgVarType.ActionArray:
             case DsgVarInfoEntry.DsgVarType.FloatArray:
-            case DsgVarInfoEntry.DsgVarType.Array11:
+            case DsgVarInfoEntry.DsgVarType.VisualMatArray:
             case DsgVarInfoEntry.DsgVarType.GraphArray:
-            case DsgVarInfoEntry.DsgVarType.Array9:
+            case DsgVarInfoEntry.DsgVarType.SOLinksArray:
             case DsgVarInfoEntry.DsgVarType.IntegerArray:
             case DsgVarInfoEntry.DsgVarType.PersoArray:
             case DsgVarInfoEntry.DsgVarType.SoundEventArray:

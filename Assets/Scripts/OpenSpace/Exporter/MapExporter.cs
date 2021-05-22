@@ -21,6 +21,22 @@ namespace OpenSpace.Exporter {
         private MapLoader loader;
         private string exportPath;
         private string gameName;
+        private ExportFlags flags;
+
+        [Flags]
+        public enum ExportFlags {
+            None         = 0,
+
+            Levels       = 1 << 0,
+            AIModels     = 1 << 1,
+            Materials    = 1 << 2,
+            Textures     = 1 << 3,
+            Families     = 1 << 4,
+            EntryActions = 1 << 5,
+            TextTable    = 1 << 6,
+
+            All = Levels | AIModels | Materials | Textures | Families | EntryActions | TextTable
+        }
 
         public static JsonSerializerSettings JsonExportSettings
         {
@@ -40,11 +56,12 @@ namespace OpenSpace.Exporter {
             
         }
 
-        public MapExporter(MapLoader loader, string exportPath)
+        public MapExporter(MapLoader loader, string exportPath, ExportFlags flags)
         {
             this.loader = loader;
             this.exportPath = exportPath;
             this.gameName = Settings.s.mode.ToString();
+            this.flags = flags;
         }
 
         public class NameInfoContainer {
@@ -99,6 +116,7 @@ namespace OpenSpace.Exporter {
             }
         }
 
+        // Function used to transfer object names between similar versions
         public void ExportNames() {
             string filePath = "objectNames_" + loader.lvlName.ToLower() + ".json";
             if (File.Exists(filePath)) {
@@ -146,9 +164,6 @@ namespace OpenSpace.Exporter {
 
         public void Export()
         {
-            ExportNames();
-            //return;
-
             string exportDirectoryLevels = Path.Combine(this.exportPath, "Levels");
             string exportDirectoryAIModels = Path.Combine(this.exportPath, "AIModels");
             string exportDirectoryMaterials = Path.Combine(this.exportPath, "Materials");
@@ -156,32 +171,61 @@ namespace OpenSpace.Exporter {
             string exportDirectoryGeneral = Path.Combine(this.exportPath, "General");
             string exportDirectoryTextures = Path.Combine(this.exportPath, "Resources", "Textures");
 
-            if (!Directory.Exists(exportDirectoryLevels)) {
-                Directory.CreateDirectory(exportDirectoryLevels);
+            if (flags.HasFlag(ExportFlags.Levels)) {
+                if (!Directory.Exists(exportDirectoryLevels)) {
+                    Directory.CreateDirectory(exportDirectoryLevels);
+                }
             }
-            if (!Directory.Exists(exportDirectoryAIModels)) {
-                Directory.CreateDirectory(exportDirectoryAIModels);
+
+            if (flags.HasFlag(ExportFlags.AIModels)) {
+                if (!Directory.Exists(exportDirectoryAIModels)) {
+                    Directory.CreateDirectory(exportDirectoryAIModels);
+                }
             }
-            if (!Directory.Exists(exportDirectoryMaterials)) {
-                Directory.CreateDirectory(exportDirectoryMaterials);
+
+            if (flags.HasFlag(ExportFlags.Materials)) {
+                if (!Directory.Exists(exportDirectoryMaterials)) {
+                    Directory.CreateDirectory(exportDirectoryMaterials);
+                }
             }
-            if (!Directory.Exists(exportDirectoryTextures)) {
-                Directory.CreateDirectory(exportDirectoryTextures);
+
+            if (flags.HasFlag(ExportFlags.Textures)) {
+                if (!Directory.Exists(exportDirectoryTextures)) {
+                    Directory.CreateDirectory(exportDirectoryTextures);
+                }
             }
-            if (!Directory.Exists(exportDirectoryFamilies)) {
-                Directory.CreateDirectory(exportDirectoryFamilies);
+
+            if (flags.HasFlag(ExportFlags.Families)) {
+                if (!Directory.Exists(exportDirectoryFamilies)) {
+                    Directory.CreateDirectory(exportDirectoryFamilies);
+                }
             }
+
+            // Always create general directory
             if (!Directory.Exists(exportDirectoryGeneral)) {
                 Directory.CreateDirectory(exportDirectoryGeneral);
             }
 
-            ExportTextures(exportDirectoryTextures);
-            ExportMaterials(exportDirectoryMaterials, exportDirectoryLevels);
-            ExportFamilies(exportDirectoryFamilies);
-            ExportAIModels(exportDirectoryAIModels);
-            ExportEntryActions(exportDirectoryGeneral);
-            ExportTextTable(exportDirectoryGeneral);
-            ExportScene(exportDirectoryLevels);
+            if (flags.HasFlag(ExportFlags.Textures))
+                ExportTextures(exportDirectoryTextures);
+
+            if (flags.HasFlag(ExportFlags.Materials))
+                ExportMaterials(exportDirectoryMaterials);
+
+            if (flags.HasFlag(ExportFlags.Families))
+                ExportFamilies(exportDirectoryFamilies);
+
+            if (flags.HasFlag(ExportFlags.AIModels))
+                ExportAIModels(exportDirectoryAIModels);
+
+            if (flags.HasFlag(ExportFlags.EntryActions))
+                ExportEntryActions(exportDirectoryGeneral);
+
+            if (flags.HasFlag(ExportFlags.TextTable))
+                ExportTextTable(exportDirectoryGeneral);
+
+            if (flags.HasFlag(ExportFlags.Levels))
+                ExportScene(exportDirectoryLevels);
         }
 
         private void ExportScene(string path)
@@ -232,7 +276,7 @@ namespace OpenSpace.Exporter {
             }
         }
 
-        private void ExportMaterials(string commonPath, string levelPath)
+        private void ExportMaterials(string commonPath)
         {
             foreach (VisualMaterial vismat in loader.visualMaterials) {
 
@@ -400,8 +444,11 @@ namespace OpenSpace.Exporter {
         private void ExportEntryActions(string path)
         {
             List<string> entryActions = new List<string>();
-            foreach (EntryAction action in loader.inputStruct.entryActions) {
-                entryActions.Add(EntryActionExporter.EntryActionToCSharpClass(action));
+
+            if (loader?.inputStruct?.entryActions != null) {
+                foreach (EntryAction action in loader.inputStruct.entryActions) {
+                    entryActions.Add(EntryActionExporter.EntryActionToCSharpClass(action));
+                }
             }
 
 
@@ -458,8 +505,11 @@ namespace OpenSpace.Exporter {
                 }
 
                 int entryIndex = 0;
-                foreach (string entry in textTable.entries) {
-                    textEntries.Add("SetStringForLanguage(" + languageIndex + ", " + (entryIndex++) + ", \"" + EscapeStringForCSharp(entry) + "\");");
+                if (textTable.entries != null) {
+                    foreach (string entry in textTable.entries) {
+                        textEntries.Add("SetStringForLanguage(" + languageIndex + ", " + (entryIndex++) + ", \"" +
+                                        EscapeStringForCSharp(entry) + "\");");
+                    }
                 }
 
                 textEntries.Add(""); // Extra line break

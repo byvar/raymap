@@ -17,6 +17,8 @@ using Newtonsoft.Json;
 using OpenSpace.Loader;
 using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
+using TMPro;
+using Unity;
 
 public class Controller : MonoBehaviour {
 	public Material baseMaterial;
@@ -33,6 +35,7 @@ public class Controller : MonoBehaviour {
 	public WebCommunicator communicator;
     public GameObject SpawnableParent { get; set; }
 	public GameObject PersoPartsParent { get; set; }
+	public TMP_Text ScreenshotHighlightTextPrefab;
 
 	public MapLoader loader = null;
 	bool viewCollision_ = false; public bool viewCollision = false;
@@ -54,6 +57,10 @@ public class Controller : MonoBehaviour {
 	private bool ExportAfterLoad { get; set; }
 	private bool ExportText { get; set; }
     private UnitySettings.ScreenshotAfterLoadSetting ScreenshotAfterLoad { get; set; }
+	private float ScreenshotScale { get; set; }
+    private string HighlightObjectsFilter { get; set; }
+    private string HighlightObjectsTextFormat { get; set; }
+    public MapExporter.ExportFlags ExportFlags { get; set; }
     public string ExportPath { get; set; }
 
 
@@ -93,7 +100,11 @@ public class Controller : MonoBehaviour {
 
 		ExportPath = UnitySettings.ExportPath;
 		ExportAfterLoad = UnitySettings.ExportAfterLoad;
+        ExportFlags = UnitySettings.ExportFlags;
         ScreenshotAfterLoad = UnitySettings.ScreenshotAfterLoad;
+        ScreenshotScale = UnitySettings.ScreenshotScale;
+        HighlightObjectsFilter = UnitySettings.HighlightObjectsFilter;
+        HighlightObjectsTextFormat = UnitySettings.HighlightObjectsTextFormat;
 		if (FileSystem.mode != FileSystem.Mode.Web) {
 			if (UnitySettings.LoadFromMemory) {
 				lvlName = UnitySettings.ProcessName + ".exe";
@@ -174,10 +185,58 @@ public class Controller : MonoBehaviour {
 		}
 
         if (ExportAfterLoad) {
-            MapExporter e = new MapExporter(this.loader, ExportPath);
+            MapExporter e = new MapExporter(this.loader, ExportPath, ExportFlags);
             e.Export();
 
             Application.Quit();
+        }
+
+        if (!string.IsNullOrWhiteSpace(HighlightObjectsFilter)) {
+
+            int count = 0;
+
+            foreach (var p in persos) {
+
+                bool passesFilter = string.Equals(HighlightObjectsFilter, "*");
+                foreach (var fi in HighlightObjectsFilter.Split(',')) {
+                    if (string.Equals(p.NameFamily, fi, StringComparison.CurrentCultureIgnoreCase) ||
+                        string.Equals(p.NameModel, fi, StringComparison.CurrentCultureIgnoreCase)) {
+                        passesFilter = true;
+                    }
+                }
+
+                if (passesFilter) {
+
+                    count++;
+
+                    var highlightTextParentGao = new GameObject("HighlightTextParent");
+                    highlightTextParentGao.transform.SetParent(p.gameObject.transform, false);
+					var textComponent = Instantiate(ScreenshotHighlightTextPrefab);
+                    textComponent.gameObject.transform.SetParent(highlightTextParentGao.transform, false);
+
+                    string text = HighlightObjectsTextFormat;
+                    text = text.Replace("\\n", Environment.NewLine);
+                    text = text.Replace("$f", p.NameFamily);
+					text = text.Replace("$m", p.NameModel);
+					text = text.Replace("$i", p.NameInstance);
+					text = text.Replace("$c", count.ToString());
+
+                    textComponent.text = text;
+
+                    BillboardBehaviour b = highlightTextParentGao.AddComponent<BillboardBehaviour>();
+                    b.mode = BillboardBehaviour.LookAtMode.ViewRotation;
+
+                    textComponent.transform.localRotation = Quaternion.Euler(0, -90, 0);
+
+                    BillboardBehaviour billboardPerso = p.gameObject.AddComponent<BillboardBehaviour>();
+                    billboardPerso.mode = BillboardBehaviour.LookAtMode.ViewRotation;
+                    billboardPerso.scaleMode = BillboardBehaviour.ScaleMode.KeepSize;
+                    billboardPerso.RotationOffset = Quaternion.Euler(0, -90, 0);
+					billboardPerso.ScaleMultiplier = 1.0f / 25.0f;
+
+					LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("HighlightAlwaysOnTop"));
+                }
+            }
         }
 
         if (ScreenshotAfterLoad!=UnitySettings.ScreenshotAfterLoadSetting.None) {
@@ -217,7 +276,7 @@ public class Controller : MonoBehaviour {
 
                 Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
 
-                screenshotBytes = await pb.Capture(res.width * 8, res.height * 8, true);
+                screenshotBytes = await pb.Capture((int) (res.width * ScreenshotScale), (int) (res.height * ScreenshotScale), true);
                 OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
 
             }
@@ -230,14 +289,16 @@ public class Controller : MonoBehaviour {
                     Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
 
                     Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
-                    screenshotBytes = await pb.Capture(res.width * 8, res.height * 8, true);
+                    screenshotBytes = await pb.Capture((int) (res.width * ScreenshotScale), (int) (res.height * ScreenshotScale), true);
                     OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
 
                 }
             }
 
             Destroy(pb.gameObject);
-        }
+
+            Application.Quit();
+		}
 
 		// Collect searchable strings
 		if (Application.platform != RuntimePlatform.WebGLPlayer) {

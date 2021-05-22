@@ -59,24 +59,27 @@ public class RaymanTrail : MonoBehaviour
 
     private bool linesDirty = true;
 
-    public class AttemptData
+    public class RecordingData
     {
         public List<Attempt> Attempts = new List<Attempt>();
     }
 
-    public AttemptData Data;
+    public RecordingData Data;
 
     public class Attempt
     {
         public class FrameData
         {
-            public FrameData(Vector3 position, Quaternion rotation, int animationIndex, int animationFrame)
+            public FrameData(float time, Vector3 position, Quaternion rotation, int animationIndex, int animationFrame)
             {
+                Time = time;
                 Position = position;
                 Rotation = rotation;
                 AnimationIndex = animationIndex;
                 AnimationFrame = animationFrame;
             }
+
+            public float Time;
 
             public float posX;
             public float posY;
@@ -123,7 +126,7 @@ public class RaymanTrail : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Data = new AttemptData();
+        Data = new RecordingData();
     }
 
     private void UpdateLivePreview()
@@ -191,6 +194,7 @@ public class RaymanTrail : MonoBehaviour
                 if (IsValidPos(raymanPos)) {
 
                     currentAttempt.Frames.Add(new Attempt.FrameData(
+                        0,
                         Rayman.Gao.transform.position,
                         Rayman.Gao.transform.rotation,
                         RaymanPersoBehaviour.currentState,

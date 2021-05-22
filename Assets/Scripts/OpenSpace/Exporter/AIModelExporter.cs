@@ -73,7 +73,8 @@ namespace OpenSpace.Exporter {
             if (ai.macros != null) {
                 for (int i = 0; i < ai.macros.Length; i++) {
                     if (ai.macros[i].script != null) {
-                        string combinedScript = "private async Task Macro_" + i + "() {" + Environment.NewLine;
+                        string macroName = ai.macros[i].name != null ? "_"+ai.macros[i].name : "";
+                        string combinedScript = "private async Task Macro_" + i + macroName + "() {" + Environment.NewLine;
                         TranslatedScript ts = new TranslatedScript(ai.macros[i].script, null);
                         ts.settings = translationSettings;
                         combinedScript += ts.ToCSharpString_R2() + Environment.NewLine + "}";

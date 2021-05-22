@@ -15,7 +15,7 @@ public class TransparencyCaptureBehaviourEditor : Editor {
         if (GUILayout.Button("Take screenshot")) {
 			Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
 			System.DateTime dateTime = System.DateTime.Now;
-			byte[] screenshotBytes = await pb.Capture(res.width* 4, res.height * 4, true);
+			byte[] screenshotBytes = await pb.Capture((int)(res.width * UnitySettings.ScreenshotScale), (int)(res.height * UnitySettings.ScreenshotScale), true);
 			OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
 		}
     }

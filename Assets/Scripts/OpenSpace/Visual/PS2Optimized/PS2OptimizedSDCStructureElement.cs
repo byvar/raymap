@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace OpenSpace.Visual.PS2Optimized {
 	public class PS2OptimizedSDCStructureElement {
 		public Pointer offset;
+		[JsonIgnore]
 		public PS2OptimizedSDCStructure geo;
 		public int index;
 

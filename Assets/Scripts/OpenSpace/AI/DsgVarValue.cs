@@ -160,8 +160,8 @@ namespace OpenSpace.AI {
 				case DsgVarInfoEntry.DsgVarType.VectorArray:
 				case DsgVarInfoEntry.DsgVarType.WayPointArray:
 				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.Array11:
-				case DsgVarInfoEntry.DsgVarType.Array9:
+				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
+				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
 					ReadArray(reader); break;
 			}
 		}
@@ -255,8 +255,8 @@ namespace OpenSpace.AI {
 				case DsgVarInfoEntry.DsgVarType.VectorArray:
 				case DsgVarInfoEntry.DsgVarType.WayPointArray:
 				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.Array11:
-				case DsgVarInfoEntry.DsgVarType.Array9:
+				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
+				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
 					return "new " + type + "[" + arrayLength + "]";
 			}
 			return null;
@@ -335,8 +335,8 @@ namespace OpenSpace.AI {
 				case DsgVarInfoEntry.DsgVarType.VectorArray:
 				case DsgVarInfoEntry.DsgVarType.WayPointArray:
 				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.Array11:
-				case DsgVarInfoEntry.DsgVarType.Array9:
+				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
+				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
 					WriteArray(writer); break;
 			}
 		}
@@ -521,8 +521,8 @@ namespace OpenSpace.AI {
 				case DsgVarInfoEntry.DsgVarType.VectorArray:
 				case DsgVarInfoEntry.DsgVarType.WayPointArray:
 				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.Array11:
-				case DsgVarInfoEntry.DsgVarType.Array9:
+				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
+				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
 					if (arrayType != other.arrayType || arrayLength != other.arrayLength) {
 						return false;
 					}

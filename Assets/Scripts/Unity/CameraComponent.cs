@@ -40,7 +40,8 @@ public class CameraComponent : MonoBehaviour {
 	public WebJSON.CameraPos debugCameraPos = WebJSON.CameraPos.Initial;
 	private WebJSON.CameraPos lastDebugCameraPos = WebJSON.CameraPos.Initial;
 
-	void Start() {
+	void Start()
+    {
     }
 
     public void JumpTo(GameObject gao) {

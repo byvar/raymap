@@ -52,6 +52,14 @@ namespace OpenSpace.AI {
 				&& Settings.s.platform != Settings.Platform.PS3
 				&& Settings.s.platform != Settings.Platform.PS2) {
 				name = reader.ReadString(0x100);
+
+                // Some versions have extra information in the name, e.g.
+                // rayman\YLT_RaymanModel\YLT_RaymanModel.rul^CreateIntelligence^CreateComport:YAM_C_Init
+                int indexOf = name.IndexOf("CreateMacro:", StringComparison.Ordinal);
+                if (indexOf >= 0) {
+                    name = name.Substring(indexOf + "CreateMacro:".Length);
+                }
+
 			}
 
 			off_script = Pointer.Read(reader);

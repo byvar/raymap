@@ -148,12 +148,12 @@ namespace OpenSpace.AI {
                     typeText = "List<DsgVarTextRef2>"; break;
                 case DsgVarInfoEntry.DsgVarType.GraphArray:
                     typeText = "List<Graph>"; break;
-                case DsgVarInfoEntry.DsgVarType.Array9:
-                    typeText = "List<Unknown_7>"; break;
+                case DsgVarInfoEntry.DsgVarType.SOLinksArray:
+                    typeText = "List<SOLinks>"; break;
                 case DsgVarInfoEntry.DsgVarType.SoundEventArray:
                     typeText = "List<DsgVarSoundEvent>"; break;
-                case DsgVarInfoEntry.DsgVarType.Array11:
-                    typeText = "List<Unknown_11>"; break;
+                case DsgVarInfoEntry.DsgVarType.VisualMatArray:
+                    typeText = "List<VisualMaterial>"; break;
                 case DsgVarInfoEntry.DsgVarType.Way:
                     typeText = "Way"; break;
                 case DsgVarInfoEntry.DsgVarType.ActionArray:
@@ -198,9 +198,9 @@ namespace OpenSpace.AI {
             TextArray,
             TextRefArray,
             GraphArray,
-            Array9,
+            SOLinksArray,
             SoundEventArray,
-            Array11,
+            VisualMatArray,
             Way, // TT SE only
             ActionArray, // Hype
 			SuperObjectArray,

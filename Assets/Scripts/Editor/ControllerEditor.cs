@@ -15,8 +15,10 @@ public class ControllerEditor : Editor {
             cont.SaveChanges();
         }
 
+        cont.ExportFlags = (MapExporter.ExportFlags) EditorGUILayout.EnumFlagsField(cont.ExportFlags);
+
         if (GUILayout.Button("Export map")) {
-            MapExporter exporter = new MapExporter(MapLoader.Loader, cont.ExportPath);
+            MapExporter exporter = new MapExporter(MapLoader.Loader, cont.ExportPath, cont.ExportFlags);
             exporter.Export();
         }
 

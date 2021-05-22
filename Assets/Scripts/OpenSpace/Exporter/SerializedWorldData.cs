@@ -11,7 +11,9 @@ using UnityEngine;
 namespace OpenSpace.Exporter {
     public class SerializedWorldData {
 
-        public struct ESector {
+        public struct ESector
+        {
+            public string Name;
             public VisualMaterial SkyMaterial;
             public List<String> Neighbours;
             public List<String> LightReferences;
@@ -31,6 +33,7 @@ namespace OpenSpace.Exporter {
         {
             ESector eSector = new ESector()
             {
+                Name = sector.name,
                 SkyMaterial = sector.skyMaterial,
                 SectorBorder = sector.sectorBorder,
                 LightReferences = sector.staticLights.Select(l => l.Offset.ToString()).ToList(),

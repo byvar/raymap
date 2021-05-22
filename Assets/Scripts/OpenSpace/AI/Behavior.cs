@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
 namespace OpenSpace.AI {
@@ -98,6 +99,13 @@ namespace OpenSpace.AI {
             //l.print("Behavior " + Offset);
             if (Settings.s.hasNames && Settings.s.platform != Settings.Platform.PS2) {
                 name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
+
+                // Some versions have extra information in the name, e.g.
+                // rayman\YLT_RaymanModel\YLT_RaymanModel.rul^CreateIntelligence^CreateComport:YAM_C_Init
+                int indexOf = name.IndexOf("CreateComport:", StringComparison.Ordinal);
+                if (indexOf >= 0) {
+                    name = name.Substring(indexOf + "CreateComport:".Length);
+                }
             }
             off_scripts = Pointer.Read(reader);
             off_firstScript = Pointer.Read(reader);

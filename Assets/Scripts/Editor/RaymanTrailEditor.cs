@@ -76,7 +76,7 @@ namespace Assets.Scripts.Editor {
                 }
                 if (GUILayout.Button("Paste from Clipboard")) {
 
-                    t.Data = JsonConvert.DeserializeObject<RaymanTrail.AttemptData>(GUIUtility.systemCopyBuffer);
+                    t.Data = JsonConvert.DeserializeObject<RaymanTrail.RecordingData>(GUIUtility.systemCopyBuffer);
                 }
                 GUILayout.EndHorizontal();
             }

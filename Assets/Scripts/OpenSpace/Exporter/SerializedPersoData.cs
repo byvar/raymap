@@ -123,11 +123,11 @@ namespace OpenSpace.Exporter {
                     goto default;
                 case DsgVarInfoEntry.DsgVarType.GraphArray:
                     break;
-                case DsgVarInfoEntry.DsgVarType.Array9:
+                case DsgVarInfoEntry.DsgVarType.SOLinksArray:
                     break;
                 case DsgVarInfoEntry.DsgVarType.SoundEventArray: // TODO: check
                     goto default;
-                case DsgVarInfoEntry.DsgVarType.Array11:
+                case DsgVarInfoEntry.DsgVarType.VisualMatArray:
                     break;
                 case DsgVarInfoEntry.DsgVarType.Way:
                     break;
