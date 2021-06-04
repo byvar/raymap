@@ -285,8 +285,14 @@ namespace OpenSpace.Collide {
             return m;
         }
 
+        // Call after clone
+        public void Reset() {
+            gao = null;
+        }
+
         public GeometricObjectCollide Clone() {
             GeometricObjectCollide m = (GeometricObjectCollide)MemberwiseClone();
+            m.Reset();
             for (uint i = 0; i < m.num_elements; i++) {
                 if (elements[i] != null) {
                     m.elements[i] = elements[i].Clone(m);
