@@ -930,7 +930,7 @@ namespace OpenSpace {
                 { "fatherSector", 0x5AEEE0 },
                 { "firstSubmapPosition", 0x5ACE40 },
                 { "always", 0x4A8EC8 },
-                { "anim_stacks", 0x4A8EF8 },
+                { "anim_stacks", 0x4A8EF0 },
                 { "anim_framesKF", 0x5AD954 },
                 { "anim_a3d", 0x5AD958 },
                 { "anim_channels", 0x5AD95C },
