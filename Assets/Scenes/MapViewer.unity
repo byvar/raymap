@@ -1616,6 +1616,8 @@ MonoBehaviour:
   loadingScreen: {fileID: 1109753673}
   selector: {fileID: 1701416324}
   communicator: {fileID: 1701416323}
+  recordingToolPrefab: {fileID: 1480293497455159104, guid: 48ea7c4467298b14d8d04c8030a417f3,
+    type: 3}
   ScreenshotHighlightTextPrefab: {fileID: 3661124797403113144, guid: 849ce0d30849b2a4caf7dab4002736f2,
     type: 3}
   viewCollision: 0

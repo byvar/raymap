@@ -921,8 +921,37 @@ namespace OpenSpace {
             saturate = true,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.FixRelocation, Caps.AllExceptExtension }
+			},
+			hasMemorySupport = true,
+            memoryAddresses = new Dictionary<string, uint> {
+                { "actualWorld", 0x5AF2E8 },
+                { "dynamicWorld", 0x5AEEF0 },
+                { "inactiveDynamicWorld", 0x5AEEE4 },
+                { "fatherSector", 0x5AEEE0 },
+                { "firstSubmapPosition", 0x5ACE40 },
+                { "always", 0x4A8EC8 },
+                { "anim_stacks", 0x4A8EF8 },
+                { "anim_framesKF", 0x5AD954 },
+                { "anim_a3d", 0x5AD958 },
+                { "anim_channels", 0x5AD95C },
+                { "anim_framesNumOfNTTO", 0x5AD960 },
+                { "anim_hierarchies", 0x5AD964 },
+                { "anim_morphData", 0x5AD968 },
+                { "anim_keyframes", 0x5AD96c },
+                { "anim_onlyFrames", 0x5AD970 },
+                { "anim_vectors", 0x5AD974 },
+                { "anim_events", 0x5AD978 },
+                { "anim_NTTO", 0x5AD97C },
+                { "anim_quaternions", 0x5AD980 },
+                { "engineStructure", 0x5AE2A0 },
+                { "families", 0x5AE480 },
+                { "objectTypes", 0x5AF300 },
+                { "textures", 0x5B05A0 },
+                { "textureMemoryChannels", 0x5AF580 },
+                { "inputStructure", 0x5B7DA0 },
+                { "localizationStructure", 0x5AD940 }
 			}
-        };
+		};
 		public static Settings DDDC = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,

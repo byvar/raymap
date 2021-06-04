@@ -33,7 +33,8 @@ public class Controller : MonoBehaviour {
 	public LoadingScreen loadingScreen;
 	public ObjectSelector selector;
 	public WebCommunicator communicator;
-    public GameObject SpawnableParent { get; set; }
+	public RecordingTool recordingToolPrefab;
+	public GameObject SpawnableParent { get; set; }
 	public GameObject PersoPartsParent { get; set; }
 	public TMP_Text ScreenshotHighlightTextPrefab;
 
@@ -957,8 +958,10 @@ public class Controller : MonoBehaviour {
 			foreach (Perso perso in loader.persos) {
 				if (perso != null && perso.Gao != null) {
 					PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
-					pb.UpdateViewCollision(viewCollision);
-				}
+                    if (pb != null) {
+                        pb.UpdateViewCollision(viewCollision);
+                    }
+                }
 			}
 			foreach (ROMPersoBehaviour perso in romPersos) {
 				if (perso != null) { perso.UpdateViewCollision(viewCollision); }

@@ -35,7 +35,7 @@ namespace OpenSpace.AI {
         public Vector3 valueVector;
 		public List valueList;
         public ObjectList valueObjectList;
-        public Behavior valueComport;
+        public Macro valueComport;
         public State valueAction;
         public uint valueCaps;
         public EntryAction valueInput;
@@ -114,7 +114,8 @@ namespace OpenSpace.AI {
 					break;
 				case DsgVarInfoEntry.DsgVarType.Comport:
 					valuePointer = Pointer.Read(reader);
-					valueComport = MapLoader.Loader.FromOffsetOrRead<Behavior>(reader, valuePointer);
+                    // 2021-05-25 Changed type from Behavior to Macro since it always seems to be a Macro (from R3, seemingly unused in R2) - RTS
+					valueComport = MapLoader.Loader.FromOffsetOrRead<Macro>(reader, valuePointer);
 					break;
 				case DsgVarInfoEntry.DsgVarType.Input:
 					valuePointer = Pointer.Read(reader);

@@ -9,8 +9,8 @@ namespace OpenSpace.Object.Properties {
 
         public uint customBits;
         public uint aiCustomBits;
-        public byte isAPlatform;
-        public byte updateCheckByte;
+        public byte platformType;
+        public byte miscFlags;
         public byte transparencyZoneMin;
         public byte transparencyZoneMax;
 
@@ -25,7 +25,7 @@ namespace OpenSpace.Object.Properties {
         {
             get
             {
-                return ((updateCheckByte >> 6) & 1) != 0;
+                return ((miscFlags >> 6) & 1) != 0;
             }
         }
 
@@ -71,8 +71,8 @@ namespace OpenSpace.Object.Properties {
 						reader.ReadByte();
 					}
 					stdGame.customBits = reader.ReadUInt32(); // 0x24 custom bits
-					stdGame.isAPlatform = reader.ReadByte(); // 0x28
-					stdGame.updateCheckByte = reader.ReadByte(); // 0x29
+					stdGame.platformType = reader.ReadByte(); // 0x28
+					stdGame.miscFlags = reader.ReadByte(); // 0x29
 					stdGame.transparencyZoneMin = reader.ReadByte(); // 0x2A
 					stdGame.transparencyZoneMax = reader.ReadByte(); // 0x2B
 					stdGame.customBitsInitial = reader.ReadUInt32(); // 0x2C
@@ -90,8 +90,8 @@ namespace OpenSpace.Object.Properties {
 					reader.ReadBytes(0x10); // 0x10 - 0x1F
 					stdGame.customBits = reader.ReadUInt32(); // 0x20 custom bits
 					stdGame.aiCustomBits = reader.ReadUInt32(); // 0x24 AI custom bits
-					stdGame.isAPlatform = reader.ReadByte();
-					stdGame.updateCheckByte = reader.ReadByte();
+					stdGame.platformType = reader.ReadByte();
+					stdGame.miscFlags = reader.ReadByte();
 					stdGame.transparencyZoneMin = reader.ReadByte();
 					stdGame.transparencyZoneMax = reader.ReadByte();
 					stdGame.customBitsInitial = reader.ReadUInt32();
@@ -113,8 +113,8 @@ namespace OpenSpace.Object.Properties {
 				reader.ReadUInt32();
 				stdGame.off_superobject = Pointer.Read(reader);
 				reader.ReadBytes(0xC);
-				stdGame.isAPlatform = reader.ReadByte();
-				stdGame.updateCheckByte = reader.ReadByte();
+				stdGame.platformType = reader.ReadByte();
+				stdGame.miscFlags = reader.ReadByte();
 				stdGame.transparencyZoneMin = reader.ReadByte();
 				stdGame.transparencyZoneMax = reader.ReadByte();
 				stdGame.customBits = reader.ReadUInt32();
@@ -134,8 +134,8 @@ namespace OpenSpace.Object.Properties {
 				reader.ReadUInt32();
 				stdGame.off_superobject = Pointer.Read(reader);
 				reader.ReadBytes(0x10);
-				stdGame.isAPlatform = reader.ReadByte();
-				stdGame.updateCheckByte = reader.ReadByte();
+				stdGame.platformType = reader.ReadByte();
+				stdGame.miscFlags = reader.ReadByte();
 				stdGame.transparencyZoneMin = reader.ReadByte();
 				stdGame.transparencyZoneMax = reader.ReadByte();
 				stdGame.customBits = reader.ReadUInt32();
@@ -157,14 +157,19 @@ namespace OpenSpace.Object.Properties {
             }
         }
 
-        public bool ConsideredOnScreen()
+        public bool IsActive()
         {
-            return (updateCheckByte & (1 << 5)) != 0;
+			return (miscFlags & (1 << 2)) != 0;
+        }
+
+		public bool ConsideredOnScreen()
+        {
+            return (miscFlags & (1 << 5)) != 0;
         }
 
         public bool ConsideredTooFarAway()
         {
-            return (updateCheckByte & (1 << 7)) != 0;
+            return (miscFlags & (1 << 7)) != 0;
         }
 
         public void Write(Writer writer)
@@ -173,8 +178,8 @@ namespace OpenSpace.Object.Properties {
             if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
                 Pointer.Goto(ref writer, offset + 0x24);
                 writer.Write(customBits);
-                writer.Write(isAPlatform);
-                writer.Write(updateCheckByte);
+                writer.Write(platformType);
+                writer.Write(miscFlags);
                 writer.Write(transparencyZoneMin);
                 writer.Write(transparencyZoneMax);
                 writer.Write(customBitsInitial);
@@ -182,8 +187,8 @@ namespace OpenSpace.Object.Properties {
                 Pointer.Goto(ref writer, offset + 0x20);
                 writer.Write(customBits);
                 writer.Write(aiCustomBits);
-                writer.Write(isAPlatform);
-                writer.Write(updateCheckByte);
+                writer.Write(platformType);
+                writer.Write(miscFlags);
                 writer.Write(transparencyZoneMin);
                 writer.Write(transparencyZoneMax);
                 writer.Write(customBitsInitial);

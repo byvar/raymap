@@ -29,14 +29,14 @@ public class PersoBehaviourEditor : Editor {
         }*/
 
         GUILayout.BeginVertical();
-        byte updateCheckByte = pb.perso.stdGame.updateCheckByte;
+        byte updateCheckByte = pb.perso.stdGame.miscFlags;
         GUILayout.Label("StdGame: " + pb.perso.stdGame.offset.ToString());
         GUILayout.Label("StdGame.UpdateByte: " + Convert.ToString(updateCheckByte, 2).PadLeft(8, '0'));
         bool consideredOnScreen = (updateCheckByte & (1 << 5)) != 0;
         bool consideredTooFarAway = (updateCheckByte & (1 << 7)) != 0;
         GUILayout.Label("Considered on screen (bit 5): " + consideredOnScreen);
         GUILayout.Label("Considered too far away (bit 7): " + consideredTooFarAway);
-        GUILayout.Label("State custom bits: " + Convert.ToString(pb.state.customStateBits, 2).PadLeft(8, '0'));
+        GUILayout.Label("State custom bits: " + Convert.ToString(pb.state != null ? pb.state.customStateBits : 0, 2).PadLeft(8, '0'));
 
 		/* // Only enable when working on morph data, it prevents from using the buttons properly otherwise
         if (pb.a3d != null && pb.morphDataArray != null) {

@@ -34,7 +34,8 @@ namespace OpenSpace.AI {
 				}
 			} else {
 				s.off_script = Pointer.Read(reader);
-				//l.print(s.off_script);
+
+                //l.print(s.off_script);
 				Pointer.DoAt(ref reader, s.off_script, () => {
 					bool endReached = false;
 					while (!endReached) {

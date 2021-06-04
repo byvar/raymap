@@ -57,8 +57,8 @@ namespace OpenSpace.Exporter {
                     CustomBits = perso.stdGame.customBits,
                     IsAlwaysActive = perso.stdGame.IsAlwaysActive,
                     IsMainActor = perso.stdGame.IsMainActor,
-                    IsAPlatform = perso.stdGame.isAPlatform!=0 ? true:false,
-                    UpdateCheckByte = perso.stdGame.updateCheckByte,
+                    IsAPlatform = perso.stdGame.platformType!=0 ? true:false,
+                    UpdateCheckByte = perso.stdGame.miscFlags,
                     TransparencyZoneMin = perso.stdGame.transparencyZoneMin,
                     TransparencyZoneMax = perso.stdGame.transparencyZoneMax,
                     TooFarLimit = perso.stdGame.tooFarLimit
