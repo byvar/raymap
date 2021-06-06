@@ -252,6 +252,7 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
 		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Visualize Sector Borders"), UnitySettings.VisualizeSectorBorders);
 		UnitySettings.CreateFamilyGameObjects = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Create Family GameObjects"), UnitySettings.CreateFamilyGameObjects);
+		UnitySettings.ShowCollisionDataForNoCollisionObjects = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Show Collision Data For NoCollision SPOs"), UnitySettings.ShowCollisionDataForNoCollisionObjects);
 
 		totalyPos = yPos;
 		GUI.EndScrollView();

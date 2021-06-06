@@ -77,7 +77,7 @@ namespace OpenSpace.Object {
 				if (Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
 			}
 			Pointer.DoAt(ref reader, ipo.off_data, () => {
-				ipo.data = PhysicalObject.Read(reader, ipo.off_data, radiosity: ipo.radiosity);
+				ipo.data = PhysicalObject.Read(reader, ipo.off_data, so:ipo.superObject, radiosity: ipo.radiosity);
 			});
 			/*Pointer.DoAt(ref reader, ipo.off_portalCamera, () => {
 				ipo.portalCamera = SuperObject.FromOffsetOrRead(reader, 

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenSpace.Object.Properties;
 using UnityEngine;
 
 namespace OpenSpace.Object {
@@ -20,6 +21,7 @@ namespace OpenSpace.Object {
         public ushort visualSetType = 0;
         public GeometricObjectCollide collideMesh;
         public Vector3? scaleMultiplier = null;
+
         private GameObject gao = null;
         public GameObject Gao {
             get {
@@ -248,7 +250,12 @@ namespace OpenSpace.Object {
 					if (gao != null) gao.SetActive(!viewCollision);
 				}
 			}
-			if (collideMesh != null) collideMesh.SetVisualsActive(viewCollision);
-		}
+
+            bool spoHasNoCollisionFlag = superObject?.flags.HasFlag(SuperObjectFlags.Flags.NoCollision) ?? false;
+            var parentSector = superObject?.ParentSector;
+            bool isInVirtualSector = parentSector != null && (parentSector.data as Sector)?.isSectorVirtual > 0;
+
+            collideMesh?.SetVisualsActive(viewCollision && ((!spoHasNoCollisionFlag && !isInVirtualSector) || UnitySettings.ShowCollisionDataForNoCollisionObjects));
+        }
     }
 }

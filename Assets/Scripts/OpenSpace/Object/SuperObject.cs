@@ -141,6 +141,18 @@ namespace OpenSpace.Object {
             }
         }
 
+        /// <summary>
+        /// Check in which sector this SuperObject resides by recursively checking the parent SPO's until encountering a sector type
+        /// </summary>
+        public SuperObject ParentSector
+        {
+            get
+            {
+                if (this.type == Type.Sector) return this;
+                return parent?.ParentSector;
+            }
+        }
+
         public SuperObject(Pointer offset) {
             this.offset = offset;
         }
@@ -165,7 +177,7 @@ namespace OpenSpace.Object {
             so.globalMatrix = reader.ReadInt32(); // 0x28 -> 0x2C
 			so.drawFlags = SuperObjectDrawFlags.Read(reader);
             so.flags = SuperObjectFlags.Read(reader); // 0x30->0x34
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32();
+            if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32(); // Visual Bounding Volume?
             Pointer off_boundingVolume = Pointer.Read(reader);
             //l.print("SuperObject T" + so.typeCode + ": " + off_so + " - " + so.off_matrix);
 
