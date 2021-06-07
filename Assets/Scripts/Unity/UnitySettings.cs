@@ -53,9 +53,10 @@ public class UnitySettings {
 	public static bool TracePointers { get; set; } = false;
 	public static bool VisualizeSectorBorders { get; set; } = false;
 	public static bool CreateFamilyGameObjects { get; set; } = false;
+    public static bool ShowCollisionDataForNoCollisionObjects { get; set; } = false;
 
-	// Export
-	public static bool ExportText { get; set; }
+    // Export
+    public static bool ExportText { get; set; }
 	public static bool SaveTextures { get; set; }
 	public static string ExportPath { get; set; } = "./exports/";
 	public static bool ExportAfterLoad { get; set; } // If set to true, exports the map after loading is finished and quits Raymap.
@@ -165,6 +166,7 @@ public class UnitySettings {
 		UseLevelTranslation = s.SerializeBool("UseLevelTranslation", UseLevelTranslation);
 		VisualizeSectorBorders = s.SerializeBool("VisualizeSectorBorders", VisualizeSectorBorders);
 		CreateFamilyGameObjects = s.SerializeBool("CreateFamilyGameObjects", CreateFamilyGameObjects);
+		ShowCollisionDataForNoCollisionObjects = s.SerializeBool("ShowCollisionDataForNoCollisionObjects", ShowCollisionDataForNoCollisionObjects);
 	}
 
 
