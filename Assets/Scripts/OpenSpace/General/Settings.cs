@@ -10,6 +10,37 @@ using LinkedListType = OpenSpace.LinkedList.Type;
 namespace OpenSpace {
     public class Settings {
 
+        public Settings(Settings s = null)
+        {
+            if (s != null) {
+                this.mode = s.mode;
+                this.engineVersion = s.engineVersion;
+                this.game = s.game;
+                this.platform = s.platform;
+                this.endian = s.endian;
+				this.linkedListType = s.linkedListType;
+                this.hasObjectTypes = s.hasObjectTypes;
+                this.hasNames = s.hasNames;
+                this.hasDeformations = s.hasDeformations;
+                this.numEntryActions = s.numEntryActions;
+                this.hasExtraInputData = s.hasExtraInputData;
+                this.hasMemorySupport = s.hasMemorySupport;
+                this.memoryAddresses = s.memoryAddresses;
+                this.loadFromMemory = s.loadFromMemory;
+                this.encryption = s.encryption;
+                this.encryptPointerFiles = s.encryptPointerFiles;
+                this.hasLinkedListHeaderPointers = s.hasLinkedListHeaderPointers;
+                this.snaCompression = s.snaCompression;
+                this.aiTypes = s.aiTypes;
+                this.textureAnimationSpeedModifier = s.textureAnimationSpeedModifier;
+                this.luminosity = s.luminosity;
+                this.saturate = s.saturate;
+                this.caps = s.caps;
+                this.levelTranslation = s.levelTranslation;
+                this.linkUncategorizedObjectsToScriptFamily = s.linkUncategorizedObjectsToScriptFamily;
+            }
+		}
+
 		public static Dictionary<string, Mode> cmdModeNameDict = new Dictionary<string, Mode>() {
 			{ "r3_gc", Mode.Rayman3GC },
 			{ "r3_pc", Mode.Rayman3PC },
@@ -105,6 +136,7 @@ namespace OpenSpace {
             [Description("Tonic Trouble (PC)")] TonicTroublePC,
             [Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
             [Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
+            [Description("Donald Duck: Quack Attack Demo (PC)")] DonaldDuckPCDemo,
             [Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
             [Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
 			[Description("Donald Duck: Quack Attack (PS1)")] DonaldDuckPS1,
@@ -952,7 +984,13 @@ namespace OpenSpace {
                 { "localizationStructure", 0x5AD940 }
 			}
 		};
-		public static Settings DDDC = new Settings() {
+
+        public static Settings DDPCDemo = new Settings(Settings.DDPC)
+        {
+            numEntryActions = 43
+        };
+        
+        public static Settings DDDC = new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
 			platform = Platform.DC,
@@ -1219,6 +1257,7 @@ namespace OpenSpace {
 			{ Mode.TonicTroublePC, TTPC },
 			{ Mode.TonicTroubleSEPC, TTSEPC },
 			{ Mode.DonaldDuckPC, DDPC },
+			{ Mode.DonaldDuckPCDemo, DDPCDemo },
 			{ Mode.DonaldDuckDC, DDDC },
 			{ Mode.DonaldDuckN64, DDN64 },
 			{ Mode.DonaldDuckPS1, DDPS1 },

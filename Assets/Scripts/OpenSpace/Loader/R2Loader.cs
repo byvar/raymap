@@ -745,9 +745,16 @@ namespace OpenSpace.Loader {
                     Pointer off_geometricShadowObject = Pointer.Read(reader);
                 }
                 Pointer.Read(reader); // DemoSOList
-                if (Settings.s.game == Settings.Game.R2Demo || Settings.s.game == Settings.Game.RedPlanet) {
+
+                if (Settings.s.game == Settings.Game.R2Demo || Settings.s.game == Settings.Game.RedPlanet || Settings.s.mode == Settings.Mode.DonaldDuckPCDemo) {
                     Pointer.Read(reader);
                 }
+
+                if (Settings.s.mode == Settings.Mode.DonaldDuckPCDemo) {
+                    reader.ReadUInt32();
+                    reader.ReadUInt32();
+                }
+
                 loadingState = "Loading level animation bank";
                 //print("Animation bank: " + Pointer.Current(reader));
                 await WaitIfNecessary();
