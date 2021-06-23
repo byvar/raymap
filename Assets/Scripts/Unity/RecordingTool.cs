@@ -37,7 +37,7 @@ public class RecordingTool : MonoBehaviour
 
     private float _currentTime;
 
-    private float LastRecordingTime = 0.0f;
+    //private float LastRecordingTime = 0.0f;
     public RecordingData.FrameData CurrentFrameData => Data.Frames.First(f => f.time >= CurrentTime).data;
     public float CurrentFrameTime => Data.Frames.First(f => f.time >= CurrentTime).time;
 
