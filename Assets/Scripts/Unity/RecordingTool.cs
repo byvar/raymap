@@ -38,17 +38,16 @@ public class RecordingTool : MonoBehaviour
     private float _currentTime;
 
     private float LastRecordingTime = 0.0f;
-    public RecordingData.FrameData CurrentFrameData => Data.Frames.First(f => f.time >= CurrentTime).data;
-    public float CurrentFrameTime => Data.Frames.First(f => f.time >= CurrentTime).time;
 
-    public RecordingData.FrameData LastFrameData => Data.Frames.LastOrDefault(f => f.time < CurrentFrameTime).data;
-    public float LastFrameTime => Data.Frames.LastOrDefault(f => f.time < CurrentFrameTime).time;
+    public RecordingData.Frame CurrentFrame => Data.Frames.First(f => f.Time >= CurrentTime);
+    public RecordingData.Frame LastFrame(float currentFrameTime) => Data.Frames.LastOrDefault(f => f.Time < currentFrameTime);
 
     public bool AlignCameraToGame;
     public bool InterpolateTransforms = true;
 
     public bool IsPlaying { get; private set; }
     public float PlaybackSpeed = 1.0f;
+    public float MaxRecordingFps = 60.0f;
 
     public RecordingData Data;
 
@@ -57,6 +56,18 @@ public class RecordingTool : MonoBehaviour
 
     public class RecordingData
     {
+        public struct Frame
+        {
+            public float Time;
+            public FrameData Data;
+
+            public Frame(float time, FrameData data)
+            {
+                Time = time;
+                Data = data;
+            }
+        }
+
         public class FrameData
         {
             public Dictionary<string, PersoData> PersoData { get; private set; }
@@ -119,9 +130,9 @@ public class RecordingTool : MonoBehaviour
         }
 
         // (frame, (objName, data))
-        public List<(float time,FrameData data)> Frames = new List<(float time,FrameData data)>();
+        public List<Frame> Frames = new List<Frame>();
         public List<string> PersoNames { get; private set; }
-        public float Duration => Frames.LastOrDefault().time;
+        public float Duration => Frames.LastOrDefault().Time;
 
         public RecordingData(MapLoader loader)
         {
@@ -134,6 +145,8 @@ public class RecordingTool : MonoBehaviour
     private void UpdateLivePreview( PersoBehaviour pb, Reader reader)
     {
         var spo = pb.perso.SuperObject;
+
+        pb.IsEnabled = true;
 
         if (spo != null) {
             // Update gameobject being active
@@ -150,7 +163,7 @@ public class RecordingTool : MonoBehaviour
             if (pb.gameObject.activeSelf) {
                 var mind = pb.brain?.mind?.mind;
                 if (mind != null) {
-                    Pointer.DoAt(ref reader, mind.Offset, () => { mind.UpdateCurrentBehaviors(reader); });
+                    Pointer.DoAt(ref reader, mind.Offset, () => { mind.UpdateCurrentBehaviors(reader); }); // TODO: add a toggle to not record behaviors
                 }
             }
 
@@ -171,8 +184,10 @@ public class RecordingTool : MonoBehaviour
 
                 // State offset changed?
                 if (perso.p3dData.stateCurrent != null) {
-                    pb.SetState(perso.p3dData.stateCurrent.index);
-                    pb.autoNextState = true;
+                    if (pb.stateIndex != perso.p3dData.stateCurrent.index) {
+                        pb.SetState(perso.p3dData.stateCurrent.index);
+                        pb.autoNextState = false;
+                    }
                 }
 
             }
@@ -232,10 +247,8 @@ public class RecordingTool : MonoBehaviour
 
     private void HandleStatePlayback()
     {
-        var currentData = CurrentFrameData.PersoData;
-        var currentFrameTime = CurrentFrameTime;
-        var lastFrameData = InterpolateTransforms ? LastFrameData?.PersoData : null;
-        var lastFrameTime = lastFrameData != null ? LastFrameTime : currentFrameTime;
+        var currentFrame = CurrentFrame;
+        var lastFrame = LastFrame(currentFrame.Time);
 
         if (IsPlaying) {
             CurrentTime += Time.deltaTime * PlaybackSpeed;
@@ -243,15 +256,17 @@ public class RecordingTool : MonoBehaviour
 
         foreach (var kv in nameToPersoMap) {
             var pb = kv.Value;
-            pb.playAnimation = false;
+            pb.playAnimation = IsPlaying;
+            pb.AlwaysPlayAnimation = true;
+            pb.IsEnabled = true;
 
-            var data = currentData[kv.Key];
-            var lastData = lastFrameData?[kv.Key];
+            var data = currentFrame.Data.PersoData[kv.Key];
+            var lastData = lastFrame.Data?.PersoData?[kv.Key];
 
             pb.gameObject.SetActive(data != null);
             if (data != null) {
 
-                float interpFactor = (CurrentTime - lastFrameTime) / (currentFrameTime - lastFrameTime);
+                float interpFactor = (CurrentTime - lastFrame.Time) / (currentFrame.Time - lastFrame.Time);
 
                 var interpPosition = lastData != null ? Vector3.Lerp(lastData.Position, data.Position, interpFactor) : data.Position;
                 var interpRotation = lastData != null ? Quaternion.Lerp(lastData.Rotation, data.Rotation, interpFactor) : data.Rotation;
@@ -264,6 +279,12 @@ public class RecordingTool : MonoBehaviour
 
     private void HandleStateRecording()
     {
+        if (Time.time < LastRecordingTime + (1.0f/MaxRecordingFps)) {
+            return;
+        }
+
+        LastRecordingTime = Time.time;
+
         var livePreviewReader = MapLoader.Loader.livePreviewReader;
 
         ReadAlways(livePreviewReader);
@@ -273,6 +294,7 @@ public class RecordingTool : MonoBehaviour
         foreach (var kv in nameToPersoMap) {
             var pb = kv.Value;
             pb.playAnimation = true;
+            pb.AlwaysPlayAnimation = true;
 
             if (livePreviewReader != null) {
 
@@ -288,10 +310,11 @@ public class RecordingTool : MonoBehaviour
         }
 
         foreach (var alw in SpawnedAlwaysObjects) {
+            alw.Value.IsAlways = true;
             UpdateLivePreview(alw.Value, livePreviewReader);
         }
 
-        Data.Frames.Add((CurrentTime, new RecordingData.FrameData(data)));
+        Data.Frames.Add(new RecordingData.Frame(CurrentTime, new RecordingData.FrameData(data)));
 
         _currentTime += Time.deltaTime;
     }
@@ -372,11 +395,11 @@ public class RecordingTool : MonoBehaviour
         if (Data != null) {
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (CurrentTime == Data.Frames.LastOrDefault().time) {
+            if (CurrentTime == Data.Frames.LastOrDefault().Time) {
                 return;
             }
 
-            CurrentTime = Data.Frames.FirstOrDefault(f => f.time > CurrentTime).time;
+            CurrentTime = Data.Frames.FirstOrDefault(f => f.Time > CurrentTime).Time;
         }
     }
 
@@ -388,7 +411,7 @@ public class RecordingTool : MonoBehaviour
                 return;
             }
 
-            CurrentTime = Data.Frames.LastOrDefault(f => f.time < CurrentTime).time;
+            CurrentTime = Data.Frames.LastOrDefault(f => f.Time < CurrentTime).Time;
         }
     }
 
@@ -422,6 +445,7 @@ public class RecordingTool : MonoBehaviour
         Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["always"], mem));
         var num_always = reader.ReadUInt32();
         var spawnablePersos = OpenSpace.LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+        var currentPointer = Pointer.Current(reader);
         var off_alwaysSPOs = Pointer.Read(reader);
         Pointer.Goto(ref reader, off_alwaysSPOs);
 
@@ -439,32 +463,39 @@ public class RecordingTool : MonoBehaviour
 
             var off_alwaysSPO = off_alwaysSpoArray + (i * spoSize);
 
-            Pointer.Goto(ref reader, off_alwaysSPO+4); // read linkedObject (data)
-            var data = Pointer.Read(reader);
+            Pointer.Goto(ref reader, off_alwaysSPO + 0x1c); // make sure spo has a parent, otherwise they're not in the world
+            var parent = Pointer.Read(reader);
 
-            if (data != null) {
-                Pointer.Goto(ref reader, data + 4); // StdGame
-                var stdGame = Pointer.Read(reader);
+            if (parent != null) {
+                Pointer.Goto(ref reader, off_alwaysSPO + 4); // read linkedObject (data)
+                var data = Pointer.Read(reader);
 
+                if (data != null) {
+                    Pointer.Goto(ref reader, data + 4); // stdGame
+                    var stdGamePtr = Pointer.Read(reader);
 
-                if (stdGame != null) {
-                    if (!SpawnedAlwaysObjects.ContainsKey(stdGame)) {
+                    if (stdGamePtr != null) {
 
-                        MapLoader.Loader.superObjects.Remove(SuperObject.FromOffset(off_alwaysSPO));
-                        Pointer.Goto(ref reader, off_alwaysSPO);
-                        var spo = SuperObject.Read(reader, off_alwaysSPO);
+                        if (!SpawnedAlwaysObjects.ContainsKey(stdGamePtr)) {
 
-                        var pb = spo.Gao.AddComponent<PersoBehaviour>(); 
-                        pb.perso = spo.data as Perso;
-                        pb.controller = MapLoader.Loader.controller;
-                        pb.Init();
+                            MapLoader.Loader.superObjects.Remove(SuperObject.FromOffset(off_alwaysSPO));
+                            Pointer.Goto(ref reader, off_alwaysSPO);
+                            var spo = SuperObject.Read(reader, off_alwaysSPO);
 
-                        SpawnedAlwaysObjects.Add(stdGame, pb);
+                            var pb = spo.Gao.AddComponent<PersoBehaviour>();
+                            pb.perso = spo.data as Perso;
+                            pb.sector = null;
+                            pb.controller = MapLoader.Loader.controller;
+                            pb.IsEnabled = true;
+                            pb.Init();
 
-                        spo.Gao.transform.SetParent(RecordingSpawnablesRoot.transform, false);
+                            SpawnedAlwaysObjects.Add(stdGamePtr, pb);
 
-                    } else {
-                        ObjectsToRemove.Remove(stdGame);
+                            spo.Gao.transform.SetParent(RecordingSpawnablesRoot.transform, false);
+
+                        } else {
+                            ObjectsToRemove.Remove(stdGamePtr);
+                        }
                     }
                 }
             }
