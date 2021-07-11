@@ -111,9 +111,9 @@ public class zzTransparencyCapture
     {
         float lAlpha = getAlpha(pColorWhenBlack.r, pColorWhenWhite.r);
         return new Color(
-            pColorWhenBlack.r / lAlpha,
-            pColorWhenBlack.g / lAlpha,
-            pColorWhenBlack.b / lAlpha,
+            Mathf.Clamp01(lAlpha > 0 ? (pColorWhenBlack.r / lAlpha) : pColorWhenBlack.r),
+            Mathf.Clamp01(lAlpha > 0 ? (pColorWhenBlack.g / lAlpha) : pColorWhenBlack.g),
+            Mathf.Clamp01(lAlpha > 0 ? (pColorWhenBlack.b / lAlpha) : pColorWhenBlack.b),
             lAlpha);
     }
 
@@ -123,7 +123,7 @@ public class zzTransparencyCapture
     static float getAlpha(float pColorWhenZero, float pColorWhenOne)
     {
         //pColorWhenOne-pColorWhenZero=1-Alpha
-        return 1 + pColorWhenZero - pColorWhenOne;
+        return Mathf.Clamp01(1 + pColorWhenZero - pColorWhenOne);
     }
 
     static Texture2D captureView(Rect pRect)
