@@ -89,15 +89,18 @@ namespace OpenSpace.AI {
          *  byte type
          * }
          */
-        /*public byte[] GetNodeBytes()
+        public byte[] GetNodeBytes()
         {
             List<byte> bytes = new List<byte>();
             foreach (var n in scriptNodes) {
-                // TOOD: Don't store bytes for nodes
-                //bytes.AddRange(n.bytes);
+                
+                bytes.AddRange(n.param_ptr!=null?BitConverter.GetBytes(n.param_ptr.offset): BitConverter.GetBytes(n.param));
+                bytes.AddRange(BitConverter.GetBytes((short)n.indent));
+                bytes.Add(n.indent);
+                bytes.Add(n.type);
             }
 
             return bytes.ToArray();
-        }*/
+        }
     }
 }

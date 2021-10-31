@@ -40,6 +40,7 @@ public abstract class BasePersoBehaviour : MonoBehaviour {
 
     // Other
     public bool IsAlways { get; set; }
+    public bool AlwaysPlayAnimation { get; set; } = false;
 
     private bool isEnabled = true;
     public bool IsEnabled {

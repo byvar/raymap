@@ -15,7 +15,7 @@ namespace OpenSpace.AI {
         public string[] functionTable;
         public string[] procedureTable;
         public string[] conditionTable;
-        public DsgVarInfoEntry.DsgVarType[] dsgVarTypeTable;
+        public DsgVarType[] dsgVarTypeTable;
         public string[] fieldTable;
         public string[] metaActionTable;
         public ScriptNode.NodeType[] nodeTypes;
@@ -43,9 +43,9 @@ namespace OpenSpace.AI {
             return ScriptNode.NodeType.Unknown;
         }
 
-        public DsgVarInfoEntry.DsgVarType GetDsgVarType(uint type) {
+        public DsgVarType GetDsgVarType(uint type) {
             if (type < dsgVarTypeTable.Length) return dsgVarTypeTable[type];
-            return DsgVarInfoEntry.DsgVarType.None;
+            return DsgVarType.None;
         }
 
 	}

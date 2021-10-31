@@ -198,17 +198,127 @@ public class Controller : MonoBehaviour {
 
             foreach (var p in persos) {
 
+                int itemCount = 1;
                 bool passesFilter = string.Equals(HighlightObjectsFilter, "*");
-                foreach (var fi in HighlightObjectsFilter.Split(',')) {
-                    if (string.Equals(p.NameFamily, fi, StringComparison.CurrentCultureIgnoreCase) ||
-                        string.Equals(p.NameModel, fi, StringComparison.CurrentCultureIgnoreCase)) {
+
+                if (string.Equals(HighlightObjectsFilter, "$redlums")) {
+
+                    DsgMem dsgMem = p.perso?.brain?.mind?.dsgMem;
+
+                    // Red lums:
+					// CHR_lums_basic (dsgVar_0, 0 = red lums, 1 = yellow lums (including big lusm), 2 = ?, 3+4 = blue lums, 
+					// Alw_Lums_Model (dsgVar_0, 0 = red lums, 1 = yellow lums (including big lusm), 2 = ?, 3+4 = blue lums, 
+					// ARG_SerieRouge
+					// Red lums spawned by:
+					// MIC_SbireNinja (5 lums)
+					// SUN_Clarky (1 lum per hit, maximum of 5 lums (6th hit doesnt give a lum)
+					// SUN_fayagwod (7 lums)
+					// ARG_Araignee -> 1 lum
+					// OLD_SBIRE_alarme (depends on custombits (excludes cb30) dsgvar_1: 0->3, 1->2, 2->4)
+					// ARG_SimpleSbire -> 1 lum, depending on CB31/CB29 and actor hitpoints
+					// XAP_TonoGear_light -> 3 red lums
+					// STN_tonogear -> 3 red lums
+					// FRH_Sbire_Gnak -> CB31 = invincible -> depending on CB30 + DsgVar_2: 0->2 lums, !0->3 lums 
+					// ARG_CageLums -> doesnt spawn red lums, lums activated by a different object
+
+                    bool invincible = (p.perso.stdGame.customBits & 1 << 30) != 0; // 31 is 1-based, 30 = 0-based
+
+					if (p.NameModel.ToLower() == "chr_lums_basic") {
+
+                        if (dsgMem != null) {
+                            int value_0 = dsgMem.values[0].valueInt;
+                            if (value_0 == 0) {
+								passesFilter = true;
+                                itemCount = 1;
+
+                                p.stateIndex = 2;
+							}
+                        }
+
+
+                    } else if (p.NameModel.ToLower() == "alw_lums_model") {
+
+                        if (dsgMem != null) {
+                            byte value_0 = dsgMem.values[0].valueUByte;
+                            if (value_0 == 0) {
+                                passesFilter = true;
+								itemCount = 1;
+
+                                p.stateIndex = 2;
+							}
+                        }
+
+
+					} else if (p.NameModel.ToLower() == "arg_serierouge") {
                         passesFilter = true;
+
+                        p.stateIndex = 2;
+					} else if (p.NameModel.ToLower() == "mic_sbireninja") {
+                        passesFilter = true;
+                        itemCount = 5;
+					} else if (p.NameModel.ToLower() == "sun_clarky") {
+                        passesFilter = true;
+                        itemCount = 5;
+					} else if (p.NameModel.ToLower() == "sun_fayagwod") {
+                        passesFilter = true;
+                        itemCount = 7;
+					} else if (p.NameModel.ToLower() == "xap_tonogear_light" || p.NameModel.ToLower() == "stn_tonogear") {
+                        passesFilter = true;
+                        itemCount = 3;
+					} else if (p.NameModel.ToLower() == "arg_araignee") {
+                        passesFilter = true;
+                        itemCount = 1;
+					} else if (p.NameModel.ToLower() == "arg_simplesbire" || p.NameModel.ToLower() == "old_sbire_shoot_sol") {
+                        passesFilter = !invincible;
+                        itemCount = 1;
+					} else if (p.NameModel.ToLower() == "old_sbire_alarme") {
+                        // OLD_SBIRE_alarme (depends on custombits (excludes cb30) dsgvar_1: 0->3, 1->2, 2->4)
+						passesFilter = !invincible;
+
+                        if (dsgMem != null) {
+                            byte value_1 = dsgMem.values[1].valueUByte;
+                            switch (value_1) {
+                                case 0:
+                                    itemCount = 3;
+                                    break;
+                                case 1:
+                                    itemCount = 2;
+                                    break;
+                                case 2:
+                                    itemCount = 4;
+                                    break;
+                            }
+                        }
+
+					} else if (p.NameModel.ToLower() == "frh_sbire_gnak") {
+                        // FRH_Sbire_Gnak -> CB31 = invincible -> depending on CB30 + DsgVar_2: 0->2 lums, !0->3 lums 
+						passesFilter = !invincible;
+
+                        if (dsgMem != null) {
+                            int value_2 = dsgMem.values[2].valueInt;
+							itemCount = value_2 == 0 ? 2 : 3;
+						}
                     }
+
+                    if (passesFilter && p.NameModel.ToLower()!="chr_lums_basic"&& p.NameModel.ToLower() != "arg_serierouge" && p.NameModel.ToLower() != "alw_lums_model") {
+
+                        p.stateIndex = 0;
+					}
+
+				} else {
+
+                    foreach (var fi in HighlightObjectsFilter.Split(',')) {
+                        if (string.Equals(p.NameFamily, fi, StringComparison.CurrentCultureIgnoreCase) ||
+                            string.Equals(p.NameModel, fi, StringComparison.CurrentCultureIgnoreCase)) {
+                            passesFilter = true;
+                        }
+                    }
+
                 }
 
                 if (passesFilter) {
 
-                    count++;
+                    count+=itemCount;
 
                     var highlightTextParentGao = new GameObject("HighlightTextParent");
                     highlightTextParentGao.transform.SetParent(p.gameObject.transform, false);
@@ -221,6 +331,7 @@ public class Controller : MonoBehaviour {
 					text = text.Replace("$m", p.NameModel);
 					text = text.Replace("$i", p.NameInstance);
 					text = text.Replace("$c", count.ToString());
+					text = text.Replace("$_c", itemCount.ToString());
 
                     textComponent.text = text;
 
@@ -233,7 +344,7 @@ public class Controller : MonoBehaviour {
                     billboardPerso.mode = BillboardBehaviour.LookAtMode.ViewRotation;
                     billboardPerso.scaleMode = BillboardBehaviour.ScaleMode.KeepSize;
                     billboardPerso.RotationOffset = Quaternion.Euler(0, -90, 0);
-					billboardPerso.ScaleMultiplier = 1.0f / 25.0f;
+					billboardPerso.ScaleMultiplier = 1.0f / 15.0f;
 
 					LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("HighlightAlwaysOnTop"));
                 }

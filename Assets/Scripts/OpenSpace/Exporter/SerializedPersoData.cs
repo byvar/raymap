@@ -93,16 +93,16 @@ namespace OpenSpace.Exporter {
                 default:
                     value = val.ToString();
                     break;
-                case DsgVarInfoEntry.DsgVarType.GameMaterial:
+                case DsgVarType.GameMaterial:
                     value = HashUtils.MD5Hash(val.valueGameMaterial?.ToJSON());
                     break;
-                case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+                case DsgVarType.VisualMaterial:
                     value = HashUtils.MD5Hash(val.valueVisualMaterial?.ToJSON());
                     break;
-                case DsgVarInfoEntry.DsgVarType.Perso:
+                case DsgVarType.Perso:
                     value = val.valuePerso?.namePerso;
                     break;
-                case DsgVarInfoEntry.DsgVarType.PersoArray:
+                case DsgVarType.PersoArray:
                     List<string> persoNames = new List<string>();
                     foreach (DsgVarValue child in val.valueArray) {
                         Perso perso = child.valuePerso;
@@ -114,26 +114,26 @@ namespace OpenSpace.Exporter {
                     }
                     value = "{ " + string.Join(", ", persoNames) + " }";
                     break;
-                case DsgVarInfoEntry.DsgVarType.WayPointArray: // TODO
+                case DsgVarType.WayPointArray: // TODO
                     break;
-                case DsgVarInfoEntry.DsgVarType.TextArray: // TODO: check
+                case DsgVarType.TextArray: // TODO: check
                     goto default;
                 //break;
-                case DsgVarInfoEntry.DsgVarType.TextRefArray: // TODO: check
+                case DsgVarType.TextRefArray: // TODO: check
                     goto default;
-                case DsgVarInfoEntry.DsgVarType.GraphArray:
+                case DsgVarType.GraphArray:
                     break;
-                case DsgVarInfoEntry.DsgVarType.SOLinksArray:
+                case DsgVarType.SOLinksArray:
                     break;
-                case DsgVarInfoEntry.DsgVarType.SoundEventArray: // TODO: check
+                case DsgVarType.SoundEventArray: // TODO: check
                     goto default;
-                case DsgVarInfoEntry.DsgVarType.VisualMatArray:
+                case DsgVarType.VisualMatArray:
                     break;
-                case DsgVarInfoEntry.DsgVarType.Way:
+                case DsgVarType.Way:
                     break;
-                case DsgVarInfoEntry.DsgVarType.ActionArray: // TODO                    
+                case DsgVarType.ActionArray: // TODO                    
                     break;
-                case DsgVarInfoEntry.DsgVarType.SuperObjectArray: // TODO
+                case DsgVarType.SuperObjectArray: // TODO
                     break;
             }
 
@@ -164,7 +164,7 @@ namespace OpenSpace.Exporter {
         }
 
         public struct EDsgVar {
-            public DsgVarInfoEntry.DsgVarType type;
+            public DsgVarType type;
             public object value;
         }
     }

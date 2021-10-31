@@ -34,8 +34,9 @@ namespace OpenSpace.Exporter {
             Families     = 1 << 4,
             EntryActions = 1 << 5,
             TextTable    = 1 << 6,
+            RawAIModels  = 1 << 7,
 
-            All = Levels | AIModels | Materials | Textures | Families | EntryActions | TextTable
+            All = Levels | AIModels | Materials | Textures | Families | EntryActions | TextTable | RawAIModels
         }
 
         public static JsonSerializerSettings JsonExportSettings
@@ -166,6 +167,7 @@ namespace OpenSpace.Exporter {
         {
             string exportDirectoryLevels = Path.Combine(this.exportPath, "Levels");
             string exportDirectoryAIModels = Path.Combine(this.exportPath, "AIModels");
+            string exportDirectoryRawAIModels = Path.Combine(this.exportPath, "RawAIModels");
             string exportDirectoryMaterials = Path.Combine(this.exportPath, "Materials");
             string exportDirectoryFamilies = Path.Combine(this.exportPath, "Families");
             string exportDirectoryGeneral = Path.Combine(this.exportPath, "General");
@@ -226,6 +228,9 @@ namespace OpenSpace.Exporter {
 
             if (flags.HasFlag(ExportFlags.Levels))
                 ExportScene(exportDirectoryLevels);
+
+            if (flags.HasFlag(ExportFlags.RawAIModels))
+                ExportRawAIModels(exportDirectoryRawAIModels);
         }
 
         private void ExportScene(string path)
@@ -401,13 +406,53 @@ namespace OpenSpace.Exporter {
                     aiModelFileStream.Flush();
                     aiModelFileStream.Close();
                 }
+            }
+        }
 
-                /*if (aiModel.behaviors_normal != null) {
+        private void ExportRawAIModels(string path)
+        {
+            ExportTextTableJson(path);
+
+            Dictionary<(string model, string family), AIModel> aiModelFamilyCombination = new Dictionary<(string, string), AIModel>();
+            Dictionary<AIModel, string> defaultRules = new Dictionary<AIModel, string>();
+            Dictionary<AIModel, string> defaultReflexes = new Dictionary<AIModel, string>();
+
+            var persos = loader.persos;
+            //persos.AddRange(loader.globals.spawnablePersos); maybe needed?
+
+            foreach (var perso in persos) {
+                if (perso?.brain?.mind?.AI_model == null) {
+                    continue;
+                }
+
+                if (!defaultRules.ContainsKey(perso.brain.mind.AI_model)) {
+                    defaultRules.Add(perso.brain.mind.AI_model, perso.brain.mind.intelligenceNormal?.defaultComport?.NameSubstring??"");
+                }
+                if (!defaultReflexes.ContainsKey(perso.brain.mind.AI_model)) {
+                    defaultReflexes.Add(perso.brain.mind.AI_model, perso.brain.mind.intelligenceReflex?.defaultComport?.NameSubstring ?? "");
+                }
+
+                var combination = (perso.nameModel, perso.nameFamily);
+                if (!aiModelFamilyCombination.ContainsKey(combination)) {
+                    aiModelFamilyCombination.Add(combination, perso.brain.mind.AI_model);
+                }
+            }
+
+            foreach (var aiModelKV in aiModelFamilyCombination) {
+
+                string exportAIModelName = aiModelKV.Key.model + "__" + aiModelKV.Key.family;
+                string aiModelDir = Path.Combine(path, exportAIModelName);
+                var aiModel = aiModelKV.Value;
+                Directory.CreateDirectory(aiModelDir);
+
+                ExportStringPointers(aiModelDir);
+
+                if (aiModel.behaviors_normal != null) {
                     foreach (var b in aiModel.behaviors_normal) {
                         int i = 0;
                         foreach (var s in b.scripts) {
                             string filePathRaw =
-                                Path.Combine(path, aiModel.name, "rule", b.name + "." + (i++) + ".osb");
+                                Path.Combine(aiModelDir, "rule", b.NameSubstring, (i++) + ".osb");
                             if (File.Exists(filePathRaw)) {
                                 File.Delete(filePathRaw);
                             }
@@ -424,8 +469,8 @@ namespace OpenSpace.Exporter {
                     foreach (var b in aiModel.behaviors_reflex) {
                         int i = 0;
                         foreach (var s in b.scripts) {
-                            string filePathRaw = Path.Combine(path, aiModel.name, "reflex",
-                                b.name + "." + (i++) + ".osb");
+                            string filePathRaw = Path.Combine(aiModelDir, "reflex",
+                                b.NameSubstring, + (i++) + ".osb");
                             if (File.Exists(filePathRaw)) {
                                 File.Delete(filePathRaw);
                             }
@@ -436,8 +481,44 @@ namespace OpenSpace.Exporter {
                         }
 
                     }
-                }*/
+                }
 
+                if (aiModel.macros != null) {
+                    int i = 0;
+                    foreach (var m in aiModel.macros) {
+
+                        var script = m.script;
+
+                        if (script == null) continue;
+
+                        string filePathRaw = Path.Combine(aiModelDir, "macros",
+                            m.NameSubstring + ".osb");
+                        if (File.Exists(filePathRaw)) {
+                            File.Delete(filePathRaw);
+                        }
+
+                        Directory.CreateDirectory(Path.GetDirectoryName(filePathRaw));
+
+                        File.WriteAllBytes(filePathRaw, script.GetNodeBytes());
+                    }
+                }
+
+                var metaFilePath = Path.Combine(aiModelDir, "aimodel.json");
+
+                AIModelMetaData? oldMetaData = null;
+
+                if (File.Exists(metaFilePath)) {
+                    oldMetaData = JsonConvert.DeserializeObject<AIModelMetaData>(File.ReadAllText(metaFilePath));
+                }
+
+                var aiModelMetaData = AIModelMetaData.FromAIModel(aiModel, exportAIModelName, defaultRules[aiModel], defaultReflexes[aiModel]);
+
+                if (oldMetaData != null) {
+                    aiModelMetaData = AIModelMetaData.Merge(oldMetaData.Value, aiModelMetaData);
+                }
+
+                var metaJSON = JsonConvert.SerializeObject(aiModelMetaData, JsonExportSettings);
+                File.WriteAllText(metaFilePath, metaJSON);
             }
         }
 
@@ -478,6 +559,65 @@ namespace OpenSpace.Exporter {
                 str = str.Replace((char)0x85, '\0'); // For some reason there's a ... whitespace character used sometimes
             return str;
         }
+
+        private void ExportTextTableJson(string path)
+        {
+            string filePath = Path.Combine(path, "TextTable.json");
+            if (File.Exists(filePath)) {
+                File.Delete(filePath);
+            }
+
+            if (loader?.localization?.languages == null) {
+                return;
+            }
+
+            int numLanguages = loader.localization.languages.Length;
+            int numTextsPerLanguage = 0;
+
+            Dictionary<int, Dictionary<string, string>> textEntries = new Dictionary<int, Dictionary<string, string>>();
+            int languageIndex = 0;
+
+            foreach (LocalizationStructure.TextTable textTable in loader.localization.languages) {
+                if (textTable.num_entries > numTextsPerLanguage) {
+                    numTextsPerLanguage = textTable.num_entries;
+                }
+
+                var dictionary = new Dictionary<string, string>();
+
+                int entryIndex = 0;
+                if (textTable.entries != null) {
+                    for (int i=0;i<textTable.entries.Length;i++) {
+                        dictionary.Add(loader.localization.GenerateReadableHandle(i), EscapeStringForCSharp(textTable.entries[i]));
+                    }
+                }
+
+                textEntries.Add(languageIndex, dictionary);
+
+                languageIndex++;
+            }
+
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(textEntries));
+        }
+
+        private void ExportStringPointers(string path)
+        {
+            string filePath = Path.Combine(path, "strings.json");
+            if (File.Exists(filePath)) {
+                File.Delete(filePath);
+            }
+
+            if (loader?.strings == null) {
+                return;
+            }
+
+            Dictionary<uint, string> strings = new Dictionary<uint, string>();
+            foreach (var kv in loader.strings) {
+                strings.Add(kv.Key.offset, kv.Value);
+            }
+
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(strings));
+        }
+
 
         private void ExportTextTable(string path)
         {

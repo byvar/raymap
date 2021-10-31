@@ -25,6 +25,7 @@ namespace OpenSpace.ROM {
 					if (data.Value.entries[i].obj.Value != null) {
 						PhysicalObjectComponent child = data.Value.entries[i].obj.Value.GetGameObject();
 						child.transform.SetParent(gao.transform);
+                        child.transform.localPosition = new Vector3(0, i * 5, 0);
 						child.name = "[Entry " + i + "] " + child.name;
 					}
 				}

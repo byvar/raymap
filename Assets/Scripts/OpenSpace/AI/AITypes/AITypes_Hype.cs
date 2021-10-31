@@ -57,34 +57,34 @@ namespace OpenSpace.AI {
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new DsgVarInfoEntry.DsgVarType[] {
-                DsgVarInfoEntry.DsgVarType.Boolean,
-                DsgVarInfoEntry.DsgVarType.Byte,
-                DsgVarInfoEntry.DsgVarType.UByte, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Short,
-                DsgVarInfoEntry.DsgVarType.UShort, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Int,
-                DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Float,
-                DsgVarInfoEntry.DsgVarType.WayPoint,
-                DsgVarInfoEntry.DsgVarType.Way,
-                DsgVarInfoEntry.DsgVarType.Perso,
-                DsgVarInfoEntry.DsgVarType.List,
-                DsgVarInfoEntry.DsgVarType.Vector,
-                DsgVarInfoEntry.DsgVarType.Comport,
-                DsgVarInfoEntry.DsgVarType.Action,
-                DsgVarInfoEntry.DsgVarType.Text,
-                DsgVarInfoEntry.DsgVarType.GameMaterial,
-                DsgVarInfoEntry.DsgVarType.Caps,
-                DsgVarInfoEntry.DsgVarType.Graph,
-                DsgVarInfoEntry.DsgVarType.PersoArray,
-                DsgVarInfoEntry.DsgVarType.VectorArray,
-                DsgVarInfoEntry.DsgVarType.FloatArray,
-                DsgVarInfoEntry.DsgVarType.IntegerArray,
-                DsgVarInfoEntry.DsgVarType.WayPointArray,
-                DsgVarInfoEntry.DsgVarType.TextArray,
-                DsgVarInfoEntry.DsgVarType.ActionArray,
-                DsgVarInfoEntry.DsgVarType.None
+            dsgVarTypeTable = new DsgVarType[] {
+                DsgVarType.Boolean,
+                DsgVarType.Byte,
+                DsgVarType.UByte, // Unsigned
+                DsgVarType.Short,
+                DsgVarType.UShort, // Unsigned
+                DsgVarType.Int,
+                DsgVarType.UInt, // Unsigned
+                DsgVarType.Float,
+                DsgVarType.WayPoint,
+                DsgVarType.Way,
+                DsgVarType.Perso,
+                DsgVarType.List,
+                DsgVarType.Vector,
+                DsgVarType.Comport,
+                DsgVarType.Action,
+                DsgVarType.Text,
+                DsgVarType.GameMaterial,
+                DsgVarType.Caps,
+                DsgVarType.Graph,
+                DsgVarType.PersoArray,
+                DsgVarType.VectorArray,
+                DsgVarType.FloatArray,
+                DsgVarType.IntegerArray,
+                DsgVarType.WayPointArray,
+                DsgVarType.TextArray,
+                DsgVarType.ActionArray,
+                DsgVarType.None
             },
             #endregion
 

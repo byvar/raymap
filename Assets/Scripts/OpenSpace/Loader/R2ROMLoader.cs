@@ -452,6 +452,24 @@ namespace OpenSpace.Loader {
 					}
 				}
 			}*/
+
+            if (UnitySettings.CreateFamilyGameObjects) {
+
+                GameObject objectListsParent = new GameObject("Object Lists");
+                objectListsParent.transform.position = new Vector3(9999, 9999, 9999);
+				objectListsParent.SetActive(false);
+
+                int i = 0;
+
+                foreach (var ot in objectsTables) {
+                    var gao = ot.GetGameObject();
+                    gao.transform.parent = objectListsParent.transform;
+
+                    gao.transform.localPosition = new Vector3(i * 20, 0, 0);
+
+                    i++;
+                }
+            }
 		}
 
 		public async UniTask LoadAnims() {

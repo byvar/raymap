@@ -1119,32 +1119,32 @@ namespace OpenSpace.AI {
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new DsgVarInfoEntry.DsgVarType[] {
-                DsgVarInfoEntry.DsgVarType.Boolean,
-                DsgVarInfoEntry.DsgVarType.Byte,
-                DsgVarInfoEntry.DsgVarType.UByte, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Short,
-                DsgVarInfoEntry.DsgVarType.UShort, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Int,
-                DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Float,
-                DsgVarInfoEntry.DsgVarType.WayPoint,
-                DsgVarInfoEntry.DsgVarType.Perso,
-                DsgVarInfoEntry.DsgVarType.List,
-                DsgVarInfoEntry.DsgVarType.Vector,
-                DsgVarInfoEntry.DsgVarType.Comport,
-                DsgVarInfoEntry.DsgVarType.Action,
-                DsgVarInfoEntry.DsgVarType.Text,
-                DsgVarInfoEntry.DsgVarType.GameMaterial,
-                DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
-                DsgVarInfoEntry.DsgVarType.Graph,
-                DsgVarInfoEntry.DsgVarType.PersoArray,
-                DsgVarInfoEntry.DsgVarType.VectorArray,
-                DsgVarInfoEntry.DsgVarType.FloatArray,
-                DsgVarInfoEntry.DsgVarType.IntegerArray,
-                DsgVarInfoEntry.DsgVarType.WayPointArray,
-                DsgVarInfoEntry.DsgVarType.TextArray,
-                DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
+            dsgVarTypeTable = new DsgVarType[] {
+                DsgVarType.Boolean,
+                DsgVarType.Byte,
+                DsgVarType.UByte, // Unsigned
+                DsgVarType.Short,
+                DsgVarType.UShort, // Unsigned
+                DsgVarType.Int,
+                DsgVarType.UInt, // Unsigned
+                DsgVarType.Float,
+                DsgVarType.WayPoint,
+                DsgVarType.Perso,
+                DsgVarType.List,
+                DsgVarType.Vector,
+                DsgVarType.Comport,
+                DsgVarType.Action,
+                DsgVarType.Text,
+                DsgVarType.GameMaterial,
+                DsgVarType.Caps, // Capabilities
+                DsgVarType.Graph,
+                DsgVarType.PersoArray,
+                DsgVarType.VectorArray,
+                DsgVarType.FloatArray,
+                DsgVarType.IntegerArray,
+                DsgVarType.WayPointArray,
+                DsgVarType.TextArray,
+                DsgVarType.SuperObject // input on iOS
             },
             #endregion
 

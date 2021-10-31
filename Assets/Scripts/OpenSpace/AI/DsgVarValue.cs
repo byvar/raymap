@@ -11,13 +11,13 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class DsgVarValue {
-        public DsgVarInfoEntry.DsgVarType type;
+        public DsgVarType type;
 		public Pointer offset;
         public DsgMem dsgMem;
 
 		// Array data
 		public uint arrayTypeNumber;
-		public DsgVarInfoEntry.DsgVarType arrayType = DsgVarInfoEntry.DsgVarType.None;
+		public DsgVarType arrayType = DsgVarType.None;
         public byte arrayLength;
 		public DsgVarValue[] valueArray;
 
@@ -52,7 +52,7 @@ namespace OpenSpace.AI {
         public uint valueSOLinks;
 		public uint valueWay;
 
-		public DsgVarValue(DsgVarInfoEntry.DsgVarType type, DsgMem dsgMem) {
+		public DsgVarValue(DsgVarType type, DsgMem dsgMem) {
 			this.type = type;
             this.dsgMem = dsgMem;
 		}
@@ -60,109 +60,109 @@ namespace OpenSpace.AI {
         public void Read(Reader reader) {
 			offset = Pointer.Current(reader);
 			switch (type) {
-				case DsgVarInfoEntry.DsgVarType.Boolean:
+				case DsgVarType.Boolean:
 					valueBool = reader.ReadBoolean(); break;
-				case DsgVarInfoEntry.DsgVarType.Byte:
+				case DsgVarType.Byte:
 					valueByte = reader.ReadSByte(); break;
-				case DsgVarInfoEntry.DsgVarType.UByte:
+				case DsgVarType.UByte:
 					valueUByte = reader.ReadByte(); break;
-				case DsgVarInfoEntry.DsgVarType.Float:
+				case DsgVarType.Float:
 					valueFloat = reader.ReadSingle(); break;
-				case DsgVarInfoEntry.DsgVarType.Int:
+				case DsgVarType.Int:
 					valueInt = reader.ReadInt32(); break;
-				case DsgVarInfoEntry.DsgVarType.UInt:
+				case DsgVarType.UInt:
 					valueUInt = reader.ReadUInt32(); break;
-				case DsgVarInfoEntry.DsgVarType.Short:
+				case DsgVarType.Short:
 					valueShort = reader.ReadInt16(); break;
-				case DsgVarInfoEntry.DsgVarType.UShort:
+				case DsgVarType.UShort:
 					valueUShort = reader.ReadUInt16(); break;
-				case DsgVarInfoEntry.DsgVarType.Vector:
+				case DsgVarType.Vector:
 					float x = reader.ReadSingle();
 					float y = reader.ReadSingle();
 					float z = reader.ReadSingle();
 					valueVector = new Vector3(x, y, z);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Text:
+				case DsgVarType.Text:
 					valueText = reader.ReadInt32(); break;
-				case DsgVarInfoEntry.DsgVarType.Graph:
+				case DsgVarType.Graph:
 					valuePointer = Pointer.Read(reader);
 					valueGraph = Graph.FromOffsetOrRead(valuePointer, reader);
 					break;
-				case DsgVarInfoEntry.DsgVarType.WayPoint:
+				case DsgVarType.WayPoint:
 					valuePointer = Pointer.Read(reader);
 					valueWayPoint = WayPoint.FromOffsetOrRead(valuePointer, reader);
 					break;
-				case DsgVarInfoEntry.DsgVarType.GameMaterial:
+				case DsgVarType.GameMaterial:
 					valuePointer = Pointer.Read(reader);
 					valueGameMaterial = GameMaterial.FromOffsetOrRead(valuePointer, reader);
 					break;
-				case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+				case DsgVarType.VisualMaterial:
 					valuePointer = Pointer.Read(reader);
 					valueVisualMaterial = VisualMaterial.FromOffsetOrRead(valuePointer, reader);
 					break;
-				case DsgVarInfoEntry.DsgVarType.ObjectList:
+				case DsgVarType.ObjectList:
 					valuePointer = Pointer.Read(reader);
 					valueObjectList = ObjectList.FromOffsetOrRead(valuePointer, reader);
 					break;
-				case DsgVarInfoEntry.DsgVarType.List:
+				case DsgVarType.List:
 					valueList = new List();
 					valueList.Read(reader);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Light:
+				case DsgVarType.Light:
 					valuePointer = Pointer.Read(reader);
 					valueLight = MapLoader.Loader.FromOffsetOrRead<LightInfo>(reader, valuePointer);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Comport:
+				case DsgVarType.Comport:
 					valuePointer = Pointer.Read(reader);
                     // 2021-05-25 Changed type from Behavior to Macro since it always seems to be a Macro (from R3, seemingly unused in R2) - RTS
 					valueComport = MapLoader.Loader.FromOffsetOrRead<Macro>(reader, valuePointer);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Input:
+				case DsgVarType.Input:
 					valuePointer = Pointer.Read(reader);
 					valueInput = EntryAction.FromOffsetOrRead(valuePointer, reader);
 					break;
 
 				// Fill these in after loading
-				case DsgVarInfoEntry.DsgVarType.Perso:
+				case DsgVarType.Perso:
 					valuePointer = Pointer.Read(reader);
 					// Don't fill in perso yet
 					MapLoader.Loader.onPostLoad.Add(InitPostLoad);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Action:
+				case DsgVarType.Action:
 					valuePointer = Pointer.Read(reader);
 					// Don't fill in state yet
 					MapLoader.Loader.onPostLoad.Add(InitPostLoad);
 					break;
-				case DsgVarInfoEntry.DsgVarType.SuperObject:
+				case DsgVarType.SuperObject:
 					valuePointer = Pointer.Read(reader);
 					// Don't fill in SO yet
 					MapLoader.Loader.onPostLoad.Add(InitPostLoad);
 					break;
 
 				// TODO: Figure these out
-				case DsgVarInfoEntry.DsgVarType.Caps:
+				case DsgVarType.Caps:
 					valueCaps = reader.ReadUInt32(); break;
-				case DsgVarInfoEntry.DsgVarType.SOLinks:
+				case DsgVarType.SOLinks:
 					valueSOLinks = reader.ReadUInt32(); break;
-				case DsgVarInfoEntry.DsgVarType.SoundEvent:
+				case DsgVarType.SoundEvent:
 					valueSoundEvent = reader.ReadUInt32(); break;
-				case DsgVarInfoEntry.DsgVarType.Way:
+				case DsgVarType.Way:
 					valueWay = reader.ReadUInt32(); break;
 
 				// Arrays
-				case DsgVarInfoEntry.DsgVarType.ActionArray:
-				case DsgVarInfoEntry.DsgVarType.FloatArray:
-				case DsgVarInfoEntry.DsgVarType.IntegerArray:
-				case DsgVarInfoEntry.DsgVarType.PersoArray:
-				case DsgVarInfoEntry.DsgVarType.SoundEventArray:
-				case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-				case DsgVarInfoEntry.DsgVarType.TextArray:
-				case DsgVarInfoEntry.DsgVarType.TextRefArray:
-				case DsgVarInfoEntry.DsgVarType.VectorArray:
-				case DsgVarInfoEntry.DsgVarType.WayPointArray:
-				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
-				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
+				case DsgVarType.ActionArray:
+				case DsgVarType.FloatArray:
+				case DsgVarType.IntegerArray:
+				case DsgVarType.PersoArray:
+				case DsgVarType.SoundEventArray:
+				case DsgVarType.SuperObjectArray:
+				case DsgVarType.TextArray:
+				case DsgVarType.TextRefArray:
+				case DsgVarType.VectorArray:
+				case DsgVarType.WayPointArray:
+				case DsgVarType.GraphArray:
+				case DsgVarType.VisualMatArray:
+				case DsgVarType.SOLinksArray:
 					ReadArray(reader); break;
 			}
 		}
@@ -170,16 +170,16 @@ namespace OpenSpace.AI {
 		public void InitPostLoad() {
 			switch (type) {
 				// Fill these in after loading
-				case DsgVarInfoEntry.DsgVarType.Perso:
+				case DsgVarType.Perso:
 					SuperObject so = SuperObject.FromOffset(valuePointer);
 					if (so != null) {
 						valuePerso = so.data as Perso;
 					}
 					break;
-				case DsgVarInfoEntry.DsgVarType.Action:
+				case DsgVarType.Action:
 					valueAction = State.FromOffset(valuePointer);
 					break;
-				case DsgVarInfoEntry.DsgVarType.SuperObject:
+				case DsgVarType.SuperObject:
 					valueSuperObject = SuperObject.FromOffset(valuePointer);
 					break;
 			}
@@ -191,73 +191,73 @@ namespace OpenSpace.AI {
 
 		public override string ToString() {
 			switch (type) {
-				case DsgVarInfoEntry.DsgVarType.Boolean:
+				case DsgVarType.Boolean:
 					return valueBool.ToString();
-				case DsgVarInfoEntry.DsgVarType.Byte:
+				case DsgVarType.Byte:
 					return valueByte.ToString();
-				case DsgVarInfoEntry.DsgVarType.UByte:
+				case DsgVarType.UByte:
 					return valueUByte.ToString();
-				case DsgVarInfoEntry.DsgVarType.Short:
+				case DsgVarType.Short:
 					return valueShort.ToString();
-				case DsgVarInfoEntry.DsgVarType.UShort:
+				case DsgVarType.UShort:
 					return valueUShort.ToString();
-				case DsgVarInfoEntry.DsgVarType.Int:
+				case DsgVarType.Int:
 					return valueInt.ToString();
-				case DsgVarInfoEntry.DsgVarType.UInt:
+				case DsgVarType.UInt:
 					return valueUInt.ToString();
-				case DsgVarInfoEntry.DsgVarType.Float:
+				case DsgVarType.Float:
 					return valueFloat.ToString();
-				case DsgVarInfoEntry.DsgVarType.Vector:
+				case DsgVarType.Vector:
 					return "new Vector3(" + valueVector.x + ", " + valueVector.y + ", " + valueVector.z + ")";
-				case DsgVarInfoEntry.DsgVarType.Text:
+				case DsgVarType.Text:
 					return "TextRef(" + valueText + ")";
-				case DsgVarInfoEntry.DsgVarType.Graph:
+				case DsgVarType.Graph:
 					return valueGraph?.ToString();
-				case DsgVarInfoEntry.DsgVarType.WayPoint:
+				case DsgVarType.WayPoint:
 					return valueWayPoint?.ToString();
-				case DsgVarInfoEntry.DsgVarType.GameMaterial:
+				case DsgVarType.GameMaterial:
 					return valueGameMaterial?.ToString();
-				case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+				case DsgVarType.VisualMaterial:
 					return valueVisualMaterial?.ToString();
-				case DsgVarInfoEntry.DsgVarType.ObjectList:
+				case DsgVarType.ObjectList:
 					return valueObjectList?.ToString();
-				case DsgVarInfoEntry.DsgVarType.List:
+				case DsgVarType.List:
 					return valueList?.ToString();
-				case DsgVarInfoEntry.DsgVarType.Light:
+				case DsgVarType.Light:
 					return valueLight?.ToString();
-				case DsgVarInfoEntry.DsgVarType.Comport:
+				case DsgVarType.Comport:
 					return valueComport?.ShortName;
-				case DsgVarInfoEntry.DsgVarType.Input:
+				case DsgVarType.Input:
 					return valueInput?.ToString();
-				case DsgVarInfoEntry.DsgVarType.Perso:
+				case DsgVarType.Perso:
 					return valuePerso != null ? ("Perso.GetByName(" + valuePerso.namePerso + ")") : "null";
-				case DsgVarInfoEntry.DsgVarType.Action:
+				case DsgVarType.Action:
 					return valueAction?.ShortName;
-				case DsgVarInfoEntry.DsgVarType.SuperObject:
+				case DsgVarType.SuperObject:
 					return valueSuperObject != null ? ("GameObject.GetByName(" + valueSuperObject.Gao.name + ")") : "null";
-				case DsgVarInfoEntry.DsgVarType.Caps:
+				case DsgVarType.Caps:
 					return valueCaps.ToString();
-				case DsgVarInfoEntry.DsgVarType.SOLinks:
+				case DsgVarType.SOLinks:
 					return valueSOLinks.ToString();
-				case DsgVarInfoEntry.DsgVarType.SoundEvent:
+				case DsgVarType.SoundEvent:
 					return valueSoundEvent.ToString();
-				case DsgVarInfoEntry.DsgVarType.Way:
+				case DsgVarType.Way:
 					return valueWay.ToString();
 
 				// Arrays
-				case DsgVarInfoEntry.DsgVarType.ActionArray:
-				case DsgVarInfoEntry.DsgVarType.FloatArray:
-				case DsgVarInfoEntry.DsgVarType.IntegerArray:
-				case DsgVarInfoEntry.DsgVarType.PersoArray:
-				case DsgVarInfoEntry.DsgVarType.SoundEventArray:
-				case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-				case DsgVarInfoEntry.DsgVarType.TextArray:
-				case DsgVarInfoEntry.DsgVarType.TextRefArray:
-				case DsgVarInfoEntry.DsgVarType.VectorArray:
-				case DsgVarInfoEntry.DsgVarType.WayPointArray:
-				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
-				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
+				case DsgVarType.ActionArray:
+				case DsgVarType.FloatArray:
+				case DsgVarType.IntegerArray:
+				case DsgVarType.PersoArray:
+				case DsgVarType.SoundEventArray:
+				case DsgVarType.SuperObjectArray:
+				case DsgVarType.TextArray:
+				case DsgVarType.TextRefArray:
+				case DsgVarType.VectorArray:
+				case DsgVarType.WayPointArray:
+				case DsgVarType.GraphArray:
+				case DsgVarType.VisualMatArray:
+				case DsgVarType.SOLinksArray:
 					return "new " + type + "[" + arrayLength + "]";
 			}
 			return null;
@@ -266,78 +266,78 @@ namespace OpenSpace.AI {
 		public void Write(Writer writer) {
 			Pointer.Goto(ref writer, offset);
 			switch (type) {
-				case DsgVarInfoEntry.DsgVarType.Boolean:
+				case DsgVarType.Boolean:
 					writer.Write(valueBool); break;
-				case DsgVarInfoEntry.DsgVarType.Byte:
+				case DsgVarType.Byte:
 					writer.Write(valueByte); break;
-				case DsgVarInfoEntry.DsgVarType.UByte:
+				case DsgVarType.UByte:
 					writer.Write(valueUByte); break;
-				case DsgVarInfoEntry.DsgVarType.Float:
+				case DsgVarType.Float:
 					writer.Write(valueFloat); break;
-				case DsgVarInfoEntry.DsgVarType.Int:
+				case DsgVarType.Int:
 					writer.Write(valueInt); break;
-				case DsgVarInfoEntry.DsgVarType.UInt:
+				case DsgVarType.UInt:
 					writer.Write(valueUInt); break;
-				case DsgVarInfoEntry.DsgVarType.Short:
+				case DsgVarType.Short:
 					writer.Write(valueShort); break;
-				case DsgVarInfoEntry.DsgVarType.UShort:
+				case DsgVarType.UShort:
 					writer.Write(valueUShort); break;
-				case DsgVarInfoEntry.DsgVarType.Vector:
+				case DsgVarType.Vector:
 					writer.Write(valueVector.x);
 					writer.Write(valueVector.y);
 					writer.Write(valueVector.z);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Text:
+				case DsgVarType.Text:
 					writer.Write(valueText); break;
-				case DsgVarInfoEntry.DsgVarType.Graph:
+				case DsgVarType.Graph:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.WayPoint:
+				case DsgVarType.WayPoint:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.GameMaterial:
+				case DsgVarType.GameMaterial:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+				case DsgVarType.VisualMaterial:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.ObjectList:
+				case DsgVarType.ObjectList:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.List:
+				case DsgVarType.List:
 					valueList?.Write(writer); break;
-				case DsgVarInfoEntry.DsgVarType.Light:
+				case DsgVarType.Light:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.Comport:
+				case DsgVarType.Comport:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.Input:
+				case DsgVarType.Input:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.Perso:
+				case DsgVarType.Perso:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.Action:
+				case DsgVarType.Action:
 					Pointer.Write(writer, valuePointer); break;
-				case DsgVarInfoEntry.DsgVarType.SuperObject:
+				case DsgVarType.SuperObject:
 					Pointer.Write(writer, valuePointer); break;
 
 				// TODO: Figure these out
-				case DsgVarInfoEntry.DsgVarType.Caps:
+				case DsgVarType.Caps:
 					writer.Write(valueCaps); break;
-				case DsgVarInfoEntry.DsgVarType.SOLinks:
+				case DsgVarType.SOLinks:
 					writer.Write(valueSOLinks); break;
-				case DsgVarInfoEntry.DsgVarType.SoundEvent:
+				case DsgVarType.SoundEvent:
 					writer.Write(valueSoundEvent); break;
-				case DsgVarInfoEntry.DsgVarType.Way:
+				case DsgVarType.Way:
 					writer.Write(valueWay); break;
 
 				// Arrays
-				case DsgVarInfoEntry.DsgVarType.ActionArray:
-				case DsgVarInfoEntry.DsgVarType.FloatArray:
-				case DsgVarInfoEntry.DsgVarType.IntegerArray:
-				case DsgVarInfoEntry.DsgVarType.PersoArray:
-				case DsgVarInfoEntry.DsgVarType.SoundEventArray:
-				case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-				case DsgVarInfoEntry.DsgVarType.TextArray:
-				case DsgVarInfoEntry.DsgVarType.TextRefArray:
-				case DsgVarInfoEntry.DsgVarType.VectorArray:
-				case DsgVarInfoEntry.DsgVarType.WayPointArray:
-				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
-				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
+				case DsgVarType.ActionArray:
+				case DsgVarType.FloatArray:
+				case DsgVarType.IntegerArray:
+				case DsgVarType.PersoArray:
+				case DsgVarType.SoundEventArray:
+				case DsgVarType.SuperObjectArray:
+				case DsgVarType.TextArray:
+				case DsgVarType.TextRefArray:
+				case DsgVarType.VectorArray:
+				case DsgVarType.WayPointArray:
+				case DsgVarType.GraphArray:
+				case DsgVarType.VisualMatArray:
+				case DsgVarType.SOLinksArray:
 					WriteArray(writer); break;
 			}
 		}
@@ -375,11 +375,11 @@ namespace OpenSpace.AI {
             List<SearchableString> results = new List<SearchableString>();
 
             switch(type) {
-                case DsgVarInfoEntry.DsgVarType.Text:
+                case DsgVarType.Text:
                     results.Add(new SearchableString(MapLoader.Loader.localization.GetTextForHandleAndLanguageID(valueText, 0), perso.Gao, locationString));
                     break;
-                case DsgVarInfoEntry.DsgVarType.TextArray:
-                case DsgVarInfoEntry.DsgVarType.TextRefArray:
+                case DsgVarType.TextArray:
+                case DsgVarType.TextRefArray:
 
                     foreach (var item in valueArray) {
                         results.AddRange(item.GetSearchableString(perso, dsgVarNum));
@@ -448,37 +448,37 @@ namespace OpenSpace.AI {
 			if(Equals(other)) return true;
 			if (type != other.type) return false;
 			switch (type) {
-				case DsgVarInfoEntry.DsgVarType.Boolean:
+				case DsgVarType.Boolean:
 					return valueBool == other.valueBool;
-				case DsgVarInfoEntry.DsgVarType.Byte:
+				case DsgVarType.Byte:
 					return valueByte == other.valueByte;
-				case DsgVarInfoEntry.DsgVarType.UByte:
+				case DsgVarType.UByte:
 					return valueUByte == other.valueUByte;
-				case DsgVarInfoEntry.DsgVarType.Short:
+				case DsgVarType.Short:
 					return valueShort == other.valueShort;
-				case DsgVarInfoEntry.DsgVarType.UShort:
+				case DsgVarType.UShort:
 					return valueUShort == other.valueUShort;
-				case DsgVarInfoEntry.DsgVarType.Int:
+				case DsgVarType.Int:
 					return valueInt == other.valueInt;
-				case DsgVarInfoEntry.DsgVarType.UInt:
+				case DsgVarType.UInt:
 					return valueUInt == other.valueUInt;
-				case DsgVarInfoEntry.DsgVarType.Float:
+				case DsgVarType.Float:
 					return valueFloat == other.valueFloat;
-				case DsgVarInfoEntry.DsgVarType.Vector:
+				case DsgVarType.Vector:
 					return valueVector == other.valueVector;
-				case DsgVarInfoEntry.DsgVarType.Text:
+				case DsgVarType.Text:
 					return valueText == other.valueText;
-				case DsgVarInfoEntry.DsgVarType.Graph:
+				case DsgVarType.Graph:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.WayPoint:
+				case DsgVarType.WayPoint:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.GameMaterial:
+				case DsgVarType.GameMaterial:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+				case DsgVarType.VisualMaterial:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.ObjectList:
+				case DsgVarType.ObjectList:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.List:
+				case DsgVarType.List:
 					if (valueList.curLength != other.valueList.curLength
 						|| valueList.maxLength != other.valueList.maxLength) {
 						return false;
@@ -489,41 +489,41 @@ namespace OpenSpace.AI {
 						}
 					}
 					return true;
-				case DsgVarInfoEntry.DsgVarType.Light:
+				case DsgVarType.Light:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.Comport:
+				case DsgVarType.Comport:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.Input:
+				case DsgVarType.Input:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.Perso:
+				case DsgVarType.Perso:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.Action:
+				case DsgVarType.Action:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.SuperObject:
+				case DsgVarType.SuperObject:
 					return valuePointer == other.valuePointer;
-				case DsgVarInfoEntry.DsgVarType.Caps:
+				case DsgVarType.Caps:
 					return valueCaps == other.valueCaps;
-				case DsgVarInfoEntry.DsgVarType.SOLinks:
+				case DsgVarType.SOLinks:
 					return valueSOLinks == other.valueSOLinks;
-				case DsgVarInfoEntry.DsgVarType.SoundEvent:
+				case DsgVarType.SoundEvent:
 					return valueSoundEvent == other.valueSoundEvent;
-				case DsgVarInfoEntry.DsgVarType.Way:
+				case DsgVarType.Way:
 					return valueWay == other.valueWay;
 
 				// Arrays
-				case DsgVarInfoEntry.DsgVarType.ActionArray:
-				case DsgVarInfoEntry.DsgVarType.FloatArray:
-				case DsgVarInfoEntry.DsgVarType.IntegerArray:
-				case DsgVarInfoEntry.DsgVarType.PersoArray:
-				case DsgVarInfoEntry.DsgVarType.SoundEventArray:
-				case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-				case DsgVarInfoEntry.DsgVarType.TextArray:
-				case DsgVarInfoEntry.DsgVarType.TextRefArray:
-				case DsgVarInfoEntry.DsgVarType.VectorArray:
-				case DsgVarInfoEntry.DsgVarType.WayPointArray:
-				case DsgVarInfoEntry.DsgVarType.GraphArray:
-				case DsgVarInfoEntry.DsgVarType.VisualMatArray:
-				case DsgVarInfoEntry.DsgVarType.SOLinksArray:
+				case DsgVarType.ActionArray:
+				case DsgVarType.FloatArray:
+				case DsgVarType.IntegerArray:
+				case DsgVarType.PersoArray:
+				case DsgVarType.SoundEventArray:
+				case DsgVarType.SuperObjectArray:
+				case DsgVarType.TextArray:
+				case DsgVarType.TextRefArray:
+				case DsgVarType.VectorArray:
+				case DsgVarType.WayPointArray:
+				case DsgVarType.GraphArray:
+				case DsgVarType.VisualMatArray:
+				case DsgVarType.SOLinksArray:
 					if (arrayType != other.arrayType || arrayLength != other.arrayLength) {
 						return false;
 					}
@@ -538,18 +538,80 @@ namespace OpenSpace.AI {
         public void RegisterReferences(DsgMem dsgMem)
         {
             switch(type) {
-                case DsgVarInfoEntry.DsgVarType.SuperObject:    valueSuperObject?.References.referencedByDsgMems.Add(dsgMem); break;
-                case DsgVarInfoEntry.DsgVarType.Perso:          valuePerso?.References.referencedByDsgMems.Add(dsgMem); break;
-                case DsgVarInfoEntry.DsgVarType.WayPoint:       valueWayPoint?.References.referencedByDsgMems.Add(dsgMem); break;
-                case DsgVarInfoEntry.DsgVarType.Graph:          valueGraph?.References.referencedByDsgMems.Add(dsgMem); break;
+                case DsgVarType.SuperObject:    valueSuperObject?.References.referencedByDsgMems.Add(dsgMem); break;
+                case DsgVarType.Perso:          valuePerso?.References.referencedByDsgMems.Add(dsgMem); break;
+                case DsgVarType.WayPoint:       valueWayPoint?.References.referencedByDsgMems.Add(dsgMem); break;
+                case DsgVarType.Graph:          valueGraph?.References.referencedByDsgMems.Add(dsgMem); break;
                 // Arrays
-                case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-                case DsgVarInfoEntry.DsgVarType.PersoArray:
-                case DsgVarInfoEntry.DsgVarType.WayPointArray:
-                case DsgVarInfoEntry.DsgVarType.GraphArray:
+                case DsgVarType.SuperObjectArray:
+                case DsgVarType.PersoArray:
+                case DsgVarType.WayPointArray:
+                case DsgVarType.GraphArray:
                     valueArray.ToList().ForEach(v => v.RegisterReferences(dsgMem)); break;
                 default: return;
             }
+        }
+
+        public object GetUntypedValue()
+        {
+            switch (type) {
+                case DsgVarType.Boolean: return valueBool;
+                case DsgVarType.Byte: return valueByte;
+                case DsgVarType.UByte: return valueUByte;
+                case DsgVarType.Float: return valueFloat;
+                case DsgVarType.Int: return valueInt;
+                case DsgVarType.UInt: return valueUInt;
+                case DsgVarType.Short: return valueShort;
+                case DsgVarType.UShort: return valueUShort;
+                case DsgVarType.Vector: return valueVector;
+                case DsgVarType.Text: return valueText;
+
+                case DsgVarType.Graph:
+                case DsgVarType.WayPoint:
+                case DsgVarType.GameMaterial:
+                case DsgVarType.VisualMaterial:
+                case DsgVarType.ObjectList:
+                case DsgVarType.Light:
+                case DsgVarType.Comport:
+                case DsgVarType.Input:
+
+                case DsgVarType.Perso:
+				case DsgVarType.Action:
+                case DsgVarType.SuperObject:
+					return valuePointer;
+
+                case DsgVarType.List:
+                    return valueList.list;
+
+                // TODO: Figure these out
+                case DsgVarType.Caps: return valueCaps;
+                case DsgVarType.SOLinks: return valueSOLinks;
+                case DsgVarType.SoundEvent: return valueSoundEvent;
+                case DsgVarType.Way: return valueWay;
+
+
+                case DsgVarType.ActionArray:
+                case DsgVarType.FloatArray:
+                case DsgVarType.IntegerArray:
+                case DsgVarType.PersoArray:
+                case DsgVarType.SoundEventArray:
+                case DsgVarType.SuperObjectArray:
+                case DsgVarType.TextArray:
+                case DsgVarType.TextRefArray:
+                case DsgVarType.VectorArray:
+                case DsgVarType.WayPointArray:
+                case DsgVarType.GraphArray:
+                case DsgVarType.VisualMatArray:
+                case DsgVarType.SOLinksArray:
+                    List<object> untypedArray = new List<object>();
+                    foreach (var item in this.valueArray) {
+						untypedArray.Add(item.GetUntypedValue());
+                    }
+
+                    return untypedArray.ToArray();
+			}
+
+            return null;
         }
 
         public class List {

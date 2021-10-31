@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenSpace.AI;
 using UnityEngine;
 
 public class WebJSON {
@@ -168,16 +169,16 @@ public class WebJSON {
 	}
 	public class DsgVar {
 		public string Name { get; set; }
-		public OpenSpace.AI.DsgVarInfoEntry.DsgVarType Type { get; set; }
+		public DsgVarType Type { get; set; }
 		public bool IsArray { get; set; }
-		public OpenSpace.AI.DsgVarInfoEntry.DsgVarType? ArrayType { get; set; }
+		public DsgVarType? ArrayType { get; set; }
 		public int? ArrayLength { get; set; }
 		public DsgVarValue ValueCurrent { get; set; }
 		public DsgVarValue ValueInitial { get; set; }
 		public DsgVarValue ValueModel { get; set; }
 	}
 	public class DsgVarValue {
-		public OpenSpace.AI.DsgVarInfoEntry.DsgVarType Type { get; set; }
+		public DsgVarType Type { get; set; }
 		public bool? AsBoolean { get; set; }
 		public sbyte? AsByte { get; set; }
 		public byte? AsUByte { get; set; }

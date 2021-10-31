@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
-using DsgVarType = OpenSpace.AI.DsgVarInfoEntry.DsgVarType;
+using DsgVarType = OpenSpace.AI.DsgVarType;
 
 public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 {

@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 
 namespace OpenSpace.AI {
-    public class DsgVarInfoEntry {
+    public partial class DsgVarInfoEntry {
         public Pointer offset;
 
         public uint offsetInBuffer; // offset in DsgMemBuffer
@@ -82,129 +82,86 @@ namespace OpenSpace.AI {
             string typeText = "";
 
             switch (type) {
-                case DsgVarInfoEntry.DsgVarType.None:
+                case DsgVarType.None:
                     break;
-                case DsgVarInfoEntry.DsgVarType.Boolean:
+                case DsgVarType.Boolean:
                     typeText = "DsgVarBool"; break;
-                case DsgVarInfoEntry.DsgVarType.Byte:
+                case DsgVarType.Byte:
                     typeText = "DsgVarByte"; break;
-                case DsgVarInfoEntry.DsgVarType.UByte:
+                case DsgVarType.UByte:
                     typeText = "DsgVarUByte"; break;
-                case DsgVarInfoEntry.DsgVarType.Short:
+                case DsgVarType.Short:
                     typeText = "DsgVarShort"; break;
-                case DsgVarInfoEntry.DsgVarType.UShort:
+                case DsgVarType.UShort:
                     typeText = "DsgVarUShort"; break;
-                case DsgVarInfoEntry.DsgVarType.Int:
+                case DsgVarType.Int:
                     typeText = "DsgVarInt"; break;
-                case DsgVarInfoEntry.DsgVarType.UInt:
+                case DsgVarType.UInt:
                     typeText = "DsgVarUInt"; break;
-                case DsgVarInfoEntry.DsgVarType.Float:
+                case DsgVarType.Float:
                     typeText = "DsgVarFloat"; break;
-                case DsgVarInfoEntry.DsgVarType.Vector:
+                case DsgVarType.Vector:
                     typeText = "Vector3"; break;
-                case DsgVarInfoEntry.DsgVarType.List:
+                case DsgVarType.List:
                     typeText = "DsgVarList"; break;
-                case DsgVarInfoEntry.DsgVarType.Comport:
+                case DsgVarType.Comport:
                     typeText = "Comport"; break;
-                case DsgVarInfoEntry.DsgVarType.Action:
+                case DsgVarType.Action:
                     typeText = "Action"; break;
-                case DsgVarInfoEntry.DsgVarType.Caps:
+                case DsgVarType.Caps:
                     typeText = "Caps"; break;
-                case DsgVarInfoEntry.DsgVarType.Input:
+                case DsgVarType.Input:
                     typeText = "Input"; break;
-                case DsgVarInfoEntry.DsgVarType.SoundEvent:
+                case DsgVarType.SoundEvent:
                     typeText = "SoundEvent"; break;
-                case DsgVarInfoEntry.DsgVarType.Light:
+                case DsgVarType.Light:
                     typeText = "Light"; break;
-                case DsgVarInfoEntry.DsgVarType.GameMaterial:
+                case DsgVarType.GameMaterial:
                     typeText = "GameMaterial"; break;
-                case DsgVarInfoEntry.DsgVarType.VisualMaterial:
+                case DsgVarType.VisualMaterial:
                     typeText = "VisualMaterial"; break;
-                case DsgVarInfoEntry.DsgVarType.Perso:
+                case DsgVarType.Perso:
                     typeText = "Perso"; break;
-                case DsgVarInfoEntry.DsgVarType.WayPoint:
+                case DsgVarType.WayPoint:
                     typeText = "WayPoint"; break;
-                case DsgVarInfoEntry.DsgVarType.Graph:
+                case DsgVarType.Graph:
                     typeText = "Graph"; break;
-                case DsgVarInfoEntry.DsgVarType.Text:
+                case DsgVarType.Text:
                     typeText = "DsgVarString"; break;
-                case DsgVarInfoEntry.DsgVarType.SuperObject:
+                case DsgVarType.SuperObject:
                     typeText = "SuperObject"; break;
-                case DsgVarInfoEntry.DsgVarType.SOLinks:
+                case DsgVarType.SOLinks:
                     typeText = "SOLinks"; break;
-                case DsgVarInfoEntry.DsgVarType.PersoArray:
+                case DsgVarType.PersoArray:
                     typeText = "List<Perso>"; break;
-                case DsgVarInfoEntry.DsgVarType.VectorArray:
+                case DsgVarType.VectorArray:
                     typeText = "List<Vector3>"; break;
-                case DsgVarInfoEntry.DsgVarType.FloatArray:
+                case DsgVarType.FloatArray:
                     typeText = "List<DsgVarFloat>"; break;
-                case DsgVarInfoEntry.DsgVarType.IntegerArray:
+                case DsgVarType.IntegerArray:
                     typeText = "List<DsgVarInt>"; break;
-                case DsgVarInfoEntry.DsgVarType.WayPointArray:
+                case DsgVarType.WayPointArray:
                     typeText = "List<WayPoint>"; break;
-                case DsgVarInfoEntry.DsgVarType.TextArray: // These are text references
+                case DsgVarType.TextArray: // These are text references
                     typeText = "List<DsgVarTextRef>"; break;
-                case DsgVarInfoEntry.DsgVarType.TextRefArray: // Don't know what these are then?
+                case DsgVarType.TextRefArray: // Don't know what these are then?
                     typeText = "List<DsgVarTextRef2>"; break;
-                case DsgVarInfoEntry.DsgVarType.GraphArray:
+                case DsgVarType.GraphArray:
                     typeText = "List<Graph>"; break;
-                case DsgVarInfoEntry.DsgVarType.SOLinksArray:
+                case DsgVarType.SOLinksArray:
                     typeText = "List<SOLinks>"; break;
-                case DsgVarInfoEntry.DsgVarType.SoundEventArray:
+                case DsgVarType.SoundEventArray:
                     typeText = "List<DsgVarSoundEvent>"; break;
-                case DsgVarInfoEntry.DsgVarType.VisualMatArray:
+                case DsgVarType.VisualMatArray:
                     typeText = "List<VisualMaterial>"; break;
-                case DsgVarInfoEntry.DsgVarType.Way:
+                case DsgVarType.Way:
                     typeText = "Way"; break;
-                case DsgVarInfoEntry.DsgVarType.ActionArray:
+                case DsgVarType.ActionArray:
                     typeText = "List<Action>"; break;
-                case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
+                case DsgVarType.SuperObjectArray:
                     typeText = "List<SuperObject>"; break;
             }
             return typeText;
         }
-
-        public enum DsgVarType {
-            None,
-            Boolean,
-            Byte,
-            UByte, // Unsigned
-            Short,
-            UShort, // Unsigned
-            Int,
-            UInt, // Unsigned
-            Float,
-            Vector,
-            List,
-            Comport,
-            Action,
-            Caps, // Capabilities
-            Input,
-            SoundEvent,
-            Light,
-            GameMaterial,
-            VisualMaterial, // Also an array?
-            Perso,
-            WayPoint,
-            Graph,
-            Text,
-            SuperObject,
-            SOLinks,
-            PersoArray,
-            VectorArray,
-            FloatArray,
-            IntegerArray,
-            WayPointArray,
-            TextArray,
-            TextRefArray,
-            GraphArray,
-            SOLinksArray,
-            SoundEventArray,
-            VisualMatArray,
-            Way, // TT SE only
-            ActionArray, // Hype
-			SuperObjectArray,
-			ObjectList, // Largo
-		}
     }
 }

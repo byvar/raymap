@@ -1123,22 +1123,22 @@ namespace OpenSpace.AI {
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new DsgVarInfoEntry.DsgVarType[] {
-                DsgVarInfoEntry.DsgVarType.Boolean,
-                DsgVarInfoEntry.DsgVarType.Byte,
-                DsgVarInfoEntry.DsgVarType.UByte, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Short,
-                DsgVarInfoEntry.DsgVarType.UShort, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Int,
-                DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Float,
-                DsgVarInfoEntry.DsgVarType.WayPoint,
-                DsgVarInfoEntry.DsgVarType.Perso,
-				DsgVarInfoEntry.DsgVarType.List, // 10
-				DsgVarInfoEntry.DsgVarType.Vector,
-				DsgVarInfoEntry.DsgVarType.Comport,
-				DsgVarInfoEntry.DsgVarType.Action,
-				DsgVarInfoEntry.DsgVarType.Text,
+            dsgVarTypeTable = new DsgVarType[] {
+                DsgVarType.Boolean,
+                DsgVarType.Byte,
+                DsgVarType.UByte, // Unsigned
+                DsgVarType.Short,
+                DsgVarType.UShort, // Unsigned
+                DsgVarType.Int,
+                DsgVarType.UInt, // Unsigned
+                DsgVarType.Float,
+                DsgVarType.WayPoint,
+                DsgVarType.Perso,
+				DsgVarType.List, // 10
+				DsgVarType.Vector,
+				DsgVarType.Comport,
+				DsgVarType.Action,
+				DsgVarType.Text,
 				/*DsgVarInfoEntry.DsgVarType.GameMaterial,
 				DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
                 DsgVarInfoEntry.DsgVarType.Graph,
@@ -1150,28 +1150,28 @@ namespace OpenSpace.AI {
 				DsgVarInfoEntry.DsgVarType.TextArray,
 				DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
 				*/
-                DsgVarInfoEntry.DsgVarType.Light,
-                DsgVarInfoEntry.DsgVarType.GameMaterial,
-                DsgVarInfoEntry.DsgVarType.SoundEvent,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.WayPointArray,
-                DsgVarInfoEntry.DsgVarType.PersoArray, // 20
-				DsgVarInfoEntry.DsgVarType.VectorArray,
-                DsgVarInfoEntry.DsgVarType.FloatArray,
-                DsgVarInfoEntry.DsgVarType.IntegerArray,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.TextArray, // 25
-				DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.GraphArray,
-                DsgVarInfoEntry.DsgVarType.None, // 30
-				DsgVarInfoEntry.DsgVarType.SuperObject,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.ActionArray,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.None,
-                DsgVarInfoEntry.DsgVarType.ObjectList, // 36
+                DsgVarType.Light,
+                DsgVarType.GameMaterial,
+                DsgVarType.SoundEvent,
+                DsgVarType.None,
+                DsgVarType.WayPointArray,
+                DsgVarType.PersoArray, // 20
+				DsgVarType.VectorArray,
+                DsgVarType.FloatArray,
+                DsgVarType.IntegerArray,
+                DsgVarType.None,
+                DsgVarType.TextArray, // 25
+				DsgVarType.None,
+                DsgVarType.None,
+                DsgVarType.None,
+                DsgVarType.GraphArray,
+                DsgVarType.None, // 30
+				DsgVarType.SuperObject,
+                DsgVarType.None,
+                DsgVarType.ActionArray,
+                DsgVarType.None,
+                DsgVarType.None,
+                DsgVarType.ObjectList, // 36
 			},
             #endregion
 

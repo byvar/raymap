@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_collide
-  m_Shader: {fileID: 4800000, guid: 3fb56d60f90c406488f3d710c8948ba0, type: 3}
+  m_Shader: {fileID: 4800000, guid: 86d7f216b76a47a45b7457f07a51ec22, type: 3}
   m_ShaderKeywords: _GLOSSYREFLECTIONS_OFF
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -84,9 +84,12 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _UseAlpha: 0
+    - _WireSmoothness: 5
+    - _WireThickness: 0
     - _ZWrite: 1
     m_Colors:
     - _AmbientCoef: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DiffuseCoef: {r: 1, g: 1, b: 1, a: 1}
     - _EmisColor: {r: 0.2, g: 0.2, b: 0.2, a: 0}
@@ -97,3 +100,5 @@ Material:
     - _SectorFogParams: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularCoef: {r: 1, g: 1, b: 1, a: 1}
+    - _WireColor: {r: 1, g: 0, b: 0, a: 1}
+  m_BuildTextureStacks: []

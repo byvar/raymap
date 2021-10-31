@@ -1643,42 +1643,42 @@ namespace OpenSpace.AI {
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new DsgVarInfoEntry.DsgVarType[] {
-                DsgVarInfoEntry.DsgVarType.Boolean,
-                DsgVarInfoEntry.DsgVarType.Byte,
-                DsgVarInfoEntry.DsgVarType.UByte, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Short,
-                DsgVarInfoEntry.DsgVarType.UShort, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Int,
-                DsgVarInfoEntry.DsgVarType.UInt, // Unsigned
-                DsgVarInfoEntry.DsgVarType.Float,
-                DsgVarInfoEntry.DsgVarType.Vector,
-                DsgVarInfoEntry.DsgVarType.List,
-                DsgVarInfoEntry.DsgVarType.Comport,
-                DsgVarInfoEntry.DsgVarType.Action,
-                DsgVarInfoEntry.DsgVarType.Caps,
-                DsgVarInfoEntry.DsgVarType.Input,
-                DsgVarInfoEntry.DsgVarType.SoundEvent,
-                DsgVarInfoEntry.DsgVarType.Light,
-                DsgVarInfoEntry.DsgVarType.GameMaterial,
-                DsgVarInfoEntry.DsgVarType.VisualMaterial,
-                DsgVarInfoEntry.DsgVarType.Perso,
-                DsgVarInfoEntry.DsgVarType.WayPoint,
-                DsgVarInfoEntry.DsgVarType.Graph,
-                DsgVarInfoEntry.DsgVarType.Text,
-                DsgVarInfoEntry.DsgVarType.SuperObject,
-                DsgVarInfoEntry.DsgVarType.SOLinks,
-                DsgVarInfoEntry.DsgVarType.IntegerArray,
-                DsgVarInfoEntry.DsgVarType.FloatArray,
-                DsgVarInfoEntry.DsgVarType.VectorArray,
-                DsgVarInfoEntry.DsgVarType.PersoArray,
-                DsgVarInfoEntry.DsgVarType.WayPointArray,
-                DsgVarInfoEntry.DsgVarType.GraphArray,
-                DsgVarInfoEntry.DsgVarType.TextArray,
-                DsgVarInfoEntry.DsgVarType.SuperObjectArray,
-                DsgVarInfoEntry.DsgVarType.SOLinksArray,
-                DsgVarInfoEntry.DsgVarType.SoundEventArray,
-                DsgVarInfoEntry.DsgVarType.VisualMatArray
+            dsgVarTypeTable = new DsgVarType[] {
+                DsgVarType.Boolean,
+                DsgVarType.Byte,
+                DsgVarType.UByte, // Unsigned
+                DsgVarType.Short,
+                DsgVarType.UShort, // Unsigned
+                DsgVarType.Int,
+                DsgVarType.UInt, // Unsigned
+                DsgVarType.Float,
+                DsgVarType.Vector,
+                DsgVarType.List,
+                DsgVarType.Comport,
+                DsgVarType.Action,
+                DsgVarType.Caps,
+                DsgVarType.Input,
+                DsgVarType.SoundEvent,
+                DsgVarType.Light,
+                DsgVarType.GameMaterial,
+                DsgVarType.VisualMaterial,
+                DsgVarType.Perso,
+                DsgVarType.WayPoint,
+                DsgVarType.Graph,
+                DsgVarType.Text,
+                DsgVarType.SuperObject,
+                DsgVarType.SOLinks,
+                DsgVarType.IntegerArray,
+                DsgVarType.FloatArray,
+                DsgVarType.VectorArray,
+                DsgVarType.PersoArray,
+                DsgVarType.WayPointArray,
+                DsgVarType.GraphArray,
+                DsgVarType.TextArray,
+                DsgVarType.SuperObjectArray,
+                DsgVarType.SOLinksArray,
+                DsgVarType.SoundEventArray,
+                DsgVarType.VisualMatArray
             },
             #endregion
 

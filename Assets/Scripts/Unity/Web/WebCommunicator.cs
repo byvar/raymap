@@ -418,7 +418,7 @@ public class WebCommunicator : MonoBehaviour {
 			Name = dsg.Name,
 			Type = dsg.Type,
 			IsArray = isArray,
-			ArrayType = isArray ? (DsgVarInfoEntry.DsgVarType?)DsgVarInfoEntry.GetDsgVarTypeFromArrayType(dsg.Type) : null,
+			ArrayType = isArray ? (DsgVarType?)DsgVarInfoEntry.GetDsgVarTypeFromArrayType(dsg.Type) : null,
 			ArrayLength = isArray ? (int?)dsg.ArrayLength : null,
 			ValueCurrent = GetDsgVarValueJSON(dsg.valueCurrent, isArray),
 			ValueInitial = GetDsgVarValueJSON(dsg.valueInitial, isArray),
@@ -435,34 +435,34 @@ public class WebCommunicator : MonoBehaviour {
 			dsgObj.AsArray = value.AsArray.Select(a => GetDsgVarValueJSON(a, false)).ToArray();
 		} else {
 			switch (value.type) {
-				case DsgVarInfoEntry.DsgVarType.Boolean: dsgObj.AsBoolean = value.AsBoolean; break;
-				case DsgVarInfoEntry.DsgVarType.Byte: dsgObj.AsByte = value.AsByte; break;
-				case DsgVarInfoEntry.DsgVarType.UByte: dsgObj.AsUByte = value.AsUByte; break;
-				case DsgVarInfoEntry.DsgVarType.Short: dsgObj.AsShort = value.AsShort; break;
-				case DsgVarInfoEntry.DsgVarType.UShort: dsgObj.AsUShort = value.AsUShort; break;
-				case DsgVarInfoEntry.DsgVarType.Int: dsgObj.AsInt = value.AsInt; break;
-				case DsgVarInfoEntry.DsgVarType.UInt: dsgObj.AsUInt = value.AsUInt; break;
-				case DsgVarInfoEntry.DsgVarType.Float: dsgObj.AsFloat = value.AsFloat; break;
-				case DsgVarInfoEntry.DsgVarType.Caps: dsgObj.AsCaps = value.AsCaps; break;
-				case DsgVarInfoEntry.DsgVarType.Text: dsgObj.AsText = value.AsText; break;
-				case DsgVarInfoEntry.DsgVarType.Vector: dsgObj.AsVector = value.AsVector; break;
-				case DsgVarInfoEntry.DsgVarType.Perso:
+				case DsgVarType.Boolean: dsgObj.AsBoolean = value.AsBoolean; break;
+				case DsgVarType.Byte: dsgObj.AsByte = value.AsByte; break;
+				case DsgVarType.UByte: dsgObj.AsUByte = value.AsUByte; break;
+				case DsgVarType.Short: dsgObj.AsShort = value.AsShort; break;
+				case DsgVarType.UShort: dsgObj.AsUShort = value.AsUShort; break;
+				case DsgVarType.Int: dsgObj.AsInt = value.AsInt; break;
+				case DsgVarType.UInt: dsgObj.AsUInt = value.AsUInt; break;
+				case DsgVarType.Float: dsgObj.AsFloat = value.AsFloat; break;
+				case DsgVarType.Caps: dsgObj.AsCaps = value.AsCaps; break;
+				case DsgVarType.Text: dsgObj.AsText = value.AsText; break;
+				case DsgVarType.Vector: dsgObj.AsVector = value.AsVector; break;
+				case DsgVarType.Perso:
 					if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
 						dsgObj.AsPerso = GetPersoJSON(value.AsPersoROM, includeDetails: false);
 					} else {
 						dsgObj.AsPerso = GetPersoJSON(value.AsPerso, includeDetails: false);
 					}
 					break;
-				case DsgVarInfoEntry.DsgVarType.SuperObject:
+				case DsgVarType.SuperObject:
 					dsgObj.AsSuperObject = GetSuperObjectJSON(value.AsSuperObject, includeChildren: false);
 					break;
-				case DsgVarInfoEntry.DsgVarType.WayPoint:
+				case DsgVarType.WayPoint:
 					dsgObj.AsWayPoint = GetWayPointJSON(value.AsWayPoint, false);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Graph:
+				case DsgVarType.Graph:
 					dsgObj.AsGraph = GetGraphJSON(value.AsGraph);
 					break;
-				case DsgVarInfoEntry.DsgVarType.Action:
+				case DsgVarType.Action:
 					dsgObj.AsAction = new WebJSON.DsgState() { Name = value.AsAction?.ToString() };
 					break;
 			}

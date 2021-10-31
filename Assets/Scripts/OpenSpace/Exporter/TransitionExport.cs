@@ -74,7 +74,7 @@ namespace OpenSpace.Exporter {
             State state = new State();
             state.index = behavior.index;
             state.offset = behavior.Offset.ToString();
-            state.name = behavior.VeryShortName;
+            state.name = behavior.ExportName;
 
             List<int> transitionToIndicesNormal = new List<int>();
             List<int> transitionToIndicesReflex = new List<int>();

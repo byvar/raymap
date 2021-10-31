@@ -8,6 +8,9 @@ namespace OpenSpace.Waypoints {
         public WayPoint wayPoint;
         public ArcList arcList;
 
+        public uint typeOfWP;
+        public uint typeOfWPInit;
+
         public Pointer off_nextNode;
         public Pointer off_prevNode;
         public Pointer off_graph;
@@ -61,8 +64,8 @@ namespace OpenSpace.Waypoints {
             node.off_graph = Pointer.Read(reader);
             node.off_wayPoint = Pointer.Read(reader);
             if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
-                reader.ReadUInt32();
-                reader.ReadUInt32();
+                node.typeOfWP = reader.ReadUInt32();
+                node.typeOfWPInit = reader.ReadUInt32();
             }
             node.off_arcList = Pointer.Read(reader);
 

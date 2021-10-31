@@ -1,7 +1,7 @@
 ﻿using OpenSpace.Loader;
 using System.Linq;
 using UnityEngine;
-using DsgVarType = OpenSpace.AI.DsgVarInfoEntry.DsgVarType;
+using DsgVarType = OpenSpace.AI.DsgVarType;
 
 namespace OpenSpace.ROM {
 	public class DsgMemInfo : ROMStruct {

@@ -135,7 +135,8 @@ namespace OpenSpace {
             [Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
             [Description("Tonic Trouble (PC)")] TonicTroublePC,
             [Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
-            [Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
+            [Description("Tonic Trouble (N64 NTSC)")] TonicTroubleN64,
+			[Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
             [Description("Donald Duck: Quack Attack Demo (PC)")] DonaldDuckPCDemo,
             [Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
             [Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
@@ -940,6 +941,20 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
+        public static Settings TTN64 = new Settings()
+        {
+            engineVersion = EngineVersion.TT,
+            game = Game.TT,
+            platform = Platform.N64,
+            endian = Endian.Big,
+            linkedListType = LinkedListType.Double,
+            encryption = Encryption.ReadInit,
+            luminosity = 0.5f,
+            saturate = true,
+            aiTypes = AITypes.R2ROM,
+            numEntryActions = 1
+        };
+
 		public static Settings DDPC = new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.DD,
@@ -1226,6 +1241,7 @@ namespace OpenSpace {
 			{ Mode.Rayman2PS1, R2PS1 },
 			{ Mode.Rayman2PS2, R2PS2 },
 			{ Mode.Rayman2N64, R2N64 },
+			{ Mode.TonicTroubleN64, TTN64 },
 			{ Mode.Rayman2DS, R2DS },
 			{ Mode.Rayman23DS, R23DS },
 			{ Mode.RaymanMPC, RMPC },

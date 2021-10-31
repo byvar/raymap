@@ -3,6 +3,7 @@ using OpenSpace.Waypoints;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using OpenSpace;
 using UnityEngine;
 
 public class WayPointBehaviour : MonoBehaviour, IReferenceable {
@@ -249,4 +250,11 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
             }
         }
     }*/
+    public void SaveChanges(Writer writer)
+    {
+        Pointer.Goto(ref writer, wp.offset);
+        writer.Write(transform.position.x);
+        writer.Write(transform.position.z);
+        writer.Write(transform.position.y);
+    }
 }

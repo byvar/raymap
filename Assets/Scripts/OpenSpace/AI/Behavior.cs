@@ -45,7 +45,7 @@ namespace OpenSpace.AI {
             return shortName;
         }
 
-        public string VeryShortName
+        public string ExportName
         {
             get
             {
@@ -71,6 +71,8 @@ namespace OpenSpace.AI {
                     if (shortName.Contains("^CreateComport:")) {
                         shortName = shortName.Substring(shortName.LastIndexOf("^CreateComport:") + 15);
                     }
+                } else {
+                    return type + "_" + index;
                 }
                 return shortName;
             }

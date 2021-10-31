@@ -16,6 +16,9 @@ public class PersoBehaviourEditor : Editor {
 	TreeViewState treeviewStateTransitionsState;
 	MultiColumnHeaderState m_MultiColumnHeaderState;
 
+    private int initialRule = -1;
+    private int initialReflex = -1;
+
 	public override void OnInspectorGUI() {
         DrawDefaultInspector();
 
@@ -71,25 +74,28 @@ public class PersoBehaviourEditor : Editor {
 			treeViewStateTransitions.OnGUI(rect);
 		}
 
-		/*if (pb.state != null && pb.state.stateTransitions != null && pb.state.stateTransitions.Count > 0) {
-			GUILayout.Label("State transition");
-			GUILayout.BeginHorizontal();
-			GUILayout.Label("Target State");
-			GUILayout.Label("State To Go");
-			GUILayout.EndHorizontal();
-			foreach (State.Transition t in pb.state.stateTransitions) {
-				if (t != null) {
-					State stateToGo = State.FromOffset(t.off_stateToGo);
-					State targetState = State.FromOffset(t.off_targetState);
-					if (stateToGo != null && targetState != null) {
-						GUILayout.BeginHorizontal();
-						if (GUILayout.Button(targetState.ToString())) pb.SetState(targetState);
-						if (GUILayout.Button(stateToGo.ToString())) pb.SetState(stateToGo);
-						GUILayout.EndHorizontal();
-					}
-				}
-			}
-		}*/
+		GUILayout.Label($"Initial Rule: "+pb.perso?.brain?.mind?.intelligenceNormal?.defaultComport?.NameSubstring);
+		GUILayout.Label($"Initial Reflex: "+pb.perso?.brain?.mind?.intelligenceReflex?.defaultComport?.NameSubstring);
+
+        /*if (pb.state != null && pb.state.stateTransitions != null && pb.state.stateTransitions.Count > 0) {
+            GUILayout.Label("State transition");
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Target State");
+            GUILayout.Label("State To Go");
+            GUILayout.EndHorizontal();
+            foreach (State.Transition t in pb.state.stateTransitions) {
+                if (t != null) {
+                    State stateToGo = State.FromOffset(t.off_stateToGo);
+                    State targetState = State.FromOffset(t.off_targetState);
+                    if (stateToGo != null && targetState != null) {
+                        GUILayout.BeginHorizontal();
+                        if (GUILayout.Button(targetState.ToString())) pb.SetState(targetState);
+                        if (GUILayout.Button(stateToGo.ToString())) pb.SetState(stateToGo);
+                        GUILayout.EndHorizontal();
+                    }
+                }
+            }
+        }*/
 
         if (GUILayout.Button("Print scripts")) pb.PrintScripts();
         if (GUILayout.Button("Print translated scripts")) pb.PrintTranslatedScripts();

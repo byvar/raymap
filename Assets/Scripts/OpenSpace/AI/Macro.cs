@@ -39,7 +39,9 @@ namespace OpenSpace.AI {
 					if (shortName.Contains("^CreateMacro:")) {
 						shortName = shortName.Substring(shortName.LastIndexOf("^CreateMacro:") + 13);
 					}
-				}
+				} else {
+                    return "Macro_" + index;
+                }
 				return shortName;
 			}
 		}

@@ -77,7 +77,7 @@ public class DsgVarComponentEditor : Editor {
             MapLoader.Loader.print(printResult);
         }
 
-        if (GUILayout.Button("Print dsgvar value offsets as CheatEngine table")) {
+        if (GUILayout.Button("Copy DsgVars as CheatEngine table")) {
 
             string printResult = "";
 
@@ -87,16 +87,17 @@ public class DsgVarComponentEditor : Editor {
 
                 string variableType;
                 switch (dsgVarEntry.Type) {
-                    case DsgVarInfoEntry.DsgVarType.Float: variableType = "Float"; break;
-                    case DsgVarInfoEntry.DsgVarType.Byte: variableType = "Byte"; break;
-                    case DsgVarInfoEntry.DsgVarType.UByte: variableType = "Byte"; break;
-                    case DsgVarInfoEntry.DsgVarType.Short: variableType = "2 Bytes"; break;
-                    case DsgVarInfoEntry.DsgVarType.UShort: variableType = "2 Bytes"; break;
-                    case DsgVarInfoEntry.DsgVarType.Vector: variableType = "Float"; break;
+                    case DsgVarType.Float: variableType = "Float"; break;
+                    case DsgVarType.Byte: variableType = "Byte"; break;
+                    case DsgVarType.UByte: variableType = "Byte"; break;
+                    case DsgVarType.Short: variableType = "2 Bytes"; break;
+                    case DsgVarType.UShort: variableType = "2 Bytes"; break;
+                    case DsgVarType.Vector: variableType = "Float"; break;
+                    case DsgVarType.Boolean: variableType = "Byte"; break;
                     default: variableType = "4 Bytes"; break;
                 }
 
-                for (int i = 0; i <= ((dsgVarEntry.Type == DsgVarInfoEntry.DsgVarType.Vector) ? 8 : 0); i += 4) {
+                for (int i = 0; i <= ((dsgVarEntry.Type == DsgVarType.Vector) ? 8 : 0); i += 4) {
                     printResult += "<CheatEntry>" +
                                 $"<ID>0</ID>" +
                                 $"<Description>\"{dsgVarEntry.entry.NiceVariableName}\"</Description>" +
@@ -110,14 +111,7 @@ public class DsgVarComponentEditor : Editor {
             printResult = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><CheatTable><CheatEntries>{printResult}</CheatEntries></CheatTable>";
             cheatTableString = printResult;
 
-            TextEditor te = new TextEditor();
-            te.text = cheatTableString;
-            te.SelectAll();
-            te.Copy();
-        }
-
-        if (cheatTableString != "") {
-            GUILayout.TextArea(cheatTableString);
+            EditorGUIUtility.systemCopyBuffer = cheatTableString;
         }
 
         //GUILayout.EndVertical();
@@ -223,48 +217,48 @@ public class DsgVarComponentEditor : Editor {
     public static void DrawDsgVarValue(Rect rect, DsgVarComponent.DsgVarEditableEntry dsgVarEntry, DsgVarComponent.DsgVarEditableEntry.Value value, int? arrayIndex) {
         string stringVal;
         switch (value.type) {
-            case DsgVarInfoEntry.DsgVarType.Boolean:
+            case DsgVarType.Boolean:
                 value.AsBoolean = EditorGUI.Toggle(rect, value.AsBoolean);
                 break;
-            case DsgVarInfoEntry.DsgVarType.Int:
+            case DsgVarType.Int:
                 value.AsInt = EditorGUI.IntField(rect, value.AsInt);
                 break;
-            case DsgVarInfoEntry.DsgVarType.UInt:
+            case DsgVarType.UInt:
                 stringVal = EditorGUI.TextField(rect, value.AsUInt.ToString());
                 if(UInt32.TryParse(stringVal, out uint r_uint)) value.AsUInt = r_uint;
                 break;
-            case DsgVarInfoEntry.DsgVarType.Caps:
+            case DsgVarType.Caps:
                 stringVal = EditorGUI.TextField(rect, value.AsCaps.ToString());
                 if (UInt32.TryParse(stringVal, out uint r_caps)) value.AsCaps = r_caps;
                 break;
-            case DsgVarInfoEntry.DsgVarType.Short:
+            case DsgVarType.Short:
                 stringVal = EditorGUI.TextField(rect, value.AsShort.ToString());
                 if(Int16.TryParse(stringVal, out short r_short)) value.AsShort = r_short;
                 break;
-            case DsgVarInfoEntry.DsgVarType.UShort:
+            case DsgVarType.UShort:
                 stringVal = EditorGUI.TextField(rect, value.AsUShort.ToString());
                 if(UInt16.TryParse(stringVal, out ushort r_ushort)) value.AsUShort = r_ushort;
                 break;
-            case DsgVarInfoEntry.DsgVarType.Byte:
+            case DsgVarType.Byte:
                 stringVal = EditorGUI.TextField(rect, value.AsByte.ToString());
                 if (SByte.TryParse(stringVal, out sbyte r_sbyte)) value.AsByte = r_sbyte;
                 break;
-            case DsgVarInfoEntry.DsgVarType.UByte:
+            case DsgVarType.UByte:
                 stringVal = EditorGUI.TextField(rect, value.AsUByte.ToString());
                 if (Byte.TryParse(stringVal, out byte r_byte)) value.AsUByte = r_byte;
                 break;
-            case DsgVarInfoEntry.DsgVarType.Float:
+            case DsgVarType.Float:
                 value.AsFloat = EditorGUI.FloatField(rect, value.AsFloat);
                 break;
-            case DsgVarInfoEntry.DsgVarType.Text:
+            case DsgVarType.Text:
                 int? newTextID = DrawText(rect, value.AsText);
                 if (newTextID.HasValue) value.AsText = newTextID.Value;
                 //GUILayout.Label(MapLoader.Loader.localization.GetTextForHandleAndLanguageID((int)value.AsUInt, 0));
                 break;
-            case DsgVarInfoEntry.DsgVarType.Vector:
+            case DsgVarType.Vector:
                 value.AsVector = EditorGUI.Vector3Field(rect, "", value.AsVector);
                 break;
-            case DsgVarInfoEntry.DsgVarType.Perso:
+            case DsgVarType.Perso:
                 if (MapLoader.Loader is OpenSpace.Loader.R2ROMLoader) {
                     ROMPersoBehaviour currentPersoBehaviour = value.AsPersoROM != null ? value.AsPersoROM : null;
                     ROMPersoBehaviour selectedPersoBehaviour = ((ROMPersoBehaviour)EditorGUI.ObjectField(rect, currentPersoBehaviour, typeof(ROMPersoBehaviour), true));
@@ -281,7 +275,7 @@ public class DsgVarComponentEditor : Editor {
                     }
                 }
                 break;
-            case DsgVarInfoEntry.DsgVarType.SuperObject:
+            case DsgVarType.SuperObject:
                 SuperObjectComponent currentGao = value.AsSuperObject != null ? value.AsSuperObject : null;
                 SuperObjectComponent selectedGao = ((SuperObjectComponent)EditorGUI.ObjectField(rect, currentGao, typeof(SuperObjectComponent), true));
 
@@ -289,7 +283,7 @@ public class DsgVarComponentEditor : Editor {
                     value.AsSuperObject = selectedGao;
                 }
                 break;
-            case DsgVarInfoEntry.DsgVarType.WayPoint:
+            case DsgVarType.WayPoint:
                 WayPointBehaviour currentWaypointGao = value.AsWayPoint != null ? value.AsWayPoint : null;
                 WayPointBehaviour selectedWaypointGao = ((WayPointBehaviour)EditorGUI.ObjectField(rect, currentWaypointGao, typeof(WayPointBehaviour), true));
 
@@ -297,7 +291,7 @@ public class DsgVarComponentEditor : Editor {
                     value.AsWayPoint = selectedWaypointGao;
                 }
                 break;
-            case DsgVarInfoEntry.DsgVarType.Graph:
+            case DsgVarType.Graph:
                 GraphBehaviour currentGraphGao = value.AsGraph != null ? value.AsGraph : null;
                 GraphBehaviour selectedGraphGao = ((GraphBehaviour)EditorGUI.ObjectField(rect, currentGraphGao, typeof(GraphBehaviour), true));
 
@@ -305,19 +299,19 @@ public class DsgVarComponentEditor : Editor {
                     value.AsGraph = selectedGraphGao;
                 }
                 break;
-            case DsgVarInfoEntry.DsgVarType.ActionArray:
-            case DsgVarInfoEntry.DsgVarType.FloatArray:
-            case DsgVarInfoEntry.DsgVarType.VisualMatArray:
-            case DsgVarInfoEntry.DsgVarType.GraphArray:
-            case DsgVarInfoEntry.DsgVarType.SOLinksArray:
-            case DsgVarInfoEntry.DsgVarType.IntegerArray:
-            case DsgVarInfoEntry.DsgVarType.PersoArray:
-            case DsgVarInfoEntry.DsgVarType.SoundEventArray:
-            case DsgVarInfoEntry.DsgVarType.SuperObjectArray:
-            case DsgVarInfoEntry.DsgVarType.TextArray:
-            case DsgVarInfoEntry.DsgVarType.TextRefArray:
-            case DsgVarInfoEntry.DsgVarType.VectorArray:
-            case DsgVarInfoEntry.DsgVarType.WayPointArray:
+            case DsgVarType.ActionArray:
+            case DsgVarType.FloatArray:
+            case DsgVarType.VisualMatArray:
+            case DsgVarType.GraphArray:
+            case DsgVarType.SOLinksArray:
+            case DsgVarType.IntegerArray:
+            case DsgVarType.PersoArray:
+            case DsgVarType.SoundEventArray:
+            case DsgVarType.SuperObjectArray:
+            case DsgVarType.TextArray:
+            case DsgVarType.TextRefArray:
+            case DsgVarType.VectorArray:
+            case DsgVarType.WayPointArray:
                 if (value.AsArray != null) {
                     if (arrayIndex.HasValue) {
                         if (value.AsArray[arrayIndex.Value] != null) {

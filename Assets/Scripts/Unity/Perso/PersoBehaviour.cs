@@ -453,8 +453,8 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 		}
 		if (!IsLoaded || !(controller.LoadState == Controller.State.Finished || controller.LoadState == Controller.State.Error)) return;
         bool sectorActive = false, insideSectors = false;
-        if (sector == null || IsAlways || sector.Loaded) sectorActive = true;
-        if (sector == null || IsAlways || controller.sectorManager.activeSector != null) insideSectors = true;
+        if (sector == null || IsAlways || AlwaysPlayAnimation || sector.Loaded) sectorActive = true;
+        if (sector == null || IsAlways || AlwaysPlayAnimation || controller.sectorManager.activeSector != null) insideSectors = true;
         if (controller.playAnimations && playAnimation && sectorActive) {
             updateCounter += Time.deltaTime * animationSpeed;
             // If the camera is not inside a sector, animations will only update 1 out of 2 times (w/ frameskip) to avoid lag

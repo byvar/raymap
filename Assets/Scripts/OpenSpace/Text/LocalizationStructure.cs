@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text.RegularExpressions;
+using UnityEngine;
 using UnityEditor;
 
 namespace OpenSpace.Text {
@@ -149,6 +150,16 @@ namespace OpenSpace.Text {
             } else { // *(*(dialogStartOffset + 8 * currentLanguageID) + 4 * index);
                 return languages[currentLanguageId].entries[index];
             }
+        }
+
+        public string GenerateReadableHandle(int index)
+        {
+            string text = GetTextForHandleAndLanguageID(index, 0);
+            text = Regex.Replace(text, @"\/[^:]+:", " ").Trim();
+            text = Regex.Replace(text, @"[^\sa-zA-Z0-9_]+", string.Empty);
+			text = Regex.Replace(text, @"\s", "_");
+            text = Regex.Replace(text, "__+", "_"); // Replace double/triple/etc. _
+			return $"{index}_{text}";
         }
 	}
 }

@@ -39,14 +39,14 @@ public class DsgVarComponent : MonoBehaviour {
         }
         public bool IsArray {
             get {
-                return DsgVarInfoEntry.GetDsgVarTypeFromArrayType(Type) != DsgVarInfoEntry.DsgVarType.None;
+                return DsgVarInfoEntry.GetDsgVarTypeFromArrayType(Type) != DsgVarType.None;
             }
         }
-        public DsgVarInfoEntry.DsgVarType Type {
+        public DsgVarType Type {
             get {
                 if(entry != null) return entry.type;
                 if (entryROM != null) return entryROM.value.dsgVarType;
-                return DsgVarInfoEntry.DsgVarType.None;
+                return DsgVarType.None;
             }
         }
         public int ArrayLength {
@@ -64,11 +64,11 @@ public class DsgVarComponent : MonoBehaviour {
         public class Value {
             public DsgVarValue val;
             public OpenSpace.ROM.DsgVarValue valROM;
-            public DsgVarInfoEntry.DsgVarType type;
+            public DsgVarType type;
 
             public SuperObjectComponent AsSuperObject {
                 get {
-                    if (type != DsgVarInfoEntry.DsgVarType.SuperObject) return null;
+                    if (type != DsgVarType.SuperObject) return null;
                     if (val != null) {
                         if (val.valueSuperObject == null && val.valuePointer != null) {
                             val.valueSuperObject = MapLoader.Loader.superObjects.FirstOrDefault(p => (p.offset != null && p.offset == val.valuePointer));
@@ -78,7 +78,7 @@ public class DsgVarComponent : MonoBehaviour {
                     return null;
                 }
                 set {
-                    if (type != DsgVarInfoEntry.DsgVarType.SuperObject) return;
+                    if (type != DsgVarType.SuperObject) return;
                     if (val != null) {
                         if (value != null) {
                             val.valueSuperObject = value.so;
@@ -92,7 +92,7 @@ public class DsgVarComponent : MonoBehaviour {
             }
             public PersoBehaviour AsPerso {
                 get {
-                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return null;
+                    if (type != DsgVarType.Perso) return null;
                     if (val != null) {
                         if (val.valuePerso == null && val.valuePointer != null) {
                             SuperObject so = SuperObject.FromOffset(val.valuePointer);
@@ -105,7 +105,7 @@ public class DsgVarComponent : MonoBehaviour {
                     return null;
                 }
                 set {
-                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return;
+                    if (type != DsgVarType.Perso) return;
                     if (val != null) {
                         if (value != null) {
                             val.valuePerso = value.perso;
@@ -119,7 +119,7 @@ public class DsgVarComponent : MonoBehaviour {
             }
             public OpenSpace.Object.Properties.State AsAction {
                 get {
-                    if (type != DsgVarInfoEntry.DsgVarType.Action) return null;
+                    if (type != DsgVarType.Action) return null;
                     if (val != null) {
                         if (val.valueAction == null && val.valuePointer != null) {
                             OpenSpace.Object.Properties.State a = OpenSpace.Object.Properties.State.FromOffset(val.valuePointer);
@@ -136,7 +136,7 @@ public class DsgVarComponent : MonoBehaviour {
 
             public ROMPersoBehaviour AsPersoROM {
                 get {
-                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return null;
+                    if (type != DsgVarType.Perso) return null;
                     if (valROM != null) {
                         OpenSpace.ROM.Perso p = valROM.ValuePerso;
                         if (p == null) return null;
@@ -146,7 +146,7 @@ public class DsgVarComponent : MonoBehaviour {
                     return null;
                 }
                 set {
-                    if (type != DsgVarInfoEntry.DsgVarType.Perso) return;
+                    if (type != DsgVarType.Perso) return;
                     if (val != null) {
                         /*if (value != null) {
                             val.valuePerso = value.perso;
@@ -160,7 +160,7 @@ public class DsgVarComponent : MonoBehaviour {
             }
             public WayPointBehaviour AsWayPoint {
                 get {
-                    if (type != DsgVarInfoEntry.DsgVarType.WayPoint) return null;
+                    if (type != DsgVarType.WayPoint) return null;
                     if (val != null) {
                         return val.valueWayPoint?.Gao.GetComponent<WayPointBehaviour>();
                     }
@@ -172,7 +172,7 @@ public class DsgVarComponent : MonoBehaviour {
                     return null;
                 }
                 set {
-                    if (type != DsgVarInfoEntry.DsgVarType.WayPoint) return;
+                    if (type != DsgVarType.WayPoint) return;
                     if (val != null) {
                         if (value != null) {
                             val.valueWayPoint = value.wp;
@@ -186,7 +186,7 @@ public class DsgVarComponent : MonoBehaviour {
             }
             public GraphBehaviour AsGraph {
                 get {
-                    if (type != DsgVarInfoEntry.DsgVarType.Graph) return null;
+                    if (type != DsgVarType.Graph) return null;
                     if (val != null) {
                         Graph graph = val.valueGraph;
                         if (graph == null) return null;
@@ -200,7 +200,7 @@ public class DsgVarComponent : MonoBehaviour {
                     return null;
                 }
                 set {
-                    if (type != DsgVarInfoEntry.DsgVarType.Graph) return;
+                    if (type != DsgVarType.Graph) return;
                     if (val != null) {
                         if (value != null) {
                             val.valueGraph = value.graph;
@@ -336,7 +336,7 @@ public class DsgVarComponent : MonoBehaviour {
                 }
             }
             // Create an empty array
-            public Value(DsgVarInfoEntry.DsgVarType type, int length) {
+            public Value(DsgVarType type, int length) {
                 this.type = type;
                 AsArray = new Value[length];
                 for (int i = 0; i < AsArray.Length; i++) {
@@ -357,7 +357,7 @@ public class DsgVarComponent : MonoBehaviour {
             public void InitValue(OpenSpace.ROM.DsgVarValue value) {
                 this.type = value.dsgVarType;
 
-                if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type) != DsgVarInfoEntry.DsgVarType.None) {
+                if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type) != DsgVarType.None) {
                     AsArray = new Value[value.ValueArrayLength];
                     for (int i = 0; i < AsArray.Length; i++) {
                         AsArray[i] = null;
@@ -396,7 +396,7 @@ public class DsgVarComponent : MonoBehaviour {
             this.entriesMemROM = currentEntries;
             if(modelEntry != null) valueModel = new Value(modelEntry.value);
             if (currentEntries.Count > 0) {
-                if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(modelEntry.value.dsgVarType) != DsgVarInfoEntry.DsgVarType.None) {
+                if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(modelEntry.value.dsgVarType) != DsgVarType.None) {
                     // Check for array
                     valueInitial = new Value(modelEntry.value.dsgVarType, modelEntry.value.ValueArrayLength);
                     for (int i = 0; i < currentEntries.Count; i++) {
