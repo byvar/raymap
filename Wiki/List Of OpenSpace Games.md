@@ -233,7 +233,7 @@
     <td class="tg-yw4l">2000</td>
     <td class="tg-yw4l">❌</td>
     <td class="tg-yw4l"></td>
-    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l"></td>
     <td class="tg-yw4l">❌</td>
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
@@ -264,6 +264,20 @@
     <td class="tg-yw4l">❌</td>
     <td class="tg-yw4l">❌</td>
     <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">VIP</td>
+    <td class="tg-yw4l">M2</td>
+    <td class="tg-yw4l">2002</td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l"></td>
+    <td class="tg-yw4l">❌</td>
+    <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
     <td class="tg-yw4l"></td>
