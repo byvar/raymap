@@ -745,6 +745,17 @@ namespace OpenSpace.Loader {
 							if (!b.exeOnly && b.inEngine) {
 								if (b.hasSoundEffects) {
 									Util.ByteArrayToFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
+									using (MemoryStream ms = new MemoryStream(mainBlock[blockIndex - 1])) {
+										using (Reader r = new Reader(ms)) {
+											int soundIndex = 0;
+											while (r.BaseStream.Position < r.BaseStream.Length) {
+												int numSamples = r.ReadInt32();
+												byte[] bs = r.ReadBytes(numSamples*8);
+												Util.ByteArrayToFile(levelDir + $"sound_{soundIndex}.vb", bs);
+												soundIndex++;
+											}
+										}
+									}
 								}
 								Util.ByteArrayToFile(levelDir + "vram.xtp", mainBlock[blockIndex++]);
 								Util.ByteArrayToFile(levelDir + "level.sys", mainBlock[blockIndex++]);
