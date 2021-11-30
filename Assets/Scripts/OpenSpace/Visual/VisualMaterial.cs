@@ -108,6 +108,11 @@ namespace OpenSpace.Visual {
                                 textures[i].currentScrollX, textures[i].currentScrollY,
                                 textures[i].ScrollX, textures[i].ScrollY));
                             //material.SetTextureOffset(textureName, new Vector2(textures[i].texture.currentScrollX, textures[i].texture.currentScrollY));
+
+                            if (i == 0) { // HACK
+                                material.SetTexture("_MainTex", textures[i].Texture);
+                            }
+
                         } else {
                             // No texture = just color. So create white texture and let that be colored by other properties.
                             Texture2D tex = new Texture2D(1, 1);

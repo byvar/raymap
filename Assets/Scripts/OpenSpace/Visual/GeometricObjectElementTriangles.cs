@@ -641,6 +641,11 @@ namespace OpenSpace.Visual {
             if (visualMaterial != null) {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
+
+                if (visualMaterial.IsTransparent) {
+                    gao.layer = LayerMask.NameToLayer("Transparent");
+                }
+
 				if(rli != null && unityMat != null) unityMat.SetFloat("_Prelit", 2f);
 				if (((sdc != null && (sdc.geo.Type != 6 || (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3)))
 					|| vertexColors != null) && unityMat != null) unityMat.SetFloat("_Prelit", 1f);

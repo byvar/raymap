@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: mat_gouraud_alpha
-  m_Shader: {fileID: 4800000, guid: f20b3e15d6ccc5e4c9d3dba3435f3f13, type: 3}
+  m_Shader: {fileID: 4800000, guid: 149e608d358c2423fa8382f08a6c30b6, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -59,23 +59,44 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Tex0:
+        m_Texture: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _Billboard: 0
     - _Blend: 0
+    - _BlendOp: 0
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _DstBlendMode: 10
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
+    - _NumTextures: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularFactor: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _SrcBlendMode: 5
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
@@ -83,4 +104,15 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DiffuseCoef: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+    - _SectorFog: {r: 0, g: 0, b: 0, a: 0}
+    - _SectorFogParams: {r: 0, g: 0, b: 0, a: 0}
     - _SpecularCoef: {r: 1, g: 1, b: 1, a: 0.5}
+    - _Tex0Params: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex0Params2: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex1Params: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex1Params2: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex2Params: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex2Params2: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex3Params: {r: 0, g: 0, b: 0, a: 0}
+    - _Tex3Params2: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []
