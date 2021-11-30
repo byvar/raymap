@@ -305,9 +305,60 @@ public class Controller : MonoBehaviour {
                         p.stateIndex = 0;
 					}
 
-				} else {
+				} else if (string.Equals(HighlightObjectsFilter, "$yellowlums")) {
 
-                    foreach (var fi in HighlightObjectsFilter.Split(',')) {
+					DsgMem dsgMem = p.perso?.brain?.mind?.dsgMem;
+
+					if (p.NameModel.ToLower() == "chr_lums_basic") {
+
+						if (dsgMem != null) {
+							int lumType = dsgMem.values[0].valueInt;
+                            bool isBigLum = dsgMem.values[4].valueBool;
+
+							if (lumType == 1) {
+								passesFilter = true;
+								itemCount = 1;
+
+                                p.stateIndex = 4;
+
+                                if (isBigLum) {
+                                    p.stateIndex = 13;
+                                    itemCount = 5;
+                                }
+							}
+						}
+
+
+					} else if (p.NameModel.ToLower() == "alw_lums_model") {
+
+						if (dsgMem != null) {
+							byte lumType = dsgMem.values[0].valueUByte;
+                            bool isBigLum = dsgMem.values[4].valueBool;
+							if (lumType == 1) {
+								passesFilter = true;
+								itemCount = 1;
+
+								p.stateIndex = 4;
+
+                                if (isBigLum) {
+                                    p.stateIndex = 13;
+									itemCount = 5;
+                                }
+							}
+						}
+
+
+					} else if (p.NameModel.ToLower() == "arg_cagelums") {
+
+                        if (dsgMem != null) {
+                            passesFilter = true;
+                            itemCount = dsgMem.values[4].valueInt;
+						}
+					}
+
+                } else {
+
+					foreach (var fi in HighlightObjectsFilter.Split(',')) {
                         if (string.Equals(p.NameFamily, fi, StringComparison.CurrentCultureIgnoreCase) ||
                             string.Equals(p.NameModel, fi, StringComparison.CurrentCultureIgnoreCase)) {
                             passesFilter = true;
@@ -346,77 +397,109 @@ public class Controller : MonoBehaviour {
                     billboardPerso.RotationOffset = Quaternion.Euler(0, -90, 0);
 					billboardPerso.ScaleMultiplier = 1.0f / 15.0f;
 
-					LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("HighlightAlwaysOnTop"));
+                    if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.None) {
+                        LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("HighlightAlwaysOnTop"));
+                    } else {
+                        LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("Default"));
+                        LayerUtil.SetLayerRecursive(highlightTextParentGao, LayerMask.NameToLayer("Default"));
+						billboardPerso.ForceCloseToOrthoCamera = true;
+                    }
                 }
             }
         }
 
         if (ScreenshotAfterLoad!=UnitySettings.ScreenshotAfterLoadSetting.None) {
 
-            Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
-            System.DateTime dateTime = System.DateTime.Now;
-            TransparencyCaptureBehaviour pb = new GameObject("Dummy").AddComponent<TransparencyCaptureBehaviour>();
-            lightManager.enableFog = false;
-            Camera.main.orthographic = true;
+            CreateScreenshotAfterLoad(false);
 
-            var filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 ? true : false);
-			
-            float minX = filledSectors.Min(v => v.SectorBorder.boxMin.x);
-            float minY = filledSectors.Min(v => v.SectorBorder.boxMin.y);
-            float minZ = filledSectors.Min(v => v.SectorBorder.boxMin.z);
+			IEnumerator ScreenshotCoroutine()
+            {
+                yield return new WaitForSeconds(1);
+                CreateScreenshotAfterLoad(true);
+			}
 
-            float maxX = filledSectors.Max(v => v.SectorBorder.boxMax.x);
-            float maxY = filledSectors.Max(v => v.SectorBorder.boxMax.y);
-            float maxZ = filledSectors.Max(v => v.SectorBorder.boxMax.z);
-
-            Vector3 worldMin = new Vector3(minX, minY, minZ);
-            Vector3 worldMax = new Vector3(maxX, maxY, maxZ);
-
-            Vector3 worldSize = (worldMax - worldMin);
-            Vector3 center = worldMin + worldSize * 0.5f;
-
-            sectorManager.displayInactiveSectors = true;
-            lightManager.luminosity = Settings.s.luminosity * 2.0f;
-            SpawnableParent?.SetActive(false);
-
-            byte[] screenshotBytes;
-
-            if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic || ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownOnly) {
-
-                Camera.main.transform.position = center + new Vector3(0, Camera.main.farClipPlane * 0.5f, 0);
-                Camera.main.transform.rotation = Quaternion.Euler(90, worldSize.z <= worldSize.x ? 90 : 0, 0);
-
-                Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
-
-                screenshotBytes = await pb.Capture((int) (res.width * ScreenshotScale), (int) (res.height * ScreenshotScale), true);
-                OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
-
-            }
-
-            if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic || ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.OrthographicOnly) {
-
-                var pitch = Mathf.Rad2Deg * Mathf.Atan(Mathf.Sin(Mathf.Deg2Rad * 45));
-                for (int i = 0; i < 360; i += 45) {
-                    Camera.main.transform.rotation = Quaternion.Euler(pitch, i, 0);
-                    Camera.main.transform.position = center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
-
-                    Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
-                    screenshotBytes = await pb.Capture((int) (res.width * ScreenshotScale), (int) (res.height * ScreenshotScale), true);
-                    OpenSpace.Util.ByteArrayToFile(UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i + dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
-
-                }
-            }
-
-            Destroy(pb.gameObject);
-
-            Application.Quit();
-		}
+            StartCoroutine(ScreenshotCoroutine());
+        }
 
 		// Collect searchable strings
 		if (Application.platform != RuntimePlatform.WebGLPlayer) {
 			loader.searchableStrings.AddRange(loader.persos.SelectMany(p => p.GetSearchableStrings()));
 		}
 
+    }
+
+    private async Task CreateScreenshotAfterLoad(bool save)
+    {
+        Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
+        System.DateTime dateTime = System.DateTime.Now;
+        TransparencyCaptureBehaviour pb = new GameObject("Dummy").AddComponent<TransparencyCaptureBehaviour>();
+        lightManager.enableFog = false;
+        Camera.main.orthographic = true;
+
+        var filledSectors = sectorManager.sectors.Where(s => s.sector?.SuperObject?.children?.Count > 0 ? true : false);
+
+        float minX = filledSectors.Min(v => v.SectorBorder.boxMin.x);
+        float minY = filledSectors.Min(v => v.SectorBorder.boxMin.y);
+        float minZ = filledSectors.Min(v => v.SectorBorder.boxMin.z);
+
+        float maxX = filledSectors.Max(v => v.SectorBorder.boxMax.x);
+        float maxY = filledSectors.Max(v => v.SectorBorder.boxMax.y);
+        float maxZ = filledSectors.Max(v => v.SectorBorder.boxMax.z);
+
+        Vector3 worldMin = new Vector3(minX, minY, minZ);
+        Vector3 worldMax = new Vector3(maxX, maxY, maxZ);
+
+        Vector3 worldSize = (worldMax - worldMin);
+        Vector3 center = worldMin + worldSize * 0.5f;
+
+        sectorManager.displayInactiveSectors = true;
+        lightManager.luminosity = Settings.s.luminosity * 2.0f;
+        SpawnableParent?.SetActive(false);
+
+        byte[] screenshotBytes;
+
+        if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic ||
+            ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownOnly) {
+            Camera.main.transform.position = center + new Vector3(0, Camera.main.farClipPlane * 0.5f, 0);
+            Camera.main.transform.rotation = Quaternion.Euler(90, worldSize.z <= worldSize.x ? 90 : 0, 0);
+
+            Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
+
+            if (save) {
+                screenshotBytes =
+                    await pb.Capture((int) (res.width * ScreenshotScale), (int) (res.height * ScreenshotScale), true);
+                OpenSpace.Util.ByteArrayToFile(
+                    UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" +
+                    dateTime.ToString("yyyy_MM_dd HH_mm_ss") +
+                    ".png", screenshotBytes);
+            }
+        }
+
+        if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic ||
+            ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.OrthographicOnly) {
+            var pitch = Mathf.Rad2Deg * Mathf.Atan(Mathf.Sin(Mathf.Deg2Rad * 45));
+            for (int i = 0; i < 360; i += 45) {
+                Camera.main.transform.rotation = Quaternion.Euler(pitch, i, 0);
+                Camera.main.transform.position =
+                    center - Camera.main.transform.rotation * Vector3.forward * Camera.main.farClipPlane * 0.5f;
+
+                Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
+
+                if (save) {
+                    screenshotBytes = await pb.Capture((int) (res.width * ScreenshotScale),
+                        (int) (res.height * ScreenshotScale), true);
+                    OpenSpace.Util.ByteArrayToFile(
+                        UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i +
+                        dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
+                }
+            }
+        }
+
+        Destroy(pb.gameObject);
+
+        if (save) {
+            Application.Quit();
+        }
     }
 
     // Update is called once per frame
@@ -565,15 +648,15 @@ public class Controller : MonoBehaviour {
 								scriptComponent.SetScript(script, p);
 								c.Scripts.Add(scriptComponent);
 							}
-							if (behavior.firstScript != null) {
+							if (behavior.scheduleScript != null) {
 								ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
-								scriptComponent.SetScript(behavior.firstScript, p);
+								scriptComponent.SetScript(behavior.scheduleScript, p);
 								c.FirstScript = scriptComponent;
 							}
 							if (iter == 0) {
 								behaviorGao.name += " (Init)";
 							}
-							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
+							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.scheduleScript == null) {
 								behaviorGao.name += " (Empty)";
 							}
 							c.Offset = behavior.Offset;
@@ -600,12 +683,12 @@ public class Controller : MonoBehaviour {
 								scriptComponent.SetScript(script, p);
 								c.Scripts.Add(scriptComponent);
 							}
-							if (behavior.firstScript != null) {
+							if (behavior.scheduleScript != null) {
 								ScriptComponent scriptComponent = behaviorGao.AddComponent<ScriptComponent>();
-								scriptComponent.SetScript(behavior.firstScript, p);
+								scriptComponent.SetScript(behavior.scheduleScript, p);
 								c.FirstScript = scriptComponent;
 							}
-							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.firstScript == null) {
+							if ((behavior.scripts == null || behavior.scripts.Length == 0) && behavior.scheduleScript == null) {
 								behaviorGao.name += " (Empty)";
 							}
 							c.Offset = behavior.Offset;

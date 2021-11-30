@@ -14,10 +14,10 @@ namespace OpenSpace.AI {
 
         public string name = null;
         public Pointer off_scripts;
-        private Pointer off_firstScript;
+        private Pointer off_scheduleScript;
         public byte num_scripts;
         public Script[] scripts;
-        public Script firstScript;
+        public Script scheduleScript;
 
         // Custom
         public List<Pointer> copies;
@@ -83,9 +83,9 @@ namespace OpenSpace.AI {
         }
 
 		public bool ContentEquals(Behavior b) {
-			if (firstScript != null) {
-				if (b.firstScript == null || !firstScript.ContentEquals(b.firstScript)) return false;
-			} else if (b.firstScript != null) return false;
+			if (scheduleScript != null) {
+				if (b.scheduleScript == null || !scheduleScript.ContentEquals(b.scheduleScript)) return false;
+			} else if (b.scheduleScript != null) return false;
 			if (scripts.Length != b.scripts.Length) return false;
 			for (int i = 0; i < scripts.Length; i++) {
 				if (scripts[i] != null) {
@@ -110,7 +110,7 @@ namespace OpenSpace.AI {
                 }
             }
             off_scripts = Pointer.Read(reader);
-            off_firstScript = Pointer.Read(reader);
+            off_scheduleScript = Pointer.Read(reader);
             if (Settings.s.platform == Settings.Platform.DC || 
                 Settings.s.game == Settings.Game.RedPlanet
                 || Settings.s.game == Settings.Game.R2Demo) {
@@ -127,8 +127,8 @@ namespace OpenSpace.AI {
                     scripts[i] = Script.Read(reader, Pointer.Current(reader), this);
                 }
             });
-            Pointer.DoAt(ref reader, off_firstScript, () => {
-                firstScript = Script.Read(reader, Pointer.Current(reader), this, single: true);
+            Pointer.DoAt(ref reader, off_scheduleScript, () => {
+                scheduleScript = Script.Read(reader, Pointer.Current(reader), this, single: true);
             });
         }
 

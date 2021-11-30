@@ -24,6 +24,9 @@ public class MindComponent : MonoBehaviour {
     public bool writeReflexComport;
     public bool writeNormalComport;
 
+    public bool writeInitialReflexComport;
+    public bool writeInitialNormalComport;
+
     public void Init(Perso perso, Mind mind)
     {
         this.perso = perso;
@@ -41,6 +44,16 @@ public class MindComponent : MonoBehaviour {
             mind.intelligenceReflex.off_comport = mind.intelligenceReflex.comport?.Offset;
             mind.intelligenceReflex.Write(writer);
             this.writeReflexComport = false;
+        }
+        if (this.writeInitialNormalComport) {
+            mind.intelligenceNormal.off_defaultComport = mind.intelligenceNormal.defaultComport?.Offset;
+            mind.intelligenceNormal.Write(writer);
+            this.writeInitialNormalComport = false;
+        }
+        if (this.writeInitialReflexComport) {
+            mind.intelligenceReflex.off_defaultComport = mind.intelligenceReflex.defaultComport?.Offset;
+            mind.intelligenceReflex.Write(writer);
+            this.writeInitialReflexComport = false;
         }
     }
 }

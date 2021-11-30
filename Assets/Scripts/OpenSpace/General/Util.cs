@@ -210,6 +210,16 @@ namespace OpenSpace {
             return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z) || float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
         }
 
+
+        /// <summary>
+        /// Returns true if all components of this quaternion are a floating point number that's not NaN or an infinity.
+        /// </summary>
+        /// <returns>true for quaternions with valid components, false otherwise</returns>
+        public static bool IsValid(this Quaternion q)
+        {
+            return !(float.IsNaN(q.x) || float.IsNaN(q.y) || float.IsNaN(q.z) || float.IsNaN(q.w) || float.IsInfinity(q.x) || float.IsInfinity(q.y) || float.IsInfinity(q.z) || float.IsInfinity(q.w));
+        }
+
         public static IEnumerable<T> TakeAllButLast<T>(this IEnumerable<T> source) {
             var it = source.GetEnumerator();
             bool hasRemainingItems = false;

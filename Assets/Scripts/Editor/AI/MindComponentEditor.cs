@@ -14,6 +14,7 @@ public class MindComponentEditor : Editor {
 
         Intelligence intelligenceNormal = c.mind.intelligenceNormal;
         Intelligence intelligenceReflex = c.mind.intelligenceReflex;
+
         AIModel aiModel = c.mind.AI_model;
 
         GUILayout.BeginHorizontal();
@@ -52,7 +53,39 @@ public class MindComponentEditor : Editor {
         }
         GUILayout.EndHorizontal();
 
-		if (GUILayout.Button("Export transitions")) {
+        GUILayout.BeginHorizontal();
+        if (aiModel.behaviors_normal != null && aiModel.behaviors_normal.Length > 0) {
+            int activeInitialNormalComportIndex = intelligenceNormal.defaultComport != null ? intelligenceNormal.defaultComport.index + 1 : 0;
+            List<string> normalComportStrings = aiModel.behaviors_normal.Select(b => b.ToString()).ToList();
+            normalComportStrings.Insert(0, "<null>");
+
+            GUILayout.Label("Initial normal behavior");
+            int o = activeInitialNormalComportIndex - 1;
+            activeInitialNormalComportIndex = EditorGUILayout.Popup(activeInitialNormalComportIndex, normalComportStrings.ToArray()) - 1;
+            if (activeInitialNormalComportIndex != o) {
+                c.writeInitialNormalComport = true;
+                intelligenceNormal.defaultComport = activeInitialNormalComportIndex >= 0 ? aiModel.behaviors_normal[activeInitialNormalComportIndex] : null;
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        if (aiModel.behaviors_reflex != null && aiModel.behaviors_reflex.Length > 0) {
+            int activeInitialReflexComportIndex = intelligenceReflex.defaultComport != null ? intelligenceReflex.defaultComport.index + 1 : 0;
+            List<string> reflexComportStrings = aiModel.behaviors_reflex.Select(b => b.ToString()).ToList();
+            reflexComportStrings.Insert(0, "<null>");
+
+            GUILayout.Label("Initial reflex behavior");
+            int o = activeInitialReflexComportIndex - 1;
+            activeInitialReflexComportIndex = EditorGUILayout.Popup(activeInitialReflexComportIndex, reflexComportStrings.ToArray()) - 1;
+            if (activeInitialReflexComportIndex != o) {
+                c.writeInitialReflexComport = true;
+                intelligenceReflex.defaultComport = activeInitialReflexComportIndex >= 0 ? aiModel.behaviors_reflex[activeInitialReflexComportIndex] : null;
+            }
+        }
+        GUILayout.EndHorizontal();
+
+        if (GUILayout.Button("Export transitions")) {
 			MindComponent.print(c.TransitionExport);
 		}
     }

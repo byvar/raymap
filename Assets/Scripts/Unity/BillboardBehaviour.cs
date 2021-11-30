@@ -32,6 +32,21 @@ public class BillboardBehaviour : MonoBehaviour {
         }
     }
 
+    private bool _forceCloseToOrthoCamera = false;
+    private Vector3 originalPosition;
+    public bool ForceCloseToOrthoCamera
+    {
+        get => _forceCloseToOrthoCamera;
+        set
+        {
+            if (value && !_forceCloseToOrthoCamera) {
+                originalPosition = transform.position;
+            }
+
+            _forceCloseToOrthoCamera = value;
+        }
+    }
+
     void LateUpdate() {
         if (Cam != null && mode != LookAtMode.None) {
             Quaternion inverseParent = transform.parent != null ? Quaternion.Inverse(transform.parent.rotation) : Quaternion.identity;
@@ -92,6 +107,12 @@ public class BillboardBehaviour : MonoBehaviour {
                     transform.localScale = Vector3.one * ScaleMultiplier * Vector3.Distance(transform.position,Cam.transform.position);
                 }
             }
+        }
+
+        if (Cam != null && ForceCloseToOrthoCamera) {
+
+            float distToCam = Vector3.Distance(originalPosition, Cam.transform.position);
+            transform.position = originalPosition + (Cam.transform.rotation * Vector3.back * distToCam * 0.5f);
         }
     }
 }

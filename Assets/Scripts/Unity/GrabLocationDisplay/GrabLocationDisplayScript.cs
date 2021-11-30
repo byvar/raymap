@@ -3,13 +3,15 @@ using OpenSpace.AI;
 using OpenSpace.Object;
 using System.Collections;
 using System.Collections.Generic;
+using OpenSpace.FileFormat;
 using UnityEditor;
 using UnityEngine;
 
 public class GrabLocationDisplayScript : MonoBehaviour
 {
     GameObject raymanGAO = null;
-
+    public GameObject GaoDsgVar38;
+    public GameObject GaoDsgVar40;
 
     // Start is called before the first frame update
     void Start()
@@ -20,11 +22,30 @@ public class GrabLocationDisplayScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        var reader = MapLoader.Loader.livePreviewReader;
+
+        if (reader != null) {
+            MemoryFile mem = (MemoryFile)MapLoader.Loader.files_array[0];
+            new Pointer(0x500298, mem).Goto(ref reader);
+            (Pointer.Read(reader)+ 0x234).Goto(ref reader);
+            (Pointer.Read(reader)+ 0x10).Goto(ref reader);
+            (Pointer.Read(reader) + 0xC).Goto(ref reader);
+            (Pointer.Read(reader) + 0xB0).Goto(ref reader);
+            float x = reader.ReadSingle();
+            float y = reader.ReadSingle();
+            float z = reader.ReadSingle();
+            
+            GaoDsgVar38.transform.position = new Vector3(x,z,y);
+        }
+
+        //GaoDsgVar40.transform.position = vector40;
+
+        /* oldMethod
         if (raymanGAO == null) {
             GameObject[] gameObjects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
 
             foreach (GameObject gao in gameObjects) {
-                if (gao.name.Contains("YLT_RaymanModel")) {
+                if (gao.name.Contains("[rayman] YLT_RaymanModel")) {
                     raymanGAO = gao;
                     break;
                 }
@@ -42,8 +63,8 @@ public class GrabLocationDisplayScript : MonoBehaviour
                     vector40Entry = dsgVarComponent.editableEntries[40];
                 } else if (Settings.s.game == Settings.Game.R3) {
                     return;
-                    /*vector38Entry = dsgVarComponent.dsgVarEntries[38];
-                    vector40Entry = dsgVarComponent.dsgVarEntries[40];*/
+                    //vector38Entry = dsgVarComponent.dsgVarEntries[38];
+                    //vector40Entry = dsgVarComponent.dsgVarEntries[40];
                 }
 
                 Vector3 vector38_xzy = (Vector3)vector38Entry.valueCurrent.AsVector;
@@ -52,34 +73,10 @@ public class GrabLocationDisplayScript : MonoBehaviour
                 Vector3 vector38 = new Vector3(vector38_xzy.x, vector38_xzy.z, vector38_xzy.y);
                 Vector3 vector40 = new Vector3(vector40_xzy.x, vector40_xzy.z, vector40_xzy.y);
 
-                Vector3 raymanVec = raymanGAO.transform.position;
-                Vector3 dir = (vector40) - (raymanVec);
-                Vector3 dirFlat = new Vector3(dir.x, 0, dir.z);
-
-                for (float i = -0.05f; i <= 0.05f; i+=0.02f) {
-                    for (float j = -0.05f; j <= 0.05f; j += 0.02f) {
-
-                        Vector3 o = new Vector3(i, 0, j);
-
-                        Debug.DrawRay(vector38 + o , new Vector3(0, -0.9f, 0), Color.red);
-                        Debug.DrawRay(vector38 + o, new Vector3(-1f, 0, 0), Color.red);
-                        Debug.DrawRay(vector38 + o, new Vector3(1f, 0, 0), Color.red);
-                        Debug.DrawRay(vector38 + o, new Vector3(0f, 0, -1f), Color.red);
-                        Debug.DrawRay(vector38 + o, new Vector3(0f, 0, 1f), Color.red);
-
-                        Debug.DrawRay(vector40 + o , new Vector3(0, -0.9f, 0), Color.blue);
-                        Debug.DrawRay(vector40 + o, new Vector3(-1f, 0, 0), Color.blue);
-                        Debug.DrawRay(vector40 + o, new Vector3(1f, 0, 0), Color.blue);
-                        Debug.DrawRay(vector40 + o, new Vector3(0f, 0, -1f), Color.blue);
-                        Debug.DrawRay(vector40 + o, new Vector3(0f, 0, 1f), Color.blue);
-
-                        
-                        Debug.DrawRay(raymanVec + o, dir, Color.blue);
-                        Debug.DrawRay(raymanVec + o, dirFlat, Color.blue);
-                    }
-                }
+                GaoDsgVar38.transform.position = vector38;
+                GaoDsgVar40.transform.position = vector40;
             }
-        }
+        }*/
 
         //Debug.draw
     }

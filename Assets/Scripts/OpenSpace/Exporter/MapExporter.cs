@@ -411,11 +411,23 @@ namespace OpenSpace.Exporter {
 
         private void ExportRawAIModels(string path)
         {
+            void ExportScript(string path, Behavior b, int i, Script s)
+            {
+                string filePathRaw = Path.Combine(path, i + ".osb");
+                if (File.Exists(filePathRaw)) {
+                    File.Delete(filePathRaw);
+                }
+
+                Directory.CreateDirectory(Path.GetDirectoryName(filePathRaw));
+
+                File.WriteAllBytes(filePathRaw, s.GetNodeBytes());
+            }
+
             ExportTextTableJson(path);
 
             Dictionary<(string model, string family), AIModel> aiModelFamilyCombination = new Dictionary<(string, string), AIModel>();
-            Dictionary<AIModel, string> defaultRules = new Dictionary<AIModel, string>();
-            Dictionary<AIModel, string> defaultReflexes = new Dictionary<AIModel, string>();
+            Dictionary<AIModel, List<string>> defaultRules = new Dictionary<AIModel, List<string>>();
+            Dictionary<AIModel, List<string>> defaultReflexes = new Dictionary<AIModel, List<string>>();
 
             var persos = loader.persos;
             //persos.AddRange(loader.globals.spawnablePersos); maybe needed?
@@ -426,10 +438,14 @@ namespace OpenSpace.Exporter {
                 }
 
                 if (!defaultRules.ContainsKey(perso.brain.mind.AI_model)) {
-                    defaultRules.Add(perso.brain.mind.AI_model, perso.brain.mind.intelligenceNormal?.defaultComport?.NameSubstring??"");
+                    defaultRules.Add(perso.brain.mind.AI_model, new List<string>(){perso.brain.mind.intelligenceNormal?.defaultComport?.NameSubstring??""});
+                } else {
+                    defaultRules[perso.brain.mind.AI_model].Add(perso.brain.mind.intelligenceNormal?.defaultComport?.NameSubstring ?? "" );
                 }
                 if (!defaultReflexes.ContainsKey(perso.brain.mind.AI_model)) {
-                    defaultReflexes.Add(perso.brain.mind.AI_model, perso.brain.mind.intelligenceReflex?.defaultComport?.NameSubstring ?? "");
+                    defaultReflexes.Add(perso.brain.mind.AI_model, new List<string>() { perso.brain.mind.intelligenceReflex?.defaultComport?.NameSubstring ?? ""});
+                } else {
+                    defaultReflexes[perso.brain.mind.AI_model].Add(perso.brain.mind.intelligenceReflex?.defaultComport?.NameSubstring ?? "");
                 }
 
                 var combination = (perso.nameModel, perso.nameFamily);
@@ -448,18 +464,19 @@ namespace OpenSpace.Exporter {
                 ExportStringPointers(aiModelDir);
 
                 if (aiModel.behaviors_normal != null) {
+
                     foreach (var b in aiModel.behaviors_normal) {
                         int i = 0;
+
+                        string behaviorPath = Path.Combine(aiModelDir, "rule", b.NameSubstring);
+                        Directory.CreateDirectory(behaviorPath);
+
+                        if (b.scheduleScript != null && !b.scripts.Contains(b.scheduleScript)) {
+                            ExportScript(behaviorPath, b, i++, b.scheduleScript);
+                        }
+
                         foreach (var s in b.scripts) {
-                            string filePathRaw =
-                                Path.Combine(aiModelDir, "rule", b.NameSubstring, (i++) + ".osb");
-                            if (File.Exists(filePathRaw)) {
-                                File.Delete(filePathRaw);
-                            }
-
-                            Directory.CreateDirectory(Path.GetDirectoryName(filePathRaw));
-
-                            File.WriteAllBytes(filePathRaw, s.GetNodeBytes());
+                            ExportScript(behaviorPath, b, i++, s);
                         }
 
                     }
@@ -468,16 +485,16 @@ namespace OpenSpace.Exporter {
                 if (aiModel.behaviors_reflex != null) {
                     foreach (var b in aiModel.behaviors_reflex) {
                         int i = 0;
+
+                        string behaviorPath = Path.Combine(aiModelDir, "reflex", b.NameSubstring);
+                        Directory.CreateDirectory(behaviorPath);
+
+                        if (b.scheduleScript!=null && !b.scripts.Contains(b.scheduleScript)) {
+                            ExportScript(behaviorPath, b, i++, b.scheduleScript);
+                        }
+
                         foreach (var s in b.scripts) {
-                            string filePathRaw = Path.Combine(aiModelDir, "reflex",
-                                b.NameSubstring, + (i++) + ".osb");
-                            if (File.Exists(filePathRaw)) {
-                                File.Delete(filePathRaw);
-                            }
-
-                            Directory.CreateDirectory(Path.GetDirectoryName(filePathRaw));
-
-                            File.WriteAllBytes(filePathRaw, s.GetNodeBytes());
+                            ExportScript(behaviorPath, b, i++, s);
                         }
 
                     }
@@ -511,7 +528,7 @@ namespace OpenSpace.Exporter {
                     oldMetaData = JsonConvert.DeserializeObject<AIModelMetaData>(File.ReadAllText(metaFilePath));
                 }
 
-                var aiModelMetaData = AIModelMetaData.FromAIModel(aiModel, exportAIModelName, defaultRules[aiModel], defaultReflexes[aiModel]);
+                var aiModelMetaData = AIModelMetaData.FromAIModel(aiModel, exportAIModelName, defaultRules[aiModel].ToArray(), defaultReflexes[aiModel].ToArray());
 
                 if (oldMetaData != null) {
                     aiModelMetaData = AIModelMetaData.Merge(oldMetaData.Value, aiModelMetaData);

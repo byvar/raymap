@@ -8,7 +8,7 @@ using OpenSpace.AI;
 namespace OpenSpace.Exporter {
     public readonly struct AIModelMetaData
     {
-        public static AIModelMetaData FromAIModel(AIModel m, string name, string initialRule, string initialReflex)
+        public static AIModelMetaData FromAIModel(AIModel m, string name, string[] initialRule, string[] initialReflex)
         {
             Dictionary<PointerInMap, string> offsetToBehaviourNameMap = new Dictionary<PointerInMap, string>();
             Dictionary<PointerInMap, PersoNames> offsetToPersoModelNameMap = new Dictionary<PointerInMap, PersoNames>();
@@ -55,19 +55,19 @@ namespace OpenSpace.Exporter {
         public readonly uint Offset;
         public readonly string Map;
         public readonly string Name;
-        public readonly string InitialRule;
-        public readonly string InitialReflex;
+        public readonly string[] InitialRules;
+        public readonly string[] InitialReflexes;
         public readonly List<DsgVar> DsgVars;
         public readonly Dictionary<PointerInMap, string> OffsetToBehaviourNameMap;
         public readonly Dictionary<PointerInMap, PersoNames> OffsetToPersoNamesMap;
 
-        public AIModelMetaData(uint offset, string map, string name, string initialRule, string initialReflex, List<DsgVar> dsgVars, Dictionary<PointerInMap, string> offsetToBehaviourNameMap, Dictionary<PointerInMap, PersoNames> offsetToPersoNamesMap)
+        public AIModelMetaData(uint offset, string map, string name, string[] initialRules, string[] initialReflexes, List<DsgVar> dsgVars, Dictionary<PointerInMap, string> offsetToBehaviourNameMap, Dictionary<PointerInMap, PersoNames> offsetToPersoNamesMap)
         {
             this.Offset = offset;
             this.Map = map;
             this.Name = name;
-            this.InitialRule = initialRule;
-            this.InitialReflex = initialReflex;
+            this.InitialRules = initialRules;
+            this.InitialReflexes = initialReflexes;
             this.DsgVars = dsgVars;
             this.OffsetToBehaviourNameMap = offsetToBehaviourNameMap;
             this.OffsetToPersoNamesMap = offsetToPersoNamesMap;
@@ -118,7 +118,16 @@ namespace OpenSpace.Exporter {
                 }
             }
 
-            return new AIModelMetaData(newData.Offset, newData.Map, newData.Name, newData.InitialRule, newData.InitialReflex, newData.DsgVars, newBehaviourNameMap,
+            var initialRules = new List<string>();
+            var initialReflexes = new List<string>();
+
+            initialRules.AddRange(oldData.InitialRules);
+            initialRules.AddRange(newData.InitialRules);
+
+            initialReflexes.AddRange(oldData.InitialReflexes);
+            initialReflexes.AddRange(newData.InitialReflexes);
+
+            return new AIModelMetaData(newData.Offset, newData.Map, newData.Name, initialRules.Distinct().ToArray(), initialReflexes.Distinct().ToArray(), newData.DsgVars, newBehaviourNameMap,
                 newPersoNameMap);
 
         }

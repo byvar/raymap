@@ -80,9 +80,9 @@ namespace OpenSpace.Exporter {
             List<int> transitionToIndicesReflex = new List<int>();
 
             // Apparently hype and TT uses this
-            if (behavior.firstScript != null) {
-                transitionToIndicesNormal.AddRange(GetTransitionToIndicesNormalBehavior(behavior.firstScript));
-                transitionToIndicesReflex.AddRange(GetTransitionToIndicesReflexBehavior(behavior.firstScript));
+            if (behavior.scheduleScript != null) {
+                transitionToIndicesNormal.AddRange(GetTransitionToIndicesNormalBehavior(behavior.scheduleScript));
+                transitionToIndicesReflex.AddRange(GetTransitionToIndicesReflexBehavior(behavior.scheduleScript));
             }
 
             foreach (Script script in behavior.scripts) {
