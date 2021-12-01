@@ -51,10 +51,10 @@ public class MultiTextureManager : MonoBehaviour {
 							vm.currentAnimTexture %= vm.animTextures.Count;
 							vm.animTextures[vm.currentAnimTexture].currentTime += updateCounter * modifier;
 							float time = vm.animTextures[vm.currentAnimTexture].time;
-							if (time <= 0) time = 20f;
+							if (!UnitySettings.IsRaymapGame && time <= 0) time = 20f;
 							while (vm.animTextures[vm.currentAnimTexture].currentTime > time) {
 								time = vm.animTextures[vm.currentAnimTexture].time;
-								if (time <= 0) time = 20f;
+								if (!UnitySettings.IsRaymapGame && time <= 0) time = 20f;
 
 								float rest = vm.animTextures[vm.currentAnimTexture].currentTime - time;
 								vm.animTextures[vm.currentAnimTexture].currentTime = 0;
