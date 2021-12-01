@@ -27,8 +27,8 @@ namespace OpenSpace.PS1 {
 			gao.name = "Sphere " + index;
 			gao.transform.SetParent(parent.transform);
 			MeshRenderer mr = gao.GetComponent<MeshRenderer>();
-			gao.transform.localPosition = new Vector3(x / 256f, z / 256f, y / 256f);
-			gao.transform.localScale = Vector3.one * (radius / 256f) * 2; // default Unity sphere radius is 0.5
+			gao.transform.localPosition = new Vector3(x, z, y) / R2PS1Loader.CoordinateFactor;
+			gao.transform.localScale = Vector3.one * (radius / R2PS1Loader.CoordinateFactor) * 2; // default Unity sphere radius is 0.5
 			gao.layer = LayerMask.NameToLayer("Collide");
 
 			BillboardBehaviour bill = gao.AddComponent<BillboardBehaviour>();

@@ -129,10 +129,7 @@ namespace OpenSpace.PS1 {
 				GeometricObjectCollideVector[] v = vertIndices.Select(vi => vertices[vi]).ToArray();
 				GeometricObjectCollideVector[] n = normalIndices.Select(ni => normals[ni]).ToArray();
 				Mesh m = new Mesh();
-				m.vertices = v.Select(s => new Vector3(
-					s.x / 256f,
-					s.z / 256f,
-					s.y / 256f)).ToArray();
+				m.vertices = v.Select(s => new Vector3(s.x, s.z, s.y) / R2PS1Loader.CoordinateFactor).ToArray();
 				//m.vertices = verts2.ToArray();
 				m.normals = n.Select(s => new Vector3(
 					s.x / (short.MaxValue / 8f),

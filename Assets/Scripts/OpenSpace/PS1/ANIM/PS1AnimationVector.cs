@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,7 @@ namespace OpenSpace.PS1 {
 			z = reader.ReadInt16();
 			vector = GetVector();
 		}
-		public Vector3 GetVector(float factor = 256f, bool switchAxes = true) {
+		public Vector3 GetVector(float factor = R2PS1Loader.CoordinateFactor, bool switchAxes = true) {
 			if (switchAxes) {
 				return new Vector3(x / factor, z / factor, y / factor);
 			} else {

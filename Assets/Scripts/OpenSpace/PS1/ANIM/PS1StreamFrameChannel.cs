@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenSpace.Loader;
+using System;
 using UnityEngine;
 
 namespace OpenSpace.PS1 {
@@ -82,7 +79,7 @@ namespace OpenSpace.PS1 {
 		}
 
 
-		public Vector3 GetPosition(float factor = 256f, bool switchAxes = true) {
+		public Vector3 GetPosition(float factor = R2PS1Loader.CoordinateFactor, bool switchAxes = true) {
 			int x, y, z;
 			if (HasFlag(StreamFlags.IntPosition)) {
 				x = xInt;

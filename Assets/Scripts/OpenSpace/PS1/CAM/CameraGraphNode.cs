@@ -36,7 +36,7 @@ namespace OpenSpace.PS1 {
 			gao.name = $"Camera graph node";
 			MeshRenderer mr = gao.GetComponent<MeshRenderer>();
 			gao.transform.SetParent(parent.transform);
-			gao.transform.position = new Vector3(x / 256f, z / 256f, y / 256f);
+			gao.transform.position = new Vector3(x, z, y) / R2PS1Loader.CoordinateFactor;
 			//gao.transform.localScale = Vector3.one * (type / 256f) * 2; // default Unity sphere radius is 0.5
 			//gao.layer = LayerMask.NameToLayer("Collide");
 

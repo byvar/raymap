@@ -32,8 +32,8 @@ namespace OpenSpace.PS1 {
 			gao.name = "Box " + index + " - " + Offset;
 			gao.transform.SetParent(parent.transform);
 			MeshRenderer mr = gao.GetComponent<MeshRenderer>();
-			Vector3 minVertex = new Vector3(x0 / 256f, z0 / 256f, y0 / 256f);
-			Vector3 maxVertex = new Vector3(x1 / 256f, z1 / 256f, y1 / 256f);
+			Vector3 minVertex = new Vector3(x0, z0, y0) / R2PS1Loader.CoordinateFactor;
+			Vector3 maxVertex = new Vector3(x1, z1, y1) / R2PS1Loader.CoordinateFactor;
 			Vector3 center = Vector3.Lerp(minVertex, maxVertex, 0.5f);
 			gao.transform.localPosition = center;
 			gao.transform.localScale = maxVertex - minVertex;

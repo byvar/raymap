@@ -42,16 +42,16 @@ namespace OpenSpace.PS1 {
 			if ((flags & 0x100) == 0x100) {
 				gao = GameObject.CreatePrimitive(PrimitiveType.Cube);
 				gao.transform.SetParent(parent.transform);
-				Vector3 center = new Vector3(x0 / 256f, z0 / 256f, y0 / 256f);
-				Vector3 scale = new Vector3(x1 / 256f, z1 / 256f, y1 / 256f);
+				Vector3 center = new Vector3(x0, z0, y0) / R2PS1Loader.CoordinateFactor;
+				Vector3 scale = new Vector3(x1, z1, y1) / R2PS1Loader.CoordinateFactor;
 				gao.transform.position = center;
 				gao.transform.localScale = scale * 2f;
 			} else {
 				gao = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 				gao.transform.SetParent(parent.transform);
-				Vector3 center = new Vector3(x0 / 256f, z0 / 256f, y0 / 256f);
+				Vector3 center = new Vector3(x0, z0, y0) / R2PS1Loader.CoordinateFactor;
 				gao.transform.localPosition = center;
-				gao.transform.localScale = Vector3.one * (radius / 256f) * 2; // default Unity sphere radius is 0.5
+				gao.transform.localScale = Vector3.one * (radius / R2PS1Loader.CoordinateFactor) * 2; // default Unity sphere radius is 0.5
 			}
 			gao.name = "CameraModifierVolume - " + Offset;
 			MeshRenderer mr = gao.GetComponent<MeshRenderer>();

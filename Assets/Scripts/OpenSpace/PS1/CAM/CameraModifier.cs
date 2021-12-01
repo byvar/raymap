@@ -94,12 +94,13 @@ namespace OpenSpace.PS1 {
 
 		Vector3 Position {
 			get {
+				var factor = R2PS1Loader.CoordinateFactor;
 				if (type == 6 || type == 9) {
-					return new Vector3(x / 256f, z / 256f, y / 256f);
+					return new Vector3(x, z, y) / factor;
 				} else if (type == 7) {
-					return new Vector3(x_7 / 256f, z_7 / 256f, y_7 / 256f);
+					return new Vector3(x_7, z_7, y_7) / factor;
 				}
-				return new Vector3(x / 256f, z / 256f, y / 256f);
+				return new Vector3(x, z, y) / factor;
 			}
 		}
 

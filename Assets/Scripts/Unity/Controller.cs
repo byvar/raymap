@@ -197,7 +197,7 @@ public class Controller : MonoBehaviour {
         if (ScreenshotAfterLoad!=UnitySettings.ScreenshotAfterLoadSetting.None) {
 			bool hasObjectHighlight = !string.IsNullOrWhiteSpace(HighlightObjectsFilter);
 
-			await CreateScreenshotAfterLoad(hasObjectHighlight);
+			await CreateScreenshotAfterLoad(waitBeforeScreenshot: hasObjectHighlight);
         }
 
 		// Collect searchable strings

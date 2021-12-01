@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -138,17 +139,17 @@ namespace OpenSpace.PS1 {
 
 		public Vector3 GetMinPoint(bool convertAxes = true) {
 			if (convertAxes) {
-				return new Vector3(minX / 256f, minZ / 256f, minY / 256f);
+				return new Vector3(minX, minZ, minY) / R2PS1Loader.CoordinateFactor;
 			} else {
-				return new Vector3(minX / 256f, minY / 256f, minZ / 256f);
+				return new Vector3(minX, minY, minZ) / R2PS1Loader.CoordinateFactor;
 			}
 		}
 
 		public Vector3 GetMaxPoint(bool convertAxes = true) {
 			if (convertAxes) {
-				return new Vector3(maxX / 256f, maxZ / 256f, maxY / 256f);
+				return new Vector3(maxX, maxZ, maxY) / R2PS1Loader.CoordinateFactor;
 			} else {
-				return new Vector3(maxX / 256f, maxY / 256f, maxZ / 256f);
+				return new Vector3(maxX, maxY, maxZ) / R2PS1Loader.CoordinateFactor;
 			}
 		}
 

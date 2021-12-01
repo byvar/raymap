@@ -111,20 +111,14 @@ namespace OpenSpace.PS1 {
 			}
 
 			// Morph
-			Vector3[] mainVertices = vertices.Select(s => new Vector3(
-					s.x / 256f,
-					s.z / 256f,
-					s.y / 256f)).ToArray();
+			Vector3[] mainVertices = vertices.Select(s => new Vector3(s.x, s.z, s.y) / R2PS1Loader.CoordinateFactor).ToArray();
 			Color[] mainColors = vertices.Select(s => new Color(
 					s.r / (float)0x80,
 					s.g / (float)0x80,
 					s.b / (float)0x80,
 					1f)).ToArray();
 			if (morphProgress > 0f && morphObject != null && morphObject.vertices.Length == vertices.Length) {
-				Vector3[] morphVertices = morphObject.vertices.Select(s => new Vector3(
-					s.x / 256f,
-					s.z / 256f,
-					s.y / 256f)).ToArray();
+				Vector3[] morphVertices = morphObject.vertices.Select(s => new Vector3(s.x, s.z, s.y) / R2PS1Loader.CoordinateFactor).ToArray();
 				Color[] morphColors = morphObject.vertices.Select(s => new Color(
 					s.r / (float)0x80,
 					s.g / (float)0x80,
@@ -265,8 +259,8 @@ namespace OpenSpace.PS1 {
                             float scale_x = 1.0f;
                             float scale_y = 1.0f;
 
-                            scale_x = ((float)s.height / 256f) / 2.0f;
-                            scale_y = ((float)s.width / 256f) / 2.0f;
+                            scale_x = ((float)s.height / R2PS1Loader.CoordinateFactor) / 2.0f;
+                            scale_y = ((float)s.width / R2PS1Loader.CoordinateFactor) / 2.0f;
 
 							BoxCollider bc = spr_gao.AddComponent<BoxCollider>();
 							bc.size = new Vector3(0, scale_y * 2, scale_x * 2);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -56,7 +57,7 @@ namespace OpenSpace.PS1 {
 
 		public Matrix Matrix {
 			get {
-				Vector3 pos = new Vector3(x / 256f, y / 256f, z / 256f);
+				Vector3 pos = new Vector3(x, y, z) / R2PS1Loader.CoordinateFactor;
 				Quaternion rot = Quaternion.identity;
 				//Vector3 scale = scaleMatrix != null ? scaleMatrix.GetScale() : Vector3.one;
 				//Loader.print(scale);

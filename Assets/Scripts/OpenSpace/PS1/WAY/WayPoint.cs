@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenSpace.Loader;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,9 +31,9 @@ namespace OpenSpace.PS1 {
 		public WayPointBehaviour GetGameObject() {
 			GameObject gao = new GameObject("WayPoint (" + Offset + ")");
 			//if (perso.Value != null) gao.name += " - Perso: " + perso.Value.Offset;
-			float factor = 100f;
 			Vector3 pos = Position;
-			float radius_conv = radius / factor;
+			//UnityEngine.Debug.Log(Offset + " - " + radius + " - " + short_0C + " - " + short_0E + " - " + short_12);
+			float radius_conv = radius / 100f; // Radius is usually 100, matching PC's default value of 1
 
 			gao.transform.position = pos;
 			WayPointBehaviour wpBehaviour = gao.AddComponent<WayPointBehaviour>();
@@ -43,8 +44,7 @@ namespace OpenSpace.PS1 {
 		}
 		public Vector3 Position {
 			get {
-				float factor = 256f;
-				Vector3 pos = new Vector3(x / factor, z / factor, y / factor);
+				Vector3 pos = new Vector3(x, z, y) / R2PS1Loader.CoordinateFactor;
 				return pos;
 			}
 		}

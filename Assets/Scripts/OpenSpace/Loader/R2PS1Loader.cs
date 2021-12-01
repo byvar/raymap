@@ -26,6 +26,8 @@ namespace OpenSpace.Loader {
 		public PS1Stream[] streams;
 		PS1GameInfo.File.MemoryBlock mainMemoryBlock;
 
+		public const float CoordinateFactor = 100f;
+
 		// Actor
 		public string actor1Name;
 		public string actor2Name;
