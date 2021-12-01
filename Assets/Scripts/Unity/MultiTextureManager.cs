@@ -13,6 +13,7 @@ public class MultiTextureManager : MonoBehaviour {
 	public float animationSpeed = 60f; // Force 60fps w/ frameskip
 	private float updateCounter = 0f;
 	public List<MultiTextureMaterial> materials = new List<MultiTextureMaterial>();
+	public const float defaultTime = 20f;
 
 	public void Update() {
 		if(cont.playTextureAnimations) {
@@ -51,10 +52,10 @@ public class MultiTextureManager : MonoBehaviour {
 							vm.currentAnimTexture %= vm.animTextures.Count;
 							vm.animTextures[vm.currentAnimTexture].currentTime += updateCounter * modifier;
 							float time = vm.animTextures[vm.currentAnimTexture].time;
-							if (!UnitySettings.IsRaymapGame && time <= 0) time = 20f;
+							if (!UnitySettings.IsRaymapGame && time <= 0) time = defaultTime;
 							while (vm.animTextures[vm.currentAnimTexture].currentTime > time) {
 								time = vm.animTextures[vm.currentAnimTexture].time;
-								if (!UnitySettings.IsRaymapGame && time <= 0) time = 20f;
+								if (!UnitySettings.IsRaymapGame && time <= 0) time = defaultTime;
 
 								float rest = vm.animTextures[vm.currentAnimTexture].currentTime - time;
 								vm.animTextures[vm.currentAnimTexture].currentTime = 0;

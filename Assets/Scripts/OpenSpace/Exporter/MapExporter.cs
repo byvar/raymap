@@ -484,7 +484,7 @@ namespace OpenSpace.Exporter {
                 }
 
                 if (aiModel.macros != null) {
-                    int i = 0;
+                    //int i = 0;
                     foreach (var m in aiModel.macros) {
 
                         var script = m.script;
@@ -584,7 +584,7 @@ namespace OpenSpace.Exporter {
 
                 var dictionary = new Dictionary<string, string>();
 
-                int entryIndex = 0;
+                //int entryIndex = 0;
                 if (textTable.entries != null) {
                     for (int i=0;i<textTable.entries.Length;i++) {
                         dictionary.Add(loader.localization.GenerateReadableHandle(i), EscapeStringForCSharp(textTable.entries[i]));

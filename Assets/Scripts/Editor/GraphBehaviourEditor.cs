@@ -14,7 +14,7 @@ public class GraphBehaviourEditor : Editor {
         GraphBehaviour graphBehaviour = (GraphBehaviour)target;
 
         if (GUILayout.Button("Copy offsets to Cheat Engine table")) {
-            string text = "";
+            //string text = "";
 
             CETableBuilder cb = new CETableBuilder();
 

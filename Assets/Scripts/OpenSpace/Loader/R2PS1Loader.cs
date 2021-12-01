@@ -1,31 +1,18 @@
-﻿using OpenSpace.AI;
-using OpenSpace.Animation;
-using OpenSpace.Collide;
-using OpenSpace.Object;
-using OpenSpace.FileFormat;
+﻿using OpenSpace.FileFormat;
 using OpenSpace.FileFormat.Texture;
-using OpenSpace.Input;
-using OpenSpace.Text;
-using OpenSpace.Visual;
-using OpenSpace.Waypoints;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using OpenSpace.Object.Properties;
-using System.Collections;
-using System.Text.RegularExpressions;
 using lzo.net;
 using System.IO.Compression;
-using System.Threading.Tasks;
 using OpenSpace.PS1;
 using OpenSpace.PS1.GLI;
-using System.Text;
 using Cysharp.Threading.Tasks;
 
 namespace OpenSpace.Loader {
-    public class R2PS1Loader : MapLoader {
+	public class R2PS1Loader : MapLoader {
 		public int CurrentLevel { get; private set; } = -1;
 		public PS1VRAM vram = new PS1VRAM();
 		public LevelHeader levelHeader;

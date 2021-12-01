@@ -1,15 +1,9 @@
 ﻿using ModelExport.R3.SkinnedAnimatedMeshesExporting.Model;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ModelExport.R3.SkinnedAnimatedMeshesExporting
-{
-    public class ObjectsExportLibraryInterface
+namespace ModelExport.R3.SkinnedAnimatedMeshesExporting {
+	public class ObjectsExportLibraryInterface
     {
         public static void AddR3AnimatedMeshToLibrary(ExportableModel r3AnimatedMesh)
         {

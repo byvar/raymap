@@ -16,8 +16,8 @@ public class PersoBehaviourEditor : Editor {
 	TreeViewState treeviewStateTransitionsState;
 	MultiColumnHeaderState m_MultiColumnHeaderState;
 
-    private int initialRule = -1;
-    private int initialReflex = -1;
+    //private int initialRule = -1;
+    //private int initialReflex = -1;
 
 	public override void OnInspectorGUI() {
         DrawDefaultInspector();
