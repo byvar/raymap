@@ -192,20 +192,36 @@ public class Controller : MonoBehaviour {
             Application.Quit();
         }
 
-        if (!string.IsNullOrWhiteSpace(HighlightObjectsFilter)) {
+		ApplyHighlightObjectsFilter();
 
-            int count = 0;
+        if (ScreenshotAfterLoad!=UnitySettings.ScreenshotAfterLoadSetting.None) {
+			bool hasObjectHighlight = !string.IsNullOrWhiteSpace(HighlightObjectsFilter);
 
-            foreach (var p in persos) {
+			await CreateScreenshotAfterLoad(hasObjectHighlight);
+        }
 
-                int itemCount = 1;
-                bool passesFilter = string.Equals(HighlightObjectsFilter, "*");
+		// Collect searchable strings
+		if (Application.platform != RuntimePlatform.WebGLPlayer) {
+			loader.searchableStrings.AddRange(loader.persos.SelectMany(p => p.GetSearchableStrings()));
+		}
 
-                if (string.Equals(HighlightObjectsFilter, "$redlums")) {
+    }
 
-                    DsgMem dsgMem = p.perso?.brain?.mind?.dsgMem;
+	private void ApplyHighlightObjectsFilter() {
+		if (!string.IsNullOrWhiteSpace(HighlightObjectsFilter)) {
 
-                    // Red lums:
+			int count = 0;
+
+			foreach (var p in persos) {
+
+				int itemCount = 1;
+				bool passesFilter = string.Equals(HighlightObjectsFilter, "*");
+
+				if (string.Equals(HighlightObjectsFilter, "$redlums")) {
+
+					DsgMem dsgMem = p.perso?.brain?.mind?.dsgMem;
+
+					// Red lums:
 					// CHR_lums_basic (dsgVar_0, 0 = red lums, 1 = yellow lums (including big lusm), 2 = ?, 3+4 = blue lums, 
 					// Alw_Lums_Model (dsgVar_0, 0 = red lums, 1 = yellow lums (including big lusm), 2 = ?, 3+4 = blue lums, 
 					// ARG_SerieRouge
@@ -221,88 +237,88 @@ public class Controller : MonoBehaviour {
 					// FRH_Sbire_Gnak -> CB31 = invincible -> depending on CB30 + DsgVar_2: 0->2 lums, !0->3 lums 
 					// ARG_CageLums -> doesnt spawn red lums, lums activated by a different object
 
-                    bool invincible = (p.perso.stdGame.customBits & 1 << 30) != 0; // 31 is 1-based, 30 = 0-based
+					bool invincible = (p.perso.stdGame.customBits & 1 << 30) != 0; // 31 is 1-based, 30 = 0-based
 
 					if (p.NameModel.ToLower() == "chr_lums_basic") {
 
-                        if (dsgMem != null) {
-                            int value_0 = dsgMem.values[0].valueInt;
-                            if (value_0 == 0) {
+						if (dsgMem != null) {
+							int value_0 = dsgMem.values[0].valueInt;
+							if (value_0 == 0) {
 								passesFilter = true;
-                                itemCount = 1;
-
-                                p.stateIndex = 2;
-							}
-                        }
-
-
-                    } else if (p.NameModel.ToLower() == "alw_lums_model") {
-
-                        if (dsgMem != null) {
-                            byte value_0 = dsgMem.values[0].valueUByte;
-                            if (value_0 == 0) {
-                                passesFilter = true;
 								itemCount = 1;
 
-                                p.stateIndex = 2;
+								p.stateIndex = 2;
 							}
-                        }
+						}
+
+
+					} else if (p.NameModel.ToLower() == "alw_lums_model") {
+
+						if (dsgMem != null) {
+							byte value_0 = dsgMem.values[0].valueUByte;
+							if (value_0 == 0) {
+								passesFilter = true;
+								itemCount = 1;
+
+								p.stateIndex = 2;
+							}
+						}
 
 
 					} else if (p.NameModel.ToLower() == "arg_serierouge") {
-                        passesFilter = true;
+						passesFilter = true;
 
-                        p.stateIndex = 2;
+						p.stateIndex = 2;
 					} else if (p.NameModel.ToLower() == "mic_sbireninja") {
-                        passesFilter = true;
-                        itemCount = 5;
+						passesFilter = true;
+						itemCount = 5;
 					} else if (p.NameModel.ToLower() == "sun_clarky") {
-                        passesFilter = true;
-                        itemCount = 5;
+						passesFilter = true;
+						itemCount = 5;
 					} else if (p.NameModel.ToLower() == "sun_fayagwod") {
-                        passesFilter = true;
-                        itemCount = 7;
+						passesFilter = true;
+						itemCount = 7;
 					} else if (p.NameModel.ToLower() == "xap_tonogear_light" || p.NameModel.ToLower() == "stn_tonogear") {
-                        passesFilter = true;
-                        itemCount = 3;
+						passesFilter = true;
+						itemCount = 3;
 					} else if (p.NameModel.ToLower() == "arg_araignee") {
-                        passesFilter = true;
-                        itemCount = 1;
+						passesFilter = true;
+						itemCount = 1;
 					} else if (p.NameModel.ToLower() == "arg_simplesbire" || p.NameModel.ToLower() == "old_sbire_shoot_sol") {
-                        passesFilter = !invincible;
-                        itemCount = 1;
+						passesFilter = !invincible;
+						itemCount = 1;
 					} else if (p.NameModel.ToLower() == "old_sbire_alarme") {
-                        // OLD_SBIRE_alarme (depends on custombits (excludes cb30) dsgvar_1: 0->3, 1->2, 2->4)
+						// OLD_SBIRE_alarme (depends on custombits (excludes cb30) dsgvar_1: 0->3, 1->2, 2->4)
 						passesFilter = !invincible;
 
-                        if (dsgMem != null) {
-                            byte value_1 = dsgMem.values[1].valueUByte;
-                            switch (value_1) {
-                                case 0:
-                                    itemCount = 3;
-                                    break;
-                                case 1:
-                                    itemCount = 2;
-                                    break;
-                                case 2:
-                                    itemCount = 4;
-                                    break;
-                            }
-                        }
+						if (dsgMem != null) {
+							byte value_1 = dsgMem.values[1].valueUByte;
+							switch (value_1) {
+								case 0:
+									itemCount = 3;
+									break;
+								case 1:
+									itemCount = 2;
+									break;
+								case 2:
+									itemCount = 4;
+									break;
+							}
+						}
 
 					} else if (p.NameModel.ToLower() == "frh_sbire_gnak") {
-                        // FRH_Sbire_Gnak -> CB31 = invincible -> depending on CB30 + DsgVar_2: 0->2 lums, !0->3 lums 
+						// FRH_Sbire_Gnak -> CB31 = invincible -> depending on CB30 + DsgVar_2: 0->2 lums, !0->3 lums 
 						passesFilter = !invincible;
 
-                        if (dsgMem != null) {
-                            int value_2 = dsgMem.values[2].valueInt;
+						if (dsgMem != null) {
+							int value_2 = dsgMem.values[2].valueInt;
 							itemCount = value_2 == 0 ? 2 : 3;
 						}
-                    }
+					}
 
-                    if (passesFilter && p.NameModel.ToLower()!="chr_lums_basic"&& p.NameModel.ToLower() != "arg_serierouge" && p.NameModel.ToLower() != "alw_lums_model") {
+					if (passesFilter && p.NameModel.ToLower() != "chr_lums_basic" && p.NameModel.ToLower() != "arg_serierouge" && p.NameModel.ToLower() != "alw_lums_model") {
 
-                        p.stateIndex = 0;
+						p.stateIndex = 0;
 					}
 
 				} else if (string.Equals(HighlightObjectsFilter, "$yellowlums")) {
@@ -313,18 +329,18 @@ public class Controller : MonoBehaviour {
 
 						if (dsgMem != null) {
 							int lumType = dsgMem.values[0].valueInt;
-                            bool isBigLum = dsgMem.values[4].valueBool;
+							bool isBigLum = dsgMem.values[4].valueBool;
 
 							if (lumType == 1) {
 								passesFilter = true;
 								itemCount = 1;
 
-                                p.stateIndex = 4;
+								p.stateIndex = 4;
 
-                                if (isBigLum) {
-                                    p.stateIndex = 13;
-                                    itemCount = 5;
-                                }
+								if (isBigLum) {
+									p.stateIndex = 13;
+									itemCount = 5;
+								}
 							}
 						}
 
@@ -333,102 +349,83 @@ public class Controller : MonoBehaviour {
 
 						if (dsgMem != null) {
 							byte lumType = dsgMem.values[0].valueUByte;
-                            bool isBigLum = dsgMem.values[4].valueBool;
+							bool isBigLum = dsgMem.values[4].valueBool;
 							if (lumType == 1) {
 								passesFilter = true;
 								itemCount = 1;
 
 								p.stateIndex = 4;
 
-                                if (isBigLum) {
-                                    p.stateIndex = 13;
+								if (isBigLum) {
+									p.stateIndex = 13;
 									itemCount = 5;
-                                }
+								}
 							}
 						}
 
 
 					} else if (p.NameModel.ToLower() == "arg_cagelums") {
 
-                        if (dsgMem != null) {
-                            passesFilter = true;
-                            itemCount = dsgMem.values[4].valueInt;
+						if (dsgMem != null) {
+							passesFilter = true;
+							itemCount = dsgMem.values[4].valueInt;
 						}
 					}
 
-                } else {
+				} else {
 
 					foreach (var fi in HighlightObjectsFilter.Split(',')) {
-                        if (string.Equals(p.NameFamily, fi, StringComparison.CurrentCultureIgnoreCase) ||
-                            string.Equals(p.NameModel, fi, StringComparison.CurrentCultureIgnoreCase)) {
-                            passesFilter = true;
-                        }
-                    }
+						if (string.Equals(p.NameFamily, fi, StringComparison.CurrentCultureIgnoreCase) ||
+							string.Equals(p.NameModel, fi, StringComparison.CurrentCultureIgnoreCase)) {
+							passesFilter = true;
+						}
+					}
 
-                }
+				}
 
-                if (passesFilter) {
+				if (passesFilter) {
 
-                    count+=itemCount;
+					count += itemCount;
 
-                    var highlightTextParentGao = new GameObject("HighlightTextParent");
-                    highlightTextParentGao.transform.SetParent(p.gameObject.transform, false);
+					var highlightTextParentGao = new GameObject("HighlightTextParent");
+					highlightTextParentGao.transform.SetParent(p.gameObject.transform, false);
 					var textComponent = Instantiate(ScreenshotHighlightTextPrefab);
-                    textComponent.gameObject.transform.SetParent(highlightTextParentGao.transform, false);
+					textComponent.gameObject.transform.SetParent(highlightTextParentGao.transform, false);
 
-                    string text = HighlightObjectsTextFormat;
-                    text = text.Replace("\\n", Environment.NewLine);
-                    text = text.Replace("$f", p.NameFamily);
+					string text = HighlightObjectsTextFormat;
+					text = text.Replace("\\n", Environment.NewLine);
+					text = text.Replace("$f", p.NameFamily);
 					text = text.Replace("$m", p.NameModel);
 					text = text.Replace("$i", p.NameInstance);
 					text = text.Replace("$c", count.ToString());
 					text = text.Replace("$_c", itemCount.ToString());
 
-                    textComponent.text = text;
+					textComponent.text = text;
 
-                    BillboardBehaviour b = highlightTextParentGao.AddComponent<BillboardBehaviour>();
-                    b.mode = BillboardBehaviour.LookAtMode.ViewRotation;
+					BillboardBehaviour b = highlightTextParentGao.AddComponent<BillboardBehaviour>();
+					b.mode = BillboardBehaviour.LookAtMode.ViewRotation;
 
-                    textComponent.transform.localRotation = Quaternion.Euler(0, -90, 0);
+					textComponent.transform.localRotation = Quaternion.Euler(0, -90, 0);
 
-                    BillboardBehaviour billboardPerso = p.gameObject.AddComponent<BillboardBehaviour>();
-                    billboardPerso.mode = BillboardBehaviour.LookAtMode.ViewRotation;
-                    billboardPerso.scaleMode = BillboardBehaviour.ScaleMode.KeepSize;
-                    billboardPerso.RotationOffset = Quaternion.Euler(0, -90, 0);
+					BillboardBehaviour billboardPerso = p.gameObject.AddComponent<BillboardBehaviour>();
+					billboardPerso.mode = BillboardBehaviour.LookAtMode.ViewRotation;
+					billboardPerso.scaleMode = BillboardBehaviour.ScaleMode.KeepSize;
+					billboardPerso.RotationOffset = Quaternion.Euler(0, -90, 0);
 					billboardPerso.ScaleMultiplier = 1.0f / 15.0f;
 
-                    if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.None) {
-                        LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("HighlightAlwaysOnTop"));
-                    } else {
-                        LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("Default"));
-                        LayerUtil.SetLayerRecursive(highlightTextParentGao, LayerMask.NameToLayer("Default"));
+					if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.None) {
+						LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("HighlightAlwaysOnTop"));
+					} else {
+						LayerUtil.SetLayerRecursive(p.gameObject, LayerMask.NameToLayer("Default"));
+						LayerUtil.SetLayerRecursive(highlightTextParentGao, LayerMask.NameToLayer("Default"));
 						billboardPerso.ForceCloseToOrthoCamera = true;
-                    }
-                }
-            }
-        }
-
-        if (ScreenshotAfterLoad!=UnitySettings.ScreenshotAfterLoadSetting.None) {
-
-            CreateScreenshotAfterLoad(false);
-
-			IEnumerator ScreenshotCoroutine()
-            {
-                yield return new WaitForSeconds(1);
-                CreateScreenshotAfterLoad(true);
+					}
+				}
 			}
-
-            StartCoroutine(ScreenshotCoroutine());
-        }
-
-		// Collect searchable strings
-		if (Application.platform != RuntimePlatform.WebGLPlayer) {
-			loader.searchableStrings.AddRange(loader.persos.SelectMany(p => p.GetSearchableStrings()));
 		}
+	}
 
-    }
-
-    private async Task CreateScreenshotAfterLoad(bool save)
+    private async UniTask CreateScreenshotAfterLoad(bool waitBeforeScreenshot = false)
     {
         Resolution res = TransparencyCaptureBehaviour.GetCurrentResolution();
         System.DateTime dateTime = System.DateTime.Now;
@@ -465,14 +462,14 @@ public class Controller : MonoBehaviour {
 
             Camera.main.orthographicSize = (worldSize.z > worldSize.x ? worldSize.z : worldSize.x) * 0.5f;
 
-            if (save) {
-                screenshotBytes =
-                    await pb.Capture((int) (res.width * ScreenshotScale), (int) (res.height * ScreenshotScale), true);
-                OpenSpace.Util.ByteArrayToFile(
-                    UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" +
-                    dateTime.ToString("yyyy_MM_dd HH_mm_ss") +
-                    ".png", screenshotBytes);
-            }
+			if(waitBeforeScreenshot) await UniTask.Delay(200);
+
+            screenshotBytes =
+                await pb.Capture((int) (res.width * ScreenshotScale), (int) (res.height * ScreenshotScale), true);
+            OpenSpace.Util.ByteArrayToFile(
+                UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_top_" +
+                dateTime.ToString("yyyy_MM_dd HH_mm_ss") +
+                ".png", screenshotBytes);
         }
 
         if (ScreenshotAfterLoad == UnitySettings.ScreenshotAfterLoadSetting.TopDownAndOrthographic ||
@@ -485,21 +482,19 @@ public class Controller : MonoBehaviour {
 
                 Camera.main.orthographicSize = (worldSize.x + worldSize.y + worldSize.z) / 6.0f;
 
-                if (save) {
-                    screenshotBytes = await pb.Capture((int) (res.width * ScreenshotScale),
-                        (int) (res.height * ScreenshotScale), true);
-                    OpenSpace.Util.ByteArrayToFile(
-                        UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i +
-                        dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
-                }
+				if (waitBeforeScreenshot) await UniTask.Delay(200);
+
+				screenshotBytes = await pb.Capture((int) (res.width * ScreenshotScale),
+                    (int) (res.height * ScreenshotScale), true);
+                OpenSpace.Util.ByteArrayToFile(
+                    UnitySettings.ScreenshotPath + "/" + loader.lvlName + "_iso_" + i +
+                    dateTime.ToString("yyyy_MM_dd HH_mm_ss") + ".png", screenshotBytes);
             }
         }
 
         Destroy(pb.gameObject);
 
-        if (save) {
-            Application.Quit();
-        }
+        Application.Quit();
     }
 
     // Update is called once per frame

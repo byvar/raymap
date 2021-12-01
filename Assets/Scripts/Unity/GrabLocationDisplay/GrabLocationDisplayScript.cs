@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class GrabLocationDisplayScript : MonoBehaviour
 {
-    GameObject raymanGAO = null;
+    //GameObject raymanGAO = null;
     public GameObject GaoDsgVar38;
     public GameObject GaoDsgVar40;
 
