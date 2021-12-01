@@ -33,7 +33,7 @@ namespace OpenSpace.PS1 {
 			//if (perso.Value != null) gao.name += " - Perso: " + perso.Value.Offset;
 			Vector3 pos = Position;
 			//UnityEngine.Debug.Log(Offset + " - " + radius + " - " + short_0C + " - " + short_0E + " - " + short_12);
-			float radius_conv = radius / 100f; // Radius is usually 100, matching PC's default value of 1
+			float radius_conv = radius / 100f * (256f/R2PS1Loader.CoordinateFactor); // Radius is usually 100, matching PC's default value of 1
 
 			gao.transform.position = pos;
 			WayPointBehaviour wpBehaviour = gao.AddComponent<WayPointBehaviour>();

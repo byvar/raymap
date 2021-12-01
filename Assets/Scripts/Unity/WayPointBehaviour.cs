@@ -121,11 +121,15 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
     }
 
     void CreateMesh() {
+        float defaultRadius = 1f;
+        if (wpPS1 != null) {
+            defaultRadius = (256f / OpenSpace.Loader.R2PS1Loader.CoordinateFactor);
+        }
         MeshFilter mf = gameObject.AddComponent<MeshFilter>();
         MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
         Material unityMat = Resources.Load("Material_WP") as Material;
         SphereCollider sc = gameObject.AddComponent<SphereCollider>();
-        sc.radius = radius > 1f ? radius : 1f;
+        sc.radius = radius > defaultRadius ? radius : defaultRadius;
         mr.material = unityMat;
         Mesh meshUnity = new Mesh();
         Vector3[] vertices = new Vector3[4];
@@ -154,7 +158,7 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
         mf.mesh = meshUnity;
 
 
-        if (radius > 1) {
+        if (radius > defaultRadius) {
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.transform.localScale = new Vector3(radius * 2, radius * 2, radius * 2);
             sphere.transform.parent = transform;
