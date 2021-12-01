@@ -83,9 +83,9 @@ namespace OpenSpace.Object {
                 }
 
                 if (parent != null && parent.Gao != null) Gao.transform.parent = parent.Gao.transform;
-                Gao.transform.localPosition = pos;
-                Gao.transform.localRotation = rot;
-                Gao.transform.localScale = scale;
+                if (pos.IsValid()) Gao.transform.localPosition = pos;
+                if (rot.IsValid()) Gao.transform.localRotation = rot;
+                if (scale.IsValid()) Gao.transform.localScale = scale;
                 if (boundingVolumeTT != null) {
                     boundingVolumeTT.Gao.transform.SetParent(Gao.transform);
                     boundingVolumeTT.Gao.transform.localPosition = Vector3.zero;

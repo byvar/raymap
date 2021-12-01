@@ -40,6 +40,9 @@ namespace OpenSpace.AI {
         public void Write(Writer writer) {
             Pointer.Goto(ref writer, Offset + 8);
             Pointer.Write(writer, off_comport);
+
+            Pointer.Goto(ref writer, Offset + 20);
+            Pointer.Write(writer, off_defaultComport);
         }
     }
 }

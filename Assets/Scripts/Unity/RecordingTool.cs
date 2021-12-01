@@ -173,9 +173,13 @@ public class RecordingTool : MonoBehaviour
 
                 var gao = spo.data.Gao;
 
-                gao.transform.position = spo.matrix.GetPosition(convertAxes: true);
-                gao.transform.rotation = spo.matrix.GetRotation(convertAxes: true);
-                gao.transform.localScale = spo.matrix.GetScale(convertAxes: true);
+                var pos = spo.matrix.GetPosition(convertAxes: true);
+                var rot = spo.matrix.GetRotation(convertAxes: true);
+                var scale = spo.matrix.GetScale(convertAxes: true);
+
+                if (pos.IsValid()) gao.transform.position = pos;
+                if (rot.IsValid()) gao.transform.rotation = rot;
+                if (scale.IsValid()) gao.transform.localScale = scale;
 
                 var perso = pb.perso;
 
