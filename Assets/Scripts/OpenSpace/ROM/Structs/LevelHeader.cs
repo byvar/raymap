@@ -48,12 +48,12 @@ namespace OpenSpace.ROM {
 			ref_144 = reader.ReadUInt16();
 			ref_143 = reader.ReadUInt16();
 			unk6 = reader.ReadUInt16();
-			if (Settings.s.platform == Settings.Platform._3DS || Settings.s.game == Settings.Game.RRR) {
+			if (Settings.s.platform == Settings.Platform._3DS || (Settings.s.game == Settings.Game.RRR && Settings.s.mode != Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25)) {
 				unk7_3dsOnly = reader.ReadUInt16();
 			}
 			length_46 = reader.ReadUInt16();
 			num_spawnablepersos = reader.ReadUInt16();
-			if (Settings.s.platform == Settings.Platform._3DS || Settings.s.game == Settings.Game.RRR) {
+			if (Settings.s.platform == Settings.Platform._3DS || (Settings.s.game == Settings.Game.RRR && Settings.s.mode != Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25)) {
 				unk10_3dsOnly = reader.ReadUInt16();
 			}
 			unk11 = reader.ReadUInt16();
