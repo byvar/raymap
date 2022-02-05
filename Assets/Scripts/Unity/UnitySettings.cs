@@ -17,8 +17,23 @@ public class UnitySettings {
 	private const string settingsFile = "Settings.txt";
 	public static bool IsRaymapGame { get; set; } = false;
 
-	public static Dictionary<Settings.Mode, string> GameDirs = new Dictionary<Settings.Mode, string>();
-	public static Dictionary<Settings.Mode, string> GameDirsWeb = new Dictionary<Settings.Mode, string>();
+	public static Dictionary<Settings.Mode, string> GameDirectories = new Dictionary<Settings.Mode, string>();
+	public static Dictionary<Settings.Mode, string> GameDirectoriesWeb = new Dictionary<Settings.Mode, string>();
+
+    /// <summary>
+    /// Serialization log file
+    /// </summary>
+    public static string LogFile { get; set; }
+
+    /// <summary>
+    /// Whether to log to the serialization log file
+    /// </summary>
+    public static bool Log { get; set; }
+
+    /// <summary>
+    /// Indicates if .BAK backup files should be created before writing
+    /// </summary>
+    public static bool BackupFiles { get; set; }
 
     /// <summary>
     /// Gets the current directory based on the selected mode
@@ -26,9 +41,9 @@ public class UnitySettings {
     public static string CurrentDirectory {
         get {
             if (FileSystem.mode == FileSystem.Mode.Web) {
-                return GameDirsWeb.TryGetValue(GameMode, out string value) ? value : String.Empty;
+                return GameDirectoriesWeb.TryGetValue(GameMode, out string value) ? value : String.Empty;
             } else {
-                return GameDirs.TryGetValue(GameMode, out string value) ? value : String.Empty;
+                return GameDirectories.TryGetValue(GameMode, out string value) ? value : String.Empty;
             }
         }
     }
@@ -85,13 +100,13 @@ public class UnitySettings {
         if (!cmdLine) {
             Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
             foreach (Settings.Mode mode in modes) {
-                string dir = GameDirs.ContainsKey(mode) ? GameDirs[mode] : "";
-                GameDirs[mode] = s.SerializeString("Directory" + mode.ToString(), dir);
+                string dir = GameDirectories.ContainsKey(mode) ? GameDirectories[mode] : "";
+                GameDirectories[mode] = s.SerializeString("Directory" + mode.ToString(), dir);
             }
             if (UnityEngine.Application.isEditor) {
                 foreach (Settings.Mode mode in modes) {
-                    string dir = GameDirsWeb.ContainsKey(mode) ? GameDirsWeb[mode] : "";
-                    GameDirsWeb[mode] = s.SerializeString("WebDirectory" + mode.ToString(), dir);
+                    string dir = GameDirectoriesWeb.ContainsKey(mode) ? GameDirectoriesWeb[mode] : "";
+                    GameDirectoriesWeb[mode] = s.SerializeString("WebDirectory" + mode.ToString(), dir);
                 }
             }
         }
@@ -102,11 +117,11 @@ public class UnitySettings {
                 GameMode = Settings.cmdModeNameDict[modeString];
             }
             if (FileSystem.mode == FileSystem.Mode.Web) {
-                string dir = GameDirsWeb.ContainsKey(GameMode) ? GameDirsWeb[GameMode] : "";
-                GameDirsWeb[GameMode] = s.SerializeString("WebDirectory", dir, "dir", "directory", "folder", "f", "d");
+                string dir = GameDirectoriesWeb.ContainsKey(GameMode) ? GameDirectoriesWeb[GameMode] : "";
+                GameDirectoriesWeb[GameMode] = s.SerializeString("WebDirectory", dir, "dir", "directory", "folder", "f", "d");
             } else {
-                string dir = GameDirs.ContainsKey(GameMode) ? GameDirs[GameMode] : "";
-                GameDirs[GameMode] = s.SerializeString("Directory", dir, "dir", "directory", "folder", "f", "d");
+                string dir = GameDirectories.ContainsKey(GameMode) ? GameDirectories[GameMode] : "";
+                GameDirectories[GameMode] = s.SerializeString("Directory", dir, "dir", "directory", "folder", "f", "d");
             }
         }
         MapName = s.SerializeString("MapName", MapName, "level", "lvl", "map");

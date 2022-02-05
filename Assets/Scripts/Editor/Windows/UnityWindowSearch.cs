@@ -14,10 +14,8 @@ public class UnityWindowSearch : UnityWindow {
 
     public string SearchString = "";
     public List<SearchableString> Results = null;
-
-
-    private float totalyPos = 0f;
-    private Vector2 scrollPosition = Vector2.zero;
+    private float sub_totalYPos = 0f;
+    private Vector2 sub_scrollPosition = Vector2.zero;
 
     [MenuItem("Raymap/Search variables and scripts")]
 	public static void ShowWindow() {
@@ -28,14 +26,13 @@ public class UnityWindowSearch : UnityWindow {
         titleContent.text = "Text Search";
     }
 
-    public void OnGUI() {
+	protected override void UpdateEditorFields() {
 
         if (!EditorApplication.isPlaying || Settings.s == null) {
             Results = null;
         }
         if (EditorApplication.isPlaying && Settings.s != null) {
-            float yPos = 0f;
-            Rect rect = GetNextRect(ref yPos);
+            Rect rect = GetNextRect(ref YPos);
             string newSearchString = EditorGUI.TextField(rect, SearchString, EditorStyles.toolbarSearchField);
             if (newSearchString != SearchString || Results == null) {
                 SearchString = newSearchString;
@@ -43,12 +40,13 @@ public class UnityWindowSearch : UnityWindow {
                 Results = Search(newSearchString);
             }
 
-            float height = position.height - yPos;
-            if (totalyPos == 0f) totalyPos = height;
-            scrollbarShown = totalyPos > height;
-            scrollPosition = GUI.BeginScrollView(new Rect(0, yPos, EditorGUIUtility.currentViewWidth, height), scrollPosition, new Rect(0, 0, EditorGUIUtility.currentViewWidth - (scrollbarShown ? scrollbarWidth : 0f), totalyPos));
+            float height = position.height - YPos;
 
-            yPos = 0f;
+            if (sub_totalYPos == 0f) sub_totalYPos = height;
+            scrollbarShown = sub_totalYPos > height;
+            sub_scrollPosition = GUI.BeginScrollView(new Rect(0, YPos, EditorGUIUtility.currentViewWidth, height), sub_scrollPosition, new Rect(0, 0, EditorGUIUtility.currentViewWidth - (scrollbarShown ? scrollbarWidth : 0f), sub_totalYPos));
+
+            float yPos = 0f;
             Results.ForEach(s => {
                 rect = GetNextRect(ref yPos);
                 GUI.Label(rect, s.String);
@@ -61,7 +59,7 @@ public class UnityWindowSearch : UnityWindow {
                     EditorGUIUtility.PingObject(s.RelatedGameObject);
                 }
             });
-            totalyPos = yPos;
+            sub_totalYPos = yPos;
             GUI.EndScrollView();
         } else {
             EditorGUILayout.HelpBox("Please start the scene to use this window.", MessageType.Info);

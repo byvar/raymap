@@ -19,28 +19,23 @@ public class UnityWindowSettings : UnityWindow {
 		titleContent = EditorGUIUtility.IconContent("Settings");
 		titleContent.text = "Settings";
 	}
-	public void OnGUI() {
+
+	protected override void UpdateEditorFields() {
 		FileSystem.Mode fileMode = FileSystem.Mode.Normal;
 		if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL) {
 			fileMode = FileSystem.Mode.Web;
 		}
 
 		// Increase label width due to it being cut off otherwise
-		EditorGUIUtility.labelWidth = 195;
-
-		float yPos = 0f;
-
-		if (totalyPos == 0f) totalyPos = position.height;
-		scrollbarShown = totalyPos > position.height;
-		scrollPosition = GUI.BeginScrollView(new Rect(0, 0, EditorGUIUtility.currentViewWidth, position.height), scrollPosition, new Rect(0, 0, EditorGUIUtility.currentViewWidth - (scrollbarShown ? scrollbarWidth : 0f), totalyPos));
+		EditorGUIUtility.labelWidth = 192;
 
 		EditorGUI.BeginChangeCheck();
 		// Game Mode
-		DrawHeader(ref yPos, "Mode");
-		UnitySettings.GameMode = (Settings.Mode)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Game"), UnitySettings.GameMode);
+		DrawHeader(ref YPos, "Mode");
+		UnitySettings.GameMode = (Settings.Mode)EditorGUI.EnumPopup(GetNextRect(ref YPos), new GUIContent("Game"), UnitySettings.GameMode);
 
 		// Scene file
-		DrawHeader(ref yPos, "Map");
+		DrawHeader(ref YPos, "Map");
 
 		string buttonString = "No map selected";
 		if (!string.IsNullOrEmpty(UnitySettings.MapName)) {
@@ -49,11 +44,11 @@ public class UnityWindowSettings : UnityWindow {
 				buttonString = Settings.settingsDict[UnitySettings.GameMode].levelTranslation.Translate(UnitySettings.MapName);
 			}
 		}
-		Rect rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
+		Rect rect = GetNextRect(ref YPos, vPaddingBottom: 4f);
 		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Map name"));
 		if (fileMode == FileSystem.Mode.Web) {
 			UnitySettings.MapName = EditorGUI.TextField(rect, UnitySettings.MapName);
-			EditorGUI.HelpBox(GetNextRect(ref yPos, height: 40f), "Your build target is configured as WebGL. Raymap will attempt to load from the server. Make sure the caps in the map name are correct.", MessageType.Warning);
+			EditorGUI.HelpBox(GetNextRect(ref YPos, height: 40f), "Your build target is configured as WebGL. Raymap will attempt to load from the server. Make sure the caps in the map name are correct.", MessageType.Warning);
 		} else {
 
 			EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
@@ -90,7 +85,7 @@ public class UnityWindowSettings : UnityWindow {
 				int mapIndex = Array.IndexOf(game.maps.Select(s => s.ToLower()).ToArray(), UnitySettings.MapName.ToLower());
 				if (mapIndex != -1 && game.files.FirstOrDefault(f => f.type == OpenSpace.PS1.PS1GameInfo.File.Type.Map).memoryBlocks[mapIndex].isActorSelectable) {
 					if (game.actors?.Where(a => a.isSelectable && a.isSelectableActor1).Count() > 0) {
-						rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
+						rect = GetNextRect(ref YPos, vPaddingBottom: 4f);
 						rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 1"));
 						buttonString = "No actor selected";
 						if (!string.IsNullOrEmpty(UnitySettings.Actor1Name)) {
@@ -117,7 +112,7 @@ public class UnityWindowSettings : UnityWindow {
 						}
 					}
 					if (game.actors?.Where(a => a.isSelectable && a.isSelectableActor2).Count() > 0) {
-						rect = GetNextRect(ref yPos, vPaddingBottom: 4f);
+						rect = GetNextRect(ref YPos, vPaddingBottom: 4f);
 						rect = EditorGUI.PrefixLabel(rect, new GUIContent("Actor 2"));
 						buttonString = "No actor selected";
 						if (!string.IsNullOrEmpty(UnitySettings.Actor2Name)) {
@@ -146,10 +141,10 @@ public class UnityWindowSettings : UnityWindow {
 				}
 			}
 
-			UnitySettings.ExportPS1Files = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Export PS1 Files"), UnitySettings.ExportPS1Files);
+			UnitySettings.ExportPS1Files = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Export PS1 Files"), UnitySettings.ExportPS1Files);
 		}
 		if (fileMode != FileSystem.Mode.Web) {
-			rect = GetNextRect(ref yPos);
+			rect = GetNextRect(ref YPos);
 			rect = EditorGUI.PrefixLabel(rect, new GUIContent("Load Process"));
 			bool loadFromMemory = UnitySettings.LoadFromMemory;
 			rect = PrefixToggle(rect, ref loadFromMemory);
@@ -163,15 +158,15 @@ public class UnityWindowSettings : UnityWindow {
 		}
 
 		// Directories
-		DrawHeader(ref yPos, "Directories" + (fileMode == FileSystem.Mode.Web ? " (Web)" : ""));
+		DrawHeader(ref YPos, "Directories" + (fileMode == FileSystem.Mode.Web ? " (Web)" : ""));
 		Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
 		if (fileMode == FileSystem.Mode.Web) {
 			foreach (Settings.Mode mode in modes) {
-				UnitySettings.GameDirsWeb[mode] = EditorGUI.TextField(GetNextRect(ref yPos), mode.GetDescription(), UnitySettings.GameDirsWeb.ContainsKey(mode) ? UnitySettings.GameDirsWeb[mode] : "");
+				UnitySettings.GameDirectoriesWeb[mode] = EditorGUI.TextField(GetNextRect(ref YPos), mode.GetDescription(), UnitySettings.GameDirectoriesWeb.ContainsKey(mode) ? UnitySettings.GameDirectoriesWeb[mode] : "");
 			}
 		} else {
 			foreach (Settings.Mode mode in modes) {
-				UnitySettings.GameDirs[mode] = DirectoryField(GetNextRect(ref yPos), mode.GetDescription(), UnitySettings.GameDirs.ContainsKey(mode) ? UnitySettings.GameDirs[mode] : "");
+				UnitySettings.GameDirectories[mode] = DirectoryField(GetNextRect(ref YPos), mode.GetDescription(), UnitySettings.GameDirectories.ContainsKey(mode) ? UnitySettings.GameDirectories[mode] : "");
 			}
 		}
 		/*if (GUILayout.Button("Update available scenes")) {
@@ -181,53 +176,67 @@ public class UnityWindowSettings : UnityWindow {
 			}
 		}*/
 
+
+		// Serialization
+		DrawHeader("Serialization");
+		UnitySettings.BackupFiles = EditorField("Create .BAK backup files", UnitySettings.BackupFiles);
+
+		rect = GetNextRect(ref YPos);
+		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Serialization log"));
+		bool log = UnitySettings.Log;
+		rect = PrefixToggle(rect, ref log);
+		UnitySettings.Log = log;
+
+		if (UnitySettings.Log)
+			UnitySettings.LogFile = FileField(rect, "Serialization log File", UnitySettings.LogFile, true, "txt", includeLabel: false);
+
 		// Export
-		DrawHeader(ref yPos, "Export Settings");
-		rect = GetNextRect(ref yPos);
+		DrawHeader(ref YPos, "Export Settings");
+		rect = GetNextRect(ref YPos);
 		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Export After Load"));
 		bool export = UnitySettings.ExportAfterLoad;
 		rect = PrefixToggle(rect, ref export);
 		UnitySettings.ExportAfterLoad = export;
 
-        rect = GetNextRect(ref yPos);
+        rect = GetNextRect(ref YPos);
 		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Export Flags"));
 		Enum exportFlags = UnitySettings.ExportFlags;
         rect = EnumFlagsToggle(rect, ref exportFlags);
         UnitySettings.ExportFlags = (MapExporter.ExportFlags) exportFlags;
 
-        UnitySettings.ExportPath = DirectoryField(GetNextRect(ref yPos), "Export Path", UnitySettings.ExportPath);
+        UnitySettings.ExportPath = DirectoryField(GetNextRect(ref YPos), "Export Path", UnitySettings.ExportPath);
         
-        if (GUI.Button(GetNextRect(ref yPos), "Copy export commands for all levels to clipboard...")) {
+        if (GUI.Button(GetNextRect(ref YPos), "Copy export commands for all levels to clipboard...")) {
             GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"Raymap.exe -batchmode " +
 				$"--export {UnitySettings.ExportPath} " +
 				$"--flags {(int) UnitySettings.ExportFlags} " +
 				$"--mode {UnitySettings.GameMode} " +
-				$"--dir \"{UnitySettings.GameDirs[UnitySettings.GameMode]}\" " +
+				$"--dir \"{UnitySettings.GameDirectories[UnitySettings.GameMode]}\" " +
 				$"--level {f}");
         }
 
-		if (GUI.Button(GetNextRect(ref yPos), "Copy blend export commands for all levels to clipboard...")) {
+		if (GUI.Button(GetNextRect(ref YPos), "Copy blend export commands for all levels to clipboard...")) {
 			GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"blender --background --python generate_maps_blend.py -- {UnitySettings.ExportPath} {f} {UnitySettings.ExportPath}/BlendFiles/Levels");
         }
 
-		UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref yPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
+		UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref YPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
 
-        string screenShotScaleString = EditorGUI.TextField(GetNextRect(ref yPos), "Screenshot Scale", UnitySettings.ScreenshotScale.ToString(CultureInfo.InvariantCulture));
+        string screenShotScaleString = EditorGUI.TextField(GetNextRect(ref YPos), "Screenshot Scale", UnitySettings.ScreenshotScale.ToString(CultureInfo.InvariantCulture));
         if (float.TryParse(screenShotScaleString, out var screenshotScale)) {
             UnitySettings.ScreenshotScale = screenshotScale;
         } else {
             UnitySettings.ScreenshotScale = 1;
         }
 
-        UnitySettings.HighlightObjectsFilter = EditorGUI.TextField(GetNextRect(ref yPos), "Highlight objects filter", UnitySettings.HighlightObjectsFilter);
-        EditorGUI.LabelField(GetNextRect(ref yPos), "Comma separated list of Model/Family names, or * to highlight all");
-		UnitySettings.HighlightObjectsTextFormat = EditorGUI.TextField(GetNextRect(ref yPos), "Highlight format string", UnitySettings.HighlightObjectsTextFormat);
-        EditorGUI.LabelField(GetNextRect(ref yPos), "($f=family, $m=model, $i=instance name, $c=count)");
+        UnitySettings.HighlightObjectsFilter = EditorGUI.TextField(GetNextRect(ref YPos), "Highlight objects filter", UnitySettings.HighlightObjectsFilter);
+        EditorGUI.LabelField(GetNextRect(ref YPos), "Comma separated list of Model/Family names, or * to highlight all");
+		UnitySettings.HighlightObjectsTextFormat = EditorGUI.TextField(GetNextRect(ref YPos), "Highlight format string", UnitySettings.HighlightObjectsTextFormat);
+        EditorGUI.LabelField(GetNextRect(ref YPos), "($f=family, $m=model, $i=instance name, $c=count)");
 
-        if (GUI.Button(GetNextRect(ref yPos), "Copy screenshot commands for all levels to clipboard...")) {
+        if (GUI.Button(GetNextRect(ref YPos), "Copy screenshot commands for all levels to clipboard...")) {
             GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"Raymap.exe -batchmode " +
                 $"--mode {UnitySettings.GameMode} " +
-				$"--dir \"{UnitySettings.GameDirs[UnitySettings.GameMode]}\" " +
+				$"--dir \"{UnitySettings.GameDirectories[UnitySettings.GameMode]}\" " +
                 $"--level {f} " +
                 $"--ScreenshotPath \"{UnitySettings.ScreenshotPath}\" " +
                 $"--ScreenshotAfterLoad {UnitySettings.ScreenshotAfterLoad} " +
@@ -241,21 +250,18 @@ public class UnityWindowSettings : UnityWindow {
         }*/
 
 		// Misc
-		DrawHeader(ref yPos, "Miscellaneous Settings");
-		UnitySettings.ScreenshotPath = DirectoryField(GetNextRect(ref yPos), "Screenshot Path", UnitySettings.ScreenshotPath);
-		UnitySettings.AllowDeadPointers = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Allow Dead Pointers"), UnitySettings.AllowDeadPointers);
-		UnitySettings.ForceDisplayBackfaces = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Force Display Backfaces"), UnitySettings.ForceDisplayBackfaces);
-		UnitySettings.BlockyMode = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Blocky Mode"), UnitySettings.BlockyMode);
-		UnitySettings.TracePointers = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Trace Pointers (slow!)"), UnitySettings.TracePointers);
-		UnitySettings.SaveTextures = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Save Textures"), UnitySettings.SaveTextures);
-		UnitySettings.ExportText = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Export Text"), UnitySettings.ExportText);
-		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
-		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Visualize Sector Borders"), UnitySettings.VisualizeSectorBorders);
-		UnitySettings.CreateFamilyGameObjects = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Create Family GameObjects"), UnitySettings.CreateFamilyGameObjects);
-		UnitySettings.ShowCollisionDataForNoCollisionObjects = EditorGUI.Toggle(GetNextRect(ref yPos), new GUIContent("Show Collision Data For NoCollision SPOs"), UnitySettings.ShowCollisionDataForNoCollisionObjects);
-
-		totalyPos = yPos;
-		GUI.EndScrollView();
+		DrawHeader(ref YPos, "Miscellaneous Settings");
+		UnitySettings.ScreenshotPath = DirectoryField(GetNextRect(ref YPos), "Screenshot Path", UnitySettings.ScreenshotPath);
+		UnitySettings.AllowDeadPointers = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Allow Dead Pointers"), UnitySettings.AllowDeadPointers);
+		UnitySettings.ForceDisplayBackfaces = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Force Display Backfaces"), UnitySettings.ForceDisplayBackfaces);
+		UnitySettings.BlockyMode = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Blocky Mode"), UnitySettings.BlockyMode);
+		UnitySettings.TracePointers = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Trace Pointers (slow!)"), UnitySettings.TracePointers);
+		UnitySettings.SaveTextures = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Save Textures"), UnitySettings.SaveTextures);
+		UnitySettings.ExportText = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Export Text"), UnitySettings.ExportText);
+		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
+		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Visualize Sector Borders"), UnitySettings.VisualizeSectorBorders);
+		UnitySettings.CreateFamilyGameObjects = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Create Family GameObjects"), UnitySettings.CreateFamilyGameObjects);
+		UnitySettings.ShowCollisionDataForNoCollisionObjects = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Show Collision Data For NoCollision SPOs"), UnitySettings.ShowCollisionDataForNoCollisionObjects);
 
 		if (EditorGUI.EndChangeCheck() || Dirty) {
 #if UNITY_EDITOR
@@ -284,7 +290,7 @@ public class UnityWindowSettings : UnityWindow {
         return commands;
     }
 
-    #endregion
+	#endregion
 
 	#region Properties
 
@@ -300,14 +306,10 @@ public class UnityWindowSettings : UnityWindow {
 	private PS1ActorSelectionDropdown ActorDropdown1 { get; set; }
 	private PS1ActorSelectionDropdown ActorDropdown2 { get; set; }
 
-	private float totalyPos = 0f;
-	private Vector2 scrollPosition = Vector2.zero;
-
-
 	private string CurrentGameDataDir {
 		get {
 			Dictionary<Settings.Mode, string> GameDirs =
-				EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL ? UnitySettings.GameDirsWeb : UnitySettings.GameDirs;
+				EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL ? UnitySettings.GameDirectoriesWeb : UnitySettings.GameDirectories;
 			if (GameDirs.ContainsKey(UnitySettings.GameMode)) {
 				return (GameDirs[UnitySettings.GameMode] ?? "");
 			} else {
