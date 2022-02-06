@@ -20,6 +20,9 @@ public class UnitySettings {
 	public static Dictionary<Settings.Mode, string> GameDirectories = new Dictionary<Settings.Mode, string>();
 	public static Dictionary<Settings.Mode, string> GameDirectoriesWeb = new Dictionary<Settings.Mode, string>();
 
+    public static Dictionary<Settings.EngineVersion, bool> HideDirectories { get; set; } = new Dictionary<Settings.EngineVersion, bool>();
+
+
     /// <summary>
     /// Serialization log file
     /// </summary>

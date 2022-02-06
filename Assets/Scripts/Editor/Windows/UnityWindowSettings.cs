@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using BinarySerializer;
 using OpenSpace;
 using OpenSpace.Exporter;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using Path = System.IO.Path;
 
@@ -29,10 +31,34 @@ public class UnityWindowSettings : UnityWindow {
 		// Increase label width due to it being cut off otherwise
 		EditorGUIUtility.labelWidth = 192;
 
+
+		if (CategorizedGameModes == null)
+			CategorizedGameModes = EnumHelpers.GetValues<Settings.Mode>().Select(x => Settings.GetSettings(x))
+				.GroupBy(x => x.engineVersion).ToDictionary(
+				x => x.Key,
+				x => x
+					.GroupBy(y => y.game)
+					.ToDictionary(y => y.Key, y => y.ToArray())
+			);
+
+
 		EditorGUI.BeginChangeCheck();
 		// Game Mode
 		DrawHeader(ref YPos, "Mode");
-		UnitySettings.GameMode = (Settings.Mode)EditorGUI.EnumPopup(GetNextRect(ref YPos), new GUIContent("Game"), UnitySettings.GameMode);
+
+		if (GameModeDropdown == null)
+			GameModeDropdown = new GameModeSelectionDropdown(new AdvancedDropdownState());
+		var rectTemp = GetNextRect(ref YPos);
+		var rbutton = EditorGUI.PrefixLabel(rectTemp, new GUIContent("Game"));
+		rectTemp = new Rect(rbutton.x + rbutton.width - Mathf.Max(400f, rbutton.width), rbutton.y, Mathf.Max(400f, rbutton.width), rbutton.height);
+		if (EditorGUI.DropdownButton(rbutton, new GUIContent(GameModeDropdown.SelectionName), FocusType.Passive))
+			GameModeDropdown.Show(rectTemp);
+
+		if (GameModeDropdown != null && GameModeDropdown.HasChanged) {
+			UnitySettings.GameMode = GameModeDropdown.Selection;
+			GameModeDropdown.HasChanged = false;
+			Dirty = true;
+		}
 
 		// Scene file
 		DrawHeader(ref YPos, "Map");
@@ -159,7 +185,30 @@ public class UnityWindowSettings : UnityWindow {
 
 		// Directories
 		DrawHeader(ref YPos, "Directories" + (fileMode == FileSystem.Mode.Web ? " (Web)" : ""));
-		Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
+
+		foreach (var modeCategory in CategorizedGameModes) {
+			UnitySettings.HideDirectories[modeCategory.Key] = !EditorGUI.Foldout(GetNextRect(ref YPos), !UnitySettings.HideDirectories.TryGetItem(modeCategory.Key, true), $"Directories ({modeCategory.Key})", true);
+
+			if (!UnitySettings.HideDirectories[modeCategory.Key]) {
+				foreach (var engine in modeCategory.Value) {
+					YPos += 8;
+
+					var modes = engine.Value;
+					if (fileMode == FileSystem.Mode.Web) {
+						foreach (var mode in modes) {
+							UnitySettings.GameDirectoriesWeb[mode.mode] = EditorField(mode.DisplayName ?? "N/A", UnitySettings.GameDirectoriesWeb.TryGetItem(mode.mode, String.Empty));
+						}
+					} else {
+						foreach (var mode in modes) {
+							UnitySettings.GameDirectories[mode.mode] = DirectoryField(GetNextRect(ref YPos), mode.DisplayName ?? "N/A", UnitySettings.GameDirectories.TryGetItem(mode.mode, String.Empty));
+						}
+					}
+				}
+
+				YPos += 8;
+			}
+		}
+		/*Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
 		if (fileMode == FileSystem.Mode.Web) {
 			foreach (Settings.Mode mode in modes) {
 				UnitySettings.GameDirectoriesWeb[mode] = EditorGUI.TextField(GetNextRect(ref YPos), mode.GetDescription(), UnitySettings.GameDirectoriesWeb.ContainsKey(mode) ? UnitySettings.GameDirectoriesWeb[mode] : "");
@@ -168,7 +217,7 @@ public class UnityWindowSettings : UnityWindow {
 			foreach (Settings.Mode mode in modes) {
 				UnitySettings.GameDirectories[mode] = DirectoryField(GetNextRect(ref YPos), mode.GetDescription(), UnitySettings.GameDirectories.ContainsKey(mode) ? UnitySettings.GameDirectories[mode] : "");
 			}
-		}
+		}*/
 		/*if (GUILayout.Button("Update available scenes")) {
 			string path = EditorUtility.OpenFilePanel("Scene files", "", "isc.ckd");
 			if (path.Length != 0) {
@@ -299,9 +348,13 @@ public class UnityWindowSettings : UnityWindow {
 	/// </summary>
 	private int SelectedLevelFileIndex { get; set; }
 
+	// Categorized game modes
+	public Dictionary<Settings.EngineVersion, Dictionary<Settings.Game, Settings[]>> CategorizedGameModes { get; set; }
+
 	/// <summary>
 	/// The file selection dropdown
 	/// </summary>
+	private GameModeSelectionDropdown GameModeDropdown { get; set; }
 	private MapSelectionDropdown MapDropdown { get; set; }
 	private PS1ActorSelectionDropdown ActorDropdown1 { get; set; }
 	private PS1ActorSelectionDropdown ActorDropdown2 { get; set; }

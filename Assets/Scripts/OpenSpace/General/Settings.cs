@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using static OpenSpace.LevelTranslation;
 using LinkedListType = OpenSpace.LinkedList.Type;
@@ -207,11 +208,17 @@ namespace OpenSpace {
         #endregion
 
         public static void Init(Mode mode) {
+			s = GetSettings(mode);
+        }
+
+		public static Settings GetSettings(Mode mode) {
+			Settings s = null;
 			if (settingsDict.ContainsKey(mode)) {
 				s = settingsDict[mode];
 			}
-            if (s != null) s.mode = mode;
-        }
+			if (s != null) s.mode = mode;
+			return s;
+		}
 
 		public string CmdModeName {
 			get {
@@ -220,12 +227,26 @@ namespace OpenSpace {
 			}
 		}
 
+		public string DisplayName {
+			get {
+				Type genericEnumType = mode.GetType();
+				MemberInfo[] memberInfo = genericEnumType.GetMember(mode.ToString());
+				if ((memberInfo != null && memberInfo.Length > 0)) {
+					var _Attribs = memberInfo[0].GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
+					if ((_Attribs != null && _Attribs.Count() > 0)) {
+						return ((System.ComponentModel.DescriptionAttribute)_Attribs.ElementAt(0)).Description;
+					}
+				}
+				return mode.ToString();
+			}
+		}
+
 
         public static Settings s = null;
 
         #region Settings
 
-        public static Settings R3PC = new Settings() {
+        public static Settings R3PC => new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.R3,
             platform = Platform.PC,
@@ -276,7 +297,7 @@ namespace OpenSpace {
 			},
 		};
 
-		public static Settings R3PCDemo20021001 = new Settings() {
+		public static Settings R3PCDemo20021001 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -295,7 +316,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings R3PCDemo20021021 = new Settings() {
+		public static Settings R3PCDemo20021021 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -314,7 +335,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings R3PCDemo20021209 = new Settings() {
+		public static Settings R3PCDemo20021209 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -333,7 +354,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings R3PCDemo20030106 = new Settings() {
+		public static Settings R3PCDemo20030106 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -352,7 +373,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings R3MacOS = new Settings() {
+		public static Settings R3MacOS => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.MacOS,
@@ -372,7 +393,7 @@ namespace OpenSpace {
 			},
 		};
 
-		public static Settings R3GC = new Settings() {
+		public static Settings R3GC => new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.R3,
             platform = Platform.GC,
@@ -393,7 +414,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings R3PS2 = new Settings() {
+		public static Settings R3PS2 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -410,7 +431,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings R3PS2Demo_20020517 = new Settings() {
+		public static Settings R3PS2Demo_20020517 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -428,7 +449,7 @@ namespace OpenSpace {
 			},
 			hasNames = true
 		};
-		public static Settings R3PS2Demo_20020807 = new Settings() {
+		public static Settings R3PS2Demo_20020807 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -445,7 +466,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings R3PS2DevBuild = new Settings() {
+		public static Settings R3PS2DevBuild => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -462,7 +483,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings R3PS2Demo_20021029 = new Settings() {
+		public static Settings R3PS2Demo_20021029 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -479,7 +500,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings R3PS2Demo_20021218 = new Settings() {
+		public static Settings R3PS2Demo_20021218 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -497,7 +518,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings R3Xbox = new Settings() {
+		public static Settings R3Xbox => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.Xbox,
@@ -516,7 +537,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings R3Xbox360 = new Settings() {
+		public static Settings R3Xbox360 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.Xbox360,
@@ -534,7 +555,7 @@ namespace OpenSpace {
 			},
 			hasNames = true,
 		};
-		public static Settings R3PS3 = new Settings() {
+		public static Settings R3PS3 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS3,
@@ -553,7 +574,7 @@ namespace OpenSpace {
 			hasNames = true,
 		};
 
-		public static Settings RMPC = new Settings() {
+		public static Settings RMPC => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RM,
 			platform = Platform.PC,
@@ -571,7 +592,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings RMPS2 = new Settings() {
+		public static Settings RMPS2 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RM,
 			platform = Platform.PS2,
@@ -588,7 +609,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings RMPS2Demo = new Settings() {
+		public static Settings RMPS2Demo => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RM,
 			platform = Platform.PS2,
@@ -605,7 +626,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings RAPC = new Settings() {
+		public static Settings RAPC => new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
             platform = Platform.PC,
@@ -655,7 +676,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings RAPS2 = new Settings() {
+		public static Settings RAPS2 => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RA,
 			platform = Platform.PS2,
@@ -672,7 +693,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings RAGC = new Settings() {
+		public static Settings RAGC => new Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
             platform = Platform.GC,
@@ -690,7 +711,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings RAGCDemo = new Settings() {
+		public static Settings RAGCDemo => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RA,
 			platform = Platform.GC,
@@ -708,7 +729,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static Settings RAXbox = new Settings() {
+		public static Settings RAXbox => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RA,
 			platform = Platform.Xbox,
@@ -727,7 +748,7 @@ namespace OpenSpace {
 			},
 		};
 
-        public static Settings R2PC = new Settings() {
+        public static Settings R2PC => new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.PC,
@@ -770,7 +791,7 @@ namespace OpenSpace {
                 { "localizationStructure", 0x00500260 }
             }
         };
-        public static Settings R2PCDemo1 = new Settings() {
+        public static Settings R2PCDemo1 => new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
             platform = Platform.PC,
@@ -786,7 +807,7 @@ namespace OpenSpace {
 				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
 			}
 		};
-        public static Settings R2PCDemo2 = new Settings() {
+        public static Settings R2PCDemo2 => new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
             platform = Platform.PC,
@@ -802,7 +823,7 @@ namespace OpenSpace {
 				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
 			}
 		};
-        public static Settings R2DC = new Settings() {
+        public static Settings R2DC => new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.DC,
@@ -819,7 +840,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
         };
-		public static Settings R2PS2 = new Settings() {
+		public static Settings R2PS2 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2Revolution,
 			platform = Platform.PS2,
@@ -837,7 +858,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.None }
 			}
 		};
-		public static Settings R2IOS = new Settings() {
+		public static Settings R2IOS => new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.iOS,
@@ -854,7 +875,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
 		};
-		public static Settings R2PS1 = new Settings() {
+		public static Settings R2PS1 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.PS1,
@@ -867,7 +888,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 		};
 
-		public static Settings RRushPS1 = new Settings() {
+		public static Settings RRushPS1 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RRush,
 			platform = Platform.PS1,
@@ -880,7 +901,7 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
-		public static Settings R2DS = new Settings() {
+		public static Settings R2DS => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.DS,
@@ -893,7 +914,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static Settings RRRDS_20060525 = new Settings() {
+		public static Settings RRRDS_20060525 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RRR,
 			platform = Platform.DS,
@@ -906,7 +927,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static Settings RRRDS = new Settings() {
+		public static Settings RRRDS => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RRR,
 			platform = Platform.DS,
@@ -919,7 +940,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static Settings R23DS = new Settings() {
+		public static Settings R23DS => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform._3DS,
@@ -932,7 +953,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static Settings R2N64 = new Settings() {
+		public static Settings R2N64 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.N64,
@@ -945,7 +966,7 @@ namespace OpenSpace {
             levelTranslation = LevelTranslation.levelTranslation_r2,
             numEntryActions = 1
 		};
-		public static Settings DDN64 = new Settings() {
+		public static Settings DDN64 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
 			platform = Platform.N64,
@@ -972,7 +993,7 @@ namespace OpenSpace {
             numEntryActions = 1
         };
 
-		public static Settings DDPC = new Settings() {
+		public static Settings DDPC => new Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.DD,
             platform = Platform.PC,
@@ -1022,7 +1043,7 @@ namespace OpenSpace {
             numEntryActions = 43
         };
         
-        public static Settings DDDC = new Settings() {
+        public static Settings DDDC => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
 			platform = Platform.DC,
@@ -1038,7 +1059,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
 		};
-		public static Settings DDPS1 = new Settings() {
+		public static Settings DDPS1 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
 			platform = Platform.PS1,
@@ -1051,7 +1072,7 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
-		public static Settings RedPlanetPC = new Settings() {
+		public static Settings RedPlanetPC => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RedPlanet,
 			platform = Platform.PC,
@@ -1071,7 +1092,7 @@ namespace OpenSpace {
 			}
 		};
 
-		public static Settings TTPC = new Settings() {
+		public static Settings TTPC => new Settings() {
 			engineVersion = EngineVersion.TT,
 			game = Game.TT,
 			platform = Platform.PC,
@@ -1090,7 +1111,7 @@ namespace OpenSpace {
 				{ CapsType.DSB, Caps.None }
 			}
         };
-		public static Settings TTSEPC = new Settings() {
+		public static Settings TTSEPC => new Settings() {
 			engineVersion = EngineVersion.TT,
 			game = Game.TTSE,
 			platform = Platform.PC,
@@ -1106,7 +1127,7 @@ namespace OpenSpace {
 			}
 		};
 
-        public static Settings PlaymobilHypePC = new Settings() {
+        public static Settings PlaymobilHypePC => new Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilHype,
             platform = Platform.PC,
@@ -1122,7 +1143,7 @@ namespace OpenSpace {
 				{ CapsType.FixLvl, Caps.None }
 			}
 		};
-        public static Settings PlaymobilAlexPC = new Settings() {
+        public static Settings PlaymobilAlexPC => new Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilAlex,
             platform = Platform.PC,
@@ -1144,7 +1165,7 @@ namespace OpenSpace {
 				{ CapsType.LangLevelFolder, Caps.None }
 			}
 		};
-        public static Settings PlaymobilLauraPC = new Settings() {
+        public static Settings PlaymobilLauraPC => new Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilLaura,
             platform = Platform.PC,
@@ -1167,7 +1188,7 @@ namespace OpenSpace {
 			}
         };
 
-		public static Settings DDPKGC = new Settings() {
+		public static Settings DDPKGC => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.DDPK,
 			platform = Platform.GC,
@@ -1185,7 +1206,7 @@ namespace OpenSpace {
 			},
 		};
 
-		public static Settings DinosaurPC = new Settings() {
+		public static Settings DinosaurPC => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.Dinosaur,
 			platform = Platform.PC,
@@ -1200,7 +1221,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static Settings LargoWinchPC = new Settings() {
+		public static Settings LargoWinchPC => new Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.LargoWinch,
 			platform = Platform.PC,
@@ -1219,7 +1240,7 @@ namespace OpenSpace {
 			},
 			hasDeformations = true
 		};
-		public static Settings VIPPS1 = new Settings() {
+		public static Settings VIPPS1 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.VIP,
 			platform = Platform.PS1,
@@ -1232,7 +1253,7 @@ namespace OpenSpace {
 			hasDeformations = true,
 			numEntryActions = 1
 		};
-		public static Settings JungleBookPS1 = new Settings() {
+		public static Settings JungleBookPS1 => new Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.JungleBook,
 			platform = Platform.PS1,
