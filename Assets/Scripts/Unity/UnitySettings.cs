@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using OpenSpace.Exporter;
 using UnityEngine;
+using BinarySerializer;
 
 /// <summary>
 /// Settings for Raymap
@@ -185,7 +186,18 @@ public class UnitySettings {
 		VisualizeSectorBorders = s.SerializeBool("VisualizeSectorBorders", VisualizeSectorBorders);
 		CreateFamilyGameObjects = s.SerializeBool("CreateFamilyGameObjects", CreateFamilyGameObjects);
 		ShowCollisionDataForNoCollisionObjects = s.SerializeBool("ShowCollisionDataForNoCollisionObjects", ShowCollisionDataForNoCollisionObjects);
-	}
+
+
+
+        Settings.EngineVersion[] engines = EnumHelpers.GetValues<Settings.EngineVersion>();
+        foreach (Settings.EngineVersion engine in engines) {
+            bool v = HideDirectories.ContainsKey(engine) && HideDirectories[engine];
+            HideDirectories[engine] = s.SerializeBool("HideDirectory" + engine.ToString(), v);
+        }
+        Log = s.SerializeBool("Log", Log);
+        LogFile = s.SerializeString("LogFile", LogFile);
+        BackupFiles = s.SerializeBool("BackupFiles", BackupFiles);
+    }
 
 
     /// <summary>
