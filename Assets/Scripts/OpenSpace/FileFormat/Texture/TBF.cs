@@ -1,4 +1,5 @@
-﻿using DDSImageParser;
+﻿using BinarySerializer.Unity;
+using DDSImageParser;
 using LibGC.Texture;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BinarySerializer.Unity;
+using System;
 using System.IO;
 using UnityEngine;
 

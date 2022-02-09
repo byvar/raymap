@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using BinarySerializer;
+using BinarySerializer.Unity;
 using OpenSpace;
 using OpenSpace.Exporter;
 using UnityEditor;

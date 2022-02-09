@@ -46,7 +46,7 @@ namespace OpenSpace {
 
         public static bool ByteArrayToFile(string fileName, byte[] byteArray) {
 			if (byteArray == null) return false;
-            if (FileSystem.mode == FileSystem.Mode.Web) return false;
+            if (BinarySerializer.Unity.FileSystem.mode == BinarySerializer.Unity.FileSystem.Mode.Web) return false;
             try {
                 Directory.CreateDirectory(new FileInfo(fileName).Directory.FullName);
                 using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write)) {

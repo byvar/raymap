@@ -20,6 +20,7 @@ using OpenSpace.FileFormat.RenderWare;
 using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using BinarySerializer.Unity;
 
 namespace OpenSpace.Loader {
     public class R2PS2Loader : MapLoader {

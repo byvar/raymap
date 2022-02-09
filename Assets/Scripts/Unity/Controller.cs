@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using Unity;
+using BinarySerializer.Unity;
 
 public class Controller : MonoBehaviour {
 	public Material baseMaterial;

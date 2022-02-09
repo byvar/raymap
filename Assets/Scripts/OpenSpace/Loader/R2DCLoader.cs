@@ -18,6 +18,7 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using BinarySerializer.Unity;
 
 namespace OpenSpace.Loader {
     public class R2DCLoader : MapLoader {

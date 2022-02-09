@@ -11,6 +11,7 @@ using OpenSpace.FileFormat.Texture.DS;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Cysharp.Threading.Tasks;
+using BinarySerializer.Unity;
 
 namespace OpenSpace.Loader {
 	public class R2ROMLoader : MapLoader {

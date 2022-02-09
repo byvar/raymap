@@ -1,4 +1,5 @@
-﻿using OpenSpace.Loader;
+﻿using BinarySerializer.Unity;
+using OpenSpace.Loader;
 using System.Linq;
 using UnityEngine;
 

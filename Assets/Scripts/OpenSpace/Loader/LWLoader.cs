@@ -20,6 +20,7 @@ using System.IO.Compression;
 using lzo.net;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using BinarySerializer.Unity;
 
 namespace OpenSpace.Loader {
 	public class LWLoader : MapLoader {

@@ -1,6 +1,7 @@
 ﻿// Adapted from Rayman2Lib by szymski
 // https://github.com/szymski/Rayman2Lib/blob/master/csharp_tools/Rayman2Lib/CNTFile.cs
 
+using BinarySerializer.Unity;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;

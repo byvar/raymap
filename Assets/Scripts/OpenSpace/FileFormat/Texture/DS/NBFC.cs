@@ -1,4 +1,5 @@
-﻿using LibGC.Texture;
+﻿using BinarySerializer.Unity;
+using LibGC.Texture;
 using System;
 using System.IO;
 using UnityEngine;

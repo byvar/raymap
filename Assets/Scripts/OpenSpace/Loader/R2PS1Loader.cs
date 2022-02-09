@@ -10,6 +10,7 @@ using System.IO.Compression;
 using OpenSpace.PS1;
 using OpenSpace.PS1.GLI;
 using Cysharp.Threading.Tasks;
+using BinarySerializer.Unity;
 
 namespace OpenSpace.Loader {
 	public class R2PS1Loader : MapLoader {

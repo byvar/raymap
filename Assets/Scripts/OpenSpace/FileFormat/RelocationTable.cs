@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using BinarySerializer.Unity;
+using Cysharp.Threading.Tasks;
 using lzo.net;
 using System;
 using System.Collections;

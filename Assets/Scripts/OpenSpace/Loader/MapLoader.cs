@@ -21,6 +21,7 @@ using OpenSpace.Animation.ComponentLargo;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
+using BinarySerializer.Unity;
 
 namespace OpenSpace {
     public class MapLoader {

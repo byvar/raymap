@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using BinarySerializer;
+using BinarySerializer.Unity;
 
 public class UnityWindow : EditorWindow {
     public Rect GetNextRect(ref float yPos, float padding = 4f, float height = 0f, float vPadding = 0f, float vPaddingBottom = 0f, bool ignoreIndent = false) {

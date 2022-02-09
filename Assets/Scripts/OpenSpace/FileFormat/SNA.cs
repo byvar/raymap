@@ -1,4 +1,5 @@
-﻿using lzo.net;
+﻿using BinarySerializer.Unity;
+using lzo.net;
 using System;
 using System.Collections.Generic;
 using System.IO;

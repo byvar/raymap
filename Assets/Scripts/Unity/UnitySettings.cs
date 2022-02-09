@@ -6,6 +6,7 @@ using System.IO;
 using OpenSpace.Exporter;
 using UnityEngine;
 using BinarySerializer;
+using BinarySerializer.Unity;
 
 /// <summary>
 /// Settings for Raymap
@@ -16,7 +17,8 @@ using BinarySerializer;
 public class UnitySettings {
 	private const string editorPrefsPrefix = "Raymap.";
 	private const string settingsFile = "Settings.txt";
-	public static bool IsRaymapGame { get; set; } = false;
+    private const string serverAddress = "https://raym.app/data/raymap/";
+    public static bool IsRaymapGame { get; set; } = false;
 
 	public static Dictionary<Settings.Mode, string> GameDirectories = new Dictionary<Settings.Mode, string>();
 	public static Dictionary<Settings.Mode, string> GameDirectoriesWeb = new Dictionary<Settings.Mode, string>();
@@ -239,13 +241,13 @@ public class UnitySettings {
     }
 
     public static void ConfigureFileSystem() {
-
+		FileSystem.serverAddress = serverAddress;
         if (Application.platform == RuntimePlatform.WebGLPlayer) {
-            FileSystem.mode = FileSystem.Mode.Web;
+            FileSystem.mode = BinarySerializer.Unity.FileSystem.Mode.Web;
         }
 #if UNITY_EDITOR
         if (Application.isEditor && UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL) {
-            FileSystem.mode = FileSystem.Mode.Web;
+            FileSystem.mode = BinarySerializer.Unity.FileSystem.Mode.Web;
         }
 #endif
     }

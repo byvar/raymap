@@ -1,6 +1,7 @@
 ﻿// Adapted from Rayman2Lib by szymski
 // https://github.com/szymski/Rayman2Lib/blob/master/d_tools/rayman2lib/source/formats/gf.d
 
+using BinarySerializer.Unity;
 using System;
 using System.IO;
 using UnityEngine;
