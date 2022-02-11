@@ -56,7 +56,7 @@ namespace OpenSpace.PS1 {
 			off_prev_brother = Pointer.Read(reader); // 18
 			off_parent = Pointer.Read(reader); // 1c
 			off_matrix1 = Pointer.Read(reader); //
-			if (Settings.s.game != Settings.Game.RRush) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.RRush) {
 				off_matrix2 = Pointer.Read(reader);
 				short_28 = reader.ReadInt16();
 				short_2A = reader.ReadInt16();

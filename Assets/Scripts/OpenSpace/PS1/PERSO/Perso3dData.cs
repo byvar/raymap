@@ -96,13 +96,13 @@ namespace OpenSpace.PS1 {
 		}
 
 		public uint GetFileIndex() {
-			if (Settings.s.game == Settings.Game.RRush) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 				if (HasFlag(Perso3dDataFlags.Actor1)) {
 					return 1;
 				} else if (HasFlag(Perso3dDataFlags.Actor2)) {
 					return 2;
 				}
-			} else if (Settings.s.game == Settings.Game.JungleBook) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				if (HasFlag(Perso3dDataJBFlags.Actor1)) {
 					return 1;
 				} else if (HasFlag(Perso3dDataJBFlags.Actor2)) {

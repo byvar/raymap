@@ -28,10 +28,10 @@ public class UnityWindowSearch : UnityWindow {
 
 	protected override void UpdateEditorFields() {
 
-        if (!EditorApplication.isPlaying || Settings.s == null) {
+        if (!EditorApplication.isPlaying || CPA_Settings.s == null) {
             Results = null;
         }
-        if (EditorApplication.isPlaying && Settings.s != null) {
+        if (EditorApplication.isPlaying && CPA_Settings.s != null) {
             Rect rect = GetNextRect(ref YPos);
             string newSearchString = EditorGUI.TextField(rect, SearchString, EditorStyles.toolbarSearchField);
             if (newSearchString != SearchString || Results == null) {
@@ -68,7 +68,7 @@ public class UnityWindowSearch : UnityWindow {
 
     private List<SearchableString> Search(string query)
     {
-        if (!EditorApplication.isPlaying || Settings.s == null) return new List<SearchableString>();
+        if (!EditorApplication.isPlaying || CPA_Settings.s == null) return new List<SearchableString>();
         var results = new List<SearchableString>();
         return MapLoader.Loader?.searchableStrings.Where(s => s.String.ToLower().Contains(query.ToLower())).ToList() ?? new List<SearchableString>();
 

@@ -52,9 +52,9 @@ namespace OpenSpace.Cinematics {
 		public static CinematicActor Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
 			CinematicActor ca = new CinematicActor(offset);
-			if (Settings.s.game == Settings.Game.R3 || Settings.s.game == Settings.Game.Dinosaur) {
-				if (Settings.s.platform != Settings.Platform.PS2) {
-					if (Settings.s.platform == Settings.Platform.GC) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R3 || CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+				if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+					if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
 						reader.ReadUInt32();
 						reader.ReadUInt32();
 					}

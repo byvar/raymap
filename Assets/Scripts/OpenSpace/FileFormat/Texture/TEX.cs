@@ -18,7 +18,7 @@ namespace OpenSpace.FileFormat.Texture {
 
 		public TEX(string path, bool compressed = true) {
 			Stream fs = FileSystem.GetFileReadStream(path);
-			using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
+			using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
 				if (compressed) {
 					reader.ReadUInt32(); // "LZSS"
 					List<Texture2D> texturesList = new List<Texture2D>();
@@ -43,7 +43,7 @@ namespace OpenSpace.FileFormat.Texture {
         private byte[] DecompressLZSS(byte[] compressed) {
             byte[] decompressed = new byte[compressed.Length * 128];
             uint decompressedPos = 0;
-            using (Reader reader = new Reader(new MemoryStream(compressed), Settings.s.IsLittleEndian)) {
+            using (Reader reader = new Reader(new MemoryStream(compressed), CPA_Settings.s.IsLittleEndian)) {
                 while (reader.BaseStream.Position < reader.BaseStream.Length) {
                     byte controlByte = reader.ReadByte();
                     if (controlByte == 0) {

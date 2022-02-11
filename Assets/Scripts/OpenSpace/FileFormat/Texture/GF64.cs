@@ -29,9 +29,9 @@ namespace OpenSpace.FileFormat.Texture {
 			this.height = height;
 			this.format = format;
 			this.palette_num_colors = palette_num_colors;
-			using (Reader r = new Reader(stream, Settings.s.IsLittleEndian)) {
+			using (Reader r = new Reader(stream, CPA_Settings.s.IsLittleEndian)) {
 				if (palette != null) {
-					using (Reader p = new Reader(palette, Settings.s.IsLittleEndian)) {
+					using (Reader p = new Reader(palette, CPA_Settings.s.IsLittleEndian)) {
 						Parse(r, p, null, null);
 					}
 				} else {
@@ -74,7 +74,7 @@ namespace OpenSpace.FileFormat.Texture {
 						int index = (x * height) + y;
 						bool shift = index % 2 != 0;
 						byte texByte = texBytes[((x * height) + y) / 2];
-						if (Settings.s.IsLittleEndian) {
+						if (CPA_Settings.s.IsLittleEndian) {
 							if (shift) {
 								texByte = (byte)(texByte >> 4);
 							} else {
@@ -167,7 +167,7 @@ namespace OpenSpace.FileFormat.Texture {
 
 		static Color ParseColorRGBA5551(ushort shortCol) {
 			uint alpha, blue, green, red;
-			if (Settings.s.platform == Settings.Platform.DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 				alpha = ExtractBits(shortCol, 1, 15);
 				blue = ExtractBits(shortCol, 5, 10);
 				green = ExtractBits(shortCol, 5, 5);

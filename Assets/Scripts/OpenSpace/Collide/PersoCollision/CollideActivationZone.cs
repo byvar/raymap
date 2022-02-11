@@ -24,15 +24,15 @@ namespace OpenSpace.Collide
 
         public static CollideActivationZone Read(Reader reader, Pointer offset) {
             CollideActivationZone z = new CollideActivationZone(offset);
-			if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
+			if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
 				z.off_next = Pointer.Read(reader);
-				if (Settings.s.hasLinkedListHeaderPointers) {
+				if (CPA_Settings.s.hasLinkedListHeaderPointers) {
 					z.off_prev = Pointer.Read(reader);
 					z.off_header = Pointer.Read(reader);
 				}
 			}
 			z.zdxIndex = reader.ReadUInt16();
-			if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
+			if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) {
 				z.off_next = Pointer.Current(reader);
 			}
 			return z;

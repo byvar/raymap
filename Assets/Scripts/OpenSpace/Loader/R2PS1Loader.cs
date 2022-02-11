@@ -46,8 +46,8 @@ namespace OpenSpace.Loader {
 		public GameObject gao_always;
 
 		public string[] LoadLevelList() {
-			if (PS1GameInfo.Games.ContainsKey(Settings.s.mode)) {
-				return PS1GameInfo.Games[Settings.s.mode].maps;
+			if (PS1GameInfo.Games.ContainsKey(CPA_Settings.s.mode)) {
+				return PS1GameInfo.Games[CPA_Settings.s.mode].maps;
 			}
 			return new string[] { "<no map>" };
 		}
@@ -60,10 +60,10 @@ namespace OpenSpace.Loader {
 				gameDataBinFolder += "/";
 				await FileSystem.CheckDirectory(gameDataBinFolder);
 				if (!FileSystem.DirectoryExists(gameDataBinFolder)) throw new Exception("GAMEDATABIN folder doesn't exist");
-				if (!PS1GameInfo.Games.ContainsKey(Settings.s.mode)) throw new Exception("PS1 info wasn't defined for this mode");
+				if (!PS1GameInfo.Games.ContainsKey(CPA_Settings.s.mode)) throw new Exception("PS1 info wasn't defined for this mode");
 				loadingState = "Initializing files";
 				//RipRHRLoc();
-				game = PS1GameInfo.Games[Settings.s.mode];
+				game = PS1GameInfo.Games[CPA_Settings.s.mode];
 				CurrentLevel = Array.IndexOf(game.maps, lvlName);
 				Actor1Index = Array.FindIndex(game.actors, a => a.Actor1 == actor1Name);
 				Actor2Index = Array.FindIndex(game.actors, a => a.Actor2 == actor2Name);
@@ -178,7 +178,7 @@ namespace OpenSpace.Loader {
 				case 0:
 					return mainFile.memoryBlocks[CurrentLevel].overrideActor1Address ?? game.actor1Address;
 				case 1:
-					if (Settings.s.game == Settings.Game.JungleBook) {
+					if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 						return (mainFile.memoryBlocks[CurrentLevel].overrideActor1Address ?? game.actor1Address)
 							+ (uint)actor1File.reader.BaseStream.Length;
 					}
@@ -187,7 +187,7 @@ namespace OpenSpace.Loader {
 			}
 		}
 		private void SetForcedActor() {
-			if (Settings.s.game == Settings.Game.JungleBook) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				if (CurrentLevel < 9) {
 					// Story levels
 					Actor1Index = CurrentLevel;
@@ -213,7 +213,7 @@ namespace OpenSpace.Loader {
 					// Base address for Act2: 80149400
 					// I guess anything goes between >= 9 && <= 26
 				}
-			} else if (Settings.s.game == Settings.Game.RRush) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 				if (CurrentLevel == 12) { // mainmenu
 					Actor1Index = 8; // menubox1
 					Actor2Index = 9; // menubox2
@@ -278,7 +278,7 @@ namespace OpenSpace.Loader {
 			if (file != null) {
 				Pointer soPointer = null;
 				byte[] perso = null, unk = null, unk2 = null;
-				if (Settings.s.game == Settings.Game.RRush) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 					Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file), () => {
 						soPointer = Pointer.Read(reader);
 						perso = reader.ReadBytes(0x18);
@@ -312,7 +312,7 @@ namespace OpenSpace.Loader {
 							(off_dynamicWorld.file as PS1Data).OverwriteData(off_dynamicWorld.FileOffset + 0x10, numChild);
 						});
 					});
-				} else if (Settings.s.game == Settings.Game.JungleBook) {
+				} else if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 					Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file) + 0x98, () => {
 						//soPointer = Pointer.Read(reader);
 						perso = reader.ReadBytes(0x18);
@@ -470,7 +470,7 @@ namespace OpenSpace.Loader {
 			}
 		}
 		public void ReadCollSetsR2(Reader reader) {
-			if (Settings.s.game != Settings.Game.R2) return;
+			if (CPA_Settings.s.game != CPA_Settings.Game.R2) return;
 			Dictionary<PS1.CollSet, HashSet<PS1.Family>> collSets = new Dictionary<PS1.CollSet, HashSet<PS1.Family>>();
 			Dictionary<PS1.Family, HashSet<PS1.CollSet>> fcollSets = new Dictionary<PS1.Family, HashSet<PS1.CollSet>>();
 			foreach (PS1.Perso p in levelHeader.persos) {
@@ -504,7 +504,7 @@ namespace OpenSpace.Loader {
 				RelocateActorFile(0);
 				RelocateActorFile(1);
 			}
-			if (Settings.s.game == Settings.Game.DD) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
 				RelocateActorMemoryDonaldDuck();
 			}
 
@@ -522,7 +522,7 @@ namespace OpenSpace.Loader {
 			levelHeader.dynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_dynamicWorld, onPreRead: s => s.isDynamic = true);
 			levelHeader.inactiveDynamicWorld = FromOffsetOrRead<PS1.SuperObject>(reader, levelHeader.off_inactiveDynamicWorld, onPreRead: s => s.isDynamic = true);
 
-			if (Settings.s.game == Settings.Game.RRush || Settings.s.game == Settings.Game.JungleBook) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.RRush || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				loadingState = "Loading actor files";
 				await WaitIfNecessary();
 				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
@@ -649,7 +649,7 @@ namespace OpenSpace.Loader {
 			loadingState = "Extracting data from bigfile(s)";
 			await WaitIfNecessary();
 			if (FileSystem.FileExists(bigFilePath)) {
-				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath), isLittleEndian: Settings.s.IsLittleEndian)) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(bigFilePath), isLittleEndian: CPA_Settings.s.IsLittleEndian)) {
 
 					loadingState = "Extracting data from bigfile(s): main data";
 					await WaitIfNecessary();
@@ -659,7 +659,7 @@ namespace OpenSpace.Loader {
 					if (fileInfo.type == PS1GameInfo.File.Type.Map) {
 						if (CurrentLevel < 0 || CurrentLevel >= fileInfo.memoryBlocks.Length) return;
 						if (!b.inEngine) return;
-						if (Settings.s.game != Settings.Game.RRush && !b.exeOnly) FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
+						if (CPA_Settings.s.game != CPA_Settings.Game.RRush && !b.exeOnly) FileSystem.AddVirtualFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
 						if (!b.exeOnly && b.inEngine) {
 							if (b.hasSoundEffects) {
 								FileSystem.AddVirtualFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
@@ -731,7 +731,7 @@ namespace OpenSpace.Loader {
 						List<byte[]> mainBlock = await ExtractPackedBlocks(reader, b.main_compressed, fileInfo.baseLBA);
 						int blockIndex = 0;
 						if (fileInfo.type == PS1GameInfo.File.Type.Map) {
-							if (Settings.s.game != Settings.Game.RRush && !b.exeOnly) Util.ByteArrayToFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
+							if (CPA_Settings.s.game != CPA_Settings.Game.RRush && !b.exeOnly) Util.ByteArrayToFile(levelDir + "vignette.tim", mainBlock[blockIndex++]);
 							if (!b.exeOnly && b.inEngine) {
 								if (b.hasSoundEffects) {
 									Util.ByteArrayToFile(levelDir + "sound.vb", mainBlock[blockIndex++]);
@@ -883,7 +883,7 @@ namespace OpenSpace.Loader {
 
 		public void ParseMainBlock(byte[] data, PS1GameInfo.File.MemoryBlock block, int index, string basename) {
 			using (MemoryStream ms = new MemoryStream(data)) {
-				using (Reader reader = new Reader(ms, Settings.s.IsLittleEndian)) {
+				using (Reader reader = new Reader(ms, CPA_Settings.s.IsLittleEndian)) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					uint loadingImgSize = reader.ReadUInt32();
@@ -920,7 +920,7 @@ namespace OpenSpace.Loader {
 			List<byte[]> cutsceneAudioList = new List<byte[]>();
 			List<byte[]> cutsceneFramesList = new List<byte[]>();
 			using (MemoryStream ms = new MemoryStream(cutsceneData)) {
-				using (Reader reader = new Reader(ms, Settings.s.IsLittleEndian)) {
+				using (Reader reader = new Reader(ms, CPA_Settings.s.IsLittleEndian)) {
 					uint size_frame_packet = 1;
 					while (reader.BaseStream.Position < reader.BaseStream.Length && size_frame_packet > 0) {
 						size_frame_packet = reader.ReadUInt32();
@@ -1029,7 +1029,7 @@ namespace OpenSpace.Loader {
 						byte[] compressedData = reader.ReadBytes((int)compressedSize);
 						using (var compressedStream = new MemoryStream(compressedData))
 						using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
-						using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+						using (Reader lzoReader = new Reader(lzo, CPA_Settings.s.IsLittleEndian)) {
 							lzo.SetLength(decompressedSize);
 							uncompressedData = lzoReader.ReadBytes((int)decompressedSize);
 						}
@@ -1051,7 +1051,7 @@ namespace OpenSpace.Loader {
 		#region Textures
 		public void FillVRAM() {
 			int startXPage = 5;
-			if (Settings.s.game == Settings.Game.JungleBook) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				startXPage = 8;
 			}
 			vram.currentXPage = startXPage;

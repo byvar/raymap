@@ -48,12 +48,12 @@ namespace OpenSpace.ROM {
 			ref_144 = reader.ReadUInt16();
 			ref_143 = reader.ReadUInt16();
 			unk6 = reader.ReadUInt16();
-			if (Settings.s.platform == Settings.Platform._3DS || (Settings.s.game == Settings.Game.RRR && Settings.s.mode != Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25)) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS || (CPA_Settings.s.game == CPA_Settings.Game.RRR && CPA_Settings.s.mode != CPA_Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25)) {
 				unk7_3dsOnly = reader.ReadUInt16();
 			}
 			length_46 = reader.ReadUInt16();
 			num_spawnablepersos = reader.ReadUInt16();
-			if (Settings.s.platform == Settings.Platform._3DS || (Settings.s.game == Settings.Game.RRR && Settings.s.mode != Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25)) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS || (CPA_Settings.s.game == CPA_Settings.Game.RRR && CPA_Settings.s.mode != CPA_Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25)) {
 				unk10_3dsOnly = reader.ReadUInt16();
 			}
 			unk11 = reader.ReadUInt16();
@@ -76,7 +76,7 @@ namespace OpenSpace.ROM {
 			len_vectors = reader.ReadUInt16();
 			len_indices = reader.ReadUInt16();
 			unk30 = reader.ReadUInt16(); // 1 is divided by this one
-			if (Settings.s.game == Settings.Game.DD) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
 				backgroundUpLeft = new Reference<VisualMaterial>(reader, true);
 				backgroundUpRight = new Reference<VisualMaterial>(reader, true);
 				backgroundDownLeft = new Reference<VisualMaterial>(reader, true);

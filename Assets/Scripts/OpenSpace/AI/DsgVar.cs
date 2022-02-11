@@ -19,7 +19,7 @@ namespace OpenSpace.AI {
         protected override void ReadInternal(Reader reader) {
             off_dsgMemBuffer = Pointer.Read(reader);
             off_dsgVarInfo = Pointer.Read(reader);
-            if (Settings.s.game == Settings.Game.R2Revolution) {
+            if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
                 dsgMemBufferLength = reader.ReadUInt16();
                 amountOfInfos = reader.ReadUInt16();
             } else {

@@ -32,30 +32,30 @@ namespace OpenSpace.Loader {
 
                 loadingState = "Initializing files";
                 await WaitIfNecessary();
-                string gameDsbPath = gameDataBinFolder + ConvertCase("Game.dsb", Settings.CapsType.DSB);
-                if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-                    gameDsbPath = gameDataBinFolder + ConvertCase("gamedsc.bin", Settings.CapsType.DSB);
-                } else if (Settings.s.game == Settings.Game.TTSE) {
-                    gameDsbPath = gameDataBinFolder + ConvertCase("GAME.DSC", Settings.CapsType.DSB);
+                string gameDsbPath = gameDataBinFolder + ConvertCase("Game.dsb", CPA_Settings.CapsType.DSB);
+                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+                    gameDsbPath = gameDataBinFolder + ConvertCase("gamedsc.bin", CPA_Settings.CapsType.DSB);
+                } else if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+                    gameDsbPath = gameDataBinFolder + ConvertCase("GAME.DSC", CPA_Settings.CapsType.DSB);
 				}
 				await PrepareFile(gameDsbPath);
 				gameDsb = new DSB("Game", gameDsbPath);
 				if (FileSystem.mode != FileSystem.Mode.Web) {
-					gameDsb.Save(gameDataBinFolder + ConvertCase("Game_dsb.dmp", Settings.CapsType.DSB));
+					gameDsb.Save(gameDataBinFolder + ConvertCase("Game_dsb.dmp", CPA_Settings.CapsType.DSB));
 				}
                 gameDsb.ReadAllSections();
                 gameDsb.Dispose();
 
 				await CreateCNT();
 
-				if (Settings.s.game == Settings.Game.R2) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
 					string comportsPath = gameDataBinFolder + "R2DC_Comports.json";
 					await PrepareFile(comportsPath);
 				}
 
 				if (lvlName.EndsWith(".exe")) {
-                    if (!Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
-                    Settings.s.loadFromMemory = true;
+                    if (!CPA_Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
+                    CPA_Settings.s.loadFromMemory = true;
                     MemoryFile mem = new MemoryFile(lvlName);
                     files_array[0] = mem;
                     await WaitIfNecessary();
@@ -63,15 +63,15 @@ namespace OpenSpace.Loader {
                 } else {
                     hasTransit = false;
                     DAT dat = null;
-					string levelsSubFolder = ConvertCase(ConvertPath(gameDsb.levelsDataPath), Settings.CapsType.All) + "/";
+					string levelsSubFolder = ConvertCase(ConvertPath(gameDsb.levelsDataPath), CPA_Settings.CapsType.All) + "/";
 					string levelsFolder = gameDataBinFolder + levelsSubFolder;
                     string langDataPath = gameDataBinFolder
-						+ ConvertCase("../LangData/English/", Settings.CapsType.All)
+						+ ConvertCase("../LangData/English/", CPA_Settings.CapsType.All)
 						+ levelsSubFolder;
-					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
 						await FileSystem.CheckDirectory(langDataPath);
 						if (FileSystem.mode != FileSystem.Mode.Web && !FileSystem.DirectoryExists(langDataPath)) {
-							string langPath = gameDataBinFolder + ConvertCase("../LangData/", Settings.CapsType.All);
+							string langPath = gameDataBinFolder + ConvertCase("../LangData/", CPA_Settings.CapsType.All);
 							await FileSystem.CheckDirectory(langPath);
 							if (FileSystem.DirectoryExists(langPath)) {
 								DirectoryInfo dirInfo = new DirectoryInfo(langPath);
@@ -86,7 +86,7 @@ namespace OpenSpace.Loader {
 
                     await WaitIfNecessary();
 					bool hasRelocationFiles = true;
-                    if (Settings.s.mode == Settings.Mode.Rayman2PC || Settings.s.mode == Settings.Mode.DonaldDuckPC) {
+                    if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman2PC || CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPC) {
                         string dataPath = levelsFolder + "LEVELS0.DAT";
 						await PrepareBigFile(dataPath, 512*1024);
                         if (FileSystem.FileExists(dataPath)) {
@@ -96,28 +96,28 @@ namespace OpenSpace.Loader {
 					}
 
 					// Prepare folder names
-					string lvlFolder = ConvertCase(lvlName + "/", Settings.CapsType.LevelFolder);
-					string langLvlFolder = ConvertCase(lvlName + "/", Settings.CapsType.LangLevelFolder);
+					string lvlFolder = ConvertCase(lvlName + "/", CPA_Settings.CapsType.LevelFolder);
+					string langLvlFolder = ConvertCase(lvlName + "/", CPA_Settings.CapsType.LangLevelFolder);
 
 					// Prepare paths
-					paths["fix.sna"] = levelsFolder + ConvertCase("Fix.sna", Settings.CapsType.Fix);
-					paths["fix.rtb"] = levelsFolder + ConvertCase("Fix.rtb", Settings.CapsType.FixRelocation);
-					paths["fix.gpt"] = levelsFolder + ConvertCase("Fix.gpt", Settings.CapsType.Fix);
-					paths["fix.rtp"] = levelsFolder + ConvertCase("Fix.rtp", Settings.CapsType.FixRelocation);
-					paths["fix.ptx"] = levelsFolder + ConvertCase("Fix.ptx", Settings.CapsType.Fix);
-					paths["fix.rtt"] = levelsFolder + ConvertCase("Fix.rtt", Settings.CapsType.FixRelocation);
-					if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
-						paths["fixlvl.rtb"] = levelsFolder + lvlFolder + ConvertCase("FixLvl.rtb", Settings.CapsType.FixLvl);
+					paths["fix.sna"] = levelsFolder + ConvertCase("Fix.sna", CPA_Settings.CapsType.Fix);
+					paths["fix.rtb"] = levelsFolder + ConvertCase("Fix.rtb", CPA_Settings.CapsType.FixRelocation);
+					paths["fix.gpt"] = levelsFolder + ConvertCase("Fix.gpt", CPA_Settings.CapsType.Fix);
+					paths["fix.rtp"] = levelsFolder + ConvertCase("Fix.rtp", CPA_Settings.CapsType.FixRelocation);
+					paths["fix.ptx"] = levelsFolder + ConvertCase("Fix.ptx", CPA_Settings.CapsType.Fix);
+					paths["fix.rtt"] = levelsFolder + ConvertCase("Fix.rtt", CPA_Settings.CapsType.FixRelocation);
+					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) {
+						paths["fixlvl.rtb"] = levelsFolder + lvlFolder + ConvertCase("FixLvl.rtb", CPA_Settings.CapsType.FixLvl);
 					} else {
 						paths["fixlvl.rtb"] = null;
 					}
-					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-						paths["fix.sda"] = levelsFolder + ConvertCase("Fix.sda", Settings.CapsType.Fix);
-						paths["fix.lng"] = langDataPath + ConvertCase("Fix.lng", Settings.CapsType.LangFix);
-						paths["fix.rtg"] = langDataPath + ConvertCase("Fix.rtg", Settings.CapsType.FixRelocation);
-						paths["fix.dlg"] = langDataPath + ConvertCase("Fix.dlg", Settings.CapsType.LangFix);
-						paths["fix.rtd"] = langDataPath + ConvertCase("Fix.rtd", Settings.CapsType.FixRelocation);
-						paths["fixlvl.rtg"] = langDataPath + langLvlFolder + ConvertCase("FixLvl.rtg", Settings.CapsType.FixLvl);
+					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+						paths["fix.sda"] = levelsFolder + ConvertCase("Fix.sda", CPA_Settings.CapsType.Fix);
+						paths["fix.lng"] = langDataPath + ConvertCase("Fix.lng", CPA_Settings.CapsType.LangFix);
+						paths["fix.rtg"] = langDataPath + ConvertCase("Fix.rtg", CPA_Settings.CapsType.FixRelocation);
+						paths["fix.dlg"] = langDataPath + ConvertCase("Fix.dlg", CPA_Settings.CapsType.LangFix);
+						paths["fix.rtd"] = langDataPath + ConvertCase("Fix.rtd", CPA_Settings.CapsType.FixRelocation);
+						paths["fixlvl.rtg"] = langDataPath + langLvlFolder + ConvertCase("FixLvl.rtg", CPA_Settings.CapsType.FixLvl);
 					} else {
 						paths["fix.sda"] = null;
 						paths["fix.lng"] = null;
@@ -127,24 +127,24 @@ namespace OpenSpace.Loader {
 						paths["fixlvl.rtg"] = null;
 					}
 
-					paths["lvl.sna"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sna", Settings.CapsType.LevelFile);
-					paths["lvl.gpt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".gpt", Settings.CapsType.LevelFile);
-					paths["lvl.ptx"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".ptx", Settings.CapsType.LevelFile);
+					paths["lvl.sna"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sna", CPA_Settings.CapsType.LevelFile);
+					paths["lvl.gpt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".gpt", CPA_Settings.CapsType.LevelFile);
+					paths["lvl.ptx"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".ptx", CPA_Settings.CapsType.LevelFile);
 					if (hasRelocationFiles) {
-						paths["lvl.rtb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtb", Settings.CapsType.LevelRelocation);
-						paths["lvl.rtp"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtp", Settings.CapsType.LevelRelocation);
-						paths["lvl.rtt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtt", Settings.CapsType.LevelRelocation);
+						paths["lvl.rtb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtb", CPA_Settings.CapsType.LevelRelocation);
+						paths["lvl.rtp"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtp", CPA_Settings.CapsType.LevelRelocation);
+						paths["lvl.rtt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtt", CPA_Settings.CapsType.LevelRelocation);
 					} else {
 						paths["lvl.rtb"] = null;
 						paths["lvl.rtp"] = null;
 						paths["lvl.rtt"] = null;
 					}
-					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
-						paths["lvl.sda"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sda", Settings.CapsType.LevelFile);
-						paths["lvl.lng"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".lng", Settings.CapsType.LangLevelFile);
-						paths["lvl.rtg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtg", Settings.CapsType.LangLevelFile);
-						paths["lvl.dlg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".dlg", Settings.CapsType.LangLevelFile);
-						paths["lvl.rtd"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtd", Settings.CapsType.LangLevelRelocation);
+					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+						paths["lvl.sda"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sda", CPA_Settings.CapsType.LevelFile);
+						paths["lvl.lng"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".lng", CPA_Settings.CapsType.LangLevelFile);
+						paths["lvl.rtg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtg", CPA_Settings.CapsType.LangLevelFile);
+						paths["lvl.dlg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".dlg", CPA_Settings.CapsType.LangLevelFile);
+						paths["lvl.rtd"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtd", CPA_Settings.CapsType.LangLevelRelocation);
 					} else {
 						paths["lvl.sda"] = null;
 						paths["lvl.lng"] = null;
@@ -152,9 +152,9 @@ namespace OpenSpace.Loader {
 						paths["lvl.dlg"] = null;
 						paths["lvl.rtd"] = null;
 					}
-					paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsb", Settings.CapsType.DSB);
-					if (Settings.s.engineVersion < Settings.EngineVersion.R2) {
-						paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsc", Settings.CapsType.DSB);
+					paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsb", CPA_Settings.CapsType.DSB);
+					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) {
+						paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsc", CPA_Settings.CapsType.DSB);
                     }
 
 					// Download files
@@ -183,7 +183,7 @@ namespace OpenSpace.Loader {
 						fixRtb.Add(fixLvlRtb);
                     }
                     SNA fixSna = new SNA("Fix", paths["fix.sna"], fixRtb);
-					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
+					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
 						RelocationTable fixLangRTG = new RelocationTable(paths["fix.rtg"], dat, "fixLang", RelocationType.RTG);
 						await fixLangRTG.Init();
 						if (FileSystem.FileExists(paths["fixlvl.rtg"])) {
@@ -216,7 +216,7 @@ namespace OpenSpace.Loader {
                     RelocationTable lvlRtb = new RelocationTable(paths["lvl.rtb"], dat, lvlName, RelocationType.RTB);
 					await lvlRtb.Init();
 					SNA lvlSna = new SNA(lvlName, paths["lvl.sna"], lvlRtb);
-					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
+					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
 						RelocationTable lvlLangRTG = new RelocationTable(paths["lvl.rtg"], dat, lvlName + "Lang", RelocationType.RTG);
 						await lvlLangRTG.Init();
 						SNA lvlLangSna = new SNA(lvlName + "Lang", paths["lvl.lng"], lvlLangRTG);
@@ -228,7 +228,7 @@ namespace OpenSpace.Loader {
 						lvlSna.ReadDLG(paths["lvl.dlg"], lvlRtd);
                     }
 
-                    if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                    if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
                         RelocationTable lvlRtp = new RelocationTable(paths["lvl.rtp"], dat, lvlName, RelocationType.RTP);
 						await lvlRtp.Init();
 						lvlSna.ReadGPT(paths["lvl.gpt"], lvlRtp);
@@ -289,29 +289,29 @@ namespace OpenSpace.Loader {
             print("FIX GPT offset: " + Pointer.Current(reader));
             SNA sna = (SNA)files_array[Mem.Fix];
 
-            if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
                 // Tonic Trouble
                 inputStruct = new InputStructure(null);
-                uint stringCount = Settings.s.game == Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
+                uint stringCount = CPA_Settings.s.game == CPA_Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
                 Pointer.Read(reader);
                 Pointer.Read(reader);
                 Pointer.Read(reader);
-                if (Settings.s.game == Settings.Game.TTSE) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
                     for (int i = 0; i < 50; i++) Pointer.Read(reader);
                 } else {
                     for (int i = 0; i < 100; i++) Pointer.Read(reader);
                 }
                 reader.ReadUInt32(); // 0x35
-                if (Settings.s.game != Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
+                if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
                 reader.ReadBytes(0x90);
                 Pointer.Read(reader);
                 reader.ReadUInt32(); // 0x28
                 reader.ReadUInt32(); // 0x1
-                if (Settings.s.game == Settings.Game.TTSE) Pointer.Read(reader);
+                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) Pointer.Read(reader);
                 for (int i = 0; i < 100; i++) Pointer.Read(reader);
                 for (int i = 0; i < 100; i++) Pointer.Read(reader);
                 reader.ReadUInt32(); // 0x1
-                if (Settings.s.game == Settings.Game.TTSE) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
                     reader.ReadBytes(0xB4);
                 } else {
                     if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
@@ -329,7 +329,7 @@ namespace OpenSpace.Loader {
                 Pointer.Read(reader);
                 for (int i = 0; i < stringCount; i++) Pointer.Read(reader); // read num_loaded_strings pointers here
                 reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
-                if (Settings.s.game != Settings.Game.TTSE) { // There's more but what is even the point in reading all this
+                if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) { // There's more but what is even the point in reading all this
                     reader.ReadUInt32();
                     Pointer.Read(reader);
                     reader.ReadBytes(0x14);
@@ -352,7 +352,7 @@ namespace OpenSpace.Loader {
                     reader.ReadBytes(0x30);
                     reader.ReadBytes(0x960);
                 }
-            } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+            } else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
                 uint num_strings = 0;
                 inputStruct = new InputStructure(null);
 
@@ -434,7 +434,7 @@ namespace OpenSpace.Loader {
                 Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
                 loadingState = "Loading input structure";
                 await WaitIfNecessary();
-                for (int i = 0; i < Settings.s.numEntryActions; i++) {
+                for (int i = 0; i < CPA_Settings.s.numEntryActions; i++) {
                     Pointer.Read(reader); // 3DOS_EntryActions
                 }
                 Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
@@ -489,7 +489,7 @@ namespace OpenSpace.Loader {
             reader = files_array[Mem.Lvl].reader;
             print("LVL GPT offset: " + Pointer.Current(reader));
 
-            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
 
                 // SDA
                 /*sna.GotoSDA();
@@ -511,14 +511,14 @@ namespace OpenSpace.Loader {
 
                 // GPT
                 sna.GotoHeader();
-                if (Settings.s.game != Settings.Game.PlaymobilLaura) {
+                if (CPA_Settings.s.game != CPA_Settings.Game.PlaymobilLaura) {
                     Pointer.Read(reader); // sound related
                 }
                 Pointer.Read(reader);
                 Pointer.Read(reader);
                 reader.ReadUInt32();
             }
-            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
                 loadingState = "Reading settings for persos in fix";
                 await WaitIfNecessary();
                 // Fill in fix -> lvl pointers for perso's in fix
@@ -531,7 +531,7 @@ namespace OpenSpace.Loader {
                         reader.ReadUInt32();
                         Pointer off_stdGame = Pointer.Read(reader);
                         if (off_stdGame != null) {
-                            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
                                 Pointer.Goto(ref reader, off_stdGame);
                                 reader.ReadUInt32(); // type 0
                                 reader.ReadUInt32(); // type 1
@@ -545,7 +545,7 @@ namespace OpenSpace.Loader {
                             // First read everything from the GPT
                             Pointer off_newSuperObject = null, off_nextBrother = null, off_prevBrother = null, off_father = null;
                             byte[] matrixData = null, floatData = null, renderBits = null;
-                            if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
                                 off_newSuperObject = Pointer.Read(reader);
                                 matrixData = reader.ReadBytes(0x58);
                                 renderBits = reader.ReadBytes(4);
@@ -569,13 +569,13 @@ namespace OpenSpace.Loader {
                                 persoInFixPointers[i] = off_newSOengineObject;
                                 Pointer.Goto(ref reader, off_newSOengineObject);
 								Pointer off_p3dData = Pointer.Read(reader);
-                                if (Settings.s.game == Settings.Game.R2Demo) {
+                                if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
                                     ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x1C, matrixData);
                                 } else {
                                     ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x18, matrixData);
                                 }
 
-                                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
                                     FileWithPointers file = off_newSuperObject.file;
                                     file.AddPointer(off_newSuperObject.FileOffset + 0x14, off_nextBrother);
                                     file.AddPointer(off_newSuperObject.FileOffset + 0x18, off_prevBrother);
@@ -594,7 +594,7 @@ namespace OpenSpace.Loader {
             }
             loadingState = "Loading globals";
             await WaitIfNecessary();
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 globals.off_actualWorld = Pointer.Read(reader);
                 globals.off_dynamicWorld = Pointer.Read(reader);
                 globals.off_inactiveDynamicWorld = Pointer.Read(reader);
@@ -605,7 +605,7 @@ namespace OpenSpace.Loader {
                 globals.off_dynamicWorld = Pointer.Read(reader);
                 globals.off_fatherSector = Pointer.Read(reader);
                 uint soundEventIndex = reader.ReadUInt32(); // In Montreal version this is a pointer, also sound event related
-                if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
                     Pointer.Read(reader);
                 }
             }
@@ -613,7 +613,7 @@ namespace OpenSpace.Loader {
             globals.num_always = reader.ReadUInt32();
             globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
             globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
                 globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
             } else {
@@ -621,8 +621,8 @@ namespace OpenSpace.Loader {
                 globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
             }
 
-            if (Settings.s.game == Settings.Game.DD) reader.ReadUInt32();
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.game == CPA_Settings.Game.DD) reader.ReadUInt32();
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 Pointer dword_4A6B1C_always_header = Pointer.Read(reader);
                 Pointer dword_4A6B20_always_last = Pointer.Read(reader);
 
@@ -657,7 +657,7 @@ namespace OpenSpace.Loader {
             loadingState = "Loading engine structure";
             await WaitIfNecessary();
             print("Start of EngineStructure: " + Pointer.Current(reader));
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 reader.ReadByte();
                 string mapName = reader.ReadString(0x1E);
                 reader.ReadChars(0x1E);
@@ -669,16 +669,16 @@ namespace OpenSpace.Loader {
                 string mapName = reader.ReadString(0x104);
                 reader.ReadChars(0x104);
                 string mapName2 = reader.ReadString(0x104);
-                if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
                     reader.ReadChars(0x104);
                     reader.ReadChars(0x104);
                 }
                 string mapName3 = reader.ReadString(0x104);
-                if (Settings.s.game == Settings.Game.TT) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.TT) {
                     reader.ReadBytes(0x47F7); // don't know what this data is
-                } else if (Settings.s.game == Settings.Game.TTSE) {
+                } else if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
                     reader.ReadBytes(0x240F);
-                } else if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+                } else if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
                     reader.ReadBytes(0x240F); // don't know what this data is
                 } else { // Hype & Alex
                     reader.ReadBytes(0x2627); // don't know what this data is
@@ -691,17 +691,17 @@ namespace OpenSpace.Loader {
             families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             families.FillPointers(reader, families.off_tail, families.off_head);
 
-            if (Settings.s.game == Settings.Game.PlaymobilLaura) {
+            if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
                 LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
             }
 
             LinkedList<SuperObject> alwaysActiveCharacters = LinkedList<SuperObject>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
 
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                if (Settings.s.game == Settings.Game.RedPlanet ||Settings.s.game == Settings.Game.R2Demo) reader.ReadUInt32();
+                if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet ||CPA_Settings.s.game == CPA_Settings.Game.R2Demo) reader.ReadUInt32();
                 Pointer off_languages = Pointer.Read(reader);
                 reader.ReadUInt32();
 
@@ -724,7 +724,7 @@ namespace OpenSpace.Loader {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
 
-                if (Settings.s.game == Settings.Game.DD) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
                     reader.ReadUInt32();
                 }
 
@@ -732,7 +732,7 @@ namespace OpenSpace.Loader {
                 Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
                 Pointer off_mainChar = Pointer.Read(reader); // superobject
                 Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
-                if (Settings.s.game == Settings.Game.DD) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
                     globals.off_backgroundGameMaterial = Pointer.Read(reader);
                 }
                 Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
@@ -747,11 +747,11 @@ namespace OpenSpace.Loader {
                 }
                 Pointer.Read(reader); // DemoSOList
 
-                if (Settings.s.game == Settings.Game.R2Demo || Settings.s.game == Settings.Game.RedPlanet || Settings.s.mode == Settings.Mode.DonaldDuckPCDemo) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo || CPA_Settings.s.game == CPA_Settings.Game.RedPlanet || CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPCDemo) {
                     Pointer.Read(reader);
                 }
 
-                if (Settings.s.mode == Settings.Mode.DonaldDuckPCDemo) {
+                if (CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPCDemo) {
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                 }
@@ -792,13 +792,13 @@ namespace OpenSpace.Loader {
 
             loadingState = "Creating animation bank";
             await WaitIfNecessary();
-            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
                 animationBanks = new AnimationBank[2];
                 animationBanks[0] = new AnimationBank(null) {
                     animations = new Animation.Component.AnimA3DGeneral[0]
                 };
                 animationBanks[1] = animationBanks[0];
-            } else if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+            } else if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
                 uint maxAnimIndex = 0;
                 foreach (State s in states) {
                     if (s.anim_ref != null && s.anim_ref.anim_index > maxAnimIndex) maxAnimIndex = s.anim_ref.anim_index;
@@ -824,7 +824,7 @@ namespace OpenSpace.Loader {
             ReadCrossReferences(reader);
 
 			// TODO: Make more generic
-			if (Settings.s.game == Settings.Game.R2) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
 				loadingState = "Filling in comport names";
 				await WaitIfNecessary();
 				string path = gameDataBinFolder + "R2DC_Comports.json";

@@ -32,7 +32,7 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			//Load.print("Anim " + Pointer.Current(reader));
-			if (Settings.s.game == Settings.Game.R2) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
 				speed = reader.ReadUInt32();
 				off_channels = Pointer.Read(reader);
 				num_channels = reader.ReadUInt32();
@@ -41,7 +41,7 @@ namespace OpenSpace.PS1 {
 				num_hierarchies = reader.ReadUInt32();
 				off_hierarchies = Pointer.Read(reader);
 				uint_18 = reader.ReadUInt32();
-			} else if(Settings.s.game == Settings.Game.RRush) {
+			} else if(CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 				off_channels = Pointer.Read(reader);
 				off_hierarchies = Pointer.Read(reader);
 				num_hierarchies = reader.ReadUInt16();
@@ -57,7 +57,7 @@ namespace OpenSpace.PS1 {
 				//Load.print("Anim " + Offset + " - " + num_frames);
 				ushort_0E = reader.ReadUInt16();
 				num_hierarchies = reader.ReadUInt32();
-				if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.VIP || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 					off_hierarchies = Pointer.Read(reader);
 					ushort_18 = reader.ReadUInt16();
 					num_bones = reader.ReadUInt16();
@@ -82,7 +82,7 @@ namespace OpenSpace.PS1 {
 			hierarchies = Load.ReadArray<PS1AnimationHierarchy>(num_hierarchies, reader, off_hierarchies);
 			//Load.print(channels.Max(c => c.frames.Length == 0 ? 0 : c.frames.Max(f => f.ntto >= 1 ? f.frameNumber.GetValueOrDefault(0) : 0)) + " - " + num_frames + " - " + num_channels);
 			if (off_hierarchies != null) {
-				Pointer.DoAt(ref reader, off_hierarchies - (Settings.s.game == Settings.Game.DD ? 0x14 : 0x10), () => {
+				Pointer.DoAt(ref reader, off_hierarchies - (CPA_Settings.s.game == CPA_Settings.Game.DD ? 0x14 : 0x10), () => {
 					name = reader.ReadString(0x10);
 					//Load.print(Offset + " - " + name);
 				});

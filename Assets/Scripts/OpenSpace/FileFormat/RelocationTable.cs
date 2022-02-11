@@ -97,7 +97,7 @@ namespace OpenSpace.FileFormat {
 
         private async UniTask Load(Stream stream, bool masking) {
             using (Reader reader = new Reader(stream, isLittleEndian)) {
-                if (Settings.s.encryptPointerFiles) {
+                if (CPA_Settings.s.encryptPointerFiles) {
                     reader.InitMask();
 					//reader.InitWindowMask();
 					/*byte [] data = reader.ReadBytes((int)stream.Length);
@@ -168,8 +168,8 @@ namespace OpenSpace.FileFormat {
 
 			if (httpStream != null) await httpStream.FillCacheForRead(5);
 			byte count = reader.ReadByte();
-            if (Settings.s.game != Settings.Game.R2Demo && Settings.s.game != Settings.Game.RedPlanet
-                && Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.game != CPA_Settings.Game.R2Demo && CPA_Settings.s.game != CPA_Settings.Game.RedPlanet
+                && CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
             }
             pointerBlocks = new RelocationPointerList[count];
@@ -188,7 +188,7 @@ namespace OpenSpace.FileFormat {
                 pointerBlocks[i].count = reader.ReadUInt32();
 				pointerBlocks[i].pointers = new RelocationPointerInfo[pointerBlocks[i].count];
                 if (pointerBlocks[i].count > 0) {
-                    if (Settings.s.snaCompression) {
+                    if (CPA_Settings.s.snaCompression) {
 						if (httpStream != null) await httpStream.FillCacheForRead(5*4);
 						uint isCompressed = reader.ReadUInt32();
                         uint compressedSize = reader.ReadUInt32();
@@ -200,12 +200,12 @@ namespace OpenSpace.FileFormat {
                         if (isCompressed != 0) {
                             using (var compressedStream = new MemoryStream(compressedData))
                             using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
-                            using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+                            using (Reader lzoReader = new Reader(lzo, CPA_Settings.s.IsLittleEndian)) {
                                 ReadPointerBlock(lzoReader, pointerBlocks[i]);
                             }
                         } else {
                             using (var uncompressedStream = new MemoryStream(compressedData))
-                            using (Reader unCompressedReader = new Reader(uncompressedStream, Settings.s.IsLittleEndian)) {
+                            using (Reader unCompressedReader = new Reader(uncompressedStream, CPA_Settings.s.IsLittleEndian)) {
                                 ReadPointerBlock(unCompressedReader, pointerBlocks[i]);
                             }
                         }
@@ -226,7 +226,7 @@ namespace OpenSpace.FileFormat {
                 pointerBlock.pointers[j].offsetInMemory = reader.ReadUInt32();
 				pointerBlock.pointers[j].module = reader.ReadByte();
                 pointerBlock.pointers[j].id = reader.ReadByte();
-                if (Settings.s.engineVersion > Settings.EngineVersion.TT && Settings.s.game != Settings.Game.PlaymobilLaura) {
+                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT && CPA_Settings.s.game != CPA_Settings.Game.PlaymobilLaura) {
                     pointerBlock.pointers[j].byte6 = reader.ReadByte();
                     pointerBlock.pointers[j].byte7 = reader.ReadByte();
                 }

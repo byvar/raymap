@@ -19,14 +19,14 @@ namespace OpenSpace.Animation.Component {
 			vector = reader.ReadUInt16();
 			num_hierarchies_for_frame = reader.ReadUInt16();
 			start_hierarchies_for_frame = reader.ReadUInt16();
-			if (Settings.s.hasDeformations) {
-				if (Settings.s.game != Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.hasDeformations) {
+				if (CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 					unk8 = reader.ReadUInt16();
 				}
 				deformation = reader.ReadUInt16();
 			}
 			numOfNTTO = reader.ReadUInt16();
-			if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
+			if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT) {
 				unk8 = reader.ReadUInt16();
 			}
 		}

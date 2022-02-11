@@ -76,10 +76,10 @@ namespace OpenSpace.Object.Properties {
             f.off_family_next = Pointer.Read(reader);
             f.off_family_prev = Pointer.Read(reader);
             f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
-			if (Settings.s.game != Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
 				f.family_index = reader.ReadUInt32();
 			}
-			if (Settings.s.hasObjectTypes) {
+			if (CPA_Settings.s.hasObjectTypes) {
 				f.name = l.objectTypes[0][f.family_index].name;
 			}
             //l.print("(" + f.family_index + ") " + f.name + " - " + offset);
@@ -89,32 +89,32 @@ namespace OpenSpace.Object.Properties {
                 State s = State.Read(reader, off_element, f, stateIndex++);
                 return s;
             });
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.LargoWinch) {
+            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
                 // (0x10 blocks: next, prev, list end, a3d pointer)
                 f.preloadAnim = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
             }
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
 			} else {
 				f.off_physical_list_default = Pointer.Read(reader); // Default objects table
 				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader));
 			}
-            if ((Settings.s.mode == Settings.Mode.Rayman3PS2DevBuild_2002_09_06
+            if ((CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2DevBuild_2002_09_06
                 || f.objectLists.off_head == f.objectLists.off_tail)
                 && f.objectLists.Count > 1) f.objectLists.Count = 1; // Correction for Rayman 2
             f.off_bounding_volume = Pointer.Read(reader);
-            if (Settings.s.game == Settings.Game.R3) {
+            if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
                 f.off_vector4s = Pointer.Read(reader);
                 f.num_vector4s = reader.ReadUInt32();
                 reader.ReadUInt32();
             }
-			if (Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				reader.ReadUInt32();
 				f.animBank = reader.ReadByte();
 				f.properties = reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
-			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			} else if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 f.animBank = reader.ReadByte();
                 reader.ReadByte();
@@ -136,7 +136,7 @@ namespace OpenSpace.Object.Properties {
                 ObjectList ol = ObjectList.FromOffsetOrRead(off_list, reader);
 				f.AddNewPhysicalList(ol, alreadyAdded: true);
 
-				if (Settings.s.game == Settings.Game.LargoWinch) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 					foreach (State state in f.states) {
 						if (state != null && state.anim_ref != null && state.anim_ref.a3dLargo != null) {
 							foreach (Animation.Component.AnimNTTO n in state.anim_ref.a3dLargo.ntto) {

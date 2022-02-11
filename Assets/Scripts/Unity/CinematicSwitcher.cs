@@ -50,7 +50,7 @@ public class CinematicSwitcher : MonoBehaviour {
 
 			for (int i = 0; i < ps1Streams.Length; i++) {
 				CinematicNames[i + 1] = "Stream " + i;
-				PS1GameInfo game = PS1GameInfo.Games[Settings.s.mode];
+				PS1GameInfo game = PS1GameInfo.Games[CPA_Settings.s.mode];
 				if (game != null && game.cines !=null && game.cines.ContainsKey(l.lvlName)) {
 					if (game.cines[l.lvlName].Length > i) {
 						CinematicNames[i + 1] += ": " + game.cines[l.lvlName][i];

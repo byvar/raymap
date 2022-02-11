@@ -19,7 +19,7 @@ namespace OpenSpace.ROM {
 
 		protected override void ReadInternal(Reader reader) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
-			if (Settings.s.platform == Settings.Platform.N64) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
 				r = reader.ReadByte();
 				g = reader.ReadByte();
 				b = reader.ReadByte();
@@ -46,7 +46,7 @@ namespace OpenSpace.ROM {
 					if (texInfo.AlphaIsTransparency || texInfo.RenderWater1 || texInfo.RenderWater2) {
 						mat = new Material(MapLoader.Loader.baseTransparentMaterial);
 					} else {
-						if (Settings.s.platform == Settings.Platform._3DS) {
+						if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
 							mat = new Material(MapLoader.Loader.baseLightMaterial);
 						} else {
 							mat = new Material(MapLoader.Loader.baseTransparentMaterial);
@@ -69,7 +69,7 @@ namespace OpenSpace.ROM {
 				mat = new Material(MapLoader.Loader.baseMaterial);
 			}
 			Vector4 ambient, diffuse;
-			if (Settings.s.platform == Settings.Platform.N64) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
 				ambient = new Vector4(0.25f, 0.25f, 0.25f, 1f);
 				diffuse = new Vector4(r / 255f, g / 255f, b / 255f, a / 255f);
 			} else {
@@ -89,12 +89,12 @@ namespace OpenSpace.ROM {
 
 		public float ScrollX {
 			get {
-				return scrollSpeedX * Mathf.Abs(Settings.s.textureAnimationSpeedModifier);
+				return scrollSpeedX * Mathf.Abs(CPA_Settings.s.textureAnimationSpeedModifier);
 			}
 		}
 		public float ScrollY {
 			get {
-				return scrollSpeedY * Settings.s.textureAnimationSpeedModifier;
+				return scrollSpeedY * CPA_Settings.s.textureAnimationSpeedModifier;
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace OpenSpace.ROM {
 
 		static Vector4 ParseColorRGBA5551(ushort shortCol) {
 			uint alpha, blue, green, red;
-			if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform._3DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS || CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
 				alpha = ExtractBits(shortCol, 1, 15);
 				blue = ExtractBits(shortCol, 5, 10);
 				green = ExtractBits(shortCol, 5, 5);
@@ -131,7 +131,7 @@ namespace OpenSpace.ROM {
 		}
 		static Vector4 ParseColorRGB565(ushort shortCol) {
 			uint blue, green, red;
-			if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform._3DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS || CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
 				red = ExtractBits(shortCol, 5, 0);
 				green = ExtractBits(shortCol, 6, 5);
 				blue = ExtractBits(shortCol, 5, 11);
@@ -144,7 +144,7 @@ namespace OpenSpace.ROM {
 		}
 		static Vector4 ParseColorRGBA4444(ushort shortCol) {
 			uint alpha, blue, green, red;
-			if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform._3DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS || CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
 				alpha = ExtractBits(shortCol, 4, 12);
 				blue = ExtractBits(shortCol, 4, 8);
 				green = ExtractBits(shortCol, 4, 4);

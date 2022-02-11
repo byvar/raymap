@@ -60,7 +60,7 @@ namespace OpenSpace.ROM {
 				index = paramEntry.Value.index_of_entry;
 				usedParam = paramEntry.Value.param;
 			}
-			if (Settings.s.aiTypes != null) dsgVarType = Settings.s.aiTypes.GetDsgVarType(typeNumber);
+			if (CPA_Settings.s.aiTypes != null) dsgVarType = CPA_Settings.s.aiTypes.GetDsgVarType(typeNumber);
 			if (paramEntry == null) {
 				// If paramEntry exists, all params <= 4 bytes, so until float, should be read from paramEntry.
 				// eg. instead of using paramUInt, you use paramEntry.Value.paramUInt

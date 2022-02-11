@@ -23,8 +23,8 @@ namespace OpenSpace.AI {
             Brain b = new Brain(offset);
 			//MapLoader.Loader.print("Brain " + offset);
             b.off_mind = Pointer.Read(reader);
-			if (Settings.s.game != Settings.Game.R2Revolution) b.unknown1 = reader.ReadUInt32(); // init at 0xCDCDCDCD
-			if (Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) b.unknown1 = reader.ReadUInt32(); // init at 0xCDCDCDCD
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				b.unknown2 = reader.ReadByte(); // 0
 			} else {
 				b.unknown2 = reader.ReadUInt32(); // 0

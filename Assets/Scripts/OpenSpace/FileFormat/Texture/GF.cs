@@ -62,17 +62,17 @@ namespace OpenSpace.FileFormat.Texture {
 
         public GF(Stream stream) {
             MapLoader l = MapLoader.Loader;
-            bool isR3PS2Proto = Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17;
+            bool isR3PS2Proto = CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17;
             Reader reader = new Reader(stream, isLittleEndian);
             /*var pos = reader.BaseStream.Position;
             reader.ReadBytes(*/
             if (isR3PS2Proto) {
-            } else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+            } else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
                 byte version = reader.ReadByte();
                 format = 1555;
             } else {
                 format = 8888;
-                if (Settings.s.platform != Settings.Platform.iOS && Settings.s.game != Settings.Game.TTSE) format = reader.ReadUInt32();
+                if (CPA_Settings.s.platform != CPA_Settings.Platform.iOS && CPA_Settings.s.game != CPA_Settings.Game.TTSE) format = reader.ReadUInt32();
             }
 
             width = reader.ReadUInt32();
@@ -83,7 +83,7 @@ namespace OpenSpace.FileFormat.Texture {
             if (!isR3PS2Proto) {
                 channels = reader.ReadByte();
                 byte enlargeByte = 0;
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) enlargeByte = reader.ReadByte();
+                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.Dinosaur && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) enlargeByte = reader.ReadByte();
                 if (enlargeByte > 1) {
                     uint w = width, h = height, e = enlargeByte;
                     if (w != 1) w >>= 1;
@@ -99,7 +99,7 @@ namespace OpenSpace.FileFormat.Texture {
                 reader.ReadUInt32();
             }
             if(!isR3PS2Proto) repeatByte = reader.ReadByte();
-            if (Settings.s.engineVersion == Settings.EngineVersion.Montreal || isR3PS2Proto) {
+            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal || isR3PS2Proto) {
                 paletteNumColors = reader.ReadUInt16();
                 paletteBytesPerColor = reader.ReadByte();
                 if (isR3PS2Proto) {
@@ -129,7 +129,7 @@ namespace OpenSpace.FileFormat.Texture {
 
             pixels = new Color[width * height];
             if (!isR3PS2Proto) {
-                if (Settings.s.engineVersion == Settings.EngineVersion.R3 && channels == 1) {
+                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && channels == 1) {
                     paletteBytesPerColor = 4;
                     paletteNumColors = 256;
                     palette = reader.ReadBytes(paletteBytesPerColor * paletteNumColors);

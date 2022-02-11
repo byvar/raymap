@@ -49,10 +49,10 @@ namespace OpenSpace.AI {
 
 		protected override void ReadInternal(Reader reader) {
 			MapLoader.Loader.macros.Add(this);
-			if (Settings.s.hasNames
-				&& Settings.s.platform != Settings.Platform.Xbox360
-				&& Settings.s.platform != Settings.Platform.PS3
-				&& Settings.s.platform != Settings.Platform.PS2) {
+			if (CPA_Settings.s.hasNames
+				&& CPA_Settings.s.platform != CPA_Settings.Platform.Xbox360
+				&& CPA_Settings.s.platform != CPA_Settings.Platform.PS3
+				&& CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
 				name = reader.ReadString(0x100);
 
                 // Some versions have extra information in the name, e.g.

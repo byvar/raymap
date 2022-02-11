@@ -177,7 +177,7 @@ namespace OpenSpace.Object {
             so.globalMatrix = reader.ReadInt32(); // 0x28 -> 0x2C
 			so.drawFlags = SuperObjectDrawFlags.Read(reader);
             so.flags = SuperObjectFlags.Read(reader); // 0x30->0x34
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) reader.ReadUInt32(); // Visual Bounding Volume?
+            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) reader.ReadUInt32(); // Visual Bounding Volume?
             Pointer off_boundingVolume = Pointer.Read(reader);
             //l.print("SuperObject T" + so.typeCode + ": " + off_so + " - " + so.off_matrix);
 
@@ -206,7 +206,7 @@ namespace OpenSpace.Object {
                     });
                     break;
                 case Type.PhysicalObject:
-                    if (!Settings.s.loadFromMemory) {
+                    if (!CPA_Settings.s.loadFromMemory) {
                         Pointer.DoAt(ref reader, so.off_data, () => {
                             so.data = PhysicalObject.Read(reader, so.off_data, so);
                         });
@@ -244,7 +244,7 @@ namespace OpenSpace.Object {
 
             Pointer.DoAt(ref reader, off_boundingVolume, () => {
 				//l.print(so.type + " - " + so.offset + " - " + off_boundingVolume);
-                if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) {
+                if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) {
                     so.boundingVolumeTT = GeometricObjectCollide.Read(reader, off_boundingVolume, isBoundingVolume: true);
                 } else {
                     so.boundingVolume = BoundingVolume.Read(reader, off_boundingVolume, so.flags.HasFlag(SuperObjectFlags.Flags.BoundingBoxInsteadOfSphere) ?
@@ -287,7 +287,7 @@ namespace OpenSpace.Object {
 
         public static Type GetSOType(uint typeCode) {
             Type type = Type.Unknown;
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 switch (typeCode) {
                     case 0x1: type = Type.World; break;
                     case 0x2: type = Type.Perso; break;

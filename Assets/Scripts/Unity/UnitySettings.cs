@@ -20,10 +20,10 @@ public class UnitySettings {
     private const string serverAddress = "https://raym.app/data/raymap/";
     public static bool IsRaymapGame { get; set; } = false;
 
-	public static Dictionary<Settings.Mode, string> GameDirectories = new Dictionary<Settings.Mode, string>();
-	public static Dictionary<Settings.Mode, string> GameDirectoriesWeb = new Dictionary<Settings.Mode, string>();
+	public static Dictionary<CPA_Settings.Mode, string> GameDirectories = new Dictionary<CPA_Settings.Mode, string>();
+	public static Dictionary<CPA_Settings.Mode, string> GameDirectoriesWeb = new Dictionary<CPA_Settings.Mode, string>();
 
-    public static Dictionary<Settings.EngineVersion, bool> HideDirectories { get; set; } = new Dictionary<Settings.EngineVersion, bool>();
+    public static Dictionary<CPA_Settings.EngineVersion, bool> HideDirectories { get; set; } = new Dictionary<CPA_Settings.EngineVersion, bool>();
 
 
     /// <summary>
@@ -54,7 +54,7 @@ public class UnitySettings {
         }
     }
 
-    public static Settings.Mode GameMode { get; set; } = Settings.Mode.Rayman2PC;
+    public static CPA_Settings.Mode GameMode { get; set; } = CPA_Settings.Mode.Rayman2PC;
 
     public static string MapName { get; set; }
 	public static string ProcessName { get; set; }
@@ -104,23 +104,23 @@ public class UnitySettings {
 
 	private static void SerializeSettings(ISerializer s, bool cmdLine = false) {
         if (!cmdLine) {
-            Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
-            foreach (Settings.Mode mode in modes) {
+            CPA_Settings.Mode[] modes = (CPA_Settings.Mode[])Enum.GetValues(typeof(CPA_Settings.Mode));
+            foreach (CPA_Settings.Mode mode in modes) {
                 string dir = GameDirectories.ContainsKey(mode) ? GameDirectories[mode] : "";
                 GameDirectories[mode] = s.SerializeString("Directory" + mode.ToString(), dir);
             }
             if (UnityEngine.Application.isEditor) {
-                foreach (Settings.Mode mode in modes) {
+                foreach (CPA_Settings.Mode mode in modes) {
                     string dir = GameDirectoriesWeb.ContainsKey(mode) ? GameDirectoriesWeb[mode] : "";
                     GameDirectoriesWeb[mode] = s.SerializeString("WebDirectory" + mode.ToString(), dir);
                 }
             }
         }
 		string modeString = s.SerializeString("GameMode", GameMode.ToString(), "mode", "m");
-        GameMode = Enum.TryParse(modeString, out Settings.Mode gameMode) ? gameMode : GameMode;
+        GameMode = Enum.TryParse(modeString, out CPA_Settings.Mode gameMode) ? gameMode : GameMode;
         if (cmdLine) {
-            if (Settings.cmdModeNameDict.ContainsKey(modeString)) {
-                GameMode = Settings.cmdModeNameDict[modeString];
+            if (CPA_Settings.cmdModeNameDict.ContainsKey(modeString)) {
+                GameMode = CPA_Settings.cmdModeNameDict[modeString];
             }
             if (FileSystem.mode == FileSystem.Mode.Web) {
                 string dir = GameDirectoriesWeb.ContainsKey(GameMode) ? GameDirectoriesWeb[GameMode] : "";
@@ -191,8 +191,8 @@ public class UnitySettings {
 
 
 
-        Settings.EngineVersion[] engines = EnumHelpers.GetValues<Settings.EngineVersion>();
-        foreach (Settings.EngineVersion engine in engines) {
+        CPA_Settings.EngineVersion[] engines = EnumHelpers.GetValues<CPA_Settings.EngineVersion>();
+        foreach (CPA_Settings.EngineVersion engine in engines) {
             bool v = HideDirectories.ContainsKey(engine) && HideDirectories[engine];
             HideDirectories[engine] = s.SerializeBool("HideDirectory" + engine.ToString(), v);
         }

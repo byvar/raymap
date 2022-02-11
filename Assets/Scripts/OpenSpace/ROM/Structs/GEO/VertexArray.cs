@@ -13,7 +13,7 @@ namespace OpenSpace.ROM {
 
 
 		protected override void ReadInternal(Reader reader) {
-			if (Settings.s.platform == Settings.Platform.N64) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
 				vertices = new Vertex[length / 16];
 				for (int i = 0; i < vertices.Length; i++) {
 					vertices[i] = new Vertex(reader);
@@ -23,7 +23,7 @@ namespace OpenSpace.ROM {
 			}
 		}
 		public void ResetVertexBuffer() {
-			if (Settings.s.platform == Settings.Platform.N64) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
 				foreach(Vertex v in vertices) {
 					v.ResetWorkingCopy();
 				}

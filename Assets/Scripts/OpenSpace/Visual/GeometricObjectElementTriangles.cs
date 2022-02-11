@@ -278,7 +278,7 @@ namespace OpenSpace.Visual {
 						}
 						OPT_unityMesh.SetUVs(t, uv);
 					}
-					if (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3) {
+					if (sdc.geo.Type != 3 && CPA_Settings.s.game != CPA_Settings.Game.R3) {
 						Color[] colors = new Color[vertices.Length];
 						for (int u = 0; u < colors.Length; u++) {
 							colors[u] = sdc.GetColor(u);
@@ -331,7 +331,7 @@ namespace OpenSpace.Visual {
 							normals[i] = sdc.GetNormal(i);
 						}
 						OPT_unityMesh.normals = normals;
-					} else if (sdc.geo.Type == 3 && Settings.s.game != Settings.Game.R3) {
+					} else if (sdc.geo.Type == 3 && CPA_Settings.s.game != CPA_Settings.Game.R3) {
 						OPT_unityMesh.normals = normals;
 					} else {
 						OPT_unityMesh.RecalculateNormals();
@@ -642,7 +642,7 @@ namespace OpenSpace.Visual {
                 //gao.name += " " + visualMaterial.offset + " - " + (visualMaterial.textures.Count > 0 ? visualMaterial.textures[0].offset.ToString() : "NULL" );
                 Material unityMat = visualMaterial.GetMaterial(materialHints);
 				if(rli != null && unityMat != null) unityMat.SetFloat("_Prelit", 2f);
-				if (((sdc != null && (sdc.geo.Type != 6 || (sdc.geo.Type != 3 && Settings.s.game != Settings.Game.R3)))
+				if (((sdc != null && (sdc.geo.Type != 6 || (sdc.geo.Type != 3 && CPA_Settings.s.game != CPA_Settings.Game.R3)))
 					|| vertexColors != null) && unityMat != null) unityMat.SetFloat("_Prelit", 1f);
                 bool receiveShadows = (visualMaterial.properties & VisualMaterial.property_receiveShadows) != 0;
                 bool scroll = visualMaterial.ScrollingEnabled;
@@ -778,10 +778,10 @@ namespace OpenSpace.Visual {
 			//l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
             sm.off_material = Pointer.Read(reader);
-			if (Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				//sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
 				sm.visualMaterial = VisualMaterial.FromOffsetOrRead(sm.off_material, reader);
-			} else if (Settings.s.engineVersion == Settings.EngineVersion.R3 || Settings.s.game == Settings.Game.R2Revolution) {
+			} else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 || CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
                 sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
             } else {
                 sm.gameMaterial = GameMaterial.FromOffsetOrRead(sm.off_material, reader);
@@ -795,26 +795,26 @@ namespace OpenSpace.Visual {
                 sm.backfaceCulling = ((sm.visualMaterial.flags & VisualMaterial.flags_backfaceCulling) != 0) && !l.forceDisplayBackfaces;
             }
             sm.num_triangles = reader.ReadUInt16();
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				sm.lightmap_index = reader.ReadInt16();
 				sm.off_triangles = Pointer.Read(reader);
 			} else {
 				sm.num_uvs = reader.ReadUInt16();
-				if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
 					sm.num_uvMaps = reader.ReadUInt16();
 					sm.lightmap_index = reader.ReadInt16();
 				}
 				sm.off_triangles = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_vertices
-				if (Settings.s.mode == Settings.Mode.Rayman3GC) reader.ReadUInt32();
+				if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC) reader.ReadUInt32();
 				sm.off_mapping_uvs = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
 				sm.off_normals = Pointer.Read(reader); // 1 entry = 3 floats
 				sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats
-				if (Settings.s.game == Settings.Game.LargoWinch) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 					sm.off_mapping_lightmap = Pointer.Read(reader);
 					sm.num_mapping_lightmap = reader.ReadUInt16();
 					reader.ReadUInt16();
-				} else if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-					if (Settings.s.platform != Settings.Platform.PS2) {
+				} else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+					if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
 						reader.ReadUInt32();
 						reader.ReadUInt32();
 					} else {
@@ -829,21 +829,21 @@ namespace OpenSpace.Visual {
 							}
 						});
 					}
-				} else if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+				} else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
 					reader.ReadUInt32();
 				}
-				if (Settings.s.game != Settings.Game.TTSE) {
+				if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) {
 					sm.off_vertex_indices = Pointer.Read(reader);
 					sm.num_vertex_indices = reader.ReadUInt16();
 					sm.parallelBox = reader.ReadUInt16();
 					reader.ReadUInt32();
 				}
 			}
-            if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
-				if (Settings.s.game != Settings.Game.Dinosaur
-					&& Settings.s.game != Settings.Game.LargoWinch
-					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo_2002_03_07
-					&& Settings.s.platform != Settings.Platform.PS2) {
+            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+				if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur
+					&& CPA_Settings.s.game != CPA_Settings.Game.LargoWinch
+					&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07
+					&& CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
 					sm.isVisibleInPortal = reader.ReadByte();
 					reader.ReadByte();
 					sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts
@@ -853,8 +853,8 @@ namespace OpenSpace.Visual {
 					sm.OPT_num_disconnectedTriangles = reader.ReadUInt16();
 					sm.OPT_off_triangleStrip = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
 					sm.OPT_off_disconnectedTriangles = Pointer.Read(reader);
-					if (Settings.s.hasNames) sm.name += reader.ReadString(0x34);
-				} else if(Settings.s.platform == Settings.Platform.PS2) {
+					if (CPA_Settings.s.hasNames) sm.name += reader.ReadString(0x34);
+				} else if(CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
 					reader.ReadUInt32();
 					sm.isVisibleInPortal = reader.ReadByte();
 					reader.ReadByte();
@@ -879,7 +879,7 @@ namespace OpenSpace.Visual {
 					sm.OPT_off_triangleStrip = null;
 					sm.OPT_off_disconnectedTriangles = null;
 					sm.isVisibleInPortal = 1;
-					if (Settings.s.mode == Settings.Mode.RaymanArenaGCDemo_2002_03_07) {
+					if (CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07) {
 						sm.isVisibleInPortal = reader.ReadByte();
 						reader.ReadByte();
 						sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts
@@ -979,7 +979,7 @@ namespace OpenSpace.Visual {
 					});
                 }
             }
-			if (Settings.s.game == Settings.Game.LargoWinch && sm.lightmap_index != -1) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch && sm.lightmap_index != -1) {
 				LWLoader lwl = MapLoader.Loader as LWLoader;
 				if (lwl.lms != null && sm.lightmap_index >= 0 && sm.lightmap_index < lwl.lms.Count) {
 					/*if (sm.lightmap_index < l.off_lightmapUV.Length - 1) {
@@ -1016,7 +1016,7 @@ namespace OpenSpace.Visual {
 				Array.Resize(ref OPT_mapping_uvs, num_uvMaps + 1);
 				OPT_mapping_uvs[OPT_mapping_uvs.Length - 1] = Enumerable.Range(num_uvs, lightmapUVs.Length).ToArray();
 			}
-			if (Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				if (mapping_uvs != null && mapping_lightmap != null) {
 					Array.Resize(ref mapping_uvs, num_uvMaps + 1);
 					mapping_uvs[mapping_uvs.Length - 1] = new int[num_triangles * 3];

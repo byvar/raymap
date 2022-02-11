@@ -109,11 +109,11 @@ namespace OpenSpace.Exporter {
                 }
 
                 if (node.nodeType == ScriptNode.NodeType.Procedure) {
-                    if (node.param>=Settings.s.aiTypes.procedureTable.Length) {
+                    if (node.param>=CPA_Settings.s.aiTypes.procedureTable.Length) {
                         //Debug.LogError("node.param is out of range of procedure table: "+node.param);
                         continue;
                     }
-                    string procedureType = Settings.s.aiTypes.procedureTable[node.param];
+                    string procedureType = CPA_Settings.s.aiTypes.procedureTable[node.param];
                     if (procedureType == "Proc_ChangeMyComport" || procedureType == "Proc_ChangeMyComportAndMyReflex" ||
                         procedureType == "_fn_p_stChangeMyComportIntelligenceProcedure" || procedureType == "_fn_p_stChangeMyComportIntelligenceAndReflexProcedure" || 
                         procedureType == "ChangeMyComportIntelligenceProcedure" ||  procedureType == "ChangeMyComportIntelligenceAndReflexProcedure" ) {
@@ -158,11 +158,11 @@ namespace OpenSpace.Exporter {
                 }
 
                 if (node.nodeType == ScriptNode.NodeType.Procedure) {
-                    if (node.param >= Settings.s.aiTypes.procedureTable.Length) {
+                    if (node.param >= CPA_Settings.s.aiTypes.procedureTable.Length) {
                         //Debug.LogError("node.param is out of range of procedure table: "+node.param);
                         continue;
                     }
-                    string procedureType = Settings.s.aiTypes.procedureTable[node.param];
+                    string procedureType = CPA_Settings.s.aiTypes.procedureTable[node.param];
                     if (procedureType == "Proc_ChangeMyComportReflex" || procedureType == "_fn_p_stChangeMyComportReflexProcedure" || procedureType == "ChangeMyComportReflexProcedure") {
                         Behavior transitionBehavior = MapLoader.Loader.FromOffset<Behavior>(nextNode.param_ptr);
                         if (transitionBehavior!=null && !transitionToIndices.Contains(transitionBehavior.index)) {

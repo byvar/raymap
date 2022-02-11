@@ -342,7 +342,7 @@ namespace OpenSpace.AI {
 			}
 		}
 		public void ReadArray(Reader reader) {
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				reader.ReadUInt32();
 				arrayTypeNumber = reader.ReadByte();
 				arrayLength = reader.ReadByte();
@@ -352,7 +352,7 @@ namespace OpenSpace.AI {
 				arrayLength = reader.ReadByte();
 				reader.ReadBytes(3); // padding
 			}
-			arrayType = Settings.s.aiTypes.GetDsgVarType(arrayTypeNumber);
+			arrayType = CPA_Settings.s.aiTypes.GetDsgVarType(arrayTypeNumber);
 			if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type) != arrayType) {
 				Debug.LogWarning(currentbuf + " - " + type + " - " + arrayTypeNumber + " - " + arrayType + " - " + arrayLength + " - " + Pointer.Current(reader));
 			}
@@ -393,7 +393,7 @@ namespace OpenSpace.AI {
         }
 
         public void WriteArray(Writer writer) {
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				Pointer.Goto(ref writer, Pointer.Current(writer) + 4);
 				writer.Write((byte)arrayTypeNumber);
 				writer.Write(arrayLength);
@@ -406,7 +406,7 @@ namespace OpenSpace.AI {
 				writer.Write((byte)0);
 				writer.Write((byte)0);
 			}
-			arrayType = Settings.s.aiTypes.GetDsgVarType(arrayTypeNumber);
+			arrayType = CPA_Settings.s.aiTypes.GetDsgVarType(arrayTypeNumber);
 			if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type) != arrayType) {
 				Debug.LogWarning(currentbuf + " - " + arrayTypeNumber + " - " + arrayType + " - " + arrayLength + " - " + Pointer.Current(writer));
 			}

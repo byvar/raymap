@@ -63,7 +63,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 			for (int i = 0; i < num_vertices; i++) {
 				vertices[i] = new Vertex(reader);
 			}
-			if (geo.Type == 1 && Settings.s.game == Settings.Game.R3) {
+			if (geo.Type == 1 && CPA_Settings.s.game == CPA_Settings.Game.R3) {
 				uvUnoptimized = new UVUnoptimized[num_vertices];
 				for (int i = 0; i < uvUnoptimized.Length; i++) {
 					uvUnoptimized[i] = new UVUnoptimized(reader);
@@ -121,7 +121,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 
 		public Vector3 GetUV(int index, int texIndex, bool applyBlendWeight) {
 			Vector3 baseUV = Vector3.zero;
-			if (geo.Type == 1 && Settings.s.game == Settings.Game.R3) {
+			if (geo.Type == 1 && CPA_Settings.s.game == CPA_Settings.Game.R3) {
 				baseUV = new Vector3(uvUnoptimized[index].u, uvUnoptimized[index].v, 1f);
 			} else {
 				byte uvFunction = 0;

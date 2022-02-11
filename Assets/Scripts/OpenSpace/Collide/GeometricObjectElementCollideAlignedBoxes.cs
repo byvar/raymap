@@ -82,7 +82,7 @@ namespace OpenSpace.Collide {
         public static GeometricObjectElementCollideAlignedBoxes Read(Reader reader, Pointer offset, GeometricObjectCollide geo) {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementCollideAlignedBoxes s = new GeometricObjectElementCollideAlignedBoxes(offset, geo);
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 s.off_boxes = Pointer.Read(reader);
                 s.num_boxes = reader.ReadUInt16();
                 s.ind_parallelBox = reader.ReadInt16(); // -1

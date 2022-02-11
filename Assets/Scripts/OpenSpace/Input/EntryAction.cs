@@ -48,7 +48,7 @@ namespace OpenSpace.Input {
             //l.print("EntryAction " + offset);
 			l.entryActions.Add(ea);
 
-            if (Settings.s.game == Settings.Game.TTSE) {
+            if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
                 ea.off_entryAction_next = Pointer.Read(reader);
                 ea.off_entryAction_prev = Pointer.Read(reader);
                 reader.ReadUInt32(); //element.off_entryAction_hdr = Pointer.Read(reader); // hdr pointer doesn't work here
@@ -56,7 +56,7 @@ namespace OpenSpace.Input {
                     (off_element) => {
                         return KeyWord.Read(reader, off_element);
                     },
-                    flags: Settings.s.hasLinkedListHeaderPointers ?
+                    flags: CPA_Settings.s.hasLinkedListHeaderPointers ?
                             LinkedList.Flags.HasHeaderPointers :
                             LinkedList.Flags.NoPreviousPointersForDouble,
                     type: LinkedList.Type.Default);
@@ -67,22 +67,22 @@ namespace OpenSpace.Input {
                 ea.active = reader.ReadByte();
                 reader.ReadBytes(2);
             } else {
-                if (Settings.s.hasExtraInputData) {
+                if (CPA_Settings.s.hasExtraInputData) {
                     reader.ReadBytes(0x18);
                 }
-                if (Settings.s.platform == Settings.Platform.PS2 &&
-                    (Settings.s.game == Settings.Game.RM
-                    || Settings.s.game == Settings.Game.RA
-                    || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18
-                    || Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
+                if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 &&
+                    (CPA_Settings.s.game == CPA_Settings.Game.RM
+                    || CPA_Settings.s.game == CPA_Settings.Game.RA
+                    || CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_12_18
+                    || CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
                     reader.ReadBytes(0x8);
                 }
                 ea.num_keywords = reader.ReadUInt32();
                 ea.off_keywords = Pointer.Read(reader);
 				ea.keywords = new LinkedList<KeyWord>(Pointer.Current(reader), ea.off_keywords, ea.num_keywords, type: LinkedList.Type.SingleNoElementPointers);
-                if (Settings.s.engineVersion < Settings.EngineVersion.R2) reader.ReadUInt32(); // Offset of extra input data in tmp memory? It's different by 0x18 every time
+                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) reader.ReadUInt32(); // Offset of extra input data in tmp memory? It's different by 0x18 every time
                 ea.off_name = Pointer.Read(reader);
-                if (Settings.s.hasExtraInputData || Settings.s.platform == Settings.Platform.DC || Settings.s.engineVersion == Settings.EngineVersion.R3) ea.off_name2 = Pointer.Read(reader);  
+                if (CPA_Settings.s.hasExtraInputData || CPA_Settings.s.platform == CPA_Settings.Platform.DC || CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) ea.off_name2 = Pointer.Read(reader);  
 				reader.ReadInt32(); // -2
                 reader.ReadUInt32();
                 ea.active = reader.ReadByte();
@@ -95,13 +95,13 @@ namespace OpenSpace.Input {
             if (ea.keywords != null && ea.keywords.Count > 0) {
                 int keywordsRead = ea.keywords[0].FillInSubKeywords(ref reader, ea.keywords, 0);
                 if (keywordsRead != ea.keywords.Count) {
-                    if (Settings.s.game != Settings.Game.RedPlanet) { // Seems to be normal in this game
+                    if (CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) { // Seems to be normal in this game
                         Debug.LogError(offset + " - Keywords read was: " + keywordsRead + " vs " + ea.keywords.Count);
                         Debug.LogError(ea.ToString());
                     }
                 }
             }
-            if (Settings.s.game != Settings.Game.RedPlanet) {
+            if (CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) {
                 Pointer.DoAt(ref reader, ea.off_name, () => {
                     ea.name = reader.ReadNullDelimitedString();
                 });

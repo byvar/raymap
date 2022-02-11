@@ -82,15 +82,15 @@ namespace OpenSpace.Animation {
                 banks[i].keyframes = AnimationStack.Read(reader);
                 banks[i].events = AnimationStack.Read(reader);
                 banks[i].morphData = AnimationStack.Read(reader);
-                if (Settings.s.hasDeformations) {
+                if (CPA_Settings.s.hasDeformations) {
                     banks[i].deformations = AnimationStack.Read(reader);
                 } else {
                     banks[i].deformations = null;
                 }
                 banks[i].animations = new AnimA3DGeneral[banks[i].a3d_general.count];
             }
-            if (Settings.s.mode != Settings.Mode.Rayman3GC && !append) {
-                if (!Settings.s.loadFromMemory) {
+            if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3GC && !append) {
+                if (!CPA_Settings.s.loadFromMemory) {
                     for (int i = 0; i < num_banks; i++) {
                         if (banks[i].a3d_general.reservedMemory > 0) banks[i].a3d_general.off_data = Pointer.Read(reader);
                         if (banks[i].vectors.reservedMemory > 0) banks[i].vectors.off_data = Pointer.Read(reader);
@@ -108,35 +108,35 @@ namespace OpenSpace.Animation {
                         }
                         if (banks[i].events.reservedMemory > 0) banks[i].events.off_data = Pointer.Read(reader);
                         if (banks[i].morphData.reservedMemory > 0) banks[i].morphData.off_data = Pointer.Read(reader);
-                        if (Settings.s.hasDeformations && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = Pointer.Read(reader);
+                        if (CPA_Settings.s.hasDeformations && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = Pointer.Read(reader);
                     }
                 } else {
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_a3d"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_a3d"], offset.file));
                     for(int i = 0; i < num_banks; i++) banks[i].a3d_general.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_vectors"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_vectors"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].vectors.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_quaternions"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_quaternions"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].quaternions.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_hierarchies"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_hierarchies"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].hierarchies.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_NTTO"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_NTTO"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].NTTO.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_onlyFrames"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_onlyFrames"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].onlyFrames.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_channels"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_channels"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].channels.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_framesNumOfNTTO"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_framesNumOfNTTO"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].framesNumOfNTTO.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_framesKF"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_framesKF"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].framesKFIndex.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_keyframes"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_keyframes"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].keyframes.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_events"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_events"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].events.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_morphData"], offset.file));
+                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_morphData"], offset.file));
                     for (int i = 0; i < num_banks; i++) banks[i].morphData.off_data = Pointer.Read(reader);
-                    if (Settings.s.hasDeformations) {
-                        Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["anim_deformations"], offset.file));
+                    if (CPA_Settings.s.hasDeformations) {
+                        Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_deformations"], offset.file));
                         for (int i = 0; i < num_banks; i++) banks[i].deformations.off_data = Pointer.Read(reader);
                     }
                 }
@@ -144,7 +144,7 @@ namespace OpenSpace.Animation {
             Pointer off_current = Pointer.Current(reader);
             Pointer off_a3d = null;
             uint num_a3d = (uint)banks.Sum(b => b.a3d_general.count);
-            if (kfFile != null && Settings.s.mode == Settings.Mode.Rayman3GC) {
+            if (kfFile != null && CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC) {
                 kfFile.GotoHeader();
                 reader = kfFile.reader;
                 uint[] a3d_sizes = new uint[num_a3d];
@@ -172,9 +172,9 @@ namespace OpenSpace.Animation {
                         current_anim++;
                     }
                 }
-            } else if (Settings.s.mode != Settings.Mode.Rayman3GC) {
+            } else if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3GC) {
                 for (uint i = 0; i < banks.Length; i++) {
-                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.AutoAligning = true;
+                    if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) reader.AutoAligning = true;
                     
 					if (banks[i].a3d_general.off_data != null) Pointer.Goto(ref reader, banks[i].a3d_general.off_data);
 					banks[i].animations = l.ReadArray<AnimA3DGeneral>(banks[i].a3d_general.Count(append), reader);
@@ -227,7 +227,7 @@ namespace OpenSpace.Animation {
                     if (banks[i].morphData.off_data != null) Pointer.Goto(ref reader, banks[i].morphData.off_data);
 					banks[i].global_morphData = l.ReadArray<AnimMorphData>(banks[i].morphData.Count(append), reader);
 
-					if (Settings.s.hasDeformations) {
+					if (CPA_Settings.s.hasDeformations) {
 						if (reader.AutoAligning) reader.AutoAlign(4);
 						if (banks[i].deformations.off_data != null) Pointer.Goto(ref reader, banks[i].deformations.off_data);
 						banks[i].global_deformations = l.ReadArray<AnimDeformation>(banks[i].deformations.Count(append), reader);

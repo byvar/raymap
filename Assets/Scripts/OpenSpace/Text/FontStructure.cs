@@ -20,11 +20,11 @@ namespace OpenSpace.Text {
 			num_fonts = reader.ReadByte();
 			fonts = new FontDefine[num_fonts];
 			fontsBitmap = new Pointer[num_fontsBitmap];
-			if (Settings.s.game != Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 				for (int i = 0; i < num_fonts; i++) {
 					fonts[i] = new FontDefine(reader);
 				}
-				if (Settings.s.platform == Settings.Platform.Xbox360 || Settings.s.platform == Settings.Platform.PS3) {
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360 || CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
 					reader.Align(4); // Align position
 					num_fontsBitmap2 = reader.ReadByte();
 					num_fonts2 = reader.ReadByte();
@@ -68,8 +68,8 @@ namespace OpenSpace.Text {
 				y = reader.ReadUInt16();
 				height = reader.ReadUInt16();
 				width = reader.ReadUInt16();
-				if (Settings.s.game != Settings.Game.Dinosaur) {
-					if (Settings.s.game != Settings.Game.LargoWinch) {
+				if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
+					if (CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 						pixelSize = reader.ReadUInt16();
 					}
 					unk_0A = reader.ReadUInt16();
@@ -96,17 +96,17 @@ namespace OpenSpace.Text {
 			public ushort unk;
 
 			public FontDefine(Reader reader) {
-				if (Settings.s.platform == Settings.Platform.GC
-					|| Settings.s.platform == Settings.Platform.Xbox360
-					|| Settings.s.platform == Settings.Platform.PS3
-					|| Settings.s.mode == Settings.Mode.RaymanArenaXbox) {
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.GC
+					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
+					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3
+					|| CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaXbox) {
 					name = reader.ReadString(50);
 				}
 				characters = new CharacterDefine[256];
 				for (int i = 0; i < characters.Length; i++) {
 					characters[i] = new CharacterDefine(reader);
 				}
-				if (Settings.s.game != Settings.Game.Dinosaur && Settings.s.game != Settings.Game.LargoWinch) {
+				if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 					kerningInfo = new KerningInfo[200];
 					for (int i = 0; i < kerningInfo.Length; i++) {
 						kerningInfo[i] = new KerningInfo(reader);

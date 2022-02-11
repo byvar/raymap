@@ -21,7 +21,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
 			this.mapPath = mapPath;
 			this.palPath = palPath;
 			Stream palFS = FileSystem.GetFileReadStream(palPath);
-			using (Reader reader = new Reader(palFS, Settings.s.IsLittleEndian)) {
+			using (Reader reader = new Reader(palFS, CPA_Settings.s.IsLittleEndian)) {
 				palettes = new Color[reader.BaseStream.Length / 32][];
 				for (int i = 0; i < palettes.Length; i++) {
 					palettes[i] = new Color[16];
@@ -32,7 +32,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
 				}
 			}
 			Stream mapFS = FileSystem.GetFileReadStream(mapPath);
-			using (Reader reader = new Reader(mapFS, Settings.s.IsLittleEndian)) {
+			using (Reader reader = new Reader(mapFS, CPA_Settings.s.IsLittleEndian)) {
 				map = new MapEntry[reader.BaseStream.Length / 2];
 				for (int i = 0; i < map.Length; i++) {
 					map[i] = new MapEntry(reader.ReadUInt16());
@@ -40,7 +40,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
 			}
 			int tile_size = 8;
 			Stream fs = FileSystem.GetFileReadStream(gfxPath);
-            using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
+            using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
 				texture = new Texture2D(width * tile_size, height * tile_size);
 				Color[] pixels = new Color[texture.width * texture.height];
 				byte[][] tiles = new byte[reader.BaseStream.Length / 0x20][];
@@ -169,7 +169,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
 
 		static Color ParseColorRGBA5551(ushort shortCol) {
 			uint alpha, blue, green, red;
-			if (Settings.s.platform == Settings.Platform.DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 				alpha = ExtractBits(shortCol, 1, 15);
 				blue = ExtractBits(shortCol, 5, 10);
 				green = ExtractBits(shortCol, 5, 5);

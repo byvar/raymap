@@ -24,7 +24,7 @@ namespace OpenSpace.ROM.ANIM.Component {
 
         public static bool Aligned {
             get {
-                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
                     return true;
                 } else {
                     return false;

@@ -582,9 +582,9 @@ namespace OpenSpace.ROM {
 
 		public static Type GetEntryType(ushort type) {
 			Dictionary<ushort, Type> dict = null;
-			switch (Settings.s.platform) {
-				case Settings.Platform._3DS: dict = Types3DS; break;
-				case Settings.Platform.N64: dict = TypesN64; break;
+			switch (CPA_Settings.s.platform) {
+				case CPA_Settings.Platform._3DS: dict = Types3DS; break;
+				case CPA_Settings.Platform.N64: dict = TypesN64; break;
 				default: dict = TypesDS; break;
 			}
 			if (dict.ContainsKey(type)) {

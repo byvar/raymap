@@ -20,7 +20,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 
 		public MeshFile(string path) {
 			Stream fs = FileSystem.GetFileReadStream(path);
-			using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
+			using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
 				root = Section.Read(reader);
 			}
 			if (root != null && root.type == Section.Type.Clump) {

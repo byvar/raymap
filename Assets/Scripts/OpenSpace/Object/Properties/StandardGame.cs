@@ -48,14 +48,14 @@ namespace OpenSpace.Object.Properties {
             //l.print("StdGame: " + offset);
             StandardGame stdGame = new StandardGame(offset);
 
-			if (Settings.s.game != Settings.Game.R2Revolution && Settings.s.game != Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 				stdGame.objectTypes[0] = reader.ReadUInt32();
 				stdGame.objectTypes[1] = reader.ReadUInt32();
 				stdGame.objectTypes[2] = reader.ReadUInt32();
 				stdGame.off_superobject = Pointer.Read(reader); // 0xC SuperObject from Perso probably
 
-				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
-					if (Settings.s.platform == Settings.Platform.DC) {
+				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+					if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
 						reader.ReadInt32();
 						reader.ReadInt32();
 						reader.ReadInt32();
@@ -97,7 +97,7 @@ namespace OpenSpace.Object.Properties {
 					stdGame.customBitsInitial = reader.ReadUInt32();
 					stdGame.aiCustomBitsInitial = reader.ReadUInt32();
 				}
-			} else if (Settings.s.game == Settings.Game.R2Revolution) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				// Revolution
 				reader.ReadInt32();
 				reader.ReadInt32();
@@ -121,7 +121,7 @@ namespace OpenSpace.Object.Properties {
 				reader.ReadUInt32();
 				reader.ReadUInt32(); // a pointer?
 				stdGame.customBitsInitial = reader.ReadUInt32();
-			} else if (Settings.s.game == Settings.Game.LargoWinch) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				// Almost same as revo
 				reader.ReadInt32();
 				reader.ReadInt32();
@@ -175,7 +175,7 @@ namespace OpenSpace.Object.Properties {
         public void Write(Writer writer)
         {
 			Pointer.Goto(ref writer, offset);
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                 Pointer.Goto(ref writer, offset + 0x24);
                 writer.Write(customBits);
                 writer.Write(platformType);

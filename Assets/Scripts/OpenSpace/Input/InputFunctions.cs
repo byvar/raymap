@@ -344,15 +344,15 @@ namespace OpenSpace.Input {
 
         public static FunctionType GetFunctionType(uint index) {
             try {
-				if (Settings.s.game == Settings.Game.TTSE) return functionTypesSE[index];
-                if (Settings.s.game == Settings.Game.TT) return functionTypesTT[index];
-                if (Settings.s.game == Settings.Game.LargoWinch) return functionTypesLargo[index];
-                if (Settings.s.game == Settings.Game.R2Revolution) return functionTypesRevolution[index];
-                if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) return functionTypesHype[index];
-				if (Settings.s.platform == Settings.Platform.GC) return functionTypesGC[index];
-				if (Settings.s.platform == Settings.Platform.DC || Settings.s.platform == Settings.Platform.iOS) return functionTypesDC[index];
-                if (Settings.s.engineVersion > Settings.EngineVersion.R2 && 
-                    Settings.s.platform == Settings.Platform.PS2) return functionTypesPS2[index];
+				if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) return functionTypesSE[index];
+                if (CPA_Settings.s.game == CPA_Settings.Game.TT) return functionTypesTT[index];
+                if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) return functionTypesLargo[index];
+                if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) return functionTypesRevolution[index];
+                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) return functionTypesHype[index];
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) return functionTypesGC[index];
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.DC || CPA_Settings.s.platform == CPA_Settings.Platform.iOS) return functionTypesDC[index];
+                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.R2 && 
+                    CPA_Settings.s.platform == CPA_Settings.Platform.PS2) return functionTypesPS2[index];
                 return (FunctionType)(index);
             } catch (Exception) {
                 return FunctionType.Unknown;

@@ -34,7 +34,7 @@ public class UnityWindowSettings : UnityWindow {
 
 
 		if (CategorizedGameModes == null)
-			CategorizedGameModes = EnumHelpers.GetValues<Settings.Mode>().Select(x => Settings.GetSettings(x))
+			CategorizedGameModes = EnumHelpers.GetValues<CPA_Settings.Mode>().Select(x => CPA_Settings.GetSettings(x))
 				.GroupBy(x => x.engineVersion).ToDictionary(
 				x => x.Key,
 				x => x
@@ -67,8 +67,8 @@ public class UnityWindowSettings : UnityWindow {
 		string buttonString = "No map selected";
 		if (!string.IsNullOrEmpty(UnitySettings.MapName)) {
 			buttonString = UnitySettings.MapName;
-			if (UnitySettings.UseLevelTranslation && Settings.settingsDict[UnitySettings.GameMode].levelTranslation != null) {
-				buttonString = Settings.settingsDict[UnitySettings.GameMode].levelTranslation.Translate(UnitySettings.MapName);
+			if (UnitySettings.UseLevelTranslation && CPA_Settings.settingsDict[UnitySettings.GameMode].levelTranslation != null) {
+				buttonString = CPA_Settings.settingsDict[UnitySettings.GameMode].levelTranslation.Translate(UnitySettings.MapName);
 			}
 		}
 		Rect rect = GetNextRect(ref YPos, vPaddingBottom: 4f);
@@ -81,7 +81,7 @@ public class UnityWindowSettings : UnityWindow {
 			EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
 			if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
 				// Initialize settings
-				Settings.Init(UnitySettings.GameMode);
+				CPA_Settings.Init(UnitySettings.GameMode);
 				string directory = CurrentGameDataDir;
 				/*string directory = (UnitySettings.CurrentGameDataDir + "/" + Settings.s.ITFDirectory).Replace(Path.DirectorySeparatorChar, '/');
 				if (!directory.EndsWith("/")) directory += "/";
@@ -106,7 +106,7 @@ public class UnityWindowSettings : UnityWindow {
 			MapDropdown.selection = null;
 			Dirty = true;
 		}
-		if (Settings.settingsDict[UnitySettings.GameMode].platform == Settings.Platform.PS1) {
+		if (CPA_Settings.settingsDict[UnitySettings.GameMode].platform == CPA_Settings.Platform.PS1) {
 			OpenSpace.PS1.PS1GameInfo.Games.TryGetValue(UnitySettings.GameMode, out OpenSpace.PS1.PS1GameInfo game);
 			if (game != null && game.actors?.Where(a => a.isSelectable).Count() > 0) {
 				int mapIndex = Array.IndexOf(game.maps.Select(s => s.ToLower()).ToArray(), UnitySettings.MapName.ToLower());
@@ -323,7 +323,7 @@ public class UnityWindowSettings : UnityWindow {
 
     private string GenerateExportScript(Func<string, string> lineDelegate)
     {
-        Settings.Init(UnitySettings.GameMode);
+        CPA_Settings.Init(UnitySettings.GameMode);
         string commands = "";
 
         var tempDropDown =
@@ -350,7 +350,7 @@ public class UnityWindowSettings : UnityWindow {
 	private int SelectedLevelFileIndex { get; set; }
 
 	// Categorized game modes
-	public Dictionary<Settings.EngineVersion, Dictionary<Settings.Game, Settings[]>> CategorizedGameModes { get; set; }
+	public Dictionary<CPA_Settings.EngineVersion, Dictionary<CPA_Settings.Game, CPA_Settings[]>> CategorizedGameModes { get; set; }
 
 	/// <summary>
 	/// The file selection dropdown
@@ -362,7 +362,7 @@ public class UnityWindowSettings : UnityWindow {
 
 	private string CurrentGameDataDir {
 		get {
-			Dictionary<Settings.Mode, string> GameDirs =
+			Dictionary<CPA_Settings.Mode, string> GameDirs =
 				EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL ? UnitySettings.GameDirectoriesWeb : UnitySettings.GameDirectories;
 			if (GameDirs.ContainsKey(UnitySettings.GameMode)) {
 				return (GameDirs[UnitySettings.GameMode] ?? "");

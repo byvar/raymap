@@ -11,9 +11,9 @@ public class GameModeSelectionDropdown : AdvancedDropdown {
     }
 
     protected override AdvancedDropdownItem BuildRoot() {
-        var modes = EnumHelpers.GetValues<Settings.Mode>().Select(x => new {
+        var modes = EnumHelpers.GetValues<CPA_Settings.Mode>().Select(x => new {
             Mode = x,
-            Settings = Settings.GetSettings(x)
+            Settings = CPA_Settings.GetSettings(x)
         }).GroupBy(x => x.Settings.engineVersion);
 
         var root = new AdvancedDropdownItem("Game");
@@ -42,14 +42,14 @@ public class GameModeSelectionDropdown : AdvancedDropdown {
     protected override void ItemSelected(AdvancedDropdownItem item) {
         base.ItemSelected(item);
 
-        if (item.id != -1 && ((Settings.Mode)item.id != Selection)) {
-            Selection = (Settings.Mode)item.id;
+        if (item.id != -1 && ((CPA_Settings.Mode)item.id != Selection)) {
+            Selection = (CPA_Settings.Mode)item.id;
             SelectionName = Selection.GetDescription();
             HasChanged = true;
         }
     }
 
     public bool HasChanged { get; set; }
-    public Settings.Mode Selection { get; set; } = UnitySettings.GameMode;
+    public CPA_Settings.Mode Selection { get; set; } = UnitySettings.GameMode;
     public string SelectionName { get; set; } = UnitySettings.GameMode.GetDescription();
 }

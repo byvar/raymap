@@ -324,7 +324,7 @@ public class PS1PersoBehaviour : BasePersoBehaviour {
 							GameObject c = geometricObjectsDynamic.GetGameObject(j, perso.p3dData?.collisionMapping, out bones);
 							if (c != null) {
 								//GeometricObject geo = geometricObjectsDynamic.entries[j].geo;
-								if (Settings.s.hasDeformations && bones != null) {
+								if (CPA_Settings.s.hasDeformations && bones != null) {
 									subObjectBones[i][k] = bones;
 									hasBones = true;
 								}

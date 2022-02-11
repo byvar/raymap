@@ -27,7 +27,7 @@ namespace OpenSpace.FileFormat {
                 ms.Position = 0;
                 data = ms.ToArray();
             }
-            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+            reader = new Reader(new MemoryStream(data), CPA_Settings.s.IsLittleEndian);
         }
 
         public override void CreateWriter() {

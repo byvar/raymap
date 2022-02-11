@@ -34,7 +34,7 @@ namespace OpenSpace.PS1 {
 			p3dData = Load.FromOffsetOrRead<Perso3dData>(reader, off_p3dData);
 			Pointer.DoAt(ref reader, off_superObjectPointer, () => {
 				Pointer off_superobject = Pointer.Read(reader);
-				if (Settings.s.game == Settings.Game.RRush) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 					Pointer off_name = Pointer.Read(reader);
 					Pointer.DoAt(ref reader, off_name, () => {
 						name = reader.ReadNullDelimitedString();

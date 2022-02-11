@@ -20,7 +20,7 @@ namespace OpenSpace.FileFormat.Texture {
 		public TBF(string path, bool hasNames = false) {
 			this.path = path;
 			Stream tbf = FileSystem.GetFileReadStream(path);
-			using (Reader reader = new Reader(tbf, Settings.s.IsLittleEndian)) {
+			using (Reader reader = new Reader(tbf, CPA_Settings.s.IsLittleEndian)) {
 				if (hasNames) { // for example, TXC file in Rayman M/Arena
 					Count = reader.ReadUInt32();
 					headers = new TBFHeader[Count];
@@ -67,7 +67,7 @@ namespace OpenSpace.FileFormat.Texture {
 				case 0x1: {
 						Color[] palette = ReadPalette(reader, 16, h.HasAlpha);
 						byte[] texData = reader.ReadBytes((int)(h.height * h.width / 2));
-						if (Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+						if (CPA_Settings.s.game == CPA_Settings.Game.R3 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 							ezSwizzle.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 4, texData);
 							Array.Resize<byte>(ref texData, (int)(h.height * h.width));
 							ezSwizzle.readTexPSMT4_mod(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
@@ -81,7 +81,7 @@ namespace OpenSpace.FileFormat.Texture {
 				case 0x2: {
 						Color[] palette = ReadPalette(reader, 256, h.HasAlpha);
 						byte[] texData = reader.ReadBytes((int)(h.height * h.width));
-						if (Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+						if (CPA_Settings.s.game == CPA_Settings.Game.R3 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 							ezSwizzle.writeTexPSMCT32(0, (int)h.width / 128, 0, 0, (int)h.width / 2, (int)h.height / 2, texData);
 							//texData = new byte[h.height * h.width];
 							ezSwizzle.readTexPSMT8(0, (int)h.width / 64, 0, 0, (int)h.width, (int)h.height, ref texData);
@@ -115,7 +115,7 @@ namespace OpenSpace.FileFormat.Texture {
 				palette[i] = new Color(r / 255f, g / 255f, b / 255f, hasAlpha ? (a / 128f) : 1f);
 			}
 			Color[] pal = palette;
-			if (length == 256 && (Settings.s.game == Settings.Game.R3 && Settings.s.mode != Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
+			if (length == 256 && (CPA_Settings.s.game == CPA_Settings.Game.R3 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
 				// Tile
 				pal = new Color[palette.Length];
 				for (int i = 0; i < length; i++) {

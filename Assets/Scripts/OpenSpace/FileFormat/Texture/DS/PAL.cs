@@ -13,7 +13,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
         public PAL(string path) {
 			this.path = path;
             Stream fs = FileSystem.GetFileReadStream(path);
-            using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
+            using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
 				palette = new Color[reader.BaseStream.Length/2];
 				for (int i = 0; i < palette.Length; i++) {
 					ushort shortCol = reader.ReadUInt16();
@@ -25,7 +25,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
 
 		static Color ParseColorRGBA5551(ushort shortCol) {
 			uint alpha, blue, green, red;
-			if (Settings.s.platform == Settings.Platform.DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 				alpha = ExtractBits(shortCol, 1, 15);
 				blue = ExtractBits(shortCol, 5, 10);
 				green = ExtractBits(shortCol, 5, 5);

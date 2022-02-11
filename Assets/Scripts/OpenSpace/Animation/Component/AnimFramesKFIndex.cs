@@ -9,10 +9,10 @@ namespace OpenSpace.Animation.Component {
         public uint kf;
 
 		protected override void ReadInternal(Reader reader) {
-			if (Settings.s.engineVersion == Settings.EngineVersion.TT ||
-				Settings.s.game == Settings.Game.R2Demo ||
-				Settings.s.game == Settings.Game.RedPlanet ||
-				Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT ||
+				CPA_Settings.s.game == CPA_Settings.Game.R2Demo ||
+				CPA_Settings.s.game == CPA_Settings.Game.RedPlanet ||
+				CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				kf = reader.ReadUInt16();
 			} else {
 				kf = reader.ReadUInt32();
@@ -32,10 +32,10 @@ namespace OpenSpace.Animation.Component {
         public static bool Aligned {
             get {
 
-				if (Settings.s.engineVersion == Settings.EngineVersion.TT ||
-					Settings.s.game == Settings.Game.R2Demo ||
-					Settings.s.game == Settings.Game.RedPlanet ||
-					Settings.s.game == Settings.Game.R2Revolution) {
+				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT ||
+					CPA_Settings.s.game == CPA_Settings.Game.R2Demo ||
+					CPA_Settings.s.game == CPA_Settings.Game.RedPlanet ||
+					CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 					return false;
 				} else {
 					return true;

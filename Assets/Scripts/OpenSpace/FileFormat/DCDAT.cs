@@ -20,10 +20,10 @@ namespace OpenSpace.FileFormat {
             this.name = name;
             this.fileID = fileID;
             length = stream.Length;
-            using (Reader fileReader = new Reader(stream, Settings.s.IsLittleEndian)) {
+            using (Reader fileReader = new Reader(stream, CPA_Settings.s.IsLittleEndian)) {
                 data = fileReader.ReadBytes((int)stream.Length);
             }
-            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+            reader = new Reader(new MemoryStream(data), CPA_Settings.s.IsLittleEndian);
             //reader = new Reader(stream, Settings.s.IsLittleEndian);
             switch (fileID) {
                 case 0:

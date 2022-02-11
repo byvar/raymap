@@ -99,7 +99,7 @@ namespace OpenSpace.AI {
             MapLoader l = MapLoader.Loader;
             l.behaviors.Add(this);
             //l.print("Behavior " + Offset);
-            if (Settings.s.hasNames && Settings.s.platform != Settings.Platform.PS2) {
+            if (CPA_Settings.s.hasNames && CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
                 name = new string(reader.ReadChars(0x100)).TrimEnd('\0');
 
                 // Some versions have extra information in the name, e.g.
@@ -111,9 +111,9 @@ namespace OpenSpace.AI {
             }
             off_scripts = Pointer.Read(reader);
             off_scheduleScript = Pointer.Read(reader);
-            if (Settings.s.platform == Settings.Platform.DC || 
-                Settings.s.game == Settings.Game.RedPlanet
-                || Settings.s.game == Settings.Game.R2Demo) {
+            if (CPA_Settings.s.platform == CPA_Settings.Platform.DC || 
+                CPA_Settings.s.game == CPA_Settings.Game.RedPlanet
+                || CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
                 reader.ReadUInt32();
             }
             num_scripts = reader.ReadByte();

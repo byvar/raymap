@@ -132,13 +132,13 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			R2PS1Loader l = Load as R2PS1Loader;
-			if (Settings.s.game == Settings.Game.RRush) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 				reader.ReadBytes(0x40);
-			} else if (Settings.s.game == Settings.Game.DD) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
 				reader.ReadBytes(0x58);
-			} else if (Settings.s.game == Settings.Game.VIP) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.VIP) {
 				reader.ReadBytes(0x28);
-			} else if(Settings.s.game == Settings.Game.JungleBook) {
+			} else if(CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				reader.ReadBytes(0xEC);
 			} else {
 				reader.ReadBytes(0xCC);
@@ -177,7 +177,7 @@ namespace OpenSpace.PS1 {
 			off_animScales = Pointer.Read(reader);
 			Load.print(off_12C + " - " + off_130 + " - " + off_animPositions + " - " + off_animRotations + " - " + off_animScales);
 			//Load.print(Pointer.Current(reader));
-			if (Settings.s.game == Settings.Game.DD) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
 				// Also stuff for big textures, but names and amount is stored in exe
 				Pointer.Read(reader);
 				Pointer.Read(reader);
@@ -201,7 +201,7 @@ namespace OpenSpace.PS1 {
 				reader.ReadUInt32(); // total skin memory size?
 				off_geometricObjects_static = Pointer.Read(reader);
 				num_geometricObjects_dynamic = reader.ReadUInt32();
-			} else if (Settings.s.game == Settings.Game.VIP || Settings.s.game == Settings.Game.JungleBook) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.VIP || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
@@ -233,7 +233,7 @@ namespace OpenSpace.PS1 {
 				off_geometricObjects_static = Pointer.Read(reader);
 				num_geometricObjects_dynamic = reader.ReadUInt32();
 			}
-			if (Settings.s.game != Settings.Game.VIP) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.VIP) {
 				ushort_18C = reader.ReadUInt16();
 				ushort_18E = reader.ReadUInt16();
 				short_190 = reader.ReadInt16();
@@ -264,12 +264,12 @@ namespace OpenSpace.PS1 {
 
 			ushort_1AA = reader.ReadUInt16();
 			Load.print(Pointer.Current(reader));
-			if (Settings.s.game != Settings.Game.DD) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.DD) {
 				num_cameraModifiers = reader.ReadUInt32();
 				uint_1B0 = reader.ReadUInt32();
 				uint_1B4 = reader.ReadUInt32();
 				uint_1B8 = reader.ReadUInt32();
-				if (Settings.s.game != Settings.Game.VIP) {
+				if (CPA_Settings.s.game != CPA_Settings.Game.VIP) {
 					off_cameraModifiers_volumes = Pointer.Read(reader); // uint_1B4 * 0x70
 					off_cameraModifiers = Pointer.Read(reader); // uint_1ac * 0x68. lights? first with type (first byte) = 9 is camera related? position is at 0x14, 0x18, 0x1c?
 				} else {
@@ -277,7 +277,7 @@ namespace OpenSpace.PS1 {
 					reader.ReadUInt32();
 				}
 
-				if (Settings.s.game == Settings.Game.RRush) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 					off_rush_114 = Pointer.Read(reader);
 					ushort_rush_118 = reader.ReadUInt16();
 					ushort_rush_11A = reader.ReadUInt16();
@@ -297,12 +297,12 @@ namespace OpenSpace.PS1 {
 			off_ago_textures_yInPage = Pointer.Read(reader);
 			off_ago_textures_globalX = Pointer.Read(reader);
 			off_ago_textures_globalY = Pointer.Read(reader);
-			if (Settings.s.game == Settings.Game.RRush) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 				off_ago_textures_width = Pointer.Read(reader);
 				off_ago_textures_height = Pointer.Read(reader);
 				//Load.print(Pointer.Current(reader));
 				ParseAGOTextures(reader);
-			} else if(Settings.s.game == Settings.Game.R2) {
+			} else if(CPA_Settings.s.game == CPA_Settings.Game.R2) {
 				uint_1F4 = reader.ReadUInt32();
 				uint_1F8 = reader.ReadUInt32();
 				uint_1FC = reader.ReadUInt32();
@@ -314,7 +314,7 @@ namespace OpenSpace.PS1 {
 			persos = Load.ReadArray<Perso>(num_persos, reader, off_persos);
 			geometricObjectsDynamic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_dynamic, onPreRead: t => t.length = num_geometricObjects_dynamic - 2);
 			geometricObjectsStatic = Load.FromOffsetOrRead<ObjectsTable>(reader, off_geometricObjects_static, onPreRead: t => {
-				if (Settings.s.game == Settings.Game.R2) t.length = num_ipoCollision;
+				if (CPA_Settings.s.game == CPA_Settings.Game.R2) t.length = num_ipoCollision;
 			});
 			ipoCollision = Load.ReadArray<GeometricObjectCollide>(num_ipoCollision, reader, off_ipoCollision);
 			meshCollision = Load.ReadArray<GeometricObjectCollide>(num_meshCollision, reader, off_meshCollision);
@@ -429,7 +429,7 @@ namespace OpenSpace.PS1 {
 					textures[i].globalY = reader.ReadUInt16();
 				}
 			});
-			if (Settings.s.game == Settings.Game.RRush) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 				Pointer.DoAt(ref reader, off_ago_textures_width, () => {
 					for (int i = 0; i < textures.Length; i++) {
 						textures[i].width = reader.ReadUInt16();

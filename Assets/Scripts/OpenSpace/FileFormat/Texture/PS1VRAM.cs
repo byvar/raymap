@@ -330,7 +330,7 @@ namespace OpenSpace.FileFormat.Texture {
 						// Get the color from the palette
 						if (!palette[paletteIndex].HasValue) {
 							palette[paletteIndex] = GetColor1555(0, 0, paletteX + paletteIndex, paletteY);
-							if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.JungleBook) {
+							if (CPA_Settings.s.game == CPA_Settings.Game.DD || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 								Color c = palette[paletteIndex].Value;
 								if (c.r == 0 && c.g == 0 && c.b == 0 && c.a == 0) {
 									palette[paletteIndex] = new Color(c.r, c.g, c.b, 0f);
@@ -363,7 +363,7 @@ namespace OpenSpace.FileFormat.Texture {
 						if (!palette[paletteIndex].HasValue) {
 							palette[paletteIndex] = GetColor1555(0, 0, paletteX + paletteIndex, paletteY);
 
-							if (Settings.s.game == Settings.Game.DD || Settings.s.game == Settings.Game.JungleBook) {
+							if (CPA_Settings.s.game == CPA_Settings.Game.DD || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 								Color c = palette[paletteIndex].Value;
 								if (c.r == 0 && c.g == 0 && c.b == 0 && c.a == 0) {
 									palette[paletteIndex] = new Color(c.r, c.g, c.b, 0f);

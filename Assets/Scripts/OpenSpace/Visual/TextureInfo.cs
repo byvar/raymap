@@ -50,7 +50,7 @@ namespace OpenSpace.Visual {
 
         public bool IsTransparent {
             get {
-                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                     return (flags & 0x100) != 0 || (flags & (1 << 1)) != 0 || (flags & flags_isTransparent) != 0;
                 } else {
                     return (flags & flags_isTransparent) != 0;
@@ -70,7 +70,7 @@ namespace OpenSpace.Visual {
             set {
                 texture = value;
 
-                if (Application.platform != RuntimePlatform.WebGLPlayer && Settings.s.platform == Settings.Platform.DC) {
+                if (Application.platform != RuntimePlatform.WebGLPlayer && CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
                     name = HashUtils.MD5Hash(value.GetRawTextureData());
                 }
 
@@ -81,11 +81,11 @@ namespace OpenSpace.Visual {
 					if (!IsRepeatV) {
 						texture.wrapModeV = TextureWrapMode.Clamp;
 					}
-					if (IsMirrorX && Settings.s.game != Settings.Game.R2Revolution) {
+					if (IsMirrorX && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
 						texture.wrapModeU = TextureWrapMode.Mirror;
 					}
-					if (IsMirrorY && Settings.s.game != Settings.Game.R2Revolution) {
-						if (Settings.s.platform == Settings.Platform.DC) {
+					if (IsMirrorY && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
+						if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
 							Texture2D flipped = new Texture2D(texture.width, texture.height);
 
 							int w = texture.width;
@@ -109,7 +109,7 @@ namespace OpenSpace.Visual {
 						}
 						texture.wrapModeV = TextureWrapMode.Mirror;
 					}
-                    if ((flags & 0x902) != 0 && Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                    if ((flags & 0x902) != 0 && CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                         byte[] alphaMaskBytes = BitConverter.GetBytes(alphaMask);
                         SetTextureAlpha(alphaMaskBytes[0] / 255f, alphaMaskBytes[1] / 255f, alphaMaskBytes[2] / 255f);
                         /*MapLoader.Loader.print(name + " - Alpha mask: " + alphaMask + " - " + String.Format("{0:X}", alphaMask));
@@ -157,15 +157,15 @@ namespace OpenSpace.Visual {
         }
         public bool IsRepeatU {
             get {
-                if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
-                if (Settings.s.game == Settings.Game.RedPlanet) return true;
+                if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3) return true;
+                if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) return true;
                 return (flagsByte & 2) != 0;
             }
         }
         public bool IsRepeatV {
             get {
-                if (Settings.s.engineVersion >= Settings.EngineVersion.R3) return true;
-                if (Settings.s.game == Settings.Game.RedPlanet) return true;
+                if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3) return true;
+                if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) return true;
                 return (flagsByte & 1) != 0;
             }
         }
@@ -188,8 +188,8 @@ namespace OpenSpace.Visual {
 
         public static TextureInfo Read(Reader reader, Pointer offset) {
             TextureInfo tex = new TextureInfo(offset);
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-				if (Settings.s.game == Settings.Game.LargoWinch) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 					tex.field0 = reader.ReadUInt32(); // 888 or 8888
 					tex.fieldC = reader.ReadUInt32();
 					tex.field10 = reader.ReadUInt32();
@@ -202,7 +202,7 @@ namespace OpenSpace.Visual {
 					tex.field48 = reader.ReadByte();
 					tex.flagsByte = reader.ReadByte(); // contains stuff like tiling mode
 					tex.name = reader.ReadString(0x80);
-				} else if (Settings.s.game == Settings.Game.R2Revolution) {
+				} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 					reader.ReadUInt32();
 					tex.flags = reader.ReadUInt16();
 					tex.flagsByte = reader.ReadByte();
@@ -215,7 +215,7 @@ namespace OpenSpace.Visual {
 					reader.ReadByte();
 					reader.ReadByte();
 					reader.ReadByte();
-				} else if (Settings.s.platform == Settings.Platform.DC) {
+				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
                     reader.ReadUInt32();
                     tex.flags = reader.ReadUInt32();
                     reader.ReadUInt32();
@@ -230,7 +230,7 @@ namespace OpenSpace.Visual {
                 } else {
                     //MapLoader.Loader.print("tex @ " + offset);
                     tex.field0 = reader.ReadUInt32(); // 888 or 8888
-					if (Settings.s.game == Settings.Game.Dinosaur) {
+					if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
 						reader.ReadUInt32();
 					}
 					tex.field4 = reader.ReadUInt16(); // 20
@@ -248,7 +248,7 @@ namespace OpenSpace.Visual {
                     tex.textureScrollingEnabled = reader.ReadUInt32();
                     tex.alphaMask = reader.ReadUInt32();
                     tex.field30 = reader.ReadUInt32();
-                    if (Settings.s.engineVersion == Settings.EngineVersion.R3) tex.numMipmaps = reader.ReadUInt32();
+                    if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) tex.numMipmaps = reader.ReadUInt32();
                     tex.field38 = reader.ReadUInt32();
                     tex.field3C = reader.ReadUInt32();
                     tex.field40 = reader.ReadUInt32();
@@ -267,7 +267,7 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                     reader.ReadUInt32();
@@ -286,12 +286,12 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
                     tex.name = reader.ReadString(0x50);
                 } else {
                     tex.name = reader.ReadString(0x100);
                 }
-                if (Settings.s.game == Settings.Game.TTSE) {
+                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
                     tex.field48 = (byte)reader.ReadUInt32();
                 } else {
                     tex.field48 = reader.ReadByte();

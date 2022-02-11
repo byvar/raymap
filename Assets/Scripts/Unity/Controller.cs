@@ -94,7 +94,7 @@ public class Controller : MonoBehaviour {
 		string lvlName = "";
 		string actor1Name = "";
 		string actor2Name = "";
-		Settings.Mode mode = UnitySettings.GameMode;
+		CPA_Settings.Mode mode = UnitySettings.GameMode;
 		gameDataBinFolder = UnitySettings.CurrentDirectory;
 		lvlName = UnitySettings.MapName;
 		actor1Name = UnitySettings.Actor1Name;
@@ -120,7 +120,7 @@ public class Controller : MonoBehaviour {
 			UnityEngine.Debug.unityLogger.filterLogType = LogType.Assert;
 		}
 		loadingScreen.Active = true;
-		Settings.Init(mode);
+		CPA_Settings.Init(mode);
 		loader = MapLoader.Loader;
 		loader.controller = this;
 		loader.gameDataBinFolder = gameDataBinFolder;
@@ -451,7 +451,7 @@ public class Controller : MonoBehaviour {
         Vector3 center = worldMin + worldSize * 0.5f;
 
         sectorManager.displayInactiveSectors = true;
-        lightManager.luminosity = Settings.s.luminosity * 2.0f;
+        lightManager.luminosity = CPA_Settings.s.luminosity * 2.0f;
         SpawnableParent?.SetActive(false);
 
         byte[] screenshotBytes;
@@ -738,7 +738,7 @@ public class Controller : MonoBehaviour {
 					if (p.stdGame != null) {
 						CustomBitsComponent c = p.Gao.AddComponent<CustomBitsComponent>();
 						c.stdGame = p.stdGame;
-						if (Settings.s.engineVersion == Settings.EngineVersion.R3) c.hasAiCustomBits = true;
+						if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) c.hasAiCustomBits = true;
 						c.Init();
 					}
 				}

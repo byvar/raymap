@@ -446,7 +446,7 @@ public class RecordingTool : MonoBehaviour
     public void ReadAlways(Reader reader)
     {
         MemoryFile mem = (MemoryFile)MapLoader.Loader.files_array[0];
-        Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["always"], mem));
+        Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["always"], mem));
         var num_always = reader.ReadUInt32();
         var spawnablePersos = OpenSpace.LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
         var currentPointer = Pointer.Current(reader);
@@ -463,7 +463,7 @@ public class RecordingTool : MonoBehaviour
 
         for (int i = 0; i < num_always; i++) {
 
-            int spoSize = Settings.s.game == Settings.Game.R3 ? 0x80 : 0x48; // 0x80 for r3
+            int spoSize = CPA_Settings.s.game == CPA_Settings.Game.R3 ? 0x80 : 0x48; // 0x80 for r3
 
             var off_alwaysSPO = off_alwaysSpoArray + (i * spoSize);
 

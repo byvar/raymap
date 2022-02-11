@@ -18,7 +18,7 @@ namespace OpenSpace.Animation.Component {
             }
         }
 		public float GetMorphProgressFloat(int i) {
-			if (Settings.s.engineVersion >= Settings.EngineVersion.R3 && i < morphProgressArray.Length) {
+			if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3 && i < morphProgressArray.Length) {
 				return ((float)morphProgressArray[i]) / 100.0f;
 			} else {
 				return morphProgressFloat;
@@ -31,7 +31,7 @@ namespace OpenSpace.Animation.Component {
 		public ushort[] objectIndexToArray;
 
 		protected override void ReadInternal(Reader reader) {
-			if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 				objectIndexTo = reader.ReadByte(); // object index to morph to
 				morphProgress = reader.ReadByte(); // 0-100, at 100 the morph is over.
 				channel = reader.ReadInt16(); // the channel for which this morph data is relevant

@@ -124,7 +124,7 @@ namespace OpenSpace.Visual {
 			//l.print("Geometric Object: " + offset);
             GeometricObject m = new GeometricObject(offset);
 			m.radiosity = radiosity;
-			if (Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				uint flags = reader.ReadUInt32();
 				m.num_vertices = reader.ReadUInt16();
 				m.num_elements = reader.ReadUInt16();
@@ -138,7 +138,7 @@ namespace OpenSpace.Visual {
 				float sphereY = reader.ReadSingle(); // y
 				m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 				m.lookAtMode = reader.ReadUInt32();
-			} else if (Settings.s.game == Settings.Game.R2Revolution) {
+			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				m.off_element_types = Pointer.Read(reader);
 				m.off_elements = Pointer.Read(reader);
 				uint flags = reader.ReadUInt32();
@@ -154,40 +154,40 @@ namespace OpenSpace.Visual {
 				m.off_normals = Pointer.Read(reader);
 				m.lookAtMode = flags & 3;
 			} else {
-				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
+				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
 				m.off_vertices = Pointer.Read(reader);
 				m.off_normals = Pointer.Read(reader);
-				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 					m.off_materials = Pointer.Read(reader);
 				} else {
 					m.off_blendWeights = Pointer.Read(reader);
 				}
-				if (Settings.s.mode != Settings.Mode.RaymanArenaGC 
-					&& Settings.s.mode != Settings.Mode.RaymanArenaGCDemo_2002_03_07
-					&& Settings.s.game != Settings.Game.RM
-					&& Settings.s.mode != Settings.Mode.DonaldDuckPKGC
-					&& !(Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion == Settings.EngineVersion.R3)) {
+				if (CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGC 
+					&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07
+					&& CPA_Settings.s.game != CPA_Settings.Game.RM
+					&& CPA_Settings.s.mode != CPA_Settings.Mode.DonaldDuckPKGC
+					&& !(CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3)) {
 					reader.ReadInt32();
 				}
-				if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
+				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
 				m.off_element_types = Pointer.Read(reader);
 				m.off_elements = Pointer.Read(reader);
-				if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
+				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) {
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
 				reader.ReadInt32();
-				if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+				if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
 					m.off_parallelBoxes = Pointer.Read(reader);
 				} else {
 					reader.ReadInt32();
 				}
-				if (Settings.s.game == Settings.Game.Dinosaur) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
 					reader.ReadInt32();
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
-				if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+				if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
 					m.lookAtMode = reader.ReadUInt32();
 					//if (m.lookAtMode != 0) l.print(m.lookAtMode);
 					m.num_vertices = reader.ReadUInt16();
@@ -200,11 +200,11 @@ namespace OpenSpace.Visual {
 					float sphereY = reader.ReadSingle(); // y
 					m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 					reader.ReadInt32();
-					if (Settings.s.engineVersion == Settings.EngineVersion.R3) {
+					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
 						reader.ReadInt32();
-						if (!(Settings.s.platform == Settings.Platform.PS2 && (Settings.s.game == Settings.Game.RM || Settings.s.game == Settings.Game.RA))) {
+						if (!(CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && (CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA))) {
 							reader.ReadInt16();
-							if (Settings.s.platform == Settings.Platform.PS2) {
+							if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
 								reader.ReadInt16();
 								reader.ReadUInt32();
 							}
@@ -221,15 +221,15 @@ namespace OpenSpace.Visual {
 				}
 			}
             m.name = "Mesh @ " + offset;
-            if (Settings.s.hasNames) m.name = reader.ReadString(0x32);
-			if (Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion >= Settings.EngineVersion.R3) {
+            if (CPA_Settings.s.hasNames) m.name = reader.ReadString(0x32);
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3) {
 				reader.Align(0x4);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				m.optimizedObject = new Pointer<PS2OptimizedSDCStructure>(reader, resolve: false);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
-				if (Settings.s.game == Settings.Game.R3) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
 					m.ps2IsSinus = reader.ReadUInt32();
 				}
 			}
@@ -344,7 +344,7 @@ namespace OpenSpace.Visual {
                 }
 			}
 			ReadMeshFromATO(reader, m);
-			if (Settings.s.platform == Settings.Platform.PS2 && Settings.s.engineVersion == Settings.EngineVersion.R3) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
 				m.optimizedObject?.Resolve(reader, onPreRead: opt => opt.isSinus = m.ps2IsSinus);
 				m.ReadMeshFromSDC();
 			}
@@ -373,7 +373,7 @@ namespace OpenSpace.Visual {
 
 		private static void ReadMeshFromATO(Reader reader, GeometricObject m) {
 			// Revolution only: Before creating the gameobject, read the actual model data from the ATO
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				MapLoader l = MapLoader.Loader;
 				List<GeometricObject> meshObjects = new List<GeometricObject>();
 				for (uint i = 0; i < m.num_elements; i++) {

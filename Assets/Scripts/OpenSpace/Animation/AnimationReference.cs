@@ -28,7 +28,7 @@ namespace OpenSpace.Animation {
 		public AnimA3DLargo a3dLargo = null;
 
 		protected override void ReadInternal(Reader reader) {
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				off_a3d = Pointer.Read(reader);
 				reader.ReadUInt32();
 				off_events = Pointer.Read(reader);
@@ -42,24 +42,24 @@ namespace OpenSpace.Animation {
 				num_events = reader.ReadByte();
 				transition = reader.ReadByte();
 			} else {
-				if (Settings.s.hasNames) name = new string(reader.ReadChars(0x50));
-				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) reader.ReadUInt32();
-				if (Settings.s.game == Settings.Game.LargoWinch) off_a3d = Pointer.Read(reader);
+				if (CPA_Settings.s.hasNames) name = new string(reader.ReadChars(0x50));
+				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) reader.ReadUInt32();
+				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) off_a3d = Pointer.Read(reader);
 				num_onlyFrames = reader.ReadUInt16();
 				speed = reader.ReadByte();
 				num_channels = reader.ReadByte();
 				off_events = Pointer.Read(reader);
-				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 					x = reader.ReadSingle();
 					y = reader.ReadSingle();
 					z = reader.ReadSingle();
 				}
 				off_morphData = Pointer.Read(reader); // Runtime only?
-				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				}
-				if (Settings.s.game != Settings.Game.LargoWinch) {
+				if (CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 					anim_index = reader.ReadUInt16();
 					num_events = reader.ReadByte();
 					transition = reader.ReadByte();
@@ -69,13 +69,13 @@ namespace OpenSpace.Animation {
 					anim_index = reader.ReadUInt16();
 				}
 
-				if (Settings.s.engineVersion == Settings.EngineVersion.R2) reader.ReadUInt32(); // no idea what this is sadly
-				if (Settings.s.engineVersion <= Settings.EngineVersion.TT) {
+				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) reader.ReadUInt32(); // no idea what this is sadly
+				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
 					off_a3d = Pointer.Read(reader);
 				}
 			}
 			MapLoader l = MapLoader.Loader;
-			if (Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				a3dLargo = l.FromOffsetOrRead<AnimA3DLargo>(reader, off_a3d, (a) => {
 					a.num_onlyFrames = num_onlyFrames;
 					a.num_channels = num_channels;

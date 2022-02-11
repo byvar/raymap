@@ -33,7 +33,7 @@ namespace OpenSpace.PS1 {
 			off_transitions = Pointer.Read(reader); // Points to animation data, incl name
 			num_transitions = reader.ReadUInt32();
 			off_state_auto = Pointer.Read(reader);
-			if (Settings.s.game != Settings.Game.RRush) {
+			if (CPA_Settings.s.game != CPA_Settings.Game.RRush) {
 				off_18 = Pointer.Read(reader);
 			}
 			byte_1C = reader.ReadByte();

@@ -26,7 +26,7 @@ namespace OpenSpace.AI {
             off_behaviors_normal = Pointer.Read(reader);
             off_behaviors_reflex = Pointer.Read(reader);
             off_dsgVar = Pointer.Read(reader);
-            if (Settings.s.engineVersion >= Settings.EngineVersion.R2) {
+            if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R2) {
                 off_macros = Pointer.Read(reader);
                 flags = reader.ReadUInt32();
             }

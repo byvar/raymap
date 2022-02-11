@@ -54,12 +54,12 @@ namespace OpenSpace.Animation.Component {
         public AnimDeformation[] deformations;
 
 		protected override void ReadInternal(Reader reader) {
-			if (readFull && Settings.s.game != Settings.Game.R2Revolution) {
+			if (readFull && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
 				reader.AutoAligning = true;
 			}
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				ReadRevolution(reader);
-			} else if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+			} else if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 				/* Each a3d is 0x38 long in R2. 0x34 in TT */
 				speed = reader.ReadUInt16();
 				num_vectors = reader.ReadUInt16();
@@ -70,9 +70,9 @@ namespace OpenSpace.Animation.Component {
 				num_channels = reader.ReadUInt16();
 				num_onlyFrames = reader.ReadUInt16();
 				num_keyframes = reader.ReadUInt16();
-				if (Settings.s.engineVersion >= Settings.EngineVersion.R2
-					&& Settings.s.game != Settings.Game.R2Demo
-					&& Settings.s.game != Settings.Game.RedPlanet) {
+				if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R2
+					&& CPA_Settings.s.game != CPA_Settings.Game.R2Demo
+					&& CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) {
 					unk_14 = reader.ReadUInt16();
 				}
 				num_events = reader.ReadUInt16();
@@ -92,12 +92,12 @@ namespace OpenSpace.Animation.Component {
 				start_channels = reader.ReadUInt16();
 				start_events = reader.ReadUInt16();
 				start_morphData = reader.ReadUInt16();
-				if (Settings.s.engineVersion >= Settings.EngineVersion.R2
-					&& Settings.s.game != Settings.Game.R2Demo
-					&& Settings.s.game != Settings.Game.RedPlanet) {
+				if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R2
+					&& CPA_Settings.s.game != CPA_Settings.Game.R2Demo
+					&& CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) {
 					reader.ReadUInt16(); // padding?
 				}
-				if (Settings.s.engineVersion == Settings.EngineVersion.TT) {
+				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT) {
 					start_vectors2 = 0;
 					start_quaternions2 = 0;
 					start_vectors = 0;
@@ -142,7 +142,7 @@ namespace OpenSpace.Animation.Component {
 				start_events = reader.ReadUInt16();
 				start_morphData = reader.ReadUInt16();
 			}
-			if (readFull && Settings.s.game != Settings.Game.R2Revolution) {
+			if (readFull && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
 				ReadFull(reader);
 				reader.AutoAligning = false;
 			}
@@ -213,7 +213,7 @@ namespace OpenSpace.Animation.Component {
 			framesKFIndex = l.ReadArray<AnimFramesKFIndex>(num_onlyFrames * num_channels, reader);
 			if (AnimKeyframe.Aligned) reader.AutoAlign(4);
 			keyframes = l.ReadArray<AnimKeyframe>(num_keyframes, reader);
-			if (Settings.s.engineVersion > Settings.EngineVersion.TT) {
+			if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
 				if (AnimEvent.Aligned) reader.AutoAlign(4);
 				events = l.ReadArray<AnimEvent>(num_events, reader);
 				if (AnimMorphData.Aligned) reader.AutoAlign(4);
@@ -228,7 +228,7 @@ namespace OpenSpace.Animation.Component {
 				+ " - KFI: " + a3d.num_onlyFrames * a3d.num_channels
 				+ " - V:" + a3d.num_vectors
 				+ " - Q:" + a3d.num_quaternions);*/
-			if (Settings.s.hasDeformations) {
+			if (CPA_Settings.s.hasDeformations) {
 				if (AnimDeformation.Aligned) reader.AutoAlign(4);
 				deformations = l.ReadArray<AnimDeformation>(num_deformations, reader);
 				//reader.Align(AnimDeformation.Size * a3d.deformations.Length, 4);

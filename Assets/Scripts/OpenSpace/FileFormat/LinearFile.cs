@@ -22,7 +22,7 @@ namespace OpenSpace.FileFormat {
             length = stream.Length;
             headerOffset = baseAddress;
             baseOffset = -headerOffset;
-            reader = new Reader(stream, Settings.s.IsLittleEndian);
+            reader = new Reader(stream, CPA_Settings.s.IsLittleEndian);
         }
 
         public override void CreateWriter() {

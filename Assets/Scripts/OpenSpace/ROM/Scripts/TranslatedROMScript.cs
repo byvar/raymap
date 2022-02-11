@@ -50,7 +50,7 @@ namespace OpenSpace.ROM {
                     string secondChildNode = (this.children.Count > 1 && this.children[1] != null) ? this.children[1].ToString() : "null";
                     string prefix = (ts.printAddresses ? "{" + scriptNode.offset + "}" : "");
 
-                    AITypes aiTypes = Settings.s.aiTypes;
+                    AITypes aiTypes = CPA_Settings.s.aiTypes;
                     uint param = scriptNode.param;
 
                     switch (scriptNode.nodeType) {

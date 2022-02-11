@@ -33,7 +33,7 @@ namespace OpenSpace.ROM {
 			// maybe this can help https://github.com/ricrpi/mupen64plus-video-gles2rice/blob/master/src/RSP_Parser.cpp
 			// 8 bytes per command, 1st byte is RSP byte
 
-			if (Settings.s.platform == Settings.Platform._3DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
 				triangles = new Triangle[length];
 				for (int i = 0; i < length; i++) {
 					/*if (i % 2 == 0) {
@@ -59,18 +59,18 @@ namespace OpenSpace.ROM {
 					colors[i] = new CompressedVector3(reader);
 				}
 			} else {
-				if (Settings.s.platform == Settings.Platform.N64) {
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
 					data = reader.ReadBytes(length);
 					using (MemoryStream str = new MemoryStream(data)) {
-						using (Reader dataReader = new Reader(str, Settings.s.IsLittleEndian)) {
+						using (Reader dataReader = new Reader(str, CPA_Settings.s.IsLittleEndian)) {
 							rspCommands = new RSPCommand[length / 8];
 							for (int i = 0; i < rspCommands.Length; i++) {
 								rspCommands[i] = new RSPCommand(dataReader);
 							}
 						}
 					}
-				} else if (Settings.s.platform == Settings.Platform.DS) {
-					if (Settings.s.game == Settings.Game.RRR) {
+				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
+					if (CPA_Settings.s.game == CPA_Settings.Game.RRR) {
 						data = reader.ReadBytes(compressedLength);
 						data = DS3D.GeometryParser.Decompress(data);
 						//data = DS3D.GeometryParser.ReadCompressed(reader);

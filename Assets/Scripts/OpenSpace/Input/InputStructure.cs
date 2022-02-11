@@ -16,17 +16,17 @@ namespace OpenSpace.Input {
 
         public static InputStructure Read(Reader reader, Pointer offset) {
             InputStructure input = new InputStructure(offset);
-			if (Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				input.num_entryActions = reader.ReadUInt32();
 				input.off_entryActions = Pointer.Read(reader);
 			} else {
-				switch (Settings.s.platform) {
-					case Settings.Platform.GC:
+				switch (CPA_Settings.s.platform) {
+					case CPA_Settings.Platform.GC:
 						//reader.ReadBytes(0x1714);
-						if (Settings.s.game == Settings.Game.R3) {
+						if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
 							reader.ReadBytes(0x12E0);
-						} else if (Settings.s.game == Settings.Game.RA
-							|| Settings.s.game == Settings.Game.DDPK) {
+						} else if (CPA_Settings.s.game == CPA_Settings.Game.RA
+							|| CPA_Settings.s.game == CPA_Settings.Game.DDPK) {
 							//reader.ReadBytes(0x16e8);
 							reader.ReadBytes(0x12C8);
 						}
@@ -34,48 +34,48 @@ namespace OpenSpace.Input {
 						input.off_entryActions = Pointer.Read(reader);
 						reader.ReadBytes(0x418);
 						break;
-					case Settings.Platform.PC:
-					case Settings.Platform.MacOS:
-						if (Settings.s.game == Settings.Game.RedPlanet) {
+					case CPA_Settings.Platform.PC:
+					case CPA_Settings.Platform.MacOS:
+						if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) {
 							reader.ReadBytes(0x32CC);
-						} else if (Settings.s.engineVersion == Settings.EngineVersion.R2) {
+						} else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) {
 							reader.ReadBytes(0x700);
-						} else if (Settings.s.game == Settings.Game.Dinosaur) {
+						} else if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
 							reader.ReadBytes(0xC58);
 						} else {
 							reader.ReadBytes(0x16BC);
 						}
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
-						if (Settings.s.game == Settings.Game.RedPlanet) {
+						if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) {
 							reader.ReadBytes(0x14);
 						} else {
 							reader.ReadBytes(0x418);
 						}
 						break;
-					case Settings.Platform.Xbox:
-					case Settings.Platform.Xbox360:
-					case Settings.Platform.PS3:
+					case CPA_Settings.Platform.Xbox:
+					case CPA_Settings.Platform.Xbox360:
+					case CPA_Settings.Platform.PS3:
 						reader.ReadBytes(0x16BC);
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
 						reader.ReadBytes(0x418);
 						break;
-					case Settings.Platform.iOS:
+					case CPA_Settings.Platform.iOS:
 						reader.ReadBytes(0x2A0);
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
 						reader.ReadBytes(0x14);
 						break;
-					case Settings.Platform.DC:
+					case CPA_Settings.Platform.DC:
 						reader.ReadBytes(0x278);
 						input.num_entryActions = reader.ReadUInt32();
 						input.off_entryActions = Pointer.Read(reader);
 						reader.ReadUInt32();
 						Pointer.Read(reader);
 						break;
-					case Settings.Platform.PS2:
-						if (Settings.s.game == Settings.Game.R2Revolution) {
+					case CPA_Settings.Platform.PS2:
+						if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 							reader.ReadBytes(0x130);
 							input.num_entryActions = reader.ReadUInt32();
 							input.off_entryActions = Pointer.Read(reader);
@@ -85,12 +85,12 @@ namespace OpenSpace.Input {
 							reader.ReadUInt32(); // 0F00020000040100
 							reader.ReadBytes(0x300);
 						} else {
-							if (Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+							if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 								reader.ReadBytes(0x1368);
 							} else {
 								reader.ReadBytes(0x1250);
-								if (Settings.s.game == Settings.Game.RA || Settings.s.game == Settings.Game.RM
-									|| Settings.s.mode == Settings.Mode.Rayman3PS2Demo_2002_12_18) {
+								if (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM
+									|| CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_12_18) {
 									reader.ReadBytes(0x10);
 								}
 							}

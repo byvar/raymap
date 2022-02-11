@@ -51,11 +51,11 @@ namespace OpenSpace.FileFormat {
             headerOffset = 0;
             this.name = name;
             this.rtb = rtb;
-            using (Reader encodedReader = new Reader(stream, Settings.s.IsLittleEndian)) {
+            using (Reader encodedReader = new Reader(stream, CPA_Settings.s.IsLittleEndian)) {
                 int maskBytes = encodedReader.InitMask();
                 data = encodedReader.ReadBytes((int)stream.Length - maskBytes);
             }
-            reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+            reader = new Reader(new MemoryStream(data), CPA_Settings.s.IsLittleEndian);
             ReadSNA();
         }
 
@@ -78,8 +78,8 @@ namespace OpenSpace.FileFormat {
 
         public void WriteSNA() {
             using (FileStream stream = new FileStream(path, FileMode.Open)) {
-                Writer writer = new Writer(stream, Settings.s.IsLittleEndian);
-                if (Settings.s.game == Settings.Game.TT) {
+                Writer writer = new Writer(stream, CPA_Settings.s.IsLittleEndian);
+                if (CPA_Settings.s.game == CPA_Settings.Game.TT) {
                     throw new NotImplementedException();
                     //byte headerLength = reader.ReadByte();
                     //reader.ReadBytes(headerLength);
@@ -87,7 +87,7 @@ namespace OpenSpace.FileFormat {
                 foreach (SNAMemoryBlock block in blocks) {
                     writer.Write(block.module);
                     writer.Write(block.id);
-                    if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) writer.Write(block.unk1);
+                    if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) writer.Write(block.unk1);
                     writer.Write(block.baseInMemory);
 
                     if (block.baseInMemory != -1) {
@@ -95,7 +95,7 @@ namespace OpenSpace.FileFormat {
                         writer.Write(block.unk3);
                         writer.Write(block.maxPosMinus9);
                         writer.Write(block.size);
-                        if (Settings.s.game == Settings.Game.TT) writer.Write(block.unk1);
+                        if (CPA_Settings.s.game == CPA_Settings.Game.TT) writer.Write(block.unk1);
 
                         WriteSNABlock(writer, block);
                     }
@@ -106,7 +106,7 @@ namespace OpenSpace.FileFormat {
         void ReadSNA() {
             MapLoader l = MapLoader.Loader;
             uint szCounter = 0;
-            if (Settings.s.game == Settings.Game.TT) {
+            if (CPA_Settings.s.game == CPA_Settings.Game.TT) {
                 byte headerLength = reader.ReadByte();
                 reader.ReadBytes(headerLength);
             }
@@ -116,7 +116,7 @@ namespace OpenSpace.FileFormat {
                 block.position = (uint)reader.BaseStream.Position;
                 block.module = reader.ReadByte();
                 block.id = reader.ReadByte();
-                if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) block.unk1 = reader.ReadByte();
+                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) block.unk1 = reader.ReadByte();
                 block.baseInMemory = reader.ReadInt32();
                 if (blocks.Count == 0) {
                     l.print("Initial block: " + block.module + "|" + block.id + " - base: " + block.baseInMemory);
@@ -133,7 +133,7 @@ namespace OpenSpace.FileFormat {
                     block.maxPosMinus9 = reader.ReadUInt32();
                     block.size = reader.ReadUInt32();
                     szCounter += block.size;
-                    if (Settings.s.game == Settings.Game.TT) block.unk1 = reader.ReadByte();
+                    if (CPA_Settings.s.game == CPA_Settings.Game.TT) block.unk1 = reader.ReadByte();
                     block.dataPosition = (uint)reader.BaseStream.Position;
                     //l.print("(" + block.module + "," + block.id + ") Base: " + block.baseInMemory + " - Size: " + block.size + " - 2:" + block.unk2 + " - 3:" + block.unk3 + " - 4:" + block.maxPosMinus9);
 
@@ -201,7 +201,7 @@ namespace OpenSpace.FileFormat {
             Array.Copy(other, 0, data, oldLength, other.Length);
             if (reading) {
                 reader.Close();
-                reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+                reader = new Reader(new MemoryStream(data), CPA_Settings.s.IsLittleEndian);
                 reader.BaseStream.Seek(readerOffset, SeekOrigin.Begin);
             }
         }
@@ -209,7 +209,7 @@ namespace OpenSpace.FileFormat {
         void ReadSNABlock(SNAMemoryBlock block) {
             MapLoader l = MapLoader.Loader;
             if (block.size > 0) {
-                if (Settings.s.snaCompression) {
+                if (CPA_Settings.s.snaCompression) {
                     uint isCompressed = reader.ReadUInt32();
                     uint compressedSize = reader.ReadUInt32();
                     uint compressedChecksum = reader.ReadUInt32();
@@ -231,14 +231,14 @@ namespace OpenSpace.FileFormat {
                         }*/
                         using (var compressedStream = new MemoryStream(compressedData))
                         using (var lzo = new LzoStream(compressedStream, CompressionMode.Decompress))
-                        using (Reader lzoReader = new Reader(lzo, Settings.s.IsLittleEndian)) {
+                        using (Reader lzoReader = new Reader(lzo, CPA_Settings.s.IsLittleEndian)) {
                             lzo.SetLength(decompressedSize);
                             uncompressedData = lzoReader.ReadBytes((int)block.size);
                         }
                     } else {
                         diff = 0;
                         using (var uncompressedStream = new MemoryStream(compressedData))
-                        using (Reader unCompressedReader = new Reader(uncompressedStream, Settings.s.IsLittleEndian)) {
+                        using (Reader unCompressedReader = new Reader(uncompressedStream, CPA_Settings.s.IsLittleEndian)) {
                             uncompressedData = unCompressedReader.ReadBytes((int)block.size);
                         }
                     }
@@ -252,7 +252,7 @@ namespace OpenSpace.FileFormat {
                             data.Length - block.dataPosition - 20 - compressedSize);
                         data = newData;
                         reader.Close();
-                        reader = new Reader(new MemoryStream(data), Settings.s.IsLittleEndian);
+                        reader = new Reader(new MemoryStream(data), CPA_Settings.s.IsLittleEndian);
                         reader.BaseStream.Seek(block.dataPosition + compressedSize + diff, SeekOrigin.Begin);
                     }
                 } else {
@@ -354,14 +354,14 @@ namespace OpenSpace.FileFormat {
             Stream gptStream = FileSystem.GetFileReadStream(path);
             uint gptOffset = (uint)data.Length;
             byte[] gptData = null;
-            using (Reader gptReader = new Reader(gptStream, Settings.s.IsLittleEndian)) {
-                int maskBytes = Settings.s.encryptPointerFiles ? gptReader.InitMask() : 0;
+            using (Reader gptReader = new Reader(gptStream, CPA_Settings.s.IsLittleEndian)) {
+                int maskBytes = CPA_Settings.s.encryptPointerFiles ? gptReader.InitMask() : 0;
                 gptData = gptReader.ReadBytes((int)gptStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", gptData);
             AppendData(gptData);
             SNAMemoryBlock block;
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 ushort ptrRelocationKey = GetRelocationKey(rtp.pointerBlocks[0]);
                 block = relocation_local[ptrRelocationKey];
             } else {
@@ -382,14 +382,14 @@ namespace OpenSpace.FileFormat {
             Stream dlgStream = FileSystem.GetFileReadStream(path);
             uint dlgOffset = (uint)data.Length;
             byte[] dlgData = null;
-            using (Reader dlgReader = new Reader(dlgStream, Settings.s.IsLittleEndian)) {
-                int maskBytes = Settings.s.encryptPointerFiles ? dlgReader.InitMask() : 0;
+            using (Reader dlgReader = new Reader(dlgStream, CPA_Settings.s.IsLittleEndian)) {
+                int maskBytes = CPA_Settings.s.encryptPointerFiles ? dlgReader.InitMask() : 0;
                 dlgData = dlgReader.ReadBytes((int)dlgStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", gptData);
             AppendData(dlgData);
             SNAMemoryBlock block;
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 ushort ptrRelocationKey = GetRelocationKey(rtd.pointerBlocks[0]);
                 block = relocation_local[ptrRelocationKey];
             } else {
@@ -407,7 +407,7 @@ namespace OpenSpace.FileFormat {
             Stream sdaStream = FileSystem.GetFileReadStream(path);
             uint sdaOffset = (uint)data.Length;
             byte[] sdaData = null;
-            using (Reader sdaReader = new Reader(sdaStream, Settings.s.IsLittleEndian)) {
+            using (Reader sdaReader = new Reader(sdaStream, CPA_Settings.s.IsLittleEndian)) {
                 sdaData = sdaReader.ReadBytes((int)sdaStream.Length);
             }
             AppendData(sdaData);
@@ -423,14 +423,14 @@ namespace OpenSpace.FileFormat {
             Stream ptxStream = FileSystem.GetFileReadStream(path);
             uint ptxOffset = (uint)data.Length;
             byte[] ptxData = null;
-            using (Reader ptxReader = new Reader(ptxStream, Settings.s.IsLittleEndian)) {
-                int maskBytes = Settings.s.encryptPointerFiles ? ptxReader.InitMask() : 0;
+            using (Reader ptxReader = new Reader(ptxStream, CPA_Settings.s.IsLittleEndian)) {
+                int maskBytes = CPA_Settings.s.encryptPointerFiles ? ptxReader.InitMask() : 0;
                 ptxData = ptxReader.ReadBytes((int)ptxStream.Length - maskBytes);
             }
             //Util.ByteArrayToFile(path + ".dmp", ptxData);
             AppendData(ptxData);
             ptx = new SNAMemoryBlock();
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 // It doesn't exist in Tonic Trouble
                 ushort ptrRelocationKey = GetRelocationKey(rtt.pointerBlocks[0]);
                 SNAMemoryBlock block = relocation_local[ptrRelocationKey];
@@ -465,7 +465,7 @@ namespace OpenSpace.FileFormat {
                             
                             ushort ptrRelocationKey = GetRelocationKey(info);
                             if (!l.relocation_global.ContainsKey(ptrRelocationKey)) {
-                                if (Settings.s.engineVersion > Settings.EngineVersion.Montreal || !(info.module == 0xFF && info.id == 0xFF)) {
+                                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal || !(info.module == 0xFF && info.id == 0xFF)) {
                                     l.print("Could not find SNA block (" + info.module + "," + info.id + ")");
                                 }
                             } else {
@@ -542,7 +542,7 @@ namespace OpenSpace.FileFormat {
                     for (uint i = 0; i < pf.size / 4; i++) {
                         uint ptrValue = reader.ReadUInt32();
                         RelocationPointerInfo info = null;
-                        if (Settings.s.engineVersion == Settings.EngineVersion.Montreal ||Settings.s.game == Settings.Game.RedPlanet) {
+                        if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal ||CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) {
                             foreach (RelocationPointerInfo info_new in ptrList.pointers) {
                                 if (info_new.offsetInMemory == ptrValue) {
                                     info = info_new;
@@ -566,7 +566,7 @@ namespace OpenSpace.FileFormat {
                             } else {
                                 l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
                             }
-                            if (Settings.s.engineVersion != Settings.EngineVersion.Montreal && Settings.s.game != Settings.Game.RedPlanet) {
+                            if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal && CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) {
                                 listIndex++;
                                 if (listIndex >= ptrList.pointers.Length) break;
                             }
@@ -655,7 +655,7 @@ namespace OpenSpace.FileFormat {
             if (path != null) {
                 MemoryStream stream = new MemoryStream(data, true);
                 //FileStream stream = new FileStream(path, FileMode.Open);
-                writer = new Writer(stream, Settings.s.IsLittleEndian);
+                writer = new Writer(stream, CPA_Settings.s.IsLittleEndian);
             }
         }
 

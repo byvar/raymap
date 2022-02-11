@@ -61,7 +61,7 @@ namespace OpenSpace.Exporter {
         {
             this.loader = loader;
             this.exportPath = exportPath;
-            this.gameName = Settings.s.mode.ToString();
+            this.gameName = CPA_Settings.s.mode.ToString();
             this.flags = flags;
         }
 
@@ -84,7 +84,7 @@ namespace OpenSpace.Exporter {
 
         public static void ExportText() {
             MapLoader l = MapLoader.Loader;
-            string filePath = l.gameDataBinFolder + "/localization_" + Settings.s.CmdModeName + ".json";
+            string filePath = l.gameDataBinFolder + "/localization_" + CPA_Settings.s.CmdModeName + ".json";
             if (l is Loader.R2ROMLoader) {
                 Loader.R2ROMLoader rl = l as Loader.R2ROMLoader;
                 ROM.Localization rloc = rl.localizationROM;

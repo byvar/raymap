@@ -142,26 +142,26 @@ namespace OpenSpace.Collide {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementCollideTriangles sm = new GeometricObjectElementCollideTriangles(offset, geo);
             sm.off_material = Pointer.Read(reader);
-			if (Settings.s.game == Settings.Game.R2Revolution || Settings.s.game == Settings.Game.LargoWinch) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				sm.num_triangles = reader.ReadUInt16();
 				reader.ReadUInt16();
 				sm.off_triangles = Pointer.Read(reader);
-				if (Settings.s.game == Settings.Game.LargoWinch) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 					sm.off_normals = Pointer.Read(reader);
 					sm.off_unk = Pointer.Read(reader);
 				}
 			} else {
-				if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 					sm.num_triangles = reader.ReadUInt16();
 					sm.num_mapping = reader.ReadUInt16();
 					sm.off_triangles = Pointer.Read(reader);
 					sm.off_mapping = Pointer.Read(reader);
 					sm.off_normals = Pointer.Read(reader);
 					sm.off_uvs = Pointer.Read(reader);
-					if (Settings.s.engineVersion == Settings.EngineVersion.Montreal) {
+					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
 						reader.ReadUInt32();
 					}
-					if (Settings.s.game != Settings.Game.TTSE) {
+					if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) {
 						Pointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
 						reader.ReadUInt16(); // num_unk
 						sm.ind_parallelBox = reader.ReadInt16();
@@ -172,7 +172,7 @@ namespace OpenSpace.Collide {
 					sm.num_triangles = reader.ReadUInt16();
 					sm.ind_parallelBox = reader.ReadInt16();
 					reader.ReadUInt32();
-					if (Settings.s.game != Settings.Game.Dinosaur) {
+					if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
 						sm.off_mapping = Pointer.Read(reader);
 						sm.off_unk = Pointer.Read(reader); // num_mapping_entries * 3 floats 
 						sm.off_unk2 = Pointer.Read(reader); // num_mapping_entries * 1 float

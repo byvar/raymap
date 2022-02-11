@@ -128,7 +128,7 @@ namespace OpenSpace.Visual.Deform {
                     mat.SetColumn(j, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1f));
                 }
                 d.r3bones[i].mat = new Matrix(null, 1, mat, new Vector4(1f, 1f, 1f, 1f));
-				if (Settings.s.game == Settings.Game.LargoWinch) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 					Pointer off_shorts = Pointer.Read(reader); // offset of shorts. the next ushort, invert, is actually number of shorts.
 					d.r3bones[i].invert = reader.ReadUInt16();
 					//l.print("Number of shorts: " + d.r3bones[i].invert);

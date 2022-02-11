@@ -27,7 +27,7 @@ namespace OpenSpace.FileFormat {
             baseOffset = 0;
             headerOffset = 0;
             this.name = name;
-            reader = new Reader(stream, Settings.s.IsLittleEndian);
+            reader = new Reader(stream, CPA_Settings.s.IsLittleEndian);
         }
 
         public async UniTask GetOffset(RelocationTableReference rtref) {
@@ -166,9 +166,9 @@ namespace OpenSpace.FileFormat {
         public uint GetMask(RelocationTableReference rtref) {
             rtref.byte3 = (byte)~rtref.byte2;
             byte[] rtRefBytes = new byte[] { rtref.levelId, rtref.relocationType, rtref.byte2, rtref.byte3 };
-            if (Settings.s.IsLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(rtRefBytes);
+            if (CPA_Settings.s.IsLittleEndian != BitConverter.IsLittleEndian) Array.Reverse(rtRefBytes);
             uint currentMask = BitConverter.ToUInt32(rtRefBytes, 0);
-            if (Settings.s.platform == Settings.Platform.iOS) {
+            if (CPA_Settings.s.platform == CPA_Settings.Platform.iOS) {
                 return (uint)(16807 * ((currentMask ^ 0x75BD924) % 0x1F31D) - 2836 * ((currentMask ^ 0x75BD924) / 0x1F31D));
             } else {
                 return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));

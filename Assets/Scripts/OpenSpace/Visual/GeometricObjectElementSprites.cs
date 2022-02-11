@@ -66,7 +66,7 @@ namespace OpenSpace.Visual {
                 bc.size = new Vector3(0, sprites[i].info_scale.y * 2, sprites[i].info_scale.x * 2);
                 spr_gao.layer = LayerMask.NameToLayer("Visual");
 				if (sprites[i].visualMaterial != null) {
-					if (Settings.s.game != Settings.Game.R2Revolution &&
+					if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution &&
 						sprites[i].visualMaterial.textures != null &&
 						sprites[i].visualMaterial.textures.Count > 0) {
 						TextureInfo mainTex = sprites[i].visualMaterial.textures[0].texture;
@@ -131,17 +131,17 @@ namespace OpenSpace.Visual {
             s.name = "Sprite @ pos " + offset;
 			//l.print(s.name);
             
-            if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-                if (Settings.s.platform == Settings.Platform.DC) {
+            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+                if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
                     s.off_sprites = offset;
                     s.num_sprites = 1;
                 } else {
                     s.off_sprites = Pointer.Read(reader);
                     s.num_sprites = reader.ReadUInt16();
                     reader.ReadInt16(); // -1
-					if (Settings.s.game != Settings.Game.R2Revolution) {
+					if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
 						reader.ReadUInt32();
-						if(Settings.s.game != Settings.Game.LargoWinch) reader.ReadUInt32();
+						if(CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) reader.ReadUInt32();
 					}
                 }
             } else {
@@ -149,7 +149,7 @@ namespace OpenSpace.Visual {
                 s.off_sprites = Pointer.Read(reader);
                 reader.ReadUInt32();
             }
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				Pointer.DoAt(ref reader, s.off_sprites, () => {
 					s.sprites = new IndexedSprite[s.num_sprites];
 					for (uint i = 0; i < s.num_sprites; i++) {
@@ -170,7 +170,7 @@ namespace OpenSpace.Visual {
 						}
 					}
 				});
-			} else if (Settings.s.platform == Settings.Platform.DC) {
+			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
                 s.sprites = new IndexedSprite[1];
                 s.sprites[0] = new IndexedSprite();
                 s.sprites[0].off_material = Pointer.Read(reader);
@@ -190,19 +190,19 @@ namespace OpenSpace.Visual {
                     s.sprites = new IndexedSprite[s.num_sprites];
                     for (uint i = 0; i < s.num_sprites; i++) {
                         s.sprites[i] = new IndexedSprite();
-						if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) reader.ReadUInt32();
+						if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32();
 						s.sprites[i].off_info = Pointer.Read(reader);
 						s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
-                        if (Settings.s.engineVersion > Settings.EngineVersion.Montreal) {
-							if (Settings.s.game != Settings.Game.LargoWinch) {
+                        if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+							if (CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 								s.sprites[i].constraint = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 								s.sprites[i].uv1 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 								s.sprites[i].uv2 = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 							}
                             s.sprites[i].centerPoint = reader.ReadUInt16();
                             reader.ReadUInt16();
-                            if (Settings.s.engineVersion < Settings.EngineVersion.R3) reader.ReadUInt32();
+                            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) reader.ReadUInt32();
                         }
 
                         if (s.sprites[i].off_info != null) {
@@ -225,7 +225,7 @@ namespace OpenSpace.Visual {
                                 off_current = Pointer.Goto(ref reader, s.sprites[i].off_material_pointer);
                                 s.sprites[i].off_material = Pointer.Read(reader);
                                 if (s.sprites[i].off_material != null) {
-                                    if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                                    if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                                         s.sprites[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
                                         s.sprites[i].visualMaterial = s.sprites[i].gameMaterial.visualMaterial;
                                     } else {

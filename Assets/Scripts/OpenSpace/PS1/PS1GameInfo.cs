@@ -797,12 +797,12 @@ namespace OpenSpace.PS1 {
 			}
 		};
 
-		public static Dictionary<Settings.Mode, PS1GameInfo> Games = new Dictionary<Settings.Mode, PS1GameInfo>() {
-			{ Settings.Mode.Rayman2PS1, R2_PS1_US },
-			{ Settings.Mode.RaymanRushPS1, RR_PS1_US },
-			{ Settings.Mode.DonaldDuckPS1, DD_PS1_US },
-			{ Settings.Mode.VIPPS1, VIP_PS1_US },
-			{ Settings.Mode.JungleBookPS1, JB_PS1_US },
+		public static Dictionary<CPA_Settings.Mode, PS1GameInfo> Games = new Dictionary<CPA_Settings.Mode, PS1GameInfo>() {
+			{ CPA_Settings.Mode.Rayman2PS1, R2_PS1_US },
+			{ CPA_Settings.Mode.RaymanRushPS1, RR_PS1_US },
+			{ CPA_Settings.Mode.DonaldDuckPS1, DD_PS1_US },
+			{ CPA_Settings.Mode.VIPPS1, VIP_PS1_US },
+			{ CPA_Settings.Mode.JungleBookPS1, JB_PS1_US },
 		};
 	}
 }

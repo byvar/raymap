@@ -15,7 +15,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
 			this.path = path;
 			this.i4 = i4;
             Stream fs = FileSystem.GetFileReadStream(path);
-            using (Reader reader = new Reader(fs, Settings.s.IsLittleEndian)) {
+            using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
 				texture = new Texture2D(width * 8, height * 8);
 				Color[] pixels = new Color[texture.width * texture.height];
 				int tile_size = 8;
@@ -44,7 +44,7 @@ namespace OpenSpace.FileFormat.Texture.DS {
 					if (i4) {
 						bool shift = index % 2 != 0;
 						byte texByte = texBytes[index / 2];
-						if (Settings.s.IsLittleEndian) {
+						if (CPA_Settings.s.IsLittleEndian) {
 							if (shift) {
 								texByte = (byte)(texByte >> 4);
 							} else {

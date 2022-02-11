@@ -27,9 +27,9 @@ namespace OpenSpace.Collide
         public static CollideActivation Read(Reader reader, Pointer offset, CollSet collset, CollideType type) {
             CollideActivation a = new CollideActivation(offset);
 
-            if (Settings.s.linkedListType != LinkedList.Type.Minimize) {
+            if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
                 a.off_next = Pointer.Read(reader);
-				if (Settings.s.hasLinkedListHeaderPointers) {
+				if (CPA_Settings.s.hasLinkedListHeaderPointers) {
 					a.off_prev = Pointer.Read(reader);
 					a.off_header = Pointer.Read(reader);
 				}
@@ -40,7 +40,7 @@ namespace OpenSpace.Collide
 						(off_element) => {
 							return CollideActivationZone.Read(reader, off_element);
 						},
-						flags: (Settings.s.hasLinkedListHeaderPointers ?
+						flags: (CPA_Settings.s.hasLinkedListHeaderPointers ?
 								LinkedList.Flags.HasHeaderPointers :
 								LinkedList.Flags.NoPreviousPointersForDouble),
 						type: LinkedList.Type.Minimize
@@ -48,7 +48,7 @@ namespace OpenSpace.Collide
 			});
 			a.index = reader.ReadUInt16();
 			reader.ReadUInt16();
-			if (Settings.s.linkedListType == LinkedList.Type.Minimize) {
+			if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) {
 				a.off_next = Pointer.Current(reader);
 			}
 			return a;

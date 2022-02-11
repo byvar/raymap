@@ -108,8 +108,8 @@ namespace OpenSpace.Loader {
 					Debug.LogError("Textures saved. Due to how N64 loading works, levels can only be loaded without Save Textures.");
 					return;
 				}
-				if (Settings.s.game == Settings.Game.R2
-					&& (Settings.s.platform == Settings.Platform.N64 || Settings.s.platform == Settings.Platform.DS)) {
+				if (CPA_Settings.s.game == CPA_Settings.Game.R2
+					&& (CPA_Settings.s.platform == CPA_Settings.Platform.N64 || CPA_Settings.s.platform == CPA_Settings.Platform.DS)) {
                     string objectNamesFileName = "objectNames_" + lvlName.ToLower() + ".json";
                     string objectNamesPath = gameDataBinFolder + "objectNames/" + objectNamesFileName;
 					await PrepareFile(objectNamesPath);
@@ -290,7 +290,7 @@ namespace OpenSpace.Loader {
 			ushort num_levels = reader.ReadUInt16();
 			reader.ReadUInt16();
 
-			if (Settings.s.platform == Settings.Platform.DS || Settings.s.platform == Settings.Platform.N64) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS || CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
 				loadingState = "Loading texture tables";
 				await WaitIfNecessary();
 				for (int i = 0; i < 18; i++) {
@@ -324,7 +324,7 @@ namespace OpenSpace.Loader {
 					}
 				});
 				Pointer off_palettesTable = Pointer.Read(reader);
-				if (Settings.s.platform == Settings.Platform.DS) {
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 					uint sz_palettesTable = reader.ReadUInt32() >> 2;
 					palettesTable = new Pointer[sz_palettesTable];
 					print(texturesTable.Length + " - " + palettesTable.Length);
@@ -594,7 +594,7 @@ namespace OpenSpace.Loader {
 				}
 			}*/
 			//print("Unused textures: " + texturesTableSeen.Where(t => !t).Count() + " - Unused palettes: " + palettesTableSeen.Where(p => !p).Count());
-			if (Settings.s.platform == Settings.Platform.DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 				// R2 DS
 				/*PAL palette = new PAL(gameDataBinFolder + "hud/objpal.bin");
 				ExportNBFC("hud/sprlums1.nbfc", 4, 4, palette.palette);
@@ -670,7 +670,7 @@ namespace OpenSpace.Loader {
 				ExportNBFC("hud/wifi_level_2.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/wifi_level_0.pal").palette, i4: true);
 				ExportNBFC("hud/wifi_level_3.bgc", 2, 2, new PAL(gameDataBinFolder + "hud/wifi_level_0.pal").palette, i4: true);*/
 			}
-			if (Settings.s.platform == Settings.Platform._3DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
 				// Stored separately
 				for (int i = 1; i < 25; i++) {
 					ExportEtcFile("LoadingAnimation/Course_" + i.ToString("D2") + ".etc", 64, 64, false);
@@ -735,7 +735,7 @@ namespace OpenSpace.Loader {
 		}
 
 		public void ExportEtcFile(string name, int w, int h, bool hasAlpha) {
-			if (Settings.s.platform == Settings.Platform._3DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
 				using (Reader reader = new Reader(FileSystem.GetFileReadStream(gameDataBinFolder + name))) {
 					byte[] textureBytes = reader.ReadBytes((int)reader.BaseStream.Length);
 					if (!File.Exists(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
@@ -746,7 +746,7 @@ namespace OpenSpace.Loader {
 			}
 		}
 		public void ExportNBFC(string name, int w, int h, Color[] palette, bool i4 = false) {
-			if (Settings.s.platform == Settings.Platform.DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 				if(FileSystem.FileExists(gameDataBinFolder + name)) {
 					if (!File.Exists(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
 						Texture2D tex = new NBFC(gameDataBinFolder + name, w, h, palette, i4).texture;
@@ -756,7 +756,7 @@ namespace OpenSpace.Loader {
 			}
 		}
 		public void ExportGFX(string name, string mapName, string palName, int w, int h) {
-			if (Settings.s.platform == Settings.Platform.DS) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 				if (FileSystem.FileExists(gameDataBinFolder + name)) {
 					//if (!File.Exists(gameDataBinFolder + "/textures/" + Path.GetDirectoryName(name) + "/" + Path.GetFileNameWithoutExtension(name) + ".png")) {
 						Texture2D tex = new GFX(gameDataBinFolder + name, gameDataBinFolder + mapName, gameDataBinFolder + palName, w, h).texture;

@@ -25,10 +25,10 @@ namespace OpenSpace.FileFormat.Texture {
 			path = btfPath;
 			Stream btf = FileSystem.GetFileReadStream(btfPath);
 			Stream bhf = FileSystem.GetFileReadStream(bhfPath);
-			using (Reader reader = new Reader(bhf, Settings.s.IsLittleEndian)) {
+			using (Reader reader = new Reader(bhf, CPA_Settings.s.IsLittleEndian)) {
 				Count = reader.ReadUInt32();
 				textures = new Texture2D[Count];
-				if (Settings.s.platform == Settings.Platform.Xbox) {
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox) {
 					headers = new BTFHeader[Count];
 					for (uint i = 0; i < Count; i++) {
 						headers[i] = new BTFHeader();
@@ -39,7 +39,7 @@ namespace OpenSpace.FileFormat.Texture {
 						headers[i].flags = reader.ReadUInt32();
 						headers[i].dword_10 = reader.ReadUInt32();
 					}
-				} else if (Settings.s.platform == Settings.Platform.Xbox360) {
+				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
 					headers360 = new BTFHeader360[Count];
 					for (uint i = 0; i < Count; i++) {
 						headers360[i] = new BTFHeader360();
@@ -58,8 +58,8 @@ namespace OpenSpace.FileFormat.Texture {
 					}
 				}
 			}
-			using (Reader reader = new Reader(btf, Settings.s.IsLittleEndian)) {
-				if (Settings.s.platform == Settings.Platform.Xbox) {
+			using (Reader reader = new Reader(btf, CPA_Settings.s.IsLittleEndian)) {
+				if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox) {
 					for (uint i = 0; i < Count; i++) {
 						btf.Seek(headers[i].offset, SeekOrigin.Begin);
 						uint width = (uint)(1 << (int)headers[i].WidthExponent);
@@ -72,7 +72,7 @@ namespace OpenSpace.FileFormat.Texture {
 							textures[i] = dds.BitmapImage;
 						}
 					}
-				} else if (Settings.s.platform == Settings.Platform.Xbox360) {
+				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
 					for (uint i = 0; i < Count; i++) {
 						//Debug.Log("parsing " + i);
 						btf.Seek(headers360[i].offset1, SeekOrigin.Begin);
@@ -86,9 +86,9 @@ namespace OpenSpace.FileFormat.Texture {
         }
 
 		public Texture2D GetTexture(int i, uint width, uint height) {
-			if (Settings.s.platform == Settings.Platform.Xbox) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox) {
 				return textures[i];
-			} else if (Settings.s.platform == Settings.Platform.Xbox360) {
+			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
 				//i = headers360.FirstOrDefault(t => t.name.Substring(0, t.name.LastIndexOf('.')) == name).index;
 				if (textures[i] == null) {
 					/*while (width * height < headers360[i].data1.Length) {

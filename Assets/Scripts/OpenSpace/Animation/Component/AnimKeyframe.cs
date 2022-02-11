@@ -21,10 +21,10 @@ namespace OpenSpace.Animation.Component {
         public static ushort flag_endKF = (1 << 7);
 
 		protected override void ReadInternal(Reader reader) {
-			if (Settings.s.engineVersion < Settings.EngineVersion.R3
-				|| Settings.s.game == Settings.Game.RM
-				|| Settings.s.game == Settings.Game.Dinosaur
-                || (Settings.s.game == Settings.Game.RA && Settings.s.platform == Settings.Platform.PS2)) {
+			if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3
+				|| CPA_Settings.s.game == CPA_Settings.Game.RM
+				|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur
+                || (CPA_Settings.s.game == CPA_Settings.Game.RA && CPA_Settings.s.platform == CPA_Settings.Platform.PS2)) {
 				x = reader.ReadSingle();
 				y = reader.ReadSingle();
 				z = reader.ReadSingle();
@@ -37,10 +37,10 @@ namespace OpenSpace.Animation.Component {
 			scaleVector = reader.ReadUInt16();
 
 			positionVector = reader.ReadUInt16();
-			if (Settings.s.engineVersion < Settings.EngineVersion.R3
-				|| Settings.s.game == Settings.Game.RM
-				|| Settings.s.game == Settings.Game.Dinosaur
-                || (Settings.s.game == Settings.Game.RA && Settings.s.platform == Settings.Platform.PS2)) {
+			if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3
+				|| CPA_Settings.s.game == CPA_Settings.Game.RM
+				|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur
+                || (CPA_Settings.s.game == CPA_Settings.Game.RA && CPA_Settings.s.platform == CPA_Settings.Platform.PS2)) {
 				reader.ReadUInt16();
 				reader.ReadUInt16();
 				reader.ReadUInt16();
@@ -71,7 +71,7 @@ namespace OpenSpace.Animation.Component {
 
         public static bool Aligned {
             get {
-                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                     return true;
                 } else {
                     return false;

@@ -13,7 +13,7 @@ namespace OpenSpace.ROM.ANIM.Component {
 		}
 
 		protected void ReadInternal(Reader reader) {
-			if (Settings.s.platform == Settings.Platform.N64) {
+			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
 				float x = reader.ReadSingle();
 				float z = reader.ReadSingle();
 				float y = reader.ReadSingle();

@@ -249,22 +249,22 @@ namespace OpenSpace {
         public static Matrix Read(Reader reader, Pointer offset) {
             MapLoader l = MapLoader.Loader;
 			//l.print("MATRIX " + offset);
-            UInt32 type = Settings.s.game != Settings.Game.R2Revolution ? reader.ReadUInt32() : 0; // 0x02: always at the start of a transformation matrix
+            UInt32 type = CPA_Settings.s.game != CPA_Settings.Game.R2Revolution ? reader.ReadUInt32() : 0; // 0x02: always at the start of a transformation matrix
             Matrix mat = new Matrix(offset, type, new Matrix4x4(), null);
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.R2Revolution) {
+            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
                 Vector3 pos = Vector3.zero;
 
-                if (Settings.s.platform != Settings.Platform.DC) {
+                if (CPA_Settings.s.platform != CPA_Settings.Platform.DC) {
                     pos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 }
                 mat.m.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
                 mat.m.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
                 mat.m.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 0f));
                 Matrix4x4 sclMatrix = new Matrix4x4();
-                sclMatrix.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), Settings.s.platform == Settings.Platform.DC ? reader.ReadSingle() : 0f));
-                sclMatrix.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), Settings.s.platform == Settings.Platform.DC ? reader.ReadSingle() : 0f));
-                sclMatrix.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), Settings.s.platform == Settings.Platform.DC ? reader.ReadSingle() : 0f));
-                if (Settings.s.platform == Settings.Platform.DC) {
+                sclMatrix.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), CPA_Settings.s.platform == CPA_Settings.Platform.DC ? reader.ReadSingle() : 0f));
+                sclMatrix.SetColumn(1, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), CPA_Settings.s.platform == CPA_Settings.Platform.DC ? reader.ReadSingle() : 0f));
+                sclMatrix.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), CPA_Settings.s.platform == CPA_Settings.Platform.DC ? reader.ReadSingle() : 0f));
+                if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
                     pos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 }
 
@@ -282,7 +282,7 @@ namespace OpenSpace {
                     transMatrix.SetColumn(2, sclColZ);
                 }*/
             } else {
-                if (Settings.s.platform == Settings.Platform.PS2 && Settings.s.game != Settings.Game.R2Revolution) {
+                if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
                     Vector3 v = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                 }
                 mat.m.SetColumn(0, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
@@ -297,7 +297,7 @@ namespace OpenSpace {
 					new Vector4(0, 0, 0, v.w)));*/
 
 			}
-			if (Settings.s.game == Settings.Game.R2Revolution) {
+			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				mat.type = reader.ReadUInt32();
 				// There's 0x8c more?
 			}
@@ -404,7 +404,7 @@ namespace OpenSpace {
             Pointer.Goto(ref writer, offset);
             writer.Write(type);
 
-            if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                 Vector4 pos = m.GetColumn(3);
                 writer.Write(pos.x);
                 writer.Write(pos.y);

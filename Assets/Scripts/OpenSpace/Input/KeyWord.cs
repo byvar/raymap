@@ -33,7 +33,7 @@ namespace OpenSpace.Input {
             KeyWord keyword = new KeyWord(offset);
 
             // Read 20 in total for R2iOS
-            if (Settings.s.hasExtraInputData) {
+            if (CPA_Settings.s.hasExtraInputData) {
                 reader.ReadInt32();
                 reader.ReadInt32();
                 reader.ReadInt32();
@@ -43,7 +43,7 @@ namespace OpenSpace.Input {
             keyword.indexOrKeyCode = reader.ReadUInt16();
 			Pointer.Goto(ref reader, off_value);
 
-            if (Settings.s == Settings.R2PC) {
+            if (CPA_Settings.s == CPA_Settings.R2PC) {
                 keyword.valueAsInt = reader.ReadInt16();
                 reader.ReadInt16();
             } else {
@@ -51,8 +51,8 @@ namespace OpenSpace.Input {
             }
 
 			keyword.valueAsPointer = Pointer.GetPointerAtOffset(off_value);
-			if (Settings.s.engineVersion == Settings.EngineVersion.R3 && Settings.s.game != Settings.Game.LargoWinch) reader.ReadInt32();
-			if(Settings.s.game != Settings.Game.R2Revolution) reader.ReadInt32();
+			if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) reader.ReadInt32();
+			if(CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) reader.ReadInt32();
 
             /*if (isFunction && Settings.s.game != Settings.Game.TTSE) {
                 keyWord.isFunction = true;
@@ -149,7 +149,7 @@ namespace OpenSpace.Input {
                     break;
                 case InputFunctions.FunctionType.SequencePad:
                 case InputFunctions.FunctionType.SequencePadEnd:
-                    if (Settings.s.game == Settings.Game.LargoWinch) {
+                    if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
                         subkeywords = new KeyWord[3];
                         subkeywords[0] = keywords[thisIndex + keywordsRead];
                         keywordsRead += 1;
@@ -194,7 +194,7 @@ namespace OpenSpace.Input {
 				case InputFunctions.FunctionType.JoystickOrPadReleased:
 				case InputFunctions.FunctionType.JoystickOrPadJustPressed:
 				case InputFunctions.FunctionType.JoystickOrPadJustReleased:
-                    if (Settings.s.game == Settings.Game.LargoWinch) {
+                    if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
                         subkeywords = new KeyWord[3];
                         subkeywords[0] = keywords[thisIndex + keywordsRead];
                         keywordsRead += 1;
@@ -211,7 +211,7 @@ namespace OpenSpace.Input {
                     }
 					break;
 				case InputFunctions.FunctionType.JoystickAxeValue:
-                    if (Settings.s.game == Settings.Game.LargoWinch) {
+                    if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
                         subkeywords = new KeyWord[5];
                         subkeywords[0] = keywords[thisIndex + keywordsRead];
                         keywordsRead += 1;
@@ -256,7 +256,7 @@ namespace OpenSpace.Input {
 				case InputFunctions.FunctionType.ActionJustInvalidated:
 					subkeywords = new KeyWord[1];
 					subkeywords[0] = keywords[thisIndex + keywordsRead];
-					if (subkeywords[0] != null && Settings.s.game == Settings.Game.TT) {
+					if (subkeywords[0] != null && CPA_Settings.s.game == CPA_Settings.Game.TT) {
 						EntryAction.FromOffsetOrRead(subkeywords[0].valueAsPointer, reader);
 					}
 					keywordsRead += 1;
@@ -311,7 +311,7 @@ namespace OpenSpace.Input {
 					case InputFunctions.FunctionType.JoystickOrPadJustReleased:
                         return FunctionType + GetJoyPadString(subkeywords);
 					case InputFunctions.FunctionType.JoystickAxeValue:
-                        if (Settings.s.game == Settings.Game.LargoWinch) {
+                        if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
                             return FunctionType + "("
                                 + (subkeywords[2].indexOrKeyCode == 4 ? "X" : "Y")
                                 + ", " + subkeywords[3].valueAsInt
@@ -329,7 +329,7 @@ namespace OpenSpace.Input {
 					case InputFunctions.FunctionType.ActionJustValidated:
 					case InputFunctions.FunctionType.ActionJustInvalidated:
 						Pointer off_action = subkeywords[0].valueAsPointer;
-						if (Settings.s.engineVersion <= Settings.EngineVersion.Montreal) return FunctionType + "()";
+						if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) return FunctionType + "()";
 						EntryAction action = EntryAction.FromOffset(off_action);
 						return FunctionType + "{" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + "}";
 					default:
@@ -342,13 +342,13 @@ namespace OpenSpace.Input {
 
         private string GetJoyPadString(KeyWord[] subkeywords) {
             int firstKW = 0;
-            if (Settings.s.game == Settings.Game.LargoWinch) firstKW++;
-            if (Settings.s.platform == Settings.Platform.GC) {
+            if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) firstKW++;
+            if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
                 return "(" + Enum.GetName(typeof(GameCubeKeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
-            } else if (Settings.s.platform == Settings.Platform.DC) {
+            } else if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
                 return "(" + Enum.GetName(typeof(DreamcastKeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
-            } else if (Settings.s.platform == Settings.Platform.PS2) {
-                if (Settings.s.engineVersion < Settings.EngineVersion.R3) {
+            } else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                     return "(" + Enum.GetName(typeof(RevolutionPS2KeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
                 } else {
                     return "(" + Enum.GetName(typeof(PS2KeyCode), subkeywords[firstKW + 1].indexOrKeyCode) + (subkeywords[firstKW + 0].indexOrKeyCode != 0 ? (", " + subkeywords[firstKW + 0].indexOrKeyCode) : "") + ")";
