@@ -2,12 +2,24 @@
 
 namespace Raymap {
     public class MapTreeNode {
-        public MapTreeNode(string name) {
-            Name = name;
+        public MapTreeNode(string id, string displayName) {
+            Id = id;
+            DisplayName = displayName;
         }
 
-        public string Name { get; set; }
+        public string Id { get; set; }
 
-        public List<MapTreeNode> Children { get; set; } = new List<MapTreeNode>();
+        public string DisplayName { get; set; }
+
+        public MapTreeNode[] Children { get; set; }
+
+        public IEnumerable<MapTreeNode> GetMaps() {
+            if(Id != null) yield return this;
+            if (Children != null) {
+                foreach (var child in Children) {
+                    foreach (var x in child.GetMaps()) yield return x;
+                }
+            }
+        }
     }
 }

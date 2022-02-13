@@ -84,7 +84,7 @@ namespace OpenSpace.Exporter {
 
         public static void ExportText() {
             MapLoader l = MapLoader.Loader;
-            string filePath = l.gameDataBinFolder + "/localization_" + CPA_Settings.s.CmdModeName + ".json";
+            string filePath = l.gameDataBinFolder + "/localization_" + CPA_Settings.s.mode.ToString() + ".json";
             if (l is Loader.R2ROMLoader) {
                 Loader.R2ROMLoader rl = l as Loader.R2ROMLoader;
                 ROM.Localization rloc = rl.localizationROM;

@@ -7,6 +7,7 @@ using BinarySerializer;
 using BinarySerializer.Unity;
 using OpenSpace;
 using OpenSpace.Exporter;
+using Raymap;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -29,21 +30,40 @@ public class UnityWindowSettings : UnityWindow {
 			fileMode = FileSystem.Mode.Web;
 		}
 
+		bool refreshGameActions = (GameModeDropdown?.HasChanged ?? false) || (MapSelectionDropdown?.HasChanged ?? false);
+
 		// Increase label width due to it being cut off otherwise
 		EditorGUIUtility.labelWidth = 192;
 
 
-		if (CategorizedGameModes == null)
-			CategorizedGameModes = EnumHelpers.GetValues<CPA_Settings.Mode>().Select(x => CPA_Settings.GetSettings(x))
-				.GroupBy(x => x.engineVersion).ToDictionary(
-				x => x.Key,
-				x => x
-					.GroupBy(y => y.game)
-					.ToDictionary(y => y.Key, y => y.ToArray())
-			);
+		if (CategorizedGameModes == null) {
+			var modes = EnumHelpers.GetValues<GameModeSelection>().Select(x => new {
+				GameModeSelection = x,
+				GameModeAttribute = x.GetAttribute<GameModeAttribute>(),
+				EngineCategoryAttribute = x.GetAttribute<GameModeAttribute>()
+					.Category.GetAttribute<EngineCategoryAttribute>(),
+				EngineAttribute = x.GetAttribute<GameModeAttribute>()
+					.Category.GetAttribute<EngineCategoryAttribute>()
+					.Engine.GetAttribute<EngineAttribute>(),
+
+			})
+				.GroupBy(x => x.GameModeAttribute.Category)
+				.GroupBy(x => x.FirstOrDefault().EngineCategoryAttribute.Engine);
+			CategorizedGameModes = modes.ToDictionary(
+				engineGroup => engineGroup.Key,
+				engineGroup => engineGroup.ToDictionary(
+					categoryGroup => categoryGroup.Key,
+					categoryGroup => categoryGroup.Select(x => x.GameModeSelection)));
+		}
 
 
 		EditorGUI.BeginChangeCheck();
+
+
+		if (fileMode == FileSystem.Mode.Web) {
+			EditorGUI.HelpBox(GetNextRect(ref YPos, height: 40f), "Your build target is configured as WebGL. Raymap will attempt to load from the server. Make sure the caps in the map name are correct.", MessageType.Warning);
+		}
+
 		// Game Mode
 		DrawHeader(ref YPos, "Mode");
 
@@ -55,59 +75,76 @@ public class UnityWindowSettings : UnityWindow {
 		if (EditorGUI.DropdownButton(rbutton, new GUIContent(GameModeDropdown.SelectionName), FocusType.Passive))
 			GameModeDropdown.Show(rectTemp);
 
-		if (GameModeDropdown != null && GameModeDropdown.HasChanged) {
-			UnitySettings.GameMode = GameModeDropdown.Selection;
-			GameModeDropdown.HasChanged = false;
-			Dirty = true;
-		}
-
 		// Scene file
 		DrawHeader(ref YPos, "Map");
 
-		string buttonString = "No map selected";
-		if (!string.IsNullOrEmpty(UnitySettings.MapName)) {
-			buttonString = UnitySettings.MapName;
-			if (UnitySettings.UseLevelTranslation && CPA_Settings.settingsDict[UnitySettings.GameMode].levelTranslation != null) {
-				buttonString = CPA_Settings.settingsDict[UnitySettings.GameMode].levelTranslation.Translate(UnitySettings.MapName);
-			}
-		}
-		Rect rect = GetNextRect(ref YPos, vPaddingBottom: 4f);
-		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Map name"));
-		if (fileMode == FileSystem.Mode.Web) {
-			UnitySettings.MapName = EditorGUI.TextField(rect, UnitySettings.MapName);
-			EditorGUI.HelpBox(GetNextRect(ref YPos, height: 40f), "Your build target is configured as WebGL. Raymap will attempt to load from the server. Make sure the caps in the map name are correct.", MessageType.Warning);
-		} else {
 
-			EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
-			if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
-				// Initialize settings
-				CPA_Settings.Init(UnitySettings.GameMode);
-				string directory = CurrentGameDataDir;
-				/*string directory = (UnitySettings.CurrentGameDataDir + "/" + Settings.s.ITFDirectory).Replace(Path.DirectorySeparatorChar, '/');
-				if (!directory.EndsWith("/")) directory += "/";
-				while (directory.Contains("//")) directory = directory.Replace("//", "/");
-				string extension = "*.isc";
-				if (Settings.s.cooked) {
-					extension += ".ckd";
-				}*/
+		Rect rect;
+		string buttonString;
 
-				if (MapDropdown == null || MapDropdown.directory != directory || MapDropdown.mode != UnitySettings.GameMode) {
-					MapDropdown = new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), directory) {
-						name = "Maps",
-						mode = UnitySettings.GameMode
-					};
+		if (fileMode == FileSystem.Mode.Normal) {
+			rectTemp = GetNextRect(ref YPos);
+			rbutton = EditorGUI.PrefixLabel(rectTemp, new GUIContent("Map"));
+			rectTemp = new Rect(rbutton.x + rbutton.width - Mathf.Max(400f, rbutton.width), rbutton.y, Mathf.Max(400f, rbutton.width), rbutton.height);
+
+			// Map selection dropdown
+			if (MapSelectionDropdown == null || GameModeDropdown.HasChanged) {
+				if (GameModeDropdown.HasChanged) {
+					UnitySettings.SelectedGameMode = GameModeDropdown.Selection;
+					GameModeDropdown.HasChanged = false;
+					Dirty = true;
 				}
-				MapDropdown.Show(rect);
+
+				MapTreeNode mapTree;
+
+				try {
+					var manager = UnitySettings.GetGameManager;
+					var settings = UnitySettings.GetGameSettings;
+
+					mapTree = manager.GetLevels(settings);
+				} catch (Exception ex) {
+					mapTree = new MapTreeNode(null,null);
+					Debug.LogWarning(ex.Message);
+				}
+
+				MapSelectionDropdown = new MapSelectionDropdown(new AdvancedDropdownState(), mapTree);
+
+				// Debug.Log($"Map selection updated with {volumes.Length} volumes");
 			}
-			EditorGUI.EndDisabledGroup();
+
+			// Next & previous map buttons
+			BrowseButton(rbutton, "Next map", EditorGUIUtility.IconContent("Profiler.NextFrame"), () => {
+				MapSelectionDropdown.NextMap();
+			}, ButtonWidth);
+			rbutton = new Rect(rbutton.x, rbutton.y, rbutton.width - ButtonWidth, rbutton.height);
+			BrowseButton(rbutton, "Previous map", EditorGUIUtility.IconContent("Profiler.PrevFrame"), () => {
+				MapSelectionDropdown.PreviousMap();
+			}, ButtonWidth);
+			rbutton = new Rect(rbutton.x, rbutton.y, rbutton.width - ButtonWidth, rbutton.height);
+
+			// Map selection dropdown button
+			buttonString = "No map selected";
+			if (!string.IsNullOrEmpty(UnitySettings.MapName)) {
+				buttonString = UnitySettings.MapName;
+			}
+			if (MapSelectionDropdown.SelectedMap != null) {
+				buttonString = MapSelectionDropdown.GetName(MapSelectionDropdown.SelectedMap);
+			}
+			if (EditorGUI.DropdownButton(rbutton, new GUIContent(buttonString), FocusType.Passive))
+				MapSelectionDropdown.Show(rectTemp);
+		} else if (fileMode == FileSystem.Mode.Web) {
+			if (GameModeDropdown.HasChanged) {
+				UnitySettings.SelectedGameMode = GameModeDropdown.Selection;
+				GameModeDropdown.HasChanged = false;
+				Dirty = true;
+			}
+			UnitySettings.MapName = EditorField("Map", UnitySettings.MapName);
 		}
-		if (MapDropdown != null && MapDropdown.selection != null) {
-			UnitySettings.MapName = MapDropdown.selection;
-			MapDropdown.selection = null;
-			Dirty = true;
-		}
-		if (CPA_Settings.settingsDict[UnitySettings.GameMode].platform == CPA_Settings.Platform.PS1) {
-			OpenSpace.PS1.PS1GameInfo.Games.TryGetValue(UnitySettings.GameMode, out OpenSpace.PS1.PS1GameInfo game);
+		
+		var managerTmp = UnitySettings.SelectedGameMode.GetManager();
+		if (managerTmp is PS1LegacyGameManager ps1manager) {
+			var LegacyMode = ps1manager.GetLegacyMode(UnitySettings.GetGameSettings);
+			OpenSpace.PS1.PS1GameInfo.Games.TryGetValue(LegacyMode, out OpenSpace.PS1.PS1GameInfo game);
 			if (game != null && game.actors?.Where(a => a.isSelectable).Count() > 0) {
 				int mapIndex = Array.IndexOf(game.maps.Select(s => s.ToLower()).ToArray(), UnitySettings.MapName.ToLower());
 				if (mapIndex != -1 && game.files.FirstOrDefault(f => f.type == OpenSpace.PS1.PS1GameInfo.File.Type.Map).memoryBlocks[mapIndex].isActorSelectable) {
@@ -123,8 +160,8 @@ public class UnityWindowSettings : UnityWindow {
 						} else {
 							EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
 							if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
-								if (ActorDropdown1 == null || ActorDropdown1.mode != UnitySettings.GameMode) {
-									ActorDropdown1 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 0) {
+								if (ActorDropdown1 == null || ActorDropdown1.mode != LegacyMode) {
+									ActorDropdown1 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), LegacyMode, 0) {
 										name = "Actors"
 									};
 								}
@@ -150,8 +187,8 @@ public class UnityWindowSettings : UnityWindow {
 						} else {
 							EditorGUI.BeginDisabledGroup(UnitySettings.LoadFromMemory);
 							if (EditorGUI.DropdownButton(rect, new GUIContent(buttonString), FocusType.Passive)) {
-								if (ActorDropdown2 == null || ActorDropdown2.mode != UnitySettings.GameMode) {
-									ActorDropdown2 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), UnitySettings.GameMode, 1) {
+								if (ActorDropdown2 == null || ActorDropdown2.mode != LegacyMode) {
+									ActorDropdown2 = new PS1ActorSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), LegacyMode, 1) {
 										name = "Actors"
 									};
 								}
@@ -168,7 +205,7 @@ public class UnityWindowSettings : UnityWindow {
 				}
 			}
 
-			UnitySettings.ExportPS1Files = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Export PS1 Files"), UnitySettings.ExportPS1Files);
+			UnitySettings.ExportPS1Files = EditorField("Export PS1 Files", UnitySettings.ExportPS1Files);
 		}
 		if (fileMode != FileSystem.Mode.Web) {
 			rect = GetNextRect(ref YPos);
@@ -187,44 +224,28 @@ public class UnityWindowSettings : UnityWindow {
 		// Directories
 		DrawHeader(ref YPos, "Directories" + (fileMode == FileSystem.Mode.Web ? " (Web)" : ""));
 
-		foreach (var modeCategory in CategorizedGameModes) {
-			UnitySettings.HideDirectories[modeCategory.Key] = !EditorGUI.Foldout(GetNextRect(ref YPos), !UnitySettings.HideDirectories.TryGetItem(modeCategory.Key, true), $"Directories ({modeCategory.Key})", true);
-
-			if (!UnitySettings.HideDirectories[modeCategory.Key]) {
-				foreach (var engine in modeCategory.Value) {
-					YPos += 8;
-
-					var modes = engine.Value;
+		foreach (var engine in CategorizedGameModes) {
+			UnitySettings.HideDirectoriesEngine[engine.Key] = !EditorGUI.Foldout(GetNextRect(ref YPos), !UnitySettings.HideDirectoriesEngine.TryGetItem(engine.Key, true), $"Directories ({engine.Key.GetAttribute<EngineAttribute>().DisplayName})", true);
+			if (UnitySettings.HideDirectoriesEngine[engine.Key]) continue;
+			foreach (var category in engine.Value) {
+				IndentLevel++;
+				UnitySettings.HideDirectoriesCategory[category.Key] = !EditorGUI.Foldout(GetNextRect(ref YPos), !UnitySettings.HideDirectoriesCategory.TryGetItem(category.Key, true), $"Directories ({category.Key.GetAttribute<EngineCategoryAttribute>().DisplayName})", true);
+				IndentLevel--;
+				if(UnitySettings.HideDirectoriesCategory[category.Key]) continue;
+				YPos += 4;
+				foreach (var mode in category.Value) {
+					//YPos += 8;
+					var displayName = mode.GetAttribute<GameModeAttribute>().DisplayName;
 					if (fileMode == FileSystem.Mode.Web) {
-						foreach (var mode in modes) {
-							UnitySettings.GameDirectoriesWeb[mode.mode] = EditorField(mode.DisplayName ?? "N/A", UnitySettings.GameDirectoriesWeb.TryGetItem(mode.mode, String.Empty));
-						}
+						UnitySettings.GameDirectoriesWeb[mode] = EditorField(displayName ?? "N/A", UnitySettings.GameDirectoriesWeb.TryGetItem(mode, String.Empty));
 					} else {
-						foreach (var mode in modes) {
-							UnitySettings.GameDirectories[mode.mode] = DirectoryField(GetNextRect(ref YPos), mode.DisplayName ?? "N/A", UnitySettings.GameDirectories.TryGetItem(mode.mode, String.Empty));
-						}
+						UnitySettings.GameDirectories[mode] = DirectoryField(GetNextRect(ref YPos), displayName ?? "N/A", UnitySettings.GameDirectories.TryGetItem(mode, String.Empty));
 					}
 				}
 
 				YPos += 8;
 			}
 		}
-		/*Settings.Mode[] modes = (Settings.Mode[])Enum.GetValues(typeof(Settings.Mode));
-		if (fileMode == FileSystem.Mode.Web) {
-			foreach (Settings.Mode mode in modes) {
-				UnitySettings.GameDirectoriesWeb[mode] = EditorGUI.TextField(GetNextRect(ref YPos), mode.GetDescription(), UnitySettings.GameDirectoriesWeb.ContainsKey(mode) ? UnitySettings.GameDirectoriesWeb[mode] : "");
-			}
-		} else {
-			foreach (Settings.Mode mode in modes) {
-				UnitySettings.GameDirectories[mode] = DirectoryField(GetNextRect(ref YPos), mode.GetDescription(), UnitySettings.GameDirectories.ContainsKey(mode) ? UnitySettings.GameDirectories[mode] : "");
-			}
-		}*/
-		/*if (GUILayout.Button("Update available scenes")) {
-			string path = EditorUtility.OpenFilePanel("Scene files", "", "isc.ckd");
-			if (path.Length != 0) {
-				//UbiCanvasSettings.SelectedLevelFile = AvailableFiles.ElementAtOrDefault(SelectedLevelFileIndex);
-			}
-		}*/
 
 
 		// Serialization
@@ -242,11 +263,7 @@ public class UnityWindowSettings : UnityWindow {
 
 		// Export
 		DrawHeader(ref YPos, "Export Settings");
-		rect = GetNextRect(ref YPos);
-		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Export After Load"));
-		bool export = UnitySettings.ExportAfterLoad;
-		rect = PrefixToggle(rect, ref export);
-		UnitySettings.ExportAfterLoad = export;
+		UnitySettings.ExportAfterLoad = EditorField("Export After Load", UnitySettings.ExportAfterLoad);
 
         rect = GetNextRect(ref YPos);
 		rect = EditorGUI.PrefixLabel(rect, new GUIContent("Export Flags"));
@@ -255,19 +272,6 @@ public class UnityWindowSettings : UnityWindow {
         UnitySettings.ExportFlags = (MapExporter.ExportFlags) exportFlags;
 
         UnitySettings.ExportPath = DirectoryField(GetNextRect(ref YPos), "Export Path", UnitySettings.ExportPath);
-        
-        if (GUI.Button(GetNextRect(ref YPos), "Copy export commands for all levels to clipboard...")) {
-            GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"Raymap.exe -batchmode " +
-				$"--export {UnitySettings.ExportPath} " +
-				$"--flags {(int) UnitySettings.ExportFlags} " +
-				$"--mode {UnitySettings.GameMode} " +
-				$"--dir \"{UnitySettings.GameDirectories[UnitySettings.GameMode]}\" " +
-				$"--level {f}");
-        }
-
-		if (GUI.Button(GetNextRect(ref YPos), "Copy blend export commands for all levels to clipboard...")) {
-			GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"blender --background --python generate_maps_blend.py -- {UnitySettings.ExportPath} {f} {UnitySettings.ExportPath}/BlendFiles/Levels");
-        }
 
 		UnitySettings.ScreenshotAfterLoad = (UnitySettings.ScreenshotAfterLoadSetting)EditorGUI.EnumPopup(GetNextRect(ref YPos), new GUIContent("Screenshot After Load"), UnitySettings.ScreenshotAfterLoad);
 
@@ -283,18 +287,6 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.HighlightObjectsTextFormat = EditorGUI.TextField(GetNextRect(ref YPos), "Highlight format string", UnitySettings.HighlightObjectsTextFormat);
         EditorGUI.LabelField(GetNextRect(ref YPos), "($f=family, $m=model, $i=instance name, $c=count)");
 
-        if (GUI.Button(GetNextRect(ref YPos), "Copy screenshot commands for all levels to clipboard...")) {
-            GUIUtility.systemCopyBuffer = GenerateExportScript((f) => $"Raymap.exe -batchmode " +
-                $"--mode {UnitySettings.GameMode} " +
-				$"--dir \"{UnitySettings.GameDirectories[UnitySettings.GameMode]}\" " +
-                $"--level {f} " +
-                $"--ScreenshotPath \"{UnitySettings.ScreenshotPath}\" " +
-                $"--ScreenshotAfterLoad {UnitySettings.ScreenshotAfterLoad} " +
-                $"--ScreenshotScale {UnitySettings.ScreenshotScale} " +
-                $"--HighlightObjectsFilter \"{UnitySettings.HighlightObjectsFilter}\" " +
-                $"--HighlightObjectsTextFormat \"{UnitySettings.HighlightObjectsTextFormat}\"");
-		}
-
 		/*if (UnitySettings.ExportAfterLoad) {
             UnitySettings.ExportPath = DirectoryField(rect, "Export Path", UnitySettings.ExportPath, includeLabel: false);
         }*/
@@ -302,16 +294,16 @@ public class UnityWindowSettings : UnityWindow {
 		// Misc
 		DrawHeader(ref YPos, "Miscellaneous Settings");
 		UnitySettings.ScreenshotPath = DirectoryField(GetNextRect(ref YPos), "Screenshot Path", UnitySettings.ScreenshotPath);
-		UnitySettings.AllowDeadPointers = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Allow Dead Pointers"), UnitySettings.AllowDeadPointers);
-		UnitySettings.ForceDisplayBackfaces = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Force Display Backfaces"), UnitySettings.ForceDisplayBackfaces);
-		UnitySettings.BlockyMode = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Blocky Mode"), UnitySettings.BlockyMode);
-		UnitySettings.TracePointers = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Trace Pointers (slow!)"), UnitySettings.TracePointers);
-		UnitySettings.SaveTextures = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Save Textures"), UnitySettings.SaveTextures);
-		UnitySettings.ExportText = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Export Text"), UnitySettings.ExportText);
-		UnitySettings.UseLevelTranslation = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Use Level Translation"), UnitySettings.UseLevelTranslation);
-		UnitySettings.VisualizeSectorBorders = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Visualize Sector Borders"), UnitySettings.VisualizeSectorBorders);
-		UnitySettings.CreateFamilyGameObjects = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Create Family GameObjects"), UnitySettings.CreateFamilyGameObjects);
-		UnitySettings.ShowCollisionDataForNoCollisionObjects = EditorGUI.Toggle(GetNextRect(ref YPos), new GUIContent("Show Collision Data For NoCollision SPOs"), UnitySettings.ShowCollisionDataForNoCollisionObjects);
+		UnitySettings.AllowDeadPointers = EditorField("Allow Dead Pointers", UnitySettings.AllowDeadPointers);
+		UnitySettings.ForceDisplayBackfaces = EditorField("Force Display Backfaces", UnitySettings.ForceDisplayBackfaces);
+		UnitySettings.BlockyMode = EditorField("Blocky Mode", UnitySettings.BlockyMode);
+		UnitySettings.TracePointers = EditorField("Trace Pointers (slow!)", UnitySettings.TracePointers);
+		UnitySettings.SaveTextures = EditorField("Save Textures", UnitySettings.SaveTextures);
+		UnitySettings.ExportText = EditorField("Export Text", UnitySettings.ExportText);
+		UnitySettings.UseLevelTranslation = EditorField("Use Level Translation", UnitySettings.UseLevelTranslation);
+		UnitySettings.VisualizeSectorBorders = EditorField("Visualize Sector Borders", UnitySettings.VisualizeSectorBorders);
+		UnitySettings.CreateFamilyGameObjects = EditorField("Create Family GameObjects", UnitySettings.CreateFamilyGameObjects);
+		UnitySettings.ShowCollisionDataForNoCollisionObjects = EditorField("Show Collision Data For NoCollision SPOs", UnitySettings.ShowCollisionDataForNoCollisionObjects);
 
 		if (EditorGUI.EndChangeCheck() || Dirty) {
 #if UNITY_EDITOR
@@ -320,26 +312,6 @@ public class UnityWindowSettings : UnityWindow {
 			Dirty = false;
 		}
 	}
-
-    private string GenerateExportScript(Func<string, string> lineDelegate)
-    {
-        CPA_Settings.Init(UnitySettings.GameMode);
-        string commands = "";
-
-        var tempDropDown =
-            new MapSelectionDropdown(new UnityEditor.IMGUI.Controls.AdvancedDropdownState(), CurrentGameDataDir)
-            {
-                name = "Maps",
-                mode = UnitySettings.GameMode
-            };
-
-        foreach (var f in tempDropDown.files) {
-            commands += lineDelegate.Invoke(f) + Environment.NewLine;
-        }
-
-        return commands;
-    }
-
 	#endregion
 
 	#region Properties
@@ -350,22 +322,22 @@ public class UnityWindowSettings : UnityWindow {
 	private int SelectedLevelFileIndex { get; set; }
 
 	// Categorized game modes
-	public Dictionary<CPA_Settings.EngineVersion, Dictionary<CPA_Settings.Game, CPA_Settings[]>> CategorizedGameModes { get; set; }
+	public Dictionary<Engine, Dictionary<EngineCategory, IEnumerable<GameModeSelection>>> CategorizedGameModes { get; set; }
 
 	/// <summary>
 	/// The file selection dropdown
 	/// </summary>
 	private GameModeSelectionDropdown GameModeDropdown { get; set; }
-	private MapSelectionDropdown MapDropdown { get; set; }
+	private MapSelectionDropdown MapSelectionDropdown { get; set; }
 	private PS1ActorSelectionDropdown ActorDropdown1 { get; set; }
 	private PS1ActorSelectionDropdown ActorDropdown2 { get; set; }
 
 	private string CurrentGameDataDir {
 		get {
-			Dictionary<CPA_Settings.Mode, string> GameDirs =
+			Dictionary<GameModeSelection, string> GameDirs =
 				EditorUserBuildSettings.activeBuildTarget == BuildTarget.WebGL ? UnitySettings.GameDirectoriesWeb : UnitySettings.GameDirectories;
-			if (GameDirs.ContainsKey(UnitySettings.GameMode)) {
-				return (GameDirs[UnitySettings.GameMode] ?? "");
+			if (GameDirs.ContainsKey(UnitySettings.SelectedGameMode)) {
+				return (GameDirs[UnitySettings.SelectedGameMode] ?? "");
 			} else {
 				return "";
 			}

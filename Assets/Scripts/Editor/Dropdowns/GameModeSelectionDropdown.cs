@@ -1,6 +1,6 @@
 ﻿using BinarySerializer;
 using BinarySerializer.Unity;
-using OpenSpace;
+using Raymap;
 using System.Linq;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -11,29 +11,40 @@ public class GameModeSelectionDropdown : AdvancedDropdown {
     }
 
     protected override AdvancedDropdownItem BuildRoot() {
-        var modes = EnumHelpers.GetValues<CPA_Settings.Mode>().Select(x => new {
-            Mode = x,
-            Settings = CPA_Settings.GetSettings(x)
-        }).GroupBy(x => x.Settings.engineVersion);
+        var modes = EnumHelpers.GetValues<GameModeSelection>().Select(x => new {
+            GameModeSelection = x,
+            GameModeAttribute = x.GetAttribute<GameModeAttribute>(),
+            EngineCategoryAttribute = x.GetAttribute<GameModeAttribute>()
+                .Category.GetAttribute<EngineCategoryAttribute>(),
+            EngineAttribute = x.GetAttribute<GameModeAttribute>()
+                .Category.GetAttribute<EngineCategoryAttribute>()
+                .Engine.GetAttribute<EngineAttribute>(),
+
+        })
+            .GroupBy(x => x.GameModeAttribute.Category)
+            .GroupBy(x => x.FirstOrDefault().EngineCategoryAttribute.Engine);
 
         var root = new AdvancedDropdownItem("Game");
 
-        foreach (var mode in modes) {
-            var group = new AdvancedDropdownItem(mode.Key.ToString()) {
+        foreach (var engineGroup in modes) {
+            var engineNode = new AdvancedDropdownItem(engineGroup.Key.GetAttribute<EngineAttribute>().DisplayName) {
                 id = -1
             };
 
-            foreach (var selectionGroup in mode.GroupBy(x => x.Settings.game)) {
-                foreach (var selection in selectionGroup) {
-                    group.AddChild(new AdvancedDropdownItem(selection.Settings.DisplayName) {
-                        id = (int)selection.Mode
+            foreach (var categoryGroup in engineGroup) {
+                var categoryNode = new AdvancedDropdownItem(categoryGroup.Key.GetAttribute<EngineCategoryAttribute>().DisplayName) {
+                    id = -1
+                };
+                foreach (var mode in categoryGroup) {
+                    categoryNode.AddChild(new AdvancedDropdownItem(mode.GameModeAttribute.DisplayName) {
+                        id = (int)mode.GameModeSelection
                     });
                 }
-
-                group.AddSeparator();
+                // engineNode.AddSeparator();
+                engineNode.AddChild(categoryNode);
             }
 
-            root.AddChild(group);
+            root.AddChild(engineNode);
         }
 
         return root;
@@ -42,14 +53,14 @@ public class GameModeSelectionDropdown : AdvancedDropdown {
     protected override void ItemSelected(AdvancedDropdownItem item) {
         base.ItemSelected(item);
 
-        if (item.id != -1 && ((CPA_Settings.Mode)item.id != Selection)) {
-            Selection = (CPA_Settings.Mode)item.id;
-            SelectionName = Selection.GetDescription();
+        if (item.id != -1 && ((GameModeSelection)item.id != Selection)) {
+            Selection = (GameModeSelection)item.id;
+            SelectionName = Selection.GetAttribute<GameModeAttribute>().DisplayName;
             HasChanged = true;
         }
     }
 
     public bool HasChanged { get; set; }
-    public CPA_Settings.Mode Selection { get; set; } = UnitySettings.GameMode;
-    public string SelectionName { get; set; } = UnitySettings.GameMode.GetDescription();
+    public GameModeSelection Selection { get; set; } = UnitySettings.SelectedGameMode;
+    public string SelectionName { get; set; } = UnitySettings.SelectedGameMode.GetAttribute<GameModeAttribute>().DisplayName;
 }

@@ -1,159 +1,92 @@
-﻿
-using UnityEditor.IMGUI.Controls;
+﻿using Raymap;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenSpace;
-using System.IO;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using OpenSpace.Loader;
 
-class MapSelectionDropdown : AdvancedDropdown {
-	public static string[] filterPaths = new string[] {
-		"fix",
-		/*"ani0",
-		"ani1",
-		"ani2",
-		"ani3",
-		"ani4",
-		"ani5",
-		"ani6",
-		"ani7",
-		"ani8",
-		"ani9",
-		"ani10",*/
-	};
-	public string selection = null;
-	public string directory;
-	public CPA_Settings.Mode mode;
-	public string[] files;
-	public string[] translatedFiles;
-	public string name;
-	//public SerializedProperty property;
+public class MapSelectionDropdown : AdvancedDropdown {
+    public MapSelectionDropdown(AdvancedDropdownState state, MapTreeNode mapTree) : base(state) {
+        MapTree = mapTree;
+        FlattenedMapTree = MapTree.GetMaps().ToArray();
+        SelectedMap = FlattenedMapTree.FirstOrDefault(t => t.Id.ToLower() == UnitySettings.MapName.ToLower());
+        if(SelectedMap == null) SelectedMap = FlattenedMapTree.FirstOrDefault();
 
-	public MapSelectionDropdown(AdvancedDropdownState state) : base(state) {
-		minimumSize = new UnityEngine.Vector2(50, 400f);
-	}
-	public MapSelectionDropdown(AdvancedDropdownState state, string directory) : this(state) {
-		this.directory = directory;
-		BuildFileList();
-	}
+        minimumSize = new Vector2(50, 400f);
+    }
 
-	private void BuildFileList() {
-		List<string> filesUnprocessed = FindFiles();
-		List<string> filesSorted = filesUnprocessed;
-		if (UnitySettings.UseLevelTranslation && CPA_Settings.s.levelTranslation != null) {
-			filesSorted = CPA_Settings.s.levelTranslation.Sort(filesSorted);
-			translatedFiles = CPA_Settings.s.levelTranslation.Translate(filesSorted).ToArray();
-		}
-		files = filesSorted.ToArray();
-	}
+    protected override AdvancedDropdownItem BuildRoot() {
+        var root = new AdvancedDropdownItem("Map");
 
-	private List<string> FindFiles() {
-		// Create the output
-		var output = new List<string>();
-		
-		// If the directory does not exist, return the empty list
-		if (!Directory.Exists(directory))
-			return output;
+        foreach (var node in MapTree.Children) {
+            AddNode(root, node);
+        }
 
-		// Add the found files containing the correct file extension
-		string extension = null;
-		string[] levels;
-		switch (CPA_Settings.s.platform) {
-			case CPA_Settings.Platform.PC:
-			case CPA_Settings.Platform.iOS:
-			case CPA_Settings.Platform.GC:
-			case CPA_Settings.Platform.Xbox:
-			case CPA_Settings.Platform.Xbox360:
-			case CPA_Settings.Platform.PS3:
-			case CPA_Settings.Platform.MacOS:
-				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-					extension = "*.sna";
-				} else {
-					extension = "*.lvl";
-				}
-				break;
-			case CPA_Settings.Platform.DC: extension = "*.DAT"; break;
-			case CPA_Settings.Platform.PS2:
-				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) {
-						extension = "*.sna";
-					} else {
-						extension = "*.lv2";
-					}
-				} else {
-					extension = "*.lvl";
-				}
-				break;
-			case CPA_Settings.Platform.PS1:
-				MapLoader.Reset();
-				R2PS1Loader l1 = MapLoader.Loader as R2PS1Loader;
-				l1.gameDataBinFolder = directory;
-				levels = l1.LoadLevelList();
-				MapLoader.Reset();
-				output.AddRange(levels);
-				break;
-			case CPA_Settings.Platform.DS:
-			case CPA_Settings.Platform.N64:
-			case CPA_Settings.Platform._3DS:
-				MapLoader.Reset();
-				R2ROMLoader lr = MapLoader.Loader as R2ROMLoader;
-				lr.gameDataBinFolder = directory;
-				levels = lr.LoadLevelList();
-				MapLoader.Reset();
-				output.AddRange(levels);
-				break;
-		}
-		if (extension != null) {
-			output.AddRange(
-				from file in Directory.EnumerateFiles(directory, extension, SearchOption.AllDirectories)
-				let filename = Path.GetFileNameWithoutExtension(file)
-				let dirname = new DirectoryInfo(file).Parent.Name
-				where ((!filterPaths.Contains(filename.ToLower()))
-				&& dirname.ToLower() == filename.ToLower())
-				select dirname
-				
-			);
-		}
-		//Debug.Log(string.Join("\n",output));
+        return root;
+    }
 
-		// Return the output
-		return output;
-	}
+    public string GetName(MapTreeNode node) {
+        if (node.Id == null) {
+            return node.DisplayName;
+        } else if (node.DisplayName == null || node.DisplayName == node.Id) {
+            return node.Id;
+        } else {
+            return $"{node.Id} - {node.DisplayName}";
+        }
+    }
 
-	protected override AdvancedDropdownItem BuildRoot() {
-		var root = new AdvancedDropdownItem(name);
-		for (int i = 0; i < files.Length; i++) {
-			Add(root, files[i], files[i], translatedFiles?[i], i);
-		}
+    protected AdvancedDropdownItem AddNode(AdvancedDropdownItem parent, MapTreeNode node) {
+        AdvancedDropdownItem curDropdownItem = new MapSelectionDropdownItem(GetName(node), node);
+        if (node.Children == null) {
+            curDropdownItem.id = Array.IndexOf(FlattenedMapTree, node);
+        } else {
+            curDropdownItem.id = -1;
+        }
+        parent.AddChild(curDropdownItem);
+        if (node.Children != null) {
+            foreach (var child in node.Children) AddNode(curDropdownItem, child);
+        }
 
-		return root;
-	}
+        return parent;
+    }
 
-	protected void Add(AdvancedDropdownItem parent, string path, string fullPath, string translation, int id) {
-		if (path.Contains("/")) {
-			// Folder
-			string folder = path.Substring(0, path.IndexOf("/"));
-			string rest = path.Substring(path.IndexOf("/") + 1);
-			AdvancedDropdownItem folderNode = parent.children.FirstOrDefault(c => c.name == folder);
-			if (folderNode == null) {
-				folderNode = new AdvancedDropdownItem(folder);
-				parent.AddChild(folderNode);
-			}
-			Add(folderNode, rest, fullPath, translation, id);
-		} else {
-			// File
-			parent.AddChild(new AdvancedDropdownItem(translation ?? path) {
-				id = id
-			});
-		}
-	}
+    protected override void ItemSelected(AdvancedDropdownItem item) {
+        base.ItemSelected(item);
 
-	protected override void ItemSelected(AdvancedDropdownItem item) {
-		base.ItemSelected(item);
-		if (item.children.Count() == 0 && files != null && files.Length > item.id) {
-			selection = files[item.id];
-			//property.stringValue = selection;
-		}
-	}
+        if (item.id == -1 || !(item is MapSelectionDropdownItem mapItem) || !mapItem.IsMap)
+            return;
+
+        SelectedMap = mapItem.MapTreeNode;
+        HasChanged = true;
+    }
+
+    public void NextMap() {
+        if(FlattenedMapTree == null || FlattenedMapTree.Length == 0) return;
+        var index = (Array.IndexOf(FlattenedMapTree, SelectedMap) + 1) % FlattenedMapTree.Length;
+        SelectedMap = FlattenedMapTree[index];
+        HasChanged = true;
+    }
+
+    public void PreviousMap() {
+        if (FlattenedMapTree == null || FlattenedMapTree.Length == 0) return;
+        var index = (Array.IndexOf(FlattenedMapTree, SelectedMap) - 1 + FlattenedMapTree.Length) % FlattenedMapTree.Length;
+        SelectedMap = FlattenedMapTree[index];
+        HasChanged = true;
+    }
+
+    public MapTreeNode MapTree { get; set; }
+    public MapTreeNode[] FlattenedMapTree { get; set; }
+
+    public bool HasChanged { get; set; }
+
+    public MapTreeNode SelectedMap { get; set; }
+
+    public class MapSelectionDropdownItem : AdvancedDropdownItem {
+        public MapSelectionDropdownItem(string name, MapTreeNode mapTreeNode) : base(name) {
+            MapTreeNode = mapTreeNode;
+        }
+
+        public MapTreeNode MapTreeNode { get; set; }
+        public bool IsMap => MapTreeNode.Children == null || !MapTreeNode.Children.Any();
+    }
 }

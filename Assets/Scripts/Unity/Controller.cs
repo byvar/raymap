@@ -20,6 +20,7 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using Unity;
 using BinarySerializer.Unity;
+using Raymap;
 
 public class Controller : MonoBehaviour {
 	public Material baseMaterial;
@@ -94,7 +95,7 @@ public class Controller : MonoBehaviour {
 		string lvlName = "";
 		string actor1Name = "";
 		string actor2Name = "";
-		CPA_Settings.Mode mode = UnitySettings.GameMode;
+		GameModeSelection mode = UnitySettings.SelectedGameMode;
 		gameDataBinFolder = UnitySettings.CurrentDirectory;
 		lvlName = UnitySettings.MapName;
 		actor1Name = UnitySettings.Actor1Name;
@@ -120,7 +121,8 @@ public class Controller : MonoBehaviour {
 			UnityEngine.Debug.unityLogger.filterLogType = LogType.Assert;
 		}
 		loadingScreen.Active = true;
-		CPA_Settings.Init(mode);
+		var manager = UnitySettings.GetGameManager;
+		((LegacyGameManager)manager).CreateSettings(UnitySettings.GetGameSettings);
 		loader = MapLoader.Loader;
 		loader.controller = this;
 		loader.gameDataBinFolder = gameDataBinFolder;

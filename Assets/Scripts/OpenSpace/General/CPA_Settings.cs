@@ -42,120 +42,64 @@ namespace OpenSpace {
             }
 		}
 
-		public static Dictionary<string, Mode> cmdModeNameDict = new Dictionary<string, Mode>() {
-			{ "r3_gc", Mode.Rayman3GC },
-			{ "r3_pc", Mode.Rayman3PC },
-			{ "r3_pc_demo_20021001", Mode.Rayman3PCDemo_2002_10_01 },
-			{ "r3_pc_demo_20021021", Mode.Rayman3PCDemo_2002_10_21 },
-			{ "r3_pc_demo_20021209", Mode.Rayman3PCDemo_2002_12_09 },
-			{ "r3_pc_demo_20030106", Mode.Rayman3PCDemo_2003_01_06 },
-			{ "r3_macos", Mode.Rayman3MacOS },
-			{ "r3_ps2", Mode.Rayman3PS2 },
-			{ "r3_ps2_demo_20020517", Mode.Rayman3PS2Demo_2002_05_17 },
-			{ "r3_ps2_demo_20020807", Mode.Rayman3PS2Demo_2002_08_07 },
-			{ "r3_ps2_devbuild_20020906", Mode.Rayman3PS2DevBuild_2002_09_06 },
-			{ "r3_ps2_demo_20021029", Mode.Rayman3PS2Demo_2002_10_29 },
-			{ "r3_ps2_demo_20021218", Mode.Rayman3PS2Demo_2002_12_18 },
-			{ "r3_xbox", Mode.Rayman3Xbox },
-			{ "r3_x360", Mode.Rayman3Xbox360 },
-			{ "r3_ps3", Mode.Rayman3PS3 },
-			{ "ra_gc", Mode.RaymanArenaGC },
-			{ "ra_gc_demo_20020307", Mode.RaymanArenaGCDemo_2002_03_07 },
-			{ "ra_xbox", Mode.RaymanArenaXbox },
-			{ "ra_ps2", Mode.RaymanArenaPS2 },
-			{ "ra_pc", Mode.RaymanArenaPC },
-			{ "rm_ps2", Mode.RaymanMPS2 },
-			{ "rm_ps2_demo_20010725", Mode.RaymanMPS2Demo_2001_07_25 },
-			{ "rm_pc", Mode.RaymanMPC },
-			{ "rr_ps1", Mode.RaymanRushPS1 },
-			{ "r2_pc", Mode.Rayman2PC },
-			{ "r2_pc_demo_19990818", Mode.Rayman2PCDemo_1999_08_18 },
-			{ "r2_pc_demo_19990904", Mode.Rayman2PCDemo_1999_09_04 },
-			{ "r2_dc", Mode.Rayman2DC },
-			{ "r2_ios", Mode.Rayman2IOS },
-			{ "r2_ios_demo", Mode.Rayman2IOSDemo },
-			{ "r2_ps1", Mode.Rayman2PS1 },
-			{ "r2_ps2", Mode.Rayman2PS2 },
-			{ "r2_ds", Mode.Rayman2DS },
-			{ "rrr_ds", Mode.RaymanRavingRabbidsDS },
-			{ "rrr_ds_devbuild_20060525", Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25 },
-			{ "r2_3ds", Mode.Rayman23DS },
-			{ "r2_n64", Mode.Rayman2N64 },
-			{ "dd_pc", Mode.DonaldDuckPC },
-			{ "dd_dc", Mode.DonaldDuckDC },
-			{ "dd_n64", Mode.DonaldDuckN64 },
-			{ "dd_ps1", Mode.DonaldDuckPS1 },
-			{ "ddpk_gc", Mode.DonaldDuckPKGC },
-			{ "tt_pc", Mode.TonicTroublePC },
-			{ "ttse_pc", Mode.TonicTroubleSEPC },
-			{ "playmobil_hype_pc", Mode.PlaymobilHypePC },
-			{ "playmobil_alex_pc", Mode.PlaymobilAlexPC },
-			{ "playmobil_laura_pc", Mode.PlaymobilLauraPC },
-			{ "dinosaur_pc", Mode.DinosaurPC },
-			{ "largowinch_pc", Mode.LargoWinchPC },
-			{ "jb_ps1", Mode.JungleBookPS1 },
-			{ "vip_ps1", Mode.VIPPS1 },
-			{ "redplanet_pc", Mode.RedPlanetPC },
-		};
-
         #region Enums
         public enum Mode {
-            [Description("Rayman 2 (PC)")] Rayman2PC,
-            [Description("R2 (PC) Demo (1999/08/19)")] Rayman2PCDemo_1999_08_18,
-            [Description("R2 (PC) Demo (1999/09/11)")] Rayman2PCDemo_1999_09_04,
-            [Description("Rayman 2 (DC)")] Rayman2DC,
-            [Description("Rayman 2 (iOS)")] Rayman2IOS,
-			[Description("Rayman 2 (iOS) Demo")] Rayman2IOSDemo,
-			[Description("Rayman 2 (PS1)")] Rayman2PS1,
-            [Description("Rayman 2 (PS2)")] Rayman2PS2,
-            [Description("Rayman 2 (N64)")] Rayman2N64,
-            [Description("Rayman 2 (DS)")] Rayman2DS,
-            [Description("Rayman 2 (3DS)")] Rayman23DS,
-            [Description("Rayman M (PC)")] RaymanMPC,
-            [Description("Rayman M (PS2)")] RaymanMPS2,
-            [Description("RM (PS2) Demo (2001/07/25)")] RaymanMPS2Demo_2001_07_25,
-            [Description("Rayman Arena (PC)")] RaymanArenaPC,
-            [Description("Rayman Arena (PS2)")] RaymanArenaPS2,
-            [Description("Rayman Arena (GC)")] RaymanArenaGC,
-            [Description("RA (GC) Demo (2002/03/07)")] RaymanArenaGCDemo_2002_03_07,
-            [Description("Rayman Arena (Xbox)")] RaymanArenaXbox,
-            [Description("Rayman Rush (PS1)")] RaymanRushPS1,
-            [Description("Rayman 3 (PC)")] Rayman3PC,
-			[Description("R3 (PC) Demo (2002/10/01)")] Rayman3PCDemo_2002_10_01,
-			[Description("R3 (PC) Demo (2002/10/21)")] Rayman3PCDemo_2002_10_21,
-			[Description("R3 (PC) Demo (2002/12/09)")] Rayman3PCDemo_2002_12_09,
-			[Description("R3 (PC) Demo (2003/01/06)")] Rayman3PCDemo_2003_01_06,
-			[Description("Rayman 3 (MacOS)")] Rayman3MacOS,
-			[Description("Rayman 3 (GC)")] Rayman3GC,
-            [Description("Rayman 3 (PS2)")] Rayman3PS2,
-			[Description("R3 (PS2) Demo (2002/05/17)")] Rayman3PS2Demo_2002_05_17,
-			[Description("R3 (PS2) Demo (2002/08/07)")] Rayman3PS2Demo_2002_08_07,
-            [Description("R3 (PS2) Dev Build (2002/09/06)")] Rayman3PS2DevBuild_2002_09_06,
-            [Description("R3 (PS2) Demo (2002/10/29)")] Rayman3PS2Demo_2002_10_29,
-            [Description("R3 (PS2) Demo (2002/12/18)")] Rayman3PS2Demo_2002_12_18,
-            [Description("Rayman 3 (Xbox)")] Rayman3Xbox,
-            [Description("Rayman 3 (Xbox 360)")] Rayman3Xbox360,
-            [Description("Rayman 3 (PS3)")] Rayman3PS3,
-            [Description("Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
-			[Description("Rayman Raving Rabbids (DS) Dev Build (2006/05/25)")] RaymanRavingRabbidsDSDevBuild_2006_05_25,
-			[Description("Tonic Trouble (PC)")] TonicTroublePC,
-            [Description("Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
-            [Description("Tonic Trouble (N64 NTSC)")] TonicTroubleN64,
-			[Description("Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
-            [Description("Donald Duck: Quack Attack (PC) Demo")] DonaldDuckPCDemo,
-            [Description("Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
-            [Description("Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
-			[Description("Donald Duck: Quack Attack (PS1)")] DonaldDuckPS1,
-			[Description("Donald Duck: PK (GC)")] DonaldDuckPKGC,
-            [Description("Playmobil: Hype (PC)")] PlaymobilHypePC,
-            [Description("Playmobil: Laura (PC)")] PlaymobilLauraPC,
-            [Description("Playmobil: Alex (PC)")] PlaymobilAlexPC,
-            [Description("Disney's Dinosaur (PC)")] DinosaurPC,
-            [Description("Largo Winch (PC)")] LargoWinchPC,
-			[Description("Jungle Book: Groove Party (PS1)")] JungleBookPS1,
-			[Description("VIP (PS1)")] VIPPS1,
-			[Description("Red Planet (PC)")] RedPlanetPC,
-        };
+			Rayman2PC,
+			Rayman2PCDemo_1999_08_18,
+			Rayman2PCDemo_1999_09_04,
+			Rayman2DC,
+			Rayman2IOS,
+			Rayman2IOSDemo,
+			Rayman2PS1,
+			Rayman2PS2,
+			Rayman2N64,
+			Rayman2DS,
+			Rayman23DS,
+			RaymanMPC,
+			RaymanMPS2,
+			RaymanMPS2Demo_2001_07_25,
+			RaymanArenaPC,
+			RaymanArenaPS2,
+			RaymanArenaGC,
+			RaymanArenaGCDemo_2002_03_07,
+			RaymanArenaXbox,
+			RaymanRushPS1,
+			Rayman3PC,
+			Rayman3PCDemo_2002_10_01,
+			Rayman3PCDemo_2002_10_21,
+			Rayman3PCDemo_2002_12_09,
+			Rayman3PCDemo_2003_01_06,
+			Rayman3MacOS,
+			Rayman3GC,
+			Rayman3PS2,
+			Rayman3PS2Demo_2002_05_17,
+			Rayman3PS2Demo_2002_08_07,
+			Rayman3PS2DevBuild_2002_09_06,
+			Rayman3PS2Demo_2002_10_29,
+			Rayman3PS2Demo_2002_12_18,
+			Rayman3Xbox,
+			Rayman3Xbox360,
+			Rayman3PS3,
+			RaymanRavingRabbidsDS,
+			RaymanRavingRabbidsDSDevBuild_2006_05_25,
+			TonicTroublePC,
+			TonicTroubleSEPC,
+			TonicTroubleN64,
+			DonaldDuckPC,
+			DonaldDuckPCDemo,
+			DonaldDuckDC,
+			DonaldDuckN64,
+			DonaldDuckPS1,
+			DonaldDuckPKGC,
+			PlaymobilHypePC,
+			PlaymobilLauraPC,
+			PlaymobilAlexPC,
+			DinosaurPC,
+			LargoWinchPC,
+			JungleBookPS1,
+			VIPPS1,
+			RedPlanetPC,
+		};
         public enum EngineVersion {
             TT = 0,
             Montreal = 1,
@@ -207,8 +151,8 @@ namespace OpenSpace {
 
         #endregion
 
-        public static void Init(Mode mode) {
-			s = GetSettings(mode);
+        public static void Init(CPA_Settings newSettings) {
+			s = newSettings;
         }
 
 		public static CPA_Settings GetSettings(Mode mode) {
@@ -218,27 +162,6 @@ namespace OpenSpace {
 			}
 			if (s != null) s.mode = mode;
 			return s;
-		}
-
-		public string CmdModeName {
-			get {
-				if(!cmdModeNameDict.Any(c => c.Value == mode)) return null;
-				return cmdModeNameDict.FirstOrDefault(c => c.Value == mode).Key;
-			}
-		}
-
-		public string DisplayName {
-			get {
-				Type genericEnumType = mode.GetType();
-				MemberInfo[] memberInfo = genericEnumType.GetMember(mode.ToString());
-				if ((memberInfo != null && memberInfo.Length > 0)) {
-					var _Attribs = memberInfo[0].GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
-					if ((_Attribs != null && _Attribs.Count() > 0)) {
-						return ((System.ComponentModel.DescriptionAttribute)_Attribs.ElementAt(0)).Description;
-					}
-				}
-				return mode.ToString();
-			}
 		}
 
 

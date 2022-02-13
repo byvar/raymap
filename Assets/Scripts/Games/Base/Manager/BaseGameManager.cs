@@ -11,7 +11,7 @@ namespace Raymap {
         /// </summary>
         /// <param name="settings">The game settings</param>
         /// <returns>The levels</returns>
-        public abstract MapTreeNode[] GetLevels(MapViewerSettings settings);
+        public abstract MapTreeNode GetLevels(MapViewerSettings settings);
 
         /// <summary>
         /// Gets the available game actions

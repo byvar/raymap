@@ -25,42 +25,24 @@ namespace OpenSpace {
 
         public List<(string, string)> items;
 
-        public List<string> SortAndTranslate(List<string> levels)
+        public List<(string, string)> SortAndTranslate(List<string> levels)
         {
-            List<string> result = new List<string>(levels);
-            result = result.OrderBy((l) =>
+            List<string> sortedLevels = new List<string>(levels);
+            sortedLevels = sortedLevels.OrderBy((l) =>
             {
                 return items.IndexOf(items.Find(m => { return m.Item1.ToLower() == l.ToLower(); }));
             }).ToList();
 
-            List<string> translatedResult = new List<string>();
+            List<(string, string)> translatedResult = new List<(string, string)>();
 
-            result.ForEach((l) =>
+            sortedLevels.ForEach((l) =>
             {
                 (string, string)? item = items.Find(m => { return m.Item1.ToLower() == l.ToLower(); });
-                if (item != null) {
-                    translatedResult.Add(item.Value.Item2 + " <" + l + ">");
+                if (item.HasValue) {
+                    translatedResult.Add((l,item.Value.Item2));
                 } else {
-                    translatedResult.Add(l);
+                    translatedResult.Add((l, l));
                 }
-            });
-
-            return translatedResult;
-        }
-        public List<string> Sort(List<string> levels) {
-            List<string> result = new List<string>(levels);
-            result = result.OrderBy((l) => {
-                return items.IndexOf(items.Find(m => { return m.Item1.ToLower() == l.ToLower(); }));
-            }).ToList();
-
-            return result;
-        }
-        public List<string> Translate(List<string> levels) {
-            List<string> result = new List<string>(levels);
-            List<string> translatedResult = new List<string>();
-
-            result.ForEach((l) => {
-                translatedResult.Add(Translate(l));
             });
 
             return translatedResult;
