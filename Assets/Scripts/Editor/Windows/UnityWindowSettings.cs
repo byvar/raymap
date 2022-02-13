@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using BinarySerializer;
 using BinarySerializer.Unity;
+using Cysharp.Threading.Tasks;
 using OpenSpace;
 using OpenSpace.Exporter;
 using Raymap;
@@ -261,6 +262,51 @@ public class UnityWindowSettings : UnityWindow {
 		if (UnitySettings.Log)
 			UnitySettings.LogFile = FileField(rect, "Serialization log File", UnitySettings.LogFile, true, "txt", includeLabel: false);
 
+
+		// Game Tools
+
+		DrawHeader("Game Tools");
+
+		// Only update if previous values don't match
+		if (CurrentGameActions == null || refreshGameActions) {
+			if (fileMode != FileSystem.Mode.Web) {
+				MapSelectionDropdown.HasChanged = false;
+				UnitySettings.MapName = MapSelectionDropdown.SelectedMap?.Id ?? UnitySettings.MapName;
+			}
+			Dirty = true;
+			CurrentGameActions = UnitySettings.GetGameManager.GetGameActions(UnitySettings.GetGameSettings);
+		}
+
+		// Add every game action
+		foreach (GameAction action in CurrentGameActions) {
+			if (EditorButton(action.DisplayName)) {
+				// Get the directories
+				string inputDir = action.RequiresInputDir ? EditorUtility.OpenFolderPanel("Select input directory", null, "") : null;
+
+				if (string.IsNullOrEmpty(inputDir) && action.RequiresInputDir)
+					return;
+
+				string outputDir = action.RequiresOutputDir ? EditorUtility.OpenFolderPanel("Select output directory", null, "") : null;
+
+				if (string.IsNullOrEmpty(outputDir) && action.RequiresOutputDir)
+					return;
+
+				async UniTask ExecuteGameAction(GameAction action) {
+					try {
+						BinarySerializer.Unity.Controller.StartStopwatch();
+						// Run the action
+						await action.GameActionFunc(inputDir, outputDir);
+					} catch (Exception ex) {
+						Debug.LogError(ex.ToString());
+					} finally {
+						BinarySerializer.Unity.Controller.StopStopwatch();
+					}
+				}
+				_ = ExecuteGameAction(action);
+			}
+		}
+
+
 		// Export
 		DrawHeader(ref YPos, "Export Settings");
 		UnitySettings.ExportAfterLoad = EditorField("Export After Load", UnitySettings.ExportAfterLoad);
@@ -300,7 +346,6 @@ public class UnityWindowSettings : UnityWindow {
 		UnitySettings.TracePointers = EditorField("Trace Pointers (slow!)", UnitySettings.TracePointers);
 		UnitySettings.SaveTextures = EditorField("Save Textures", UnitySettings.SaveTextures);
 		UnitySettings.ExportText = EditorField("Export Text", UnitySettings.ExportText);
-		UnitySettings.UseLevelTranslation = EditorField("Use Level Translation", UnitySettings.UseLevelTranslation);
 		UnitySettings.VisualizeSectorBorders = EditorField("Visualize Sector Borders", UnitySettings.VisualizeSectorBorders);
 		UnitySettings.CreateFamilyGameObjects = EditorField("Create Family GameObjects", UnitySettings.CreateFamilyGameObjects);
 		UnitySettings.ShowCollisionDataForNoCollisionObjects = EditorField("Show Collision Data For NoCollision SPOs", UnitySettings.ShowCollisionDataForNoCollisionObjects);
@@ -323,6 +368,8 @@ public class UnityWindowSettings : UnityWindow {
 
 	// Categorized game modes
 	public Dictionary<Engine, Dictionary<EngineCategory, IEnumerable<GameModeSelection>>> CategorizedGameModes { get; set; }
+
+	private GameAction[] CurrentGameActions { get; set; }
 
 	/// <summary>
 	/// The file selection dropdown

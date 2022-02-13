@@ -84,7 +84,6 @@ public class UnitySettings {
 	public static bool AllowDeadPointers { get; set; }
 	public static bool ForceDisplayBackfaces { get; set; }
 	public static bool BlockyMode { get; set; }
-	public static bool UseLevelTranslation { get; set; } = true;
 	public static bool TracePointers { get; set; } = false;
 	public static bool VisualizeSectorBorders { get; set; } = false;
 	public static bool CreateFamilyGameObjects { get; set; } = false;
@@ -195,7 +194,6 @@ public class UnitySettings {
 		TracePointers = s.SerializeBool("TracePointers", TracePointers);
 		SaveTextures = s.SerializeBool("SaveTextures", SaveTextures);
 		ExportText = s.SerializeBool("ExportText", ExportText);
-		UseLevelTranslation = s.SerializeBool("UseLevelTranslation", UseLevelTranslation);
 		VisualizeSectorBorders = s.SerializeBool("VisualizeSectorBorders", VisualizeSectorBorders);
 		CreateFamilyGameObjects = s.SerializeBool("CreateFamilyGameObjects", CreateFamilyGameObjects);
 		ShowCollisionDataForNoCollisionObjects = s.SerializeBool("ShowCollisionDataForNoCollisionObjects", ShowCollisionDataForNoCollisionObjects);
