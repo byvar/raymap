@@ -286,30 +286,30 @@ namespace OpenSpace.Loader {
             await WaitIfNecessary();
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
-            print("FIX GPT offset: " + Pointer.Current(reader));
+            print("FIX GPT offset: " + LegacyPointer.Current(reader));
             SNA sna = (SNA)files_array[Mem.Fix];
 
             if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
                 // Tonic Trouble
                 inputStruct = new InputStructure(null);
                 uint stringCount = CPA_Settings.s.game == CPA_Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
-                Pointer.Read(reader);
+                LegacyPointer.Read(reader);
+                LegacyPointer.Read(reader);
+                LegacyPointer.Read(reader);
                 if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
-                    for (int i = 0; i < 50; i++) Pointer.Read(reader);
+                    for (int i = 0; i < 50; i++) LegacyPointer.Read(reader);
                 } else {
-                    for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                    for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
                 }
                 reader.ReadUInt32(); // 0x35
                 if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
                 reader.ReadBytes(0x90);
-                Pointer.Read(reader);
+                LegacyPointer.Read(reader);
                 reader.ReadUInt32(); // 0x28
                 reader.ReadUInt32(); // 0x1
-                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) Pointer.Read(reader);
-                for (int i = 0; i < 100; i++) Pointer.Read(reader);
-                for (int i = 0; i < 100; i++) Pointer.Read(reader);
+                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) LegacyPointer.Read(reader);
+                for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
+                for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
                 reader.ReadUInt32(); // 0x1
                 if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
                     reader.ReadBytes(0xB4);
@@ -326,21 +326,21 @@ namespace OpenSpace.Loader {
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 1
                 reader.ReadUInt32(); // ???
-                Pointer.Read(reader);
-                for (int i = 0; i < stringCount; i++) Pointer.Read(reader); // read num_loaded_strings pointers here
+                LegacyPointer.Read(reader);
+                for (int i = 0; i < stringCount; i++) LegacyPointer.Read(reader); // read num_loaded_strings pointers here
                 reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
                 if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) { // There's more but what is even the point in reading all this
                     reader.ReadUInt32();
-                    Pointer.Read(reader);
+                    LegacyPointer.Read(reader);
                     reader.ReadBytes(0x14);
-                    Pointer.Read(reader);
-                    Pointer.Read(reader);
-                    Pointer.Read(reader);
-                    Pointer.Read(reader);
-                    Pointer.Read(reader);
-                    Pointer.Read(reader);
-                    Pointer.Read(reader);
-                    Pointer.Read(reader);
+                    LegacyPointer.Read(reader);
+                    LegacyPointer.Read(reader);
+                    LegacyPointer.Read(reader);
+                    LegacyPointer.Read(reader);
+                    LegacyPointer.Read(reader);
+                    LegacyPointer.Read(reader);
+                    LegacyPointer.Read(reader);
+                    LegacyPointer.Read(reader);
                     reader.ReadUInt32(); // 0, so can be pointer too
                     reader.ReadUInt32(); // 0, so can be pointer too
                     reader.ReadUInt32(); // 0, so can be pointer too
@@ -357,108 +357,108 @@ namespace OpenSpace.Loader {
                 inputStruct = new InputStructure(null);
 
                 // SDA
-                Pointer.DoAt(ref reader, sna.SDA, () => {
-                    print(Pointer.Current(reader));
+                LegacyPointer.DoAt(ref reader, sna.SDA, () => {
+                    print(LegacyPointer.Current(reader));
                     reader.ReadUInt32();
                     reader.ReadUInt32(); // same as next
                     num_strings = reader.ReadUInt32();
                     uint indexOfTextGlobal = reader.ReadUInt32(); // dword_6EEE78
                     uint dword_83EC58 = reader.ReadUInt32();
-                    print(num_strings + " - " + Pointer.Current(reader));
+                    print(num_strings + " - " + LegacyPointer.Current(reader));
                 });
 
                 // DLG
-                Pointer.DoAt(ref reader, sna.DLG, () => {
-                    Pointer off_strings = Pointer.Read(reader);
+                LegacyPointer.DoAt(ref reader, sna.DLG, () => {
+                    LegacyPointer off_strings = LegacyPointer.Read(reader);
                     for (int i = 0; i < num_strings; i++) {
-                        Pointer.Read(reader);
+                        LegacyPointer.Read(reader);
                     }
                     reader.ReadUInt32();
                 });
 
                 // GPT
                 sna.GotoHeader();
-                Pointer.Read(reader);
-                Pointer off_mainLight = Pointer.Read(reader);
+                LegacyPointer.Read(reader);
+                LegacyPointer off_mainLight = LegacyPointer.Read(reader);
                 uint lpPerformanceCount = reader.ReadUInt32();
-                Pointer.Read(reader);
-                Pointer off_defaultMaterial = Pointer.Read(reader);
-                Pointer off_geometricObject1 = Pointer.Read(reader);
-                Pointer off_geometricObject2 = Pointer.Read(reader);
-                Pointer off_geometricObject3 = Pointer.Read(reader);
+                LegacyPointer.Read(reader);
+                LegacyPointer off_defaultMaterial = LegacyPointer.Read(reader);
+                LegacyPointer off_geometricObject1 = LegacyPointer.Read(reader);
+                LegacyPointer off_geometricObject2 = LegacyPointer.Read(reader);
+                LegacyPointer off_geometricObject3 = LegacyPointer.Read(reader);
                 reader.ReadBytes(0x90); // FON_ related
                 reader.ReadBytes(0x3D54); // FON_ related
-                for (int i = 0; i < 100; i++) Pointer.Read(reader); // matrix in stack
+                for (int i = 0; i < 100; i++) LegacyPointer.Read(reader); // matrix in stack
                 uint matrixInStack = reader.ReadUInt32(); // number of matrix in stack
                 reader.ReadBytes(0xC);
                 reader.ReadBytes(0x20);
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                Pointer.Read(reader);
-                Pointer.Read(reader);
+                LegacyPointer.Read(reader);
+                LegacyPointer.Read(reader);
                 for (int i = 0; i < num_strings; i++) {
-                    Pointer.Read(reader);
+                    LegacyPointer.Read(reader);
                 }
-                LinkedList<int> fontDefinitions = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
-                Pointer.Read(reader);
+                LinkedList<int> fontDefinitions = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader));
+                LegacyPointer.Read(reader);
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                Pointer off_geometricObject4 = Pointer.Read(reader);
-                Pointer off_geometricObject5 = Pointer.Read(reader);
-                Pointer off_geometricObject6 = Pointer.Read(reader);
-                Pointer off_visualmaterial1 = Pointer.Read(reader);
-                Pointer off_visualmaterial2 = Pointer.Read(reader);
+                LegacyPointer off_geometricObject4 = LegacyPointer.Read(reader);
+                LegacyPointer off_geometricObject5 = LegacyPointer.Read(reader);
+                LegacyPointer off_geometricObject6 = LegacyPointer.Read(reader);
+                LegacyPointer off_visualmaterial1 = LegacyPointer.Read(reader);
+                LegacyPointer off_visualmaterial2 = LegacyPointer.Read(reader);
                 for (int i = 0; i < 10; i++) {
-                    Pointer off_texture = Pointer.Read(reader);
+                    LegacyPointer off_texture = LegacyPointer.Read(reader);
                 }
-                Pointer off_visualmaterial3 = Pointer.Read(reader);
-                Pointer off_gamematerial = Pointer.Read(reader);
+                LegacyPointer off_visualmaterial3 = LegacyPointer.Read(reader);
+                LegacyPointer off_gamematerial = LegacyPointer.Read(reader);
                 uint geometricElementIndexGlobal = reader.ReadUInt32();
-                Pointer off_texture2 = Pointer.Read(reader);
-                Pointer off_geometricObject7 = Pointer.Read(reader);
+                LegacyPointer off_texture2 = LegacyPointer.Read(reader);
+                LegacyPointer off_geometricObject7 = LegacyPointer.Read(reader);
                 for (uint i = 0; i < 7; i++) {
-                    Pointer.Read(reader); // Material for stencils. Order: corner, border, center, side, redarrow, bullet, and another one
+                    LegacyPointer.Read(reader); // Material for stencils. Order: corner, border, center, side, redarrow, bullet, and another one
                 }
-                Pointer dword_5DCB9C = Pointer.Read(reader);
+                LegacyPointer dword_5DCB9C = LegacyPointer.Read(reader);
 
                 // Now comes INV_fn_vSnaMultilanguageLoading
 
 
-                print(Pointer.Current(reader));
+                print(LegacyPointer.Current(reader));
             } else {
-                Pointer off_identityMatrix = Pointer.Read(reader);
+                LegacyPointer off_identityMatrix = LegacyPointer.Read(reader);
                 reader.ReadBytes(50 * 4);
                 uint matrixInStack = reader.ReadUInt32();
-                Pointer off_collisionGeoObj = Pointer.Read(reader);
-                Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
+                LegacyPointer off_collisionGeoObj = LegacyPointer.Read(reader);
+                LegacyPointer off_staticCollisionGeoObj = LegacyPointer.Read(reader);
                 loadingState = "Loading input structure";
                 await WaitIfNecessary();
                 for (int i = 0; i < CPA_Settings.s.numEntryActions; i++) {
-                    Pointer.Read(reader); // 3DOS_EntryActions
+                    LegacyPointer.Read(reader); // 3DOS_EntryActions
                 }
-                Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+                LegacyPointer off_IPT_keyAndPadDefine = LegacyPointer.Read(reader);
                 ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 
-                inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+                inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
 				foreach (EntryAction ea in inputStruct.entryActions) {
 					print(ea.ToString());
 				}
 				print("Num entractions: " + inputStruct.num_entryActions);
                 print("Off entryactions: " + inputStruct.off_entryActions);
-                Pointer off_IPT_entryElementList = Pointer.Read(reader);
+                LegacyPointer off_IPT_entryElementList = LegacyPointer.Read(reader);
                 print("Off entryelements: " + off_IPT_entryElementList);
 
                 loadingState = "Loading text";
                 await WaitIfNecessary();
-                localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true); // FON_g_stGeneral
+                localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true); // FON_g_stGeneral
 
                 loadingState = "Loading fixed animation bank";
                 await WaitIfNecessary();
                 animationBanks = new AnimationBank[2]; // 1 in fix, 1 in lvl
-                animationBanks[0] = AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, files_array[Mem.FixKeyFrames])[0];
+                animationBanks[0] = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 1, files_array[Mem.FixKeyFrames])[0];
                 print("Fix animation bank: " + animationBanks[0].off_header);
-                Pointer off_fixInfo = Pointer.Read(reader);
+                LegacyPointer off_fixInfo = LegacyPointer.Read(reader);
             }
 
             // Read PTX
@@ -466,9 +466,9 @@ namespace OpenSpace.Loader {
             await WaitIfNecessary();
 			// Can't yield inside a lambda, so we must do it the old fashioned way, with off_current
 			if (sna.PTX != null) {
-				Pointer off_current = Pointer.Goto(ref reader, sna.PTX);
-				await ReadTexturesFix(reader, Pointer.Current(reader));
-				Pointer.Goto(ref reader, off_current);
+				LegacyPointer off_current = LegacyPointer.Goto(ref reader, sna.PTX);
+				await ReadTexturesFix(reader, LegacyPointer.Current(reader));
+				LegacyPointer.Goto(ref reader, off_current);
 			}
             /*Pointer.DoAt(ref reader, sna.PTX, () => {
                 ReadTexturesFix(reader, Pointer.Current(reader));
@@ -481,13 +481,13 @@ namespace OpenSpace.Loader {
             loadingState = "Loading level memory";
             await WaitIfNecessary();
             Reader reader = files_array[Mem.Lvl].reader;
-            Pointer off_current;
+            LegacyPointer off_current;
             SNA sna = (SNA)files_array[Mem.Lvl];
 
             // First read GPT
             files_array[Mem.Lvl].GotoHeader();
             reader = files_array[Mem.Lvl].reader;
-            print("LVL GPT offset: " + Pointer.Current(reader));
+            print("LVL GPT offset: " + LegacyPointer.Current(reader));
 
             if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
 
@@ -512,10 +512,10 @@ namespace OpenSpace.Loader {
                 // GPT
                 sna.GotoHeader();
                 if (CPA_Settings.s.game != CPA_Settings.Game.PlaymobilLaura) {
-                    Pointer.Read(reader); // sound related
+                    LegacyPointer.Read(reader); // sound related
                 }
-                Pointer.Read(reader);
-                Pointer.Read(reader);
+                LegacyPointer.Read(reader);
+                LegacyPointer.Read(reader);
                 reader.ReadUInt32();
             }
             if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
@@ -523,52 +523,52 @@ namespace OpenSpace.Loader {
                 await WaitIfNecessary();
                 // Fill in fix -> lvl pointers for perso's in fix
                 uint num_persoInFixPointers = reader.ReadUInt32();
-                Pointer[] persoInFixPointers = new Pointer[num_persoInFixPointers];
+                LegacyPointer[] persoInFixPointers = new LegacyPointer[num_persoInFixPointers];
                 for (int i = 0; i < num_persoInFixPointers; i++) {
-                    Pointer off_perso = Pointer.Read(reader);
+                    LegacyPointer off_perso = LegacyPointer.Read(reader);
                     if (off_perso != null) {
-                        off_current = Pointer.Goto(ref reader, off_perso);
+                        off_current = LegacyPointer.Goto(ref reader, off_perso);
                         reader.ReadUInt32();
-                        Pointer off_stdGame = Pointer.Read(reader);
+                        LegacyPointer off_stdGame = LegacyPointer.Read(reader);
                         if (off_stdGame != null) {
                             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
-                                Pointer.Goto(ref reader, off_stdGame);
+                                LegacyPointer.Goto(ref reader, off_stdGame);
                                 reader.ReadUInt32(); // type 0
                                 reader.ReadUInt32(); // type 1
                                 reader.ReadUInt32(); // type 2
-                                Pointer off_superObject = Pointer.Read(reader);
-                                Pointer.Goto(ref reader, off_current);
+                                LegacyPointer off_superObject = LegacyPointer.Read(reader);
+                                LegacyPointer.Goto(ref reader, off_current);
                                 if (off_superObject == null) continue;
                             } else {
-                                Pointer.Goto(ref reader, off_current);
+                                LegacyPointer.Goto(ref reader, off_current);
                             }
                             // First read everything from the GPT
-                            Pointer off_newSuperObject = null, off_nextBrother = null, off_prevBrother = null, off_father = null;
+                            LegacyPointer off_newSuperObject = null, off_nextBrother = null, off_prevBrother = null, off_father = null;
                             byte[] matrixData = null, floatData = null, renderBits = null;
                             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
-                                off_newSuperObject = Pointer.Read(reader);
+                                off_newSuperObject = LegacyPointer.Read(reader);
                                 matrixData = reader.ReadBytes(0x58);
                                 renderBits = reader.ReadBytes(4);
                                 floatData = reader.ReadBytes(4);
-                                off_nextBrother = Pointer.Read(reader);
-                                off_prevBrother = Pointer.Read(reader);
-                                off_father = Pointer.Read(reader);
+                                off_nextBrother = LegacyPointer.Read(reader);
+                                off_prevBrother = LegacyPointer.Read(reader);
+                                off_father = LegacyPointer.Read(reader);
                             } else {
                                 matrixData = reader.ReadBytes(0x58);
-                                off_newSuperObject = Pointer.Read(reader);
-                                Pointer.DoAt(ref reader, off_stdGame + 0xC, () => {
+                                off_newSuperObject = LegacyPointer.Read(reader);
+                                LegacyPointer.DoAt(ref reader, off_stdGame + 0xC, () => {
                                     ((SNA)off_stdGame.file).AddPointer(off_stdGame.offset + 0xC, off_newSuperObject);
                                 });
                             }
 
                             // Then fill everything in
-                            off_current = Pointer.Goto(ref reader, off_newSuperObject);
+                            off_current = LegacyPointer.Goto(ref reader, off_newSuperObject);
                             uint newSOtype = reader.ReadUInt32();
-                            Pointer off_newSOengineObject = Pointer.Read(reader);
+                            LegacyPointer off_newSOengineObject = LegacyPointer.Read(reader);
                             if (SuperObject.GetSOType(newSOtype) == SuperObject.Type.Perso) {
                                 persoInFixPointers[i] = off_newSOengineObject;
-                                Pointer.Goto(ref reader, off_newSOengineObject);
-								Pointer off_p3dData = Pointer.Read(reader);
+                                LegacyPointer.Goto(ref reader, off_newSOengineObject);
+								LegacyPointer off_p3dData = LegacyPointer.Read(reader);
                                 if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
                                     ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x1C, matrixData);
                                 } else {
@@ -588,34 +588,34 @@ namespace OpenSpace.Loader {
                             }
 
                         }
-                        Pointer.Goto(ref reader, off_current);
+                        LegacyPointer.Goto(ref reader, off_current);
                     }
                 }
             }
             loadingState = "Loading globals";
             await WaitIfNecessary();
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
-                globals.off_actualWorld = Pointer.Read(reader);
-                globals.off_dynamicWorld = Pointer.Read(reader);
-                globals.off_inactiveDynamicWorld = Pointer.Read(reader);
-                globals.off_fatherSector = Pointer.Read(reader);
-                globals.off_firstSubMapPosition = Pointer.Read(reader);
+                globals.off_actualWorld = LegacyPointer.Read(reader);
+                globals.off_dynamicWorld = LegacyPointer.Read(reader);
+                globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
+                globals.off_fatherSector = LegacyPointer.Read(reader);
+                globals.off_firstSubMapPosition = LegacyPointer.Read(reader);
             } else {
-                globals.off_actualWorld = Pointer.Read(reader);
-                globals.off_dynamicWorld = Pointer.Read(reader);
-                globals.off_fatherSector = Pointer.Read(reader);
+                globals.off_actualWorld = LegacyPointer.Read(reader);
+                globals.off_dynamicWorld = LegacyPointer.Read(reader);
+                globals.off_fatherSector = LegacyPointer.Read(reader);
                 uint soundEventIndex = reader.ReadUInt32(); // In Montreal version this is a pointer, also sound event related
                 if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
-                    Pointer.Read(reader);
+                    LegacyPointer.Read(reader);
                 }
             }
 
             globals.num_always = reader.ReadUInt32();
-            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-            globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+            globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
-                globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
-                globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
+                globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
+                globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
             } else {
                 reader.ReadUInt32(); // 0x6F. In Montreal version this is a pointer to a pointer table for always
                 globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
@@ -623,13 +623,13 @@ namespace OpenSpace.Loader {
 
             if (CPA_Settings.s.game == CPA_Settings.Game.DD) reader.ReadUInt32();
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
-                Pointer dword_4A6B1C_always_header = Pointer.Read(reader);
-                Pointer dword_4A6B20_always_last = Pointer.Read(reader);
+                LegacyPointer dword_4A6B1C_always_header = LegacyPointer.Read(reader);
+                LegacyPointer dword_4A6B20_always_last = LegacyPointer.Read(reader);
 
-                Pointer v28 = Pointer.Read(reader);
-                Pointer v31 = Pointer.Read(reader);
-                Pointer v32 = Pointer.Read(reader);
-                Pointer v33 = Pointer.Read(reader);
+                LegacyPointer v28 = LegacyPointer.Read(reader);
+                LegacyPointer v31 = LegacyPointer.Read(reader);
+                LegacyPointer v32 = LegacyPointer.Read(reader);
+                LegacyPointer v33 = LegacyPointer.Read(reader);
 
                 // These things aren't parsed, but in raycap they're null. This way we'll notice when they aren't.
                 if (v28 != null) print("v28 is not null, it's " + v28);
@@ -644,9 +644,9 @@ namespace OpenSpace.Loader {
             // Fill in pointers for the object type tables and read them
             objectTypes = new ObjectType[3][];
             for (uint i = 0; i < 3; i++) {
-                Pointer off_names_header = Pointer.Current(reader);
-                Pointer off_names_first = Pointer.Read(reader);
-                Pointer off_names_last = Pointer.Read(reader);
+                LegacyPointer off_names_header = LegacyPointer.Current(reader);
+                LegacyPointer off_names_first = LegacyPointer.Read(reader);
+                LegacyPointer off_names_last = LegacyPointer.Read(reader);
                 uint num_names = reader.ReadUInt32();
 
                 FillLinkedListPointers(reader, off_names_last, off_names_header);
@@ -656,7 +656,7 @@ namespace OpenSpace.Loader {
             // Begin of engineStructure
             loadingState = "Loading engine structure";
             await WaitIfNecessary();
-            print("Start of EngineStructure: " + Pointer.Current(reader));
+            print("Start of EngineStructure: " + LegacyPointer.Current(reader));
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 reader.ReadByte();
                 string mapName = reader.ReadString(0x1E);
@@ -684,40 +684,40 @@ namespace OpenSpace.Loader {
                     reader.ReadBytes(0x2627); // don't know what this data is
                 }
             }
-            Pointer off_unknown_first = Pointer.Read(reader);
-            Pointer off_unknown_last = Pointer.Read(reader);
+            LegacyPointer off_unknown_first = LegacyPointer.Read(reader);
+            LegacyPointer off_unknown_last = LegacyPointer.Read(reader);
             uint num_unknown = reader.ReadUInt32();
 
-            families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+            families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
             families.FillPointers(reader, families.off_tail, families.off_head);
 
             if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
-                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+                LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
             }
 
-            LinkedList<SuperObject> alwaysActiveCharacters = LinkedList<SuperObject>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+            LinkedList<SuperObject> alwaysActiveCharacters = LinkedList<SuperObject>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet ||CPA_Settings.s.game == CPA_Settings.Game.R2Demo) reader.ReadUInt32();
-                Pointer off_languages = Pointer.Read(reader);
+                LegacyPointer off_languages = LegacyPointer.Read(reader);
                 reader.ReadUInt32();
 
-                Pointer.DoAt(ref reader, off_languages, () => {
+                LegacyPointer.DoAt(ref reader, off_languages, () => {
                     ReadLanguages(reader, off_languages, localization.num_languages);
                 });
 
                 for (uint i = 0; i < 2; i++) {
-                    Pointer off_matrix = Pointer.Current(reader);
+                    LegacyPointer off_matrix = LegacyPointer.Current(reader);
                     Matrix mat = Matrix.Read(reader, off_matrix);
                 }
 
                 reader.ReadUInt32();
                 reader.ReadUInt16();
 
-                ReadLevelNames(reader, Pointer.Current(reader), 80);
+                ReadLevelNames(reader, LegacyPointer.Current(reader), 80);
                 uint num_mapNames = reader.ReadUInt32();
                 Array.Resize(ref levels, (int)num_mapNames);
                 reader.ReadUInt16();
@@ -729,26 +729,26 @@ namespace OpenSpace.Loader {
                 }
 
                 // End of engineStructure
-                Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
-                Pointer off_mainChar = Pointer.Read(reader); // superobject
-                Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
+                LegacyPointer off_light = LegacyPointer.Read(reader); // the offset of a light. It's just an ordinary light.
+                LegacyPointer off_mainChar = LegacyPointer.Read(reader); // superobject
+                LegacyPointer off_characterLaunchingSoundEvents = LegacyPointer.Read(reader);
                 if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
-                    globals.off_backgroundGameMaterial = Pointer.Read(reader);
+                    globals.off_backgroundGameMaterial = LegacyPointer.Read(reader);
                 }
-                Pointer off_shadowPolygonVisualMaterial = Pointer.Read(reader);
-                Pointer off_shadowPolygonGameMaterialInit = Pointer.Read(reader);
-                Pointer off_shadowPolygonGameMaterial = Pointer.Read(reader);
-                Pointer off_textureOfTextureShadow = Pointer.Read(reader);
-                Pointer off_col_taggedFacesTable = Pointer.Read(reader);
+                LegacyPointer off_shadowPolygonVisualMaterial = LegacyPointer.Read(reader);
+                LegacyPointer off_shadowPolygonGameMaterialInit = LegacyPointer.Read(reader);
+                LegacyPointer off_shadowPolygonGameMaterial = LegacyPointer.Read(reader);
+                LegacyPointer off_textureOfTextureShadow = LegacyPointer.Read(reader);
+                LegacyPointer off_col_taggedFacesTable = LegacyPointer.Read(reader);
 
                 for (int i = 0; i < 10; i++) {
-                    Pointer off_elementForShadow = Pointer.Read(reader);
-                    Pointer off_geometricShadowObject = Pointer.Read(reader);
+                    LegacyPointer off_elementForShadow = LegacyPointer.Read(reader);
+                    LegacyPointer off_geometricShadowObject = LegacyPointer.Read(reader);
                 }
-                Pointer.Read(reader); // DemoSOList
+                LegacyPointer.Read(reader); // DemoSOList
 
                 if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo || CPA_Settings.s.game == CPA_Settings.Game.RedPlanet || CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPCDemo) {
-                    Pointer.Read(reader);
+                    LegacyPointer.Read(reader);
                 }
 
                 if (CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPCDemo) {
@@ -759,7 +759,7 @@ namespace OpenSpace.Loader {
                 loadingState = "Loading level animation bank";
                 //print("Animation bank: " + Pointer.Current(reader));
                 await WaitIfNecessary();
-                AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, files_array[Mem.LvlKeyFrames], append: true);
+                AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 1, files_array[Mem.LvlKeyFrames], append: true);
                 animationBanks[1] = animationBanks[0];
             }
             if (FileSystem.mode != FileSystem.Mode.Web) {
@@ -774,9 +774,9 @@ namespace OpenSpace.Loader {
 
 			// Can't yield inside a lambda, so we must do it the old fashioned way, with off_current
 			if (sna.PTX != null) {
-				off_current = Pointer.Goto(ref reader, sna.PTX);
-				await ReadTexturesLvl(reader, Pointer.Current(reader));
-				Pointer.Goto(ref reader, off_current);
+				off_current = LegacyPointer.Goto(ref reader, sna.PTX);
+				await ReadTexturesLvl(reader, LegacyPointer.Current(reader));
+				LegacyPointer.Goto(ref reader, off_current);
 			}
 			/*Pointer.DoAt(ref reader, sna.PTX, () => {
                 ReadTexturesLvl(reader, Pointer.Current(reader));

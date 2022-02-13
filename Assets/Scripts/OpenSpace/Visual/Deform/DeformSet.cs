@@ -8,10 +8,10 @@ using UnityEngine;
 namespace OpenSpace.Visual.Deform {
     public class DeformSet : IGeometricObjectElement {
         [JsonIgnore] public GeometricObject mesh;
-        public Pointer offset;
+        public LegacyPointer offset;
 		
-        public Pointer off_weights;
-        public Pointer off_bones;
+        public LegacyPointer off_weights;
+        public LegacyPointer off_bones;
         public ushort num_weights;
         public byte num_bones;
         
@@ -33,7 +33,7 @@ namespace OpenSpace.Visual.Deform {
             }
         }
 
-        public DeformSet(Pointer offset, GeometricObject mesh) {
+        public DeformSet(LegacyPointer offset, GeometricObject mesh) {
             this.mesh = mesh;
             this.offset = offset;
         }
@@ -77,11 +77,11 @@ namespace OpenSpace.Visual.Deform {
         }
         
 
-        public static DeformSet Read(Reader reader, Pointer offset, GeometricObject m) {
+        public static DeformSet Read(Reader reader, LegacyPointer offset, GeometricObject m) {
             MapLoader l = MapLoader.Loader;
             DeformSet d = new DeformSet(offset, m);
-            d.off_weights = Pointer.Read(reader);
-            d.off_bones = Pointer.Read(reader);
+            d.off_weights = LegacyPointer.Read(reader);
+            d.off_bones = LegacyPointer.Read(reader);
             d.num_weights = reader.ReadUInt16();
             d.num_bones = reader.ReadByte();
             d.num_bones += 1;
@@ -92,14 +92,14 @@ namespace OpenSpace.Visual.Deform {
             d.r3weights = new DeformVertexWeights[d.num_weights];
 
             // Read weights
-            Pointer.Goto(ref reader, d.off_weights);
+            LegacyPointer.Goto(ref reader, d.off_weights);
             for (int i = 0; i < d.num_weights; i++) {
-                Pointer off_weightsForVertex = Pointer.Read(reader);
+                LegacyPointer off_weightsForVertex = LegacyPointer.Read(reader);
                 ushort vertex_index = reader.ReadUInt16();
                 byte num_weightsForVertex = reader.ReadByte();
                 reader.ReadByte(); // 0, padding
                 d.r3weights[i] = new DeformVertexWeights(vertex_index);
-                Pointer curPos = Pointer.Goto(ref reader, off_weightsForVertex);
+                LegacyPointer curPos = LegacyPointer.Goto(ref reader, off_weightsForVertex);
                 for (int j = 0; j < num_weightsForVertex; j++) {
                     ushort weight = reader.ReadUInt16();
                     //float floatWeight = weight / UInt16.MaxValue;
@@ -107,14 +107,14 @@ namespace OpenSpace.Visual.Deform {
                     reader.ReadByte(); // 0, padding
                     d.r3weights[i].boneWeights.Add(boneIndex, weight);
                 }
-                Pointer.Goto(ref reader, curPos);
+                LegacyPointer.Goto(ref reader, curPos);
             }
 
             // Read bones
             d.r3bones[0] = new DeformBone();
             d.r3bones[0].mat = new Matrix(null, 1, Matrix4x4.identity, new Vector4(1f, 1f, 1f, 1f));
             d.r3bones[0].index = 0;
-            Pointer.Goto(ref reader, d.off_bones);
+            LegacyPointer.Goto(ref reader, d.off_bones);
             for (int i = 1; i < d.num_bones; i++) {
                 d.r3bones[i] = new DeformBone();
 
@@ -129,10 +129,10 @@ namespace OpenSpace.Visual.Deform {
                 }
                 d.r3bones[i].mat = new Matrix(null, 1, mat, new Vector4(1f, 1f, 1f, 1f));
 				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
-					Pointer off_shorts = Pointer.Read(reader); // offset of shorts. the next ushort, invert, is actually number of shorts.
+					LegacyPointer off_shorts = LegacyPointer.Read(reader); // offset of shorts. the next ushort, invert, is actually number of shorts.
 					d.r3bones[i].invert = reader.ReadUInt16();
 					//l.print("Number of shorts: " + d.r3bones[i].invert);
-					Pointer.DoAt(ref reader, off_shorts, () => {
+					LegacyPointer.DoAt(ref reader, off_shorts, () => {
 						for (int j = 0; j < d.r3bones[i].invert; j++) {
 							reader.ReadUInt16();
 						}

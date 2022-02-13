@@ -1205,7 +1205,7 @@ public class Controller : MonoBehaviour {
 			if (so.off_matrix == null) {
 				continue;
 			}
-			Pointer.Goto(ref reader, so.off_matrix);
+			LegacyPointer.Goto(ref reader, so.off_matrix);
 			so.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, so.off_matrix);
 			if (so.data != null && so.data.Gao != null) {
 				so.data.Gao.transform.localPosition = so.matrix.GetPosition(convertAxes: true);
@@ -1218,7 +1218,7 @@ public class Controller : MonoBehaviour {
 					PersoBehaviour pb = perso.Gao.GetComponent<PersoBehaviour>();
 					if (pb != null) {
 
-						Pointer.Goto(ref reader, perso.p3dData.offset);
+						LegacyPointer.Goto(ref reader, perso.p3dData.offset);
 						perso.p3dData.UpdateCurrentState(reader);
 
 						// State offset changed?
@@ -1231,7 +1231,7 @@ public class Controller : MonoBehaviour {
 					MindComponent mc = perso.Gao.GetComponent<MindComponent>();
 					if (mc != null) {
 						Mind mind = mc.mind;
-						Pointer.DoAt(ref reader, mind.Offset, () => {
+						LegacyPointer.DoAt(ref reader, mind.Offset, () => {
 							mind.UpdateCurrentBehaviors(reader);
 						});
 					}
@@ -1243,7 +1243,7 @@ public class Controller : MonoBehaviour {
 
 					CustomBitsComponent customBitsComponent = perso.Gao.GetComponent<CustomBitsComponent>();
 					if (customBitsComponent != null) {
-						Pointer.Goto(ref reader, perso.off_stdGame);
+						LegacyPointer.Goto(ref reader, perso.off_stdGame);
 						perso.stdGame = StandardGame.Read(reader, perso.off_stdGame);
 						customBitsComponent.stdGame = perso.stdGame;
 						customBitsComponent.Init();
@@ -1251,7 +1251,7 @@ public class Controller : MonoBehaviour {
 
 					DynamicsMechanicsComponent dnComponent = perso.Gao.GetComponent<DynamicsMechanicsComponent>();
 					if (dnComponent != null) {
-						Pointer.DoAt(ref reader, perso.off_dynam, () => {
+						LegacyPointer.DoAt(ref reader, perso.off_dynam, () => {
 							perso.dynam = Dynam.Read(reader, perso.off_dynam);
 						});
 
@@ -1265,7 +1265,7 @@ public class Controller : MonoBehaviour {
 		if (camera != null) {
 
 			SuperObject cameraSO = camera.SuperObject;
-			Pointer.Goto(ref reader, cameraSO.off_matrix);
+			LegacyPointer.Goto(ref reader, cameraSO.off_matrix);
 			cameraSO.matrix = Matrix.Read(reader, cameraSO.off_matrix);
 			camera.Gao.transform.localPosition = cameraSO.matrix.GetPosition(convertAxes: true);
 			camera.Gao.transform.localRotation = cameraSO.matrix.GetRotation(convertAxes: true);

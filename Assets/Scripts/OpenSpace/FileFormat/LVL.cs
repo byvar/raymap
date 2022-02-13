@@ -38,7 +38,7 @@ namespace OpenSpace.FileFormat {
                     uint ptr_ptr = ptrReader.ReadUInt32();
                     reader.BaseStream.Seek(ptr_ptr + baseOffset, SeekOrigin.Begin);
                     uint ptr = reader.ReadUInt32();
-                    pointers[ptr_ptr] = new Pointer(ptr, GetFileWithID(file));
+                    pointers[ptr_ptr] = new LegacyPointer(ptr, GetFileWithID(file));
 				}
 				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 					// Revolution
@@ -82,7 +82,7 @@ namespace OpenSpace.FileFormat {
 						int src_file = ptrReader.ReadInt32(); // the file the pointer should be located in
 						uint ptr = ptrReader.ReadUInt32();
 						int target_file = ptrReader.ReadInt32();
-						GetFileWithID(src_file).pointers[ptr_ptr] = new Pointer(ptr, GetFileWithID(target_file)); // can overwrite if necessary
+						GetFileWithID(src_file).pointers[ptr_ptr] = new LegacyPointer(ptr, GetFileWithID(target_file)); // can overwrite if necessary
 					}
 				}
             }
@@ -101,7 +101,7 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
 			UnityEngine.Debug.LogWarning("Pointer writing not supported!");
 			writer.BaseStream.Position += 4;
 		}

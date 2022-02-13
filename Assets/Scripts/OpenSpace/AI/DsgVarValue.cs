@@ -12,7 +12,7 @@ using UnityEngine;
 namespace OpenSpace.AI {
     public class DsgVarValue {
         public DsgVarType type;
-		public Pointer offset;
+		public LegacyPointer offset;
         public DsgMem dsgMem;
 
 		// Array data
@@ -22,7 +22,7 @@ namespace OpenSpace.AI {
 		public DsgVarValue[] valueArray;
 
 		// Possible values
-		public Pointer valuePointer;
+		public LegacyPointer valuePointer;
 
 		public bool valueBool;
         public sbyte valueByte;
@@ -58,7 +58,7 @@ namespace OpenSpace.AI {
 		}
 
         public void Read(Reader reader) {
-			offset = Pointer.Current(reader);
+			offset = LegacyPointer.Current(reader);
 			switch (type) {
 				case DsgVarType.Boolean:
 					valueBool = reader.ReadBoolean(); break;
@@ -85,23 +85,23 @@ namespace OpenSpace.AI {
 				case DsgVarType.Text:
 					valueText = reader.ReadInt32(); break;
 				case DsgVarType.Graph:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					valueGraph = Graph.FromOffsetOrRead(valuePointer, reader);
 					break;
 				case DsgVarType.WayPoint:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					valueWayPoint = WayPoint.FromOffsetOrRead(valuePointer, reader);
 					break;
 				case DsgVarType.GameMaterial:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					valueGameMaterial = GameMaterial.FromOffsetOrRead(valuePointer, reader);
 					break;
 				case DsgVarType.VisualMaterial:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					valueVisualMaterial = VisualMaterial.FromOffsetOrRead(valuePointer, reader);
 					break;
 				case DsgVarType.ObjectList:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					valueObjectList = ObjectList.FromOffsetOrRead(valuePointer, reader);
 					break;
 				case DsgVarType.List:
@@ -109,32 +109,32 @@ namespace OpenSpace.AI {
 					valueList.Read(reader);
 					break;
 				case DsgVarType.Light:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					valueLight = MapLoader.Loader.FromOffsetOrRead<LightInfo>(reader, valuePointer);
 					break;
 				case DsgVarType.Comport:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
                     // 2021-05-25 Changed type from Behavior to Macro since it always seems to be a Macro (from R3, seemingly unused in R2) - RTS
 					valueComport = MapLoader.Loader.FromOffsetOrRead<Macro>(reader, valuePointer);
 					break;
 				case DsgVarType.Input:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					valueInput = EntryAction.FromOffsetOrRead(valuePointer, reader);
 					break;
 
 				// Fill these in after loading
 				case DsgVarType.Perso:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					// Don't fill in perso yet
 					MapLoader.Loader.onPostLoad.Add(InitPostLoad);
 					break;
 				case DsgVarType.Action:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					// Don't fill in state yet
 					MapLoader.Loader.onPostLoad.Add(InitPostLoad);
 					break;
 				case DsgVarType.SuperObject:
-					valuePointer = Pointer.Read(reader);
+					valuePointer = LegacyPointer.Read(reader);
 					// Don't fill in SO yet
 					MapLoader.Loader.onPostLoad.Add(InitPostLoad);
 					break;
@@ -264,7 +264,7 @@ namespace OpenSpace.AI {
 		}
 
 		public void Write(Writer writer) {
-			Pointer.Goto(ref writer, offset);
+			LegacyPointer.Goto(ref writer, offset);
 			switch (type) {
 				case DsgVarType.Boolean:
 					writer.Write(valueBool); break;
@@ -290,29 +290,29 @@ namespace OpenSpace.AI {
 				case DsgVarType.Text:
 					writer.Write(valueText); break;
 				case DsgVarType.Graph:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.WayPoint:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.GameMaterial:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.VisualMaterial:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.ObjectList:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.List:
 					valueList?.Write(writer); break;
 				case DsgVarType.Light:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.Comport:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.Input:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.Perso:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.Action:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 				case DsgVarType.SuperObject:
-					Pointer.Write(writer, valuePointer); break;
+					LegacyPointer.Write(writer, valuePointer); break;
 
 				// TODO: Figure these out
 				case DsgVarType.Caps:
@@ -354,7 +354,7 @@ namespace OpenSpace.AI {
 			}
 			arrayType = CPA_Settings.s.aiTypes.GetDsgVarType(arrayTypeNumber);
 			if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type) != arrayType) {
-				Debug.LogWarning(currentbuf + " - " + type + " - " + arrayTypeNumber + " - " + arrayType + " - " + arrayLength + " - " + Pointer.Current(reader));
+				Debug.LogWarning(currentbuf + " - " + type + " - " + arrayTypeNumber + " - " + arrayType + " - " + arrayLength + " - " + LegacyPointer.Current(reader));
 			}
 			if (valueArray == null || arrayLength != valueArray.Length) {
 				valueArray = new DsgVarValue[arrayLength];
@@ -394,7 +394,7 @@ namespace OpenSpace.AI {
 
         public void WriteArray(Writer writer) {
 			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
-				Pointer.Goto(ref writer, Pointer.Current(writer) + 4);
+				LegacyPointer.Goto(ref writer, LegacyPointer.Current(writer) + 4);
 				writer.Write((byte)arrayTypeNumber);
 				writer.Write(arrayLength);
 				writer.Write((byte)0);
@@ -408,7 +408,7 @@ namespace OpenSpace.AI {
 			}
 			arrayType = CPA_Settings.s.aiTypes.GetDsgVarType(arrayTypeNumber);
 			if (DsgVarInfoEntry.GetDsgVarTypeFromArrayType(type) != arrayType) {
-				Debug.LogWarning(currentbuf + " - " + arrayTypeNumber + " - " + arrayType + " - " + arrayLength + " - " + Pointer.Current(writer));
+				Debug.LogWarning(currentbuf + " - " + arrayTypeNumber + " - " + arrayType + " - " + arrayLength + " - " + LegacyPointer.Current(writer));
 			}
 			if (valueArray != null && arrayLength == valueArray.Length) {
 				for (uint i = 0; i < arrayLength; i++) {
@@ -417,12 +417,12 @@ namespace OpenSpace.AI {
 			}
 		}
 
-		public void ReadFromBuffer(Reader reader, DsgVarInfoEntry infoEntry, Pointer buffer) {
+		public void ReadFromBuffer(Reader reader, DsgVarInfoEntry infoEntry, LegacyPointer buffer) {
             ReadFromBuffer(reader, infoEntry.offsetInBuffer, buffer);
         }
 
-        public void ReadFromBuffer(Reader reader, uint offsetInBuffer, Pointer buffer) {
-			Pointer.DoAt(ref reader, buffer + offsetInBuffer, () => {
+        public void ReadFromBuffer(Reader reader, uint offsetInBuffer, LegacyPointer buffer) {
+			LegacyPointer.DoAt(ref reader, buffer + offsetInBuffer, () => {
 				Read(reader);
 			});
         }
@@ -621,7 +621,7 @@ namespace OpenSpace.AI {
 
 			public struct Entry {
 				public uint value;
-				public Pointer ptr;
+				public LegacyPointer ptr;
 			}
 
 			public void Read(Reader reader) {
@@ -631,7 +631,7 @@ namespace OpenSpace.AI {
 				list = new Entry[maxLength];
 				for (int i = 0; i < maxLength; i++) {
 					list[i] = new Entry();
-					list[i].ptr = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+					list[i].ptr = LegacyPointer.GetPointerAtOffset(LegacyPointer.Current(reader));
 					list[i].value = reader.ReadUInt32();
 				}
 			}

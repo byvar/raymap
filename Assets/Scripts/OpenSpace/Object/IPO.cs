@@ -10,10 +10,10 @@ namespace OpenSpace.Object {
     /// IPO = Instantiated Physical Object. Used for level geometry
     /// </summary>
     public class IPO : IEngineObject {
-        public Pointer offset;
-        public Pointer off_data;
-        public Pointer off_radiosity;
-		public Pointer off_portalCamera;
+        public LegacyPointer offset;
+        public LegacyPointer off_data;
+        public LegacyPointer off_radiosity;
+		public LegacyPointer off_portalCamera;
 
         public PhysicalObject data;
         public Radiosity radiosity;
@@ -53,16 +53,16 @@ namespace OpenSpace.Object {
             }
         }
 
-        public IPO(Pointer offset, SuperObject so) {
+        public IPO(LegacyPointer offset, SuperObject so) {
             this.offset = offset;
             this.superObject = so;
         }
 
-        public static IPO Read(Reader reader, Pointer offset, SuperObject so) {
+        public static IPO Read(Reader reader, LegacyPointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             IPO ipo = new IPO(offset, so);
-            ipo.off_data = Pointer.Read(reader);
-            ipo.off_radiosity = Pointer.Read(reader);
+            ipo.off_data = LegacyPointer.Read(reader);
+            ipo.off_radiosity = LegacyPointer.Read(reader);
 			ipo.name = "IPO @ " + offset;
 
             // TODO: Read radiosity on all platforms. Currently crashes on Xbox 360
@@ -70,13 +70,13 @@ namespace OpenSpace.Object {
 
 			if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3) {
 				reader.ReadUInt32();
-				ipo.off_portalCamera = Pointer.Read(reader);
+				ipo.off_portalCamera = LegacyPointer.Read(reader);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				if (CPA_Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
 			}
-			Pointer.DoAt(ref reader, ipo.off_data, () => {
+			LegacyPointer.DoAt(ref reader, ipo.off_data, () => {
 				ipo.data = PhysicalObject.Read(reader, ipo.off_data, so:ipo.superObject, radiosity: ipo.radiosity);
 			});
 			/*Pointer.DoAt(ref reader, ipo.off_portalCamera, () => {

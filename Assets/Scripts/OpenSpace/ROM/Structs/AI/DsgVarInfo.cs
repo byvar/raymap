@@ -32,11 +32,11 @@ namespace OpenSpace.ROM {
 			public ushort offsetInBuffer;
 
 			// Custom
-			public Pointer offset;
+			public LegacyPointer offset;
 			public DsgVarValue value;
 
 			public Entry(Reader reader, ushort index_of_info) {
-				offset = Pointer.Current(reader);
+				offset = LegacyPointer.Current(reader);
 
 				type = reader.ReadUInt16();
 				value = new DsgVarValue(index_of_info, type);

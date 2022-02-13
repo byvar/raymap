@@ -11,14 +11,14 @@ namespace OpenSpace
         }
 
         // Raw data
-        public Pointer offset;
+        public LegacyPointer offset;
 
         public uint field_0;
         public uint field_4;
         public uint field_8;
         public uint field_C;
 
-        public Pointer off_speedVector;
+        public LegacyPointer off_speedVector;
 
         // Processed data
         public Matrix matrixA;
@@ -32,12 +32,12 @@ namespace OpenSpace
 
         public DynamicsType type;   
 
-        public Dynamics(Pointer offset)
+        public Dynamics(LegacyPointer offset)
         {
             this.offset = offset;
         }
 
-        public static Dynamics Read(Reader reader, Pointer offset)
+        public static Dynamics Read(Reader reader, LegacyPointer offset)
         {
             Dynamics dynamics = new Dynamics(offset);
             
@@ -62,13 +62,13 @@ namespace OpenSpace
 
             // Process data (common)
 
-            Pointer.Goto(ref reader, offset + 0x54);
-            dynamics.off_speedVector = Pointer.Read(reader);
+            LegacyPointer.Goto(ref reader, offset + 0x54);
+            dynamics.off_speedVector = LegacyPointer.Read(reader);
 
-            Pointer.Goto(ref reader, offset + 0x78);
+            LegacyPointer.Goto(ref reader, offset + 0x78);
             dynamics.matrixA = Matrix.Read(reader, offset + 0x78);
 
-            Pointer.Goto(ref reader, offset + 0xD0);
+            LegacyPointer.Goto(ref reader, offset + 0xD0);
             dynamics.matrixB = Matrix.Read(reader, offset + 0xD0);
 
             // Process data (type specific)
@@ -79,7 +79,7 @@ namespace OpenSpace
 
             } else if (dynamics.type == DynamicsType.Type2_BIG) {
 
-                Pointer.Goto(ref reader, dynamics.off_speedVector);
+                LegacyPointer.Goto(ref reader, dynamics.off_speedVector);
                 dynamics.speedVector = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
             }
 

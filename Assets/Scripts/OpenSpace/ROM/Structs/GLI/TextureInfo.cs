@@ -23,9 +23,9 @@ namespace OpenSpace.ROM {
 		public byte[] textureBytes;
 		public byte[] paletteBytes;
 
-		public Pointer off_texture;
-		public Pointer off_alpha;
-		public Pointer off_palette;
+		public LegacyPointer off_texture;
+		public LegacyPointer off_alpha;
+		public LegacyPointer off_palette;
 		public GF64 mainTex;
 		public GF64 alphaTex;
 
@@ -124,7 +124,7 @@ namespace OpenSpace.ROM {
 				color_size = reader.ReadUInt16();
 				bpp = reader.ReadUInt16();
 				name = reader.ReadString(200);
-				off_texture = Pointer.Current(reader);
+				off_texture = LegacyPointer.Current(reader);
 				textureBytes = reader.ReadBytes(color_size); // max size: 0x10000
 				Texture2D rawTex = new ETC(textureBytes, 1 << wExponent, 1 << hExponent, bpp == 32).texture;
 				if (l.exportTextures) {

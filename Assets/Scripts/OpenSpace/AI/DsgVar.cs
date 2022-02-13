@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class DsgVar : OpenSpaceStruct {
-        public Pointer off_dsgMemBuffer;
-        public Pointer off_dsgVarInfo; // points to DsgVarInfo, which is an array of dsgVarInfoEntries
+        public LegacyPointer off_dsgMemBuffer;
+        public LegacyPointer off_dsgVarInfo; // points to DsgVarInfo, which is an array of dsgVarInfoEntries
         public uint amountOfInfos;
         public uint dsgMemBufferLength;
 
@@ -17,8 +17,8 @@ namespace OpenSpace.AI {
         public DsgVarValue[] defaultValues;
 
         protected override void ReadInternal(Reader reader) {
-            off_dsgMemBuffer = Pointer.Read(reader);
-            off_dsgVarInfo = Pointer.Read(reader);
+            off_dsgMemBuffer = LegacyPointer.Read(reader);
+            off_dsgVarInfo = LegacyPointer.Read(reader);
             if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
                 dsgMemBufferLength = reader.ReadUInt16();
                 amountOfInfos = reader.ReadUInt16();
@@ -30,10 +30,10 @@ namespace OpenSpace.AI {
             dsgVarInfos = new DsgVarInfoEntry[amountOfInfos];
             defaultValues = new DsgVarValue[amountOfInfos];
             if (amountOfInfos > 0) {
-                Pointer.DoAt(ref reader, off_dsgVarInfo, () => {
+                LegacyPointer.DoAt(ref reader, off_dsgVarInfo, () => {
                     //l.print(dsgVar.amountOfInfos);
                     for (uint i = 0; i < amountOfInfos; i++) {
-                        dsgVarInfos[i] = DsgVarInfoEntry.Read(reader, Pointer.Current(reader), i);
+                        dsgVarInfos[i] = DsgVarInfoEntry.Read(reader, LegacyPointer.Current(reader), i);
                         defaultValues[i] = new DsgVarValue(dsgVarInfos[i].type, null);
                         defaultValues[i].ReadFromDsgVarBuffer(reader, dsgVarInfos[i], this);
 

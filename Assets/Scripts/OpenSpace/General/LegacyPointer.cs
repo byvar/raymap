@@ -9,10 +9,10 @@ using System.Text;
 
 namespace OpenSpace {
     [JsonConverter(typeof(PointerJsonConverter))]
-    public class Pointer : IEquatable<Pointer> {
+    public class LegacyPointer : IEquatable<LegacyPointer> {
         public uint offset;
         public FileWithPointers file;
-        public Pointer(uint offset, FileWithPointers file) {
+        public LegacyPointer(uint offset, FileWithPointers file) {
             this.offset = offset;
             this.file = file;
         }
@@ -32,30 +32,30 @@ namespace OpenSpace {
         }
 
         public override bool Equals(System.Object obj) {
-            return obj is Pointer && this == (Pointer)obj;
+            return obj is LegacyPointer && this == (LegacyPointer)obj;
         }
         public override int GetHashCode() {
             return offset.GetHashCode() ^ file.GetHashCode();
         }
 
-        public bool Equals(Pointer other) {
-            return this == (Pointer)other;
+        public bool Equals(LegacyPointer other) {
+            return this == (LegacyPointer)other;
         }
 
-        public static bool operator ==(Pointer x, Pointer y) {
+        public static bool operator ==(LegacyPointer x, LegacyPointer y) {
             if (ReferenceEquals(x, y)) return true;
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
             return x.offset == y.offset && x.file == y.file;
         }
-        public static bool operator !=(Pointer x, Pointer y) {
+        public static bool operator !=(LegacyPointer x, LegacyPointer y) {
             return !(x == y);
         }
-        public static Pointer operator +(Pointer x, long y) {
-            return new Pointer((uint)((long)x.offset + y), x.file);
+        public static LegacyPointer operator +(LegacyPointer x, long y) {
+            return new LegacyPointer((uint)((long)x.offset + y), x.file);
         }
-        public static Pointer operator -(Pointer x, long y) {
-            return new Pointer((uint)((long)x.offset - y), x.file);
+        public static LegacyPointer operator -(LegacyPointer x, long y) {
+            return new LegacyPointer((uint)((long)x.offset - y), x.file);
         }
         public override string ToString() {
             if (file != null && file.baseOffset != 0) {
@@ -77,16 +77,16 @@ namespace OpenSpace {
             }
         }
 
-        public static Pointer GetPointerAtOffset(Pointer pointer) {
+        public static LegacyPointer GetPointerAtOffset(LegacyPointer pointer) {
             MapLoader l = MapLoader.Loader;
-            Pointer ptr = null;
+            LegacyPointer ptr = null;
             if (pointer.file.pointers.ContainsKey(pointer.offset)) {
                 ptr = pointer.file.pointers[pointer.offset];
                 if (ptr.offset == 0) return null;
                 return ptr;
             } else if (pointer.file.allowUnsafePointers) {
                 Reader reader = pointer.file.reader;
-                Pointer.DoAt(ref reader, pointer, () => {
+                LegacyPointer.DoAt(ref reader, pointer, () => {
                     uint current_off = (uint)(reader.BaseStream.Position);
                     uint value = reader.ReadUInt32();
                     FileWithPointers file = pointer.file;
@@ -107,10 +107,10 @@ namespace OpenSpace {
             return null;
         }
 
-        public static Pointer Read(Reader reader, bool allowMinusOne = false) {
+        public static LegacyPointer Read(Reader reader, bool allowMinusOne = false) {
             MapLoader l = MapLoader.Loader;
             uint current_off = (uint)(reader.BaseStream.Position);
-            Pointer readFrom = Pointer.Current(reader);
+            LegacyPointer readFrom = LegacyPointer.Current(reader);
             uint value = reader.ReadUInt32();
             FileWithPointers file = l.GetFileByReader(reader);
             if (file == null) throw new PointerException("Reader wasn't recognized.", "Pointer.Read");
@@ -118,12 +118,12 @@ namespace OpenSpace {
             if (!file.pointers.ContainsKey(fileOff)) {
                 if (value == 0 || (allowMinusOne && value == 0xFFFFFFFF)) return null;
                 if (!l.allowDeadPointers && !file.allowUnsafePointers) {
-                    throw new PointerException("Not a valid pointer at " + (Pointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
+                    throw new PointerException("Not a valid pointer at " + (LegacyPointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
                 }
                 if (file.allowUnsafePointers) {
-                    Pointer ptr = file.GetUnsafePointer(value);
+                    LegacyPointer ptr = file.GetUnsafePointer(value);
                     if (ptr == null) {
-                        throw new PointerException("Not a valid pointer at " + (Pointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
+                        throw new PointerException("Not a valid pointer at " + (LegacyPointer.Current(reader) - 4) + ": " + value, "Pointer.Read");
                     }
                     return LogPointer(ptr, readFrom, l);
                 }
@@ -134,7 +134,7 @@ namespace OpenSpace {
             return LogPointer(file.pointers[fileOff], readFrom, l);
         }
 
-        public static Pointer LogPointer(Pointer pointer, Pointer readFrom, MapLoader loader)
+        public static LegacyPointer LogPointer(LegacyPointer pointer, LegacyPointer readFrom, MapLoader loader)
         {
             if (UnitySettings.TracePointers && pointer!=null)
             {
@@ -155,7 +155,7 @@ namespace OpenSpace {
             return pointer;
         }
 
-        public static void Write(Writer writer, Pointer pointer) {
+        public static void Write(Writer writer, LegacyPointer pointer) {
             MapLoader l = MapLoader.Loader;
             uint current_off = (uint)(writer.BaseStream.Position);
             FileWithPointers file = l.GetFileByWriter(writer);
@@ -164,67 +164,67 @@ namespace OpenSpace {
         }
 
         public void Write(Writer writer) {
-            Pointer.Write(writer, this);
+            LegacyPointer.Write(writer, this);
         }
 
         // For readers
-        public Pointer Goto(ref Reader reader) {
-            Pointer oldPos = Current(reader);
+        public LegacyPointer Goto(ref Reader reader) {
+            LegacyPointer oldPos = Current(reader);
             reader = file.reader;
             reader.BaseStream.Seek(offset + file.baseOffset, SeekOrigin.Begin);
             return oldPos;
         }
 
-        public static Pointer Goto(ref Reader reader, Pointer newPos) {
+        public static LegacyPointer Goto(ref Reader reader, LegacyPointer newPos) {
             if (newPos != null) return newPos.Goto(ref reader);
             return null;
         }
 
-        public static Pointer Current(Reader reader) {
+        public static LegacyPointer Current(Reader reader) {
             MapLoader l = MapLoader.Loader;
             uint curPos = (uint)reader.BaseStream.Position;
             FileWithPointers curFile = l.GetFileByReader(reader);
-            return new Pointer((uint)(curPos - curFile.baseOffset), curFile);
+            return new LegacyPointer((uint)(curPos - curFile.baseOffset), curFile);
         }
 
         public void DoAt(ref Reader reader, Action action) {
-            Pointer off_current = Goto(ref reader, this);
+            LegacyPointer off_current = Goto(ref reader, this);
             action();
             Goto(ref reader, off_current);
         }
 
-        public static void DoAt(ref Reader reader, Pointer newPos, Action action) {
+        public static void DoAt(ref Reader reader, LegacyPointer newPos, Action action) {
             if (newPos != null) newPos.DoAt(ref reader, action);
         }
 
         // For writers
-        public Pointer Goto(ref Writer writer) {
-            Pointer oldPos = Current(writer);
+        public LegacyPointer Goto(ref Writer writer) {
+            LegacyPointer oldPos = Current(writer);
             writer = file.writer;
             writer.BaseStream.Seek(offset + file.baseOffset, SeekOrigin.Begin);
             return oldPos;
         }
 
-        public static Pointer Goto(ref Writer writer, Pointer newPos) {
+        public static LegacyPointer Goto(ref Writer writer, LegacyPointer newPos) {
             if (newPos != null) return newPos.Goto(ref writer);
             return null;
         }
 
-        public static Pointer Current(Writer writer) {
+        public static LegacyPointer Current(Writer writer) {
             MapLoader l = MapLoader.Loader;
             uint curPos = (uint)writer.BaseStream.Position;
             FileWithPointers curFile = l.GetFileByWriter(writer);
-            return new Pointer((uint)(curPos - curFile.baseOffset), curFile);
+            return new LegacyPointer((uint)(curPos - curFile.baseOffset), curFile);
         }
 
         public void DoAt(ref Writer writer, Action action)
         {
-            Pointer off_current = Goto(ref writer, this);
+            LegacyPointer off_current = Goto(ref writer, this);
             action();
             Goto(ref writer, off_current);
         }
 
-        public static void DoAt(ref Writer writer, Pointer newPos, Action action)
+        public static void DoAt(ref Writer writer, LegacyPointer newPos, Action action)
         {
             if (newPos != null) newPos.DoAt(ref writer, action);
         }
@@ -236,7 +236,7 @@ namespace OpenSpace {
             public int column;
             public int lineNumber;
             public string code;
-            public Pointer readFrom;
+            public LegacyPointer readFrom;
 
             public override string ToString()
             {
@@ -246,24 +246,24 @@ namespace OpenSpace {
     }
 
     public class Pointer<T> where T : OpenSpaceStruct, new() {
-        public Pointer pointer;
+        public LegacyPointer pointer;
         public T Value { get; set; }
 
         public Pointer(Reader reader, bool resolve = false, Action<T> onPreRead = null) {
-            pointer = Pointer.Read(reader);
+            pointer = LegacyPointer.Read(reader);
             if (resolve) {
                 Resolve(reader, onPreRead: onPreRead);
             }
         }
 
-        public Pointer(Pointer pointer, Reader reader = null, bool resolve = false, Action<T> onPreRead = null) {
+        public Pointer(LegacyPointer pointer, Reader reader = null, bool resolve = false, Action<T> onPreRead = null) {
             this.pointer = pointer;
             if (resolve) {
                 Resolve(reader, onPreRead: onPreRead);
             }
         }
 
-        public Pointer(Pointer pointer, T value) {
+        public Pointer(LegacyPointer pointer, T value) {
             this.pointer = pointer;
             this.Value = value;
         }

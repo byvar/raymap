@@ -33,7 +33,7 @@ public class PS1PersoBehaviour : BasePersoBehaviour {
 	private Dictionary<byte, Vector3> objectIndexScales = new Dictionary<byte, Vector3>();
 
 	// Abstract properties
-	public override Pointer Offset => perso?.Offset;
+	public override LegacyPointer Offset => perso?.Offset;
 	public override string NameFamily => perso?.p3dData?.family?.name;
 	public override string NameModel => null;
 	public override string NameInstance => perso?.name;

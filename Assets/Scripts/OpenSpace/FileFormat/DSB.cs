@@ -517,7 +517,7 @@ namespace OpenSpace.FileFormat {
             return result;
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             return; // No pointers in this file
         }
     }

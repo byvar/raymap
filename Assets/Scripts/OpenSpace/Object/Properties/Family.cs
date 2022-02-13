@@ -11,18 +11,18 @@ using UnityEngine;
 namespace OpenSpace.Object.Properties {
     public class Family : ILinkedListEntry {
 		
-        public Pointer offset;
-        public Pointer off_family_next;
-        public Pointer off_family_prev;
-        public Pointer off_family_hdr; // at this offset, start and end pointers appear again
+        public LegacyPointer offset;
+        public LegacyPointer off_family_next;
+        public LegacyPointer off_family_prev;
+        public LegacyPointer off_family_hdr; // at this offset, start and end pointers appear again
         public uint family_index;
         public LinkedList<State> states;
         public LinkedList<int> preloadAnim; // int is just a placeholder type, change to actual type when I finally read it
-        public Pointer off_physical_list_default;
+        public LegacyPointer off_physical_list_default;
         [JsonProperty(PropertyName = "objectListReferences")]
         public LinkedList<ObjectList> objectLists;
-        public Pointer off_bounding_volume;
-        public Pointer off_vector4s;
+        public LegacyPointer off_bounding_volume;
+        public LegacyPointer off_vector4s;
         public uint num_vector4s;
         public byte animBank;
         public byte properties;
@@ -40,19 +40,19 @@ namespace OpenSpace.Object.Properties {
             }
         }
 		
-        public Pointer NextEntry {
+        public LegacyPointer NextEntry {
             get { return off_family_next; }
         }
 		
-        public Pointer PreviousEntry {
+        public LegacyPointer PreviousEntry {
             get { return off_family_prev; }
         }
 
-        public Family(Pointer offset) {
+        public Family(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public int GetIndexOfPhysicalList(Pointer off_physicalList) {
+        public int GetIndexOfPhysicalList(LegacyPointer off_physicalList) {
             for(int i = 0; i < objectLists.Count; i++) {
                 ObjectList ol = objectLists[i];
                 if (ol != null && ol.offset == off_physicalList) return i;
@@ -69,13 +69,13 @@ namespace OpenSpace.Object.Properties {
 			if (!alreadyAdded && !objectLists.Contains(ol)) objectLists.Add(ol);
         }
 
-        public static Family Read(Reader reader, Pointer offset) {
+        public static Family Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
 			//l.print("Family " + offset);
             Family f = new Family(offset);
-            f.off_family_next = Pointer.Read(reader);
-            f.off_family_prev = Pointer.Read(reader);
-            f.off_family_hdr = Pointer.Read(reader); // at this offset, start and end pointers appear again
+            f.off_family_next = LegacyPointer.Read(reader);
+            f.off_family_prev = LegacyPointer.Read(reader);
+            f.off_family_hdr = LegacyPointer.Read(reader); // at this offset, start and end pointers appear again
 			if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
 				f.family_index = reader.ReadUInt32();
 			}
@@ -84,27 +84,27 @@ namespace OpenSpace.Object.Properties {
 			}
             //l.print("(" + f.family_index + ") " + f.name + " - " + offset);
             int stateIndex = 0;
-            f.states = LinkedList<State>.Read(ref reader, Pointer.Current(reader), (off_element) => {
+            f.states = LinkedList<State>.Read(ref reader, LegacyPointer.Current(reader), (off_element) => {
                 //l.print(f.name + " [" + stateIndex + "]: " + off_element);
                 State s = State.Read(reader, off_element, f, stateIndex++);
                 return s;
             });
             if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
                 // (0x10 blocks: next, prev, list end, a3d pointer)
-                f.preloadAnim = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader));
+                f.preloadAnim = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader));
             }
 			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
-				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
 			} else {
-				f.off_physical_list_default = Pointer.Read(reader); // Default objects table
-				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, Pointer.Current(reader));
+				f.off_physical_list_default = LegacyPointer.Read(reader); // Default objects table
+				f.objectLists = LinkedList<ObjectList>.ReadHeader(reader, LegacyPointer.Current(reader));
 			}
             if ((CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2DevBuild_2002_09_06
                 || f.objectLists.off_head == f.objectLists.off_tail)
                 && f.objectLists.Count > 1) f.objectLists.Count = 1; // Correction for Rayman 2
-            f.off_bounding_volume = Pointer.Read(reader);
+            f.off_bounding_volume = LegacyPointer.Read(reader);
             if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
-                f.off_vector4s = Pointer.Read(reader);
+                f.off_vector4s = LegacyPointer.Read(reader);
                 f.num_vector4s = reader.ReadUInt32();
                 reader.ReadUInt32();
             }
@@ -173,7 +173,7 @@ namespace OpenSpace.Object.Properties {
             return f;
         }
 
-        public static Family FromOffset(Pointer offset) {
+        public static Family FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.families.FirstOrDefault(f => f.offset == offset);

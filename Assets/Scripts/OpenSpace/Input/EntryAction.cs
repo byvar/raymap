@@ -5,12 +5,12 @@ using System;
 
 namespace OpenSpace.Input {
     public class EntryAction : ILinkedListEntry { // IPT_tdstEntryElement
-        public Pointer offset;
+        public LegacyPointer offset;
 
         public uint num_keywords;
-        public Pointer off_keywords;
-        public Pointer off_name;
-        public Pointer off_name2;
+        public LegacyPointer off_keywords;
+        public LegacyPointer off_name;
+        public LegacyPointer off_name2;
         public byte active;
 
         public string name = null;
@@ -18,15 +18,15 @@ namespace OpenSpace.Input {
         public LinkedList<KeyWord> keywords = null;
 
         // Only in Tonic Trouble: Special Edition
-        public Pointer off_entryAction_next = null;
-        public Pointer off_entryAction_prev = null;
-        public Pointer off_entryAction_hdr = null;
+        public LegacyPointer off_entryAction_next = null;
+        public LegacyPointer off_entryAction_prev = null;
+        public LegacyPointer off_entryAction_hdr = null;
 
-        public Pointer NextEntry {
+        public LegacyPointer NextEntry {
             get { return off_entryAction_next; }
         }
 
-        public Pointer PreviousEntry {
+        public LegacyPointer PreviousEntry {
             get { return off_entryAction_prev; }
         }
 
@@ -38,21 +38,21 @@ namespace OpenSpace.Input {
             }
         }
 
-        public EntryAction(Pointer offset) {
+        public EntryAction(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static EntryAction Read(Reader reader, Pointer offset) {
+        public static EntryAction Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             EntryAction ea = new EntryAction(offset);
             //l.print("EntryAction " + offset);
 			l.entryActions.Add(ea);
 
             if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
-                ea.off_entryAction_next = Pointer.Read(reader);
-                ea.off_entryAction_prev = Pointer.Read(reader);
+                ea.off_entryAction_next = LegacyPointer.Read(reader);
+                ea.off_entryAction_prev = LegacyPointer.Read(reader);
                 reader.ReadUInt32(); //element.off_entryAction_hdr = Pointer.Read(reader); // hdr pointer doesn't work here
-                ea.keywords = LinkedList<KeyWord>.Read(ref reader, Pointer.Current(reader),
+                ea.keywords = LinkedList<KeyWord>.Read(ref reader, LegacyPointer.Current(reader),
                     (off_element) => {
                         return KeyWord.Read(reader, off_element);
                     },
@@ -60,7 +60,7 @@ namespace OpenSpace.Input {
                             LinkedList.Flags.HasHeaderPointers :
                             LinkedList.Flags.NoPreviousPointersForDouble,
                     type: LinkedList.Type.Default);
-                ea.off_name = Pointer.Read(reader);
+                ea.off_name = LegacyPointer.Read(reader);
                 reader.ReadInt32(); // -2
                 reader.ReadUInt32();
                 reader.ReadByte();
@@ -78,11 +78,11 @@ namespace OpenSpace.Input {
                     reader.ReadBytes(0x8);
                 }
                 ea.num_keywords = reader.ReadUInt32();
-                ea.off_keywords = Pointer.Read(reader);
-				ea.keywords = new LinkedList<KeyWord>(Pointer.Current(reader), ea.off_keywords, ea.num_keywords, type: LinkedList.Type.SingleNoElementPointers);
+                ea.off_keywords = LegacyPointer.Read(reader);
+				ea.keywords = new LinkedList<KeyWord>(LegacyPointer.Current(reader), ea.off_keywords, ea.num_keywords, type: LinkedList.Type.SingleNoElementPointers);
                 if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) reader.ReadUInt32(); // Offset of extra input data in tmp memory? It's different by 0x18 every time
-                ea.off_name = Pointer.Read(reader);
-                if (CPA_Settings.s.hasExtraInputData || CPA_Settings.s.platform == CPA_Settings.Platform.DC || CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) ea.off_name2 = Pointer.Read(reader);  
+                ea.off_name = LegacyPointer.Read(reader);
+                if (CPA_Settings.s.hasExtraInputData || CPA_Settings.s.platform == CPA_Settings.Platform.DC || CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) ea.off_name2 = LegacyPointer.Read(reader);  
 				reader.ReadInt32(); // -2
                 reader.ReadUInt32();
                 ea.active = reader.ReadByte();
@@ -102,10 +102,10 @@ namespace OpenSpace.Input {
                 }
             }
             if (CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) {
-                Pointer.DoAt(ref reader, ea.off_name, () => {
+                LegacyPointer.DoAt(ref reader, ea.off_name, () => {
                     ea.name = reader.ReadNullDelimitedString();
                 });
-                Pointer.DoAt(ref reader, ea.off_name2, () => {
+                LegacyPointer.DoAt(ref reader, ea.off_name2, () => {
                     ea.name2 = reader.ReadNullDelimitedString();
                 });
             }
@@ -155,16 +155,16 @@ namespace OpenSpace.Input {
             return "";
         }
 
-        public static EntryAction FromOffset(Pointer offset) {
+        public static EntryAction FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             return MapLoader.Loader.entryActions.FirstOrDefault(a => a.offset == offset);
         }
 
-        public static EntryAction FromOffsetOrRead(Pointer offset, Reader reader) {
+        public static EntryAction FromOffsetOrRead(LegacyPointer offset, Reader reader) {
             if (offset == null) return null;
             EntryAction e = EntryAction.FromOffset(offset);
             if (e == null) {
-                Pointer.DoAt(ref reader, offset, () => {
+                LegacyPointer.DoAt(ref reader, offset, () => {
                     e = EntryAction.Read(reader, offset);
 					MapLoader.Loader.print(e.ToString());
                 });

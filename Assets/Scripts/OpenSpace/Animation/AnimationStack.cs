@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace OpenSpace.Animation {
     public class AnimationStack {
-        public Pointer off_data = null;
+        public LegacyPointer off_data = null;
         public uint count;
         public uint reservedMemory;
         public uint countInFix;

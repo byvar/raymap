@@ -16,8 +16,8 @@ namespace OpenSpace.PS1 {
 		public short short_0A;
 		public short short_0C;
 		public ushort ushort_0E;
-		public Pointer off_vertices;
-		public Pointer off_triangleLists;
+		public LegacyPointer off_vertices;
+		public LegacyPointer off_triangleLists;
 		public short short_18;
 		public short short_1A;
 		public short currentScrollValue;
@@ -28,10 +28,10 @@ namespace OpenSpace.PS1 {
 		public ushort num_boneWeights;
 		public ushort num_boneUnk;
 		public ushort num_unk4;
-		public Pointer off_bones;
-		public Pointer off_boneWeights;
-		public Pointer off_boneUnk;
-		public Pointer off_unk4;
+		public LegacyPointer off_bones;
+		public LegacyPointer off_boneWeights;
+		public LegacyPointer off_boneUnk;
+		public LegacyPointer off_unk4;
 		public uint off_bones_;
 		public uint off_boneWeights_;
 		public uint off_boneUnk_;
@@ -53,30 +53,30 @@ namespace OpenSpace.PS1 {
 			short_0A = reader.ReadInt16();
 			short_0C = reader.ReadInt16();
 			ushort_0E = reader.ReadUInt16();
-			off_vertices = Pointer.Read(reader);
-			off_triangleLists = Pointer.Read(reader);
+			off_vertices = LegacyPointer.Read(reader);
+			off_triangleLists = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.game == CPA_Settings.Game.VIP || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				num_bones = reader.ReadUInt16();
 				num_boneWeights = reader.ReadUInt16();
 				num_boneUnk = reader.ReadUInt16();
 				num_unk4 = reader.ReadUInt16();
 				if (num_bones > 0) {
-					off_bones = Pointer.Read(reader);
+					off_bones = LegacyPointer.Read(reader);
 				} else {
 					off_bones_ = reader.ReadUInt32();
 				}
 				if (num_boneWeights > 0) {
-					off_boneWeights = Pointer.Read(reader);
+					off_boneWeights = LegacyPointer.Read(reader);
 				} else {
 					off_boneWeights_ = reader.ReadUInt32();
 				}
 				if (num_boneUnk > 0) {
-					off_boneUnk = Pointer.Read(reader);
+					off_boneUnk = LegacyPointer.Read(reader);
 				} else {
 					off_boneUnk_ = reader.ReadUInt32();
 				}
 				if (num_unk4 > 0) {
-					off_unk4 = Pointer.Read(reader);
+					off_unk4 = LegacyPointer.Read(reader);
 				} else {
 					off_unk4_ = reader.ReadUInt32();
 				}

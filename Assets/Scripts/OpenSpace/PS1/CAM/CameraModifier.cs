@@ -12,7 +12,7 @@ namespace OpenSpace.PS1 {
 		public int int_14;
 		public int int_18;
 		public int int_1C;
-		public Pointer off_20; // if type == 9: a linkedlist. otherwise: a SO pointer
+		public LegacyPointer off_20; // if type == 9: a linkedlist. otherwise: a SO pointer
 		public int x2;
 		public int y2;
 		public int z2;
@@ -43,7 +43,7 @@ namespace OpenSpace.PS1 {
 			int_14 = reader.ReadInt32();
 			int_18 = reader.ReadInt32();
 			int_1C = reader.ReadInt32();
-			off_20 = Pointer.Read(reader);
+			off_20 = LegacyPointer.Read(reader);
 			x2 = reader.ReadInt32();
 			y2 = reader.ReadInt32();
 			z2 = reader.ReadInt32();

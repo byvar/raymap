@@ -13,25 +13,25 @@ namespace OpenSpace.Animation {
         public ushort num_onlyFrames;
         public byte speed;
         public byte num_channels;
-        public Pointer off_events;
+        public LegacyPointer off_events;
         public float x;
         public float y;
         public float z;
-        public Pointer off_morphData;
+        public LegacyPointer off_morphData;
         public ushort anim_index; // Index of animation within bank
         public byte num_events;
         public byte transition;
         public AnimMorphData[,] morphDataArray; // [channel][frame]
 		
-        public Pointer off_a3d = null;
+        public LegacyPointer off_a3d = null;
         public AnimA3DGeneral a3d = null;
 		public AnimA3DLargo a3dLargo = null;
 
 		protected override void ReadInternal(Reader reader) {
 			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
-				off_a3d = Pointer.Read(reader);
+				off_a3d = LegacyPointer.Read(reader);
 				reader.ReadUInt32();
-				off_events = Pointer.Read(reader);
+				off_events = LegacyPointer.Read(reader);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
@@ -44,17 +44,17 @@ namespace OpenSpace.Animation {
 			} else {
 				if (CPA_Settings.s.hasNames) name = new string(reader.ReadChars(0x50));
 				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) reader.ReadUInt32();
-				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) off_a3d = Pointer.Read(reader);
+				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) off_a3d = LegacyPointer.Read(reader);
 				num_onlyFrames = reader.ReadUInt16();
 				speed = reader.ReadByte();
 				num_channels = reader.ReadByte();
-				off_events = Pointer.Read(reader);
+				off_events = LegacyPointer.Read(reader);
 				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 					x = reader.ReadSingle();
 					y = reader.ReadSingle();
 					z = reader.ReadSingle();
 				}
-				off_morphData = Pointer.Read(reader); // Runtime only?
+				off_morphData = LegacyPointer.Read(reader); // Runtime only?
 				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -71,7 +71,7 @@ namespace OpenSpace.Animation {
 
 				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) reader.ReadUInt32(); // no idea what this is sadly
 				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
-					off_a3d = Pointer.Read(reader);
+					off_a3d = LegacyPointer.Read(reader);
 				}
 			}
 			MapLoader l = MapLoader.Loader;
@@ -81,7 +81,7 @@ namespace OpenSpace.Animation {
 					a.num_channels = num_channels;
 				});
 			} else {
-				Pointer.DoAt(ref reader, off_a3d, () => {
+				LegacyPointer.DoAt(ref reader, off_a3d, () => {
 					a3d = l.FromOffsetOrRead<AnimA3DGeneral>(reader, off_a3d, onPreRead: a3d => a3d.readFull = true);
 				});
 			}

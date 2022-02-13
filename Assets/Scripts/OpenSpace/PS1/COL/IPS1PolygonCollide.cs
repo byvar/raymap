@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 namespace OpenSpace.PS1 {
 	public interface IPS1PolygonCollide {
 		byte MaterialIndex { get; }
-		Pointer Offset { get; }
+		LegacyPointer Offset { get; }
 	}
 }

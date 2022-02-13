@@ -29,7 +29,7 @@ namespace OpenSpace.FileFormat {
             return; // No writing support for PS1Data files yet
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             if (writer != null) {
                 if (pointer == null) {
                     writer.Write((uint)0);
@@ -39,9 +39,9 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        public override Pointer GetUnsafePointer(uint value) {
+        public override LegacyPointer GetUnsafePointer(uint value) {
             if (headerOffset != 0 && value >= headerOffset && value < headerOffset + length) {
-                return new Pointer(value, this);
+                return new LegacyPointer(value, this);
             }
             return null;
         }

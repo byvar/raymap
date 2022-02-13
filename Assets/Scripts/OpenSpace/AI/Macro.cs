@@ -7,8 +7,8 @@ using UnityEngine;
 namespace OpenSpace.AI {
     public class Macro : BehaviorOrMacro {
         public string name = null;
-        public Pointer off_script;
-        public Pointer off_script2;
+        public LegacyPointer off_script;
+        public LegacyPointer off_script2;
 		public Script script;
 
 		// Custom
@@ -64,11 +64,11 @@ namespace OpenSpace.AI {
 
 			}
 
-			off_script = Pointer.Read(reader);
-			off_script2 = Pointer.Read(reader);
+			off_script = LegacyPointer.Read(reader);
+			off_script2 = LegacyPointer.Read(reader);
 
-			Pointer.DoAt(ref reader, off_script, () => {
-				script = Script.Read(reader, Pointer.Current(reader), this, single: true);
+			LegacyPointer.DoAt(ref reader, off_script, () => {
+				script = Script.Read(reader, LegacyPointer.Current(reader), this, single: true);
 			});
 		}
 	}

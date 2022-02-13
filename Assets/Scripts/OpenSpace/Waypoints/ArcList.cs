@@ -4,19 +4,19 @@ using System.Collections.Generic;
 namespace OpenSpace.Waypoints {
     public class ArcList {
 
-        public Pointer offset;
+        public LegacyPointer offset;
         public LinkedList<Arc> list;
 
-        public ArcList(Pointer offset)
+        public ArcList(LegacyPointer offset)
         {
             this.offset = offset;
         }
 
-        public static ArcList Read(Reader reader, Pointer offset)
+        public static ArcList Read(Reader reader, LegacyPointer offset)
         {
             ArcList arcList = new ArcList(offset);
 
-            Pointer.DoAt(ref reader, offset, () => {
+            LegacyPointer.DoAt(ref reader, offset, () => {
                 //zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
                 arcList.list = LinkedList<Arc>.Read(ref reader, offset,
                     (off_element) => {

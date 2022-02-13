@@ -34,7 +34,7 @@ public class ROMPersoBehaviour : BasePersoBehaviour {
 	protected new Dictionary<short, List<int>>[] channelIDDictionary;
 
 	// Abstract properties
-	public override Pointer Offset => perso?.Offset;
+	public override LegacyPointer Offset => perso?.Offset;
 	public override string NameFamily => _nameFamily ?? $"Family_{perso.stdGame.Value.family.Value.IndexString}";
 	public override string NameModel => _nameModel ?? $"Model_{(perso.brain.Value?.aiModel.Value?.IndexString ?? "null")}";
 	public override string NameInstance => _nameInstance ?? $"Instance_{perso.stdGame.Value.family.Value.IndexString}";

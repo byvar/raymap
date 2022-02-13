@@ -12,7 +12,7 @@ namespace OpenSpace.ROM {
 
 		// Custom
 		public DsgVarType dsgVarType;
-		public Pointer offset;
+		public LegacyPointer offset;
 		public int index;
 
 		// Parsed param
@@ -38,13 +38,13 @@ namespace OpenSpace.ROM {
 			this.type = type;
 		}
 		public void Read(Reader reader) {
-			offset = Pointer.Current(reader);
+			offset = LegacyPointer.Current(reader);
 			param = reader.ReadUInt16();
 
 			// Read different types of param
-			Pointer.Goto(ref reader, offset); paramByte = reader.ReadSByte();
-			Pointer.Goto(ref reader, offset); paramUByte = reader.ReadByte();
-			Pointer.Goto(ref reader, offset); paramShort = reader.ReadInt16();
+			LegacyPointer.Goto(ref reader, offset); paramByte = reader.ReadSByte();
+			LegacyPointer.Goto(ref reader, offset); paramUByte = reader.ReadByte();
+			LegacyPointer.Goto(ref reader, offset); paramShort = reader.ReadInt16();
 
 			Parse(reader);
 		}

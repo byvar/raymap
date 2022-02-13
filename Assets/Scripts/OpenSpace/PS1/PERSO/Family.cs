@@ -8,7 +8,7 @@ namespace OpenSpace.PS1 {
 	public class Family : OpenSpaceStruct { // Animation/state related
 		public uint uint_00;
 		public uint uint_04;
-		public Pointer off_animations;
+		public LegacyPointer off_animations;
 		public uint num_animations;
 		public uint uint_10;
 		public uint uint_14;
@@ -25,13 +25,13 @@ namespace OpenSpace.PS1 {
 		public State[] states;
 
 		protected override void ReadInternal(Reader reader) {
-			Pointer.DoAt(ref reader, Offset - 0x24, () => { // Hack
+			LegacyPointer.DoAt(ref reader, Offset - 0x24, () => { // Hack
 				name = reader.ReadString(0x24);
 			});
 			//Load.print(name + " " + Offset);
 			uint_00 = reader.ReadUInt32();
 			uint_04 = reader.ReadUInt32();
-			off_animations = Pointer.Read(reader);
+			off_animations = LegacyPointer.Read(reader);
 			num_animations = reader.ReadUInt32();
 			uint_10 = reader.ReadUInt32();
 			uint_14 = reader.ReadUInt32();

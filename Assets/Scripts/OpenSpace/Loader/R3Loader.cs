@@ -320,7 +320,7 @@ namespace OpenSpace.Loader {
 		}
 
 		#region FIX
-		Pointer off_animBankFix;
+		LegacyPointer off_animBankFix;
 
 		async UniTask LoadFIX() {
 			loadingState = "Loading fixed memory";
@@ -364,10 +364,10 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 				}
 			}
-			Pointer off_identityMatrix = Pointer.Read(reader);
+			LegacyPointer off_identityMatrix = LegacyPointer.Read(reader);
 			loadingState = "Loading text";
 			await WaitIfNecessary();
-			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
 			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
 				uint num_lvlNames = reader.ReadUInt32();
 				uint num_fixEntries1 = reader.ReadUInt32();
@@ -378,7 +378,7 @@ namespace OpenSpace.Loader {
 				for (uint i = 0; i < num_fixEntries1; i++) {
 					string savMapName = new string(reader.ReadChars(0xC));
 				}
-				ReadLevelNames(reader, Pointer.Current(reader), num_lvlNames);
+				ReadLevelNames(reader, LegacyPointer.Current(reader), num_lvlNames);
 				if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
@@ -399,7 +399,7 @@ namespace OpenSpace.Loader {
 				byte num_lvlNames = reader.ReadByte();
 				byte num_fixEntries1 = reader.ReadByte();
 				reader.ReadBytes(2); // padding
-				ReadLevelNames(reader, Pointer.Current(reader), num_lvlNames);
+				ReadLevelNames(reader, LegacyPointer.Current(reader), num_lvlNames);
 				string firstMapName = new string(reader.ReadChars(0x1E));
 				for (uint i = 0; i < num_fixEntries1; i++) {
 					string savName = new string(reader.ReadChars(0xC));
@@ -412,8 +412,8 @@ namespace OpenSpace.Loader {
 				}
 			}
 			uint num_languages = reader.ReadUInt32();
-			Pointer off_languages = Pointer.Read(reader);
-			Pointer.DoAt(ref reader, off_languages, () => {
+			LegacyPointer off_languages = LegacyPointer.Read(reader);
+			LegacyPointer.DoAt(ref reader, off_languages, () => {
 				ReadLanguages(reader, off_languages, num_languages);
 			});
 			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && localization != null && CPA_Settings.s.game == CPA_Settings.Game.R3 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
@@ -430,7 +430,7 @@ namespace OpenSpace.Loader {
 							await PrepareFile(paths["lang" + i + ".ptr"]);
 							int fileId = i + 207;
 							FileWithPointers f = InitExtraLVL(fileName, paths["lang" + i + ".lvl"], paths["lang" + i + ".ptr"], fileId);
-							Pointer.DoAt(ref reader, new Pointer(0, f), () => {
+							LegacyPointer.DoAt(ref reader, new LegacyPointer(0, f), () => {
 
 								string timeStamp = reader.ReadString(0x18);
 								reader.ReadUInt32();
@@ -444,8 +444,8 @@ namespace OpenSpace.Loader {
 				}
 			}
 			loadingState = "Loading fixed textures";
-			print("Fix textures address: " + Pointer.Current(reader));
-			await ReadTexturesFix(reader, Pointer.Current(reader));
+			print("Fix textures address: " + LegacyPointer.Current(reader));
+			await ReadTexturesFix(reader, LegacyPointer.Current(reader));
 			// Defaults for Rayman 3 PC. Sizes are hardcoded in the exes and might differ for versions too :/
 			int sz_entryActions = 0x100;
 			int sz_randomStructure = 0xDC;
@@ -523,7 +523,7 @@ namespace OpenSpace.Loader {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
 
-				inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+				inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
 				foreach (EntryAction ea in inputStruct.entryActions) {
 					print(ea.ToString());
 				}
@@ -532,27 +532,27 @@ namespace OpenSpace.Loader {
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
-					Pointer off_IPT_keyAndPadDefine = Pointer.Read(reader);
+					LegacyPointer off_IPT_keyAndPadDefine = LegacyPointer.Read(reader);
 					ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 				}
 				reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
 			}
 			uint num_persoInFix = reader.ReadUInt32();
-			persoInFix = new Pointer[num_persoInFix];
+			persoInFix = new LegacyPointer[num_persoInFix];
 			for (int i = 0; i < persoInFix.Length; i++) {
-				persoInFix[i] = Pointer.Read(reader);
+				persoInFix[i] = LegacyPointer.Read(reader);
 			}
 			reader.ReadBytes(sz_randomStructure);
 			uint soundEventTableIndexInFix = reader.ReadUInt32();
-			Pointer off_soundEventTable = Pointer.Read(reader);
-			fonts = FromOffsetOrRead<FontStructure>(reader, Pointer.Current(reader), inline: true);
+			LegacyPointer off_soundEventTable = LegacyPointer.Read(reader);
+			fonts = FromOffsetOrRead<FontStructure>(reader, LegacyPointer.Current(reader), inline: true);
 			if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 				reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
 			}
 			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
-				inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+				inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
 				foreach (EntryAction ea in inputStruct.entryActions) {
 					print(ea.ToString());
 				}
@@ -572,21 +572,21 @@ namespace OpenSpace.Loader {
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
-					Pointer off_bgMaterialForMenu2D = Pointer.Read(reader);
-					Pointer off_fixMaterialForMenu2D = Pointer.Read(reader);
+					LegacyPointer off_bgMaterialForMenu2D = LegacyPointer.Read(reader);
+					LegacyPointer off_fixMaterialForMenu2D = LegacyPointer.Read(reader);
 					if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_01 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_21) {
-						Pointer off_fixMaterialForSelectedFilms = Pointer.Read(reader);
-						Pointer off_fixMaterialForArcadeAndFilms = Pointer.Read(reader);
+						LegacyPointer off_fixMaterialForSelectedFilms = LegacyPointer.Read(reader);
+						LegacyPointer off_fixMaterialForArcadeAndFilms = LegacyPointer.Read(reader);
 					}
 					for (int i = 0; i < num_menuPages; i++) {
-						Pointer off_menuPage = Pointer.Read(reader);
+						LegacyPointer off_menuPage = LegacyPointer.Read(reader);
 					}
 				}
 			}
 			/*loadingState = "Loading fixed animation bank";
 			await WaitIfNecessary();*/
 			if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
-				off_animBankFix = Pointer.Read(reader); // Note: only one 0x104 bank in fix.
+				off_animBankFix = LegacyPointer.Read(reader); // Note: only one 0x104 bank in fix.
 														//print(Pointer.Current(reader));
 				print("Fix animation bank address: " + off_animBankFix);
 			}
@@ -669,29 +669,29 @@ namespace OpenSpace.Loader {
 				}
 			}
 			loadingState = "Loading level textures";
-			await ReadTexturesLvl(reader, Pointer.Current(reader));
+			await ReadTexturesLvl(reader, LegacyPointer.Current(reader));
 			if ((CPA_Settings.s.platform == CPA_Settings.Platform.PC
 				|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
 				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
 				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
 				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3)
 				&& !hasTransit && CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
-				Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
-				Pointer.DoAt(ref reader, off_lightMapTexture, () => {
+				LegacyPointer off_lightMapTexture = LegacyPointer.Read(reader); // g_p_stLMTexture
+				LegacyPointer.DoAt(ref reader, off_lightMapTexture, () => {
 					lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);
 				});
 				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
-					Pointer off_overlightTexture = Pointer.Read(reader); // *(_DWORD *)(GLI_BIG_GLOBALS + 370068)
-					Pointer.DoAt(ref reader, off_overlightTexture, () => {
+					LegacyPointer off_overlightTexture = LegacyPointer.Read(reader); // *(_DWORD *)(GLI_BIG_GLOBALS + 370068)
+					LegacyPointer.DoAt(ref reader, off_overlightTexture, () => {
 						overlightTexture = TextureInfo.Read(reader, off_overlightTexture);
 					});
 				}
 			}
-			Pointer off_animBankLvl = null;
+			LegacyPointer off_animBankLvl = null;
 			await WaitIfNecessary();
 			if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
 				// animation bank is read right here.
-				off_animBankLvl = Pointer.Current(reader); // Note: only one 0x104 bank in fix.
+				off_animBankLvl = LegacyPointer.Current(reader); // Note: only one 0x104 bank in fix.
 				print("Lvl animation bank address: " + off_animBankLvl);
 				animationBanks = new AnimationBank[5];
 				AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 0, 1, files_array[Mem.LvlKeyFrames]);
@@ -700,8 +700,8 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading globals";
 			await WaitIfNecessary();
 			globals.off_transitDynamicWorld = null;
-			globals.off_actualWorld = Pointer.Read(reader);
-			globals.off_dynamicWorld = Pointer.Read(reader);
+			globals.off_actualWorld = LegacyPointer.Read(reader);
+			globals.off_dynamicWorld = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.game == CPA_Settings.Game.R3
 				&& (CPA_Settings.s.platform == CPA_Settings.Platform.PC
 				|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
@@ -710,49 +710,49 @@ namespace OpenSpace.Loader {
 				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3)) {
 				reader.ReadUInt32(); // ???
 			}
-			globals.off_inactiveDynamicWorld = Pointer.Read(reader);
-			globals.off_fatherSector = Pointer.Read(reader); // It is I, Father Sector.
-			globals.off_firstSubMapPosition = Pointer.Read(reader);
+			globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
+			globals.off_fatherSector = LegacyPointer.Read(reader); // It is I, Father Sector.
+			globals.off_firstSubMapPosition = LegacyPointer.Read(reader);
 			globals.num_always = reader.ReadUInt32();
-			globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-			globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-			globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
-			globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
+			globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+			globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+			globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
+			globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
 
 			// Read object types
 			objectTypes = new ObjectType[3][];
 			for (uint i = 0; i < 3; i++) {
-				Pointer off_names_header = Pointer.Current(reader);
-				Pointer off_names_first = Pointer.Read(reader);
-				Pointer off_names_last = Pointer.Read(reader);
+				LegacyPointer off_names_header = LegacyPointer.Current(reader);
+				LegacyPointer off_names_first = LegacyPointer.Read(reader);
+				LegacyPointer off_names_last = LegacyPointer.Read(reader);
 				uint num_names = reader.ReadUInt32();
 
 				ReadObjectNamesTable(reader, off_names_first, num_names, i);
 			}
 			await WaitIfNecessary();
 
-			Pointer off_light = Pointer.Read(reader); // the offset of a light. It's just an ordinary light.
-			Pointer off_characterLaunchingSoundEvents = Pointer.Read(reader);
+			LegacyPointer off_light = LegacyPointer.Read(reader); // the offset of a light. It's just an ordinary light.
+			LegacyPointer off_characterLaunchingSoundEvents = LegacyPointer.Read(reader);
 
 			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
-				Pointer off_collisionGeoObj = Pointer.Read(reader);
-				Pointer off_staticCollisionGeoObj = Pointer.Read(reader);
+				LegacyPointer off_collisionGeoObj = LegacyPointer.Read(reader);
+				LegacyPointer off_staticCollisionGeoObj = LegacyPointer.Read(reader);
 			}
 			if (!hasTransit) {
 				reader.ReadUInt32(); // viewport related <--- cameras in here
 			}
 
-			LinkedList<int> unknown = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+			LinkedList<int> unknown = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
-			families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+			families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
-			LinkedList<int> alwaysActiveCharacters = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+			LinkedList<int> alwaysActiveCharacters = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
 			if (!hasTransit) {
-				LinkedList<int> mainCharacters = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+				LinkedList<int> mainCharacters = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 			}
 			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-				Pointer off_mainCharacters_first = Pointer.Read(reader);
+				LegacyPointer off_mainCharacters_first = LegacyPointer.Read(reader);
 				uint num_mainCharacters_entries = reader.ReadUInt32();
 			}
 
@@ -762,7 +762,7 @@ namespace OpenSpace.Loader {
 			if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur && CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
 				reader.ReadUInt32(); // same
 			}
-			Pointer off_cineManager = Pointer.Read(reader);
+			LegacyPointer off_cineManager = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
 				byte unk = reader.ReadByte();
 				byte IPO_numRLItables = reader.ReadByte();
@@ -774,17 +774,17 @@ namespace OpenSpace.Loader {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
-				Matrix identity = Matrix.Read(reader, Pointer.Current(reader));
+				Matrix identity = Matrix.Read(reader, LegacyPointer.Current(reader));
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 			}
-			Pointer off_COL_taggedFacesTable = Pointer.Read(reader);
+			LegacyPointer off_COL_taggedFacesTable = LegacyPointer.Read(reader);
 			uint num_COL_maxTaggedFaces = reader.ReadUInt32();
 			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
-				Pointer off_collisionGeoObj2 = Pointer.Read(reader);
-				Pointer off_staticCollisionGeoObj2 = Pointer.Read(reader);
+				LegacyPointer off_collisionGeoObj2 = LegacyPointer.Read(reader);
+				LegacyPointer off_staticCollisionGeoObj2 = LegacyPointer.Read(reader);
 			}
 			// The ptrsTable seems to be related to sound events. Perhaps cuuids.
 			reader.ReadUInt32();
@@ -798,7 +798,7 @@ namespace OpenSpace.Loader {
 			if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
 				uint bool_ptrsTable = reader.ReadUInt32();
 			}
-			Pointer off_ptrsTable = Pointer.Read(reader);
+			LegacyPointer off_ptrsTable = LegacyPointer.Read(reader);
 
 
 			uint num_internalStructure = num_ptrsTable;
@@ -808,47 +808,47 @@ namespace OpenSpace.Loader {
 				|| (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM))) {
 				reader.ReadUInt32();
 			}
-			Pointer off_internalStructure_first = Pointer.Read(reader);
-			Pointer off_internalStructure_last = Pointer.Read(reader);
+			LegacyPointer off_internalStructure_first = LegacyPointer.Read(reader);
+			LegacyPointer off_internalStructure_last = LegacyPointer.Read(reader);
 
 			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
 				if (!hasTransit && CPA_Settings.s.game == CPA_Settings.Game.R3) {
 					uint num_geometric = reader.ReadUInt32();
-					Pointer off_array_geometric = Pointer.Read(reader);
-					Pointer off_array_geometric_RLI = Pointer.Read(reader);
-					Pointer off_array_transition_flags = Pointer.Read(reader);
+					LegacyPointer off_array_geometric = LegacyPointer.Read(reader);
+					LegacyPointer off_array_geometric_RLI = LegacyPointer.Read(reader);
+					LegacyPointer off_array_transition_flags = LegacyPointer.Read(reader);
 				} else if (CPA_Settings.s.game == CPA_Settings.Game.RA
 					|| CPA_Settings.s.game == CPA_Settings.Game.RM
 					|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur
 					|| CPA_Settings.s.game == CPA_Settings.Game.DDPK) {
 					uint num_unk = reader.ReadUInt32();
-					Pointer unk_first = Pointer.Read(reader);
+					LegacyPointer unk_first = LegacyPointer.Read(reader);
 					if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
-						Pointer unk_last = Pointer.Read(reader);
+						LegacyPointer unk_last = LegacyPointer.Read(reader);
 					}
 				}
 			}
-			Pointer off_settingsForPersoInFix = null;
+			LegacyPointer off_settingsForPersoInFix = null;
 			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-				off_settingsForPersoInFix = Pointer.Current(reader);
+				off_settingsForPersoInFix = LegacyPointer.Current(reader);
 				uint num_persoInFix = (uint)persoInFix.Length;
 				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
 					num_persoInFix = reader.ReadUInt32();
 				}
 				for (int i = 0; i < num_persoInFix; i++) {
 					if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
-						Pointer.Read(reader);
+						LegacyPointer.Read(reader);
 						reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
-						Matrix.Read(reader, Pointer.Current(reader));
+						Matrix.Read(reader, LegacyPointer.Current(reader));
 						reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
 						reader.ReadUInt32();
 					} else if (CPA_Settings.s.game == CPA_Settings.Game.RA
 						|| CPA_Settings.s.game == CPA_Settings.Game.RM
 						|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
-						Matrix.Read(reader, Pointer.Current(reader));
+						Matrix.Read(reader, LegacyPointer.Current(reader));
 					}
 				}
-				Pointer.Read(reader);
+				LegacyPointer.Read(reader);
 				if (CPA_Settings.s.game == CPA_Settings.Game.R3 || CPA_Settings.s.game == CPA_Settings.Game.DDPK) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -856,16 +856,16 @@ namespace OpenSpace.Loader {
 			}
 
 			uint num_visual_materials = reader.ReadUInt32();
-			Pointer off_array_visual_materials = Pointer.Read(reader);
+			LegacyPointer off_array_visual_materials = LegacyPointer.Read(reader);
 
 			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2
 				&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGC
 				&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07
 				&& CPA_Settings.s.mode != CPA_Settings.Mode.DonaldDuckPKGC) {
-				Pointer off_dynamic_so_list = Pointer.Read(reader);
+				LegacyPointer off_dynamic_so_list = LegacyPointer.Read(reader);
 
 				// Parse SO list
-				Pointer.DoAt(ref reader, off_dynamic_so_list, () => {
+				LegacyPointer.DoAt(ref reader, off_dynamic_so_list, () => {
 					LinkedList<SuperObject>.ReadHeader(reader, off_dynamic_so_list);
 					/*Pointer off_so_list_first = Pointer.Read(reader);
                     Pointer off_so_list_last = Pointer.Read(reader);
@@ -889,10 +889,10 @@ namespace OpenSpace.Loader {
 			// Parse materials list
 			loadingState = "Loading visual materials";
 			await WaitIfNecessary();
-			Pointer.DoAt(ref reader, off_array_visual_materials, () => {
+			LegacyPointer.DoAt(ref reader, off_array_visual_materials, () => {
 				for (uint i = 0; i < num_visual_materials; i++) {
-					Pointer off_material = Pointer.Read(reader);
-					Pointer.DoAt(ref reader, off_material, () => {
+					LegacyPointer off_material = LegacyPointer.Read(reader);
+					LegacyPointer.DoAt(ref reader, off_material, () => {
 						//print(Pointer.Current(reader));
 						visualMaterials.Add(VisualMaterial.Read(reader, off_material));
 					});
@@ -902,28 +902,28 @@ namespace OpenSpace.Loader {
 			if (hasTransit) {
 				loadingState = "Loading transit memory";
 				await WaitIfNecessary();
-				Pointer off_transit = new Pointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
-				Pointer.DoAt(ref reader, off_transit, () => {
+				LegacyPointer off_transit = new LegacyPointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
+				LegacyPointer.DoAt(ref reader, off_transit, () => {
 					if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
 					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
-						Pointer off_lightMapTexture = Pointer.Read(reader); // g_p_stLMTexture
-						Pointer.DoAt(ref reader, off_lightMapTexture, () => {
+						LegacyPointer off_lightMapTexture = LegacyPointer.Read(reader); // g_p_stLMTexture
+						LegacyPointer.DoAt(ref reader, off_lightMapTexture, () => {
 							lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);
 						});
 						if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
-							Pointer off_overlightTexture = Pointer.Read(reader); // *(_DWORD *)(GLI_BIG_GLOBALS + 370068)
-							Pointer.DoAt(ref reader, off_overlightTexture, () => {
+							LegacyPointer off_overlightTexture = LegacyPointer.Read(reader); // *(_DWORD *)(GLI_BIG_GLOBALS + 370068)
+							LegacyPointer.DoAt(ref reader, off_overlightTexture, () => {
 								overlightTexture = TextureInfo.Read(reader, off_overlightTexture);
 							});
 						}
 					}
-					globals.off_transitDynamicWorld = Pointer.Read(reader);
-					globals.off_actualWorld = Pointer.Read(reader);
-					globals.off_dynamicWorld = Pointer.Read(reader);
-					globals.off_inactiveDynamicWorld = Pointer.Read(reader);
+					globals.off_transitDynamicWorld = LegacyPointer.Read(reader);
+					globals.off_actualWorld = LegacyPointer.Read(reader);
+					globals.off_dynamicWorld = LegacyPointer.Read(reader);
+					globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
 				});
 			}
 
@@ -940,15 +940,15 @@ namespace OpenSpace.Loader {
 
 
 			await WaitIfNecessary();
-			Pointer.DoAt(ref reader, off_cineManager, () => {
+			LegacyPointer.DoAt(ref reader, off_cineManager, () => {
 				cinematicsManager = CinematicsManager.Read(reader, off_cineManager);
 			});
 
 			// off_current should be after the dynamic SO list positions.
 			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-				Pointer off_current = Pointer.Goto(ref reader, off_settingsForPersoInFix);
+				LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_settingsForPersoInFix);
 				await ReadSettingsForPersoInFix(reader);
-				Pointer.Goto(ref reader, off_current);
+				LegacyPointer.Goto(ref reader, off_current);
 			} else {
 				await ReadSettingsForPersoInFix(reader);
 			}
@@ -959,17 +959,17 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading animation banks";
 			await WaitIfNecessary();
 			if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
-				off_animBankLvl = Pointer.Read(reader); // Note: 4 0x104 banks in lvl.
+				off_animBankLvl = LegacyPointer.Read(reader); // Note: 4 0x104 banks in lvl.
 				//print(Pointer.Current(reader));
 				print("Lvl animation bank address: " + off_animBankLvl);
 				animationBanks = new AnimationBank[5];
 				if (off_animBankFix != off_animBankLvl) {
-					Pointer.DoAt(ref reader, off_animBankFix, () => {
+					LegacyPointer.DoAt(ref reader, off_animBankFix, () => {
 						animationBanks[0] = AnimationBank.Read(reader, off_animBankFix, 0, 1, files_array[Mem.FixKeyFrames])[0];
 					});
 				}
 				await WaitIfNecessary();
-				Pointer.DoAt(ref reader, off_animBankLvl, () => {
+				LegacyPointer.DoAt(ref reader, off_animBankLvl, () => {
 					AnimationBank[] banks = AnimationBank.Read(reader, off_animBankLvl, 1, 4, files_array[Mem.LvlKeyFrames]);
 					for (int i = 0; i < 4; i++) {
 						animationBanks[1 + i] = banks[i];
@@ -1024,8 +1024,8 @@ namespace OpenSpace.Loader {
 						if (animBank >= animationBanks.Length) {
 							Array.Resize(ref animationBanks, animBank + 1);
 						}
-						Pointer off_animBankExtra = new Pointer(0, animFile);
-						Pointer.DoAt(ref reader, off_animBankExtra, () => {
+						LegacyPointer off_animBankExtra = new LegacyPointer(0, animFile);
+						LegacyPointer.DoAt(ref reader, off_animBankExtra, () => {
 							if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
 								string timestamp = reader.ReadString(0x18);
 								reader.ReadUInt32();
@@ -1037,7 +1037,7 @@ namespace OpenSpace.Loader {
 								int alignBytes = reader.ReadInt32();
 								if (alignBytes > 0) reader.Align(4, alignBytes);
 							}
-							off_animBankExtra = Pointer.Current(reader);
+							off_animBankExtra = LegacyPointer.Current(reader);
 							animationBanks[animBank] = AnimationBank.Read(reader, off_animBankExtra, (uint)animBank, 1, kfFile)[0];
 						});
 					}
@@ -1057,20 +1057,20 @@ namespace OpenSpace.Loader {
 			uint num_perso_with_settings_in_fix = (uint)persoInFix.Length;
 			if (CPA_Settings.s.game == CPA_Settings.Game.R3) num_perso_with_settings_in_fix = reader.ReadUInt32();
 			for (int i = 0; i < num_perso_with_settings_in_fix; i++) {
-				Pointer off_perso_so_with_settings_in_fix = null, off_matrix = null;
+				LegacyPointer off_perso_so_with_settings_in_fix = null, off_matrix = null;
 				SuperObject so = null;
 				Matrix mat = null;
 				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
 					if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-						off_perso_so_with_settings_in_fix = Pointer.Read(reader);
+						off_perso_so_with_settings_in_fix = LegacyPointer.Read(reader);
 						reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
-						off_matrix = Pointer.Current(reader);
+						off_matrix = LegacyPointer.Current(reader);
 						mat = Matrix.Read(reader, off_matrix);
 						reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
 						reader.ReadUInt32();
 					} else {
-						off_perso_so_with_settings_in_fix = Pointer.Read(reader);
-						off_matrix = Pointer.Current(reader);
+						off_perso_so_with_settings_in_fix = LegacyPointer.Read(reader);
+						off_matrix = LegacyPointer.Current(reader);
 						mat = Matrix.Read(reader, off_matrix);
 						reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
 						reader.ReadUInt32();
@@ -1080,7 +1080,7 @@ namespace OpenSpace.Loader {
 					|| CPA_Settings.s.game == CPA_Settings.Game.RM
 					|| CPA_Settings.s.game == CPA_Settings.Game.DDPK
 					|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
-					off_matrix = Pointer.Current(reader);
+					off_matrix = LegacyPointer.Current(reader);
 					mat = Matrix.Read(reader, off_matrix);
 					so = superObjects.FirstOrDefault(s => s.off_data == persoInFix[i]);
 				}

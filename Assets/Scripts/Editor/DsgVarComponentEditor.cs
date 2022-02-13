@@ -70,7 +70,7 @@ public class DsgVarComponentEditor : Editor {
 
             DsgMem dsgMem = c.dsgMem;
             foreach (DsgVarComponent.DsgVarEditableEntry dsgVarEntry in c.editableEntries) {
-                Pointer offsetOfValue = (dsgMem.memBuffer + dsgVarEntry.entry.offsetInBuffer);
+                LegacyPointer offsetOfValue = (dsgMem.memBuffer + dsgVarEntry.entry.offsetInBuffer);
                 printResult += dsgVarEntry.entry.NiceVariableName + " " + offsetOfValue +Environment.NewLine;
             }
 
@@ -83,7 +83,7 @@ public class DsgVarComponentEditor : Editor {
 
             DsgMem dsgMem = c.dsgMem;
             foreach (DsgVarComponent.DsgVarEditableEntry dsgVarEntry in c.editableEntries) {
-                Pointer offsetOfValue = (dsgMem.memBuffer + dsgVarEntry.entry.offsetInBuffer);
+                LegacyPointer offsetOfValue = (dsgMem.memBuffer + dsgVarEntry.entry.offsetInBuffer);
 
                 string variableType;
                 switch (dsgVarEntry.Type) {

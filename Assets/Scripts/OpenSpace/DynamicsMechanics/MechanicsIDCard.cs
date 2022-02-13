@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace OpenSpace {
     public class MechanicsIDCard {
-        public Pointer offset;
+        public LegacyPointer offset;
         public uint type;
         public uint flags;
         public float gravity;
@@ -22,11 +22,11 @@ namespace OpenSpace {
         public float tiltOrigin;
         public Vector3 maxInertia;
 
-        public MechanicsIDCard(Pointer offset) {
+        public MechanicsIDCard(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static MechanicsIDCard Read(Reader reader, Pointer offset) {
+        public static MechanicsIDCard Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             MechanicsIDCard c = new MechanicsIDCard(offset);
 
@@ -59,19 +59,19 @@ namespace OpenSpace {
             });
         }
 
-        public static MechanicsIDCard FromOffsetOrRead(Pointer offset, Reader reader) {
+        public static MechanicsIDCard FromOffsetOrRead(LegacyPointer offset, Reader reader) {
             if (offset == null) return null;
             MechanicsIDCard c = FromOffset(offset);
             if (c == null) {
-                Pointer off_current = Pointer.Goto(ref reader, offset);
+                LegacyPointer off_current = LegacyPointer.Goto(ref reader, offset);
                 c = MechanicsIDCard.Read(reader, offset);
-                Pointer.Goto(ref reader, off_current);
+                LegacyPointer.Goto(ref reader, off_current);
                 MapLoader.Loader.mechanicsIDCards.Add(c);
             }
             return c;
         }
 
-        public static MechanicsIDCard FromOffset(Pointer offset) {
+        public static MechanicsIDCard FromOffset(LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             for (int i = 0; i < l.mechanicsIDCards.Count; i++) {
                 if (offset == l.mechanicsIDCards[i].offset) return l.mechanicsIDCards[i];

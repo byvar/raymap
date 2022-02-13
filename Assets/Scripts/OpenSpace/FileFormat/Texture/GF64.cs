@@ -11,7 +11,7 @@ namespace OpenSpace.FileFormat.Texture {
 		public Format format;
 		public int palette_num_colors;
 
-		public GF64(Reader reader, Pointer off_texture, int width, int height, Format format, Pointer off_palette, int palette_num_colors) {
+		public GF64(Reader reader, LegacyPointer off_texture, int width, int height, Format format, LegacyPointer off_palette, int palette_num_colors) {
 			this.width = width;
 			this.height = height;
 			this.format = format;
@@ -51,13 +51,13 @@ namespace OpenSpace.FileFormat.Texture {
 			texture.Apply();
 		}
 
-		private void Parse(Reader reader, Reader paletteReader, Pointer off_texture, Pointer off_palette) {
+		private void Parse(Reader reader, Reader paletteReader, LegacyPointer off_texture, LegacyPointer off_palette) {
 			
 			// If both texture_index and texture_index2: texture_index2 is the real one, texture_index is palette_index.
 
 			Color[] palette = null;
 			if (off_palette != null) {
-				Pointer.DoAt(ref reader, off_palette, () => {
+				LegacyPointer.DoAt(ref reader, off_palette, () => {
 					palette = ReadPalette(reader);
 				});
 			} else if (paletteReader != null) {
@@ -66,8 +66,8 @@ namespace OpenSpace.FileFormat.Texture {
 			texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
 			Color[] pixels = new Color[width * height];
 			if (format == Format.I4 || format == Format.I4Alpha) {
-				Pointer off_current = null;
-				if (off_texture != null) off_current = Pointer.Goto(ref reader, off_texture);
+				LegacyPointer off_current = null;
+				if (off_texture != null) off_current = LegacyPointer.Goto(ref reader, off_texture);
 				byte[] texBytes = reader.ReadBytes((width * height) / 2);
 				for (int x = 0; x < width; x++) {
 					for (int y = 0; y < height; y++) {
@@ -102,10 +102,10 @@ namespace OpenSpace.FileFormat.Texture {
 						}
 					}
 				}
-				if (off_current != null) Pointer.Goto(ref reader, off_current);
+				if (off_current != null) LegacyPointer.Goto(ref reader, off_current);
 			} else if (format == Format.I8) {
-				Pointer off_current = null;
-				if (off_texture != null) off_current = Pointer.Goto(ref reader, off_texture);
+				LegacyPointer off_current = null;
+				if (off_texture != null) off_current = LegacyPointer.Goto(ref reader, off_texture);
 				byte[] texBytes = reader.ReadBytes(width * height);
 				for (int x = 0; x < width; x++) {
 					for (int y = 0; y < height; y++) {
@@ -127,10 +127,10 @@ namespace OpenSpace.FileFormat.Texture {
 						}
 					}
 				}
-				if (off_current != null) Pointer.Goto(ref reader, off_current);
+				if (off_current != null) LegacyPointer.Goto(ref reader, off_current);
 			} else if (format == Format.RGBA) {
-				Pointer off_current = null;
-				if (off_texture != null) off_current = Pointer.Goto(ref reader, off_texture);
+				LegacyPointer off_current = null;
+				if (off_texture != null) off_current = LegacyPointer.Goto(ref reader, off_texture);
 				for (int x = 0; x < width; x++) {
 					for (int y = 0; y < height; y++) {
 						int index = (x * height) + y;
@@ -138,7 +138,7 @@ namespace OpenSpace.FileFormat.Texture {
 						pixels[index] = ParseColorRGBA5551(shortCol);
 					}
 				}
-				if (off_current != null) Pointer.Goto(ref reader, off_current);
+				if (off_current != null) LegacyPointer.Goto(ref reader, off_current);
 			}
 			texture.SetPixels(pixels);
 			texture.Apply();

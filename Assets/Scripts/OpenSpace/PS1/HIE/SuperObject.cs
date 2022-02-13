@@ -13,11 +13,11 @@ namespace OpenSpace.PS1 {
 		public uint typeCode;
 		public int dataIndex;
 		public LinkedList<SuperObject> children;
-		public Pointer off_next_brother;
-		public Pointer off_prev_brother;
-		public Pointer off_parent;
-		public Pointer off_matrix1;
-		public Pointer off_matrix2;
+		public LegacyPointer off_next_brother;
+		public LegacyPointer off_prev_brother;
+		public LegacyPointer off_parent;
+		public LegacyPointer off_matrix1;
+		public LegacyPointer off_matrix2;
 		public short short_28;
 		public short short_2A;
 		public short short_2C;
@@ -27,7 +27,7 @@ namespace OpenSpace.PS1 {
 		public short short_34;
 		public short short_36;
 		public uint uint_38;
-		public Pointer off_38;
+		public LegacyPointer off_38;
 		public short short_3C;
 		public short short_3E;
 		public short short_40;
@@ -43,21 +43,21 @@ namespace OpenSpace.PS1 {
 		public PS1Matrix matrix1;
 		public PS1Matrix matrix2;
 
-		public Pointer NextEntry => off_next_brother;
-		public Pointer PreviousEntry => off_prev_brother;
+		public LegacyPointer NextEntry => off_next_brother;
+		public LegacyPointer PreviousEntry => off_prev_brother;
 		public bool isDynamic = false;
 
 		protected override void ReadInternal(Reader reader) {
 			//Load.print("SuperObject @ " + Offset);
 			typeCode = reader.ReadUInt32();
 			dataIndex = reader.ReadInt32();
-			children = LinkedList<SuperObject>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-			off_next_brother = Pointer.Read(reader); // 14
-			off_prev_brother = Pointer.Read(reader); // 18
-			off_parent = Pointer.Read(reader); // 1c
-			off_matrix1 = Pointer.Read(reader); //
+			children = LinkedList<SuperObject>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+			off_next_brother = LegacyPointer.Read(reader); // 14
+			off_prev_brother = LegacyPointer.Read(reader); // 18
+			off_parent = LegacyPointer.Read(reader); // 1c
+			off_matrix1 = LegacyPointer.Read(reader); //
 			if (CPA_Settings.s.game != CPA_Settings.Game.RRush) {
-				off_matrix2 = Pointer.Read(reader);
+				off_matrix2 = LegacyPointer.Read(reader);
 				short_28 = reader.ReadInt16();
 				short_2A = reader.ReadInt16();
 				short_2C = reader.ReadInt16();
@@ -69,7 +69,7 @@ namespace OpenSpace.PS1 {
 				if (isDynamic) {
 					uint_38 = reader.ReadUInt32();
 				} else {
-					off_38 = Pointer.Read(reader);
+					off_38 = LegacyPointer.Read(reader);
 				}
 				short_3C = reader.ReadInt16();
 				short_3E = reader.ReadInt16();

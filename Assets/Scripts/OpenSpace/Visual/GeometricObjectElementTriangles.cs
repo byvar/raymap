@@ -13,11 +13,11 @@ namespace OpenSpace.Visual {
     /// </summary>
     public class GeometricObjectElementTriangles : IGeometricObjectElement {
         [JsonIgnore] public GeometricObject geo;
-        public Pointer offset;
+        public LegacyPointer offset;
 
         [JsonIgnore]
         public string name;
-        public Pointer off_material;
+        public LegacyPointer off_material;
         public GameMaterial gameMaterial;
 		public VisualMaterial visualMaterialOG;
 		public VisualMaterial visualMaterial;
@@ -25,20 +25,20 @@ namespace OpenSpace.Visual {
         public ushort num_triangles;
         public ushort num_uvs;
         public ushort num_uvMaps;
-        public Pointer off_triangles;
-        public Pointer off_mapping_uvs;
-        public Pointer off_normals;
-        public Pointer off_uvs;
-        public Pointer off_vertex_indices;
+        public LegacyPointer off_triangles;
+        public LegacyPointer off_mapping_uvs;
+        public LegacyPointer off_normals;
+        public LegacyPointer off_uvs;
+        public LegacyPointer off_vertex_indices;
         public ushort num_vertex_indices;
         public ushort OPT_num_mapping_entries;
-        public Pointer OPT_off_mapping_vertices;
-        public Pointer OPT_off_mapping_uvs;
+        public LegacyPointer OPT_off_mapping_vertices;
+        public LegacyPointer OPT_off_mapping_uvs;
         public ushort OPT_num_triangleStrip;
         public ushort OPT_num_disconnectedTriangles;
-        public Pointer OPT_off_triangleStrip;
-        public Pointer OPT_off_disconnectedTriangles;
-		public Pointer off_mapping_lightmap;
+        public LegacyPointer OPT_off_triangleStrip;
+        public LegacyPointer OPT_off_disconnectedTriangles;
+		public LegacyPointer off_mapping_lightmap;
 		public ushort num_mapping_lightmap;
 		public ushort parallelBox;
 		public byte isVisibleInPortal;
@@ -58,7 +58,7 @@ namespace OpenSpace.Visual {
 		public int lightmap_index = -1;
 
 		// R3 PS2
-		public Pointer off_sdc_mapping = null;
+		public LegacyPointer off_sdc_mapping = null;
 		public ushort[] sdc_mapping;
 		public PS2OptimizedSDCStructureElement sdc = null;
 
@@ -85,7 +85,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public GeometricObjectElementTriangles(Pointer offset, GeometricObject geo) {
+        public GeometricObjectElementTriangles(LegacyPointer offset, GeometricObject geo) {
             this.geo = geo;
             this.offset = offset;
         }
@@ -771,13 +771,13 @@ namespace OpenSpace.Visual {
 			UpdateMeshVertices(geo.vertices);
 		}
 
-        public static GeometricObjectElementTriangles Read(Reader reader, Pointer offset, GeometricObject geo) {
+        public static GeometricObjectElementTriangles Read(Reader reader, LegacyPointer offset, GeometricObject geo) {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementTriangles sm = new GeometricObjectElementTriangles(offset, geo);
             sm.name = "Submesh @ pos " + offset;
 			//l.print(sm.name);
             sm.backfaceCulling = !l.forceDisplayBackfaces;
-            sm.off_material = Pointer.Read(reader);
+            sm.off_material = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				//sm.visualMaterial = VisualMaterial.FromOffset(sm.off_material);
 				sm.visualMaterial = VisualMaterial.FromOffsetOrRead(sm.off_material, reader);
@@ -797,20 +797,20 @@ namespace OpenSpace.Visual {
             sm.num_triangles = reader.ReadUInt16();
 			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				sm.lightmap_index = reader.ReadInt16();
-				sm.off_triangles = Pointer.Read(reader);
+				sm.off_triangles = LegacyPointer.Read(reader);
 			} else {
 				sm.num_uvs = reader.ReadUInt16();
 				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
 					sm.num_uvMaps = reader.ReadUInt16();
 					sm.lightmap_index = reader.ReadInt16();
 				}
-				sm.off_triangles = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_vertices
+				sm.off_triangles = LegacyPointer.Read(reader); // 1 entry = 3 shorts. Max: num_vertices
 				if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC) reader.ReadUInt32();
-				sm.off_mapping_uvs = Pointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
-				sm.off_normals = Pointer.Read(reader); // 1 entry = 3 floats
-				sm.off_uvs = Pointer.Read(reader); // 1 entry = 2 floats
+				sm.off_mapping_uvs = LegacyPointer.Read(reader); // 1 entry = 3 shorts. Max: num_weights
+				sm.off_normals = LegacyPointer.Read(reader); // 1 entry = 3 floats
+				sm.off_uvs = LegacyPointer.Read(reader); // 1 entry = 2 floats
 				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
-					sm.off_mapping_lightmap = Pointer.Read(reader);
+					sm.off_mapping_lightmap = LegacyPointer.Read(reader);
 					sm.num_mapping_lightmap = reader.ReadUInt16();
 					reader.ReadUInt16();
 				} else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
@@ -820,8 +820,8 @@ namespace OpenSpace.Visual {
 					} else {
 						// PS2
 						reader.ReadUInt32();
-						sm.off_sdc_mapping = Pointer.Read(reader);
-						Pointer.DoAt(ref reader, sm.off_sdc_mapping, () => {
+						sm.off_sdc_mapping = LegacyPointer.Read(reader);
+						LegacyPointer.DoAt(ref reader, sm.off_sdc_mapping, () => {
 							uint length = reader.ReadUInt32();
 							sm.sdc_mapping = new ushort[length];
 							for (int i = 0; i < length; i++) {
@@ -833,7 +833,7 @@ namespace OpenSpace.Visual {
 					reader.ReadUInt32();
 				}
 				if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) {
-					sm.off_vertex_indices = Pointer.Read(reader);
+					sm.off_vertex_indices = LegacyPointer.Read(reader);
 					sm.num_vertex_indices = reader.ReadUInt16();
 					sm.parallelBox = reader.ReadUInt16();
 					reader.ReadUInt32();
@@ -847,12 +847,12 @@ namespace OpenSpace.Visual {
 					sm.isVisibleInPortal = reader.ReadByte();
 					reader.ReadByte();
 					sm.OPT_num_mapping_entries = reader.ReadUInt16(); // num_shorts
-					sm.OPT_off_mapping_vertices = Pointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
-					sm.OPT_off_mapping_uvs = Pointer.Read(reader); // shorts_offset2 (2nd array of size num_shorts, max: num_weights)
+					sm.OPT_off_mapping_vertices = LegacyPointer.Read(reader); // shorts_offset1 (1st array of size num_shorts, max_num_vertices)
+					sm.OPT_off_mapping_uvs = LegacyPointer.Read(reader); // shorts_offset2 (2nd array of size num_shorts, max: num_weights)
 					sm.OPT_num_triangleStrip = reader.ReadUInt16(); // num_shorts2
 					sm.OPT_num_disconnectedTriangles = reader.ReadUInt16();
-					sm.OPT_off_triangleStrip = Pointer.Read(reader); // shorts2_offset (array of size num_shorts2)
-					sm.OPT_off_disconnectedTriangles = Pointer.Read(reader);
+					sm.OPT_off_triangleStrip = LegacyPointer.Read(reader); // shorts2_offset (array of size num_shorts2)
+					sm.OPT_off_disconnectedTriangles = LegacyPointer.Read(reader);
 					if (CPA_Settings.s.hasNames) sm.name += reader.ReadString(0x34);
 				} else if(CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
 					reader.ReadUInt32();
@@ -901,14 +901,14 @@ namespace OpenSpace.Visual {
             // Read mapping tables
             sm.OPT_mapping_uvs = new int[sm.num_uvMaps][];
             if (sm.OPT_num_mapping_entries > 0) {
-				Pointer.DoAt(ref reader, sm.OPT_off_mapping_vertices, () => {
+				LegacyPointer.DoAt(ref reader, sm.OPT_off_mapping_vertices, () => {
 					//print("Mapping offset: " + String.Format("0x{0:X}", fs.Position));
 					sm.OPT_mapping_vertices = new int[sm.OPT_num_mapping_entries];
 					for (int j = 0; j < sm.OPT_num_mapping_entries; j++) {
 						sm.OPT_mapping_vertices[j] = reader.ReadInt16();
 					}
 				});
-				Pointer.DoAt(ref reader, sm.OPT_off_mapping_uvs, () => {
+				LegacyPointer.DoAt(ref reader, sm.OPT_off_mapping_uvs, () => {
 					for (int j = 0; j < sm.num_uvMaps; j++) {
 						sm.OPT_mapping_uvs[j] = new int[sm.OPT_num_mapping_entries];
 					}
@@ -920,7 +920,7 @@ namespace OpenSpace.Visual {
 				});
             }
             if (sm.num_triangles > 0) {
-				Pointer.DoAt(ref reader, sm.off_mapping_uvs, () => {
+				LegacyPointer.DoAt(ref reader, sm.off_mapping_uvs, () => {
 					sm.mapping_uvs = new int[sm.num_uvMaps][];
 					for (int j = 0; j < sm.num_uvMaps; j++) {
 						sm.mapping_uvs[j] = new int[sm.num_triangles * 3];
@@ -935,20 +935,20 @@ namespace OpenSpace.Visual {
             }
 
 			// Read UVs
-			Pointer.DoAt(ref reader, sm.off_uvs, () => {
+			LegacyPointer.DoAt(ref reader, sm.off_uvs, () => {
 				sm.uvs = new Vector2[sm.num_uvs];
 				for (int j = 0; j < sm.num_uvs; j++) {
 					sm.uvs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 				}
 			});
 			// Read triangle data
-			Pointer.DoAt(ref reader, sm.OPT_off_triangleStrip, () => {
+			LegacyPointer.DoAt(ref reader, sm.OPT_off_triangleStrip, () => {
 				sm.OPT_triangleStrip = new int[sm.OPT_num_triangleStrip];
 				for (int j = 0; j < sm.OPT_num_triangleStrip; j++) {
 					sm.OPT_triangleStrip[j] = reader.ReadInt16();
 				}
 			});
-			Pointer.DoAt(ref reader, sm.OPT_off_disconnectedTriangles, () => {
+			LegacyPointer.DoAt(ref reader, sm.OPT_off_disconnectedTriangles, () => {
 				sm.OPT_disconnectedTriangles = new int[sm.OPT_num_disconnectedTriangles * 3];
 				//print("Loading disconnected triangles at " + String.Format("0x{0:X}", fs.Position));
 				for (int j = 0; j < sm.OPT_num_disconnectedTriangles; j++) {
@@ -958,7 +958,7 @@ namespace OpenSpace.Visual {
 				}
 			});
             if (sm.num_triangles > 0) {
-				Pointer.DoAt(ref reader, sm.off_triangles, () => {
+				LegacyPointer.DoAt(ref reader, sm.off_triangles, () => {
 					sm.triangles = new int[sm.num_triangles * 3];
 					//print("Loading disconnected triangles at " + String.Format("0x{0:X}", fs.Position));
 					for (int j = 0; j < sm.num_triangles; j++) {
@@ -968,7 +968,7 @@ namespace OpenSpace.Visual {
 					}
 				});
                 if (sm.off_normals != null) {
-					Pointer.DoAt(ref reader, sm.off_normals, () => {
+					LegacyPointer.DoAt(ref reader, sm.off_normals, () => {
 						sm.normals = new Vector3[sm.num_triangles];
 						for (int j = 0; j < sm.num_triangles; j++) {
 							float x = reader.ReadSingle();
@@ -988,13 +988,13 @@ namespace OpenSpace.Visual {
 						l.print(offset + " - UVs: " + amount + " - " + sm.mesh.num_vertices + " - " + sm.num_mapping_entries + " - " + sm.num_uvs + " - " + sm.num_disconnected_triangles_spe + " - " + sm.num_mapping_lightmap);
 					}*/
 					Vector2[] lightmapUVs = new Vector2[sm.num_mapping_lightmap];
-					Pointer.DoAt(ref reader, sm.off_mapping_lightmap, () => {
+					LegacyPointer.DoAt(ref reader, sm.off_mapping_lightmap, () => {
 						sm.mapping_lightmap = new int[sm.num_mapping_lightmap];
 						for (int i = 0; i < sm.num_mapping_lightmap; i++) {
 							sm.mapping_lightmap[i] = reader.ReadInt16();
 						}
 					});
-					Pointer.DoAt(ref reader, l.off_lightmapUV[sm.lightmap_index], () => {
+					LegacyPointer.DoAt(ref reader, l.off_lightmapUV[sm.lightmap_index], () => {
 						for (int j = 0; j < lightmapUVs.Length; j++) {
 							lightmapUVs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						}

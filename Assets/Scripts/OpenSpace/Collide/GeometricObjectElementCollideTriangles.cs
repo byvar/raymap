@@ -8,17 +8,17 @@ using UnityEngine;
 namespace OpenSpace.Collide {
     public class GeometricObjectElementCollideTriangles : IGeometricObjectElementCollide {
         [JsonIgnore] public GeometricObjectCollide geo;
-        public Pointer offset;
+        public LegacyPointer offset;
 		
-        public Pointer off_material;
-        public Pointer off_triangles; // num_triangles * 3 * 0x2
-        public Pointer off_mapping; // num_triangles * 3 * 0x2. Max: num_uvs-1
-        public Pointer off_normals; // num_triangles * 3 * 0x4. 1 normal per face, kinda logical for collision I guess
-        public Pointer off_uvs;
+        public LegacyPointer off_material;
+        public LegacyPointer off_triangles; // num_triangles * 3 * 0x2
+        public LegacyPointer off_mapping; // num_triangles * 3 * 0x2. Max: num_uvs-1
+        public LegacyPointer off_normals; // num_triangles * 3 * 0x4. 1 normal per face, kinda logical for collision I guess
+        public LegacyPointer off_uvs;
         public ushort num_triangles;
         public ushort num_mapping;
-        public Pointer off_unk;
-        public Pointer off_unk2;
+        public LegacyPointer off_unk;
+        public LegacyPointer off_unk2;
         public ushort num_mapping_entries;
         public short ind_parallelBox;
 
@@ -40,7 +40,7 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public GeometricObjectElementCollideTriangles(Pointer offset, GeometricObjectCollide geo) {
+        public GeometricObjectElementCollideTriangles(LegacyPointer offset, GeometricObjectCollide geo) {
             this.geo = geo;
             this.offset = offset;
         }
@@ -138,44 +138,44 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public static GeometricObjectElementCollideTriangles Read(Reader reader, Pointer offset, GeometricObjectCollide geo) {
+        public static GeometricObjectElementCollideTriangles Read(Reader reader, LegacyPointer offset, GeometricObjectCollide geo) {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementCollideTriangles sm = new GeometricObjectElementCollideTriangles(offset, geo);
-            sm.off_material = Pointer.Read(reader);
+            sm.off_material = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				sm.num_triangles = reader.ReadUInt16();
 				reader.ReadUInt16();
-				sm.off_triangles = Pointer.Read(reader);
+				sm.off_triangles = LegacyPointer.Read(reader);
 				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
-					sm.off_normals = Pointer.Read(reader);
-					sm.off_unk = Pointer.Read(reader);
+					sm.off_normals = LegacyPointer.Read(reader);
+					sm.off_unk = LegacyPointer.Read(reader);
 				}
 			} else {
 				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 					sm.num_triangles = reader.ReadUInt16();
 					sm.num_mapping = reader.ReadUInt16();
-					sm.off_triangles = Pointer.Read(reader);
-					sm.off_mapping = Pointer.Read(reader);
-					sm.off_normals = Pointer.Read(reader);
-					sm.off_uvs = Pointer.Read(reader);
+					sm.off_triangles = LegacyPointer.Read(reader);
+					sm.off_mapping = LegacyPointer.Read(reader);
+					sm.off_normals = LegacyPointer.Read(reader);
+					sm.off_uvs = LegacyPointer.Read(reader);
 					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
 						reader.ReadUInt32();
 					}
 					if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) {
-						Pointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
+						LegacyPointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
 						reader.ReadUInt16(); // num_unk
 						sm.ind_parallelBox = reader.ReadInt16();
 					}
 				} else {
-					sm.off_triangles = Pointer.Read(reader);
-					sm.off_normals = Pointer.Read(reader);
+					sm.off_triangles = LegacyPointer.Read(reader);
+					sm.off_normals = LegacyPointer.Read(reader);
 					sm.num_triangles = reader.ReadUInt16();
 					sm.ind_parallelBox = reader.ReadInt16();
 					reader.ReadUInt32();
 					if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
-						sm.off_mapping = Pointer.Read(reader);
-						sm.off_unk = Pointer.Read(reader); // num_mapping_entries * 3 floats 
-						sm.off_unk2 = Pointer.Read(reader); // num_mapping_entries * 1 float
+						sm.off_mapping = LegacyPointer.Read(reader);
+						sm.off_unk = LegacyPointer.Read(reader); // num_mapping_entries * 3 floats 
+						sm.off_unk2 = LegacyPointer.Read(reader); // num_mapping_entries * 1 float
 						sm.num_mapping = reader.ReadUInt16();
 						reader.ReadUInt16();
 					}
@@ -186,14 +186,14 @@ namespace OpenSpace.Collide {
             } else {
                 // Sector superobject
             }
-            Pointer.Goto(ref reader, sm.off_triangles);
+            LegacyPointer.Goto(ref reader, sm.off_triangles);
             sm.triangles = new int[sm.num_triangles * 3];
             for (int j = 0; j < sm.num_triangles; j++) {
                 sm.triangles[(j * 3) + 0] = reader.ReadInt16();
                 sm.triangles[(j * 3) + 1] = reader.ReadInt16();
                 sm.triangles[(j * 3) + 2] = reader.ReadInt16();
             }
-			Pointer.DoAt(ref reader, sm.off_normals, () => {
+			LegacyPointer.DoAt(ref reader, sm.off_normals, () => {
 				sm.normals = new Vector3[sm.num_triangles];
 				for (int j = 0; j < sm.num_triangles; j++) {
 					float x = reader.ReadSingle();
@@ -204,7 +204,7 @@ namespace OpenSpace.Collide {
 			});
 
             if (sm.num_mapping > 0 && sm.off_mapping != null) {
-                Pointer.Goto(ref reader, sm.off_mapping);
+                LegacyPointer.Goto(ref reader, sm.off_mapping);
                 sm.mapping = new int[sm.num_triangles * 3];
                 for (int i = 0; i < sm.num_triangles; i++) {
                     sm.mapping[(i * 3) + 0] = reader.ReadInt16();
@@ -212,7 +212,7 @@ namespace OpenSpace.Collide {
                     sm.mapping[(i * 3) + 2] = reader.ReadInt16();
                 }
                 if (sm.off_uvs != null) {
-                    Pointer.Goto(ref reader, sm.off_uvs);
+                    LegacyPointer.Goto(ref reader, sm.off_uvs);
                     sm.uvs = new Vector2[sm.num_mapping];
                     for (int i = 0; i < sm.num_mapping; i++) {
                         sm.uvs[i] = new Vector2(reader.ReadSingle(), reader.ReadSingle());

@@ -11,7 +11,7 @@ namespace OpenSpace.PS1 {
 	public class GameMaterial : OpenSpaceStruct {
 		public ushort ushort_00;
 		public ushort ushort_02;
-		public Pointer off_collideMaterial;
+		public LegacyPointer off_collideMaterial;
 		public int int_08;
 		public uint uint_0C;
 
@@ -21,7 +21,7 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			ushort_00 = reader.ReadUInt16();
 			ushort_02 = reader.ReadUInt16();
-			off_collideMaterial = Pointer.Read(reader);
+			off_collideMaterial = LegacyPointer.Read(reader);
 			int_08 = reader.ReadInt32();
 			uint_0C = reader.ReadUInt32();
 

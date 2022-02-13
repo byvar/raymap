@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class DsgMem : OpenSpaceStruct {
-        public Pointer off_dsgVar;
-        public Pointer memBufferInitial; // initial state
-        public Pointer memBuffer; // current state
+        public LegacyPointer off_dsgVar;
+        public LegacyPointer memBufferInitial; // initial state
+        public LegacyPointer memBuffer; // current state
 
         public DsgVar dsgVar;
         public DsgVarValue[] values;
@@ -17,13 +17,13 @@ namespace OpenSpace.AI {
 
         protected override void ReadInternal(Reader reader) {
             //MapLoader.Loader.print("DsgMem " + Offset);
-            Pointer dsgVarPointer = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, dsgVarPointer, () => {
-                off_dsgVar = Pointer.Read(reader);
+            LegacyPointer dsgVarPointer = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, dsgVarPointer, () => {
+                off_dsgVar = LegacyPointer.Read(reader);
             });
 
-            memBufferInitial = Pointer.Read(reader);
-            memBuffer = Pointer.Read(reader);
+            memBufferInitial = LegacyPointer.Read(reader);
+            memBuffer = LegacyPointer.Read(reader);
 
             dsgVar = MapLoader.Loader.FromOffsetOrRead<DsgVar>(reader, off_dsgVar);
             if (dsgVar != null && dsgVar.amountOfInfos > 0) {

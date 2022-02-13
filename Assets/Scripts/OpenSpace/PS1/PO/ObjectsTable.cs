@@ -38,7 +38,7 @@ namespace OpenSpace.PS1 {
 
 		public void ReadExtra(Reader reader, uint count) {
 			Array.Resize(ref entries, (int)(length + count));
-			Pointer.DoAt(ref reader, Offset + 8 + (8 * length.Value), () => {
+			LegacyPointer.DoAt(ref reader, Offset + 8 + (8 * length.Value), () => {
 				//Load.print(Pointer.Current(reader) + " - " + count);
 				for (int i = (int)length; i < entries.Length; i++) {
 					entries[i] = new Entry();
@@ -49,17 +49,17 @@ namespace OpenSpace.PS1 {
 		}
 
 		public class Entry {
-			public Pointer offset;
+			public LegacyPointer offset;
 
-			public Pointer off_0; // object of 0x50, 5 rows of 0x10
-			public Pointer off_geo;
+			public LegacyPointer off_0; // object of 0x50, 5 rows of 0x10
+			public LegacyPointer off_geo;
 			public GeometricObject geo;
 
 			public void Read(Reader reader) {
-				offset = Pointer.Current(reader);
+				offset = LegacyPointer.Current(reader);
 
-				off_0 = Pointer.Read(reader);
-				off_geo = Pointer.Read(reader);
+				off_0 = LegacyPointer.Read(reader);
+				off_geo = LegacyPointer.Read(reader);
 				geo = Load.FromOffsetOrRead<GeometricObject>(reader, off_geo);
 			}
 			public GameObject GetGameObject(PhysicalObjectCollisionMapping[] collision, out GameObject[] bones, Entry morphEntry = null, float morphProgress = 0f) {

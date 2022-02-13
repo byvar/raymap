@@ -171,7 +171,7 @@ public class GraphManager : MonoBehaviour {
 			isolateWaypointRoot.SetActive(false);
 		}
 		foreach (WayPointBehaviour wp in isolateWaypoints) {
-			Pointer offset = (wp.wpROM != null ? wp.wpROM.Offset : (wp.wpPS1 != null ? wp.wpPS1.Offset : wp.wp.offset));
+			LegacyPointer offset = (wp.wpROM != null ? wp.wpROM.Offset : (wp.wpPS1 != null ? wp.wpPS1.Offset : wp.wp.offset));
 			wp.name = "Isolate WayPoint @" + offset;
 			wp.transform.SetParent(isolateWaypointRoot.transform);
 		}

@@ -34,7 +34,7 @@ namespace OpenSpace.FileFormat {
             return; // No writing support for PS1Data files yet
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             if (writer != null) {
                 if (pointer == null) {
                     writer.Write((uint)0);
@@ -44,12 +44,12 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        public override Pointer GetUnsafePointer(uint value) {
+        public override LegacyPointer GetUnsafePointer(uint value) {
             MapLoader l = MapLoader.Loader;
             for (int i = l.files_array.Length - 1; i >= 0; i--) {
                 PS1Data ps1File = l.files_array[i] as PS1Data;
                 if (ps1File != null && ps1File.headerOffset != 0 && value >= ps1File.headerOffset && value < ps1File.headerOffset + ps1File.length) {
-                    return new Pointer(value, ps1File);
+                    return new LegacyPointer(value, ps1File);
                 }
             }
             // Do a second loop over the files. If end and start overlap we want the start (returned by previous loop),
@@ -57,7 +57,7 @@ namespace OpenSpace.FileFormat {
             for (int i = l.files_array.Length - 1; i >= 0; i--) {
                 PS1Data ps1File = l.files_array[i] as PS1Data;
                 if (ps1File != null && ps1File.headerOffset != 0 && value == ps1File.headerOffset + ps1File.length) {
-                    return new Pointer(value, ps1File);
+                    return new LegacyPointer(value, ps1File);
                 }
             }
             /*if (headerOffset != 0 && value >= headerOffset && value < headerOffset + length) {

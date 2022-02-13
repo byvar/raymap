@@ -69,7 +69,7 @@ public class SuperObjectComponent : MonoBehaviour, IReferenceable {
 			return SuperObject.Type.Unknown;
 		}
 	}
-	public Pointer Offset {
+	public LegacyPointer Offset {
 		get {
 			if (so != null) return so.offset;
 			if (soROMDynamic != null) return soROMDynamic.Offset;

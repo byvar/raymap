@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class NeighborSector : OpenSpaceStruct {
-		public Pointer off_sectorSO;
+		public LegacyPointer off_sectorSO;
 		public short word04;
 		public short word06;
 
@@ -24,7 +24,7 @@ namespace OpenSpace.PS1 {
 		}
 
 		protected override void ReadInternal(Reader reader) {
-			off_sectorSO = Pointer.Read(reader);
+			off_sectorSO = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.game != CPA_Settings.Game.DD && CPA_Settings.s.game != CPA_Settings.Game.JungleBook) {
 				word04 = reader.ReadInt16();
 				word06 = reader.ReadInt16();

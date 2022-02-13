@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace OpenSpace.PS1 {
 	public class PS1AnimationChannel : OpenSpaceStruct {
-		public Pointer off_frames;
+		public LegacyPointer off_frames;
 		public ushort num_frames;
 		public short id;
 
 		public PS1AnimationKeyframe[] frames;
 
 		protected override void ReadInternal(Reader reader) {
-			off_frames = Pointer.Read(reader);
+			off_frames = LegacyPointer.Read(reader);
 			num_frames = reader.ReadUInt16();
 			id = reader.ReadInt16();
 

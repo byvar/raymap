@@ -152,7 +152,7 @@ public class RecordingTool : MonoBehaviour
             // Update gameobject being active
             MapLoader.Loader.controller.UpdatePersoActive(pb);
 
-            Pointer.Goto(ref reader, pb.perso.off_stdGame);
+            LegacyPointer.Goto(ref reader, pb.perso.off_stdGame);
             // Update stdgame
             pb.perso.stdGame = StandardGame.Read(reader, pb.perso.off_stdGame);
             // If stdgame says the object is inactive, deactivate gao too (ignore camera)
@@ -163,11 +163,11 @@ public class RecordingTool : MonoBehaviour
             if (pb.gameObject.activeSelf) {
                 var mind = pb.brain?.mind?.mind;
                 if (mind != null) {
-                    Pointer.DoAt(ref reader, mind.Offset, () => { mind.UpdateCurrentBehaviors(reader); }); // TODO: add a toggle to not record behaviors
+                    LegacyPointer.DoAt(ref reader, mind.Offset, () => { mind.UpdateCurrentBehaviors(reader); }); // TODO: add a toggle to not record behaviors
                 }
             }
 
-            Pointer.Goto(ref reader, spo.off_staticMatrix);
+            LegacyPointer.Goto(ref reader, spo.off_staticMatrix);
             spo.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, spo.off_staticMatrix);
             if (spo.data != null && spo.data.Gao != null) {
 
@@ -183,7 +183,7 @@ public class RecordingTool : MonoBehaviour
 
                 var perso = pb.perso;
 
-                Pointer.Goto(ref reader, perso.p3dData.offset);
+                LegacyPointer.Goto(ref reader, perso.p3dData.offset);
                 perso.p3dData.UpdateCurrentState(reader);
 
                 // State offset changed?
@@ -204,7 +204,7 @@ public class RecordingTool : MonoBehaviour
             RecordingSpawnablesRoot = new GameObject("Recording Spawnables");
         }
 
-        SpawnedAlwaysObjects = new Dictionary<Pointer, PersoBehaviour>();
+        SpawnedAlwaysObjects = new Dictionary<LegacyPointer, PersoBehaviour>();
 
         if (State != RecordingState.Recording) {
             Data = new RecordingData(MapLoader.Loader);
@@ -441,17 +441,17 @@ public class RecordingTool : MonoBehaviour
         CurrentTime += 0.5f;
     }
 
-    public Dictionary<Pointer, PersoBehaviour> SpawnedAlwaysObjects;
+    public Dictionary<LegacyPointer, PersoBehaviour> SpawnedAlwaysObjects;
 
     public void ReadAlways(Reader reader)
     {
         MemoryFile mem = (MemoryFile)MapLoader.Loader.files_array[0];
-        Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["always"], mem));
+        LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["always"], mem));
         var num_always = reader.ReadUInt32();
-        var spawnablePersos = OpenSpace.LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-        var currentPointer = Pointer.Current(reader);
-        var off_alwaysSPOs = Pointer.Read(reader);
-        Pointer.Goto(ref reader, off_alwaysSPOs);
+        var spawnablePersos = OpenSpace.LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+        var currentPointer = LegacyPointer.Current(reader);
+        var off_alwaysSPOs = LegacyPointer.Read(reader);
+        LegacyPointer.Goto(ref reader, off_alwaysSPOs);
 
         if (SuperObject.FromOffset(off_alwaysSPOs) != null) {
             MapLoader.Loader.superObjects.Remove(SuperObject.FromOffset(off_alwaysSPOs));
@@ -459,7 +459,7 @@ public class RecordingTool : MonoBehaviour
 
         var off_alwaysSpoArray = off_alwaysSPOs;
 
-        List<Pointer> ObjectsToRemove = SpawnedAlwaysObjects.Keys.ToList();
+        List<LegacyPointer> ObjectsToRemove = SpawnedAlwaysObjects.Keys.ToList();
 
         for (int i = 0; i < num_always; i++) {
 
@@ -467,23 +467,23 @@ public class RecordingTool : MonoBehaviour
 
             var off_alwaysSPO = off_alwaysSpoArray + (i * spoSize);
 
-            Pointer.Goto(ref reader, off_alwaysSPO + 0x1c); // make sure spo has a parent, otherwise they're not in the world
-            var parent = Pointer.Read(reader);
+            LegacyPointer.Goto(ref reader, off_alwaysSPO + 0x1c); // make sure spo has a parent, otherwise they're not in the world
+            var parent = LegacyPointer.Read(reader);
 
             if (parent != null) {
-                Pointer.Goto(ref reader, off_alwaysSPO + 4); // read linkedObject (data)
-                var data = Pointer.Read(reader);
+                LegacyPointer.Goto(ref reader, off_alwaysSPO + 4); // read linkedObject (data)
+                var data = LegacyPointer.Read(reader);
 
                 if (data != null) {
-                    Pointer.Goto(ref reader, data + 4); // stdGame
-                    var stdGamePtr = Pointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, data + 4); // stdGame
+                    var stdGamePtr = LegacyPointer.Read(reader);
 
                     if (stdGamePtr != null) {
 
                         if (!SpawnedAlwaysObjects.ContainsKey(stdGamePtr)) {
 
                             MapLoader.Loader.superObjects.Remove(SuperObject.FromOffset(off_alwaysSPO));
-                            Pointer.Goto(ref reader, off_alwaysSPO);
+                            LegacyPointer.Goto(ref reader, off_alwaysSPO);
                             var spo = SuperObject.Read(reader, off_alwaysSPO);
 
                             var pb = spo.Gao.AddComponent<PersoBehaviour>();

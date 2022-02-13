@@ -49,7 +49,7 @@ namespace Raymap {
             public bool IgnoreCacheOnRead => false;
 
             /// <summary>
-            /// The pointer size to use when logging a <see cref="Pointer"/>. Set to <see langword="null"/> to dynamically determine the appropriate size.
+            /// The pointer size to use when logging a <see cref="LegacyPointer"/>. Set to <see langword="null"/> to dynamically determine the appropriate size.
             /// </summary>
             public PointerSize? LoggingPointerSize => PointerSize.Pointer32;
 

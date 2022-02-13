@@ -9,11 +9,11 @@ using UnityEngine;
 namespace OpenSpace.Waypoints {
     public class WayPoint : IReferenceable{
 
-        public Pointer offset;
+        public LegacyPointer offset;
         public Vector3 position;
         public float radius;
 
-        public Pointer off_perso_so;
+        public LegacyPointer off_perso_so;
 
         [JsonIgnore]
         public List<GraphNode> containingGraphNodes;
@@ -39,22 +39,22 @@ namespace OpenSpace.Waypoints {
         }
         // ^ for isolate waypoints
 
-        public WayPoint(Pointer offset) {
+        public WayPoint(LegacyPointer offset) {
             this.offset = offset;
             containingGraphNodes = new List<GraphNode>();
         }
 
-        public static WayPoint FromOffset(Pointer offset) {
+        public static WayPoint FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.waypoints.FirstOrDefault(w => w.offset == offset);
         }
 
-        public static WayPoint FromOffsetOrRead(Pointer offset, Reader reader) {
+        public static WayPoint FromOffsetOrRead(LegacyPointer offset, Reader reader) {
             if (offset == null) return null;
             WayPoint w = FromOffset(offset);
             if (w == null) {
-                Pointer.DoAt(ref reader, offset, () => {
+                LegacyPointer.DoAt(ref reader, offset, () => {
                     w = WayPoint.Read(reader, offset);
                     MapLoader.Loader.waypoints.Add(w);
                 });
@@ -62,7 +62,7 @@ namespace OpenSpace.Waypoints {
             return w;
         }
 
-        public static WayPoint Read(Reader reader, Pointer offset) {
+        public static WayPoint Read(Reader reader, LegacyPointer offset) {
 
             WayPoint wp = new WayPoint(offset);
             float radius = 0;
@@ -81,7 +81,7 @@ namespace OpenSpace.Waypoints {
                 radius = reader.ReadSingle();
             }
             if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
-                wp.off_perso_so = Pointer.Read(reader);// perso
+                wp.off_perso_so = LegacyPointer.Read(reader);// perso
             }
 
             wp.position = new Vector3(x, y, z);

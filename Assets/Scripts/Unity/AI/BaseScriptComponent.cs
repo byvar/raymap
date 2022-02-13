@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using OpenSpace;
 
 public abstract class BaseScriptComponent : MonoBehaviour {
-    public OpenSpace.Pointer Offset;
+    public OpenSpace.LegacyPointer Offset;
     public string offsetString;
     public string comportOffset;
     public bool showOffset = false;

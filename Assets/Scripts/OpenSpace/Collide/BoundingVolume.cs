@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OpenSpace.Collide {
     public class BoundingVolume {
-        public Pointer offset;
+        public LegacyPointer offset;
 
         public enum Type {
             Sphere, Box
@@ -49,7 +49,7 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public BoundingVolume(Pointer offset) {
+        public BoundingVolume(LegacyPointer offset) {
             this.offset = offset;
         }
 
@@ -67,7 +67,7 @@ namespace OpenSpace.Collide {
         }
 
         // SuperObject BoundingVolume
-        public static BoundingVolume Read(Reader reader, Pointer offset, Type type) {
+        public static BoundingVolume Read(Reader reader, LegacyPointer offset, Type type) {
             BoundingVolume volume = new BoundingVolume(offset);
 
             volume.type = type;

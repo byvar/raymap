@@ -30,12 +30,12 @@ namespace Assets.Scripts.Editor {
         public struct TableEntry
         {
             public string Name;
-            public Pointer Address;
+            public LegacyPointer Address;
             public CEVarType Type;
             public bool ShowAsHex;
             public List<TableEntry> Children;
 
-            public TableEntry(string name, Pointer address, CEVarType type, bool showAsHex) : this()
+            public TableEntry(string name, LegacyPointer address, CEVarType type, bool showAsHex) : this()
             {
                 Name = name;
                 Address = address;

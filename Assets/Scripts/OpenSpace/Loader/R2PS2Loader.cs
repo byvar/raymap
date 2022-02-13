@@ -26,7 +26,7 @@ namespace OpenSpace.Loader {
     public class R2PS2Loader : MapLoader {
 		public List<TextureDictionary> txds = new List<TextureDictionary>();
 		public MeshFile ato;
-		public Pointer[] off_materials;
+		public LegacyPointer[] off_materials;
 		public uint meshesRead = 0;
 		public VisualMaterial lightCookieMaterial;
 		public Color[] lightCookieColors;
@@ -109,19 +109,19 @@ namespace OpenSpace.Loader {
             await WaitIfNecessary();
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
-            Pointer off_base_fix = Pointer.Current(reader);
+            LegacyPointer off_base_fix = LegacyPointer.Current(reader);
 
 			loadingState = "Loading input struct";
 			await WaitIfNecessary();
 			for (int i = 0; i < CPA_Settings.s.numEntryActions; i++) {
-				Pointer.Read(reader); // 3DOS_EntryActions
+				LegacyPointer.Read(reader); // 3DOS_EntryActions
 			}
 
-			inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+			inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
-			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
 
 			/*
             Pointer off_inputStructure = Pointer.Read(reader);
@@ -232,33 +232,33 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32(); // 0xc
 			reader.ReadUInt32(); // 0
-			Pointer.Read(reader);
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
 
             // Globals
-            globals.off_actualWorld = Pointer.Read(reader);
-            globals.off_dynamicWorld = Pointer.Read(reader);
-            globals.off_fatherSector = Pointer.Read(reader);
+            globals.off_actualWorld = LegacyPointer.Read(reader);
+            globals.off_dynamicWorld = LegacyPointer.Read(reader);
+            globals.off_fatherSector = LegacyPointer.Read(reader);
             globals.num_always = reader.ReadUInt32();
-            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
 			//globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
-			Pointer.Read(reader); // format: (0x4 number, number * 0x4: null)
-			globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-			Pointer.Read(reader);
-			Pointer.Read(reader);
-			Pointer.Read(reader);
-			Pointer.Read(reader);
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader); // format: (0x4 number, number * 0x4: null)
+			globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
 
-			LinkedList<Perso> cameras = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-			families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
-			LinkedList<Perso> mainChars = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-            Pointer.Read(reader); // Rayman
+			LinkedList<Perso> cameras = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+			families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
+			LinkedList<Perso> mainChars = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+            LegacyPointer.Read(reader); // Rayman
             reader.ReadUInt32();
-            globals.off_camera = Pointer.Read(reader); // Camera
-			Pointer.Read(reader);
-			Pointer.Read(reader);
-			Pointer.Read(reader);
+            globals.off_camera = LegacyPointer.Read(reader); // Camera
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
 
 			uint numMeshes = (uint)files_array[Mem.Lvl].extraData["numMeshes"];
 			uint numMaterials = (uint)files_array[Mem.Lvl].extraData["numMaterials"];
@@ -268,46 +268,46 @@ namespace OpenSpace.Loader {
 
 
 			textures = new TextureInfo[numTextures];
-			Pointer[] off_meshes = new Pointer[numMeshes];
-			off_materials = new Pointer[numMaterials];
+			LegacyPointer[] off_meshes = new LegacyPointer[numMeshes];
+			off_materials = new LegacyPointer[numMaterials];
 			for (int i = 0; i < numMeshes; i++) {
-				off_meshes[i] = Pointer.Read(reader);
+				off_meshes[i] = LegacyPointer.Read(reader);
 			}
 			for (int i = 0; i < numMaterials; i++) {
-				off_materials[i] = Pointer.Read(reader);
+				off_materials[i] = LegacyPointer.Read(reader);
 			}
 			for (int i = 0; i < numTextures; i++) {
-				Pointer off_textureInfo = Pointer.Read(reader);
+				LegacyPointer off_textureInfo = LegacyPointer.Read(reader);
 				int texture_index = reader.ReadInt32();
-				Pointer.DoAt(ref reader, off_textureInfo, () => {
+				LegacyPointer.DoAt(ref reader, off_textureInfo, () => {
 					textures[i] = TextureInfo.Read(reader, off_textureInfo);
 					textures[i].Texture = txds[0].Lookup(texture_index.ToString("D3"));
 					//textures[i].Texture = txds[0].textures[txds[0].Count - 1 - texture_index];
 				});
 			}
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			uint num_unk = reader.ReadUInt32();
 			for (int i = 0; i < num_unk; i++) {
-				Pointer.Read(reader);
+				LegacyPointer.Read(reader);
 			}
 			uint num_unk2 = reader.ReadUInt32();
 			for (int i = 0; i < num_unk2; i++) {
-				Pointer.Read(reader);
+				LegacyPointer.Read(reader);
 			}
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			reader.ReadSingle(); // a bounding volume most likely
 			reader.ReadSingle();
 			reader.ReadSingle();
 			reader.ReadSingle();
 			reader.ReadSingle();
 			reader.ReadSingle();
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			reader.ReadUInt32(); // 2?
 			uint num_poTable = reader.ReadUInt32();
-			Pointer off_poTable = Pointer.Read(reader);
+			LegacyPointer off_poTable = LegacyPointer.Read(reader);
 			reader.ReadUInt32(); // 1. 10x 0
 			reader.ReadUInt32(); // 2
 			reader.ReadUInt32(); // 3
@@ -338,14 +338,14 @@ namespace OpenSpace.Loader {
 				reader.ReadByte();
 			}
 			reader.Align(0x4);
-			Pointer off_lightCookieMaterial = Pointer.Read(reader);
+			LegacyPointer off_lightCookieMaterial = LegacyPointer.Read(reader);
 			lightCookieMaterial = VisualMaterial.FromOffsetOrRead(off_lightCookieMaterial, reader);
-			off_lightmapUV = new Pointer[numLightmappedObjects];
+			off_lightmapUV = new LegacyPointer[numLightmappedObjects];
 			for (int i = 0; i < numLightmappedObjects; i++) {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
-				off_lightmapUV[i] = Pointer.Read(reader);
+				off_lightmapUV[i] = LegacyPointer.Read(reader);
 			}
 
 
@@ -354,7 +354,7 @@ namespace OpenSpace.Loader {
 				VisualMaterial.FromOffsetOrRead(off_materials[i], reader);
 			}
 			for (int i = 0; i < numMeshes; i++) {
-				Pointer.DoAt(ref reader, off_meshes[i], () => {
+				LegacyPointer.DoAt(ref reader, off_meshes[i], () => {
 					GeometricObject mesh = GeometricObject.Read(reader, off_meshes[i]);
 					meshObjects.Add(mesh);
 					//print("Mesh " + i + ": " + mesh.num_vertices + " - " + mesh.subblock_types[0] + " - " + mesh.num_subblocks);

@@ -133,7 +133,7 @@ public class RaymanTrail : MonoBehaviour
     {
         Reader reader = MapLoader.Loader.livePreviewReader;
 
-        Pointer.Goto(ref reader, Rayman.off_staticMatrix);
+        LegacyPointer.Goto(ref reader, Rayman.off_staticMatrix);
         Rayman.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, Rayman.off_staticMatrix);
         if (Rayman.data != null && Rayman.data.Gao != null) {
             Rayman.data.Gao.transform.position = Rayman.matrix.GetPosition(convertAxes: true);
@@ -145,7 +145,7 @@ public class RaymanTrail : MonoBehaviour
             PersoBehaviour pb = RaymanPersoBehaviour;
             if (pb != null) {
 
-                Pointer.Goto(ref reader, perso.p3dData.offset);
+                LegacyPointer.Goto(ref reader, perso.p3dData.offset);
                 perso.p3dData.UpdateCurrentState(reader);
 
                 // State offset changed?

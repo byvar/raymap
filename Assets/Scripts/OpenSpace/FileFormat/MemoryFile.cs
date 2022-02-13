@@ -23,7 +23,7 @@ namespace OpenSpace.FileFormat {
             writer = new Writer(stream, CPA_Settings.s.IsLittleEndian);
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             if (writer != null) {
                 if (pointer == null) {
                     writer.Write((uint)0);

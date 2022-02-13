@@ -12,13 +12,13 @@ using OpenSpace.Visual;
 
 namespace OpenSpace.Object.Properties {
     public class ObjectList : ILinkedListEntry, IList<ObjectListEntry> {
-        public Pointer offset;
-        public Pointer off_objList_next = null;
-        public Pointer off_objList_prev = null;
-        public Pointer off_objList_hdr = null; // at this offset, start and end pointers appear again
+        public LegacyPointer offset;
+        public LegacyPointer off_objList_next = null;
+        public LegacyPointer off_objList_prev = null;
+        public LegacyPointer off_objList_hdr = null; // at this offset, start and end pointers appear again
 		
-        public Pointer off_objList_start;
-        public Pointer off_objList_2;
+        public LegacyPointer off_objList_start;
+        public LegacyPointer off_objList_2;
         public ushort num_entries;
         public string unknownFamilyName;
 
@@ -45,11 +45,11 @@ namespace OpenSpace.Object.Properties {
             }
         }
 
-        public Pointer NextEntry {
+        public LegacyPointer NextEntry {
             get { return off_objList_next; }
         }
 
-        public Pointer PreviousEntry {
+        public LegacyPointer PreviousEntry {
             get { return off_objList_prev; }
         }
 
@@ -75,39 +75,39 @@ namespace OpenSpace.Object.Properties {
             }
         }
 
-        public ObjectList(Pointer offset) {
+        public ObjectList(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static ObjectList Read(Reader reader, Pointer offset) {
+        public static ObjectList Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             ObjectList ol = new ObjectList(offset);
             //l.print("ObjectList: " + Pointer.Current(reader));
-            if(CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Read(reader);
+            if(CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.hasLinkedListHeaderPointers) {
-                ol.off_objList_prev = Pointer.Read(reader);
-                ol.off_objList_hdr = Pointer.Read(reader);
+                ol.off_objList_prev = LegacyPointer.Read(reader);
+                ol.off_objList_hdr = LegacyPointer.Read(reader);
             }
-            ol.off_objList_start = Pointer.Read(reader);
-            ol.off_objList_2 = Pointer.Read(reader); // is this a copy of the list or something?
+            ol.off_objList_start = LegacyPointer.Read(reader);
+            ol.off_objList_2 = LegacyPointer.Read(reader); // is this a copy of the list or something?
             ol.num_entries = reader.ReadUInt16();
             reader.ReadUInt16();
 
-            if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) ol.off_objList_next = Pointer.Current(reader);
+            if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) ol.off_objList_next = LegacyPointer.Current(reader);
 
 			//l.print("ObjectList " + offset + " - " + ol.num_entries);
 
             if (ol.off_objList_start != null) {
-                Pointer.Goto(ref reader, ol.off_objList_start);
+                LegacyPointer.Goto(ref reader, ol.off_objList_start);
                 ol.entries = new ObjectListEntry[ol.num_entries];
                 for (uint i = 0; i < ol.num_entries; i++) {
                     // each entry is 0x14
                     ol.entries[i] = new ObjectListEntry();
 					if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
-						ol.entries[i].off_po = Pointer.Read(reader);
+						ol.entries[i].off_po = LegacyPointer.Read(reader);
 					} else {
-						ol.entries[i].off_scale = Pointer.Read(reader);
-						ol.entries[i].off_po = Pointer.Read(reader);
+						ol.entries[i].off_scale = LegacyPointer.Read(reader);
+						ol.entries[i].off_po = LegacyPointer.Read(reader);
 						ol.entries[i].thirdvalue = reader.ReadUInt32();
 						ol.entries[i].unk0 = reader.ReadUInt16();
 						ol.entries[i].unk1 = reader.ReadUInt16();
@@ -119,7 +119,7 @@ namespace OpenSpace.Object.Properties {
                     if (/*ol.entries[i].unk0 == 0 || ol.entries[i].unk0 == 4*/ ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT) {
                         ol.entries[i].po = null;
                         ol.entries[i].scale = null;
-                        Pointer.DoAt(ref reader, ol.entries[i].off_scale, () => {
+                        LegacyPointer.DoAt(ref reader, ol.entries[i].off_scale, () => {
                             float x = reader.ReadSingle();
                             float z = reader.ReadSingle();
                             float y = reader.ReadSingle();
@@ -153,7 +153,7 @@ namespace OpenSpace.Object.Properties {
 
 		public void ReadPO(Reader reader, int i) {
 			if (entries[i].po != null) return;
-			Pointer.DoAt(ref reader, entries[i].off_po, () => {
+			LegacyPointer.DoAt(ref reader, entries[i].off_po, () => {
 				entries[i].po = PhysicalObject.Read(reader, entries[i].off_po);
 				if (entries[i].po != null && entries[i].scale.HasValue) {
 					entries[i].po.scaleMultiplier = entries[i].scale.Value;
@@ -164,17 +164,17 @@ namespace OpenSpace.Object.Properties {
 			});
 		}
 
-		public static ObjectList FromOffset(Pointer offset) {
+		public static ObjectList FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.objectLists.FirstOrDefault(f => f.offset == offset);
         }
 
-        public static ObjectList FromOffsetOrRead(Pointer offset, Reader reader) {
+        public static ObjectList FromOffsetOrRead(LegacyPointer offset, Reader reader) {
             if (offset == null) return null;
             ObjectList ol = FromOffset(offset);
             if (ol == null) {
-                Pointer.DoAt(ref reader, offset, () => {
+                LegacyPointer.DoAt(ref reader, offset, () => {
                     ol = ObjectList.Read(reader, offset);
                     MapLoader.Loader.objectLists.Add(ol);
                 });

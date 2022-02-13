@@ -10,35 +10,35 @@ namespace OpenSpace.Cinematics {
 	/// Called "Cine" in the code
 	/// </summary>
     public class Cinematic : ILinkedListEntry {
-        public Pointer offset;
+        public LegacyPointer offset;
 		public LinkedList<CinematicActor> actors;
-		public Pointer off_next;
-		public Pointer off_previous;
-		public Pointer off_header;
+		public LegacyPointer off_next;
+		public LegacyPointer off_previous;
+		public LegacyPointer off_header;
 		public uint unk;
         public string name = null;
 
-        public Cinematic(Pointer offset) {
+        public Cinematic(LegacyPointer offset) {
             this.offset = offset;
         }
 
-		public Pointer NextEntry {
+		public LegacyPointer NextEntry {
 			get { return off_next; }
 		}
 
-		public Pointer PreviousEntry {
+		public LegacyPointer PreviousEntry {
 			get { return off_previous; }
 		}
 
-		public static Cinematic Read(Reader reader, Pointer offset) {
+		public static Cinematic Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
 			Cinematic c = new Cinematic(offset);
-			c.actors = LinkedList<CinematicActor>.Read(ref reader, Pointer.Current(reader), (off_actor) => {
+			c.actors = LinkedList<CinematicActor>.Read(ref reader, LegacyPointer.Current(reader), (off_actor) => {
 				return CinematicActor.Read(reader, off_actor);
 			}, type: LinkedList.Type.Double);
-			c.off_next = Pointer.Read(reader);
-			c.off_previous = Pointer.Read(reader);
-			c.off_header = Pointer.Read(reader);
+			c.off_next = LegacyPointer.Read(reader);
+			c.off_previous = LegacyPointer.Read(reader);
+			c.off_header = LegacyPointer.Read(reader);
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			c.name = reader.ReadString(0x100);

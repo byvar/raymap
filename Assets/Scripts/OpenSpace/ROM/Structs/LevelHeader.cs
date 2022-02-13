@@ -41,7 +41,7 @@ namespace OpenSpace.ROM {
 		public Reference<VisualMaterial> backgroundDownRight;
 
 		protected override void ReadInternal(Reader reader) {
-			MapLoader.Loader.print("Level Header: " + Pointer.Current(reader));
+			MapLoader.Loader.print("Level Header: " + LegacyPointer.Current(reader));
 			hierarchyRoot = new Reference<HierarchyRoot>(reader);
 			ref_46 = reader.ReadUInt16();
 			spawnablePersos = new Reference<SuperObjectDynamicArray>(reader);

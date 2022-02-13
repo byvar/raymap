@@ -4,11 +4,11 @@ using System;
 
 namespace OpenSpace.Input {
     public class KeyWord { // IPT_tdstEntryElement
-        public Pointer offset;
+        public LegacyPointer offset;
 
         public ushort indexOrKeyCode;
 		public int valueAsInt;
-		public Pointer valueAsPointer;
+		public LegacyPointer valueAsPointer;
         
         public KeyWord[] subkeywords;
         public bool isFunction = false;
@@ -25,11 +25,11 @@ namespace OpenSpace.Input {
             get { return (byte)(indexOrKeyCode & 0xFF); }
         }
 
-        public KeyWord(Pointer offset) {
+        public KeyWord(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static KeyWord Read(Reader reader, Pointer offset, bool isFunction=true) {
+        public static KeyWord Read(Reader reader, LegacyPointer offset, bool isFunction=true) {
             KeyWord keyword = new KeyWord(offset);
 
             // Read 20 in total for R2iOS
@@ -39,9 +39,9 @@ namespace OpenSpace.Input {
                 reader.ReadInt32();
             }
 
-			Pointer off_value = Pointer.Current(reader);
+			LegacyPointer off_value = LegacyPointer.Current(reader);
             keyword.indexOrKeyCode = reader.ReadUInt16();
-			Pointer.Goto(ref reader, off_value);
+			LegacyPointer.Goto(ref reader, off_value);
 
             if (CPA_Settings.s == CPA_Settings.R2PC) {
                 keyword.valueAsInt = reader.ReadInt16();
@@ -50,7 +50,7 @@ namespace OpenSpace.Input {
                 keyword.valueAsInt = reader.ReadInt32();
             }
 
-			keyword.valueAsPointer = Pointer.GetPointerAtOffset(off_value);
+			keyword.valueAsPointer = LegacyPointer.GetPointerAtOffset(off_value);
 			if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) reader.ReadInt32();
 			if(CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) reader.ReadInt32();
 
@@ -328,7 +328,7 @@ namespace OpenSpace.Input {
 					case InputFunctions.FunctionType.ActionInvalidated:
 					case InputFunctions.FunctionType.ActionJustValidated:
 					case InputFunctions.FunctionType.ActionJustInvalidated:
-						Pointer off_action = subkeywords[0].valueAsPointer;
+						LegacyPointer off_action = subkeywords[0].valueAsPointer;
 						if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) return FunctionType + "()";
 						EntryAction action = EntryAction.FromOffset(off_action);
 						return FunctionType + "{" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + "}";

@@ -15,7 +15,7 @@ namespace OpenSpace.PS1 {
 		public short y;
 		public short z;
 		public short short_0A;
-		public Pointer off_vertices;
+		public LegacyPointer off_vertices;
 
 		public short rot_m00;
 		public short rot_m01;
@@ -60,7 +60,7 @@ namespace OpenSpace.PS1 {
 			y = reader.ReadInt16();
 			z = reader.ReadInt16();
 			short_0A = reader.ReadInt16();
-			off_vertices = Pointer.Read(reader);
+			off_vertices = LegacyPointer.Read(reader);
 
 			rot_m00 = reader.ReadInt16();
 			rot_m01 = reader.ReadInt16();
@@ -81,7 +81,7 @@ namespace OpenSpace.PS1 {
 			unk6 = reader.ReadInt16();
 
 			vertices = new ushort[num_vertices];
-			Pointer.DoAt(ref reader, off_vertices, () => {
+			LegacyPointer.DoAt(ref reader, off_vertices, () => {
 				for (int i = 0; i < num_vertices; i++) {
 					vertices[i] = reader.ReadUInt16();
 				}

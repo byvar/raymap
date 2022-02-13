@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class Intelligence : OpenSpaceStruct {
-        public Pointer off_aiModel;
-        public Pointer off_actionTree;
-        public Pointer off_comport;
-        public Pointer off_lastComport;
-        public Pointer off_actionTable;
-        public Pointer off_defaultComport;
+        public LegacyPointer off_aiModel;
+        public LegacyPointer off_actionTree;
+        public LegacyPointer off_comport;
+        public LegacyPointer off_lastComport;
+        public LegacyPointer off_actionTable;
+        public LegacyPointer off_defaultComport;
 
         // Processed data
         public AIModel aiModel;
@@ -20,13 +20,13 @@ namespace OpenSpace.AI {
         public Behavior defaultComport;
 
         protected override void ReadInternal(Reader reader) {
-            off_aiModel = Pointer.Read(reader); // 0x0
-            off_actionTree = Pointer.Read(reader); //0x4
-            off_comport = Pointer.Read(reader); //0x8
+            off_aiModel = LegacyPointer.Read(reader); // 0x0
+            off_actionTree = LegacyPointer.Read(reader); //0x4
+            off_comport = LegacyPointer.Read(reader); //0x8
             if (CPA_Settings.s.game != CPA_Settings.Game.R2Demo) {
-                off_lastComport = Pointer.Read(reader);
-                off_actionTable = Pointer.Read(reader);
-                off_defaultComport = Pointer.Read(reader);
+                off_lastComport = LegacyPointer.Read(reader);
+                off_actionTable = LegacyPointer.Read(reader);
+                off_defaultComport = LegacyPointer.Read(reader);
             }
 
             aiModel = Load.FromOffset<AIModel>(off_aiModel);
@@ -38,11 +38,11 @@ namespace OpenSpace.AI {
         }
 
         public void Write(Writer writer) {
-            Pointer.Goto(ref writer, Offset + 8);
-            Pointer.Write(writer, off_comport);
+            LegacyPointer.Goto(ref writer, Offset + 8);
+            LegacyPointer.Write(writer, off_comport);
 
-            Pointer.Goto(ref writer, Offset + 20);
-            Pointer.Write(writer, off_defaultComport);
+            LegacyPointer.Goto(ref writer, Offset + 20);
+            LegacyPointer.Write(writer, off_defaultComport);
         }
     }
 }

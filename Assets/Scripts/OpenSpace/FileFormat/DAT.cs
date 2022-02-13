@@ -179,7 +179,7 @@ namespace OpenSpace.FileFormat {
             return; // Don't need to write to this file
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             return;
         }
     }

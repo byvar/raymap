@@ -5,20 +5,20 @@ using System.Text;
 
 namespace OpenSpace.Input {
     public class InputStructure {
-        public Pointer offset;
+        public LegacyPointer offset;
         public uint num_entryActions;
-        public Pointer off_entryActions;
+        public LegacyPointer off_entryActions;
         public List<EntryAction> entryActions = new List<EntryAction>();
 
-        public InputStructure(Pointer offset) {
+        public InputStructure(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static InputStructure Read(Reader reader, Pointer offset) {
+        public static InputStructure Read(Reader reader, LegacyPointer offset) {
             InputStructure input = new InputStructure(offset);
 			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				input.num_entryActions = reader.ReadUInt32();
-				input.off_entryActions = Pointer.Read(reader);
+				input.off_entryActions = LegacyPointer.Read(reader);
 			} else {
 				switch (CPA_Settings.s.platform) {
 					case CPA_Settings.Platform.GC:
@@ -31,7 +31,7 @@ namespace OpenSpace.Input {
 							reader.ReadBytes(0x12C8);
 						}
 						input.num_entryActions = reader.ReadUInt32();
-						input.off_entryActions = Pointer.Read(reader);
+						input.off_entryActions = LegacyPointer.Read(reader);
 						reader.ReadBytes(0x418);
 						break;
 					case CPA_Settings.Platform.PC:
@@ -46,7 +46,7 @@ namespace OpenSpace.Input {
 							reader.ReadBytes(0x16BC);
 						}
 						input.num_entryActions = reader.ReadUInt32();
-						input.off_entryActions = Pointer.Read(reader);
+						input.off_entryActions = LegacyPointer.Read(reader);
 						if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) {
 							reader.ReadBytes(0x14);
 						} else {
@@ -58,28 +58,28 @@ namespace OpenSpace.Input {
 					case CPA_Settings.Platform.PS3:
 						reader.ReadBytes(0x16BC);
 						input.num_entryActions = reader.ReadUInt32();
-						input.off_entryActions = Pointer.Read(reader);
+						input.off_entryActions = LegacyPointer.Read(reader);
 						reader.ReadBytes(0x418);
 						break;
 					case CPA_Settings.Platform.iOS:
 						reader.ReadBytes(0x2A0);
 						input.num_entryActions = reader.ReadUInt32();
-						input.off_entryActions = Pointer.Read(reader);
+						input.off_entryActions = LegacyPointer.Read(reader);
 						reader.ReadBytes(0x14);
 						break;
 					case CPA_Settings.Platform.DC:
 						reader.ReadBytes(0x278);
 						input.num_entryActions = reader.ReadUInt32();
-						input.off_entryActions = Pointer.Read(reader);
+						input.off_entryActions = LegacyPointer.Read(reader);
 						reader.ReadUInt32();
-						Pointer.Read(reader);
+						LegacyPointer.Read(reader);
 						break;
 					case CPA_Settings.Platform.PS2:
 						if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 							reader.ReadBytes(0x130);
 							input.num_entryActions = reader.ReadUInt32();
-							input.off_entryActions = Pointer.Read(reader);
-							Pointer.Read(reader);
+							input.off_entryActions = LegacyPointer.Read(reader);
+							LegacyPointer.Read(reader);
 							reader.ReadUInt16();
 							reader.ReadUInt16();
 							reader.ReadUInt32(); // 0F00020000040100
@@ -95,7 +95,7 @@ namespace OpenSpace.Input {
 								}
 							}
 							input.num_entryActions = reader.ReadUInt32();
-							input.off_entryActions = Pointer.Read(reader);
+							input.off_entryActions = LegacyPointer.Read(reader);
 							reader.ReadBytes(0x418);
 						}
 						break;
@@ -104,9 +104,9 @@ namespace OpenSpace.Input {
 
             if (input.off_entryActions != null && input.num_entryActions > 0) {
 				//input.entryActions = new EntryAction[input.num_entryActions];
-				Pointer.DoAt(ref reader, input.off_entryActions, () => {
+				LegacyPointer.DoAt(ref reader, input.off_entryActions, () => {
 					for (int i = 0; i < input.num_entryActions; i++) {
-						input.entryActions.Add(EntryAction.Read(reader, Pointer.Current(reader)));
+						input.entryActions.Add(EntryAction.Read(reader, LegacyPointer.Current(reader)));
 					}
 				});
             }

@@ -9,17 +9,17 @@ namespace OpenSpace.Collide {
     public class GeometricObjectElementCollideSpheres : IGeometricObjectElementCollide {
         public class IndexedSphere {
             public float radius;
-            public Pointer off_material;
+            public LegacyPointer off_material;
             public ushort centerPoint;
 
             public GameMaterial gameMaterial;
-            public Pointer debug_radiusAddress;
+            public LegacyPointer debug_radiusAddress;
         }
 
         [JsonIgnore] public GeometricObjectCollide geo;
-        public Pointer offset;
+        public LegacyPointer offset;
 		
-        public Pointer off_spheres; // called IndexedSprites in the game code
+        public LegacyPointer off_spheres; // called IndexedSprites in the game code
         public ushort num_spheres;
         public short ind_parallelBox;
         public IndexedSphere[] spheres;
@@ -36,7 +36,7 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public GeometricObjectElementCollideSpheres(Pointer offset, GeometricObjectCollide geo) {
+        public GeometricObjectElementCollideSpheres(LegacyPointer offset, GeometricObjectCollide geo) {
             this.geo = geo;
             this.offset = offset;
         }
@@ -82,41 +82,41 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public static GeometricObjectElementCollideSpheres Read(Reader reader, Pointer offset, GeometricObjectCollide geo) {
+        public static GeometricObjectElementCollideSpheres Read(Reader reader, LegacyPointer offset, GeometricObjectCollide geo) {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementCollideSpheres s = new GeometricObjectElementCollideSpheres(offset, geo);
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
-                s.off_spheres = Pointer.Read(reader);
+                s.off_spheres = LegacyPointer.Read(reader);
                 s.num_spheres = reader.ReadUInt16();
                 s.ind_parallelBox = reader.ReadInt16(); // -1
             } else {
                 s.num_spheres = (ushort)reader.ReadUInt32();
-                s.off_spheres = Pointer.Read(reader);
+                s.off_spheres = LegacyPointer.Read(reader);
             }
 
             if (s.off_spheres != null) {
-                Pointer off_current = Pointer.Goto(ref reader, s.off_spheres);
+                LegacyPointer off_current = LegacyPointer.Goto(ref reader, s.off_spheres);
                 s.spheres = new IndexedSphere[s.num_spheres];
                 for (uint i = 0; i < s.num_spheres; i++) {
                     s.spheres[i] = new IndexedSphere();
                     if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
-                        s.spheres[i].debug_radiusAddress = Pointer.Current(reader);
+                        s.spheres[i].debug_radiusAddress = LegacyPointer.Current(reader);
                         s.spheres[i].radius = reader.ReadSingle();
-                        s.spheres[i].off_material = Pointer.Read(reader);
+                        s.spheres[i].off_material = LegacyPointer.Read(reader);
                         s.spheres[i].centerPoint = reader.ReadUInt16();
                         reader.ReadUInt16();
                     } else {
                         s.spheres[i].centerPoint = reader.ReadUInt16();
                         reader.ReadUInt16();
-                        s.spheres[i].debug_radiusAddress = Pointer.Current(reader);
+                        s.spheres[i].debug_radiusAddress = LegacyPointer.Current(reader);
                         s.spheres[i].radius = reader.ReadSingle();
-                        s.spheres[i].off_material = Pointer.Read(reader);
+                        s.spheres[i].off_material = LegacyPointer.Read(reader);
                     }
                     if (!geo.isBoundingVolume) {
                         s.spheres[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.spheres[i].off_material, reader);
                     }
                 }
-                Pointer.Goto(ref reader, off_current);
+                LegacyPointer.Goto(ref reader, off_current);
             }
             return s;
         }

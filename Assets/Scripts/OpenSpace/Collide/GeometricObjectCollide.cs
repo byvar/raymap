@@ -12,17 +12,17 @@ namespace OpenSpace.Collide {
     /// </summary>
     public class GeometricObjectCollide {
         public PhysicalObject po;
-        public Pointer offset;
+        public LegacyPointer offset;
         public CollideType type;
 		
-        public Pointer off_modelstart;
+        public LegacyPointer off_modelstart;
         public ushort num_vertices;
         public ushort num_elements;
-        public Pointer off_vertices;
-        public Pointer off_normals = null;
-        public Pointer off_element_types;
-        public Pointer off_elements;
-        public Pointer off_parallelBoxes;
+        public LegacyPointer off_vertices;
+        public LegacyPointer off_normals = null;
+        public LegacyPointer off_element_types;
+        public LegacyPointer off_elements;
+        public LegacyPointer off_parallelBoxes;
         public ushort num_parallelBoxes;
         public Vector3 sphereCenter = Vector3.zero;
         public float sphereRadius = 0;
@@ -76,7 +76,7 @@ namespace OpenSpace.Collide {
                                      //m.gao.SetActive(false); // Invisible by default
         }
 
-        public GeometricObjectCollide(Pointer offset, CollideType type = CollideType.None) {
+        public GeometricObjectCollide(LegacyPointer offset, CollideType type = CollideType.None) {
             this.offset = offset;
             this.type = type;
         }
@@ -166,7 +166,7 @@ namespace OpenSpace.Collide {
             }
         }
 
-        public static GeometricObjectCollide Read(Reader reader, Pointer offset, CollideType type = CollideType.None, bool isBoundingVolume = false) {
+        public static GeometricObjectCollide Read(Reader reader, LegacyPointer offset, CollideType type = CollideType.None, bool isBoundingVolume = false) {
             MapLoader l = MapLoader.Loader;
 			//l.print("CollideMesh " + offset);
             GeometricObjectCollide m = new GeometricObjectCollide(offset, type);
@@ -179,17 +179,17 @@ namespace OpenSpace.Collide {
 				}
             }
             if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
-            m.off_vertices = Pointer.Read(reader);
+            m.off_vertices = LegacyPointer.Read(reader);
             if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
-                m.off_normals = Pointer.Read(reader);
-                Pointer.Read(reader);
+                m.off_normals = LegacyPointer.Read(reader);
+                LegacyPointer.Read(reader);
                 reader.ReadInt32();
             }
             if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
-            m.off_element_types = Pointer.Read(reader);
-            m.off_elements = Pointer.Read(reader);
+            m.off_element_types = LegacyPointer.Read(reader);
+            m.off_elements = LegacyPointer.Read(reader);
             if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
-                Pointer.Read(reader);
+                LegacyPointer.Read(reader);
                 if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                     if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) {
                         reader.ReadInt32();
@@ -207,7 +207,7 @@ namespace OpenSpace.Collide {
                     m.num_parallelBoxes = reader.ReadUInt16();
                 } else {
                     //l.print((Pointer.Current(reader).FileOffset - offset.FileOffset));
-                    m.off_parallelBoxes = Pointer.Read(reader);
+                    m.off_parallelBoxes = LegacyPointer.Read(reader);
                 }
             } else {
                 reader.ReadUInt32();
@@ -223,7 +223,7 @@ namespace OpenSpace.Collide {
             }
             
             // Vertices
-            Pointer off_current = Pointer.Goto(ref reader, m.off_vertices);
+            LegacyPointer off_current = LegacyPointer.Goto(ref reader, m.off_vertices);
             m.vertices = new Vector3[m.num_vertices];
             for (int i = 0; i < m.num_vertices; i++) {
                 float x = reader.ReadSingle();
@@ -234,7 +234,7 @@ namespace OpenSpace.Collide {
 
             // Normals
             if (m.off_normals != null) {
-                off_current = Pointer.Goto(ref reader, m.off_normals);
+                off_current = LegacyPointer.Goto(ref reader, m.off_normals);
                 m.normals = new Vector3[m.num_vertices];
                 for (int i = 0; i < m.num_vertices; i++) {
                     float x = reader.ReadSingle();
@@ -244,7 +244,7 @@ namespace OpenSpace.Collide {
                 }
             }
             // Read subblock types & initialize arrays
-            Pointer.Goto(ref reader, m.off_element_types);
+            LegacyPointer.Goto(ref reader, m.off_element_types);
             m.element_types = new ushort[m.num_elements];
             m.elements = new IGeometricObjectElementCollide[m.num_elements];
             for (uint i = 0; i < m.num_elements; i++) {
@@ -252,9 +252,9 @@ namespace OpenSpace.Collide {
             }
 
             for (uint i = 0; i < m.num_elements; i++) {
-                Pointer.Goto(ref reader, m.off_elements + (i * 4));
-                Pointer block_offset = Pointer.Read(reader);
-                Pointer.Goto(ref reader, block_offset);
+                LegacyPointer.Goto(ref reader, m.off_elements + (i * 4));
+                LegacyPointer block_offset = LegacyPointer.Read(reader);
+                LegacyPointer.Goto(ref reader, block_offset);
                 switch (m.element_types[i]) {
                     /*1 = indexedtriangles
                     2 = facemap

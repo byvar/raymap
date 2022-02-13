@@ -9,13 +9,13 @@ namespace OpenSpace {
     /// Transformation matrix storing position, rotation and scale. Also, an unknown vector4 and type.
     /// </summary>
     public class Matrix {
-        public Pointer offset;
+        public LegacyPointer offset;
         public UInt32 type;
         public Matrix4x4 m;
         public Matrix4x4? scaleMatrix;
         public Vector4? v;
 
-        public Matrix(Pointer offset, uint type, Matrix4x4 matrix, Vector4? vec) {
+        public Matrix(LegacyPointer offset, uint type, Matrix4x4 matrix, Vector4? vec) {
             this.offset = offset;
             this.type = type;
             this.m = matrix;
@@ -246,7 +246,7 @@ namespace OpenSpace {
             return q;
         }
 
-        public static Matrix Read(Reader reader, Pointer offset) {
+        public static Matrix Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
 			//l.print("MATRIX " + offset);
             UInt32 type = CPA_Settings.s.game != CPA_Settings.Game.R2Revolution ? reader.ReadUInt32() : 0; // 0x02: always at the start of a transformation matrix
@@ -304,7 +304,7 @@ namespace OpenSpace {
             return mat;
         }
 
-        public static Matrix ReadCompressed(Reader reader, Pointer offset) {
+        public static Matrix ReadCompressed(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             ushort type = reader.ReadUInt16();
             Vector4 vec = new Vector4(1f, 1f, 1f, 1f);
@@ -401,7 +401,7 @@ namespace OpenSpace {
         }
 
         public void Write(Writer writer) {
-            Pointer.Goto(ref writer, offset);
+            LegacyPointer.Goto(ref writer, offset);
             writer.Write(type);
 
             if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {

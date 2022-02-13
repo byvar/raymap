@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace OpenSpace.Animation {
     public class AnimationBank : IEquatable<AnimationBank> {
-        public Pointer off_header;
-        public Pointer off_data;
+        public LegacyPointer off_header;
+        public LegacyPointer off_data;
         public AnimationStack a3d_general;
         public AnimationStack vectors;
         public AnimationStack quaternions;
@@ -39,7 +39,7 @@ namespace OpenSpace.Animation {
         public AnimMorphData[]     global_morphData;
         public AnimDeformation[]   global_deformations;
 
-        public AnimationBank(Pointer off_header) {
+        public AnimationBank(LegacyPointer off_header) {
             this.off_header = off_header;
         }
         public override bool Equals(System.Object obj) {
@@ -63,13 +63,13 @@ namespace OpenSpace.Animation {
             return !(x == y);
         }
 
-        public static AnimationBank[] Read(Reader reader, Pointer offset, uint index, uint num_banks, FileFormat.FileWithPointers kfFile, bool append = false) {
+        public static AnimationBank[] Read(Reader reader, LegacyPointer offset, uint index, uint num_banks, FileFormat.FileWithPointers kfFile, bool append = false) {
             MapLoader l = MapLoader.Loader;
             AnimationBank[] banks = new AnimationBank[num_banks];
 
             for (int i = 0; i < num_banks; i++) {
                 // In R3, each animation bank is of size 0x104 = 13 times a stack description of 5 uint32s.
-                banks[i] = new AnimationBank(Pointer.Current(reader));
+                banks[i] = new AnimationBank(LegacyPointer.Current(reader));
                 banks[i].a3d_general = AnimationStack.Read(reader);
                 banks[i].vectors = AnimationStack.Read(reader);
                 banks[i].quaternions = AnimationStack.Read(reader);
@@ -92,57 +92,57 @@ namespace OpenSpace.Animation {
             if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3GC && !append) {
                 if (!CPA_Settings.s.loadFromMemory) {
                     for (int i = 0; i < num_banks; i++) {
-                        if (banks[i].a3d_general.reservedMemory > 0) banks[i].a3d_general.off_data = Pointer.Read(reader);
-                        if (banks[i].vectors.reservedMemory > 0) banks[i].vectors.off_data = Pointer.Read(reader);
-                        if (banks[i].quaternions.reservedMemory > 0) banks[i].quaternions.off_data = Pointer.Read(reader);
-                        if (banks[i].hierarchies.reservedMemory > 0) banks[i].hierarchies.off_data = Pointer.Read(reader);
-                        if (banks[i].NTTO.reservedMemory > 0) banks[i].NTTO.off_data = Pointer.Read(reader);
-                        if (banks[i].onlyFrames.reservedMemory > 0) banks[i].onlyFrames.off_data = Pointer.Read(reader);
-                        if (banks[i].channels.reservedMemory > 0) banks[i].channels.off_data = Pointer.Read(reader);
-                        if (banks[i].framesNumOfNTTO.reservedMemory > 0) banks[i].framesNumOfNTTO.off_data = Pointer.Read(reader);
-                        if (banks[i].framesKFIndex.reservedMemory > 0) banks[i].framesKFIndex.off_data = Pointer.Read(reader);
+                        if (banks[i].a3d_general.reservedMemory > 0) banks[i].a3d_general.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].vectors.reservedMemory > 0) banks[i].vectors.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].quaternions.reservedMemory > 0) banks[i].quaternions.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].hierarchies.reservedMemory > 0) banks[i].hierarchies.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].NTTO.reservedMemory > 0) banks[i].NTTO.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].onlyFrames.reservedMemory > 0) banks[i].onlyFrames.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].channels.reservedMemory > 0) banks[i].channels.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].framesNumOfNTTO.reservedMemory > 0) banks[i].framesNumOfNTTO.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].framesKFIndex.reservedMemory > 0) banks[i].framesKFIndex.off_data = LegacyPointer.Read(reader);
                         if (kfFile == null) {
-                            if (banks[i].keyframes.reservedMemory > 0) banks[i].keyframes.off_data = Pointer.Read(reader);
+                            if (banks[i].keyframes.reservedMemory > 0) banks[i].keyframes.off_data = LegacyPointer.Read(reader);
                         } else {
-                            banks[i].keyframes.off_data = new Pointer(0, kfFile);
+                            banks[i].keyframes.off_data = new LegacyPointer(0, kfFile);
                         }
-                        if (banks[i].events.reservedMemory > 0) banks[i].events.off_data = Pointer.Read(reader);
-                        if (banks[i].morphData.reservedMemory > 0) banks[i].morphData.off_data = Pointer.Read(reader);
-                        if (CPA_Settings.s.hasDeformations && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = Pointer.Read(reader);
+                        if (banks[i].events.reservedMemory > 0) banks[i].events.off_data = LegacyPointer.Read(reader);
+                        if (banks[i].morphData.reservedMemory > 0) banks[i].morphData.off_data = LegacyPointer.Read(reader);
+                        if (CPA_Settings.s.hasDeformations && banks[i].deformations.reservedMemory > 0) banks[i].deformations.off_data = LegacyPointer.Read(reader);
                     }
                 } else {
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_a3d"], offset.file));
-                    for(int i = 0; i < num_banks; i++) banks[i].a3d_general.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_vectors"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].vectors.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_quaternions"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].quaternions.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_hierarchies"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].hierarchies.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_NTTO"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].NTTO.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_onlyFrames"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].onlyFrames.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_channels"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].channels.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_framesNumOfNTTO"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].framesNumOfNTTO.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_framesKF"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].framesKFIndex.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_keyframes"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].keyframes.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_events"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].events.off_data = Pointer.Read(reader);
-                    Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_morphData"], offset.file));
-                    for (int i = 0; i < num_banks; i++) banks[i].morphData.off_data = Pointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_a3d"], offset.file));
+                    for(int i = 0; i < num_banks; i++) banks[i].a3d_general.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_vectors"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].vectors.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_quaternions"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].quaternions.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_hierarchies"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].hierarchies.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_NTTO"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].NTTO.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_onlyFrames"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].onlyFrames.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_channels"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].channels.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_framesNumOfNTTO"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].framesNumOfNTTO.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_framesKF"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].framesKFIndex.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_keyframes"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].keyframes.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_events"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].events.off_data = LegacyPointer.Read(reader);
+                    LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_morphData"], offset.file));
+                    for (int i = 0; i < num_banks; i++) banks[i].morphData.off_data = LegacyPointer.Read(reader);
                     if (CPA_Settings.s.hasDeformations) {
-                        Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_deformations"], offset.file));
-                        for (int i = 0; i < num_banks; i++) banks[i].deformations.off_data = Pointer.Read(reader);
+                        LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_deformations"], offset.file));
+                        for (int i = 0; i < num_banks; i++) banks[i].deformations.off_data = LegacyPointer.Read(reader);
                     }
                 }
             }
-            Pointer off_current = Pointer.Current(reader);
-            Pointer off_a3d = null;
+            LegacyPointer off_current = LegacyPointer.Current(reader);
+            LegacyPointer off_a3d = null;
             uint num_a3d = (uint)banks.Sum(b => b.a3d_general.count);
             if (kfFile != null && CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC) {
                 kfFile.GotoHeader();
@@ -151,12 +151,12 @@ namespace OpenSpace.Animation {
                 for (uint i = 0; i < num_a3d; i++) {
                     a3d_sizes[i] = reader.ReadUInt32();
                 }
-                off_a3d = Pointer.Current(reader);
+                off_a3d = LegacyPointer.Current(reader);
                 uint current_anim = 0;
                 for (uint i = 0; i < banks.Length; i++) {
                     uint num_a3d_in_bank = banks[i].a3d_general.count;
                     for (uint j = 0; j < num_a3d_in_bank; j++) {
-                        Pointer.Goto(ref reader, off_a3d);
+                        LegacyPointer.Goto(ref reader, off_a3d);
 						// Read animation data here
 						banks[i].animations[j] = l.FromOffsetOrRead<AnimA3DGeneral>(reader, off_a3d, onPreRead: (a3d) => {
 							a3d.readFull = true;
@@ -164,7 +164,7 @@ namespace OpenSpace.Animation {
                         off_a3d += a3d_sizes[current_anim];
 
                         // Check if read correctly
-                        Pointer off_postAnim = Pointer.Current(reader);
+                        LegacyPointer off_postAnim = LegacyPointer.Current(reader);
                         if (off_postAnim != off_a3d) l.print("Animation block size does not match data size: " +
                             "Current offset: " + off_postAnim + " - Expected offset: " + off_a3d +
                             " - Block start: " + (off_a3d + -(int)(a3d_sizes[current_anim])));
@@ -176,43 +176,43 @@ namespace OpenSpace.Animation {
                 for (uint i = 0; i < banks.Length; i++) {
                     if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) reader.AutoAligning = true;
                     
-					if (banks[i].a3d_general.off_data != null) Pointer.Goto(ref reader, banks[i].a3d_general.off_data);
+					if (banks[i].a3d_general.off_data != null) LegacyPointer.Goto(ref reader, banks[i].a3d_general.off_data);
 					banks[i].animations = l.ReadArray<AnimA3DGeneral>(banks[i].a3d_general.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-					if (banks[i].vectors.off_data != null) Pointer.Goto(ref reader, banks[i].vectors.off_data);
+					if (banks[i].vectors.off_data != null) LegacyPointer.Goto(ref reader, banks[i].vectors.off_data);
 					banks[i].global_vectors = l.ReadArray<AnimVector>(banks[i].vectors.Count(append), reader);
 
 					if (reader.AutoAligning) reader.AutoAlign(4);
-					if (banks[i].quaternions.off_data != null) Pointer.Goto(ref reader, banks[i].quaternions.off_data);
+					if (banks[i].quaternions.off_data != null) LegacyPointer.Goto(ref reader, banks[i].quaternions.off_data);
 					banks[i].global_quaternions = l.ReadArray<AnimQuaternion>(banks[i].quaternions.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-                    if (banks[i].hierarchies.off_data != null) Pointer.Goto(ref reader, banks[i].hierarchies.off_data);
+                    if (banks[i].hierarchies.off_data != null) LegacyPointer.Goto(ref reader, banks[i].hierarchies.off_data);
 					banks[i].global_hierarchies = l.ReadArray<AnimHierarchy>(banks[i].hierarchies.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-					if (banks[i].NTTO.off_data != null) Pointer.Goto(ref reader, banks[i].NTTO.off_data);
+					if (banks[i].NTTO.off_data != null) LegacyPointer.Goto(ref reader, banks[i].NTTO.off_data);
 					banks[i].global_NTTO = l.ReadArray<AnimNTTO>(banks[i].NTTO.Count(append), reader);
 
 					if (reader.AutoAligning) reader.AutoAlign(4);
-					if (banks[i].onlyFrames.off_data != null) Pointer.Goto(ref reader, banks[i].onlyFrames.off_data);
+					if (banks[i].onlyFrames.off_data != null) LegacyPointer.Goto(ref reader, banks[i].onlyFrames.off_data);
 					banks[i].global_onlyFrames = l.ReadArray<AnimOnlyFrame>(banks[i].onlyFrames.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-                    if (banks[i].channels.off_data != null) Pointer.Goto(ref reader, banks[i].channels.off_data);
+                    if (banks[i].channels.off_data != null) LegacyPointer.Goto(ref reader, banks[i].channels.off_data);
                     banks[i].global_channels = l.ReadArray<AnimChannel>(banks[i].channels.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-                    if (banks[i].framesNumOfNTTO.off_data != null) Pointer.Goto(ref reader, banks[i].framesNumOfNTTO.off_data);
+                    if (banks[i].framesNumOfNTTO.off_data != null) LegacyPointer.Goto(ref reader, banks[i].framesNumOfNTTO.off_data);
                     banks[i].global_numOfNTTO = l.ReadArray<AnimNumOfNTTO>(banks[i].framesNumOfNTTO.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-                    if (banks[i].framesKFIndex.off_data != null) Pointer.Goto(ref reader, banks[i].framesKFIndex.off_data);
+                    if (banks[i].framesKFIndex.off_data != null) LegacyPointer.Goto(ref reader, banks[i].framesKFIndex.off_data);
 					banks[i].global_framesKFIndex = l.ReadArray<AnimFramesKFIndex>(banks[i].framesKFIndex.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-                    if (banks[i].keyframes.off_data != null) Pointer.Goto(ref reader, banks[i].keyframes.off_data);
+                    if (banks[i].keyframes.off_data != null) LegacyPointer.Goto(ref reader, banks[i].keyframes.off_data);
                     if (banks[i].keyframes.Count(append) > 0 && kfFile != null) {
                         int alignBytes = reader.ReadInt32();
                         if(alignBytes > 0) reader.Align(4, alignBytes);
@@ -220,16 +220,16 @@ namespace OpenSpace.Animation {
                     banks[i].global_keyframes = l.ReadArray<AnimKeyframe>(banks[i].keyframes.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-                    if (banks[i].events.off_data != null) Pointer.Goto(ref reader, banks[i].events.off_data);
+                    if (banks[i].events.off_data != null) LegacyPointer.Goto(ref reader, banks[i].events.off_data);
 					banks[i].global_events = l.ReadArray<AnimEvent>(banks[i].events.Count(append), reader);
 
                     if (reader.AutoAligning) reader.AutoAlign(4);
-                    if (banks[i].morphData.off_data != null) Pointer.Goto(ref reader, banks[i].morphData.off_data);
+                    if (banks[i].morphData.off_data != null) LegacyPointer.Goto(ref reader, banks[i].morphData.off_data);
 					banks[i].global_morphData = l.ReadArray<AnimMorphData>(banks[i].morphData.Count(append), reader);
 
 					if (CPA_Settings.s.hasDeformations) {
 						if (reader.AutoAligning) reader.AutoAlign(4);
-						if (banks[i].deformations.off_data != null) Pointer.Goto(ref reader, banks[i].deformations.off_data);
+						if (banks[i].deformations.off_data != null) LegacyPointer.Goto(ref reader, banks[i].deformations.off_data);
 						banks[i].global_deformations = l.ReadArray<AnimDeformation>(banks[i].deformations.Count(append), reader);
 					}
                     reader.AutoAligning = false;
@@ -308,29 +308,29 @@ namespace OpenSpace.Animation {
                     if(append) Util.AppendArrayAndMergeReferences(ref l.animationBanks[index + i].animations, ref banks[i].animations, (int)banks[i].a3d_general.countInFix);
                 }
             }
-            Pointer.Goto(ref reader, off_current);
+            LegacyPointer.Goto(ref reader, off_current);
             //Debug.LogError("Bank here: " + offset);
             return banks;
         }
 
         // A completely separate Read function for the Dreamcast version, since it's so different
-        public static AnimationBank ReadDreamcast(Reader reader, Pointer offset, Pointer off_events_fix, uint num_events_fix) {
+        public static AnimationBank ReadDreamcast(Reader reader, LegacyPointer offset, LegacyPointer off_events_fix, uint num_events_fix) {
             MapLoader l = MapLoader.Loader;
             AnimationBank bank = new AnimationBank(offset);
-            bank.a3d_general = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.vectors = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.quaternions = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.hierarchies = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.NTTO = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.onlyFrames = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.channels = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.framesNumOfNTTO = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.framesKFIndex = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.keyframes = new AnimationStack() { off_data = Pointer.Read(reader) };
-            bank.events = new AnimationStack() { off_data = Pointer.Read(reader), countInFix = num_events_fix };
+            bank.a3d_general = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.vectors = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.quaternions = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.hierarchies = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.NTTO = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.onlyFrames = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.channels = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.framesNumOfNTTO = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.framesKFIndex = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.keyframes = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            bank.events = new AnimationStack() { off_data = LegacyPointer.Read(reader), countInFix = num_events_fix };
             bank.events.count = bank.events.countInFix + reader.ReadUInt32();
-            bank.morphData = new AnimationStack() { off_data = Pointer.Read(reader) };
-            Pointer off_current = Pointer.Current(reader);
+            bank.morphData = new AnimationStack() { off_data = LegacyPointer.Read(reader) };
+            LegacyPointer off_current = LegacyPointer.Current(reader);
 
             uint max_a3d_ind = 0, num_vectors = 0, num_quaternions = 0, num_hierarchies = 0, num_NTTO = 0,
                 num_numNTTO = 0, num_channels = 0, num_onlyFrames = 0, num_framesKF = 0, num_keyframes = 0, num_morphData = 0;
@@ -402,7 +402,7 @@ namespace OpenSpace.Animation {
 			bank.keyframes.count = num_keyframes;
 			bank.global_keyframes = l.ReadArray<AnimKeyframe>(bank.keyframes.Count(false), reader, bank.keyframes.off_data);
 
-            Pointer.Goto(ref reader, off_current);
+            LegacyPointer.Goto(ref reader, off_current);
             for (uint j = 0; j < bank.animations.Length; j++) {
                 bank.animations[j].vectors = bank.global_vectors;
                 bank.animations[j].quaternions = bank.global_quaternions;

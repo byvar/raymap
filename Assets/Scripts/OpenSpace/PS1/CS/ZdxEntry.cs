@@ -5,11 +5,11 @@ using CollideType = OpenSpace.Collide.CollideType;
 namespace OpenSpace.PS1 {
 	public class ZdxEntry : OpenSpaceStruct {
 		public uint num_spheres;
-		public Pointer off_spheres; // 0x10 large
+		public LegacyPointer off_spheres; // 0x10 large
 		public uint num_boxes;
-		public Pointer off_boxes; // 0x14 large
+		public LegacyPointer off_boxes; // 0x14 large
 		public uint unk;
-		public Pointer off_unk; // 0x3c large
+		public LegacyPointer off_unk; // 0x3c large
 
 		// Parsed
 		public ZdxSphere[] spheres;
@@ -17,11 +17,11 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			num_spheres = reader.ReadUInt32();
-			off_spheres = Pointer.Read(reader);
+			off_spheres = LegacyPointer.Read(reader);
 			num_boxes = reader.ReadUInt32();
-			off_boxes = Pointer.Read(reader);
+			off_boxes = LegacyPointer.Read(reader);
 			unk = reader.ReadUInt32();
-			off_unk = Pointer.Read(reader);
+			off_unk = LegacyPointer.Read(reader);
 
 			spheres = Load.ReadArray<ZdxSphere>(num_spheres, reader, off_spheres);
 			boxes = Load.ReadArray<ZdxBox>(num_boxes, reader, off_boxes);

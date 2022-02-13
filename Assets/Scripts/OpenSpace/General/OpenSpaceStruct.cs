@@ -10,20 +10,20 @@ namespace OpenSpace {
 	/// Recently introduced, so don't expect it to be used a lot yet
 	/// </summary>
 	public abstract class OpenSpaceStruct {
-		public Pointer Offset { get; protected set; }
+		public LegacyPointer Offset { get; protected set; }
 
-		public void Init(Pointer offset) {
+		public void Init(LegacyPointer offset) {
 			this.Offset = offset;
 		}
 		protected abstract void ReadInternal(Reader reader);
 		public void Read(Reader reader, bool inline = false) {
 			if (inline) {
 				ReadInternal(reader);
-				Size = Pointer.Current(reader).offset - Offset.offset;
+				Size = LegacyPointer.Current(reader).offset - Offset.offset;
 			} else {
-				Pointer.DoAt(ref reader, Offset, () => {
+				LegacyPointer.DoAt(ref reader, Offset, () => {
 					ReadInternal(reader);
-					Size = Pointer.Current(reader).offset - Offset.offset;
+					Size = LegacyPointer.Current(reader).offset - Offset.offset;
 				});
 			}
 		}

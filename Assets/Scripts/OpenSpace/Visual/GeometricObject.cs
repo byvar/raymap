@@ -15,19 +15,19 @@ namespace OpenSpace.Visual {
     /// Mesh data (both static and dynamic)
     /// </summary>
     public class GeometricObject : IGeometricObject, IEngineObject {
-        public Pointer offset;
+        public LegacyPointer offset;
 		
-        public Pointer off_vertices;
-        public Pointer off_normals;
-        public Pointer off_blendWeights;
-        public Pointer off_materials;
-        public Pointer off_element_types;
-        public Pointer off_elements;
-        public Pointer off_mapping; // Revolution only
+        public LegacyPointer off_vertices;
+        public LegacyPointer off_normals;
+        public LegacyPointer off_blendWeights;
+        public LegacyPointer off_materials;
+        public LegacyPointer off_element_types;
+        public LegacyPointer off_elements;
+        public LegacyPointer off_mapping; // Revolution only
         public uint lookAtMode;
         public ushort num_vertices;
         public ushort num_elements;
-		public Pointer off_parallelBoxes;
+		public LegacyPointer off_parallelBoxes;
 		public ushort num_parallelBoxes;
 		public Vector3 sphereCenter = Vector3.zero;
 		public float sphereRadius = 0;
@@ -76,7 +76,7 @@ namespace OpenSpace.Visual {
 		public SuperObject so;
 		public SuperObject SuperObject => so;
 
-		public GeometricObject(Pointer offset) {
+		public GeometricObject(LegacyPointer offset) {
             this.offset = offset;
         }
 
@@ -119,7 +119,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public static GeometricObject Read(Reader reader, Pointer offset, RadiosityLOD radiosity = null, PatchGeometricObject mod = null) {
+        public static GeometricObject Read(Reader reader, LegacyPointer offset, RadiosityLOD radiosity = null, PatchGeometricObject mod = null) {
             MapLoader l = MapLoader.Loader;
 			//l.print("Geometric Object: " + offset);
             GeometricObject m = new GeometricObject(offset);
@@ -128,10 +128,10 @@ namespace OpenSpace.Visual {
 				uint flags = reader.ReadUInt32();
 				m.num_vertices = reader.ReadUInt16();
 				m.num_elements = reader.ReadUInt16();
-				m.off_element_types = Pointer.Read(reader);
-				m.off_elements = Pointer.Read(reader);
-				m.off_vertices = Pointer.Read(reader);
-				m.off_normals = Pointer.Read(reader);
+				m.off_element_types = LegacyPointer.Read(reader);
+				m.off_elements = LegacyPointer.Read(reader);
+				m.off_vertices = LegacyPointer.Read(reader);
+				m.off_normals = LegacyPointer.Read(reader);
 				m.sphereRadius = reader.ReadSingle(); // bounding volume radius
 				float sphereX = reader.ReadSingle(); // x
 				float sphereZ = reader.ReadSingle(); // z
@@ -139,28 +139,28 @@ namespace OpenSpace.Visual {
 				m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 				m.lookAtMode = reader.ReadUInt32();
 			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
-				m.off_element_types = Pointer.Read(reader);
-				m.off_elements = Pointer.Read(reader);
+				m.off_element_types = LegacyPointer.Read(reader);
+				m.off_elements = LegacyPointer.Read(reader);
 				uint flags = reader.ReadUInt32();
 				m.sphereRadius = reader.ReadSingle(); // bounding volume radius
 				float sphereX = reader.ReadSingle(); // x
 				float sphereZ = reader.ReadSingle(); // z
 				float sphereY = reader.ReadSingle(); // y
 				m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
-				m.off_mapping = Pointer.Read(reader);
+				m.off_mapping = LegacyPointer.Read(reader);
 				m.num_vertices = reader.ReadUInt16();
 				m.num_elements = reader.ReadUInt16();
-				m.off_vertices = Pointer.Read(reader);
-				m.off_normals = Pointer.Read(reader);
+				m.off_vertices = LegacyPointer.Read(reader);
+				m.off_normals = LegacyPointer.Read(reader);
 				m.lookAtMode = flags & 3;
 			} else {
 				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
-				m.off_vertices = Pointer.Read(reader);
-				m.off_normals = Pointer.Read(reader);
+				m.off_vertices = LegacyPointer.Read(reader);
+				m.off_normals = LegacyPointer.Read(reader);
 				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-					m.off_materials = Pointer.Read(reader);
+					m.off_materials = LegacyPointer.Read(reader);
 				} else {
-					m.off_blendWeights = Pointer.Read(reader);
+					m.off_blendWeights = LegacyPointer.Read(reader);
 				}
 				if (CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGC 
 					&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07
@@ -170,15 +170,15 @@ namespace OpenSpace.Visual {
 					reader.ReadInt32();
 				}
 				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
-				m.off_element_types = Pointer.Read(reader);
-				m.off_elements = Pointer.Read(reader);
+				m.off_element_types = LegacyPointer.Read(reader);
+				m.off_elements = LegacyPointer.Read(reader);
 				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) {
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
 				reader.ReadInt32();
 				if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
-					m.off_parallelBoxes = Pointer.Read(reader);
+					m.off_parallelBoxes = LegacyPointer.Read(reader);
 				} else {
 					reader.ReadInt32();
 				}
@@ -234,7 +234,7 @@ namespace OpenSpace.Visual {
 				}
 			}
             // Vertices
-			Pointer.DoAt(ref reader, m.off_vertices, () => {
+			LegacyPointer.DoAt(ref reader, m.off_vertices, () => {
 				m.vertices = new Vector3[m.num_vertices];
 				for (int i = 0; i < m.num_vertices; i++) {
 					float x = reader.ReadSingle();
@@ -252,7 +252,7 @@ namespace OpenSpace.Visual {
 				}
 			}
 			// Normals
-			Pointer.DoAt(ref reader, m.off_normals, () => {
+			LegacyPointer.DoAt(ref reader, m.off_normals, () => {
 				m.normals = new Vector3[m.num_vertices];
 				for (int i = 0; i < m.num_vertices; i++) {
 					float x = reader.ReadSingle();
@@ -261,14 +261,14 @@ namespace OpenSpace.Visual {
 					m.normals[i] = new Vector3(x, y, z);
 				}
 			});
-            Pointer.DoAt(ref reader, m.off_blendWeights, () => {
+            LegacyPointer.DoAt(ref reader, m.off_blendWeights, () => {
                 m.blendWeights = new float[4][];
                 /*reader.ReadUInt32(); // 0
                 R3Pointer off_blendWeightsStart = R3Pointer.Read(reader);
                 R3Pointer.Goto(ref reader, off_blendWeightsStart);*/
                 for (int i = 0; i < 4; i++) {
-                    Pointer off_blendWeights = Pointer.Read(reader);
-                    Pointer.DoAt(ref reader, off_blendWeights, () => {
+                    LegacyPointer off_blendWeights = LegacyPointer.Read(reader);
+                    LegacyPointer.DoAt(ref reader, off_blendWeights, () => {
                         m.blendWeights[i] = new float[m.num_vertices];
                         for (int j = 0; j < m.num_vertices; j++) {
                             m.blendWeights[i][j] = reader.ReadSingle();
@@ -280,20 +280,20 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
             });
-			Pointer.DoAt(ref reader, m.off_mapping, () => {
+			LegacyPointer.DoAt(ref reader, m.off_mapping, () => {
 				// Revolution only
 				reader.ReadUInt32();
-				Pointer.Read(reader);
-				Pointer off_mappingBlocks = Pointer.Read(reader);
-				Pointer.Read(reader);
-				Pointer.Read(reader);
+				LegacyPointer.Read(reader);
+				LegacyPointer off_mappingBlocks = LegacyPointer.Read(reader);
+				LegacyPointer.Read(reader);
+				LegacyPointer.Read(reader);
 				ushort num_mappingBlocks = reader.ReadUInt16();
 				reader.ReadUInt16();
-				Pointer.DoAt(ref reader, off_mappingBlocks, () => {
+				LegacyPointer.DoAt(ref reader, off_mappingBlocks, () => {
 					m.mapping = new int[num_mappingBlocks][];
 					for (int i = 0; i < num_mappingBlocks; i++) {
-						Pointer off_mapping = Pointer.Read(reader);
-						Pointer.DoAt(ref reader, off_mapping, () => {
+						LegacyPointer off_mapping = LegacyPointer.Read(reader);
+						LegacyPointer.DoAt(ref reader, off_mapping, () => {
 							m.mapping[i] = new int[m.num_vertices];
 							for (int j = 0; j < m.num_vertices; j++) {
 								m.mapping[i][j] = reader.ReadUInt16();
@@ -304,7 +304,7 @@ namespace OpenSpace.Visual {
 				});
 			});
             // Read element types & initialize arrays
-            Pointer.Goto(ref reader, m.off_element_types);
+            LegacyPointer.Goto(ref reader, m.off_element_types);
             m.element_types = new ushort[m.num_elements];
             m.elements = new IGeometricObjectElement[m.num_elements];
             for (uint i = 0; i < m.num_elements; i++) {
@@ -312,9 +312,9 @@ namespace OpenSpace.Visual {
             }
 			// Process elements
 			for (uint i = 0; i < m.num_elements; i++) {
-                Pointer.Goto(ref reader, m.off_elements + (i * 4));
-                Pointer block_offset = Pointer.Read(reader);
-                Pointer.Goto(ref reader, block_offset);
+                LegacyPointer.Goto(ref reader, m.off_elements + (i * 4));
+                LegacyPointer block_offset = LegacyPointer.Read(reader);
+                LegacyPointer.Goto(ref reader, block_offset);
                 switch (m.element_types[i]) {
                     case 1: // Material
                         m.elements[i] = GeometricObjectElementTriangles.Read(reader, block_offset, m);
@@ -456,7 +456,7 @@ namespace OpenSpace.Visual {
 									lm.Apply();
 								}
 								Vector2[] lightmapUVs = new Vector2[mo.num_vertices];
-								Pointer.DoAt(ref reader, ps2l.off_lightmapUV[me.lightmap_index], () => {
+								LegacyPointer.DoAt(ref reader, ps2l.off_lightmapUV[me.lightmap_index], () => {
 									for (int j = 0; j < mo.num_vertices; j++) {
 										lightmapUVs[j] = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 									}

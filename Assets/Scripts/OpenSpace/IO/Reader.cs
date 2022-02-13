@@ -11,7 +11,7 @@ namespace OpenSpace {
             Window,
             RedPlanet
         }
-        public delegate void ReadAction(Reader reader, Pointer offset);
+        public delegate void ReadAction(Reader reader, LegacyPointer offset);
         Encoding wind1252 = Encoding.GetEncoding(1252);
         bool isLittleEndian = true;
         MaskingMode masking = MaskingMode.Off;

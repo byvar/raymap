@@ -10,7 +10,7 @@ namespace OpenSpace.PS1 {
 	public class AlwaysList : OpenSpaceStruct {
 		public uint index;
 		public uint length;
-		public Pointer off_items;
+		public LegacyPointer off_items;
 		public uint invalidPointer; // pointer in exe?
 
 		public AlwaysItem[] items;
@@ -18,7 +18,7 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			index = reader.ReadUInt32();
 			length = reader.ReadUInt32();
-			off_items = Pointer.Read(reader);
+			off_items = LegacyPointer.Read(reader);
 			invalidPointer = reader.ReadUInt32();
 
 			items = Load.ReadArray<AlwaysItem>(length, reader, off_items);

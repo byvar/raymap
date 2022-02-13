@@ -12,14 +12,14 @@ namespace OpenSpace.Text {
 		public byte num_fonts2;
 		public FontDefine[] fonts2;
 
-		public Pointer[] fontsBitmap;
+		public LegacyPointer[] fontsBitmap;
 
 		protected override void ReadInternal(Reader reader) {
 			// 1 fontDefine is normally sized 0x12E4 ( 0x12B0 if no names )
 			num_fontsBitmap = reader.ReadByte();
 			num_fonts = reader.ReadByte();
 			fonts = new FontDefine[num_fonts];
-			fontsBitmap = new Pointer[num_fontsBitmap];
+			fontsBitmap = new LegacyPointer[num_fontsBitmap];
 			if (CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
 				for (int i = 0; i < num_fonts; i++) {
 					fonts[i] = new FontDefine(reader);
@@ -35,16 +35,16 @@ namespace OpenSpace.Text {
 				}
 				reader.Align(4); // Align position
 				for (int i = 0; i < num_fontsBitmap; i++) {
-					fontsBitmap[i] = Pointer.Read(reader);
+					fontsBitmap[i] = LegacyPointer.Read(reader);
 				}
 			} else {
 				// Largo Winch
 				reader.Align(4); // Align position
 				for (int i = 0; i < num_fontsBitmap; i++) {
-					fontsBitmap[i] = Pointer.Read(reader);
+					fontsBitmap[i] = LegacyPointer.Read(reader);
 				}
-				Pointer off_fontDefine = Pointer.Read(reader);
-				Pointer.DoAt(ref reader, off_fontDefine, () => {
+				LegacyPointer off_fontDefine = LegacyPointer.Read(reader);
+				LegacyPointer.DoAt(ref reader, off_fontDefine, () => {
 					for (int i = 0; i < num_fonts; i++) {
 						fonts[i] = new FontDefine(reader);
 					}

@@ -9,11 +9,11 @@ using UnityEngine;
 namespace OpenSpace.Visual {
     public class PatchGeometricObject : IGeometricObject {
 		[JsonIgnore] public PhysicalObject po;
-        public Pointer offset;
+        public LegacyPointer offset;
 		
-        public Pointer off_geometricObject;
+        public LegacyPointer off_geometricObject;
         public uint num_properties;
-        public Pointer off_properties;
+        public LegacyPointer off_properties;
 
         [JsonIgnore] public GeometricObject mesh = null;
         public PatchGeometricObjectProperty[] properties;
@@ -26,21 +26,21 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public PatchGeometricObject(PhysicalObject po, Pointer offset) {
+        public PatchGeometricObject(PhysicalObject po, LegacyPointer offset) {
             this.po = po;
             this.offset = offset;
         }
 
         // I don't even know what this is yet here I am parsing it
-        public static PatchGeometricObject Read(Reader reader, PhysicalObject po, Pointer offset) {
+        public static PatchGeometricObject Read(Reader reader, PhysicalObject po, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             //Debug.LogWarning("Unknown object @ " + offset);
             PatchGeometricObject patch = new PatchGeometricObject(po, offset);
-            patch.off_geometricObject = Pointer.Read(reader);
+            patch.off_geometricObject = LegacyPointer.Read(reader);
 
             patch.num_properties = reader.ReadUInt32();
-            patch.off_properties = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, patch.off_properties, () => {
+            patch.off_properties = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, patch.off_properties, () => {
                 patch.properties = new PatchGeometricObjectProperty[patch.num_properties];
                 for (int i = 0; i < patch.num_properties; i++) {
                     patch.properties[i] = new PatchGeometricObjectProperty();

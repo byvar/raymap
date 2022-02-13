@@ -9,12 +9,12 @@ using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class Perso : OpenSpaceStruct { // Animation/state related
-		public Pointer off_p3dData;
-		public Pointer off_superObjectPointer;
-		public Pointer off_08; // dynamics
-		public Pointer off_0C;
-		public Pointer off_collSet;
-		public Pointer off_sectorSuperObjectPointer;
+		public LegacyPointer off_p3dData;
+		public LegacyPointer off_superObjectPointer;
+		public LegacyPointer off_08; // dynamics
+		public LegacyPointer off_0C;
+		public LegacyPointer off_collSet;
+		public LegacyPointer off_sectorSuperObjectPointer;
 
 		// Parsed
 		public Perso3dData p3dData;
@@ -23,20 +23,20 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			//Load.print("Perso @ " + Offset);
-			off_p3dData = Pointer.Read(reader);
-			off_superObjectPointer = Pointer.Read(reader);
-			off_08 = Pointer.Read(reader); // Probably Dynamics!
-			off_0C = Pointer.Read(reader); // points to struct of 0x18 size
-			off_collSet = Pointer.Read(reader);
-			off_sectorSuperObjectPointer = Pointer.Read(reader); // points to 4 bytes: 00000000. Only filled in at runtime
+			off_p3dData = LegacyPointer.Read(reader);
+			off_superObjectPointer = LegacyPointer.Read(reader);
+			off_08 = LegacyPointer.Read(reader); // Probably Dynamics!
+			off_0C = LegacyPointer.Read(reader); // points to struct of 0x18 size
+			off_collSet = LegacyPointer.Read(reader);
+			off_sectorSuperObjectPointer = LegacyPointer.Read(reader); // points to 4 bytes: 00000000. Only filled in at runtime
 			//Load.print(off_00 + " - " + off_04 + " - " + off_08 + " - " + off_0C + " - " + off_10 + " - " + off_14);
 
 			p3dData = Load.FromOffsetOrRead<Perso3dData>(reader, off_p3dData);
-			Pointer.DoAt(ref reader, off_superObjectPointer, () => {
-				Pointer off_superobject = Pointer.Read(reader);
+			LegacyPointer.DoAt(ref reader, off_superObjectPointer, () => {
+				LegacyPointer off_superobject = LegacyPointer.Read(reader);
 				if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
-					Pointer off_name = Pointer.Read(reader);
-					Pointer.DoAt(ref reader, off_name, () => {
+					LegacyPointer off_name = LegacyPointer.Read(reader);
+					LegacyPointer.DoAt(ref reader, off_name, () => {
 						name = reader.ReadNullDelimitedString();
 					});
 				} else {

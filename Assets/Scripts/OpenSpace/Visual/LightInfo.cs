@@ -48,7 +48,7 @@ namespace OpenSpace.Visual {
         public Vector4 background_color;
         public uint createsShadowsOrNot;
         public string name = null;
-        public Pointer dimmer;
+        public LegacyPointer dimmer;
 
 
         [Flags]
@@ -88,16 +88,16 @@ namespace OpenSpace.Visual {
 
         public void Write(Writer writer) {
             if (light != null && light.IsModified) {
-                Pointer.Goto(ref writer, transMatrix.offset);
+                LegacyPointer.Goto(ref writer, transMatrix.offset);
                 transMatrix.Write(writer);
-                Pointer.Goto(ref writer, Pointer.Current(writer) + (6 * 4));
+                LegacyPointer.Goto(ref writer, LegacyPointer.Current(writer) + (6 * 4));
                 writer.Write(color.x); writer.Write(color.y); writer.Write(color.z); writer.Write(color.w);
 
                 if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
                     if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
                         writer.Write(shadowIntensity); // 0
                     }
-                    Pointer.Goto(ref writer, Pointer.Current(writer) + 2);
+                    LegacyPointer.Goto(ref writer, LegacyPointer.Current(writer) + 2);
                     writer.Write(paintingLightFlag);
                     writer.Write(alphaLightFlag);
                 }
@@ -148,7 +148,7 @@ namespace OpenSpace.Visual {
                 reader.ReadSingle();
             }
             if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) reader.ReadUInt32();
-            transMatrix = Matrix.Read(reader, Pointer.Current(reader));
+            transMatrix = Matrix.Read(reader, LegacyPointer.Current(reader));
             if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2 && CPA_Settings.s.platform != CPA_Settings.Platform.DC && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
@@ -214,7 +214,7 @@ namespace OpenSpace.Visual {
                 reader.ReadByte();
                 reader.ReadByte();
                 intensityMin_fogBlendFar = reader.ReadSingle();
-                dimmer = Pointer.Read(reader);
+                dimmer = LegacyPointer.Read(reader);
             }
         }
     }

@@ -4,38 +4,38 @@ namespace OpenSpace.Collide
 {
     public class CollideActivation : ILinkedListEntry
     {
-        public Pointer offset;
-        public Pointer off_next;
-		public Pointer off_prev;
-		public Pointer off_header;
-		public Pointer off_activationZone;
+        public LegacyPointer offset;
+        public LegacyPointer off_next;
+		public LegacyPointer off_prev;
+		public LegacyPointer off_header;
+		public LegacyPointer off_activationZone;
 		public LinkedList<CollideActivationZone> activationZone;
         public ushort index;
 
-        public Pointer NextEntry {
+        public LegacyPointer NextEntry {
             get { return off_next; }
         }
 
-        public Pointer PreviousEntry {
+        public LegacyPointer PreviousEntry {
             get { return off_prev; }
         }
 
-        public CollideActivation(Pointer offset) {
+        public CollideActivation(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static CollideActivation Read(Reader reader, Pointer offset, CollSet collset, CollideType type) {
+        public static CollideActivation Read(Reader reader, LegacyPointer offset, CollSet collset, CollideType type) {
             CollideActivation a = new CollideActivation(offset);
 
             if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
-                a.off_next = Pointer.Read(reader);
+                a.off_next = LegacyPointer.Read(reader);
 				if (CPA_Settings.s.hasLinkedListHeaderPointers) {
-					a.off_prev = Pointer.Read(reader);
-					a.off_header = Pointer.Read(reader);
+					a.off_prev = LegacyPointer.Read(reader);
+					a.off_header = LegacyPointer.Read(reader);
 				}
             }
-			a.off_activationZone = Pointer.Read(reader);
-			Pointer.DoAt(ref reader, a.off_activationZone, () => {
+			a.off_activationZone = LegacyPointer.Read(reader);
+			LegacyPointer.DoAt(ref reader, a.off_activationZone, () => {
 				a.activationZone = LinkedList<CollideActivationZone>.Read(ref reader, offset,
 						(off_element) => {
 							return CollideActivationZone.Read(reader, off_element);
@@ -49,7 +49,7 @@ namespace OpenSpace.Collide
 			a.index = reader.ReadUInt16();
 			reader.ReadUInt16();
 			if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) {
-				a.off_next = Pointer.Current(reader);
+				a.off_next = LegacyPointer.Current(reader);
 			}
 			return a;
         }

@@ -8,28 +8,28 @@ using UnityEngine;
 
 namespace OpenSpace.Object.Properties {
     public class State : ILinkedListEntry {
-        public Pointer offset;
+        public LegacyPointer offset;
         [JsonIgnore] public Family family;
         public int index = 0;
         public string name = null;
-        public Pointer off_entry_next;
-        public Pointer off_entry_prev;
-        public Pointer off_anim_ref;
+        public LegacyPointer off_entry_next;
+        public LegacyPointer off_entry_prev;
+        public LegacyPointer off_anim_ref;
         public LinkedList<Transition> stateTransitions;
 		public LinkedList<Prohibit> prohobitStates;
-        public Pointer off_mechanicsIDCard = null;
-        public Pointer off_cine_mapname = null;
-        public Pointer off_cine_name = null;
+        public LegacyPointer off_mechanicsIDCard = null;
+        public LegacyPointer off_cine_mapname = null;
+        public LegacyPointer off_cine_name = null;
         public string cine_mapname = null;
         public string cine_name = null;
         public byte speed;
-        public Pointer off_nextState; // Go to this state after a while if nothing changes
+        public LegacyPointer off_nextState; // Go to this state after a while if nothing changes
         public AnimationReference anim_ref = null;
         public AnimationMontreal anim_refMontreal = null;
         public MechanicsIDCard mechanicsIDCard;
         public byte customStateBits;
 		
-        public Pointer NextEntry {
+        public LegacyPointer NextEntry {
             get {
                 if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
                     return off_entry_next;
@@ -46,7 +46,7 @@ namespace OpenSpace.Object.Properties {
             }
         }
 		
-        public Pointer PreviousEntry {
+        public LegacyPointer PreviousEntry {
             get { return off_entry_prev; }
         }
 
@@ -65,7 +65,7 @@ namespace OpenSpace.Object.Properties {
 			}
 		}
 
-		public State(Pointer offset, Family family, int index) {
+		public State(LegacyPointer offset, Family family, int index) {
             this.offset = offset;
             this.family = family;
             this.index = index;
@@ -78,31 +78,31 @@ namespace OpenSpace.Object.Properties {
             return result;
         }
 
-        public static State Read(Reader reader, Pointer offset, Family family, int index) {
+        public static State Read(Reader reader, LegacyPointer offset, Family family, int index) {
             MapLoader l = MapLoader.Loader;
             //l.print("State " + Pointer.Current(reader));
             State s = new State(offset, family, index);
             l.states.Add(s);
             if (CPA_Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
-            if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) s.off_entry_next = Pointer.Read(reader);
+            if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) s.off_entry_next = LegacyPointer.Read(reader);
             if (CPA_Settings.s.hasLinkedListHeaderPointers) {
-                s.off_entry_prev = Pointer.Read(reader);
-                Pointer.Read(reader); // another header at tail of state list
+                s.off_entry_prev = LegacyPointer.Read(reader);
+                LegacyPointer.Read(reader); // another header at tail of state list
             }
-            s.off_anim_ref = Pointer.Read(reader);
-			s.stateTransitions = LinkedList<Transition>.Read(ref reader, Pointer.Current(reader), element => {
+            s.off_anim_ref = LegacyPointer.Read(reader);
+			s.stateTransitions = LinkedList<Transition>.Read(ref reader, LegacyPointer.Current(reader), element => {
 				return l.FromOffsetOrRead<Transition>(reader, element);
 			});
-			s.prohobitStates = LinkedList<Prohibit>.Read(ref reader, Pointer.Current(reader), element => {
+			s.prohobitStates = LinkedList<Prohibit>.Read(ref reader, LegacyPointer.Current(reader), element => {
 				return l.FromOffsetOrRead<Prohibit>(reader, element);
 			});
-            s.off_nextState = Pointer.Read(reader, allowMinusOne: true);
-            s.off_mechanicsIDCard = Pointer.Read(reader);
+            s.off_nextState = LegacyPointer.Read(reader, allowMinusOne: true);
+            s.off_mechanicsIDCard = LegacyPointer.Read(reader);
             if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3
 				&& CPA_Settings.s.game != CPA_Settings.Game.Dinosaur
 				&& CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
-                s.off_cine_mapname = Pointer.Read(reader);
-                s.off_cine_name = Pointer.Read(reader);
+                s.off_cine_mapname = LegacyPointer.Read(reader);
+                s.off_cine_name = LegacyPointer.Read(reader);
 			}
 			if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
@@ -121,10 +121,10 @@ namespace OpenSpace.Object.Properties {
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
             }
-			Pointer.DoAt(ref reader, s.off_cine_mapname, () => {
+			LegacyPointer.DoAt(ref reader, s.off_cine_mapname, () => {
 				s.cine_mapname = reader.ReadNullDelimitedString();
 			});
-			Pointer.DoAt(ref reader, s.off_cine_name, () => {
+			LegacyPointer.DoAt(ref reader, s.off_cine_name, () => {
 				s.cine_name = reader.ReadNullDelimitedString();
 			});
             if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal || CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
@@ -135,41 +135,41 @@ namespace OpenSpace.Object.Properties {
             return s;
         }
 
-        public static State FromOffset(Family f, Pointer offset) {
+        public static State FromOffset(Family f, LegacyPointer offset) {
             if (f == null || offset == null) return null;
             return f.states.FirstOrDefault(s => (s != null && s.offset == offset));
         }
 
-        public static State FromOffset(Pointer offset) {
+        public static State FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.states.FirstOrDefault(s => s.offset == offset);
         }
 
 		public class Transition : OpenSpaceStruct, ILinkedListEntry {
-			public Pointer off_entry_next;
-			public Pointer off_entry_prev;
-			public Pointer off_entry_hdr;
+			public LegacyPointer off_entry_next;
+			public LegacyPointer off_entry_prev;
+			public LegacyPointer off_entry_hdr;
 
-			public Pointer off_targetState;
-			public Pointer off_stateToGo;
+			public LegacyPointer off_targetState;
+			public LegacyPointer off_stateToGo;
 			public byte linkingType;
 
 			// Custom
-			public Pointer NextEntry => (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
-			public Pointer PreviousEntry => off_entry_prev;
+			public LegacyPointer NextEntry => (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
+			public LegacyPointer PreviousEntry => off_entry_prev;
 
 			protected override void ReadInternal(Reader reader) {
 				if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
-					off_entry_next = Pointer.Read(reader);
+					off_entry_next = LegacyPointer.Read(reader);
 					if (CPA_Settings.s.hasLinkedListHeaderPointers) {
-						off_entry_prev = Pointer.Read(reader);
-						off_entry_hdr = Pointer.Read(reader);
+						off_entry_prev = LegacyPointer.Read(reader);
+						off_entry_hdr = LegacyPointer.Read(reader);
 					}
 				}
 				//MapLoader.Loader.print("Transition " + Offset);
-				off_targetState = Pointer.Read(reader);
-				off_stateToGo = Pointer.Read(reader);
+				off_targetState = LegacyPointer.Read(reader);
+				off_stateToGo = LegacyPointer.Read(reader);
 				linkingType = reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
@@ -178,26 +178,26 @@ namespace OpenSpace.Object.Properties {
 		}
 
 		public class Prohibit : OpenSpaceStruct, ILinkedListEntry {
-			public Pointer off_entry_next;
-			public Pointer off_entry_prev;
-			public Pointer off_entry_hdr;
+			public LegacyPointer off_entry_next;
+			public LegacyPointer off_entry_prev;
+			public LegacyPointer off_entry_hdr;
 
-			public Pointer off_state;
+			public LegacyPointer off_state;
 
 			//Custom
-			public Pointer NextEntry => (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
-			public Pointer PreviousEntry => off_entry_prev;
+			public LegacyPointer NextEntry => (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
+			public LegacyPointer PreviousEntry => off_entry_prev;
 
 			protected override void ReadInternal(Reader reader) {
 				if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
-					off_entry_next = Pointer.Read(reader);
+					off_entry_next = LegacyPointer.Read(reader);
 					if (CPA_Settings.s.hasLinkedListHeaderPointers) {
-						off_entry_prev = Pointer.Read(reader);
-						off_entry_hdr = Pointer.Read(reader);
+						off_entry_prev = LegacyPointer.Read(reader);
+						off_entry_hdr = LegacyPointer.Read(reader);
 					}
 				}
 				//MapLoader.Loader.print("Prohibit " + Offset);
-				off_state = Pointer.Read(reader);
+				off_state = LegacyPointer.Read(reader);
 			}
 		}
 	}

@@ -12,13 +12,13 @@ namespace OpenSpace.Visual {
     /// Texture definition
     /// </summary>
     public class TextureInfo {
-        public Pointer offset;
+        public LegacyPointer offset;
         private Texture2D texture;
 
         public uint field0;
         public ushort field4;
         public ushort field6;
-        public Pointer off_tempBuffer; // field8
+        public LegacyPointer off_tempBuffer; // field8
         public uint fieldC;           //
         [JsonIgnore] // pointer to opengl texture data probaly, not interesting for JSON
         public uint field10;         //
@@ -44,7 +44,7 @@ namespace OpenSpace.Visual {
 
         public static uint flags_isTransparent = (1 << 3);
 
-        public TextureInfo(Pointer offset) {
+        public TextureInfo(LegacyPointer offset) {
             this.offset = offset;
         }
 
@@ -186,7 +186,7 @@ namespace OpenSpace.Visual {
             get { return (name != null && name.Contains("grassfx")); }
         }
 
-        public static TextureInfo Read(Reader reader, Pointer offset) {
+        public static TextureInfo Read(Reader reader, LegacyPointer offset) {
             TextureInfo tex = new TextureInfo(offset);
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
 				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
@@ -235,7 +235,7 @@ namespace OpenSpace.Visual {
 					}
 					tex.field4 = reader.ReadUInt16(); // 20
                     tex.field6 = reader.ReadUInt16();
-                    tex.off_tempBuffer = Pointer.Read(reader); // always null because it's stored here dynamically
+                    tex.off_tempBuffer = LegacyPointer.Read(reader); // always null because it's stored here dynamically
                     tex.fieldC = reader.ReadUInt32();
                     tex.field10 = reader.ReadUInt32();
                     tex.flags = reader.ReadUInt32();
@@ -301,7 +301,7 @@ namespace OpenSpace.Visual {
             return tex;
         }
 
-        public static TextureInfo FromOffset(Pointer offset) {
+        public static TextureInfo FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             for (int i = 0; i < l.textures.Length; i++) {

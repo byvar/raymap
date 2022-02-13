@@ -155,7 +155,7 @@ namespace OpenSpace.Loader {
 
 
 
-		public void ReadLanguagesVoice(Reader reader, Pointer off_languages, uint num_languages) {
+		public void ReadLanguagesVoice(Reader reader, LegacyPointer off_languages, uint num_languages) {
 			languages_voice = new string[num_languages];
 			languages_voice_loc = new string[num_languages];
 			for (uint i = 0; i < num_languages; i++) {
@@ -166,7 +166,7 @@ namespace OpenSpace.Loader {
 		}
 
 		#region FIX
-		Pointer off_animBankFix;
+		LegacyPointer off_animBankFix;
 		async UniTask LoadFIX() {
 			textures = new TextureInfo[0];
 			loadingState = "Loading fixed memory";
@@ -178,7 +178,7 @@ namespace OpenSpace.Loader {
 			reader.ReadByte();
 			reader.ReadByte();
 			reader.ReadByte();
-			ReadLevelNames(reader, Pointer.Current(reader), num_lvlNames);
+			ReadLevelNames(reader, LegacyPointer.Current(reader), num_lvlNames);
 			if (CPA_Settings.s.platform == CPA_Settings.Platform.PC) {
 				reader.ReadChars(0x1E);
 				reader.ReadChars(0x1E); // two zero entries
@@ -188,13 +188,13 @@ namespace OpenSpace.Loader {
 			byte num_languages_voice = reader.ReadByte();
 			reader.ReadByte();
 			reader.ReadByte();
-			print(Pointer.Current(reader));
-			Pointer off_languages_subtitles = Pointer.Read(reader);
-			Pointer off_languages_voice = Pointer.Read(reader);
-			Pointer.DoAt(ref reader, off_languages_subtitles, () => {
+			print(LegacyPointer.Current(reader));
+			LegacyPointer off_languages_subtitles = LegacyPointer.Read(reader);
+			LegacyPointer off_languages_voice = LegacyPointer.Read(reader);
+			LegacyPointer.DoAt(ref reader, off_languages_subtitles, () => {
 				ReadLanguages(reader, off_languages_subtitles, num_languages_subtitles);
 			});
-			Pointer.DoAt(ref reader, off_languages_voice, () => {
+			LegacyPointer.DoAt(ref reader, off_languages_voice, () => {
 				ReadLanguagesVoice(reader, off_languages_voice, num_languages_voice);
 			});
 
@@ -208,7 +208,7 @@ namespace OpenSpace.Loader {
 			}
 			loadingState = "Loading input structure";
 			await WaitIfNecessary();
-			inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+			inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
@@ -217,18 +217,18 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			ushort num_unk2 = reader.ReadUInt16();
 			reader.ReadUInt16();
-			Pointer off_unk2 = Pointer.Read(reader);
-			Pointer off_entryActions = Pointer.Read(reader);
-			Pointer[] unkMatrices = new Pointer[2];
+			LegacyPointer off_unk2 = LegacyPointer.Read(reader);
+			LegacyPointer off_entryActions = LegacyPointer.Read(reader);
+			LegacyPointer[] unkMatrices = new LegacyPointer[2];
 			for (int i = 0; i < 2; i++) {
-				unkMatrices[i] = Pointer.Read(reader);
+				unkMatrices[i] = LegacyPointer.Read(reader);
 			}
-			fonts = FromOffsetOrRead<FontStructure>(reader, Pointer.Current(reader), inline: true);
+			fonts = FromOffsetOrRead<FontStructure>(reader, LegacyPointer.Current(reader), inline: true);
 
-			Pointer off_matrices = Pointer.Read(reader);
-			Pointer off_specialEntryAction = Pointer.Read(reader);
-			Pointer off_identityMatrix = Pointer.Read(reader);
-			Pointer off_unk = Pointer.Read(reader);
+			LegacyPointer off_matrices = LegacyPointer.Read(reader);
+			LegacyPointer off_specialEntryAction = LegacyPointer.Read(reader);
+			LegacyPointer off_identityMatrix = LegacyPointer.Read(reader);
+			LegacyPointer off_unk = LegacyPointer.Read(reader);
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadBytes(0xc8);
@@ -238,10 +238,10 @@ namespace OpenSpace.Loader {
 			reader.ReadByte();
 			reader.ReadByte();
 			reader.ReadByte();
-			Pointer.Read(reader);
-			Pointer off_haloTexture = Pointer.Read(reader);
-			Pointer off_material1 = Pointer.Read(reader);
-			Pointer off_material2 = Pointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer off_haloTexture = LegacyPointer.Read(reader);
+			LegacyPointer off_material1 = LegacyPointer.Read(reader);
+			LegacyPointer off_material2 = LegacyPointer.Read(reader);
 			for (int i = 0; i < 10; i++) {
 				reader.ReadBytes(0xcc);
 			}
@@ -262,8 +262,8 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 
 
-			Pointer.Read(reader);
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
 
 			reader.ReadString(0x1E);
 			reader.ReadString(0x1E);
@@ -272,38 +272,38 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading globals";
 			await WaitIfNecessary();
 			globals.off_transitDynamicWorld = null;
-			globals.off_actualWorld = Pointer.Read(reader);
-			globals.off_dynamicWorld = Pointer.Read(reader);
-			globals.off_fatherSector = Pointer.Read(reader); // It is I, Father Sector.
-			globals.off_firstSubMapPosition = Pointer.Read(reader);
+			globals.off_actualWorld = LegacyPointer.Read(reader);
+			globals.off_dynamicWorld = LegacyPointer.Read(reader);
+			globals.off_fatherSector = LegacyPointer.Read(reader); // It is I, Father Sector.
+			globals.off_firstSubMapPosition = LegacyPointer.Read(reader);
 
 			globals.num_always = reader.ReadUInt32();
-			globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-			Pointer.Read(reader);
-			globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-			globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
-			globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
+			globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+			LegacyPointer.Read(reader);
+			globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+			globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
+			globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
 
 			// Settings for perso in fix? Lights?
-			Pointer.Read(reader);
-			Pointer.Read(reader);
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
 
-			Pointer.Read(reader); // perso
-			Pointer.Read(reader);
-			Pointer off_unknown_first = Pointer.Read(reader);
-			Pointer off_unknown_last = Pointer.Read(reader);
+			LegacyPointer.Read(reader); // perso
+			LegacyPointer.Read(reader);
+			LegacyPointer off_unknown_first = LegacyPointer.Read(reader);
+			LegacyPointer off_unknown_last = LegacyPointer.Read(reader);
 			uint num_unknown = reader.ReadUInt32();
 
-			families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+			families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
-			Pointer off_alwaysActiveCharacters_first = Pointer.Read(reader);
-			Pointer off_alwaysActiveCharacters_last = Pointer.Read(reader);
+			LegacyPointer off_alwaysActiveCharacters_first = LegacyPointer.Read(reader);
+			LegacyPointer off_alwaysActiveCharacters_last = LegacyPointer.Read(reader);
 			uint num_alwaysActiveChars = reader.ReadUInt32();
 
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			reader.ReadUInt32();
-			globals.off_camera = Pointer.Read(reader);
+			globals.off_camera = LegacyPointer.Read(reader);
 			reader.ReadUInt32();
 			reader.ReadByte();
 			reader.ReadByte();
@@ -311,69 +311,69 @@ namespace OpenSpace.Loader {
 			reader.ReadByte();
 			//print(Pointer.Current(reader));
 
-			Pointer.Read(reader);
-			Pointer off_unk0_first = Pointer.Read(reader);
-			Pointer off_unk0_last = Pointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer off_unk0_first = LegacyPointer.Read(reader);
+			LegacyPointer off_unk0_last = LegacyPointer.Read(reader);
 			uint num_unk = reader.ReadUInt32();
-			Pointer off_unk = Pointer.Read(reader);
+			LegacyPointer off_unk = LegacyPointer.Read(reader);
 
 			loadingState = "Loading level textures";
-			await ReadTexturesLvl(reader, Pointer.Current(reader));
+			await ReadTexturesLvl(reader, LegacyPointer.Current(reader));
 
-			Pointer.Read(reader); // maybe perso in fix
+			LegacyPointer.Read(reader); // maybe perso in fix
 			reader.ReadUInt32();
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			uint num_soundMaterials = reader.ReadUInt32();
-			Pointer off_soundMaterials = Pointer.Read(reader);
-			Pointer off_unkBlocks = Pointer.Read(reader); // 3 blocks of 0xb4
+			LegacyPointer off_soundMaterials = LegacyPointer.Read(reader);
+			LegacyPointer off_unkBlocks = LegacyPointer.Read(reader); // 3 blocks of 0xb4
 			uint num_unkBlocks = reader.ReadUInt32();
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			reader.ReadUInt32();
-			BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
+			BoundingVolume.Read(reader, LegacyPointer.Current(reader), BoundingVolume.Type.Box);
 			reader.ReadUInt16();
 			reader.ReadUInt16();
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
 			reader.ReadUInt32();
 			uint num_ipo = reader.ReadUInt32(); // Entries with an IPO SO pointer and a mesh pointer, then a pointer to an empty offset. RLI table?
-			Pointer off_ipo = Pointer.Read(reader);
+			LegacyPointer off_ipo = LegacyPointer.Read(reader);
 			reader.ReadBytes(0x30);
 			uint num_unkPtrs = reader.ReadUInt32();
 			for (int i = 0; i < num_unkPtrs; i++) {
-				Pointer.Read(reader);
+				LegacyPointer.Read(reader);
 			}
 			reader.ReadBytes(0x10d8); // that's a lot of null bytes
 
 			uint num_shadowDQ = reader.ReadUInt32();
 			for (int i = 0; i < 21; i++) {
-				Pointer.Read(reader);
+				LegacyPointer.Read(reader);
 			}
 			uint num_shadowHQ = reader.ReadUInt32();
 			for (int i = 0; i < 21; i++) {
-				Pointer.Read(reader);
+				LegacyPointer.Read(reader);
 			}
-			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
 			//print("Yay " + Pointer.Current(reader));
 			reader.ReadUInt16();
 			reader.ReadUInt16();
 			reader.ReadUInt32();
 			uint num_lightmaps = reader.ReadUInt32();
-			Pointer off_lightmapUVs = Pointer.Read(reader);
-			Pointer.DoAt(ref reader, off_lightmapUVs, () => {
-				off_lightmapUV = new Pointer[num_lightmaps];
+			LegacyPointer off_lightmapUVs = LegacyPointer.Read(reader);
+			LegacyPointer.DoAt(ref reader, off_lightmapUVs, () => {
+				off_lightmapUV = new LegacyPointer[num_lightmaps];
 				for (int i = 0; i < num_lightmaps; i++) {
 					reader.ReadUInt32();
 					reader.ReadByte();
 					reader.ReadBytes(3);
-					off_lightmapUV[i] = Pointer.Read(reader);
+					off_lightmapUV[i] = LegacyPointer.Read(reader);
 				}
 			});
 			reader.ReadByte();
 			reader.ReadBytes(3);
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			Pointer.Read(reader);
-			Pointer.Read(reader);
-			Pointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
+			LegacyPointer.Read(reader);
 
 			// Parse actual world & always structure
 			loadingState = "Loading families";

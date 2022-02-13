@@ -12,11 +12,11 @@ using UnityEngine;
 
 namespace OpenSpace.Object {
     public class PhysicalObject : IEquatable<PhysicalObject>, IEngineObject {
-        public Pointer offset;
-        public Pointer off_visualSet;
-        public Pointer off_collideSet;
-        public Pointer off_visualBoundingVolume;
-        public Pointer off_collideBoundingVolume;
+        public LegacyPointer offset;
+        public LegacyPointer off_visualSet;
+        public LegacyPointer off_collideSet;
+        public LegacyPointer off_visualBoundingVolume;
+        public LegacyPointer off_collideBoundingVolume;
         public VisualSetLOD[] visualSet;
         public ushort visualSetType = 0;
         public GeometricObjectCollide collideMesh;
@@ -81,7 +81,7 @@ namespace OpenSpace.Object {
 			get { return superObject; }
 		}
 
-		public PhysicalObject(Pointer offset, SuperObject so = null) {
+		public PhysicalObject(LegacyPointer offset, SuperObject so = null) {
             this.offset = offset;
 			this.superObject = so;
             visualSet = new VisualSetLOD[0];
@@ -107,24 +107,24 @@ namespace OpenSpace.Object {
             return !(x == y);
         }
 
-        public static PhysicalObject Read(Reader reader, Pointer offset, SuperObject so = null, Radiosity radiosity = null) {
+        public static PhysicalObject Read(Reader reader, LegacyPointer offset, SuperObject so = null, Radiosity radiosity = null) {
             PhysicalObject po = new PhysicalObject(offset, so);
 			//MapLoader.Loader.print("PO @ " + offset);
 			// Header
-			po.off_visualSet = Pointer.Read(reader);
-            po.off_collideSet = Pointer.Read(reader);
-            po.off_visualBoundingVolume = Pointer.Read(reader);
+			po.off_visualSet = LegacyPointer.Read(reader);
+            po.off_collideSet = LegacyPointer.Read(reader);
+            po.off_visualBoundingVolume = LegacyPointer.Read(reader);
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
                 if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                     po.off_collideBoundingVolume = po.off_visualBoundingVolume;
                     reader.ReadUInt32();
                 } else {
-                    po.off_collideBoundingVolume = Pointer.Read(reader);
+                    po.off_collideBoundingVolume = LegacyPointer.Read(reader);
                 }
             }
 
             // Parse visual set
-            Pointer.DoAt(ref reader, po.off_visualSet, () => {
+            LegacyPointer.DoAt(ref reader, po.off_visualSet, () => {
                 ushort numberOfLOD = 1;
                 po.visualSetType = 0;
 				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
@@ -146,30 +146,30 @@ namespace OpenSpace.Object {
 						//if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
 						po.visualSetType = reader.ReadUInt16();
 						if (numberOfLOD > 0) {
-							Pointer off_LODDistances = Pointer.Read(reader);
-							Pointer off_LODDataOffsets = Pointer.Read(reader);
+							LegacyPointer off_LODDistances = LegacyPointer.Read(reader);
+							LegacyPointer off_LODDataOffsets = LegacyPointer.Read(reader);
 							reader.ReadUInt32(); // always 0? RLI table offset
 							if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0? number of RLI
 							po.visualSet = new VisualSetLOD[numberOfLOD];
 							for (uint i = 0; i < numberOfLOD; i++) {
 								po.visualSet[i] = new VisualSetLOD();
 							}
-							Pointer.DoAt(ref reader, off_LODDistances, () => {
+							LegacyPointer.DoAt(ref reader, off_LODDistances, () => {
 								for (uint i = 0; i < numberOfLOD; i++) {
 									// if distance > the float at this offset, game engine uses next LOD if there is one
 									po.visualSet[i].LODdistance = reader.ReadSingle();
 								}
 							});
-							Pointer.DoAt(ref reader, off_LODDataOffsets, () => {
+							LegacyPointer.DoAt(ref reader, off_LODDataOffsets, () => {
 								for (uint i = 0; i < numberOfLOD; i++) {
-									po.visualSet[i].off_data = Pointer.Read(reader);
+									po.visualSet[i].off_data = LegacyPointer.Read(reader);
 								}
 							});
 						}
 					} else {
 						// Platform = Dreamcast
-						Pointer.Read(reader); // Material pointer?
-						Pointer off_data = Pointer.Read(reader);
+						LegacyPointer.Read(reader); // Material pointer?
+						LegacyPointer off_data = LegacyPointer.Read(reader);
 						reader.ReadUInt32(); // always 0?
 						reader.ReadUInt32(); // always 0?
 						po.visualSet = new VisualSetLOD[1];
@@ -179,7 +179,7 @@ namespace OpenSpace.Object {
 				}
                 int radiosityLODIndex = 0;
                 for (uint i = 0; i < numberOfLOD; i++) {
-                    Pointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
+                    LegacyPointer.DoAt(ref reader, po.visualSet[i].off_data, () => {
                         switch (po.visualSetType) {
                             case 0:
                                 if(po.visualSet[i].obj == null) po.visualSet[i].obj = GeometricObject.Read(reader, po.visualSet[i].off_data, radiosity: radiosity?.lod?[radiosityLODIndex++]);
@@ -196,7 +196,7 @@ namespace OpenSpace.Object {
             });
 
             // Parse collide set
-            Pointer.DoAt(ref reader, po.off_collideSet, () => {
+            LegacyPointer.DoAt(ref reader, po.off_collideSet, () => {
 				if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 					// Read collide mesh object here directly
 					po.collideMesh = GeometricObjectCollide.Read(reader, po.off_collideSet);
@@ -205,8 +205,8 @@ namespace OpenSpace.Object {
 					uint u1 = reader.ReadUInt32(); // 0, zdm
 					uint u2 = reader.ReadUInt32(); // 0, zdd
 					uint u3 = reader.ReadUInt32(); // 0, zde
-					Pointer off_zdr = Pointer.Read(reader);
-					Pointer.DoAt(ref reader, off_zdr, () => {
+					LegacyPointer off_zdr = LegacyPointer.Read(reader);
+					LegacyPointer.DoAt(ref reader, off_zdr, () => {
 						po.collideMesh = GeometricObjectCollide.Read(reader, off_zdr);
 					});
 				}

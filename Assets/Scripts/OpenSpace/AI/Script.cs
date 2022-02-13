@@ -7,39 +7,39 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class Script {
-        public Pointer offset; // offset of the pointer to the script
+        public LegacyPointer offset; // offset of the pointer to the script
         public BehaviorOrMacro behaviorOrMacro;
 
-        public Pointer off_script; // offset where the script starts
+        public LegacyPointer off_script; // offset where the script starts
         public List<ScriptNode> scriptNodes = new List<ScriptNode>();
 
-        public Script(Pointer offset) {
+        public Script(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static Script Read(Reader reader, Pointer offset, BehaviorOrMacro behaviorOrMacro, bool single = false) {
+        public static Script Read(Reader reader, LegacyPointer offset, BehaviorOrMacro behaviorOrMacro, bool single = false) {
             MapLoader l = MapLoader.Loader;
             Script s = new Script(offset);
 
             s.behaviorOrMacro = behaviorOrMacro;
 
 			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution && single) {
-				s.off_script = Pointer.Current(reader);
+				s.off_script = LegacyPointer.Current(reader);
 				bool endReached = false;
 				while (!endReached) {
-					ScriptNode sn = ScriptNode.Read(reader, Pointer.Current(reader), s);
+					ScriptNode sn = ScriptNode.Read(reader, LegacyPointer.Current(reader), s);
 					s.scriptNodes.Add(sn);
 
 					if (sn.indent == 0) endReached = true;
 				}
 			} else {
-				s.off_script = Pointer.Read(reader);
+				s.off_script = LegacyPointer.Read(reader);
 
                 //l.print(s.off_script);
-				Pointer.DoAt(ref reader, s.off_script, () => {
+				LegacyPointer.DoAt(ref reader, s.off_script, () => {
 					bool endReached = false;
 					while (!endReached) {
-						ScriptNode sn = ScriptNode.Read(reader, Pointer.Current(reader), s);
+						ScriptNode sn = ScriptNode.Read(reader, LegacyPointer.Current(reader), s);
 						s.scriptNodes.Add(sn);
 
 						if (sn.indent == 0) endReached = true;

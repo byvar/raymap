@@ -4,70 +4,70 @@ using UnityEngine;
 
 namespace OpenSpace.Waypoints {
     public class GraphNode : ILinkedListEntry {
-        public Pointer offset;
+        public LegacyPointer offset;
         public WayPoint wayPoint;
         public ArcList arcList;
 
         public uint typeOfWP;
         public uint typeOfWPInit;
 
-        public Pointer off_nextNode;
-        public Pointer off_prevNode;
-        public Pointer off_graph;
-        public Pointer off_node;
-        public Pointer off_wayPoint;
+        public LegacyPointer off_nextNode;
+        public LegacyPointer off_prevNode;
+        public LegacyPointer off_graph;
+        public LegacyPointer off_node;
+        public LegacyPointer off_wayPoint;
 
-        public Pointer off_arcList;
+        public LegacyPointer off_arcList;
 
-        public Pointer NextEntry {
+        public LegacyPointer NextEntry {
             get {
                 return off_nextNode;
             }
         }
 
-        public Pointer PreviousEntry {
+        public LegacyPointer PreviousEntry {
             get {
                 return off_prevNode;
             }
         }
 
-        public GraphNode(Pointer offset) {
+        public GraphNode(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static GraphNode FromOffset(Pointer offset) {
+        public static GraphNode FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.graphNodes.FirstOrDefault(g => g.offset == offset);
         }
 
-        public static GraphNode FromOffsetOrRead(Pointer offset, Reader reader) {
+        public static GraphNode FromOffsetOrRead(LegacyPointer offset, Reader reader) {
             if (offset == null) return null;
             GraphNode g = FromOffset(offset);
             if (g == null) {
-                Pointer.DoAt(ref reader, offset, () => {
+                LegacyPointer.DoAt(ref reader, offset, () => {
                     g = GraphNode.Read(reader, offset);
                 });
             }
             return g;
         }
 
-        public static GraphNode Read(Reader reader, Pointer offset) {
+        public static GraphNode Read(Reader reader, LegacyPointer offset) {
 
             GraphNode node = new GraphNode(offset);
 
             MapLoader.Loader.graphNodes.Add(node);
 
-            node.off_nextNode = Pointer.Read(reader);
-            node.off_prevNode = Pointer.Read(reader);
+            node.off_nextNode = LegacyPointer.Read(reader);
+            node.off_prevNode = LegacyPointer.Read(reader);
 
-            node.off_graph = Pointer.Read(reader);
-            node.off_wayPoint = Pointer.Read(reader);
+            node.off_graph = LegacyPointer.Read(reader);
+            node.off_wayPoint = LegacyPointer.Read(reader);
             if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
                 node.typeOfWP = reader.ReadUInt32();
                 node.typeOfWPInit = reader.ReadUInt32();
             }
-            node.off_arcList = Pointer.Read(reader);
+            node.off_arcList = LegacyPointer.Read(reader);
 
             //MapLoader.Loader.print("ArcList: "+node.off_arcList);
 
@@ -77,7 +77,7 @@ namespace OpenSpace.Waypoints {
 
             node.wayPoint = WayPoint.FromOffsetOrRead(node.off_wayPoint, reader);
             if (node.wayPoint != null) node.wayPoint.containingGraphNodes.Add(node);
-            Pointer.DoAt(ref reader, node.off_arcList, () => {
+            LegacyPointer.DoAt(ref reader, node.off_arcList, () => {
                 node.arcList = ArcList.Read(reader, node.off_arcList);
             });
 

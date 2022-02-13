@@ -151,17 +151,17 @@ namespace OpenSpace.Animation.Component {
 		private void ReadRevolution(Reader reader) {
 			MapLoader l = MapLoader.Loader;
 
-			Pointer off_vectors = Pointer.Read(reader);
-			Pointer off_quaternions = Pointer.Read(reader);
-			Pointer off_hierarchies = Pointer.Read(reader);
-			Pointer off_ntto = Pointer.Read(reader);
-			Pointer off_onlyFrames = Pointer.Read(reader);
-			Pointer off_channels = Pointer.Read(reader);
-			Pointer off_numNTTO = Pointer.Read(reader);
-			Pointer off_kfIndex = Pointer.Read(reader);
-			Pointer off_keyframes = Pointer.Read(reader);
-			Pointer off_events = Pointer.Read(reader);
-			Pointer off_morphData = Pointer.Read(reader);
+			LegacyPointer off_vectors = LegacyPointer.Read(reader);
+			LegacyPointer off_quaternions = LegacyPointer.Read(reader);
+			LegacyPointer off_hierarchies = LegacyPointer.Read(reader);
+			LegacyPointer off_ntto = LegacyPointer.Read(reader);
+			LegacyPointer off_onlyFrames = LegacyPointer.Read(reader);
+			LegacyPointer off_channels = LegacyPointer.Read(reader);
+			LegacyPointer off_numNTTO = LegacyPointer.Read(reader);
+			LegacyPointer off_kfIndex = LegacyPointer.Read(reader);
+			LegacyPointer off_keyframes = LegacyPointer.Read(reader);
+			LegacyPointer off_events = LegacyPointer.Read(reader);
+			LegacyPointer off_morphData = LegacyPointer.Read(reader);
 			speed = reader.ReadUInt16();
 			num_vectors = reader.ReadUInt16();
 			num_quaternions = reader.ReadUInt16();

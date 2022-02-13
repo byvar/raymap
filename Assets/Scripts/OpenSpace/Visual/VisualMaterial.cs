@@ -15,7 +15,7 @@ namespace OpenSpace.Visual {
         public List<VisualMaterialTexture> textures;
         public List<AnimatedTexture> animTextures;
         public uint flags;
-        public Pointer offset;
+        public LegacyPointer offset;
         public Vector4 ambientCoef;
         public Vector4 diffuseCoef;
         public Vector4 specularCoef;
@@ -23,8 +23,8 @@ namespace OpenSpace.Visual {
         public uint num_textures;
         public uint num_textures_in_material;
 		
-        public Pointer off_animTextures_first;
-        public Pointer off_animTextures_current;
+        public LegacyPointer off_animTextures_first;
+        public LegacyPointer off_animTextures_current;
         public ushort num_animTextures;
 
         public byte properties;
@@ -195,13 +195,13 @@ namespace OpenSpace.Visual {
             get { return (properties & 1) == 1; }
         }
 
-        public VisualMaterial(Pointer offset) {
+        public VisualMaterial(LegacyPointer offset) {
             this.offset = offset;
             textures = new List<VisualMaterialTexture>();
             animTextures = new List<AnimatedTexture>();
         }
 
-        public static VisualMaterial Read(Reader reader, Pointer offset) {
+        public static VisualMaterial Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             VisualMaterial m = new VisualMaterial(offset);
 			// Material struct = 0x188
@@ -219,8 +219,8 @@ namespace OpenSpace.Visual {
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				//m.diffuseCoef = new Vector4(1, 1, 1, 1);
 				reader.ReadInt32(); // current refresh number for scrolling/animated textures
-				m.off_animTextures_first = Pointer.Read(reader);
-				m.off_animTextures_current = Pointer.Read(reader);
+				m.off_animTextures_first = LegacyPointer.Read(reader);
+				m.off_animTextures_current = LegacyPointer.Read(reader);
 				reader.ReadInt32();
 				m.num_animTextures = reader.ReadUInt16();
 				reader.ReadUInt16(); // 0x70
@@ -230,8 +230,8 @@ namespace OpenSpace.Visual {
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				//m.ambientCoef = m.diffuseCoef;
 				reader.ReadInt32(); // current refresh number for scrolling/animated textures
-				m.off_animTextures_first = Pointer.Read(reader);
-				m.off_animTextures_current = Pointer.Read(reader);
+				m.off_animTextures_first = LegacyPointer.Read(reader);
+				m.off_animTextures_current = LegacyPointer.Read(reader);
 				reader.ReadInt32();
 				m.num_animTextures = reader.ReadUInt16();
 				reader.ReadUInt16();
@@ -239,8 +239,8 @@ namespace OpenSpace.Visual {
 			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 				m.num_textures = 1;
 				VisualMaterialTexture t = new VisualMaterialTexture();
-				t.offset = Pointer.Current(reader);
-				t.off_texture = Pointer.Read(reader); // 0x4c
+				t.offset = LegacyPointer.Current(reader);
+				t.off_texture = LegacyPointer.Read(reader); // 0x4c
 				t.texture = TextureInfo.FromOffset(t.off_texture);
 				t.textureOp = reader.ReadByte();
 				t.shadingMode = reader.ReadByte();
@@ -257,8 +257,8 @@ namespace OpenSpace.Visual {
 			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
 				m.num_textures = 1;
 				VisualMaterialTexture t = new VisualMaterialTexture();
-				t.offset = Pointer.Current(reader);
-				t.off_texture = Pointer.Read(reader); // 0x4c
+				t.offset = LegacyPointer.Current(reader);
+				t.off_texture = LegacyPointer.Read(reader); // 0x4c
 				t.texture = TextureInfo.FromOffset(t.off_texture);
 				t.scrollMode = reader.ReadUInt32();
 				t.scrollX = reader.ReadSingle();
@@ -282,14 +282,14 @@ namespace OpenSpace.Visual {
                 m.num_textures = 1;
                 reader.ReadUInt32(); // 0x48
                 VisualMaterialTexture t = new VisualMaterialTexture();
-                t.offset = Pointer.Current(reader);
-                t.off_texture = Pointer.Read(reader); // 0x4c
+                t.offset = LegacyPointer.Current(reader);
+                t.off_texture = LegacyPointer.Read(reader); // 0x4c
                 t.texture = TextureInfo.FromOffset(t.off_texture);
                 if (CPA_Settings.s.game == CPA_Settings.Game.TT) {
                     /*m.off_animTextures_first = Pointer.Read(reader); // 0x68
                     m.off_animTextures_current = Pointer.Read(reader); // 0x6c
                     m.num_animTextures = reader.ReadUInt16();*/
-                    Pointer.Read(reader); // detail texture
+                    LegacyPointer.Read(reader); // detail texture
                     t.currentScrollX = reader.ReadSingle();
                     t.currentScrollY = reader.ReadSingle();
                     t.scrollX = reader.ReadSingle(); // 0x58
@@ -310,8 +310,8 @@ namespace OpenSpace.Visual {
                     t.scrollMode = reader.ReadUInt32(); //0x60
                     m.textures.Add(t);
 					reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
-					m.off_animTextures_first = Pointer.Read(reader); // 0x68
-					m.off_animTextures_current = Pointer.Read(reader); // 0x6c
+					m.off_animTextures_first = LegacyPointer.Read(reader); // 0x68
+					m.off_animTextures_current = LegacyPointer.Read(reader); // 0x6c
 					m.num_animTextures = reader.ReadUInt16();
 					reader.ReadUInt16(); // 0x70
                 }
@@ -325,16 +325,16 @@ namespace OpenSpace.Visual {
 				if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
 					reader.ReadBytes(0x1C);
                 }
-                Pointer off_ps2Tex = null;
+                LegacyPointer off_ps2Tex = null;
                 Vector4 ps2Scroll = Vector4.zero;
                 if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
                     reader.ReadUInt32();
-                    off_ps2Tex = Pointer.Read(reader);
+                    off_ps2Tex = LegacyPointer.Read(reader);
                     ps2Scroll = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                     reader.ReadBytes(0x8);
                 }
-                m.off_animTextures_first = Pointer.Read(reader);
-                m.off_animTextures_current = Pointer.Read(reader);
+                m.off_animTextures_first = LegacyPointer.Read(reader);
+                m.off_animTextures_current = LegacyPointer.Read(reader);
                 m.num_animTextures = reader.ReadUInt16();
                 reader.ReadUInt16();
                 reader.ReadUInt32();
@@ -347,9 +347,9 @@ namespace OpenSpace.Visual {
                 m.num_textures_in_material = reader.ReadUInt32();
                 for (int i = 0; i < 4; i++) {
                     VisualMaterialTexture t = new VisualMaterialTexture();
-                    t.offset = Pointer.Current(reader);
+                    t.offset = LegacyPointer.Current(reader);
                     //l.print(t.offset);
-                    t.off_texture = Pointer.Read(reader);
+                    t.off_texture = LegacyPointer.Read(reader);
                     bool usePs2Scroll = false;
                     if (t.off_texture == null && i == 0 && off_ps2Tex != null) {
                         t.off_texture = off_ps2Tex;
@@ -445,17 +445,17 @@ namespace OpenSpace.Visual {
                 m.num_textures = (uint)m.textures.Count;
             }
             if (m.num_animTextures > 0 && m.off_animTextures_first != null) {
-                Pointer off_currentAnimTexture = m.off_animTextures_first;
-                Pointer.Goto(ref reader, m.off_animTextures_first);
+                LegacyPointer off_currentAnimTexture = m.off_animTextures_first;
+                LegacyPointer.Goto(ref reader, m.off_animTextures_first);
                 for (int i = 0; i < m.num_animTextures; i++) {
                     if (off_currentAnimTexture == m.off_animTextures_current) m.currentAnimTexture = i;
-                    Pointer off_animTexture = Pointer.Read(reader);
+                    LegacyPointer off_animTexture = LegacyPointer.Read(reader);
                     float time = reader.ReadSingle();
                     m.animTextures.Add(new AnimatedTexture(off_animTexture, time));
-                    Pointer off_nextAnimTexture = Pointer.Read(reader);
+                    LegacyPointer off_nextAnimTexture = LegacyPointer.Read(reader);
                     if (off_nextAnimTexture != null) {
                         off_currentAnimTexture = off_nextAnimTexture;
-                        Pointer.Goto(ref reader, off_nextAnimTexture);
+                        LegacyPointer.Goto(ref reader, off_nextAnimTexture);
                     }
                 }
             }
@@ -463,11 +463,11 @@ namespace OpenSpace.Visual {
             return m;
         }
 
-        public static VisualMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
+        public static VisualMaterial FromOffsetOrRead(LegacyPointer offset, Reader reader) {
             if (offset == null) return null;
             VisualMaterial vm = FromOffset(offset);
             if (vm == null) {
-                Pointer.DoAt(ref reader, offset, () => {
+                LegacyPointer.DoAt(ref reader, offset, () => {
                     vm = VisualMaterial.Read(reader, offset);
                     MapLoader.Loader.visualMaterials.Add(vm);
                 });
@@ -475,7 +475,7 @@ namespace OpenSpace.Visual {
             return vm;
         }
 
-        public static VisualMaterial FromOffset(Pointer offset) {
+        public static VisualMaterial FromOffset(LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             for (int i = 0; i < l.visualMaterials.Count; i++) {
                 if (offset == l.visualMaterials[i].offset) return l.visualMaterials[i];

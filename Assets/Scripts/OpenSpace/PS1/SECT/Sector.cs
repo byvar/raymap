@@ -8,13 +8,13 @@ using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class Sector : OpenSpaceStruct {
-		public Pointer off_persos;
-		public Pointer off_graphicSectors;
-		public Pointer off_collisionSectors;
-		public Pointer off_activitySectors;
-		public Pointer off_10;
-		public Pointer off_ipos;
-		public Pointer off_18;
+		public LegacyPointer off_persos;
+		public LegacyPointer off_graphicSectors;
+		public LegacyPointer off_collisionSectors;
+		public LegacyPointer off_activitySectors;
+		public LegacyPointer off_10;
+		public LegacyPointer off_ipos;
+		public LegacyPointer off_18;
 		public int minX;
 		public int minY;
 		public int minZ;
@@ -37,7 +37,7 @@ namespace OpenSpace.PS1 {
 		public ushort vip_ushort_08;
 		public ushort vip_ushort_0A;
 		public uint vip_uint_0C;
-		public Pointer off_so;
+		public LegacyPointer off_so;
 
 		// Parsed
 		public uint[] persos;
@@ -47,21 +47,21 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			Load.print("Sector @ " + Offset);
-			off_persos = Pointer.Read(reader);
-			off_graphicSectors = Pointer.Read(reader);
+			off_persos = LegacyPointer.Read(reader);
+			off_graphicSectors = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.game != CPA_Settings.Game.R2 && CPA_Settings.s.game != CPA_Settings.Game.RRush) {
 				vip_ushort_08 = reader.ReadUInt16();
 				vip_ushort_0A = reader.ReadUInt16();
 				vip_uint_0C = reader.ReadUInt32();
 			}
-			off_collisionSectors = Pointer.Read(reader);
-			off_activitySectors = Pointer.Read(reader);
-			off_10 = Pointer.Read(reader); // Sound sectors?
-			off_ipos = Pointer.Read(reader);
+			off_collisionSectors = LegacyPointer.Read(reader);
+			off_activitySectors = LegacyPointer.Read(reader);
+			off_10 = LegacyPointer.Read(reader); // Sound sectors?
+			off_ipos = LegacyPointer.Read(reader);
 			if (CPA_Settings.s.game != CPA_Settings.Game.R2 && CPA_Settings.s.game != CPA_Settings.Game.RRush) {
 				int_50 = reader.ReadInt32();
 			} else {
-				off_18 = Pointer.Read(reader);
+				off_18 = LegacyPointer.Read(reader);
 			}
 			minX = reader.ReadInt32();
 			minY = reader.ReadInt32();
@@ -87,41 +87,41 @@ namespace OpenSpace.PS1 {
 			} else {
 				int_4C = reader.ReadInt32();
 				int_50 = reader.ReadInt32();
-				off_so = Pointer.Read(reader);
+				off_so = LegacyPointer.Read(reader);
 			}
 
-			Pointer.DoAt(ref reader, off_persos, () => {
+			LegacyPointer.DoAt(ref reader, off_persos, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 0) {
-					Pointer off_array = Pointer.Read(reader);
+					LegacyPointer off_array = LegacyPointer.Read(reader);
 					Load.print("Persos: " + length);
 				}
 			});
-			Pointer.DoAt(ref reader, off_ipos, () => {
+			LegacyPointer.DoAt(ref reader, off_ipos, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 1) {
-					Pointer off_array = Pointer.Read(reader);
+					LegacyPointer off_array = LegacyPointer.Read(reader);
 					Load.print("IPOs: " + length);
 				}
 			});
-			Pointer.DoAt(ref reader, off_graphicSectors, () => {
+			LegacyPointer.DoAt(ref reader, off_graphicSectors, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 0) {
-					Pointer off_array = Pointer.Read(reader);
+					LegacyPointer off_array = LegacyPointer.Read(reader);
 					graphicSectors = Load.ReadArray<NeighborSector>(length, reader, off_array);
 				}
 			});
-			Pointer.DoAt(ref reader, off_collisionSectors, () => {
+			LegacyPointer.DoAt(ref reader, off_collisionSectors, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 0) {
-					Pointer off_array = Pointer.Read(reader);
+					LegacyPointer off_array = LegacyPointer.Read(reader);
 					collisionSectors = Load.ReadArray<NeighborSector>(length, reader, off_array);
 				}
 			});
-			Pointer.DoAt(ref reader, off_activitySectors, () => {
+			LegacyPointer.DoAt(ref reader, off_activitySectors, () => {
 				uint length = reader.ReadUInt32();
 				if (length > 0) {
-					Pointer off_array = Pointer.Read(reader);
+					LegacyPointer off_array = LegacyPointer.Read(reader);
 					activitySectors = Load.ReadArray<NeighborSector>(length, reader, off_array);
 				}
 			});

@@ -44,7 +44,7 @@ namespace OpenSpace {
         public TextureInfo[] textures;
         public TextureInfo overlightTexture;
         public TextureInfo lightmapTexture;
-        public Pointer[] persoInFix;
+        public LegacyPointer[] persoInFix;
         public AnimationBank[] animationBanks;
         public LinkedList<Family> families;
 
@@ -90,8 +90,8 @@ namespace OpenSpace {
         public List<ObjectList> objectLists = new List<ObjectList>();
         public List<ObjectList> uncategorizedObjectLists = new List<ObjectList>();
 		public List<EntryAction> entryActions = new List<EntryAction>();
-        public Dictionary<Pointer, string> strings = new Dictionary<Pointer, string>();
-		public Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>> structs = new Dictionary<System.Type, Dictionary<Pointer, OpenSpaceStruct>>();
+        public Dictionary<LegacyPointer, string> strings = new Dictionary<LegacyPointer, string>();
+		public Dictionary<System.Type, Dictionary<LegacyPointer, OpenSpaceStruct>> structs = new Dictionary<System.Type, Dictionary<LegacyPointer, OpenSpaceStruct>>();
 		public GameObject familiesRoot = null;
 		//List<R3GeometricObject> parsedGO = new List<R3GeometricObject>();
 		public List<Action> onPostLoad = new List<Action>();
@@ -109,12 +109,12 @@ namespace OpenSpace {
         protected DSB gameDsb = null;
         protected DSB lvlDsb = null;
 		protected Dictionary<string, string> paths = new Dictionary<string, string>();
-		public Pointer[] off_lightmapUV;
+		public LegacyPointer[] off_lightmapUV;
 
 		public Globals globals = null;
         public CPA_Settings settings = null;
         public List<SearchableString> searchableStrings = new List<SearchableString>();
-		public Dictionary<Pointer, Pointer.PointerTrace> pointerTraces = new Dictionary<Pointer, Pointer.PointerTrace>();
+		public Dictionary<LegacyPointer, LegacyPointer.PointerTrace> pointerTraces = new Dictionary<LegacyPointer, LegacyPointer.PointerTrace>();
 
         public static class Mem {
             public const int Fix = 0;
@@ -275,84 +275,84 @@ namespace OpenSpace {
             Reader reader = mem.reader;
 
             // Read object names
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["objectTypes"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["objectTypes"], mem));
             objectTypes = new ObjectType[3][];
             for (uint i = 0; i < 3; i++) {
-                Pointer off_names_header = Pointer.Current(reader);
-                Pointer off_names_first = Pointer.Read(reader);
-                Pointer off_names_last = Pointer.Read(reader);
+                LegacyPointer off_names_header = LegacyPointer.Current(reader);
+                LegacyPointer off_names_first = LegacyPointer.Read(reader);
+                LegacyPointer off_names_last = LegacyPointer.Read(reader);
                 uint num_names = reader.ReadUInt32();
 
                 ReadObjectNamesTable(reader, off_names_first, num_names, i);
             }
 
             // Read globals
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["actualWorld"], mem));
-            globals.off_actualWorld = Pointer.Read(reader);
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["dynamicWorld"], mem));
-            globals.off_dynamicWorld = Pointer.Read(reader);
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["inactiveDynamicWorld"], mem));
-            globals.off_inactiveDynamicWorld = Pointer.Read(reader);
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["fatherSector"], mem));
-            globals.off_fatherSector = Pointer.Read(reader);
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["firstSubmapPosition"], mem));
-            globals.off_firstSubMapPosition = Pointer.Read(reader);
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["always"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["actualWorld"], mem));
+            globals.off_actualWorld = LegacyPointer.Read(reader);
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["dynamicWorld"], mem));
+            globals.off_dynamicWorld = LegacyPointer.Read(reader);
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["inactiveDynamicWorld"], mem));
+            globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["fatherSector"], mem));
+            globals.off_fatherSector = LegacyPointer.Read(reader);
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["firstSubmapPosition"], mem));
+            globals.off_firstSubMapPosition = LegacyPointer.Read(reader);
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["always"], mem));
             globals.num_always = reader.ReadUInt32();
-            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
-            globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-            globals.off_always_reusableUnknown1 = Pointer.Read(reader); // (num_always) * 0x2c blocks
-            globals.off_always_reusableUnknown2 = Pointer.Read(reader); // (num_always) * 0x4 blocks
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["families"], mem));
-            families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+            globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+            globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
+            globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["families"], mem));
+            families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
             animationBanks = new AnimationBank[2];
 
             // Read animations
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["anim_stacks"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_stacks"], mem));
             if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-                animationBanks[0] = AnimationBank.Read(reader, Pointer.Current(reader), 0, 1, null)[0];
+                animationBanks[0] = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 1, null)[0];
                 animationBanks[1] = animationBanks[0];
             } else {
-                animationBanks = AnimationBank.Read(reader, Pointer.Current(reader), 0, 5, null);
+                animationBanks = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 5, null);
             }
 
             // Read textures
             uint[] texMemoryChannels = new uint[1024];
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["textureMemoryChannels"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["textureMemoryChannels"], mem));
             for (int i = 0; i < 1024; i++) {
                 texMemoryChannels[i] = reader.ReadUInt32();
             }
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["textures"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["textures"], mem));
             List<TextureInfo> textureInfos = new List<TextureInfo>();
             for (int i = 0; i < 1024; i++) {
-                Pointer off_texture = Pointer.Read(reader);
+                LegacyPointer off_texture = LegacyPointer.Read(reader);
                 if (off_texture != null && texMemoryChannels[i] != 0xC0DE0005) {
-                    Pointer off_current = Pointer.Goto(ref reader, off_texture);
+                    LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_texture);
                     TextureInfo texInfo = TextureInfo.Read(reader, off_texture);
                     //texInfo.ReadTextureFromData(reader); // Reading from GL memory doesn't seem to be possible sadly
                     // texInfo.Texture = Util.CreateDummyTexture();
                     GF gf = cnt.GetGFByTGAName(texInfo.name);
                     texInfo.Texture = gf != null ? gf.GetTexture() : null;
                     textureInfos.Add(texInfo);
-                    Pointer.Goto(ref reader, off_current);
+                    LegacyPointer.Goto(ref reader, off_current);
                 }
             }
             textures = textureInfos.ToArray();
             
             // Parse materials list
             if (CPA_Settings.s.memoryAddresses.ContainsKey("visualMaterials") && CPA_Settings.s.memoryAddresses.ContainsKey("num_visualMaterials")) {
-                Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["num_visualMaterials"], mem));
+                LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["num_visualMaterials"], mem));
                 uint num_visual_materials = reader.ReadUInt32();
-                Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["visualMaterials"], mem));
-                Pointer off_visualMaterials = Pointer.Read(reader);
+                LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["visualMaterials"], mem));
+                LegacyPointer off_visualMaterials = LegacyPointer.Read(reader);
                 if (off_visualMaterials != null) {
-                    Pointer.Goto(ref reader, off_visualMaterials);
+                    LegacyPointer.Goto(ref reader, off_visualMaterials);
                     for (uint i = 0; i < num_visual_materials; i++) {
-                        Pointer off_material = Pointer.Read(reader);
-                        Pointer off_current_mat = Pointer.Goto(ref reader, off_material);
+                        LegacyPointer off_material = LegacyPointer.Read(reader);
+                        LegacyPointer off_current_mat = LegacyPointer.Goto(ref reader, off_material);
                         visualMaterials.Add(VisualMaterial.Read(reader, off_material));
-                        Pointer.Goto(ref reader, off_current_mat);
+                        LegacyPointer.Goto(ref reader, off_current_mat);
                     }
                 }
             }
@@ -363,14 +363,14 @@ namespace OpenSpace {
                 Debug.LogError("BRIGHTNESS IS " + brightness);
             }*/
 
-            Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["inputStructure"], mem));
-            inputStruct = InputStructure.Read(reader, Pointer.Current(reader));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["inputStructure"], mem));
+            inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
 
-			Pointer.Goto(ref reader, new Pointer(CPA_Settings.s.memoryAddresses["localizationStructure"], mem));
-			localization = FromOffsetOrRead<LocalizationStructure>(reader, Pointer.Current(reader), inline: true);
+			LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["localizationStructure"], mem));
+			localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
 
 			// Parse actual world & always structure
 			ReadFamilies(reader);
@@ -530,44 +530,44 @@ MonoBehaviour.print(str);
 			}
         }
 
-        public void FillLinkedListPointers(Reader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
-            Pointer current_entry = lastEntry;
-            Pointer next_entry = null;
-            Pointer off_current = Pointer.Current(reader);
+        public void FillLinkedListPointers(Reader reader, LegacyPointer lastEntry, LegacyPointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
+            LegacyPointer current_entry = lastEntry;
+            LegacyPointer next_entry = null;
+            LegacyPointer off_current = LegacyPointer.Current(reader);
             while (current_entry != null) {
-                Pointer.Goto(ref reader, current_entry);
+                LegacyPointer.Goto(ref reader, current_entry);
                 current_entry.file.AddPointer(current_entry.offset + nextOffset, next_entry);
                 if (header != null) {
                     current_entry.file.AddPointer(current_entry.offset + headerOffset, header);
                 }
                 next_entry = current_entry;
-                current_entry = Pointer.GetPointerAtOffset(current_entry + prevOffset);
+                current_entry = LegacyPointer.GetPointerAtOffset(current_entry + prevOffset);
             }
-            Pointer.Goto(ref reader, off_current);
+            LegacyPointer.Goto(ref reader, off_current);
         }
 
-        public void ReadObjectNamesTable(Reader reader, Pointer off_names_first, uint num_names, uint index) {
-            Pointer off_current = Pointer.Goto(ref reader, off_names_first);
+        public void ReadObjectNamesTable(Reader reader, LegacyPointer off_names_first, uint num_names, uint index) {
+            LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_names_first);
             objectTypes[index] = new ObjectType[num_names];
             for (int j = 0; j < num_names; j++) {
                 objectTypes[index][j] = new ObjectType();
-                Pointer off_names_next = Pointer.Read(reader);
-                Pointer off_names_prev = Pointer.Read(reader);
-                Pointer off_header = Pointer.Read(reader);
-                Pointer off_name = Pointer.Read(reader);
+                LegacyPointer off_names_next = LegacyPointer.Read(reader);
+                LegacyPointer off_names_prev = LegacyPointer.Read(reader);
+                LegacyPointer off_header = LegacyPointer.Read(reader);
+                LegacyPointer off_name = LegacyPointer.Read(reader);
                 objectTypes[index][j].unk1 = reader.ReadByte();
                 objectTypes[index][j].id = reader.ReadByte();
                 objectTypes[index][j].unk2 = reader.ReadUInt16();
-                Pointer.Goto(ref reader, off_name);
+                LegacyPointer.Goto(ref reader, off_name);
                 objectTypes[index][j].name = reader.ReadNullDelimitedString();
-                if (off_names_next != null) Pointer.Goto(ref reader, off_names_next);
+                if (off_names_next != null) LegacyPointer.Goto(ref reader, off_names_next);
             }
-            Pointer.Goto(ref reader, off_current);
+            LegacyPointer.Goto(ref reader, off_current);
         }
 
-        public void ReadKeypadDefine(Reader reader, Pointer off_keypadDefine) {
+        public void ReadKeypadDefine(Reader reader, LegacyPointer off_keypadDefine) {
             if (off_keypadDefine == null) return;
-			Pointer.DoAt(ref reader, off_keypadDefine, () => {
+			LegacyPointer.DoAt(ref reader, off_keypadDefine, () => {
 				bool readKeypadDefine = true;
 				while (readKeypadDefine) {
 					KeypadEntry entry = new KeypadEntry();
@@ -577,14 +577,14 @@ MonoBehaviour.print(str);
 						/* Interestingly, some pointers in this list are not in the relocation table.
 						 * and don't point to any key name, so they can't be read with Pointer.Read.
 						 * Perhaps restoring this can help to restore debug functions... */
-						Pointer off_name = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+						LegacyPointer off_name = LegacyPointer.GetPointerAtOffset(LegacyPointer.Current(reader));
 						reader.ReadUInt32();
-						Pointer off_name2 = Pointer.GetPointerAtOffset(Pointer.Current(reader));
+						LegacyPointer off_name2 = LegacyPointer.GetPointerAtOffset(LegacyPointer.Current(reader));
 						reader.ReadUInt32();
-						Pointer.DoAt(ref reader, off_name, () => {
+						LegacyPointer.DoAt(ref reader, off_name, () => {
 							entry.name = reader.ReadNullDelimitedString();
 						});
-						Pointer.DoAt(ref reader, off_name2, () => {
+						LegacyPointer.DoAt(ref reader, off_name2, () => {
 							entry.name2 = reader.ReadNullDelimitedString();
 						});
 						keypadEntries.Add(entry);
@@ -593,14 +593,14 @@ MonoBehaviour.print(str);
 			});
         }
 
-        public void ReadLevelNames(Reader reader, Pointer off_levels, uint num_levels) {
+        public void ReadLevelNames(Reader reader, LegacyPointer off_levels, uint num_levels) {
             levels = new string[num_levels];
             for (uint i = 0; i < num_levels; i++) {
                 levels[i] = reader.ReadString(0x1E);
             }
         }
 
-        public void ReadLanguages(Reader reader, Pointer off_languages, uint num_languages) {
+        public void ReadLanguages(Reader reader, LegacyPointer off_languages, uint num_languages) {
             languages = new string[num_languages];
             languages_loc = new string[num_languages];
             for (uint i = 0; i < num_languages; i++) {
@@ -610,7 +610,7 @@ MonoBehaviour.print(str);
             }
         }
 
-		protected async UniTask ReadTexturesFix(Reader reader, Pointer off_textures) {
+		protected async UniTask ReadTexturesFix(Reader reader, LegacyPointer off_textures) {
             uint num_textureMemoryChannels = 0;
             if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
             uint num_textures = reader.ReadUInt32();
@@ -622,8 +622,8 @@ MonoBehaviour.print(str);
 				loadingState = "Loading fixed textures";
 				await UniTask.WaitForEndOfFrame();
                 for (uint i = 0; i < num_textures; i++) {
-                    Pointer off_texture = Pointer.Read(reader);
-                    Pointer.DoAt(ref reader, off_texture, () => {
+                    LegacyPointer off_texture = LegacyPointer.Read(reader);
+                    LegacyPointer.DoAt(ref reader, off_texture, () => {
                         textures[i] = TextureInfo.Read(reader, off_texture);
                     });
                 }
@@ -634,7 +634,7 @@ MonoBehaviour.print(str);
 						uint num_textures_menu = reader.ReadUInt32();
 						TPL menuTPL = new TPL(paths["menu.tpl"]);
 						for (uint i = 0; i < num_textures_menu; i++) {
-							Pointer off_texture = Pointer.Read(reader);
+							LegacyPointer off_texture = LegacyPointer.Read(reader);
 							TextureInfo tex = textures.Where(t => t.offset == off_texture).First();
 							/*if (exportTextures) {
 								Util.ByteArrayToFile(gameDataBinFolder + "textures/" + tex.name.Substring(0, tex.name.LastIndexOf('.')) + ".png", menuTPL.textures[i].EncodeToPNG());
@@ -770,7 +770,7 @@ MonoBehaviour.print(str);
 			loadingState = state;
 		}
 
-		protected async UniTask ReadTexturesLvl(Reader reader, Pointer off_textures) {
+		protected async UniTask ReadTexturesLvl(Reader reader, LegacyPointer off_textures) {
             uint num_textures_fix = (uint)textures.Length,
                 num_memoryChannels = 0,
                 num_textures_lvl = 0,
@@ -800,8 +800,8 @@ MonoBehaviour.print(str);
             }
             Array.Resize(ref textures, (int)num_textures_total);
             for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                Pointer off_texture = Pointer.Read(reader);
-                Pointer.DoAt(ref reader, off_texture, () => {
+                LegacyPointer off_texture = LegacyPointer.Read(reader);
+                LegacyPointer.DoAt(ref reader, off_texture, () => {
                     textures[i] = TextureInfo.Read(reader, off_texture);
                 });
 			}
@@ -979,13 +979,13 @@ MonoBehaviour.print(str);
                 // Load textures from CNT
                 int transitTexturesSeen = 0;
 				int num_textures_level_real = 0;
-				Pointer off_current = Pointer.Current(reader);
+				LegacyPointer off_current = LegacyPointer.Current(reader);
 				for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					uint file_texture = CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
 					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
 					num_textures_level_real++;
 				}
-				Pointer.Goto(ref reader, off_current);
+				LegacyPointer.Goto(ref reader, off_current);
 				int current_texture = 0;
 				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 					int fixTexturesSeen = 0;
@@ -1081,16 +1081,16 @@ MonoBehaviour.print(str);
                 controller.SpawnableParent = new GameObject("Spawnable persos");
                 globals.spawnablePersos.ReadEntries(ref reader, (offset) => {
 					uint index;
-					Pointer off_spawnable_perso;
+					LegacyPointer off_spawnable_perso;
 					if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
-						off_spawnable_perso = Pointer.Read(reader);
+						off_spawnable_perso = LegacyPointer.Read(reader);
 						index = reader.ReadUInt32();
 					} else {
 						index = reader.ReadUInt32();
-						off_spawnable_perso = Pointer.Read(reader);
+						off_spawnable_perso = LegacyPointer.Read(reader);
 					}
 					Perso perso = null;
-                    Pointer.DoAt(ref reader, off_spawnable_perso, () => {
+                    LegacyPointer.DoAt(ref reader, off_spawnable_perso, () => {
                         perso = Perso.Read(reader, off_spawnable_perso, null);
                         if (perso != null) {
                             perso.Gao.transform.parent = controller.SpawnableParent.transform;
@@ -1219,20 +1219,20 @@ MonoBehaviour.print(str);
 
 
 
-		public T FromOffset<T>(Pointer pointer) where T : OpenSpaceStruct {
+		public T FromOffset<T>(LegacyPointer pointer) where T : OpenSpaceStruct {
 			if (pointer == null) return null;
 			System.Type type = typeof(T);
 			if (!structs.ContainsKey(type) || !structs[type].ContainsKey(pointer)) return null;
 			return structs[type][pointer] as T;
 		}
 
-		private T Read<T>(Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+		private T Read<T>(Reader reader, LegacyPointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
 			if (pointer != null) {
 				T rs = new T();
 				rs.Init(pointer);
 				System.Type type = typeof(T);
 				if (!structs.ContainsKey(type)) {
-					structs[type] = new Dictionary<Pointer, OpenSpaceStruct>();
+					structs[type] = new Dictionary<LegacyPointer, OpenSpaceStruct>();
 				}
 				if (!structs[type].ContainsKey(pointer)) {
 					structs[type][pointer] = rs;
@@ -1246,33 +1246,33 @@ MonoBehaviour.print(str);
 			return null;
 		}
 
-		public T FromOffsetOrRead<T>(Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+		public T FromOffsetOrRead<T>(Reader reader, LegacyPointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
 			if (pointer == null) return null;
 			T rs = FromOffset<T>(pointer);
-			Pointer curPointer = pointer;
+			LegacyPointer curPointer = pointer;
 			if (rs == null) {
 				rs = Read(reader, pointer, onPreRead: onPreRead, inline: inline);
 			} else {
-				if(inline) Pointer.Goto(ref reader, curPointer + rs.Size);
+				if(inline) LegacyPointer.Goto(ref reader, curPointer + rs.Size);
 			}
 			return rs;
 		}
 
-		public T[] ReadArray<T>(long length, Reader reader, Pointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
+		public T[] ReadArray<T>(long length, Reader reader, LegacyPointer pointer, Action<T> onPreRead = null, bool inline = false) where T : OpenSpaceStruct, new() {
 			if (!inline && pointer == null) return new T[0];
 			T[] ts = new T[(int)length];
-			Pointer curPointer = pointer != null ? pointer : Pointer.Current(reader);
+			LegacyPointer curPointer = pointer != null ? pointer : LegacyPointer.Current(reader);
 			if (inline) {
 				//print(typeof(T) + " - " + curPointer);
 				for (int i = 0; i < length; i++) {
 					ts[i] = FromOffsetOrRead(reader, curPointer, onPreRead: onPreRead, inline: true);
-					curPointer = Pointer.Current(reader);
+					curPointer = LegacyPointer.Current(reader);
 				}
 			} else {
-				Pointer.DoAt(ref reader, pointer, () => {
+				LegacyPointer.DoAt(ref reader, pointer, () => {
 					for (int i = 0; i < length; i++) {
 						ts[i] = FromOffsetOrRead(reader, curPointer, onPreRead: onPreRead, inline: true);
-						curPointer = Pointer.Current(reader);
+						curPointer = LegacyPointer.Current(reader);
 					}
 				});
 			}

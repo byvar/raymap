@@ -14,28 +14,28 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class ScriptNode {
-        public Pointer offset;
+        public LegacyPointer offset;
         public uint param;
         public byte type;
         public byte indent;
 
         // derived fields
-        public Pointer param_ptr;
+        public LegacyPointer param_ptr;
         public NodeType nodeType;
 
         public Script script;
 
-        public ScriptNode(Pointer offset) {
+        public ScriptNode(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static ScriptNode Read(Reader reader, Pointer offset, Script script) {
+        public static ScriptNode Read(Reader reader, LegacyPointer offset, Script script) {
             MapLoader l = MapLoader.Loader;
             ScriptNode sn = new ScriptNode(offset);
 
             sn.script = script;
             sn.param = reader.ReadUInt32();
-            sn.param_ptr = Pointer.GetPointerAtOffset(offset); // if parameter is pointer
+            sn.param_ptr = LegacyPointer.GetPointerAtOffset(offset); // if parameter is pointer
             if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) reader.ReadUInt32();
 
             if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC) {
@@ -63,7 +63,7 @@ namespace OpenSpace.AI {
                     WayPoint waypoint = WayPoint.FromOffsetOrRead(sn.param_ptr, reader);
                     waypoint.References.referencedByNodes.Add(sn);
                 } else if (sn.nodeType == NodeType.String) {
-                    Pointer.DoAt(ref reader, sn.param_ptr, () => {
+                    LegacyPointer.DoAt(ref reader, sn.param_ptr, () => {
                         string str = reader.ReadNullDelimitedString();
                         l.strings[sn.param_ptr] = str;
                     });

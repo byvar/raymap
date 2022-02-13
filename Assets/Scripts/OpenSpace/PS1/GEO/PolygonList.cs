@@ -9,7 +9,7 @@ namespace OpenSpace.PS1 {
 	public class PolygonList : OpenSpaceStruct {
 		public ushort type;
 		public ushort ushort_02;
-		public Pointer off_polygons;
+		public LegacyPointer off_polygons;
 		public uint length;
 
 		public IPS1Polygon[] polygons;
@@ -17,8 +17,8 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			type = reader.ReadUInt16();
 			ushort_02 = reader.ReadUInt16();
-			off_polygons = Pointer.Read(reader);
-			Pointer.DoAt(ref reader, off_polygons, () => {
+			off_polygons = LegacyPointer.Read(reader);
+			LegacyPointer.DoAt(ref reader, off_polygons, () => {
 				length = reader.ReadUInt32();
 				switch (type) {
 					case 0:

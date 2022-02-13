@@ -8,8 +8,8 @@ using Type = OpenSpace.Object.SuperObject.Type;
 
 namespace OpenSpace.PS1 {
 	public class SkinnableGeometricObjectList : OpenSpaceStruct {
-		public Pointer off_entries;
-		public Pointer off_skin_memory;
+		public LegacyPointer off_entries;
+		public LegacyPointer off_skin_memory;
 		public uint sz_skin_memory;
 
 		// Parsed
@@ -18,8 +18,8 @@ namespace OpenSpace.PS1 {
 		public uint length;
 
 		protected override void ReadInternal(Reader reader) {
-			off_entries = Pointer.Read(reader);
-			off_skin_memory = Pointer.Read(reader);
+			off_entries = LegacyPointer.Read(reader);
+			off_skin_memory = LegacyPointer.Read(reader);
 			sz_skin_memory = reader.ReadUInt32();
 
 			geometricObjects = Load.FromOffsetOrRead<PointerList<GeometricObject>>(reader, off_entries, onPreRead: l => l.length = length);

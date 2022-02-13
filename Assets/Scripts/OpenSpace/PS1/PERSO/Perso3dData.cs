@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace OpenSpace.PS1 {
 	public class Perso3dData : OpenSpaceStruct { // Animation/state related
 		public uint flags;
-		public Pointer off_family;
-		public Pointer off_58;
+		public LegacyPointer off_family;
+		public LegacyPointer off_58;
 		public ushort ushort_5C;
 		public short short_5E;
-		public Pointer off_animationBuffer;
-		public Pointer off_64;
-		public Pointer off_68;
-		public Pointer off_6C;
+		public LegacyPointer off_animationBuffer;
+		public LegacyPointer off_64;
+		public LegacyPointer off_68;
+		public LegacyPointer off_6C;
 		public int num_collisionObjects;
-		public Pointer off_collisionObjects; public uint uint_74;
+		public LegacyPointer off_collisionObjects; public uint uint_74;
 		public uint stateIndex;
-		public Pointer off_currentState;
+		public LegacyPointer off_currentState;
 
 		// Parsed
 		public Family family;
@@ -28,29 +28,29 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			//Load.print(Offset);
 			flags = reader.ReadUInt32();
-			off_family = Pointer.Read(reader);
+			off_family = LegacyPointer.Read(reader);
 			reader.ReadBytes(0x50); // TODO
-			off_58 = Pointer.Read(reader); // 3 structs of 0x8 (no pointers)
+			off_58 = LegacyPointer.Read(reader); // 3 structs of 0x8 (no pointers)
 			ushort_5C = reader.ReadUInt16();
 			short_5E = reader.ReadInt16();
-			off_animationBuffer = Pointer.Read(reader);
+			off_animationBuffer = LegacyPointer.Read(reader);
 			if (ushort_5C > 0) {
-				off_64 = Pointer.Read(reader); // short_5e * 0x4
-				off_68 = Pointer.Read(reader); // short_5e * 0x2
+				off_64 = LegacyPointer.Read(reader); // short_5e * 0x4
+				off_68 = LegacyPointer.Read(reader); // short_5e * 0x2
 			} else {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 			}
-			off_6C = Pointer.Read(reader); // same as col
+			off_6C = LegacyPointer.Read(reader); // same as col
 			num_collisionObjects = reader.ReadInt32();
 			if (num_collisionObjects > 0) {
-				off_collisionObjects = Pointer.Read(reader); // mapping: off_collisionObject, off_poListEntry
+				off_collisionObjects = LegacyPointer.Read(reader); // mapping: off_collisionObject, off_poListEntry
 				collisionMapping = Load.ReadArray<PhysicalObjectCollisionMapping>(num_collisionObjects, reader, off_collisionObjects);
 			} else {
 				uint_74 = reader.ReadUInt32();
 			}
 			stateIndex = reader.ReadUInt32();
-			off_currentState = Pointer.Read(reader); // only at runtime
+			off_currentState = LegacyPointer.Read(reader); // only at runtime
 			reader.ReadBytes(0x24); // TODO
 
 			// at 0x92: scale shorts

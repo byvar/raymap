@@ -16,7 +16,7 @@ namespace Assets.Scripts.Editor
 
         Vector2 scrollPos = new Vector2();
         string searchString = "";
-        private List<KeyValuePair<Pointer, Pointer.PointerTrace>> results;
+        private List<KeyValuePair<LegacyPointer, LegacyPointer.PointerTrace>> results;
         private bool searched = false;
         private int resultCount = 0;
         private static int resultLimit = 1000;

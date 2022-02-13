@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace OpenSpace.PS1 {
 	public class Arc : OpenSpaceStruct {
-		public Pointer off_node1;
-		public Pointer off_node2;
+		public LegacyPointer off_node1;
+		public LegacyPointer off_node2;
 		public uint uint_08;
 		public ushort ushort_0C;
 		public ushort ushort_0E;
@@ -16,8 +16,8 @@ namespace OpenSpace.PS1 {
 		public WayPoint node2;
 
 		protected override void ReadInternal(Reader reader) {
-			off_node1 = Pointer.Read(reader);
-			off_node2 = Pointer.Read(reader);
+			off_node1 = LegacyPointer.Read(reader);
+			off_node2 = LegacyPointer.Read(reader);
 			uint_08 = reader.ReadUInt32();
 			ushort_0C = reader.ReadUInt16();
 			ushort_0E = reader.ReadUInt16();

@@ -35,7 +35,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 	public bool clearTheBrain = false;
 
 	// Abstract properties
-	public override Pointer Offset => perso?.offset;
+	public override LegacyPointer Offset => perso?.offset;
 	public override string NameFamily => perso?.nameFamily;
 	public override string NameModel => perso?.nameModel;
 	public override string NameInstance => perso?.namePerso;

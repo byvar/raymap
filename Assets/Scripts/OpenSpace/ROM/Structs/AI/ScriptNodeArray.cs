@@ -32,7 +32,7 @@ namespace OpenSpace.ROM {
 
 			// Custom
             public NodeType nodeType;
-            public Pointer offset;
+            public LegacyPointer offset;
 
 			// Parsed param
 			public Reference<Scr_Int> paramInt;
@@ -54,7 +54,7 @@ namespace OpenSpace.ROM {
 			public Reference<EntryAction> paramButton;
 
             public ScriptNode(Reader reader) {
-                offset = Pointer.Current(reader);
+                offset = LegacyPointer.Current(reader);
 
 				type = reader.ReadByte();
 				indent = reader.ReadByte();

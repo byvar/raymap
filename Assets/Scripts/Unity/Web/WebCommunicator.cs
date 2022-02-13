@@ -724,7 +724,7 @@ public class WebCommunicator : MonoBehaviour {
 	private BaseScriptComponent GetScriptFromRequest(WebJSON.Request msg) {
 		if (selector.selectedPerso == null || selector.selectedPerso.brain == null) return null;
 		BrainComponent brain = selector.selectedPerso.brain;
-		Pointer offset = msg.Offset;
+		LegacyPointer offset = msg.Offset;
 		switch (msg.BehaviorType) {
 			case WebJSON.BehaviorType.Intelligence:
 				if (brain.Intelligence == null) return null;
@@ -756,7 +756,7 @@ public class WebCommunicator : MonoBehaviour {
 	private BrainComponent.Comport GetComportFromRequest(WebJSON.Request msg) {
 		if (selector.selectedPerso == null || selector.selectedPerso.brain == null) return null;
 		BrainComponent brain = selector.selectedPerso.brain;
-		Pointer offset = msg.Offset;
+		LegacyPointer offset = msg.Offset;
 		switch (msg.BehaviorType) {
 			case WebJSON.BehaviorType.Intelligence:
 				if (brain.Intelligence == null) return null;
@@ -776,7 +776,7 @@ public class WebCommunicator : MonoBehaviour {
 	private BrainComponent.Macro GetMacroFromRequest(WebJSON.Request msg) {
 		if (selector.selectedPerso == null || selector.selectedPerso.brain == null) return null;
 		BrainComponent brain = selector.selectedPerso.brain;
-		Pointer offset = msg.Offset;
+		LegacyPointer offset = msg.Offset;
 		switch (msg.BehaviorType) {
 			case WebJSON.BehaviorType.Macro:
 				if (brain.Macros == null) return null;
@@ -787,7 +787,7 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		return null;
 	}
-	private BasePersoBehaviour GetPersoFromOffset(Pointer offset) {
+	private BasePersoBehaviour GetPersoFromOffset(LegacyPointer offset) {
 		if (offset == selectedPerso_?.Offset) {
 			return selectedPerso_;
 		} else {
@@ -802,7 +802,7 @@ public class WebCommunicator : MonoBehaviour {
 			}
 		}
 	}
-	private BasePersoBehaviour GetPersoFromSuperObjectOffset(Pointer offset) {
+	private BasePersoBehaviour GetPersoFromSuperObjectOffset(LegacyPointer offset) {
 		if (offset == selectedPerso_?.Offset) {
 			return selectedPerso_;
 		} else {

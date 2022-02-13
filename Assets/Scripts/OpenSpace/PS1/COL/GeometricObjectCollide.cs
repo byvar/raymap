@@ -14,10 +14,10 @@ namespace OpenSpace.PS1 {
 		public ushort num_triangles;
 		public ushort num_quads;
 		public byte[] unknownBytes;
-		public Pointer off_vertices;
-		public Pointer off_normals;
-		public Pointer off_triangles;
-		public Pointer off_quads;
+		public LegacyPointer off_vertices;
+		public LegacyPointer off_normals;
+		public LegacyPointer off_triangles;
+		public LegacyPointer off_quads;
 		public uint uint_38;
 
 		// Parsed
@@ -33,10 +33,10 @@ namespace OpenSpace.PS1 {
 			num_triangles = reader.ReadUInt16();
 			num_quads = reader.ReadUInt16();
 			unknownBytes = reader.ReadBytes(0x20);
-			off_vertices = Pointer.Read(reader);
-			off_normals = Pointer.Read(reader);
-			off_triangles = Pointer.Read(reader);
-			off_quads = Pointer.Read(reader);
+			off_vertices = LegacyPointer.Read(reader);
+			off_normals = LegacyPointer.Read(reader);
+			off_triangles = LegacyPointer.Read(reader);
+			off_quads = LegacyPointer.Read(reader);
 			uint_38 = reader.ReadUInt32();
 			if (uint_38 != 0) Debug.LogWarning("Uint_38 wasn't 0 at " + Offset + ": " + uint_38);
 

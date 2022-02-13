@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public class Mind : OpenSpaceStruct {
-        public Pointer off_AI_model;
-        public Pointer off_intelligence_normal;
-        public Pointer off_intelligence_reflex;
-        public Pointer off_dsgMem;
-        public Pointer off_name;
+        public LegacyPointer off_AI_model;
+        public LegacyPointer off_intelligence_normal;
+        public LegacyPointer off_intelligence_reflex;
+        public LegacyPointer off_dsgMem;
+        public LegacyPointer off_name;
         public byte byte0;
         public byte byte1;
         public byte byte2;
@@ -24,10 +24,10 @@ namespace OpenSpace.AI {
 
         public void UpdateCurrentBehaviors(Reader reader)
         {
-            off_AI_model = Pointer.Read(reader);
-            off_intelligence_normal = Pointer.Read(reader);
-            off_intelligence_reflex = Pointer.Read(reader);
-            off_dsgMem = Pointer.Read(reader);
+            off_AI_model = LegacyPointer.Read(reader);
+            off_intelligence_normal = LegacyPointer.Read(reader);
+            off_intelligence_reflex = LegacyPointer.Read(reader);
+            off_dsgMem = LegacyPointer.Read(reader);
 
             MapLoader l = MapLoader.Loader;
             if (dsgMem == null) {
@@ -47,17 +47,17 @@ namespace OpenSpace.AI {
         }
 
         protected override void ReadInternal(Reader reader) {
-            off_AI_model = Pointer.Read(reader);
-            off_intelligence_normal = Pointer.Read(reader);
+            off_AI_model = LegacyPointer.Read(reader);
+            off_intelligence_normal = LegacyPointer.Read(reader);
             if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
-                off_dsgMem = Pointer.Read(reader);
-                off_intelligence_reflex = Pointer.Read(reader);
+                off_dsgMem = LegacyPointer.Read(reader);
+                off_intelligence_reflex = LegacyPointer.Read(reader);
             } else {
-                off_intelligence_reflex = Pointer.Read(reader);
-                off_dsgMem = Pointer.Read(reader);
+                off_intelligence_reflex = LegacyPointer.Read(reader);
+                off_dsgMem = LegacyPointer.Read(reader);
             }
             if (CPA_Settings.s.hasNames) {
-                off_name = Pointer.Read(reader);
+                off_name = LegacyPointer.Read(reader);
             }
             byte0 = reader.ReadByte();
             byte1 = reader.ReadByte();

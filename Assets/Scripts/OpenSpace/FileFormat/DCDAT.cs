@@ -48,7 +48,7 @@ namespace OpenSpace.FileFormat {
             return; // No writing support for DC DAT files yet
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             if (writer != null) {
                 if (pointer == null) {
                     writer.Write((uint)0);
@@ -58,15 +58,15 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        public override Pointer GetUnsafePointer(uint value) {
+        public override LegacyPointer GetUnsafePointer(uint value) {
             if (value >= headerOffset && value < headerOffset + length) {
-                return new Pointer(value, this);
+                return new LegacyPointer(value, this);
             } else {
                 MapLoader l = MapLoader.Loader;
                 foreach (FileWithPointers f in l.files_array) {
                     DCDAT dcFile = f as DCDAT;
                     if (dcFile != null && value >= dcFile.headerOffset && value < dcFile.headerOffset + dcFile.length) {
-                        return new Pointer(value, dcFile);
+                        return new LegacyPointer(value, dcFile);
                     }
                 }
                 // Do a second loop over the files. If end and start overlap we want the start (returned by previous loop),
@@ -74,7 +74,7 @@ namespace OpenSpace.FileFormat {
                 foreach (FileWithPointers f in l.files_array) {
                     DCDAT dcFile = f as DCDAT;
                     if (dcFile != null && value == dcFile.headerOffset + dcFile.length) {
-                        return new Pointer(value, dcFile);
+                        return new LegacyPointer(value, dcFile);
                     }
                 }
             }

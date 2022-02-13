@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 
 namespace OpenSpace.ROM {
 	public abstract class ROMStruct {
-		public Pointer Offset { get; protected set; }
+		public LegacyPointer Offset { get; protected set; }
 		public ushort Index   { get; protected set; }
 		public string IndexString { get { return string.Format("{0:X4}", Index); } }
 
-		public void Init(Pointer offset, ushort index) {
+		public void Init(LegacyPointer offset, ushort index) {
 			this.Offset = offset;
 			this.Index = index;
 		}
 		protected abstract void ReadInternal(Reader reader);
 		public void Read(Reader reader) {
-			Pointer.DoAt(ref reader, Offset, () => {
+			LegacyPointer.DoAt(ref reader, Offset, () => {
 				ReadInternal(reader);
 			});
 		}

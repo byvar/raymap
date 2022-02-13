@@ -20,14 +20,14 @@ namespace OpenSpace {
     }
 
     public class LinkedList<T> : IList<T> {
-        public delegate T ReadElement(Pointer offset);
+        public delegate T ReadElement(LegacyPointer offset);
 
-        public Pointer offset;
+        public LegacyPointer offset;
         public Type type;
-        public Pointer off_head;
-        public Pointer off_tail;
+        public LegacyPointer off_head;
+        public LegacyPointer off_tail;
         private uint num_elements;
-        public Pointer off_header;
+        public LegacyPointer off_header;
         private bool customEntries = false;
 
         private T[] list = null;
@@ -51,12 +51,12 @@ namespace OpenSpace {
             set { list[index] = value; }
         }
 
-        public LinkedList(Pointer offset) {
+        public LinkedList(LegacyPointer offset) {
             this.offset = offset;
             if (typeof(ILinkedListEntry).IsAssignableFrom(typeof(T))) customEntries = true;
         }
 
-		public LinkedList(Pointer offset, Pointer off_head, Pointer off_tail, uint num_elements, Type type = Type.Default) : this(offset) {
+		public LinkedList(LegacyPointer offset, LegacyPointer off_head, LegacyPointer off_tail, uint num_elements, Type type = Type.Default) : this(offset) {
 			this.off_head = off_head;
 			this.off_tail = off_tail;
 			this.num_elements = num_elements;
@@ -82,10 +82,10 @@ namespace OpenSpace {
 
 		}
 
-		public LinkedList(Pointer offset, Pointer off_head, uint num_elements, Type type = Type.Default) : this(offset, off_head, null, num_elements, type) {}
+		public LinkedList(LegacyPointer offset, LegacyPointer off_head, uint num_elements, Type type = Type.Default) : this(offset, off_head, null, num_elements, type) {}
 
 
-		public static LinkedList<T> ReadHeader(Reader reader, Pointer offset, Type type = Type.Default) {
+		public static LinkedList<T> ReadHeader(Reader reader, LegacyPointer offset, Type type = Type.Default) {
             MapLoader l = MapLoader.Loader;
             LinkedList<T> li = new LinkedList<T>(offset);
             li.type = type;
@@ -105,35 +105,35 @@ namespace OpenSpace {
                     li.type = Type.SingleNoElementPointers;
                 }
             }
-            li.off_head = Pointer.Read(reader);
-            if (li.type == Type.Double || li.type == Type.DoubleNoElementPointers) li.off_tail = Pointer.Read(reader);
+            li.off_head = LegacyPointer.Read(reader);
+            if (li.type == Type.Double || li.type == Type.DoubleNoElementPointers) li.off_tail = LegacyPointer.Read(reader);
             li.num_elements = reader.ReadUInt32();
             li.list = new T[li.num_elements];
             return li;
         }
 
         public void ReadEntries(ref Reader reader, ReadElement readElement, LinkedList.Flags flags = LinkedList.Flags.None) {
-            Pointer off_next = off_head;
+            LegacyPointer off_next = off_head;
             bool elementPointerFirst = ((flags & LinkedList.Flags.ElementPointerFirst) != 0);
             bool hasHeaderPointers = ((flags & LinkedList.Flags.HasHeaderPointers) != 0);
             bool readAtPointer = ((flags & LinkedList.Flags.ReadAtPointer) != 0);
             bool noPreviousPointers = ((flags & LinkedList.Flags.NoPreviousPointersForDouble) != 0);
             if (off_head != null) {
-                Pointer off_current = Pointer.Goto(ref reader, off_head);
+                LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_head);
                 for (int i = 0; i < num_elements; i++) {
-                    Pointer off_element = off_next;
-                    if (elementPointerFirst) off_element = Pointer.Read(reader);
+                    LegacyPointer off_element = off_next;
+                    if (elementPointerFirst) off_element = LegacyPointer.Read(reader);
                     if (type != Type.SingleNoElementPointers && type != Type.DoubleNoElementPointers && !customEntries) {
-                        off_next = Pointer.Read(reader);
-                        if (type == Type.Double && !noPreviousPointers) Pointer.Read(reader); // previous element pointer
-                        if (hasHeaderPointers) Pointer.Read(reader); // header struct pointer
+                        off_next = LegacyPointer.Read(reader);
+                        if (type == Type.Double && !noPreviousPointers) LegacyPointer.Read(reader); // previous element pointer
+                        if (hasHeaderPointers) LegacyPointer.Read(reader); // header struct pointer
                     }
-                    if (readAtPointer && !elementPointerFirst) off_element = Pointer.Read(reader);
+                    if (readAtPointer && !elementPointerFirst) off_element = LegacyPointer.Read(reader);
                     // Read element
                     if (!readAtPointer) {
                         list[i] = readElement(off_element);
                     } else {
-                        Pointer.DoAt(ref reader, off_element, () => {
+                        LegacyPointer.DoAt(ref reader, off_element, () => {
                             list[i] = readElement(off_element);
                         });
                     }
@@ -147,37 +147,37 @@ namespace OpenSpace {
                             num_elements = (uint)i + 1;
                             break;
                         }
-                        Pointer.Goto(ref reader, off_next);
+                        LegacyPointer.Goto(ref reader, off_next);
                     } else {
-                        off_next = Pointer.Current(reader);
+                        off_next = LegacyPointer.Current(reader);
                     }
                 }
-                Pointer.Goto(ref reader, off_current);
+                LegacyPointer.Goto(ref reader, off_current);
             }
         }
 
         public void ReadEntriesBackwards(ref Reader reader, ReadElement readElement, LinkedList.Flags flags = LinkedList.Flags.None) {
-            Pointer off_next = off_tail;
+            LegacyPointer off_next = off_tail;
             bool elementPointerFirst = ((flags & LinkedList.Flags.ElementPointerFirst) != 0);
             bool hasHeaderPointers = ((flags & LinkedList.Flags.HasHeaderPointers) != 0);
             bool readAtPointer = ((flags & LinkedList.Flags.ReadAtPointer) != 0);
             bool noPreviousPointers = ((flags & LinkedList.Flags.NoPreviousPointersForDouble) != 0);
             if (off_tail != null) {
-                Pointer off_current = Pointer.Goto(ref reader, off_tail);
+                LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_tail);
                 for (int i = 0; i < num_elements; i++) {
-                    Pointer off_element = off_next;
-                    if (elementPointerFirst) off_element = Pointer.Read(reader);
+                    LegacyPointer off_element = off_next;
+                    if (elementPointerFirst) off_element = LegacyPointer.Read(reader);
                     if (type != Type.SingleNoElementPointers && type != Type.DoubleNoElementPointers && !customEntries) {
-                        off_next = Pointer.Read(reader);
-                        if (type == Type.Double && !noPreviousPointers) off_next = Pointer.Read(reader); // previous element pointer
-                        if (hasHeaderPointers) Pointer.Read(reader); // header struct pointer
+                        off_next = LegacyPointer.Read(reader);
+                        if (type == Type.Double && !noPreviousPointers) off_next = LegacyPointer.Read(reader); // previous element pointer
+                        if (hasHeaderPointers) LegacyPointer.Read(reader); // header struct pointer
                     }
-                    if (readAtPointer && !elementPointerFirst) off_element = Pointer.Read(reader);
+                    if (readAtPointer && !elementPointerFirst) off_element = LegacyPointer.Read(reader);
                     // Read element
                     if (!readAtPointer) {
                         list[i] = readElement(off_element);
                     } else {
-                        Pointer.DoAt(ref reader, off_element, () => {
+                        LegacyPointer.DoAt(ref reader, off_element, () => {
                             list[i] = readElement(off_element);
                         });
                     }
@@ -191,16 +191,16 @@ namespace OpenSpace {
                             num_elements = (uint)i + 1;
                             break;
                         }
-                        Pointer.Goto(ref reader, off_next);
+                        LegacyPointer.Goto(ref reader, off_next);
                     } else {
-                        off_next = Pointer.Current(reader);
+                        off_next = LegacyPointer.Current(reader);
                     }
                 }
-                Pointer.Goto(ref reader, off_current);
+                LegacyPointer.Goto(ref reader, off_current);
             }
         }
 
-        public static LinkedList<T> Read(ref Reader reader, Pointer offset, ReadElement readElement,
+        public static LinkedList<T> Read(ref Reader reader, LegacyPointer offset, ReadElement readElement,
             LinkedList.Flags flags = LinkedList.Flags.None,
             Type type = Type.Default) {
             LinkedList<T> li = ReadHeader(reader, offset, type: type);
@@ -208,20 +208,20 @@ namespace OpenSpace {
             return li;
         }
 
-        public void FillPointers(Reader reader, Pointer lastEntry, Pointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
-            Pointer current_entry = lastEntry;
-            Pointer next_entry = null;
-            Pointer off_current = Pointer.Current(reader);
+        public void FillPointers(Reader reader, LegacyPointer lastEntry, LegacyPointer header, uint nextOffset = 0, uint prevOffset = 4, uint headerOffset = 8) {
+            LegacyPointer current_entry = lastEntry;
+            LegacyPointer next_entry = null;
+            LegacyPointer off_current = LegacyPointer.Current(reader);
             while (current_entry != null) {
-                Pointer.Goto(ref reader, current_entry);
+                LegacyPointer.Goto(ref reader, current_entry);
                 current_entry.file.AddPointer(current_entry.offset + nextOffset, next_entry);
                 if (header != null) {
                     current_entry.file.AddPointer(current_entry.offset + headerOffset, header);
                 }
                 next_entry = current_entry;
-                current_entry = Pointer.GetPointerAtOffset(current_entry + prevOffset);
+                current_entry = LegacyPointer.GetPointerAtOffset(current_entry + prevOffset);
             }
-            Pointer.Goto(ref reader, off_current);
+            LegacyPointer.Goto(ref reader, off_current);
         }
 
         public IEnumerator<T> GetEnumerator() {

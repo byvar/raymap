@@ -26,11 +26,11 @@ public class GrabLocationDisplayScript : MonoBehaviour
 
         if (reader != null) {
             MemoryFile mem = (MemoryFile)MapLoader.Loader.files_array[0];
-            new Pointer(0x500298, mem).Goto(ref reader);
-            (Pointer.Read(reader)+ 0x234).Goto(ref reader);
-            (Pointer.Read(reader)+ 0x10).Goto(ref reader);
-            (Pointer.Read(reader) + 0xC).Goto(ref reader);
-            (Pointer.Read(reader) + 0xB0).Goto(ref reader);
+            new LegacyPointer(0x500298, mem).Goto(ref reader);
+            (LegacyPointer.Read(reader)+ 0x234).Goto(ref reader);
+            (LegacyPointer.Read(reader)+ 0x10).Goto(ref reader);
+            (LegacyPointer.Read(reader) + 0xC).Goto(ref reader);
+            (LegacyPointer.Read(reader) + 0xB0).Goto(ref reader);
             float x = reader.ReadSingle();
             float y = reader.ReadSingle();
             float z = reader.ReadSingle();

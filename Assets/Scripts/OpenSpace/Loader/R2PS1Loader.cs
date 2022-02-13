@@ -224,29 +224,29 @@ namespace OpenSpace.Loader {
 		private void RelocateActorMemoryDonaldDuck() {
 			Reader reader = files_array[Mem.Fix]?.reader;
 			if (reader == null) throw new Exception("Level \"" + lvlName + "\" does not exist");
-			Pointer.DoAt(ref reader, Pointer.Current(reader) + 0xe0, () => {
-				Pointer off_geo_dynamic = Pointer.Read(reader);
+			LegacyPointer.DoAt(ref reader, LegacyPointer.Current(reader) + 0xe0, () => {
+				LegacyPointer off_geo_dynamic = LegacyPointer.Read(reader);
 				uint num_skinnableObjects = reader.ReadUInt32();
 				int num_skins = 5;
-				Pointer[] off_skins = new Pointer[num_skins];
+				LegacyPointer[] off_skins = new LegacyPointer[num_skins];
 				//skins = new SkinnableGeometricObjectList[num_skins];
 				for (int i = 0; i < num_skins; i++) {
-					off_skins[i] = Pointer.Read(reader);
+					off_skins[i] = LegacyPointer.Read(reader);
 					//skins[i] = Load.FromOffsetOrRead<SkinnableGeometricObjectList>(reader, off_skins[i], onPreRead: s => s.length = num_skinnableObjects);
 				}
-				Pointer off_defaultSkin = Pointer.Read(reader);
-				Pointer.DoAt(ref reader, off_skins[Actor1Index], () => {
-					Pointer off_entries = Pointer.Read(reader);
-					Pointer off_memory = Pointer.Read(reader);
+				LegacyPointer off_defaultSkin = LegacyPointer.Read(reader);
+				LegacyPointer.DoAt(ref reader, off_skins[Actor1Index], () => {
+					LegacyPointer off_entries = LegacyPointer.Read(reader);
+					LegacyPointer off_memory = LegacyPointer.Read(reader);
 					uint sz_memory = reader.ReadUInt32();
 					byte[] memory = null;
-					Pointer.DoAt(ref reader, off_memory, () => {
+					LegacyPointer.DoAt(ref reader, off_memory, () => {
 						memory = reader.ReadBytes((int)sz_memory);
 					});
 					((off_defaultSkin.file) as PS1Data).OverwriteData(off_defaultSkin.FileOffset, memory);
 				});
 				reader.ReadUInt32();
-				Pointer off_geo_static = Pointer.Read(reader);
+				LegacyPointer off_geo_static = LegacyPointer.Read(reader);
 				uint num_geo_dynamic = reader.ReadUInt32();
 				/*if (num_skinnableObjects > 0) {
 					// Write geometric objects into list
@@ -276,27 +276,27 @@ namespace OpenSpace.Loader {
 				file = actor2File;
 			}
 			if (file != null) {
-				Pointer soPointer = null;
+				LegacyPointer soPointer = null;
 				byte[] perso = null, unk = null, unk2 = null;
 				if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
-					Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file), () => {
-						soPointer = Pointer.Read(reader);
+					LegacyPointer.DoAt(ref reader, new LegacyPointer((uint)file.headerOffset, file), () => {
+						soPointer = LegacyPointer.Read(reader);
 						perso = reader.ReadBytes(0x18);
 						unk = reader.ReadBytes(4);
 						unk2 = reader.ReadBytes(2);
 					});
-					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x68, () => {
-						Pointer off_persos = Pointer.Read(reader);
-						Pointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
-							(off_persos.file as PS1Data).OverwriteData(Pointer.Current(reader).FileOffset, perso);
+					LegacyPointer.DoAt(ref reader, LegacyPointer.Current(reader) + 0x68, () => {
+						LegacyPointer off_persos = LegacyPointer.Read(reader);
+						LegacyPointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
+							(off_persos.file as PS1Data).OverwriteData(LegacyPointer.Current(reader).FileOffset, perso);
 						});
 					});
-					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x40, () => {
-						Pointer off_dynamicWorld = Pointer.Read(reader);
-						Pointer.DoAt(ref reader, off_dynamicWorld, () => {
+					LegacyPointer.DoAt(ref reader, LegacyPointer.Current(reader) + 0x40, () => {
+						LegacyPointer off_dynamicWorld = LegacyPointer.Read(reader);
+						LegacyPointer.DoAt(ref reader, off_dynamicWorld, () => {
 							reader.ReadBytes(0x8);
-							Pointer firstChild = Pointer.Read(reader);
-							Pointer lastChild = Pointer.Read(reader);
+							LegacyPointer firstChild = LegacyPointer.Read(reader);
+							LegacyPointer lastChild = LegacyPointer.Read(reader);
 							uint numChild = reader.ReadUInt32();
 							if (numChild == 0) {
 								firstChild = soPointer;
@@ -313,30 +313,30 @@ namespace OpenSpace.Loader {
 						});
 					});
 				} else if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
-					Pointer.DoAt(ref reader, new Pointer((uint)file.headerOffset, file) + 0x98, () => {
+					LegacyPointer.DoAt(ref reader, new LegacyPointer((uint)file.headerOffset, file) + 0x98, () => {
 						//soPointer = Pointer.Read(reader);
 						perso = reader.ReadBytes(0x18);
 						/*unk = reader.ReadBytes(4);
 						unk2 = reader.ReadBytes(2);*/
 					});
-					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0x114, () => {
-						Pointer off_persos = Pointer.Read(reader);
-						Pointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
-							(off_persos.file as PS1Data).OverwriteData(Pointer.Current(reader).FileOffset, perso);
+					LegacyPointer.DoAt(ref reader, LegacyPointer.Current(reader) + 0x114, () => {
+						LegacyPointer off_persos = LegacyPointer.Read(reader);
+						LegacyPointer.DoAt(ref reader, off_persos + (index * 0x18), () => {
+							(off_persos.file as PS1Data).OverwriteData(LegacyPointer.Current(reader).FileOffset, perso);
 							// Start reading the data we've just overwritten
 							reader.ReadUInt32();
-							Pointer soPointerPointer = Pointer.Read(reader);
-							Pointer.DoAt(ref reader, soPointerPointer, () => {
-								soPointer = Pointer.Read(reader);
+							LegacyPointer soPointerPointer = LegacyPointer.Read(reader);
+							LegacyPointer.DoAt(ref reader, soPointerPointer, () => {
+								soPointer = LegacyPointer.Read(reader);
 							});
 						});
 					});
-					Pointer.DoAt(ref reader, Pointer.Current(reader) + 0xEC, () => {
-						Pointer off_dynamicWorld = Pointer.Read(reader);
-						Pointer.DoAt(ref reader, off_dynamicWorld, () => {
+					LegacyPointer.DoAt(ref reader, LegacyPointer.Current(reader) + 0xEC, () => {
+						LegacyPointer off_dynamicWorld = LegacyPointer.Read(reader);
+						LegacyPointer.DoAt(ref reader, off_dynamicWorld, () => {
 							reader.ReadBytes(0x8);
-							Pointer firstChild = Pointer.Read(reader);
-							Pointer lastChild = Pointer.Read(reader);
+							LegacyPointer firstChild = LegacyPointer.Read(reader);
+							LegacyPointer lastChild = LegacyPointer.Read(reader);
 							uint numChild = reader.ReadUInt32();
 							if (numChild == 0) {
 								firstChild = soPointer;
@@ -353,10 +353,10 @@ namespace OpenSpace.Loader {
 						});
 					});
 				}
-				Pointer.DoAt(ref reader, soPointer, () => {
+				LegacyPointer.DoAt(ref reader, soPointer, () => {
 					reader.ReadBytes(0x20);
-					Pointer off_matrix = Pointer.Read(reader);
-					Pointer.DoAt(ref reader, off_matrix, () => {
+					LegacyPointer off_matrix = LegacyPointer.Read(reader);
+					LegacyPointer.DoAt(ref reader, off_matrix, () => {
 						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset, new byte[0x14]);
 						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x14, (uint)(index * 0x100));
 						(off_matrix.file as PS1Data).OverwriteData(off_matrix.FileOffset + 0x18, (uint)(0 * 0x100));
@@ -514,7 +514,7 @@ namespace OpenSpace.Loader {
 
 			loadingState = "Loading level header";
 			await WaitIfNecessary();
-			levelHeader = FromOffsetOrRead<LevelHeader>(reader, Pointer.Current(reader));
+			levelHeader = FromOffsetOrRead<LevelHeader>(reader, LegacyPointer.Current(reader));
 
 			loadingState = "Loading superobject hierarchy";
 			await WaitIfNecessary();
@@ -525,8 +525,8 @@ namespace OpenSpace.Loader {
 			if (CPA_Settings.s.game == CPA_Settings.Game.RRush || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				loadingState = "Loading actor files";
 				await WaitIfNecessary();
-				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
-				if (actor2File != null) actor2Header = FromOffsetOrRead<ActorFileHeader>(reader, new Pointer((uint)actor2File.headerOffset, actor2File), onPreRead: h => h.file_index = 2);
+				if (actor1File != null) actor1Header = FromOffsetOrRead<ActorFileHeader>(reader, new LegacyPointer((uint)actor1File.headerOffset, actor1File), onPreRead: h => h.file_index = 1);
+				if (actor2File != null) actor2Header = FromOffsetOrRead<ActorFileHeader>(reader, new LegacyPointer((uint)actor2File.headerOffset, actor2File), onPreRead: h => h.file_index = 2);
 			}
 			CalculateNumberOfStatesPerFamily();
 			ReadCollSetsR2(reader);
@@ -609,7 +609,7 @@ namespace OpenSpace.Loader {
 				loadingState = $"Loading cinematic streams : {j+1}/{b.cutscenes.Length}";
 				await WaitIfNecessary();
 				reader = files_array[2 + j].reader;
-				streams[j] = FromOffsetOrRead<PS1Stream>(reader, Pointer.Current(reader), inline: true);
+				streams[j] = FromOffsetOrRead<PS1Stream>(reader, LegacyPointer.Current(reader), inline: true);
 			}
 		}
 

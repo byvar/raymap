@@ -4,14 +4,14 @@ using System.Diagnostics;
 
 namespace OpenSpace.Collide {
     public class CollSet {
-        public Pointer offset;
+        public LegacyPointer offset;
         public Perso perso;
 
 		// Struct
-		public Dictionary<CollideType, Pointer> off_zdxList = new Dictionary<CollideType, Pointer>();
-		public Dictionary<CollideType, Pointer> off_activationList = new Dictionary<CollideType, Pointer>();
-		public Dictionary<CollideType, Pointer> off_zones = new Dictionary<CollideType, Pointer>();
-		public Dictionary<CollideType, Pointer> off_currentZone = new Dictionary<CollideType, Pointer>();
+		public Dictionary<CollideType, LegacyPointer> off_zdxList = new Dictionary<CollideType, LegacyPointer>();
+		public Dictionary<CollideType, LegacyPointer> off_activationList = new Dictionary<CollideType, LegacyPointer>();
+		public Dictionary<CollideType, LegacyPointer> off_zones = new Dictionary<CollideType, LegacyPointer>();
+		public Dictionary<CollideType, LegacyPointer> off_currentZone = new Dictionary<CollideType, LegacyPointer>();
 
 		// consists of 16 bit pairs that describe the state of a zone, 00 = neutral, 01 = force active, 10 = force inactive
 		// access these using GetPrivilegedActionZoneStatus
@@ -24,7 +24,7 @@ namespace OpenSpace.Collide {
 
         public byte colliderType;
 
-        public CollSet(Perso perso, Pointer offset) {
+        public CollSet(Perso perso, LegacyPointer offset) {
             this.perso = perso;
             this.offset = offset;
         }
@@ -46,26 +46,26 @@ namespace OpenSpace.Collide {
             return (PrivilegedActivationStatus)value;
         }
 
-        public static CollSet Read(Reader reader, Perso perso, Pointer offset) {
+        public static CollSet Read(Reader reader, Perso perso, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
 			//if (Settings.s.platform == Settings.Platform.DC) return null;
 			//l.print("CollSet @ " + offset);
             CollSet c = new CollSet(perso, offset);
 
-			c.off_zdxList[CollideType.ZDD] = Pointer.Read(reader);
-			c.off_zdxList[CollideType.ZDE] = Pointer.Read(reader);
-			c.off_zdxList[CollideType.ZDM] = Pointer.Read(reader);
-			c.off_zdxList[CollideType.ZDR] = Pointer.Read(reader);
+			c.off_zdxList[CollideType.ZDD] = LegacyPointer.Read(reader);
+			c.off_zdxList[CollideType.ZDE] = LegacyPointer.Read(reader);
+			c.off_zdxList[CollideType.ZDM] = LegacyPointer.Read(reader);
+			c.off_zdxList[CollideType.ZDR] = LegacyPointer.Read(reader);
 
-			c.off_activationList[CollideType.ZDD] = Pointer.Read(reader);
-			c.off_activationList[CollideType.ZDE] = Pointer.Read(reader);
-			c.off_activationList[CollideType.ZDM] = Pointer.Read(reader);
-			c.off_activationList[CollideType.ZDR] = Pointer.Read(reader);
+			c.off_activationList[CollideType.ZDD] = LegacyPointer.Read(reader);
+			c.off_activationList[CollideType.ZDE] = LegacyPointer.Read(reader);
+			c.off_activationList[CollideType.ZDM] = LegacyPointer.Read(reader);
+			c.off_activationList[CollideType.ZDR] = LegacyPointer.Read(reader);
 
-			c.off_zones[CollideType.ZDD] = Pointer.Read(reader);
-			c.off_zones[CollideType.ZDE] = Pointer.Read(reader);
-			c.off_zones[CollideType.ZDM] = Pointer.Read(reader);
-			c.off_zones[CollideType.ZDR] = Pointer.Read(reader);
+			c.off_zones[CollideType.ZDD] = LegacyPointer.Read(reader);
+			c.off_zones[CollideType.ZDE] = LegacyPointer.Read(reader);
+			c.off_zones[CollideType.ZDM] = LegacyPointer.Read(reader);
+			c.off_zones[CollideType.ZDR] = LegacyPointer.Read(reader);
 
 			if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
 				c.privilegedActivations[CollideType.ZDD] = reader.ReadInt32();
@@ -74,8 +74,8 @@ namespace OpenSpace.Collide {
 				c.privilegedActivations[CollideType.ZDR] = reader.ReadInt32();
 			}
 
-			foreach (KeyValuePair<CollideType, Pointer> entry in c.off_zdxList) {
-				Pointer.DoAt(ref reader, entry.Value, () => {
+			foreach (KeyValuePair<CollideType, LegacyPointer> entry in c.off_zdxList) {
+				LegacyPointer.DoAt(ref reader, entry.Value, () => {
 					//zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
 					c.zdxList[entry.Key] = LinkedList<GeometricObjectCollide>.Read(ref reader, entry.Value,
 						(off_element) => {
@@ -91,8 +91,8 @@ namespace OpenSpace.Collide {
 					);
 				});
 			}
-			foreach (KeyValuePair<CollideType, Pointer> entry in c.off_zones) {
-				Pointer.DoAt(ref reader, entry.Value, () => {
+			foreach (KeyValuePair<CollideType, LegacyPointer> entry in c.off_zones) {
+				LegacyPointer.DoAt(ref reader, entry.Value, () => {
 					//zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
 					c.zones[entry.Key] = LinkedList<CollideActivationZone>.Read(ref reader, entry.Value,
 						(off_element) => {
@@ -105,8 +105,8 @@ namespace OpenSpace.Collide {
 					);
 				});
 			}
-			foreach (KeyValuePair<CollideType, Pointer> entry in c.off_activationList) {
-				Pointer.DoAt(ref reader, entry.Value, () => {
+			foreach (KeyValuePair<CollideType, LegacyPointer> entry in c.off_activationList) {
+				LegacyPointer.DoAt(ref reader, entry.Value, () => {
 					//zdxList = LinkedList<CollideMeshObject>.ReadHeader(r1, o1);
 					c.activationList[entry.Key] = LinkedList<CollideActivation>.Read(ref reader, entry.Value,
 						(off_element) => {
@@ -120,7 +120,7 @@ namespace OpenSpace.Collide {
 				});
 			}
 
-            Pointer.Goto(ref reader, offset + 0x64);
+            LegacyPointer.Goto(ref reader, offset + 0x64);
             c.colliderType = reader.ReadByte();
 
 			return c;

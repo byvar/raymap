@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace OpenSpace.Animation.ComponentMontreal {
     public class AnimChannelMontreal : OpenSpaceStruct {
-        public Pointer off_matrix;
+        public LegacyPointer off_matrix;
         public uint isIdentity = 0;
         public byte objectIndex;
         public byte unk1;
@@ -20,7 +20,7 @@ namespace OpenSpace.Animation.ComponentMontreal {
         public Matrix matrix = null;
 
 		protected override void ReadInternal(Reader reader) {
-			off_matrix = Pointer.GetPointerAtOffset(Offset);
+			off_matrix = LegacyPointer.GetPointerAtOffset(Offset);
 			isIdentity = reader.ReadUInt32(); // if this is 1, don't check the pointer
 			objectIndex = reader.ReadByte();
 			unk1 = reader.ReadByte();
@@ -32,7 +32,7 @@ namespace OpenSpace.Animation.ComponentMontreal {
 
 			// Read compressed matrix
 			if (isIdentity != 1 && isIdentity != 0) {
-				Pointer.DoAt(ref reader, off_matrix, () => {
+				LegacyPointer.DoAt(ref reader, off_matrix, () => {
 					matrix = Matrix.ReadCompressed(reader, off_matrix);
 				});
 			}

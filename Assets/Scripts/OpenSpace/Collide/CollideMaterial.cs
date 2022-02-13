@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace OpenSpace.Collide {
     public class CollideMaterial {
-        public Pointer offset;
+        public LegacyPointer offset;
 
         [Flags]
         public enum CollisionFlags_R2 : ushort {
@@ -83,11 +83,11 @@ namespace OpenSpace.Collide {
             identifier = (ushort)(identifier_R2);
         }
 
-        public CollideMaterial(Pointer offset) {
+        public CollideMaterial(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static CollideMaterial Read(Reader reader, Pointer offset) {
+        public static CollideMaterial Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             CollideMaterial cm = new CollideMaterial(offset);
 			//l.print(offset);
@@ -110,18 +110,18 @@ namespace OpenSpace.Collide {
             return cm;
         }
 
-        public static CollideMaterial FromOffsetOrRead(Pointer offset, Reader reader) {
+        public static CollideMaterial FromOffsetOrRead(LegacyPointer offset, Reader reader) {
             CollideMaterial cm = FromOffset(offset);
             if (cm == null) {
-                Pointer off_current = Pointer.Goto(ref reader, offset);
+                LegacyPointer off_current = LegacyPointer.Goto(ref reader, offset);
                 cm = CollideMaterial.Read(reader, offset);
-                Pointer.Goto(ref reader, off_current);
+                LegacyPointer.Goto(ref reader, off_current);
                 MapLoader.Loader.collideMaterials.Add(cm);
             }
             return cm;
         }
 
-        public static CollideMaterial FromOffset(Pointer offset) {
+        public static CollideMaterial FromOffset(LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             for (int i = 0; i < l.collideMaterials.Count; i++) {
                 if (offset == l.collideMaterials[i].offset) return l.collideMaterials[i];

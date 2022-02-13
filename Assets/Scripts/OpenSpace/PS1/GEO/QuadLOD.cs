@@ -22,7 +22,7 @@ namespace OpenSpace.PS1 {
 		public ushort ushort_12;
 		public ushort ushort_14;
 		public ushort ushort_16;
-		public Pointer off_actualQuads;
+		public LegacyPointer off_actualQuads;
 
 		public uint length;
 		public Quad[] quads;
@@ -43,9 +43,9 @@ namespace OpenSpace.PS1 {
 			ushort_12 = reader.ReadUInt16();// page info?
 			ushort_14 = reader.ReadUInt16();
 			ushort_16 = reader.ReadUInt16();
-			off_actualQuads = Pointer.Read(reader);
+			off_actualQuads = LegacyPointer.Read(reader);
 
-			Pointer.DoAt(ref reader, off_actualQuads, () => {
+			LegacyPointer.DoAt(ref reader, off_actualQuads, () => {
 				length = reader.ReadUInt32();
 				quads = Load.ReadArray<Quad>(length, reader);
 			});

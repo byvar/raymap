@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace OpenSpace.PS1 {
 	public class Graph : OpenSpaceStruct {
 		public uint num_arcs;
-		public Pointer off_firstNode;
-		public Pointer off_arcs;
+		public LegacyPointer off_firstNode;
+		public LegacyPointer off_arcs;
 		public uint num_nodes;
 		public byte[] unkBytes;
 
@@ -22,8 +22,8 @@ namespace OpenSpace.PS1 {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 			} else {
-				off_firstNode = Pointer.Read(reader);
-				off_arcs = Pointer.Read(reader);
+				off_firstNode = LegacyPointer.Read(reader);
+				off_arcs = LegacyPointer.Read(reader);
 			}
 			num_nodes = reader.ReadUInt32();
 			unkBytes = reader.ReadBytes(0x58);

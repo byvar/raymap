@@ -120,17 +120,17 @@ namespace OpenSpace.Loader {
             await WaitIfNecessary();
             files_array[Mem.Fix].GotoHeader();
             Reader reader = files_array[Mem.Fix].reader;
-            Pointer off_base_fix = Pointer.Current(reader);
+            LegacyPointer off_base_fix = LegacyPointer.Current(reader);
             uint base_language = reader.ReadUInt32(); //Pointer off_language = Pointer.Read(reader);
             reader.ReadUInt32();
             uint num_text_language = reader.ReadUInt32();
             reader.ReadUInt16();
             reader.ReadUInt16();
             reader.ReadUInt32(); // base
-            Pointer off_text_general = Pointer.Read(reader);
+            LegacyPointer off_text_general = LegacyPointer.Read(reader);
             localization = FromOffsetOrRead<LocalizationStructure>(reader, off_text_general);
-            Pointer off_inputStructure = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_inputStructure, () => {
+            LegacyPointer off_inputStructure = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, off_inputStructure, () => {
                 inputStruct = InputStructure.Read(reader, off_inputStructure);
 				foreach (EntryAction ea in inputStruct.entryActions) {
 					print(ea.ToString());
@@ -138,18 +138,18 @@ namespace OpenSpace.Loader {
 			});
 
             await WaitIfNecessary();
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
@@ -160,19 +160,19 @@ namespace OpenSpace.Loader {
             reader.ReadUInt32();
             reader.ReadUInt32();
             reader.ReadUInt32();
-            Pointer.Read(reader);
-            Pointer off_levelNames = Pointer.Read(reader);
-            Pointer off_languages = Pointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer off_levelNames = LegacyPointer.Read(reader);
+            LegacyPointer off_languages = LegacyPointer.Read(reader);
             uint num_levelNames = reader.ReadUInt32();
             uint num_languages = reader.ReadUInt32();
             reader.ReadUInt32(); // same as num_levelNames
-            Pointer.DoAt(ref reader, off_levelNames, () => {
+            LegacyPointer.DoAt(ref reader, off_levelNames, () => {
                 lvlNames = new string[num_levelNames];
                 for (uint i = 0; i < num_levelNames; i++) {
                     lvlNames[i] = reader.ReadString(0x1E);
                 }
             });
-            Pointer.DoAt(ref reader, off_languages, () => {
+            LegacyPointer.DoAt(ref reader, off_languages, () => {
                 ReadLanguages(reader, off_languages, num_languages);
             });
             if (languages != null && localization != null) {
@@ -190,16 +190,16 @@ namespace OpenSpace.Loader {
         
             loadingState = "Loading fixed textures";
             await WaitIfNecessary();
-            Pointer off_events_fix = Pointer.Read(reader);
+            LegacyPointer off_events_fix = LegacyPointer.Read(reader);
             uint num_events_fix = reader.ReadUInt32();
             uint num_textures_fix = reader.ReadUInt32();
-            Pointer off_textures_fix = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_textures_fix, () => {
+            LegacyPointer off_textures_fix = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, off_textures_fix, () => {
                 Array.Resize(ref textures, (int)num_textures_fix);
                 for (uint i = 0; i < num_textures_fix; i++) {
-                    Pointer off_texture = Pointer.Read(reader);
+                    LegacyPointer off_texture = LegacyPointer.Read(reader);
                     textures[i] = null;
-                    Pointer.DoAt(ref reader, off_texture, () => {
+                    LegacyPointer.DoAt(ref reader, off_texture, () => {
                         textures[i] = TextureInfo.Read(reader, off_texture);
                     });
                 }
@@ -216,69 +216,69 @@ namespace OpenSpace.Loader {
             reader = files_array[Mem.Lvl].reader;
 
             // Animation stuff
-            Pointer off_animationBank = Pointer.Current(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
-            Pointer.Read(reader);
+            LegacyPointer off_animationBank = LegacyPointer.Current(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer.Read(reader);
             reader.ReadUInt32();
-            Pointer.Read(reader);
+            LegacyPointer.Read(reader);
 
             // Globals
-            globals.off_actualWorld = Pointer.Read(reader);
-            globals.off_dynamicWorld = Pointer.Read(reader);
-            globals.off_inactiveDynamicWorld = Pointer.Read(reader);
-            globals.off_fatherSector = Pointer.Read(reader);
+            globals.off_actualWorld = LegacyPointer.Read(reader);
+            globals.off_dynamicWorld = LegacyPointer.Read(reader);
+            globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
+            globals.off_fatherSector = LegacyPointer.Read(reader);
             reader.ReadUInt32();
-            Pointer off_always = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_always, () => {
+            LegacyPointer off_always = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, off_always, () => {
                 globals.num_always = reader.ReadUInt32();
-                globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), LinkedList.Type.Double);
+                globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
                 globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
-                globals.off_always_reusableSO = Pointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+                globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
             });
-            Pointer.Read(reader);
-            Pointer off_objectTypes = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_objectTypes, () => {
+            LegacyPointer.Read(reader);
+            LegacyPointer off_objectTypes = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, off_objectTypes, () => {
                 // Fill in pointers for the object type tables and read them
                 objectTypes = new ObjectType[3][];
                 for (uint i = 0; i < 3; i++) {
-                    Pointer off_names_header = Pointer.Current(reader);
-                    Pointer off_names_first = Pointer.Read(reader);
-                    Pointer off_names_last = Pointer.Read(reader);
+                    LegacyPointer off_names_header = LegacyPointer.Current(reader);
+                    LegacyPointer off_names_first = LegacyPointer.Read(reader);
+                    LegacyPointer off_names_last = LegacyPointer.Read(reader);
                     uint num_names = reader.ReadUInt32();
 
                     FillLinkedListPointers(reader, off_names_last, off_names_header);
                     ReadObjectNamesTable(reader, off_names_first, num_names, i);
                 }
             });
-            Pointer.Read(reader);
-            Pointer off_mainChar = Pointer.Read(reader);
+            LegacyPointer.Read(reader);
+            LegacyPointer off_mainChar = LegacyPointer.Read(reader);
             reader.ReadUInt32();
             uint num_persoInFixPointers = reader.ReadUInt32();
-            Pointer off_persoInFixPointers = Pointer.Read(reader);
+            LegacyPointer off_persoInFixPointers = LegacyPointer.Read(reader);
 
             //Pointer[] persoInFixPointers = new Pointer[num_persoInFixPointers];
-            Pointer.DoAt(ref reader, off_persoInFixPointers, () => {
+            LegacyPointer.DoAt(ref reader, off_persoInFixPointers, () => {
                 for (int i = 0; i < num_persoInFixPointers; i++) {
-                    Pointer off_perso = Pointer.Read(reader);
-                    Pointer off_so = Pointer.Read(reader);
+                    LegacyPointer off_perso = LegacyPointer.Read(reader);
+                    LegacyPointer off_so = LegacyPointer.Read(reader);
                     byte[] unk = reader.ReadBytes(4);
-                    Pointer off_matrix = Pointer.Current(reader); // It's better to change the pointer instead of the data as that is reused in some places
+                    LegacyPointer off_matrix = LegacyPointer.Current(reader); // It's better to change the pointer instead of the data as that is reused in some places
                     byte[] matrixData = reader.ReadBytes(0x68);
                     byte[] soFlags = reader.ReadBytes(4);
                     byte[] brothersAndParent = reader.ReadBytes(12);
 
-                    Pointer.DoAt(ref reader, off_perso, () => {
+                    LegacyPointer.DoAt(ref reader, off_perso, () => {
                         reader.ReadUInt32();
-                        Pointer off_stdGame = Pointer.Read(reader);
+                        LegacyPointer off_stdGame = LegacyPointer.Read(reader);
                         if (off_stdGame != null && off_so != null) {
                             ((DCDAT)off_stdGame.file).OverwriteData(off_stdGame.FileOffset + 0xC, off_so.offset);
                         }
@@ -292,17 +292,17 @@ namespace OpenSpace.Loader {
             });
 
             await WaitIfNecessary();
-            Pointer.Read(reader); // contains a pointer to the camera SO
-            Pointer off_cameras = Pointer.Read(reader); // Double linkedlist of cameras
-            Pointer off_families = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_families, () => {
-                families = LinkedList<Family>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+            LegacyPointer.Read(reader); // contains a pointer to the camera SO
+            LegacyPointer off_cameras = LegacyPointer.Read(reader); // Double linkedlist of cameras
+            LegacyPointer off_families = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, off_families, () => {
+                families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
                 families.FillPointers(reader, families.off_tail, families.off_head);
             });
-            Pointer.Read(reader); // At this pointer: a double linkedlist of fix perso's with headers (soptr, next, prev, hdr)
-            Pointer.Read(reader); // Rayman
+            LegacyPointer.Read(reader); // At this pointer: a double linkedlist of fix perso's with headers (soptr, next, prev, hdr)
+            LegacyPointer.Read(reader); // Rayman
             reader.ReadUInt32();
-            Pointer.Read(reader); // Camera
+            LegacyPointer.Read(reader); // Camera
             reader.ReadUInt32();
             reader.ReadUInt32();
 
@@ -310,13 +310,13 @@ namespace OpenSpace.Loader {
             await WaitIfNecessary();
             uint num_textures_lvl = reader.ReadUInt32();
             uint num_textures_total = num_textures_fix + num_textures_lvl;
-            Pointer off_textures_lvl = Pointer.Read(reader);
-            Pointer.DoAt(ref reader, off_textures_lvl, () => {
+            LegacyPointer off_textures_lvl = LegacyPointer.Read(reader);
+            LegacyPointer.DoAt(ref reader, off_textures_lvl, () => {
                 Array.Resize(ref textures, (int)num_textures_total);
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
-                    Pointer off_texture = Pointer.Read(reader);
+                    LegacyPointer off_texture = LegacyPointer.Read(reader);
                     textures[i] = null;
-                    Pointer.DoAt(ref reader, off_texture, () => {
+                    LegacyPointer.DoAt(ref reader, off_texture, () => {
                         textures[i] = TextureInfo.Read(reader, off_texture);
                     });
                 }
@@ -333,7 +333,7 @@ namespace OpenSpace.Loader {
             ReadFamilies(reader);
             loadingState = "Loading animation banks";
             await WaitIfNecessary();
-            Pointer.DoAt(ref reader, off_animationBank, () => {
+            LegacyPointer.DoAt(ref reader, off_animationBank, () => {
                 animationBanks = new AnimationBank[2];
                 animationBanks[0] = AnimationBank.ReadDreamcast(reader, off_animationBank, off_events_fix, num_events_fix);
                 animationBanks[1] = animationBanks[0];
@@ -407,7 +407,7 @@ namespace OpenSpace.Loader {
                         string offset2Str = logMatch.Groups["offset2"].Value;
                         if (offsetStr.Length < 8) offsetStr = new String('0', offsetStr.Length - 8) + offsetStr;
                         uint offsetUint = Convert.ToUInt32(offsetStr, 16);
-                        Pointer offset = file.GetUnsafePointer(offsetUint);
+                        LegacyPointer offset = file.GetUnsafePointer(offsetUint);
                         switch (type) {
                             case "eST_Comport":
                                 Behavior b = FromOffset<Behavior>(offset);
@@ -417,7 +417,7 @@ namespace OpenSpace.Loader {
 										string modelName = comportMatch.Groups["model"].Value;
 										AIModel aiModel = aiModels.FirstOrDefault(ai => ai.name == modelName);
 										Reader reader = files_array[Mem.Fix].reader;
-										Pointer.DoAt(ref reader, offset, () => {
+										LegacyPointer.DoAt(ref reader, offset, () => {
 											Behavior newB = FromOffsetOrRead<Behavior>(reader, offset);
 											if (aiModel != null && newB != null) {
 												switch (comportMatch.Groups["type"].Value) {
@@ -487,7 +487,7 @@ namespace OpenSpace.Loader {
 									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
 										Behavior b = FromOffset<Behavior>(node.param_ptr);
 										if (b == null) {
-											Pointer.DoAt(ref reader, node.param_ptr, () => {
+											LegacyPointer.DoAt(ref reader, node.param_ptr, () => {
 												ReadBehaviorCopy(reader, node.param_ptr, ai);
 											});
 										}
@@ -506,7 +506,7 @@ namespace OpenSpace.Loader {
 									if (node.param_ptr != null && node.nodeType == ScriptNode.NodeType.ComportRef) {
 										Behavior b = FromOffset<Behavior>(node.param_ptr);
 										if (b == null) {
-											Pointer.DoAt(ref reader, node.param_ptr, () => {
+											LegacyPointer.DoAt(ref reader, node.param_ptr, () => {
 												ReadBehaviorCopy(reader, node.param_ptr, ai);
 											});
 										}
@@ -518,7 +518,7 @@ namespace OpenSpace.Loader {
 				}
 			}
 		}
-		private void ReadBehaviorCopy(Reader reader, Pointer offset, AIModel ai) {
+		private void ReadBehaviorCopy(Reader reader, LegacyPointer offset, AIModel ai) {
             Behavior b = FromOffsetOrRead<Behavior>(reader, offset);
 			if (b != null && ai != null && ai.behaviors_normal != null) {
 				foreach (Behavior originalBehavior in ai.behaviors_normal) {

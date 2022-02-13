@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenSpace.ROM {
 	public class FATEntry {
-		public Pointer offset;
+		public LegacyPointer offset;
 		public uint off_data;
 		public ushort type;
 		public ushort index;
@@ -16,7 +16,7 @@ namespace OpenSpace.ROM {
 		public uint entryIndexWithinTable;
 		public uint size;
 
-		public static FATEntry Read(Reader reader, Pointer offset) {
+		public static FATEntry Read(Reader reader, LegacyPointer offset) {
 			FATEntry entry = new FATEntry();
 			entry.offset = offset;
 			entry.off_data = reader.ReadUInt32();

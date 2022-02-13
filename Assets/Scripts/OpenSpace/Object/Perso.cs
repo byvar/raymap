@@ -14,18 +14,18 @@ namespace OpenSpace.Object {
     /// Also called "Actor" in the code which might be a better name, but I'll stick to the R2 one for now
     /// </summary>
     public class Perso : IEngineObject, IReferenceable {
-        public Pointer offset;
+        public LegacyPointer offset;
 
         // Struct
-        public Pointer off_3dData;
-        public Pointer off_stdGame;
-        public Pointer off_dynam;
-        public Pointer off_brain;
-        public Pointer off_camera;
-        public Pointer off_collSet;
-        public Pointer off_msWay;
-        public Pointer off_msLight;
-        public Pointer off_sectInfo;
+        public LegacyPointer off_3dData;
+        public LegacyPointer off_stdGame;
+        public LegacyPointer off_dynam;
+        public LegacyPointer off_brain;
+        public LegacyPointer off_camera;
+        public LegacyPointer off_collSet;
+        public LegacyPointer off_msWay;
+        public LegacyPointer off_msLight;
+        public LegacyPointer off_sectInfo;
 
 
         // Derived
@@ -70,27 +70,27 @@ namespace OpenSpace.Object {
             }
         }
 
-        public Perso(Pointer offset, SuperObject so) {
+        public Perso(LegacyPointer offset, SuperObject so) {
             this.offset = offset;
             this.superObject = so;
         }
 
-        public static Perso Read(Reader reader, Pointer offset, SuperObject so) {
+        public static Perso Read(Reader reader, LegacyPointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             Perso p = new Perso(offset, so);
 			//l.print("Perso " + offset);
 			l.persos.Add(p);
-            p.off_3dData = Pointer.Read(reader); // 0x0
-            p.off_stdGame = Pointer.Read(reader); // 4 Standard Game info
-            p.off_dynam = Pointer.Read(reader); // 0x8 Dynam
+            p.off_3dData = LegacyPointer.Read(reader); // 0x0
+            p.off_stdGame = LegacyPointer.Read(reader); // 4 Standard Game info
+            p.off_dynam = LegacyPointer.Read(reader); // 0x8 Dynam
             if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32();
-            p.off_brain = Pointer.Read(reader); // 0xC
-            p.off_camera = Pointer.Read(reader); // 0x10 is Camera in Rayman 2
-            p.off_collSet = Pointer.Read(reader); // 0x14 collset
-            p.off_msWay = Pointer.Read(reader); // 0x18
-            p.off_msLight = Pointer.Read(reader); // 0x1C - MSLight
+            p.off_brain = LegacyPointer.Read(reader); // 0xC
+            p.off_camera = LegacyPointer.Read(reader); // 0x10 is Camera in Rayman 2
+            p.off_collSet = LegacyPointer.Read(reader); // 0x14 collset
+            p.off_msWay = LegacyPointer.Read(reader); // 0x18
+            p.off_msLight = LegacyPointer.Read(reader); // 0x1C - MSLight
             if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32();
-            p.off_sectInfo = Pointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
+            p.off_sectInfo = LegacyPointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
             if (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM) reader.ReadUInt32();
@@ -101,11 +101,11 @@ namespace OpenSpace.Object {
                 reader.ReadUInt32();
             }
 
-            Pointer.DoAt(ref reader, p.off_3dData, () => {
+            LegacyPointer.DoAt(ref reader, p.off_3dData, () => {
                 p.p3dData = Perso3dData.Read(reader, p.off_3dData);
             });
 
-			Pointer.DoAt(ref reader, p.off_stdGame, () => {
+			LegacyPointer.DoAt(ref reader, p.off_stdGame, () => {
 				p.stdGame = StandardGame.Read(reader, p.off_stdGame);
 				if (CPA_Settings.s.hasObjectTypes) {
 					p.nameFamily = p.stdGame.GetName(0);
@@ -128,12 +128,12 @@ namespace OpenSpace.Object {
 			
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset+" superObject offset: "+(so!=null?so.offset.ToString():"null"));
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
-				Pointer.DoAt(ref reader, p.off_dynam, () => {
+				LegacyPointer.DoAt(ref reader, p.off_dynam, () => {
 					p.dynam = Dynam.Read(reader, p.off_dynam);
 				});
             }
 
-            Pointer.DoAt(ref reader, p.off_brain, () => {
+            LegacyPointer.DoAt(ref reader, p.off_brain, () => {
                 p.brain = Brain.Read(reader, p.off_brain);
                 if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null && p.nameModel != null) p.brain.mind.AI_model.name = p.nameModel;
             });
@@ -235,18 +235,18 @@ namespace OpenSpace.Object {
                 }
             }
 
-            Pointer.DoAt(ref reader, p.off_collSet, () => {
+            LegacyPointer.DoAt(ref reader, p.off_collSet, () => {
                 p.collset = CollSet.Read(reader, p, p.off_collSet);
             });
 
-            Pointer.DoAt(ref reader, p.off_sectInfo, () => {
+            LegacyPointer.DoAt(ref reader, p.off_sectInfo, () => {
                 p.sectInfo = PersoSectorInfo.Read(reader, p.off_sectInfo);
             });
 
             return p;
         }
 
-        public static Perso FromOffset(Pointer offset) {
+        public static Perso FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.persos.FirstOrDefault(f => f.offset == offset);
@@ -305,11 +305,11 @@ namespace OpenSpace.Object {
 
             if (persoBehaviour.clearTheBrain) {
                 if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
-                   Pointer.Goto(ref writer, offset + 0x10);
+                   LegacyPointer.Goto(ref writer, offset + 0x10);
                 } else {
-                    Pointer.Goto(ref writer, offset + 0xC);
+                    LegacyPointer.Goto(ref writer, offset + 0xC);
                 }
-                Pointer.Write(writer, null);
+                LegacyPointer.Write(writer, null);
                 persoBehaviour.clearTheBrain = false;
             }
 

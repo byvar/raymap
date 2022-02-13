@@ -515,7 +515,7 @@ namespace OpenSpace.FileFormat {
                                         l.print("Fillin pointer points to block (" + ptr_block_global.module + "," + ptr_block_global.id + ") with base " + ptr_block_global.baseInMemory);
                                         l.print("Its value prior to relocation is " + ptrValuePrior + " - minus base: " + (ptrValuePrior - ptr_block_local.baseInMemory));
                                     }*/
-                                    Pointer pointer = new Pointer(ptrValue, ptr_block_global.sna);
+                                    LegacyPointer pointer = new LegacyPointer(ptrValue, ptr_block_global.sna);
                                     block_global.sna.pointers[block_global.dataPosition + relativeAddress] = pointer;
                                 } else {
                                     l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
@@ -561,7 +561,7 @@ namespace OpenSpace.FileFormat {
                             if (ptr_block_global != null && ptr_block_local != null && ptr_block_local.baseInMemory != -1) {
                                 ptrValue -= (uint)ptr_block_local.baseInMemory;
                                 if (info.module != tmpModule) ptrValue += ptr_block_global.dataPosition;
-                                Pointer pointer = new Pointer(ptrValue, ptr_block_global.sna);
+                                LegacyPointer pointer = new LegacyPointer(ptrValue, ptr_block_global.sna);
                                 pointers[pf.dataPosition + (i * 4)] = pointer;
                             } else {
                                 l.print("Pointer error: SNA part (" + info.module + "," + info.id + ") not found.");
@@ -581,7 +581,7 @@ namespace OpenSpace.FileFormat {
                         if (ptrValue > block.baseInMemory && ptrValue < block.baseInMemory + block.size) {
                             ptrValue -= (uint)block.baseInMemory;
                             ptrValue += block.dataPosition;
-                            Pointer pointer = new Pointer(ptrValue, block.sna);
+                            LegacyPointer pointer = new LegacyPointer(ptrValue, block.sna);
                             pointers[pf.dataPosition + (i * 4)] = pointer;
                         }
                     }
@@ -606,7 +606,7 @@ namespace OpenSpace.FileFormat {
             if (replacePointers) {
                 byte[] replacedData = new byte[data.Length];
                 Array.Copy(data, replacedData, data.Length);
-                foreach (KeyValuePair<uint, Pointer> ptrKeyVal in pointers) {
+                foreach (KeyValuePair<uint, LegacyPointer> ptrKeyVal in pointers) {
                     if (ptrKeyVal.Value == null) continue;
                     uint offset = ptrKeyVal.Key;
                     if (offset < replacedData.Length) {
@@ -627,26 +627,26 @@ namespace OpenSpace.FileFormat {
             OverwriteData(position, BitConverter.GetBytes(data));
         }
 
-        public Pointer PTX {
+        public LegacyPointer PTX {
             get {
                 if (ptx != null) {
-                    return new Pointer(ptx.dataPosition, this);
+                    return new LegacyPointer(ptx.dataPosition, this);
                 } else return null;
             }
         }
 
-        public Pointer SDA {
+        public LegacyPointer SDA {
             get {
                 if (sda != null) {
-                    return new Pointer(sda.dataPosition, this);
+                    return new LegacyPointer(sda.dataPosition, this);
                 } else return null;
             }
         }
 
-        public Pointer DLG {
+        public LegacyPointer DLG {
             get {
                 if (dlg != null) {
-                    return new Pointer(dlg.dataPosition, this);
+                    return new LegacyPointer(dlg.dataPosition, this);
                 } else return null;
             }
         }
@@ -659,7 +659,7 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             UnityEngine.Debug.LogWarning("Pointer writing not supported!");
             writer.BaseStream.Position += 4;
             //throw new NotImplementedException();

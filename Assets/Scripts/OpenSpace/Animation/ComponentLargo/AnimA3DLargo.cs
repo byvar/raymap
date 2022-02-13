@@ -8,17 +8,17 @@ using UnityEngine;
 
 namespace OpenSpace.Animation.ComponentLargo {
     public class AnimA3DLargo : OpenSpaceStruct {
-		public Pointer off_vectors;
-		public Pointer off_quaternions;
-		public Pointer off_hierarchies;
-		public Pointer off_ntto;
-		public Pointer off_onlyFrames;
-		public Pointer off_channels;
-		public Pointer off_numNTTO;
-		public Pointer off_frameVector;
-		public Pointer off_frameQuaternion;
-		public Pointer off_unknowns;
-		public Pointer off_deformations;
+		public LegacyPointer off_vectors;
+		public LegacyPointer off_quaternions;
+		public LegacyPointer off_hierarchies;
+		public LegacyPointer off_ntto;
+		public LegacyPointer off_onlyFrames;
+		public LegacyPointer off_channels;
+		public LegacyPointer off_numNTTO;
+		public LegacyPointer off_frameVector;
+		public LegacyPointer off_frameQuaternion;
+		public LegacyPointer off_unknowns;
+		public LegacyPointer off_deformations;
 
 		public ushort num_onlyFrames;
 		public byte num_channels;
@@ -47,17 +47,17 @@ namespace OpenSpace.Animation.ComponentLargo {
 		protected override void ReadInternal(Reader reader) {
 			MapLoader l = MapLoader.Loader;
 
-			off_vectors = Pointer.Read(reader);
-			off_quaternions = Pointer.Read(reader);
-			off_hierarchies = Pointer.Read(reader);
-			off_ntto = Pointer.Read(reader);
-			off_onlyFrames = Pointer.Read(reader);
-			off_channels = Pointer.Read(reader);
-			off_numNTTO = Pointer.Read(reader);
-			off_frameVector = Pointer.Read(reader);
-			off_frameQuaternion = Pointer.Read(reader);
-			off_unknowns = Pointer.Read(reader);
-			off_deformations = Pointer.Read(reader);
+			off_vectors = LegacyPointer.Read(reader);
+			off_quaternions = LegacyPointer.Read(reader);
+			off_hierarchies = LegacyPointer.Read(reader);
+			off_ntto = LegacyPointer.Read(reader);
+			off_onlyFrames = LegacyPointer.Read(reader);
+			off_channels = LegacyPointer.Read(reader);
+			off_numNTTO = LegacyPointer.Read(reader);
+			off_frameVector = LegacyPointer.Read(reader);
+			off_frameQuaternion = LegacyPointer.Read(reader);
+			off_unknowns = LegacyPointer.Read(reader);
+			off_deformations = LegacyPointer.Read(reader);
 
 			onlyFrames = l.ReadArray<AnimOnlyFrame>(num_onlyFrames, reader, off_onlyFrames);
 			channels = l.ReadArray<AnimChannelLargo>(num_channels, reader, off_channels);

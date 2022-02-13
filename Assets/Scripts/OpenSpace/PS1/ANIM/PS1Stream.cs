@@ -14,7 +14,7 @@ namespace OpenSpace.PS1 {
 				uint size = reader.ReadUInt32();
 				long start_frame_packet = reader.BaseStream.Position;
 				while (reader.BaseStream.Position < start_frame_packet + size - 4) {
-					PS1StreamFrame f = Load.FromOffsetOrRead<PS1StreamFrame>(reader, Pointer.Current(reader), inline: true);
+					PS1StreamFrame f = Load.FromOffsetOrRead<PS1StreamFrame>(reader, LegacyPointer.Current(reader), inline: true);
 					if (f.num_frame == -1) {
 						num_frames = frames[frames.Count - 1].num_frame;
 					}

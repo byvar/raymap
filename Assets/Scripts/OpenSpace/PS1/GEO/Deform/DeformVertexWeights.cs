@@ -11,7 +11,7 @@ namespace OpenSpace.PS1 {
 	public class DeformVertexWeights : OpenSpaceStruct {
 		public ushort num_weights;
 		public ushort ind_vertex;
-		public Pointer off_weights;
+		public LegacyPointer off_weights;
 		public short unk0;
 		public short unk1;
 		public short unk2;
@@ -22,7 +22,7 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			num_weights = reader.ReadUInt16();
 			ind_vertex = reader.ReadUInt16();
-			off_weights = Pointer.Read(reader);
+			off_weights = LegacyPointer.Read(reader);
 
 			unk0 = reader.ReadInt16();
 			unk1 = reader.ReadInt16();

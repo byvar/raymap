@@ -9,20 +9,20 @@ using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class ActorFileHeader : OpenSpaceStruct {
-		public Pointer off_superObject;
+		public LegacyPointer off_superObject;
 		public byte[] copiedActorData;
-		public Pointer off_states;
+		public LegacyPointer off_states;
 		public ushort num_states;
 		public ushort ushort_22;
 
-		public Pointer off_animPositions;
-		public Pointer off_animRotations;
-		public Pointer off_animScales;
-		public Pointer off_geometricObjects_dynamic;
+		public LegacyPointer off_animPositions;
+		public LegacyPointer off_animRotations;
+		public LegacyPointer off_animScales;
+		public LegacyPointer off_geometricObjects_dynamic;
 		public uint num_geometricObjects_dynamic;
 		public ushort ushort_38;
 		public ushort ushort_3A;
-		public Pointer off_state_indices;
+		public LegacyPointer off_state_indices;
 
 
 		// Parsed
@@ -36,23 +36,23 @@ namespace OpenSpace.PS1 {
 		protected override void ReadInternal(Reader reader) {
 			R2PS1Loader l = Load as R2PS1Loader;
 			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
-				off_superObject = Pointer.Read(reader);
+				off_superObject = LegacyPointer.Read(reader);
 			} else if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
 				reader.ReadBytes(0x98);
 			}
 			copiedActorData = reader.ReadBytes(0x18);
-			off_states = Pointer.Read(reader);
+			off_states = LegacyPointer.Read(reader);
 			num_states = reader.ReadUInt16();
 			ushort_22 = reader.ReadUInt16();
-			off_animPositions = Pointer.Read(reader); // 0x6 size
-			off_animRotations = Pointer.Read(reader); // big array of structs of 0x8 size. 4 ushorts per struct
-			off_animScales = Pointer.Read(reader);
-			off_geometricObjects_dynamic = Pointer.Read(reader);
+			off_animPositions = LegacyPointer.Read(reader); // 0x6 size
+			off_animRotations = LegacyPointer.Read(reader); // big array of structs of 0x8 size. 4 ushorts per struct
+			off_animScales = LegacyPointer.Read(reader);
+			off_geometricObjects_dynamic = LegacyPointer.Read(reader);
 			num_geometricObjects_dynamic = reader.ReadUInt32();
 			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
 				ushort_38 = reader.ReadUInt16();
 				ushort_3A = reader.ReadUInt16();
-				off_state_indices = Pointer.Read(reader);
+				off_state_indices = LegacyPointer.Read(reader);
 			}
 			// Parse
 			states = Load.FromOffsetOrRead<PointerList<State>>(reader, off_states, s => s.length = num_states);

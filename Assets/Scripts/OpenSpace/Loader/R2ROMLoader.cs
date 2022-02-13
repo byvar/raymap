@@ -28,8 +28,8 @@ namespace OpenSpace.Loader {
 		public LevelHeader level;
 		public Localization localizationROM = null;
 
-		public Pointer[] texturesTable;
-		public Pointer[] palettesTable;
+		public LegacyPointer[] texturesTable;
+		public LegacyPointer[] palettesTable;
 		public uint ind_textureTable_i4;
 		public uint ind_textureTable_i8;
 		public uint ind_textureTable_rgba;
@@ -53,12 +53,12 @@ namespace OpenSpace.Loader {
 				fatTables = new FATTable[num_tables + 2];
 			}
 			for (uint i = 0; i < num_tables + 2; i++) {
-				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader), readEntries: i < 2);
+				fatTables[i] = FATTable.Read(reader, LegacyPointer.Current(reader), readEntries: i < 2);
 			}
 			string[] levels = new string[num_tables];
-			Pointer off_levelList = GetStructPtr(FATEntry.Type.LevelList, (ushort)(0 | FATEntry.Flag.Fix), false);
+			LegacyPointer off_levelList = GetStructPtr(FATEntry.Type.LevelList, (ushort)(0 | FATEntry.Flag.Fix), false);
 			for (int i = 0; i < levels.Length; i++) {
-				Pointer.DoAt(ref reader, off_levelList + 64*i, () => {
+				LegacyPointer.DoAt(ref reader, off_levelList + 64*i, () => {
 					reader.ReadUInt16();
 					levels[i] = reader.ReadNullDelimitedString();
 				});
@@ -262,7 +262,7 @@ namespace OpenSpace.Loader {
 					loadingState = "Loading struct table " + (i + 1) + "/" + (num_tables + 2);
 					await WaitIfNecessary();
 				}
-				fatTables[i] = FATTable.Read(reader, Pointer.Current(reader), readEntries: i < 2);
+				fatTables[i] = FATTable.Read(reader, LegacyPointer.Current(reader), readEntries: i < 2);
 			}
 			await WaitIfNecessary();
 		}
@@ -294,47 +294,47 @@ namespace OpenSpace.Loader {
 				loadingState = "Loading texture tables";
 				await WaitIfNecessary();
 				for (int i = 0; i < 18; i++) {
-					Pointer off_list = Pointer.Read(reader);
+					LegacyPointer off_list = LegacyPointer.Read(reader);
 					uint num_list = reader.ReadUInt32();
 				}
-				Pointer off_table_i4 = Pointer.Read(reader);
+				LegacyPointer off_table_i4 = LegacyPointer.Read(reader);
 				uint sz_table_i4 = reader.ReadUInt32() >> 2;
-				Pointer off_table_i8 = Pointer.Read(reader);
+				LegacyPointer off_table_i8 = LegacyPointer.Read(reader);
 				uint sz_table_i8 = reader.ReadUInt32() >> 2;
-				Pointer off_table_rgba = Pointer.Read(reader);
+				LegacyPointer off_table_rgba = LegacyPointer.Read(reader);
 				uint sz_table_rgba = reader.ReadUInt32() >> 2;
 				ind_textureTable_i4 = 0;
 				ind_textureTable_i8 = ind_textureTable_i4 + (sz_table_i4);
 				ind_textureTable_rgba = ind_textureTable_i8 + (sz_table_i8);
 				uint totalSz = ind_textureTable_rgba + (sz_table_rgba);
-				texturesTable = new Pointer[totalSz];
-				Pointer.DoAt(ref reader, off_table_i4, () => {
+				texturesTable = new LegacyPointer[totalSz];
+				LegacyPointer.DoAt(ref reader, off_table_i4, () => {
 					for (int i = 0; i < sz_table_i4; i++) {
-						texturesTable[ind_textureTable_i4 + i] = Pointer.Read(reader);
+						texturesTable[ind_textureTable_i4 + i] = LegacyPointer.Read(reader);
 					}
 				});
-				Pointer.DoAt(ref reader, off_table_i8, () => {
+				LegacyPointer.DoAt(ref reader, off_table_i8, () => {
 					for (int i = 0; i < sz_table_i8; i++) {
-						texturesTable[ind_textureTable_i8 + i] = Pointer.Read(reader);
+						texturesTable[ind_textureTable_i8 + i] = LegacyPointer.Read(reader);
 					}
 				});
-				Pointer.DoAt(ref reader, off_table_rgba, () => {
+				LegacyPointer.DoAt(ref reader, off_table_rgba, () => {
 					for (int i = 0; i < sz_table_rgba; i++) {
-						texturesTable[ind_textureTable_rgba + i] = Pointer.Read(reader);
+						texturesTable[ind_textureTable_rgba + i] = LegacyPointer.Read(reader);
 					}
 				});
-				Pointer off_palettesTable = Pointer.Read(reader);
+				LegacyPointer off_palettesTable = LegacyPointer.Read(reader);
 				if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
 					uint sz_palettesTable = reader.ReadUInt32() >> 2;
-					palettesTable = new Pointer[sz_palettesTable];
+					palettesTable = new LegacyPointer[sz_palettesTable];
 					print(texturesTable.Length + " - " + palettesTable.Length);
-					Pointer.DoAt(ref reader, off_palettesTable, () => {
+					LegacyPointer.DoAt(ref reader, off_palettesTable, () => {
 						for (int i = 0; i < sz_palettesTable; i++) {
-							palettesTable[i] = Pointer.Read(reader);
+							palettesTable[i] = LegacyPointer.Read(reader);
 						}
 					});
 				} else {
-					palettesTable = new Pointer[0];
+					palettesTable = new LegacyPointer[0];
 				}
 			}
 
@@ -482,7 +482,7 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			Pointer eof = null;
+			LegacyPointer eof = null;
 			romAnims = new ROMAnimation[num_anims];
 			for (uint i = 0; i < num_anims; i++) {
 				uint offset = reader.ReadUInt32();
@@ -490,12 +490,12 @@ namespace OpenSpace.Loader {
 					compressed = (offset & 0x80000000) == 0x80000000,
 					index = i
 				};
-				romAnims[i].Init(new Pointer(offset & 0x7FFFFFFF, files_array[SMem.Anims]));
+				romAnims[i].Init(new LegacyPointer(offset & 0x7FFFFFFF, files_array[SMem.Anims]));
 				if (i > 0) {
 					romAnims[i - 1].compressedSize = romAnims[i].Offset.offset - romAnims[i - 1].Offset.offset;
 				}
 			}
-			eof = new Pointer(reader.ReadUInt32(), files_array[SMem.Anims]); // EOF
+			eof = new LegacyPointer(reader.ReadUInt32(), files_array[SMem.Anims]); // EOF
 			if (num_anims > 0) {
 				romAnims[num_anims - 1].compressedSize = eof.offset - romAnims[num_anims - 1].Offset.offset;
 			}
@@ -514,7 +514,7 @@ namespace OpenSpace.Loader {
 			List<ROMShAnimation> shAnimsList = new List<ROMShAnimation>();
 			while (reader.BaseStream.Position < reader.BaseStream.Length) {
 				ROMShAnimation shAnim = new ROMShAnimation();
-				shAnim.Init(Pointer.Current(reader));
+				shAnim.Init(LegacyPointer.Current(reader));
 				shAnim.Read(reader, true);
 				shAnimsList.Add(shAnim);
 			}
@@ -525,7 +525,7 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading animations: cuttable";
 			await WaitIfNecessary();
 			cutTable = new ROMAnimationCutTable();
-			cutTable.Init(Pointer.Current(reader));
+			cutTable.Init(LegacyPointer.Current(reader));
 			cutTable.length = (ushort)num_anims;
 			cutTable.Read(reader, true);
 		}
@@ -537,7 +537,7 @@ namespace OpenSpace.Loader {
 			for (int i = 0; i < fatTables.Length; i++) {
 				for (int j = 0; j < fatTables[i].entries.Length; j++) {
 					if (fatTables[i].entries[j].EntryType != FATEntry.Type.TextureInfo) continue;
-					Pointer ptr = new Pointer(fatTables[i].entries[j].off_data, files_array[SMem.Data]);
+					LegacyPointer ptr = new LegacyPointer(fatTables[i].entries[j].off_data, files_array[SMem.Data]);
 					TextureInfo texInfo = new TextureInfo();
 					texInfo.Init(ptr, fatTables[i].entries[j].index);
 					texInfo.Read(reader);
@@ -702,7 +702,7 @@ namespace OpenSpace.Loader {
 			if (rs == null) {
 				if (index != 0xFFFF) {
 					FATEntry.Type type = FATEntry.types[typeof(T)];
-					Pointer offset = null;
+					LegacyPointer offset = null;
 					// For some reason, this type receives special treatment
 					if (type == FATEntry.Type.EntryAction
 						&& ((index & (ushort)FATEntry.Flag.Fix) != (ushort)FATEntry.Flag.Fix)) {
@@ -824,19 +824,19 @@ namespace OpenSpace.Loader {
 			return null;
 		}
 
-		public Pointer GetStructPtr(ushort type, ushort index, bool global = false) {
+		public LegacyPointer GetStructPtr(ushort type, ushort index, bool global = false) {
 			FATEntry entry = GetEntry(type, index, global: global);
 			if (entry != null) {
-				return new Pointer(entry.off_data, files_array[SMem.Data]);
+				return new LegacyPointer(entry.off_data, files_array[SMem.Data]);
 			} else {
 				return null;
 			}
 		}
 
-		public Pointer GetStructPtr(FATEntry.Type type, ushort index, bool global = false) {
+		public LegacyPointer GetStructPtr(FATEntry.Type type, ushort index, bool global = false) {
 			FATEntry entry = GetEntry(type, index, global: global);
 			if (entry != null) {
-				return new Pointer(entry.off_data, files_array[SMem.Data]);
+				return new LegacyPointer(entry.off_data, files_array[SMem.Data]);
 			} else {
 				return null;
 			}

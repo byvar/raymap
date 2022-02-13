@@ -256,7 +256,7 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
     }*/
     public void SaveChanges(Writer writer)
     {
-        Pointer.Goto(ref writer, wp.offset);
+        LegacyPointer.Goto(ref writer, wp.offset);
         writer.Write(transform.position.x);
         writer.Write(transform.position.z);
         writer.Write(transform.position.y);

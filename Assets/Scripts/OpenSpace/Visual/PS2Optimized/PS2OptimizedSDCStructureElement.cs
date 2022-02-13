@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace OpenSpace.Visual.PS2Optimized {
 	public class PS2OptimizedSDCStructureElement {
-		public Pointer offset;
+		public LegacyPointer offset;
 		[JsonIgnore]
 		public PS2OptimizedSDCStructure geo;
 		public int index;
@@ -33,7 +33,7 @@ namespace OpenSpace.Visual.PS2Optimized {
 		}
 
 		public void Read(Reader reader) {
-			offset = Pointer.Current(reader);
+			offset = LegacyPointer.Current(reader);
 			if (geo.Type == 4 || geo.Type == 5 || geo.Type == 6) {
 				// Optimized
 				num_vertices_actual = reader.ReadUInt32();
@@ -107,8 +107,8 @@ namespace OpenSpace.Visual.PS2Optimized {
 					sinusState[i] = new VectorForSinusEffect(reader);
 				}
 			}
-			if ((index < geo.num_elements - 1 && Pointer.Current(reader) != geo.off_elements_array[index + 1])
-				|| (index == geo.num_elements - 1 && Pointer.Current(reader) != geo.off_uint1)) {
+			if ((index < geo.num_elements - 1 && LegacyPointer.Current(reader) != geo.off_elements_array[index + 1])
+				|| (index == geo.num_elements - 1 && LegacyPointer.Current(reader) != geo.off_uint1)) {
 				UnityEngine.Debug.LogWarning("B " + geo.Offset + " - " + offset + " - " + hasUv0 + " - " + hasUv1 + " - " + hasNormals);
 			} else {
 				//UnityEngine.Debug.LogWarning("G " + geo.Offset + " - " + offset + " - " + hasUv0 + " - " + hasUv1 + " - " + hasUv4);

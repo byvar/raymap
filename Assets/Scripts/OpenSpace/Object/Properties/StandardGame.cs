@@ -3,9 +3,9 @@ using UnityEditor;
 
 namespace OpenSpace.Object.Properties {
     public class StandardGame {
-        public Pointer offset;
+        public LegacyPointer offset;
         public uint[] objectTypes = new uint[3];
-        public Pointer off_superobject;
+        public LegacyPointer off_superobject;
 
         public uint customBits;
         public uint aiCustomBits;
@@ -37,12 +37,12 @@ namespace OpenSpace.Object.Properties {
             }
         }
 
-        public StandardGame(Pointer offset)
+        public StandardGame(LegacyPointer offset)
         {
             this.offset = offset;
         }
 
-        public static StandardGame Read(Reader reader, Pointer offset)
+        public static StandardGame Read(Reader reader, LegacyPointer offset)
         {
             MapLoader l = MapLoader.Loader;
             //l.print("StdGame: " + offset);
@@ -52,7 +52,7 @@ namespace OpenSpace.Object.Properties {
 				stdGame.objectTypes[0] = reader.ReadUInt32();
 				stdGame.objectTypes[1] = reader.ReadUInt32();
 				stdGame.objectTypes[2] = reader.ReadUInt32();
-				stdGame.off_superobject = Pointer.Read(reader); // 0xC SuperObject from Perso probably
+				stdGame.off_superobject = LegacyPointer.Read(reader); // 0xC SuperObject from Perso probably
 
 				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
 					if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
@@ -111,7 +111,7 @@ namespace OpenSpace.Object.Properties {
 				stdGame.objectTypes[1] = reader.ReadUInt16();
 				stdGame.objectTypes[2] = reader.ReadUInt16();
 				reader.ReadUInt32();
-				stdGame.off_superobject = Pointer.Read(reader);
+				stdGame.off_superobject = LegacyPointer.Read(reader);
 				reader.ReadBytes(0xC);
 				stdGame.platformType = reader.ReadByte();
 				stdGame.miscFlags = reader.ReadByte();
@@ -132,7 +132,7 @@ namespace OpenSpace.Object.Properties {
 				stdGame.objectTypes[1] = reader.ReadUInt32();
 				stdGame.objectTypes[2] = reader.ReadUInt32();
 				reader.ReadUInt32();
-				stdGame.off_superobject = Pointer.Read(reader);
+				stdGame.off_superobject = LegacyPointer.Read(reader);
 				reader.ReadBytes(0x10);
 				stdGame.platformType = reader.ReadByte();
 				stdGame.miscFlags = reader.ReadByte();
@@ -174,9 +174,9 @@ namespace OpenSpace.Object.Properties {
 
         public void Write(Writer writer)
         {
-			Pointer.Goto(ref writer, offset);
+			LegacyPointer.Goto(ref writer, offset);
             if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-                Pointer.Goto(ref writer, offset + 0x24);
+                LegacyPointer.Goto(ref writer, offset + 0x24);
                 writer.Write(customBits);
                 writer.Write(platformType);
                 writer.Write(miscFlags);
@@ -184,7 +184,7 @@ namespace OpenSpace.Object.Properties {
                 writer.Write(transparencyZoneMax);
                 writer.Write(customBitsInitial);
             } else {
-                Pointer.Goto(ref writer, offset + 0x20);
+                LegacyPointer.Goto(ref writer, offset + 0x20);
                 writer.Write(customBits);
                 writer.Write(aiCustomBits);
                 writer.Write(platformType);

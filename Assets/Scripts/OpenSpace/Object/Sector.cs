@@ -9,7 +9,7 @@ using UnityEngine;
 namespace OpenSpace.Object {
     public class Sector : IEngineObject, IReferenceable {
 
-        public Pointer offset;
+        public LegacyPointer offset;
         public string name = "Sector";
 
         public LinkedList<Perso> persos;
@@ -21,7 +21,7 @@ namespace OpenSpace.Object {
 
         public byte isSectorVirtual;
 		public byte sectorPriority;
-        public Pointer off_skyMaterial;
+        public LegacyPointer off_skyMaterial;
         public VisualMaterial skyMaterial;
 
         public BoundingVolume sectorBorder;
@@ -51,7 +51,7 @@ namespace OpenSpace.Object {
 
         public ReferenceFields References { get; set; } = new ReferenceFields();
 
-        public Sector(Pointer offset, SuperObject so) {
+        public Sector(LegacyPointer offset, SuperObject so) {
             this.offset = offset;
             this.superObject = so;
         }
@@ -66,16 +66,16 @@ namespace OpenSpace.Object {
 						n.short0 = reader.ReadUInt16();
 						n.short2 = reader.ReadUInt16();
 					}
-					Pointer sp = Pointer.Read(reader);
+					LegacyPointer sp = LegacyPointer.Read(reader);
 					n.sector = Sector.FromSuperObjectOffset(sp);
                     //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
                     if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) {
                         n.off_next = off_element + 8; // No next pointer, each entry is immediately after the first one.
                     } else {
-                        n.off_next = Pointer.Read(reader);
+                        n.off_next = LegacyPointer.Read(reader);
                         if (CPA_Settings.s.hasLinkedListHeaderPointers) {
-                            n.off_previous = Pointer.Read(reader);
-                            Pointer off_sector_start = Pointer.Read(reader);
+                            n.off_previous = LegacyPointer.Read(reader);
+                            LegacyPointer off_sector_start = LegacyPointer.Read(reader);
                         }
                     }
                     return n;
@@ -89,16 +89,16 @@ namespace OpenSpace.Object {
                         n.short0 = reader.ReadUInt16();
                         n.short2 = reader.ReadUInt16();
                     }
-                    Pointer sp = Pointer.Read(reader);
+                    LegacyPointer sp = LegacyPointer.Read(reader);
                     n.sector = Sector.FromSuperObjectOffset(sp);
                     //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
                     if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) {
                         n.off_next = off_element + 4; // No next pointer, each entry is immediately after the first one.
                     } else {
-                        n.off_next = Pointer.Read(reader);
+                        n.off_next = LegacyPointer.Read(reader);
                         if (CPA_Settings.s.hasLinkedListHeaderPointers) {
-                            n.off_previous = Pointer.Read(reader);
-                            Pointer off_sector_start = Pointer.Read(reader);
+                            n.off_previous = LegacyPointer.Read(reader);
+                            LegacyPointer off_sector_start = LegacyPointer.Read(reader);
                         }
                     }
                     return n;
@@ -123,7 +123,7 @@ namespace OpenSpace.Object {
             }
         }
 
-        public static Sector Read(Reader reader, Pointer offset, SuperObject so) {
+        public static Sector Read(Reader reader, LegacyPointer offset, SuperObject so) {
             MapLoader l = MapLoader.Loader;
             Sector s = new Sector(offset, so);
             s.name = "Sector @ " + offset + ", SPO @ "+so.offset;
@@ -135,16 +135,16 @@ namespace OpenSpace.Object {
                     reader.ReadByte();
                     reader.ReadByte();
                 }
-                Pointer off_collideObj = Pointer.Read(reader);
-                Pointer.DoAt(ref reader, off_collideObj, () => {
+                LegacyPointer off_collideObj = LegacyPointer.Read(reader);
+                LegacyPointer.DoAt(ref reader, off_collideObj, () => {
                     s.collider = GeometricObjectCollide.Read(reader, off_collideObj, isBoundingVolume: true);
                     // This has the exact same structure as a CollideMeshObject but with a sector superobject as material for the collieMeshElements
                 });
-                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // "environments list"
-                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double); // "surface list"
+                LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double); // "environments list"
+                LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double); // "surface list"
             }
-            s.persos = LinkedList<Perso>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
-            s.staticLights = LinkedList<LightInfo>.Read(ref reader, Pointer.Current(reader),
+            s.persos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
+            s.staticLights = LinkedList<LightInfo>.Read(ref reader, LegacyPointer.Current(reader),
                 (off_element) => {
                     LightInfo li = l.FromOffsetOrRead<LightInfo>(reader, off_element);
                     if (li != null) li.containingSectors.Add(s);
@@ -157,19 +157,19 @@ namespace OpenSpace.Object {
                         LinkedList.Flags.NoPreviousPointersForDouble),
                 type: LinkedList.Type.Minimize
             );
-            s.dynamicLights = LinkedList<int>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Double);
+            s.dynamicLights = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
             if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) {
-                LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // "streams list", probably related to water
+                LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader)); // "streams list", probably related to water
             }
-            s.graphicSectors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
-            s.collisionSectors = LinkedList<NeighborSector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
-            s.activitySectors = LinkedList<Sector>.ReadHeader(reader, Pointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.graphicSectors = LinkedList<NeighborSector>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.collisionSectors = LinkedList<NeighborSector>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Minimize);
+            s.activitySectors = LinkedList<Sector>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Minimize);
 
-            LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // TT says: Sound Sectors
-            LinkedList<int>.ReadHeader(reader, Pointer.Current(reader)); // Placeholder
+            LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader)); // TT says: Sound Sectors
+            LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader)); // Placeholder
 
             if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
-                s.sectorBorder = BoundingVolume.Read(reader, Pointer.Current(reader), BoundingVolume.Type.Box);
+                s.sectorBorder = BoundingVolume.Read(reader, LegacyPointer.Current(reader), BoundingVolume.Type.Box);
 				reader.ReadUInt32();
 				if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
 					s.isSectorVirtual = reader.ReadByte();
@@ -182,7 +182,7 @@ namespace OpenSpace.Object {
 					reader.ReadByte();
 					s.sectorPriority = reader.ReadByte();
 					if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.R2) {
-						s.off_skyMaterial = Pointer.Read(reader);
+						s.off_skyMaterial = LegacyPointer.Read(reader);
 						s.skyMaterial = VisualMaterial.FromOffsetOrRead(s.off_skyMaterial, reader);
 					} else {
 						reader.ReadUInt32();
@@ -208,8 +208,8 @@ namespace OpenSpace.Object {
                 if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
                     reader.ReadUInt32(); // activation flag
                 }
-                Pointer off_name = Pointer.Read(reader);
-                Pointer.DoAt(ref reader, off_name, () => {
+                LegacyPointer off_name = LegacyPointer.Read(reader);
+                LegacyPointer.DoAt(ref reader, off_name, () => {
                     s.name = reader.ReadNullDelimitedString() + " @ " + offset;
                 });
             }
@@ -231,13 +231,13 @@ namespace OpenSpace.Object {
             return s;
         }
 
-        public static Sector FromOffset(Pointer offset) {
+        public static Sector FromOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.sectors.FirstOrDefault(s => s.offset == offset);
         }
 
-        public static Sector FromSuperObjectOffset(Pointer offset) {
+        public static Sector FromSuperObjectOffset(LegacyPointer offset) {
             if (offset == null) return null;
             MapLoader l = MapLoader.Loader;
             return l.sectors.FirstOrDefault(s => s.SuperObject.offset == offset);
@@ -248,11 +248,11 @@ namespace OpenSpace.Object {
             public ushort short2;
             public Sector sector;
 
-            public Pointer off_next;
-            public Pointer off_previous;
+            public LegacyPointer off_next;
+            public LegacyPointer off_previous;
 
-            public Pointer NextEntry { get { return off_next; } }
-            public Pointer PreviousEntry { get { return off_previous; } }
+            public LegacyPointer NextEntry { get { return off_next; } }
+            public LegacyPointer PreviousEntry { get { return off_previous; } }
         }
     }
 }

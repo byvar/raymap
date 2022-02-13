@@ -11,7 +11,7 @@ namespace OpenSpace {
     public class PointerJsonConverter : JsonConverter {
         const string PointerPattern = @"^(?<file>[^\|]*)\|0x(?<offset>[a-fA-F0-9]{8})(\[0x(?<offsetInFile>[a-fA-F0-9]{8})\])?$";
         public override bool CanConvert(Type objectType) {
-            return objectType == typeof(Pointer);
+            return objectType == typeof(LegacyPointer);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
@@ -37,7 +37,7 @@ namespace OpenSpace {
                     if (uint.TryParse(offset, System.Globalization.NumberStyles.HexNumber, default, out uint result)) {
                         for (int i = 0; i < files_array.Length; i++) {
                             if (files_array[i] != null && files_array[i].name == file) {
-                                return new Pointer(result, files_array[i]);
+                                return new LegacyPointer(result, files_array[i]);
                             }
                         }
                     }

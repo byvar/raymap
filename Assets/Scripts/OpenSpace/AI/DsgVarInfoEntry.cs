@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace OpenSpace.AI {
     public partial class DsgVarInfoEntry {
-        public Pointer offset;
+        public LegacyPointer offset;
 
         public uint offsetInBuffer; // offset in DsgMemBuffer
         public uint typeNumber;
@@ -23,11 +23,11 @@ namespace OpenSpace.AI {
             }
         }
 
-        public DsgVarInfoEntry(Pointer offset) {
+        public DsgVarInfoEntry(LegacyPointer offset) {
             this.offset = offset;
         }
 
-        public static DsgVarInfoEntry Read(Reader reader, Pointer offset, uint number) {
+        public static DsgVarInfoEntry Read(Reader reader, LegacyPointer offset, uint number) {
             MapLoader l = MapLoader.Loader;
             DsgVarInfoEntry d = new DsgVarInfoEntry(offset);
 			//l.print(offset);

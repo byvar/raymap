@@ -5,9 +5,9 @@ using UnityEngine;
 namespace OpenSpace.PS1 {
 	public class CameraGraph : OpenSpaceStruct {
 		public uint uint_00;
-		public Pointer off_current;
-		public Pointer off_last;
-		public Pointer off_first;
+		public LegacyPointer off_current;
+		public LegacyPointer off_last;
+		public LegacyPointer off_first;
 		public uint flags;
 
 		// Parsed
@@ -18,9 +18,9 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			uint_00 = reader.ReadUInt32();
-			off_current = Pointer.Read(reader);
-			off_last = Pointer.Read(reader);
-			off_first = Pointer.Read(reader);
+			off_current = LegacyPointer.Read(reader);
+			off_last = LegacyPointer.Read(reader);
+			off_first = LegacyPointer.Read(reader);
 			flags = reader.ReadUInt32();
 
 			current = Load.FromOffsetOrRead<CameraGraphNode>(reader, off_current);

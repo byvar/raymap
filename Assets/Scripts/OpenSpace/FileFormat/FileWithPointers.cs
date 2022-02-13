@@ -10,7 +10,7 @@ namespace OpenSpace.FileFormat {
         public int fileID = 0;
         public Reader reader;
         public Writer writer;
-        public Dictionary<uint, Pointer> pointers = new Dictionary<uint, Pointer>();
+        public Dictionary<uint, LegacyPointer> pointers = new Dictionary<uint, LegacyPointer>();
 		public Dictionary<string, object> extraData = new Dictionary<string, object>();
         public long baseOffset; // Base offset within file
         public long headerOffset = 0;
@@ -21,7 +21,7 @@ namespace OpenSpace.FileFormat {
             if (writer != null) writer.Close();
         }
 
-        public void AddPointer(uint offset, Pointer pointer) {
+        public void AddPointer(uint offset, LegacyPointer pointer) {
             pointers[offset] = pointer;
         }
 
@@ -31,11 +31,11 @@ namespace OpenSpace.FileFormat {
             }
         }
 
-        public virtual Pointer GetUnsafePointer(uint value) {
-            return new Pointer(value, this);
+        public virtual LegacyPointer GetUnsafePointer(uint value) {
+            return new LegacyPointer(value, this);
         }
 
-        public abstract void WritePointer(Pointer pointer);
+        public abstract void WritePointer(LegacyPointer pointer);
 
         public abstract void CreateWriter();
         public virtual void EndWrite() {

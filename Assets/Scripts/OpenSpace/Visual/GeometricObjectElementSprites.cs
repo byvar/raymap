@@ -9,7 +9,7 @@ using UnityEngine;
 namespace OpenSpace.Visual {
     public class GeometricObjectElementSprites : IGeometricObjectElement {
         public class IndexedSprite {
-            public Pointer off_info;
+            public LegacyPointer off_info;
             public Vector2 size;
             public Vector3 constraint;
             public Vector2 uv1;
@@ -18,19 +18,19 @@ namespace OpenSpace.Visual {
 
             public Vector2 info_scale;
             public Vector2 info_unknown;
-            public Pointer off_material_pointer;
-            public Pointer off_material;
+            public LegacyPointer off_material_pointer;
+            public LegacyPointer off_material;
             public GameMaterial gameMaterial;
             public VisualMaterial visualMaterial = null;
             [JsonIgnore] public Mesh meshUnity = null;
         }
 
         [JsonIgnore] public GeometricObject geo;
-        public Pointer offset;
+        public LegacyPointer offset;
 
         [JsonIgnore]
         public string name;
-        public Pointer off_sprites; // called IndexedSprites in the game code
+        public LegacyPointer off_sprites; // called IndexedSprites in the game code
         public ushort num_sprites;
         public IndexedSprite[] sprites;
 		
@@ -46,7 +46,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public GeometricObjectElementSprites(Pointer offset, GeometricObject geo) {
+        public GeometricObjectElementSprites(LegacyPointer offset, GeometricObject geo) {
             this.geo = geo;
             this.offset = offset;
         }
@@ -125,7 +125,7 @@ namespace OpenSpace.Visual {
             }
         }
 
-        public static GeometricObjectElementSprites Read(Reader reader, Pointer offset, GeometricObject m) {
+        public static GeometricObjectElementSprites Read(Reader reader, LegacyPointer offset, GeometricObject m) {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementSprites s = new GeometricObjectElementSprites(offset, m);
             s.name = "Sprite @ pos " + offset;
@@ -136,7 +136,7 @@ namespace OpenSpace.Visual {
                     s.off_sprites = offset;
                     s.num_sprites = 1;
                 } else {
-                    s.off_sprites = Pointer.Read(reader);
+                    s.off_sprites = LegacyPointer.Read(reader);
                     s.num_sprites = reader.ReadUInt16();
                     reader.ReadInt16(); // -1
 					if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
@@ -146,11 +146,11 @@ namespace OpenSpace.Visual {
                 }
             } else {
                 s.num_sprites = (ushort)reader.ReadUInt32();
-                s.off_sprites = Pointer.Read(reader);
+                s.off_sprites = LegacyPointer.Read(reader);
                 reader.ReadUInt32();
             }
 			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
-				Pointer.DoAt(ref reader, s.off_sprites, () => {
+				LegacyPointer.DoAt(ref reader, s.off_sprites, () => {
 					s.sprites = new IndexedSprite[s.num_sprites];
 					for (uint i = 0; i < s.num_sprites; i++) {
 						s.sprites[i] = new IndexedSprite();
@@ -163,7 +163,7 @@ namespace OpenSpace.Visual {
 							s.sprites[i].visualMaterial = ps2l.lightCookieMaterial.Clone();
 							s.sprites[i].visualMaterial.diffuseCoef = ps2l.lightCookieColors[index];
 						} else {
-							s.sprites[i].off_material = Pointer.Read(reader);
+							s.sprites[i].off_material = LegacyPointer.Read(reader);
 							if (s.sprites[i].off_material != null) {
 								s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
 							}
@@ -173,7 +173,7 @@ namespace OpenSpace.Visual {
 			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
                 s.sprites = new IndexedSprite[1];
                 s.sprites[0] = new IndexedSprite();
-                s.sprites[0].off_material = Pointer.Read(reader);
+                s.sprites[0].off_material = LegacyPointer.Read(reader);
                 if (s.sprites[0].off_material != null) {
                     s.sprites[0].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[0].off_material, reader);
                 }
@@ -186,12 +186,12 @@ namespace OpenSpace.Visual {
                 reader.ReadUInt16();
             } else {
                 if (s.off_sprites != null) {
-                    Pointer.Goto(ref reader, s.off_sprites);
+                    LegacyPointer.Goto(ref reader, s.off_sprites);
                     s.sprites = new IndexedSprite[s.num_sprites];
                     for (uint i = 0; i < s.num_sprites; i++) {
                         s.sprites[i] = new IndexedSprite();
 						if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32();
-						s.sprites[i].off_info = Pointer.Read(reader);
+						s.sprites[i].off_info = LegacyPointer.Read(reader);
 						s.sprites[i].size = new Vector2(reader.ReadSingle(), reader.ReadSingle());
 
                         if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
@@ -206,24 +206,24 @@ namespace OpenSpace.Visual {
                         }
 
                         if (s.sprites[i].off_info != null) {
-                            Pointer off_current = Pointer.Goto(ref reader, s.sprites[i].off_info);
+                            LegacyPointer off_current = LegacyPointer.Goto(ref reader, s.sprites[i].off_info);
                             reader.ReadUInt32();
-                            Pointer.Read(reader);
-                            Pointer.Read(reader);
-                            Pointer off_info_scale = Pointer.Read(reader);
-                            Pointer off_info_unknown = Pointer.Read(reader);
-                            s.sprites[i].off_material_pointer = Pointer.Read(reader);
-                            Pointer.Goto(ref reader, off_current);
+                            LegacyPointer.Read(reader);
+                            LegacyPointer.Read(reader);
+                            LegacyPointer off_info_scale = LegacyPointer.Read(reader);
+                            LegacyPointer off_info_unknown = LegacyPointer.Read(reader);
+                            s.sprites[i].off_material_pointer = LegacyPointer.Read(reader);
+                            LegacyPointer.Goto(ref reader, off_current);
 
-                            Pointer.DoAt(ref reader, off_info_scale, () => {
+                            LegacyPointer.DoAt(ref reader, off_info_scale, () => {
                                 s.sprites[i].info_scale = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                             });
-                            Pointer.DoAt(ref reader, off_info_unknown, () => {
+                            LegacyPointer.DoAt(ref reader, off_info_unknown, () => {
                                 s.sprites[i].info_unknown = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                             });
                             if (s.sprites[i].off_material_pointer != null) {
-                                off_current = Pointer.Goto(ref reader, s.sprites[i].off_material_pointer);
-                                s.sprites[i].off_material = Pointer.Read(reader);
+                                off_current = LegacyPointer.Goto(ref reader, s.sprites[i].off_material_pointer);
+                                s.sprites[i].off_material = LegacyPointer.Read(reader);
                                 if (s.sprites[i].off_material != null) {
                                     if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
                                         s.sprites[i].gameMaterial = GameMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
@@ -232,7 +232,7 @@ namespace OpenSpace.Visual {
                                         s.sprites[i].visualMaterial = VisualMaterial.FromOffsetOrRead(s.sprites[i].off_material, reader);
                                     }
                                 }
-                                Pointer.Goto(ref reader, off_current);
+                                LegacyPointer.Goto(ref reader, off_current);
                             }
                         }
                     }

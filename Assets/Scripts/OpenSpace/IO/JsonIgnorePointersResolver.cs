@@ -13,7 +13,7 @@ namespace OpenSpace {
 
 		protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization) {
 			JsonProperty property = base.CreateProperty(member, memberSerialization);
-			if (member.MemberType == MemberTypes.Property || typeof(Pointer).IsAssignableFrom(member.DeclaringType)) {
+			if (member.MemberType == MemberTypes.Property || typeof(LegacyPointer).IsAssignableFrom(member.DeclaringType)) {
 				property.Ignored = true;
 			}
             if (member.GetCustomAttribute<JsonRequiredAttribute>() != null) {

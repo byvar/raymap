@@ -39,7 +39,7 @@ namespace OpenSpace.FileFormat {
             return; // No writing support for DC DAT files yet
         }
 
-        public override void WritePointer(Pointer pointer) {
+        public override void WritePointer(LegacyPointer pointer) {
             if (writer != null) {
                 if (pointer == null) {
                     writer.Write((uint)0);
@@ -55,9 +55,9 @@ namespace OpenSpace.FileFormat {
 			pointerFile = null;
 		}
 
-        public override Pointer GetUnsafePointer(uint value) {
+        public override LegacyPointer GetUnsafePointer(uint value) {
             if (value >= headerOffset && value < headerOffset + length) {
-                return new Pointer(value, pointerFile != null ? pointerFile : this);
+                return new LegacyPointer(value, pointerFile != null ? pointerFile : this);
             }
             return null;
         }

@@ -170,7 +170,7 @@ namespace OpenSpace.AI {
 
                         case ScriptNode.NodeType.Operator:
                             string op = param < aiTypes.operatorTable.Length ? aiTypes.operatorTable[param] : "";
-                            Pointer persoPtr = null;
+                            LegacyPointer persoPtr = null;
 
                             switch (op) {
                                 // scalar:

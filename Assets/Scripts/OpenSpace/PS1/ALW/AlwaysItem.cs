@@ -8,7 +8,7 @@ using Type = OpenSpace.Object.SuperObject.Type;
 
 namespace OpenSpace.PS1 {
 	public class AlwaysItem : OpenSpaceStruct {
-		public Pointer off_superObject;
+		public LegacyPointer off_superObject;
 
 		public uint uint_04;
 		//public Pointer off_04;
@@ -22,7 +22,7 @@ namespace OpenSpace.PS1 {
 		public SuperObject superObject;
 
 		protected override void ReadInternal(Reader reader) {
-			off_superObject = Pointer.Read(reader);
+			off_superObject = LegacyPointer.Read(reader);
 			uint_04 = reader.ReadUInt32();
 			uint_08 = reader.ReadUInt32();
 			uint_0C = reader.ReadUInt32();

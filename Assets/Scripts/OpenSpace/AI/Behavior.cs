@@ -13,14 +13,14 @@ namespace OpenSpace.AI {
 		}
 
         public string name = null;
-        public Pointer off_scripts;
-        private Pointer off_scheduleScript;
+        public LegacyPointer off_scripts;
+        private LegacyPointer off_scheduleScript;
         public byte num_scripts;
         public Script[] scripts;
         public Script scheduleScript;
 
         // Custom
-        public List<Pointer> copies;
+        public List<LegacyPointer> copies;
         public BehaviorType type;
         public int index;
 
@@ -79,7 +79,7 @@ namespace OpenSpace.AI {
         }
 
         public Behavior() : base() {
-			copies = new List<Pointer>();
+			copies = new List<LegacyPointer>();
         }
 
 		public bool ContentEquals(Behavior b) {
@@ -109,8 +109,8 @@ namespace OpenSpace.AI {
                     name = name.Substring(indexOf + "CreateComport:".Length);
                 }
             }
-            off_scripts = Pointer.Read(reader);
-            off_scheduleScript = Pointer.Read(reader);
+            off_scripts = LegacyPointer.Read(reader);
+            off_scheduleScript = LegacyPointer.Read(reader);
             if (CPA_Settings.s.platform == CPA_Settings.Platform.DC || 
                 CPA_Settings.s.game == CPA_Settings.Game.RedPlanet
                 || CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
@@ -122,13 +122,13 @@ namespace OpenSpace.AI {
             reader.ReadByte();
             //if (entry.name != null) l.print(entry.name);
             scripts = new Script[num_scripts];
-            Pointer.DoAt(ref reader, off_scripts, () => {
+            LegacyPointer.DoAt(ref reader, off_scripts, () => {
                 for (int i = 0; i < num_scripts; i++) {
-                    scripts[i] = Script.Read(reader, Pointer.Current(reader), this);
+                    scripts[i] = Script.Read(reader, LegacyPointer.Current(reader), this);
                 }
             });
-            Pointer.DoAt(ref reader, off_scheduleScript, () => {
-                scheduleScript = Script.Read(reader, Pointer.Current(reader), this, single: true);
+            LegacyPointer.DoAt(ref reader, off_scheduleScript, () => {
+                scheduleScript = Script.Read(reader, LegacyPointer.Current(reader), this, single: true);
             });
         }
 

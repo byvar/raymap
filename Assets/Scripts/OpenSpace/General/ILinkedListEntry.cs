@@ -5,7 +5,7 @@ using System.Text;
 
 namespace OpenSpace {
     interface ILinkedListEntry {
-        Pointer NextEntry { get; }
-        Pointer PreviousEntry { get; }
+        LegacyPointer NextEntry { get; }
+        LegacyPointer PreviousEntry { get; }
     }
 }

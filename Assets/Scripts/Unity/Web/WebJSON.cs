@@ -77,7 +77,7 @@ public class WebJSON {
 		public SuperObject[] Children { get; set; }
 
 		// Optional
-		public OpenSpace.Pointer Offset { get; set; }
+		public OpenSpace.LegacyPointer Offset { get; set; }
 		public Perso Perso { get; set; }
 		public string Name { get; set; }
 		public Vector3? Position { get; set; }
@@ -86,7 +86,7 @@ public class WebJSON {
 	}
 	public class Perso {
 		public PersoType Type { get; set; } = PersoType.Instance;
-		public OpenSpace.Pointer Offset { get; set; }
+		public OpenSpace.LegacyPointer Offset { get; set; }
 
 		// Optional
 		public string Name { get; set; }
@@ -128,18 +128,18 @@ public class WebJSON {
 		public DsgVar[] DsgVars { get; set; }
 	}
 	public class Comport {
-		public OpenSpace.Pointer Offset { get; set; }
+		public OpenSpace.LegacyPointer Offset { get; set; }
 		public string Name { get; set; }
 		public Script FirstScript { get; set; }
 		public Script[] Scripts { get; set; }
 	}
 	public class Macro {
-		public OpenSpace.Pointer Offset { get; set; }
+		public OpenSpace.LegacyPointer Offset { get; set; }
 		public string Name { get; set; }
 		public Script Script { get; set; }
 	}
 	public class Script {
-		public OpenSpace.Pointer Offset { get; set; }
+		public OpenSpace.LegacyPointer Offset { get; set; }
 		public string Translation { get; set; }
 	}
 
@@ -211,7 +211,7 @@ public class WebJSON {
 		public RequestType Type { get; set; }
 
 		// Optional
-		public OpenSpace.Pointer Offset { get; set; }
+		public OpenSpace.LegacyPointer Offset { get; set; }
 		public BehaviorType? BehaviorType { get; set; }
 		public Screenshot Screenshot { get; set; }
 	}

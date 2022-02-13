@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace OpenSpace.PS1 {
 	public class CameraGraphNode : OpenSpaceStruct {
-		public Pointer off_previous;
-		public Pointer off_next;
+		public LegacyPointer off_previous;
+		public LegacyPointer off_next;
 		public int x;
 		public int y;
 		public int z;
@@ -18,8 +18,8 @@ namespace OpenSpace.PS1 {
 
 
 		protected override void ReadInternal(Reader reader) {
-			off_previous = Pointer.Read(reader);
-			off_next = Pointer.Read(reader);
+			off_previous = LegacyPointer.Read(reader);
+			off_next = LegacyPointer.Read(reader);
 			x = reader.ReadInt32();
 			y = reader.ReadInt32();
 			z = reader.ReadInt32();

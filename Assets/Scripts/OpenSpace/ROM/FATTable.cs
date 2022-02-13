@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace OpenSpace.ROM {
 	public class FATTable {
-		public Pointer offset;
-		public Pointer off_table;
+		public LegacyPointer offset;
+		public LegacyPointer off_table;
 		public uint num_entries;
 		public FATEntry[] entries = new FATEntry[0];
 		public Dictionary<FATEntry.Type, Dictionary<ushort, FATEntry>> entriesDict = new Dictionary<FATEntry.Type, Dictionary<ushort, FATEntry>>();
 
-		public static FATTable Read(Reader reader, Pointer offset, bool readEntries = true) {
+		public static FATTable Read(Reader reader, LegacyPointer offset, bool readEntries = true) {
 			FATTable t = new FATTable();
 			t.offset = offset;
-			t.off_table = Pointer.Read(reader);
+			t.off_table = LegacyPointer.Read(reader);
 			t.num_entries = reader.ReadUInt32();
 			if (readEntries) {
 				t.ReadEntries(reader);
@@ -25,9 +25,9 @@ namespace OpenSpace.ROM {
 
 		public void ReadEntries(Reader reader) {
 			entries = new FATEntry[num_entries];
-			Pointer.DoAt(ref reader, off_table, () => {
+			LegacyPointer.DoAt(ref reader, off_table, () => {
 				for (int i = 0; i < entries.Length; i++) {
-					entries[i] = FATEntry.Read(reader, Pointer.Current(reader));
+					entries[i] = FATEntry.Read(reader, LegacyPointer.Current(reader));
 					entries[i].entryIndexWithinTable = (uint)i;
 					AddEntryToDict(entries[i]);
 				}
