@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace OpenSpace.AI {
     public partial class AITypes {
 
-        public static AITypes TTSE = new AITypes()
+        public static AITypes TTSE => new AITypes()
         {
             #region Node types
             nodeTypes = new ScriptNode.NodeType[] {

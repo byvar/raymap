@@ -14,14 +14,15 @@ namespace BinarySerializer.Ubisoft.CPA.ROM
 
 		public override void SerializeImpl(SerializerObject s)
         {
-			// TODO: Add settings, switch between these based on platform
-			FloatX = s.Serialize<float>(FloatX, name: nameof(FloatX));
-			FloatY = s.Serialize<float>(FloatY, name: nameof(FloatY));
-			FloatZ = s.Serialize<float>(FloatZ, name: nameof(FloatZ));
-
-			IntX = s.Serialize<int>(IntX, name: nameof(IntX));
-			IntY = s.Serialize<int>(IntY, name: nameof(IntY));
-			IntZ = s.Serialize<int>(IntZ, name: nameof(IntZ));
+			if (s.GetCPASettings().Platform == Platform.N64) {
+				FloatX = s.Serialize<float>(FloatX, name: nameof(FloatX));
+				FloatY = s.Serialize<float>(FloatY, name: nameof(FloatY));
+				FloatZ = s.Serialize<float>(FloatZ, name: nameof(FloatZ));
+			} else {
+				IntX = s.Serialize<int>(IntX, name: nameof(IntX));
+				IntY = s.Serialize<int>(IntY, name: nameof(IntY));
+				IntZ = s.Serialize<int>(IntZ, name: nameof(IntZ));
+			}
 		}
     }
 }

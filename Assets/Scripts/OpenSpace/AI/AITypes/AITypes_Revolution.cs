@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace OpenSpace.AI {
     public partial class AITypes {
 
-        public static AITypes Revolution = new AITypes()
+        public static AITypes Revolution => new AITypes()
         {
             #region Keywords
             keywordTable = new string[] {
