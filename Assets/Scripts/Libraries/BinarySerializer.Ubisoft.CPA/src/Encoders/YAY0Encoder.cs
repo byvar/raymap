@@ -79,6 +79,8 @@ namespace BinarySerializer.Ubisoft.CPA
                 }
             }
 
+            input.Position = Math.Max(Math.Max(currentLayoutOffset, uncompressedOffset), compressedOffset);
+
             // Set position back to 0
             decompressedStream.Position = 0;
 

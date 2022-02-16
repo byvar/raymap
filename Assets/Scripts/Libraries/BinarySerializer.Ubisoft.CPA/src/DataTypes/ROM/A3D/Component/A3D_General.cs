@@ -26,7 +26,7 @@ namespace BinarySerializer.Ubisoft.CPA.ROM
         public ushort NumOfAnimationTranslationOffset { get; set; }
         public ushort NumOfAnimationRotationOffset { get; set; }
 
-        public ushort NumberOfMorphData { get; set; }
+        public ushort MorphDataCount { get; set; }
 
         public override void SerializeImpl(SerializerObject s)
         {
@@ -52,7 +52,7 @@ namespace BinarySerializer.Ubisoft.CPA.ROM
 			NumOfAnimationTranslationOffset = s.Serialize<ushort>(NumOfAnimationTranslationOffset, name: nameof(NumOfAnimationTranslationOffset));
 			NumOfAnimationRotationOffset = s.Serialize<ushort>(NumOfAnimationRotationOffset, name: nameof(NumOfAnimationRotationOffset));
 			
-            NumberOfMorphData = s.Serialize<ushort>(NumberOfMorphData, name: nameof(NumberOfMorphData));
+            MorphDataCount = s.Serialize<ushort>(MorphDataCount, name: nameof(MorphDataCount));
 		}
     }
 }
