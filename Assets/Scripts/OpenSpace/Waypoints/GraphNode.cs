@@ -63,7 +63,7 @@ namespace OpenSpace.Waypoints {
 
             node.off_graph = LegacyPointer.Read(reader);
             node.off_wayPoint = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.Montreal) {
                 node.typeOfWP = reader.ReadUInt32();
                 node.typeOfWPInit = reader.ReadUInt32();
             }

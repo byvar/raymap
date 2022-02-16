@@ -18,8 +18,8 @@ namespace OpenSpace.Animation.Component {
 			id = reader.ReadInt16();
 			vector = reader.ReadUInt16();
 			numOfNTTO = reader.ReadUInt16();
-			if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT
-				&& CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
+			if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT
+				&& Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution) {
 				framesKF = reader.ReadUInt32();
 				keyframe = reader.ReadUInt32();
 			} else {
@@ -44,7 +44,7 @@ namespace OpenSpace.Animation.Component {
 
         public static bool Aligned {
             get {
-                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
+                if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT) {
                     return true;
                 } else {
                     return false;

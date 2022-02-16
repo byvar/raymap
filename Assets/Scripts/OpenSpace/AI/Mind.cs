@@ -49,14 +49,14 @@ namespace OpenSpace.AI {
         protected override void ReadInternal(Reader reader) {
             off_AI_model = LegacyPointer.Read(reader);
             off_intelligence_normal = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo) {
                 off_dsgMem = LegacyPointer.Read(reader);
                 off_intelligence_reflex = LegacyPointer.Read(reader);
             } else {
                 off_intelligence_reflex = LegacyPointer.Read(reader);
                 off_dsgMem = LegacyPointer.Read(reader);
             }
-            if (CPA_Settings.s.hasNames) {
+            if (Legacy_Settings.s.hasNames) {
                 off_name = LegacyPointer.Read(reader);
             }
             byte0 = reader.ReadByte();
@@ -64,7 +64,7 @@ namespace OpenSpace.AI {
             byte2 = reader.ReadByte();
             byte3 = reader.ReadByte();
 
-            if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo) {
                 // null
                 reader.ReadUInt32();
                 reader.ReadUInt32();

@@ -40,7 +40,7 @@ namespace OpenSpace.Visual {
         public static uint flags_isBillboard = (1 << 9);
 		public static uint Flags_IsTransparent {
 			get {
-				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 					return (1 << 10);
 				} else {
 					return (1 << 3);
@@ -141,9 +141,9 @@ namespace OpenSpace.Visual {
         public bool IsTransparent {
             get {
                 bool transparent = false;
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 &&
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 &&
                     ((flags & Flags_IsTransparent) != 0 || (receivedHints & Hint.Transparent) == Hint.Transparent)) transparent = true;
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     if ((flags & 0x4000000) != 0) transparent = true;
                 }
                 if (transparent) {
@@ -179,7 +179,7 @@ namespace OpenSpace.Visual {
 
         public bool IsPixelShaded {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     return false;
                 } else {
                     if (textures.Count > 0) {
@@ -207,13 +207,13 @@ namespace OpenSpace.Visual {
 			// Material struct = 0x188
 			//l.print("Material @ " + offset);
             m.flags = reader.ReadUInt32(); // After this: 0x4
-			if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) reader.ReadUInt32();
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) reader.ReadUInt32();
 				m.ambientCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.specularCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				// Fill in light info for Revolution
 				m.ambientCoef = new Vector4(0, 0, 0, 1f);
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -224,7 +224,7 @@ namespace OpenSpace.Visual {
 				reader.ReadInt32();
 				m.num_animTextures = reader.ReadUInt16();
 				reader.ReadUInt16(); // 0x70
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				m.ambientCoef = new Vector4(0, 0, 0, 1f);
 				m.color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()); // 0x44
 				m.diffuseCoef = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -236,7 +236,7 @@ namespace OpenSpace.Visual {
 				m.num_animTextures = reader.ReadUInt16();
 				reader.ReadUInt16();
 			}
-			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				m.num_textures = 1;
 				VisualMaterialTexture t = new VisualMaterialTexture();
 				t.offset = LegacyPointer.Current(reader);
@@ -254,7 +254,7 @@ namespace OpenSpace.Visual {
 				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 				m.textures.Add(t);
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				m.num_textures = 1;
 				VisualMaterialTexture t = new VisualMaterialTexture();
 				t.offset = LegacyPointer.Current(reader);
@@ -278,14 +278,14 @@ namespace OpenSpace.Visual {
 				reader.ReadByte();
 				reader.ReadUInt32();
 				reader.ReadUInt32();*/
-			} else if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+			} else if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                 m.num_textures = 1;
                 reader.ReadUInt32(); // 0x48
                 VisualMaterialTexture t = new VisualMaterialTexture();
                 t.offset = LegacyPointer.Current(reader);
                 t.off_texture = LegacyPointer.Read(reader); // 0x4c
                 t.texture = TextureInfo.FromOffset(t.off_texture);
-                if (CPA_Settings.s.game == CPA_Settings.Game.TT) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TT) {
                     /*m.off_animTextures_first = Pointer.Read(reader); // 0x68
                     m.off_animTextures_current = Pointer.Read(reader); // 0x6c
                     m.num_animTextures = reader.ReadUInt16();*/
@@ -299,7 +299,7 @@ namespace OpenSpace.Visual {
 
                     reader.ReadInt32(); // current refresh number for scrolling/animated textures, 0x64
                 } else {
-                    if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
+                    if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) {
                         // For some reason there's a huge gap here
                         reader.ReadBytes(0xD0);
                     }
@@ -322,12 +322,12 @@ namespace OpenSpace.Visual {
                 reader.ReadByte(); // padding, not in DC
             } else { // EngineVersion >= R3
                 reader.ReadUInt32(); // current refresh number for scrolling/animated textures, 0x48
-				if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 					reader.ReadBytes(0x1C);
                 }
                 LegacyPointer off_ps2Tex = null;
                 Vector4 ps2Scroll = Vector4.zero;
-                if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+                if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
                     reader.ReadUInt32();
                     off_ps2Tex = LegacyPointer.Read(reader);
                     ps2Scroll = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -375,7 +375,7 @@ namespace OpenSpace.Visual {
                     t.uvFunction = reader.ReadByte();
                     t.scrollByte = reader.ReadByte();
 
-					if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+					if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 						t.properties = reader.ReadInt32();
 						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 						new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -398,7 +398,7 @@ namespace OpenSpace.Visual {
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
 						new Vector2(reader.ReadSingle(), reader.ReadSingle());
-					} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+					} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
                         t.properties = reader.ReadInt32();
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());
                         new Vector2(reader.ReadSingle(), reader.ReadSingle());

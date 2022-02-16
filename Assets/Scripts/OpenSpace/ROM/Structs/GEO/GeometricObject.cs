@@ -33,14 +33,14 @@ namespace OpenSpace.ROM {
 			scaleFactor = reader.ReadSingle();
 			factor_1 = reader.ReadSingle();
 			verticesCollide = new Reference<CompressedVector3Array>(reader);
-			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 				verticesVisual = new Reference<CompressedVector3Array>(reader);
 				normals = new Reference<CompressedVector3Array>(reader);
 			}
 			elementsCollide = new Reference<GeometricObjectElementCollideList>(reader);
 			elementsVisual = new Reference<GeometricObjectElementVisualList>(reader);
 			num_verticesCollide = reader.ReadUInt16();
-			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 				num_verticesVisual = reader.ReadUInt16();
 			}
 			num_elementsCollide = reader.ReadUInt16();
@@ -51,7 +51,7 @@ namespace OpenSpace.ROM {
 			lookAtMode = reader.ReadUInt16();
 
 			//MapLoader.Loader.print("Vertices: " + num_vectors_1 + " or " + string.Format("{0:X4}", num_vectors_1));
-			if (CPA_Settings.s.platform != CPA_Settings.Platform._3DS) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform._3DS) {
 				num_verticesVisual = num_verticesCollide;
 				/*verticesCollide = normals;
 				verticesVisual = normals;*/
@@ -81,7 +81,7 @@ namespace OpenSpace.ROM {
 			if (type == Type.Visual) {
 				if (elementsVisual.Value != null) {
 					// First, reset vertex buffer
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 						foreach (GeometricObjectElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 							if (entry.element.Value is GeometricObjectElementTriangles) {
 								GeometricObjectElementTriangles el = entry.element.Value as GeometricObjectElementTriangles;
@@ -145,7 +145,7 @@ namespace OpenSpace.ROM {
 
 		public void MorphVertices(GameObject gao, GeometricObject go, float lerp) {
 			// First, reset vertex buffer
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 				foreach (GeometricObjectElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 					if (entry.element.Value is GeometricObjectElementTriangles) {
 						GeometricObjectElementTriangles el = entry.element.Value as GeometricObjectElementTriangles;
@@ -170,7 +170,7 @@ namespace OpenSpace.ROM {
 
 		public void ResetMorph(GameObject gao) {
 			// First, reset vertex buffer
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 				foreach (GeometricObjectElementVisualList.GeometricElementListEntry entry in elementsVisual.Value.elements) {
 					if (entry.element.Value is GeometricObjectElementTriangles) {
 						GeometricObjectElementTriangles el = entry.element.Value as GeometricObjectElementTriangles;

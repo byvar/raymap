@@ -116,7 +116,7 @@ namespace OpenSpace.ROM {
 
 		protected override void ReadInternal(Reader reader) {
 			R2ROMLoader l = MapLoader.Loader as R2ROMLoader;
-			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 				wExponent = reader.ReadByte();
 				hExponent = reader.ReadByte();
 				flags = reader.ReadUInt16();
@@ -133,7 +133,7 @@ namespace OpenSpace.ROM {
 					}
 				}
 				Texture = rawTex;
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DS || CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DS || Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 				texture_index = reader.ReadUInt16();
 				palette_index = reader.ReadUInt16();
 				alpha_index = reader.ReadUInt16();
@@ -141,7 +141,7 @@ namespace OpenSpace.ROM {
 				hExponent = reader.ReadByte();
 				flags = reader.ReadUInt16();
 				color_size = reader.ReadUInt16();
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DS) {
 					palette_num_colors = reader.ReadUInt16();
 				} else {
 					palette_num_colors = 16;
@@ -154,7 +154,7 @@ namespace OpenSpace.ROM {
 				} else if ((flags & 2) != 0) {
 					format = GF64.Format.I8;
 					ind_texture = (ushort)((texture_index + l.ind_textureTable_i8) & 0xFFFF);
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 						palette_num_colors = 256;
 					}
 				} else if ((flags & 4) != 0) {
@@ -174,7 +174,7 @@ namespace OpenSpace.ROM {
 					format = rgba16 ? GF64.Format.RGBA : (palette_num_colors == 16 ? GF64.Format.I4 : GF64.Format.I8);
 				}*/
 				if (palette_index != 0xFFFF) {
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DS) {
 						off_palette = l.palettesTable[palette_index & 0x7FFF];
 						if(l.palettesTableSeen != null) l.palettesTableSeen[palette_index & 0x7FFF] = true;
 					} else {

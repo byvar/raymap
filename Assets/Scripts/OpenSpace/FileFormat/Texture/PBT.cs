@@ -20,7 +20,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public Texture2D[] textures = null;
         public PBT(Stream fs) {
-            using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
+            using (Reader reader = new Reader(fs, Legacy_Settings.s.IsLittleEndian)) {
                 baseOffset = reader.ReadUInt32();
 				unk = reader.ReadUInt32();
 

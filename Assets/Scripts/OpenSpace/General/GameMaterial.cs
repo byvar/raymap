@@ -30,12 +30,12 @@ namespace OpenSpace {
             MapLoader l = MapLoader.Loader;
             GameMaterial gm = new GameMaterial(offset);
 
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				gm.soundMaterial = reader.ReadUInt32();
 				gm.collideMaterial = CollideMaterial.Read(reader, LegacyPointer.Current(reader));
 				// Maybe the first uint16 of collidematerial in Revolution is actually sound material, but eh
 			} else {
-				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+				if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
 					gm.off_visualMaterial = LegacyPointer.Read(reader);
 					gm.off_mechanicsMaterial = LegacyPointer.Read(reader);
 				}

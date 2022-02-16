@@ -55,7 +55,7 @@ namespace OpenSpace.PS1 {
 			ushort_0E = reader.ReadUInt16();
 			off_vertices = LegacyPointer.Read(reader);
 			off_triangleLists = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.game == CPA_Settings.Game.VIP || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.VIP || Legacy_Settings.s.game == Legacy_Settings.Game.JungleBook) {
 				num_bones = reader.ReadUInt16();
 				num_boneWeights = reader.ReadUInt16();
 				num_boneUnk = reader.ReadUInt16();

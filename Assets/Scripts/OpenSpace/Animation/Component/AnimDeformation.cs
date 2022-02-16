@@ -12,7 +12,7 @@ namespace OpenSpace.Animation.Component {
         public ushort linkBone; // controlled/controlling bone
 
 		protected override void ReadInternal(Reader reader) {
-			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				channel = reader.ReadByte();
 				bone = reader.ReadByte();
 				linkChannel = reader.ReadByte();

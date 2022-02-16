@@ -19,7 +19,7 @@ namespace OpenSpace.AI {
         protected override void ReadInternal(Reader reader) {
             off_dsgMemBuffer = LegacyPointer.Read(reader);
             off_dsgVarInfo = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
                 dsgMemBufferLength = reader.ReadUInt16();
                 amountOfInfos = reader.ReadUInt16();
             } else {

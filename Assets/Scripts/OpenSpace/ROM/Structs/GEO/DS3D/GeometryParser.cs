@@ -18,7 +18,7 @@ namespace OpenSpace.ROM.DS3D {
 			byte compressionType = compressed[0];
 			uint size = 0;
 			using (MemoryStream str = new MemoryStream(compressed)) {
-				using (Reader reader = new Reader(str, CPA_Settings.s.IsLittleEndian)) {
+				using (Reader reader = new Reader(str, Legacy_Settings.s.IsLittleEndian)) {
 					size = reader.ReadUInt32();
 					size = extractBits(size, 24, 8);
 				}
@@ -116,7 +116,7 @@ namespace OpenSpace.ROM.DS3D {
 				data = Decompress(data);
 			}*/
 			using (MemoryStream str = new MemoryStream(data)) {
-				using (Reader dataReader = new Reader(str, CPA_Settings.s.IsLittleEndian)) {
+				using (Reader dataReader = new Reader(str, Legacy_Settings.s.IsLittleEndian)) {
 					while (dataReader.BaseStream.Position < data.Length) {
 						byte com0 = dataReader.ReadByte();
 						byte com1 = dataReader.ReadByte();

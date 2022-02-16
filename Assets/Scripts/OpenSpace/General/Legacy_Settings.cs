@@ -9,9 +9,9 @@ using static OpenSpace.LevelTranslation;
 using LinkedListType = OpenSpace.LinkedList.Type;
 
 namespace OpenSpace {
-    public class CPA_Settings {
+    public class Legacy_Settings {
 
-        public CPA_Settings(CPA_Settings s = null)
+        public Legacy_Settings(Legacy_Settings s = null)
         {
             if (s != null) {
                 this.mode = s.mode;
@@ -151,12 +151,12 @@ namespace OpenSpace {
 
         #endregion
 
-        public static void Init(CPA_Settings newSettings) {
+        public static void Init(Legacy_Settings newSettings) {
 			s = newSettings;
         }
 
-		public static CPA_Settings GetSettings(Mode mode) {
-			CPA_Settings s = null;
+		public static Legacy_Settings GetSettings(Mode mode) {
+			Legacy_Settings s = null;
 			if (settingsDict.ContainsKey(mode)) {
 				s = settingsDict[mode];
 			}
@@ -165,11 +165,11 @@ namespace OpenSpace {
 		}
 
 
-        public static CPA_Settings s = null;
+        public static Legacy_Settings s = null;
 
         #region Settings
 
-        public static CPA_Settings R3PC => new CPA_Settings() {
+        public static Legacy_Settings R3PC => new Legacy_Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.R3,
             platform = Platform.PC,
@@ -220,7 +220,7 @@ namespace OpenSpace {
 			},
 		};
 
-		public static CPA_Settings R3PCDemo20021001 => new CPA_Settings() {
+		public static Legacy_Settings R3PCDemo20021001 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -239,7 +239,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings R3PCDemo20021021 => new CPA_Settings() {
+		public static Legacy_Settings R3PCDemo20021021 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -258,7 +258,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings R3PCDemo20021209 => new CPA_Settings() {
+		public static Legacy_Settings R3PCDemo20021209 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -277,7 +277,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings R3PCDemo20030106 => new CPA_Settings() {
+		public static Legacy_Settings R3PCDemo20030106 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PC,
@@ -296,7 +296,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings R3MacOS => new CPA_Settings() {
+		public static Legacy_Settings R3MacOS => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.MacOS,
@@ -316,7 +316,7 @@ namespace OpenSpace {
 			},
 		};
 
-		public static CPA_Settings R3GC => new CPA_Settings() {
+		public static Legacy_Settings R3GC => new Legacy_Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.R3,
             platform = Platform.GC,
@@ -337,7 +337,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings R3PS2 => new CPA_Settings() {
+		public static Legacy_Settings R3PS2 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -354,7 +354,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings R3PS2Demo_20020517 => new CPA_Settings() {
+		public static Legacy_Settings R3PS2Demo_20020517 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -372,7 +372,7 @@ namespace OpenSpace {
 			},
 			hasNames = true
 		};
-		public static CPA_Settings R3PS2Demo_20020807 => new CPA_Settings() {
+		public static Legacy_Settings R3PS2Demo_20020807 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -389,7 +389,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings R3PS2DevBuild => new CPA_Settings() {
+		public static Legacy_Settings R3PS2DevBuild => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -406,7 +406,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings R3PS2Demo_20021029 => new CPA_Settings() {
+		public static Legacy_Settings R3PS2Demo_20021029 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -423,7 +423,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings R3PS2Demo_20021218 => new CPA_Settings() {
+		public static Legacy_Settings R3PS2Demo_20021218 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS2,
@@ -441,7 +441,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings R3Xbox => new CPA_Settings() {
+		public static Legacy_Settings R3Xbox => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.Xbox,
@@ -460,7 +460,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings R3Xbox360 => new CPA_Settings() {
+		public static Legacy_Settings R3Xbox360 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.Xbox360,
@@ -478,7 +478,7 @@ namespace OpenSpace {
 			},
 			hasNames = true,
 		};
-		public static CPA_Settings R3PS3 => new CPA_Settings() {
+		public static Legacy_Settings R3PS3 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.R3,
 			platform = Platform.PS3,
@@ -497,7 +497,7 @@ namespace OpenSpace {
 			hasNames = true,
 		};
 
-		public static CPA_Settings RMPC => new CPA_Settings() {
+		public static Legacy_Settings RMPC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RM,
 			platform = Platform.PC,
@@ -515,7 +515,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings RMPS2 => new CPA_Settings() {
+		public static Legacy_Settings RMPS2 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RM,
 			platform = Platform.PS2,
@@ -532,7 +532,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings RMPS2Demo => new CPA_Settings() {
+		public static Legacy_Settings RMPS2Demo => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RM,
 			platform = Platform.PS2,
@@ -549,7 +549,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings RAPC => new CPA_Settings() {
+		public static Legacy_Settings RAPC => new Legacy_Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
             platform = Platform.PC,
@@ -599,7 +599,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings RAPS2 => new CPA_Settings() {
+		public static Legacy_Settings RAPS2 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RA,
 			platform = Platform.PS2,
@@ -616,7 +616,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings RAGC => new CPA_Settings() {
+		public static Legacy_Settings RAGC => new Legacy_Settings() {
             engineVersion = EngineVersion.R3,
             game = Game.RA,
             platform = Platform.GC,
@@ -634,7 +634,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings RAGCDemo => new CPA_Settings() {
+		public static Legacy_Settings RAGCDemo => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RA,
 			platform = Platform.GC,
@@ -652,7 +652,7 @@ namespace OpenSpace {
 				{ CapsType.TextureFile, Caps.Normal },
 			},
 		};
-		public static CPA_Settings RAXbox => new CPA_Settings() {
+		public static Legacy_Settings RAXbox => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.RA,
 			platform = Platform.Xbox,
@@ -671,7 +671,7 @@ namespace OpenSpace {
 			},
 		};
 
-        public static CPA_Settings R2PC => new CPA_Settings() {
+        public static Legacy_Settings R2PC => new Legacy_Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.PC,
@@ -714,7 +714,7 @@ namespace OpenSpace {
                 { "localizationStructure", 0x00500260 }
             }
         };
-        public static CPA_Settings R2PCDemo1 => new CPA_Settings() {
+        public static Legacy_Settings R2PCDemo1 => new Legacy_Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
             platform = Platform.PC,
@@ -730,7 +730,7 @@ namespace OpenSpace {
 				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
 			}
 		};
-        public static CPA_Settings R2PCDemo2 => new CPA_Settings() {
+        public static Legacy_Settings R2PCDemo2 => new Legacy_Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
             platform = Platform.PC,
@@ -746,7 +746,7 @@ namespace OpenSpace {
 				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
 			}
 		};
-        public static CPA_Settings R2DC => new CPA_Settings() {
+        public static Legacy_Settings R2DC => new Legacy_Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.DC,
@@ -763,7 +763,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
         };
-		public static CPA_Settings R2PS2 => new CPA_Settings() {
+		public static Legacy_Settings R2PS2 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2Revolution,
 			platform = Platform.PS2,
@@ -781,7 +781,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.None }
 			}
 		};
-		public static CPA_Settings R2IOS => new CPA_Settings() {
+		public static Legacy_Settings R2IOS => new Legacy_Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2,
             platform = Platform.iOS,
@@ -798,7 +798,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
 		};
-		public static CPA_Settings R2PS1 => new CPA_Settings() {
+		public static Legacy_Settings R2PS1 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.PS1,
@@ -811,7 +811,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 		};
 
-		public static CPA_Settings RRushPS1 => new CPA_Settings() {
+		public static Legacy_Settings RRushPS1 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RRush,
 			platform = Platform.PS1,
@@ -824,7 +824,7 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
-		public static CPA_Settings R2DS => new CPA_Settings() {
+		public static Legacy_Settings R2DS => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.DS,
@@ -837,7 +837,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static CPA_Settings RRRDS_20060525 => new CPA_Settings() {
+		public static Legacy_Settings RRRDS_20060525 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RRR,
 			platform = Platform.DS,
@@ -850,7 +850,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static CPA_Settings RRRDS => new CPA_Settings() {
+		public static Legacy_Settings RRRDS => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RRR,
 			platform = Platform.DS,
@@ -863,7 +863,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static CPA_Settings R23DS => new CPA_Settings() {
+		public static Legacy_Settings R23DS => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform._3DS,
@@ -876,7 +876,7 @@ namespace OpenSpace {
 			numEntryActions = 1,
 			textureAnimationSpeedModifier = -1f,
 		};
-		public static CPA_Settings R2N64 => new CPA_Settings() {
+		public static Legacy_Settings R2N64 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
 			platform = Platform.N64,
@@ -889,7 +889,7 @@ namespace OpenSpace {
             levelTranslation = LevelTranslation.levelTranslation_r2,
             numEntryActions = 1
 		};
-		public static CPA_Settings DDN64 => new CPA_Settings() {
+		public static Legacy_Settings DDN64 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
 			platform = Platform.N64,
@@ -902,7 +902,7 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
-        public static CPA_Settings TTN64 = new CPA_Settings()
+        public static Legacy_Settings TTN64 = new Legacy_Settings()
         {
             engineVersion = EngineVersion.TT,
             game = Game.TT,
@@ -916,7 +916,7 @@ namespace OpenSpace {
             numEntryActions = 1
         };
 
-		public static CPA_Settings DDPC => new CPA_Settings() {
+		public static Legacy_Settings DDPC => new Legacy_Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.DD,
             platform = Platform.PC,
@@ -961,12 +961,12 @@ namespace OpenSpace {
 			}
 		};
 
-        public static CPA_Settings DDPCDemo = new CPA_Settings(CPA_Settings.DDPC)
+        public static Legacy_Settings DDPCDemo = new Legacy_Settings(Legacy_Settings.DDPC)
         {
             numEntryActions = 43
         };
         
-        public static CPA_Settings DDDC => new CPA_Settings() {
+        public static Legacy_Settings DDDC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
 			platform = Platform.DC,
@@ -982,7 +982,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
 		};
-		public static CPA_Settings DDPS1 => new CPA_Settings() {
+		public static Legacy_Settings DDPS1 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.DD,
 			platform = Platform.PS1,
@@ -995,7 +995,7 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
-		public static CPA_Settings RedPlanetPC => new CPA_Settings() {
+		public static Legacy_Settings RedPlanetPC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.RedPlanet,
 			platform = Platform.PC,
@@ -1015,7 +1015,7 @@ namespace OpenSpace {
 			}
 		};
 
-		public static CPA_Settings TTPC => new CPA_Settings() {
+		public static Legacy_Settings TTPC => new Legacy_Settings() {
 			engineVersion = EngineVersion.TT,
 			game = Game.TT,
 			platform = Platform.PC,
@@ -1034,7 +1034,7 @@ namespace OpenSpace {
 				{ CapsType.DSB, Caps.None }
 			}
         };
-		public static CPA_Settings TTSEPC => new CPA_Settings() {
+		public static Legacy_Settings TTSEPC => new Legacy_Settings() {
 			engineVersion = EngineVersion.TT,
 			game = Game.TTSE,
 			platform = Platform.PC,
@@ -1050,7 +1050,7 @@ namespace OpenSpace {
 			}
 		};
 
-        public static CPA_Settings PlaymobilHypePC => new CPA_Settings() {
+        public static Legacy_Settings PlaymobilHypePC => new Legacy_Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilHype,
             platform = Platform.PC,
@@ -1066,7 +1066,7 @@ namespace OpenSpace {
 				{ CapsType.FixLvl, Caps.None }
 			}
 		};
-        public static CPA_Settings PlaymobilAlexPC => new CPA_Settings() {
+        public static Legacy_Settings PlaymobilAlexPC => new Legacy_Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilAlex,
             platform = Platform.PC,
@@ -1088,7 +1088,7 @@ namespace OpenSpace {
 				{ CapsType.LangLevelFolder, Caps.None }
 			}
 		};
-        public static CPA_Settings PlaymobilLauraPC => new CPA_Settings() {
+        public static Legacy_Settings PlaymobilLauraPC => new Legacy_Settings() {
             engineVersion = EngineVersion.Montreal,
             game = Game.PlaymobilLaura,
             platform = Platform.PC,
@@ -1111,7 +1111,7 @@ namespace OpenSpace {
 			}
         };
 
-		public static CPA_Settings DDPKGC => new CPA_Settings() {
+		public static Legacy_Settings DDPKGC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.DDPK,
 			platform = Platform.GC,
@@ -1129,7 +1129,7 @@ namespace OpenSpace {
 			},
 		};
 
-		public static CPA_Settings DinosaurPC => new CPA_Settings() {
+		public static Legacy_Settings DinosaurPC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.Dinosaur,
 			platform = Platform.PC,
@@ -1144,7 +1144,7 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			},
 		};
-		public static CPA_Settings LargoWinchPC => new CPA_Settings() {
+		public static Legacy_Settings LargoWinchPC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.LargoWinch,
 			platform = Platform.PC,
@@ -1163,7 +1163,7 @@ namespace OpenSpace {
 			},
 			hasDeformations = true
 		};
-		public static CPA_Settings VIPPS1 => new CPA_Settings() {
+		public static Legacy_Settings VIPPS1 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.VIP,
 			platform = Platform.PS1,
@@ -1176,7 +1176,7 @@ namespace OpenSpace {
 			hasDeformations = true,
 			numEntryActions = 1
 		};
-		public static CPA_Settings JungleBookPS1 => new CPA_Settings() {
+		public static Legacy_Settings JungleBookPS1 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.JungleBook,
 			platform = Platform.PS1,
@@ -1193,7 +1193,7 @@ namespace OpenSpace {
 		#endregion
 
 
-		public static Dictionary<Mode, CPA_Settings> settingsDict = new Dictionary<Mode, CPA_Settings>() {
+		public static Dictionary<Mode, Legacy_Settings> settingsDict = new Dictionary<Mode, Legacy_Settings>() {
 			{ Mode.Rayman2PC, R2PC },
 			{ Mode.Rayman2PCDemo_1999_08_18, R2PCDemo1 },
 			{ Mode.Rayman2PCDemo_1999_09_04, R2PCDemo2 },

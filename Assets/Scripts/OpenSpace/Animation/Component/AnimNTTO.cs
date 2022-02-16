@@ -15,7 +15,7 @@ namespace OpenSpace.Animation.Component {
         public static ushort flag_isInvisible = 0x2;
 
 		protected override void ReadInternal(Reader reader) {
-			if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
+			if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.TT) {
 				object_index = reader.ReadUInt16();
 				flags = reader.ReadUInt16();
 			} else {
@@ -28,7 +28,7 @@ namespace OpenSpace.Animation.Component {
 
 		public bool IsInvisibleNTTO {
             get {
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
                     return (flags & flag_isBoneNTTO) != 0;
                 } else {
                     return (flags & flag_isInvisible) == flag_isInvisible;

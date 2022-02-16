@@ -78,8 +78,8 @@ namespace OpenSpace.Visual {
         }
 
         public bool IsObjectLighted(ObjectLightedFlag flags) {
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) return true;
-            if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2 || CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) return true;
+            if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2 || Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                 return true;
                 //if (flags == ObjectLightedFlag.Environment) return true;
             }
@@ -93,8 +93,8 @@ namespace OpenSpace.Visual {
                 LegacyPointer.Goto(ref writer, LegacyPointer.Current(writer) + (6 * 4));
                 writer.Write(color.x); writer.Write(color.y); writer.Write(color.z); writer.Write(color.w);
 
-                if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
-                    if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.Montreal) {
+                    if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
                         writer.Write(shadowIntensity); // 0
                     }
                     LegacyPointer.Goto(ref writer, LegacyPointer.Current(writer) + 2);
@@ -126,12 +126,12 @@ namespace OpenSpace.Visual {
 
             turnedOn = reader.ReadByte();
             castShadows = reader.ReadByte();
-            if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
                 type = reader.ReadUInt16();
             } else {
                 giroPhare = reader.ReadByte();
                 pulse = reader.ReadByte();
-                if (CPA_Settings.s.platform != CPA_Settings.Platform.DC) reader.ReadUInt32();
+                if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC) reader.ReadUInt32();
                 type = reader.ReadUInt16();
                 reader.ReadUInt16();
             }
@@ -139,45 +139,45 @@ namespace OpenSpace.Visual {
             near = reader.ReadSingle();
             littleAlpha_fogInfinite = reader.ReadSingle();
             bigAlpha_fogBlendNear = reader.ReadSingle();
-            if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) reader.ReadSingle();
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) reader.ReadSingle();
             giroStep = reader.ReadSingle();
             pulseStep = reader.ReadSingle();
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
                 pulseMaxRange = reader.ReadSingle();
                 giroAngle = reader.ReadSingle();
                 reader.ReadSingle();
             }
-            if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) reader.ReadUInt32();
+            if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) reader.ReadUInt32();
             transMatrix = Matrix.Read(reader, LegacyPointer.Current(reader));
-            if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2 && CPA_Settings.s.platform != CPA_Settings.Platform.DC && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
+            if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2 && Legacy_Settings.s.platform != Legacy_Settings.Platform.DC && Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
             }
-            if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
-                if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
+            if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.Montreal) {
+                if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) {
                     reader.ReadSingle();
-                } else if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution
-                    && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch
-                    && CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+                } else if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution
+                    && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch
+                    && Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
                     reader.ReadUInt32(); // 0
                     reader.ReadUInt32(); // 0
                 }
                 //lo.print("LIGHT " + Pointer.Current(reader));
                 color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
                     reader.ReadBytes(0x20);
                 }
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 || CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 || Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
                     shadowIntensity = reader.ReadSingle(); // 0
                 }
-                if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
                     sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
                     objectLightedFlag = reader.ReadByte(); // & 1: Affect IPOs. & 2: Affect Persos. So 3 = affect all
                     alphaLightFlag = reader.ReadByte();
                     paintingLightFlag = reader.ReadByte();
-                } else if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+                } else if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
                     sendLightFlag = reader.ReadByte(); // Non-zero: light enabled
                     paintingLightFlag = reader.ReadByte();
                     alphaLightFlag = reader.ReadByte();
@@ -197,10 +197,10 @@ namespace OpenSpace.Visual {
                 intensityMin_fogBlendFar = reader.ReadSingle();
                 intensityMax = reader.ReadSingle();
                 background_color = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                if ((CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.Dinosaur && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) || CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+                if ((Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) || Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
                     createsShadowsOrNot = reader.ReadUInt32();
                 }
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
                     reader.ReadBytes(0xC);
                 }
             } else {

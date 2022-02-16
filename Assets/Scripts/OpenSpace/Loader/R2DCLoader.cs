@@ -53,7 +53,7 @@ namespace OpenSpace.Loader {
 
                 await LoadDreamcast();
 
-				if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R2) {
 					string logPathTexFix = gameDataBinFolder + "TEXTURE_FIX.LOG";
 					string logPathTexLvl = gameDataBinFolder + lvlName + "/TEXTURE_" + lvlName + ".LOG";
 					string logPathInfo = gameDataBinFolder + lvlName + "/INFO.LOG";
@@ -72,8 +72,8 @@ namespace OpenSpace.Loader {
 						ReadLog(logPathTexLvl);
 						await WaitIfNecessary();
 					}*/
-				} else if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
-					string backgroundPath = gameDataBinFolder + ConvertCase(lvlName, CPA_Settings.CapsType.LevelFolder) + "/FOND.PVR";
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.DD) {
+					string backgroundPath = gameDataBinFolder + ConvertCase(lvlName, Legacy_Settings.CapsType.LevelFolder) + "/FOND.PVR";
 					await PrepareFile(backgroundPath);
 					if (FileSystem.FileExists(backgroundPath)) {
 						TEX backgroundTexFile = new TEX(backgroundPath, compressed: false);

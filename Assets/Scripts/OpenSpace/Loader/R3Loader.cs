@@ -29,8 +29,8 @@ namespace OpenSpace.Loader {
 				await CreateCNT();
 
 				if (lvlName.EndsWith(".exe")) {
-					if (!CPA_Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
-					CPA_Settings.s.loadFromMemory = true;
+					if (!Legacy_Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
+					Legacy_Settings.s.loadFromMemory = true;
 					MemoryFile mem = new MemoryFile(lvlName);
 					files_array[0] = mem;
 					await WaitIfNecessary();
@@ -38,48 +38,48 @@ namespace OpenSpace.Loader {
 				} else {
 					// Prepare paths
 					string fixFolder = gameDataBinFolder;
-					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", CPA_Settings.CapsType.LevelFolder);
+					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Legacy_Settings.CapsType.LevelFolder);
 
-					paths["fix.lvl"] = fixFolder + ConvertCase("Fix.lvl", CPA_Settings.CapsType.Fix);
-					paths["fix.ptr"] = fixFolder + ConvertCase("Fix.ptr", CPA_Settings.CapsType.Fix);
-					paths["lvl.lvl"] = lvlFolder + ConvertCase(lvlName + ".lvl", CPA_Settings.CapsType.LevelFile);
-					paths["lvl.ptr"] = lvlFolder + ConvertCase(lvlName + ".ptr", CPA_Settings.CapsType.LevelFile);
-					paths["transit.lvl"] = lvlFolder + ConvertCase("transit.lvl", CPA_Settings.CapsType.LevelFile);
-					paths["transit.ptr"] = lvlFolder + ConvertCase("transit.ptr", CPA_Settings.CapsType.LevelFile);
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
-						paths["menu.tpl"] = fixFolder + ConvertCase("menu.tpl", CPA_Settings.CapsType.Fix);
-						paths["fix.tpl"] = fixFolder + ConvertCase((CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGC) ? "../common.tpl" : "Fix.tpl", CPA_Settings.CapsType.Fix);
-						paths["lvl.tpl"] = lvlFolder + ConvertCase(lvlName + (CPA_Settings.s.game == CPA_Settings.Game.R3 ? "_Lvl" : "") + ".tpl", CPA_Settings.CapsType.TextureFile);
-						paths["transit.tpl"] = lvlFolder + ConvertCase(lvlName + "_Trans.tpl", CPA_Settings.CapsType.TextureFile);
-					} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox) {
-						paths["fix.btf"] = fixFolder + ConvertCase("Fix.btf", CPA_Settings.CapsType.Fix);
-						paths["fix.bhf"] = fixFolder + ConvertCase("Fix.bhf", CPA_Settings.CapsType.Fix);
-						paths["lvl.btf"] = lvlFolder + ConvertCase(lvlName + ".btf", CPA_Settings.CapsType.TextureFile);
-						paths["lvl.bhf"] = lvlFolder + ConvertCase(lvlName + ".bhf", CPA_Settings.CapsType.TextureFile);
-						paths["transit.btf"] = lvlFolder + ConvertCase("transit.btf", CPA_Settings.CapsType.TextureFile);
-						paths["transit.bhf"] = lvlFolder + ConvertCase("transit.bhf", CPA_Settings.CapsType.TextureFile);
-					} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
-						paths["fix.btf"] = fixFolder + ConvertCase("Fix.btf", CPA_Settings.CapsType.Fix);
-						paths["fix.bhf"] = fixFolder + ConvertCase("Fix.bhf", CPA_Settings.CapsType.Fix);
-						paths["lvl.btf"] = lvlFolder + ConvertCase(lvlName + "_2.btf", CPA_Settings.CapsType.TextureFile);
-						paths["lvl.bhf"] = lvlFolder + ConvertCase(lvlName + "_2.bhf", CPA_Settings.CapsType.TextureFile);
-						paths["transit.btf"] = lvlFolder + ConvertCase("transit_6.btf", CPA_Settings.CapsType.TextureFile);
-						paths["transit.bhf"] = lvlFolder + ConvertCase("transit_6.bhf", CPA_Settings.CapsType.TextureFile);
-					} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-						if (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM) {
-							paths["fix.tbf"] = fixFolder + ConvertCase("Textures.txc", CPA_Settings.CapsType.Fix);
+					paths["fix.lvl"] = fixFolder + ConvertCase("Fix.lvl", Legacy_Settings.CapsType.Fix);
+					paths["fix.ptr"] = fixFolder + ConvertCase("Fix.ptr", Legacy_Settings.CapsType.Fix);
+					paths["lvl.lvl"] = lvlFolder + ConvertCase(lvlName + ".lvl", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl.ptr"] = lvlFolder + ConvertCase(lvlName + ".ptr", Legacy_Settings.CapsType.LevelFile);
+					paths["transit.lvl"] = lvlFolder + ConvertCase("transit.lvl", Legacy_Settings.CapsType.LevelFile);
+					paths["transit.ptr"] = lvlFolder + ConvertCase("transit.ptr", Legacy_Settings.CapsType.LevelFile);
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) {
+						paths["menu.tpl"] = fixFolder + ConvertCase("menu.tpl", Legacy_Settings.CapsType.Fix);
+						paths["fix.tpl"] = fixFolder + ConvertCase((Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaGC) ? "../common.tpl" : "Fix.tpl", Legacy_Settings.CapsType.Fix);
+						paths["lvl.tpl"] = lvlFolder + ConvertCase(lvlName + (Legacy_Settings.s.game == Legacy_Settings.Game.R3 ? "_Lvl" : "") + ".tpl", Legacy_Settings.CapsType.TextureFile);
+						paths["transit.tpl"] = lvlFolder + ConvertCase(lvlName + "_Trans.tpl", Legacy_Settings.CapsType.TextureFile);
+					} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox) {
+						paths["fix.btf"] = fixFolder + ConvertCase("Fix.btf", Legacy_Settings.CapsType.Fix);
+						paths["fix.bhf"] = fixFolder + ConvertCase("Fix.bhf", Legacy_Settings.CapsType.Fix);
+						paths["lvl.btf"] = lvlFolder + ConvertCase(lvlName + ".btf", Legacy_Settings.CapsType.TextureFile);
+						paths["lvl.bhf"] = lvlFolder + ConvertCase(lvlName + ".bhf", Legacy_Settings.CapsType.TextureFile);
+						paths["transit.btf"] = lvlFolder + ConvertCase("transit.btf", Legacy_Settings.CapsType.TextureFile);
+						paths["transit.bhf"] = lvlFolder + ConvertCase("transit.bhf", Legacy_Settings.CapsType.TextureFile);
+					} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360) {
+						paths["fix.btf"] = fixFolder + ConvertCase("Fix.btf", Legacy_Settings.CapsType.Fix);
+						paths["fix.bhf"] = fixFolder + ConvertCase("Fix.bhf", Legacy_Settings.CapsType.Fix);
+						paths["lvl.btf"] = lvlFolder + ConvertCase(lvlName + "_2.btf", Legacy_Settings.CapsType.TextureFile);
+						paths["lvl.bhf"] = lvlFolder + ConvertCase(lvlName + "_2.bhf", Legacy_Settings.CapsType.TextureFile);
+						paths["transit.btf"] = lvlFolder + ConvertCase("transit_6.btf", Legacy_Settings.CapsType.TextureFile);
+						paths["transit.bhf"] = lvlFolder + ConvertCase("transit_6.bhf", Legacy_Settings.CapsType.TextureFile);
+					} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
+						if (Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM) {
+							paths["fix.tbf"] = fixFolder + ConvertCase("Textures.txc", Legacy_Settings.CapsType.Fix);
 						} else {
-							paths["fix.tbf"] = fixFolder + ConvertCase("Fix.tbf", CPA_Settings.CapsType.Fix);
+							paths["fix.tbf"] = fixFolder + ConvertCase("Fix.tbf", Legacy_Settings.CapsType.Fix);
 						}
-						paths["lvl.tbf"] = lvlFolder + ConvertCase(lvlName + ".tbf", CPA_Settings.CapsType.TextureFile);
-						paths["transit.tbf"] = lvlFolder + ConvertCase("transit.tbf", CPA_Settings.CapsType.TextureFile);
+						paths["lvl.tbf"] = lvlFolder + ConvertCase(lvlName + ".tbf", Legacy_Settings.CapsType.TextureFile);
+						paths["transit.tbf"] = lvlFolder + ConvertCase("transit.tbf", Legacy_Settings.CapsType.TextureFile);
 					}
-					paths["lvl_vb.lvl"] = lvlFolder + ConvertCase(lvlName + "_vb.lvl", CPA_Settings.CapsType.LevelFile);
-					paths["lvl_vb.ptr"] = lvlFolder + ConvertCase(lvlName + "_vb.ptr", CPA_Settings.CapsType.LevelFile);
-					paths["fixkf.lvl"] = fixFolder + ConvertCase("Fixkf.lvl", CPA_Settings.CapsType.Fix);
-					paths["fixkf.ptr"] = fixFolder + ConvertCase("Fixkf.ptr", CPA_Settings.CapsType.Fix);
-					paths["lvlkf.lvl"] = lvlFolder + ConvertCase(lvlName + "kf.lvl", CPA_Settings.CapsType.LevelFile);
-					paths["lvlkf.ptr"] = lvlFolder + ConvertCase(lvlName + "kf.ptr", CPA_Settings.CapsType.LevelFile);
+					paths["lvl_vb.lvl"] = lvlFolder + ConvertCase(lvlName + "_vb.lvl", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl_vb.ptr"] = lvlFolder + ConvertCase(lvlName + "_vb.ptr", Legacy_Settings.CapsType.LevelFile);
+					paths["fixkf.lvl"] = fixFolder + ConvertCase("Fixkf.lvl", Legacy_Settings.CapsType.Fix);
+					paths["fixkf.ptr"] = fixFolder + ConvertCase("Fixkf.ptr", Legacy_Settings.CapsType.Fix);
+					paths["lvlkf.lvl"] = lvlFolder + ConvertCase(lvlName + "kf.lvl", Legacy_Settings.CapsType.LevelFile);
+					paths["lvlkf.ptr"] = lvlFolder + ConvertCase(lvlName + "kf.ptr", Legacy_Settings.CapsType.LevelFile);
 
 					// Download files
 					/*foreach (KeyValuePair<string, string> path in paths) {
@@ -92,14 +92,14 @@ namespace OpenSpace.Loader {
 					lvlNames[0] = "fix";
 					lvlPaths[0] = paths["fix.lvl"];
 					ptrPaths[0] = paths["fix.ptr"];
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) {
 						await PrepareFile(paths["fix.tpl"]);
 						await PrepareFile(paths["menu.tpl"]);
-					} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-						|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
+					} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+						|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360) {
 						await PrepareFile(paths["fix.btf"]);
 						await PrepareFile(paths["fix.bhf"]);
-					} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+					} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 						await PrepareFile(paths["fix.tbf"]);
 					}
 					await PrepareFile(lvlPaths[0]);
@@ -114,13 +114,13 @@ namespace OpenSpace.Loader {
 					await PrepareFile(lvlPaths[1]);
 					if (FileSystem.FileExists(lvlPaths[1])) {
 						await PrepareFile(ptrPaths[1]);
-						if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
+						if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) {
 							await PrepareFile(paths["lvl.tpl"]);
-						} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-						|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
+						} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+						|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360) {
 							await PrepareFile(paths["lvl.btf"]);
 							await PrepareFile(paths["lvl.bhf"]);
-						} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+						} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 							await PrepareFile(paths["lvl.tbf"]);
 						}
 					}
@@ -132,13 +132,13 @@ namespace OpenSpace.Loader {
 					await PrepareFile(lvlPaths[2]);
 					if (FileSystem.FileExists(lvlPaths[2])) {
 						await PrepareFile(ptrPaths[2]);
-						if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
+						if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) {
 							await PrepareFile(paths["transit.tpl"]);
-						} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-						|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
+						} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+						|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360) {
 							await PrepareFile(paths["transit.btf"]);
 							await PrepareFile(paths["transit.bhf"]);
-						} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+						} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 							await PrepareFile(paths["transit.tbf"]);
 						}
 					}
@@ -184,10 +184,10 @@ namespace OpenSpace.Loader {
 						}
 					}
 					// Export PS2 vignette textures
-					if (exportTextures && CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-						if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+					if (exportTextures && Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
+						if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 							ExportR3PS2Textures();
-						} else if (CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA) {
+						} else if (Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA) {
 							ExportRAPS2Textures();
 						}
 					}
@@ -333,27 +333,27 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-				if (CPA_Settings.s.game == CPA_Settings.Game.R3
-					&& (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_01
-					&& CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_21)) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R3
+					&& (Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PCDemo_2002_10_01
+					&& Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PCDemo_2002_10_21)) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
-					if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+					if (Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 						reader.ReadUInt32();
 						reader.ReadUInt32();
 					}
-				} else if (CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.Dinosaur ||CPA_Settings.s.game == CPA_Settings.Game.R3) {
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur ||Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 						string timeStamp = reader.ReadString(0x14);
 						reader.ReadUInt32();
 						reader.ReadUInt32();
@@ -368,7 +368,7 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading text";
 			await WaitIfNecessary();
 			localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
-			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 				uint num_lvlNames = reader.ReadUInt32();
 				uint num_fixEntries1 = reader.ReadUInt32();
 				// Read tables under header
@@ -379,11 +379,11 @@ namespace OpenSpace.Loader {
 					string savMapName = new string(reader.ReadChars(0xC));
 				}
 				ReadLevelNames(reader, LegacyPointer.Current(reader), num_lvlNames);
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3) {
 					reader.ReadChars(0x1E);
 					reader.ReadChars(0x1E); // two zero entries
 				}
@@ -407,7 +407,7 @@ namespace OpenSpace.Loader {
 				for (uint i = 0; i < num_fixEntries1; i++) {
 					string savMapName = new string(reader.ReadChars(0xC));
 				}
-				if (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 					reader.Align(4);
 				}
 			}
@@ -416,15 +416,15 @@ namespace OpenSpace.Loader {
 			LegacyPointer.DoAt(ref reader, off_languages, () => {
 				ReadLanguages(reader, off_languages, num_languages);
 			});
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && localization != null && CPA_Settings.s.game == CPA_Settings.Game.R3 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && localization != null && Legacy_Settings.s.game == Legacy_Settings.Game.R3 && Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 				for (int i = 0; i < localization.num_languages; i++) {
 					if (localization.languages[i].off_textTable == null) {
 						// Load text from file
-						string filePath = ConvertCase("Texts/", CPA_Settings.CapsType.LangLevelFolder);
+						string filePath = ConvertCase("Texts/", Legacy_Settings.CapsType.LangLevelFolder);
 						string fileName = "Lang" + i;
 						loadingState = "Loading text files: " + (i + 1) + "/" + localization.num_languages;
-						paths["lang" + i + ".lvl"] = gameDataBinFolder + ConvertCase(fileName + ".lvl", CPA_Settings.CapsType.LangLevelFile);
-						paths["lang" + i + ".ptr"] = gameDataBinFolder + ConvertCase(fileName + ".ptr", CPA_Settings.CapsType.LangLevelFile);
+						paths["lang" + i + ".lvl"] = gameDataBinFolder + ConvertCase(fileName + ".lvl", Legacy_Settings.CapsType.LangLevelFile);
+						paths["lang" + i + ".ptr"] = gameDataBinFolder + ConvertCase(fileName + ".ptr", Legacy_Settings.CapsType.LangLevelFile);
 						await PrepareFile(paths["lang" + i + ".lvl"]);
 						if (FileSystem.FileExists(paths["lang" + i + ".lvl"])) {
 							await PrepareFile(paths["lang" + i + ".ptr"]);
@@ -454,50 +454,50 @@ namespace OpenSpace.Loader {
 			int sz_binDataForMenu = 0x020C;
 			int num_menuPages = 35;
 
-			if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC) {
+			if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3GC) {
 				sz_entryActions = 0xE8;
 				sz_binDataForMenu = 0x01F0;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGC
-				|| CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaGC
+				|| Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07) {
 				sz_entryActions = 0xC4;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaPC
-				|| CPA_Settings.s.mode == CPA_Settings.Mode.RaymanMPC) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaPC
+				|| Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanMPC) {
 				sz_entryActions = 0xDC;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.DinosaurPC) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.DinosaurPC) {
 				sz_entryActions = 0xD8;
 				sz_randomStructure = 0xE0;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPKGC) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.DonaldDuckPKGC) {
 				sz_entryActions = 0xC0;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaXbox) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaXbox) {
 				sz_entryActions = 0xF0;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PCDemo_2003_01_06) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PCDemo_2003_01_06) {
 				sz_binDataForMenu = 0x1a4;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PCDemo_2002_12_09) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PCDemo_2002_12_09) {
 				sz_binDataForMenu = 0x1ac;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PCDemo_2002_10_21) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PCDemo_2002_10_21) {
 				sz_entryActions = 0xFC;
 				sz_binDataForMenu = 0x1F4;
-			} else if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PCDemo_2002_10_01) {
+			} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PCDemo_2002_10_01) {
 				sz_entryActions = 0xFC;
 				sz_binDataForMenu = 0x10C;
 				num_menuPages = 25;
 			}
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 				sz_videoStructure = 0x108;
-				if (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM) {
 					sz_entryActions = 0xE8;
-				} else if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
-					if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2DevBuild_2002_09_06) {
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
+					if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2DevBuild_2002_09_06) {
 						sz_entryActions = 0xF8;
 						sz_binDataForMenu = 0x78;
-					} else if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+					} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 						sz_videoStructure = 0x18;
 						sz_entryActions = 0xCC;
 						sz_binDataForMenu = 0;
-					} else if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_08_07) {
+					} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_08_07) {
 						sz_entryActions = 0xF8;
 						sz_binDataForMenu = 0;
-					} else if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_10_29) {
+					} else if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_10_29) {
 						sz_entryActions = 0x108; // probably not right but oh well
 						sz_binDataForMenu = 0x1F4;
 					} else {
@@ -505,21 +505,21 @@ namespace OpenSpace.Loader {
 						sz_binDataForMenu = 0x1A4;
 					}
 				}
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox) {
 				sz_videoStructure = 0x108;
 				sz_binDataForMenu = 0x1AC;
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360) {
 				sz_videoStructure = 0x108;
 				sz_entryActions = 0x108;
 				sz_binDataForMenu = 0x33C;
 				num_menuPages = 96;
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3) {
 				sz_videoStructure = 0x108;
 				sz_entryActions = 0x108;
 				sz_binDataForMenu = 0x348;
 				num_menuPages = 96;
 			}
-			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
 
@@ -527,11 +527,11 @@ namespace OpenSpace.Loader {
 				foreach (EntryAction ea in inputStruct.entryActions) {
 					print(ea.ToString());
 				}
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3) {
 					LegacyPointer off_IPT_keyAndPadDefine = LegacyPointer.Read(reader);
 					ReadKeypadDefine(reader, off_IPT_keyAndPadDefine);
 				}
@@ -546,10 +546,10 @@ namespace OpenSpace.Loader {
 			uint soundEventTableIndexInFix = reader.ReadUInt32();
 			LegacyPointer off_soundEventTable = LegacyPointer.Read(reader);
 			fonts = FromOffsetOrRead<FontStructure>(reader, LegacyPointer.Current(reader), inline: true);
-			if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+			if (Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 				reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
 			}
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 				loadingState = "Loading input structure";
 				await WaitIfNecessary();
 				inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
@@ -558,23 +558,23 @@ namespace OpenSpace.Loader {
 				}
 				reader.ReadBytes(sz_entryActions); // 3DOS_EntryActions
 			}
-			if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+			if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 				reader.ReadBytes(sz_videoStructure); // Contains amount of videos and pointer to video filename table
 			}
-			if (CPA_Settings.s.game == CPA_Settings.Game.R3 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R3 && Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 				uint num_musicMarkerSlots = reader.ReadUInt32();
 				for (int i = 0; i < num_musicMarkerSlots; i++) {
 					reader.ReadBytes(sz_musicMarkerSlot);
 				}
 				reader.ReadBytes(sz_binDataForMenu);
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3) {
 					LegacyPointer off_bgMaterialForMenu2D = LegacyPointer.Read(reader);
 					LegacyPointer off_fixMaterialForMenu2D = LegacyPointer.Read(reader);
-					if (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_01 && CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_21) {
+					if (Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PCDemo_2002_10_01 && Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PCDemo_2002_10_21) {
 						LegacyPointer off_fixMaterialForSelectedFilms = LegacyPointer.Read(reader);
 						LegacyPointer off_fixMaterialForArcadeAndFilms = LegacyPointer.Read(reader);
 					}
@@ -585,7 +585,7 @@ namespace OpenSpace.Loader {
 			}
 			/*loadingState = "Loading fixed animation bank";
 			await WaitIfNecessary();*/
-			if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur) {
 				off_animBankFix = LegacyPointer.Read(reader); // Note: only one 0x104 bank in fix.
 														//print(Pointer.Current(reader));
 				print("Fix animation bank address: " + off_animBankFix);
@@ -612,33 +612,33 @@ namespace OpenSpace.Loader {
 			Reader reader = files_array[Mem.Lvl].reader;
 			long totalSize = reader.BaseStream.Length;
 			//reader.ReadUInt32();
-			if (CPA_Settings.s.game == CPA_Settings.Game.R3
-				&& (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS2)) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R3
+				&& (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2)) {
 				reader.ReadUInt32(); // fix checksum?
 			}
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 &&
-				(CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA)) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 &&
+				(Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA)) {
 				reader.ReadUInt32(); // fix checksum?
 			}
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
 			reader.ReadUInt32();
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
-				if (CPA_Settings.s.game == CPA_Settings.Game.R3
-					&& (CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_01
-					&& CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PCDemo_2002_10_21
-					&& CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R3
+					&& (Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PCDemo_2002_10_01
+					&& Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PCDemo_2002_10_21
+					&& Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17)) {
 					string timeStamp = reader.ReadString(0x18);
 					reader.ReadUInt32();
 					reader.ReadUInt32();
@@ -646,12 +646,12 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 					reader.ReadUInt32();
-					if(CPA_Settings.s.platform != CPA_Settings.Platform.PS2) reader.ReadUInt32();
-				} else if (CPA_Settings.s.game == CPA_Settings.Game.RM
-					|| CPA_Settings.s.game == CPA_Settings.Game.RA
-					|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur
-					|| CPA_Settings.s.game == CPA_Settings.Game.R3) {
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+					if(Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) reader.ReadUInt32();
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.RM
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.RA
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 						string timeStamp = reader.ReadString(0x18);
 						reader.ReadUInt32();
 						reader.ReadUInt32();
@@ -660,27 +660,27 @@ namespace OpenSpace.Loader {
 					reader.ReadUInt32();
 				}
 			}
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.MacOS) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS) {
 				reader.ReadBytes(0x404); // vignette
-			} else if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			} else if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 				reader.ReadBytes(0x104); // vignette
-				if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur) {
 					reader.ReadUInt32();
 				}
 			}
 			loadingState = "Loading level textures";
 			await ReadTexturesLvl(reader, LegacyPointer.Current(reader));
-			if ((CPA_Settings.s.platform == CPA_Settings.Platform.PC
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3)
-				&& !hasTransit && CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
+			if ((Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3)
+				&& !hasTransit && Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur) {
 				LegacyPointer off_lightMapTexture = LegacyPointer.Read(reader); // g_p_stLMTexture
 				LegacyPointer.DoAt(ref reader, off_lightMapTexture, () => {
 					lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);
 				});
-				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 					LegacyPointer off_overlightTexture = LegacyPointer.Read(reader); // *(_DWORD *)(GLI_BIG_GLOBALS + 370068)
 					LegacyPointer.DoAt(ref reader, off_overlightTexture, () => {
 						overlightTexture = TextureInfo.Read(reader, off_overlightTexture);
@@ -689,7 +689,7 @@ namespace OpenSpace.Loader {
 			}
 			LegacyPointer off_animBankLvl = null;
 			await WaitIfNecessary();
-			if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 				// animation bank is read right here.
 				off_animBankLvl = LegacyPointer.Current(reader); // Note: only one 0x104 bank in fix.
 				print("Lvl animation bank address: " + off_animBankLvl);
@@ -702,12 +702,12 @@ namespace OpenSpace.Loader {
 			globals.off_transitDynamicWorld = null;
 			globals.off_actualWorld = LegacyPointer.Read(reader);
 			globals.off_dynamicWorld = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.game == CPA_Settings.Game.R3
-				&& (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-				|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3)) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R3
+				&& (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+				|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3)) {
 				reader.ReadUInt32(); // ???
 			}
 			globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
@@ -734,7 +734,7 @@ namespace OpenSpace.Loader {
 			LegacyPointer off_light = LegacyPointer.Read(reader); // the offset of a light. It's just an ordinary light.
 			LegacyPointer off_characterLaunchingSoundEvents = LegacyPointer.Read(reader);
 
-			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 				LegacyPointer off_collisionGeoObj = LegacyPointer.Read(reader);
 				LegacyPointer off_staticCollisionGeoObj = LegacyPointer.Read(reader);
 			}
@@ -751,7 +751,7 @@ namespace OpenSpace.Loader {
 			if (!hasTransit) {
 				LinkedList<int> mainCharacters = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 			}
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 				LegacyPointer off_mainCharacters_first = LegacyPointer.Read(reader);
 				uint num_mainCharacters_entries = reader.ReadUInt32();
 			}
@@ -759,17 +759,17 @@ namespace OpenSpace.Loader {
 			reader.ReadUInt32(); // only used if there was no transit in the previous lvl. Always 00165214 in R3GC?
 			reader.ReadUInt32(); // related to "SOL". What is this? Good question.
 			reader.ReadUInt32(); // same
-			if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur && CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur && Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 				reader.ReadUInt32(); // same
 			}
 			LegacyPointer off_cineManager = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 				byte unk = reader.ReadByte();
 				byte IPO_numRLItables = reader.ReadByte();
 				reader.ReadUInt16();
 			}
 
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM)) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && (Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM)) {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
@@ -782,74 +782,74 @@ namespace OpenSpace.Loader {
 			}
 			LegacyPointer off_COL_taggedFacesTable = LegacyPointer.Read(reader);
 			uint num_COL_maxTaggedFaces = reader.ReadUInt32();
-			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 				LegacyPointer off_collisionGeoObj2 = LegacyPointer.Read(reader);
 				LegacyPointer off_staticCollisionGeoObj2 = LegacyPointer.Read(reader);
 			}
 			// The ptrsTable seems to be related to sound events. Perhaps cuuids.
 			reader.ReadUInt32();
-			if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 				for (int i = 0; i < 50; i++) {
 					reader.ReadUInt32();
 				}
 				// Actually, the previous uint is an amount for this array of uints, but it's padded to always be 50 long
 			}
 			uint num_ptrsTable = reader.ReadUInt32();
-			if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 				uint bool_ptrsTable = reader.ReadUInt32();
 			}
 			LegacyPointer off_ptrsTable = LegacyPointer.Read(reader);
 
 
 			uint num_internalStructure = num_ptrsTable;
-			if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC
-				|| CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17
-				|| CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_12_18
-				|| (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM))) {
+			if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3GC
+				|| Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17
+				|| Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_12_18
+				|| (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && (Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM))) {
 				reader.ReadUInt32();
 			}
 			LegacyPointer off_internalStructure_first = LegacyPointer.Read(reader);
 			LegacyPointer off_internalStructure_last = LegacyPointer.Read(reader);
 
-			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
-				if (!hasTransit && CPA_Settings.s.game == CPA_Settings.Game.R3) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
+				if (!hasTransit && Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 					uint num_geometric = reader.ReadUInt32();
 					LegacyPointer off_array_geometric = LegacyPointer.Read(reader);
 					LegacyPointer off_array_geometric_RLI = LegacyPointer.Read(reader);
 					LegacyPointer off_array_transition_flags = LegacyPointer.Read(reader);
-				} else if (CPA_Settings.s.game == CPA_Settings.Game.RA
-					|| CPA_Settings.s.game == CPA_Settings.Game.RM
-					|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur
-					|| CPA_Settings.s.game == CPA_Settings.Game.DDPK) {
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.RA
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.RM
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.DDPK) {
 					uint num_unk = reader.ReadUInt32();
 					LegacyPointer unk_first = LegacyPointer.Read(reader);
-					if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
+					if (Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur) {
 						LegacyPointer unk_last = LegacyPointer.Read(reader);
 					}
 				}
 			}
 			LegacyPointer off_settingsForPersoInFix = null;
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 				off_settingsForPersoInFix = LegacyPointer.Current(reader);
 				uint num_persoInFix = (uint)persoInFix.Length;
-				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 					num_persoInFix = reader.ReadUInt32();
 				}
 				for (int i = 0; i < num_persoInFix; i++) {
-					if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+					if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 						LegacyPointer.Read(reader);
 						reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
 						Matrix.Read(reader, LegacyPointer.Current(reader));
 						reader.ReadUInt32(); // is one of these the state? doesn't appear to change tho
 						reader.ReadUInt32();
-					} else if (CPA_Settings.s.game == CPA_Settings.Game.RA
-						|| CPA_Settings.s.game == CPA_Settings.Game.RM
-						|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+					} else if (Legacy_Settings.s.game == Legacy_Settings.Game.RA
+						|| Legacy_Settings.s.game == Legacy_Settings.Game.RM
+						|| Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 						Matrix.Read(reader, LegacyPointer.Current(reader));
 					}
 				}
 				LegacyPointer.Read(reader);
-				if (CPA_Settings.s.game == CPA_Settings.Game.R3 || CPA_Settings.s.game == CPA_Settings.Game.DDPK) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R3 || Legacy_Settings.s.game == Legacy_Settings.Game.DDPK) {
 					reader.ReadUInt32();
 					reader.ReadUInt32();
 				}
@@ -858,10 +858,10 @@ namespace OpenSpace.Loader {
 			uint num_visual_materials = reader.ReadUInt32();
 			LegacyPointer off_array_visual_materials = LegacyPointer.Read(reader);
 
-			if (CPA_Settings.s.platform != CPA_Settings.Platform.PS2
-				&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGC
-				&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07
-				&& CPA_Settings.s.mode != CPA_Settings.Mode.DonaldDuckPKGC) {
+			if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2
+				&& Legacy_Settings.s.mode != Legacy_Settings.Mode.RaymanArenaGC
+				&& Legacy_Settings.s.mode != Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07
+				&& Legacy_Settings.s.mode != Legacy_Settings.Mode.DonaldDuckPKGC) {
 				LegacyPointer off_dynamic_so_list = LegacyPointer.Read(reader);
 
 				// Parse SO list
@@ -904,16 +904,16 @@ namespace OpenSpace.Loader {
 				await WaitIfNecessary();
 				LegacyPointer off_transit = new LegacyPointer(16, files_array[Mem.Transit]); // It's located at offset 20 in transit
 				LegacyPointer.DoAt(ref reader, off_transit, () => {
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.PC
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.MacOS
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360
-					|| CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360
+					|| Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3) {
 						LegacyPointer off_lightMapTexture = LegacyPointer.Read(reader); // g_p_stLMTexture
 						LegacyPointer.DoAt(ref reader, off_lightMapTexture, () => {
 							lightmapTexture = TextureInfo.Read(reader, off_lightMapTexture);
 						});
-						if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+						if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 							LegacyPointer off_overlightTexture = LegacyPointer.Read(reader); // *(_DWORD *)(GLI_BIG_GLOBALS + 370068)
 							LegacyPointer.DoAt(ref reader, off_overlightTexture, () => {
 								overlightTexture = TextureInfo.Read(reader, off_overlightTexture);
@@ -945,7 +945,7 @@ namespace OpenSpace.Loader {
 			});
 
 			// off_current should be after the dynamic SO list positions.
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 				LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_settingsForPersoInFix);
 				await ReadSettingsForPersoInFix(reader);
 				LegacyPointer.Goto(ref reader, off_current);
@@ -953,12 +953,12 @@ namespace OpenSpace.Loader {
 				await ReadSettingsForPersoInFix(reader);
 			}
 
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) {
 				reader.ReadBytes(0x800); // floats
 			}
 			loadingState = "Loading animation banks";
 			await WaitIfNecessary();
-			if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur) {
 				off_animBankLvl = LegacyPointer.Read(reader); // Note: 4 0x104 banks in lvl.
 				//print(Pointer.Current(reader));
 				print("Lvl animation bank address: " + off_animBankLvl);
@@ -981,17 +981,17 @@ namespace OpenSpace.Loader {
 			}
 			// Load additional animation banks
 			string extraAnimFolder = "Anim/";
-			if (CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07 || CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+			if (Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07 || Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 				extraAnimFolder = lvlName + "/";
 			}
-			extraAnimFolder = ConvertCase(extraAnimFolder, CPA_Settings.CapsType.LevelFolder);
+			extraAnimFolder = ConvertCase(extraAnimFolder, Legacy_Settings.CapsType.LevelFolder);
 			for (int i = 0; i < families.Count; i++) {
 				if (families[i] != null && families[i].animBank > 4 && objectTypes[0][families[i].family_index].id != 0xFF) {
 					int animBank = families[i].animBank;
 					loadingState = "Loading additional animation bank " + animBank;
 					await WaitIfNecessary();
 					int animFileID = objectTypes[0][families[i].family_index].id;
-					if (CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07 || CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+					if (Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07 || Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 						animFileID = animBank - 5;
 					}
 					string animName = "ani" + animFileID.ToString();
@@ -1000,15 +1000,15 @@ namespace OpenSpace.Loader {
 					//print(animBank + " - " + objectTypes[0][families[i].family_index].id);
 					int fileID = animBank + 102;
 					int kfFileID = animBank + 2; // Anim bank will start at 5, so this will start at 7
-					if (CPA_Settings.s.game == CPA_Settings.Game.RM || (CPA_Settings.s.game == CPA_Settings.Game.RA && CPA_Settings.s.platform == CPA_Settings.Platform.PS2)) {
+					if (Legacy_Settings.s.game == Legacy_Settings.Game.RM || (Legacy_Settings.s.game == Legacy_Settings.Game.RA && Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2)) {
 						fileID = animBank;
 					}
 
 					// Prepare files for WebGL
-					string animFileLvl = gameDataBinFolder + extraAnimFolder + ConvertCase(animName + ".lvl", CPA_Settings.CapsType.LevelFile);
-					string animFilePtr = gameDataBinFolder + extraAnimFolder + ConvertCase(animName + ".ptr", CPA_Settings.CapsType.LevelFile);
-					string kfFileLvl = gameDataBinFolder + extraAnimFolder + ConvertCase(kfName + ".lvl", CPA_Settings.CapsType.LevelFile);
-					string kfFilePtr = gameDataBinFolder + extraAnimFolder + ConvertCase(kfName + ".ptr", CPA_Settings.CapsType.LevelFile);
+					string animFileLvl = gameDataBinFolder + extraAnimFolder + ConvertCase(animName + ".lvl", Legacy_Settings.CapsType.LevelFile);
+					string animFilePtr = gameDataBinFolder + extraAnimFolder + ConvertCase(animName + ".ptr", Legacy_Settings.CapsType.LevelFile);
+					string kfFileLvl = gameDataBinFolder + extraAnimFolder + ConvertCase(kfName + ".lvl", Legacy_Settings.CapsType.LevelFile);
+					string kfFilePtr = gameDataBinFolder + extraAnimFolder + ConvertCase(kfName + ".ptr", Legacy_Settings.CapsType.LevelFile);
 					await PrepareFile(animFileLvl);
 					if (FileSystem.FileExists(animFileLvl)) {
 						await PrepareFile(animFilePtr);
@@ -1026,7 +1026,7 @@ namespace OpenSpace.Loader {
 						}
 						LegacyPointer off_animBankExtra = new LegacyPointer(0, animFile);
 						LegacyPointer.DoAt(ref reader, off_animBankExtra, () => {
-							if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+							if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 								string timestamp = reader.ReadString(0x18);
 								reader.ReadUInt32();
 								reader.ReadUInt32();
@@ -1055,13 +1055,13 @@ namespace OpenSpace.Loader {
 			loadingState = "Loading settings for persos in fix";
 			await WaitIfNecessary();
 			uint num_perso_with_settings_in_fix = (uint)persoInFix.Length;
-			if (CPA_Settings.s.game == CPA_Settings.Game.R3) num_perso_with_settings_in_fix = reader.ReadUInt32();
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) num_perso_with_settings_in_fix = reader.ReadUInt32();
 			for (int i = 0; i < num_perso_with_settings_in_fix; i++) {
 				LegacyPointer off_perso_so_with_settings_in_fix = null, off_matrix = null;
 				SuperObject so = null;
 				Matrix mat = null;
-				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 						off_perso_so_with_settings_in_fix = LegacyPointer.Read(reader);
 						reader.AlignOffset(0x10, 4); // 4 because LVL starts at 4
 						off_matrix = LegacyPointer.Current(reader);
@@ -1076,10 +1076,10 @@ namespace OpenSpace.Loader {
 						reader.ReadUInt32();
 					}
 					so = SuperObject.FromOffset(off_perso_so_with_settings_in_fix);
-				} else if (CPA_Settings.s.game == CPA_Settings.Game.RA
-					|| CPA_Settings.s.game == CPA_Settings.Game.RM
-					|| CPA_Settings.s.game == CPA_Settings.Game.DDPK
-					|| CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.RA
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.RM
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.DDPK
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 					off_matrix = LegacyPointer.Current(reader);
 					mat = Matrix.Read(reader, off_matrix);
 					so = superObjects.FirstOrDefault(s => s.off_data == persoInFix[i]);

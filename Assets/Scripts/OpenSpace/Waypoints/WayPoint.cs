@@ -66,10 +66,10 @@ namespace OpenSpace.Waypoints {
 
             WayPoint wp = new WayPoint(offset);
             float radius = 0;
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
             }
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.TT) {
                 radius = reader.ReadSingle();
             }
 
@@ -77,10 +77,10 @@ namespace OpenSpace.Waypoints {
             float y = reader.ReadSingle();
             float z = reader.ReadSingle();
 
-            if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.TT) {
+            if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.TT) {
                 radius = reader.ReadSingle();
             }
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                 wp.off_perso_so = LegacyPointer.Read(reader);// perso
             }
 

@@ -186,9 +186,9 @@ public class WebCommunicator : MonoBehaviour {
 		}
 		return new WebJSON.GameSettings() {
 			EngineMode = mode,
-			EngineVersion = OpenSpace.CPA_Settings.s.engineVersion,
-			Game = OpenSpace.CPA_Settings.s.game,
-			Mode = OpenSpace.CPA_Settings.s.mode
+			EngineVersion = OpenSpace.Legacy_Settings.s.engineVersion,
+			Game = OpenSpace.Legacy_Settings.s.game,
+			Mode = OpenSpace.Legacy_Settings.s.mode
 		};
 	}
 	public WebJSON.Message GetCineDataMessageJSON() {
@@ -203,7 +203,7 @@ public class WebCommunicator : MonoBehaviour {
 				CinematicNames = controller.CinematicSwitcher.CinematicNames,
 				CinematicIndex = controller.CinematicSwitcher.CinematicIndex,
 				Actors = controller.CinematicSwitcher.actors == null || controller.CinematicSwitcher.actors.Length == 0 ? null : controller.CinematicSwitcher.actors.Select(a => GetPersoJSON(a, includeDetails: false)).ToArray(),
-				AnimationSpeed = OpenSpace.CPA_Settings.s.platform == OpenSpace.CPA_Settings.Platform.PS1 ? (float?)controller.CinematicSwitcher.animationSpeed : null
+				AnimationSpeed = OpenSpace.Legacy_Settings.s.platform == OpenSpace.Legacy_Settings.Platform.PS1 ? (float?)controller.CinematicSwitcher.animationSpeed : null
 			};
 		}
 		return null;

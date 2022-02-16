@@ -68,7 +68,7 @@ public class SectorManager : MonoBehaviour {
 	}
 
 	public void UpdateSectorLoading(Vector3 camPos) {
-		if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2 || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+		if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R2 || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 			activeSector = GetActiveSectorOld(camPos, activeSector);
 		} else {
 			activeSector = GetActiveSector(camPos, blockVirtual: true);
@@ -91,7 +91,7 @@ public class SectorManager : MonoBehaviour {
 	}
 
 	public SectorComponent GetActiveSectorWrapper(Vector3 point) {
-		if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2 || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+		if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R2 || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 			return GetActiveSectorOld(point);
 		} else {
 			return GetActiveSector(point);

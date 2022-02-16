@@ -407,8 +407,8 @@ public class LightManager : MonoBehaviour {
 			}
 		}
         if (useDefaultSettings) {
-            luminosity = CPA_Settings.s.luminosity;
-            saturate = CPA_Settings.s.saturate;
+            luminosity = Legacy_Settings.s.luminosity;
+            saturate = Legacy_Settings.s.saturate;
         }
         loaded = true;
     }

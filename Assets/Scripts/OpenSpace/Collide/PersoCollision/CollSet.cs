@@ -67,7 +67,7 @@ namespace OpenSpace.Collide {
 			c.off_zones[CollideType.ZDM] = LegacyPointer.Read(reader);
 			c.off_zones[CollideType.ZDR] = LegacyPointer.Read(reader);
 
-			if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+			if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
 				c.privilegedActivations[CollideType.ZDD] = reader.ReadInt32();
 				c.privilegedActivations[CollideType.ZDE] = reader.ReadInt32();
 				c.privilegedActivations[CollideType.ZDM] = reader.ReadInt32();
@@ -84,7 +84,7 @@ namespace OpenSpace.Collide {
 							return col;
 						},
 						flags: LinkedList.Flags.ReadAtPointer
-							| (CPA_Settings.s.hasLinkedListHeaderPointers ?
+							| (Legacy_Settings.s.hasLinkedListHeaderPointers ?
 								LinkedList.Flags.HasHeaderPointers :
 								LinkedList.Flags.NoPreviousPointersForDouble),
 						type: LinkedList.Type.Minimize
@@ -98,7 +98,7 @@ namespace OpenSpace.Collide {
 						(off_element) => {
 							return CollideActivationZone.Read(reader, off_element);
 						},
-						flags: (CPA_Settings.s.hasLinkedListHeaderPointers ?
+						flags: (Legacy_Settings.s.hasLinkedListHeaderPointers ?
 								LinkedList.Flags.HasHeaderPointers :
 								LinkedList.Flags.NoPreviousPointersForDouble),
 						type: LinkedList.Type.Minimize
@@ -112,7 +112,7 @@ namespace OpenSpace.Collide {
 						(off_element) => {
 							return CollideActivation.Read(reader, off_element, c, entry.Key);
 						},
-						flags: (CPA_Settings.s.hasLinkedListHeaderPointers ?
+						flags: (Legacy_Settings.s.hasLinkedListHeaderPointers ?
 								LinkedList.Flags.HasHeaderPointers :
 								LinkedList.Flags.NoPreviousPointersForDouble),
 						type: LinkedList.Type.Minimize

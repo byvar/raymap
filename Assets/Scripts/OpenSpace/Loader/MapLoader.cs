@@ -112,7 +112,7 @@ namespace OpenSpace {
 		public LegacyPointer[] off_lightmapUV;
 
 		public Globals globals = null;
-        public CPA_Settings settings = null;
+        public Legacy_Settings settings = null;
         public List<SearchableString> searchableStrings = new List<SearchableString>();
 		public Dictionary<LegacyPointer, LegacyPointer.PointerTrace> pointerTraces = new Dictionary<LegacyPointer, LegacyPointer.PointerTrace>();
 
@@ -133,20 +133,20 @@ namespace OpenSpace {
         public static MapLoader Loader {
             get {
                 if (loader == null) {
-                    if (CPA_Settings.s == null) return null;
-					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-						switch (CPA_Settings.s.platform) {
-							case CPA_Settings.Platform.DC: loader = new R2DCLoader(); break;
-							case CPA_Settings.Platform.PS2: loader = new R2PS2Loader(); break;
-							case CPA_Settings.Platform.PS1: loader = new R2PS1Loader(); break;
-							case CPA_Settings.Platform.DS:
-							case CPA_Settings.Platform._3DS:
-							case CPA_Settings.Platform.N64:
+                    if (Legacy_Settings.s == null) return null;
+					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
+						switch (Legacy_Settings.s.platform) {
+							case Legacy_Settings.Platform.DC: loader = new R2DCLoader(); break;
+							case Legacy_Settings.Platform.PS2: loader = new R2PS2Loader(); break;
+							case Legacy_Settings.Platform.PS1: loader = new R2PS1Loader(); break;
+							case Legacy_Settings.Platform.DS:
+							case Legacy_Settings.Platform._3DS:
+							case Legacy_Settings.Platform.N64:
 								loader = new R2ROMLoader(); break;
 							default: loader = new R2Loader(); break;
 						}
 					} else {
-						if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+						if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 							loader = new LWLoader();
 						} else {
 							loader = new R3Loader();
@@ -275,7 +275,7 @@ namespace OpenSpace {
             Reader reader = mem.reader;
 
             // Read object names
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["objectTypes"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["objectTypes"], mem));
             objectTypes = new ObjectType[3][];
             for (uint i = 0; i < 3; i++) {
                 LegacyPointer off_names_header = LegacyPointer.Current(reader);
@@ -287,30 +287,30 @@ namespace OpenSpace {
             }
 
             // Read globals
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["actualWorld"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["actualWorld"], mem));
             globals.off_actualWorld = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["dynamicWorld"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["dynamicWorld"], mem));
             globals.off_dynamicWorld = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["inactiveDynamicWorld"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["inactiveDynamicWorld"], mem));
             globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["fatherSector"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["fatherSector"], mem));
             globals.off_fatherSector = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["firstSubmapPosition"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["firstSubmapPosition"], mem));
             globals.off_firstSubMapPosition = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["always"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["always"], mem));
             globals.num_always = reader.ReadUInt32();
             globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
             globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
             globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
             globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["families"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["families"], mem));
             families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
             animationBanks = new AnimationBank[2];
 
             // Read animations
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["anim_stacks"], mem));
-            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["anim_stacks"], mem));
+            if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                 animationBanks[0] = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 1, null)[0];
                 animationBanks[1] = animationBanks[0];
             } else {
@@ -319,11 +319,11 @@ namespace OpenSpace {
 
             // Read textures
             uint[] texMemoryChannels = new uint[1024];
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["textureMemoryChannels"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["textureMemoryChannels"], mem));
             for (int i = 0; i < 1024; i++) {
                 texMemoryChannels[i] = reader.ReadUInt32();
             }
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["textures"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["textures"], mem));
             List<TextureInfo> textureInfos = new List<TextureInfo>();
             for (int i = 0; i < 1024; i++) {
                 LegacyPointer off_texture = LegacyPointer.Read(reader);
@@ -341,10 +341,10 @@ namespace OpenSpace {
             textures = textureInfos.ToArray();
             
             // Parse materials list
-            if (CPA_Settings.s.memoryAddresses.ContainsKey("visualMaterials") && CPA_Settings.s.memoryAddresses.ContainsKey("num_visualMaterials")) {
-                LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["num_visualMaterials"], mem));
+            if (Legacy_Settings.s.memoryAddresses.ContainsKey("visualMaterials") && Legacy_Settings.s.memoryAddresses.ContainsKey("num_visualMaterials")) {
+                LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["num_visualMaterials"], mem));
                 uint num_visual_materials = reader.ReadUInt32();
-                LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["visualMaterials"], mem));
+                LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["visualMaterials"], mem));
                 LegacyPointer off_visualMaterials = LegacyPointer.Read(reader);
                 if (off_visualMaterials != null) {
                     LegacyPointer.Goto(ref reader, off_visualMaterials);
@@ -363,13 +363,13 @@ namespace OpenSpace {
                 Debug.LogError("BRIGHTNESS IS " + brightness);
             }*/
 
-            LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["inputStructure"], mem));
+            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["inputStructure"], mem));
             inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
 			foreach (EntryAction ea in inputStruct.entryActions) {
 				print(ea.ToString());
 			}
 
-			LegacyPointer.Goto(ref reader, new LegacyPointer(CPA_Settings.s.memoryAddresses["localizationStructure"], mem));
+			LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["localizationStructure"], mem));
 			localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
 
 			// Parse actual world & always structure
@@ -379,7 +379,7 @@ namespace OpenSpace {
             ReadCrossReferences(reader);
 
 			// TODO: Make more generic
-            if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.R2) {
 				string path = gameDataBinFolder + "R2DC_Comports.json";
                 if (!FileSystem.FileExists(path)) {
                     path = "Assets/StreamingAssets/R2DC_Comports.json"; // Offline, the json doesn't exist, so grab it from StreamingAssets
@@ -442,35 +442,35 @@ MonoBehaviour.print(str);
 
 		protected async UniTask CreateCNT() {
 			await WaitIfNecessary();
-			if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17 && exportTextures) {
+			if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17 && exportTextures) {
 				List<string> cntPaths = new List<string>();
-				cntPaths.Add(gameDataBinFolder + ConvertCase("TEXTURES.CNT", CPA_Settings.CapsType.All));
+				cntPaths.Add(gameDataBinFolder + ConvertCase("TEXTURES.CNT", Legacy_Settings.CapsType.All));
 				if (cntPaths.Count > 0) {
 					foreach (string path in cntPaths) {
 						await PrepareBigFile(path, 512 * 1024);
 					}
 					cnt = new CNT(cntPaths.ToArray());
 				}
-				TBF tbf = new TBF(gameDataBinFolder + ConvertCase("TEXTURES.TXC", CPA_Settings.CapsType.All), hasNames: true);
+				TBF tbf = new TBF(gameDataBinFolder + ConvertCase("TEXTURES.TXC", Legacy_Settings.CapsType.All), hasNames: true);
 				string textureFolder = "textures_txc/";
 				for (int i = 0; i < tbf.headers.Length; i++) {
 					Util.ByteArrayToFile(gameDataBinFolder + textureFolder + tbf.headers[i].name.ToLower().Substring(0, tbf.headers[i].name.LastIndexOf('.')) + ".png", tbf.headers[i].texture.EncodeToPNG());
 				}
 			}
-			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				cntPaths = new string[1];
 				cntPaths[0] = gameDataBinFolder + "Vignette.cnt";
 				foreach (string path in cntPaths) {
 					await PrepareBigFile(path, 512 * 1024);
 				}
 				cnt = new CNT(cntPaths);
-			} else if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-				if (CPA_Settings.s.platform != CPA_Settings.Platform.DC &&
-					CPA_Settings.s.platform != CPA_Settings.Platform.PS1 &&
-					CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+			} else if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
+				if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC &&
+					Legacy_Settings.s.platform != Legacy_Settings.Platform.PS1 &&
+					Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
 					List<string> cntPaths = new List<string>();
-					if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileTextures), CPA_Settings.CapsType.All));
-					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileVignettes), CPA_Settings.CapsType.All));
+					if (gameDsb.bigfileTextures != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileTextures), Legacy_Settings.CapsType.All));
+					if (gameDsb.bigfileVignettes != null) cntPaths.Add(gameDataBinFolder + ConvertCase(ConvertPath(gameDsb.bigfileVignettes), Legacy_Settings.CapsType.All));
 					if (cntPaths.Count > 0) {
 						foreach (string path in cntPaths) {
 							await PrepareBigFile(path, 512 * 1024);
@@ -479,8 +479,8 @@ MonoBehaviour.print(str);
 					}
 				}
             } else {
-                if (CPA_Settings.s.platform == CPA_Settings.Platform.PC || CPA_Settings.s.platform == CPA_Settings.Platform.MacOS) {
-					if (CPA_Settings.s.game == CPA_Settings.Game.R3 && CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PC) {
+                if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC || Legacy_Settings.s.platform == Legacy_Settings.Platform.MacOS) {
+					if (Legacy_Settings.s.game == Legacy_Settings.Game.R3 && Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PC) {
 						cntPaths = new string[3];
 						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
 						cntPaths[1] = gameDataBinFolder + "tex32_1.cnt";
@@ -489,7 +489,7 @@ MonoBehaviour.print(str);
 							await PrepareBigFile(path, 512 * 1024);
 						}
 						cnt = new CNT(cntPaths);
-					} else if (CPA_Settings.s.game == CPA_Settings.Game.R3 || CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM) {
+					} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R3 || Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM) {
 						cntPaths = new string[2];
 						cntPaths[0] = gameDataBinFolder + "vignette.cnt";
 						cntPaths[1] = gameDataBinFolder + "tex32.cnt";
@@ -497,7 +497,7 @@ MonoBehaviour.print(str);
 							await PrepareBigFile(path, 512 * 1024);
 						}
 						cnt = new CNT(cntPaths);
-					} else if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+					} else if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 						cntPaths = new string[2];
 						cntPaths[0] = gameDataBinFolder + "VIGNETTE.CNT";
 						cntPaths[1] = gameDataBinFolder + "TEXTURES.CNT";
@@ -517,7 +517,7 @@ MonoBehaviour.print(str);
 					await MapLoader.WaitIfNecessary();
 					// Export all textures in cnt
 					string textureFolder = "textures/";
-					if(CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) textureFolder = "textures_cnt/";
+					if(Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) textureFolder = "textures_cnt/";
 					foreach (CNT.FileStruct file in cnt.fileList) {
 						GF gf = cnt.GetGF(file);
 						Util.ByteArrayToFile(gameDataBinFolder + textureFolder + file.FullName.Replace(".gf", ".png"), gf.GetTexture().EncodeToPNG());
@@ -612,7 +612,7 @@ MonoBehaviour.print(str);
 
 		protected async UniTask ReadTexturesFix(Reader reader, LegacyPointer off_textures) {
             uint num_textureMemoryChannels = 0;
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.R2) num_textureMemoryChannels = reader.ReadUInt32();
             uint num_textures = reader.ReadUInt32();
             print("Texture count fix: " + num_textures);
 			string state = loadingState;
@@ -627,10 +627,10 @@ MonoBehaviour.print(str);
                         textures[i] = TextureInfo.Read(reader, off_texture);
                     });
                 }
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) {
 					Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
 					TPL fixTPL = new TPL(paths["fix.tpl"]);
-					if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+					if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 						uint num_textures_menu = reader.ReadUInt32();
 						TPL menuTPL = new TPL(paths["menu.tpl"]);
 						for (uint i = 0; i < num_textures_menu; i++) {
@@ -659,7 +659,7 @@ MonoBehaviour.print(str);
 						textures[i].Texture = tex;
 						texturesSeenFile[file_texture]++;
 					}
-				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox || CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
+				} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox || Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360) {
 					Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
 					BTF fixBTF = new BTF(paths["fix.btf"], paths["fix.bhf"]);
 
@@ -679,9 +679,9 @@ MonoBehaviour.print(str);
 						textures[i].Texture = tex;
 						texturesSeenFile[file_texture]++;
 					}
-				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+				} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 					Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
-					bool hasNames = (CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA);
+					bool hasNames = (Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA);
 					TBF fixTBF = null;
 					if (FileSystem.FileExists(paths["fix.tbf"])) {
 						fixTBF = new TBF(paths["fix.tbf"], hasNames: hasNames);
@@ -716,7 +716,7 @@ MonoBehaviour.print(str);
 							Util.ByteArrayToFile(gameDataBinFolder + "textures/" + /*type + "/" +*/ fixTBF.headers[i].name.ToLower().Substring(0, fixTBF.headers[i].name.LastIndexOf('.')) + ".png", fixTBF.headers[i].texture.EncodeToPNG());
 						}
 					}
-				} else if(CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
+				} else if(Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3) {
 					Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
 					for (int i = 0, j = 0; i < num_textures; i++, j++) {
 						uint file_texture = reader.ReadUInt32();
@@ -736,13 +736,13 @@ MonoBehaviour.print(str);
 						textures[i].Texture = tex;
 						texturesSeenFile[file_texture]++;
 					}
-				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.iOS) {
+				} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS) {
                     for (int i = 0; i < num_textures; i++) {
 						loadingState = "Loading fixed textures: " + (i+1) + "/" + num_textures;
 						await WaitIfNecessary();
 						string texturePath = "World/Graphics/Textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".gf";
 						texturePath = texturePath.Replace('\\', '/');
-						if (CPA_Settings.s.platform == CPA_Settings.Platform.iOS) {
+						if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS) {
 							texturePath = texturePath.ToUpper();
 						}
 						texturePath = gameDataBinFolder + texturePath;
@@ -759,7 +759,7 @@ MonoBehaviour.print(str);
 						if (gf != null) textures[i].Texture = gf.GetTexture();
 					}
 					// Memory channels, eg which file is this
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
 						for (uint i = 0; i < num_textures; i++) {
 							reader.ReadUInt32(); // 0 or 8.
 						}
@@ -778,21 +778,21 @@ MonoBehaviour.print(str);
 			string state = loadingState;
 			loadingState = "Loading level textures";
 
-			if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.R2 || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.R2 || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
                 num_textures_fix = (uint)textures.Length;
                 num_memoryChannels = reader.ReadUInt32();
                 num_textures_lvl = reader.ReadUInt32();
                 num_textures_total = num_textures_fix + num_textures_lvl;
             } else {
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2
-					&& (CPA_Settings.s.game == CPA_Settings.Game.R3
-					|| CPA_Settings.s.game == CPA_Settings.Game.DDPK)
-					&& CPA_Settings.s.mode != CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2
+					&& (Legacy_Settings.s.game == Legacy_Settings.Game.R3
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.DDPK)
+					&& Legacy_Settings.s.mode != Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17) {
 					num_textures_lvl = reader.ReadUInt32();
 					num_textures_fix = (uint)textures.Length;
 					num_textures_total = num_textures_fix + num_textures_lvl;
 				} else {
-					bool readTotal = (CPA_Settings.s.platform == CPA_Settings.Platform.GC || CPA_Settings.s.platform == CPA_Settings.Platform.PS2);
+					bool readTotal = (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC || Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2);
 					num_textures_total = readTotal ? reader.ReadUInt32() : 1024;
 					num_textures_fix = readTotal ? (uint)textures.Length : reader.ReadUInt32();
 					num_textures_lvl = num_textures_total - num_textures_fix;
@@ -805,14 +805,14 @@ MonoBehaviour.print(str);
                     textures[i] = TextureInfo.Read(reader, off_texture);
                 });
 			}
-			if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.R2) {
+			if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.R2) {
                 uint num_texturesToCreate = reader.ReadUInt32();
 				for (uint i = 0; i < num_textures_fix; i++) { // ?
 					reader.ReadUInt32(); //1
 				}
                 uint currentMemoryChannel = reader.ReadUInt32();
             }
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) {
 				// Load textures from TPL
 				//TPL fixTPL = null;
 				TPL lvlTPL = new TPL(paths["lvl.tpl"]);
@@ -844,7 +844,7 @@ MonoBehaviour.print(str);
 					textures[i].Texture = tex;
 					texturesSeenFile[file_texture]++;
 				}
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.Xbox || CPA_Settings.s.platform == CPA_Settings.Platform.Xbox360) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox || Legacy_Settings.s.platform == Legacy_Settings.Platform.Xbox360) {
 				// Load textures from TPL
 				BTF fixBTF = null;
 				BTF lvlBTF = new BTF(paths["lvl.btf"], paths["lvl.bhf"]);
@@ -872,7 +872,7 @@ MonoBehaviour.print(str);
 					if (file_texture == 0) {
 						if (fixBTF == null) fixBTF = new BTF(paths["fix.btf"], paths["fix.bhf"]);
 						tex = fixBTF.GetTexture((int)num_textures_fix + texturesSeenFile[file_texture], textures[i].width_, textures[i].height_);
-						if (CPA_Settings.s.game == CPA_Settings.Game.RA) {
+						if (Legacy_Settings.s.game == Legacy_Settings.Game.RA) {
 							if (!texturesSeenFile.ContainsKey(2)) texturesSeenFile[2] = 0;
 							texturesSeenFile[2]++;
 						}
@@ -887,17 +887,17 @@ MonoBehaviour.print(str);
 					textures[i].Texture = tex;
 					texturesSeenFile[file_texture]++;
 				}
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 				// Load textures from TPL
 				TBF fixTBF = null;
 
-				bool hasNames = (CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA);
+				bool hasNames = (Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA);
 				TBF lvlTBF = new TBF(paths["lvl.tbf"]);
 				TBF transitTBF = hasTransit ? new TBF(paths["transit.tbf"]) : null;
 				print("Lvl TBF Texture count: " + lvlTBF.Count);
 				if (hasTransit) print("Transit TBF Texture count: " + transitTBF.Count);
 				Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
-				if (CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA) {
 					for (uint i = 0; i < num_textures_fix; i++) {
 						Texture2D tex = lvlTBF.textures[i];
 						textures[i].Texture = tex;
@@ -920,7 +920,7 @@ MonoBehaviour.print(str);
 							tex = fixTBF.textures[(int)num_textures_fix + texturesSeenFile[file_texture]];
 						}
 						//type = string.Format("{0:X4}", fixTBF.headers[(int)num_textures_fix + texturesSeenFile[file_texture]].flags);
-						if (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM) {
+						if (Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM) {
 							if (!texturesSeenFile.ContainsKey(2)) texturesSeenFile[2] = 0;
 							texturesSeenFile[2]++;
 						}
@@ -937,7 +937,7 @@ MonoBehaviour.print(str);
 					textures[i].Texture = tex;
 					texturesSeenFile[file_texture]++;
 				}
-			} else if(CPA_Settings.s.platform == CPA_Settings.Platform.PS3) {
+			} else if(Legacy_Settings.s.platform == Legacy_Settings.Platform.PS3) {
 				Dictionary<uint, int> texturesSeenFile = new Dictionary<uint, int>();
 				for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					uint file_texture = reader.ReadUInt32();
@@ -957,7 +957,7 @@ MonoBehaviour.print(str);
 					textures[i].Texture = tex;
 					texturesSeenFile[file_texture]++;
 				}
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.iOS || CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS || Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					if (textures[i] == null) continue;
@@ -965,7 +965,7 @@ MonoBehaviour.print(str);
 					await WaitIfNecessary();
 					string texturePath = "World/Graphics/Textures/" + textures[i].name.Substring(0, textures[i].name.LastIndexOf('.')) + ".gf";
 					texturePath = texturePath.Replace('\\', '/');
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.iOS) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS) {
 						texturePath = texturePath.ToUpper();
 					}
 					texturePath = gameDataBinFolder + texturePath;
@@ -981,13 +981,13 @@ MonoBehaviour.print(str);
 				int num_textures_level_real = 0;
 				LegacyPointer off_current = LegacyPointer.Current(reader);
 				for (uint i = num_textures_fix; i < num_textures_total; i++) {
-					uint file_texture = CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
+					uint file_texture = Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
 					if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
 					num_textures_level_real++;
 				}
 				LegacyPointer.Goto(ref reader, off_current);
 				int current_texture = 0;
-				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 					int fixTexturesSeen = 0;
 					int lvlTexturesSeen = 0;
 					PBT[] pbt = (this as LWLoader).pbt;
@@ -1010,7 +1010,7 @@ MonoBehaviour.print(str);
 					}
 				} else {
 					for (uint i = num_textures_fix; i < num_textures_total; i++) {
-						uint file_texture = CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
+						uint file_texture = Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 ? reader.ReadUInt32() : 0;
 						if (file_texture == 0xC0DE2005 || textures[i] == null) continue; // texture is undefined
 						current_texture++;
 						loadingState = "Loading level textures: " + current_texture + "/" + (num_textures_level_real);
@@ -1082,7 +1082,7 @@ MonoBehaviour.print(str);
                 globals.spawnablePersos.ReadEntries(ref reader, (offset) => {
 					uint index;
 					LegacyPointer off_spawnable_perso;
-					if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+					if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 						off_spawnable_perso = LegacyPointer.Read(reader);
 						index = reader.ReadUInt32();
 					} else {
@@ -1195,19 +1195,19 @@ MonoBehaviour.print(str);
 			}
 		}
 
-		public string ConvertCase(string path, CPA_Settings.CapsType capsType) {
-			CPA_Settings.Caps caps = CPA_Settings.Caps.Normal;
-			if (CPA_Settings.s.caps != null && CPA_Settings.s.caps.ContainsKey(capsType)) {
-				caps = CPA_Settings.s.caps[capsType];
-			} else if (CPA_Settings.s.caps != null && CPA_Settings.s.caps.ContainsKey(CPA_Settings.CapsType.All)) {
-				caps = CPA_Settings.s.caps[CPA_Settings.CapsType.All];
+		public string ConvertCase(string path, Legacy_Settings.CapsType capsType) {
+			Legacy_Settings.Caps caps = Legacy_Settings.Caps.Normal;
+			if (Legacy_Settings.s.caps != null && Legacy_Settings.s.caps.ContainsKey(capsType)) {
+				caps = Legacy_Settings.s.caps[capsType];
+			} else if (Legacy_Settings.s.caps != null && Legacy_Settings.s.caps.ContainsKey(Legacy_Settings.CapsType.All)) {
+				caps = Legacy_Settings.s.caps[Legacy_Settings.CapsType.All];
 			}
 			switch (caps) {
-				case CPA_Settings.Caps.All:
+				case Legacy_Settings.Caps.All:
 					return path.ToUpper();
-				case CPA_Settings.Caps.None:
+				case Legacy_Settings.Caps.None:
 					return path.ToLower();
-				case CPA_Settings.Caps.AllExceptExtension:
+				case Legacy_Settings.Caps.AllExceptExtension:
 					if (path.LastIndexOf('.') > 0) {
 						string pathWithoutExtension = path.Substring(0, path.LastIndexOf('.')).ToUpper();
 						return pathWithoutExtension + path.Substring(path.LastIndexOf('.'));

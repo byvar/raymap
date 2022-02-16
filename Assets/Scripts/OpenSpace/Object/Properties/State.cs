@@ -31,16 +31,16 @@ namespace OpenSpace.Object.Properties {
 		
         public LegacyPointer NextEntry {
             get {
-                if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
+                if (Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) {
                     return off_entry_next;
                 } else {
-					if (CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGC
-						|| CPA_Settings.s.mode == CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07
-						|| CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPKGC
-                        || (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3)) {
-                        return offset + 0x28 + (CPA_Settings.s.hasNames ? 0x50 : 0);
+					if (Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaGC
+						|| Legacy_Settings.s.mode == Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07
+						|| Legacy_Settings.s.mode == Legacy_Settings.Mode.DonaldDuckPKGC
+                        || (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3)) {
+                        return offset + 0x28 + (Legacy_Settings.s.hasNames ? 0x50 : 0);
                     } else {//if (MapLoader.Loader.mode == MapLoader.Mode.Rayman2DC) {
-                        return offset + 0x20 + (CPA_Settings.s.hasNames ? 0x50 : 0);
+                        return offset + 0x20 + (Legacy_Settings.s.hasNames ? 0x50 : 0);
                     }
                 }
             }
@@ -83,9 +83,9 @@ namespace OpenSpace.Object.Properties {
             //l.print("State " + Pointer.Current(reader));
             State s = new State(offset, family, index);
             l.states.Add(s);
-            if (CPA_Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
-            if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) s.off_entry_next = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.hasLinkedListHeaderPointers) {
+            if (Legacy_Settings.s.hasNames) s.name = new string(reader.ReadChars(0x50)).TrimEnd('\0');
+            if (Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) s.off_entry_next = LegacyPointer.Read(reader);
+            if (Legacy_Settings.s.hasLinkedListHeaderPointers) {
                 s.off_entry_prev = LegacyPointer.Read(reader);
                 LegacyPointer.Read(reader); // another header at tail of state list
             }
@@ -98,13 +98,13 @@ namespace OpenSpace.Object.Properties {
 			});
             s.off_nextState = LegacyPointer.Read(reader, allowMinusOne: true);
             s.off_mechanicsIDCard = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3
-				&& CPA_Settings.s.game != CPA_Settings.Game.Dinosaur
-				&& CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3
+				&& Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur
+				&& Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
                 s.off_cine_mapname = LegacyPointer.Read(reader);
                 s.off_cine_name = LegacyPointer.Read(reader);
 			}
-			if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) {
+			if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadByte();
@@ -116,7 +116,7 @@ namespace OpenSpace.Object.Properties {
                 s.speed = reader.ReadByte();
                 reader.ReadByte();
                 s.customStateBits = reader.ReadByte();
-				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) reader.ReadByte();
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) reader.ReadByte();
             }
             if (s.off_mechanicsIDCard != null) {
                 s.mechanicsIDCard = MechanicsIDCard.FromOffsetOrRead(s.off_mechanicsIDCard, reader);
@@ -127,7 +127,7 @@ namespace OpenSpace.Object.Properties {
 			LegacyPointer.DoAt(ref reader, s.off_cine_name, () => {
 				s.cine_name = reader.ReadNullDelimitedString();
 			});
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal || CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal || Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
                 s.anim_refMontreal = l.FromOffsetOrRead<AnimationMontreal>(reader, s.off_anim_ref);
             } else {
                 s.anim_ref = l.FromOffsetOrRead<AnimationReference>(reader, s.off_anim_ref);
@@ -156,13 +156,13 @@ namespace OpenSpace.Object.Properties {
 			public byte linkingType;
 
 			// Custom
-			public LegacyPointer NextEntry => (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
+			public LegacyPointer NextEntry => (Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
 			public LegacyPointer PreviousEntry => off_entry_prev;
 
 			protected override void ReadInternal(Reader reader) {
-				if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
+				if (Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) {
 					off_entry_next = LegacyPointer.Read(reader);
-					if (CPA_Settings.s.hasLinkedListHeaderPointers) {
+					if (Legacy_Settings.s.hasLinkedListHeaderPointers) {
 						off_entry_prev = LegacyPointer.Read(reader);
 						off_entry_hdr = LegacyPointer.Read(reader);
 					}
@@ -185,13 +185,13 @@ namespace OpenSpace.Object.Properties {
 			public LegacyPointer off_state;
 
 			//Custom
-			public LegacyPointer NextEntry => (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
+			public LegacyPointer NextEntry => (Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) ? (off_entry_next) : (Offset + Size);
 			public LegacyPointer PreviousEntry => off_entry_prev;
 
 			protected override void ReadInternal(Reader reader) {
-				if (CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) {
+				if (Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) {
 					off_entry_next = LegacyPointer.Read(reader);
-					if (CPA_Settings.s.hasLinkedListHeaderPointers) {
+					if (Legacy_Settings.s.hasLinkedListHeaderPointers) {
 						off_entry_prev = LegacyPointer.Read(reader);
 						off_entry_hdr = LegacyPointer.Read(reader);
 					}

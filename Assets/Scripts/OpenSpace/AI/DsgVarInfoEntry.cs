@@ -31,14 +31,14 @@ namespace OpenSpace.AI {
             MapLoader l = MapLoader.Loader;
             DsgVarInfoEntry d = new DsgVarInfoEntry(offset);
 			//l.print(offset);
-			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				d.offsetInBuffer = reader.ReadUInt32();
 				d.typeNumber = reader.ReadUInt32();
 				d.saveType = reader.ReadByte();
 				d.initType = reader.ReadByte();
 				reader.ReadByte();
 				reader.ReadByte();
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				d.offsetInBuffer = reader.ReadUInt16();
 				reader.ReadUInt16();
 				d.typeNumber = reader.ReadByte();
@@ -53,7 +53,7 @@ namespace OpenSpace.AI {
 
 			d.number = number;
 
-            d.type = CPA_Settings.s.aiTypes.GetDsgVarType(d.typeNumber);
+            d.type = Legacy_Settings.s.aiTypes.GetDsgVarType(d.typeNumber);
 
             return d;
         }

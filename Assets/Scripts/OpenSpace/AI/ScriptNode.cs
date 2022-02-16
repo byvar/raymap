@@ -36,9 +36,9 @@ namespace OpenSpace.AI {
             sn.script = script;
             sn.param = reader.ReadUInt32();
             sn.param_ptr = LegacyPointer.GetPointerAtOffset(offset); // if parameter is pointer
-            if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) reader.ReadUInt32();
+            if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) reader.ReadUInt32();
 
-            if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC) {
+            if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3GC) {
                 reader.ReadByte();
                 reader.ReadByte();
                 reader.ReadByte();
@@ -55,7 +55,7 @@ namespace OpenSpace.AI {
                 sn.type = reader.ReadByte();
             }
             sn.nodeType = NodeType.Unknown;
-            if (CPA_Settings.s.aiTypes != null) sn.nodeType = CPA_Settings.s.aiTypes.GetNodeType(sn.type);
+            if (Legacy_Settings.s.aiTypes != null) sn.nodeType = Legacy_Settings.s.aiTypes.GetNodeType(sn.type);
 			
             if (sn.param_ptr != null && sn.nodeType != NodeType.Unknown) {
                 //l.print("ScriptNode " + offset + " - " + sn.nodeType + " (" + sn.type + ") - " + sn.param_ptr);
@@ -138,7 +138,7 @@ namespace OpenSpace.AI {
             MapLoader l = MapLoader.Loader;
             short mask = 0;
 
-            AITypes aiTypes = CPA_Settings.s.aiTypes;
+            AITypes aiTypes = Legacy_Settings.s.aiTypes;
 
             Vector3 vector3 = new Vector3 { x = 0, y = 0, z = 0 };
 			switch (nodeType) {

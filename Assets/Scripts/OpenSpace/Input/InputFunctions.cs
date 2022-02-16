@@ -344,15 +344,15 @@ namespace OpenSpace.Input {
 
         public static FunctionType GetFunctionType(uint index) {
             try {
-				if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) return functionTypesSE[index];
-                if (CPA_Settings.s.game == CPA_Settings.Game.TT) return functionTypesTT[index];
-                if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) return functionTypesLargo[index];
-                if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) return functionTypesRevolution[index];
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) return functionTypesHype[index];
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.GC) return functionTypesGC[index];
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.DC || CPA_Settings.s.platform == CPA_Settings.Platform.iOS) return functionTypesDC[index];
-                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.R2 && 
-                    CPA_Settings.s.platform == CPA_Settings.Platform.PS2) return functionTypesPS2[index];
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) return functionTypesSE[index];
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TT) return functionTypesTT[index];
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) return functionTypesLargo[index];
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) return functionTypesRevolution[index];
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) return functionTypesHype[index];
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.GC) return functionTypesGC[index];
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC || Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS) return functionTypesDC[index];
+                if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.R2 && 
+                    Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) return functionTypesPS2[index];
                 return (FunctionType)(index);
             } catch (Exception) {
                 return FunctionType.Unknown;

@@ -63,7 +63,7 @@ namespace OpenSpace {
 			list = new T[num_elements];
 
 			if (type == Type.Default) {
-				type = CPA_Settings.s.linkedListType;
+				type = Legacy_Settings.s.linkedListType;
 				if (type == Type.Minimize) {
 					type = Type.Single;
 				}
@@ -73,7 +73,7 @@ namespace OpenSpace {
                 If the list itself does not specify the minimize type, it is read as a default one,
                 but if the default type is Minimize then it becomes a Single list (i.e. not an array, but no previous pointers).
                 */
-				type = CPA_Settings.s.linkedListType;
+				type = Legacy_Settings.s.linkedListType;
 				if (type == Type.Minimize) {
 					type = Type.SingleNoElementPointers;
 				}
@@ -90,7 +90,7 @@ namespace OpenSpace {
             LinkedList<T> li = new LinkedList<T>(offset);
             li.type = type;
             if (li.type == Type.Default) {
-                li.type = CPA_Settings.s.linkedListType;
+                li.type = Legacy_Settings.s.linkedListType;
                 if (li.type == Type.Minimize) {
                     li.type = Type.Single;
                 }
@@ -100,7 +100,7 @@ namespace OpenSpace {
                 If the list itself does not specify the minimize type, it is read as a default one,
                 but if the default type is Minimize then it becomes a Single list (i.e. not an array, but no previous pointers).
                 */
-                li.type = CPA_Settings.s.linkedListType;
+                li.type = Legacy_Settings.s.linkedListType;
                 if (li.type == Type.Minimize) {
                     li.type = Type.SingleNoElementPointers;
                 }

@@ -35,9 +35,9 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			R2PS1Loader l = Load as R2PS1Loader;
-			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.RRush) {
 				off_superObject = LegacyPointer.Read(reader);
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.JungleBook) {
 				reader.ReadBytes(0x98);
 			}
 			copiedActorData = reader.ReadBytes(0x18);
@@ -49,7 +49,7 @@ namespace OpenSpace.PS1 {
 			off_animScales = LegacyPointer.Read(reader);
 			off_geometricObjects_dynamic = LegacyPointer.Read(reader);
 			num_geometricObjects_dynamic = reader.ReadUInt32();
-			if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.RRush) {
 				ushort_38 = reader.ReadUInt16();
 				ushort_3A = reader.ReadUInt16();
 				off_state_indices = LegacyPointer.Read(reader);

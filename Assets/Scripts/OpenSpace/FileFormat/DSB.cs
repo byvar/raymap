@@ -64,11 +64,11 @@ namespace OpenSpace.FileFormat {
             baseOffset = 0;
             headerOffset = 0;
             this.name = name;
-            using (Reader encodedReader = new Reader(stream, CPA_Settings.s.IsLittleEndian)) {
+            using (Reader encodedReader = new Reader(stream, Legacy_Settings.s.IsLittleEndian)) {
                 int maskBytes = encodedReader.InitMask();
                 data = encodedReader.ReadBytes((int)stream.Length - maskBytes);
             }
-            reader = new Reader(new MemoryStream(data), CPA_Settings.s.IsLittleEndian);
+            reader = new Reader(new MemoryStream(data), Legacy_Settings.s.IsLittleEndian);
         }
 
         public override void CreateWriter() {
@@ -81,8 +81,8 @@ namespace OpenSpace.FileFormat {
 
         public void ReadAllSections() {
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT) {
-                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.TT) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
                     ReadAllAsText();
                 } else {
                     ReadMemoryDesc();
@@ -97,7 +97,7 @@ namespace OpenSpace.FileFormat {
                     ReadString(); // "3"
                     ReadString(); // "Totalski" = first level
                 }
-            } else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            } else if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                 dllDataPath = ReadString();
                 gameDataPath = ReadString();
                 worldDataPath = ReadString();
@@ -136,7 +136,7 @@ namespace OpenSpace.FileFormat {
                     Match stringValueMatch = Regex.Match(value, @"""(?<value>.+?)""", RegexOptions.IgnoreCase);
                     if (stringValueMatch.Success) {
                         value = stringValueMatch.Groups["value"].Value;
-                        if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) value = value.Replace("GameData\\", "");
+                        if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) value = value.Replace("GameData\\", "");
                         switch (method) {
                             case "DirectoryOfEngineDLL": dllDataPath = value; break;
                             case "DirectoryOfTexture": textureDataPath = value; break;
@@ -202,7 +202,7 @@ namespace OpenSpace.FileFormat {
             uint id = reader.ReadUInt32();
             uint memSize;
             while (id != 0xFFFF) {
-                if (CPA_Settings.s.mode == CPA_Settings.Mode.TonicTroublePC) {
+                if (Legacy_Settings.s.mode == Legacy_Settings.Mode.TonicTroublePC) {
                     switch (id) {
                         // Memory descriptions
                         case 10: reader.ReadUInt32(); break;
@@ -263,7 +263,7 @@ namespace OpenSpace.FileFormat {
         }
 
         private void ReadDirectoriesDesc() {
-            if (CPA_Settings.s.mode == CPA_Settings.Mode.TonicTroublePC) {
+            if (Legacy_Settings.s.mode == Legacy_Settings.Mode.TonicTroublePC) {
                 dllDataPath = ReadString();
                 ReadString(); // gamedata/menus
                 ReadString(); // gamedata/menus/anims
@@ -297,7 +297,7 @@ namespace OpenSpace.FileFormat {
             } else {
                 uint id = reader.ReadUInt32();
                 while (id != 0xFFFF) {
-                    if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo || CPA_Settings.s.game == CPA_Settings.Game.RedPlanet) {
+                    if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo || Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet) {
                         switch (id) {
                             case 41: dllDataPath = ReadString(); break;
                             case 58: textureDataPath = ReadString(); break;
@@ -379,7 +379,7 @@ namespace OpenSpace.FileFormat {
         private void ReadBigFileDesc() {
             uint id = reader.ReadUInt32();
             while (id != 0xFFFF) {
-                if (CPA_Settings.s.mode == CPA_Settings.Mode.TonicTroublePC) {
+                if (Legacy_Settings.s.mode == Legacy_Settings.Mode.TonicTroublePC) {
                     switch (id) {
                         case 19: bigfileVignettes = ReadString(); break;
                         case 20: bigfileTextures = ReadString(); break;
@@ -507,13 +507,13 @@ namespace OpenSpace.FileFormat {
 
         private string ReadString() {
             ushort strSize;
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                 strSize = reader.ReadByte();
             } else {
                 strSize = reader.ReadUInt16();
             }
             string result = reader.ReadString(strSize);
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) result = result.Replace("GameData\\", "");
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) result = result.Replace("GameData\\", "");
             return result;
         }
 

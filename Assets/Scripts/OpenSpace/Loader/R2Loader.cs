@@ -32,30 +32,30 @@ namespace OpenSpace.Loader {
 
                 loadingState = "Initializing files";
                 await WaitIfNecessary();
-                string gameDsbPath = gameDataBinFolder + ConvertCase("Game.dsb", CPA_Settings.CapsType.DSB);
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
-                    gameDsbPath = gameDataBinFolder + ConvertCase("gamedsc.bin", CPA_Settings.CapsType.DSB);
-                } else if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
-                    gameDsbPath = gameDataBinFolder + ConvertCase("GAME.DSC", CPA_Settings.CapsType.DSB);
+                string gameDsbPath = gameDataBinFolder + ConvertCase("Game.dsb", Legacy_Settings.CapsType.DSB);
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
+                    gameDsbPath = gameDataBinFolder + ConvertCase("gamedsc.bin", Legacy_Settings.CapsType.DSB);
+                } else if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+                    gameDsbPath = gameDataBinFolder + ConvertCase("GAME.DSC", Legacy_Settings.CapsType.DSB);
 				}
 				await PrepareFile(gameDsbPath);
 				gameDsb = new DSB("Game", gameDsbPath);
 				if (FileSystem.mode != FileSystem.Mode.Web) {
-					gameDsb.Save(gameDataBinFolder + ConvertCase("Game_dsb.dmp", CPA_Settings.CapsType.DSB));
+					gameDsb.Save(gameDataBinFolder + ConvertCase("Game_dsb.dmp", Legacy_Settings.CapsType.DSB));
 				}
                 gameDsb.ReadAllSections();
                 gameDsb.Dispose();
 
 				await CreateCNT();
 
-				if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R2) {
 					string comportsPath = gameDataBinFolder + "R2DC_Comports.json";
 					await PrepareFile(comportsPath);
 				}
 
 				if (lvlName.EndsWith(".exe")) {
-                    if (!CPA_Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
-                    CPA_Settings.s.loadFromMemory = true;
+                    if (!Legacy_Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
+                    Legacy_Settings.s.loadFromMemory = true;
                     MemoryFile mem = new MemoryFile(lvlName);
                     files_array[0] = mem;
                     await WaitIfNecessary();
@@ -63,15 +63,15 @@ namespace OpenSpace.Loader {
                 } else {
                     hasTransit = false;
                     DAT dat = null;
-					string levelsSubFolder = ConvertCase(ConvertPath(gameDsb.levelsDataPath), CPA_Settings.CapsType.All) + "/";
+					string levelsSubFolder = ConvertCase(ConvertPath(gameDsb.levelsDataPath), Legacy_Settings.CapsType.All) + "/";
 					string levelsFolder = gameDataBinFolder + levelsSubFolder;
                     string langDataPath = gameDataBinFolder
-						+ ConvertCase("../LangData/English/", CPA_Settings.CapsType.All)
+						+ ConvertCase("../LangData/English/", Legacy_Settings.CapsType.All)
 						+ levelsSubFolder;
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
 						await FileSystem.CheckDirectory(langDataPath);
 						if (FileSystem.mode != FileSystem.Mode.Web && !FileSystem.DirectoryExists(langDataPath)) {
-							string langPath = gameDataBinFolder + ConvertCase("../LangData/", CPA_Settings.CapsType.All);
+							string langPath = gameDataBinFolder + ConvertCase("../LangData/", Legacy_Settings.CapsType.All);
 							await FileSystem.CheckDirectory(langPath);
 							if (FileSystem.DirectoryExists(langPath)) {
 								DirectoryInfo dirInfo = new DirectoryInfo(langPath);
@@ -86,7 +86,7 @@ namespace OpenSpace.Loader {
 
                     await WaitIfNecessary();
 					bool hasRelocationFiles = true;
-                    if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman2PC || CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPC) {
+                    if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman2PC || Legacy_Settings.s.mode == Legacy_Settings.Mode.DonaldDuckPC) {
                         string dataPath = levelsFolder + "LEVELS0.DAT";
 						await PrepareBigFile(dataPath, 512*1024);
                         if (FileSystem.FileExists(dataPath)) {
@@ -96,28 +96,28 @@ namespace OpenSpace.Loader {
 					}
 
 					// Prepare folder names
-					string lvlFolder = ConvertCase(lvlName + "/", CPA_Settings.CapsType.LevelFolder);
-					string langLvlFolder = ConvertCase(lvlName + "/", CPA_Settings.CapsType.LangLevelFolder);
+					string lvlFolder = ConvertCase(lvlName + "/", Legacy_Settings.CapsType.LevelFolder);
+					string langLvlFolder = ConvertCase(lvlName + "/", Legacy_Settings.CapsType.LangLevelFolder);
 
 					// Prepare paths
-					paths["fix.sna"] = levelsFolder + ConvertCase("Fix.sna", CPA_Settings.CapsType.Fix);
-					paths["fix.rtb"] = levelsFolder + ConvertCase("Fix.rtb", CPA_Settings.CapsType.FixRelocation);
-					paths["fix.gpt"] = levelsFolder + ConvertCase("Fix.gpt", CPA_Settings.CapsType.Fix);
-					paths["fix.rtp"] = levelsFolder + ConvertCase("Fix.rtp", CPA_Settings.CapsType.FixRelocation);
-					paths["fix.ptx"] = levelsFolder + ConvertCase("Fix.ptx", CPA_Settings.CapsType.Fix);
-					paths["fix.rtt"] = levelsFolder + ConvertCase("Fix.rtt", CPA_Settings.CapsType.FixRelocation);
-					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) {
-						paths["fixlvl.rtb"] = levelsFolder + lvlFolder + ConvertCase("FixLvl.rtb", CPA_Settings.CapsType.FixLvl);
+					paths["fix.sna"] = levelsFolder + ConvertCase("Fix.sna", Legacy_Settings.CapsType.Fix);
+					paths["fix.rtb"] = levelsFolder + ConvertCase("Fix.rtb", Legacy_Settings.CapsType.FixRelocation);
+					paths["fix.gpt"] = levelsFolder + ConvertCase("Fix.gpt", Legacy_Settings.CapsType.Fix);
+					paths["fix.rtp"] = levelsFolder + ConvertCase("Fix.rtp", Legacy_Settings.CapsType.FixRelocation);
+					paths["fix.ptx"] = levelsFolder + ConvertCase("Fix.ptx", Legacy_Settings.CapsType.Fix);
+					paths["fix.rtt"] = levelsFolder + ConvertCase("Fix.rtt", Legacy_Settings.CapsType.FixRelocation);
+					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R2) {
+						paths["fixlvl.rtb"] = levelsFolder + lvlFolder + ConvertCase("FixLvl.rtb", Legacy_Settings.CapsType.FixLvl);
 					} else {
 						paths["fixlvl.rtb"] = null;
 					}
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
-						paths["fix.sda"] = levelsFolder + ConvertCase("Fix.sda", CPA_Settings.CapsType.Fix);
-						paths["fix.lng"] = langDataPath + ConvertCase("Fix.lng", CPA_Settings.CapsType.LangFix);
-						paths["fix.rtg"] = langDataPath + ConvertCase("Fix.rtg", CPA_Settings.CapsType.FixRelocation);
-						paths["fix.dlg"] = langDataPath + ConvertCase("Fix.dlg", CPA_Settings.CapsType.LangFix);
-						paths["fix.rtd"] = langDataPath + ConvertCase("Fix.rtd", CPA_Settings.CapsType.FixRelocation);
-						paths["fixlvl.rtg"] = langDataPath + langLvlFolder + ConvertCase("FixLvl.rtg", CPA_Settings.CapsType.FixLvl);
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
+						paths["fix.sda"] = levelsFolder + ConvertCase("Fix.sda", Legacy_Settings.CapsType.Fix);
+						paths["fix.lng"] = langDataPath + ConvertCase("Fix.lng", Legacy_Settings.CapsType.LangFix);
+						paths["fix.rtg"] = langDataPath + ConvertCase("Fix.rtg", Legacy_Settings.CapsType.FixRelocation);
+						paths["fix.dlg"] = langDataPath + ConvertCase("Fix.dlg", Legacy_Settings.CapsType.LangFix);
+						paths["fix.rtd"] = langDataPath + ConvertCase("Fix.rtd", Legacy_Settings.CapsType.FixRelocation);
+						paths["fixlvl.rtg"] = langDataPath + langLvlFolder + ConvertCase("FixLvl.rtg", Legacy_Settings.CapsType.FixLvl);
 					} else {
 						paths["fix.sda"] = null;
 						paths["fix.lng"] = null;
@@ -127,24 +127,24 @@ namespace OpenSpace.Loader {
 						paths["fixlvl.rtg"] = null;
 					}
 
-					paths["lvl.sna"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sna", CPA_Settings.CapsType.LevelFile);
-					paths["lvl.gpt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".gpt", CPA_Settings.CapsType.LevelFile);
-					paths["lvl.ptx"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".ptx", CPA_Settings.CapsType.LevelFile);
+					paths["lvl.sna"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sna", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl.gpt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".gpt", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl.ptx"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".ptx", Legacy_Settings.CapsType.LevelFile);
 					if (hasRelocationFiles) {
-						paths["lvl.rtb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtb", CPA_Settings.CapsType.LevelRelocation);
-						paths["lvl.rtp"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtp", CPA_Settings.CapsType.LevelRelocation);
-						paths["lvl.rtt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtt", CPA_Settings.CapsType.LevelRelocation);
+						paths["lvl.rtb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtb", Legacy_Settings.CapsType.LevelRelocation);
+						paths["lvl.rtp"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtp", Legacy_Settings.CapsType.LevelRelocation);
+						paths["lvl.rtt"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtt", Legacy_Settings.CapsType.LevelRelocation);
 					} else {
 						paths["lvl.rtb"] = null;
 						paths["lvl.rtp"] = null;
 						paths["lvl.rtt"] = null;
 					}
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
-						paths["lvl.sda"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sda", CPA_Settings.CapsType.LevelFile);
-						paths["lvl.lng"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".lng", CPA_Settings.CapsType.LangLevelFile);
-						paths["lvl.rtg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtg", CPA_Settings.CapsType.LangLevelFile);
-						paths["lvl.dlg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".dlg", CPA_Settings.CapsType.LangLevelFile);
-						paths["lvl.rtd"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtd", CPA_Settings.CapsType.LangLevelRelocation);
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
+						paths["lvl.sda"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sda", Legacy_Settings.CapsType.LevelFile);
+						paths["lvl.lng"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".lng", Legacy_Settings.CapsType.LangLevelFile);
+						paths["lvl.rtg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtg", Legacy_Settings.CapsType.LangLevelFile);
+						paths["lvl.dlg"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".dlg", Legacy_Settings.CapsType.LangLevelFile);
+						paths["lvl.rtd"] = langDataPath + langLvlFolder + ConvertCase(lvlName + ".rtd", Legacy_Settings.CapsType.LangLevelRelocation);
 					} else {
 						paths["lvl.sda"] = null;
 						paths["lvl.lng"] = null;
@@ -152,9 +152,9 @@ namespace OpenSpace.Loader {
 						paths["lvl.dlg"] = null;
 						paths["lvl.rtd"] = null;
 					}
-					paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsb", CPA_Settings.CapsType.DSB);
-					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) {
-						paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsc", CPA_Settings.CapsType.DSB);
+					paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsb", Legacy_Settings.CapsType.DSB);
+					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R2) {
+						paths["lvl.dsb"] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".dsc", Legacy_Settings.CapsType.DSB);
                     }
 
 					// Download files
@@ -183,7 +183,7 @@ namespace OpenSpace.Loader {
 						fixRtb.Add(fixLvlRtb);
                     }
                     SNA fixSna = new SNA("Fix", paths["fix.sna"], fixRtb);
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
 						RelocationTable fixLangRTG = new RelocationTable(paths["fix.rtg"], dat, "fixLang", RelocationType.RTG);
 						await fixLangRTG.Init();
 						if (FileSystem.FileExists(paths["fixlvl.rtg"])) {
@@ -216,7 +216,7 @@ namespace OpenSpace.Loader {
                     RelocationTable lvlRtb = new RelocationTable(paths["lvl.rtb"], dat, lvlName, RelocationType.RTB);
 					await lvlRtb.Init();
 					SNA lvlSna = new SNA(lvlName, paths["lvl.sna"], lvlRtb);
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal && FileSystem.DirectoryExists(langDataPath)) {
 						RelocationTable lvlLangRTG = new RelocationTable(paths["lvl.rtg"], dat, lvlName + "Lang", RelocationType.RTG);
 						await lvlLangRTG.Init();
 						SNA lvlLangSna = new SNA(lvlName + "Lang", paths["lvl.lng"], lvlLangRTG);
@@ -228,7 +228,7 @@ namespace OpenSpace.Loader {
 						lvlSna.ReadDLG(paths["lvl.dlg"], lvlRtd);
                     }
 
-                    if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
+                    if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT) {
                         RelocationTable lvlRtp = new RelocationTable(paths["lvl.rtp"], dat, lvlName, RelocationType.RTP);
 						await lvlRtp.Init();
 						lvlSna.ReadGPT(paths["lvl.gpt"], lvlRtp);
@@ -289,29 +289,29 @@ namespace OpenSpace.Loader {
             print("FIX GPT offset: " + LegacyPointer.Current(reader));
             SNA sna = (SNA)files_array[Mem.Fix];
 
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.TT) {
                 // Tonic Trouble
                 inputStruct = new InputStructure(null);
-                uint stringCount = CPA_Settings.s.game == CPA_Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
+                uint stringCount = Legacy_Settings.s.game == Legacy_Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
                 LegacyPointer.Read(reader);
                 LegacyPointer.Read(reader);
                 LegacyPointer.Read(reader);
-                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
                     for (int i = 0; i < 50; i++) LegacyPointer.Read(reader);
                 } else {
                     for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
                 }
                 reader.ReadUInt32(); // 0x35
-                if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
+                if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
                 reader.ReadBytes(0x90);
                 LegacyPointer.Read(reader);
                 reader.ReadUInt32(); // 0x28
                 reader.ReadUInt32(); // 0x1
-                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) LegacyPointer.Read(reader);
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) LegacyPointer.Read(reader);
                 for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
                 for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
                 reader.ReadUInt32(); // 0x1
-                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
                     reader.ReadBytes(0xB4);
                 } else {
                     if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
@@ -329,7 +329,7 @@ namespace OpenSpace.Loader {
                 LegacyPointer.Read(reader);
                 for (int i = 0; i < stringCount; i++) LegacyPointer.Read(reader); // read num_loaded_strings pointers here
                 reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
-                if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) { // There's more but what is even the point in reading all this
+                if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) { // There's more but what is even the point in reading all this
                     reader.ReadUInt32();
                     LegacyPointer.Read(reader);
                     reader.ReadBytes(0x14);
@@ -352,7 +352,7 @@ namespace OpenSpace.Loader {
                     reader.ReadBytes(0x30);
                     reader.ReadBytes(0x960);
                 }
-            } else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            } else if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                 uint num_strings = 0;
                 inputStruct = new InputStructure(null);
 
@@ -434,7 +434,7 @@ namespace OpenSpace.Loader {
                 LegacyPointer off_staticCollisionGeoObj = LegacyPointer.Read(reader);
                 loadingState = "Loading input structure";
                 await WaitIfNecessary();
-                for (int i = 0; i < CPA_Settings.s.numEntryActions; i++) {
+                for (int i = 0; i < Legacy_Settings.s.numEntryActions; i++) {
                     LegacyPointer.Read(reader); // 3DOS_EntryActions
                 }
                 LegacyPointer off_IPT_keyAndPadDefine = LegacyPointer.Read(reader);
@@ -489,7 +489,7 @@ namespace OpenSpace.Loader {
             reader = files_array[Mem.Lvl].reader;
             print("LVL GPT offset: " + LegacyPointer.Current(reader));
 
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
 
                 // SDA
                 /*sna.GotoSDA();
@@ -511,14 +511,14 @@ namespace OpenSpace.Loader {
 
                 // GPT
                 sna.GotoHeader();
-                if (CPA_Settings.s.game != CPA_Settings.Game.PlaymobilLaura) {
+                if (Legacy_Settings.s.game != Legacy_Settings.Game.PlaymobilLaura) {
                     LegacyPointer.Read(reader); // sound related
                 }
                 LegacyPointer.Read(reader);
                 LegacyPointer.Read(reader);
                 reader.ReadUInt32();
             }
-            if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.Montreal) {
                 loadingState = "Reading settings for persos in fix";
                 await WaitIfNecessary();
                 // Fill in fix -> lvl pointers for perso's in fix
@@ -531,7 +531,7 @@ namespace OpenSpace.Loader {
                         reader.ReadUInt32();
                         LegacyPointer off_stdGame = LegacyPointer.Read(reader);
                         if (off_stdGame != null) {
-                            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
+                            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT) {
                                 LegacyPointer.Goto(ref reader, off_stdGame);
                                 reader.ReadUInt32(); // type 0
                                 reader.ReadUInt32(); // type 1
@@ -545,7 +545,7 @@ namespace OpenSpace.Loader {
                             // First read everything from the GPT
                             LegacyPointer off_newSuperObject = null, off_nextBrother = null, off_prevBrother = null, off_father = null;
                             byte[] matrixData = null, floatData = null, renderBits = null;
-                            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
+                            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT) {
                                 off_newSuperObject = LegacyPointer.Read(reader);
                                 matrixData = reader.ReadBytes(0x58);
                                 renderBits = reader.ReadBytes(4);
@@ -569,13 +569,13 @@ namespace OpenSpace.Loader {
                                 persoInFixPointers[i] = off_newSOengineObject;
                                 LegacyPointer.Goto(ref reader, off_newSOengineObject);
 								LegacyPointer off_p3dData = LegacyPointer.Read(reader);
-                                if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo) {
+                                if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo) {
                                     ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x1C, matrixData);
                                 } else {
                                     ((SNA)off_p3dData.file).OverwriteData(off_p3dData.FileOffset + 0x18, matrixData);
                                 }
 
-                                if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT) {
+                                if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT) {
                                     FileWithPointers file = off_newSuperObject.file;
                                     file.AddPointer(off_newSuperObject.FileOffset + 0x14, off_nextBrother);
                                     file.AddPointer(off_newSuperObject.FileOffset + 0x18, off_prevBrother);
@@ -594,7 +594,7 @@ namespace OpenSpace.Loader {
             }
             loadingState = "Loading globals";
             await WaitIfNecessary();
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                 globals.off_actualWorld = LegacyPointer.Read(reader);
                 globals.off_dynamicWorld = LegacyPointer.Read(reader);
                 globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
@@ -605,7 +605,7 @@ namespace OpenSpace.Loader {
                 globals.off_dynamicWorld = LegacyPointer.Read(reader);
                 globals.off_fatherSector = LegacyPointer.Read(reader);
                 uint soundEventIndex = reader.ReadUInt32(); // In Montreal version this is a pointer, also sound event related
-                if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.PlaymobilLaura) {
                     LegacyPointer.Read(reader);
                 }
             }
@@ -613,7 +613,7 @@ namespace OpenSpace.Loader {
             globals.num_always = reader.ReadUInt32();
             globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
             globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                 globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
                 globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
             } else {
@@ -621,8 +621,8 @@ namespace OpenSpace.Loader {
                 globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
             }
 
-            if (CPA_Settings.s.game == CPA_Settings.Game.DD) reader.ReadUInt32();
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.DD) reader.ReadUInt32();
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                 LegacyPointer dword_4A6B1C_always_header = LegacyPointer.Read(reader);
                 LegacyPointer dword_4A6B20_always_last = LegacyPointer.Read(reader);
 
@@ -657,7 +657,7 @@ namespace OpenSpace.Loader {
             loadingState = "Loading engine structure";
             await WaitIfNecessary();
             print("Start of EngineStructure: " + LegacyPointer.Current(reader));
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                 reader.ReadByte();
                 string mapName = reader.ReadString(0x1E);
                 reader.ReadChars(0x1E);
@@ -669,16 +669,16 @@ namespace OpenSpace.Loader {
                 string mapName = reader.ReadString(0x104);
                 reader.ReadChars(0x104);
                 string mapName2 = reader.ReadString(0x104);
-                if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.PlaymobilLaura) {
                     reader.ReadChars(0x104);
                     reader.ReadChars(0x104);
                 }
                 string mapName3 = reader.ReadString(0x104);
-                if (CPA_Settings.s.game == CPA_Settings.Game.TT) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TT) {
                     reader.ReadBytes(0x47F7); // don't know what this data is
-                } else if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+                } else if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
                     reader.ReadBytes(0x240F);
-                } else if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
+                } else if (Legacy_Settings.s.game == Legacy_Settings.Game.PlaymobilLaura) {
                     reader.ReadBytes(0x240F); // don't know what this data is
                 } else { // Hype & Alex
                     reader.ReadBytes(0x2627); // don't know what this data is
@@ -691,17 +691,17 @@ namespace OpenSpace.Loader {
             families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
             families.FillPointers(reader, families.off_tail, families.off_head);
 
-            if (CPA_Settings.s.game == CPA_Settings.Game.PlaymobilLaura) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.PlaymobilLaura) {
                 LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
             }
 
             LinkedList<SuperObject> alwaysActiveCharacters = LinkedList<SuperObject>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
 
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
-                if (CPA_Settings.s.game == CPA_Settings.Game.RedPlanet ||CPA_Settings.s.game == CPA_Settings.Game.R2Demo) reader.ReadUInt32();
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet ||Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo) reader.ReadUInt32();
                 LegacyPointer off_languages = LegacyPointer.Read(reader);
                 reader.ReadUInt32();
 
@@ -724,7 +724,7 @@ namespace OpenSpace.Loader {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
 
-                if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.DD) {
                     reader.ReadUInt32();
                 }
 
@@ -732,7 +732,7 @@ namespace OpenSpace.Loader {
                 LegacyPointer off_light = LegacyPointer.Read(reader); // the offset of a light. It's just an ordinary light.
                 LegacyPointer off_mainChar = LegacyPointer.Read(reader); // superobject
                 LegacyPointer off_characterLaunchingSoundEvents = LegacyPointer.Read(reader);
-                if (CPA_Settings.s.game == CPA_Settings.Game.DD) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.DD) {
                     globals.off_backgroundGameMaterial = LegacyPointer.Read(reader);
                 }
                 LegacyPointer off_shadowPolygonVisualMaterial = LegacyPointer.Read(reader);
@@ -747,11 +747,11 @@ namespace OpenSpace.Loader {
                 }
                 LegacyPointer.Read(reader); // DemoSOList
 
-                if (CPA_Settings.s.game == CPA_Settings.Game.R2Demo || CPA_Settings.s.game == CPA_Settings.Game.RedPlanet || CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPCDemo) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo || Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet || Legacy_Settings.s.mode == Legacy_Settings.Mode.DonaldDuckPCDemo) {
                     LegacyPointer.Read(reader);
                 }
 
-                if (CPA_Settings.s.mode == CPA_Settings.Mode.DonaldDuckPCDemo) {
+                if (Legacy_Settings.s.mode == Legacy_Settings.Mode.DonaldDuckPCDemo) {
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                 }
@@ -792,13 +792,13 @@ namespace OpenSpace.Loader {
 
             loadingState = "Creating animation bank";
             await WaitIfNecessary();
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                 animationBanks = new AnimationBank[2];
                 animationBanks[0] = new AnimationBank(null) {
                     animations = new Animation.Component.AnimA3DGeneral[0]
                 };
                 animationBanks[1] = animationBanks[0];
-            } else if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
+            } else if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.TT) {
                 uint maxAnimIndex = 0;
                 foreach (State s in states) {
                     if (s.anim_ref != null && s.anim_ref.anim_index > maxAnimIndex) maxAnimIndex = s.anim_ref.anim_index;
@@ -824,7 +824,7 @@ namespace OpenSpace.Loader {
             ReadCrossReferences(reader);
 
 			// TODO: Make more generic
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2) {
 				loadingState = "Filling in comport names";
 				await WaitIfNecessary();
 				string path = gameDataBinFolder + "R2DC_Comports.json";

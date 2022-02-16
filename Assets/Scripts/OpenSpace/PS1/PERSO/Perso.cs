@@ -34,7 +34,7 @@ namespace OpenSpace.PS1 {
 			p3dData = Load.FromOffsetOrRead<Perso3dData>(reader, off_p3dData);
 			LegacyPointer.DoAt(ref reader, off_superObjectPointer, () => {
 				LegacyPointer off_superobject = LegacyPointer.Read(reader);
-				if (CPA_Settings.s.game == CPA_Settings.Game.RRush) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.RRush) {
 					LegacyPointer off_name = LegacyPointer.Read(reader);
 					LegacyPointer.DoAt(ref reader, off_name, () => {
 						name = reader.ReadNullDelimitedString();

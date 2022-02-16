@@ -142,26 +142,26 @@ namespace OpenSpace.Collide {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementCollideTriangles sm = new GeometricObjectElementCollideTriangles(offset, geo);
             sm.off_material = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				sm.num_triangles = reader.ReadUInt16();
 				reader.ReadUInt16();
 				sm.off_triangles = LegacyPointer.Read(reader);
-				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 					sm.off_normals = LegacyPointer.Read(reader);
 					sm.off_unk = LegacyPointer.Read(reader);
 				}
 			} else {
-				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+				if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
 					sm.num_triangles = reader.ReadUInt16();
 					sm.num_mapping = reader.ReadUInt16();
 					sm.off_triangles = LegacyPointer.Read(reader);
 					sm.off_mapping = LegacyPointer.Read(reader);
 					sm.off_normals = LegacyPointer.Read(reader);
 					sm.off_uvs = LegacyPointer.Read(reader);
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
 						reader.ReadUInt32();
 					}
-					if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) {
+					if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) {
 						LegacyPointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
 						reader.ReadUInt16(); // num_unk
 						sm.ind_parallelBox = reader.ReadInt16();
@@ -172,7 +172,7 @@ namespace OpenSpace.Collide {
 					sm.num_triangles = reader.ReadUInt16();
 					sm.ind_parallelBox = reader.ReadInt16();
 					reader.ReadUInt32();
-					if (CPA_Settings.s.game != CPA_Settings.Game.Dinosaur) {
+					if (Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur) {
 						sm.off_mapping = LegacyPointer.Read(reader);
 						sm.off_unk = LegacyPointer.Read(reader); // num_mapping_entries * 3 floats 
 						sm.off_unk2 = LegacyPointer.Read(reader); // num_mapping_entries * 1 float

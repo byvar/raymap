@@ -83,18 +83,18 @@ namespace OpenSpace.Object {
             p.off_3dData = LegacyPointer.Read(reader); // 0x0
             p.off_stdGame = LegacyPointer.Read(reader); // 4 Standard Game info
             p.off_dynam = LegacyPointer.Read(reader); // 0x8 Dynam
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32();
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) reader.ReadUInt32();
             p.off_brain = LegacyPointer.Read(reader); // 0xC
             p.off_camera = LegacyPointer.Read(reader); // 0x10 is Camera in Rayman 2
             p.off_collSet = LegacyPointer.Read(reader); // 0x14 collset
             p.off_msWay = LegacyPointer.Read(reader); // 0x18
             p.off_msLight = LegacyPointer.Read(reader); // 0x1C - MSLight
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32();
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) reader.ReadUInt32();
             p.off_sectInfo = LegacyPointer.Read(reader); // 0x20 // Pointer to struct that points to active sector
             reader.ReadUInt32(); // 0x24
             reader.ReadUInt32();
-            if (CPA_Settings.s.game == CPA_Settings.Game.RA || CPA_Settings.s.game == CPA_Settings.Game.RM) reader.ReadUInt32();
-            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.RA || Legacy_Settings.s.game == Legacy_Settings.Game.RM) reader.ReadUInt32();
+            if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                 reader.ReadUInt32();
                 reader.ReadUInt32();
                 reader.ReadUInt32();
@@ -107,7 +107,7 @@ namespace OpenSpace.Object {
 
 			LegacyPointer.DoAt(ref reader, p.off_stdGame, () => {
 				p.stdGame = StandardGame.Read(reader, p.off_stdGame);
-				if (CPA_Settings.s.hasObjectTypes) {
+				if (Legacy_Settings.s.hasObjectTypes) {
 					p.nameFamily = p.stdGame.GetName(0);
 					p.nameModel = p.stdGame.GetName(1);
 					p.namePerso = p.stdGame.GetName(2);
@@ -127,7 +127,7 @@ namespace OpenSpace.Object {
 			});
 			
             l.print("[" + p.nameFamily + "] " + p.nameModel + " | " + p.namePerso + " - offset: " + offset+" superObject offset: "+(so!=null?so.offset.ToString():"null"));
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal && Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution) {
 				LegacyPointer.DoAt(ref reader, p.off_dynam, () => {
 					p.dynam = Dynam.Read(reader, p.off_dynam);
 				});
@@ -180,7 +180,7 @@ namespace OpenSpace.Object {
 					}*/
 				}
                 if (p.brain != null && p.brain.mind != null && p.brain.mind.AI_model != null
-                    && !(CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
+                    && !(Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.loadFromMemory)) { // Weird bug for R3 memory loading
                                                                                                           // Add physical objects tables hidden in scripts
                     AIModel ai = p.brain.mind.AI_model;
                     if (ai.behaviors_normal != null) {
@@ -304,7 +304,7 @@ namespace OpenSpace.Object {
             }
 
             if (persoBehaviour.clearTheBrain) {
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                    LegacyPointer.Goto(ref writer, offset + 0x10);
                 } else {
                     LegacyPointer.Goto(ref writer, offset + 0xC);

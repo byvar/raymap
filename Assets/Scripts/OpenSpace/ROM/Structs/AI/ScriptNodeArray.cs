@@ -61,7 +61,7 @@ namespace OpenSpace.ROM {
 				param = reader.ReadUInt16();
 
                 nodeType = NodeType.Unknown;
-                if (CPA_Settings.s.aiTypes != null) nodeType = CPA_Settings.s.aiTypes.GetNodeType(type);
+                if (Legacy_Settings.s.aiTypes != null) nodeType = Legacy_Settings.s.aiTypes.GetNodeType(type);
 
 				switch (nodeType) {
 					case NodeType.GraphRef:
@@ -138,7 +138,7 @@ namespace OpenSpace.ROM {
                 R2ROMLoader l = Loader;
                 short mask = 0;
 
-                AITypes aiTypes = CPA_Settings.s.aiTypes;
+                AITypes aiTypes = Legacy_Settings.s.aiTypes;
 
                 Vector3 vector3 = new Vector3 { x = 0, y = 0, z = 0 };
                 switch (nodeType) {

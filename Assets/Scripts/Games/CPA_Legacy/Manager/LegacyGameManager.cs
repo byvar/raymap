@@ -57,25 +57,25 @@ namespace Raymap {
 			// Add the found files containing the correct file extension
 			string extension = null;
 			string[] levels;
-			CPA_Settings.Init(GetSettings(settings));
-			switch (CPA_Settings.s.platform) {
-				case CPA_Settings.Platform.PC:
-				case CPA_Settings.Platform.iOS:
-				case CPA_Settings.Platform.GC:
-				case CPA_Settings.Platform.Xbox:
-				case CPA_Settings.Platform.Xbox360:
-				case CPA_Settings.Platform.PS3:
-				case CPA_Settings.Platform.MacOS:
-					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+			Legacy_Settings.Init(GetSettings(settings));
+			switch (Legacy_Settings.s.platform) {
+				case Legacy_Settings.Platform.PC:
+				case Legacy_Settings.Platform.iOS:
+				case Legacy_Settings.Platform.GC:
+				case Legacy_Settings.Platform.Xbox:
+				case Legacy_Settings.Platform.Xbox360:
+				case Legacy_Settings.Platform.PS3:
+				case Legacy_Settings.Platform.MacOS:
+					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
 						extension = "*.sna";
 					} else {
 						extension = "*.lvl";
 					}
 					break;
-				case CPA_Settings.Platform.DC: extension = "*.DAT"; break;
-				case CPA_Settings.Platform.PS2:
-					if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-						if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R2) {
+				case Legacy_Settings.Platform.DC: extension = "*.DAT"; break;
+				case Legacy_Settings.Platform.PS2:
+					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
+						if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R2) {
 							extension = "*.sna";
 						} else {
 							extension = "*.lv2";
@@ -84,7 +84,7 @@ namespace Raymap {
 						extension = "*.lvl";
 					}
 					break;
-				case CPA_Settings.Platform.PS1:
+				case Legacy_Settings.Platform.PS1:
 					MapLoader.Reset();
 					R2PS1Loader l1 = MapLoader.Loader as R2PS1Loader;
 					l1.gameDataBinFolder = directory;
@@ -92,9 +92,9 @@ namespace Raymap {
 					MapLoader.Reset();
 					output.AddRange(levels);
 					break;
-				case CPA_Settings.Platform.DS:
-				case CPA_Settings.Platform.N64:
-				case CPA_Settings.Platform._3DS:
+				case Legacy_Settings.Platform.DS:
+				case Legacy_Settings.Platform.N64:
+				case Legacy_Settings.Platform._3DS:
 					MapLoader.Reset();
 					R2ROMLoader lr = MapLoader.Loader as R2ROMLoader;
 					lr.gameDataBinFolder = directory;
@@ -103,7 +103,7 @@ namespace Raymap {
 					output.AddRange(levels);
 					break;
 			}
-			CPA_Settings.s = null;
+			Legacy_Settings.s = null;
 			if (extension != null) {
 				output.AddRange(
 					from file in Directory.EnumerateFiles(directory, extension, SearchOption.AllDirectories)
@@ -121,72 +121,72 @@ namespace Raymap {
 			return output;
 		}
 		public void CreateSettings(MapViewerSettings settings) {
-			CPA_Settings.Init(GetSettings(settings));
+			Legacy_Settings.Init(GetSettings(settings));
 		}
 
-		public CPA_Settings GetSettings(MapViewerSettings settings) {
-			CPA_Settings.Mode Mode = GetLegacyMode(settings);
-			return CPA_Settings.GetSettings(Mode);
+		public Legacy_Settings GetSettings(MapViewerSettings settings) {
+			Legacy_Settings.Mode Mode = GetLegacyMode(settings);
+			return Legacy_Settings.GetSettings(Mode);
 		}
 
-		public CPA_Settings.Mode GetLegacyMode(MapViewerSettings settings) {
+		public Legacy_Settings.Mode GetLegacyMode(MapViewerSettings settings) {
 			var raymapMode = settings.GameModeSelection;
-			CPA_Settings.Mode legacyMode = raymapMode switch {
-				GameModeSelection.Rayman2PC => CPA_Settings.Mode.Rayman2PC,
-				GameModeSelection.Rayman2PCDemo_1999_08_18 => CPA_Settings.Mode.Rayman2PCDemo_1999_08_18,
-				GameModeSelection.Rayman2PCDemo_1999_09_04 => CPA_Settings.Mode.Rayman2PCDemo_1999_09_04,
-				GameModeSelection.Rayman2DC => CPA_Settings.Mode.Rayman2DC,
-				GameModeSelection.Rayman2IOS => CPA_Settings.Mode.Rayman2IOS,
-				GameModeSelection.Rayman2IOSDemo => CPA_Settings.Mode.Rayman2IOSDemo,
-				GameModeSelection.Rayman2PS1 => CPA_Settings.Mode.Rayman2PS1,
-				GameModeSelection.Rayman2PS2 => CPA_Settings.Mode.Rayman2PS2,
-				GameModeSelection.Rayman2N64 => CPA_Settings.Mode.Rayman2N64,
-				GameModeSelection.Rayman2DS => CPA_Settings.Mode.Rayman2DS,
-				GameModeSelection.Rayman23DS => CPA_Settings.Mode.Rayman23DS,
-				GameModeSelection.RaymanMPC => CPA_Settings.Mode.RaymanMPC,
-				GameModeSelection.RaymanMPS2 => CPA_Settings.Mode.RaymanMPS2,
-				GameModeSelection.RaymanMPS2Demo_2001_07_25 => CPA_Settings.Mode.RaymanMPS2Demo_2001_07_25,
-				GameModeSelection.RaymanArenaPC => CPA_Settings.Mode.RaymanArenaPC,
-				GameModeSelection.RaymanArenaPS2 => CPA_Settings.Mode.RaymanArenaPS2,
-				GameModeSelection.RaymanArenaGC => CPA_Settings.Mode.RaymanArenaGC,
-				GameModeSelection.RaymanArenaGCDemo_2002_03_07 => CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07,
-				GameModeSelection.RaymanArenaXbox => CPA_Settings.Mode.RaymanArenaXbox,
-				GameModeSelection.RaymanRushPS1 => CPA_Settings.Mode.RaymanRushPS1,
-				GameModeSelection.Rayman3PC => CPA_Settings.Mode.Rayman3PC,
-				GameModeSelection.Rayman3PCDemo_2002_10_01 => CPA_Settings.Mode.Rayman3PCDemo_2002_10_01,
-				GameModeSelection.Rayman3PCDemo_2002_10_21 => CPA_Settings.Mode.Rayman3PCDemo_2002_10_21,
-				GameModeSelection.Rayman3PCDemo_2002_12_09 => CPA_Settings.Mode.Rayman3PCDemo_2002_12_09,
-				GameModeSelection.Rayman3PCDemo_2003_01_06 => CPA_Settings.Mode.Rayman3PCDemo_2003_01_06,
-				GameModeSelection.Rayman3MacOS => CPA_Settings.Mode.Rayman3MacOS,
-				GameModeSelection.Rayman3GC => CPA_Settings.Mode.Rayman3GC,
-				GameModeSelection.Rayman3PS2 => CPA_Settings.Mode.Rayman3PS2,
-				GameModeSelection.Rayman3PS2Demo_2002_05_17 => CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17,
-				GameModeSelection.Rayman3PS2Demo_2002_08_07 => CPA_Settings.Mode.Rayman3PS2Demo_2002_08_07,
-				GameModeSelection.Rayman3PS2DevBuild_2002_09_06 => CPA_Settings.Mode.Rayman3PS2DevBuild_2002_09_06,
-				GameModeSelection.Rayman3PS2Demo_2002_10_29 => CPA_Settings.Mode.Rayman3PS2Demo_2002_10_29,
-				GameModeSelection.Rayman3PS2Demo_2002_12_18 => CPA_Settings.Mode.Rayman3PS2Demo_2002_12_18,
-				GameModeSelection.Rayman3Xbox => CPA_Settings.Mode.Rayman3Xbox,
-				GameModeSelection.Rayman3Xbox360 => CPA_Settings.Mode.Rayman3Xbox360,
-				GameModeSelection.Rayman3PS3 => CPA_Settings.Mode.Rayman3PS3,
-				GameModeSelection.RaymanRavingRabbidsDS => CPA_Settings.Mode.RaymanRavingRabbidsDS,
-				GameModeSelection.RaymanRavingRabbidsDSDevBuild_2006_05_25 => CPA_Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25,
-				GameModeSelection.TonicTroublePC => CPA_Settings.Mode.TonicTroublePC,
-				GameModeSelection.TonicTroubleSEPC => CPA_Settings.Mode.TonicTroubleSEPC,
-				GameModeSelection.TonicTroubleN64 => CPA_Settings.Mode.TonicTroubleN64,
-				GameModeSelection.DonaldDuckPC => CPA_Settings.Mode.DonaldDuckPC,
-				GameModeSelection.DonaldDuckPCDemo => CPA_Settings.Mode.DonaldDuckPCDemo,
-				GameModeSelection.DonaldDuckDC => CPA_Settings.Mode.DonaldDuckDC,
-				GameModeSelection.DonaldDuckN64 => CPA_Settings.Mode.DonaldDuckN64,
-				GameModeSelection.DonaldDuckPS1 => CPA_Settings.Mode.DonaldDuckPS1,
-				GameModeSelection.DonaldDuckPKGC => CPA_Settings.Mode.DonaldDuckPKGC,
-				GameModeSelection.PlaymobilHypePC => CPA_Settings.Mode.PlaymobilHypePC,
-				GameModeSelection.PlaymobilLauraPC => CPA_Settings.Mode.PlaymobilLauraPC,
-				GameModeSelection.PlaymobilAlexPC => CPA_Settings.Mode.PlaymobilAlexPC,
-				GameModeSelection.DinosaurPC => CPA_Settings.Mode.DinosaurPC,
-				GameModeSelection.LargoWinchPC => CPA_Settings.Mode.LargoWinchPC,
-				GameModeSelection.JungleBookPS1 => CPA_Settings.Mode.JungleBookPS1,
-				GameModeSelection.VIPPS1 => CPA_Settings.Mode.VIPPS1,
-				GameModeSelection.RedPlanetPC => CPA_Settings.Mode.RedPlanetPC,
+			Legacy_Settings.Mode legacyMode = raymapMode switch {
+				GameModeSelection.Rayman2PC => Legacy_Settings.Mode.Rayman2PC,
+				GameModeSelection.Rayman2PCDemo_1999_08_18 => Legacy_Settings.Mode.Rayman2PCDemo_1999_08_18,
+				GameModeSelection.Rayman2PCDemo_1999_09_04 => Legacy_Settings.Mode.Rayman2PCDemo_1999_09_04,
+				GameModeSelection.Rayman2DC => Legacy_Settings.Mode.Rayman2DC,
+				GameModeSelection.Rayman2IOS => Legacy_Settings.Mode.Rayman2IOS,
+				GameModeSelection.Rayman2IOSDemo => Legacy_Settings.Mode.Rayman2IOSDemo,
+				GameModeSelection.Rayman2PS1 => Legacy_Settings.Mode.Rayman2PS1,
+				GameModeSelection.Rayman2PS2 => Legacy_Settings.Mode.Rayman2PS2,
+				GameModeSelection.Rayman2N64 => Legacy_Settings.Mode.Rayman2N64,
+				GameModeSelection.Rayman2DS => Legacy_Settings.Mode.Rayman2DS,
+				GameModeSelection.Rayman23DS => Legacy_Settings.Mode.Rayman23DS,
+				GameModeSelection.RaymanMPC => Legacy_Settings.Mode.RaymanMPC,
+				GameModeSelection.RaymanMPS2 => Legacy_Settings.Mode.RaymanMPS2,
+				GameModeSelection.RaymanMPS2Demo_2001_07_25 => Legacy_Settings.Mode.RaymanMPS2Demo_2001_07_25,
+				GameModeSelection.RaymanArenaPC => Legacy_Settings.Mode.RaymanArenaPC,
+				GameModeSelection.RaymanArenaPS2 => Legacy_Settings.Mode.RaymanArenaPS2,
+				GameModeSelection.RaymanArenaGC => Legacy_Settings.Mode.RaymanArenaGC,
+				GameModeSelection.RaymanArenaGCDemo_2002_03_07 => Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07,
+				GameModeSelection.RaymanArenaXbox => Legacy_Settings.Mode.RaymanArenaXbox,
+				GameModeSelection.RaymanRushPS1 => Legacy_Settings.Mode.RaymanRushPS1,
+				GameModeSelection.Rayman3PC => Legacy_Settings.Mode.Rayman3PC,
+				GameModeSelection.Rayman3PCDemo_2002_10_01 => Legacy_Settings.Mode.Rayman3PCDemo_2002_10_01,
+				GameModeSelection.Rayman3PCDemo_2002_10_21 => Legacy_Settings.Mode.Rayman3PCDemo_2002_10_21,
+				GameModeSelection.Rayman3PCDemo_2002_12_09 => Legacy_Settings.Mode.Rayman3PCDemo_2002_12_09,
+				GameModeSelection.Rayman3PCDemo_2003_01_06 => Legacy_Settings.Mode.Rayman3PCDemo_2003_01_06,
+				GameModeSelection.Rayman3MacOS => Legacy_Settings.Mode.Rayman3MacOS,
+				GameModeSelection.Rayman3GC => Legacy_Settings.Mode.Rayman3GC,
+				GameModeSelection.Rayman3PS2 => Legacy_Settings.Mode.Rayman3PS2,
+				GameModeSelection.Rayman3PS2Demo_2002_05_17 => Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17,
+				GameModeSelection.Rayman3PS2Demo_2002_08_07 => Legacy_Settings.Mode.Rayman3PS2Demo_2002_08_07,
+				GameModeSelection.Rayman3PS2DevBuild_2002_09_06 => Legacy_Settings.Mode.Rayman3PS2DevBuild_2002_09_06,
+				GameModeSelection.Rayman3PS2Demo_2002_10_29 => Legacy_Settings.Mode.Rayman3PS2Demo_2002_10_29,
+				GameModeSelection.Rayman3PS2Demo_2002_12_18 => Legacy_Settings.Mode.Rayman3PS2Demo_2002_12_18,
+				GameModeSelection.Rayman3Xbox => Legacy_Settings.Mode.Rayman3Xbox,
+				GameModeSelection.Rayman3Xbox360 => Legacy_Settings.Mode.Rayman3Xbox360,
+				GameModeSelection.Rayman3PS3 => Legacy_Settings.Mode.Rayman3PS3,
+				GameModeSelection.RaymanRavingRabbidsDS => Legacy_Settings.Mode.RaymanRavingRabbidsDS,
+				GameModeSelection.RaymanRavingRabbidsDSDevBuild_2006_05_25 => Legacy_Settings.Mode.RaymanRavingRabbidsDSDevBuild_2006_05_25,
+				GameModeSelection.TonicTroublePC => Legacy_Settings.Mode.TonicTroublePC,
+				GameModeSelection.TonicTroubleSEPC => Legacy_Settings.Mode.TonicTroubleSEPC,
+				GameModeSelection.TonicTroubleN64 => Legacy_Settings.Mode.TonicTroubleN64,
+				GameModeSelection.DonaldDuckPC => Legacy_Settings.Mode.DonaldDuckPC,
+				GameModeSelection.DonaldDuckPCDemo => Legacy_Settings.Mode.DonaldDuckPCDemo,
+				GameModeSelection.DonaldDuckDC => Legacy_Settings.Mode.DonaldDuckDC,
+				GameModeSelection.DonaldDuckN64 => Legacy_Settings.Mode.DonaldDuckN64,
+				GameModeSelection.DonaldDuckPS1 => Legacy_Settings.Mode.DonaldDuckPS1,
+				GameModeSelection.DonaldDuckPKGC => Legacy_Settings.Mode.DonaldDuckPKGC,
+				GameModeSelection.PlaymobilHypePC => Legacy_Settings.Mode.PlaymobilHypePC,
+				GameModeSelection.PlaymobilLauraPC => Legacy_Settings.Mode.PlaymobilLauraPC,
+				GameModeSelection.PlaymobilAlexPC => Legacy_Settings.Mode.PlaymobilAlexPC,
+				GameModeSelection.DinosaurPC => Legacy_Settings.Mode.DinosaurPC,
+				GameModeSelection.LargoWinchPC => Legacy_Settings.Mode.LargoWinchPC,
+				GameModeSelection.JungleBookPS1 => Legacy_Settings.Mode.JungleBookPS1,
+				GameModeSelection.VIPPS1 => Legacy_Settings.Mode.VIPPS1,
+				GameModeSelection.RedPlanetPC => Legacy_Settings.Mode.RedPlanetPC,
 				_ => throw new Exception($"Could not match Mode {raymapMode} with any CPA mode.")
 			};
 			return legacyMode;

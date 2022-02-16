@@ -44,20 +44,20 @@ namespace OpenSpace.Loader {
 
 
 				// Prepare folder names
-				string fixFolder = gameDataBinFolder + ConvertCase("Fix/", CPA_Settings.CapsType.LevelFolder);
-				string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", CPA_Settings.CapsType.LevelFolder);
+				string fixFolder = gameDataBinFolder + ConvertCase("Fix/", Legacy_Settings.CapsType.LevelFolder);
+				string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Legacy_Settings.CapsType.LevelFolder);
 				
 				// Prepare paths
-				paths["fix.lv2"] = fixFolder + ConvertCase("Fix.lv2", CPA_Settings.CapsType.LevelFile);
-				paths["fix.pt2"] = fixFolder + ConvertCase("Fix.pt2", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.lv2"] = lvlFolder + ConvertCase(lvlName + ".lv2", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.pt2"] = lvlFolder + ConvertCase(lvlName + ".pt2", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.ato.0"] = lvlFolder + ConvertCase(lvlName + ".ato.0", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.rw3.0"] = lvlFolder + ConvertCase(lvlName + ".rw3.0", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.lm3.0"] = lvlFolder + ConvertCase(lvlName + ".lm3.0", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.lm3.1"] = lvlFolder + ConvertCase(lvlName + ".lm3.1", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.lm3.2"] = lvlFolder + ConvertCase(lvlName + ".lm3.2", CPA_Settings.CapsType.LevelFile);
-				paths["lvl.dmo"] = lvlFolder + ConvertCase(lvlName + ".dmo", CPA_Settings.CapsType.LevelFile);
+				paths["fix.lv2"] = fixFolder + ConvertCase("Fix.lv2", Legacy_Settings.CapsType.LevelFile);
+				paths["fix.pt2"] = fixFolder + ConvertCase("Fix.pt2", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.lv2"] = lvlFolder + ConvertCase(lvlName + ".lv2", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.pt2"] = lvlFolder + ConvertCase(lvlName + ".pt2", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.ato.0"] = lvlFolder + ConvertCase(lvlName + ".ato.0", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.rw3.0"] = lvlFolder + ConvertCase(lvlName + ".rw3.0", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.lm3.0"] = lvlFolder + ConvertCase(lvlName + ".lm3.0", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.lm3.1"] = lvlFolder + ConvertCase(lvlName + ".lm3.1", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.lm3.2"] = lvlFolder + ConvertCase(lvlName + ".lm3.2", Legacy_Settings.CapsType.LevelFile);
+				paths["lvl.dmo"] = lvlFolder + ConvertCase(lvlName + ".dmo", Legacy_Settings.CapsType.LevelFile);
 
 				// Download files
 				foreach (KeyValuePair<string, string> path in paths) {
@@ -113,7 +113,7 @@ namespace OpenSpace.Loader {
 
 			loadingState = "Loading input struct";
 			await WaitIfNecessary();
-			for (int i = 0; i < CPA_Settings.s.numEntryActions; i++) {
+			for (int i = 0; i < Legacy_Settings.s.numEntryActions; i++) {
 				LegacyPointer.Read(reader); // 3DOS_EntryActions
 			}
 

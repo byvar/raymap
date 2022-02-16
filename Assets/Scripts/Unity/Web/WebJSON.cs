@@ -36,10 +36,10 @@ public class WebJSON {
 		public Color? SelectColor { get; set; }
 	}
 	public class GameSettings {
-		public OpenSpace.CPA_Settings.EngineVersion EngineVersion { get; set; }
-		public OpenSpace.CPA_Settings.Game Game { get; set; }
-		public OpenSpace.CPA_Settings.Platform Platform { get; set; }
-		public OpenSpace.CPA_Settings.Mode Mode { get; set; }
+		public OpenSpace.Legacy_Settings.EngineVersion EngineVersion { get; set; }
+		public OpenSpace.Legacy_Settings.Game Game { get; set; }
+		public OpenSpace.Legacy_Settings.Platform Platform { get; set; }
+		public OpenSpace.Legacy_Settings.Mode Mode { get; set; }
 		public EngineMode EngineMode { get; set; }
 	}
 	public class CineData {

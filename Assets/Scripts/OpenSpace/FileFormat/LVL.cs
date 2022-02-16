@@ -19,16 +19,16 @@ namespace OpenSpace.FileFormat {
             headerOffset = 0;
             this.name = name;
             this.fileID = fileID;
-            reader = new Reader(stream, CPA_Settings.s.IsLittleEndian);
+            reader = new Reader(stream, Legacy_Settings.s.IsLittleEndian);
         }
 
         public void ReadPTR(string path) {
             if (!FileSystem.FileExists(path)) return;
             Stream ptrStream = FileSystem.GetFileReadStream(path);
             long totalSize = ptrStream.Length;
-            using (Reader ptrReader = new Reader(ptrStream, CPA_Settings.s.IsLittleEndian)) {
+            using (Reader ptrReader = new Reader(ptrStream, Legacy_Settings.s.IsLittleEndian)) {
 				uint num_ptrs;
-				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 					num_ptrs = (uint)totalSize / 8;
 				} else {
 					num_ptrs = ptrReader.ReadUInt32();
@@ -40,7 +40,7 @@ namespace OpenSpace.FileFormat {
                     uint ptr = reader.ReadUInt32();
                     pointers[ptr_ptr] = new LegacyPointer(ptr, GetFileWithID(file));
 				}
-				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+				if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
 					// Revolution
 					ushort num_specialBlocks = ptrReader.ReadUInt16();
 					for (uint j = 0; j < num_specialBlocks; j++) {
@@ -97,7 +97,7 @@ namespace OpenSpace.FileFormat {
         public override void CreateWriter() {
             if (path != null) {
                 FileStream stream = new FileStream(path, FileMode.Open);
-                writer = new Writer(stream, CPA_Settings.s.IsLittleEndian);
+                writer = new Writer(stream, Legacy_Settings.s.IsLittleEndian);
             }
         }
 
@@ -109,7 +109,7 @@ namespace OpenSpace.FileFormat {
 			baseOffset = 0;
 			overrideData = data;
 			reader.Close();
-			reader = new Reader(new MemoryStream(overrideData), CPA_Settings.s.IsLittleEndian);
+			reader = new Reader(new MemoryStream(overrideData), Legacy_Settings.s.IsLittleEndian);
 		}
 	}
 }

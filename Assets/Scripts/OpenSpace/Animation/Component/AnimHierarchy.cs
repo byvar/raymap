@@ -10,7 +10,7 @@ namespace OpenSpace.Animation.Component {
         public short parentChannelID;
 
 		protected override void ReadInternal(Reader reader) {
-			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				childChannelID = reader.ReadByte();
 				parentChannelID = reader.ReadByte();
 			} else {

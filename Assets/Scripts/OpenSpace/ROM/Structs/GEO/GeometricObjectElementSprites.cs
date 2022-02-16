@@ -71,7 +71,7 @@ namespace OpenSpace.ROM {
 				normals[2] = Vector3.forward;
 				normals[3] = Vector3.forward;
 				Vector3[] uvs = new Vector3[4];
-				if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 					uvs[0] = new Vector3(0, - (mirrorY ? 1 : 0), 1);
 					uvs[1] = new Vector3(1 + (mirrorX ? 1 : 0), -(mirrorY ? 1 : 0), 1);
 					uvs[2] = new Vector3(0, 1, 1);

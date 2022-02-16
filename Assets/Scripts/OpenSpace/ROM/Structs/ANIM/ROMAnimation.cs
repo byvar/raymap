@@ -50,7 +50,7 @@ namespace OpenSpace.ROM {
 				if (data != null && data.Length > 0) {
 					//Util.ByteArrayToFile(MapLoader.Loader.gameDataBinFolder + "exported_anims/anim_" + index + ".bin", data);
 					using (MemoryStream ms = new MemoryStream(data)) {
-						using (Reader r = new Reader(ms, CPA_Settings.s.IsLittleEndian)) {
+						using (Reader r = new Reader(ms, Legacy_Settings.s.IsLittleEndian)) {
 							a3d = new AnimA3DGeneral(r);
 							vectors = new AnimVector[a3d.num_vectors];
 							quaternions = new AnimQuaternion[a3d.num_quaternions];

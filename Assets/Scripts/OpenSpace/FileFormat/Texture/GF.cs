@@ -62,17 +62,17 @@ namespace OpenSpace.FileFormat.Texture {
 
         public GF(Stream stream) {
             MapLoader l = MapLoader.Loader;
-            bool isR3PS2Proto = CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3PS2Demo_2002_05_17;
+            bool isR3PS2Proto = Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3PS2Demo_2002_05_17;
             Reader reader = new Reader(stream, isLittleEndian);
             /*var pos = reader.BaseStream.Position;
             reader.ReadBytes(*/
             if (isR3PS2Proto) {
-            } else if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+            } else if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                 byte version = reader.ReadByte();
                 format = 1555;
             } else {
                 format = 8888;
-                if (CPA_Settings.s.platform != CPA_Settings.Platform.iOS && CPA_Settings.s.game != CPA_Settings.Game.TTSE) format = reader.ReadUInt32();
+                if (Legacy_Settings.s.platform != Legacy_Settings.Platform.iOS && Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) format = reader.ReadUInt32();
             }
 
             width = reader.ReadUInt32();
@@ -83,7 +83,7 @@ namespace OpenSpace.FileFormat.Texture {
             if (!isR3PS2Proto) {
                 channels = reader.ReadByte();
                 byte enlargeByte = 0;
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.Dinosaur && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) enlargeByte = reader.ReadByte();
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.game != Legacy_Settings.Game.Dinosaur && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) enlargeByte = reader.ReadByte();
                 if (enlargeByte > 1) {
                     uint w = width, h = height, e = enlargeByte;
                     if (w != 1) w >>= 1;
@@ -99,7 +99,7 @@ namespace OpenSpace.FileFormat.Texture {
                 reader.ReadUInt32();
             }
             if(!isR3PS2Proto) repeatByte = reader.ReadByte();
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal || isR3PS2Proto) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal || isR3PS2Proto) {
                 paletteNumColors = reader.ReadUInt16();
                 paletteBytesPerColor = reader.ReadByte();
                 if (isR3PS2Proto) {
@@ -129,7 +129,7 @@ namespace OpenSpace.FileFormat.Texture {
 
             pixels = new Color[width * height];
             if (!isR3PS2Proto) {
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && channels == 1) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && channels == 1) {
                     paletteBytesPerColor = 4;
                     paletteNumColors = 256;
                     palette = reader.ReadBytes(paletteBytesPerColor * paletteNumColors);

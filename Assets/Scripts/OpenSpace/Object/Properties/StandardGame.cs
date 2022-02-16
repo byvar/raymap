@@ -48,14 +48,14 @@ namespace OpenSpace.Object.Properties {
             //l.print("StdGame: " + offset);
             StandardGame stdGame = new StandardGame(offset);
 
-			if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
 				stdGame.objectTypes[0] = reader.ReadUInt32();
 				stdGame.objectTypes[1] = reader.ReadUInt32();
 				stdGame.objectTypes[2] = reader.ReadUInt32();
 				stdGame.off_superobject = LegacyPointer.Read(reader); // 0xC SuperObject from Perso probably
 
-				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-					if (CPA_Settings.s.platform == CPA_Settings.Platform.DC) {
+				if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
+					if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) {
 						reader.ReadInt32();
 						reader.ReadInt32();
 						reader.ReadInt32();
@@ -97,7 +97,7 @@ namespace OpenSpace.Object.Properties {
 					stdGame.customBitsInitial = reader.ReadUInt32();
 					stdGame.aiCustomBitsInitial = reader.ReadUInt32();
 				}
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				// Revolution
 				reader.ReadInt32();
 				reader.ReadInt32();
@@ -121,7 +121,7 @@ namespace OpenSpace.Object.Properties {
 				reader.ReadUInt32();
 				reader.ReadUInt32(); // a pointer?
 				stdGame.customBitsInitial = reader.ReadUInt32();
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				// Almost same as revo
 				reader.ReadInt32();
 				reader.ReadInt32();
@@ -175,7 +175,7 @@ namespace OpenSpace.Object.Properties {
         public void Write(Writer writer)
         {
 			LegacyPointer.Goto(ref writer, offset);
-            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+            if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                 LegacyPointer.Goto(ref writer, offset + 0x24);
                 writer.Write(customBits);
                 writer.Write(platformType);

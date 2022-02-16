@@ -23,7 +23,7 @@ namespace OpenSpace.AI {
             off_aiModel = LegacyPointer.Read(reader); // 0x0
             off_actionTree = LegacyPointer.Read(reader); //0x4
             off_comport = LegacyPointer.Read(reader); //0x8
-            if (CPA_Settings.s.game != CPA_Settings.Game.R2Demo) {
+            if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Demo) {
                 off_lastComport = LegacyPointer.Read(reader);
                 off_actionTable = LegacyPointer.Read(reader);
                 off_defaultComport = LegacyPointer.Read(reader);

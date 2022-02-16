@@ -114,8 +114,8 @@ namespace OpenSpace.Object {
 			po.off_visualSet = LegacyPointer.Read(reader);
             po.off_collideSet = LegacyPointer.Read(reader);
             po.off_visualBoundingVolume = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.TT && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     po.off_collideBoundingVolume = po.off_visualBoundingVolume;
                     reader.ReadUInt32();
                 } else {
@@ -127,20 +127,20 @@ namespace OpenSpace.Object {
             LegacyPointer.DoAt(ref reader, po.off_visualSet, () => {
                 ushort numberOfLOD = 1;
                 po.visualSetType = 0;
-				if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 					po.visualSet = new VisualSetLOD[1];
 					po.visualSet[0] = new VisualSetLOD();
 					po.visualSet[0].obj = null;
 					po.visualSet[0].off_data = po.off_visualSet;
 					po.visualSet[0].LODdistance = 5f;
-				} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 					po.visualSet = new VisualSetLOD[1];
 					po.visualSet[0] = new VisualSetLOD();
 					po.visualSet[0].obj = MapLoader.Loader.meshObjects.FirstOrDefault(p => p.offset == po.off_visualSet);
 					po.visualSet[0].off_data = po.off_visualSet;
 					po.visualSet[0].LODdistance = 5f;
 				} else {
-					if (CPA_Settings.s.platform != CPA_Settings.Platform.DC) {
+					if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC) {
 						reader.ReadUInt32(); // 0
 						numberOfLOD = reader.ReadUInt16();
 						//if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);
@@ -149,7 +149,7 @@ namespace OpenSpace.Object {
 							LegacyPointer off_LODDistances = LegacyPointer.Read(reader);
 							LegacyPointer off_LODDataOffsets = LegacyPointer.Read(reader);
 							reader.ReadUInt32(); // always 0? RLI table offset
-							if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0? number of RLI
+							if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) reader.ReadUInt32(); // always 0? number of RLI
 							po.visualSet = new VisualSetLOD[numberOfLOD];
 							for (uint i = 0; i < numberOfLOD; i++) {
 								po.visualSet[i] = new VisualSetLOD();
@@ -197,7 +197,7 @@ namespace OpenSpace.Object {
 
             // Parse collide set
             LegacyPointer.DoAt(ref reader, po.off_collideSet, () => {
-				if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 					// Read collide mesh object here directly
 					po.collideMesh = GeometricObjectCollide.Read(reader, po.off_collideSet);
 				} else {

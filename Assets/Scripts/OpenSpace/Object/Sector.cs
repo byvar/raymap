@@ -62,18 +62,18 @@ namespace OpenSpace.Object {
                 graphicSectors.ReadEntries(ref reader, (off_element) => {
 					//l.print(off_element);
                     NeighborSector n = new NeighborSector();
-					if (CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
+					if (Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
 						n.short0 = reader.ReadUInt16();
 						n.short2 = reader.ReadUInt16();
 					}
 					LegacyPointer sp = LegacyPointer.Read(reader);
 					n.sector = Sector.FromSuperObjectOffset(sp);
                     //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
-                    if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) {
+                    if (Legacy_Settings.s.linkedListType == LinkedList.Type.Minimize) {
                         n.off_next = off_element + 8; // No next pointer, each entry is immediately after the first one.
                     } else {
                         n.off_next = LegacyPointer.Read(reader);
-                        if (CPA_Settings.s.hasLinkedListHeaderPointers) {
+                        if (Legacy_Settings.s.hasLinkedListHeaderPointers) {
                             n.off_previous = LegacyPointer.Read(reader);
                             LegacyPointer off_sector_start = LegacyPointer.Read(reader);
                         }
@@ -85,18 +85,18 @@ namespace OpenSpace.Object {
                 //l.print(sectors_unk1.off_head + " - " + sectors_unk1.off_tail + " - " + sectors_unk1.Count);
                 collisionSectors.ReadEntries(ref reader, (off_element) => {
                     NeighborSector n = new NeighborSector();
-                    if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+                    if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                         n.short0 = reader.ReadUInt16();
                         n.short2 = reader.ReadUInt16();
                     }
                     LegacyPointer sp = LegacyPointer.Read(reader);
                     n.sector = Sector.FromSuperObjectOffset(sp);
                     //l.print(name + " -> " + n.sector.name + ": " + n.short0 + " - " + n.short2);
-                    if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) {
+                    if (Legacy_Settings.s.linkedListType == LinkedList.Type.Minimize) {
                         n.off_next = off_element + 4; // No next pointer, each entry is immediately after the first one.
                     } else {
                         n.off_next = LegacyPointer.Read(reader);
-                        if (CPA_Settings.s.hasLinkedListHeaderPointers) {
+                        if (Legacy_Settings.s.hasLinkedListHeaderPointers) {
                             n.off_previous = LegacyPointer.Read(reader);
                             LegacyPointer off_sector_start = LegacyPointer.Read(reader);
                         }
@@ -112,7 +112,7 @@ namespace OpenSpace.Object {
                 },
                 flags: LinkedList.Flags.ElementPointerFirst
                     | LinkedList.Flags.ReadAtPointer
-                    | ((CPA_Settings.s.hasLinkedListHeaderPointers) ?
+                    | ((Legacy_Settings.s.hasLinkedListHeaderPointers) ?
                         LinkedList.Flags.HasHeaderPointers :
                         LinkedList.Flags.NoPreviousPointersForDouble));
             }
@@ -128,8 +128,8 @@ namespace OpenSpace.Object {
             Sector s = new Sector(offset, so);
             s.name = "Sector @ " + offset + ", SPO @ "+so.offset;
             //l.print(s.name);
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) {
-                if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
                     s.isSectorVirtual = reader.ReadByte();
                     reader.ReadByte();
                     reader.ReadByte();
@@ -152,13 +152,13 @@ namespace OpenSpace.Object {
                 },
                 flags: LinkedList.Flags.ElementPointerFirst
                     | LinkedList.Flags.ReadAtPointer
-                    | ((CPA_Settings.s.hasLinkedListHeaderPointers) ?
+                    | ((Legacy_Settings.s.hasLinkedListHeaderPointers) ?
                         LinkedList.Flags.HasHeaderPointers :
                         LinkedList.Flags.NoPreviousPointersForDouble),
                 type: LinkedList.Type.Minimize
             );
             s.dynamicLights = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) {
                 LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader)); // "streams list", probably related to water
             }
             s.graphicSectors = LinkedList<NeighborSector>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Minimize);
@@ -168,10 +168,10 @@ namespace OpenSpace.Object {
             LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader)); // TT says: Sound Sectors
             LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader)); // Placeholder
 
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                 s.sectorBorder = BoundingVolume.Read(reader, LegacyPointer.Current(reader), BoundingVolume.Type.Box);
 				reader.ReadUInt32();
-				if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 					s.isSectorVirtual = reader.ReadByte();
 					reader.ReadByte();
 					s.sectorPriority = reader.ReadByte();
@@ -181,31 +181,31 @@ namespace OpenSpace.Object {
 					reader.ReadByte();
 					reader.ReadByte();
 					s.sectorPriority = reader.ReadByte();
-					if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.R2) {
+					if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.R2) {
 						s.off_skyMaterial = LegacyPointer.Read(reader);
 						s.skyMaterial = VisualMaterial.FromOffsetOrRead(s.off_skyMaterial, reader);
 					} else {
 						reader.ReadUInt32();
 					}
 					reader.ReadByte();
-					if (CPA_Settings.s.hasNames) {
+					if (Legacy_Settings.s.hasNames) {
 						s.name = reader.ReadString(0x104);
 						l.print(s.name);
 					}
 				}
             } else {
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                     reader.ReadUInt32();
                 }
-                if (CPA_Settings.s.game != CPA_Settings.Game.TTSE) {
+                if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) {
                     s.isSectorVirtual = reader.ReadByte();
                     reader.ReadByte();
                     reader.ReadByte();
                     reader.ReadByte();
                 }
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.Montreal) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                     reader.ReadUInt32(); // activation flag
                 }
                 LegacyPointer off_name = LegacyPointer.Read(reader);

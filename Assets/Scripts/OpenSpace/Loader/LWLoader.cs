@@ -43,25 +43,25 @@ namespace OpenSpace.Loader {
 				await CreateCNT();
 
 				if (lvlName.EndsWith(".exe")) {
-					if (!CPA_Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
-					CPA_Settings.s.loadFromMemory = true;
+					if (!Legacy_Settings.s.hasMemorySupport) throw new Exception("This game does not have memory support.");
+					Legacy_Settings.s.loadFromMemory = true;
 					MemoryFile mem = new MemoryFile(lvlName);
 					files_array[0] = mem;
 					await WaitIfNecessary();
 					await LoadMemory();
 				} else {
 					// Prepare folder names
-					string fixFolder = gameDataBinFolder + ConvertCase("Fix/", CPA_Settings.CapsType.LevelFolder);
-					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", CPA_Settings.CapsType.LevelFolder);
+					string fixFolder = gameDataBinFolder + ConvertCase("Fix/", Legacy_Settings.CapsType.LevelFolder);
+					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Legacy_Settings.CapsType.LevelFolder);
 
 					// Prepare paths
-					paths["fix.lvl"] = fixFolder + ConvertCase("Fix.lvl", CPA_Settings.CapsType.LevelFile);
-					paths["fix.ptr"] = fixFolder + ConvertCase("Fix.ptr", CPA_Settings.CapsType.LevelFile);
-					paths["fix.pbt"] = fixFolder + ConvertCase("Fix.pbt", CPA_Settings.CapsType.LevelFile);
-					paths["lvl.lvl"] = lvlFolder + ConvertCase(lvlName + ".lvl", CPA_Settings.CapsType.LevelFile);
-					paths["lvl.ptr"] = lvlFolder + ConvertCase(lvlName + ".ptr", CPA_Settings.CapsType.LevelFile);
-					paths["lvl.pbt"] = lvlFolder + ConvertCase(lvlName + ".pbt", CPA_Settings.CapsType.LevelFile);
-					paths["lvl.lms"] = lvlFolder + ConvertCase(lvlName + ".lms", CPA_Settings.CapsType.LMFile);
+					paths["fix.lvl"] = fixFolder + ConvertCase("Fix.lvl", Legacy_Settings.CapsType.LevelFile);
+					paths["fix.ptr"] = fixFolder + ConvertCase("Fix.ptr", Legacy_Settings.CapsType.LevelFile);
+					paths["fix.pbt"] = fixFolder + ConvertCase("Fix.pbt", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl.lvl"] = lvlFolder + ConvertCase(lvlName + ".lvl", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl.ptr"] = lvlFolder + ConvertCase(lvlName + ".ptr", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl.pbt"] = lvlFolder + ConvertCase(lvlName + ".pbt", Legacy_Settings.CapsType.LevelFile);
+					paths["lvl.lms"] = lvlFolder + ConvertCase(lvlName + ".lms", Legacy_Settings.CapsType.LMFile);
 
 					// Download files
 					foreach (KeyValuePair<string, string> path in paths) {
@@ -81,11 +81,11 @@ namespace OpenSpace.Loader {
 							files_array[i] = new LVL(lvlNames[i], lvlPaths[i], i);
 						}
 					}
-					ReadLargoLVL(Mem.Fix, fixFolder + ConvertCase("Fix.dmp", CPA_Settings.CapsType.LevelFile));
-					ReadLargoLVL(Mem.Lvl, lvlFolder + ConvertCase(lvlName + ".dmp", CPA_Settings.CapsType.LevelFile));
+					ReadLargoLVL(Mem.Fix, fixFolder + ConvertCase("Fix.dmp", Legacy_Settings.CapsType.LevelFile));
+					ReadLargoLVL(Mem.Lvl, lvlFolder + ConvertCase(lvlName + ".dmp", Legacy_Settings.CapsType.LevelFile));
 					
-					pbt[Mem.Fix] = ReadPBT(paths["fix.pbt"], fixFolder + ConvertCase("Fix_PBT.dmp", CPA_Settings.CapsType.LevelFile));
-					pbt[Mem.Lvl] = ReadPBT(paths["lvl.pbt"], lvlFolder + ConvertCase(lvlName + "_PBT.dmp", CPA_Settings.CapsType.LevelFile));
+					pbt[Mem.Fix] = ReadPBT(paths["fix.pbt"], fixFolder + ConvertCase("Fix_PBT.dmp", Legacy_Settings.CapsType.LevelFile));
+					pbt[Mem.Lvl] = ReadPBT(paths["lvl.pbt"], lvlFolder + ConvertCase(lvlName + "_PBT.dmp", Legacy_Settings.CapsType.LevelFile));
 					lms = ReadLMS(paths["lvl.lms"]);
 
 					for (int i = 0; i < loadOrder.Length; i++) {
@@ -127,7 +127,7 @@ namespace OpenSpace.Loader {
 
 		private PBT ReadPBT(string path, string dmpPath) {
 			if (FileSystem.FileExists(path)) {
-				using (Reader reader = new Reader(FileSystem.GetFileReadStream(path), CPA_Settings.s.IsLittleEndian)) {
+				using (Reader reader = new Reader(FileSystem.GetFileReadStream(path), Legacy_Settings.s.IsLittleEndian)) {
 					uint decompressed = reader.ReadUInt32();
 					uint compressed = reader.ReadUInt32();
 					byte[] decData = DecompressLargo(reader, compressed, decompressed);
@@ -143,9 +143,9 @@ namespace OpenSpace.Loader {
 			if (FileSystem.FileExists(path)) {
 				LMS lms = new LMS(FileSystem.GetFileReadStream(path));
 				if (lms != null && exportTextures) {
-					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", CPA_Settings.CapsType.LevelFolder);
+					string lvlFolder = gameDataBinFolder + ConvertCase(lvlName + "/", Legacy_Settings.CapsType.LevelFolder);
 					for (int i = 0; i < lms.Count; i++) {
-						Util.ByteArrayToFile(lvlFolder + "textures/" + ConvertCase(lvlName + "_" + i + ".png", CPA_Settings.CapsType.LevelFile), lms.textures[i].EncodeToPNG());
+						Util.ByteArrayToFile(lvlFolder + "textures/" + ConvertCase(lvlName + "_" + i + ".png", Legacy_Settings.CapsType.LevelFile), lms.textures[i].EncodeToPNG());
 					}
 				}
 				return lms;
@@ -179,7 +179,7 @@ namespace OpenSpace.Loader {
 			reader.ReadByte();
 			reader.ReadByte();
 			ReadLevelNames(reader, LegacyPointer.Current(reader), num_lvlNames);
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PC) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PC) {
 				reader.ReadChars(0x1E);
 				reader.ReadChars(0x1E); // two zero entries
 			}

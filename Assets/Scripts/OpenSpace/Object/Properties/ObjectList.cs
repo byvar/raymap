@@ -83,8 +83,8 @@ namespace OpenSpace.Object.Properties {
             MapLoader l = MapLoader.Loader;
             ObjectList ol = new ObjectList(offset);
             //l.print("ObjectList: " + Pointer.Current(reader));
-            if(CPA_Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.hasLinkedListHeaderPointers) {
+            if(Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = LegacyPointer.Read(reader);
+			if (Legacy_Settings.s.hasLinkedListHeaderPointers) {
                 ol.off_objList_prev = LegacyPointer.Read(reader);
                 ol.off_objList_hdr = LegacyPointer.Read(reader);
             }
@@ -93,7 +93,7 @@ namespace OpenSpace.Object.Properties {
             ol.num_entries = reader.ReadUInt16();
             reader.ReadUInt16();
 
-            if (CPA_Settings.s.linkedListType == LinkedList.Type.Minimize) ol.off_objList_next = LegacyPointer.Current(reader);
+            if (Legacy_Settings.s.linkedListType == LinkedList.Type.Minimize) ol.off_objList_next = LegacyPointer.Current(reader);
 
 			//l.print("ObjectList " + offset + " - " + ol.num_entries);
 
@@ -103,7 +103,7 @@ namespace OpenSpace.Object.Properties {
                 for (uint i = 0; i < ol.num_entries; i++) {
                     // each entry is 0x14
                     ol.entries[i] = new ObjectListEntry();
-					if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+					if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 						ol.entries[i].off_po = LegacyPointer.Read(reader);
 					} else {
 						ol.entries[i].off_scale = LegacyPointer.Read(reader);
@@ -111,12 +111,12 @@ namespace OpenSpace.Object.Properties {
 						ol.entries[i].thirdvalue = reader.ReadUInt32();
 						ol.entries[i].unk0 = reader.ReadUInt16();
 						ol.entries[i].unk1 = reader.ReadUInt16();
-						if (CPA_Settings.s.platform != CPA_Settings.Platform.DC) {
+						if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC) {
 							ol.entries[i].lastvalue = reader.ReadUInt32();
 						}
 					}
                     // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
-                    if (/*ol.entries[i].unk0 == 0 || ol.entries[i].unk0 == 4*/ ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.TT) {
+                    if (/*ol.entries[i].unk0 == 0 || ol.entries[i].unk0 == 4*/ ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.TT) {
                         ol.entries[i].po = null;
                         ol.entries[i].scale = null;
                         LegacyPointer.DoAt(ref reader, ol.entries[i].off_scale, () => {
@@ -219,7 +219,7 @@ namespace OpenSpace.Object.Properties {
                 }
             } else {
 
-                if (CPA_Settings.s.linkUncategorizedObjectsToScriptFamily) {
+                if (Legacy_Settings.s.linkUncategorizedObjectsToScriptFamily) {
                     perso.p3dData.family.AddNewPhysicalList(this);
                 } else {
                     MapLoader.Loader.AddUncategorizedObjectList(this);

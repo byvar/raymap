@@ -171,27 +171,27 @@ namespace OpenSpace.Collide {
 			//l.print("CollideMesh " + offset);
             GeometricObjectCollide m = new GeometricObjectCollide(offset, type);
             m.isBoundingVolume = isBoundingVolume;
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 || CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 || Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
                 m.num_vertices = reader.ReadUInt16();
                 m.num_elements = reader.ReadUInt16();
-				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
+				if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
 					reader.ReadUInt32();
 				}
             }
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
             m.off_vertices = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && CPA_Settings.s.game != CPA_Settings.Game.R2Revolution) {
+            if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3 && Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution) {
                 m.off_normals = LegacyPointer.Read(reader);
                 LegacyPointer.Read(reader);
                 reader.ReadInt32();
             }
-            if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
+            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
             m.off_element_types = LegacyPointer.Read(reader);
             m.off_elements = LegacyPointer.Read(reader);
-            if (CPA_Settings.s.game != CPA_Settings.Game.R2Revolution && CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) {
+            if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
                 LegacyPointer.Read(reader);
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
-                    if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
+                    if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R2) {
                         reader.ReadInt32();
                         reader.ReadInt32();
                         reader.ReadInt32();
@@ -199,7 +199,7 @@ namespace OpenSpace.Collide {
                         m.num_vertices = reader.ReadUInt16();
                         m.num_elements = reader.ReadUInt16();
                     }
-                    if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) {
+                    if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) {
                         reader.ReadInt32();
                         reader.ReadInt32();
                     }
@@ -212,14 +212,14 @@ namespace OpenSpace.Collide {
             } else {
                 reader.ReadUInt32();
             }
-            if (CPA_Settings.s.engineVersion != CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.Montreal) {
                 m.sphereRadius = reader.ReadSingle(); // bounding volume radius
                 float sphereX = reader.ReadSingle(); // x
                 float sphereZ = reader.ReadSingle(); // z
                 float sphereY = reader.ReadSingle(); // y
                 m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) reader.ReadUInt32();
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R2) reader.ReadUInt32();
             }
             
             // Vertices

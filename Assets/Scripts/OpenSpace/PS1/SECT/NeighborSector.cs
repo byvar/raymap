@@ -25,7 +25,7 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			off_sectorSO = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.game != CPA_Settings.Game.DD && CPA_Settings.s.game != CPA_Settings.Game.JungleBook) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.DD && Legacy_Settings.s.game != Legacy_Settings.Game.JungleBook) {
 				word04 = reader.ReadInt16();
 				word06 = reader.ReadInt16();
 			}

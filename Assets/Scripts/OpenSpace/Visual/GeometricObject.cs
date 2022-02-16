@@ -124,7 +124,7 @@ namespace OpenSpace.Visual {
 			//l.print("Geometric Object: " + offset);
             GeometricObject m = new GeometricObject(offset);
 			m.radiosity = radiosity;
-			if (CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				uint flags = reader.ReadUInt32();
 				m.num_vertices = reader.ReadUInt16();
 				m.num_elements = reader.ReadUInt16();
@@ -138,7 +138,7 @@ namespace OpenSpace.Visual {
 				float sphereY = reader.ReadSingle(); // y
 				m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 				m.lookAtMode = reader.ReadUInt32();
-			} else if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				m.off_element_types = LegacyPointer.Read(reader);
 				m.off_elements = LegacyPointer.Read(reader);
 				uint flags = reader.ReadUInt32();
@@ -154,40 +154,40 @@ namespace OpenSpace.Visual {
 				m.off_normals = LegacyPointer.Read(reader);
 				m.lookAtMode = flags & 3;
 			} else {
-				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
+				if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) m.num_vertices = (ushort)reader.ReadUInt32();
 				m.off_vertices = LegacyPointer.Read(reader);
 				m.off_normals = LegacyPointer.Read(reader);
-				if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+				if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
 					m.off_materials = LegacyPointer.Read(reader);
 				} else {
 					m.off_blendWeights = LegacyPointer.Read(reader);
 				}
-				if (CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGC 
-					&& CPA_Settings.s.mode != CPA_Settings.Mode.RaymanArenaGCDemo_2002_03_07
-					&& CPA_Settings.s.game != CPA_Settings.Game.RM
-					&& CPA_Settings.s.mode != CPA_Settings.Mode.DonaldDuckPKGC
-					&& !(CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3)) {
+				if (Legacy_Settings.s.mode != Legacy_Settings.Mode.RaymanArenaGC 
+					&& Legacy_Settings.s.mode != Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07
+					&& Legacy_Settings.s.game != Legacy_Settings.Game.RM
+					&& Legacy_Settings.s.mode != Legacy_Settings.Mode.DonaldDuckPKGC
+					&& !(Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3)) {
 					reader.ReadInt32();
 				}
-				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
+				if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) m.num_elements = (ushort)reader.ReadUInt32();
 				m.off_element_types = LegacyPointer.Read(reader);
 				m.off_elements = LegacyPointer.Read(reader);
-				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R2) {
+				if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R2) {
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
 				reader.ReadInt32();
-				if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+				if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
 					m.off_parallelBoxes = LegacyPointer.Read(reader);
 				} else {
 					reader.ReadInt32();
 				}
-				if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur) {
 					reader.ReadInt32();
 					reader.ReadInt32();
 					reader.ReadInt32();
 				}
-				if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+				if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
 					m.lookAtMode = reader.ReadUInt32();
 					//if (m.lookAtMode != 0) l.print(m.lookAtMode);
 					m.num_vertices = reader.ReadUInt16();
@@ -200,11 +200,11 @@ namespace OpenSpace.Visual {
 					float sphereY = reader.ReadSingle(); // y
 					m.sphereCenter = new Vector3(sphereX, sphereY, sphereZ);
 					reader.ReadInt32();
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
 						reader.ReadInt32();
-						if (!(CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && (CPA_Settings.s.game == CPA_Settings.Game.RM || CPA_Settings.s.game == CPA_Settings.Game.RA))) {
+						if (!(Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && (Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA))) {
 							reader.ReadInt16();
-							if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2) {
+							if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2) {
 								reader.ReadInt16();
 								reader.ReadUInt32();
 							}
@@ -221,15 +221,15 @@ namespace OpenSpace.Visual {
 				}
 			}
             m.name = "Mesh @ " + offset;
-            if (CPA_Settings.s.hasNames) m.name = reader.ReadString(0x32);
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3) {
+            if (Legacy_Settings.s.hasNames) m.name = reader.ReadString(0x32);
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && Legacy_Settings.s.engineVersion >= Legacy_Settings.EngineVersion.R3) {
 				reader.Align(0x4);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				m.optimizedObject = new Pointer<PS2OptimizedSDCStructure>(reader, resolve: false);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
-				if (CPA_Settings.s.game == CPA_Settings.Game.R3) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R3) {
 					m.ps2IsSinus = reader.ReadUInt32();
 				}
 			}
@@ -344,7 +344,7 @@ namespace OpenSpace.Visual {
                 }
 			}
 			ReadMeshFromATO(reader, m);
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.PS2 && CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.PS2 && Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
 				m.optimizedObject?.Resolve(reader, onPreRead: opt => opt.isSinus = m.ps2IsSinus);
 				m.ReadMeshFromSDC();
 			}
@@ -373,7 +373,7 @@ namespace OpenSpace.Visual {
 
 		private static void ReadMeshFromATO(Reader reader, GeometricObject m) {
 			// Revolution only: Before creating the gameobject, read the actual model data from the ATO
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				MapLoader l = MapLoader.Loader;
 				List<GeometricObject> meshObjects = new List<GeometricObject>();
 				for (uint i = 0; i < m.num_elements; i++) {

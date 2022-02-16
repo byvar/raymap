@@ -210,7 +210,7 @@ namespace OpenSpace {
                 return (uint)((mask & 0xFFFF0000) + (mask1 << 8) + (mask0));
             } else {
                 // 0x075BD924 = 123459876
-                if (CPA_Settings.s.platform == CPA_Settings.Platform.iOS) {
+                if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS) {
                     return (uint)(16807 * ((currentMask ^ 0x75BD924u) % 0x1F31D) - 2836 * ((currentMask ^ 0x75BD924u) / 0x1F31D));
                 } else {
                     return (uint)(16807 * (currentMask ^ 0x75BD924) - 0x7FFFFFFF * ((currentMask ^ 0x75BD924) / 0x1F31D));
@@ -219,19 +219,19 @@ namespace OpenSpace {
         }
 
         public int InitMask() {
-            switch (CPA_Settings.s.encryption) {
-                case CPA_Settings.Encryption.ReadInit:
+            switch (Legacy_Settings.s.encryption) {
+                case Legacy_Settings.Encryption.ReadInit:
                     ReadMask(); return 4;
-                case CPA_Settings.Encryption.Window:
+                case Legacy_Settings.Encryption.Window:
                     InitWindowMask(); return 0;
-                case CPA_Settings.Encryption.FixedInit:
+                case Legacy_Settings.Encryption.FixedInit:
                     mask = 0x6AB5CC79; return 0;
-                case CPA_Settings.Encryption.RedPlanet:
+                case Legacy_Settings.Encryption.RedPlanet:
                     ReadUInt32();
                     mask = 0x6AB5CC79;
                     masking = MaskingMode.RedPlanet;
                     return 4;
-                case CPA_Settings.Encryption.CalculateInit:
+                case Legacy_Settings.Encryption.CalculateInit:
                     uint currentMask = 0xFFFFFFFF;
 					// 0x075BD924 = 123459876
 					mask = (uint)(16807 * (currentMask ^ 0x75BD924) - (((currentMask ^ 0x75BD924) / -127773 << 31) - (currentMask ^ 0x75BD924) / 127773));

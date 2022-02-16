@@ -18,7 +18,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 		public Texture2D[] textures = null;
 		public TextureDictionary(string path) {
 			Stream fs = FileSystem.GetFileReadStream(path);
-			using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
+			using (Reader reader = new Reader(fs, Legacy_Settings.s.IsLittleEndian)) {
 				root = Section.Read(reader);
 			}
 			if (root != null && root.type == Section.Type.TextureDictionary) {
@@ -99,7 +99,7 @@ namespace OpenSpace.FileFormat.RenderWare {
 				} else if(rasterFormat.HasFlag(RasterFormat.FORMAT_1555)) {
 					// Just RGBA 5551
 					for (int i = 0; i < data.Length / 2; i++) {
-						ushort pixel = Util.ToUInt16(new byte[] { data[i * 2], data[i * 2 + 1] }, 0, CPA_Settings.s.IsLittleEndian);
+						ushort pixel = Util.ToUInt16(new byte[] { data[i * 2], data[i * 2 + 1] }, 0, Legacy_Settings.s.IsLittleEndian);
 						uint alpha = extractBits(pixel, 1, 15);
 						uint blue = extractBits(pixel, 5, 10);
 						uint green = extractBits(pixel, 5, 5);

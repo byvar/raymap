@@ -13,7 +13,7 @@ namespace OpenSpace.Animation.Component {
         public ushort unkA;
 
 		protected override void ReadInternal(Reader reader) {
-			if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
+			if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.TT) {
 				unk0 = reader.ReadUInt32();
 				reader.ReadByte();
 				reader.ReadByte();
@@ -23,8 +23,8 @@ namespace OpenSpace.Animation.Component {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 			} else {
-				if (CPA_Settings.s.platform != CPA_Settings.Platform.DC && CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) {
-					if (CPA_Settings.s.platform != CPA_Settings.Platform.iOS) {
+				if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC && Legacy_Settings.s.game != Legacy_Settings.Game.RedPlanet) {
+					if (Legacy_Settings.s.platform != Legacy_Settings.Platform.iOS) {
 						unk0 = reader.ReadUInt32();
 					}
 					unk4 = reader.ReadUInt16();

@@ -20,7 +20,7 @@ namespace OpenSpace.FileFormat.Texture {
 
         public Texture2D[] textures = null;
         public LMS(Stream fs) {
-            using (Reader reader = new Reader(fs, CPA_Settings.s.IsLittleEndian)) {
+            using (Reader reader = new Reader(fs, Legacy_Settings.s.IsLittleEndian)) {
 				count = reader.ReadUInt32();
 				int[] sizes = new int[count]; 
 				for (int i = 0; i < count; i++) {

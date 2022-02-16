@@ -24,7 +24,7 @@ namespace OpenSpace.Text {
 		protected override void ReadInternal(Reader reader) {
 			MapLoader l = MapLoader.Loader;
 			field0 = reader.ReadUInt32();
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				num_languages = reader.ReadUInt16();
 				languages = new TextTable[num_languages];
 				languages[0].num_entries = reader.ReadUInt16();
@@ -59,13 +59,13 @@ namespace OpenSpace.Text {
 					}
 				});
 			} else {
-				if (CPA_Settings.s.platform != CPA_Settings.Platform.DC
-					&& CPA_Settings.s.platform != CPA_Settings.Platform.PS2
-					&& CPA_Settings.s.game != CPA_Settings.Game.LargoWinch) field4 = reader.ReadUInt32();
+				if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC
+					&& Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2
+					&& Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) field4 = reader.ReadUInt32();
 				num_languages = reader.ReadUInt16();
 				reader.ReadUInt16();
 				off_text_languages = LegacyPointer.Read(reader);
-				if (CPA_Settings.s.game != CPA_Settings.Game.RedPlanet) {
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.RedPlanet) {
 					off_text_misc = LegacyPointer.Read(reader);
 				} else {
 					misc.entries = new string[0];

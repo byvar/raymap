@@ -9,13 +9,13 @@ using OpenSpace.Loader;
 
 class PS1ActorSelectionDropdown : AdvancedDropdown {
 	public string selection = null;
-	public CPA_Settings.Mode mode;
+	public Legacy_Settings.Mode mode;
 	public string name;
 	public string[] actors;
 	public int actorIndex;
 	//public SerializedProperty property;
 
-	public PS1ActorSelectionDropdown(AdvancedDropdownState state, CPA_Settings.Mode mode, int actorIndex) : base(state) {
+	public PS1ActorSelectionDropdown(AdvancedDropdownState state, Legacy_Settings.Mode mode, int actorIndex) : base(state) {
 		this.mode = mode;
 		this.actorIndex = actorIndex;
 		minimumSize = new UnityEngine.Vector2(50, 300f);

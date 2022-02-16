@@ -453,7 +453,7 @@ public class Controller : MonoBehaviour {
         Vector3 center = worldMin + worldSize * 0.5f;
 
         sectorManager.displayInactiveSectors = true;
-        lightManager.luminosity = CPA_Settings.s.luminosity * 2.0f;
+        lightManager.luminosity = Legacy_Settings.s.luminosity * 2.0f;
         SpawnableParent?.SetActive(false);
 
         byte[] screenshotBytes;
@@ -740,7 +740,7 @@ public class Controller : MonoBehaviour {
 					if (p.stdGame != null) {
 						CustomBitsComponent c = p.Gao.AddComponent<CustomBitsComponent>();
 						c.stdGame = p.stdGame;
-						if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) c.hasAiCustomBits = true;
+						if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) c.hasAiCustomBits = true;
 						c.Init();
 					}
 				}

@@ -25,7 +25,7 @@ public class LightBehaviour : MonoBehaviour {
 	public bool IsActive {
 		get {
 			if (li != null) {
-				if (CPA_Settings.s.game == CPA_Settings.Game.TTSE) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
 					return true;
 				} else {
 					return li.turnedOn != 0;
@@ -226,7 +226,7 @@ public class LightBehaviour : MonoBehaviour {
                 rot = transform.rotation;
                 scl = transform.localScale;
 				if (li != null) {
-					if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
 						li.transMatrix.type = 7;
 						li.transMatrix.SetTRS(transform.position, transform.rotation, transform.localScale, convertAxes: true, setVec: true);
 					} else {

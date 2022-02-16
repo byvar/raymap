@@ -56,7 +56,7 @@ namespace OpenSpace.PS1 {
 			off_prev_brother = LegacyPointer.Read(reader); // 18
 			off_parent = LegacyPointer.Read(reader); // 1c
 			off_matrix1 = LegacyPointer.Read(reader); //
-			if (CPA_Settings.s.game != CPA_Settings.Game.RRush) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.RRush) {
 				off_matrix2 = LegacyPointer.Read(reader);
 				short_28 = reader.ReadInt16();
 				short_2A = reader.ReadInt16();

@@ -32,7 +32,7 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			//Load.print("Anim " + Pointer.Current(reader));
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2) {
 				speed = reader.ReadUInt32();
 				off_channels = LegacyPointer.Read(reader);
 				num_channels = reader.ReadUInt32();
@@ -41,7 +41,7 @@ namespace OpenSpace.PS1 {
 				num_hierarchies = reader.ReadUInt32();
 				off_hierarchies = LegacyPointer.Read(reader);
 				uint_18 = reader.ReadUInt32();
-			} else if(CPA_Settings.s.game == CPA_Settings.Game.RRush) {
+			} else if(Legacy_Settings.s.game == Legacy_Settings.Game.RRush) {
 				off_channels = LegacyPointer.Read(reader);
 				off_hierarchies = LegacyPointer.Read(reader);
 				num_hierarchies = reader.ReadUInt16();
@@ -57,7 +57,7 @@ namespace OpenSpace.PS1 {
 				//Load.print("Anim " + Offset + " - " + num_frames);
 				ushort_0E = reader.ReadUInt16();
 				num_hierarchies = reader.ReadUInt32();
-				if (CPA_Settings.s.game == CPA_Settings.Game.VIP || CPA_Settings.s.game == CPA_Settings.Game.JungleBook) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.VIP || Legacy_Settings.s.game == Legacy_Settings.Game.JungleBook) {
 					off_hierarchies = LegacyPointer.Read(reader);
 					ushort_18 = reader.ReadUInt16();
 					num_bones = reader.ReadUInt16();
@@ -82,7 +82,7 @@ namespace OpenSpace.PS1 {
 			hierarchies = Load.ReadArray<PS1AnimationHierarchy>(num_hierarchies, reader, off_hierarchies);
 			//Load.print(channels.Max(c => c.frames.Length == 0 ? 0 : c.frames.Max(f => f.ntto >= 1 ? f.frameNumber.GetValueOrDefault(0) : 0)) + " - " + num_frames + " - " + num_channels);
 			if (off_hierarchies != null) {
-				LegacyPointer.DoAt(ref reader, off_hierarchies - (CPA_Settings.s.game == CPA_Settings.Game.DD ? 0x14 : 0x10), () => {
+				LegacyPointer.DoAt(ref reader, off_hierarchies - (Legacy_Settings.s.game == Legacy_Settings.Game.DD ? 0x14 : 0x10), () => {
 					name = reader.ReadString(0x10);
 					//Load.print(Offset + " - " + name);
 				});

@@ -296,12 +296,12 @@ namespace OpenSpace.ROM {
 				_32 = 0x20,
 			}
 			private static string GetKeyCodeString(int keycode) {
-				switch (CPA_Settings.s.platform) {
-					case CPA_Settings.Platform._3DS:
+				switch (Legacy_Settings.s.platform) {
+					case Legacy_Settings.Platform._3DS:
 						return Enum.GetName(typeof(KeyCode3DS), keycode).ToString();
-					case CPA_Settings.Platform.DS:
+					case Legacy_Settings.Platform.DS:
 						return Enum.GetName(typeof(KeyCodeDS), keycode).ToString();
-					case CPA_Settings.Platform.N64:
+					case Legacy_Settings.Platform.N64:
 						return Enum.GetName(typeof(KeyCodeN64), keycode).ToString();
 					default:
 						return keycode.ToString();

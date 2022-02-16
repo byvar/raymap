@@ -16,7 +16,7 @@ namespace OpenSpace.ROM {
 
 		protected override void ReadInternal(Reader reader) {
 			visualMaterial = new Reference<VisualMaterial>(reader, true);
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 				//MapLoader.Loader.print("Triangles: " + Pointer.Current(reader));
 				triangles = new Reference<GeometricObjectElementTrianglesData>(reader);
 				vertices = new Reference<VertexArray>(reader);
@@ -25,8 +25,8 @@ namespace OpenSpace.ROM {
 				num_triangles = reader.ReadUInt16();
 
 				vertices.Resolve(reader, v => v.length = sz_vertices);
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
-				if (CPA_Settings.s.game == CPA_Settings.Game.RRR) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DS) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.RRR) {
 					unk0 = reader.ReadUInt16();
 					sz_triangles = reader.ReadUInt16();
 					triangles = new Reference<GeometricObjectElementTrianglesData>(reader);
@@ -35,7 +35,7 @@ namespace OpenSpace.ROM {
 					triangles = new Reference<GeometricObjectElementTrianglesData>(reader);
 					sz_triangles = reader.ReadUInt16();
 				}
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 				triangles = new Reference<GeometricObjectElementTrianglesData>(reader);
 				sz_triangles = reader.ReadUInt16();
 				sz_vertices = reader.ReadUInt16();
@@ -61,7 +61,7 @@ namespace OpenSpace.ROM {
 				MeshFilter mf = gao.AddComponent<MeshFilter>();
 				gao.AddComponent<ExportableModel>();
 				Mesh mesh = new Mesh();
-				if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+				if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 					if (sz_vertices == 0) {
 						mesh.vertices = go.verticesVisual.Value.GetVectors(go.ScaleFactor);
 						if (go.hasVertexColors == 0) {
@@ -87,7 +87,7 @@ namespace OpenSpace.ROM {
 					if (go.hasVertexColors != 0) {
 						mesh.RecalculateNormals();
 					}
-				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+				} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 					mesh = RSP.RSPParser.Parse(triangles.Value.rspCommands, vertices.Value.vertices, go, backfaceCulling, mr.material);
 					//gao.name += " " + vertices.Value.Offset + " - " + vertices.Value.vertices.Length + " - " + triangles.Value.Offset;
 					/*for (int i = 0; i < mesh.triangles.Length; i++) {
@@ -96,7 +96,7 @@ namespace OpenSpace.ROM {
 					//gao.name += " " + go.unk0 + " " + go.unk1 + " " + go.hasVertexColors + " " + go.unk3;
 					//gao.name += " - Verts ( " + sz_vertices + "):" + vertices.Value.Offset + " - Tris ( " + sz_triangles + " ):" + triangles.Value.Offset + " - " + Index + " - " + flags;
 					//gao.name += " - Flags: " + string.Format("{0:X4}", visualMaterial.Value.textures.Value.vmTex[0].texRef.Value.texInfo.Value.flags);
-				} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
+				} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DS) {
 					if (triangles.Value != null) {
 						mesh = DS3D.GeometryParser.Parse(triangles.Value.ds3dCommands, go, backfaceCulling, mr.material);
 						//gao.name += " - Tris ( " + sz_triangles + " ):" + triangles.Value.Offset + " - " + Index + " - " + flags;
@@ -123,12 +123,12 @@ namespace OpenSpace.ROM {
 
 		public void MorphVertices(Mesh mesh, GeometricObjectElementTriangles tris2, GeometricObject go1, GeometricObject go2, float lerp) {
 			CompressedVector3Array v1, v2;
-			if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 				v1 = go1.verticesVisual.Value;
 				v2 = go2.verticesVisual.Value;
 			}
 			GeometricObjectElementTriangles tris1 = this;
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 				if (tris1.sz_vertices != tris2.sz_vertices) return;
 				Vector3[] verts1 = RSP.RSPParser.ParseVerticesOnly(tris1.triangles.Value.rspCommands, tris1.vertices.Value.vertices, go1);
 				Vector3[] verts2 = RSP.RSPParser.ParseVerticesOnly(tris2.triangles.Value.rspCommands, tris2.vertices.Value.vertices, go2);
@@ -136,7 +136,7 @@ namespace OpenSpace.ROM {
 					verts1[i] = Vector3.Lerp(verts1[i], verts2[i], lerp);
 				}
 				mesh.vertices = verts1;
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 				Vector3[] verts1, verts2;
 				if (tris1.sz_vertices == 0) {
 					verts1 = go1.verticesVisual.Value.GetVectors(go1.ScaleFactor);
@@ -155,7 +155,7 @@ namespace OpenSpace.ROM {
 					verts1[i] = Vector3.Lerp(verts1[i], verts2[i], lerp);
 				}
 				mesh.vertices = verts1;
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DS) {
 				Vector3[] verts1 = DS3D.GeometryParser.ParseVerticesOnly(tris1.triangles.Value.ds3dCommands, go1);
 				Vector3[] verts2 = DS3D.GeometryParser.ParseVerticesOnly(tris2.triangles.Value.ds3dCommands, go2);
 				for (int i = 0; i < verts1.Length; i++) {
@@ -166,10 +166,10 @@ namespace OpenSpace.ROM {
 		}
 
 		public void ResetMorph(Mesh mesh, GeometricObject go) {
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 				Vector3[] verts = RSP.RSPParser.ParseVerticesOnly(triangles.Value.rspCommands, vertices.Value.vertices, go);
 				mesh.vertices = verts;
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform._3DS) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform._3DS) {
 				Vector3[] verts;
 				if (sz_vertices == 0) {
 					verts = go.verticesVisual.Value.GetVectors(go.ScaleFactor);
@@ -178,14 +178,14 @@ namespace OpenSpace.ROM {
 					verts = triangles.Value.verts.Select(v => v.GetVector(go.ScaleFactor)).ToArray();
 				}
 				mesh.vertices = verts;
-			} else if (CPA_Settings.s.platform == CPA_Settings.Platform.DS) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DS) {
 				Vector3[] verts = DS3D.GeometryParser.ParseVerticesOnly(triangles.Value.ds3dCommands, go);
 				mesh.vertices = verts;
 			}
 		}
 
 		public void ResetVertexBuffer() {
-			if (CPA_Settings.s.platform == CPA_Settings.Platform.N64) {
+			if (Legacy_Settings.s.platform == Legacy_Settings.Platform.N64) {
 				if (vertices.Value != null) {
 					vertices.Value.ResetVertexBuffer();
 				}

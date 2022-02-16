@@ -25,7 +25,7 @@ public class Moddable : MonoBehaviour {
 
     public void SaveChanges(Writer writer) {
         if (startPos != transform.localPosition || startRot != transform.localRotation || startScale != transform.localScale) {
-            if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
                 mat.type = 7;
                 mat.SetTRS(transform.localPosition, transform.localRotation, transform.localScale, convertAxes: true, setVec: true);
             } else {

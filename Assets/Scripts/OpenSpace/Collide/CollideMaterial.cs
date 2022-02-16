@@ -92,13 +92,13 @@ namespace OpenSpace.Collide {
             CollideMaterial cm = new CollideMaterial(offset);
 			//l.print(offset);
 
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
 				cm.type = reader.ReadUInt16();
 				cm.identifier = reader.ReadUInt16();
 			} else {
 				cm.type = reader.ReadUInt16();
 				cm.identifier = reader.ReadUInt16();
-				if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3) {
+				if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3) {
 					cm.direction = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
 					cm.coef = reader.ReadSingle();
 				}

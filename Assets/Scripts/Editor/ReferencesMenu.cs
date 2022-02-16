@@ -59,7 +59,7 @@ namespace Assets.Scripts.Editor {
 
         void OnGUI()
         {
-            if (!EditorApplication.isPlaying || CPA_Settings.s == null) {
+            if (!EditorApplication.isPlaying || Legacy_Settings.s == null) {
                 EditorGUILayout.HelpBox("Please start the scene to use this window.", MessageType.Info);
                 hasResults = false;
                 return;

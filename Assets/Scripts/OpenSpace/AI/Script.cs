@@ -23,7 +23,7 @@ namespace OpenSpace.AI {
 
             s.behaviorOrMacro = behaviorOrMacro;
 
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2Revolution && single) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution && single) {
 				s.off_script = LegacyPointer.Current(reader);
 				bool endReached = false;
 				while (!endReached) {

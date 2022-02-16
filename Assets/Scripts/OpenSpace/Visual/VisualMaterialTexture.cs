@@ -50,7 +50,7 @@ namespace OpenSpace.Visual {
 
         public Texture2D Texture {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     if (texture == null) return null;
                     return texture.Texture;
                 }
@@ -77,7 +77,7 @@ namespace OpenSpace.Visual {
 
         public bool ScrollingEnabled {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     return scrollMode != 0;
                 } else {
                     return ((scrollByte & 6) != 0);
@@ -87,7 +87,7 @@ namespace OpenSpace.Visual {
 
         public bool IsScrollX {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     return scrollMode != 0 && scrollX != 0;
                 } else {
                     return ((scrollByte & 2) != 0) && scrollX != 0;
@@ -96,7 +96,7 @@ namespace OpenSpace.Visual {
         }
         public bool IsScrollY {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     return scrollMode != 0 && scrollY != 0;
                 } else {
                     return ((scrollByte & 4) != 0) && scrollY != 0;
@@ -105,7 +105,7 @@ namespace OpenSpace.Visual {
         }
         public bool IsRotate {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     return false;
                 } else {
                     return ((scrollByte & 8) != 0) || ((scrollByte & 16) != 0);
@@ -129,19 +129,19 @@ namespace OpenSpace.Visual {
         public float ScrollX {
             get {
                 if (!IsScrollX) return 0f;
-                return scrollX * Mathf.Abs(CPA_Settings.s.textureAnimationSpeedModifier);
+                return scrollX * Mathf.Abs(Legacy_Settings.s.textureAnimationSpeedModifier);
             }
         }
         public float ScrollY {
             get {
                 if (!IsScrollY) return 0f;
-                return scrollY * CPA_Settings.s.textureAnimationSpeedModifier;
+                return scrollY * Legacy_Settings.s.textureAnimationSpeedModifier;
             }
         }
 
         public bool IsPixelShaded {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3) {
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
                     return false;
                 } else {
                     return shadingMode != 2;
@@ -151,38 +151,38 @@ namespace OpenSpace.Visual {
 
         public bool IsMirrorX {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && texture != null) return texture.IsMirrorX;
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3 && texture != null) return texture.IsMirrorX;
                 return (properties & 4) != 0;
             }
         }
 
         public bool IsMirrorY {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && texture != null) return texture.IsMirrorY;
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3 && texture != null) return texture.IsMirrorY;
                 return (properties & 8) != 0;
             }
         }
         public bool IsRepeatU {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatU;
-				if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) return true;
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatU;
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) return true;
                 // Hack for R3GC US
-                if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC && MapLoader.Loader.allowDeadPointers && offset?.file.name == "test") return true;
+                if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3GC && MapLoader.Loader.allowDeadPointers && offset?.file.name == "test") return true;
                 return (properties & 1) != 0;
             }
         }
         public bool IsRepeatV {
             get {
-                if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatV;
-				if (CPA_Settings.s.game == CPA_Settings.Game.Dinosaur || CPA_Settings.s.game == CPA_Settings.Game.LargoWinch) return true;
+                if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3 && texture != null) return texture.IsRepeatV;
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.Dinosaur || Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) return true;
                 // Hack for R3GC US
-                if (CPA_Settings.s.mode == CPA_Settings.Mode.Rayman3GC && MapLoader.Loader.allowDeadPointers && offset?.file.name == "test") return true;
+                if (Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman3GC && MapLoader.Loader.allowDeadPointers && offset?.file.name == "test") return true;
                 return (properties & 2) != 0;
             }
         }
         public uint Format {
             get {
-                if (CPA_Settings.s.engineVersion == CPA_Settings.EngineVersion.R3 && texture != null) {
+                if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.R3 && texture != null) {
                     return texture.field0;
                 } else return 0;
             }

@@ -20,7 +20,7 @@ namespace OpenSpace.PS1 {
 
 		protected override void ReadInternal(Reader reader) {
 			//Load.print("CollSet @ " + Offset);
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2) {
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
@@ -46,7 +46,7 @@ namespace OpenSpace.PS1 {
 		}
 
 		public void ReadZdxListDependingOnStates(Reader reader, State[] states) {
-			if (CPA_Settings.s.game == CPA_Settings.Game.R2) {
+			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2) {
 				Loader.R2PS1Loader l = Load as Loader.R2PS1Loader;
 				if (zdxParsed) return;
 				zdxParsed = true;

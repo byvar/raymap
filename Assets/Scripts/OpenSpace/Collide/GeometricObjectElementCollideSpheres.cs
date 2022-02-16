@@ -85,7 +85,7 @@ namespace OpenSpace.Collide {
         public static GeometricObjectElementCollideSpheres Read(Reader reader, LegacyPointer offset, GeometricObjectCollide geo) {
             MapLoader l = MapLoader.Loader;
             GeometricObjectElementCollideSpheres s = new GeometricObjectElementCollideSpheres(offset, geo);
-            if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                 s.off_spheres = LegacyPointer.Read(reader);
                 s.num_spheres = reader.ReadUInt16();
                 s.ind_parallelBox = reader.ReadInt16(); // -1
@@ -99,7 +99,7 @@ namespace OpenSpace.Collide {
                 s.spheres = new IndexedSphere[s.num_spheres];
                 for (uint i = 0; i < s.num_spheres; i++) {
                     s.spheres[i] = new IndexedSphere();
-                    if (CPA_Settings.s.engineVersion > CPA_Settings.EngineVersion.Montreal) {
+                    if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
                         s.spheres[i].debug_radiusAddress = LegacyPointer.Current(reader);
                         s.spheres[i].radius = reader.ReadSingle();
                         s.spheres[i].off_material = LegacyPointer.Read(reader);

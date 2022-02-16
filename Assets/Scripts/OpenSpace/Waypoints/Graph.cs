@@ -24,9 +24,9 @@ namespace OpenSpace.Waypoints {
             graph.nodes = LinkedList<GraphNode>.Read(ref reader, LegacyPointer.Current(reader), (off_element) => {
                 return GraphNode.FromOffsetOrRead(off_element, reader);
             }, flags: LinkedList.Flags.HasHeaderPointers, type: LinkedList.Type.Double);
-            if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3
-                && CPA_Settings.s.platform != CPA_Settings.Platform.DC
-                && CPA_Settings.s.platform != CPA_Settings.Platform.PS2) {
+            if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3
+                && Legacy_Settings.s.platform != Legacy_Settings.Platform.DC
+                && Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
                 graph.off_name = LegacyPointer.Read(reader);
                 graph.off_wayPointName = LegacyPointer.Read(reader);
                 LegacyPointer.DoAt(ref reader, graph.off_name, () => {

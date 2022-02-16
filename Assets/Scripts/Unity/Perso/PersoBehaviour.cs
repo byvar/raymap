@@ -586,7 +586,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 										subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
 									c.Gao.transform.parent = channelObjects[i].transform;
                                     c.Gao.name = "[" + j + "] " + c.Gao.name;
-									if (CPA_Settings.s.hasDeformations && c.Bones != null) hasBones = true;
+									if (Legacy_Settings.s.hasDeformations && c.Bones != null) hasBones = true;
 									foreach (VisualSetLOD l in c.visualSet) {
 										if (l.obj != null) {
 											GameObject gao = l.obj.Gao;
@@ -613,7 +613,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 							int channelIndex = this.GetChannelByID(m.channel)[0];
 							if (channelIndex < morphDataArray.GetLength(0) && m.frame < morphDataArray.GetLength(1)) {
 								morphDataArray[channelIndex, m.frame] = m;
-								if (CPA_Settings.s.engineVersion < CPA_Settings.EngineVersion.R3 && m.morphProgress == 100 && perso.p3dData.objectList != null && perso.p3dData.objectList.Count > m.objectIndexTo) {
+								if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3 && m.morphProgress == 100 && perso.p3dData.objectList != null && perso.p3dData.objectList.Count > m.objectIndexTo) {
 									if (fullMorphPOs[channelIndex] == null) fullMorphPOs[channelIndex] = new Dictionary<ushort, PhysicalObject>();
 									if (!fullMorphPOs[channelIndex].ContainsKey(m.objectIndexTo)) {
 										PhysicalObject o = perso.p3dData.objectList[m.objectIndexTo].po;
@@ -622,7 +622,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 											c.Gao.transform.localScale = c.scaleMultiplier.HasValue ? c.scaleMultiplier.Value : Vector3.one;
 											c.Gao.transform.parent = channelObjects[channelIndex].transform;
 											c.Gao.name = "[Morph] " + c.Gao.name;
-											if (CPA_Settings.s.hasDeformations && c.Bones != null) hasBones = true;
+											if (Legacy_Settings.s.hasDeformations && c.Bones != null) hasBones = true;
 											foreach (VisualSetLOD l in c.visualSet) {
 												if (l.obj != null) {
 													GameObject gao = l.obj.Gao;
@@ -779,7 +779,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 										subObjects[i][j].scaleMultiplier.HasValue ? subObjects[i][j].scaleMultiplier.Value : Vector3.one;
 									c.Gao.transform.parent = channelObjects[i].transform;
 									c.Gao.name = "[" + j + "] " + c.Gao.name;
-									if (CPA_Settings.s.hasDeformations && c.Bones != null) hasBones = true;
+									if (Legacy_Settings.s.hasDeformations && c.Bones != null) hasBones = true;
 									foreach (VisualSetLOD l in c.visualSet) {
 										if (l.obj != null) {
 											GameObject gao = l.obj.Gao;
@@ -836,7 +836,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 				i < of.start_hierarchies_for_frame + of.num_hierarchies_for_frame; i++) {
 				AnimHierarchy h = a3d.hierarchies[i];
 
-				if (CPA_Settings.s.engineVersion <= CPA_Settings.EngineVersion.TT) {
+				if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.TT) {
 					channelObjects[h.childChannelID].transform.SetParent(channelObjects[h.parentChannelID].transform);
 					channelParents[h.childChannelID] = true;
 				} else {
@@ -919,7 +919,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 				if (physicalObject != null && a3d.num_morphData > 0 && morphDataArray != null && i < morphDataArray.GetLength(0) && currentFrame < morphDataArray.GetLength(1)) {
 					AnimMorphData morphData = morphDataArray[i, currentFrame];
 
-					if (morphData != null && (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3 || (morphData.morphProgress != 0 && morphData.morphProgress != 100))) {
+					if (morphData != null && (Legacy_Settings.s.engineVersion >= Legacy_Settings.EngineVersion.R3 || (morphData.morphProgress != 0 && morphData.morphProgress != 100))) {
 						int numMorphs = Math.Max(1, (int)morphData.numMorphs);
 						for (int j = 0; j < physicalObject.visualSet.Length; j++) {
 							IGeometricObject obj = physicalObject.visualSet[j].obj;
@@ -935,7 +935,7 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 							for (int m = 0; m < numMorphs; m++) {
 								ushort objectIndexTo = morphData.objectIndexTo;
 								float morphProgress = morphData.morphProgressFloat;
-								if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3) {
+								if (Legacy_Settings.s.engineVersion >= Legacy_Settings.EngineVersion.R3) {
 									objectIndexTo = morphData.objectIndexToArray[m];
 									morphProgress = morphData.GetMorphProgressFloat(m);
 								}

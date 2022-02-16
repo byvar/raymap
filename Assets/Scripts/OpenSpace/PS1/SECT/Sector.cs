@@ -49,7 +49,7 @@ namespace OpenSpace.PS1 {
 			Load.print("Sector @ " + Offset);
 			off_persos = LegacyPointer.Read(reader);
 			off_graphicSectors = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.game != CPA_Settings.Game.R2 && CPA_Settings.s.game != CPA_Settings.Game.RRush) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.R2 && Legacy_Settings.s.game != Legacy_Settings.Game.RRush) {
 				vip_ushort_08 = reader.ReadUInt16();
 				vip_ushort_0A = reader.ReadUInt16();
 				vip_uint_0C = reader.ReadUInt32();
@@ -58,7 +58,7 @@ namespace OpenSpace.PS1 {
 			off_activitySectors = LegacyPointer.Read(reader);
 			off_10 = LegacyPointer.Read(reader); // Sound sectors?
 			off_ipos = LegacyPointer.Read(reader);
-			if (CPA_Settings.s.game != CPA_Settings.Game.R2 && CPA_Settings.s.game != CPA_Settings.Game.RRush) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.R2 && Legacy_Settings.s.game != Legacy_Settings.Game.RRush) {
 				int_50 = reader.ReadInt32();
 			} else {
 				off_18 = LegacyPointer.Read(reader);
@@ -76,12 +76,12 @@ namespace OpenSpace.PS1 {
 			short_42 = reader.ReadInt16();
 			short_44 = reader.ReadInt16();
 			short_46 = reader.ReadInt16();
-			if (CPA_Settings.s.game != CPA_Settings.Game.JungleBook && CPA_Settings.s.game != CPA_Settings.Game.VIP) {
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.JungleBook && Legacy_Settings.s.game != Legacy_Settings.Game.VIP) {
 				short_48 = reader.ReadInt16();
 				short_4A = reader.ReadInt16();
 				int_4C = reader.ReadInt32();
-				if (CPA_Settings.s.game == CPA_Settings.Game.R2
-					|| CPA_Settings.s.game == CPA_Settings.Game.RRush) {
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R2
+					|| Legacy_Settings.s.game == Legacy_Settings.Game.RRush) {
 					int_50 = reader.ReadInt32();
 				}
 			} else {

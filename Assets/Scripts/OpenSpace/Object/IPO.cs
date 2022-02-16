@@ -68,13 +68,13 @@ namespace OpenSpace.Object {
             // TODO: Read radiosity on all platforms. Currently crashes on Xbox 360
             //ipo.radiosity = l.FromOffsetOrRead<Radiosity>(reader, ipo.off_radiosity);
 
-			if (CPA_Settings.s.engineVersion >= CPA_Settings.EngineVersion.R3) {
+			if (Legacy_Settings.s.engineVersion >= Legacy_Settings.EngineVersion.R3) {
 				reader.ReadUInt32();
 				ipo.off_portalCamera = LegacyPointer.Read(reader);
 				reader.ReadUInt32();
 				reader.ReadUInt32();
 				reader.ReadUInt32();
-				if (CPA_Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
+				if (Legacy_Settings.s.hasNames) ipo.name = reader.ReadString(0x32);
 			}
 			LegacyPointer.DoAt(ref reader, ipo.off_data, () => {
 				ipo.data = PhysicalObject.Read(reader, ipo.off_data, so:ipo.superObject, radiosity: ipo.radiosity);
