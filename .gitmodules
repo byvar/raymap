@@ -1,6 +1,3 @@
 [submodule "Assets/Scripts/Libraries/BinarySerializer"]
 	path = Assets/Scripts/Libraries/BinarySerializer
 	url = https://github.com/BinarySerializer/BinarySerializer
-[submodule "Assets/Scripts/Libraries/BinarySerializer.OpenSpace"]
-	path = Assets/Scripts/Libraries/BinarySerializer.OpenSpace
-	url = https://github.com/BinarySerializer/BinarySerializer.OpenSpace
