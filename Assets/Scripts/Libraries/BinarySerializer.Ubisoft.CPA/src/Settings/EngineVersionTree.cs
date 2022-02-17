@@ -10,6 +10,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                             new Node(EngineVersion.TonicTrouble).SetChildren(
                                 new Node(EngineVersion.CPA_2).SetChildren(
                                     new Node(EngineVersion.Rayman2Demo).SetChildren(
+                                        new Node(EngineVersion.RedPlanet),
                                         new Node(EngineVersion.Rayman2).SetChildren(
                                             new Node(EngineVersion.Rayman2Revolution),
                                             new Node(EngineVersion.DonaldDuckQuackAttack),

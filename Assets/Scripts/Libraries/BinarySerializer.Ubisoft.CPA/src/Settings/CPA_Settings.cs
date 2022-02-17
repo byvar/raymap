@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using LinkedListType = BinarySerializer.Ubisoft.CPA.LinkedList.Type;
 
 namespace BinarySerializer.Ubisoft.CPA {
     /// <summary>
@@ -30,5 +32,28 @@ namespace BinarySerializer.Ubisoft.CPA {
         /// Engine version tree. CPA has a complex history and evolved with many branches
         /// </summary>
         public EngineVersionTree EngineVersionTree { get; }
+
+        // Legacy. TODO: Remove those that become useless
+        public GameMode Mode { get; set; } = GameMode.Rayman3PC;
+        public LinkedListType LinkedListType { get; set; } = LinkedListType.Double;
+        public bool HasObjectTypes { get; set; } = true;
+        public bool HasNames { get; set; } = false;
+        public bool HasDeformations { get; set; } = false;
+        public int EntryActionsCount { get; set; } = 0;
+        public bool HasExtraInputData { get; set; } = false;
+        public bool HasMemorySupport { get; set; } = false;
+        public Dictionary<string, uint> MemoryAddresses { get; set; } = null;
+        public bool LoadFromMemory { get; set; } = false;
+        public Encryption Encryption { get; set; } = Encryption.None;
+        public bool EncryptPointerFiles { get; set; } = false;
+        public bool HasLinkedListHeaderPointers { get; set; } = false;
+        public bool SNA_Compression { get; set; } = false;
+        public AITypes AITypes { get; set; }
+        public float TextureAnimationSpeedModifier { get; set; } = 1f;
+        public float Luminosity { get; set; } = 0.5f;
+        public bool Saturate { get; set; } = true;
+        public Dictionary<PathCapitalizationType, PathCapitalization> PathCapitalization { get; set; } = new Dictionary<PathCapitalizationType, PathCapitalization>();
+        public LevelTranslation LevelTranslation { get; set; } = null;
+        public bool LinkUncategorizedObjectsToScriptFamily { get; set; } = false;
     }
 }

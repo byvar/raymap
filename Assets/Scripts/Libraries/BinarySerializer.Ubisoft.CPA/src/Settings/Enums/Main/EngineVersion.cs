@@ -14,6 +14,7 @@
         RaymanRavingRabbids,
         Rayman2_3D,
         DonaldDuckQuackAttack,
+        RedPlanet,
 
         CPA_PS1,
         Rayman2_PS1,
