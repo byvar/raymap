@@ -293,13 +293,13 @@ public class UnityWindowSettings : UnityWindow {
 
 				async UniTask ExecuteGameAction(GameAction action) {
 					try {
-						BinarySerializer.Unity.Controller.StartStopwatch();
+						BinarySerializer.Unity.TimeController.StartStopwatch();
 						// Run the action
 						await action.GameActionFunc(inputDir, outputDir);
 					} catch (Exception ex) {
 						Debug.LogError(ex.ToString());
 					} finally {
-						BinarySerializer.Unity.Controller.StopStopwatch();
+						BinarySerializer.Unity.TimeController.StopStopwatch();
 					}
 				}
 				_ = ExecuteGameAction(action);

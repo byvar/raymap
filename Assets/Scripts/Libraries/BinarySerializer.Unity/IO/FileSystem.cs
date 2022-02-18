@@ -85,7 +85,7 @@ namespace BinarySerializer.Unity {
 		public static async UniTask DownloadFile(string path) {
 			if (virtualFiles.ContainsKey(path) && virtualFiles[path] != null) return;
 			Debug.Log("Downloading " + path);
-			await Controller.WaitIfNecessary();
+			await TimeController.WaitIfNecessary();
 			UnityWebRequest www = UnityWebRequest.Get(serverAddress + path);
 
 			try {
@@ -104,13 +104,13 @@ namespace BinarySerializer.Unity {
 
 		public static async UniTask CheckDirectory(string path) {
 			if (existingDirectories.ContainsKey(path)) return;
-			await Controller.WaitIfNecessary();
+			await TimeController.WaitIfNecessary();
 			if (FileSystem.mode == FileSystem.Mode.Web) {
 				UnityWebRequest www = UnityWebRequest.Head(serverAddress + path + "/");
 				try {
 					await www.SendWebRequest();
 					while (!www.isDone) {
-						await Controller.WaitFrame();
+						await TimeController.WaitFrame();
 					}
 				} catch (UnityWebRequestException) {
 				} finally {
@@ -131,11 +131,11 @@ namespace BinarySerializer.Unity {
 
 		public static async UniTask InitBigFile(string path, int cacheLength) {
 			UnityWebRequest www = UnityWebRequest.Head(serverAddress + path);
-			await Controller.WaitIfNecessary();
+			await TimeController.WaitIfNecessary();
 			try {
 				await www.SendWebRequest();
 				while (!www.isDone) {
-					await Controller.WaitFrame();
+					await TimeController.WaitFrame();
 				}
 			} catch (UnityWebRequestException) {
 			} finally {
@@ -170,21 +170,21 @@ namespace BinarySerializer.Unity {
 
 		public static async UniTask PrepareFile(string path) {
 			if (FileSystem.mode == FileSystem.Mode.Web && !string.IsNullOrEmpty(path)) {
-				string state = Controller.DetailedState;
-				Controller.DetailedState = state + "\nDownloading file: " + path;
+				string state = GlobalLoadState.DetailedState;
+				GlobalLoadState.DetailedState = state + "\nDownloading file: " + path;
 				await FileSystem.DownloadFile(path);
-				Controller.DetailedState = state;
-				await Controller.WaitIfNecessary();
+				GlobalLoadState.DetailedState = state;
+				await TimeController.WaitIfNecessary();
 			}
 		}
 
 		public static async UniTask PrepareBigFile(string path, int cacheLength) {
 			if (FileSystem.mode == FileSystem.Mode.Web) {
-				string state = Controller.DetailedState;
-				Controller.DetailedState = state + "\nInitializing bigfile: " + path + " (Cache size: " + Util.SizeSuffix(cacheLength, 0) + ")";
+				string state = GlobalLoadState.DetailedState;
+				GlobalLoadState.DetailedState = state + "\nInitializing bigfile: " + path + " (Cache size: " + Util.SizeSuffix(cacheLength, 0) + ")";
 				await FileSystem.InitBigFile(path, cacheLength);
-				Controller.DetailedState = state;
-				await Controller.WaitIfNecessary();
+				GlobalLoadState.DetailedState = state;
+				await TimeController.WaitIfNecessary();
 			}
 		}
 

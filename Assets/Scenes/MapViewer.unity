@@ -747,6 +747,50 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 977189304}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1053010137
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1053010138}
+  - component: {fileID: 1053010139}
+  m_Layer: 0
+  m_Name: LoadController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1053010138
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053010137}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1701416322}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1053010139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1053010137}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7bcc5590936f7f47b649330a9e963f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LoadingScreen: {fileID: 1109753673}
 --- !u!1 &1060248221
 GameObject:
   m_ObjectHideFlags: 0
@@ -1584,7 +1628,7 @@ GameObject:
   - component: {fileID: 1701416324}
   - component: {fileID: 1701416325}
   m_Layer: 0
-  m_Name: Loader
+  m_Name: Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1597,11 +1641,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1701416320}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5af587f4a54f84c42ae16a9378ca8d57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LoadController: {fileID: 1053010139}
   baseMaterial: {fileID: 2100000, guid: 4c445331ca6381a44bb772fa126abb28, type: 2}
   baseTransparentMaterial: {fileID: 2100000, guid: f72b6a2550e50034d9212047304245fa,
     type: 2}
@@ -1613,7 +1658,6 @@ MonoBehaviour:
   lightManager: {fileID: 1503682888}
   graphManager: {fileID: 486948330}
   portalManager: {fileID: 469719539}
-  loadingScreen: {fileID: 1109753673}
   selector: {fileID: 1701416324}
   communicator: {fileID: 1701416323}
   recordingToolPrefab: {fileID: 1480293497455159104, guid: 48ea7c4467298b14d8d04c8030a417f3,
@@ -1637,7 +1681,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1053010138}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

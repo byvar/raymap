@@ -23,6 +23,8 @@ using BinarySerializer.Unity;
 using Raymap;
 
 public class Controller : MonoBehaviour {
+	public LoadController LoadController;
+
 	public Material baseMaterial;
 	public Material baseTransparentMaterial;
 	public Material baseLightMaterial;
@@ -32,7 +34,8 @@ public class Controller : MonoBehaviour {
 	public LightManager lightManager;
 	public GraphManager graphManager;
 	public PortalManager portalManager;
-	public LoadingScreen loadingScreen;
+
+	public LoadingScreen loadingScreen => LoadController.LoadingScreen;
 	public ObjectSelector selector;
 	public WebCommunicator communicator;
 	public RecordingTool recordingToolPrefab;

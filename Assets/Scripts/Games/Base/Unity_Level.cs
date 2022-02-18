@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 namespace Raymap {
 	public abstract class Unity_Level {
+		public abstract void Init();
 	}
 }

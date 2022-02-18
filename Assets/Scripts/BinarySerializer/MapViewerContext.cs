@@ -10,12 +10,12 @@ using ILogger = BinarySerializer.ILogger;
 using Reader = BinarySerializer.Reader;
 
 namespace Raymap {
-    public class Ray1MapContext : Context {
-        public Ray1MapContext(string basePath, MapViewerSettings settings) : base(
+    public class MapViewerContext : Context {
+        public MapViewerContext(string basePath, MapViewerSettings settings) : base(
             basePath: basePath, // Pass in the base path
-            settings: new R1SerializerSettings(), // Pass in the settings
-            serializerLog: new R1SerializerLog(), // Use R1 serializer log for logging to a file
-            fileManager: new R1FileManager(), // Use R1 file manager for use with FileSystem
+            settings: new MapViewerSerializerSettings(), // Pass in the settings
+            serializerLog: new MapViewerSerializerLog(), // Use R1 serializer log for logging to a file
+            fileManager: new MapViewerFileManager(), // Use R1 file manager for use with FileSystem
             logger: new UnityLogger()) // Use Unity logger
         {
             // Add the game settings
@@ -24,11 +24,11 @@ namespace Raymap {
             settings.GetGameManager.AddContextSettings(this);
             settings.GetGameManager.AddContextPointers(this);
         }
-        public Ray1MapContext(MapViewerSettings settings) : this(settings.GameDirectory, settings) { }
+        public MapViewerContext(MapViewerSettings settings) : this(settings.GameDirectory, settings) { }
 
         public MapViewerSettings GameSettings => GetSettings<MapViewerSettings>();
 
-        public class R1SerializerSettings : ISerializerSettings {
+        public class MapViewerSerializerSettings : ISerializerSettings {
             /// <summary>
             /// The default string encoding to use when none is specified
             /// </summary>
@@ -57,7 +57,7 @@ namespace Raymap {
             public Endian DefaultEndianness => Endian.Little;
         }
 
-        public class R1FileManager : IFileManager {
+        public class MapViewerFileManager : IFileManager {
             public PathSeparatorChar SeparatorCharacter => PathSeparatorChar.ForwardSlash;
 
             public bool DirectoryExists(string path) => FileSystem.DirectoryExists(path);
@@ -80,7 +80,7 @@ namespace Raymap {
             public void LogError(object log, params object[] args) => Debug.LogError(String.Format(log?.ToString() ?? String.Empty, args));
         }
 
-        public class R1SerializerLog : ISerializerLog {
+        public class MapViewerSerializerLog : ISerializerLog {
             public bool IsEnabled => UnitySettings.Log;
 
             private StreamWriter _logWriter;
