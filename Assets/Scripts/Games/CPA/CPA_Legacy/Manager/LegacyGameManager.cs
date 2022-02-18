@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Raymap {
-	public class LegacyGameManager : BaseGameManager {
+	public class LegacyGameManager : CPA_BaseManager {
 		public override MapTreeNode GetLevels(MapViewerSettings settings) {
 			var files = FindFiles(settings);
 			var translation = GetSettings(settings)?.levelTranslation?.SortAndTranslate(files);
@@ -25,7 +25,8 @@ namespace Raymap {
 			return root;
 		}
 
-		public override UniTask<Unity_Level> LoadAsync(Context context) {
+		public override async UniTask<Unity_Level> LoadAsync(Context context) {
+			await UniTask.CompletedTask;
 			throw new NotImplementedException();
 		}
 

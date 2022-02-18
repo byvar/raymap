@@ -5,7 +5,7 @@ namespace BinarySerializer.Ubisoft.CPA.ROM
     public class A3D_NTTO : BinarySerializable
     {
         public ushort TypeOfObject { get; set; }
-		public ushort IndexInTable { get; set; }
+		public byte IndexInTable { get; set; }
 		public byte Transparency { get; set; }
 
 		// Parsed
@@ -22,7 +22,7 @@ namespace BinarySerializer.Ubisoft.CPA.ROM
 					TypeFlags = b.SerializeBits<ElementTypeFlags>(TypeFlags, 8, name: nameof(TypeFlags));
 				});
 			});
-			IndexInTable = s.Serialize<ushort>(IndexInTable, name: nameof(IndexInTable));
+			IndexInTable = s.Serialize<byte>(IndexInTable, name: nameof(IndexInTable));
 			Transparency = s.Serialize<byte>(Transparency, name: nameof(Transparency));
 		}
 

@@ -841,5 +841,69 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		#endregion
+
+		public static CPA_Settings GetSettings(CPA_GameMode mode) {
+			CPA_Settings settings = mode switch {
+				CPA_GameMode.Rayman2PC => R2PC,
+				CPA_GameMode.Rayman2PCDemo_1999_08_18 => R2PCDemo1,
+				CPA_GameMode.Rayman2PCDemo_1999_09_04 => R2PCDemo2,
+				CPA_GameMode.Rayman2DC => R2DC,
+				CPA_GameMode.Rayman2IOS => R2IOS,
+				CPA_GameMode.Rayman2IOSDemo => R2IOS,
+				CPA_GameMode.Rayman2PS1 => R2PS1,
+				CPA_GameMode.Rayman2PS2 => R2PS2,
+				CPA_GameMode.Rayman2N64 => R2N64,
+				CPA_GameMode.TonicTroubleN64 => TTN64,
+				CPA_GameMode.Rayman2DS => R2DS,
+				CPA_GameMode.Rayman23DS => R23DS,
+				CPA_GameMode.RaymanMPC => RMPC,
+				CPA_GameMode.RaymanMPS2 => RMPS2,
+				CPA_GameMode.RaymanMPS2Demo_2001_07_25 => RMPS2Demo,
+				CPA_GameMode.RaymanArenaPC => RAPC,
+				CPA_GameMode.RaymanArenaPS2 => RAPS2,
+				CPA_GameMode.RaymanArenaGC => RAGC,
+				CPA_GameMode.RaymanArenaGCDemo_2002_03_07 => RAGCDemo,
+				CPA_GameMode.RaymanArenaXbox => RAXbox,
+				CPA_GameMode.RaymanRushPS1 => RRushPS1,
+				CPA_GameMode.Rayman3PC => R3PC,
+				CPA_GameMode.Rayman3PCDemo_2002_10_01 => R3PCDemo20021001,
+				CPA_GameMode.Rayman3PCDemo_2002_10_21 => R3PCDemo20021021,
+				CPA_GameMode.Rayman3PCDemo_2002_12_09 => R3PCDemo20021209,
+				CPA_GameMode.Rayman3PCDemo_2003_01_06 => R3PCDemo20030106,
+				CPA_GameMode.Rayman3MacOS => R3MacOS,
+				CPA_GameMode.Rayman3GC => R3GC,
+				CPA_GameMode.Rayman3PS2 => R3PS2,
+				CPA_GameMode.Rayman3PS2Demo_2002_05_17 => R3PS2Demo_20020517,
+				CPA_GameMode.Rayman3PS2Demo_2002_08_07 => R3PS2Demo_20020807,
+				CPA_GameMode.Rayman3PS2DevBuild_2002_09_06 => R3PS2DevBuild,
+				CPA_GameMode.Rayman3PS2Demo_2002_10_29 => R3PS2Demo_20021029,
+				CPA_GameMode.Rayman3PS2Demo_2002_12_18 => R3PS2Demo_20021218,
+				CPA_GameMode.Rayman3Xbox => R3Xbox,
+				CPA_GameMode.Rayman3Xbox360 => R3Xbox360,
+				CPA_GameMode.Rayman3PS3 => R3PS3,
+				CPA_GameMode.RaymanRavingRabbidsDS => RRRDS,
+				CPA_GameMode.RaymanRavingRabbidsDSDevBuild_2006_05_25 => RRRDS_20060525,
+				CPA_GameMode.TonicTroublePC => TTPC,
+				CPA_GameMode.TonicTroubleSEPC => TTSEPC,
+				CPA_GameMode.DonaldDuckPC => DDPC,
+				CPA_GameMode.DonaldDuckPCDemo => DDPCDemo,
+				CPA_GameMode.DonaldDuckDC => DDDC,
+				CPA_GameMode.DonaldDuckN64 => DDN64,
+				CPA_GameMode.DonaldDuckPS1 => DDPS1,
+				CPA_GameMode.DonaldDuckPKGC => DDPKGC,
+				CPA_GameMode.PlaymobilHypePC => PlaymobilHypePC,
+				CPA_GameMode.PlaymobilLauraPC => PlaymobilLauraPC,
+				CPA_GameMode.PlaymobilAlexPC => PlaymobilAlexPC,
+				CPA_GameMode.DinosaurPC => DinosaurPC,
+				CPA_GameMode.LargoWinchPC => LargoWinchPC,
+				CPA_GameMode.VIPPS1 => VIPPS1,
+				CPA_GameMode.JungleBookPS1 => JungleBookPS1,
+				CPA_GameMode.RedPlanetPC => RedPlanetPC,
+
+				_ => throw new Exception($"CPA_GameMode value {mode} is not a valid CPA mode")
+			};
+			settings.Mode = mode;
+			return settings;
+		}
 	}
 }

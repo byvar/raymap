@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public enum GameMode {
+	public enum CPA_GameMode {
 		Rayman2PC,
 		Rayman2PCDemo_1999_08_18,
 		Rayman2PCDemo_1999_09_04,

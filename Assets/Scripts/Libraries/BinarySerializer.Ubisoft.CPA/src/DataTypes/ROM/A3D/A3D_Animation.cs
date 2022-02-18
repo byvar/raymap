@@ -20,9 +20,9 @@
 			Quaternions = s.SerializeObjectArray<A3D_Quaternion>(Quaternions, Header.QuaternionsCount, name: nameof(Quaternions));
 			Hierarchies = s.SerializeObjectArray<A3D_Hierarchy>(Hierarchies, Header.HierarchiesCount, name: nameof(Hierarchies));
 			NTTOs = s.SerializeObjectArray<A3D_NTTO>(NTTOs, Header.NTTOCount, name: nameof(NTTOs));
-			SavedFrames = s.SerializeObjectArray<A3D_Frame>(SavedFrames, Header.SavedFramesCount, name: nameof(SavedFrames));
-			OnlyFrames = s.SerializeObjectArray<A3D_OnlyFrame>(OnlyFrames, Header.FramesCount, name: nameof(OnlyFrames));
+			OnlyFrames = s.SerializeObjectArray<A3D_OnlyFrame>(OnlyFrames, Header.EndFrame - Header.StartFrame, name: nameof(OnlyFrames));
 			Channels = s.SerializeObjectArray<A3D_Channel>(Channels, Header.ChannelsCount, name: nameof(Channels));
+			SavedFrames = s.SerializeObjectArray<A3D_Frame>(SavedFrames, Header.ChannelsCount * Header.SavedFramesCount, name: nameof(SavedFrames));
 			KeyFrames = s.SerializeObjectArray<A3D_KeyFrame>(KeyFrames, Header.KeyFramesCount, name: nameof(KeyFrames));
 			s.Align(4, Offset);
 			Events = s.SerializeObjectArray<A3D_Event>(Events, Header.EventsCount, name: nameof(Events));

@@ -34,7 +34,7 @@ namespace BinarySerializer.Ubisoft.CPA {
         public EngineVersionTree EngineVersionTree { get; }
 
         // Legacy. TODO: Remove those that become useless
-        public GameMode Mode { get; set; } = GameMode.Rayman3PC;
+        public CPA_GameMode Mode { get; set; } = CPA_GameMode.Rayman3PC;
         public LinkedListType LinkedListType { get; set; } = LinkedListType.Double;
         public bool HasObjectTypes { get; set; } = true;
         public bool HasNames { get; set; } = false;

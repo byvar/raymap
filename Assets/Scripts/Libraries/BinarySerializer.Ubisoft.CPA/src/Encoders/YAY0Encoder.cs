@@ -13,7 +13,7 @@ namespace BinarySerializer.Ubisoft.CPA
 
         public void DecodeStream(Stream input, Stream output) {
             // Create a reader for the input
-            using var reader = new Reader(input, isLittleEndian: true, leaveOpen: true);
+            using var reader = new Reader(input, isLittleEndian: false, leaveOpen: true);
             long inputOffset = reader.BaseStream.Position;
 
             string magic = reader.ReadString(4, System.Text.Encoding.ASCII);
@@ -70,8 +70,8 @@ namespace BinarySerializer.Ubisoft.CPA
 
                         // Write bytes
                         var p = decompressedStream.Position - offset;
-                        for (ulong j = length; j > 0; --j)
-                            decompressedStream.WriteByte(decompressedBuffer[p++]);
+                        for (long j = 0; j < length; j++)
+                            decompressedStream.WriteByte(decompressedBuffer[p+j]);
                         currentlyDecompressedSize += length;
 
                         reader.BaseStream.Position = currentLayoutOffset;
