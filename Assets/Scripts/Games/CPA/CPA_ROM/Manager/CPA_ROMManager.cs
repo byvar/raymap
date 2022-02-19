@@ -25,8 +25,7 @@ namespace Raymap {
 			await context.AddLinearFileAsync(AnimsCutTableFilePath, endianness: endian);
 		}
 
-		public override async UniTask<Unity_Level> LoadAsync(Context context) {
-			// Load animations
+		public async UniTask LoadAnimations(Context context) {
 			var animsFile = FileFactory.Read<A3D_AnimationsFile>(context, AnimsFilePath);
 			for (int i = 0; i < animsFile.AnimationsCount; i++) {
 				if (i % 16 != 0) continue; // This is just a test
@@ -38,6 +37,11 @@ namespace Raymap {
 			}
 			var shAnimsFile = FileFactory.Read<A3D_ShortAnimationsFile>(context, ShortAnimsFilePath);
 			var cutTableFile = FileFactory.Read<A3D_AnimationCutTable>(context, AnimsCutTableFilePath);
+		}
+
+		public override async UniTask<Unity_Level> LoadAsync(Context context) {
+			// Load animations
+			await LoadAnimations(context);
 
 			throw new NotImplementedException();
 		}

@@ -2,7 +2,7 @@
 
 namespace BinarySerializer.Ubisoft.CPA.ROM
 {
-    public class CPA_ShortQuaternion : BinarySerializable
+    public class CPA_ROM_ShortQuaternion : BinarySerializable
     {
 		public short X { get; set; } // Divide by Int16.Max to get float
 		public short Y { get; set; }

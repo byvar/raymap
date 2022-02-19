@@ -6,7 +6,7 @@ namespace Raymap {
 	public abstract class CPA_BaseManager : BaseGameManager {
 		public override void AddContextSettings(Context context) {
 			base.AddContextSettings(context);
-			var settings = ((MapViewerContext)context).GameSettings;
+			var settings = context.GetMapViewerSettings();
 			var cpaMode = GetCPAMode(settings);
 			var cpaSettings = CPA_Settings_Defines.GetSettings(cpaMode);
 			context.AddSettings<CPA_Settings>(cpaSettings);

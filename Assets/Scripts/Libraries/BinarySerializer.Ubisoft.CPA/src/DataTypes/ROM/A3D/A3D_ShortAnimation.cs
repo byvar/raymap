@@ -7,7 +7,7 @@
 		public ushort MorphDataCount { get; set; }
 		public ushort Align { get; set; }
 		public CPA_Vector Translation { get; set; }
-		public CPA_ShortQuaternion Rotation { get; set; }
+		public CPA_ROM_ShortQuaternion Rotation { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			FramesCount = s.Serialize<ushort>(FramesCount, name: nameof(FramesCount));
@@ -17,7 +17,7 @@
 			MorphDataCount = s.Serialize<ushort>(MorphDataCount, name: nameof(MorphDataCount));
 			Align = s.Serialize<ushort>(Align, name: nameof(Align));
 			Translation = s.SerializeObject<CPA_Vector>(Translation, name: nameof(Translation));
-			Rotation = s.SerializeObject<CPA_ShortQuaternion>(Rotation, name: nameof(Rotation));
+			Rotation = s.SerializeObject<CPA_ROM_ShortQuaternion>(Rotation, name: nameof(Rotation));
 		}
 	}
 }
