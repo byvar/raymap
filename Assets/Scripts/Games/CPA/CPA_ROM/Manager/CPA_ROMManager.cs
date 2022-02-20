@@ -14,12 +14,19 @@ using System.Threading.Tasks;
 
 namespace Raymap {
 	public class CPA_ROMManager : LegacyGameManager {
+		public string FatFilePath => "fat.bin";
+		public string DataFilePath => "data.bin";
 		public string AnimsFilePath => "anims.bin";
 		public string ShortAnimsFilePath => "shAnims.bin";
 		public string AnimsCutTableFilePath => "cuttable.bin";
 
 		public override async UniTask LoadFilesAsync(Context context) {
 			Endian endian = context.GetCPASettings().GetEndian;
+			await context.AddLinearFileAsync(FatFilePath, endianness: endian);
+			// TODO: change this to bigfile later?
+			await context.AddLinearFileAsync(DataFilePath, endianness: endian);
+
+			// Animations
 			await context.AddLinearFileAsync(AnimsFilePath, endianness: endian);
 			await context.AddLinearFileAsync(ShortAnimsFilePath, endianness: endian);
 			await context.AddLinearFileAsync(AnimsCutTableFilePath, endianness: endian);
@@ -40,6 +47,11 @@ namespace Raymap {
 		}
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {
+			// Load fat
+			var dataPointer = context.FilePointer(DataFilePath);
+
+			var fatFile = FileFactory.Read<LDR_FatFile>(context, FatFilePath, onPreSerialize: (_, fat) => fat.Pre_DataPointer = dataPointer);
+
 			// Load animations
 			await LoadAnimations(context);
 
