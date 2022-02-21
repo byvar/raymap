@@ -55,28 +55,31 @@ namespace Raymap {
 				"ani10",*/
 			};
 
+
+			var cpaMode = GetCPAMode(settings);
+			var cpaSettings = BinarySerializer.Ubisoft.CPA.CPA_Settings_Defines.GetSettings(cpaMode);
+
 			// Add the found files containing the correct file extension
 			string extension = null;
 			string[] levels;
-			Legacy_Settings.Init(GetSettings(settings));
-			switch (Legacy_Settings.s.platform) {
-				case Legacy_Settings.Platform.PC:
-				case Legacy_Settings.Platform.iOS:
-				case Legacy_Settings.Platform.GC:
-				case Legacy_Settings.Platform.Xbox:
-				case Legacy_Settings.Platform.Xbox360:
-				case Legacy_Settings.Platform.PS3:
-				case Legacy_Settings.Platform.MacOS:
-					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
+			switch (cpaSettings.Platform) {
+				case BinarySerializer.Ubisoft.CPA.Platform.PC:
+				case BinarySerializer.Ubisoft.CPA.Platform.iOS:
+				case BinarySerializer.Ubisoft.CPA.Platform.GC:
+				case BinarySerializer.Ubisoft.CPA.Platform.Xbox:
+				case BinarySerializer.Ubisoft.CPA.Platform.Xbox360:
+				case BinarySerializer.Ubisoft.CPA.Platform.PS3:
+				case BinarySerializer.Ubisoft.CPA.Platform.MacOS:
+					if (!cpaSettings.EngineVersionTree.HasParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_3)) {
 						extension = "*.sna";
 					} else {
 						extension = "*.lvl";
 					}
 					break;
-				case Legacy_Settings.Platform.DC: extension = "*.DAT"; break;
-				case Legacy_Settings.Platform.PS2:
-					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
-						if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R2) {
+				case BinarySerializer.Ubisoft.CPA.Platform.DC: extension = "*.DAT"; break;
+				case BinarySerializer.Ubisoft.CPA.Platform.PS2:
+					if (!cpaSettings.EngineVersionTree.HasParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_3)) {
+						if (!cpaSettings.EngineVersionTree.HasParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_Montreal)) {
 							extension = "*.sna";
 						} else {
 							extension = "*.lv2";
@@ -85,26 +88,29 @@ namespace Raymap {
 						extension = "*.lvl";
 					}
 					break;
-				case Legacy_Settings.Platform.PS1:
+				case BinarySerializer.Ubisoft.CPA.Platform.PS1:
+					Legacy_Settings.Init(GetSettings(settings));
 					MapLoader.Reset();
 					R2PS1Loader l1 = MapLoader.Loader as R2PS1Loader;
 					l1.gameDataBinFolder = directory;
 					levels = l1.LoadLevelList();
 					MapLoader.Reset();
 					output.AddRange(levels);
+					Legacy_Settings.s = null;
 					break;
-				case Legacy_Settings.Platform.DS:
-				case Legacy_Settings.Platform.N64:
-				case Legacy_Settings.Platform._3DS:
+				case BinarySerializer.Ubisoft.CPA.Platform.DS:
+				case BinarySerializer.Ubisoft.CPA.Platform.N64:
+				case BinarySerializer.Ubisoft.CPA.Platform._3DS:
+					Legacy_Settings.Init(GetSettings(settings));
 					MapLoader.Reset();
 					R2ROMLoader lr = MapLoader.Loader as R2ROMLoader;
 					lr.gameDataBinFolder = directory;
 					levels = lr.LoadLevelList();
 					MapLoader.Reset();
 					output.AddRange(levels);
+					Legacy_Settings.s = null;
 					break;
 			}
-			Legacy_Settings.s = null;
 			if (extension != null) {
 				output.AddRange(
 					from file in Directory.EnumerateFiles(directory, extension, SearchOption.AllDirectories)

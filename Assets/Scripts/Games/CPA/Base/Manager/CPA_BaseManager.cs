@@ -12,7 +12,7 @@ namespace Raymap {
 			context.AddSettings<CPA_Settings>(cpaSettings);
 		}
 
-		private CPA_GameMode GetCPAMode(MapViewerSettings settings) {
+		protected CPA_GameMode GetCPAMode(MapViewerSettings settings) {
 			return settings.GameModeSelection switch {
 
 				GameModeSelection.Rayman2PC => CPA_GameMode.Rayman2PC,
