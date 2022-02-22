@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class CPA_Vector : BinarySerializable {
+	public class CPA_Vector3D : BinarySerializable {
 		public float X { get; set; }
 		public float Y { get; set; }
 		public float Z { get; set; }

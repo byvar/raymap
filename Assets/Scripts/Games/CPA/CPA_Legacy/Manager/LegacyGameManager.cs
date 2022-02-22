@@ -30,7 +30,7 @@ namespace Raymap {
 			throw new NotImplementedException();
 		}
 
-		private List<string> FindFiles(MapViewerSettings settings) {
+		protected virtual List<string> FindFiles(MapViewerSettings settings) {
 			var directory = settings.GameDirectory;
 
 			// Create the output

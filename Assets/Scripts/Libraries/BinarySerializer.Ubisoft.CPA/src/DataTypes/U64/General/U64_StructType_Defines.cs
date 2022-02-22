@@ -386,6 +386,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 		public static readonly Dictionary<System.Type, U64_StructType> TypeMapping = new Dictionary<System.Type, U64_StructType>() {
 			[typeof(U64_Fix)] = U64_StructType.FixData,
+			[typeof(LOL_LevelsNameList)] = U64_StructType.LevelsNameList,
+			[typeof(U64_Vector3D)] = U64_StructType.AllVector3D,
+			[typeof(U64_TripledIndex)] = U64_StructType.AllTripledIndex,
 			// TODO
 		};
 

@@ -11,10 +11,10 @@ using Reader = BinarySerializer.Reader;
 
 namespace Raymap {
     public class MapViewerContext : Context {
-        public MapViewerContext(string basePath, MapViewerSettings settings) : base(
+        public MapViewerContext(string basePath, MapViewerSettings settings, bool log = true) : base(
             basePath: basePath, // Pass in the base path
             settings: new MapViewerSerializerSettings(), // Pass in the settings
-            serializerLog: new MapViewerSerializerLog(), // Use R1 serializer log for logging to a file
+            serializerLog: log ? new MapViewerSerializerLog() : null, // Use R1 serializer log for logging to a file
             fileManager: new MapViewerFileManager(), // Use R1 file manager for use with FileSystem
             logger: new UnityLogger()) // Use Unity logger
         {
@@ -24,7 +24,7 @@ namespace Raymap {
             settings.GetGameManager.AddContextSettings(this);
             settings.GetGameManager.AddContextPointers(this);
         }
-        public MapViewerContext(MapViewerSettings settings) : this(settings.GameDirectory, settings) { }
+        public MapViewerContext(MapViewerSettings settings, bool log = true) : this(settings.GameDirectory, settings, log: log) { }
 
         public MapViewerSettings GameSettings => GetSettings<MapViewerSettings>();
 

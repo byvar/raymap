@@ -6,7 +6,7 @@
 		public ushort EventsCount { get; set; }
 		public ushort MorphDataCount { get; set; }
 		public ushort Align { get; set; }
-		public CPA_Vector Translation { get; set; }
+		public CPA_Vector3D Translation { get; set; }
 		public U64_ShortQuaternion Rotation { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
@@ -16,7 +16,7 @@
 			EventsCount = s.Serialize<ushort>(EventsCount, name: nameof(EventsCount));
 			MorphDataCount = s.Serialize<ushort>(MorphDataCount, name: nameof(MorphDataCount));
 			Align = s.Serialize<ushort>(Align, name: nameof(Align));
-			Translation = s.SerializeObject<CPA_Vector>(Translation, name: nameof(Translation));
+			Translation = s.SerializeObject<CPA_Vector3D>(Translation, name: nameof(Translation));
 			Rotation = s.SerializeObject<U64_ShortQuaternion>(Rotation, name: nameof(Rotation));
 		}
 	}

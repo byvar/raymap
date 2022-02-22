@@ -236,6 +236,7 @@ public class UnitySettings {
     /// Loads the settings
     /// </summary>
     public static void Load() {
+        System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
         if (Application.isEditor) {
 #if UNITY_EDITOR
             ISerializer s = new EditorReadSerializer();

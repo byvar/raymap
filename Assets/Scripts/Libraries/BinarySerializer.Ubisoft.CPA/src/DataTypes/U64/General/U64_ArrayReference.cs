@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class U64_Reference<T> : BinarySerializable where T : U64_Struct, new() {
+	public class U64_ArrayReference<T> : BinarySerializable where T : U64_Struct, new() {
 		public ushort Index { get; set; }
-		public T Value { get; set; }
+		public T[] Value { get; set; }
 
 		public bool IsNull => Index == 0xFFFF;
 
@@ -11,19 +11,20 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			Index = s.Serialize<ushort>(Index, name: nameof(Index));
 		}
 
-		public U64_Reference() {
+		public U64_ArrayReference() {
 			Index = 0xFFFF;
 		}
-		public U64_Reference(Context c, ushort index) {
+		public U64_ArrayReference(Context c, ushort index) {
 			Context = c;
 			Index = index;
 		}
 
-		public U64_Reference<T> Resolve(SerializerObject s, bool isInFixFixFat = false,
+		public U64_ArrayReference<T> Resolve(SerializerObject s, 
+			long count,
+			bool isInFixFixFat = false,
 			Action<SerializerObject, T> onPreSerialize = null) {
-			//Action<SerializerObject, T> onPostSerialize = null) {
 
-			if (IsNull) return this;
+			if(IsNull) return this;
 
 			var loader = s.GetLoader();
 			ushort index = Index;
@@ -33,11 +34,11 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			if (ptr != null) {
 				s.DoAt(ptr, () => {
-					Value = s.SerializeObject<T>(Value, onPreSerialize: t => {
+					Value = s.SerializeObjectArray<T>(Value, count, onPreSerialize: (t, ind_in_array) => {
 						t.CPA_Index = index;
+						t.CPA_ArrayIndex = ind_in_array;
 						onPreSerialize?.Invoke(s,t);
 					}, name: nameof(Value));
-					//onPostSerialize?.Invoke(s, Value);
 				});
 			}
 			return this;
