@@ -56,7 +56,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			{ 50, U64_StructType.Vertex },
 			{ 51, U64_StructType.Edge },
 			{ 52, U64_StructType.AnimListTable },
-			{ 53, U64_StructType.LST_SectorGraphic_and_PersoArray },
+			{ 53, U64_StructType.LST_SectorGraphic_and_LST_Character },
 			{ 54, U64_StructType.LST_SectorActivity },
 			{ 55, U64_StructType.LST_SectorCollision },
 			{ 56, U64_StructType.LST_SectorStaticLights },
@@ -209,7 +209,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			{ 48, U64_StructType.LevelEntryList },
 			{ 49, U64_StructType.SuperObjectChildList },
 			{ 50, U64_StructType.Vertex },
-			{ 53, U64_StructType.LST_SectorGraphic_and_PersoArray },
+			{ 53, U64_StructType.LST_SectorGraphic_and_LST_Character },
 			{ 54, U64_StructType.LST_SectorActivity },
 			{ 55, U64_StructType.LST_SectorCollision },
 			{ 56, U64_StructType.LST_SectorStaticLights },
@@ -318,7 +318,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			{ 44, U64_StructType.LevelEntryList },
 			{ 45, U64_StructType.SuperObjectChildList },
 			{ 46, U64_StructType.Vertex },
-			{ 49, U64_StructType.LST_SectorGraphic_and_PersoArray },
+			{ 49, U64_StructType.LST_SectorGraphic_and_LST_Character },
 			{ 50, U64_StructType.LST_SectorActivity },
 			{ 51, U64_StructType.LST_SectorCollision },
 			{ 52, U64_StructType.LST_SectorStaticLights },
@@ -385,10 +385,23 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		};
 
 		public static readonly Dictionary<System.Type, U64_StructType> TypeMapping = new Dictionary<System.Type, U64_StructType>() {
-			[typeof(U64_Fix)] = U64_StructType.FixData,
-			[typeof(LOL_LevelsNameList)] = U64_StructType.LevelsNameList,
+			// General
 			[typeof(U64_Vector3D)] = U64_StructType.AllVector3D,
 			[typeof(U64_TripledIndex)] = U64_StructType.AllTripledIndex,
+			[typeof(U64_BoundingVolume)] = U64_StructType.BoundingVolume,
+
+			// GAM
+			[typeof(GAM_Fix)] = U64_StructType.FixData,
+			[typeof(GAM_LevelsNameList)] = U64_StructType.LevelsNameList,
+			[typeof(GAM_FixPreloadSection)] = U64_StructType.FixPreloadSection,
+			[typeof(GAM_Character)] = U64_StructType.Character,
+			[typeof(GAM_CharacterStandardGame)] = U64_StructType.CharacterStandardGame,
+			[typeof(GAM_Family)] = U64_StructType.Family,
+			[typeof(GAM_State)] = U64_StructType.State,
+			[typeof(GAM_StateRef)] = U64_StructType.StateRef,
+			[typeof(LST_Ref<GAM_State>)] = U64_StructType.StateRefList,
+			[typeof(LST_Ref<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
+
 			// TODO
 		};
 

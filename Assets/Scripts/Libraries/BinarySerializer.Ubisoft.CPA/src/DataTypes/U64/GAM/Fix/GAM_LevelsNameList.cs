@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class LOL_LevelsNameList : U64_Struct {
+	public class GAM_LevelsNameList : U64_Struct {
 		public U64_Reference<U64_Placeholder> Level { get; set; }
 		public string Name { get; set; }
 

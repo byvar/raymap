@@ -17,7 +17,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 		// TODO: Move to globals?
 		public A3D_AnimationsFile AnimationsFile { get; set; }
-		public U64_Reference<U64_Fix> Fix { get; set; }
+		public U64_Reference<GAM_Fix> Fix { get; set; }
+		public U64_Reference<GAM_FixPreloadSection> FixPreloadSection { get; set; }
 
 
 		public LDR_Loader(Context c, Pointer dataPointer) {

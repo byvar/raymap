@@ -113,7 +113,7 @@ namespace Raymap {
 
 				// Load fat & fix
 				loader.Fat = FileFactory.Read<LDR_FatFile>(context, FatFilePath);
-				loader.Fix = new U64_Reference<U64_Fix>(context, 0).Resolve(s, isInFixFixFat: true);
+				loader.Fix = new U64_Reference<GAM_Fix>(context, 0).Resolve(s, isInFixFixFat: true);
 
 				var levels = loader.Fix.Value.LevelsNameList.Value;
 				foreach(var l in levels) levelsList.Add(l.Name);
@@ -164,7 +164,7 @@ namespace Raymap {
 			loader.Fat = FileFactory.Read<LDR_FatFile>(context, FatFilePath);
 
 			// Load fix
-			loader.Fix = new U64_Reference<U64_Fix>(context, 0).Resolve(s, isInFixFixFat: true);
+			loader.Fix = new U64_Reference<GAM_Fix>(context, 0).Resolve(s, isInFixFixFat: true);
 
 			await UniTask.CompletedTask;
 		}
@@ -179,7 +179,7 @@ namespace Raymap {
 			// Determine level index
 			var levels = loader.Fix.Value.LevelsNameList.Value;
 			var levelName = context.GetMapViewerSettings().Map;
-			LOL_LevelsNameList ChosenLevel = null;
+			GAM_LevelsNameList ChosenLevel = null;
 			foreach (var level in levels) {
 				if (level.Name.ToLower() == levelName.ToLower()) {
 					ChosenLevel = level;
@@ -193,6 +193,12 @@ namespace Raymap {
 			loader.LevelIndex = BitHelpers.ExtractBits(ChosenLevel.Level.Index, 15, 0);
 			// Load Level FAT
 			loader.Fat.Levels[loader.LevelIndex.Value].SerializeFat(s);
+
+			// Serialize additional references in fix
+			loader.Fix?.Value?.ResolveLevelReferences(s);
+
+			loader.FixPreloadSection = new U64_Reference<GAM_FixPreloadSection>(context, 0);
+			loader.FixPreloadSection.Resolve(s);
 		}
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {

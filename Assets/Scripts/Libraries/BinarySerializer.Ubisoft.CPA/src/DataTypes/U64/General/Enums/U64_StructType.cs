@@ -98,7 +98,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		BoundingVolume,
 		LipsSynchro,
 		StateList,
-		LST_SectorGraphic_and_PersoArray,
+		LST_SectorGraphic_and_LST_Character, // type is for LST_SectorGraphic, but Ubisoft reused it for LST_Character because they're both simply a ushort index
 		LST_SectorGraphicParam,
 		LST_SoundEvent,
 		LST_SectorActivity,

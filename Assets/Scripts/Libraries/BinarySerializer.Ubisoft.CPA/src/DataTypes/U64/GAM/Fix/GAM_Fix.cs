@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class U64_Fix : U64_Struct {
-		public U64_ArrayReference<LOL_LevelsNameList> LevelsNameList { get; set; }
+﻿namespace BinarySerializer.Ubisoft.CPA.U64 {
+	public class GAM_Fix : U64_Struct {
+		public U64_ArrayReference<GAM_LevelsNameList> LevelsNameList { get; set; }
 		public U64_Reference<U64_Placeholder> DscInput { get; set; }
 		public U64_Reference<U64_Placeholder> InputLink { get; set; }
 		public U64_ArrayReference<U64_Vector3D> Vector3D { get; set; }
@@ -29,7 +23,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<U64_Placeholder> PakFont { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			LevelsNameList = s.SerializeObject<U64_ArrayReference<LOL_LevelsNameList>>(LevelsNameList, name: nameof(LevelsNameList));
+			LevelsNameList = s.SerializeObject<U64_ArrayReference<GAM_LevelsNameList>>(LevelsNameList, name: nameof(LevelsNameList));
 			DscInput = s.SerializeObject<U64_Reference<U64_Placeholder>>(DscInput, name: nameof(DscInput));
 			InputLink = s.SerializeObject<U64_Reference<U64_Placeholder>>(InputLink, name: nameof(InputLink));
 			Vector3D = s.SerializeObject<U64_ArrayReference<U64_Vector3D>>(Vector3D, name: nameof(Vector3D));
@@ -55,6 +49,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			LevelsNameList.Resolve(s, LevelsCount, isInFixFixFat: true);
 			GlobalVector3D.Resolve(s, GlobalVector3DCount, isInFixFixFat: true);
 			GlobalTripledIndex.Resolve(s, GlobalTripledIndexCount, isInFixFixFat: true);
+		}
+
+		public GAM_Fix ResolveLevelReferences(SerializerObject s) {
+			Vector3D.Resolve(s, Vector3DCount);
+			TripledIndex.Resolve(s, TripledIndexCount);
+
+			return this;
 		}
 	}
 }

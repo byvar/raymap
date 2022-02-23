@@ -32,11 +32,12 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			var ptr = loader.GetStructPointer(typeof(T), index, global: false);
 
 			if (ptr != null) {
+				var type = U64_StructType_Defines.TypeMapping[typeof(T)];
 				s.DoAt(ptr, () => {
 					Value = s.SerializeObject<T>(Value, onPreSerialize: t => {
 						t.CPA_Index = index;
 						onPreSerialize?.Invoke(s,t);
-					}, name: nameof(Value));
+					}, name: $"{type}_{index:X4}");
 					//onPostSerialize?.Invoke(s, Value);
 				});
 			}
