@@ -404,6 +404,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_StateTransition)] = U64_StructType.StateList,
 			[typeof(LST_Ref<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
 
+			// MEC
+			[typeof(MEC_IdCardBase)] = U64_StructType.IdCardBase,
+			[typeof(MEC_IdCardCamera)] = U64_StructType.IdCardCamera,
+
 			// TODO
 		};
 
