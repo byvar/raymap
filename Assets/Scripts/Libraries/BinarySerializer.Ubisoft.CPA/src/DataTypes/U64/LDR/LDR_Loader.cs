@@ -42,7 +42,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				Pointer off_current = s.CurrentPointer;
 				s.Goto(off_struct);
 
-				s.Log("LDR: Resolving struct: {0}", currentRef.Name);
+				//s.Log("LDR: Resolving struct: {0}", currentRef.Name);
 				if (currentRef.ArrayCount.HasValue) {
 					currentRef.ArrayLoadCallback(s, (f,arrayIndex) => {
 						f.CPA_Index = currentRef.Index;

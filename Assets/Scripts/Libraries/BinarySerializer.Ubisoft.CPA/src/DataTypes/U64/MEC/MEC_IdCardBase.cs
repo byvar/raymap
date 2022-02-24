@@ -9,13 +9,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public float TiltIntensity { get; set; }
 		public float TiltInertia { get; set; }
 		public float TiltOrigin { get; set; }
-		public ushort InertiaId { get; set; } // Index in AllVector3D table
-		public ushort MaxSpeedId { get; set; } // Index in AllVector3D table
+		public U64_Index<U64_Vector3D> Inertia { get; set; } // Index in AllVector3D table
+		public U64_Index<U64_Vector3D> MaxSpeed { get; set; } // Index in AllVector3D table
 		public Flags MiscFlags { get; set; }
-		public ushort Swim { get; set; }
-
-		public U64_Vector3D Inertia => InertiaId == 0xFFFF ? null : Context.GetLoader().Fix?.Value?.GlobalVector3D?.Value[InertiaId];
-		public U64_Vector3D MaxSpeed => MaxSpeedId == 0xFFFF ? null : Context.GetLoader().Fix?.Value?.GlobalVector3D?.Value[MaxSpeedId];
+		public ushort Swim { get; set; } // Just 1 flag that didn't fit in MiscFlags, it seems
 
 		public override void SerializeImpl(SerializerObject s) {
 			Gravity = s.Serialize<float>(Gravity, name: nameof(Gravity));
@@ -26,8 +23,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			TiltInertia = s.Serialize<float>(TiltInertia, name: nameof(TiltInertia));
 			TiltOrigin = s.Serialize<float>(TiltOrigin, name: nameof(TiltOrigin));
 
-			InertiaId = s.Serialize<ushort>(InertiaId, name: nameof(InertiaId));
-			MaxSpeedId = s.Serialize<ushort>(MaxSpeedId, name: nameof(MaxSpeedId));
+			Inertia = s.SerializeObject<U64_Index<U64_Vector3D>>(Inertia, name: nameof(Inertia))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
+			MaxSpeed = s.SerializeObject<U64_Index<U64_Vector3D>>(MaxSpeed, name: nameof(MaxSpeed))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
 
 			MiscFlags = s.Serialize<Flags>(MiscFlags, name: nameof(MiscFlags));
 			Swim = s.Serialize<ushort>(Swim, name: nameof(Swim));

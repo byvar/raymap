@@ -57,5 +57,8 @@
 
 			return this;
 		}
+
+		// Index resolve actions
+		public static U64_Vector3D GetGlobalVector3DIndex(U64_Index<U64_Vector3D> index) => index.Context.GetLoader().Fix?.Value?.GlobalVector3D?.Value[index.Index];
 	}
 }

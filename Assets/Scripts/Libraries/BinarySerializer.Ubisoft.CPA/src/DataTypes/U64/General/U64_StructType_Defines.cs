@@ -387,6 +387,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public static readonly Dictionary<System.Type, U64_StructType> TypeMapping = new Dictionary<System.Type, U64_StructType>() {
 			// General
 			[typeof(U64_Vector3D)] = U64_StructType.AllVector3D,
+			[typeof(U64_ShortVector3D)] = U64_StructType.Vertex,
 			[typeof(U64_TripledIndex)] = U64_StructType.AllTripledIndex,
 			[typeof(U64_BoundingVolume)] = U64_StructType.BoundingVolume,
 
@@ -400,9 +401,17 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_State)] = U64_StructType.State,
 			[typeof(GAM_StateRef)] = U64_StructType.StateRef,
 			[typeof(GAM_AnimInfo)] = U64_StructType.AnimInfo,
-			[typeof(LST_Ref<GAM_State>)] = U64_StructType.StateRefList,
 			[typeof(GAM_StateTransition)] = U64_StructType.StateList,
+			[typeof(GAM_ObjectsTable)] = U64_StructType.ObjectsTable,
+			[typeof(GAM_ObjectsTableEntry)] = U64_StructType.ObjectsTableList,
+			[typeof(LST_Ref<GAM_State>)] = U64_StructType.StateRefList,
 			[typeof(LST_Ref<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
+
+			// PO
+			[typeof(PO_PhysicalObject)] = U64_StructType.PhysicalObject,
+
+			// GEO
+			[typeof(GEO_GeometricObject)] = U64_StructType.GeometricObject,
 
 			// MEC
 			[typeof(MEC_IdCardBase)] = U64_StructType.IdCardBase,

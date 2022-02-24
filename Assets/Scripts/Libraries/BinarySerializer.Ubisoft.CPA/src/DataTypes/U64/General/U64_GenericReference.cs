@@ -83,6 +83,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		private void SerializeValue(SerializerObject s, U64_StructType type, Action<U64_Struct> onPreSerialize = null, string name = null) {
 			U64_Struct Serialize<T>() where T : U64_Struct, new() => s.SerializeObject<T>((T)Value, onPreSerialize: onPreSerialize, name: name);
 			Value = type switch {
+				U64_StructType.PhysicalObject => Serialize<PO_PhysicalObject>(),
 				U64_StructType.IdCardBase => Serialize<MEC_IdCardBase>(),
 				U64_StructType.IdCardCamera => Serialize<MEC_IdCardCamera>(),
 				_ => throw new BinarySerializableException(this, $"Type {type} is not implemented in {GetType()}")
