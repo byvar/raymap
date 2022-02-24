@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LinkedListType = BinarySerializer.Ubisoft.CPA.LinkedList.Type;
+using LinkedListType = BinarySerializer.Ubisoft.CPA.CPA_LinkedList.Type;
 using System.Text;
 
 namespace BinarySerializer.Ubisoft.CPA {

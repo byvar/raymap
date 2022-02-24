@@ -1,22 +1,25 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class LDR_Loader {
 		public Context Context { get; set; }
 		public bool IsLoadingFix => !LevelIndex.HasValue;
+		public LinkedList<StructReference> LoadQueue = new LinkedList<StructReference>();
+		public bool IsProcessingLoadQueue { get; set; }
 
 		public int? LevelIndex { get; set; }
 
-		public Pointer DataPointer { get; set; }
+		private Pointer DataPointer { get; set; }
 		public LDR_FatFile Fat { get; set; }
 
 		//public Dictionary<CPA_ROM_StructType, Dictionary<ushort, CPA_ROM_Struct>> Cache = new Dictionary<CPA_ROM_StructType, Dictionary<ushort, CPA_ROM_Struct>>();
 
 
 		// TODO: Move to globals?
-		public A3D_AnimationsFile AnimationsFile { get; set; }
 		public U64_Reference<GAM_Fix> Fix { get; set; }
 		public U64_Reference<GAM_FixPreloadSection> FixPreloadSection { get; set; }
 
@@ -28,6 +31,67 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		}
 
 
+		public void LoadLoop(SerializerObject s) {
+			if(IsProcessingLoadQueue) return;
+			IsProcessingLoadQueue = true;
+			while (LoadQueue.First?.Value != null) {
+				StructReference currentRef = LoadQueue.First?.Value;
+				LoadQueue.RemoveFirst();
+
+				var off_struct = GetStructPointer(currentRef.Type, currentRef.Index, global: currentRef.IsGlobal);
+				Pointer off_current = s.CurrentPointer;
+				s.Goto(off_struct);
+
+				s.Log("LDR: Resolving struct: {0}", currentRef.Name);
+				if (currentRef.ArrayCount.HasValue) {
+					currentRef.ArrayLoadCallback(s, (f,arrayIndex) => {
+						f.CPA_Index = currentRef.Index;
+						f.CPA_ArrayIndex = arrayIndex;
+					});
+				} else {
+					currentRef.LoadCallback(s, (f) => {
+						f.CPA_Index = currentRef.Index;
+					});
+				}
+
+				s.Goto(off_current);
+			}
+			IsProcessingLoadQueue = false;
+		}
+		public class StructReference {
+			public string Name { get; set; }
+			public ushort Index { get; set; }
+			public U64_StructType Type { get; set; }
+			public bool IsGlobal { get; set; }
+
+			public ResolveAction LoadCallback { get; set; }
+			public ArrayResolveAction ArrayLoadCallback { get; set; }
+
+			public uint? ArrayCount { get; set; }
+		}
+		public delegate void ResolveAction(SerializerObject s, Action<U64_Struct> configureAction);
+		public delegate void ArrayResolveAction(SerializerObject s, Action<U64_Struct, int> configureAction);
+		public delegate void ResolvedAction(U64_Struct f);
+
+		public void RequestFile(SerializerObject s, U64_StructType type, ushort index,
+			ResolveAction loadCallback, ArrayResolveAction arrayLoadCallback,
+			bool isGlobal = false,
+			uint? arrayCount = null,
+			string name = "") {
+			var fileRef = new StructReference() {
+				Name = name,
+				Index = index,
+				Type = type,
+				ArrayCount = arrayCount,
+				LoadCallback = loadCallback,
+				ArrayLoadCallback = arrayLoadCallback,
+				IsGlobal = isGlobal,
+			};
+			LoadQueue.AddLast(fileRef);
+			if(!IsProcessingLoadQueue) LoadLoop(s);
+		}
+
+		#region Pointer calculation
 		public Pointer GetStructPointer(LDR_EntryRef fat) => DataPointer + fat.Address;
 
 		public Pointer GetStructPointer(ushort type, ushort index, bool global = false) {
@@ -120,6 +184,17 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			return null;
 		}
+		#endregion
+
+		#region Animations
+		public A3D_AnimationsFile AnimationsFile { get; set; }
+		private HashSet<ushort> AnimationsToLoad { get; set; } = new HashSet<ushort>();
+
+		public void LoadInterpolatedAnimation(ushort animIndex) {
+			// Index in cutTable
+			AnimationsToLoad.Add(animIndex);
+		}
+		#endregion
 
 		public static string ContextKey => nameof(LDR_Loader);
 	}

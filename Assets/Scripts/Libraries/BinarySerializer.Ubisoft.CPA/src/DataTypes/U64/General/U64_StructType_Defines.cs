@@ -399,7 +399,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_Family)] = U64_StructType.Family,
 			[typeof(GAM_State)] = U64_StructType.State,
 			[typeof(GAM_StateRef)] = U64_StructType.StateRef,
+			[typeof(GAM_AnimInfo)] = U64_StructType.AnimInfo,
 			[typeof(LST_Ref<GAM_State>)] = U64_StructType.StateRefList,
+			[typeof(GAM_StateTransition)] = U64_StructType.StateList,
 			[typeof(LST_Ref<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
 
 			// TODO

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Type = BinarySerializer.Ubisoft.CPA.LinkedList.Type;
-using Flags = BinarySerializer.Ubisoft.CPA.LinkedList.Flags;
+using Type = BinarySerializer.Ubisoft.CPA.CPA_LinkedList.Type;
+using Flags = BinarySerializer.Ubisoft.CPA.CPA_LinkedList.Flags;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public static class LinkedList {
+    public static class CPA_LinkedList {
         public enum Type { Unconfigured = -2, Default = -1, Single, Double, SingleNoElementPointers, DoubleNoElementPointers, Minimize };
 
         [Flags]
@@ -19,7 +19,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
     }
 
-    public class LinkedList<T> : BinarySerializable, IList<T> {
+    public class CPA_LinkedList<T> : BinarySerializable, IList<T> {
         // Serialized
         public Pointer Head { get; set; }
         public Pointer Tail { get; set; }
@@ -31,9 +31,9 @@ namespace BinarySerializer.Ubisoft.CPA {
         private bool customEntries => typeof(ILinkedListEntry).IsAssignableFrom(typeof(T));
 
 		#region Constructor
-		public LinkedList() { }
+		public CPA_LinkedList() { }
 
-        public LinkedList(Context context, Pointer off_head, Pointer off_tail, uint num_elements, Type type = Type.Default) {
+        public CPA_LinkedList(Context context, Pointer off_head, Pointer off_tail, uint num_elements, Type type = Type.Default) {
             Context = context;
             this.Head = off_head;
             this.Tail = off_tail;
@@ -60,7 +60,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
         }
 
-        public LinkedList(Context context, Pointer off_head, uint num_elements, Type type = Type.Default) : this(context, off_head, null, num_elements, type) { }
+        public CPA_LinkedList(Context context, Pointer off_head, uint num_elements, Type type = Type.Default) : this(context, off_head, null, num_elements, type) { }
         #endregion
 
         // Call in OnPreSerialize

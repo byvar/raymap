@@ -30,7 +30,16 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			ushort index = Index;
 			if (isInFixFixFat) index = (ushort)BitHelpers.SetBits(index, 1, 1, 15);
 
-			var ptr = loader.GetStructPointer(typeof(T), index, global: false);
+			var type = U64_StructType_Defines.TypeMapping[typeof(T)];
+			var name = $"{type}_{index:X4}";
+
+			loader.RequestFile(s, type, index, null, (ser, configureAction) => {
+				Value = ser.SerializeObjectArray<T>(Value, count, onPreSerialize: (t, ind_in_array) => {
+					configureAction(t, ind_in_array); onPreSerialize?.Invoke(ser, t);
+				}, name: name);
+			}, arrayCount: (uint)count, name: name);
+
+			/*var ptr = loader.GetStructPointer(typeof(T), index, global: false);
 
 			if (ptr != null) {
 				s.DoAt(ptr, () => {
@@ -40,7 +49,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 						onPreSerialize?.Invoke(s,t);
 					}, name: nameof(Value));
 				});
-			}
+			}*/
 			return this;
 		}
 
