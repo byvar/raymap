@@ -7,8 +7,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_ArrayReference<U64_ShortVector3D> CollisionPoints { get; set; }
 		public U64_ArrayReference<U64_ShortVector3D> VisualPoints { get; set; }
 		public U64_ArrayReference<U64_ShortVector3D> Normals { get; set; }
-		public U64_ArrayReference<U64_Placeholder> CollisionElements { get; set; }
-		public U64_ArrayReference<U64_Placeholder> VisualElements { get; set; }
+		public U64_ArrayReference<GEO_CollisionElementListEntry> CollisionElements { get; set; }
+		public U64_ArrayReference<GEO_VisualElementListEntry> VisualElements { get; set; }
 		public ushort CollisionPointsCount { get; set; }
 		public ushort VisualPointsCount { get; set; }
 		public ushort CollisionElementsCount { get; set; }
@@ -29,8 +29,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			} else {
 				VisualPoints = CollisionPoints;
 			}
-			CollisionElements = s.SerializeObject<U64_ArrayReference<U64_Placeholder>>(CollisionElements, name: nameof(CollisionElements));
-			VisualElements = s.SerializeObject<U64_ArrayReference<U64_Placeholder>>(VisualElements, name: nameof(VisualElements));
+			CollisionElements = s.SerializeObject<U64_ArrayReference<GEO_CollisionElementListEntry>>(CollisionElements, name: nameof(CollisionElements));
+			VisualElements = s.SerializeObject<U64_ArrayReference<GEO_VisualElementListEntry>>(VisualElements, name: nameof(VisualElements));
 			
 			CollisionPointsCount = s.Serialize<ushort>(CollisionPointsCount, name: nameof(CollisionPointsCount));
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2_3D)) {
@@ -51,6 +51,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				VisualPoints?.Resolve(s, VisualPointsCount);
 				Normals?.Resolve(s, VisualPointsCount);
 			}
+
+			VisualElements?.Resolve(s, VisualElementsCount);
+			CollisionElements?.Resolve(s, CollisionElementsCount);
 
 		}
 
