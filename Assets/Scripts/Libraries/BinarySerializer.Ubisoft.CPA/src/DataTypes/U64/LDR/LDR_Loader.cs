@@ -113,12 +113,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		}
 
 		public Pointer GetStructPointer(System.Type type, ushort index, bool global = false) {
-			var mapping = U64_StructType_Defines.TypeMapping;
-			if (mapping.ContainsKey(type)) {
-				return GetStructPointer(mapping[type], index, global: global);
-			} else {
-				throw new System.Exception($"Type {type} does not have a corresponding ROM StructType");
-			}
+			var mappedType = U64_StructType_Defines.GetType(type);
+			return GetStructPointer(mappedType.Value, index, global: global);
 		}
 
 		public LDR_EntryRef GetEntry(ushort type, ushort index, bool global = false) {

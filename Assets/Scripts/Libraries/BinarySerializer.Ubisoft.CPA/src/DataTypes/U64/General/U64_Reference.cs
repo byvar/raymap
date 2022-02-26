@@ -28,10 +28,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			var loader = s.GetLoader();
 			ushort index = Index;
 			if (isInFixFixFat) index = (ushort)BitHelpers.SetBits(index, 1, 1, 15);
-			var type = U64_StructType_Defines.TypeMapping[typeof(T)];
-			var name = $"{type}_{index:X4}";
+			var type = U64_StructType_Defines.GetType(typeof(T));
+			var name = $"{type.Value}_{index:X4}";
 
-			loader.RequestFile(s, type, index, (ser, configureAction) => {
+			loader.RequestFile(s, type.Value, index, (ser, configureAction) => {
 				Value = ser.SerializeObject<T>(Value, onPreSerialize: t => {
 					configureAction(t); onPreSerialize?.Invoke(ser, t);
 				}, name: name);
