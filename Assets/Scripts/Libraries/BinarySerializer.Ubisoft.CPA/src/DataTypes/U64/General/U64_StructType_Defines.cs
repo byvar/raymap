@@ -216,9 +216,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GEO_GeometricObject)] = U64_StructType.GeometricObject,
 			[typeof(GEO_VisualElementListEntry)] = U64_StructType.GeometricElementU64List,
 			[typeof(GEO_ElementVisualIndexedTriangles)] = U64_StructType.GeometricElementU64IndexedTriangles,
+			[typeof(GEO_ElementSprites)] = U64_StructType.GeometricElementSprites,
 			[typeof(GEO_CollisionElementListEntry)] = U64_StructType.GeometricElementCollideList,
 			[typeof(GEO_ElementCollisionIndexedTriangles)] = U64_StructType.GeometricElementCollideIndexedTriangles,
 			[typeof(GEO_TripledIndex)] = U64_StructType.GeometricElementCollideTrianglesData__ColFacesPnt,
+
+			// GLI
+			[typeof(GLI_VisualMaterial)] = U64_StructType.VisualMaterial,
 
 
 			// MEC

@@ -2,7 +2,7 @@
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GEO_ElementVisualIndexedTriangles : U64_Struct {
-		public U64_Reference<U64_Placeholder> VisualMaterial { get; set; }
+		public U64_Reference<GLI_VisualMaterial> VisualMaterial { get; set; }
 		public U64_Reference<U64_Placeholder> VerticesList { get; set; }
 		public U64_Reference<U64_Placeholder> GraphicsList { get; set; }
 		public ushort GraphicsListSize { get; set; }
@@ -14,7 +14,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<U64_Placeholder> GraphicsList3DS { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			VisualMaterial = s.SerializeObject<U64_Reference<U64_Placeholder>>(VisualMaterial, name: nameof(VisualMaterial))?.Resolve(s);
+			VisualMaterial = s.SerializeObject<U64_Reference<GLI_VisualMaterial>>(VisualMaterial, name: nameof(VisualMaterial))?.Resolve(s);
 			if (s.GetCPASettings().Platform == Platform.N64) {
 				VerticesList = s.SerializeObject<U64_Reference<U64_Placeholder>>(VerticesList, name: nameof(VerticesList));
 				GraphicsList = s.SerializeObject<U64_Reference<U64_Placeholder>>(GraphicsList, name: nameof(GraphicsList));

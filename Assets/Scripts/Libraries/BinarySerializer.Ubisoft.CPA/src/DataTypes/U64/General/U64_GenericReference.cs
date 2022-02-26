@@ -85,6 +85,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			Value = type switch {
 				U64_StructType.PhysicalObject => Serialize<PO_PhysicalObject>(),
 				U64_StructType.GeometricElementU64IndexedTriangles => Serialize<GEO_ElementVisualIndexedTriangles>(),
+				U64_StructType.GeometricElementSprites => Serialize<GEO_ElementSprites>(),
 				U64_StructType.GeometricElementCollideIndexedTriangles => Serialize<GEO_ElementCollisionIndexedTriangles>(),
 				U64_StructType.IdCardBase => Serialize<MEC_IdCardBase>(),
 				U64_StructType.IdCardCamera => Serialize<MEC_IdCardCamera>(),
