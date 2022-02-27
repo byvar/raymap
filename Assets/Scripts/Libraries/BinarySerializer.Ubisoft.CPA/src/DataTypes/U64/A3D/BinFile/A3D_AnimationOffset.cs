@@ -13,8 +13,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64
         {
             s.DoBits<uint>(b => {
                 AnimationOffset = b.SerializeBits<uint>(AnimationOffset, 31, name: nameof(AnimationOffset));
-				IsCompressed = b.SerializeBits<bool>(IsCompressed, 1, name: nameof(IsCompressed));
-			});
+                IsCompressed = b.SerializeBits<bool>(IsCompressed, 1, name: nameof(IsCompressed));
+            });
         }
     }
 }

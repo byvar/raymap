@@ -16,13 +16,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64
 
         public override void SerializeImpl(SerializerObject s)
         {
-			AnimationsCount = s.Serialize<uint>(AnimationsCount, name: nameof(AnimationsCount));
-			IntAnimationsCount = s.Serialize<uint>(IntAnimationsCount, name: nameof(IntAnimationsCount));
-			MaxRamSizeOfAnim = s.Serialize<uint>(MaxRamSizeOfAnim, name: nameof(MaxRamSizeOfAnim));
-			MaxRomSizeOfAnim = s.Serialize<uint>(MaxRomSizeOfAnim, name: nameof(MaxRomSizeOfAnim));
-			AnimationOffsets = s.SerializeObjectArray<A3D_AnimationOffset>(AnimationOffsets, AnimationsCount, name: nameof(AnimationOffsets));
+            AnimationsCount = s.Serialize<uint>(AnimationsCount, name: nameof(AnimationsCount));
+            IntAnimationsCount = s.Serialize<uint>(IntAnimationsCount, name: nameof(IntAnimationsCount));
+            MaxRamSizeOfAnim = s.Serialize<uint>(MaxRamSizeOfAnim, name: nameof(MaxRamSizeOfAnim));
+            MaxRomSizeOfAnim = s.Serialize<uint>(MaxRomSizeOfAnim, name: nameof(MaxRomSizeOfAnim));
+            AnimationOffsets = s.SerializeObjectArray<A3D_AnimationOffset>(AnimationOffsets, AnimationsCount, name: nameof(AnimationOffsets));
             EndOfFile = s.SerializePointer(EndOfFile, anchor: Offset, name: nameof(EndOfFile));
-		}
+        }
 
         public A3D_Animation LoadAnimation(SerializerObject s, int index) {
             var offset = AnimationOffsets[index];
@@ -42,8 +42,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64
                 s.DoAt(ptr, () => {
                     if (offset.IsCompressed) {
                         s.DoEncoded(new YAY0Encoder(), () => {
-							Animations[index] = s.SerializeObject<A3D_Animation>(Animations[index], onPreSerialize: a => a.Pre_DataSize = s.CurrentLength, name: $"{nameof(Animations)}[{index}]");
-						});
+                            Animations[index] = s.SerializeObject<A3D_Animation>(Animations[index], onPreSerialize: a => a.Pre_DataSize = s.CurrentLength, name: $"{nameof(Animations)}[{index}]");
+                        });
                     } else {
                         Animations[index] = s.SerializeObject<A3D_Animation>(Animations[index], onPreSerialize: a => a.Pre_DataSize = size, name: $"{nameof(Animations)}[{index}]");
                     }

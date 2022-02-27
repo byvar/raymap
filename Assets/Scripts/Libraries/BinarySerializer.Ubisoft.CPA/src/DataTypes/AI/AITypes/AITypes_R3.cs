@@ -1715,17 +1715,17 @@ namespace BinarySerializer.Ubisoft.CPA {
                 ScriptNodeType.TextRef,
                 ScriptNodeType.ComportRef,
                 ScriptNodeType.ModuleRef, // 30
-				ScriptNodeType.SoundEventRef,
+                ScriptNodeType.SoundEventRef,
                 ScriptNodeType.ObjectTableRef,
                 ScriptNodeType.GameMaterialRef,
                 ScriptNodeType.VisualMaterial,
                 ScriptNodeType.ParticleGenerator, // 35
-				ScriptNodeType.Color,
+                ScriptNodeType.Color,
                 ScriptNodeType.ModelRef,
-				ScriptNodeType.Light,
+                ScriptNodeType.Light,
                 ScriptNodeType.Caps,
                 ScriptNodeType.Graph, // 40
-				ScriptNodeType.SubRoutine, // Officially MacroRef
+                ScriptNodeType.SubRoutine, // Officially MacroRef
                 ScriptNodeType.Unknown, // sic
                 ScriptNodeType.CineRef,
                 ScriptNodeType.GraphRef

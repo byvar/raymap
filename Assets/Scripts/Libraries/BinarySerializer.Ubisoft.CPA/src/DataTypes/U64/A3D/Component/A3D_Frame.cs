@@ -6,9 +6,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64
     {
         public ushort NTTOIndex { get; set; }
 
-		public override void SerializeImpl(SerializerObject s)
+        public override void SerializeImpl(SerializerObject s)
         {
-			NTTOIndex = s.Serialize<ushort>(NTTOIndex, name: nameof(NTTOIndex));
-		}
+            NTTOIndex = s.Serialize<ushort>(NTTOIndex, name: nameof(NTTOIndex));
+        }
     }
 }

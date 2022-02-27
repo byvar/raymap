@@ -2,7 +2,7 @@
 using System.Diagnostics;
 
 namespace BinarySerializer.Unity {
-	public class GlobalLoadState {
+    public class GlobalLoadState {
         public enum State {
             None,
             LoadingFiles,

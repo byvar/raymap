@@ -1134,45 +1134,45 @@ namespace BinarySerializer.Ubisoft.CPA {
                 DsgVarType.Float,
                 DsgVarType.WayPoint,
                 DsgVarType.Perso,
-				DsgVarType.List, // 10
-				DsgVarType.Vector,
-				DsgVarType.Comport,
-				DsgVarType.Action,
-				DsgVarType.Text,
-				/*DsgVarInfoEntry.DsgVarType.GameMaterial,
-				DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
+                DsgVarType.List, // 10
+                DsgVarType.Vector,
+                DsgVarType.Comport,
+                DsgVarType.Action,
+                DsgVarType.Text,
+                /*DsgVarInfoEntry.DsgVarType.GameMaterial,
+                DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
                 DsgVarInfoEntry.DsgVarType.Graph,
-				DsgVarInfoEntry.DsgVarType.PersoArray,
-				DsgVarInfoEntry.DsgVarType.VectorArray,
-				DsgVarInfoEntry.DsgVarType.FloatArray,
-				DsgVarInfoEntry.DsgVarType.IntegerArray,
-				DsgVarInfoEntry.DsgVarType.WayPointArray,
-				DsgVarInfoEntry.DsgVarType.TextArray,
-				DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
-				*/
+                DsgVarInfoEntry.DsgVarType.PersoArray,
+                DsgVarInfoEntry.DsgVarType.VectorArray,
+                DsgVarInfoEntry.DsgVarType.FloatArray,
+                DsgVarInfoEntry.DsgVarType.IntegerArray,
+                DsgVarInfoEntry.DsgVarType.WayPointArray,
+                DsgVarInfoEntry.DsgVarType.TextArray,
+                DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
+                */
                 DsgVarType.Light,
                 DsgVarType.GameMaterial,
                 DsgVarType.SoundEvent,
                 DsgVarType.None,
                 DsgVarType.WayPointArray,
                 DsgVarType.PersoArray, // 20
-				DsgVarType.VectorArray,
+                DsgVarType.VectorArray,
                 DsgVarType.FloatArray,
                 DsgVarType.IntegerArray,
                 DsgVarType.None,
                 DsgVarType.TextArray, // 25
-				DsgVarType.None,
+                DsgVarType.None,
                 DsgVarType.None,
                 DsgVarType.None,
                 DsgVarType.GraphArray,
                 DsgVarType.None, // 30
-				DsgVarType.SuperObject,
+                DsgVarType.SuperObject,
                 DsgVarType.None,
                 DsgVarType.ActionArray,
                 DsgVarType.None,
                 DsgVarType.None,
                 DsgVarType.ObjectList, // 36
-			},
+            },
             #endregion
 
             #region Node types
@@ -1208,17 +1208,17 @@ namespace BinarySerializer.Ubisoft.CPA {
                 ScriptNodeType.ComportRef,
                 ScriptNodeType.ModuleRef,
                 ScriptNodeType.SoundEventRef, // 30
-				ScriptNodeType.ObjectTableRef,
+                ScriptNodeType.ObjectTableRef,
                 ScriptNodeType.GameMaterialRef,
                 ScriptNodeType.VisualMaterial,
                 ScriptNodeType.ParticleGenerator,
                 ScriptNodeType.ModelRef, // 35
-				ScriptNodeType.ModelRef, // different type though
-				ScriptNodeType.CustomBits,
+                ScriptNodeType.ModelRef, // different type though
+                ScriptNodeType.CustomBits,
                 ScriptNodeType.Caps,
                 ScriptNodeType.Unknown,
                 ScriptNodeType.SubRoutine, // 40
-				ScriptNodeType.Null,
+                ScriptNodeType.Null,
                 ScriptNodeType.Null,
                 ScriptNodeType.Unknown
             }

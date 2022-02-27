@@ -2,7 +2,7 @@
 using System.Diagnostics;
 
 namespace BinarySerializer.Unity {
-	public class TimeController {
+    public class TimeController {
 
         private static readonly Stopwatch stopwatch = new Stopwatch();
 
