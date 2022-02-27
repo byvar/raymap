@@ -30,8 +30,8 @@ namespace BinarySerializer.Ubisoft.CPA {
         public Flags flags;
         private bool customEntries => typeof(ILinkedListEntry).IsAssignableFrom(typeof(T));
 
-        #region Constructor
-        public CPA_LinkedList() { }
+		#region Constructor
+		public CPA_LinkedList() { }
 
         public CPA_LinkedList(Context context, Pointer off_head, Pointer off_tail, uint num_elements, Type type = Type.Default) {
             Context = context;
@@ -69,7 +69,7 @@ namespace BinarySerializer.Ubisoft.CPA {
             this.flags = flags;
         }
 
-        public override void SerializeImpl(SerializerObject s) {
+		public override void SerializeImpl(SerializerObject s) {
             if (type == Type.Unconfigured) {
                 throw new BinarySerializableException(this, $"LinkedList is unconfigured - call Configure in onPreSerialize first");
             }
@@ -87,11 +87,11 @@ namespace BinarySerializer.Ubisoft.CPA {
                     type = Type.SingleNoElementPointers;
                 }
             }
-            Head = s.SerializePointer(Head, name: nameof(Head));
+			Head = s.SerializePointer(Head, name: nameof(Head));
             if (type == Type.Double || type == Type.DoubleNoElementPointers) {
                 Tail = s.SerializePointer(Tail, name: nameof(Tail));
             }
-            ElementsCount = s.Serialize<uint>(ElementsCount, name: nameof(ElementsCount));
+			ElementsCount = s.Serialize<uint>(ElementsCount, name: nameof(ElementsCount));
             list = new T[ElementsCount];
         }
         // TODO: Read entries implementation
@@ -247,8 +247,8 @@ namespace BinarySerializer.Ubisoft.CPA {
         }
         */
 
-        #region IList implementation
-        private T[] list = null;
+		#region IList implementation
+		private T[] list = null;
 
         public int Count {
             get { return (int)ElementsCount; }
@@ -310,6 +310,6 @@ namespace BinarySerializer.Ubisoft.CPA {
         bool ICollection<T>.Remove(T item) {
             throw new NotImplementedException();
         }
-        #endregion
-    }
+		#endregion
+	}
 }

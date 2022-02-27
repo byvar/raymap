@@ -5,12 +5,12 @@ namespace BinarySerializer.Ubisoft.CPA.U64
     public class A3D_Hierarchy : BinarySerializable
     {
         public ushort Child { get; set; }
-        public ushort Father { get; set; }
+		public ushort Father { get; set; }
 
-        public override void SerializeImpl(SerializerObject s)
+		public override void SerializeImpl(SerializerObject s)
         {
-            Child = s.Serialize<ushort>(Child, name: nameof(Child));
-            Father = s.Serialize<ushort>(Father, name: nameof(Father));
-        }
+			Child = s.Serialize<ushort>(Child, name: nameof(Child));
+			Father = s.Serialize<ushort>(Father, name: nameof(Father));
+		}
     }
 }

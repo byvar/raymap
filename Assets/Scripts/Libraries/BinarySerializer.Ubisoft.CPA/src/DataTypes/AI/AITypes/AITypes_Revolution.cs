@@ -1195,7 +1195,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 ScriptNodeType.Caps,
                 ScriptNodeType.Unknown,
                 ScriptNodeType.SubRoutine, // 40
-                ScriptNodeType.Null,
+				ScriptNodeType.Null,
                 ScriptNodeType.Unknown,
                 ScriptNodeType.Unknown,
                 ScriptNodeType.Unknown,

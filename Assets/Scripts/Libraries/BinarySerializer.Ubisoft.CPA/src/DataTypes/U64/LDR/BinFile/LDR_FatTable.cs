@@ -16,9 +16,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64
 
         public override void SerializeImpl(SerializerObject s)
         {
-            Entries = s.SerializeObjectArray<LDR_EntryRef>(Entries, Pre_ObjectsCount, name: nameof(Entries));
+			Entries = s.SerializeObjectArray<LDR_EntryRef>(Entries, Pre_ObjectsCount, name: nameof(Entries));
             Init();
-        }
+		}
 
         public void Init() {
             EntriesLookup = new Dictionary<U64_StructType, Dictionary<ushort, LDR_EntryRef>>();
