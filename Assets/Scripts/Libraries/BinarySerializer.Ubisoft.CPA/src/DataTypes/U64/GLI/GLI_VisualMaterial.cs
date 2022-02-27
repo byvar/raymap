@@ -7,7 +7,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public RGBA8888Color Color64 { get; set; }
 		public float AddU { get; set; }
 		public float AddV { get; set; }
-		public U64_ArrayReference<U64_Placeholder> TextureList { get; set; }
+		public U64_ArrayReference<GLI_TextureListEntry> TextureList { get; set; }
 		public ushort TextureListCount { get; set; }
 		public ushort TotalTime { get; set; }
 		public MaterialType Type { get; set; }
@@ -22,7 +22,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			}
 			AddU = s.Serialize<float>(AddU, name: nameof(AddU));
 			AddV = s.Serialize<float>(AddV, name: nameof(AddV));
-			TextureList = s.SerializeObject<U64_ArrayReference<U64_Placeholder>>(TextureList, name: nameof(TextureList));
+			TextureList = s.SerializeObject<U64_ArrayReference<GLI_TextureListEntry>>(TextureList, name: nameof(TextureList));
 			TextureListCount = s.Serialize<ushort>(TextureListCount, name: nameof(TextureListCount));
 			TotalTime = s.Serialize<ushort>(TotalTime, name: nameof(TotalTime));
 			s.DoBits<ushort>(b => {

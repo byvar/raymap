@@ -32,7 +32,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 
 		public void LoadLoop(SerializerObject s) {
-			if(IsProcessingLoadQueue) return;
+			if (IsProcessingLoadQueue) return;
 			IsProcessingLoadQueue = true;
 			while (LoadQueue.First?.Value != null) {
 				StructReference currentRef = LoadQueue.First?.Value;
@@ -44,7 +44,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 				//s.Log("LDR: Resolving struct: {0}", currentRef.Name);
 				if (currentRef.ArrayCount.HasValue) {
-					currentRef.ArrayLoadCallback(s, (f,arrayIndex) => {
+					currentRef.ArrayLoadCallback(s, (f, arrayIndex) => {
 						f.CPA_Index = currentRef.Index;
 						f.CPA_ArrayIndex = arrayIndex;
 					});
@@ -88,7 +88,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				IsGlobal = isGlobal,
 			};
 			LoadQueue.AddLast(fileRef);
-			if(!IsProcessingLoadQueue) LoadLoop(s);
+			if (!IsProcessingLoadQueue) LoadLoop(s);
 		}
 
 		#region Pointer calculation
@@ -111,6 +111,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				return null;
 			}
 		}
+
+
 
 		public Pointer GetStructPointer(System.Type type, ushort index, bool global = false) {
 			var mappedType = U64_StructType_Defines.GetType(type);
