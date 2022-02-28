@@ -226,6 +226,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_TextureListEntry)] = U64_StructType.TextureList,
 			[typeof(GLI_Texture)] = U64_StructType.Texture,
 			[typeof(GLI_BitmapInfo)] = U64_StructType.BitmapInfo,
+			[typeof(GLI_PaletteRGBA16)] = U64_StructType.PaletteRGBA16,
 
 
 			// MEC
@@ -235,9 +236,14 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			// TODO
 		};
 
-		public static U64_StructType? GetType(Context c, ushort index) {
-			Dictionary<ushort, U64_StructType> dict = 
+		public static Dictionary<ushort, U64_StructType> GetTypeDictionary(Context c) {
+			Dictionary<ushort, U64_StructType> dict =
 				c.GetStoredObject<Dictionary<ushort, U64_StructType>>(ContextKey) ?? InitTypesDictionary(c);
+			return dict;
+		}
+
+		public static U64_StructType? GetType(Context c, ushort index) {
+			var dict = GetTypeDictionary(c);
 
 			if (dict.ContainsKey(index)) {
 				return dict[index];

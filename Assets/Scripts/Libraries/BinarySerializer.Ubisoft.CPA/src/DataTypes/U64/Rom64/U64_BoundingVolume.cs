@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BinarySerializer.Ubisoft.CPA.U64 {
+﻿namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class U64_BoundingVolume : U64_Struct {
 		public CPA_Vector3D SphereCenter { get; set; }
 		public float SphereRadius { get; set; }

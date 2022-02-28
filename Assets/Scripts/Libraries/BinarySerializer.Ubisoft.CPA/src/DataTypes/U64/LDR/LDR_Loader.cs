@@ -13,8 +13,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 		public int? LevelIndex { get; set; }
 
-		private Pointer DataPointer { get; set; }
+		private Pointer DataPointer => Data.Offset;
 		public LDR_FatFile Fat { get; set; }
+		public U64_DataFile Data { get; set; }
 
 		//public Dictionary<CPA_ROM_StructType, Dictionary<ushort, CPA_ROM_Struct>> Cache = new Dictionary<CPA_ROM_StructType, Dictionary<ushort, CPA_ROM_Struct>>();
 
@@ -24,10 +25,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<GAM_FixPreloadSection> FixPreloadSection { get; set; }
 
 
-		public LDR_Loader(Context c, Pointer dataPointer) {
+		public LDR_Loader(Context c) {
 			Context = c;
 			c.StoreObject<LDR_Loader>(ContextKey, this);
-			DataPointer = dataPointer;
 		}
 
 

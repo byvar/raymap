@@ -106,12 +106,12 @@ namespace Raymap {
 				context.AddFile(new LinearFile(context, DataFilePath, endian));
 
 				// Create loader
-				var dataPointer = context.FilePointer(DataFilePath);
-				LDR_Loader loader = new LDR_Loader(context, dataPointer);
+				LDR_Loader loader = new LDR_Loader(context);
 
 				var s = context.Deserializer;
 
 				// Load fat & fix
+				loader.Data = FileFactory.Read<U64_DataFile>(context, DataFilePath);
 				loader.Fat = FileFactory.Read<LDR_FatFile>(context, FatFilePath);
 				loader.Fix = new U64_Reference<GAM_Fix>(context, 0).Resolve(s, isInFixFixFat: true);
 
@@ -153,12 +153,15 @@ namespace Raymap {
 		public async UniTask LoadFix(Context context) {
 			// Create loader
 			var dataPointer = context.FilePointer(DataFilePath);
-			LDR_Loader loader = new LDR_Loader(context, dataPointer);
+			LDR_Loader loader = new LDR_Loader(context);
 
 			GlobalLoadState.DetailedState = "Loading fix";
 			await TimeController.WaitIfNecessary();
 
 			var s = context.Deserializer;
+
+			// Load Data
+			loader.Data = FileFactory.Read<U64_DataFile>(context, DataFilePath);
 
 			// Load fat
 			loader.Fat = FileFactory.Read<LDR_FatFile>(context, FatFilePath);

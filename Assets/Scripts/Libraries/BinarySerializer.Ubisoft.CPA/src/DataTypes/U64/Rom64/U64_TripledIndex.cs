@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BinarySerializer.Ubisoft.CPA.U64 {
+﻿namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class U64_TripledIndex : U64_Struct {
 		public ushort Index0 { get; set; }
 		public ushort Index1 { get; set; }
