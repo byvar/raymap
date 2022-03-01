@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.N64 {
-	public class GSP_Vertex : BinarySerializable {
+	public class RSP_Vertex : BinarySerializable {
 		// Position
 		public short X { get; set; }
 		public short Y { get; set; }
