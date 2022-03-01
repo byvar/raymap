@@ -82,14 +82,16 @@ public class UnityWindow : EditorWindow {
             string directory = "";
             string defaultName = "";
 
-            if (!string.IsNullOrEmpty(value)) {
+            if (!String.IsNullOrEmpty(value)) {
                 directory = Path.GetFileName(Path.GetFullPath(value));
                 defaultName = Path.GetFileName(value);
             }
 
-            var file = save ? EditorUtility.SaveFilePanel(title, directory, defaultName, extension) : EditorUtility.OpenFilePanel(title, directory, extension);
+            var file = save 
+	            ? EditorUtility.SaveFilePanel(title, directory, defaultName, extension) 
+	            : EditorUtility.OpenFilePanel(title, directory, extension);
 
-            if (!string.IsNullOrEmpty(file)) {
+            if (!String.IsNullOrEmpty(file)) {
                 GUI.FocusControl("Button " + title);
                 value = file;
                 Dirty = true;
@@ -98,7 +100,14 @@ public class UnityWindow : EditorWindow {
 
         rect = new Rect(rect.x, rect.y, rect.width - ButtonWidth, rect.height);
 
-        value = !includeLabel ? EditorGUI.TextField(rect, value) : EditorGUI.TextField(rect, new GUIContent(title), value);
+        BrowseButton(rect, title, EditorGUIUtility.IconContent("UpArrow"), () => {
+	        if (File.Exists(value))
+		        Process.Start(value);
+        }, ButtonWidth);
+
+        rect = new Rect(rect.x, rect.y, rect.width - ButtonWidth, rect.height);
+
+		value = !includeLabel ? EditorGUI.TextField(rect, value) : EditorGUI.TextField(rect, new GUIContent(title, title), value);
         return value;
     }
 
