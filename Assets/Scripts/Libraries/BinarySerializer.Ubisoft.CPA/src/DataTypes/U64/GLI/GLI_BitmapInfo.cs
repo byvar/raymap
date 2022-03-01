@@ -2,18 +2,18 @@
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GLI_BitmapInfo : U64_Struct {
-		public U64_Index<U64_Placeholder> Texture { get; set; }
-		public U64_Index<U64_Placeholder> Palette { get; set; }
+		public U64_MainTableReference<GLI_Bitmap> Texture { get; set; }
+		public U64_MainTableReference<GLI_PaletteRGBA16> Palette { get; set; }
 		public U64_Reference<GLI_PaletteRGBA16> PaletteN64 { get; set; }
-		public U64_Index<U64_Placeholder> Alpha { get; set; }
+		public U64_MainTableReference<GLI_BitmapCI4> Alpha { get; set; }
 		public byte WidthLog { get; set; }
 		public byte HeightLog { get; set; }
 		public BitmapFlags Flags { get; set; }
 		public BitmapType Type { get; set; }
 		public DrawFlags MiscFlags { get; set; }
 		public ushort AlphaChannel { get; set; } // Is this a color?
-		public ushort PaletteSize { get; set; }
-		
+		public ushort PaletteSize { get; set; } = 256;
+
 		// 3DS
 		public ushort Flags3DS { get; set; }
 		public ushort ImageDataSize { get; set; }
@@ -36,13 +36,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				Name = s.SerializeString(Name, 200, name: nameof(Name));
 				ImageData = s.SerializeArray<byte>(ImageData, ImageDataSize, name: nameof(ImageData));
 			} else {
-				Texture = s.SerializeObject<U64_Index<U64_Placeholder>>(Texture, name: nameof(Texture));
+				Texture = s.SerializeObject<U64_MainTableReference<GLI_Bitmap>>(Texture, name: nameof(Texture));
 				if (s.GetCPASettings().Platform == Platform.N64) {
 					PaletteN64 = s.SerializeObject<U64_Reference<GLI_PaletteRGBA16>>(PaletteN64, name: nameof(PaletteN64))?.Resolve(s);
 				} else {
-					Palette = s.SerializeObject<U64_Index<U64_Placeholder>>(Palette, name: nameof(Palette));
+					Palette = s.SerializeObject<U64_MainTableReference<GLI_PaletteRGBA16>>(Palette, name: nameof(Palette));
 				}
-				Alpha = s.SerializeObject<U64_Index<U64_Placeholder>>(Alpha, name: nameof(Alpha));
+				Alpha = s.SerializeObject<U64_MainTableReference<GLI_BitmapCI4>>(Alpha, name: nameof(Alpha));
 				WidthLog = s.Serialize<byte>(WidthLog, name: nameof(WidthLog));
 				HeightLog = s.Serialize<byte>(HeightLog, name: nameof(HeightLog));
 				s.DoBits<ushort>(b => {
@@ -54,6 +54,27 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				if (s.GetCPASettings().Platform == Platform.DS) {
 					PaletteSize = s.Serialize<ushort>(PaletteSize, name: nameof(PaletteSize));
 				}
+				if (Flags.HasFlag(BitmapFlags.CI4)) {
+					Texture?.ResolveAs<GLI_BitmapCI4>(s, onPreSerialize: (_, t) => {
+						t.Pre_HeightLog = HeightLog;
+						t.Pre_WidthLog = WidthLog;
+					});
+				} else if (Flags.HasFlag(BitmapFlags.CI8)) {
+					Texture?.ResolveAs<GLI_BitmapCI8>(s, onPreSerialize: (_, t) => {
+						t.Pre_HeightLog = HeightLog;
+						t.Pre_WidthLog = WidthLog;
+					});
+				} else if (Flags.HasFlag(BitmapFlags.RGBA16)) {
+					Texture?.ResolveAs<GLI_BitmapRGBA16>(s, onPreSerialize: (_, t) => {
+						t.Pre_HeightLog = HeightLog;
+						t.Pre_WidthLog = WidthLog;
+					});
+				}
+				Palette?.Resolve(s, onPreSerialize: (_, p) => p.Length = PaletteSize);
+				Alpha?.Resolve(s, onPreSerialize: (_, a) => {
+					a.Pre_HeightLog = HeightLog;
+					a.Pre_WidthLog = WidthLog;
+				});
 			}
 		}
 

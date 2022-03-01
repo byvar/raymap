@@ -226,7 +226,12 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_TextureListEntry)] = U64_StructType.TextureList,
 			[typeof(GLI_Texture)] = U64_StructType.Texture,
 			[typeof(GLI_BitmapInfo)] = U64_StructType.BitmapInfo,
+
+			[typeof(GLI_BitmapCI4)] = U64_StructType.BitmapCI4,
+			[typeof(GLI_BitmapCI8)] = U64_StructType.BitmapCI8,
+			[typeof(GLI_BitmapRGBA16)] = U64_StructType.BitmapRGBA16,
 			[typeof(GLI_PaletteRGBA16)] = U64_StructType.PaletteRGBA16,
+
 
 
 			// MEC
