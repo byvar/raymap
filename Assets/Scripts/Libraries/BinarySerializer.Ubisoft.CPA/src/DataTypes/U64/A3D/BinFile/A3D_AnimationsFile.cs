@@ -1,4 +1,4 @@
-﻿using System;
+﻿using BinarySerializer.N64;
 
 namespace BinarySerializer.Ubisoft.CPA.U64
 {

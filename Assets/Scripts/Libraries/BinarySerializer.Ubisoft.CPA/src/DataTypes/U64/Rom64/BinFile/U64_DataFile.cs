@@ -23,7 +23,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				MainTablesDictionary[U64_StructType.BitmapCI4].SerializeStructTable(s);
 				MainTablesDictionary[U64_StructType.BitmapCI8].SerializeStructTable(s);
 				MainTablesDictionary[U64_StructType.BitmapRGBA16].SerializeStructTable(s);
-				MainTablesDictionary[U64_StructType.PaletteRGBA16].SerializeStructTable(s);
+				if (s.GetCPASettings().Platform != Platform.N64) {
+					MainTablesDictionary[U64_StructType.PaletteRGBA16].SerializeStructTable(s);
+				}
 			}
 		}
 
