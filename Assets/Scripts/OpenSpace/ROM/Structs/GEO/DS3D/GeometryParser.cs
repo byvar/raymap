@@ -11,7 +11,7 @@ namespace OpenSpace.ROM.DS3D {
 		private static uint extractBits(uint number, int count, int offset) {
 			return (uint)(((1 << count) - 1) & (number >> (offset)));
 		}
-		public static byte[] Decompress(byte[] compressed) {
+		public static byte[] Decompress(byte[] compressed) { // MI_UncompressLZ8
 			byte[] data = new byte[compressed.Length];
 			Array.Copy(compressed, data, compressed.Length);
 			uint src = 0, dst = 0;

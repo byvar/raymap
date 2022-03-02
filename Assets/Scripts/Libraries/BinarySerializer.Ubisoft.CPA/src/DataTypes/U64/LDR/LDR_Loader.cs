@@ -39,6 +39,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				LoadQueue.RemoveFirst();
 
 				var off_struct = GetStructPointer(currentRef.Type, currentRef.Index, global: currentRef.IsGlobal);
+				if (off_struct == null) {
+					s.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name}");
+					continue;
+				}
 				Pointer off_current = s.CurrentPointer;
 				s.Goto(off_struct);
 

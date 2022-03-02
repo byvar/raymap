@@ -222,6 +222,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GEO_TripledIndex)] = U64_StructType.GeometricElementCollideTrianglesData__ColFacesPnt,
 			[typeof(GEO_VerticesList)] = U64_StructType.U64VertexList,
 			[typeof(GEO_GraphicsList3DS)] = U64_StructType.GraphicsList3DS,
+			[typeof(GEO_GraphicsList)] = U64_StructType.U64GraphicsList,
+			[typeof(GEO_CompressedGraphicsListDS)] = U64_StructType.CompressedDSGraphicsList,
 
 			// GLI
 			[typeof(GLI_VisualMaterial)] = U64_StructType.VisualMaterial,

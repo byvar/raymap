@@ -1,6 +1,4 @@
-﻿using BinarySerializer.N64;
-
-namespace BinarySerializer.Ubisoft.CPA.U64 {
+﻿namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GEO_GraphicsList3DS : U64_Struct {
 		public ushort Pre_VerticesCount { get; set; }
 		public ushort Pre_FacesCount { get; set; }

@@ -5,7 +5,7 @@
 		public abstract void SerializeBits(BitSerializerObject b);
 
 		public override void SerializeImpl(SerializerObject s) {
-			s.DoBits<ulong>(b => {
+			s.DoBits<long>(b => {
 				SerializeBits(b);
 
 				b.Position = 7 * 8; // Command is the most significant byte

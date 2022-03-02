@@ -44,6 +44,8 @@
 					Z = b.SerializeBits<ushort>(Z, 16, name: nameof(Z));
 					b.SerializePadding(16, logIfNotNull: true);
 					break;
+				default:
+					throw new BinarySerializableException(this, $"Unparsed command {ModifyCommand}");
 			}
 
 		}

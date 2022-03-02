@@ -16,11 +16,16 @@
 			Data = Command switch {
 				RSP_CommandType.RSP_GBI1_Vtx => SerializeData<RSP_Command_GBI1_Vtx>(),
 				RSP_CommandType.RSP_GBI1_ModifyVtx => SerializeData<RSP_Command_GBI1_ModifyVtx>(),
+				RSP_CommandType.RSP_GBI1_Tri1 => SerializeData<RSP_Command_GBI1_Tri1>(),
+				RSP_CommandType.RSP_GBI1_Tri2 => SerializeData<RSP_Command_GBI1_Tri2>(),
+				RSP_CommandType.RSP_GBI1_EndDL => SerializeData<RSP_Command_GBI1_EndDL>(),
 				_ => SerializeData<RSP_Command_Placeholder>(),
 			};
 
 
 			s.Align(8, Offset);
 		}
+
+		public const int StructSize = 8;
 	}
 }
