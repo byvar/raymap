@@ -11,7 +11,7 @@ namespace Raymap {
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (DC)")] Rayman2DC,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (iOS)")] Rayman2IOS,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (iOS) Demo")] Rayman2IOSDemo,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(PS1LegacyGameManager), "Rayman 2 (PS1)")] Rayman2PS1,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1)")] Rayman2PS1,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (PS2)")] Rayman2PS2,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_U64Manager), "Rayman 2 (N64)")] Rayman2N64,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_U64Manager), "Rayman 2 (DS)")] Rayman2DS,
@@ -25,7 +25,7 @@ namespace Raymap {
         [GameMode(EngineCategory.CPA_RaymanM, typeof(LegacyGameManager), "Rayman Arena (GC)")] RaymanArenaGC,
         [GameMode(EngineCategory.CPA_RaymanM, typeof(LegacyGameManager), "RA (GC) Demo (2002/03/07)")] RaymanArenaGCDemo_2002_03_07,
         [GameMode(EngineCategory.CPA_RaymanM, typeof(LegacyGameManager), "Rayman Arena (Xbox)")] RaymanArenaXbox,
-        [GameMode(EngineCategory.CPA_RaymanM, typeof(PS1LegacyGameManager), "Rayman Rush (PS1)")] RaymanRushPS1,
+        [GameMode(EngineCategory.CPA_RaymanM, typeof(CPA_PS1Manager), "Rayman Rush (PS1)")] RaymanRushPS1,
 
         [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "Rayman 3 (PC)")] Rayman3PC,
         [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "R3 (PC) Demo (2002/10/01)")] Rayman3PCDemo_2002_10_01,
@@ -55,17 +55,17 @@ namespace Raymap {
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: Quack Attack (PC) Demo")] DonaldDuckPCDemo,
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_U64Manager), "Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
-        [GameMode(EngineCategory.CPA_Disney, typeof(PS1LegacyGameManager), "Donald Duck: Quack Attack (PS1)")] DonaldDuckPS1,
+        [GameMode(EngineCategory.CPA_Disney, typeof(CPA_PS1Manager), "Donald Duck: Quack Attack (PS1)")] DonaldDuckPS1,
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: PK (GC)")] DonaldDuckPKGC,
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Disney's Dinosaur (PC)")] DinosaurPC,
-        [GameMode(EngineCategory.CPA_Disney, typeof(PS1LegacyGameManager), "Jungle Book: Groove Party (PS1)")] JungleBookPS1,
+        [GameMode(EngineCategory.CPA_Disney, typeof(CPA_PS1Manager), "Jungle Book: Groove Party (PS1)")] JungleBookPS1,
 
         [GameMode(EngineCategory.CPA_Playmobil, typeof(LegacyGameManager), "Playmobil: Hype (PC)")] PlaymobilHypePC,
         [GameMode(EngineCategory.CPA_Playmobil, typeof(LegacyGameManager), "Playmobil: Laura (PC)")] PlaymobilLauraPC,
         [GameMode(EngineCategory.CPA_Playmobil, typeof(LegacyGameManager), "Playmobil: Alex (PC)")] PlaymobilAlexPC,
 
         [GameMode(EngineCategory.CPA_Other, typeof(LegacyGameManager), "Largo Winch (PC)")] LargoWinchPC,
-        [GameMode(EngineCategory.CPA_Other, typeof(PS1LegacyGameManager), "VIP (PS1)")] VIPPS1,
+        [GameMode(EngineCategory.CPA_Other, typeof(CPA_PS1Manager), "VIP (PS1)")] VIPPS1,
         [GameMode(EngineCategory.CPA_Other, typeof(LegacyGameManager), "Red Planet (PC)")] RedPlanetPC,
     }
 }

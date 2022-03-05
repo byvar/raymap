@@ -143,7 +143,7 @@ public class UnityWindowSettings : UnityWindow {
 		}
 		
 		var managerTmp = UnitySettings.SelectedGameMode.GetManager();
-		if (managerTmp is PS1LegacyGameManager ps1manager) {
+		if (managerTmp is CPA_PS1Manager ps1manager) {
 			var LegacyMode = ps1manager.GetLegacyMode(UnitySettings.GetGameSettings);
 			OpenSpace.PS1.PS1GameInfo.Games.TryGetValue(LegacyMode, out OpenSpace.PS1.PS1GameInfo game);
 			if (game != null && game.actors?.Where(a => a.isSelectable).Count() > 0) {
