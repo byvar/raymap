@@ -43,6 +43,8 @@ namespace OpenSpace.PS1 {
 			public uint baseLBA;
 			public Type type = Type.Map;
 
+			public string BigFilePath => $"{bigfile}.{extension}";
+
 			public class MemoryBlock {
 				public uint address; // Base address for level data
 				public bool hasSoundEffects;
