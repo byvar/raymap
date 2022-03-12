@@ -55,13 +55,9 @@ namespace Raymap
 			string exportDir = Path.Combine(outputDir, fileInfo.bigfile);
 			PS1GameInfo.File.Type type = fileInfo.type;
 
-			uint cineDataBaseAddress = 0;
-
 			// Enumerate every memory block
 			for (int i = 0; i < memoryBlocks.Length; i++)
 			{
-				int gptIndex = 0;
-
 				PS1GameInfo.File.MemoryBlock b = memoryBlocks[i];
 
 				string lvlExportDir;
@@ -78,109 +74,78 @@ namespace Raymap
 				}
 
 				byte[][] packedFiles = await ReadPackedFilesAsync(s, binaryFile, fileInfo, b.main_compressed);
+				
+				PackedFileType[] fileTypes = GetPackedFileTypes(settings, fileInfo, b);
 
-				int fileIndex = 0;
-
-				if (type == PS1GameInfo.File.Type.Map)
+				for (int fileIndex = 0; fileIndex < packedFiles.Length; fileIndex++)
 				{
-					if (settings.Mode != CPA_GameMode.RaymanRushPS1 && !b.exeOnly)
-						Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vignette.tim"), packedFiles[fileIndex++]);
+					PackedFileType fileType = fileTypes[fileIndex];
+					byte[] fileData = packedFiles[fileIndex];
 
-					if (!b.exeOnly && b.inEngine)
+					switch (fileType)
 					{
-						if (b.hasSoundEffects)
+						case PackedFileType.TIM:
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vignette.tim"), fileData);
+							break;
+
+						case PackedFileType.VB:
 						{
-							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "sound.vb"), packedFiles[fileIndex++]);
-							using MemoryStream ms = new MemoryStream(packedFiles[fileIndex - 1]);
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "sounds.vb"), fileData);
+							using MemoryStream ms = new MemoryStream(fileData);
 							using Reader r = new Reader(ms);
 							int soundIndex = 0;
 							while (r.BaseStream.Position < r.BaseStream.Length)
 							{
 								int numSamples = r.ReadInt32();
 								byte[] bs = r.ReadBytes(numSamples * 8);
-								Util.ByteArrayToFile(Path.Combine(lvlExportDir, $"sound_{soundIndex}.vb"), bs);
+								Util.ByteArrayToFile(Path.Combine(lvlExportDir, $"sounds_{soundIndex}.vb"), bs);
 								soundIndex++;
 							}
+							break;
 						}
 
-						Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vram.xtp"), packedFiles[fileIndex++]);
-						Util.ByteArrayToFile(Path.Combine(lvlExportDir, "level.sys"), packedFiles[fileIndex++]);
+						case PackedFileType.XTP:
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vram.xtp"), fileData);
+							break;
+						
+						case PackedFileType.SYS:
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "level.sys"), fileData);
+							break;
 
-						gptIndex = fileIndex - 1;
+						case PackedFileType.PXE_Code:
+							// The data file always appears after the main exe file
+							byte[] exe = fileData;
+							fileIndex++;
+							byte[] exeData = packedFiles[fileIndex];
+
+							int exeLength = exe.Length;
+							Array.Resize(ref exe, exeLength + exeData.Length);
+							Array.Copy(exeData, 0, exe, exeLength, exeData.Length);
+
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "executable.pxe"), exe);
+							break;
+						
+						//case PackedFileType.PXE_1:
+						//	break;
+						
+						case PackedFileType.IMG:
+							if (type == PS1GameInfo.File.Type.Map)
+								Util.ByteArrayToFile(Path.Combine(lvlExportDir, "level.img"), fileData);
+							else if (type == PS1GameInfo.File.Type.Actor)
+								Util.ByteArrayToFile(Path.Combine(lvlExportDir, "actor.img"), fileData);
+							break;
+
+						default:
+							throw new ArgumentOutOfRangeException();
 					}
 
-					byte[] exe = packedFiles[fileIndex++];
-					byte[] exeData = packedFiles[fileIndex++];
-
-					int exeLength = exe.Length;
-					Array.Resize(ref exe, exeLength + exeData.Length);
-					Array.Copy(exeData, 0, exe, exeLength, exeData.Length);
-
-					Util.ByteArrayToFile(Path.Combine(lvlExportDir, "executable.pxe"), exe);
-
-					if (!b.exeOnly && b.inEngine)
-					{
-						Util.ByteArrayToFile(Path.Combine(lvlExportDir, "level.img"), packedFiles[fileIndex++]);
-
-						int lvlIndex = fileIndex - 1;
-						uint length = (uint)packedFiles[lvlIndex].Length;
-						byte[] data = packedFiles[gptIndex];
-
-						RelocatePointers(data, new Range(b.address, b.address + length));
-
-						if (data[0x14c + 3] == 0x80)
-							cineDataBaseAddress = BitConverter.ToUInt32(data, 0x14c);
-
-						Util.ByteArrayToFile(Path.Combine(lvlExportDir, "level_relocated.sys"), data);
-						data = packedFiles[lvlIndex];
-
-						RelocatePointers(data, new Range(b.address, b.address + length));
-						Util.ByteArrayToFile(Path.Combine(lvlExportDir, "level_relocated.img"), data);
-					}
-				}
-				else if (type == PS1GameInfo.File.Type.Actor)
-				{
-					Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vram.xtp"), packedFiles[fileIndex++]);
-					Util.ByteArrayToFile(Path.Combine(lvlExportDir, "actor.img"), packedFiles[fileIndex++]);
-
-					if (fileInfo.bigfile == "ACTOR1")
-					{
-						byte[] data = packedFiles[fileIndex - 1];
-						uint baseAddress = gameInfo.actor1Address;
-						uint length = (uint)data.Length;
-
-						RelocatePointers(data, new Range(baseAddress, baseAddress + length));
-						Util.ByteArrayToFile(Path.Combine(lvlExportDir, "actor_relocated.img"), data);
-					}
-				}
-				else if (type == PS1GameInfo.File.Type.Sound)
-				{
-					Util.ByteArrayToFile(Path.Combine(lvlExportDir, "sound.vb"), packedFiles[fileIndex++]);
+					await TimeController.WaitIfNecessary();
 				}
 
-				if (fileIndex != packedFiles.Length)
-					Debug.LogWarning("Not all blocks were exported!");
-
-				await TimeController.WaitIfNecessary();
-
-				Util.ByteArrayToFile(Path.Combine(lvlExportDir, "overlay_game.img"), await ReadDataBlock(s, binaryFile, fileInfo, b.overlay_game));
-				byte[] cineblock = await ReadDataBlock(s, binaryFile, fileInfo, b.overlay_cine);
-				Util.ByteArrayToFile(Path.Combine(lvlExportDir, "overlay_cine.img"), cineblock);
-
-				await TimeController.WaitIfNecessary();
-
-				if (cineblock != null)
-				{
-					cineDataBaseAddress += 0x1f800 + 0x32 * 0xc00; // magic!
-
-					RelocatePointers(cineblock, new Range[]
-					{
-						new Range(b.address, cineDataBaseAddress),
-						new Range(cineDataBaseAddress, (uint)(cineDataBaseAddress + cineblock.Length)),
-					});
-
-					Util.ByteArrayToFile(Path.Combine(lvlExportDir, "overlay_cine_relocated.img"), cineblock);
-				}
+				Util.ByteArrayToFile(Path.Combine(lvlExportDir, "overlay_game.img"), 
+					await ReadDataBlock(s, binaryFile, fileInfo, b.overlay_game));
+				Util.ByteArrayToFile(Path.Combine(lvlExportDir, "overlay_cine.img"), 
+					await ReadDataBlock(s, binaryFile, fileInfo, b.overlay_cine));
 
 				await TimeController.WaitIfNecessary();
 
@@ -248,52 +213,6 @@ namespace Raymap
 			}
 			cutsceneAudio = cutsceneAudioList.SelectMany(i => i).ToArray();
 			cutsceneFrames = cutsceneFramesList.SelectMany(i => i).ToArray();
-		}
-
-		#endregion
-
-		#region Private Methods
-
-		/// <summary>
-		/// Relocates game pointers to have their address start with 0xDD to have them be easier to find in a hex editor
-		/// </summary>
-		private static void RelocatePointers(byte[] data, Range memoryRange) => RelocatePointers(data, memoryRange.YieldToArray());
-
-		/// <summary>
-		/// Relocates game pointers to have their address start with 0xDD (or 0xCC if not the first range)
-		/// to have them be easier to find in a hex editor
-		/// </summary>
-		private static void RelocatePointers(byte[] data, Range[] memoryRanges)
-		{
-			for (int j = 0; j < data.Length; j++)
-			{
-				if (data[j] != 0x80)
-					continue;
-
-				int off = j - 3;
-				uint ptr = BitConverter.ToUInt32(data, off);
-
-				bool firstRange = true;
-
-				foreach (Range range in memoryRanges)
-				{
-					if (ptr < range.Start || ptr >= range.End)
-					{
-						firstRange = false;
-						continue;
-					}
-
-					ptr = ptr - range.Start + (firstRange ? 0xDD000000 : 0xCC000000); // We want to tell the ranges apart
-					byte[] newData = BitConverter.GetBytes(ptr);
-
-					for (int y = 0; y < 4; y++)
-						data[off + 3 - y] = newData[y];
-
-					break;
-				}
-
-				j += 3;
-			}
 		}
 
 		#endregion
@@ -372,6 +291,43 @@ namespace Raymap
 			return s.SerializeArray<byte>(default, lba.size, name: "Data");
 		}
 
+		public PackedFileType[] GetPackedFileTypes(CPA_Settings settings, PS1GameInfo.File fileInfo, PS1GameInfo.File.MemoryBlock b)
+		{
+			var types = new List<PackedFileType>();
+
+			if (fileInfo.type == PS1GameInfo.File.Type.Map)
+			{
+				if (settings.Mode != CPA_GameMode.RaymanRushPS1 && !b.exeOnly)
+					types.Add(PackedFileType.TIM);
+
+				if (!b.exeOnly && b.inEngine)
+				{
+					if (b.hasSoundEffects)
+						types.Add(PackedFileType.VB);
+
+					types.Add(PackedFileType.XTP);
+					types.Add(PackedFileType.SYS);
+				}
+
+				types.Add(PackedFileType.PXE_Code);
+				types.Add(PackedFileType.PXE_Data);
+
+				if (!b.exeOnly && b.inEngine)
+					types.Add(PackedFileType.IMG);
+			}
+			else if (fileInfo.type == PS1GameInfo.File.Type.Actor)
+			{
+				types.Add(PackedFileType.XTP);
+				types.Add(PackedFileType.IMG);
+			}
+			else if (fileInfo.type == PS1GameInfo.File.Type.Sound)
+			{
+				types.Add(PackedFileType.VB);
+			}
+
+			return types.ToArray();
+		}
+
 		public override async UniTask LoadFilesAsync(Context context)
 		{
 			Endian endian = context.GetCPASettings().GetEndian;
@@ -386,17 +342,15 @@ namespace Raymap
 
 		#region Data Types
 
-		// TODO: Replace with System.Range once the C# version used here supports it
-		private readonly struct Range
+		public enum PackedFileType
 		{
-			public Range(uint start, uint end)
-			{
-				Start = start;
-				End = end;
-			}
-
-			public uint Start { get; }
-			public uint End { get; }
+			TIM, // Vignette
+			VB, // Sound
+			XTP, // VRAM
+			SYS, // Level
+			PXE_Code, // Executable
+			PXE_Data, // Executable data
+			IMG, // Level
 		}
 
 		#endregion
