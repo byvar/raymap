@@ -46,15 +46,15 @@ namespace BinarySerializer.Unity {
 
             return file;
         }
-        public static MemoryMappedByteArrayFile AddMemoryMappedByteArrayFile(this Context context, string name, uint length, uint baseAddress, Endian endianness = Endian.Little) {
-            var file = new MemoryMappedByteArrayFile(context, name, length, baseAddress, endianness);
+        public static StreamFile AddStreamFile(this Context context, string name, byte[] bytes, Endian endianness = Endian.Little, bool allowLocalPointers = false) {
+            var file = new StreamFile(context, name, new MemoryStream(bytes), endianness, allowLocalPointers);
 
             context.AddFile(file);
 
             return file;
         }
-        public static MemoryMappedByteArrayFile AddMemoryMappedByteArrayFile(this Context context, string name, byte[] bytes, uint baseAddress, Endian endianness = Endian.Little) {
-            var file = new MemoryMappedByteArrayFile(context, name, baseAddress, bytes, endianness);
+        public static MemoryMappedStreamFile AddMemoryMappedStreamFile(this Context context, string name, byte[] bytes, uint baseAddress, Endian endianness = Endian.Little) {
+            var file = new MemoryMappedStreamFile(context, name, baseAddress, bytes, endianness);
 
             context.AddFile(file);
 
