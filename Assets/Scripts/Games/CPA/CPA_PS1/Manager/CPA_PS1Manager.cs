@@ -10,6 +10,7 @@ using BinarySerializer.Unity;
 using Cysharp.Threading.Tasks;
 using OpenSpace.PS1;
 using UnityEngine;
+using LevelHeader = BinarySerializer.Ubisoft.CPA.PS1.LevelHeader;
 using Reader = BinarySerializer.Reader;
 using Util = BinarySerializer.Unity.Util;
 
@@ -233,14 +234,21 @@ namespace Raymap
 			PS1GameInfo.File mainFileInfo = gameInfo.files.First(x => x.fileID == 0);
 			PS1GameInfo.File.MemoryBlock levelMemBlock = mainFileInfo.memoryBlocks[Array.IndexOf(gameInfo.maps, settings.Map)];
 
+			// File names
+			const string levelHeaderFileName = "level.sys";
+			const string levelDataFileName = "level.img";
+
 			GlobalLoadState.DetailedState = $"Loading files";
 			await TimeController.WaitIfNecessary();
 
 			// TODO: Load actor files
 
 			// Read the packed files
-			byte[][] packedFiles = await ReadPackedFilesAsync(s, s.Context.GetFile(mainFileInfo.BigFilePath), mainFileInfo, levelMemBlock.main_compressed);
+			byte[][] packedFileDatas = await ReadPackedFilesAsync(s, s.Context.GetFile(mainFileInfo.BigFilePath), mainFileInfo, levelMemBlock.main_compressed);
 			PackedFileType[] fileTypes = GetPackedFileTypes(cpaSettings, mainFileInfo, levelMemBlock);
+			Dictionary<PackedFileType, byte[]> packedFiles = packedFileDatas.
+				Select((x, i) => new { Data = x, Type = fileTypes[i] }).
+				ToDictionary(x => x.Type, x => x.Data);
 
 			GlobalLoadState.DetailedState = $"Loading VRAM";
 			await TimeController.WaitIfNecessary();
@@ -250,9 +258,21 @@ namespace Raymap
 			int startXPage = cpaSettings.Mode != CPA_GameMode.JungleBookPS1 ? 5 : 8;
 			vram.CurrentXPage = startXPage;
 
-			byte[] vramData = packedFiles[fileTypes.FindItemIndex(x => x == PackedFileType.XTP)];
+			byte[] vramData = packedFiles[PackedFileType.XTP];
 			int width = Mathf.CeilToInt(vramData.Length / (float)(PS1_VRAM.PageHeight * 2));
 			vram.AddData(vramData, width);
+
+			GlobalLoadState.DetailedState = $"Loading level";
+			await TimeController.WaitIfNecessary();
+
+			// Add the level data as a memory mapped file. The header references data here.
+			byte[] levelData = packedFiles[PackedFileType.IMG];
+			context.AddMemoryMappedStreamFile(levelDataFileName, levelData, levelMemBlock.address, cpaSettings.GetEndian);
+
+			// Add the level header file as a linear file as it doesn't matter where it's allocated in memory. This will parse the level data.
+			byte[] levelHeaderData = packedFiles[PackedFileType.SYS];
+			context.AddStreamFile(levelHeaderFileName, levelHeaderData, cpaSettings.GetEndian);
+			LevelHeader levelHeader = FileFactory.Read<LevelHeader>(context, levelHeaderFileName);
 
 			throw new NotImplementedException();
 		}
@@ -354,10 +374,10 @@ namespace Raymap
 			TIM, // Vignette
 			VB, // Sound
 			XTP, // VRAM
-			SYS, // Level
+			SYS, // Level header
 			PXE_Code, // Executable
 			PXE_Data, // Executable data
-			IMG, // Level
+			IMG, // Level data
 		}
 
 		#endregion
