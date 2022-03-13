@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BinarySerializer;
+using BinarySerializer.PS1;
 using BinarySerializer.Ubisoft.CPA;
 using BinarySerializer.Ubisoft.CPA.PS1;
 using BinarySerializer.Unity;
@@ -226,26 +227,32 @@ namespace Raymap
 			// Get properties
 			CPA_Settings cpaSettings = context.GetCPASettings();
 			MapViewerSettings settings = context.GetMapViewerSettings();
-			PS1GameInfo gameInfo = GetGameInfo(settings);
-			PS1GameInfo.File fileInfo = gameInfo.files[0]; // TODO: Don't hard-code this
-			PS1GameInfo.File.MemoryBlock memoryBlock = fileInfo.memoryBlocks[0]; // TODO: Don't hard-code this
 			BinaryDeserializer s = context.Deserializer;
+			
+			PS1GameInfo gameInfo = GetGameInfo(settings);
+			PS1GameInfo.File mainFileInfo = gameInfo.files.First(x => x.fileID == 0);
+			PS1GameInfo.File.MemoryBlock levelMemBlock = mainFileInfo.memoryBlocks[Array.IndexOf(gameInfo.maps, settings.Map)];
 
 			GlobalLoadState.DetailedState = $"Loading files";
 			await TimeController.WaitIfNecessary();
 
-			// Read the packed files
-			byte[][] packedFiles = await ReadPackedFilesAsync(s, s.Context.GetFile(fileInfo.BigFilePath), fileInfo, memoryBlock.main_compressed);
+			// TODO: Load actor files
 
-			// TODO: Parse files (we can skip the vignette, sounds etc.)
-			// TODO: Handle memory mapping
-			int index = 0;
-			foreach (byte[] file in packedFiles)
-			{
-				var binaryFile = new StreamFile(context, $"File {index}", new MemoryStream(file), cpaSettings.GetEndian);
-				context.AddFile(binaryFile);
-				index++;
-			}
+			// Read the packed files
+			byte[][] packedFiles = await ReadPackedFilesAsync(s, s.Context.GetFile(mainFileInfo.BigFilePath), mainFileInfo, levelMemBlock.main_compressed);
+			PackedFileType[] fileTypes = GetPackedFileTypes(cpaSettings, mainFileInfo, levelMemBlock);
+
+			GlobalLoadState.DetailedState = $"Loading VRAM";
+			await TimeController.WaitIfNecessary();
+
+			PS1_VRAM vram = new PS1_VRAM();
+
+			int startXPage = cpaSettings.Mode != CPA_GameMode.JungleBookPS1 ? 5 : 8;
+			vram.CurrentXPage = startXPage;
+
+			byte[] vramData = packedFiles[fileTypes.FindItemIndex(x => x == PackedFileType.XTP)];
+			int width = Mathf.CeilToInt(vramData.Length / (float)(PS1_VRAM.PageHeight * 2));
+			vram.AddData(vramData, width);
 
 			throw new NotImplementedException();
 		}
