@@ -7,6 +7,9 @@
 		public byte[] UnknownBytes2 { get; set; }
 		public Pointer DynamicWorldPointer { get; set; }
 
+		// Parsed from pointers
+		public HIE_SuperObject DynamicWorld { get; set; }
+
 		public override void SerializeImpl(SerializerObject s)
 		{
 			CPA_Settings settings = s.GetCPASettings();
@@ -35,6 +38,12 @@
 			}
 
 			DynamicWorldPointer = s.SerializePointer(DynamicWorldPointer, name: nameof(DynamicWorldPointer));
+			// TODO: Serialize remaining data
+
+
+			// Serialize data from pointers
+			s.DoAt(DynamicWorldPointer, () => 
+				DynamicWorld = s.SerializeObject<HIE_SuperObject>(DynamicWorld, name: nameof(DynamicWorld)));
 		}
 	}
 }
