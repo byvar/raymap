@@ -12,7 +12,7 @@
 		public FixedPointInt16 Rot_M20 { get; set; }
 		public FixedPointInt16 Rot_M21 { get; set; }
 		public FixedPointInt16 Rot_M22 { get; set; }
-		public ushort Uhsort_12 { get; set; }
+		public ushort Ushort_12 { get; set; }
 
 		public int X { get; set; }
 		public int Y { get; set; }
@@ -31,7 +31,7 @@
 			Rot_M20 = s.SerializeObject<FixedPointInt16>(Rot_M20, x => x.Pre_PointPosition = 12, name: nameof(Rot_M20));
 			Rot_M21 = s.SerializeObject<FixedPointInt16>(Rot_M21, x => x.Pre_PointPosition = 12, name: nameof(Rot_M21));
 			Rot_M22 = s.SerializeObject<FixedPointInt16>(Rot_M22, x => x.Pre_PointPosition = 12, name: nameof(Rot_M22));
-			Uhsort_12 = s.Serialize<ushort>(Uhsort_12, name: nameof(Uhsort_12));
+			Ushort_12 = s.Serialize<ushort>(Ushort_12, name: nameof(Ushort_12));
 
 			X = s.Serialize<int>(X, name: nameof(X));
 			Y = s.Serialize<int>(Y, name: nameof(Y));

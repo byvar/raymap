@@ -255,7 +255,7 @@ namespace Raymap
 
 			PS1_VRAM vram = new PS1_VRAM();
 
-			int startXPage = cpaSettings.Mode != CPA_GameMode.JungleBookPS1 ? 5 : 8;
+			int startXPage = cpaSettings.EngineVersion != EngineVersion.JungleBook_PS1 ? 5 : 8;
 			vram.CurrentXPage = startXPage;
 
 			byte[] vramData = packedFiles[PackedFileType.XTP];
@@ -324,7 +324,7 @@ namespace Raymap
 
 			if (fileInfo.type == PS1GameInfo.File.Type.Map)
 			{
-				if (settings.Mode != CPA_GameMode.RaymanRushPS1 && !b.exeOnly)
+				if (settings.EngineVersion != EngineVersion.RaymanRush_PS1 && !b.exeOnly)
 					types.Add(PackedFileType.TIM);
 
 				if (!b.exeOnly && b.inEngine)
