@@ -10,12 +10,18 @@
 		public Pointer InactiveDynamicWorldPointer { get; set; }
 		public int AlwaysCount { get; set; }
 		public Pointer AlwaysPointer { get; set; }
+		public int WayPointsCount { get; set; }
+		public int GraphsCount { get; set; }
+		public Pointer WayPointsPointer { get; set; }
+		public Pointer GraphsPointer { get; set; }
 
-		// Parsed from pointers
+		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
 		public HIE_SuperObject FatherSector { get; set; }
 		public HIE_SuperObject InactiveDynamicWorld { get; set; }
 		public ALW_AlwaysList[] Always { get; set; }
+		public WAY_WayPoint[] WayPoints { get; set; }
+		public WAY_Graph[] Graphs { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -47,8 +53,15 @@
 			DynamicWorldPointer = s.SerializePointer(DynamicWorldPointer, name: nameof(DynamicWorldPointer));
 			FatherSectorPointer = s.SerializePointer(FatherSectorPointer, name: nameof(FatherSectorPointer));
 			InactiveDynamicWorldPointer = s.SerializePointer(InactiveDynamicWorldPointer, name: nameof(InactiveDynamicWorldPointer));
+			
 			AlwaysCount = s.Serialize<int>(AlwaysCount, name: nameof(AlwaysCount));
 			AlwaysPointer = s.SerializePointer(AlwaysPointer, name: nameof(AlwaysPointer));
+
+			WayPointsCount = s.Serialize<int>(WayPointsCount, name: nameof(WayPointsCount));
+			GraphsCount = s.Serialize<int>(GraphsCount, name: nameof(GraphsCount));
+			WayPointsPointer = s.SerializePointer(WayPointsPointer, name: nameof(WayPointsPointer));
+			GraphsPointer = s.SerializePointer(GraphsPointer, name: nameof(GraphsPointer));
+
 			// TODO: Serialize remaining data
 
 
@@ -59,7 +72,14 @@
 				FatherSector = s.SerializeObject<HIE_SuperObject>(FatherSector, x => x.Pre_IsDynamic = false, name: nameof(FatherSector)));
 			s.DoAt(InactiveDynamicWorldPointer, () =>
 				InactiveDynamicWorld = s.SerializeObject<HIE_SuperObject>(InactiveDynamicWorld, x => x.Pre_IsDynamic = true, name: nameof(InactiveDynamicWorld)));
-			s.DoAt(AlwaysPointer, () => Always = s.SerializeObjectArray<ALW_AlwaysList>(Always, AlwaysCount, name: nameof(Always)));
+
+			s.DoAt(AlwaysPointer, () => 
+				Always = s.SerializeObjectArray<ALW_AlwaysList>(Always, AlwaysCount, name: nameof(Always)));
+
+			s.DoAt(WayPointsPointer, () => 
+				WayPoints = s.SerializeObjectArray<WAY_WayPoint>(WayPoints, WayPointsCount, name: nameof(WayPoints)));
+			s.DoAt(GraphsPointer, () =>
+				Graphs = s.SerializeObjectArray<WAY_Graph>(Graphs, GraphsCount, name: nameof(Graphs)));
 		}
 	}
 }
