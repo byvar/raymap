@@ -14,6 +14,12 @@
 		public int GraphsCount { get; set; }
 		public Pointer WayPointsPointer { get; set; }
 		public Pointer GraphsPointer { get; set; }
+		public short PersosCount { get; set; }
+		public short Ushort_0116 { get; set; }
+		public Pointer PersosPointer { get; set; }
+		public Pointer StatesPointer { get; set; } // TODO: Serialize states
+		public short StatesCount { get; set; }
+		public short Ushort_0122 { get; set; }
 
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
@@ -22,6 +28,7 @@
 		public ALW_AlwaysList[] Always { get; set; }
 		public WAY_WayPoint[] WayPoints { get; set; }
 		public WAY_Graph[] Graphs { get; set; }
+		public PERSO_Perso[] Persos { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -62,6 +69,14 @@
 			WayPointsPointer = s.SerializePointer(WayPointsPointer, name: nameof(WayPointsPointer));
 			GraphsPointer = s.SerializePointer(GraphsPointer, name: nameof(GraphsPointer));
 
+			PersosCount = s.Serialize<short>(PersosCount, name: nameof(PersosCount));
+			Ushort_0116 = s.Serialize<short>(Ushort_0116, name: nameof(Ushort_0116));
+			PersosPointer = s.SerializePointer(PersosPointer, name: nameof(PersosPointer));
+
+			StatesPointer = s.SerializePointer(StatesPointer, name: nameof(StatesPointer));
+			StatesCount = s.Serialize<short>(StatesCount, name: nameof(StatesCount));
+			Ushort_0122 = s.Serialize<short>(Ushort_0122, name: nameof(Ushort_0122));
+
 			// TODO: Serialize remaining data
 
 
@@ -80,6 +95,9 @@
 				WayPoints = s.SerializeObjectArray<WAY_WayPoint>(WayPoints, WayPointsCount, name: nameof(WayPoints)));
 			s.DoAt(GraphsPointer, () =>
 				Graphs = s.SerializeObjectArray<WAY_Graph>(Graphs, GraphsCount, name: nameof(Graphs)));
+
+			s.DoAt(PersosPointer, () =>
+				Persos = s.SerializeObjectArray<PERSO_Perso>(Persos, PersosCount, name: nameof(Persos)));
 		}
 	}
 }

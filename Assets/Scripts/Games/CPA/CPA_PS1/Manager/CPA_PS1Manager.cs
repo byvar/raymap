@@ -145,15 +145,15 @@ namespace Raymap
 				}
 
 				Util.ByteArrayToFile(Path.Combine(lvlExportDir, "overlay_game.img"), 
-					await ReadDataBlock(s, binaryFile, fileInfo, b.overlay_game));
+					await ReadDataBlockAsync(s, binaryFile, fileInfo, b.overlay_game));
 				Util.ByteArrayToFile(Path.Combine(lvlExportDir, "overlay_cine.img"), 
-					await ReadDataBlock(s, binaryFile, fileInfo, b.overlay_cine));
+					await ReadDataBlockAsync(s, binaryFile, fileInfo, b.overlay_cine));
 
 				await TimeController.WaitIfNecessary();
 
 				for (int j = 0; j < b.cutscenes.Length; j++)
 				{
-					byte[] cutsceneAudioBlk = await ReadDataBlock(s, binaryFile, fileInfo, b.cutscenes[j]);
+					byte[] cutsceneAudioBlk = await ReadDataBlockAsync(s, binaryFile, fileInfo, b.cutscenes[j]);
 
 					if (cutsceneAudioBlk == null) 
 						continue;
@@ -303,7 +303,7 @@ namespace Raymap
 			return archive.Files.Select(x => x.GetFileBytes()).Where(x => x != null).ToArray();
 		}
 
-		public async UniTask<byte[]> ReadDataBlock(BinaryDeserializer s, BinaryFile file, PS1GameInfo.File fileInfo, PS1GameInfo.File.LBA lba)
+		public async UniTask<byte[]> ReadDataBlockAsync(BinaryDeserializer s, BinaryFile file, PS1GameInfo.File fileInfo, PS1GameInfo.File.LBA lba)
 		{
 			if (lba.lba < fileInfo.baseLBA || lba.size <= 0)
 				return null;

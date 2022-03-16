@@ -14,8 +14,8 @@
 		public override void SerializeImpl(SerializerObject s)
 		{
 			ArcsCount = s.Serialize<int>(ArcsCount, name: nameof(ArcsCount));
-			FirstNodePointer = s.SerializePointer(FirstNodePointer, name: nameof(FirstNodePointer));
-			ArcsPointer = s.SerializePointer(ArcsPointer, name: nameof(ArcsPointer));
+			FirstNodePointer = s.SerializePointer(FirstNodePointer, allowInvalid: ArcsCount == 0, name: nameof(FirstNodePointer));
+			ArcsPointer = s.SerializePointer(ArcsPointer, allowInvalid: ArcsCount == 0, name: nameof(ArcsPointer));
 			NodesCount = s.Serialize<int>(NodesCount, name: nameof(NodesCount));
 			Bytes_10 = s.SerializeArray<byte>(Bytes_10, 0x58, name: nameof(Bytes_10));
 
