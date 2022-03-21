@@ -26,7 +26,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 		// Serialized from pointers
 		public PERSO_Family Family { get; set; }
-		// TODO: Serialize collision
+		public CS_PhysicalObjectCollisionMapping[] CollisionMapping { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -59,7 +59,10 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			Bytes_80 = s.SerializeArray<byte>(Bytes_80, 0x24, name: nameof(Bytes_80));
 
 			// Serialize data from pointers
-			s.DoAt(FamilyPointer, () => Family = s.SerializeObject<PERSO_Family>(Family, name: nameof(Family)));
+			s.DoAt(FamilyPointer, () => 
+				Family = s.SerializeObject<PERSO_Family>(Family, name: nameof(Family)));
+			s.DoAt(CollisionObjectsPointer, () => 
+				CollisionMapping = s.SerializeObjectArray<CS_PhysicalObjectCollisionMapping>(CollisionMapping, CollisionObjectsCount, name: nameof(CollisionMapping)));
 		}
 
 		[Flags]
