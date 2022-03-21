@@ -25,7 +25,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public byte[] Bytes_80 { get; set; } // At 0x92: scale shorts
 
 		// Serialized from pointers
-		// TODO: Serialize family and collision
+		public PERSO_Family Family { get; set; }
+		// TODO: Serialize collision
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -58,7 +59,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			Bytes_80 = s.SerializeArray<byte>(Bytes_80, 0x24, name: nameof(Bytes_80));
 
 			// Serialize data from pointers
-
+			s.DoAt(FamilyPointer, () => Family = s.SerializeObject<PERSO_Family>(Family, name: nameof(Family)));
 		}
 
 		[Flags]
