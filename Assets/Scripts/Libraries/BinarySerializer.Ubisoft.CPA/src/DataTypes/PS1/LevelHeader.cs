@@ -17,7 +17,7 @@
 		public short PersosCount { get; set; }
 		public short Ushort_0116 { get; set; }
 		public Pointer PersosPointer { get; set; }
-		public Pointer StatesPointer { get; set; } // TODO: Serialize states
+		public Pointer StatesPointer { get; set; }
 		public short StatesCount { get; set; }
 		public short Ushort_0122 { get; set; }
 
@@ -29,6 +29,7 @@
 		public WAY_WayPoint[] WayPoints { get; set; }
 		public WAY_Graph[] Graphs { get; set; }
 		public PERSO_Perso[] Persos { get; set; }
+		public Pointer<PLA_State>[] States { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -98,6 +99,8 @@
 
 			s.DoAt(PersosPointer, () =>
 				Persos = s.SerializeObjectArray<PERSO_Perso>(Persos, PersosCount, name: nameof(Persos)));
+			s.DoAt(StatesPointer, () =>
+				States = s.SerializePointerArray<PLA_State>(States, StatesCount, resolve: true, name: nameof(States)));
 		}
 	}
 }
