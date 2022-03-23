@@ -1,4 +1,6 @@
-﻿namespace BinarySerializer.Ubisoft.CPA.PS1
+﻿using System.Linq;
+
+namespace BinarySerializer.Ubisoft.CPA.PS1
 {
 	public class LevelHeader : BinarySerializable
 	{
@@ -20,6 +22,19 @@
 		public Pointer StatesPointer { get; set; }
 		public short StatesCount { get; set; }
 		public short Ushort_0122 { get; set; }
+		public uint Ushort_0124 { get; set; }
+		public uint Ushort_0128 { get; set; }
+		public Pointer Pointer_012C { get; set; } // This + 0x10 = main character
+		public Pointer Pointer_0130 { get; set; }
+		public uint Uint_134 { get; set; } 
+		public uint Uint_138 { get; set; }
+		public uint Uint_13C { get; set; }
+		public uint Uint_140 { get; set; }
+		public uint Uint_144 { get; set; }
+		public int InitialCinematicStreamID { get; set; }
+		public Pointer AnimationPositionsPointer { get; set; }
+		public Pointer AnimationRotationsPointer { get; set; }
+		public Pointer AnimationScalesPointer { get; set; }
 
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
@@ -30,6 +45,9 @@
 		public WAY_Graph[] Graphs { get; set; }
 		public PERSO_Perso[] Persos { get; set; }
 		public Pointer<PLA_State>[] States { get; set; }
+		public ANIM_Vector[] AnimationPositions { get; set; }
+		public ANIM_Quaternion[] AnimationRotations { get; set; }
+		public ANIM_Vector[] AnimationScales { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -77,6 +95,19 @@
 			StatesPointer = s.SerializePointer(StatesPointer, name: nameof(StatesPointer));
 			StatesCount = s.Serialize<short>(StatesCount, name: nameof(StatesCount));
 			Ushort_0122 = s.Serialize<short>(Ushort_0122, name: nameof(Ushort_0122));
+			Ushort_0124 = s.Serialize<uint>(Ushort_0124, name: nameof(Ushort_0124));
+			Ushort_0128 = s.Serialize<uint>(Ushort_0128, name: nameof(Ushort_0128));
+			Pointer_012C = s.SerializePointer(Pointer_012C, name: nameof(Pointer_012C));
+			Pointer_0130 = s.SerializePointer(Pointer_0130, name: nameof(Pointer_0130));
+			Uint_134 = s.Serialize<uint>(Uint_134, name: nameof(Uint_134));
+			Uint_138 = s.Serialize<uint>(Uint_138, name: nameof(Uint_138));
+			Uint_13C = s.Serialize<uint>(Uint_13C, name: nameof(Uint_13C));
+			Uint_140 = s.Serialize<uint>(Uint_140, name: nameof(Uint_140));
+			Uint_144 = s.Serialize<uint>(Uint_144, name: nameof(Uint_144));
+			InitialCinematicStreamID = s.Serialize<int>(InitialCinematicStreamID, name: nameof(InitialCinematicStreamID));
+			AnimationPositionsPointer = s.SerializePointer(AnimationPositionsPointer, name: nameof(AnimationPositionsPointer));
+			AnimationRotationsPointer = s.SerializePointer(AnimationRotationsPointer, name: nameof(AnimationRotationsPointer));
+			AnimationScalesPointer = s.SerializePointer(AnimationScalesPointer, name: nameof(AnimationScalesPointer));
 
 			// TODO: Serialize remaining data
 
@@ -101,6 +132,24 @@
 				Persos = s.SerializeObjectArray<PERSO_Perso>(Persos, PersosCount, name: nameof(Persos)));
 			s.DoAt(StatesPointer, () =>
 				States = s.SerializePointerArray<PLA_State>(States, StatesCount, resolve: true, name: nameof(States)));
+
+			long animPosCount = (AnimationRotationsPointer.FileOffset - AnimationPositionsPointer.FileOffset) / 6;
+			long animRotCount = (AnimationScalesPointer.FileOffset - AnimationRotationsPointer.FileOffset) / 8;
+			long animScaleCount = Persos?.
+				Where(x => x.Perso3DData?.Family?.Animations != null).
+				SelectMany(x => x.Perso3DData.Family.Animations).
+				Where(x => x.Channels != null).
+				SelectMany(x => x.Channels).
+				Where(x => x.Frames != null).
+				SelectMany(x => x.Frames).
+				Max(x => x.Scale) + 1 ?? 0;
+
+			s.DoAt(AnimationPositionsPointer, () =>
+				AnimationPositions = s.SerializeObjectArray<ANIM_Vector>(AnimationPositions, animPosCount, name: nameof(AnimationPositions)));
+			s.DoAt(AnimationRotationsPointer, () =>
+				AnimationRotations = s.SerializeObjectArray<ANIM_Quaternion>(AnimationRotations, animRotCount, name: nameof(AnimationRotations)));
+			s.DoAt(AnimationScalesPointer, () =>
+				AnimationScales = s.SerializeObjectArray<ANIM_Vector>(AnimationScales, animScaleCount, name: nameof(AnimationScales)));
 		}
 	}
 }
