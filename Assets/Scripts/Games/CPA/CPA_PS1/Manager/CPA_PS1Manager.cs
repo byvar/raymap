@@ -21,6 +21,8 @@ namespace Raymap
 		#region Private Constants
 
 		private const ushort SectorSize = 0x800;
+		private const string LevelHeaderFileName = "level.sys";
+		private const string LevelDataFileName = "level.img";
 
 		#endregion
 
@@ -233,46 +235,33 @@ namespace Raymap
 			PS1GameInfo gameInfo = GetGameInfo(settings);
 			PS1GameInfo.File mainFileInfo = gameInfo.files.First(x => x.fileID == 0);
 			PS1GameInfo.File.MemoryBlock levelMemBlock = mainFileInfo.memoryBlocks[Array.IndexOf(gameInfo.maps, settings.Map)];
-
-			// File names
-			const string levelHeaderFileName = "level.sys";
-			const string levelDataFileName = "level.img";
-
+			
 			GlobalLoadState.DetailedState = $"Loading files";
 			await TimeController.WaitIfNecessary();
 
 			// TODO: Load actor files
 
 			// Read the packed files
-			byte[][] packedFileDatas = await ReadPackedFilesAsync(s, s.Context.GetFile(mainFileInfo.BigFilePath), mainFileInfo, levelMemBlock.main_compressed);
-			PackedFileType[] fileTypes = GetPackedFileTypes(cpaSettings, mainFileInfo, levelMemBlock);
-			Dictionary<PackedFileType, byte[]> packedFiles = packedFileDatas.
-				Select((x, i) => new { Data = x, Type = fileTypes[i] }).
-				ToDictionary(x => x.Type, x => x.Data);
+			Dictionary<PackedFileType, byte[]> packedFiles = await ReadAndCategorizePackedFilesAsync(
+				s: s, 
+				binaryFile: s.Context.GetFile(mainFileInfo.BigFilePath), 
+				fileInfo: mainFileInfo, 
+				memBlock: levelMemBlock);
 
 			GlobalLoadState.DetailedState = $"Loading VRAM";
 			await TimeController.WaitIfNecessary();
 
-			PS1_VRAM vram = new PS1_VRAM();
-
-			int startXPage = cpaSettings.EngineVersion != EngineVersion.JungleBook_PS1 ? 5 : 8;
-			vram.CurrentXPage = startXPage;
-
-			byte[] vramData = packedFiles[PackedFileType.XTP];
-			int width = Mathf.CeilToInt(vramData.Length / (float)(PS1_VRAM.PageHeight * 2));
-			vram.AddData(vramData, width);
+			// Load the VRAM
+			PS1_VRAM vram = LoadVRAM(cpaSettings, packedFiles[PackedFileType.XTP]);
 
 			GlobalLoadState.DetailedState = $"Loading level";
 			await TimeController.WaitIfNecessary();
 
-			// Add the level data as a memory mapped file. The header references data here.
-			byte[] levelData = packedFiles[PackedFileType.IMG];
-			context.AddMemoryMappedStreamFile(levelDataFileName, levelData, levelMemBlock.address, cpaSettings.GetEndian);
+			// Load the level memory
+			LoadLevelMemory(context, packedFiles[PackedFileType.IMG], levelMemBlock);
 
-			// Add the level header file as a linear file as it doesn't matter where it's allocated in memory. This will parse the level data.
-			byte[] levelHeaderData = packedFiles[PackedFileType.SYS];
-			context.AddStreamFile(levelHeaderFileName, levelHeaderData, cpaSettings.GetEndian);
-			LevelHeader levelHeader = FileFactory.Read<LevelHeader>(context, levelHeaderFileName);
+			// Load the level header
+			LevelHeader levelHeader = LoadLevelHeader(context, packedFiles[PackedFileType.SYS]);
 
 			throw new NotImplementedException();
 		}
@@ -301,6 +290,15 @@ namespace Raymap
 
 			// Return the file data
 			return archive.Files.Select(x => x.GetFileBytes()).Where(x => x != null).ToArray();
+		}
+
+		public async UniTask<Dictionary<PackedFileType, byte[]>> ReadAndCategorizePackedFilesAsync(BinaryDeserializer s, BinaryFile binaryFile, PS1GameInfo.File fileInfo, PS1GameInfo.File.MemoryBlock memBlock)
+		{
+			byte[][] packedFileDatas = await ReadPackedFilesAsync(s, binaryFile, fileInfo, memBlock.main_compressed);
+			PackedFileType[] fileTypes = GetPackedFileTypes(s.GetCPASettings(), fileInfo, memBlock);
+			return packedFileDatas.
+				Select((x, i) => new { Data = x, Type = fileTypes[i] }).
+				ToDictionary(x => x.Type, x => x.Data);
 		}
 
 		public async UniTask<byte[]> ReadDataBlockAsync(BinaryDeserializer s, BinaryFile file, PS1GameInfo.File fileInfo, PS1GameInfo.File.LBA lba)
@@ -353,6 +351,32 @@ namespace Raymap
 			}
 
 			return types.ToArray();
+		}
+
+		public PS1_VRAM LoadVRAM(CPA_Settings settings, byte[] xtp)
+		{
+			PS1_VRAM vram = new PS1_VRAM();
+
+			int startXPage = settings.EngineVersion != EngineVersion.JungleBook_PS1 ? 5 : 8;
+			vram.CurrentXPage = startXPage;
+
+			int width = Mathf.CeilToInt(xtp.Length / (float)(PS1_VRAM.PageHeight * 2));
+			vram.AddData(xtp, width);
+
+			return vram;
+		}
+
+		public void LoadLevelMemory(Context context, byte[] data, PS1GameInfo.File.MemoryBlock memBlock)
+		{
+			// Add the level data as a memory mapped file. The header references data here.
+			context.AddMemoryMappedStreamFile(LevelDataFileName, data, memBlock.address, context.GetCPASettings().GetEndian);
+		}
+
+		public LevelHeader LoadLevelHeader(Context context, byte[] data)
+		{
+			// Add the level header file as a linear file as it doesn't matter where it's allocated in memory. This will parse the level data.
+			context.AddStreamFile(LevelHeaderFileName, data, context.GetCPASettings().GetEndian);
+			return FileFactory.Read<LevelHeader>(context, LevelHeaderFileName);
 		}
 
 		public override async UniTask LoadFilesAsync(Context context)
