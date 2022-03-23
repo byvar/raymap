@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using BinarySerializer.PS1;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1
 {
@@ -35,6 +37,17 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public Pointer AnimationPositionsPointer { get; set; }
 		public Pointer AnimationRotationsPointer { get; set; }
 		public Pointer AnimationScalesPointer { get; set; }
+		
+		public byte UITexturesCount { get; set; }
+		public byte Byte_0159 { get; set; }
+		public ushort Ushort_015A { get; set; }
+		public Pointer UITexturesNamesPointer { get; set; }
+		public Pointer UITexturesWidthsPointer { get; set; }
+		public Pointer UITexturesHeightsPointer { get; set; }
+		public Pointer UITexturesTSBPointer { get; set; }
+		public Pointer UITexturesCBAPointer { get; set; }
+		public Pointer UITexturesXPointer { get; set; }
+		public Pointer UITexturesYPointer { get; set; }
 
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
@@ -48,6 +61,14 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public ANIM_Vector[] AnimationPositions { get; set; }
 		public ANIM_Quaternion[] AnimationRotations { get; set; }
 		public ANIM_Vector[] AnimationScales { get; set; }
+
+		public Pointer<UITextureName>[] UITexturesNames { get; set; }
+		public ushort[] UITexturesWidths { get; set; }
+		public ushort[] UITexturesHeights { get; set; }
+		public PS1_TSB[] UITexturesTSB { get; set; }
+		public PS1_CBA[] UITexturesCBA { get; set; }
+		public byte[] UITexturesX { get; set; }
+		public byte[] UITexturesY { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -109,6 +130,34 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			AnimationRotationsPointer = s.SerializePointer(AnimationRotationsPointer, name: nameof(AnimationRotationsPointer));
 			AnimationScalesPointer = s.SerializePointer(AnimationScalesPointer, name: nameof(AnimationScalesPointer));
 
+			if (settings.EngineVersion == EngineVersion.DonaldDuckQuackAttack_PS1)
+			{
+				// TODO: Implement
+				throw new NotImplementedException();
+			}
+			else if (settings.EngineVersion == EngineVersion.VIP_PS1 || settings.EngineVersion == EngineVersion.JungleBook_PS1)
+			{
+				// TODO: Implement
+				throw new NotImplementedException();
+			}
+			else
+			{
+				UITexturesCount = s.Serialize<byte>(UITexturesCount, name: nameof(UITexturesCount));
+				Byte_0159 = s.Serialize<byte>(Byte_0159, name: nameof(Byte_0159));
+				Ushort_015A = s.Serialize<ushort>(Ushort_015A, name: nameof(Ushort_015A));
+
+				UITexturesNamesPointer = s.SerializePointer(UITexturesNamesPointer, name: nameof(UITexturesNamesPointer));
+				UITexturesWidthsPointer = s.SerializePointer(UITexturesWidthsPointer, name: nameof(UITexturesWidthsPointer));
+				UITexturesHeightsPointer = s.SerializePointer(UITexturesHeightsPointer, name: nameof(UITexturesHeightsPointer));
+				UITexturesTSBPointer = s.SerializePointer(UITexturesTSBPointer, name: nameof(UITexturesTSBPointer));
+				UITexturesCBAPointer = s.SerializePointer(UITexturesCBAPointer, name: nameof(UITexturesCBAPointer));
+				UITexturesXPointer = s.SerializePointer(UITexturesXPointer, name: nameof(UITexturesXPointer));
+				UITexturesYPointer = s.SerializePointer(UITexturesYPointer, name: nameof(UITexturesYPointer));
+
+				// TODO: Serialize remaining data
+
+			}
+
 			// TODO: Serialize remaining data
 
 
@@ -150,6 +199,21 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				AnimationRotations = s.SerializeObjectArray<ANIM_Quaternion>(AnimationRotations, animRotCount, name: nameof(AnimationRotations)));
 			s.DoAt(AnimationScalesPointer, () =>
 				AnimationScales = s.SerializeObjectArray<ANIM_Vector>(AnimationScales, animScaleCount, name: nameof(AnimationScales)));
+
+			s.DoAt(UITexturesNamesPointer, () =>
+				UITexturesNames = s.SerializePointerArray(UITexturesNames, UITexturesCount, resolve: true, name: nameof(UITexturesNames)));
+			s.DoAt(UITexturesWidthsPointer, () =>
+				UITexturesWidths = s.SerializeArray<ushort>(UITexturesWidths, UITexturesCount, name: nameof(UITexturesWidths)));
+			s.DoAt(UITexturesHeightsPointer, () =>
+				UITexturesHeights = s.SerializeArray<ushort>(UITexturesHeights, UITexturesCount, name: nameof(UITexturesHeights)));
+			s.DoAt(UITexturesTSBPointer, () =>
+				UITexturesTSB = s.SerializeObjectArray<PS1_TSB>(UITexturesTSB, UITexturesCount, name: nameof(UITexturesTSB)));
+			s.DoAt(UITexturesCBAPointer, () =>
+				UITexturesCBA = s.SerializeObjectArray<PS1_CBA>(UITexturesCBA, UITexturesCount, name: nameof(UITexturesCBA)));
+			s.DoAt(UITexturesXPointer, () =>
+				UITexturesX = s.SerializeArray<byte>(UITexturesX, UITexturesCount, name: nameof(UITexturesX)));
+			s.DoAt(UITexturesYPointer, () =>
+				UITexturesY = s.SerializeArray<byte>(UITexturesY, UITexturesCount, name: nameof(UITexturesY)));
 		}
 	}
 }
