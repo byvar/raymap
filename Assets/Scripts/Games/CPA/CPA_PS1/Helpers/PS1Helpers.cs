@@ -72,6 +72,38 @@ namespace Raymap
 			}
 		}
 
+		public static Texture2D GetTexture(
+			this PS1_VRAM vram, 
+			int width, int height, 
+			PS1_TSB tsb, PS1_CBA cba, 
+			int x, int y, 
+			bool flipX = false, bool flipY = false)
+		{
+			Texture2D tex = TextureHelpers.CreateTexture2D(width, height, clear: true);
+
+			FillTexture(
+				vram: vram, 
+				tex: tex, 
+				width: width, height: height, 
+				colorFormat: tsb.TP switch
+				{
+					PS1_TSB.TexturePageTP.CLUT_4Bit => PS1_TIM.TIM_ColorFormat.BPP_4,
+					PS1_TSB.TexturePageTP.CLUT_8Bit => PS1_TIM.TIM_ColorFormat.BPP_8,
+					//PS1_TSB.TexturePageTP.Direct_15Bit => ,
+					_ => throw new ArgumentOutOfRangeException()
+				}, 
+				texX: 0, texY: 0, 
+				clutX: cba.ClutX * 16, clutY: cba.ClutY, 
+				texturePageOriginX: 0, texturePageOriginY: 0, 
+				texturePageOffsetX: x, texturePageOffsetY: y, 
+				texturePageX: tsb.TX, texturePageY: tsb.TY, 
+				flipX: flipX, flipY: flipY);
+
+			tex.Apply();
+
+			return tex;
+		}
+
 		public static Texture2D FillMapTexture(this PS1_VRAM vram, PS1_TIM tim, PS1_CEL cel, PS1_BGD map, Texture2D tex = null)
 		{
 			tex ??= TextureHelpers.CreateTexture2D(map.MapWidth * map.CellWidth, map.MapHeight * map.CellHeight, clear: true);

@@ -30,7 +30,8 @@ namespace Raymap
 
 		public override GameAction[] GetGameActions(MapViewerSettings settings) => new GameAction[]
 		{
-			new GameAction("Export Big Files", false, true, (input, output) => ExportBigFiles(settings, output))
+			new GameAction("Export Big Files", false, true, (input, output) => ExportBigFiles(settings, output)),
+			new GameAction("Export UI Textures", false, true, (input, output) => ExportUITextures(settings, output)),
 		};
 
 		public async UniTask ExportBigFiles(MapViewerSettings settings, string outputDir)
@@ -169,6 +170,61 @@ namespace Raymap
 				Debug.Log($"Exported memory block {i + 1}/{memoryBlocks.Length} for {fileInfo.BigFilePath}");
 				await TimeController.WaitIfNecessary();
 			}
+		}
+
+		public async UniTask ExportUITextures(MapViewerSettings settings, string outputDir)
+		{
+			PS1GameInfo gameInfo = GetGameInfo(settings);
+
+			using var context = new MapViewerContext(settings);
+
+			await LoadFilesAsync(context);
+
+			CPA_Settings cpaSettings = context.GetCPASettings();
+			BinaryDeserializer s = context.Deserializer;
+			PS1GameInfo.File mainFileInfo = gameInfo.files.First(x => x.fileID == 0);
+
+			int memBlockIndex = 0;
+
+			foreach (PS1GameInfo.File.MemoryBlock memBlock in mainFileInfo.memoryBlocks)
+			{
+				// Read the packed files
+				Dictionary<PackedFileType, byte[]> packedFiles = await ReadAndCategorizePackedFilesAsync(
+					s: s,
+					binaryFile: s.Context.GetFile(mainFileInfo.BigFilePath),
+					fileInfo: mainFileInfo,
+					memBlock: memBlock);
+
+				PS1_VRAM vram = LoadVRAM(cpaSettings, packedFiles[PackedFileType.XTP]);
+
+				// Load the level memory
+				LoadLevelMemory(context, packedFiles[PackedFileType.IMG], memBlock);
+
+				// Load the level header
+				LevelHeader levelHeader = LoadLevelHeader(context, packedFiles[PackedFileType.SYS]);
+
+				for (int i = 0; i < levelHeader.UITexturesCount; i++)
+				{
+					string name = levelHeader.UITexturesNames[i].Value.Name;
+					int width = levelHeader.UITexturesWidths[i];
+					int height = levelHeader.UITexturesHeights[i];
+					PS1_TSB tsb = levelHeader.UITexturesTSB[i];
+					PS1_CBA cba = levelHeader.UITexturesCBA[i];
+					byte x = levelHeader.UITexturesX[i];
+					byte y = levelHeader.UITexturesY[i];
+
+					Texture2D tex = vram.GetTexture(width, height, tsb, cba, x, y);
+
+					tex.Export(Path.Combine(outputDir, gameInfo.maps[memBlockIndex], name));
+				}
+
+				context.RemoveFile(LevelHeaderFileName);
+				context.RemoveFile(LevelDataFileName);
+
+				memBlockIndex++;
+			}
+
+			Debug.Log("Finished exporting textures");
 		}
 
 		// TODO: Refactor to use BinarySerializer
