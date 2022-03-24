@@ -7,7 +7,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 	public class LevelHeader : BinarySerializable
 	{
 		public byte[] UnknownBytes1 { get; set; }
-		public uint GeometricObjectsDynamicCount_Cine { get; set; }
+		public uint DynamicGeometricObjectsCount_Cine { get; set; }
 		public byte[] UnknownBytes2 { get; set; }
 		public Pointer DynamicWorldPointer { get; set; }
 		public Pointer FatherSectorPointer { get; set; }
@@ -49,6 +49,19 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public Pointer UITexturesXPointer { get; set; }
 		public Pointer UITexturesYPointer { get; set; }
 
+		public Pointer Pointer_0178 { get; set; }
+		public int Int_017C { get; set; }
+
+		public Pointer DynamicGeometricObjectsPointer { get; set; }
+		public Pointer StaticGeometricObjectsPointer { get; set; }
+		public uint DynamicGeometricObjectsCount { get; set; }
+
+		public ushort Ushort_018C { get; set; }
+		public ushort Ushort_018E { get; set; }
+		public short Short_0190 { get; set; }
+		public ushort Ushort_0192 { get; set; }
+		public uint IpoCollisionCount { get; set; }
+
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
 		public HIE_SuperObject FatherSector { get; set; }
@@ -69,6 +82,9 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public PS1_CBA[] UITexturesCBA { get; set; }
 		public byte[] UITexturesX { get; set; }
 		public byte[] UITexturesY { get; set; }
+
+		public PO_ObjectsTable DynamicGeometricObjects { get; set; }
+		public PO_ObjectsTable StaticGeometricObjects { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -93,7 +109,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			else
 			{
 				UnknownBytes1 = s.SerializeArray<byte>(UnknownBytes1, 0xCC, name: nameof(UnknownBytes1));
-				GeometricObjectsDynamicCount_Cine = s.Serialize<uint>(GeometricObjectsDynamicCount_Cine, name: nameof(GeometricObjectsDynamicCount_Cine));
+				DynamicGeometricObjectsCount_Cine = s.Serialize<uint>(DynamicGeometricObjectsCount_Cine, name: nameof(DynamicGeometricObjectsCount_Cine));
 				UnknownBytes2 = s.SerializeArray<byte>(UnknownBytes2, 0x20, name: nameof(UnknownBytes2));
 			}
 
@@ -154,8 +170,27 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				UITexturesXPointer = s.SerializePointer(UITexturesXPointer, name: nameof(UITexturesXPointer));
 				UITexturesYPointer = s.SerializePointer(UITexturesYPointer, name: nameof(UITexturesYPointer));
 
-				// TODO: Serialize remaining data
+				Pointer_0178 = s.SerializePointer(Pointer_0178, name: nameof(Pointer_0178));
+				Int_017C = s.Serialize<int>(Int_017C, name: nameof(Int_017C));
 
+				DynamicGeometricObjectsPointer = s.SerializePointer(DynamicGeometricObjectsPointer, name: nameof(DynamicGeometricObjectsPointer));
+				StaticGeometricObjectsPointer = s.SerializePointer(StaticGeometricObjectsPointer, name: nameof(StaticGeometricObjectsPointer));
+				DynamicGeometricObjectsCount = s.Serialize<uint>(DynamicGeometricObjectsCount, name: nameof(DynamicGeometricObjectsCount));
+			}
+
+			if (settings.EngineVersion != EngineVersion.VIP_PS1)
+			{
+				Ushort_018C = s.Serialize<ushort>(Ushort_018C, name: nameof(Ushort_018C));
+				Ushort_018E = s.Serialize<ushort>(Ushort_018E, name: nameof(Ushort_018E));
+				Short_0190 = s.Serialize<short>(Short_0190, name: nameof(Short_0190));
+				Ushort_0192 = s.Serialize<ushort>(Ushort_0192, name: nameof(Ushort_0192));
+				IpoCollisionCount = s.Serialize<uint>(IpoCollisionCount, name: nameof(IpoCollisionCount));
+				// TODO: Serialize remaining data
+			}
+			else
+			{
+				// TODO: Implement
+				throw new NotImplementedException();
 			}
 
 			// TODO: Serialize remaining data
@@ -214,6 +249,14 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				UITexturesX = s.SerializeArray<byte>(UITexturesX, UITexturesCount, name: nameof(UITexturesX)));
 			s.DoAt(UITexturesYPointer, () =>
 				UITexturesY = s.SerializeArray<byte>(UITexturesY, UITexturesCount, name: nameof(UITexturesY)));
+
+			uint dynamicGeoCount = DynamicGeometricObjectsCount - 2 + DynamicGeometricObjectsCount_Cine;
+			uint? staticGeoCount = settings.EngineVersion == EngineVersion.Rayman2_PS1 ? IpoCollisionCount : (uint?)null;
+
+			s.DoAt(DynamicGeometricObjectsPointer, () =>
+				DynamicGeometricObjects = s.SerializeObject<PO_ObjectsTable>(DynamicGeometricObjects, x => x.Pre_Length = dynamicGeoCount, name: nameof(DynamicGeometricObjects)));
+			s.DoAt(StaticGeometricObjectsPointer, () =>
+				StaticGeometricObjects = s.SerializeObject<PO_ObjectsTable>(StaticGeometricObjects, x => x.Pre_Length = staticGeoCount, name: nameof(StaticGeometricObjects)));
 		}
 	}
 }
