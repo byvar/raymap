@@ -10,6 +10,7 @@ using BinarySerializer.Unity;
 using Cysharp.Threading.Tasks;
 using OpenSpace.PS1;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using LevelHeader = BinarySerializer.Ubisoft.CPA.PS1.LevelHeader;
 using Reader = BinarySerializer.Reader;
 using Util = BinarySerializer.Unity.Util;
@@ -316,8 +317,13 @@ namespace Raymap
 			// Load the level memory
 			LoadLevelMemory(context, packedFiles[PackedFileType.IMG], levelMemBlock);
 
+			var sw = System.Diagnostics.Stopwatch.StartNew();
+
 			// Load the level header
 			LevelHeader levelHeader = LoadLevelHeader(context, packedFiles[PackedFileType.SYS]);
+
+			sw.Stop();
+			Debug.Log($"Loaded level header in {sw.ElapsedMilliseconds} ms");
 
 			throw new NotImplementedException();
 		}
