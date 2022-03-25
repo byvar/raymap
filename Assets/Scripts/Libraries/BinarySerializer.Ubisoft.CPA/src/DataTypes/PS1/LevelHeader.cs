@@ -61,6 +61,12 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public short Short_0190 { get; set; }
 		public ushort Ushort_0192 { get; set; }
 		public uint IpoCollisionCount { get; set; }
+		public Pointer IpoCollisionPointer { get; set; }
+		public uint MeshCollisionCount { get; set; }
+		public uint MeshCollisionPointer { get; set; }
+		public Pointer SectorsPointer { get; set; }
+		public ushort SectorsCount { get; set; }
+		public ushort Ushort_01AA { get; set; }
 
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
@@ -85,6 +91,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 		public PO_ObjectsTable DynamicGeometricObjects { get; set; }
 		public PO_ObjectsTable StaticGeometricObjects { get; set; }
+		public COL_GeometricObjectCollide[] IpoCollision { get; set; }
+		public SECT_Sector[] Sectors { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -184,13 +192,27 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				Ushort_018E = s.Serialize<ushort>(Ushort_018E, name: nameof(Ushort_018E));
 				Short_0190 = s.Serialize<short>(Short_0190, name: nameof(Short_0190));
 				Ushort_0192 = s.Serialize<ushort>(Ushort_0192, name: nameof(Ushort_0192));
+
 				IpoCollisionCount = s.Serialize<uint>(IpoCollisionCount, name: nameof(IpoCollisionCount));
-				// TODO: Serialize remaining data
+				IpoCollisionPointer = s.SerializePointer(IpoCollisionPointer, name: nameof(IpoCollisionPointer));
+				MeshCollisionCount = s.Serialize<uint>(MeshCollisionCount, name: nameof(MeshCollisionCount));
+				MeshCollisionPointer = s.Serialize<uint>(MeshCollisionPointer, name: nameof(MeshCollisionPointer));
 			}
 			else
 			{
 				// TODO: Implement
 				throw new NotImplementedException();
+			}
+
+			SectorsPointer = s.SerializePointer(SectorsPointer, name: nameof(SectorsPointer));
+			SectorsCount = s.Serialize<ushort>(SectorsCount, name: nameof(SectorsCount));
+			Ushort_01AA = s.Serialize<ushort>(Ushort_01AA, name: nameof(Ushort_01AA));
+
+			if (settings.EngineVersion != EngineVersion.DonaldDuckQuackAttack_PS1)
+			{
+
+
+				// TODO: Serialize remaining data
 			}
 
 			// TODO: Serialize remaining data
@@ -257,6 +279,12 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				DynamicGeometricObjects = s.SerializeObject<PO_ObjectsTable>(DynamicGeometricObjects, x => x.Pre_Length = dynamicGeoCount, name: nameof(DynamicGeometricObjects)));
 			s.DoAt(StaticGeometricObjectsPointer, () =>
 				StaticGeometricObjects = s.SerializeObject<PO_ObjectsTable>(StaticGeometricObjects, x => x.Pre_Length = staticGeoCount, name: nameof(StaticGeometricObjects)));
+
+			s.DoAt(IpoCollisionPointer, () => 
+				IpoCollision = s.SerializeObjectArray<COL_GeometricObjectCollide>(IpoCollision, IpoCollisionCount, name: nameof(IpoCollision)));
+
+			s.DoAt(SectorsPointer, () => 
+				Sectors = s.SerializeObjectArray<SECT_Sector>(Sectors, SectorsCount, name: nameof(Sectors)));
 		}
 	}
 }
