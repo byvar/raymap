@@ -1,0 +1,27 @@
+﻿namespace BinarySerializer.Ubisoft.CPA.PS1
+{
+	public class GMT_GameMaterial : BinarySerializable
+	{
+		public ushort Ushort_00 { get; set; }
+		public ushort Ushort_02 { get; set; }
+		public Pointer CollideMaterialPointer { get; set; }
+		public int Int_08 { get; set; }
+		public uint Uint_0C { get; set; }
+
+		// Serialized from pointers
+		public GMT_CollideMaterial CollideMaterial { get; set; }
+
+		public override void SerializeImpl(SerializerObject s)
+		{
+			Ushort_00 = s.Serialize<ushort>(Ushort_00, name: nameof(Ushort_00));
+			Ushort_02 = s.Serialize<ushort>(Ushort_02, name: nameof(Ushort_02));
+			CollideMaterialPointer = s.SerializePointer(CollideMaterialPointer, name: nameof(CollideMaterialPointer));
+			Int_08 = s.Serialize<int>(Int_08, name: nameof(Int_08));
+			Uint_0C = s.Serialize<uint>(Uint_0C, name: nameof(Uint_0C));
+
+			// Serialize data from pointers
+			s.DoAt(CollideMaterialPointer, () => 
+				CollideMaterial = s.SerializeObject<GMT_CollideMaterial>(CollideMaterial, name: nameof(CollideMaterial)));
+		}
+	}
+}

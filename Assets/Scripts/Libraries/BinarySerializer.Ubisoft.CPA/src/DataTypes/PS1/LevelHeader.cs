@@ -78,6 +78,12 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public Pointer Rush_Pointer_0114 { get; set; }
 		public ushort Rush_Ushort_0118 { get; set; }
 		public ushort Rush_Ushort_011A { get; set; }
+		public Pointer GameMaterialsPointer { get; set; }
+		public uint GameMaterialsCount { get; set; }
+		public uint Uint_1CC { get; set; }
+		public ushort Ushort_1D0 { get; set; }
+		public ushort Ushort_1D2 { get; set; }
+		public Pointer Pointer_01D4 { get; set; }
 
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
@@ -106,6 +112,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public SECT_Sector[] Sectors { get; set; }
 		public CAM_CameraModifierVolume[] CameraModifierVolumes { get; set; }
 		public CAM_CameraModifier[] CameraModifiers { get; set; }
+		public GMT_GameMaterial[] GameMaterials { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -247,6 +254,13 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				}
 			}
 
+			GameMaterialsPointer = s.SerializePointer(GameMaterialsPointer, name: nameof(GameMaterialsPointer));
+			GameMaterialsCount = s.Serialize<uint>(GameMaterialsCount, name: nameof(GameMaterialsCount));
+			Uint_1CC = s.Serialize<uint>(Uint_1CC, name: nameof(Uint_1CC));
+			Ushort_1D0 = s.Serialize<ushort>(Ushort_1D0, name: nameof(Ushort_1D0));
+			Ushort_1D2 = s.Serialize<ushort>(Ushort_1D2, name: nameof(Ushort_1D2));
+			Pointer_01D4 = s.SerializePointer(Pointer_01D4, name: nameof(Pointer_01D4));
+
 			// TODO: Serialize remaining data
 
 
@@ -322,6 +336,9 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				CameraModifierVolumes = s.SerializeObjectArray<CAM_CameraModifierVolume>(CameraModifierVolumes, CameraModifiersCount, name: nameof(CameraModifierVolumes)));
 			s.DoAt(CameraModifiersPointer, () =>
 				CameraModifiers = s.SerializeObjectArray<CAM_CameraModifier>(CameraModifiers, CameraModifiersCount, name: nameof(CameraModifiers)));
+
+			s.DoAt(GameMaterialsPointer, () => 
+				GameMaterials = s.SerializeObjectArray<GMT_GameMaterial>(GameMaterials, GameMaterialsCount, name: nameof(GameMaterials)));
 		}
 	}
 }
