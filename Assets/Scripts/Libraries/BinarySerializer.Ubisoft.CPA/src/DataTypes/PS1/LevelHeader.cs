@@ -304,7 +304,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			s.DoAt(UITexturesYPointer, () =>
 				UITexturesY = s.SerializeArray<byte>(UITexturesY, UITexturesCount, name: nameof(UITexturesY)));
 
-			uint dynamicGeoCount = DynamicGeometricObjectsCount - 2 + DynamicGeometricObjectsCount_Cine;
+			uint dynamicGeoCount = DynamicGeometricObjectsCount - 2;
 			uint? staticGeoCount = settings.EngineVersion == EngineVersion.Rayman2_PS1 ? IpoCollisionCount : (uint?)null;
 
 			s.DoAt(DynamicGeometricObjectsPointer, () =>
