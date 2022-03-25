@@ -38,6 +38,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public Pointer AnimationRotationsPointer { get; set; }
 		public Pointer AnimationScalesPointer { get; set; }
 		
+		// UI textures
 		public byte UITexturesCount { get; set; }
 		public byte Byte_0159 { get; set; }
 		public ushort Ushort_015A { get; set; }
@@ -51,11 +52,9 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 		public Pointer Pointer_0178 { get; set; }
 		public int Int_017C { get; set; }
-
 		public Pointer DynamicGeometricObjectsPointer { get; set; }
 		public Pointer StaticGeometricObjectsPointer { get; set; }
 		public uint DynamicGeometricObjectsCount { get; set; }
-
 		public ushort Ushort_018C { get; set; }
 		public ushort Ushort_018E { get; set; }
 		public short Short_0190 { get; set; }
@@ -85,6 +84,20 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public ushort Ushort_1D2 { get; set; }
 		public Pointer Pointer_01D4 { get; set; }
 
+		// AGO textures
+		public uint AGOTexturesCount { get; set; }
+		public Pointer AGOTexturesTSBPointer { get; set; }
+		public Pointer AGOTexturesCBAPointer { get; set; }
+		public Pointer AGOTexturesXPointer { get; set; }
+		public Pointer AGOTexturesYPointer { get; set; }
+		public Pointer AGOTexturesAbsoluteXPointer { get; set; }
+		public Pointer AGOTexturesAbsoluteYPointer { get; set; }
+		public uint Uint_01F4 { get; set; }
+		public uint Uint_01F8 { get; set; }
+		public uint Uint_01FC { get; set; }
+		public Pointer Rush_AGOTexturesWidthsPointer { get; set; }
+		public Pointer Rush_AGOTexturesHeightsPointer { get; set; }
+
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
 		public HIE_SuperObject FatherSector { get; set; }
@@ -98,6 +111,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public ANIM_Quaternion[] AnimationRotations { get; set; }
 		public ANIM_Vector[] AnimationScales { get; set; }
 
+		// UI textures
 		public Pointer<UITextureName>[] UITexturesNames { get; set; }
 		public ushort[] UITexturesWidths { get; set; }
 		public ushort[] UITexturesHeights { get; set; }
@@ -113,6 +127,16 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public CAM_CameraModifierVolume[] CameraModifierVolumes { get; set; }
 		public CAM_CameraModifier[] CameraModifiers { get; set; }
 		public GMT_GameMaterial[] GameMaterials { get; set; }
+
+		// AGO textures
+		public PS1_TSB[] AGOTexturesTSB { get; set; }
+		public PS1_CBA[] AGOTexturesCBA { get; set; }
+		public byte[] AGOTexturesX { get; set; }
+		public byte[] AGOTexturesY { get; set; }
+		public ushort[] AGOTexturesAbsoluteX { get; set; }
+		public ushort[] AGOTexturesAbsoluteY { get; set; }
+		public ushort[] Rush_AGOTexturesWidths { get; set; }
+		public ushort[] Rush_AGOTexturesHeights { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -261,8 +285,25 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			Ushort_1D2 = s.Serialize<ushort>(Ushort_1D2, name: nameof(Ushort_1D2));
 			Pointer_01D4 = s.SerializePointer(Pointer_01D4, name: nameof(Pointer_01D4));
 
-			// TODO: Serialize remaining data
+			AGOTexturesCount = s.Serialize<uint>(AGOTexturesCount, name: nameof(AGOTexturesCount));
+			AGOTexturesTSBPointer = s.SerializePointer(AGOTexturesTSBPointer, name: nameof(AGOTexturesTSBPointer));
+			AGOTexturesCBAPointer = s.SerializePointer(AGOTexturesCBAPointer, name: nameof(AGOTexturesCBAPointer));
+			AGOTexturesXPointer = s.SerializePointer(AGOTexturesXPointer, name: nameof(AGOTexturesXPointer));
+			AGOTexturesYPointer = s.SerializePointer(AGOTexturesYPointer, name: nameof(AGOTexturesYPointer));
+			AGOTexturesAbsoluteXPointer = s.SerializePointer(AGOTexturesAbsoluteXPointer, name: nameof(AGOTexturesAbsoluteXPointer));
+			AGOTexturesAbsoluteYPointer = s.SerializePointer(AGOTexturesAbsoluteYPointer, name: nameof(AGOTexturesAbsoluteYPointer));
 
+			if (settings.EngineVersion == EngineVersion.RaymanRush_PS1)
+			{
+				Rush_AGOTexturesWidthsPointer = s.SerializePointer(Rush_AGOTexturesWidthsPointer, name: nameof(Rush_AGOTexturesWidthsPointer));
+				Rush_AGOTexturesHeightsPointer = s.SerializePointer(Rush_AGOTexturesHeightsPointer, name: nameof(Rush_AGOTexturesHeightsPointer));
+			}
+			else if (settings.EngineVersion == EngineVersion.Rayman2_PS1)
+			{
+				Uint_01F4 = s.Serialize<uint>(Uint_01F4, name: nameof(Uint_01F4));
+				Uint_01F8 = s.Serialize<uint>(Uint_01F8, name: nameof(Uint_01F8));
+				Uint_01FC = s.Serialize<uint>(Uint_01FC, name: nameof(Uint_01FC));
+			}
 
 			// Serialize data from pointers
 			s.DoAt(DynamicWorldPointer, () => 
@@ -339,6 +380,23 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 			s.DoAt(GameMaterialsPointer, () => 
 				GameMaterials = s.SerializeObjectArray<GMT_GameMaterial>(GameMaterials, GameMaterialsCount, name: nameof(GameMaterials)));
+
+			s.DoAt(AGOTexturesTSBPointer, () =>
+				AGOTexturesTSB = s.SerializeObjectArray<PS1_TSB>(AGOTexturesTSB, AGOTexturesCount, name: nameof(AGOTexturesTSB)));
+			s.DoAt(AGOTexturesCBAPointer, () =>
+				AGOTexturesCBA = s.SerializeObjectArray<PS1_CBA>(AGOTexturesCBA, AGOTexturesCount, name: nameof(AGOTexturesCBA)));
+			s.DoAt(AGOTexturesXPointer, () =>
+				AGOTexturesX = s.SerializeArray<byte>(AGOTexturesX, AGOTexturesCount, name: nameof(AGOTexturesX)));
+			s.DoAt(AGOTexturesYPointer, () =>
+				AGOTexturesY = s.SerializeArray<byte>(AGOTexturesY, AGOTexturesCount, name: nameof(AGOTexturesY)));
+			s.DoAt(AGOTexturesAbsoluteXPointer, () =>
+				AGOTexturesAbsoluteX = s.SerializeArray<ushort>(AGOTexturesAbsoluteX, AGOTexturesCount, name: nameof(AGOTexturesAbsoluteX)));
+			s.DoAt(AGOTexturesAbsoluteYPointer, () =>
+				AGOTexturesAbsoluteY = s.SerializeArray<ushort>(AGOTexturesAbsoluteY, AGOTexturesCount, name: nameof(AGOTexturesAbsoluteY)));
+			s.DoAt(Rush_AGOTexturesWidthsPointer, () =>
+				Rush_AGOTexturesWidths = s.SerializeArray<ushort>(Rush_AGOTexturesWidths, AGOTexturesCount, name: nameof(Rush_AGOTexturesWidths)));
+			s.DoAt(Rush_AGOTexturesHeightsPointer, () =>
+				Rush_AGOTexturesHeights = s.SerializeArray<ushort>(Rush_AGOTexturesHeights, AGOTexturesCount, name: nameof(Rush_AGOTexturesHeights)));
 		}
 	}
 }

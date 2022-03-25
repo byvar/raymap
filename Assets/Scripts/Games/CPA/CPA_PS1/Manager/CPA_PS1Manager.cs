@@ -32,7 +32,7 @@ namespace Raymap
 		public override GameAction[] GetGameActions(MapViewerSettings settings) => new GameAction[]
 		{
 			new GameAction("Export Big Files", false, true, (input, output) => ExportBigFiles(settings, output)),
-			new GameAction("Export UI Textures", false, true, (input, output) => ExportUITextures(settings, output)),
+			new GameAction("Export UI/AGO Textures", false, true, (input, output) => ExportUIAndAGOTextures(settings, output)),
 		};
 
 		public async UniTask ExportBigFiles(MapViewerSettings settings, string outputDir)
@@ -173,7 +173,7 @@ namespace Raymap
 			}
 		}
 
-		public async UniTask ExportUITextures(MapViewerSettings settings, string outputDir)
+		public async UniTask ExportUIAndAGOTextures(MapViewerSettings settings, string outputDir)
 		{
 			PS1GameInfo gameInfo = GetGameInfo(settings);
 
@@ -204,6 +204,9 @@ namespace Raymap
 				// Load the level header
 				LevelHeader levelHeader = LoadLevelHeader(context, packedFiles[PackedFileType.SYS]);
 
+				string levelName = gameInfo.maps[memBlockIndex];
+
+				// Export UI textures
 				for (int i = 0; i < levelHeader.UITexturesCount; i++)
 				{
 					string name = levelHeader.UITexturesNames[i].Value.Name;
@@ -216,7 +219,59 @@ namespace Raymap
 
 					Texture2D tex = vram.GetTexture(width, height, tsb, cba, x, y);
 
-					tex.Export(Path.Combine(outputDir, gameInfo.maps[memBlockIndex], name));
+					tex.Export(Path.Combine(outputDir, "UI", levelName, name));
+				}
+
+				// Export AGO textures
+				for (int i = 0; i < levelHeader.AGOTexturesCount; i++)
+				{
+					int width = levelHeader.Rush_AGOTexturesWidths?[i] ?? -1;
+					int height = levelHeader.Rush_AGOTexturesHeights?[i] ?? -1;
+					PS1_TSB tsb = levelHeader.AGOTexturesTSB[i];
+					PS1_CBA cba = levelHeader.AGOTexturesCBA[i];
+					byte x = levelHeader.AGOTexturesX[i];
+					byte y = levelHeader.AGOTexturesY[i];
+
+					if (width != -1 && height != -1)
+					{
+						Texture2D tex = vram.GetTexture(width, height, tsb, cba, x, y);
+						tex.Export(Path.Combine(outputDir, "AGO", levelName, $"{i}"));
+					}
+					else
+					{
+						int pageW = tsb.TP switch
+						{
+							PS1_TSB.TexturePageTP.CLUT_8Bit => 128,
+							PS1_TSB.TexturePageTP.CLUT_4Bit => 256,
+							_ => 64
+						};
+
+						int maxW = pageW - x;
+						int maxH = 256 - y;
+
+						for (int xx = 0; xx < 5; xx++) 
+						{
+							ushort w = (ushort)(0x10 << xx);
+
+							if (w > maxW) 
+								continue;
+
+							for (int yy = 0; yy < 5; yy++) 
+							{
+								ushort h = (ushort)(0x10 << yy);
+
+								if (h > maxH) 
+									continue;
+
+								try
+								{
+									Texture2D tex = vram.GetTexture(w, h, tsb, cba, x, y);
+									tex.Export(Path.Combine(outputDir, "AGO", levelName, $"{i}_{w}x{h}"));
+								} 
+								catch { }
+							}
+						}
+					}
 				}
 
 				context.RemoveFile(LevelHeaderFileName);
