@@ -67,6 +67,17 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public Pointer SectorsPointer { get; set; }
 		public ushort SectorsCount { get; set; }
 		public ushort Ushort_01AA { get; set; }
+		public uint CameraModifiersCount { get; set; }
+		public uint Uint_01B0 { get; set; }
+		public uint Uint_01B4 { get; set; }
+		public uint Uint_01B8 { get; set; }
+		public uint VIP_Uint_01BC { get; set; }
+		public uint VIP_Uint_01C0 { get; set; }
+		public Pointer CameraModifiersVolumesPointer { get; set; }
+		public Pointer CameraModifiersPointer { get; set; }
+		public Pointer Rush_Pointer_0114 { get; set; }
+		public ushort Rush_Ushort_0118 { get; set; }
+		public ushort Rush_Ushort_011A { get; set; }
 
 		// Serialized from pointers
 		public HIE_SuperObject DynamicWorld { get; set; }
@@ -93,6 +104,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public PO_ObjectsTable StaticGeometricObjects { get; set; }
 		public COL_GeometricObjectCollide[] IpoCollision { get; set; }
 		public SECT_Sector[] Sectors { get; set; }
+		public CAM_CameraModifierVolume[] CameraModifierVolumes { get; set; }
+		public CAM_CameraModifier[] CameraModifiers { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -210,9 +223,28 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 			if (settings.EngineVersion != EngineVersion.DonaldDuckQuackAttack_PS1)
 			{
+				CameraModifiersCount = s.Serialize<uint>(CameraModifiersCount, name: nameof(CameraModifiersCount));
+				Uint_01B0 = s.Serialize<uint>(Uint_01B0, name: nameof(Uint_01B0));
+				Uint_01B4 = s.Serialize<uint>(Uint_01B4, name: nameof(Uint_01B4));
+				Uint_01B8 = s.Serialize<uint>(Uint_01B8, name: nameof(Uint_01B8));
 
+				if (settings.EngineVersion != EngineVersion.VIP_PS1)
+				{
+					CameraModifiersVolumesPointer = s.SerializePointer(CameraModifiersVolumesPointer, name: nameof(CameraModifiersVolumesPointer));
+					CameraModifiersPointer = s.SerializePointer(CameraModifiersPointer, name: nameof(CameraModifiersPointer));
+				}
+				else
+				{
+					VIP_Uint_01BC = s.Serialize<uint>(VIP_Uint_01BC, name: nameof(VIP_Uint_01BC));
+					VIP_Uint_01C0 = s.Serialize<uint>(VIP_Uint_01C0, name: nameof(VIP_Uint_01C0));
+				}
 
-				// TODO: Serialize remaining data
+				if (settings.EngineVersion == EngineVersion.RaymanRush_PS1)
+				{
+					Rush_Pointer_0114 = s.SerializePointer(Rush_Pointer_0114, name: nameof(Rush_Pointer_0114));
+					Rush_Ushort_0118 = s.Serialize<ushort>(Rush_Ushort_0118, name: nameof(Rush_Ushort_0118));
+					Rush_Ushort_011A = s.Serialize<ushort>(Rush_Ushort_011A, name: nameof(Rush_Ushort_011A));
+				}
 			}
 
 			// TODO: Serialize remaining data
@@ -285,6 +317,11 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 			s.DoAt(SectorsPointer, () => 
 				Sectors = s.SerializeObjectArray<SECT_Sector>(Sectors, SectorsCount, name: nameof(Sectors)));
+
+			s.DoAt(CameraModifiersVolumesPointer, () => 
+				CameraModifierVolumes = s.SerializeObjectArray<CAM_CameraModifierVolume>(CameraModifierVolumes, CameraModifiersCount, name: nameof(CameraModifierVolumes)));
+			s.DoAt(CameraModifiersPointer, () =>
+				CameraModifiers = s.SerializeObjectArray<CAM_CameraModifier>(CameraModifiers, CameraModifiersCount, name: nameof(CameraModifiers)));
 		}
 	}
 }
