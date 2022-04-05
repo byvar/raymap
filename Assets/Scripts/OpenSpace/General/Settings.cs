@@ -853,6 +853,7 @@ namespace OpenSpace {
 			aiTypes = AITypes.Revolution,
 			//textureAnimationSpeedModifier = 2f,
 			hasExtraInputData = false,
+			levelTranslation = LevelTranslation.levelTranslation_r2,
 			hasObjectTypes = false,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.None }
