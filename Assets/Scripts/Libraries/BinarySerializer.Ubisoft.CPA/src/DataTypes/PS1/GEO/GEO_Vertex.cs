@@ -6,7 +6,7 @@
 		public short Y { get; set; }
 		public short Z { get; set; }
 		public ushort Ushort_06 { get; set; }
-		public RGB777Color Color { get; set; }
+		public RGB888Color Color { get; set; } // Range is 0-2
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -14,7 +14,7 @@
 			Y = s.Serialize<short>(Y, name: nameof(Y));
 			Z = s.Serialize<short>(Z, name: nameof(Z));
 			Ushort_06 = s.Serialize<ushort>(Ushort_06, name: nameof(Ushort_06));
-			Color = s.SerializeObject<RGB777Color>(Color, name: nameof(Color));
+			Color = s.SerializeObject<RGB888Color>(Color, name: nameof(Color));
 			s.SerializePadding(1, logIfNotNull: true);
 		}
 	}
