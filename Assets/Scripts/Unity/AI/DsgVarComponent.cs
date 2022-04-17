@@ -37,7 +37,21 @@ public class DsgVarComponent : MonoBehaviour {
                 return "null";
             }
         }
-        public bool IsArray {
+		public string SaveType {
+			get {
+				if (entry != null) return (entry.saveType == 0 ? "" : entry.saveType.ToString());
+				//if (entryROM != null) return entryROM.NiceVariableName;
+				return "null";
+			}
+		}
+		public string InitType {
+			get {
+				if (entry != null) return (entry.initType == 4 ? "" : entry.initType.ToString());
+				//if (entryROM != null) return entryROM.ini;
+				return "null";
+			}
+		}
+		public bool IsArray {
             get {
                 return DsgVarInfoEntry.GetDsgVarTypeFromArrayType(Type) != DsgVarType.None;
             }

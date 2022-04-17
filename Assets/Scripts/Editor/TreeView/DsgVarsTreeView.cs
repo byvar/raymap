@@ -79,7 +79,9 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 		Name,
 		CurrentValue,
 		InitialValue,
-		ModelValue
+		ModelValue,
+		SaveType,
+		InitType
 	}
 
 	public static void TreeToList (TreeViewItem root, IList<TreeViewItem> result)
@@ -210,6 +212,12 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 			case Columns.ModelValue:
 				DsgVarComponentEditor.DrawDsgVarModel(cellRect, item.data.entry, item.data.arrayIndex);
 				break;
+			case Columns.SaveType:
+				GUI.Label(cellRect, new GUIContent(item.data.entry.SaveType), EditorStyles.miniLabel);
+				break;
+			case Columns.InitType:
+				GUI.Label(cellRect, new GUIContent(item.data.entry.InitType), EditorStyles.miniLabel);
+				break;
 		}
 	}
 
@@ -290,6 +298,28 @@ public class DsgVarsTreeView : TreeViewWithTreeModel<DsgVarsTreeElement>
 				canSort = false,
 				width = 100,
 				minWidth = 100,
+				autoResize = true,
+				allowToggleVisibility = false
+			},
+			new MultiColumnHeaderState.Column
+			{
+				headerContent = new GUIContent("SaveType", ""),
+				headerTextAlignment = TextAlignment.Left,
+				canSort = false,
+				width = 60,
+				minWidth = 40,
+				maxWidth = 120,
+				autoResize = true,
+				allowToggleVisibility = false
+			},
+			new MultiColumnHeaderState.Column
+			{
+				headerContent = new GUIContent("InitType", ""),
+				headerTextAlignment = TextAlignment.Left,
+				canSort = false,
+				width = 60,
+				minWidth = 40,
+				maxWidth = 120,
 				autoResize = true,
 				allowToggleVisibility = false
 			},
