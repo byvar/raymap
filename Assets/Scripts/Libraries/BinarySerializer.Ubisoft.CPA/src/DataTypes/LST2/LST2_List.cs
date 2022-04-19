@@ -1,124 +1,83 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Type = BinarySerializer.Ubisoft.CPA.CPA_LinkedList.Type;
-using Flags = BinarySerializer.Ubisoft.CPA.CPA_LinkedList.Flags;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public static class CPA_LinkedList {
-        public enum Type { Default = -1, Single, Double, SingleNoElementPointers, DoubleNoElementPointers, Minimize };
+	public class LST2_List<T> : BinarySerializable, IList<T> where T : BinarySerializable, LST2_IEntry<T>, new() {
+		#region Constructors
 
-        [Flags]
-        public enum Flags {
-            None = 0,
-            HasHeaderPointers = 1,
-            ReadAtPointer = 2, // The list contains a pointer which points to the struct location
-            ElementPointerFirst = 4, // Order: element pointer, next pointer, prev pointer
-            NoPreviousPointersForDouble = 8 // Even with double linked list type, there is no prev pointer here
-        };
+		public LST2_List() { }
 
-    }
+		public LST2_List(LST2_ListType type) {
+			Type = type;
+		}
 
-    public class CPA_LinkedList<T> : BinarySerializable, IList<T> 
-    {
-	    #region Constructors
+		public LST2_List(Context context, Pointer<T> head, Pointer<T> tail, uint elementsCount, LST2_ListType type) {
+			Context = context;
+			Head = head;
+			Tail = tail;
+			ElementsCount = elementsCount;
+			list = new T[elementsCount];
 
-	    public CPA_LinkedList() { }
+			Type = type;
+		}
 
-	    public CPA_LinkedList(Type type = Type.Default, Flags flags = Flags.None)
-	    {
-		    Type = type;
-		    Flags = flags;
-	    }
-
-		public CPA_LinkedList(Context context, Pointer head, Pointer tail, uint elementsCount, Type type = Type.Default)
-	    {
-		    Context = context;
-		    Head = head;
-		    Tail = tail;
-		    ElementsCount = elementsCount;
-		    list = new T[elementsCount];
-
-		    if (type == Type.Default)
-		    {
-			    type = Context.GetCPASettings().LinkedListType;
-
-			    if (type == Type.Minimize)
-				    type = Type.Single;
-		    }
-		    else if (type == Type.Minimize)
-		    {
-			    /* Minimize works as follows. A linkedlist with type minimize is a default one,
-                but if the default type is also Minimize (RA GC, R2 DC) then it is a SingleNoElementPointers list (i.e. optimized to an array).
-                If the list itself does not specify the minimize type, it is read as a default one,
-                but if the default type is Minimize then it becomes a Single list (i.e. not an array, but no previous pointers).
-                */
-			    type = Context.GetCPASettings().LinkedListType;
-
-			    if (type == Type.Minimize)
-				    type = Type.SingleNoElementPointers;
-		    }
-
-		    Type = type;
-	    }
-
-	    public CPA_LinkedList(Context context, Pointer head, uint num_elements, Type type = Type.Default) : 
-		    this(context, head, null, num_elements, type) { }
+		public LST2_List(Context context, Pointer<T> head, uint num_elements, LST2_ListType type) :
+			this(context, head, null, num_elements, type) { }
 
 		#endregion
 
 		#region Properties
 
 		// Serialized
-		public Pointer Head { get; set; }
-		public Pointer Tail { get; set; }
+		public Pointer<T> Head { get; set; }
+		public Pointer<T> Tail { get; set; }
 		public uint ElementsCount { get; set; }
-		//public Pointer Header { get; set; }
 
-		public Type Type { get; set; } = Type.Default;
-		public Flags Flags { get; set; }
-		//private bool customEntries => typeof(ILinkedListEntry).IsAssignableFrom(typeof(T));
+		public LST2_ListType Type { get; set; }
+		public uint ActualElementsCount { get; set; }
 
 		#endregion
 
 		#region Public Methods
 
-		// Call in OnPreSerialize
-		public void Configure(Type type = Type.Default, Flags flags = Flags.None)
-		{
-			Type = type;
-			Flags = flags;
+		public override void SerializeImpl(SerializerObject s) {
+			Head = s.SerializePointer<T>(Head, name: nameof(Head));
+			if (Type == LST2_ListType.DoubleLinked)
+				Tail = s.SerializePointer<T>(Tail, name: nameof(Tail));
+
+			ElementsCount = s.Serialize<uint>(ElementsCount, name: nameof(ElementsCount));
+			ActualElementsCount = ElementsCount;
+			list = new T[ActualElementsCount];
 		}
 
-		public override void SerializeImpl(SerializerObject s)
-		{
-			if (Type == Type.Default)
-			{
-				Type = Context.GetCPASettings().LinkedListType;
+		public LST2_List<T> Resolve(SerializerObject s, string name = null) {
+			if (Type == LST2_ListType.Array || Type == LST2_ListType.Optimized) {
+				s.DoAt(Head, () => {
+					list = s.SerializeObjectArray<T>(list, ActualElementsCount, name: name);
+				});
+			} else {
+				Pointer<T> Element = Head;
+				uint elementIndex = 0;
+				while (Element != null && elementIndex < ActualElementsCount) {
+					// Just so we can use the name, we do DoAt first
+					s.DoAt(Element?.PointerValue, () => {
+						list[elementIndex] = s.SerializeObject<T>(list[elementIndex], name: $"{name}[{elementIndex}]");
+					});
+					Element.Value = list[elementIndex];
+					Element?.Value?.LST2_Previous?.Resolve(s); // Resolve previous pointer if it exists
 
-				if (Type == Type.Minimize) 
-					Type = Type.Single;
-			}
-			else if (Type == Type.Minimize)
-			{
-				/* Minimize works as follows. A linkedlist with type minimize is a default one,
-                but if the default type is also Minimize (RA GC, R2 DC) then it is a SingleNoElementPointers list (i.e. optimized to an array).
-                If the list itself does not specify the minimize type, it is read as a default one,
-                but if the default type is Minimize then it becomes a Single list (i.e. not an array, but no previous pointers).
-                */
-				Type = Context.GetCPASettings().LinkedListType;
-				if (Type == Type.Minimize)
-				{
-					Type = Type.SingleNoElementPointers;
+					list[elementIndex] = Element?.Value;
+					elementIndex++;
+					if (Type == LST2_ListType.DoubleLinked || Type == LST2_ListType.SingleLinked || Type == LST2_ListType.SemiOptimized) {
+						Element = Element?.Value?.LST2_Next;
+						if (Element == null) {
+							ActualElementsCount = elementIndex;
+						}
+					}
 				}
 			}
-			Head = s.SerializePointer(Head, name: nameof(Head));
-			if (Type == Type.Double || Type == Type.DoubleNoElementPointers)
-			{
-				Tail = s.SerializePointer(Tail, name: nameof(Tail));
-			}
-			ElementsCount = s.Serialize<uint>(ElementsCount, name: nameof(ElementsCount));
-			list = new T[ElementsCount];
+			return this;
 		}
 
 		#endregion
@@ -280,66 +239,66 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		private T[] list = null;
 
-        public int Count {
-            get { return (int)ElementsCount; }
-            set {
-                ElementsCount = (uint)value;
-                if (list.Length != ElementsCount) {
-                    Array.Resize(ref list, (int)ElementsCount);
-                }
-            }
-        }
+		public int Count {
+			get { return (int)ElementsCount; }
+			set {
+				ElementsCount = (uint)value;
+				if (list.Length != ElementsCount) {
+					Array.Resize(ref list, (int)ElementsCount);
+				}
+			}
+		}
 
-        public bool IsReadOnly {
-            get { return list.IsReadOnly; }
-        }
+		public bool IsReadOnly {
+			get { return list.IsReadOnly; }
+		}
 
-        public T this[int index] {
-            get { return list[index]; }
-            set { list[index] = value; }
-        }
+		public T this[int index] {
+			get { return list[index]; }
+			set { list[index] = value; }
+		}
 
-        public IEnumerator<T> GetEnumerator() {
-            return ((IEnumerable<T>)list).GetEnumerator();
-        }
+		public IEnumerator<T> GetEnumerator() {
+			return ((IEnumerable<T>)list).GetEnumerator();
+		}
 
-        IEnumerator IEnumerable.GetEnumerator() {
-            return ((IEnumerable<T>)list).GetEnumerator();
-        }
+		IEnumerator IEnumerable.GetEnumerator() {
+			return ((IEnumerable<T>)list).GetEnumerator();
+		}
 
-        public int IndexOf(T item) {
-            return Array.IndexOf(list, item);
-        }
+		public int IndexOf(T item) {
+			return Array.IndexOf(list, item);
+		}
 
-        public bool Contains(T item) {
-            return Array.IndexOf(list, item) >= 0;
-        }
+		public bool Contains(T item) {
+			return Array.IndexOf(list, item) >= 0;
+		}
 
-        public void CopyTo(T[] array, int arrayIndex) {
-            list.CopyTo(array, arrayIndex);
-        }
+		public void CopyTo(T[] array, int arrayIndex) {
+			list.CopyTo(array, arrayIndex);
+		}
 
-        void IList<T>.Insert(int index, T item) {
-            throw new NotImplementedException();
-        }
+		void IList<T>.Insert(int index, T item) {
+			throw new NotImplementedException();
+		}
 
-        void IList<T>.RemoveAt(int index) {
-            throw new NotImplementedException();
-        }
+		void IList<T>.RemoveAt(int index) {
+			throw new NotImplementedException();
+		}
 
-        public void Add(T item) {
-            Array.Resize(ref list, list.Length + 1);
-            list[list.Length - 1] = item;
-            Count = Count + 1;
-        }
+		public void Add(T item) {
+			Array.Resize(ref list, list.Length + 1);
+			list[list.Length - 1] = item;
+			Count = Count + 1;
+		}
 
-        void ICollection<T>.Clear() {
-            throw new NotImplementedException();
-        }
+		void ICollection<T>.Clear() {
+			throw new NotImplementedException();
+		}
 
-        bool ICollection<T>.Remove(T item) {
-            throw new NotImplementedException();
-        }
+		bool ICollection<T>.Remove(T item) {
+			throw new NotImplementedException();
+		}
 
 		#endregion
 	}

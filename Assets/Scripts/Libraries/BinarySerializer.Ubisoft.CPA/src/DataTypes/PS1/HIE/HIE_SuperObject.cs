@@ -1,15 +1,15 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class HIE_SuperObject : BinarySerializable
+	public class HIE_SuperObject : BinarySerializable, LST2_IEntry<HIE_SuperObject>
 	{
 		public bool Pre_IsDynamic { get; set; }
 
 		public uint TypeCode { get; set; }
 		public int DataIndex { get; set; }
-		public CPA_DoubleLinkedList<HIE_SuperObject> Children { get; set; } // TODO: Serialize children
-		public Pointer NextBrotherPointer { get; set; }
-		public Pointer PrevBrotherPointer { get; set; }
-		public Pointer ParentPointer { get; set; }
+		public LST2_DynamicList<HIE_SuperObject> Children { get; set; }
+		public Pointer<HIE_SuperObject> NextBrother { get; set; }
+		public Pointer<HIE_SuperObject> PreviousBrother { get; set; }
+		public Pointer<HIE_SuperObject> Parent { get; set; }
 		public Pointer Matrix1Pointer { get; set; }
 		public Pointer Matrix2Pointer { get; set; }
 		public short Short_28 { get; set; }
@@ -32,9 +32,11 @@
 		public short Short_4A { get; set; }
 
 		// Serialized from pointers
-		public HIE_SuperObject Parent { get; set; }
 		public PS1_Matrix Matrix1 { get; set; }
 		public PS1_Matrix Matrix2 { get; set; }
+
+		public Pointer<HIE_SuperObject> LST2_Next => NextBrother;
+		public Pointer<HIE_SuperObject> LST2_Previous => PreviousBrother;
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -42,10 +44,10 @@
 
 			TypeCode = s.Serialize<uint>(TypeCode, name: nameof(TypeCode));
 			DataIndex = s.Serialize<int>(DataIndex, name: nameof(DataIndex));
-			Children = s.SerializeObject<CPA_DoubleLinkedList<HIE_SuperObject>>(Children, name: nameof(Children));
-			NextBrotherPointer = s.SerializePointer(NextBrotherPointer, name: nameof(NextBrotherPointer));
-			PrevBrotherPointer = s.SerializePointer(PrevBrotherPointer, name: nameof(PrevBrotherPointer));
-			ParentPointer = s.SerializePointer(ParentPointer, name: nameof(ParentPointer));
+			Children = s.SerializeObject<LST2_DynamicList<HIE_SuperObject>>(Children, name: nameof(Children));
+			NextBrother = s.SerializePointer<HIE_SuperObject>(NextBrother, name: nameof(NextBrother));
+			PreviousBrother = s.SerializePointer<HIE_SuperObject>(PreviousBrother, name: nameof(PreviousBrother));
+			Parent = s.SerializePointer<HIE_SuperObject>(Parent, name: nameof(Parent));
 			Matrix1Pointer = s.SerializePointer(Matrix1Pointer, name: nameof(Matrix1Pointer));
 
 			if (settings.EngineVersion != EngineVersion.RaymanRush_PS1)
@@ -75,7 +77,13 @@
 				Short_4A = s.Serialize<short>(Short_4A, name: nameof(Short_4A));
 			}
 
-			s.DoAt(ParentPointer, () => Parent = s.SerializeObject<HIE_SuperObject>(Parent, name: nameof(Parent)));
+			// Resolve hierarchy
+			Children?.Resolve(s, name: nameof(Children));
+			if (Parent?.PointerValue == null) {
+				NextBrother?.Resolve(s);
+				PreviousBrother?.Resolve(s);
+			}
+			Parent?.Resolve(s);
 			s.DoAt(Matrix1Pointer, () => Matrix1 = s.SerializeObject<PS1_Matrix>(Matrix1, name: nameof(Matrix1)));
 			s.DoAt(Matrix2Pointer, () => Matrix2 = s.SerializeObject<PS1_Matrix>(Matrix2, name: nameof(Matrix2)));
 		}

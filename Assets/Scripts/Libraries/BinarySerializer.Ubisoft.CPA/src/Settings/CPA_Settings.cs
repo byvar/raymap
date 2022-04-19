@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using LinkedListType = BinarySerializer.Ubisoft.CPA.CPA_LinkedList.Type;
+using LinkedListType = BinarySerializer.Ubisoft.CPA.LST2_ListType;
 
 namespace BinarySerializer.Ubisoft.CPA {
     /// <summary>
@@ -35,7 +35,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
         // Legacy. TODO: Remove those that become useless
         public CPA_GameMode Mode { get; set; } = CPA_GameMode.Rayman3PC;
-        public LinkedListType LinkedListType { get; set; } = LinkedListType.Double;
+        public LST2_ListType StaticListType { get; set; } = LST2_ListType.DoubleLinked;
         public bool HasObjectTypes { get; set; } = true;
         public bool HasNames { get; set; } = false;
         public bool HasDeformations { get; set; } = false;

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LinkedListType = BinarySerializer.Ubisoft.CPA.CPA_LinkedList.Type;
 using System.Text;
 
 namespace BinarySerializer.Ubisoft.CPA {
 	public class CPA_Settings_Defines {
 		#region Rayman 3
 		public static CPA_Settings R3PC => new CPA_Settings(EngineVersion.Rayman3, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = true,
@@ -55,7 +54,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 
 		public static CPA_Settings R3PCDemo20021001 => new CPA_Settings(EngineVersion.Rayman3, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -70,7 +69,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PCDemo20021021 => new CPA_Settings(EngineVersion.Rayman3, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -85,7 +84,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PCDemo20021209 => new CPA_Settings(EngineVersion.Rayman3, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -100,7 +99,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PCDemo20030106 => new CPA_Settings(EngineVersion.Rayman3, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -115,7 +114,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3MacOS => new CPA_Settings(EngineVersion.Rayman3, Platform.MacOS) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -131,7 +130,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 
 		public static CPA_Settings R3GC => new CPA_Settings(EngineVersion.Rayman3, Platform.GC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasNames = true,
 			HasDeformations = true,
 			AITypes = AITypes.R3_GC,
@@ -148,7 +147,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			//StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -161,7 +160,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2Demo_20020517 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -175,7 +174,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			HasNames = true
 		};
 		public static CPA_Settings R3PS2Demo_20020807 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -188,7 +187,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2DevBuild => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -201,7 +200,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2Demo_20021029 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -214,7 +213,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2Demo_20021218 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = false,
@@ -228,7 +227,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3Xbox => new CPA_Settings(EngineVersion.Rayman3, Platform.Xbox) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = true,
@@ -243,7 +242,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3Xbox360 => new CPA_Settings(EngineVersion.Rayman3, Platform.Xbox360) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = true,
@@ -257,7 +256,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			HasNames = true,
 		};
 		public static CPA_Settings R3PS3 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS3) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			HasMemorySupport = true,
@@ -274,7 +273,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Rayman M
 		public static CPA_Settings RMPC => new CPA_Settings(EngineVersion.RaymanM, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R3,
 			HasDeformations = true,
 			TextureAnimationSpeedModifier = 10f,
@@ -288,7 +287,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RMPS2 => new CPA_Settings(EngineVersion.RaymanM, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			TextureAnimationSpeedModifier = 10f,
@@ -301,7 +300,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RMPS2Demo => new CPA_Settings(EngineVersion.RaymanM, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			TextureAnimationSpeedModifier = 10f,
@@ -314,7 +313,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAPC => new CPA_Settings(EngineVersion.RaymanM, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R3,
 			HasDeformations = true,
 			TextureAnimationSpeedModifier = 10f,
@@ -360,7 +359,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAPS2 => new CPA_Settings(EngineVersion.RaymanM, Platform.PS2) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			TextureAnimationSpeedModifier = 10f,
@@ -373,7 +372,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAGC => new CPA_Settings(EngineVersion.RaymanArena, Platform.GC) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			AITypes = AITypes.R3,
 			HasDeformations = true,
 			TextureAnimationSpeedModifier = -10f,
@@ -387,7 +386,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAGCDemo => new CPA_Settings(EngineVersion.RaymanArena, Platform.GC) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			AITypes = AITypes.R3,
 			HasDeformations = true,
 			TextureAnimationSpeedModifier = -10f,
@@ -401,7 +400,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAXbox => new CPA_Settings(EngineVersion.RaymanArena, Platform.Xbox) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R3,
 			HasDeformations = true,
 			TextureAnimationSpeedModifier = 10f,
@@ -419,7 +418,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#region Rayman 2
 		public static CPA_Settings R2PC => new CPA_Settings(EngineVersion.Rayman2, Platform.PC) {
 			EntryActionsCount = 43,
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R2,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
@@ -457,7 +456,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings R2PCDemo1 => new CPA_Settings(EngineVersion.Rayman2Demo, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -470,7 +469,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2PCDemo2 => new CPA_Settings(EngineVersion.Rayman2Demo, Platform.PC) {
 			EntryActionsCount = 7,
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R2,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
@@ -482,7 +481,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2DC => new CPA_Settings(EngineVersion.Rayman2, Platform.DC) {
 			EntryActionsCount = 43,
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			Encryption = Encryption.None,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -495,7 +494,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2PS2 => new CPA_Settings(EngineVersion.Rayman2Revolution, Platform.PS2) {
 			EntryActionsCount = 42,
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			Encryption = Encryption.None,
 			Luminosity = 0.5f,
 			Saturate = false,
@@ -509,7 +508,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2IOS => new CPA_Settings(EngineVersion.Rayman2, Platform.iOS) {
 			EntryActionsCount = 43,
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			AITypes = AITypes.R2,
 			HasExtraInputData = true,
@@ -521,7 +520,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings R2PS1 => new CPA_Settings(EngineVersion.Rayman2_PS1, Platform.PS1) {
-			LinkedListType = LinkedListType.Single,
+			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -530,7 +529,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 
 		public static CPA_Settings RRushPS1 => new CPA_Settings(EngineVersion.RaymanRush_PS1, Platform.PS1) {
-			LinkedListType = LinkedListType.Single,
+			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -539,7 +538,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 
 		public static CPA_Settings R2DS => new CPA_Settings(EngineVersion.Rayman2, Platform.DS) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -548,7 +547,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			TextureAnimationSpeedModifier = -1f,
 		};
 		public static CPA_Settings R23DS => new CPA_Settings(EngineVersion.Rayman2_3D, Platform._3DS) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -557,7 +556,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			TextureAnimationSpeedModifier = -1f,
 		};
 		public static CPA_Settings R2N64 => new CPA_Settings(EngineVersion.Rayman2, Platform.N64) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -569,7 +568,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Rayman Raving Rabbids DS
 		public static CPA_Settings RRRDS_20060525 => new CPA_Settings(EngineVersion.RaymanRavingRabbids, Platform.DS) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -578,7 +577,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			TextureAnimationSpeedModifier = -1f,
 		};
 		public static CPA_Settings RRRDS => new CPA_Settings(EngineVersion.RaymanRavingRabbids, Platform.DS) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -590,7 +589,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Tonic Trouble
 		public static CPA_Settings TTPC => new CPA_Settings(EngineVersion.TonicTrouble, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			EntryActionsCount = 1,
 			AITypes = AITypes.TTSE,
 			Encryption = Encryption.Window,
@@ -605,7 +604,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings TTN64 = new CPA_Settings(EngineVersion.TonicTrouble, Platform.N64) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -613,7 +612,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			EntryActionsCount = 1
 		};
 		public static CPA_Settings TTSEPC => new CPA_Settings(EngineVersion.TonicTroubleSE, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			EntryActionsCount = 1,
 			AITypes = AITypes.TTSE,
 			HasLinkedListHeaderPointers = true,
@@ -627,7 +626,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Montreal: Playmobil
 		public static CPA_Settings PlaymobilHypePC => new CPA_Settings(EngineVersion.PlaymobilHype, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			EntryActionsCount = 1,
 			AITypes = AITypes.Hype,
 			HasLinkedListHeaderPointers = true,
@@ -639,7 +638,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings PlaymobilAlexPC => new CPA_Settings(EngineVersion.PlaymobilAlex, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			EntryActionsCount = 1,
 			AITypes = AITypes.Hype,
 			HasLinkedListHeaderPointers = true,
@@ -657,7 +656,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings PlaymobilLauraPC => new CPA_Settings(EngineVersion.PlaymobilLaura, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			EntryActionsCount = 1,
 			AITypes = AITypes.Hype,
 			HasLinkedListHeaderPointers = true,
@@ -679,7 +678,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#region Donald Duck Quack Attack
 		public static CPA_Settings DDPC => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.PC) {
 			EntryActionsCount = 44, // 43 for demo
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R2,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
@@ -720,7 +719,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public static CPA_Settings DDPCDemo = new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.PC) {
 			EntryActionsCount = 43,
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R2,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
@@ -732,7 +731,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public static CPA_Settings DDDC => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.DC) {
 			EntryActionsCount = 43,
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			Encryption = Encryption.None,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -743,7 +742,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings DDN64 => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.N64) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -751,7 +750,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			EntryActionsCount = 1
 		};
 		public static CPA_Settings DDPS1 => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack_PS1, Platform.PS1) {
-			LinkedListType = LinkedListType.Single,
+			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -762,7 +761,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Other Disney
 		public static CPA_Settings DDPKGC => new CPA_Settings(EngineVersion.DonaldDuckPK, Platform.GC) {
-			LinkedListType = LinkedListType.Minimize,
+			StaticListType = LST2_ListType.Optimized,
 			HasDeformations = true,
 			AITypes = AITypes.R3,
 			TextureAnimationSpeedModifier = -10f,
@@ -776,7 +775,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 
 		public static CPA_Settings DinosaurPC => new CPA_Settings(EngineVersion.Dinosaur, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R3,
 			HasDeformations = true,
 			TextureAnimationSpeedModifier = 1f,
@@ -787,7 +786,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings JungleBookPS1 => new CPA_Settings(EngineVersion.JungleBook_PS1, Platform.PS1) {
-			LinkedListType = LinkedListType.Single,
+			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -799,7 +798,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Other licensed
 		public static CPA_Settings LargoWinchPC => new CPA_Settings(EngineVersion.LargoWinch, Platform.PC) {
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.Largo,
 			TextureAnimationSpeedModifier = 1f,
 			Luminosity = 0.5f,
@@ -814,7 +813,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			HasDeformations = true
 		};
 		public static CPA_Settings VIPPS1 => new CPA_Settings(EngineVersion.VIP_PS1, Platform.PS1) {
-			LinkedListType = LinkedListType.Single,
+			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -827,7 +826,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#region Other
 		public static CPA_Settings RedPlanetPC => new CPA_Settings(EngineVersion.RedPlanet, Platform.PC) {
 			EntryActionsCount = 31,
-			LinkedListType = LinkedListType.Double,
+			StaticListType = LST2_ListType.DoubleLinked,
 			AITypes = AITypes.R2,
 			Encryption = Encryption.RedPlanet,
 			Luminosity = 0.5f,
