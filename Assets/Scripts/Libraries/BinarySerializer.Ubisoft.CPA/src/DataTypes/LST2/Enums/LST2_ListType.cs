@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
 	public enum LST2_ListType {
+		Static, // = change type upon serialize
+		Dynamic, // = change type upon serialize
 		DoubleLinked,
 		SingleLinked,
 		Array,

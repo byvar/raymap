@@ -40,8 +40,19 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#endregion
 
 		#region Public Methods
+		public void Configure(Context c) {
+			switch (Type) {
+				case LST2_ListType.Dynamic:
+					Type = LST2_ListType.DoubleLinked;
+					break;
+				case LST2_ListType.Static:
+					Type = c.GetCPASettings().StaticListType;
+					break;
+			}
+		}
 
 		public override void SerializeImpl(SerializerObject s) {
+			Configure(s.Context);
 			Head = s.SerializePointer<T>(Head, name: nameof(Head));
 			if (Type == LST2_ListType.DoubleLinked)
 				Tail = s.SerializePointer<T>(Tail, name: nameof(Tail));
