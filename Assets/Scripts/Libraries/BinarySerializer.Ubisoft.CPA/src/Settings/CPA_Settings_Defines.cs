@@ -413,6 +413,15 @@ namespace BinarySerializer.Ubisoft.CPA {
 				{ PathCapitalizationType.TextureFile, PathCapitalization.Normal },
 			},
 		};
+
+		public static CPA_Settings RRushPS1 => new CPA_Settings(EngineVersion.RaymanRush_PS1, Platform.PS1) {
+			StaticListType = LST2_ListType.Optimized,
+			Encryption = Encryption.ReadInit,
+			Luminosity = 0.5f,
+			Saturate = true,
+			AITypes = AITypes.R2,
+			EntryActionsCount = 1
+		};
 		#endregion
 
 		#region Rayman 2
@@ -520,21 +529,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings R2PS1 => new CPA_Settings(EngineVersion.Rayman2_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.SingleLinked,
+			StaticListType = LST2_ListType.Optimized,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
 			AITypes = AITypes.R2,
 			EntryActionsCount = 1,
-		};
-
-		public static CPA_Settings RRushPS1 => new CPA_Settings(EngineVersion.RaymanRush_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.SingleLinked,
-			Encryption = Encryption.ReadInit,
-			Luminosity = 0.5f,
-			Saturate = true,
-			AITypes = AITypes.R2,
-			EntryActionsCount = 1
 		};
 
 		public static CPA_Settings R2DS => new CPA_Settings(EngineVersion.Rayman2, Platform.DS) {
@@ -750,7 +750,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			EntryActionsCount = 1
 		};
 		public static CPA_Settings DDPS1 => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.SingleLinked,
+			StaticListType = LST2_ListType.Optimized,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -786,7 +786,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings JungleBookPS1 => new CPA_Settings(EngineVersion.JungleBook_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.SingleLinked,
+			StaticListType = LST2_ListType.Optimized,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -813,7 +813,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			HasDeformations = true
 		};
 		public static CPA_Settings VIPPS1 => new CPA_Settings(EngineVersion.VIP_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.SingleLinked,
+			StaticListType = LST2_ListType.Optimized,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
