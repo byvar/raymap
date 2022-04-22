@@ -61,22 +61,21 @@ public class LoadController : MonoBehaviour {
             GlobalLoadState.LoadState = GlobalLoadState.State.Loading;
             Level = await manager.LoadAsync(SerializeContext);
             Level.Init();
-
-            await TimeController.WaitIfNecessary();
-            if (GlobalLoadState.LoadState == GlobalLoadState.State.Error) return;
-
-            GlobalLoadState.LoadState = GlobalLoadState.State.Initializing;
-            await TimeController.WaitIfNecessary();
-
-            // TODO
-            // Select an "Environment" based on the Unity_Level.
-            // This environment will be a prefab or will create all the necessary controllers/monobehaviours.
-            // And those will be initialized by the environment itself.
-            // This way CPA and Jade for example can use completely different code without getting in each other's way.
         }
 
+		await TimeController.WaitIfNecessary();
+		if (GlobalLoadState.LoadState == GlobalLoadState.State.Error) return;
 
-        await TimeController.WaitIfNecessary();
+		GlobalLoadState.LoadState = GlobalLoadState.State.Initializing;
+		await TimeController.WaitIfNecessary();
+
+		// TODO
+		// Select an "Environment" based on the Unity_Level.
+		// This environment will be a prefab or will create all the necessary controllers/monobehaviours.
+		// And those will be initialized by the environment itself.
+		// This way CPA and Jade for example can use completely different code without getting in each other's way.
+
+		await TimeController.WaitIfNecessary();
         if (GlobalLoadState.LoadState == GlobalLoadState.State.Error) return;
 
         GlobalLoadState.DetailedState = "Finished";

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class CPA_Vector2D : BinarySerializable {
+	public class MTH2D_Vector : BinarySerializable {
 		public float X { get; set; }
 		public float Y { get; set; }
 
@@ -11,5 +11,14 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 		public override bool UseShortLog => true;
 		public override string ToString() => $"Vector({X}, {Y})";
+
+		public MTH2D_Vector() { }
+		public MTH2D_Vector(float x, float y) {
+			X = x;
+			Y = y;
+		}
+
+		public double Magnitude => Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2));
+		public bool IsUniform => X == Y;
 	}
 }

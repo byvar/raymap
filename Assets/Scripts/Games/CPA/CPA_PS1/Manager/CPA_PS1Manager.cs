@@ -380,7 +380,11 @@ namespace Raymap
 			sw.Stop();
 			Debug.Log($"Loaded level header in {sw.ElapsedMilliseconds} ms");
 
-			throw new NotImplementedException();
+			Unity_Level_CPAPS1 level = new Unity_Level_CPAPS1() {
+				LevelHeader = levelHeader
+			};
+
+			return level;
 		}
 
 		public PS1GameInfo GetGameInfo(MapViewerSettings settings) => 
