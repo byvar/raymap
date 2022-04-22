@@ -20,8 +20,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			soc.soPS1 = spo;*/
 
 			spo.ApplyMatrix(gao);
-			/*if (type == Type.IPO) {
-				PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
+			if (spo.Type == HIE_ObjectType_98.InstanciatedPhysicalObject) {
+				/*PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
 				LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				int ind = (dataIndex >> 1);
 				if (ind >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
@@ -42,27 +42,26 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 						c.transform.localRotation = Quaternion.identity;
 					}
 				}
-				poc.Init(MapLoader.Loader.controller);
-			} else if (type == Type.Perso) {
-				LevelHeader h = (Load as R2PS1Loader).levelHeader;
+				poc.Init(MapLoader.Loader.controller);*/
+			} else if (spo.Type == HIE_ObjectType_98.Character) {
+				/*LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				if (dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
 				gao.name = gao.name + " - " + dataIndex;
 				PS1PersoBehaviour ps1Perso = h.persos[dataIndex].GetGameObject(gao);
-				ps1Perso.superObject = this;
-			} else if (type == Type.Sector) {
-				LevelHeader h = (Load as R2PS1Loader).levelHeader;
+				ps1Perso.superObject = this;*/
+			} else if (spo.Type == HIE_ObjectType_98.Sector) {
+				/*LevelHeader h = (Load as R2PS1Loader).levelHeader;
 				if (dataIndex >= h.sectors.Length) throw new Exception("Sector SO data index was too high! " + h.sectors.Length + " - " + dataIndex);
 				gao.name = gao.name + " - " + dataIndex;
-				SectorComponent sect = h.sectors[dataIndex].GetGameObject(gao);
-			}*/
+				SectorComponent sect = h.sectors[dataIndex].GetGameObject(gao);*/
+			}
 			if (spo.Children != null) {
 				foreach (HIE_SuperObject spoChild in spo.Children) {
 					if (spoChild != null) {
 						GameObject gao_spoChild = spoChild.GetGameObject();
 						if (gao_spoChild != null) {
 							//soc.Children.Add(gao_spoChild.GetComponent<SuperObjectComponent>());
-							gao_spoChild.transform.SetParent(gao.transform);
-							spoChild.ApplyMatrix(gao_spoChild);
+							gao_spoChild.transform.SetParent(gao.transform, false);
 						}
 					}
 				}

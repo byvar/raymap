@@ -9,7 +9,7 @@ namespace Raymap {
 		public LevelHeader LevelHeader { get; set; }
 
 		// Added by Init
-		public List<HIE_SuperObject> SuperObjects { get; set; } = new List<HIE_SuperObject>();
+		public List<SuperObjectComponent> SuperObjects { get; set; } = new List<SuperObjectComponent>(); // To use when SuperObjectComponent is added to GetGameObject
 
 		public override void Init() {
 			// Collect all superobjects
@@ -21,8 +21,8 @@ namespace Raymap {
 
 		private void ProcessSuperObject(HIE_SuperObject spo, string name) {
 			if(spo == null) return;
-			if(!SuperObjects.Contains(spo)) SuperObjects.Add(spo);
-			spo.GetGameObject();
+			var gao = spo.GetGameObject();
+			if(gao != null) gao.name = name;
 		}
 	}
 }
