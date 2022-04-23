@@ -20,40 +20,40 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			soc.soPS1 = spo;*/
 
 			spo.ApplyMatrix(gao);
+			LevelHeader h = spo.Context.GetLevelHeader();
 			if (spo.Type == HIE_ObjectType_98.InstanciatedPhysicalObject) {
-				/*PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
-				LevelHeader h = (Load as R2PS1Loader).levelHeader;
-				int ind = (dataIndex >> 1);
-				if (ind >= h.geometricObjectsStatic.entries.Length) throw new Exception("IPO SO data index was too high! " + h.geometricObjectsStatic.entries.Length + " - " + dataIndex);
+				PhysicalObjectComponent poc = gao.AddComponent<PhysicalObjectComponent>();
+				int ind = (spo.DataIndex >> 1);
+				if (ind >= h.StaticGeometricObjects.Entries.Length) throw new Exception("IPO SPO data index was too high! " + h.StaticGeometricObjects.Entries.Length + " - " + spo.DataIndex);
 				gao.name = gao.name + " - " + ind;
-				GameObject g = h.geometricObjectsStatic.GetGameObject(ind, null, out _);
+				GameObject g = h.StaticGeometricObjects.GetGameObject(ind, null, out _);
 				if (g != null) {
 					poc.visual = g;
 					g.transform.SetParent(gao.transform);
 					g.transform.localPosition = Vector3.zero;
 					g.transform.localRotation = Quaternion.identity;
 				}
-				if (h.ipoCollision != null && h.ipoCollision.Length > ind) {
-					GameObject c = h.ipoCollision[ind].GetGameObject();
+				/*if (h.IpoCollision != null && h.IpoCollision.Length > ind) {
+					GameObject c = h.IpoCollision[ind].GetGameObject();
 					if (c != null) {
 						poc.collide = c;
 						c.transform.SetParent(gao.transform);
 						c.transform.localPosition = Vector3.zero;
 						c.transform.localRotation = Quaternion.identity;
 					}
-				}
-				poc.Init(MapLoader.Loader.controller);*/
+				}*/
+				//poc.Init(OpenSpace.MapLoader.Loader.controller);
 			} else if (spo.Type == HIE_ObjectType_98.Character) {
-				/*LevelHeader h = (Load as R2PS1Loader).levelHeader;
-				if (dataIndex >= h.persos.Length) throw new Exception("Perso SO data index was too high! " + h.persos.Length + " - " + dataIndex);
-				gao.name = gao.name + " - " + dataIndex;
-				PS1PersoBehaviour ps1Perso = h.persos[dataIndex].GetGameObject(gao);
+				PERSO_Perso p = (PERSO_Perso)spo.LinkedObject;
+				if (spo.DataIndex >= h.Persos.Length) throw new Exception("Perso SPO data index was too high! " + h.Persos.Length + " - " + spo.DataIndex);
+				gao.name = gao.name + " - " + spo.DataIndex;
+				/*PS1PersoBehaviour ps1Perso = h.persos[dataIndex].GetGameObject(gao);
 				ps1Perso.superObject = this;*/
 			} else if (spo.Type == HIE_ObjectType_98.Sector) {
-				/*LevelHeader h = (Load as R2PS1Loader).levelHeader;
-				if (dataIndex >= h.sectors.Length) throw new Exception("Sector SO data index was too high! " + h.sectors.Length + " - " + dataIndex);
-				gao.name = gao.name + " - " + dataIndex;
-				SectorComponent sect = h.sectors[dataIndex].GetGameObject(gao);*/
+				SECT_Sector s = (SECT_Sector)spo.LinkedObject;
+				if (spo.DataIndex >= h.Sectors.Length) throw new Exception("Sector SPO data index was too high! " + h.Sectors.Length + " - " + spo.DataIndex);
+				gao.name = gao.name + " - " + spo.DataIndex;
+				//SectorComponent sect = h.sectors[dataIndex].GetGameObject(gao);
 			}
 			if (spo.Children != null) {
 				foreach (HIE_SuperObject spoChild in spo.Children) {

@@ -1,6 +1,6 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class PO_ObjectsTableEntry : BinarySerializable
+	public class PO_PhysicalObject : BinarySerializable
 	{
 		public Pointer Pointer_00 { get; set; } // Object of 0x50, 5 rows of 0x10
 		public Pointer GeometricObjectPointer { get; set; }

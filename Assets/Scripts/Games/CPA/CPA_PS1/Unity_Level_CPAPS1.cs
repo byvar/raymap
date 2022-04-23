@@ -3,6 +3,7 @@ using BinarySerializer.Ubisoft.CPA.PS1;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BinarySerializer;
 
 namespace Raymap {
 	public class Unity_Level_CPAPS1 : Unity_Level {

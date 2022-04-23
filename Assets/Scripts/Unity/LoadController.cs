@@ -60,6 +60,7 @@ public class LoadController : MonoBehaviour {
             // Load the level
             GlobalLoadState.LoadState = GlobalLoadState.State.Loading;
             Level = await manager.LoadAsync(SerializeContext);
+			Level.Register(SerializeContext);
             Level.Init();
         }
 

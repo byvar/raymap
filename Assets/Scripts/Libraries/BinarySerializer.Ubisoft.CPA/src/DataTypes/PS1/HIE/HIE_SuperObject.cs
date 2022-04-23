@@ -1,4 +1,6 @@
-﻿namespace BinarySerializer.Ubisoft.CPA.PS1
+﻿using System;
+
+namespace BinarySerializer.Ubisoft.CPA.PS1
 {
 	public class HIE_SuperObject : BinarySerializable, LST2_IEntry<HIE_SuperObject>
 	{
@@ -80,6 +82,23 @@
 				PreviousBrother?.Resolve(s);
 			}
 			Parent?.Resolve(s);
+		}
+
+		public BinarySerializable LinkedObject {
+			get {
+				LevelHeader h = Context.GetLevelHeader();
+				if (Type == HIE_ObjectType_98.InstanciatedPhysicalObject) {
+					if ((DataIndex >> 1) >= h.StaticGeometricObjects.Entries.Length) throw new Exception("IPO SO data index was too high! " + h.StaticGeometricObjects.Entries.Length + " - " + DataIndex);
+					return h.StaticGeometricObjects.Entries[DataIndex >> 1].GeometricObject;
+				} else if (Type == HIE_ObjectType_98.Character) {
+					if (DataIndex >= h.Persos.Length) throw new Exception("Perso SO data index was too high! " + h.Persos.Length + " - " + DataIndex);
+					return h.Persos[DataIndex];
+				} else if (Type == HIE_ObjectType_98.Sector) {
+					if (DataIndex >= h.Sectors.Length) throw new Exception("Sector SO data index was too high! " + h.Sectors.Length + " - " + DataIndex);
+					return h.Sectors[DataIndex];
+				}
+				return null;
+			}
 		}
 	}
 }

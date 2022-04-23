@@ -26,6 +26,18 @@ namespace BinarySerializer.Ubisoft.CPA {
 			M22 = s.SerializeObject<FixedPointInt16>(M22, x => x.Pre_PointPosition = 12, name: nameof(M22));
 		}
 
+		public MTH3D_Matrix_PS1 InvertedMatrix => new MTH3D_Matrix_PS1() {
+			M00 = M00,
+			M01 = M10,
+			M02 = M20,
+			M10 = M01,
+			M11 = M11,
+			M12 = M21,
+			M20 = M02,
+			M21 = M12,
+			M22 = M22,
+		};
+
 		public MTH4D_Vector GetRotation(MTH3D_Vector scaleVector = null) {
 			float m00, m01, m02; // Row 0
 			float m10, m11, m12; // Row 1

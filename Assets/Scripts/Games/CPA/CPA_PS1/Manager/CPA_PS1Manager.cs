@@ -8,10 +8,9 @@ using BinarySerializer.Ubisoft.CPA;
 using BinarySerializer.Ubisoft.CPA.PS1;
 using BinarySerializer.Unity;
 using Cysharp.Threading.Tasks;
-using OpenSpace.PS1;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using LevelHeader = BinarySerializer.Ubisoft.CPA.PS1.LevelHeader;
+using PS1GameInfo = OpenSpace.PS1.PS1GameInfo; // TODO: Remove this
 using Reader = BinarySerializer.Reader;
 using Util = BinarySerializer.Unity.Util;
 

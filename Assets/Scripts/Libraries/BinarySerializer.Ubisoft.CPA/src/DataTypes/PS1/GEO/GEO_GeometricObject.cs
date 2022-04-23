@@ -4,7 +4,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 {
 	public class GEO_GeometricObject : BinarySerializable
 	{
-		public uint Uint_00 { get; set; }
+		public uint UInt_00 { get; set; }
 		public ushort VerticesCount { get; set; }
 		public ushort PolygonListsCount { get; set; }
 		public short Short_08 { get; set; }
@@ -18,15 +18,29 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public short CurrentScrollValue { get; set; }
 		public short Short_1E { get; set; }
 
+		// VIP, Jungle Book
+		public ushort BonesCount { get; set; }
+		public ushort BoneWeightsCount { get; set; }
+		public ushort BonesUnknownCount { get; set; }
+		public ushort Unknown4Count { get; set; }
+		public Pointer BonesPointer { get; set; }
+		public Pointer BoneWeightsPointer { get; set; }
+		public Pointer BonesUnknownPointer { get; set; }
+		public Pointer Unknown4Pointer { get; set; }
+
 		// Serialized from pointers
 		public GEO_Vertex[] Vertices { get; set; }
 		public GEO_PolygonList[] PolygonLists { get; set; }
+
+		public GEO_DeformationBone[] Bones { get; set; }
+		public GEO_DeformationVertexWeightSet[] BoneWeights { get; set; }
+		public GEO_DeformationUnknown[] BonesUnknown { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
 			CPA_Settings settings = s.GetCPASettings();
 
-			Uint_00 = s.Serialize<uint>(Uint_00, name: nameof(Uint_00));
+			UInt_00 = s.Serialize<uint>(UInt_00, name: nameof(UInt_00));
 			VerticesCount = s.Serialize<ushort>(VerticesCount, name: nameof(VerticesCount));
 			PolygonListsCount = s.Serialize<ushort>(PolygonListsCount, name: nameof(PolygonListsCount));
 			Short_08 = s.Serialize<short>(Short_08, name: nameof(Short_08));
@@ -38,8 +52,15 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 			if (settings.EngineVersion == EngineVersion.VIP_PS1 || settings.EngineVersion == EngineVersion.JungleBook_PS1)
 			{
-				// TODO: Implement
-				throw new NotImplementedException();
+				BonesCount = s.Serialize<ushort>(BonesCount, name: nameof(BonesCount));
+				BoneWeightsCount = s.Serialize<ushort>(BoneWeightsCount, name: nameof(BoneWeightsCount));
+				BonesUnknownCount = s.Serialize<ushort>(BonesUnknownCount, name: nameof(BonesUnknownCount));
+				Unknown4Count = s.Serialize<ushort>(Unknown4Count, name: nameof(Unknown4Count));
+
+				BonesPointer = s.SerializePointer(BonesPointer, allowInvalid: BonesCount == 0, name: nameof(BonesPointer));
+				BoneWeightsPointer = s.SerializePointer(BoneWeightsPointer, allowInvalid: BoneWeightsCount == 0, name: nameof(BoneWeightsPointer));
+				BonesUnknownPointer = s.SerializePointer(BonesUnknownPointer, allowInvalid: BonesUnknownCount == 0, name: nameof(BonesUnknownPointer));
+				Unknown4Pointer = s.SerializePointer(Unknown4Pointer, allowInvalid: Unknown4Count == 0, name: nameof(Unknown4Pointer));
 			}
 			else
 			{
@@ -54,6 +75,13 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				Vertices = s.SerializeObjectArray<GEO_Vertex>(Vertices, VerticesCount, name: nameof(Vertices)));
 			s.DoAt(PolygonListsPointer, () => 
 				PolygonLists = s.SerializeObjectArray<GEO_PolygonList>(PolygonLists, PolygonListsCount, name: nameof(PolygonLists)));
+
+			s.DoAt(BonesPointer, () =>
+				Bones = s.SerializeObjectArray<GEO_DeformationBone>(Bones, BonesCount, name: nameof(Bones)));
+			s.DoAt(BoneWeightsPointer, () =>
+				BoneWeights = s.SerializeObjectArray<GEO_DeformationVertexWeightSet>(BoneWeights, BoneWeightsCount, name: nameof(BoneWeights)));
+			s.DoAt(BonesUnknownPointer, () =>
+				BonesUnknown = s.SerializeObjectArray<GEO_DeformationUnknown>(BonesUnknown, BonesUnknownCount, name: nameof(BonesUnknown)));
 		}
 	}
 }

@@ -2,7 +2,6 @@
     "name": "Libraries",
     "rootNamespace": "",
     "references": [
-        "GUID:4f52b4f57e145e14b9565734592d9832",
         "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [],
