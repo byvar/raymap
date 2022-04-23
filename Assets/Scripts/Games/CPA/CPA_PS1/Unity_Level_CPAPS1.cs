@@ -12,6 +12,8 @@ namespace Raymap {
 		// Added by Init
 		public List<SuperObjectComponent> SuperObjects { get; set; } = new List<SuperObjectComponent>(); // To use when SuperObjectComponent is added to GetGameObject
 
+		public override string EnvironmentKey => Unity_Environment_CPA.Key;
+
 		public override void Init() {
 			// Collect all superobjects
 			ProcessSuperObject(LevelHeader?.DynamicWorld, "Dynamic world");

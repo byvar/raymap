@@ -1,10 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using OpenSpace;
-using System.Linq;
-using OpenSpace.Visual;
-using OpenSpace.Object;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class LoadingScreen : MonoBehaviour {

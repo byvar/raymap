@@ -7,5 +7,8 @@ namespace Raymap {
 
 		public static Unity_Level GetUnityLevel(this SerializerObject s) => s.Context.GetUnityLevel();
 		public static Unity_Level GetUnityLevel(this Context c) => c.GetStoredObject<Unity_Level>(Unity_Level.ContextKey, throwIfNotFound: true);
+
+		public static Unity_Environment GetUnityEnvironment(this SerializerObject s) => s.Context.GetUnityEnvironment();
+		public static Unity_Environment GetUnityEnvironment(this Context c) => c.GetStoredObject<Unity_Environment>(Unity_Environment.ContextKey, throwIfNotFound: true);
 	}
 }

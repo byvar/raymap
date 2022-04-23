@@ -10,7 +10,8 @@ public class LoadController : MonoBehaviour {
     // The context, to reuse when writing
     private Context SerializeContext { get; set; }
 
-    public Unity_Level Level { get; set; }
+    public Unity_Level Level { get; private set; }
+	public Unity_Environment Environment { get; private set; }
 
     // Set in Unity inspector
     public LoadingScreen LoadingScreen;
@@ -60,9 +61,10 @@ public class LoadController : MonoBehaviour {
             // Load the level
             GlobalLoadState.LoadState = GlobalLoadState.State.Loading;
             Level = await manager.LoadAsync(SerializeContext);
+
+			// Store Unity_Level in context
 			Level.Register(SerializeContext);
-            Level.Init();
-        }
+		}
 
 		await TimeController.WaitIfNecessary();
 		if (GlobalLoadState.LoadState == GlobalLoadState.State.Error) return;
@@ -70,11 +72,19 @@ public class LoadController : MonoBehaviour {
 		GlobalLoadState.LoadState = GlobalLoadState.State.Initializing;
 		await TimeController.WaitIfNecessary();
 
-		// TODO
 		// Select an "Environment" based on the Unity_Level.
 		// This environment will be a prefab or will create all the necessary controllers/monobehaviours.
 		// And those will be initialized by the environment itself.
 		// This way CPA and Jade for example can use completely different code without getting in each other's way.
+		EnvironmentController envController = FindObjectOfType<EnvironmentController>();
+		Environment = envController.InitializeEnvironment(Level.EnvironmentKey);
+		Environment.Register(SerializeContext);
+		Environment.Init();
+
+		// Initialize level
+		Level.Init();
+
+		Environment.OnDataLoaded();
 
 		await TimeController.WaitIfNecessary();
         if (GlobalLoadState.LoadState == GlobalLoadState.State.Error) return;

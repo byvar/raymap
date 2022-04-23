@@ -110,5 +110,15 @@ namespace BinarySerializer.Unity
 
 			Util.ByteArrayToFile(filePath, texture2D.EncodeToPNG());
 		}
+
+		public static bool IsTransparent(this Texture2D texture2D) {
+			Color[] cols = texture2D.GetPixels();
+			foreach (Color col in cols) {
+				if (col.a != 1f) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }
