@@ -12,6 +12,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 		public static GameObject GetGameObject(this GEO_DeformationBone bone, GameObject parent) {
 
 			GameObject gao = new GameObject($"Bone @ {bone.Offset}");
+			gao.AddBinarySerializableData(bone);
 			gao.transform.parent = parent.transform;
 
 			// Visualization for debugging

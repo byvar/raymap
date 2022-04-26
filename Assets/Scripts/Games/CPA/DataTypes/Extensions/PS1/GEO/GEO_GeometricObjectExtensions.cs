@@ -13,6 +13,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 
 		public static GameObject GetGameObject(this GEO_GeometricObject geo, out GameObject[] boneGaos, GEO_GeometricObject morphObject = null, float morphProgress = 0f) {
 			GameObject parentGao = new GameObject(geo.Offset.ToString());
+			parentGao.AddBinarySerializableData(geo);
 
 			// Bones
 			boneGaos = null;

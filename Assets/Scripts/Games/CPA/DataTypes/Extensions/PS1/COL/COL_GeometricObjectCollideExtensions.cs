@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BinarySerializer.Unity;
 using UnityEngine;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public static class COL_GeometricObjectCollideExtensions {
 		public static GameObject GetGameObject(this COL_GeometricObjectCollide geo) {
 			GameObject parentGao = new GameObject(geo.Offset.ToString());
+			parentGao.AddBinarySerializableData(geo);
 
 			// First pass
 			Dictionary<byte, List<COL_GeometricObjectCollidePolygon>> elementsDict = new Dictionary<byte, List<COL_GeometricObjectCollidePolygon>>();
@@ -32,6 +34,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 
 				COL_GeometricObjectCollidePolygon pf = elementsDict[gmi].FirstOrDefault();
 				GameObject gao = new GameObject(geo.Offset.ToString());
+				gao.AddBinarySerializableData(geo);
 				if (cmt != null) {
 					/*+ " - " + i
 					+ " - " + pf?.Offset*/

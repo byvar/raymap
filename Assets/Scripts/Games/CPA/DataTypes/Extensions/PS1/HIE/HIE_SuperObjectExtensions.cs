@@ -10,7 +10,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public static class HIE_SuperObjectExtensions {
 		public static GameObject GetGameObject(this HIE_SuperObject spo) {
 			GameObject gao = new GameObject($"{spo.Type} @ {spo.Offset}");
-			
+			gao.AddBinarySerializableData(spo);
+
 			if (FileSystem.mode == FileSystem.Mode.Web) {
 				gao.name = $"{spo.Type}";
 			}
