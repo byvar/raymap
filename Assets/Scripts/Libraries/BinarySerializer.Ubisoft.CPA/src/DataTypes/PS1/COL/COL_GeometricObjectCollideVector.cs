@@ -2,17 +2,15 @@
 {
 	public class COL_GeometricObjectCollideVector : BinarySerializable
 	{
-		public short X { get; set; }
-		public short Y { get; set; }
-		public short Z { get; set; }
-		public short Short_06 { get; set; }
+		public float? Pre_CoordinateScale { get; set; }
+
+		public MTH3D_Vector_PS1_Short Vector { get; set; }
+		public short GarbageData { get; set; } // ???
 
 		public override void SerializeImpl(SerializerObject s)
 		{
-			X = s.Serialize<short>(X, name: nameof(X));
-			Y = s.Serialize<short>(Y, name: nameof(Y));
-			Z = s.Serialize<short>(Z, name: nameof(Z));
-			Short_06 = s.Serialize<short>(Short_06, name: nameof(Short_06));
+			Vector = s.SerializeObject<MTH3D_Vector_PS1_Short>(Vector, onPreSerialize: v => v.Pre_CoordinateScale = Pre_CoordinateScale, name: nameof(Vector));
+			GarbageData = s.Serialize<short>(GarbageData, name: nameof(GarbageData));
 		}
 	}
 }

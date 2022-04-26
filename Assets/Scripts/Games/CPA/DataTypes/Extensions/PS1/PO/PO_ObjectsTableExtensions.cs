@@ -35,7 +35,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 				if (collision != null) {
 					CS_PhysicalObjectCollisionMapping cm = collision.FirstOrDefault(c => c.POListEntryPointer == po.Offset);
 					if (cm != null && cm.Collision != null) {
-						GameObject cgao = null; //cm.Collision.GetGameObject();
+						GameObject cgao = cm.Collision.GetGameObject();
 						cgao.transform.SetParent(wrapper.transform);
 						cgao.transform.localPosition = Vector3.zero;
 						cgao.transform.localRotation = Quaternion.identity;

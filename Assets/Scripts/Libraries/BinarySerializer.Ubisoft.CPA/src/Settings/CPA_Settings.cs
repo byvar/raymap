@@ -13,6 +13,7 @@ namespace BinarySerializer.Ubisoft.CPA {
             EngineVersion = engineVersion;
             Platform = platform;
             EngineVersionTree = EngineVersionTree.Create(this);
+			COLTypes = COL_Types.GetCOLTypes(this);
         }
 
         public EngineVersion EngineVersion { get; }
@@ -49,6 +50,7 @@ namespace BinarySerializer.Ubisoft.CPA {
         public bool HasLinkedListHeaderPointers { get; set; } = false;
         public bool SNA_Compression { get; set; } = false;
         public AITypes AITypes { get; set; }
+		public COL_Types COLTypes { get; set; }
         public float TextureAnimationSpeedModifier { get; set; } = 1f;
         public float Luminosity { get; set; } = 0.5f;
         public bool Saturate { get; set; } = true;

@@ -15,15 +15,8 @@
 		public ushort V3 { get; set; }
 
 		// Unknown
-		public short X0 { get; set; }
-		public short Y0 { get; set; }
-		public short Z0 { get; set; }
-		public short X1 { get; set; }
-		public short Y1 { get; set; }
-		public short Z1 { get; set; }
-		public short X2 { get; set; }
-		public short Y2 { get; set; }
-		public short Z2 { get; set; }
+		public COL_GeometricObjectCollideVector Vector1 { get; set; }
+		public COL_GeometricObjectCollideVector Vector2 { get; set; }
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -34,21 +27,10 @@
 			V0 = s.Serialize<ushort>(V0, name: nameof(V0));
 			V1 = s.Serialize<ushort>(V1, name: nameof(V1));
 			V2 = s.Serialize<ushort>(V2, name: nameof(V2));
+			V3 = s.Serialize<ushort>(V3, name: nameof(V3));
 
-			if (Pre_IsQuad)
-				V3 = s.Serialize<ushort>(V3, name: nameof(V3));
-
-			X0 = s.Serialize<short>(X0, name: nameof(X0));
-			Y0 = s.Serialize<short>(Y0, name: nameof(Y0));
-			Z0 = s.Serialize<short>(Z0, name: nameof(Z0));
-			X1 = s.Serialize<short>(X1, name: nameof(X1));
-			Y1 = s.Serialize<short>(Y1, name: nameof(Y1));
-			Z1 = s.Serialize<short>(Z1, name: nameof(Z1));
-			X2 = s.Serialize<short>(X2, name: nameof(X2));
-			Y2 = s.Serialize<short>(Y2, name: nameof(Y2));
-			
-			if (!Pre_IsQuad)
-				Z2 = s.Serialize<short>(Z2, name: nameof(Z2));
+			Vector1 = s.SerializeObject<COL_GeometricObjectCollideVector>(Vector1, name: nameof(Vector1));
+			Vector2 = s.SerializeObject<COL_GeometricObjectCollideVector>(Vector2, name: nameof(Vector2));
 		}
 	}
 }

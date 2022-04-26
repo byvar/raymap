@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class EnvironmentController : MonoBehaviour {
 	// Set in inspector
+	public GeneralController GeneralController;
 	public EnvironmentEntry[] Environments;
 
 	public Unity_Environment InitializeEnvironment(string key) {

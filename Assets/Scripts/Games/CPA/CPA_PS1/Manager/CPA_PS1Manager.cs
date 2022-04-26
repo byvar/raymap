@@ -195,45 +195,47 @@ namespace Raymap
 					fileInfo: mainFileInfo,
 					memBlock: memBlock);
 
-				PS1_VRAM vram = LoadVRAM(cpaSettings, packedFiles[PackedFileType.XTP]);
+				GAM_Level_PS1 Level = new GAM_Level_PS1(context);
+
+				Level.VRAM = LoadVRAM(cpaSettings, packedFiles[PackedFileType.XTP]);
 
 				// Load the level memory
 				LoadLevelMemory(context, packedFiles[PackedFileType.IMG], memBlock);
 
-				// Load the level header
-				LevelHeader levelHeader = LoadLevelHeader(context, packedFiles[PackedFileType.SYS]);
+				// Load the Global Pointer Table
+				GAM_GlobalPointerTable gpt = LoadGlobalPointerTable(context, packedFiles[PackedFileType.SYS]);
 
 				string levelName = gameInfo.maps[memBlockIndex];
 
 				// Export UI textures
-				for (int i = 0; i < levelHeader.UITexturesCount; i++)
+				for (int i = 0; i < gpt.UITexturesCount; i++)
 				{
-					string name = levelHeader.UITexturesNames[i].Value.Name;
-					int width = levelHeader.UITexturesWidths[i];
-					int height = levelHeader.UITexturesHeights[i];
-					PS1_TSB tsb = levelHeader.UITexturesTSB[i];
-					PS1_CBA cba = levelHeader.UITexturesCBA[i];
-					byte x = levelHeader.UITexturesX[i];
-					byte y = levelHeader.UITexturesY[i];
+					string name = gpt.UITexturesNames[i].Value.Name;
+					int width = gpt.UITexturesWidths[i];
+					int height = gpt.UITexturesHeights[i];
+					PS1_TSB tsb = gpt.UITexturesTSB[i];
+					PS1_CBA cba = gpt.UITexturesCBA[i];
+					byte x = gpt.UITexturesX[i];
+					byte y = gpt.UITexturesY[i];
 
-					Texture2D tex = vram.GetTexture(width, height, tsb, cba, x, y);
+					Texture2D tex = Level.VRAM.GetTexture(width, height, tsb, cba, x, y);
 
 					tex.Export(Path.Combine(outputDir, "UI", levelName, name));
 				}
 
 				// Export AGO textures
-				for (int i = 0; i < levelHeader.AGOTexturesCount; i++)
+				for (int i = 0; i < gpt.AGOTexturesCount; i++)
 				{
-					int width = levelHeader.Rush_AGOTexturesWidths?[i] ?? -1;
-					int height = levelHeader.Rush_AGOTexturesHeights?[i] ?? -1;
-					PS1_TSB tsb = levelHeader.AGOTexturesTSB[i];
-					PS1_CBA cba = levelHeader.AGOTexturesCBA[i];
-					byte x = levelHeader.AGOTexturesX[i];
-					byte y = levelHeader.AGOTexturesY[i];
+					int width = gpt.Rush_AGOTexturesWidths?[i] ?? -1;
+					int height = gpt.Rush_AGOTexturesHeights?[i] ?? -1;
+					PS1_TSB tsb = gpt.AGOTexturesTSB[i];
+					PS1_CBA cba = gpt.AGOTexturesCBA[i];
+					byte x = gpt.AGOTexturesX[i];
+					byte y = gpt.AGOTexturesY[i];
 
 					if (width != -1 && height != -1)
 					{
-						Texture2D tex = vram.GetTexture(width, height, tsb, cba, x, y);
+						Texture2D tex = Level.VRAM.GetTexture(width, height, tsb, cba, x, y);
 						tex.Export(Path.Combine(outputDir, "AGO", levelName, $"{i}"));
 					}
 					else
@@ -264,7 +266,7 @@ namespace Raymap
 
 								try
 								{
-									Texture2D tex = vram.GetTexture(w, h, tsb, cba, x, y);
+									Texture2D tex = Level.VRAM.GetTexture(w, h, tsb, cba, x, y);
 									tex.Export(Path.Combine(outputDir, "AGO", levelName, $"{i}_{w}x{h}"));
 								} 
 								catch { }
@@ -342,7 +344,8 @@ namespace Raymap
 			CPA_Settings cpaSettings = context.GetCPASettings();
 			MapViewerSettings settings = context.GetMapViewerSettings();
 			BinaryDeserializer s = context.Deserializer;
-			
+			GAM_Level_PS1 Level = new GAM_Level_PS1(context);
+
 			PS1GameInfo gameInfo = GetGameInfo(settings);
 			PS1GameInfo.File mainFileInfo = gameInfo.files.First(x => x.fileID == 0);
 			PS1GameInfo.File.MemoryBlock levelMemBlock = mainFileInfo.memoryBlocks[Array.IndexOf(gameInfo.maps, settings.Map)];
@@ -363,7 +366,7 @@ namespace Raymap
 			await TimeController.WaitIfNecessary();
 
 			// Load the VRAM
-			PS1_VRAM vram = LoadVRAM(cpaSettings, packedFiles[PackedFileType.XTP]);
+			Level.VRAM = LoadVRAM(cpaSettings, packedFiles[PackedFileType.XTP]);
 
 			GlobalLoadState.DetailedState = $"Loading level";
 			await TimeController.WaitIfNecessary();
@@ -374,16 +377,18 @@ namespace Raymap
 			var sw = System.Diagnostics.Stopwatch.StartNew();
 
 			// Load the level header
-			LevelHeader levelHeader = LoadLevelHeader(context, packedFiles[PackedFileType.SYS]);
+			Level.GlobalPointerTable = LoadGlobalPointerTable(context, packedFiles[PackedFileType.SYS]);
+
+			// TODO: Load overlays & cutscene data
 
 			sw.Stop();
 			Debug.Log($"Loaded level header in {sw.ElapsedMilliseconds} ms");
 
-			Unity_Level_CPAPS1 level = new Unity_Level_CPAPS1() {
-				LevelHeader = levelHeader
+			Unity_Level_CPAPS1 unityLevel = new Unity_Level_CPAPS1() {
+				LevelData = Level
 			};
 
-			return level;
+			return unityLevel;
 		}
 
 		public PS1GameInfo GetGameInfo(MapViewerSettings settings) => 
@@ -492,11 +497,11 @@ namespace Raymap
 			context.AddMemoryMappedStreamFile(LevelDataFileName, data, memBlock.address, context.GetCPASettings().GetEndian);
 		}
 
-		public LevelHeader LoadLevelHeader(Context context, byte[] data)
+		public GAM_GlobalPointerTable LoadGlobalPointerTable(Context context, byte[] data)
 		{
 			// Add the level header file as a linear file as it doesn't matter where it's allocated in memory. This will parse the level data.
 			context.AddStreamFile(LevelHeaderFileName, data, context.GetCPASettings().GetEndian);
-			return FileFactory.Read<LevelHeader>(context, LevelHeaderFileName);
+			return FileFactory.Read<GAM_GlobalPointerTable>(context, LevelHeaderFileName);
 		}
 
 		public override async UniTask LoadFilesAsync(Context context)

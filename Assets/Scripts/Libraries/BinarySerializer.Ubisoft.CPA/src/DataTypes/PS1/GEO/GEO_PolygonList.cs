@@ -17,6 +17,20 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public GEO_Triangle[] Triangles { get; set; }
 		public GEO_Quad[] Quads { get; set; }
 
+		public GEO_IPS1Polygon[] Polygons {
+			get {
+				switch (Type) {
+					case PolygonListType.Quad: return Quads;
+					case PolygonListType.QuadLOD: return QuadLODs;
+					case PolygonListType.QuadNoTexture: return QuadNoTextures;
+					case PolygonListType.Triangle: return Triangles;
+					case PolygonListType.TriangleNoTexture: return TriangleNoTextures;
+					case PolygonListType.Sprite: return Sprites;
+					default: throw new BinarySerializableException(this, $"Invalid polygon type {Type}");
+				}
+			}
+		}
+
 		public override void SerializeImpl(SerializerObject s)
 		{
 			Type = s.Serialize<PolygonListType>(Type, name: nameof(Type));

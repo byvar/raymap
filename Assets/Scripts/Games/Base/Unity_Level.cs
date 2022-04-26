@@ -18,5 +18,15 @@ namespace Raymap {
 		}
 
 		public static string ContextKey => nameof(Unity_Level);
+
+		protected Dictionary<object, Unity_Data> UnityDataDictionary { get; set; } = new Dictionary<object, Unity_Data>();
+		public T GetUnityData<T,U>(U obj) where T : Unity_Data<U>, new() {
+			if (!UnityDataDictionary.ContainsKey(obj)) {
+				var data = new T();
+				data.Init(this, obj);
+				UnityDataDictionary[obj] = data;
+			}
+			return (T)UnityDataDictionary[obj];
+		}
 	}
 }

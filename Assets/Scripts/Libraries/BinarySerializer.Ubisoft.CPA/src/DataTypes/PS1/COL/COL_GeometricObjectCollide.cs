@@ -36,7 +36,7 @@
 			s.DoAt(VerticesPointer, () => 
 				Vertices = s.SerializeObjectArray<COL_GeometricObjectCollideVector>(Vertices, VerticesCount, name: nameof(Vertices)));
 			s.DoAt(NormalsPointer, () =>
-				Normals = s.SerializeObjectArray<COL_GeometricObjectCollideVector>(Normals, NormalsCount, name: nameof(Normals)));
+				Normals = s.SerializeObjectArray<COL_GeometricObjectCollideVector>(Normals, NormalsCount, onPreSerialize: v => v.Pre_CoordinateScale = (short.MaxValue / 8f), name: nameof(Normals)));
 			s.DoAt(TrianglesPointer, () =>
 				Triangles = s.SerializeObjectArray<COL_GeometricObjectCollidePolygon>(Triangles, TrianglesCount, x => x.Pre_IsQuad = false, name: nameof(Triangles)));
 			s.DoAt(QuadsPointer, () =>

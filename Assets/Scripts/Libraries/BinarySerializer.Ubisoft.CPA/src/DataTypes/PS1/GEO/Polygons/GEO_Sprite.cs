@@ -1,8 +1,9 @@
 ﻿using BinarySerializer.PS1;
+using System.Linq;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class GEO_Sprite : BinarySerializable
+	public class GEO_Sprite : BinarySerializable, GEO_IPS1Polygon
 	{
 		public byte MaterialFlags { get; set; }
 		public byte Scroll { get; set; }
@@ -37,6 +38,29 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			Y2 = s.Serialize<byte>(Y2, name: nameof(Y2));
 			X3 = s.Serialize<byte>(X3, name: nameof(X3));
 			Y3 = s.Serialize<byte>(Y3, name: nameof(Y3));
+
+			RegisterTexture();
 		}
+		#region GEO_IPS1Polygon implementation
+		public GLI_Texture Texture => Context?.GetLevel()?.TextureCache?.GetTexture(TSB, CBA, X0, Y0);
+
+		public GLI_VisualMaterial Material => new GLI_VisualMaterial(Context) {
+			Texture = Texture,
+			Scroll = Scroll,
+			MaterialFlags = MaterialFlags,
+		};
+
+		public void RegisterTexture() {
+			byte[] x = new[] { X0, X1, X2, X3 };
+			byte[] y = new[] { Y0, Y1, Y2, Y3 };
+			int xMin = x.Min();
+			int xMax = x.Max() + 1;
+			int yMin = y.Min();
+			int yMax = y.Max() + 1;
+			int w = xMax - xMin;
+			int h = yMax - yMin;
+			Context?.GetLevel()?.TextureCache?.RegisterTexture(TSB, CBA, xMin, xMax, yMin, yMax);
+		}
+		#endregion
 	}
 }

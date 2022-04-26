@@ -1,6 +1,6 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class GEO_QuadNoTexture : BinarySerializable
+	public class GEO_QuadNoTexture : BinarySerializable, GEO_IPS1Polygon
 	{
 		public ushort V0 { get; set; }
 		public ushort V1 { get; set; }
@@ -18,5 +18,16 @@
 			Ushort_08 = s.Serialize<ushort>(Ushort_08, name: nameof(Ushort_08));
 			Ushort_0A = s.Serialize<ushort>(Ushort_0A, name: nameof(Ushort_0A));
 		}
+
+
+		#region GEO_IPS1Polygon implementation
+		public GLI_Texture Texture => null;
+
+		public GLI_VisualMaterial Material => null;
+
+		public void RegisterTexture() {
+			throw new System.NotImplementedException();
+		}
+		#endregion
 	}
 }

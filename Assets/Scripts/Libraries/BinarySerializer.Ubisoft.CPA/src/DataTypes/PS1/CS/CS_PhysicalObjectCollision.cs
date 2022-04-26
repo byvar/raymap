@@ -15,6 +15,8 @@
 			CollisionCount = s.Serialize<uint>(CollisionCount, name: nameof(CollisionCount));
 			GeoCollidePointer = s.SerializePointer(GeoCollidePointer, allowInvalid: CollisionCount == 0, name: nameof(GeoCollidePointer));
 
+			if(CollisionCount > 1)
+				s.LogWarning($"{Offset}: Encountered a {nameof(CS_PhysicalObjectCollision)} with {nameof(CollisionCount)} > 1! Check the data to find out how this is serialized");
 			// Serialize data from pointers
 			s.DoAt(GeoCollidePointer, () => 
 				GeoCollide = s.SerializeObject<COL_GeometricObjectCollide>(GeoCollide, name: nameof(GeoCollide)));

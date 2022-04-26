@@ -5,9 +5,13 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public class GLI_VisualMaterial : IEquatable<GLI_VisualMaterial> {
 		public Context Context { get; set; }
 
-		public GLI_TextureBounds Texture { get; set; }
+		public GLI_Texture Texture { get; set; }
 		public byte MaterialFlags { get; set; }
 		public byte Scroll { get; set; }
+
+		public GLI_VisualMaterial(Context c) {
+			Context = c;
+		}
 
 		public SemiTransparentMode BlendMode {
 			get {
@@ -53,7 +57,6 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 		}
 		public float ScrollY => 0f;
 		public bool ScrollingEnabled => (Scroll >> 5) != 0;
-		public bool IsTransparent => Texture?.IsTransparent ?? false;
 		public bool IsLight => (MaterialFlags & 0x80) == 0x80;
 
 		public override bool Equals(System.Object obj) {

@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace BinarySerializer.Ubisoft.CPA {
+namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public class MTH3D_Vector_PS1_Int : BinarySerializable {
 		public int X_Int { get; set; }
 		public int Y_Int { get; set; }
 		public int Z_Int { get; set; }
 
-		public float CoordinateScale => 100f;
+		public float CoordinateScale => Context.GetLevel().CoordinateFactor;
 		public float X {
 			get => X_Int / CoordinateScale;
 			set => X_Int = (int)(value * CoordinateScale);

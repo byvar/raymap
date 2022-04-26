@@ -1,12 +1,14 @@
 ﻿using System;
 
-namespace BinarySerializer.Ubisoft.CPA {
+namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public class MTH3D_Vector_PS1_Short : BinarySerializable {
+		public float? Pre_CoordinateScale { get; set; }
+
 		public short X_Short { get; set; }
 		public short Y_Short { get; set; }
 		public short Z_Short { get; set; }
 
-		public float CoordinateScale => 100f;
+		public float CoordinateScale => Pre_CoordinateScale ?? Context.GetLevel().CoordinateFactor;
 		public float X {
 			get => X_Short / CoordinateScale;
 			set => X_Short = (short)(value * CoordinateScale);

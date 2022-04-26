@@ -1,4 +1,5 @@
 ﻿using BinarySerializer.Unity;
+using Raymap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,10 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			gao.transform.localPosition = bone.TranslationVector.GetUnityVector(convertAxes: true);
 			gao.transform.localRotation = bone.RotationMatrix.InvertedMatrix.GetRotation().GetUnityQuaternion(convertAxes: true);
 			gao.transform.localScale = Vector3.one;
+		}
+
+		public static BoneWeight GetUnityWeight(this GEO_DeformationVertexWeightSet dvw) {
+			return dvw.Context.GetUnityLevel().GetUnityData<GEO_UnityDeformationWeight, GEO_DeformationVertexWeightSet>(dvw).UnityWeight;
 		}
 	}
 }

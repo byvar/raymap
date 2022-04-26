@@ -1,6 +1,6 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class GEO_QuadLOD : BinarySerializable
+	public class GEO_QuadLOD : BinarySerializable, GEO_IPS1Polygon
 	{
 		public ushort V0 { get; set; }
 		public ushort V1 { get; set; }
@@ -43,5 +43,15 @@
 				Quads = s.SerializeObjectArray<GEO_Quad>(Quads, QuadsCount, name: nameof(Quads));
 			});
 		}
+
+		#region GEO_IPS1Polygon implementation
+		public GLI_Texture Texture => null;
+
+		public GLI_VisualMaterial Material => null;
+
+		public void RegisterTexture() {
+			throw new System.NotImplementedException();
+		}
+		#endregion
 	}
 }

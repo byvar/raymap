@@ -4,7 +4,7 @@ using BinarySerializer.PS1;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class LevelHeader : BinarySerializable
+	public class GAM_GlobalPointerTable : BinarySerializable
 	{
 		public byte[] UnknownBytes1 { get; set; }
 		public uint DynamicGeometricObjectsCount_Cine { get; set; }
@@ -136,7 +136,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public ushort[] Rush_AGOTexturesHeights { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			Context.StoreObject<LevelHeader>(ContextKey, this);
+			s.GetLevel().GlobalPointerTable = this;
 			CPA_Settings settings = s.GetCPASettings();
 
 			if (settings.EngineVersion == EngineVersion.RaymanRush_PS1)
@@ -392,7 +392,5 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			s.DoAt(Rush_AGOTexturesHeightsPointer, () =>
 				Rush_AGOTexturesHeights = s.SerializeArray<ushort>(Rush_AGOTexturesHeights, AGOTexturesCount, name: nameof(Rush_AGOTexturesHeights)));
 		}
-
-		public static string ContextKey => nameof(LevelHeader);
 	}
 }

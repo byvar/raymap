@@ -5,13 +5,13 @@ using static BinarySerializer.Ubisoft.CPA.PS1.GLI_VisualMaterial;
 namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public static class GLI_VisualMaterialExtensions {
 		public static Material CreateMaterial(this GLI_VisualMaterial vm) {
-			GLI_TextureBounds b = vm.Texture;
+			GLI_Texture b = vm.Texture;
 			Material baseMaterial;
 			SemiTransparentMode stMode = vm.BlendMode;
 			var env = (Unity_Environment_CPA)vm.Context.GetUnityEnvironment();
 			if (vm.IsLight || stMode == SemiTransparentMode.MinusOne) {
 				baseMaterial = env.MaterialVisualLight;
-			} else if (vm.IsTransparent || stMode != SemiTransparentMode.One) {
+			} else if ((vm?.Texture?.IsTransparent() ?? false) || stMode != SemiTransparentMode.One) {
 				baseMaterial = env.MaterialVisualTransparent;
 			} else {
 				baseMaterial = env.MaterialVisualOpaque;
@@ -23,7 +23,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			Material mat = new Material(baseMaterial);
 			mat.SetInt("_NumTextures", 1);
 			string textureName = "_Tex0";
-			Texture2D tex = null; // TODO //b.texture;
+			Texture2D tex = b.GetTexture();
 			if (vm.ScrollingEnabled) tex.wrapMode = TextureWrapMode.Repeat;
 			mat.SetTexture(textureName, tex);
 

@@ -86,16 +86,16 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 		public BinarySerializable LinkedObject {
 			get {
-				LevelHeader h = Context.GetLevelHeader();
+				GAM_GlobalPointerTable gpt = Context.GetLevel().GlobalPointerTable;
 				if (Type == HIE_ObjectType_98.InstanciatedPhysicalObject) {
-					if ((DataIndex >> 1) >= h.StaticGeometricObjects.Entries.Length) throw new Exception("IPO SO data index was too high! " + h.StaticGeometricObjects.Entries.Length + " - " + DataIndex);
-					return h.StaticGeometricObjects.Entries[DataIndex >> 1].GeometricObject;
+					if ((DataIndex >> 1) >= gpt.StaticGeometricObjects.Entries.Length) throw new Exception("IPO SO data index was too high! " + gpt.StaticGeometricObjects.Entries.Length + " - " + DataIndex);
+					return gpt.StaticGeometricObjects.Entries[DataIndex >> 1].GeometricObject;
 				} else if (Type == HIE_ObjectType_98.Character) {
-					if (DataIndex >= h.Persos.Length) throw new Exception("Perso SO data index was too high! " + h.Persos.Length + " - " + DataIndex);
-					return h.Persos[DataIndex];
+					if (DataIndex >= gpt.Persos.Length) throw new Exception("Perso SO data index was too high! " + gpt.Persos.Length + " - " + DataIndex);
+					return gpt.Persos[DataIndex];
 				} else if (Type == HIE_ObjectType_98.Sector) {
-					if (DataIndex >= h.Sectors.Length) throw new Exception("Sector SO data index was too high! " + h.Sectors.Length + " - " + DataIndex);
-					return h.Sectors[DataIndex];
+					if (DataIndex >= gpt.Sectors.Length) throw new Exception("Sector SO data index was too high! " + gpt.Sectors.Length + " - " + DataIndex);
+					return gpt.Sectors[DataIndex];
 				}
 				return null;
 			}

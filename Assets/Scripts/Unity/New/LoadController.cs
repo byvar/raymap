@@ -6,15 +6,15 @@ using System.Diagnostics;
 using UnityEngine;
 
 public class LoadController : MonoBehaviour {
+	// Set in Unity inspector
+	public GeneralController GeneralController;
+	public LoadingScreen LoadingScreen;
 
-    // The context, to reuse when writing
-    private Context SerializeContext { get; set; }
+	// The context, to reuse when writing
+	private Context SerializeContext { get; set; }
 
     public Unity_Level Level { get; private set; }
 	public Unity_Environment Environment { get; private set; }
-
-    // Set in Unity inspector
-    public LoadingScreen LoadingScreen;
 
 	private void Awake() {
         Application.logMessageReceived += Log;
@@ -76,8 +76,7 @@ public class LoadController : MonoBehaviour {
 		// This environment will be a prefab or will create all the necessary controllers/monobehaviours.
 		// And those will be initialized by the environment itself.
 		// This way CPA and Jade for example can use completely different code without getting in each other's way.
-		EnvironmentController envController = FindObjectOfType<EnvironmentController>();
-		Environment = envController.InitializeEnvironment(Level.EnvironmentKey);
+		Environment = GeneralController.EnvironmentController.InitializeEnvironment(Level.EnvironmentKey);
 		Environment.Register(SerializeContext);
 		Environment.Init();
 

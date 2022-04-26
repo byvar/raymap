@@ -120,5 +120,51 @@ namespace BinarySerializer.Unity
 			}
 			return false;
 		}
+
+		public static Texture2D CreateDummyTexture() {
+			Texture2D texture = new Texture2D(1, 1);
+			texture.SetPixel(0, 0, UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f, 1f, 1f));
+			texture.Apply();
+			return texture;
+		}
+
+		public static Texture2D WhiteTexture() {
+			Texture2D tex = new Texture2D(1, 1);
+			tex.SetPixel(0, 0, Color.white);
+			tex.Apply();
+			return tex;
+		}
+		public static Texture2D GrayTexture() {
+			Texture2D tex = new Texture2D(1, 1);
+			tex.SetPixel(0, 0, Color.gray);
+			tex.Apply();
+			return tex;
+		}
+
+		public static Texture2D CreateDummyCheckerTexture() {
+			Texture2D texture = new Texture2D(2, 2);
+			Color col1 = Color.white;
+			Color col2 = new Color(0.9f, 0.9f, 0.9f, 1f); // very light grey
+			texture.SetPixel(0, 0, col1);
+			texture.SetPixel(1, 1, col1);
+			texture.SetPixel(0, 1, col2);
+			texture.SetPixel(1, 0, col2);
+			texture.filterMode = FilterMode.Point;
+			texture.Apply();
+			return texture;
+		}
+
+		public static Texture2D CreateDummyLineTexture() {
+			Texture2D texture = new Texture2D(2, 2);
+			Color col1 = Color.white;
+			Color col2 = new Color(0.9f, 0.9f, 0.9f, 1f); // very light grey
+			texture.SetPixel(0, 0, col1);
+			texture.SetPixel(1, 1, col2);
+			texture.SetPixel(0, 1, col1);
+			texture.SetPixel(1, 0, col2);
+			texture.filterMode = FilterMode.Point;
+			texture.Apply();
+			return texture;
+		}
 	}
 }

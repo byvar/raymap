@@ -1,8 +1,9 @@
 ﻿using BinarySerializer.PS1;
+using System.Linq;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class GEO_Triangle : BinarySerializable
+	public class GEO_Triangle : BinarySerializable, GEO_IPS1Polygon
 	{
 		public ushort V0 { get; set; }
 		public ushort V1 { get; set; }
@@ -35,6 +36,29 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			X2 = s.Serialize<byte>(X2, name: nameof(X2));
 			Y2 = s.Serialize<byte>(Y2, name: nameof(Y2));
 			Ushort_12 = s.Serialize<ushort>(Ushort_12, name: nameof(Ushort_12));
+
+			RegisterTexture();
 		}
+		#region GEO_IPS1Polygon implementation
+		public GLI_Texture Texture => Context?.GetLevel()?.TextureCache?.GetTexture(TSB, CBA, X0, Y0);
+
+		public GLI_VisualMaterial Material => new GLI_VisualMaterial(Context) {
+			Texture = Texture,
+			Scroll = Scroll,
+			MaterialFlags = MaterialFlags,
+		};
+
+		public void RegisterTexture() {
+			byte[] x = new[] { X0, X1, X2 };
+			byte[] y = new[] { Y0, Y1, Y2 };
+			int xMin = x.Min();
+			int xMax = x.Max() + 1;
+			int yMin = y.Min();
+			int yMax = y.Max() + 1;
+			int w = xMax - xMin;
+			int h = yMax - yMin;
+			Context?.GetLevel()?.TextureCache?.RegisterTexture(TSB, CBA, xMin, xMax, yMin, yMax);
+		}
+		#endregion
 	}
 }

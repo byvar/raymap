@@ -1,6 +1,6 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class GMT_CollideMaterial : BinarySerializable
+	public class GMT_CollisionMaterial : BinarySerializable
 	{
 		public ushort Type { get; set; }
 		public ushort Identifier { get; set; } // TODO: Flags

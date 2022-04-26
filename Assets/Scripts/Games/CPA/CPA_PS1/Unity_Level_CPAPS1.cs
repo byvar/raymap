@@ -7,7 +7,7 @@ using BinarySerializer;
 
 namespace Raymap {
 	public class Unity_Level_CPAPS1 : Unity_Level {
-		public LevelHeader LevelHeader { get; set; }
+		public GAM_Level_PS1 LevelData { get; set; }
 
 		// Added by Init
 		public List<SuperObjectComponent> SuperObjects { get; set; } = new List<SuperObjectComponent>(); // To use when SuperObjectComponent is added to GetGameObject
@@ -16,9 +16,9 @@ namespace Raymap {
 
 		public override void Init() {
 			// Collect all superobjects
-			ProcessSuperObject(LevelHeader?.DynamicWorld, "Dynamic world");
-			ProcessSuperObject(LevelHeader?.FatherSector, "Father sector");
-			ProcessSuperObject(LevelHeader?.InactiveDynamicWorld, "Inactive dynamic world");
+			ProcessSuperObject(LevelData?.GlobalPointerTable?.DynamicWorld, "Dynamic world");
+			ProcessSuperObject(LevelData?.GlobalPointerTable?.FatherSector, "Father sector");
+			ProcessSuperObject(LevelData?.GlobalPointerTable?.InactiveDynamicWorld, "Inactive dynamic world");
 
 		}
 
