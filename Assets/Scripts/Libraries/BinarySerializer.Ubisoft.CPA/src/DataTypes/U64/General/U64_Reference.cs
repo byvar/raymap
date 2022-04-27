@@ -27,7 +27,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			var loader = s.GetLoader();
 			ushort index = Index;
-			if (isInFixFixFat) index = (ushort)BitHelpers.SetBits(index, 1, 1, 15);
+			if (isInFixFixFat) index = (ushort)BitHelpers.SetBits64(index, 1, 1, 15);
 			var type = U64_StructType_Defines.GetType(typeof(T));
 			var name = $"{type.Value}_{index:X4}";
 

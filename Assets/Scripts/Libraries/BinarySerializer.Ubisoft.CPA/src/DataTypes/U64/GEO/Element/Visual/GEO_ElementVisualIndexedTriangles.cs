@@ -41,7 +41,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				g.Pre_VerticesCount = VerticesCount;
 				g.Pre_FacesCount = FacesCount;
 			});
-			GraphicsList?.Resolve(s, onPreSerialize: (_, g) => g.Pre_Size = GraphicsListSize);
+			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.RaymanRavingRabbids))
+				GraphicsList?.Resolve(s, onPreSerialize: (_, g) => g.Pre_Size = GraphicsListSize);
 			CompressedGraphicsList?.Resolve(s, onPreSerialize: (_, g) => g.Pre_CompressedSize = CompressedGraphicsListSize);
 		}
 	}
