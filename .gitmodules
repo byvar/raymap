@@ -4,3 +4,6 @@
 [submodule "Assets/Scripts/Libraries/BinarySerializer.PS1"]
 	path = Assets/Scripts/Libraries/BinarySerializer.PS1
 	url = https://github.com/BinarySerializer/BinarySerializer.PS1
+[submodule "Assets/Scripts/Libraries/BinarySerializer.Nintendo"]
+	path = Assets/Scripts/Libraries/BinarySerializer.Nintendo
+	url = https://github.com/BinarySerializer/BinarySerializer.Nintendo
