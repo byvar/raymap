@@ -1,4 +1,4 @@
-﻿using BinarySerializer.Nintendo.N64;
+﻿using BinarySerializer.Nintendo;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GEO_VerticesList : U64_Struct {
