@@ -1,4 +1,4 @@
-﻿using BinarySerializer.Nintendo;
+﻿using BinarySerializer.Nintendo.N64;
 
 namespace BinarySerializer.Ubisoft.CPA.U64
 {
