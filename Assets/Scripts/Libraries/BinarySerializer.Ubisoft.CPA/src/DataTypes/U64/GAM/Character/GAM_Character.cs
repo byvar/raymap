@@ -1,7 +1,7 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA.U64 {
 	// Loaded into EngineObject
 	public class GAM_Character : U64_Struct {
-		public U64_Reference<U64_Placeholder> _3dData { get; set; }
+		public U64_Reference<GAM_Character3dData> _3dData { get; set; }
 		public U64_Reference<U64_Placeholder> Brain { get; set; }
 		public U64_Reference<U64_Placeholder> CineInfo { get; set; }
 		public U64_Reference<U64_Placeholder> CollSet { get; set; }
@@ -14,7 +14,7 @@
 		public byte AllocWay { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			_3dData = s.SerializeObject<U64_Reference<U64_Placeholder>>(_3dData, name: nameof(_3dData));
+			_3dData = s.SerializeObject<U64_Reference<GAM_Character3dData>>(_3dData, name: nameof(_3dData))?.Resolve(s);
 			Brain = s.SerializeObject<U64_Reference<U64_Placeholder>>(Brain, name: nameof(Brain));
 			CineInfo = s.SerializeObject<U64_Reference<U64_Placeholder>>(CineInfo, name: nameof(CineInfo));
 			CollSet = s.SerializeObject<U64_Reference<U64_Placeholder>>(CollSet, name: nameof(CollSet));

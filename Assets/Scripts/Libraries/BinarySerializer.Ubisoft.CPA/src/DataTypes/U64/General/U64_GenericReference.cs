@@ -95,6 +95,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 
 		public override bool UseShortLog => true;
-		public override string ShortLog => $"{Index:X4}";
+		public override string ShortLog {
+			get {
+				var type = U64_StructType_Defines.GetType(Context, Type);
+				if (!type.HasValue)
+					return $"Type_{Type}_{Index:X4}";
+				return $"{type}_{Index:X4}";
+			}
+		}
 	}
 }

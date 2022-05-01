@@ -198,6 +198,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_LevelsNameList)] = U64_StructType.LevelsNameList,
 			[typeof(GAM_FixPreloadSection)] = U64_StructType.FixPreloadSection,
 			[typeof(GAM_Character)] = U64_StructType.Character,
+			[typeof(GAM_Character3dData)] = U64_StructType.Character3dData,
 			[typeof(GAM_CharacterStandardGame)] = U64_StructType.CharacterStandardGame,
 			[typeof(GAM_Family)] = U64_StructType.Family,
 			[typeof(GAM_State)] = U64_StructType.State,
@@ -211,6 +212,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			// PO
 			[typeof(PO_PhysicalObject)] = U64_StructType.PhysicalObject,
+			[typeof(PO_Zoo)] = U64_StructType.PhysicalCollSet__Zoo,
 
 			// GEO
 			[typeof(GEO_GeometricObject)] = U64_StructType.GeometricObject,
