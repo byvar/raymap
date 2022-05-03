@@ -30,7 +30,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			for (int i = 0; i < elements.Length; i++) {
 				byte gmi = elements[i];
 				GMT_GameMaterial gmt = GetMaterial(gmi);
-				var cmt = gmt?.CollisionMaterial?.Value;
+				var cmt = gmt?.CollideMaterial?.Value;
 
 				COL_GeometricObjectCollidePolygon pf = elementsDict[gmi].FirstOrDefault();
 				GameObject gao = new GameObject(geo.Offset.ToString());
@@ -38,7 +38,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 				if (cmt != null) {
 					/*+ " - " + i
 					+ " - " + pf?.Offset*/
-					gao.name += " - " + string.Format("{0:X2}", cmt.Type)
+					gao.name += " - " + cmt.ZoneType
 					+ "|" + string.Format("{0:X2}", cmt.Identifier);
 				}
 				gao.transform.SetParent(parentGao.transform);

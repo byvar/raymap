@@ -5,7 +5,7 @@ using Colors = OpenSpace.Collide.CollideMaterial.Colors;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public static class GMT_CollisionMaterialExtensions {
-		public static Material CreateMaterial(this GMT_CollisionMaterial cmt) {
+		public static Material CreateMaterial(this GMT_CollideMaterial cmt) {
 			var env = ((Unity_Environment_CPA)cmt.Context.GetUnityEnvironment());
 			Material mat = new Material(env.MaterialCollision);
 			// TODO: use col types

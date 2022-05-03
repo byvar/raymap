@@ -200,9 +200,11 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_Character)] = U64_StructType.Character,
 			[typeof(GAM_Character3dData)] = U64_StructType.Character3dData,
 			[typeof(GAM_CharacterStandardGame)] = U64_StructType.CharacterStandardGame,
+			[typeof(GAM_CharacterCollSet)] = U64_StructType.CharacterCollSet,
 			[typeof(GAM_CharacterMicro)] = U64_StructType.CharacterMicro,
 			[typeof(GAM_CharacterDynamics)] = U64_StructType.CharacterDyn,
 			[typeof(GAM_CharacterCineInfo)] = U64_StructType.CharacterCineInfo,
+			[typeof(GAM_CharacterLight)] = U64_StructType.CharacterLight,
 			[typeof(GAM_CharacterSound)] = U64_StructType.CharacterSound,
 			[typeof(GAM_Family)] = U64_StructType.Family,
 			[typeof(GAM_State)] = U64_StructType.State,
@@ -211,8 +213,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_StateTransition)] = U64_StructType.StateList,
 			[typeof(GAM_ObjectsTable)] = U64_StructType.ObjectsTable,
 			[typeof(GAM_ObjectsTableEntry)] = U64_StructType.ObjectsTableList,
-			[typeof(LST_Ref<GAM_State>)] = U64_StructType.StateRefList,
-			[typeof(LST_Ref<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
+			[typeof(GAM_ZdxArray)] = U64_StructType.ArrayOfZdx,
+			[typeof(GAM_ZdxIndex)] = U64_StructType.LST_ZdxIndex,
+			[typeof(GAM_ZoneSetArray)] = U64_StructType.ArrayOfZoneSet,
+			[typeof(GAM_ZoneSet)] = U64_StructType.LST_ZoneSet,
+			[typeof(GAM_ActivationZone)] = U64_StructType.ActivationZone,
+			[typeof(LST_ReferenceElement<GAM_State>)] = U64_StructType.StateRefList,
+			[typeof(LST_ReferenceElement<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
 
 			// PO
 			[typeof(PO_PhysicalObject)] = U64_StructType.PhysicalObject,
@@ -225,11 +232,14 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GEO_ElementSprites)] = U64_StructType.GeometricElementSprites,
 			[typeof(GEO_CollisionElementListEntry)] = U64_StructType.GeometricElementCollideList,
 			[typeof(GEO_ElementCollisionIndexedTriangles)] = U64_StructType.GeometricElementCollideIndexedTriangles,
+			[typeof(GEO_ElementSpheres)] = U64_StructType.GeometricElementSpheres,
+			[typeof(GEO_Sphere)] = U64_StructType.LST_GeometricElementSpheres,
 			[typeof(GEO_TripledIndex)] = U64_StructType.GeometricElementCollideTrianglesData__ColFacesPnt,
 			[typeof(GEO_VerticesList)] = U64_StructType.U64VertexList,
 			[typeof(GEO_GraphicsList3DS)] = U64_StructType.GraphicsList3DS,
 			[typeof(GEO_GraphicsList)] = U64_StructType.U64GraphicsList,
 			[typeof(GEO_CompressedGraphicsListDS)] = U64_StructType.CompressedDSGraphicsList,
+			[typeof(LST_ReferenceElement<GEO_GeometricObject>)] = U64_StructType.LST_GeometricObject,
 
 			// GLI
 			[typeof(GLI_VisualMaterial)] = U64_StructType.VisualMaterial,
@@ -242,6 +252,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_BitmapRGBA16)] = U64_StructType.BitmapRGBA16,
 			[typeof(GLI_PaletteRGBA16)] = U64_StructType.PaletteRGBA16,
 
+			// GMT
+			[typeof(GMT_GameMaterial)] = U64_StructType.GameMaterial,
+			[typeof(GMT_CollideMaterial)] = U64_StructType.CollideMaterial,
 
 
 			// MEC

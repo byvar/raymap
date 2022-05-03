@@ -87,6 +87,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.GeometricElementU64IndexedTriangles => Serialize<GEO_ElementVisualIndexedTriangles>(),
 				U64_StructType.GeometricElementSprites => Serialize<GEO_ElementSprites>(),
 				U64_StructType.GeometricElementCollideIndexedTriangles => Serialize<GEO_ElementCollisionIndexedTriangles>(),
+				U64_StructType.GeometricElementSpheres => Serialize<GEO_ElementSpheres>(),
 				U64_StructType.IdCardBase => Serialize<MEC_IdCardBase>(),
 				U64_StructType.IdCardCamera => Serialize<MEC_IdCardCamera>(),
 				_ => throw new BinarySerializableException(this, $"Type {type} is not implemented in {GetType()}")
