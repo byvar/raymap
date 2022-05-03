@@ -177,7 +177,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.TextureList,
 				U64_StructType.StringChunk,
 				U64_StructType.ArrayEntry,
-				// TOOD: Add other entries
+				U64_StructType.BackgroundCI8,
+				U64_StructType.BackgroundPaletteList,
+				U64_StructType.BackgroundInfo,
+				U64_StructType.NODFile,
+				U64_StructType.VignetteCount,
+				U64_StructType.CPakFont,
+				// TOOD: Add other entries? DontSaveStructStart starts here
 			});
 			Dictionary<ushort, U64_StructType> dict = new Dictionary<ushort, U64_StructType>();
 			for(ushort i = 0; i < Types.Count; i++) {
@@ -200,6 +206,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_Character)] = U64_StructType.Character,
 			[typeof(GAM_Character3dData)] = U64_StructType.Character3dData,
 			[typeof(GAM_CharacterStandardGame)] = U64_StructType.CharacterStandardGame,
+			[typeof(GAM_CharacterBrain)] = U64_StructType.CharacterBrain,
 			[typeof(GAM_CharacterCollSet)] = U64_StructType.CharacterCollSet,
 			[typeof(GAM_CharacterMicro)] = U64_StructType.CharacterMicro,
 			[typeof(GAM_CharacterDynamics)] = U64_StructType.CharacterDyn,
@@ -260,6 +267,15 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			// MEC
 			[typeof(MEC_IdCardBase)] = U64_StructType.IdCardBase,
 			[typeof(MEC_IdCardCamera)] = U64_StructType.IdCardCamera,
+
+			// AI
+			[typeof(AI_AIModel)] = U64_StructType.AIModel,
+			[typeof(AI_Intelligence)] = U64_StructType.Intelligence,
+			[typeof(AI_Comport)] = U64_StructType.Comport,
+			[typeof(AI_Rule)] = U64_StructType.Rule,
+			[typeof(AI_NodeInterpret)] = U64_StructType.NODFile,
+			[typeof(LST_ReferenceElement<AI_Comport>)] = U64_StructType.ListOfComport,
+			[typeof(LST_ReferenceElement<AI_Rule>)] = U64_StructType.ListOfRules,
 
 			// TODO
 		};

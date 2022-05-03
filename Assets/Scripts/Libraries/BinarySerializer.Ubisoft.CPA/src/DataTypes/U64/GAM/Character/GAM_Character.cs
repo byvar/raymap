@@ -2,7 +2,7 @@
 	// Loaded into EngineObject
 	public class GAM_Character : U64_Struct {
 		public U64_Reference<GAM_Character3dData> _3dData { get; set; }
-		public U64_Reference<U64_Placeholder> Brain { get; set; }
+		public U64_Reference<GAM_CharacterBrain> Brain { get; set; }
 		public U64_Reference<GAM_CharacterCineInfo> CineInfo { get; set; }
 		public U64_Reference<GAM_CharacterCollSet> CollSet { get; set; }
 		public U64_Reference<GAM_CharacterLight> Light { get; set; }
@@ -15,7 +15,7 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 			_3dData = s.SerializeObject<U64_Reference<GAM_Character3dData>>(_3dData, name: nameof(_3dData))?.Resolve(s);
-			Brain = s.SerializeObject<U64_Reference<U64_Placeholder>>(Brain, name: nameof(Brain));
+			Brain = s.SerializeObject<U64_Reference<GAM_CharacterBrain>>(Brain, name: nameof(Brain))?.Resolve(s);
 			CineInfo = s.SerializeObject<U64_Reference<GAM_CharacterCineInfo>>(CineInfo, name: nameof(CineInfo))?.Resolve(s);
 			CollSet = s.SerializeObject<U64_Reference<GAM_CharacterCollSet>>(CollSet, name: nameof(CollSet))?.Resolve(s);
 			Light = s.SerializeObject<U64_Reference<GAM_CharacterLight>>(Light, name: nameof(Light))?.Resolve(s);

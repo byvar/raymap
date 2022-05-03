@@ -168,5 +168,11 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		CharacterCineInfo,
 		CharacterLight,
 		CharacterMicro,
+		BackgroundCI8,
+		BackgroundPaletteList,
+		BackgroundInfo,
+		NODFile,
+		VignetteCount,
+		CPakFont,
 	}
 }
