@@ -273,7 +273,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(AI_Intelligence)] = U64_StructType.Intelligence,
 			[typeof(AI_Comport)] = U64_StructType.Comport,
 			[typeof(AI_Rule)] = U64_StructType.Rule,
-			[typeof(AI_NodeInterpret)] = U64_StructType.NODFile,
+			[typeof(AI_Node)] = U64_StructType.ScriptNodeArray__Node,
+			[typeof(AI_NodeInterpretFull)] = U64_StructType.NODFile,
 			[typeof(LST_ReferenceElement<AI_Comport>)] = U64_StructType.ListOfComport,
 			[typeof(LST_ReferenceElement<AI_Rule>)] = U64_StructType.ListOfRules,
 

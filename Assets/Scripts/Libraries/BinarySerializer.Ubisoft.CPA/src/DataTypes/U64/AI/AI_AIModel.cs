@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 		// For FastC
 		public U64_Reference<AI_Intelligence> Reference { get; set; }
-		public U64_ArrayReference<AI_NodeInterpret> ReferenceTree { get; set; } // Full NodeInterpret reference!
+		public U64_ArrayReference<AI_NodeInterpretFull> ReferenceTree { get; set; } // Full NodeInterpret reference!
 		public ushort ReferenceTreeSize { get; set; }
 		public short CFast_FunctionIndex { get; set; }
 		public bool CFast_IsC { get; set; }
@@ -20,7 +20,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			// For FastC
 			Reference = s.SerializeObject<U64_Reference<AI_Intelligence>>(Reference, name: nameof(Reference));
-			ReferenceTree = s.SerializeObject<U64_ArrayReference<AI_NodeInterpret>>(ReferenceTree, name: nameof(ReferenceTree));
+			ReferenceTree = s.SerializeObject<U64_ArrayReference<AI_NodeInterpretFull>>(ReferenceTree, name: nameof(ReferenceTree));
 			ReferenceTreeSize = s.Serialize<ushort>(ReferenceTreeSize, name: nameof(ReferenceTreeSize));
 			CFast_FunctionIndex = s.Serialize<short>(CFast_FunctionIndex, name: nameof(CFast_FunctionIndex));
 			s.DoBits<ushort>(b => {
@@ -30,7 +30,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			if (CFast_IsC && !Reference.IsNull) {
 				Reference?.Resolve(s);
-				ReferenceTree?.Resolve(s, ReferenceTreeSize / AI_NodeInterpret.StructSize);
+				ReferenceTree?.Resolve(s, ReferenceTreeSize / AI_NodeInterpretFull.StructSize);
 			}
 		}
 	}

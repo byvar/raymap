@@ -5,55 +5,53 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public partial class AITypes {
-
-        public static AITypes TTSE => new AITypes()
-        {
-            #region Node types
-            nodeTypes = new ScriptNodeType[] {
-                ScriptNodeType.KeyWord, // 0
-                ScriptNodeType.Condition,
-                ScriptNodeType.Operator,
-                ScriptNodeType.Function,
-                ScriptNodeType.Procedure,
-                ScriptNodeType.MetaAction, // 5
-                ScriptNodeType.BeginMacro,
-                ScriptNodeType.EndMacro,
-                ScriptNodeType.Unknown,
-                ScriptNodeType.Field,
-                ScriptNodeType.DsgVar, // 10
-                ScriptNodeType.DsgVarRef,
-                ScriptNodeType.Constant,
-                ScriptNodeType.Real,
-                ScriptNodeType.Button,
-                ScriptNodeType.ConstantVector, // 15
-                ScriptNodeType.Vector,
-                ScriptNodeType.Mask,
-                ScriptNodeType.Module,
-                ScriptNodeType.DsgVarId,
-                ScriptNodeType.String, // 20
-                ScriptNodeType.LipsSynchroRef,
-                ScriptNodeType.FamilyRef,
-                ScriptNodeType.Way,
-                ScriptNodeType.PersoRef,
-                ScriptNodeType.ActionRef, // 25
-                ScriptNodeType.EnvironmentRef,
-                ScriptNodeType.SuperObjectRef,
-                ScriptNodeType.SurfaceRef,
-                ScriptNodeType.WayPointRef,
-                ScriptNodeType.TextRef, // 30
-                ScriptNodeType.FontRef,
-                ScriptNodeType.ComportRef,
-                ScriptNodeType.ModuleRef,
-                ScriptNodeType.SoundEventRef,
-                ScriptNodeType.ObjectTableRef, // 35
-                ScriptNodeType.GameMaterialRef,
-                ScriptNodeType.ParticleGenerator,
-                ScriptNodeType.Color,
-                ScriptNodeType.ModelRef,
-                ScriptNodeType.Unknown,
-                ScriptNodeType.GraphRef
-            },
+    public class AI_Types_TTSE : AI_Types {
+		protected override void InitArrays() {
+			#region Node types
+			nodeTypes = new AI_InterpretType[] {
+                AI_InterpretType.KeyWord, // 0
+                AI_InterpretType.Condition,
+                AI_InterpretType.Operator,
+                AI_InterpretType.Function,
+                AI_InterpretType.Procedure,
+                AI_InterpretType.MetaAction, // 5
+                AI_InterpretType.BeginMacro,
+                AI_InterpretType.EndMacro,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.Field,
+                AI_InterpretType.DsgVar, // 10
+                AI_InterpretType.DsgVarRef,
+                AI_InterpretType.Constant,
+                AI_InterpretType.Real,
+                AI_InterpretType.Button,
+                AI_InterpretType.ConstantVector, // 15
+                AI_InterpretType.Vector,
+                AI_InterpretType.Mask,
+                AI_InterpretType.Module,
+                AI_InterpretType.DsgVarId,
+                AI_InterpretType.String, // 20
+                AI_InterpretType.LipsSynchroRef,
+                AI_InterpretType.FamilyRef,
+                AI_InterpretType.Way,
+                AI_InterpretType.PersoRef,
+                AI_InterpretType.ActionRef, // 25
+                AI_InterpretType.EnvironmentRef,
+                AI_InterpretType.SuperObjectRef,
+                AI_InterpretType.SurfaceRef,
+                AI_InterpretType.WayPointRef,
+                AI_InterpretType.TextRef, // 30
+                AI_InterpretType.FontRef,
+                AI_InterpretType.ComportRef,
+                AI_InterpretType.ModuleRef,
+                AI_InterpretType.SoundEventRef,
+                AI_InterpretType.ObjectTableRef, // 35
+                AI_InterpretType.GameMaterialRef,
+                AI_InterpretType.ParticleGenerator,
+                AI_InterpretType.Color,
+                AI_InterpretType.ModelRef,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.GraphRef
+            };
             #endregion
 
             #region Operators
@@ -86,7 +84,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Operator_ModelCast", // 25
                 "Operator_Array",
                 "Operator_AffectArray"
-            },
+            };
             #endregion
 
             #region Conditions
@@ -189,7 +187,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cond_IsPersoLightOn",
                 "Cond_IsPersoLightPulseOn",
                 "Cond_IsPersoLightGyroPhareOn"
-            },
+            };
             #endregion
 
             #region Procedures
@@ -424,7 +422,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_SetVisualGMTFrame",
                 "Proc_FootPath_AddFootPrint",
                 "Proc_FootPath_Clear"
-            },
+            };
             #endregion
 
             #region Meta Actions
@@ -471,7 +469,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Action_RotateModule",
                 "Action_RotateModuleToPerso",
                 "Action_SwimToSurface"
-            },
+            };
             #endregion
 
             #region Functions
@@ -597,7 +595,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Func_GetVisualGMTTextureScrollingCoefV",
                 "Func_GetVisualGMTFrame",
                 "Func_GetVisualGMTNumberOfFrames"
-            },
+            };
             #endregion
 
             #region Keywords
@@ -611,36 +609,36 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "World",
                 "Nobody",
                 "Nowhere"
-            },
+            };
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new DsgVarType[] {
-                DsgVarType.Boolean,
-                DsgVarType.Byte,
-                DsgVarType.UByte, // Unsigned
-                DsgVarType.Short,
-                DsgVarType.UShort, // Unsigned
-                DsgVarType.Int,
-                DsgVarType.UInt, // Unsigned
-                DsgVarType.Float,
-                DsgVarType.WayPoint,
-                DsgVarType.Way,
-                DsgVarType.Perso,
-                DsgVarType.List,
-                DsgVarType.Vector,
-                DsgVarType.Comport,
-                DsgVarType.Action,
-                DsgVarType.Text,
-                DsgVarType.GameMaterial,
-                DsgVarType.PersoArray,
-                DsgVarType.VectorArray,
-                DsgVarType.FloatArray,
-                DsgVarType.IntegerArray,
-                DsgVarType.WayPointArray,
-                DsgVarType.TextArray,
-                DsgVarType.None
-            },
+            dsgVarTypeTable = new AI_DsgVarType[] {
+                AI_DsgVarType.Boolean,
+                AI_DsgVarType.Byte,
+                AI_DsgVarType.UByte, // Unsigned
+                AI_DsgVarType.Short,
+                AI_DsgVarType.UShort, // Unsigned
+                AI_DsgVarType.Int,
+                AI_DsgVarType.UInt, // Unsigned
+                AI_DsgVarType.Float,
+                AI_DsgVarType.WayPoint,
+                AI_DsgVarType.Way,
+                AI_DsgVarType.Perso,
+                AI_DsgVarType.List,
+                AI_DsgVarType.Vector,
+                AI_DsgVarType.Comport,
+                AI_DsgVarType.Action,
+                AI_DsgVarType.Text,
+                AI_DsgVarType.GameMaterial,
+                AI_DsgVarType.PersoArray,
+                AI_DsgVarType.VectorArray,
+                AI_DsgVarType.FloatArray,
+                AI_DsgVarType.IntegerArray,
+                AI_DsgVarType.WayPointArray,
+                AI_DsgVarType.TextArray,
+                AI_DsgVarType.None
+            };
             #endregion
 
             #region Fields
@@ -660,9 +658,9 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "CollisionFlag",
                 "ShadowScaleX",
                 "ShadowScaleY"
-            },
+            };
             #endregion
-        };
+        }
 
     }
 }

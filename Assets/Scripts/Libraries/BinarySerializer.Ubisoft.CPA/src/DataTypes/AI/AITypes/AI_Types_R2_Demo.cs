@@ -5,12 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public partial class AITypes {
-
-        public static AITypes R2 => new AITypes()
-        {
-            #region Keywords
-            keywordTable = new string[] {
+    public class AI_Types_R2_Demo : AI_Types {
+		protected override void InitArrays() {
+			#region Keywords
+			keywordTable = new string[] {
                 "If",
                 "IfNot",
                 "If2",
@@ -31,7 +29,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "CapsNull",
                 "NoGraph",
                 "NoAction"
-            },
+            };
             #endregion
 
             #region Operators
@@ -64,7 +62,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Operator_ModelCast", // 25
                 "Operator_Array",
                 "Operator_AffectArray"
-            },
+            };
             #endregion
 
             #region Functions
@@ -383,7 +381,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cam_ComputeCurrentTarget",
                 "Cam_GetSectorCameraType",
                 "Cam_GetBestPos"
-            },
+            };
             #endregion
 
             #region Procedures
@@ -908,7 +906,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "fn_p_stCheatCodeProcedure",
                 "fn_p_stCheatCodeProcedure",
                 "fn_p_stCheatCodeProcedure"
-            },
+            };
             #endregion
 
             #region Conditions
@@ -1062,7 +1060,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cond_Cam_IsFlagForcedPosition",
                 "Cond_Cam_IsFlagForcedTarget",
                 "Cond_Cam_IsFlagForcedAxis"
-            },
+            };
             #endregion
 
             #region Fields
@@ -1098,7 +1096,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "bCameraLook",
                 "bHoldCamera",
                 "CheatEnable"
-            },
+            };
             #endregion
 
             #region Meta Actions
@@ -1115,89 +1113,89 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "CAM_CinePosATgtBTurnTgtH",
                 "CAM_CinePosATgtBTurnPosV",
                 "CAM_CinePosATgtBTurnTgtV"
-            },
+            };
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new DsgVarType[] {
-                DsgVarType.Boolean,
-                DsgVarType.Byte,
-                DsgVarType.UByte, // Unsigned
-                DsgVarType.Short,
-                DsgVarType.UShort, // Unsigned
-                DsgVarType.Int,
-                DsgVarType.UInt, // Unsigned
-                DsgVarType.Float,
-                DsgVarType.WayPoint,
-                DsgVarType.Perso,
-                DsgVarType.List,
-                DsgVarType.Vector,
-                DsgVarType.Comport,
-                DsgVarType.Action,
-                DsgVarType.Text,
-                DsgVarType.GameMaterial,
-                DsgVarType.Caps, // Capabilities
-                DsgVarType.Graph,
-                DsgVarType.PersoArray,
-                DsgVarType.VectorArray,
-                DsgVarType.FloatArray,
-                DsgVarType.IntegerArray,
-                DsgVarType.WayPointArray,
-                DsgVarType.TextArray,
-                DsgVarType.SuperObject // input on iOS
-            },
+            dsgVarTypeTable = new AI_DsgVarType[] {
+                AI_DsgVarType.Boolean,
+                AI_DsgVarType.Byte,
+                AI_DsgVarType.UByte, // Unsigned
+                AI_DsgVarType.Short,
+                AI_DsgVarType.UShort, // Unsigned
+                AI_DsgVarType.Int,
+                AI_DsgVarType.UInt, // Unsigned
+                AI_DsgVarType.Float,
+                AI_DsgVarType.WayPoint,
+                AI_DsgVarType.Perso,
+                AI_DsgVarType.List,
+                AI_DsgVarType.Vector,
+                AI_DsgVarType.Comport,
+                AI_DsgVarType.Action,
+                AI_DsgVarType.Text,
+                AI_DsgVarType.GameMaterial,
+                AI_DsgVarType.Caps, // Capabilities
+                AI_DsgVarType.Graph,
+                AI_DsgVarType.PersoArray,
+                AI_DsgVarType.VectorArray,
+                AI_DsgVarType.FloatArray,
+                AI_DsgVarType.IntegerArray,
+                AI_DsgVarType.WayPointArray,
+                AI_DsgVarType.TextArray,
+                AI_DsgVarType.SuperObject // input on iOS
+            };
             #endregion
 
             #region Node types
-            nodeTypes = new ScriptNodeType[] {
-                ScriptNodeType.KeyWord, // 0
-                ScriptNodeType.Condition,
-                ScriptNodeType.Operator,
-                ScriptNodeType.Function,
-                ScriptNodeType.Procedure,
-                ScriptNodeType.MetaAction, // 5
-                ScriptNodeType.BeginMacro,
-                ScriptNodeType.BeginMacro,
-                ScriptNodeType.EndMacro,
-                ScriptNodeType.Field,
-                ScriptNodeType.DsgVarRef, // 10
-                ScriptNodeType.DsgVarRef,
-                ScriptNodeType.Constant,
-                ScriptNodeType.Real,
-                ScriptNodeType.Button,
-                ScriptNodeType.ConstantVector, // 15
-                ScriptNodeType.Vector,
-                ScriptNodeType.Mask,
-                ScriptNodeType.ModuleRef,
-                ScriptNodeType.DsgVarId,
-                ScriptNodeType.String, // 20
-                ScriptNodeType.LipsSynchroRef,
-                ScriptNodeType.FamilyRef,
-                ScriptNodeType.PersoRef,
-                ScriptNodeType.ActionRef,
-                ScriptNodeType.SuperObjectRef, // 25
-                ScriptNodeType.WayPointRef,
-                ScriptNodeType.TextRef,
-                ScriptNodeType.ComportRef,
-                ScriptNodeType.ModuleRef,
-                ScriptNodeType.SoundEventRef, // 30
-                ScriptNodeType.ObjectTableRef,
-                ScriptNodeType.GameMaterialRef,
-                ScriptNodeType.ParticleGenerator,
-                ScriptNodeType.VisualMaterial,
-                ScriptNodeType.ModelRef, // 35
-                ScriptNodeType.DataType42,
-                ScriptNodeType.CustomBits,
-                ScriptNodeType.Caps,
-                ScriptNodeType.SubRoutine,
-                ScriptNodeType.Null, // 40
-                ScriptNodeType.Unknown,
-                ScriptNodeType.Unknown,
-                ScriptNodeType.Unknown,
-                ScriptNodeType.GraphRef
-            }
+            nodeTypes = new AI_InterpretType[] {
+                AI_InterpretType.KeyWord, // 0
+                AI_InterpretType.Condition,
+                AI_InterpretType.Operator,
+                AI_InterpretType.Function,
+                AI_InterpretType.Procedure,
+                AI_InterpretType.MetaAction, // 5
+                AI_InterpretType.BeginMacro,
+                AI_InterpretType.BeginMacro,
+                AI_InterpretType.EndMacro,
+                AI_InterpretType.Field,
+                AI_InterpretType.DsgVarRef, // 10
+                AI_InterpretType.DsgVarRef,
+                AI_InterpretType.Constant,
+                AI_InterpretType.Real,
+                AI_InterpretType.Button,
+                AI_InterpretType.ConstantVector, // 15
+                AI_InterpretType.Vector,
+                AI_InterpretType.Mask,
+                AI_InterpretType.ModuleRef,
+                AI_InterpretType.DsgVarId,
+                AI_InterpretType.String, // 20
+                AI_InterpretType.LipsSynchroRef,
+                AI_InterpretType.FamilyRef,
+                AI_InterpretType.PersoRef,
+                AI_InterpretType.ActionRef,
+                AI_InterpretType.SuperObjectRef, // 25
+                AI_InterpretType.WayPointRef,
+                AI_InterpretType.TextRef,
+                AI_InterpretType.ComportRef,
+                AI_InterpretType.ModuleRef,
+                AI_InterpretType.SoundEventRef, // 30
+                AI_InterpretType.ObjectTableRef,
+                AI_InterpretType.GameMaterialRef,
+                AI_InterpretType.ParticleGenerator,
+                AI_InterpretType.VisualMaterial,
+                AI_InterpretType.ModelRef, // 35
+                AI_InterpretType.DataType42,
+                AI_InterpretType.CustomBits,
+                AI_InterpretType.Caps,
+                AI_InterpretType.SubRoutine,
+                AI_InterpretType.Null, // 40
+                AI_InterpretType.Unknown,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.GraphRef
+            };
             #endregion
-        };
+        }
 
     }
 }

@@ -5,12 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public partial class AITypes {
-
-        public static AITypes R2ROM => new AITypes()
-        {
-            #region Keywords
-            keywordTable = new string[] {
+    public class AI_Types_R2 : AI_Types {
+		protected override void InitArrays() {
+			#region Keywords
+			keywordTable = new string[] {
                 "If",
                 "IfNot",
                 "If2",
@@ -31,7 +29,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "CapsNull",
                 "NoGraph",
                 "NoAction"
-            },
+            };
             #endregion
 
             #region Operators
@@ -64,7 +62,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Operator_ModelCast", // 25
                 "Operator_Array",
                 "Operator_AffectArray"
-            },
+            };
             #endregion
 
             #region Functions
@@ -96,7 +94,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Func_Square",
                 "Func_SquareRoot", // 25
                 "Func_RandomReal",
-                "Func_AbsoluteValue",
+                "Func_MinimumReal",
                 "Func_MaximumReal",
                 "Func_DegreeToRadian",
                 "Func_RadianToDegree", // 30
@@ -119,7 +117,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Func_AddAndGetHitPointsMax",
                 "Func_SubAndGetHitPointsMax",
                 "Func_ListSize",
-                "Func_GetDeltaTime",
+                "Func_GivePersoInList", // 50
                 "Func_AbsoluteVector",
                 "Func_RelativeVector",
                 "Func_VectorLocalToGlobal",
@@ -167,10 +165,10 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "fn_p_stIsAValidSlotName",
                 "RAY_GetMagicPoints",
                 "RAY_GetMagicPointsMax",
-                "Func_GetPersoSighting",
+                "RAY_AddAndGetMagicPoints",
                 "RAY_AddAndGetMagicPointsMax",
                 "RAY_RemoveAndGetMagicPoints",
-                "ZON_GetZDMPosition",
+                "RAY_RemoveAndGetMagicPointsMax",
                 "RAY_GetAirPoints",
                 "RAY_GetAirPointsMax",
                 "RAY_AddAndGetAirPoints",
@@ -180,9 +178,9 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "ACT_NearestActor",
                 "ACT_NearestActorInCurrentSector",
                 "ACT_NearerActorInFieldOfVision",
-                "VEC_GetVectorNorm",
+                "Func_GetNbActivePerso",
                 "Func_CibleLaPlusProche",
-                "VEC_AngleVector",
+                "Func_CibleLaPlusProcheavecAngles",
                 "NETWORK_CloserWPn",
                 "NETWORK_CloserWPOfType",
                 "NETWORK_CloserWPnInAxis",
@@ -214,7 +212,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "NETWORK_GetLinkWeightInGraph",
                 "NETWORK_SetLinkWeightInGraph",
                 "NETWORK_GetTypeOfWP",
-                "ACT_GetNumberOfBooleanInArray",
+                "Func_CapsGetCapabilities",
                 "Func_CapabilityAtBitNumber",
                 "Func_GetScrollSpeed",
                 "Func_GetNbFrame",
@@ -383,7 +381,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cam_ComputeCurrentTarget",
                 "Cam_GetSectorCameraType",
                 "Cam_GetBestPos"
-            },
+            };
             #endregion
 
             #region Procedures
@@ -395,8 +393,8 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_AddHitPoints",
                 "Proc_SubHitPoints", // 5
                 "Proc_SetHitPointsMax",
-                "Proc_TransparentDisplay",
-                "Proc_SetTransparency",
+                "Proc_SetHitPointsMaxToInit",
+                "Proc_SetHitPointsMaxToMax",
                 "Proc_AddHitPointsMax",
                 "Proc_SubHitPointsMax", // 10
                 "Proc_TransparentDisplay",
@@ -425,29 +423,30 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_ListSortByModele",
                 "Proc_FillListWithAllPersoOfAFamily",
                 "Proc_FillListWithAllPersoOfAModel", // 35
-                "Proc_None",
-                "Proc_ChangeComport",
-                "Proc_ChangeComportReflex",
-                "Proc_ChangeMyComport",
-                "Proc_ChangeMyComportReflex", // 70
-                "Proc_ChangeMyComportAndMyReflex",
-                "Proc_ChangeAction",
+                "Proc_DeleteFamilyInList",
+                "Proc_DeleteModelInList",
+                // list ensemble procedure
+                "Proc_ListUnion",
+                "Proc_ListInter",
+                "Proc_ListDiff", // 40
+                "Proc_ListAdd",
+                "FOG_Proc_Activate",
                 "FOG_Proc_SetColor",
                 "FOG_Proc_SetNearFarInf",
-                "Proc_ChangeActionWithEvents",
+                "FOG_Proc_SetBlend", // 45
                 "FOG_Proc_RestoreFog",
                 "FOG_Proc_SaveFog",
                 "Procedure_Magnet_ActiveMagnet",
                 "Procedure_Magnet_DeactiveMagnet",
                 "Procedure_Magnet_SetStrength", // 50
                 "Procedure_Magnet_SetFar",
-                "Proc_IgnoreTraceFlagForNextPicking",
+                "Procedure_Magnet_SetNear",
                 "Procedure_Magnet_SetDuration",
                 "Proc_FootPath_AddFootPrint",
                 "Proc_FootPath_Clear", // 55
                 "SinusEffect_SetFreq",
                 "SinusEffect_SetAmplitude",
-                "Proc_FactorAnimationFrameRate",
+                "SinusEffect_SetState",
                 "SinusEffect_SetFreq",
                 "SinusEffect_SetRLIParams", // 60
                 "SinusEffect_SetRLIParams",
@@ -456,14 +455,14 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_DeactivateBut",
                 "Proc_ActivateBut", // 65
                 "Proc_None",
-                "ActivateChannel",
-                "DeactivateChannel",
+                "Proc_ChangeComport",
+                "Proc_ChangeComportReflex",
                 "Proc_ChangeMyComport",
                 "Proc_ChangeMyComportReflex", // 70
                 "Proc_ChangeMyComportAndMyReflex",
                 "Proc_ChangeAction",
                 "Proc_ChangeActionForce",
-                "SOUND_SendSoundRequest",
+                "Proc_ChangeActionRandom",
                 "Proc_ChangeActionWithEvents", // 75
                 "Proc_Loop",
                 "Proc_EndLoop",
@@ -479,9 +478,9 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_DesactivateObject", // 85
                 "Proc_ChangeMap",
                 "Proc_SetActionReturn",
-                "GMT_SetVisualGMTAsChromed",
+                "Proc_FactorAnimationFrameRate",
                 // MiscUltraProcedure
-                "GMT_SetVisualGMTFrame",
+                "Proc_ForcePersoHandling",
                 "Proc_PlayerIsDeadWithPlacement", // 90
                 "fn_p_stMiscProcedure",
                 "fn_p_stMiscMoreProcedure",
@@ -493,7 +492,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "MOD_TakeManyModulesControl",
                 "MOD_ReleaseModuleControl",
                 "GAME_CopyGame",
-                "Proc_RotatePersoAroundZ",
+                "GAME_QuitGame",
                 "ActivateChannel",
                 "DeactivateChannel",
                 "ACT_PersoLightOn",
@@ -501,7 +500,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "ACT_SetPersoLightColor",
                 "ACT_SetPersoLightNearFar",
                 "ACT_SetPersoLightLittleBigAlpha",
-                "Proc_ZoomPerso",
+                "ACT_SetPersoLightGyrophare",
                 "ACT_SetPersoLightPulse",
                 "ACT_SetPersoLightParalleleType",
                 "ACT_SetPersoLightSphericalType",
@@ -535,10 +534,10 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "fn_p_stKillPersoAndClearVariableProcedure2",
                 "GMT_SetVisualGMTColor",
                 "GMT_SetVisualGMTSpecularExponant",
-                "Proc_ResetLastCollisionActor",
-                "Proc_ClearCollisionReport",
-                "Proc_SetGoThroughMechanicsHandling",
-                "Proc_EraseLastGoThroughMaterial",
+                "GMT_SetVisualGMTSpecularCoef",
+                "GMT_SetVisualGMTDiffuseCoef",
+                "GMT_SetVisualGMTAmbientCoef",
+                "GMT_SetVisualGMTAsChromed",
                 "GMT_SetVisualGMTTextureScrollingCoef",
                 "GMT_LockVisualGMT",
                 "GMT_UnlockVisualGMT",
@@ -566,7 +565,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_SetFullPersoOrientation",
                 "Proc_SetFullPersoOrientationWithOffset",
                 "Proc_ZoomPerso",
-                "Proc_StopMoveLimitXYZ",
+                "Proc_ChangeOneCustomBit",
                 "Proc_ChangeManyCustomBits",
                 // mechanic speed functions
                 "Proc_ImposeSpeed",
@@ -579,13 +578,13 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_ImposeAbsoluteSpeed",
                 "Proc_ImposeAbsoluteSpeedX",
                 "Proc_ImposeAbsoluteSpeedY",
-                "Proc_FixePositionZDM",
+                "Proc_ImposeAbsoluteSpeedZ",
                 "Proc_ImposeAbsoluteSpeedXY",
-                "ACT_ChangeSpoFlag",
+                "Proc_ImposeAbsoluteSpeedXYZ",
                 "Proc_ProposeSpeed",
                 "Proc_ProposeSpeedX",
                 "Proc_ProposeSpeedY",
-                "SHADOW_Display",
+                "Proc_ProposeSpeedZ",
                 "Proc_ProposeSpeedXY",
                 "Proc_ProposeSpeedXYZ",
                 "Proc_ProposeAbsoluteSpeed",
@@ -606,7 +605,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_AddAbsoluteSpeedZ",
                 "Proc_AddAbsoluteSpeedXY",
                 "Proc_AddAbsoluteSpeedXYZ",
-                "PAD_ReadAnalogJoystickMarioMode",
+                "Proc_PrepareMorph",
                 "Proc_StopMorph",
                 "Proc_Morphing",
                 "Proc_ReleaseAllModulesControl",
@@ -639,7 +638,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_IntToText",
                 "Proc_SetMechanicAnimation",
                 "Proc_SetMechanicCollide",
-                "ANI_ChangeCurrFrame",
+                "Proc_SetMechanicGravity",
                 "Proc_SetMechanicTilt",
                 "Proc_SetMechanicGI",
                 "Proc_SetMechanicClimb",
@@ -650,7 +649,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_SetMechanicNeverFall",
                 "Proc_SetMechanicCollisionControl",
                 "Proc_SetMechanicKeepSpeedZ",
-                "ZON_SetZDMSizeSphere",
+                "Proc_SetMechanicSpeedLimit",
                 "Proc_SetMechanicInertia",
                 "Proc_SetMechanicStream",
                 "Proc_SetMechanicStickOnPlatform",
@@ -661,7 +660,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Proc_SetMechanicSlopeLimit",
                 "Proc_SetMechanicInertiaX",
                 "Proc_SetMechanicInertiaY",
-                "ACT_ChangeActorSighting",
+                "Proc_SetMechanicInertiaZ",
                 "fn_p_SetMechanicRealParameter",
                 "Proc_SetMechanicInertiaXYZ",
                 "Proc_SetMechanicTiltIntensity",
@@ -709,13 +708,13 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "SCREEN_ChangeSize",
                 "SCREEN_ChangeClip",
                 "SCREEN_ChangePos",
-                "Cam_ChangeConstants",
+                "SCREEN_ChangePosPercent",
                 "SCREEN_ChangeProportion",
                 "SHADOW_Display",
                 "SHADOW_ChangeHeight",
                 "SHADOW_ChangeVectorProjection",
                 "ZON_ForceActivationZDD",
-                "Cam_ForceBestPos",
+                "ZON_ForceActivationZDM",
                 "ZON_ForceActivationZDE",
                 "ZON_ForceActivationZDR",
                 "ZON_ForceDesactivationZDD",
@@ -906,8 +905,8 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "fn_p_stCheatCodeProcedure",
                 "fn_p_stCheatCodeProcedure",
                 "fn_p_stCheatCodeProcedure",
-                "fn_p_stCheatCodeProcedure",
-            },
+                "fn_p_stCheatCodeProcedure"
+            };
             #endregion
 
             #region Conditions
@@ -915,13 +914,13 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cond_And", // 0
                 "Cond_Or",
                 "Cond_Not",
-                "Cond_Equal", // 5
-                "Cond_Different",
-                "Cond_Greater",
-                "Cond_Lesser",
-                "Cond_GreaterOrEqual",
-                "Cond_LesserOrEqual",
                 "Cond_XOR",
+                "Cond_Equal",
+                "Cond_Different", // 5
+                "Cond_Lesser",
+                "Cond_Greater",
+                "Cond_LesserOrEqual",
+                "Cond_GreaterOrEqual",
                 "Cond_CollidePersoZDDWithPerso", // 10
                 "Cond_CollideModuleZDDWithPerso",
                 "Cond_CollidePersoAllZDDWithPersoAllZDD",
@@ -932,17 +931,17 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cond_CollidePersoZDEWithModuleZDE",
                 "Cond_CollideModuleZDEWithModuleZDE",
                 "Cond_CollidePersoZDEWithPersoTypeZDE",
-                "Cond_CollideWithWater",
+                "Cond_CollideModuleZDEWithPersoTypeZDE", // 20
                 "Cond_CollidePersoTypeZDEWithPersoTypeZDE",
                 "Cond_CollidePersoAllZDEWithPersoAllZDE",
                 "Cond_CollidePersoTypeZDEWithPersoAllZDE",
                 "Cond_CollidePersoAllZDEWithPersoTypeZDE",
                 "Cond_CollidePersoZDENoWithTypeZDE", // 25
                 "Cond_CollideModuleZDENoWithTypeZDE",
-                "Cond_PressedBut",
-                "Cond_JustPressedBut", // 45
-                "Cond_ReleasedBut",
-                "Cond_JustReleasedBut",
+                "Cond_CollideWithGround",
+                "Cond_CollideWithWall",
+                "Cond_CollideWithNothing",
+                "Cond_CollideWithCeiling", // 30
                 "Cond_CollideWithPerso",
                 "Cond_CollideWithWater",
                 "Cond_CollideWithThisPerso",
@@ -959,28 +958,28 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cond_PressedBut",
                 "Cond_JustPressedBut", // 45
                 "Cond_ReleasedBut",
-                "Cond_CheckActionEnd",
+                "Cond_JustReleasedBut",
                 "Cond_IsTimeElapsed",
                 "Cond_IsValidObject",
                 "Cond_IsValidWayPoint", // 50
                 "Cond_IsValidGMT",
                 "Cond_IsValidAction",
                 "Cond_IsValidText",
-                "Cond_IsCurrentStateCustomBitSet",
+                "Cond_SeePerso", // SectorCondition
                 "Cond_IsActivable", // ActivationCondition
                 "Cond_IsAlreadyHandled", // HandledCondition
                 "Cond_Alw_IsMain",
                 "Cond_IsPersoLightOn",
                 "Cond_IsPersoLightPulseOn",
-                "fn_p_stNullVector",
+                "Cond_IsPersoLightGyroPhareOn",
                 "Cond_ZDMCollideWithObstacle",
                 "Cond_IsZDMCollideWithWall",
                 "Cond_IsZDMCollideWithGround",
                 "Cond_IsZDMCollideWithCeiling",
                 "Cond_CmtIdentifierContainsMask", // 65
-                "Cond_PressedBut",
+                "Cond_HitByCollider",
                 "Cond_IsTypeOfGMTCollide",
-                "Cond_IsInComport", // 68
+                "Cond_IsInComport", // 68   
                 "Cond_IsInReflexComport",
                 "Cond_CheckActionEnd", // fn_p_stCheckAnimEnd
                 "Cond_IsInAction",
@@ -1061,7 +1060,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "Cond_Cam_IsFlagForcedPosition",
                 "Cond_Cam_IsFlagForcedTarget",
                 "Cond_Cam_IsFlagForcedAxis"
-            },
+            };
             #endregion
 
             #region Fields
@@ -1097,7 +1096,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "bCameraLook",
                 "bHoldCamera",
                 "CheatEnable"
-            },
+            };
             #endregion
 
             #region Meta Actions
@@ -1114,86 +1113,89 @@ namespace BinarySerializer.Ubisoft.CPA {
                 "CAM_CinePosATgtBTurnTgtH",
                 "CAM_CinePosATgtBTurnPosV",
                 "CAM_CinePosATgtBTurnTgtV"
-            },
+            };
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new DsgVarType[] {
-                DsgVarType.Boolean,
-                DsgVarType.Byte,
-                DsgVarType.UByte, // Unsigned
-                DsgVarType.Short,
-                DsgVarType.UShort, // Unsigned
-                DsgVarType.Int,
-                DsgVarType.UInt, // Unsigned
-                DsgVarType.Float,
-                DsgVarType.WayPoint,
-                DsgVarType.Perso,
-                DsgVarType.List,
-                DsgVarType.Vector,
-                DsgVarType.Comport,
-                DsgVarType.Action,
-                DsgVarType.Text,
-                DsgVarType.GameMaterial,
-                DsgVarType.Caps, // Capabilities
-                DsgVarType.Graph,
-                DsgVarType.PersoArray,
-                DsgVarType.VectorArray,
-                DsgVarType.FloatArray,
-                DsgVarType.IntegerArray,
-                DsgVarType.WayPointArray,
-                DsgVarType.TextArray,
-                DsgVarType.None
-                // 24, the above, seems to be an array on 3DS. Doesn't seem to be treated at all on DS
-                //24 on PC is DsgVarInfoEntry.DsgVarType.SuperObject and input on iOS.
-            },
+            dsgVarTypeTable = new AI_DsgVarType[] {
+                AI_DsgVarType.Boolean,
+                AI_DsgVarType.Byte,
+                AI_DsgVarType.UByte, // Unsigned
+                AI_DsgVarType.Short,
+                AI_DsgVarType.UShort, // Unsigned
+                AI_DsgVarType.Int,
+                AI_DsgVarType.UInt, // Unsigned
+                AI_DsgVarType.Float,
+                AI_DsgVarType.WayPoint,
+                AI_DsgVarType.Perso,
+                AI_DsgVarType.List,
+                AI_DsgVarType.Vector,
+                AI_DsgVarType.Comport,
+                AI_DsgVarType.Action,
+                AI_DsgVarType.Text,
+                AI_DsgVarType.GameMaterial,
+                AI_DsgVarType.Caps, // Capabilities
+                AI_DsgVarType.Graph,
+                AI_DsgVarType.PersoArray,
+                AI_DsgVarType.VectorArray,
+                AI_DsgVarType.FloatArray,
+                AI_DsgVarType.IntegerArray,
+                AI_DsgVarType.WayPointArray,
+                AI_DsgVarType.TextArray,
+                AI_DsgVarType.SuperObject // input on iOS
+            };
             #endregion
 
             #region Node types
-            nodeTypes = new ScriptNodeType[] {
-                ScriptNodeType.KeyWord, // 0
-                ScriptNodeType.Condition,
-                ScriptNodeType.Operator,
-                ScriptNodeType.Function,
-                ScriptNodeType.Procedure,
-                ScriptNodeType.MetaAction, // 5
-                ScriptNodeType.BeginMacro,
-                ScriptNodeType.BeginMacro,
-                ScriptNodeType.EndMacro,
-                ScriptNodeType.Field,
-                ScriptNodeType.DsgVarRef, // 10
-                ScriptNodeType.DsgVarRef,
-                ScriptNodeType.Constant,
-                ScriptNodeType.Real,
-                ScriptNodeType.Button,
-                ScriptNodeType.ConstantVector, // 15
-                ScriptNodeType.Vector,
-                ScriptNodeType.Mask,
-                ScriptNodeType.ModuleRef,
-                ScriptNodeType.DsgVarId,
-                ScriptNodeType.String, // 20
-                ScriptNodeType.LipsSynchroRef,
-                ScriptNodeType.FamilyRef,
-                ScriptNodeType.PersoRef,
-                ScriptNodeType.ActionRef,
-                ScriptNodeType.SuperObjectRef, // 25
-                ScriptNodeType.WayPointRef,
-                ScriptNodeType.TextRef,
-                ScriptNodeType.ComportRef,
-                ScriptNodeType.ModuleRef,
-                ScriptNodeType.SoundEventRef, // 30
-                ScriptNodeType.ObjectTableRef,
-                ScriptNodeType.GameMaterialRef,
-                ScriptNodeType.ParticleGenerator,
-                ScriptNodeType.VisualMaterial,
-                ScriptNodeType.ModelRef, // 35
-                ScriptNodeType.LightInfoRef,
-                ScriptNodeType.Unknown,
-                ScriptNodeType.GraphRef,
-                ScriptNodeType.SubRoutine,
-            }
+            nodeTypes = new AI_InterpretType[] {
+                AI_InterpretType.KeyWord, // 0
+                AI_InterpretType.Condition,
+                AI_InterpretType.Operator,
+                AI_InterpretType.Function,
+                AI_InterpretType.Procedure,
+                AI_InterpretType.MetaAction, // 5
+                AI_InterpretType.BeginMacro,
+                AI_InterpretType.BeginMacro,
+                AI_InterpretType.EndMacro,
+                AI_InterpretType.Field,
+                AI_InterpretType.DsgVarRef, // 10
+                AI_InterpretType.DsgVarRef,
+                AI_InterpretType.Constant,
+                AI_InterpretType.Real,
+                AI_InterpretType.Button,
+                AI_InterpretType.ConstantVector, // 15
+                AI_InterpretType.Vector,
+                AI_InterpretType.Mask,
+                AI_InterpretType.ModuleRef,
+                AI_InterpretType.DsgVarId,
+                AI_InterpretType.String, // 20
+                AI_InterpretType.LipsSynchroRef,
+                AI_InterpretType.FamilyRef,
+                AI_InterpretType.PersoRef,
+                AI_InterpretType.ActionRef,
+                AI_InterpretType.SuperObjectRef, // 25
+                AI_InterpretType.WayPointRef,
+                AI_InterpretType.TextRef,
+                AI_InterpretType.ComportRef,
+                AI_InterpretType.ModuleRef,
+                AI_InterpretType.SoundEventRef, // 30
+                AI_InterpretType.ObjectTableRef,
+                AI_InterpretType.GameMaterialRef,
+                AI_InterpretType.ParticleGenerator,
+                AI_InterpretType.VisualMaterial,
+                AI_InterpretType.ModelRef, // 35
+                AI_InterpretType.DataType42,
+                AI_InterpretType.CustomBits,
+                AI_InterpretType.Caps,
+                AI_InterpretType.SubRoutine,
+                AI_InterpretType.Null, // 40
+                AI_InterpretType.Unknown,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.GraphRef
+            };
             #endregion
-        };
+        }
 
     }
 }

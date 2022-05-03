@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
 	public class COL_Types_R2 : COL_Types {
-		protected override void Init() {
+		protected override void InitArrays() {
 			ZDM = new COL_Type_ZDM[] {
 				COL_Type_ZDM.Pieds,
 				COL_Type_ZDM.Corps,

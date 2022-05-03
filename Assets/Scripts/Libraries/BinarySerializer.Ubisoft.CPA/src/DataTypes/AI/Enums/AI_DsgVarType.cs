@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-    public enum DsgVarType {
+    public enum AI_DsgVarType {
         None,
         Boolean,
         Byte,

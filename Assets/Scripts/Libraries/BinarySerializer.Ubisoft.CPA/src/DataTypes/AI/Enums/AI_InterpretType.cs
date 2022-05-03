@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-    public enum ScriptNodeType {
+    public enum AI_InterpretType {
         Unknown,
         KeyWord,
         Condition,

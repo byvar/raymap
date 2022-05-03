@@ -13,8 +13,12 @@ namespace BinarySerializer.Ubisoft.CPA {
             EngineVersion = engineVersion;
             Platform = platform;
             EngineVersionTree = EngineVersionTree.Create(this);
-			COLTypes = COL_Types.GetCOLTypes(this);
         }
+
+		public void Init() {
+			AITypes?.Init();
+			COLTypes?.Init();
+		}
 
         public EngineVersion EngineVersion { get; }
         public Platform Platform { get; }
@@ -49,7 +53,7 @@ namespace BinarySerializer.Ubisoft.CPA {
         public bool EncryptPointerFiles { get; set; } = false;
         public bool HasLinkedListHeaderPointers { get; set; } = false;
         public bool SNA_Compression { get; set; } = false;
-        public AITypes AITypes { get; set; }
+        public AI_Types AITypes { get; set; }
 		public COL_Types COLTypes { get; set; }
         public float TextureAnimationSpeedModifier { get; set; } = 1f;
         public float Luminosity { get; set; } = 0.5f;

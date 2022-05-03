@@ -2,7 +2,7 @@
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	// Full NodeInterpret struct on DS/N64. Used only for NODFile struct type
-	public class AI_NodeInterpret : U64_Struct {
+	public class AI_NodeInterpretFull : U64_Struct {
 		public uint Param { get; set; }
 		public ushort NodesToSkip { get; set; }
 		public byte Type { get; set; }

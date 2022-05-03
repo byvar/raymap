@@ -7,8 +7,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public COL_Type_ZDR[] ZDR { get; protected set; }
 
 		// TODO: Add identifier names like MAX_VARAPPE
+		public void Init() {
+			InitArrays();
+			CreateDictionaries();
+		}
 
-		protected abstract void Init();
+		protected abstract void InitArrays();
 
 		private void CreateDictionaries() {
 			// TODO
@@ -25,17 +29,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public COL_Type_ZDR GetType_ZDR(int type) {
 			if (type < ZDR.Length) return ZDR[type];
 			return COL_Type_ZDR.Undefined;
-		}
-
-		public static COL_Types GetCOLTypes(CPA_Settings settings) {
-			COL_Types types = null;
-			// TODO
-			types = new COL_Types_R2();
-			if (types != null) {
-				types.Init();
-				types.CreateDictionaries();
-			}
-			return types;
 		}
 	}
 }
