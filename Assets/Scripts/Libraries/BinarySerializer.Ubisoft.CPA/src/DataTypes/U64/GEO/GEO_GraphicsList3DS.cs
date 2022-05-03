@@ -5,14 +5,14 @@
 
 		public Triangle[] Triangles { get; set; }
 		public UV[] UVs { get; set; }
-		public U64_ShortVector3D[] Vertices { get; set; }
-		public U64_ShortVector3D[] Colors { get; set; }
+		public MTH3D_ShortVector[] Vertices { get; set; }
+		public MTH3D_ShortVector[] Colors { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			Triangles = s.SerializeObjectArray<Triangle>(Triangles, Pre_FacesCount, name: nameof(Triangles));
 			UVs = s.SerializeObjectArray<UV>(UVs, Pre_VerticesCount, name: nameof(UVs));
-			Vertices = s.SerializeObjectArray<U64_ShortVector3D>(Vertices, Pre_VerticesCount, name: nameof(Vertices));
-			Colors = s.SerializeObjectArray<U64_ShortVector3D>(Colors, Pre_VerticesCount, name: nameof(Colors));
+			Vertices = s.SerializeObjectArray<MTH3D_ShortVector>(Vertices, Pre_VerticesCount, name: nameof(Vertices));
+			Colors = s.SerializeObjectArray<MTH3D_ShortVector>(Colors, Pre_VerticesCount, name: nameof(Colors));
 		}
 
 		public class Triangle : BinarySerializable {

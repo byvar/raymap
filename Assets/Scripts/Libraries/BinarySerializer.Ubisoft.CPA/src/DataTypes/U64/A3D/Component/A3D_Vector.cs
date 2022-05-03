@@ -4,11 +4,11 @@
 		public int IntY { get; set; }
 		public int IntZ { get; set; }
 
-		public MTH3D_Vector Vector { get; set; }
+		public CPA.MTH3D_Vector Vector { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().Platform == Platform.N64) {
-				Vector = s.SerializeObject<MTH3D_Vector>(Vector, name: nameof(Vector));
+				Vector = s.SerializeObject<CPA.MTH3D_Vector>(Vector, name: nameof(Vector));
 			} else {
 				IntX = s.Serialize<int>(IntX, name: nameof(IntX));
 				IntY = s.Serialize<int>(IntY, name: nameof(IntY));

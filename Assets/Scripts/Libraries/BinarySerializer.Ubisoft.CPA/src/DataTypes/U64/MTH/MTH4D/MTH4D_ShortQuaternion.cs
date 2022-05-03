@@ -2,7 +2,7 @@
 
 namespace BinarySerializer.Ubisoft.CPA.U64
 {
-    public class U64_ShortQuaternion : BinarySerializable
+    public class MTH4D_ShortQuaternion : BinarySerializable
     {
 		public short X { get; set; } // Divide by Int16.Max to get float
 		public short Y { get; set; }

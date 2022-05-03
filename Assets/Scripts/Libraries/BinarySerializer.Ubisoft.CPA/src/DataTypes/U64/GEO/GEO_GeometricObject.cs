@@ -4,9 +4,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GEO_GeometricObject : U64_Struct {
 		public float Scale { get; set; }
 		public float Radius { get; set; }
-		public U64_ArrayReference<U64_ShortVector3D> CollisionPoints { get; set; }
-		public U64_ArrayReference<U64_ShortVector3D> VisualPoints { get; set; }
-		public U64_ArrayReference<U64_ShortVector3D> Normals { get; set; }
+		public U64_ArrayReference<MTH3D_ShortVector> CollisionPoints { get; set; }
+		public U64_ArrayReference<MTH3D_ShortVector> VisualPoints { get; set; }
+		public U64_ArrayReference<MTH3D_ShortVector> Normals { get; set; }
 		public U64_ArrayReference<GEO_CollisionElementListEntry> CollisionElements { get; set; }
 		public U64_ArrayReference<GEO_VisualElementListEntry> VisualElements { get; set; }
 		public ushort CollisionPointsCount { get; set; }
@@ -22,10 +22,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			Scale = s.Serialize<float>(Scale, name: nameof(Scale));
 			Radius = s.Serialize<float>(Radius, name: nameof(Radius));
 			
-			CollisionPoints = s.SerializeObject<U64_ArrayReference<U64_ShortVector3D>>(CollisionPoints, name: nameof(CollisionPoints));
+			CollisionPoints = s.SerializeObject<U64_ArrayReference<MTH3D_ShortVector>>(CollisionPoints, name: nameof(CollisionPoints));
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2_3D)) {
-				VisualPoints = s.SerializeObject<U64_ArrayReference<U64_ShortVector3D>>(VisualPoints, name: nameof(VisualPoints));
-				Normals = s.SerializeObject<U64_ArrayReference<U64_ShortVector3D>>(Normals, name: nameof(Normals));
+				VisualPoints = s.SerializeObject<U64_ArrayReference<MTH3D_ShortVector>>(VisualPoints, name: nameof(VisualPoints));
+				Normals = s.SerializeObject<U64_ArrayReference<MTH3D_ShortVector>>(Normals, name: nameof(Normals));
 			} else {
 				VisualPoints = CollisionPoints;
 			}

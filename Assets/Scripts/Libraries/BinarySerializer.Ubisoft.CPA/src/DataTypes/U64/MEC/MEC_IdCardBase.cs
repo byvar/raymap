@@ -9,8 +9,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public float TiltIntensity { get; set; }
 		public float TiltInertia { get; set; }
 		public float TiltOrigin { get; set; }
-		public U64_Index<U64_Vector3D> Inertia { get; set; } // Index in AllVector3D table
-		public U64_Index<U64_Vector3D> MaxSpeed { get; set; } // Index in AllVector3D table
+		public U64_Index<MTH3D_Vector> Inertia { get; set; } // Index in AllVector3D table
+		public U64_Index<MTH3D_Vector> MaxSpeed { get; set; } // Index in AllVector3D table
 		public Flags MiscFlags { get; set; }
 		public ushort Swim { get; set; } // Just 1 flag that didn't fit in MiscFlags, it seems
 
@@ -23,8 +23,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			TiltInertia = s.Serialize<float>(TiltInertia, name: nameof(TiltInertia));
 			TiltOrigin = s.Serialize<float>(TiltOrigin, name: nameof(TiltOrigin));
 
-			Inertia = s.SerializeObject<U64_Index<U64_Vector3D>>(Inertia, name: nameof(Inertia))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
-			MaxSpeed = s.SerializeObject<U64_Index<U64_Vector3D>>(MaxSpeed, name: nameof(MaxSpeed))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
+			Inertia = s.SerializeObject<U64_Index<MTH3D_Vector>>(Inertia, name: nameof(Inertia))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
+			MaxSpeed = s.SerializeObject<U64_Index<MTH3D_Vector>>(MaxSpeed, name: nameof(MaxSpeed))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
 
 			MiscFlags = s.Serialize<Flags>(MiscFlags, name: nameof(MiscFlags));
 			Swim = s.Serialize<ushort>(Swim, name: nameof(Swim));

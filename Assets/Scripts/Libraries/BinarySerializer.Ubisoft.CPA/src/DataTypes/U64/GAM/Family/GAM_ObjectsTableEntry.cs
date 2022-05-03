@@ -24,7 +24,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 		public class PhysicalObject : EntryLinkedObject {
 			public U64_GenericReference Entry { get; set; }
-			public U64_Index<U64_Vector3D> CustomZoom { get; set; }
+			public U64_Index<MTH3D_Vector> CustomZoom { get; set; }
 			//public ushort EntryType { get; set; }
 			public ushort Flag { get; set; }
 
@@ -32,7 +32,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				Entry = s.SerializeObject<U64_GenericReference>(Entry,
 					onPreSerialize: gr => gr.ImmediateSerializeType = U64_GenericReference.ImmediateSerialize.Index,
 					name: nameof(Entry));
-				CustomZoom = s.SerializeObject<U64_Index<U64_Vector3D>>(CustomZoom, name: nameof(CustomZoom))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
+				CustomZoom = s.SerializeObject<U64_Index<MTH3D_Vector>>(CustomZoom, name: nameof(CustomZoom))?.SetAction(GAM_Fix.GetGlobalVector3DIndex);
 				Entry.SerializeType(s);
 				Flag = s.Serialize<ushort>(Flag, name: nameof(Flag));
 

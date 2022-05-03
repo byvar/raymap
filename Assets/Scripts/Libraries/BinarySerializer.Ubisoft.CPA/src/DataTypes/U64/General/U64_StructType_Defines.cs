@@ -188,8 +188,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 		private static readonly Dictionary<Type, U64_StructType> TypeMapping = new Dictionary<Type, U64_StructType>() {
 			// General
-			[typeof(U64_Vector3D)] = U64_StructType.AllVector3D,
-			[typeof(U64_ShortVector3D)] = U64_StructType.Vertex,
+			[typeof(MTH3D_Vector)] = U64_StructType.AllVector3D,
+			[typeof(MTH3D_ShortVector)] = U64_StructType.Vertex,
 			[typeof(U64_TripledIndex)] = U64_StructType.AllTripledIndex,
 			[typeof(U64_BoundingVolume)] = U64_StructType.BoundingVolume,
 
@@ -200,6 +200,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_Character)] = U64_StructType.Character,
 			[typeof(GAM_Character3dData)] = U64_StructType.Character3dData,
 			[typeof(GAM_CharacterStandardGame)] = U64_StructType.CharacterStandardGame,
+			[typeof(GAM_CharacterMicro)] = U64_StructType.CharacterMicro,
+			[typeof(GAM_CharacterDynamics)] = U64_StructType.CharacterDyn,
+			[typeof(GAM_CharacterCineInfo)] = U64_StructType.CharacterCineInfo,
+			[typeof(GAM_CharacterSound)] = U64_StructType.CharacterSound,
 			[typeof(GAM_Family)] = U64_StructType.Family,
 			[typeof(GAM_State)] = U64_StructType.State,
 			[typeof(GAM_StateRef)] = U64_StructType.StateRef,
