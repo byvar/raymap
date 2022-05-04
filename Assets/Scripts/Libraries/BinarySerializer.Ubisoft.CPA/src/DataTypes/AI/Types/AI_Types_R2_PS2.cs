@@ -5,35 +5,33 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public class AI_Types_LargoWinch : AI_Types {
+    public class AI_Types_R2_PS2 : AI_Types {
 		protected override void InitArrays() {
 			#region Keywords
-			keywordTable = new string[] {
-                "If",
-                "IfNot",
-                "If2",
-                "If4",
-                "If8",
-                "If16",
-                "If32",
-                "If64",
-                "IfNot32",
-                "IfNot64",
-                "IfDebug",
-                "IfNotU64",
-                "Then",
-                "Else",
-                "Goto",
-                "Me",
-                "MainActor",
-                "Nobody",
-                "NoInput",
-                "Nowhere",
-                "EmptyText",
-                "CapsNull",
-                "NoGraph",
-                "NoAction"
-            };
+			Keywords = new AI_Keyword[] {
+				AI_Keyword.If,
+				AI_Keyword.IfNot,
+				AI_Keyword.If2,
+				AI_Keyword.If4,
+				AI_Keyword.If8,
+				AI_Keyword.If16,
+				AI_Keyword.If32,
+				AI_Keyword.If64,
+				AI_Keyword.IfDebug,
+				AI_Keyword.IfNotU64,
+				AI_Keyword.Then,
+				AI_Keyword.Else,
+				AI_Keyword.EngineGoto,
+				AI_Keyword.Me,
+				AI_Keyword.MainActor,
+				AI_Keyword.Nobody,
+				AI_Keyword.NoSuperObject,
+				AI_Keyword.Nowhere,
+				AI_Keyword.EmptyText,
+				AI_Keyword.CapsNull,
+				AI_Keyword.NoGraph,
+				AI_Keyword.NoAction,
+			};
             #endregion
 
             #region Operators
@@ -1121,9 +1119,9 @@ namespace BinarySerializer.Ubisoft.CPA {
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new AI_DsgVarType[] {
+            VariableTypes = new AI_DsgVarType[] {
                 AI_DsgVarType.Boolean,
-                AI_DsgVarType.Byte,
+                AI_DsgVarType.SByte,
                 AI_DsgVarType.UByte, // Unsigned
                 AI_DsgVarType.Short,
                 AI_DsgVarType.UShort, // Unsigned
@@ -1132,49 +1130,28 @@ namespace BinarySerializer.Ubisoft.CPA {
                 AI_DsgVarType.Float,
                 AI_DsgVarType.WayPoint,
                 AI_DsgVarType.Perso,
-				AI_DsgVarType.List, // 10
-				AI_DsgVarType.Vector,
-				AI_DsgVarType.Comport,
-				AI_DsgVarType.Action,
-				AI_DsgVarType.Text,
-				/*DsgVarInfoEntry.DsgVarType.GameMaterial,
-				DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
-                DsgVarInfoEntry.DsgVarType.Graph,
-				DsgVarInfoEntry.DsgVarType.PersoArray,
-				DsgVarInfoEntry.DsgVarType.VectorArray,
-				DsgVarInfoEntry.DsgVarType.FloatArray,
-				DsgVarInfoEntry.DsgVarType.IntegerArray,
-				DsgVarInfoEntry.DsgVarType.WayPointArray,
-				DsgVarInfoEntry.DsgVarType.TextArray,
-				DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
-				*/
+                AI_DsgVarType.List,
+                AI_DsgVarType.Vector,
+                AI_DsgVarType.Action,
+                AI_DsgVarType.Capability,
+                AI_DsgVarType.Text,
+                AI_DsgVarType.SoundEvent,
                 AI_DsgVarType.Light,
                 AI_DsgVarType.GameMaterial,
-                AI_DsgVarType.SoundEvent,
-                AI_DsgVarType.None,
-                AI_DsgVarType.WayPointArray,
-                AI_DsgVarType.PersoArray, // 20
-				AI_DsgVarType.VectorArray,
+                AI_DsgVarType.VisualMaterial,
+                AI_DsgVarType.Graph,
+                AI_DsgVarType.PersoArray,
+                AI_DsgVarType.VectorArray,
                 AI_DsgVarType.FloatArray,
                 AI_DsgVarType.IntegerArray,
-                AI_DsgVarType.None,
-                AI_DsgVarType.TextArray, // 25
-				AI_DsgVarType.None,
-                AI_DsgVarType.None,
-                AI_DsgVarType.None,
-                AI_DsgVarType.GraphArray,
-                AI_DsgVarType.None, // 30
-				AI_DsgVarType.SuperObject,
-                AI_DsgVarType.None,
-                AI_DsgVarType.ActionArray,
-                AI_DsgVarType.None,
-                AI_DsgVarType.None,
-                AI_DsgVarType.ObjectList, // 36
-			};
+                AI_DsgVarType.WayPointArray,
+                AI_DsgVarType.TextArray,
+                AI_DsgVarType.SuperObject // input on iOS
+            };
             #endregion
 
             #region Node types
-            nodeTypes = new AI_InterpretType[] {
+            InterpretTypes = new AI_InterpretType[] {
                 AI_InterpretType.KeyWord, // 0
                 AI_InterpretType.Condition,
                 AI_InterpretType.Operator,
@@ -1206,19 +1183,21 @@ namespace BinarySerializer.Ubisoft.CPA {
                 AI_InterpretType.ComportRef,
                 AI_InterpretType.ModuleRef,
                 AI_InterpretType.SoundEventRef, // 30
-				AI_InterpretType.ObjectTableRef,
+                AI_InterpretType.ObjectTableRef,
                 AI_InterpretType.GameMaterialRef,
-                AI_InterpretType.VisualMaterial,
                 AI_InterpretType.ParticleGenerator,
+                AI_InterpretType.VisualMaterial,
                 AI_InterpretType.ModelRef, // 35
-				AI_InterpretType.ModelRef, // different type though
-				AI_InterpretType.CustomBits,
+                AI_InterpretType.DataType42,
+                AI_InterpretType.CustomBits,
                 AI_InterpretType.Caps,
                 AI_InterpretType.Unknown,
                 AI_InterpretType.SubRoutine, // 40
 				AI_InterpretType.Null,
-                AI_InterpretType.Null,
-                AI_InterpretType.Unknown
+                AI_InterpretType.Unknown,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.Unknown,
+                AI_InterpretType.GraphRef
             };
             #endregion
         }

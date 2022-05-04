@@ -8,45 +8,45 @@ namespace BinarySerializer.Ubisoft.CPA {
     public class AI_Types_R3 : AI_Types {
 		protected override void InitArrays() {
 			#region Keywords
-			keywordTable = new string[] {
-                "If",
-                "IfNot",
-                "If2",
-                "If4",
-                "If8",
-                "If16",
-                "If32",
-                "If64",
-                "IfNot2",
-                "IfNot4",
-                "IfNot8",
-                "IfNot16",
-                "IfNot32",
-                "IfNot64",
-                "IfDebug ",
-                "IfNotU64 ",
-                "Then",
-                "Else",
-                "EngineGoto",
-                "Me",
-                "MainActor",
-                "Nobody",
-                "NoInput",
-                "NoSoundEvent",
-                "NoLight",
-                "NoSuperObject",
-                "Nowhere",
-                "NoSOL",
-                "EmptyText",
-                "CapsNull",
-                "NoGraph",
-                "NoAction",
-                "NoGMT",
-                "NoVMT",
-                "While",
-                "BeginWhile",
-                "EndWhile",
-            };
+			Keywords = new AI_Keyword[] {
+				AI_Keyword.If,
+				AI_Keyword.IfNot,
+				AI_Keyword.If2,
+				AI_Keyword.If4,
+				AI_Keyword.If8,
+				AI_Keyword.If16,
+				AI_Keyword.If32,
+				AI_Keyword.If64,
+				AI_Keyword.IfNot2,
+				AI_Keyword.IfNot4,
+				AI_Keyword.IfNot8,
+				AI_Keyword.IfNot16,
+				AI_Keyword.IfNot32,
+				AI_Keyword.IfNot64,
+				AI_Keyword.IfDebug,
+				AI_Keyword.IfNotU64,
+				AI_Keyword.Then,
+				AI_Keyword.Else,
+				AI_Keyword.EngineGoto,
+				AI_Keyword.Me,
+				AI_Keyword.MainActor,
+				AI_Keyword.Nobody,
+				AI_Keyword.NoInput,
+				AI_Keyword.NoSoundEvent,
+				AI_Keyword.NoLight,
+				AI_Keyword.NoSuperObject,
+				AI_Keyword.Nowhere,
+				AI_Keyword.NoSOL,
+				AI_Keyword.EmptyText,
+				AI_Keyword.CapsNull,
+				AI_Keyword.NoGraph,
+				AI_Keyword.NoAction,
+				AI_Keyword.NoGameMaterial,
+				AI_Keyword.NoVisualMaterial,
+				AI_Keyword.While,
+				AI_Keyword.BeginWhile,
+				AI_Keyword.EndWhile,
+			};
             #endregion
 
             #region Operators
@@ -1641,9 +1641,9 @@ namespace BinarySerializer.Ubisoft.CPA {
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new AI_DsgVarType[] {
+            VariableTypes = new AI_DsgVarType[] {
                 AI_DsgVarType.Boolean,
-                AI_DsgVarType.Byte,
+                AI_DsgVarType.SByte,
                 AI_DsgVarType.UByte, // Unsigned
                 AI_DsgVarType.Short,
                 AI_DsgVarType.UShort, // Unsigned
@@ -1654,7 +1654,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 AI_DsgVarType.List,
                 AI_DsgVarType.Comport,
                 AI_DsgVarType.Action,
-                AI_DsgVarType.Caps,
+                AI_DsgVarType.Capability,
                 AI_DsgVarType.Input,
                 AI_DsgVarType.SoundEvent,
                 AI_DsgVarType.Light,
@@ -1681,7 +1681,7 @@ namespace BinarySerializer.Ubisoft.CPA {
             #endregion
 
             #region Node types
-            nodeTypes = new AI_InterpretType[] {
+            InterpretTypes = new AI_InterpretType[] {
                 AI_InterpretType.KeyWord, // 0
                 AI_InterpretType.Condition,
                 AI_InterpretType.Operator,

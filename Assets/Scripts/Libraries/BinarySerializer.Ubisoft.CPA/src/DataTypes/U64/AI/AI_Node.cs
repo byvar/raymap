@@ -4,20 +4,36 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class AI_Node : U64_Struct {
 		public byte Type { get; set; }
 		public byte Depth { get; set; }
-		public short IdOrValue { get; set; }
+		public ushort IdOrValue { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			Type = s.Serialize<byte>(Type, name: nameof(Type));
 			Depth = s.Serialize<byte>(Depth, name: nameof(Depth));
-			IdOrValue = s.Serialize<short>(IdOrValue, name: nameof(IdOrValue));
+			SerializeValue(s);
+		}
+
+		private void SerializeValue(SerializerObject s) {
+			// TODO: Serialize differently depending on type
+			IdOrValue = s.Serialize<ushort>(IdOrValue, name: nameof(IdOrValue));
 		}
 
 		public override bool UseShortLog => true;
 		public override string ShortLog => ToString();
 
-		public string ToString() {
-			var nodeType = Context.GetCPASettings().AITypes.GetNodeType(Type);
-			return $"{new string(' ',4*Depth)}{nodeType}_{IdOrValue}";
+		public override string ToString() {
+			var aiTypes = Context.GetCPASettings().AITypes;
+			var nodeType = aiTypes.GetNodeType(Type);
+			string translatedValue = nodeType switch {
+				AI_InterpretType.KeyWord => aiTypes.GetKeyword(IdOrValue)?.ToString(),
+				AI_InterpretType.Procedure => aiTypes.GetProcedure(IdOrValue),
+				AI_InterpretType.Function => aiTypes.GetFunction(IdOrValue),
+				AI_InterpretType.Field => aiTypes.GetField(IdOrValue),
+				AI_InterpretType.Operator => aiTypes.GetOperator(IdOrValue),
+				AI_InterpretType.MetaAction => aiTypes.GetMetaAction(IdOrValue),
+				AI_InterpretType.Condition => aiTypes.GetCondition(IdOrValue),
+				_ => $"{nodeType}_{IdOrValue:X4}"
+			};
+			return $"({Type:X2},{Depth:X2},{IdOrValue:X4}){new string(' ',4*Depth)}{translatedValue}";
 		}
 	}
 }

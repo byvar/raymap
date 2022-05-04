@@ -2,7 +2,7 @@
     public enum AI_DsgVarType {
         None,
         Boolean,
-        Byte,
+        SByte,
         UByte, // Unsigned
         Short,
         UShort, // Unsigned
@@ -13,7 +13,7 @@
         List,
         Comport,
         Action,
-        Caps, // Capabilities
+        Capability, // Capabilities
         Input,
         SoundEvent,
         Light,

@@ -5,30 +5,30 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public class AI_Types_R2_Demo : AI_Types {
+    public class AI_Types_R2 : AI_Types {
 		protected override void InitArrays() {
 			#region Keywords
-			keywordTable = new string[] {
-                "If",
-                "IfNot",
-                "If2",
-                "If4",
-                "If8",
-                "If16",
-                "IfDebug",
-                "IfNotU64",
-                "Then",
-                "Else",
-                "Goto",
-                "Me",
-                "MainActor",
-                "Nobody",
-                "NoInput",
-                "Nowhere",
-                "EmptyText",
-                "CapsNull",
-                "NoGraph",
-                "NoAction"
+			Keywords = new AI_Keyword[] {
+				AI_Keyword.If,
+				AI_Keyword.IfNot,
+				AI_Keyword.If2,
+				AI_Keyword.If4,
+				AI_Keyword.If8,
+				AI_Keyword.If16,
+				AI_Keyword.IfDebug,
+				AI_Keyword.IfNotU64,
+				AI_Keyword.Then,
+				AI_Keyword.Else,
+				AI_Keyword.EngineGoto,
+				AI_Keyword.Me,
+				AI_Keyword.MainActor,
+				AI_Keyword.Nobody,
+				AI_Keyword.NoSuperObject,
+				AI_Keyword.Nowhere,
+				AI_Keyword.EmptyText,
+				AI_Keyword.CapsNull,
+				AI_Keyword.NoGraph,
+				AI_Keyword.NoAction,
             };
             #endregion
 
@@ -1117,9 +1117,9 @@ namespace BinarySerializer.Ubisoft.CPA {
             #endregion
 
             #region DsgVar Types
-            dsgVarTypeTable = new AI_DsgVarType[] {
+            VariableTypes = new AI_DsgVarType[] {
                 AI_DsgVarType.Boolean,
-                AI_DsgVarType.Byte,
+                AI_DsgVarType.SByte,
                 AI_DsgVarType.UByte, // Unsigned
                 AI_DsgVarType.Short,
                 AI_DsgVarType.UShort, // Unsigned
@@ -1134,7 +1134,7 @@ namespace BinarySerializer.Ubisoft.CPA {
                 AI_DsgVarType.Action,
                 AI_DsgVarType.Text,
                 AI_DsgVarType.GameMaterial,
-                AI_DsgVarType.Caps, // Capabilities
+                AI_DsgVarType.Capability, // Capabilities
                 AI_DsgVarType.Graph,
                 AI_DsgVarType.PersoArray,
                 AI_DsgVarType.VectorArray,
@@ -1147,7 +1147,7 @@ namespace BinarySerializer.Ubisoft.CPA {
             #endregion
 
             #region Node types
-            nodeTypes = new AI_InterpretType[] {
+            InterpretTypes = new AI_InterpretType[] {
                 AI_InterpretType.KeyWord, // 0
                 AI_InterpretType.Condition,
                 AI_InterpretType.Operator,
