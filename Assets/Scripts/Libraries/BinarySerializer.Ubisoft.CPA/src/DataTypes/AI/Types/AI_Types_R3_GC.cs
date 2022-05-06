@@ -5,17 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-    public class AI_Types_R3_GC : AI_Types_R3 {
-		protected override void InitArrays() {
-			base.InitArrays();
+	public class AI_Types_R3_GC : AI_Types_R3_PS2 {
+		protected override void InitProcedures() {
+			base.InitProcedures();
 			procedureTable = InsertIntoArray(procedureTable, 219, "Unknown_GamecubeOnly");
-        }
-        
-        private string[] InsertIntoArray(string[] array, int index, string item)
-        {
-            var list = new List<string>(array);
-            list.Insert(index, item);
-            return list.ToArray();
-        }
-    }
+		}
+
+		private string[] InsertIntoArray(string[] array, int index, string item) {
+			var list = new List<string>(array);
+			list.Insert(index, item);
+			return list.ToArray();
+		}
+	}
 }

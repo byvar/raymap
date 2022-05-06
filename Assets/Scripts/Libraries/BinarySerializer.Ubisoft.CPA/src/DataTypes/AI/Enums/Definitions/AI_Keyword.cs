@@ -67,5 +67,13 @@
 		BeginWhile,
 		EndWhile,
 		#endregion
+
+		#region Hype PS2
+		Noway,
+		#endregion
+
+		#region R2 PS2
+		NoModule,
+		#endregion
 	}
 }

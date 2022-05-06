@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class AI_Types_LargoWinch : AI_Types_R2_PS2 {
-
+	public class AI_Types_R2_PC : AI_Types {
 		#region Functions
 		protected override void InitFunctions() {
 			functionTable = new string[] {
@@ -893,57 +892,36 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 		#endregion
 
+		// Re-checked
+
 		#region DsgVar Types
 		protected override void InitVariableTypes() {
 			VariableTypes = new AI_DsgVarType[] {
 				AI_DsgVarType.Boolean,
 				AI_DsgVarType.SByte,
-				AI_DsgVarType.UByte, // Unsigned
-                AI_DsgVarType.Short,
-				AI_DsgVarType.UShort, // Unsigned
-                AI_DsgVarType.Int,
-				AI_DsgVarType.UInt, // Unsigned
-                AI_DsgVarType.Float,
+				AI_DsgVarType.UByte,
+				AI_DsgVarType.Short,
+				AI_DsgVarType.UShort,
+				AI_DsgVarType.Int,
+				AI_DsgVarType.UInt,
+				AI_DsgVarType.Float,
 				AI_DsgVarType.WayPoint,
 				AI_DsgVarType.Perso,
-				AI_DsgVarType.List, // 10
+				AI_DsgVarType.List,
 				AI_DsgVarType.Vector,
 				AI_DsgVarType.Comport,
 				AI_DsgVarType.Action,
 				AI_DsgVarType.Text,
-				/*DsgVarInfoEntry.DsgVarType.GameMaterial,
-				DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
-                DsgVarInfoEntry.DsgVarType.Graph,
-				DsgVarInfoEntry.DsgVarType.PersoArray,
-				DsgVarInfoEntry.DsgVarType.VectorArray,
-				DsgVarInfoEntry.DsgVarType.FloatArray,
-				DsgVarInfoEntry.DsgVarType.IntegerArray,
-				DsgVarInfoEntry.DsgVarType.WayPointArray,
-				DsgVarInfoEntry.DsgVarType.TextArray,
-				DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
-				*/
-                AI_DsgVarType.Light,
 				AI_DsgVarType.GameMaterial,
-				AI_DsgVarType.SoundEvent,
-				AI_DsgVarType.None,
-				AI_DsgVarType.WayPointArray,
-				AI_DsgVarType.PersoArray, // 20
+				AI_DsgVarType.Caps,
+				AI_DsgVarType.Graph,
+				AI_DsgVarType.PersoArray,
 				AI_DsgVarType.VectorArray,
 				AI_DsgVarType.FloatArray,
 				AI_DsgVarType.IntegerArray,
-				AI_DsgVarType.None,
-				AI_DsgVarType.TextArray, // 25
-				AI_DsgVarType.None,
-				AI_DsgVarType.None,
-				AI_DsgVarType.None,
-				AI_DsgVarType.GraphArray,
-				AI_DsgVarType.None, // 30
-				AI_DsgVarType.SuperObject,
-				AI_DsgVarType.None,
-				AI_DsgVarType.ActionArray,
-				AI_DsgVarType.None,
-				AI_DsgVarType.None,
-				AI_DsgVarType.ObjectList, // 36
+				AI_DsgVarType.WayPointArray,
+				AI_DsgVarType.TextArray,
+				AI_DsgVarType.SuperObject
 			};
 		}
 		#endregion
@@ -958,10 +936,10 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_InterpretType.Procedure,
 				AI_InterpretType.MetaAction, // 5
                 AI_InterpretType.BeginMacro,
-				AI_InterpretType.BeginMacro,
 				AI_InterpretType.EndMacro,
+				AI_InterpretType.EndTree,
 				AI_InterpretType.Field,
-				AI_InterpretType.DsgVarRef, // 10
+				AI_InterpretType.DsgVar, // 10
                 AI_InterpretType.DsgVarRef,
 				AI_InterpretType.Constant,
 				AI_InterpretType.Real,
@@ -969,7 +947,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_InterpretType.ConstantVector, // 15
                 AI_InterpretType.Vector,
 				AI_InterpretType.Mask,
-				AI_InterpretType.ModuleRef,
+				AI_InterpretType.Module,
 				AI_InterpretType.DsgVarId,
 				AI_InterpretType.String, // 20
                 AI_InterpretType.LipsSynchroRef,
@@ -982,24 +960,19 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_InterpretType.ComportRef,
 				AI_InterpretType.ModuleRef,
 				AI_InterpretType.SoundEventRef, // 30
-				AI_InterpretType.ObjectTableRef,
+                AI_InterpretType.ObjectTableRef,
 				AI_InterpretType.GameMaterialRef,
-				AI_InterpretType.VisualMaterial,
 				AI_InterpretType.ParticleGenerator,
+				AI_InterpretType.Color,
 				AI_InterpretType.ModelRef, // 35
-				AI_InterpretType.ModelRef, // different type though
-				AI_InterpretType.CustomBits,
+                AI_InterpretType.Light,
 				AI_InterpretType.Caps,
-				AI_InterpretType.Unknown,
-				AI_InterpretType.MacroRef__Subroutine, // 40
-				AI_InterpretType.Null,
-				AI_InterpretType.Null,
-				AI_InterpretType.Unknown
+				AI_InterpretType.Graph,
+				AI_InterpretType.MacroRef__Subroutine,
+				AI_InterpretType.Null, // 40
 			};
 		}
 		#endregion
-
-		// Re-checked
 
 		#region Keywords
 		protected override void InitKeywords() {
@@ -1010,10 +983,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Keyword.If4,
 				AI_Keyword.If8,
 				AI_Keyword.If16,
-				AI_Keyword.IfNot2,
-				AI_Keyword.IfNot4,
-				AI_Keyword.IfNot8,
-				AI_Keyword.IfNot16,
 				AI_Keyword.IfDebug,
 				AI_Keyword.IfNotU64,
 				AI_Keyword.Then,
@@ -1022,7 +991,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Keyword.Me,
 				AI_Keyword.MainActor,
 				AI_Keyword.Nobody,
-				AI_Keyword.NoInput,
+				AI_Keyword.NoSuperObject,
 				AI_Keyword.Nowhere,
 				AI_Keyword.EmptyText,
 				AI_Keyword.CapsNull,
@@ -1084,16 +1053,11 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Condition.ReleasedBut,
 				AI_Condition.JustReleasedBut,
 				AI_Condition.IsTimeElapsed,
-				AI_Condition.IsValidObject, // First validity condition. Don't know the rest
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
+				AI_Condition.IsValidObject,
+				AI_Condition.IsValidWayPoint,
+				AI_Condition.IsValidGMT,
+				AI_Condition.IsValidAction,
+				AI_Condition.IsValidText,
 				AI_Condition.SeePerso,
 				AI_Condition.IsActivable,
 				AI_Condition.IsAlreadyHandled,
@@ -1101,8 +1065,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Condition.IsPersoLightOn,
 				AI_Condition.IsPersoLightPulseOn,
 				AI_Condition.IsPersoLightGyroPhareOn,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
 				AI_Condition.IsZDMCollideWithObstacle,
 				AI_Condition.IsZDMCollideWithWall,
 				AI_Condition.IsZDMCollideWithGround,
@@ -1121,13 +1083,36 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Condition.IsPersoActive,
 				AI_Condition.CheckActionEnd,
 				AI_Condition.IsCurrentStateCustomBitSet,
+
+				AI_Condition.IsGiBlock,
+				AI_Condition.IsMechanicBlock,
 				AI_Condition.IsMechanicAnimation,
 				AI_Condition.IsMechanicCollide,
+				AI_Condition.IsMechanicGravity,
+				AI_Condition.IsMechanicTilt,
+				AI_Condition.IsMechanicGi,
+				AI_Condition.IsMechanicClimb,
 				AI_Condition.IsMechanicOnGround,
+				AI_Condition.IsMechanicSpider,
+				AI_Condition.IsMechanicShoot,
+				AI_Condition.IsMechanicSwim,
+				AI_Condition.IsMechanicNeverFall,
+				AI_Condition.IsMechanicCollisionControl,
+				AI_Condition.IsMechanicKeepSpeedZ,
+				AI_Condition.IsMechanicSpeedLimit,
+				AI_Condition.IsMechanicInertia,
+				AI_Condition.IsMechanicStream,
+				AI_Condition.IsMechanicStickOnPlatform,
+				AI_Condition.IsMechanicPatformCrash,
+				AI_Condition.IsMechanicScale,
+				AI_Condition.IsMechanicExec,
+				AI_Condition.CanFall,
+				AI_Condition.IsMechanicCrash,
+
 				AI_Condition.IsNullVector,
+				AI_Condition.HierIsSonOfActor,
 				AI_Condition.IsMorphing,
 				AI_Condition.CheckAnimEnd,
-				AI_Condition.CheckAnimSmooth,
 				AI_Condition.HasTheCapability,
 				AI_Condition.HasOneOfTheCapabilities,
 				AI_Condition.HasTheCapabilityNumber,
@@ -1142,22 +1127,15 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Condition.NEstPasEnCollisionAvecAutresSecteurs,
 				AI_Condition.IsInFamily,
 				AI_Condition.IsInModel,
+
 				AI_Condition.AJoypadIsConnected,
 				AI_Condition.AKeyJustPressed,
 				AI_Condition.AButtonPadJustPressed,
-				AI_Condition.AKeyJustPressedAlphanumeric, // With an extra argument
 				AI_Condition.IsInDemoMode,
 				AI_Condition.IsInStereoMode,
 				AI_Condition.IsMusicPlaying,
-				AI_Condition.Placeholder,
 				AI_Condition.IsShapnessMax,
-				AI_Condition.IsTooFar,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
-				AI_Condition.Placeholder,
+
 				AI_Condition.Cam_IsActive,
 				AI_Condition.Cam_IsViewportOwner,
 				AI_Condition.Cam_IsFlagNoDynamicTarget,
@@ -1179,27 +1157,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Condition.Cam_IsFlagForcedPosition,
 				AI_Condition.Cam_IsFlagForcedTarget,
 				AI_Condition.Cam_IsFlagForcedAxis,
-			};
-		}
-		#endregion
-
-		#region Meta Actions
-		protected override void InitMetaActions() {
-			MetaActions = new AI_MetaAction[] {
-				AI_MetaAction.FrozenWait,
-				AI_MetaAction.ExecuteAction,
-				AI_MetaAction.ExecuteActionSmooth,
-				AI_MetaAction.WaitEndOfAction,
-				AI_MetaAction.WaitEndOfAnim,
-				AI_MetaAction.Placeholder, // Unknown type "g" too. Something new for Largo Winch
-				AI_MetaAction.CamCineMoveAToBTgtC,
-				AI_MetaAction.CamCineMoveAToBTgtAC,
-				AI_MetaAction.CamCinePosATgtB,
-				AI_MetaAction.CamCinePosAMoveTgtBToC,
-				AI_MetaAction.CamCinePosATgtBTurnPosH,
-				AI_MetaAction.CamCinePosATgtBTurnTgtH,
-				AI_MetaAction.CamCinePosATgtBTurnPosV,
-				AI_MetaAction.CamCinePosATgtBTurnTgtV
 			};
 		}
 		#endregion
@@ -1235,6 +1192,25 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Operator.ModelCast,
 				AI_Operator.Array,
 				AI_Operator.AffectArray,
+			};
+		}
+		#endregion
+
+		#region Meta Actions
+		protected override void InitMetaActions() {
+			MetaActions = new AI_MetaAction[] {
+				AI_MetaAction.FrozenWait,
+				AI_MetaAction.ExecuteAction,
+				AI_MetaAction.WaitEndOfAction,
+				AI_MetaAction.WaitEndOfAnim,
+				AI_MetaAction.CamCineMoveAToBTgtC,
+				AI_MetaAction.CamCineMoveAToBTgtAC,
+				AI_MetaAction.CamCinePosATgtB,
+				AI_MetaAction.CamCinePosAMoveTgtBToC,
+				AI_MetaAction.CamCinePosATgtBTurnPosH,
+				AI_MetaAction.CamCinePosATgtBTurnTgtH,
+				AI_MetaAction.CamCinePosATgtBTurnPosV,
+				AI_MetaAction.CamCinePosATgtBTurnTgtV
 			};
 		}
 		#endregion

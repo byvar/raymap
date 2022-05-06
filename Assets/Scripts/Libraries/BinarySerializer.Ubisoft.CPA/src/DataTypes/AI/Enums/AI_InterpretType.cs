@@ -37,7 +37,7 @@
         DataType42,
         CustomBits,
         Caps,
-        SubRoutine,
+        MacroRef__Subroutine,
         Null,
         GraphRef,
         // Types below here added for engineversions < R2

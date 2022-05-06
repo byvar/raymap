@@ -2,13 +2,13 @@
     public abstract class AI_Types {
         //public string[] functionTypes;
         public AI_Keyword[] Keywords { get; set; }
-        public string[] operatorTable { get; set; }
+        public AI_Operator[] Operators { get; set; }
 		public string[] functionTable { get; set; }
 		public string[] procedureTable { get; set; }
-		public string[] conditionTable { get; set; }
+		public AI_Condition[] Conditions { get; set; }
 		public AI_DsgVarType[] VariableTypes { get; set; }
 		public string[] fieldTable { get; set; }
-		public string[] metaActionTable { get; set; }
+		public AI_MetaAction[] MetaActions { get; set; }
 		public AI_InterpretType[] InterpretTypes { get; set; }
 
 		public void Init() {
@@ -16,7 +16,27 @@
 			CreateDictionaries();
 		}
 
-		protected abstract void InitArrays();
+		protected abstract void InitInterpretTypes();
+		protected abstract void InitVariableTypes();
+		protected abstract void InitKeywords();
+		protected abstract void InitOperators();
+		protected abstract void InitConditions();
+		protected abstract void InitFields();
+		protected abstract void InitMetaActions();
+		protected abstract void InitFunctions();
+		protected abstract void InitProcedures();
+
+		protected void InitArrays() {
+			InitInterpretTypes();
+			InitVariableTypes();
+			InitKeywords();
+			InitOperators();
+			InitConditions();
+			InitFields();
+			InitMetaActions();
+			InitFunctions();
+			InitProcedures();
+		}
 
 		private void CreateDictionaries() {
 			// TODO
@@ -26,9 +46,9 @@
 			if(index < Keywords.Length) return Keywords[index];
 			return null;
 		}
-		public string GetOperator(uint index) {
-			if (index < operatorTable.Length) return operatorTable[index];
-			return "";
+		public AI_Operator? GetOperator(uint index) {
+			if (index < Operators.Length) return Operators[index];
+			return null;
 		}
 		public string GetFunction(uint index) {
 			if (index < functionTable.Length) return functionTable[index];
@@ -38,17 +58,17 @@
 			if (index < procedureTable.Length) return procedureTable[index];
 			return "";
 		}
-		public string GetCondition(uint index) {
-			if (index < conditionTable.Length) return conditionTable[index];
-			return "";
+		public AI_Condition? GetCondition(uint index) {
+			if (index < Conditions.Length) return Conditions[index];
+			return null;
 		}
 		public string GetField(uint index) {
 			if (index < fieldTable.Length) return fieldTable[index];
 			return "";
 		}
-		public string GetMetaAction(uint index) {
-			if (index < metaActionTable.Length) return metaActionTable[index];
-			return "";
+		public AI_MetaAction? GetMetaAction(uint index) {
+			if (index < MetaActions.Length) return MetaActions[index];
+			return null;
 		}
 
 		public AI_InterpretType GetNodeType(byte functionType) {

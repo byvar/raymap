@@ -28,9 +28,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				AI_InterpretType.Procedure => aiTypes.GetProcedure(IdOrValue),
 				AI_InterpretType.Function => aiTypes.GetFunction(IdOrValue),
 				AI_InterpretType.Field => aiTypes.GetField(IdOrValue),
-				AI_InterpretType.Operator => aiTypes.GetOperator(IdOrValue),
-				AI_InterpretType.MetaAction => aiTypes.GetMetaAction(IdOrValue),
-				AI_InterpretType.Condition => aiTypes.GetCondition(IdOrValue),
+				AI_InterpretType.Operator => aiTypes.GetOperator(IdOrValue)?.ToString(),
+				AI_InterpretType.MetaAction => aiTypes.GetMetaAction(IdOrValue)?.ToString(),
+				AI_InterpretType.Condition => aiTypes.GetCondition(IdOrValue)?.ToString(),
 				_ => $"{nodeType}_{IdOrValue:X4}"
 			};
 			return $"({Type:X2},{Depth:X2},{IdOrValue:X4}){new string(' ',4*Depth)}{translatedValue}";

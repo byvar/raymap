@@ -5,6 +5,8 @@
 	// Replace: \[Definition\(SCR: \6, EN: \5, FR: \3\)] \2,
 	// Then replace " EN: ," with ""
 	public enum AI_Condition {
+		Placeholder,
+
 		#region DefCond
 		//
 		// 1. DefCond
@@ -259,6 +261,106 @@
 		[AI_Definition(SCR: "Cond_Cam_IsFlagForcedTarget", EN: "Cam_IsFlagForcedTarget", FR: "Cam_IsFlagForcedTarget")] Cam_IsFlagForcedTarget,
 		[AI_Definition(SCR: "Cond_Cam_IsFlagForcedAxis", EN: "Cam_IsFlagForcedAxis", FR: "Cam_IsFlagForcedAxis")] Cam_IsFlagForcedAxis,
 
+		#endregion
+
+		#region Hype PC & PS2
+		[AI_Definition(SCR: "Cond_CollideWithPoint")] CollideWithPoint,
+		[AI_Definition(SCR: "Cond_CollideWithTriangle")] CollideWithTriangle,
+		[AI_Definition(SCR: "Cond_CollideWithEdge")] CollideWithEdge,
+		[AI_Definition(SCR: "Cond_CollideWithSphere")] CollideWithSphere,
+		[AI_Definition(SCR: "Cond_CollideWithAlignedBox")] CollideWithAlignedBox,
+
+		[AI_Definition(SCR: "Cond_InEnvironmentAir")] InEnvironmentAir,
+		[AI_Definition(SCR: "Cond_InEnvironmentWater")] InEnvironmentWater,
+		[AI_Definition(SCR: "Cond_InEnvironmentFire")] InEnvironmentFire,
+
+		[AI_Definition(SCR: "Cond_IsInReflex")] IsInReflex,
+		[AI_Definition(SCR: "Cond_WallIsTypeOfGMTCollide")] WallIsTypeOfGMTCollide,
+		[AI_Definition(SCR: "Cond_ObstacleIsTypeOfGMTCollide")] ObstacleIsTypeOfGMTCollide,
+		[AI_Definition(SCR: "Cond_IsValidWay")] IsValidWay,
+		[AI_Definition(SCR: "Cond_InTopOfJump")] InTopOfJump,
+		[AI_Definition(SCR: "Cond_CanSwim")] CanSwim,
+		[AI_Definition(SCR: "Cond_CanSwimOnSurface")] CanSwimOnSurface,
+		[AI_Definition(SCR: "Cond_CanSwimUnderWater")] CanSwimUnderWater,
+		[AI_Definition(SCR: "Cond_IsNotOutOfDepth")] IsNotOutOfDepth,
+		[AI_Definition(SCR: "Cond_IsCompletelyOutOfWater")] IsCompletelyOutOfWater,
+		[AI_Definition(SCR: "Cond_LSY_IsSpeechOver")] LSY_IsSpeechOver,
+		[AI_Definition(SCR: "Cond_SeePosition")] SeePosition,
+		[AI_Definition(SCR: "Cond_SeePositionWithOffset")] SeePositionWithOffset,
+		[AI_Definition(SCR: "Cond_SeePersoWithOffset")] SeePersoWithOffset,
+		[AI_Definition(SCR: "Cond_IsSectorInTranslation")] IsSectorInTranslation,
+		[AI_Definition(SCR: "Cond_IsSectorInRotation")] IsSectorInRotation,
+		[AI_Definition(SCR: "Condition_Camera_IsInState")] IsCameraInState,
+		[AI_Definition(SCR: "Condition_Camera_IsInInitialState")] IsCameraInInitialState,
+		[AI_Definition(SCR: "Condition_Camera_IsActive")] IsCameraActive,
+		[AI_Definition(SCR: "Condition_Camera_IsViewportOwner")] IsCameraViewportOwner,
+		[AI_Definition(SCR: "Condition_Camera_IsCameraTargetVisible")] IsCameraTargetVisible,
+		[AI_Definition(SCR: "Condition_Camera_IsCameraTargetMoving")] IsCameraTargetMoving,
+		[AI_Definition(SCR: "Cond_Camera_IsCamReachedItsOptPos")] IsCameraReachedItsOptPos,
+		[AI_Definition(SCR: "Cond_Camera_IsCamInAlphaOrientation")] IsCameraInAlphaOrientation,
+		[AI_Definition(SCR: "Cond_Camera_IsCamInTetaOrientation")] IsCameraInTetaOrientation,
+		[AI_Definition(SCR: "Cond_IsSurfaceHeightMoving")] IsSurfaceHeightMoving,
+		[AI_Definition(SCR: "Cond_TestPower")] TestPower,
+		[AI_Definition(SCR: "Cond_IsAtLeftOfPerso")] HasAtLeft,
+		[AI_Definition(SCR: "Cond_IsAtRightOfPerso")] HasAtRight,
+		[AI_Definition(SCR: "Cond_IsBehindPerso")] HasBehind,
+		[AI_Definition(SCR: "Cond_IsInFrontOfPerso")] HasInFront,
+		[AI_Definition(SCR: "Cond_IsAbovePerso")] HasAbove,
+		[AI_Definition(SCR: "Cond_IsBelowPerso")] HasBelow,
+
+		[AI_Definition(SCR: "Cond_GetAction")] GetAction,
+		[AI_Definition(SCR: "Cond_Inv_InventoryIsFull")] Inv_InventairePlein,
+		[AI_Definition(SCR: "Cond_Inv_FindObject")] Inv_TrouverObjet,
+		[AI_Definition(SCR: "Cond_GetDialogStatus")] GetDialogStatus,
+		[AI_Definition(SCR: "Cond_DLG_IsDialogOver")] DLG_IsDialogOver,
+		[AI_Definition(SCR: "Cond_DLG_IsScrollingOver")] DLG_IsScrollingOver,
+		[AI_Definition(SCR: "Cond_ActionFinished")] ActionFinished,
+		[AI_Definition(SCR: "SCT_ActorInSector")] SCT_ActorInSector,
+		[AI_Definition(SCR: "Cond_CollisionSphereSphere")] CollisionSphereSphere,
+		[AI_Definition(SCR: "Cond_SectorActive")] SectorActive,
+		[AI_Definition(SCR: "Cond_SND_IsSonFinished")] IsSoundFinished,
+		#endregion
+
+		#region R3 PS2
+		UserEvent_IsSet3,
+		IsValidVMT,
+		IsValidSPO,
+		IsValidGraph,
+		IsRLITransitionInProgress,
+		IsInAlwaysActiveList,
+		IsAlwaysActive,
+		IsAnActivePad,
+		IsMultitap,
+		SAV2_IsValid,
+		IsWidescreen,
+		EngineIsInPAL,
+		CheckAnimSmooth,
+		IsTooFar,
+		IsSubAnimPlaying,
+		TestCBSubAnim,
+		IsInSubAnim,
+		IsSubAnimNearEnd,
+		IsSameSPO,
+		PressedPadBut,
+		JustPressedPadBut,
+		ReleasedPadBut,
+		JustReleasedPadBut,
+		IsCinePlaying,
+		LoadInProgress,
+		SAV2LastError,
+		CheckMCStatus,
+		SND_IsInStereoMode,
+		SND_IsMusicPlaying,
+		SND_IsVoicePlaying,
+		SND_IsEventValid,
+		#endregion
+
+		#region TT:SE PC
+		[AI_Definition(SCR: "Cond_CanIAddObjectInInventory")] CanIAddObjectInInventory,
+		#endregion
+
+		#region Largo (Custom name)
+		AKeyJustPressedAlphanumeric,
 		#endregion
 	}
 }

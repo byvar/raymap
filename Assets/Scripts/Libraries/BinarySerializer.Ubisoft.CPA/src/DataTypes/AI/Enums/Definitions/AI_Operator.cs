@@ -52,5 +52,9 @@
 		// Affect Array Operator 
 		[AI_Definition(SCR: "Operator_AffectArray", ED: ":={")] AffectArray,
 		#endregion
+
+		#region R3 PS2
+		[AI_Definition(SCR: "Operator_Modulo", ED: "%")] ScalarModulo,
+		#endregion
 	}
 }
