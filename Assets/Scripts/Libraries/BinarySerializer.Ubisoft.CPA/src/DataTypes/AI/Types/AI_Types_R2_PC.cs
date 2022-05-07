@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 	public class AI_Types_R2_PC : AI_Types {
 		#region Functions
 		protected override void InitFunctions() {
-			functionTable = new string[] {
+			Functions = new string[] {
 				"Func_GetPersoAbsolutePosition", // 0
                 "Func_GetMyAbsolutePosition",
 				"Func_GetAngleAroundZToPerso",

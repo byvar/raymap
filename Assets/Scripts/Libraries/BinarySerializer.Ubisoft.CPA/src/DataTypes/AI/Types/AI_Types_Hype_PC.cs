@@ -145,5 +145,16 @@ namespace BinarySerializer.Ubisoft.CPA {
 			};
 		}
 		#endregion
+
+		#region Functions
+		protected override void InitFunctions() {
+			base.InitFunctions();
+			var funcList = Functions.ToList();
+			// These two functions were added on PS2
+			funcList.Remove(AI_Function.GetLaserPointerDistaneToStaticMap);
+			funcList.Remove(AI_Function.SND_GetMicroOrientationPerso);
+			Functions = funcList.ToArray();
+		}
+		#endregion
 	}
 }

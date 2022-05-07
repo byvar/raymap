@@ -9,7 +9,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Functions
 		protected override void InitFunctions() {
-			functionTable = new string[] {
+			Functions = new string[] {
 				"Func_GetPersoAbsolutePosition", // 0
                 "Func_GetMyAbsolutePosition",
 				"Func_GetAngleAroundZToPerso",
