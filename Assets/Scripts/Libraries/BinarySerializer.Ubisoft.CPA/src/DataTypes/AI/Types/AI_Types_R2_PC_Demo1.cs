@@ -855,44 +855,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 		#endregion
 
-		#region Fields
-		protected override void InitFields() {
-			fieldTable = new string[] {
-				"Position",
-				"Orientation",
-				"Speed",
-				"NormSpeed",
-				"AbsoluteAxisX",
-				"AbsoluteAxisY",
-				"AbsoluteAxisZ",
-				"PrevComportIntell",
-				"PrevComportReflex",
-				"ShadowScaleX",
-				"ShadowScaleY",
-				"PadGlobalVector",
-				"PadHorizontalAxis",
-				"PadVerticalAxis",
-				"PadAnalogForce",
-				"PadTrueAnalogForce",
-				"PadRotationAngle",
-				"PadSector",
-                // Below only in iOS ver.
-                "CameraOffsetX",
-				"MenuIndex",
-				"MenuItem_Index",
-				"HoldItem_Index",
-				"SoundEffectVolume",
-				"MusicVolume",
-				"bGotoIGM",
-				"TempFunction",
-				"bMotionSensor",
-				"bCameraLook",
-				"bHoldCamera",
-				"CheatEnable"
-			};
-		}
-		#endregion
-
 		// Re-checked
 
 		// DsgVarTypes list: same as PC
@@ -901,6 +863,24 @@ namespace BinarySerializer.Ubisoft.CPA {
 		// Conditions list: same as PC
 		// Operators list: same as PC
 		// MetaActions list: same as PC
+
+		#region Fields
+		protected override void InitFields() { // Matches DS/N64 version
+			Fields = new AI_Field[] {
+				AI_Field.Position,
+				AI_Field.Orientation,
+				AI_Field.Speed,
+				AI_Field.NormSpeed,
+				AI_Field.AbsoluteAxisX,
+				AI_Field.AbsoluteAxisY,
+				AI_Field.AbsoluteAxisZ,
+				AI_Field.PrevComportIntell,
+				AI_Field.PrevComportReflex,
+				AI_Field.ShadowScaleX,
+				AI_Field.ShadowScaleY,
+			};
+		}
+		#endregion
 
 	}
 

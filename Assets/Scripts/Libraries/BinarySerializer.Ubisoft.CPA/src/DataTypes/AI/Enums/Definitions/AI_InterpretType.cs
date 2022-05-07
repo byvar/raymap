@@ -32,7 +32,7 @@
         ObjectTableRef,
         GameMaterialRef,
         ParticleGenerator,
-        VisualMaterial,
+        VisualMaterialRef,
         ModelRef,
         DataType42,
         CustomBits,
@@ -58,6 +58,11 @@
         SOLinksRef,
         Light,
         Graph,
-        CineRef
-    };
+        CineRef,
+
+		// Revo:
+		Placeholder__R2PS2__Type2E,
+		Placeholder__Largo__Type2F,
+		Placeholder__Largo__Type30,
+	};
 }

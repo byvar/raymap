@@ -855,151 +855,67 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 		#endregion
 
-		#region Fields
-		protected override void InitFields() {
-			fieldTable = new string[] {
-				"Position",
-				"Orientation",
-				"Speed",
-				"NormSpeed",
-				"AbsoluteAxisX",
-				"AbsoluteAxisY",
-				"AbsoluteAxisZ",
-				"PrevComportIntell",
-				"PrevComportReflex",
-				"ShadowScaleX",
-				"ShadowScaleY",
-				"PadGlobalVector",
-				"PadHorizontalAxis",
-				"PadVerticalAxis",
-				"PadAnalogForce",
-				"PadTrueAnalogForce",
-				"PadRotationAngle",
-				"PadSector",
-                // Below only in iOS ver.
-                "CameraOffsetX",
-				"MenuIndex",
-				"MenuItem_Index",
-				"HoldItem_Index",
-				"SoundEffectVolume",
-				"MusicVolume",
-				"bGotoIGM",
-				"TempFunction",
-				"bMotionSensor",
-				"bCameraLook",
-				"bHoldCamera",
-				"CheatEnable"
-			};
-		}
-		#endregion
+		// Re-checked
+
+		// Fields: same as R2 PS2
 
 		#region DsgVar Types
 		protected override void InitVariableTypes() {
+			// Same list as Revolution, with 1 extra array, 2 extra types at the end as well as ObjectTable
 			VariableTypes = new AI_DsgVarType[] {
 				AI_DsgVarType.Boolean,
 				AI_DsgVarType.SByte,
-				AI_DsgVarType.UByte, // Unsigned
-                AI_DsgVarType.Short,
-				AI_DsgVarType.UShort, // Unsigned
-                AI_DsgVarType.Int,
-				AI_DsgVarType.UInt, // Unsigned
-                AI_DsgVarType.Float,
+				AI_DsgVarType.UByte,
+				AI_DsgVarType.Short,
+				AI_DsgVarType.UShort,
+				AI_DsgVarType.Int,
+				AI_DsgVarType.UInt,
+				AI_DsgVarType.Float,
 				AI_DsgVarType.WayPoint,
 				AI_DsgVarType.Perso,
-				AI_DsgVarType.List, // 10
+				AI_DsgVarType.List,
 				AI_DsgVarType.Vector,
 				AI_DsgVarType.Comport,
 				AI_DsgVarType.Action,
 				AI_DsgVarType.Text,
-				/*DsgVarInfoEntry.DsgVarType.GameMaterial,
-				DsgVarInfoEntry.DsgVarType.Caps, // Capabilities
-                DsgVarInfoEntry.DsgVarType.Graph,
-				DsgVarInfoEntry.DsgVarType.PersoArray,
-				DsgVarInfoEntry.DsgVarType.VectorArray,
-				DsgVarInfoEntry.DsgVarType.FloatArray,
-				DsgVarInfoEntry.DsgVarType.IntegerArray,
-				DsgVarInfoEntry.DsgVarType.WayPointArray,
-				DsgVarInfoEntry.DsgVarType.TextArray,
-				DsgVarInfoEntry.DsgVarType.SuperObject // input on iOS
-				*/
-                AI_DsgVarType.Light,
 				AI_DsgVarType.GameMaterial,
+				AI_DsgVarType.VisualMaterial,
 				AI_DsgVarType.SoundEvent,
-				AI_DsgVarType.None,
-				AI_DsgVarType.WayPointArray,
-				AI_DsgVarType.PersoArray, // 20
-				AI_DsgVarType.VectorArray,
-				AI_DsgVarType.FloatArray,
-				AI_DsgVarType.IntegerArray,
-				AI_DsgVarType.None,
-				AI_DsgVarType.TextArray, // 25
-				AI_DsgVarType.None,
-				AI_DsgVarType.None,
-				AI_DsgVarType.None,
-				AI_DsgVarType.GraphArray,
-				AI_DsgVarType.None, // 30
+				AI_DsgVarType.Caps,
+				AI_DsgVarType.Graph,
+
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__R2PS2__Type2E,
+				AI_DsgVarType.Module,
+				AI_DsgVarType.Placeholder__UnknownArray,
 				AI_DsgVarType.SuperObject,
-				AI_DsgVarType.None,
-				AI_DsgVarType.ActionArray,
-				AI_DsgVarType.None,
-				AI_DsgVarType.None,
-				AI_DsgVarType.ObjectList, // 36
+				AI_DsgVarType.Input,
+
+				AI_DsgVarType.Placeholder__Largo__Type2F,
+				AI_DsgVarType.Placeholder__Largo__Type30,
+				AI_DsgVarType.ObjectTable,
+
 			};
 		}
 		#endregion
 
 		#region Node types
 		protected override void InitInterpretTypes() {
-			InterpretTypes = new AI_InterpretType[] {
-				AI_InterpretType.KeyWord, // 0
-                AI_InterpretType.Condition,
-				AI_InterpretType.Operator,
-				AI_InterpretType.Function,
-				AI_InterpretType.Procedure,
-				AI_InterpretType.MetaAction, // 5
-                AI_InterpretType.BeginMacro,
-				AI_InterpretType.BeginMacro,
-				AI_InterpretType.EndMacro,
-				AI_InterpretType.Field,
-				AI_InterpretType.DsgVarRef, // 10
-                AI_InterpretType.DsgVarRef,
-				AI_InterpretType.Constant,
-				AI_InterpretType.Real,
-				AI_InterpretType.Button,
-				AI_InterpretType.ConstantVector, // 15
-                AI_InterpretType.Vector,
-				AI_InterpretType.Mask,
-				AI_InterpretType.ModuleRef,
-				AI_InterpretType.DsgVarId,
-				AI_InterpretType.String, // 20
-                AI_InterpretType.LipsSynchroRef,
-				AI_InterpretType.FamilyRef,
-				AI_InterpretType.PersoRef,
-				AI_InterpretType.ActionRef,
-				AI_InterpretType.SuperObjectRef, // 25
-                AI_InterpretType.WayPointRef,
-				AI_InterpretType.TextRef,
-				AI_InterpretType.ComportRef,
-				AI_InterpretType.ModuleRef,
-				AI_InterpretType.SoundEventRef, // 30
-				AI_InterpretType.ObjectTableRef,
-				AI_InterpretType.GameMaterialRef,
-				AI_InterpretType.VisualMaterial,
-				AI_InterpretType.ParticleGenerator,
-				AI_InterpretType.ModelRef, // 35
-				AI_InterpretType.ModelRef, // different type though
-				AI_InterpretType.CustomBits,
-				AI_InterpretType.Caps,
-				AI_InterpretType.Unknown,
-				AI_InterpretType.MacroRef__Subroutine, // 40
-				AI_InterpretType.Null,
-				AI_InterpretType.Null,
-				AI_InterpretType.Unknown
-			};
+			base.InitInterpretTypes();
+			// Exact same list as Revo, but 2 extra
+			InterpretTypes = InterpretTypes
+				.Append(AI_InterpretType.Placeholder__Largo__Type2F)
+				.Append(AI_InterpretType.Placeholder__Largo__Type30)
+				.ToArray();
 		}
 		#endregion
-
-		// Re-checked
 
 		#region Keywords
 		protected override void InitKeywords() {

@@ -6,50 +6,6 @@ using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
 	public class AI_Types_R3_PS2 : AI_Types {
-		#region Keywords
-		protected override void InitKeywords() {
-			Keywords = new AI_Keyword[] {
-				AI_Keyword.If,
-				AI_Keyword.IfNot,
-				AI_Keyword.If2,
-				AI_Keyword.If4,
-				AI_Keyword.If8,
-				AI_Keyword.If16,
-				AI_Keyword.If32,
-				AI_Keyword.If64,
-				AI_Keyword.IfNot2,
-				AI_Keyword.IfNot4,
-				AI_Keyword.IfNot8,
-				AI_Keyword.IfNot16,
-				AI_Keyword.IfNot32,
-				AI_Keyword.IfNot64,
-				AI_Keyword.IfDebug,
-				AI_Keyword.IfNotU64,
-				AI_Keyword.Then,
-				AI_Keyword.Else,
-				AI_Keyword.EngineGoto,
-				AI_Keyword.Me,
-				AI_Keyword.MainActor,
-				AI_Keyword.Nobody,
-				AI_Keyword.NoInput,
-				AI_Keyword.NoSoundEvent,
-				AI_Keyword.NoLight,
-				AI_Keyword.NoSuperObject,
-				AI_Keyword.Nowhere,
-				AI_Keyword.NoSOL,
-				AI_Keyword.EmptyText,
-				AI_Keyword.CapsNull,
-				AI_Keyword.NoGraph,
-				AI_Keyword.NoAction,
-				AI_Keyword.NoGameMaterial,
-				AI_Keyword.NoVisualMaterial,
-				AI_Keyword.While,
-				AI_Keyword.BeginWhile,
-				AI_Keyword.EndWhile,
-			};
-		}
-		#endregion
-
 		#region Functions
 		protected override void InitFunctions() {
 			functionTable = new string[] {
@@ -1386,33 +1342,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 		#endregion
 
-		#region Fields
-		protected override void InitFields() {
-			fieldTable = new string[] {
-				"Position",
-				"Orientation",
-				"Speed",
-				"NormSpeed",
-				"AbsoluteAxisX",
-				"AbsoluteAxisY",
-				"AbsoluteAxisZ",
-				"PrevComportIntell",
-				"PrevComportReflex",
-				"ShadowScaleX",
-				"ShadowScaleY",
-				"PadGlobalVector",
-				"PadHorizontalAxis",
-				"PadVerticalAxis",
-				"PadAnalogForce",
-				"PadTrueAnalogForce",
-				"PadRotationAngle",
-				"PadSector",
-				"SystemDate",
-				"SystemTime"
-			};
-		}
-		#endregion
-
 		// Re-checked
 
 		#region DsgVar Types
@@ -1494,7 +1423,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_InterpretType.SoundEventRef,
 				AI_InterpretType.ObjectTableRef,
 				AI_InterpretType.GameMaterialRef,
-				AI_InterpretType.VisualMaterial,
+				AI_InterpretType.VisualMaterialRef,
 				AI_InterpretType.ParticleGenerator, // 35
 				AI_InterpretType.Color,
 				AI_InterpretType.ModelRef,
@@ -1505,6 +1434,50 @@ namespace BinarySerializer.Ubisoft.CPA {
                 AI_InterpretType.Unknown, // sic
                 AI_InterpretType.CineRef,
 				AI_InterpretType.GraphRef
+			};
+		}
+		#endregion
+
+		#region Keywords
+		protected override void InitKeywords() {
+			Keywords = new AI_Keyword[] {
+				AI_Keyword.If,
+				AI_Keyword.IfNot,
+				AI_Keyword.If2,
+				AI_Keyword.If4,
+				AI_Keyword.If8,
+				AI_Keyword.If16,
+				AI_Keyword.If32,
+				AI_Keyword.If64,
+				AI_Keyword.IfNot2,
+				AI_Keyword.IfNot4,
+				AI_Keyword.IfNot8,
+				AI_Keyword.IfNot16,
+				AI_Keyword.IfNot32,
+				AI_Keyword.IfNot64,
+				AI_Keyword.IfDebug,
+				AI_Keyword.IfNotU64,
+				AI_Keyword.Then,
+				AI_Keyword.Else,
+				AI_Keyword.EngineGoto,
+				AI_Keyword.Me,
+				AI_Keyword.MainActor,
+				AI_Keyword.Nobody,
+				AI_Keyword.NoInput,
+				AI_Keyword.NoSoundEvent,
+				AI_Keyword.NoLight,
+				AI_Keyword.NoSuperObject,
+				AI_Keyword.Nowhere,
+				AI_Keyword.NoSOL,
+				AI_Keyword.EmptyText,
+				AI_Keyword.CapsNull,
+				AI_Keyword.NoGraph,
+				AI_Keyword.NoAction,
+				AI_Keyword.NoGameMaterial,
+				AI_Keyword.NoVisualMaterial,
+				AI_Keyword.While,
+				AI_Keyword.BeginWhile,
+				AI_Keyword.EndWhile,
 			};
 		}
 		#endregion
@@ -1746,6 +1719,33 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Operator.ModelCast,
 				AI_Operator.Array,
 				AI_Operator.AffectArray,
+			};
+		}
+		#endregion
+
+		#region Fields
+		protected override void InitFields() {
+			Fields = new AI_Field[] {
+				AI_Field.Position,
+				AI_Field.Orientation,
+				AI_Field.Speed,
+				AI_Field.NormSpeed,
+				AI_Field.AbsoluteAxisX,
+				AI_Field.AbsoluteAxisY,
+				AI_Field.AbsoluteAxisZ,
+				AI_Field.PrevComportIntell,
+				AI_Field.PrevComportReflex,
+				AI_Field.ShadowScaleX,
+				AI_Field.ShadowScaleY,
+				AI_Field.PadGlobalVector,
+				AI_Field.PadHorizontalAxis,
+				AI_Field.PadVerticalAxis,
+				AI_Field.PadAnalogForce,
+				AI_Field.PadTrueAnalogForce,
+				AI_Field.PadRotationAngle,
+				AI_Field.PadSector,
+				AI_Field.SystemData,
+				AI_Field.SystemTime,
 			};
 		}
 		#endregion

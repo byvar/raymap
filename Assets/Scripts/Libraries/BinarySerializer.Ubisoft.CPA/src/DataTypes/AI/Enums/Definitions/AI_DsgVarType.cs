@@ -44,6 +44,12 @@
 
 		TextRefArray,
         ActionArray, // Hype
-        ObjectList, // Largo
-    }
+
+		Placeholder__R2PS2__Type2E,
+		Placeholder__UnknownArray,
+		Module,
+		Placeholder__Largo__Type2F,
+		Placeholder__Largo__Type30,
+		ObjectTable,
+	}
 }

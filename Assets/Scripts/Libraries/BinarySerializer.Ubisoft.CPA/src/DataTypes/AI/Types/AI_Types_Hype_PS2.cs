@@ -6,89 +6,6 @@ using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
 	public class AI_Types_Hype_PS2 : AI_Types {
-		#region Node types
-		protected override void InitInterpretTypes() {
-			InterpretTypes = new AI_InterpretType[] {
-				AI_InterpretType.KeyWord, // 0
-                AI_InterpretType.Condition,
-				AI_InterpretType.Operator,
-				AI_InterpretType.Function,
-				AI_InterpretType.Procedure,
-				AI_InterpretType.MetaAction, // 5
-                AI_InterpretType.BeginMacro,
-				AI_InterpretType.EndMacro,
-				AI_InterpretType.Unknown,
-				AI_InterpretType.Field,
-				AI_InterpretType.DsgVar, // 10
-                AI_InterpretType.DsgVarRef,
-				AI_InterpretType.Constant,
-				AI_InterpretType.Real,
-				AI_InterpretType.Button,
-				AI_InterpretType.ConstantVector, // 15
-                AI_InterpretType.Vector,
-				AI_InterpretType.Mask,
-				AI_InterpretType.Module,
-				AI_InterpretType.DsgVarId,
-				AI_InterpretType.String, // 20
-                AI_InterpretType.LipsSynchroRef,
-				AI_InterpretType.FamilyRef,
-				AI_InterpretType.Way,
-				AI_InterpretType.PersoRef,
-				AI_InterpretType.ActionRef, // 25
-                AI_InterpretType.EnvironmentRef,
-				AI_InterpretType.SuperObjectRef,
-				AI_InterpretType.SurfaceRef,
-				AI_InterpretType.WayPointRef,
-				AI_InterpretType.TextRef, // 30
-                AI_InterpretType.FontRef,
-				AI_InterpretType.ComportRef,
-				AI_InterpretType.ModuleRef,
-				AI_InterpretType.SoundEventRef,
-				AI_InterpretType.ObjectTableRef, // 35
-                AI_InterpretType.GameMaterialRef,
-				AI_InterpretType.ParticleGenerator,
-				AI_InterpretType.Color,
-				AI_InterpretType.ModelRef,
-				AI_InterpretType.Caps,
-				AI_InterpretType.GraphRef
-			};
-		}
-		#endregion
-
-		#region DsgVar Types
-		protected override void InitVariableTypes() {
-			VariableTypes = new AI_DsgVarType[] {
-				AI_DsgVarType.Boolean,
-				AI_DsgVarType.SByte,
-				AI_DsgVarType.UByte, // Unsigned
-                AI_DsgVarType.Short,
-				AI_DsgVarType.UShort, // Unsigned
-                AI_DsgVarType.Int,
-				AI_DsgVarType.UInt, // Unsigned
-                AI_DsgVarType.Float,
-				AI_DsgVarType.WayPoint,
-				AI_DsgVarType.Way,
-				AI_DsgVarType.Perso,
-				AI_DsgVarType.List,
-				AI_DsgVarType.Vector,
-				AI_DsgVarType.Comport,
-				AI_DsgVarType.Action,
-				AI_DsgVarType.Text,
-				AI_DsgVarType.GameMaterial,
-				AI_DsgVarType.Caps,
-				AI_DsgVarType.Graph,
-				AI_DsgVarType.PersoArray,
-				AI_DsgVarType.VectorArray,
-				AI_DsgVarType.FloatArray,
-				AI_DsgVarType.IntegerArray,
-				AI_DsgVarType.WayPointArray,
-				AI_DsgVarType.TextArray,
-				AI_DsgVarType.ActionArray,
-				AI_DsgVarType.None
-			};
-		}
-		#endregion
-
 		#region Procedures
 		protected override void InitProcedures() {
 			procedureTable = new string[] {
@@ -786,26 +703,90 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 		#endregion
 
-		#region Fields
-		protected override void InitFields() {
-			fieldTable = new string[] {
-				"Position",
-				"Orientation",
-				"Speed",
-				"NormSpeed",
-				"AbsoluteAxisX",
-				"AbsoluteAxisY",
-				"AbsoluteAxisZ",
-				"PrevComportIntell",
-				"PrevComportReflex",
-				"CollisionFlag",
-				"ShadowScaleX",
-				"ShadowScaleY"
+		// Re-checked
+
+		#region DsgVar Types
+		protected override void InitVariableTypes() {
+			VariableTypes = new AI_DsgVarType[] {
+				AI_DsgVarType.Boolean,
+				AI_DsgVarType.SByte,
+				AI_DsgVarType.UByte,
+				AI_DsgVarType.Short,
+				AI_DsgVarType.UShort,
+				AI_DsgVarType.Int,
+				AI_DsgVarType.UInt,
+				AI_DsgVarType.Float,
+				AI_DsgVarType.WayPoint,
+				AI_DsgVarType.Way,
+				AI_DsgVarType.Perso,
+				AI_DsgVarType.List,
+				AI_DsgVarType.Vector,
+				AI_DsgVarType.Comport,
+				AI_DsgVarType.Action,
+				AI_DsgVarType.Text,
+				AI_DsgVarType.GameMaterial,
+				AI_DsgVarType.Caps,
+				AI_DsgVarType.Graph,
+				AI_DsgVarType.PersoArray,
+				AI_DsgVarType.VectorArray,
+				AI_DsgVarType.FloatArray,
+				AI_DsgVarType.IntegerArray,
+				AI_DsgVarType.WayPointArray,
+				AI_DsgVarType.TextArray,
+				AI_DsgVarType.ActionArray,
+				AI_DsgVarType.None
 			};
 		}
 		#endregion
 
-		// Re-checked
+		#region Node types
+		protected override void InitInterpretTypes() {
+			InterpretTypes = new AI_InterpretType[] {
+				AI_InterpretType.KeyWord, // 0
+                AI_InterpretType.Condition,
+				AI_InterpretType.Operator,
+				AI_InterpretType.Function,
+				AI_InterpretType.Procedure,
+				AI_InterpretType.MetaAction, // 5
+                AI_InterpretType.BeginMacro,
+				AI_InterpretType.EndMacro,
+				AI_InterpretType.EndTree,
+				AI_InterpretType.Field,
+				AI_InterpretType.DsgVar, // 10
+                AI_InterpretType.DsgVarRef,
+				AI_InterpretType.Constant,
+				AI_InterpretType.Real,
+				AI_InterpretType.Button,
+				AI_InterpretType.ConstantVector, // 15
+                AI_InterpretType.Vector,
+				AI_InterpretType.Mask,
+				AI_InterpretType.Module,
+				AI_InterpretType.DsgVarId,
+				AI_InterpretType.String, // 20
+                AI_InterpretType.LipsSynchroRef,
+				AI_InterpretType.FamilyRef,
+				AI_InterpretType.Way,
+				AI_InterpretType.PersoRef,
+				AI_InterpretType.ActionRef, // 25
+                AI_InterpretType.EnvironmentRef,
+				AI_InterpretType.SuperObjectRef,
+				AI_InterpretType.SurfaceRef,
+				AI_InterpretType.WayPointRef,
+				AI_InterpretType.TextRef, // 30
+                AI_InterpretType.FontRef,
+				AI_InterpretType.ComportRef,
+				AI_InterpretType.ModuleRef,
+				AI_InterpretType.SoundEventRef,
+				AI_InterpretType.ObjectTableRef, // 35
+                AI_InterpretType.GameMaterialRef,
+				AI_InterpretType.ParticleGenerator,
+				AI_InterpretType.Color,
+				AI_InterpretType.ModelRef,
+				AI_InterpretType.Caps,
+				AI_InterpretType.GraphRef
+			};
+		}
+		#endregion
 
 		#region Conditions
 		protected override void InitConditions() {
@@ -1068,6 +1049,25 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_MetaAction.IncrementalTurnAbsDirection,
 				AI_MetaAction.IncTurnPersoAbsDirection,
 				AI_MetaAction.WaitNbFrames,
+			};
+		}
+		#endregion
+
+		#region Fields
+		protected override void InitFields() {
+			Fields = new AI_Field[] {
+				AI_Field.Position,
+				AI_Field.Orientation,
+				AI_Field.Speed,
+				AI_Field.NormSpeed,
+				AI_Field.AbsoluteAxisX,
+				AI_Field.AbsoluteAxisY,
+				AI_Field.AbsoluteAxisZ,
+				AI_Field.PrevComportIntell,
+				AI_Field.PrevComportReflex,
+				AI_Field.CollisionFlag,
+				AI_Field.ShadowScaleX,
+				AI_Field.ShadowScaleY,
 			};
 		}
 		#endregion

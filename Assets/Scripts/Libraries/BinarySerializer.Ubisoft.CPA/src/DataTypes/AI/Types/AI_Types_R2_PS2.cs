@@ -854,75 +854,46 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 		#endregion
 
-		#region Fields
-		protected override void InitFields() {
-			fieldTable = new string[] {
-				"Position",
-				"Orientation",
-				"Speed",
-				"NormSpeed",
-				"AbsoluteAxisX",
-				"AbsoluteAxisY",
-				"AbsoluteAxisZ",
-				"PrevComportIntell",
-				"PrevComportReflex",
-				"ShadowScaleX",
-				"ShadowScaleY",
-				"PadGlobalVector",
-				"PadHorizontalAxis",
-				"PadVerticalAxis",
-				"PadAnalogForce",
-				"PadTrueAnalogForce",
-				"PadRotationAngle",
-				"PadSector",
-                // Below only in iOS ver.
-                "CameraOffsetX",
-				"MenuIndex",
-				"MenuItem_Index",
-				"HoldItem_Index",
-				"SoundEffectVolume",
-				"MusicVolume",
-				"bGotoIGM",
-				"TempFunction",
-				"bMotionSensor",
-				"bCameraLook",
-				"bHoldCamera",
-				"CheatEnable"
-			};
-		}
-		#endregion
+		// Re-checked
 
 		#region DsgVar Types
 		protected override void InitVariableTypes() {
 			VariableTypes = new AI_DsgVarType[] {
 				AI_DsgVarType.Boolean,
 				AI_DsgVarType.SByte,
-				AI_DsgVarType.UByte, // Unsigned
-                AI_DsgVarType.Short,
-				AI_DsgVarType.UShort, // Unsigned
-                AI_DsgVarType.Int,
-				AI_DsgVarType.UInt, // Unsigned
-                AI_DsgVarType.Float,
+				AI_DsgVarType.UByte,
+				AI_DsgVarType.Short,
+				AI_DsgVarType.UShort,
+				AI_DsgVarType.Int,
+				AI_DsgVarType.UInt,
+				AI_DsgVarType.Float,
 				AI_DsgVarType.WayPoint,
 				AI_DsgVarType.Perso,
 				AI_DsgVarType.List,
 				AI_DsgVarType.Vector,
+				AI_DsgVarType.Comport,
 				AI_DsgVarType.Action,
-				AI_DsgVarType.Caps,
 				AI_DsgVarType.Text,
-				AI_DsgVarType.SoundEvent,
-				AI_DsgVarType.Light,
 				AI_DsgVarType.GameMaterial,
 				AI_DsgVarType.VisualMaterial,
+				AI_DsgVarType.SoundEvent,
+				AI_DsgVarType.Caps,
 				AI_DsgVarType.Graph,
-				AI_DsgVarType.PersoArray,
-				AI_DsgVarType.VectorArray,
-				AI_DsgVarType.FloatArray,
-				AI_DsgVarType.IntegerArray,
-				AI_DsgVarType.WayPointArray,
-				AI_DsgVarType.TextArray,
-				AI_DsgVarType.SuperObject // input on iOS
-            };
+
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.Placeholder__R2PS2__Type2E,
+				AI_DsgVarType.Module,
+				AI_DsgVarType.Placeholder__UnknownArray,
+				AI_DsgVarType.SuperObject,
+				AI_DsgVarType.Input,
+
+			};
 		}
 		#endregion
 
@@ -936,10 +907,10 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_InterpretType.Procedure,
 				AI_InterpretType.MetaAction, // 5
                 AI_InterpretType.BeginMacro,
-				AI_InterpretType.BeginMacro,
 				AI_InterpretType.EndMacro,
+				AI_InterpretType.EndTree,
 				AI_InterpretType.Field,
-				AI_InterpretType.DsgVarRef, // 10
+				AI_InterpretType.DsgVar, // 10
                 AI_InterpretType.DsgVarRef,
 				AI_InterpretType.Constant,
 				AI_InterpretType.Real,
@@ -962,24 +933,18 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_InterpretType.SoundEventRef, // 30
                 AI_InterpretType.ObjectTableRef,
 				AI_InterpretType.GameMaterialRef,
-				AI_InterpretType.ParticleGenerator,
-				AI_InterpretType.VisualMaterial,
+				AI_InterpretType.VisualMaterialRef, // Not 100% sure
+				AI_InterpretType.Placeholder__R2PS2__Type2E, // Not 100% sure
+				AI_InterpretType.Color,
 				AI_InterpretType.ModelRef, // 35
-                AI_InterpretType.DataType42,
-				AI_InterpretType.CustomBits,
+				AI_InterpretType.Light,
 				AI_InterpretType.Caps,
-				AI_InterpretType.Unknown,
+				AI_InterpretType.Graph,
 				AI_InterpretType.MacroRef__Subroutine, // 40
 				AI_InterpretType.Null,
-				AI_InterpretType.Unknown,
-				AI_InterpretType.Unknown,
-				AI_InterpretType.Unknown,
-				AI_InterpretType.GraphRef
 			};
 		}
 		#endregion
-
-		// Re-checked
 
 		#region Keywords
 		protected override void InitKeywords() {
@@ -1185,6 +1150,26 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Condition.Cam_IsFlagForcedPosition,
 				AI_Condition.Cam_IsFlagForcedTarget,
 				AI_Condition.Cam_IsFlagForcedAxis,
+			};
+		}
+		#endregion
+
+		#region Fields
+		protected override void InitFields() {
+			Fields = new AI_Field[] {        // Type
+				AI_Field.Position,           // 2
+				AI_Field.Orientation,        // 2
+				AI_Field.Speed,              // 2
+				AI_Field.NormSpeed,          // 1
+				AI_Field.PrevComportIntell,  // 3
+				AI_Field.PrevComportReflex,  // 3
+				AI_Field.PadGlobalVector,    // 2
+				AI_Field.PadHorizontalAxis,  // 0
+				AI_Field.PadVerticalAxis,    // 0
+				AI_Field.PadAnalogForce,     // 1
+				AI_Field.PadTrueAnalogForce, // 1
+				AI_Field.PadRotationAngle,   // 1
+				AI_Field.PadSector,          // 0
 			};
 		}
 		#endregion

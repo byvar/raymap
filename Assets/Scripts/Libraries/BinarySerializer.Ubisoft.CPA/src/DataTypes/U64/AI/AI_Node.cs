@@ -27,7 +27,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				AI_InterpretType.KeyWord => aiTypes.GetKeyword(IdOrValue)?.ToString(),
 				AI_InterpretType.Procedure => aiTypes.GetProcedure(IdOrValue),
 				AI_InterpretType.Function => aiTypes.GetFunction(IdOrValue),
-				AI_InterpretType.Field => aiTypes.GetField(IdOrValue),
+				AI_InterpretType.Field => aiTypes.GetField(IdOrValue)?.ToString(),
 				AI_InterpretType.Operator => aiTypes.GetOperator(IdOrValue)?.ToString(),
 				AI_InterpretType.MetaAction => aiTypes.GetMetaAction(IdOrValue)?.ToString(),
 				AI_InterpretType.Condition => aiTypes.GetCondition(IdOrValue)?.ToString(),

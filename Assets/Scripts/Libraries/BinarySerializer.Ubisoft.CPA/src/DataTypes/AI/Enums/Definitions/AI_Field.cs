@@ -27,5 +27,32 @@
 		[AI_Definition(SCR: "ShadowScaleX", EN: "ShadowScaleX", FR: "ShadowScaleX", Type: "Float")] ShadowScaleX,
 		[AI_Definition(SCR: "ShadowScaleY", EN: "ShadowScaleY", FR: "ShadowScaleY", Type: "Float")] ShadowScaleY,
 		#endregion
+
+		#region R3 PS2
+		PadGlobalVector,
+		PadHorizontalAxis,
+		PadVerticalAxis,
+		PadAnalogForce,
+		PadTrueAnalogForce,
+		PadRotationAngle,
+		PadSector,
+		SystemData,
+		SystemTime,
+		#endregion
+
+		#region R2 iOS
+		CameraOffsetX,
+		MenuIndex,
+		MenuItem_Index,
+		HoldItem_Index,
+		SoundEffectVolume,
+		MusicVolume,
+		bGotoIGM,
+		TempFunction,
+		bMotionSensor,
+		bCameraLook,
+		bHoldCamera,
+		CheatEnable,
+		#endregion
 	}
 }

@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
 	public class AI_Types_Hype_PC : AI_Types_Hype_PS2 {
+		// Re-checked
+
+		// Fields list: same as PS2
+
 		#region Conditions
 		// Slightly less than PS2
 		protected override void InitConditions() {

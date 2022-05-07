@@ -574,7 +574,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_DS(),
+			AITypes = new AI_Types_R2_DS_EU(),
 			COLTypes = new COL_Types_R2(),
 			EntryActionsCount = 1,
 			TextureAnimationSpeedModifier = -1f,
@@ -584,7 +584,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_DS(),
+			AITypes = new AI_Types_R2_DS_EU(),
 			COLTypes = new COL_Types_R2(),
 			EntryActionsCount = 1,
 			TextureAnimationSpeedModifier = -1f,
@@ -594,7 +594,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_DS(),
+			AITypes = new AI_Types_R2_DS_EU(),
 			COLTypes = new COL_Types_R2(),
 			LevelTranslation = LevelTranslation.levelTranslation_r2,
 			EntryActionsCount = 1
@@ -607,7 +607,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_DS(),
+			AITypes = new AI_Types_R2_DS_EU(),
 			COLTypes = new COL_Types_R2(),
 			EntryActionsCount = 1,
 			TextureAnimationSpeedModifier = -1f,
@@ -617,7 +617,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_DS(),
+			AITypes = new AI_Types_R2_DS_EU(),
 			COLTypes = new COL_Types_R2(),
 			EntryActionsCount = 1,
 			TextureAnimationSpeedModifier = -1f,
@@ -646,7 +646,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_DS(),
+			AITypes = new AI_Types_R2_DS_EU(),
 			COLTypes = new COL_Types_R2(),
 			EntryActionsCount = 1
 		};
@@ -791,7 +791,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_DS(),
+			AITypes = new AI_Types_R2_DS_EU(),
 			COLTypes = new COL_Types_R2(),
 			EntryActionsCount = 1
 		};

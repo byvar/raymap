@@ -1,4 +1,16 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
+	/* TODO: Add the following
+	 * - R2 iOS
+	 * - TT PC final
+	 * - R2 3DS
+	 * - R2 N64?
+	 * - Donald PC
+	 * - Donald N64
+	 * - Laura & Alex
+	 * - Rayman M (check PS2 versions)
+	 * - Rayman Arena GC/Xb
+	 */
+
     public abstract class AI_Types {
         //public string[] functionTypes;
         public AI_Keyword[] Keywords { get; set; }
@@ -7,7 +19,7 @@
 		public string[] procedureTable { get; set; }
 		public AI_Condition[] Conditions { get; set; }
 		public AI_DsgVarType[] VariableTypes { get; set; }
-		public string[] fieldTable { get; set; }
+		public AI_Field[] Fields { get; set; }
 		public AI_MetaAction[] MetaActions { get; set; }
 		public AI_InterpretType[] InterpretTypes { get; set; }
 
@@ -62,9 +74,9 @@
 			if (index < Conditions.Length) return Conditions[index];
 			return null;
 		}
-		public string GetField(uint index) {
-			if (index < fieldTable.Length) return fieldTable[index];
-			return "";
+		public AI_Field? GetField(uint index) {
+			if (index < Fields.Length) return Fields[index];
+			return null;
 		}
 		public AI_MetaAction? GetMetaAction(uint index) {
 			if (index < MetaActions.Length) return MetaActions[index];
