@@ -825,8 +825,9 @@
 		[AI_Definition(SCR: "Func_UseNObjectsFromInventory")] UseNObjectsFromInventory,
 		#endregion
 
-		#region R2 PC & iOS (Custom names)
+		#region R2 PC & iOS (Custom names) & demos
 		[AI_Definition(SCR: "Func_NewGame", EN: "GAME_NewGame", FR: "NouvellePartie")] NewGame,
+		[AI_Definition(SCR: "Func_ReadCharAtKeyPosition")] ReadCharAtKeyPosition, // R2 deoo
 		#endregion
 	}
 }
