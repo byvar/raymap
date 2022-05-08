@@ -145,6 +145,104 @@
 
 		#endregion
 
+		#region FuncRay2
+		//********************************************************************************************************************************************************************************************************************************************************
+		// Management of magic points for Rayman 
+		[AI_Definition(SCR: "Func_LitPointsDeMagie", EN: "RAY_GetMagicPoints", FR: "RAY_LitPointsDeMagie")] LitPointsDeMagie,
+		[AI_Definition(SCR: "Func_LitPointsDeMagieMax", EN: "RAY_GetMagicPointsMax", FR: "RAY_LitPointsDeMagieMax")] LitPointsDeMagieMax,
+		[AI_Definition(SCR: "Func_AjouteEtLitPointsDeMagie", EN: "RAY_AddAndGetMagicPoints", FR: "RAY_AjouteEtLitPointsDeMagie")] AjouteEtLitPointsDeMagie,
+		[AI_Definition(SCR: "Func_AjouteEtLitPointsDeMagieMax", EN: "RAY_AddAndGetMagicPointsMax", FR: "RAY_AjouteEtLitPointsDeMagieMax")] AjouteEtLitPointsDeMagieMax,
+		[AI_Definition(SCR: "Func_EnleveEtLitPointsDeMagie", EN: "RAY_RemoveAndGetMagicPoints", FR: "RAY_EnleveEtLitPointsDeMagie")] EnleveEtLitPointsDeMagie,
+		[AI_Definition(SCR: "Func_EnleveEtLitPointsDeMagieMax", EN: "RAY_RemoveAndGetMagicPointsMax", FR: "RAY_EnleveEtLitPointsDeMagieMax")] EnleveEtLitPointsDeMagieMax,
+		// Management of air points for Rayman 
+		[AI_Definition(SCR: "Func_LitPointsDair", EN: "RAY_GetAirPoints", FR: "RAY_LitPointsDair")] LitPointsDair,
+		[AI_Definition(SCR: "Func_LitPointsDairMax", EN: "RAY_GetAirPointsMax", FR: "RAY_LitPointsDairMax")] LitPointsDairMax,
+		[AI_Definition(SCR: "Func_AjouteEtLitPointsDair", EN: "RAY_AddAndGetAirPoints", FR: "RAY_AjouteEtLitPointsDair")] AjouteEtLitPointsDair,
+		[AI_Definition(SCR: "Func_AjouteEtLitPointsDairMax", EN: "RAY_AddAndGetAirPointsMax", FR: "RAY_AjouteEtLitPointsDairMax")] AjouteEtLitPointsDairMax,
+		[AI_Definition(SCR: "Func_EnleveEtLitPointsDair", EN: "RAY_RemoveAndGetAirPoints", FR: "RAY_EnleveEtLitPointsDair")] EnleveEtLitPointsDair,
+		[AI_Definition(SCR: "Func_EnleveEtLitPointsDairMax", EN: "RAY_RemoveAndGetAirPointsMax", FR: "RAY_EnleveEtLitPointsDairMax")] EnleveEtLitPointsDairMax,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_PersoLePlusProche", EN: "ACT_NearestActor", FR: "ACT_PersoLePlusProche")] PersoLePlusProche,
+		[AI_Definition(SCR: "Func_NearestActorInCurrentSector", EN: "ACT_NearestActorInCurrentSector", FR: "ACT_PersoLePlusProcheDansSecteurCourant")] PersoLePlusProcheDansSecteurCourant,
+		[AI_Definition(SCR: "Func_NearerActorInFieldOfVision", EN: "ACT_NearerActorInFieldOfVision", FR: "ACT_PersoLePlusProcheDansChampsDeVision")] NearerActorInFieldOfVision,
+		[AI_Definition(SCR: "Func_GetNbActivePerso", EN: "ACT_GetNbActivePerso", FR: "ACT_LitNbPersoActifs")] GetNbActivePerso,
+		[AI_Definition(SCR: "Func_CibleLaPlusProche", EN: "ACT_CibleLaPlusProche", FR: "ACT_CibleLaPlusProche")] CibleLaPlusProche,
+		[AI_Definition(SCR: "Func_CibleLaPlusProcheavecAngles", EN: "ACT_CibleLaPlusProcheAvecAngles", FR: "ACT_CibleLaPlusProcheAvecAngles")] CibleLaPlusProcheAvecAngles,
+		//********************************************************************************************************************************************************************************************************************************************************
+		// Graph function management 
+
+		// To reach a graph before building a way (or to travel on a graph without building a way) 
+		[AI_Definition(SCR: "Func_ReseauWPnLePlusProche", EN: "NETWORK_CloserWPn", FR: "Reseau_WPLePlusProche")] ReseauWPLePlusProche,
+		[AI_Definition(SCR: "Func_NetworkCloserWPOfType", EN: "NETWORK_CloserWPOfType", FR: "Reseau_WPDeTelTypeLePlusProche")] NetworkCloserWPOfType,
+		[AI_Definition(SCR: "Func_ReseauWPnLePlusDansLAxe", EN: "NETWORK_CloserWPnInAxis", FR: "Reseau_WPLePlusDansLAxe")] ReseauWPLePlusDansLAxe,
+		[AI_Definition(SCR: "Func_ReseauWPnLePlusDansLAxe2", EN: "NETWORK_CloserWPnInAxis2", FR: "Reseau_WPDeTelTypeLePlusDansLAxe")] ReseauWPLePlusDansLAxe2,
+
+		// To travel on a graph without building a way 
+		[AI_Definition(SCR: "eFunc_NetworkNextWPWithCapa", EN: "NETWORK_NextWPWithCapa", FR: "Reseau_ProchainWPJoignableAvecCapacite")] NetworkNextWPWithCapa,
+		[AI_Definition(SCR: "Func_NetworkAffectTypeOfConnectedWP", EN: "NETWORK_AffectTypeOfConnectedWP", FR: "Reseau_ChangeTypeDesWPJoignables")] NetworkAffectTypeOfConnectedWP,
+		[AI_Definition(SCR: "Func_NetworkAffectTypeOfConnectedWP2", EN: "NETWORK_AffectTypeOfConnectedWP2", FR: "Reseau_ChangeTypeDesWPJoignablesAvecCapacite")] NetworkAffectTypeOfConnectedWPWithCapa,
+
+		// To build a way from a graph 
+		[AI_Definition(SCR: "Func_ReseauCheminLePlusCourt", EN: "NETWORK_ShorterWay", FR: "Reseau_CheminLePlusCourt")] ReseauCheminLePlusCourt,
+		[AI_Definition(SCR: "Func_NetworkBuildOrderedPath", EN: "NETWORK_BuildOrderedPath", FR: "Reseau_ConstruitCheminOrdonne")] NetworkBuildOrderedPath,
+		[AI_Definition(SCR: "Func_NetworkBuildOrderedPathCircular", EN: "NETWORK_BuildOrderedPathCircular", FR: "Reseau_ConstruitCheminCirculaireOrdonne")] NetworkBuildOrderedPathCircular,
+		[AI_Definition(SCR: "Func_NetworkAllocateGraphToMSWay", EN: "NETWORK_AllocateGraphToMSWay", FR: "Reseau_AffecteGraphAChemin")] NetworkAllocateGraphToMSWay,
+		[AI_Definition(SCR: "Func_NetworkAllocateGraphToMSWayCircular", EN: "NETWORK_AllocateGraphToMSWay", FR: "Reseau_AffecteGraphACheminCirculaire")] NetworkAllocateGraphToMSWayCircular,
+
+		// To travel on the way built (no graph in parameter, bicose everything is tested with the MsWay) 
+		[AI_Definition(SCR: "Func_ReseauLitIndexCourant", EN: "NETWORK_GetCurrentIndex", FR: "Reseau_LitIndexCourant")] ReseauLitIndexCourant,
+		[AI_Definition(SCR: "Func_ReseauForceIndexCourant", EN: "NETWORK_SetCurrentIndex", FR: "Reseau_ForceIndexCourant")] ReseauForceIndexCourant,
+		[AI_Definition(SCR: "Func_ReseauLitPremierIndex", EN: "NETWORK_GetFirstIndex", FR: "Reseau_LitPremierIndex")] ReseauLitPremierIndex,
+		[AI_Definition(SCR: "Func_ReseauLitDernierIndex", EN: "NETWORK_GetLastIndex", FR: "Reseau_LitDernierIndex")] ReseauLitDernierIndex,
+		[AI_Definition(SCR: "Func_ReseauIncrementIndex", EN: "NETWORK_IncrementIndex", FR: "Reseau_IncrementIndex")] ReseauIncrementIndex,
+		[AI_Definition(SCR: "Func_ReseauDecrementIndex", EN: "NETWORK_DecrementIndex", FR: "Reseau_DecrementIndex")] ReseauDecrementIndex,
+		[AI_Definition(SCR: "Func_ReseauLitWPAIndex", EN: "NETWORK_GetWPAIndex", FR: "Reseau_LitWPAIndex")] ReseauLitWPAIndex,
+
+		[AI_Definition(SCR: "Func_ReseauLitCapaciteLiaisonAIndex", EN: "NETWORK_GetLinkCapacityToIndex", FR: "Reseau_LitCapaciteLiaisonAIndex")] ReseauLitCapaciteLiaisonAIndex,
+		[AI_Definition(SCR: "Func_ReseauChangeCapaciteLiaisonAIndex", EN: "NETWORK_ChangeLinkCapacityToIndex", FR: "Reseau_ChangeCapaciteLiaisonAIndex")] ReseauChangeCapaciteLiaisonAIndex,
+		[AI_Definition(SCR: "Func_ReseauLitPoidsLiaisonAIndex", EN: "NETWORK_GetLinkWeightToIndex", FR: "Reseau_LitPoidsLiaisonAIndex")] ReseauLitPoidsLiaisonAIndex,
+		[AI_Definition(SCR: "Func_ReseauChangePoidsLiaisonAIndex", EN: "NETWORK_ChangeLinkWeightToIndex", FR: "Reseau_ChangePoidsLiaisonAIndex")] ReseauChangePoidsLiaisonAIndex,
+
+		[AI_Definition(SCR: "Func_NetworkGetIndexOfWPInMSWay", EN: "NETWORK_GetIndexOfWPInMSWay", FR: "Reseau_ChercheIndiceDuWP")] NetworkGetIndexOfWPInMSWay,
+		[AI_Definition(SCR: "Func_NetworkForceWPToCurrent", EN: "NETWORK_ForceWPToCurrent", FR: "Reseau_ForceWPCourant")] NetworkForceWPToCurrent,
+
+		[AI_Definition(SCR: "Func_ReseauTestExtremite", EN: "NETWORK_TestExtremite", FR: "Reseau_TestExtremities")] NetworkTestTheEnds,
+
+
+		// miscellaneous 
+		[AI_Definition(SCR: "Func_ReseauLitCapaciteLiaisonDansGraph", EN: "NETWORK_GetLinkCapInGraph", FR: "Reseau_LitCapaciteLiaisonDansGraph")] ReseauLitCapaciteLiaisonDansGraph,
+		[AI_Definition(SCR: "Func_ReseauChangeCapaciteLiaisonDansGraph", EN: "NETWORK_SetLinkCapInGraph", FR: "Reseau_ChangeCapaciteLiaisonDansGraph")] ReseauChangeCapaciteLiaisonDansGraph,
+		[AI_Definition(SCR: "Func_ReseauLitPoidsLiaisonDansGraph", EN: "NETWORK_GetLinkWeightInGraph", FR: "Reseau_LitPoidsLiaisonDansGraph")] ReseauLitPoidsLiaisonDansGraph,
+		[AI_Definition(SCR: "Func_ReseauChangePoidsLiaisonDansGraph", EN: "NETWORK_SetLinkWeightInGraph", FR: "Reseau_ChangePoidsLiaisonDansGraph")] ReseauChangePoidsLiaisonDansGraph,
+
+		[AI_Definition(SCR: "Func_NetworkGetTypeOfWP", EN: "NETWORK_GetTypeOfWP", FR: "Reseau_LitTypeDuWP")] NetworkGetTypeOfWP,
+		// Capability functions 
+		[AI_Definition(SCR: "Func_CapsGetCapabilities", EN: "CAPS_GetCapabilities", FR: "Caps_LitCapacites")] GetCapabilities,
+		[AI_Definition(SCR: "Func_CapabilityAtBitNumber", EN: "CAPS_CapabilityAtBitNumber", FR: "Caps_CapaciteAuBitNumero")] CapabilityAtBitNumber,
+
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_GetScrollSpeed", EN: "MAT_GetScrollSpeed", FR: "MAT_VitesseTexture")] GetScrollSpeed,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_GetNbFrame", EN: "MAT_GetNbFrame", FR: "ANI_LitNbFrame")] GetNbFrame,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_DotProduct", EN: "VEC_DotProduct", FR: "VEC_ProduitScalaire")] DotProduct,
+		[AI_Definition(SCR: "Func_CrossProduct", EN: "VEC_CrossProduct", FR: "VEC_ProduitVectoriel")] CrossProduct,
+		[AI_Definition(SCR: "Func_Normalize", EN: "VEC_Normalize", FR: "VEC_Normer")] Normalize,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_GetSPOCoordinates", EN: "SPO_GetSPOCoordinates", FR: "SPO_LitCoordonnees")] GetSPOCoordinates,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_ACTGetTractionFactor", EN: "ACT_GetTractionFactor", FR: "ACT_LitFacteurDeTraction")] GetTractionFactor,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_GetCenterZDEType", EN: "ZON_GetCenterZDEType", FR: "ZON_LitCentreZDEType")] GetCenterZDEType,
+		[AI_Definition(SCR: "Func_GetCenterZDMType", EN: "ZON_GetCenterZDMType", FR: "ZON_LitCentreZDMType")] GetCenterZDMType,
+		[AI_Definition(SCR: "Func_GetCenterZDRType", EN: "ZON_GetCenterZDRType", FR: "ZON_LitCentreZDRType")] GetCenterZDRType,
+		[AI_Definition(SCR: "Func_GetCenterZDDType", EN: "ZON_GetCenterZDDType", FR: "ZON_LitCentreZDDType")] GetCenterZDDType,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_TextAffiche", EN: "TEXT_DisplayText", FR: "TEXT_Affiche")] TextAffiche,
+		//********************************************************************************************************************************************************************************************************************************************************
+		[AI_Definition(SCR: "Func_GetCPUCounter", EN: "DEBUG_GetCPUCounter", FR: "DEBUG_LitCompteurCPU")] GetCPUCounter,
+		#endregion
+
 		#region DefFunc1
 		//********************************************************************************************************************************************************************************************************************************************************
 		[AI_Definition(SCR: "Func_VitesseHorizontaleDuPerso", EN: "ACT_HorizontalPersoSpeed", FR: "ACT_VitesseHorizontaleDuPerso")] VitesseHorizontaleDuPerso,
@@ -300,6 +398,11 @@
 		[AI_Definition(SCR: "Func_ExecuteVariable", EN: "PRO_ExecuteVariable", FR: "PRO_ExecuteVariable")] ExecuteVariable,
 		[AI_Definition(SCR: "Func_ComputeProtectKey", EN: "ACT_ComputeProtectKey", FR: "ACT_CalculeClefProtection")] ComputeProtectKey,
 		[AI_Definition(SCR: "Func_Xor", EN: "MATH_Xor", FR: "MATH_Xor")] Xor,
+		// v These are only present on PC, not in the U64 project
+		[AI_Definition(SCR: "MATH_And", EN: "MATH_And", FR: "MATH_And")] And,
+		[AI_Definition(SCR: "Func_Or", EN: "MATH_Or", FR: "MATH_Or")] Or,
+		[AI_Definition(SCR: "Func_Not", EN: "MATH_Not", FR: "MATH_Not")] Not,
+		// ^
 		[AI_Definition(SCR: "Func_DivU", EN: "MATH_DivU", FR: "MATH_DivU")] DivUnsigned,
 		[AI_Definition(SCR: "Func_MulU", EN: "MATH_MulU", FR: "MATH_MulU")] MulUnsigned,
 		[AI_Definition(SCR: "Func_AddU", EN: "MATH_AddU", FR: "MATH_AddU")] AddUnsigned,
@@ -348,104 +451,6 @@
 
 		[AI_Definition(SCR: "Fct_Cam_GetSectorCameraType", EN: "Cam_GetSectorCameraType", FR: "Cam_GetSectorCameraType")] Cam_GetSectorCameraType,
 		[AI_Definition(SCR: "Fct_Cam_GetBestPos", EN: "Cam_GetBestPos", FR: "Cam_GetBestPos")] Cam_GetBestPos,
-		#endregion
-
-		#region FuncRay2
-		//********************************************************************************************************************************************************************************************************************************************************
-		// Management of magic points for Rayman 
-		[AI_Definition(SCR: "Func_LitPointsDeMagie", EN: "RAY_GetMagicPoints", FR: "RAY_LitPointsDeMagie")] LitPointsDeMagie,
-		[AI_Definition(SCR: "Func_LitPointsDeMagieMax", EN: "RAY_GetMagicPointsMax", FR: "RAY_LitPointsDeMagieMax")] LitPointsDeMagieMax,
-		[AI_Definition(SCR: "Func_AjouteEtLitPointsDeMagie", EN: "RAY_AddAndGetMagicPoints", FR: "RAY_AjouteEtLitPointsDeMagie")] AjouteEtLitPointsDeMagie,
-		[AI_Definition(SCR: "Func_AjouteEtLitPointsDeMagieMax", EN: "RAY_AddAndGetMagicPointsMax", FR: "RAY_AjouteEtLitPointsDeMagieMax")] AjouteEtLitPointsDeMagieMax,
-		[AI_Definition(SCR: "Func_EnleveEtLitPointsDeMagie", EN: "RAY_RemoveAndGetMagicPoints", FR: "RAY_EnleveEtLitPointsDeMagie")] EnleveEtLitPointsDeMagie,
-		[AI_Definition(SCR: "Func_EnleveEtLitPointsDeMagieMax", EN: "RAY_RemoveAndGetMagicPointsMax", FR: "RAY_EnleveEtLitPointsDeMagieMax")] EnleveEtLitPointsDeMagieMax,
-		// Management of air points for Rayman 
-		[AI_Definition(SCR: "Func_LitPointsDair", EN: "RAY_GetAirPoints", FR: "RAY_LitPointsDair")] LitPointsDair,
-		[AI_Definition(SCR: "Func_LitPointsDairMax", EN: "RAY_GetAirPointsMax", FR: "RAY_LitPointsDairMax")] LitPointsDairMax,
-		[AI_Definition(SCR: "Func_AjouteEtLitPointsDair", EN: "RAY_AddAndGetAirPoints", FR: "RAY_AjouteEtLitPointsDair")] AjouteEtLitPointsDair,
-		[AI_Definition(SCR: "Func_AjouteEtLitPointsDairMax", EN: "RAY_AddAndGetAirPointsMax", FR: "RAY_AjouteEtLitPointsDairMax")] AjouteEtLitPointsDairMax,
-		[AI_Definition(SCR: "Func_EnleveEtLitPointsDair", EN: "RAY_RemoveAndGetAirPoints", FR: "RAY_EnleveEtLitPointsDair")] EnleveEtLitPointsDair,
-		[AI_Definition(SCR: "Func_EnleveEtLitPointsDairMax", EN: "RAY_RemoveAndGetAirPointsMax", FR: "RAY_EnleveEtLitPointsDairMax")] EnleveEtLitPointsDairMax,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_PersoLePlusProche", EN: "ACT_NearestActor", FR: "ACT_PersoLePlusProche")] PersoLePlusProche,
-		[AI_Definition(SCR: "Func_NearestActorInCurrentSector", EN: "ACT_NearestActorInCurrentSector", FR: "ACT_PersoLePlusProcheDansSecteurCourant")] PersoLePlusProcheDansSecteurCourant,
-		[AI_Definition(SCR: "Func_NearerActorInFieldOfVision", EN: "ACT_NearerActorInFieldOfVision", FR: "ACT_PersoLePlusProcheDansChampsDeVision")] NearerActorInFieldOfVision,
-		[AI_Definition(SCR: "Func_GetNbActivePerso", EN: "ACT_GetNbActivePerso", FR: "ACT_LitNbPersoActifs")] GetNbActivePerso,
-		[AI_Definition(SCR: "Func_CibleLaPlusProche", EN: "ACT_CibleLaPlusProche", FR: "ACT_CibleLaPlusProche")] CibleLaPlusProche,
-		[AI_Definition(SCR: "Func_CibleLaPlusProcheavecAngles", EN: "ACT_CibleLaPlusProcheAvecAngles", FR: "ACT_CibleLaPlusProcheAvecAngles")] CibleLaPlusProcheAvecAngles,
-		//********************************************************************************************************************************************************************************************************************************************************
-		// Graph function management 
-
-		// To reach a graph before building a way (or to travel on a graph without building a way) 
-		[AI_Definition(SCR: "Func_ReseauWPnLePlusProche", EN: "NETWORK_CloserWPn", FR: "Reseau_WPLePlusProche")] ReseauWPLePlusProche,
-		[AI_Definition(SCR: "Func_NetworkCloserWPOfType", EN: "NETWORK_CloserWPOfType", FR: "Reseau_WPDeTelTypeLePlusProche")] NetworkCloserWPOfType,
-		[AI_Definition(SCR: "Func_ReseauWPnLePlusDansLAxe", EN: "NETWORK_CloserWPnInAxis", FR: "Reseau_WPLePlusDansLAxe")] ReseauWPLePlusDansLAxe,
-		[AI_Definition(SCR: "Func_ReseauWPnLePlusDansLAxe2", EN: "NETWORK_CloserWPnInAxis2", FR: "Reseau_WPDeTelTypeLePlusDansLAxe")] ReseauWPLePlusDansLAxe2,
-
-		// To travel on a graph without building a way 
-		[AI_Definition(SCR: "eFunc_NetworkNextWPWithCapa", EN: "NETWORK_NextWPWithCapa", FR: "Reseau_ProchainWPJoignableAvecCapacite")] NetworkNextWPWithCapa,
-		[AI_Definition(SCR: "Func_NetworkAffectTypeOfConnectedWP", EN: "NETWORK_AffectTypeOfConnectedWP", FR: "Reseau_ChangeTypeDesWPJoignables")] NetworkAffectTypeOfConnectedWP,
-		[AI_Definition(SCR: "Func_NetworkAffectTypeOfConnectedWP2", EN: "NETWORK_AffectTypeOfConnectedWP2", FR: "Reseau_ChangeTypeDesWPJoignablesAvecCapacite")] NetworkAffectTypeOfConnectedWPWithCapa,
-
-		// To build a way from a graph 
-		[AI_Definition(SCR: "Func_ReseauCheminLePlusCourt", EN: "NETWORK_ShorterWay", FR: "Reseau_CheminLePlusCourt")] ReseauCheminLePlusCourt,
-		[AI_Definition(SCR: "Func_NetworkBuildOrderedPath", EN: "NETWORK_BuildOrderedPath", FR: "Reseau_ConstruitCheminOrdonne")] NetworkBuildOrderedPath,
-		[AI_Definition(SCR: "Func_NetworkBuildOrderedPathCircular", EN: "NETWORK_BuildOrderedPathCircular", FR: "Reseau_ConstruitCheminCirculaireOrdonne")] NetworkBuildOrderedPathCircular,
-		[AI_Definition(SCR: "Func_NetworkAllocateGraphToMSWay", EN: "NETWORK_AllocateGraphToMSWay", FR: "Reseau_AffecteGraphAChemin")] NetworkAllocateGraphToMSWay,
-		[AI_Definition(SCR: "Func_NetworkAllocateGraphToMSWayCircular", EN: "NETWORK_AllocateGraphToMSWay", FR: "Reseau_AffecteGraphACheminCirculaire")] NetworkAllocateGraphToMSWayCircular,
-
-		// To travel on the way built (no graph in parameter, bicose everything is tested with the MsWay) 
-		[AI_Definition(SCR: "Func_ReseauLitIndexCourant", EN: "NETWORK_GetCurrentIndex", FR: "Reseau_LitIndexCourant")] ReseauLitIndexCourant,
-		[AI_Definition(SCR: "Func_ReseauForceIndexCourant", EN: "NETWORK_SetCurrentIndex", FR: "Reseau_ForceIndexCourant")] ReseauForceIndexCourant,
-		[AI_Definition(SCR: "Func_ReseauLitPremierIndex", EN: "NETWORK_GetFirstIndex", FR: "Reseau_LitPremierIndex")] ReseauLitPremierIndex,
-		[AI_Definition(SCR: "Func_ReseauLitDernierIndex", EN: "NETWORK_GetLastIndex", FR: "Reseau_LitDernierIndex")] ReseauLitDernierIndex,
-		[AI_Definition(SCR: "Func_ReseauIncrementIndex", EN: "NETWORK_IncrementIndex", FR: "Reseau_IncrementIndex")] ReseauIncrementIndex,
-		[AI_Definition(SCR: "Func_ReseauDecrementIndex", EN: "NETWORK_DecrementIndex", FR: "Reseau_DecrementIndex")] ReseauDecrementIndex,
-		[AI_Definition(SCR: "Func_ReseauLitWPAIndex", EN: "NETWORK_GetWPAIndex", FR: "Reseau_LitWPAIndex")] ReseauLitWPAIndex,
-
-		[AI_Definition(SCR: "Func_ReseauLitCapaciteLiaisonAIndex", EN: "NETWORK_GetLinkCapacityToIndex", FR: "Reseau_LitCapaciteLiaisonAIndex")] ReseauLitCapaciteLiaisonAIndex,
-		[AI_Definition(SCR: "Func_ReseauChangeCapaciteLiaisonAIndex", EN: "NETWORK_ChangeLinkCapacityToIndex", FR: "Reseau_ChangeCapaciteLiaisonAIndex")] ReseauChangeCapaciteLiaisonAIndex,
-		[AI_Definition(SCR: "Func_ReseauLitPoidsLiaisonAIndex", EN: "NETWORK_GetLinkWeightToIndex", FR: "Reseau_LitPoidsLiaisonAIndex")] ReseauLitPoidsLiaisonAIndex,
-		[AI_Definition(SCR: "Func_ReseauChangePoidsLiaisonAIndex", EN: "NETWORK_ChangeLinkWeightToIndex", FR: "Reseau_ChangePoidsLiaisonAIndex")] ReseauChangePoidsLiaisonAIndex,
-
-		[AI_Definition(SCR: "Func_NetworkGetIndexOfWPInMSWay", EN: "NETWORK_GetIndexOfWPInMSWay", FR: "Reseau_ChercheIndiceDuWP")] NetworkGetIndexOfWPInMSWay,
-		[AI_Definition(SCR: "Func_NetworkForceWPToCurrent", EN: "NETWORK_ForceWPToCurrent", FR: "Reseau_ForceWPCourant")] NetworkForceWPToCurrent,
-
-		[AI_Definition(SCR: "Func_ReseauTestExtremite", EN: "NETWORK_TestExtremite", FR: "Reseau_TestExtremities")] NetworkTestTheEnds,
-
-
-		// miscellaneous 
-		[AI_Definition(SCR: "Func_ReseauLitCapaciteLiaisonDansGraph", EN: "NETWORK_GetLinkCapInGraph", FR: "Reseau_LitCapaciteLiaisonDansGraph")] ReseauLitCapaciteLiaisonDansGraph,
-		[AI_Definition(SCR: "Func_ReseauChangeCapaciteLiaisonDansGraph", EN: "NETWORK_SetLinkCapInGraph", FR: "Reseau_ChangeCapaciteLiaisonDansGraph")] ReseauChangeCapaciteLiaisonDansGraph,
-		[AI_Definition(SCR: "Func_ReseauLitPoidsLiaisonDansGraph", EN: "NETWORK_GetLinkWeightInGraph", FR: "Reseau_LitPoidsLiaisonDansGraph")] ReseauLitPoidsLiaisonDansGraph,
-		[AI_Definition(SCR: "Func_ReseauChangePoidsLiaisonDansGraph", EN: "NETWORK_SetLinkWeightInGraph", FR: "Reseau_ChangePoidsLiaisonDansGraph")] ReseauChangePoidsLiaisonDansGraph,
-
-		[AI_Definition(SCR: "Func_NetworkGetTypeOfWP", EN: "NETWORK_GetTypeOfWP", FR: "Reseau_LitTypeDuWP")] NetworkGetTypeOfWP,
-		// Capability functions 
-		[AI_Definition(SCR: "Func_CapsGetCapabilities", EN: "CAPS_GetCapabilities", FR: "Caps_LitCapacites")] GetCapabilities,
-		[AI_Definition(SCR: "Func_CapabilityAtBitNumber", EN: "CAPS_CapabilityAtBitNumber", FR: "Caps_CapaciteAuBitNumero")] CapabilityAtBitNumber,
-
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_GetScrollSpeed", EN: "MAT_GetScrollSpeed", FR: "MAT_VitesseTexture")] GetScrollSpeed,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_GetNbFrame", EN: "MAT_GetNbFrame", FR: "ANI_LitNbFrame")] GetNbFrame,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_DotProduct", EN: "VEC_DotProduct", FR: "VEC_ProduitScalaire")] DotProduct,
-		[AI_Definition(SCR: "Func_CrossProduct", EN: "VEC_CrossProduct", FR: "VEC_ProduitVectoriel")] CrossProduct,
-		[AI_Definition(SCR: "Func_Normalize", EN: "VEC_Normalize", FR: "VEC_Normer")] Normalize,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_GetSPOCoordinates", EN: "SPO_GetSPOCoordinates", FR: "SPO_LitCoordonnees")] GetSPOCoordinates,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_ACTGetTractionFactor", EN: "ACT_GetTractionFactor", FR: "ACT_LitFacteurDeTraction")] GetTractionFactor,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_GetCenterZDEType", EN: "ZON_GetCenterZDEType", FR: "ZON_LitCentreZDEType")] GetCenterZDEType,
-		[AI_Definition(SCR: "Func_GetCenterZDMType", EN: "ZON_GetCenterZDMType", FR: "ZON_LitCentreZDMType")] GetCenterZDMType,
-		[AI_Definition(SCR: "Func_GetCenterZDRType", EN: "ZON_GetCenterZDRType", FR: "ZON_LitCentreZDRType")] GetCenterZDRType,
-		[AI_Definition(SCR: "Func_GetCenterZDDType", EN: "ZON_GetCenterZDDType", FR: "ZON_LitCentreZDDType")] GetCenterZDDType,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_TextAffiche", EN: "TEXT_DisplayText", FR: "TEXT_Affiche")] TextAffiche,
-		//********************************************************************************************************************************************************************************************************************************************************
-		[AI_Definition(SCR: "Func_GetCPUCounter", EN: "DEBUG_GetCPUCounter", FR: "DEBUG_LitCompteurCPU")] GetCPUCounter,
 		#endregion
 
 		#region R3 PS2 (SCR from RA PS2)
@@ -557,9 +562,6 @@
 		[AI_Definition(SCR: "Func_SaveResolution")] SaveResolution,
 		[AI_Definition(SCR: "Func_IsResolutionAvailable")] IsResolutionAvailable,
 		[AI_Definition(SCR: "Func_GetCurrentFrame")] GetCurrentFrame,
-		[AI_Definition(SCR: "MATH_And")] And,
-		[AI_Definition(SCR: "Func_Or")] Or,
-		[AI_Definition(SCR: "Func_Not")] Not,
 		GetXBoxRegion,
 		CreditsBegin,
 		CreditsGetChapter,
@@ -821,6 +823,10 @@
 		[AI_Definition(SCR: "Func_GetObjectNumberInInventory")] GetObjectNumberInInventory,
 		[AI_Definition(SCR: "Func_UseObjectFromInventory")] UseObjectFromInventory,
 		[AI_Definition(SCR: "Func_UseNObjectsFromInventory")] UseNObjectsFromInventory,
+		#endregion
+
+		#region R2 PC & iOS (Custom names)
+		[AI_Definition(SCR: "Func_NewGame", EN: "GAME_NewGame", FR: "NouvellePartie")] NewGame,
 		#endregion
 	}
 }

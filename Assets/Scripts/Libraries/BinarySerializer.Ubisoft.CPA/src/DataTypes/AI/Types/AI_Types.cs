@@ -7,8 +7,9 @@
 	 * - Donald PC
 	 * - Donald N64
 	 * - Laura & Alex
-	 * - Rayman M (check PS2 versions)
+	 * - Rayman M PS2 demo
 	 * - Rayman Arena GC/Xb
+	 * - Dinosaur PS2
 	 */
 
     public abstract class AI_Types {
