@@ -873,6 +873,46 @@
 		Placeholder__R2PS2__CheckPersoStdGamePlusC4_2__Float,
 		Placeholder__R2PS2__LargoOnly__AfterR2Placeholders_1__Vector,
 		Placeholder__R2PS2__LargoOnly__AfterR2Placeholders_2__UInt,
+		ModuloInt, // Largo only
+		Power, // Largo only
+		Factorial, // Largo only
+
+		Placeholder__Largo__GameFunction__1,
+		Placeholder__Largo__GameFunction__2,
+		Placeholder__Largo__GameFunction__3,
+		Placeholder__Largo__GameFunction__4,
+		Placeholder__Largo__GameFunction__5,
+		Placeholder__Largo__GameFunction__6,
+		Placeholder__Largo__GameFunction__7,
+		Placeholder__Largo__GameFunction__8,
+		Placeholder__Largo__GameFunction__9,
+		Placeholder__Largo__GameFunction__10,
+		Placeholder__Largo__GameFunction__11,
+		Placeholder__Largo__GameFunction__12,
+		Placeholder__Largo__GameFunction__13,
+		Placeholder__Largo__GameFunction__14,
+		Placeholder__Largo__GameFunction__15,
+		Placeholder__Largo__GameFunction__16,
+		Placeholder__Largo__GameFunction__17,
+		Placeholder__Largo__GameFunction__18,
+		Placeholder__Largo__GameFunction__19,
+		Placeholder__Largo__GameFunction__20,
+		Placeholder__Largo__GameFunction__21,
+		Placeholder__Largo__GameFunction__22,
+		Placeholder__Largo__GameFunction__23,
+		Placeholder__Largo__GameFunction__24,
+		Placeholder__Largo__GameFunction__25,
+		Placeholder__Largo__GameFunction__26,
+		NetworkBuildComplexPath,
+		NetworkShortestPathRadius1,
+		NetworkShortestPathRadius2,
+		GetCurrentNetwork,
+		ReseauLitCapaciteLiaisonDansGraphCourant, // Same without graph parameter. Uses current network
+		ReseauChangeCapaciteLiaisonDansGraphCourant, // Same without graph parameter. Uses current network
+		ReseauLitPoidsLiaisonDansGraphCourant, // Same without graph parameter. Uses current network
+		ReseauChangePoidsLiaisonDansGraphCourant, // Same without graph parameter. Uses current network
+		CurrentNetworkGetNbOfArcsForWP, // Gets MSWay.Graph, finds WP in it, gets number of arcs defined for that graph node
+		CurrentNetworkGetWPAtArcIndexForWP, // Gets MSWay.Graph, finds WP in it, gets arc index i, gets WP for that graph node
 		#endregion
 	}
 }
