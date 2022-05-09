@@ -829,5 +829,50 @@
 		[AI_Definition(SCR: "Func_NewGame", EN: "GAME_NewGame", FR: "NouvellePartie")] NewGame,
 		[AI_Definition(SCR: "Func_ReadCharAtKeyPosition")] ReadCharAtKeyPosition, // R2 deoo
 		#endregion
+
+		#region Revolution & Largo
+		Placeholder__GetRevolutionStdGamePlusC, // Returns ((byte)(StdGame + 0xC) & 0x7F
+		Placeholder__R2PS2__SaveGame_0__UInt,
+		Placeholder__R2PS2__SaveGame_0b__UInt__LargoOnly,
+		Placeholder__R2PS2__SaveGame_1__UInt,
+		Placeholder__R2PS2__SaveGame_2__1P__String,
+		Placeholder__R2PS2__SaveGame_3__1P__UInt__NotInLargo,
+		Placeholder__R2PS2__SaveGame_4__1P__String,
+		Placeholder__R2PS2__SaveGame_5__UInt,
+		Placeholder__R2PS2__SaveGame_6__String,
+		Placeholder__R2PS2__SaveGame_7__UInt__NotInLargo,
+		Placeholder__R2PS2__SaveGame_8__String,
+		Placeholder__R2PS2__SaveGame_9__UInt,
+		Placeholder__R2PS2__SaveGame_9b__LargoOnly__Dummy,
+		Placeholder__R2PS2__SaveGame_9c__LargoOnly__Dummy,
+		Placeholder__R2PS2__SaveGame_9d__LargoOnly__Dummy,
+		Placeholder__R2PS2__SaveGame_10__UInt,
+		Placeholder__R2PS2__SaveGame_11__1P__UInt,
+		Placeholder__R2PS2__SaveGame_12__UInt,
+		Placeholder__R2PS2__SaveGame_13__UInt,
+		Placeholder__R2PS2__SaveGame_14__1P__UInt,
+		Placeholder__R2PS2__SaveGame_15__1P__UInt,
+		Placeholder__R2PS2__SaveGame_16__1P__UInt__LargoOnly,
+		Largo__GetFreeSpaceInKB,
+		Placeholder__R2PS2__SaveGame_18__1P__UInt__LargoOnly,
+		
+		CurrentNetworkGetTypeOfWP, // Largo only: Same as NetworkGetTypeOfWP, but without the first argument. Uses current perso (or ultra)'s current graph in MSWay instead
+		CurrentNetworkGetRadiusWP, // Largo only: Same as GetRadiusWP, but without the first argument. Uses current perso (or ultra)'s current graph in MSWay instead
+
+		// TODO: What are these?
+		[AI_Definition(SCR: "Func_PAD2_GetPadGlobalVector_2")] PAD2_GetGlobalVector_2,
+		[AI_Definition(SCR: "Func_PAD2_GetPadHorizontalAxis_2")] PAD2_GetHorizontalAxis_2,
+		[AI_Definition(SCR: "Func_PAD2_GetPadVerticalAxis_2")] PAD2_GetVerticalAxis_2,
+		[AI_Definition(SCR: "Func_PAD2_GetPadAnalogForce_2")] PAD2_GetAnalogForce_2,
+		[AI_Definition(SCR: "Func_PAD2_GetPadTrueAnalogForce_2")] PAD2_GetTrueAnalogForce_2,
+		[AI_Definition(SCR: "Func_PAD2_GetPadRotationAngle_2")] PAD2_GetRotationAngle_2,
+		[AI_Definition(SCR: "Func_PAD2_GetPadSector_2")] PAD2_GetPadSector_2,
+		Placeholder__R2PS2__AfterGetButtonName_DummyFunction,
+		[AI_Definition(SCR: "Func_GetVoicesVolume", EN: "OPTION_GetVoicesVolume", FR: "Option_GetVolumeVoices")] GetVoicesVolume,
+		Placeholder__R2PS2__CheckPersoStdGamePlusC4_1__Float,
+		Placeholder__R2PS2__CheckPersoStdGamePlusC4_2__Float,
+		Placeholder__R2PS2__LargoOnly__AfterR2Placeholders_1__Vector,
+		Placeholder__R2PS2__LargoOnly__AfterR2Placeholders_2__UInt,
+		#endregion
 	}
 }
