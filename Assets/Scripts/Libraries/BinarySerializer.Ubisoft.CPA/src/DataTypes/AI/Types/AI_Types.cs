@@ -3,7 +3,9 @@
 	 * - R2 iOS
 	 * - TT PC final
 	 * - R2 3DS
-	 * - R2 N64?
+	 * - R2 N64: there are some DS exclusive functions, conditions etc.
+	 * - RRR DS proto
+	 * - RRR DS final
 	 * - Donald PC
 	 * - Donald N64
 	 * - Laura & Alex
