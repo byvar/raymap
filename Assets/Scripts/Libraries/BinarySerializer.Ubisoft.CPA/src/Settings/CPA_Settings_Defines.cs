@@ -849,7 +849,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#region Other licensed
 		public static CPA_Settings LargoWinchPC => new CPA_Settings(EngineVersion.LargoWinch, Platform.PC) {
 			StaticListType = LST2_ListType.DoubleLinked,
-			AITypes = new AI_Types_LargoWinch(),
+			AITypes = new AI_Types_LargoWinch_PC(),
 			COLTypes = new COL_Types_R2(),
 			TextureAnimationSpeedModifier = 1f,
 			Luminosity = 0.5f,

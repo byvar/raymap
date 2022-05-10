@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class AI_Types_LargoWinch : AI_Types_R2_PS2 {
+	public class AI_Types_LargoWinch_PC : AI_Types_R2_PS2 {
 
 		#region Procedures
 		protected override void InitProcedures() {
