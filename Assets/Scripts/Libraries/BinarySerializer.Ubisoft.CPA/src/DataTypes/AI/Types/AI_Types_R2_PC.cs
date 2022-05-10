@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 	public class AI_Types_R2_PC : AI_Types {
 		#region Procedures
 		protected override void InitProcedures() {
-			procedureTable = new string[] {
+			var strProcs = new string[] {
 				"Proc_SetHitPoints", // 0
                 "Proc_SetHitPointsInit",
 				"Proc_SetHitPointsToInit",

@@ -9,7 +9,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Procedures
 		protected override void InitProcedures() {
-			procedureTable = new string[] {
+			var strProcs = new string[] {
 				"Proc_PlayerIsDead",
 				"Proc_SetMainActor",
 				"Proc_ActivateObject",

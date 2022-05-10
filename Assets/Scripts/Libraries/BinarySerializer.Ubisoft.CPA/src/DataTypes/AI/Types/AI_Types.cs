@@ -19,7 +19,7 @@
         public AI_Keyword[] Keywords { get; set; }
         public AI_Operator[] Operators { get; set; }
 		public AI_Function[] Functions { get; set; }
-		public string[] procedureTable { get; set; }
+		public AI_Procedure[] Procedures { get; set; }
 		public AI_Condition[] Conditions { get; set; }
 		public AI_DsgVarType[] VariableTypes { get; set; }
 		public AI_Field[] Fields { get; set; }
@@ -69,9 +69,9 @@
 			if (index < Functions.Length) return Functions[index];
 			return null;
 		}
-		public string GetProcedure(uint index) {
-			if (index < procedureTable.Length) return procedureTable[index];
-			return "";
+		public AI_Procedure? GetProcedure(uint index) {
+			if (index < Procedures.Length) return Procedures[index];
+			return null;
 		}
 		public AI_Condition? GetCondition(uint index) {
 			if (index < Conditions.Length) return Conditions[index];

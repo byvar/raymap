@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 	public class AI_Types_Hype_PS2 : AI_Types {
 		#region Procedures
 		protected override void InitProcedures() {
-			procedureTable = new string[] {
+			var strProcs = new string[] {
 				"Proc_PlayerIsDead",
 				"Proc_ChangeInitPosition",
 				"Proc_SetMainActor",

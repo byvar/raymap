@@ -25,7 +25,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			var nodeType = aiTypes.GetNodeType(Type);
 			string translatedValue = nodeType switch {
 				AI_InterpretType.KeyWord => aiTypes.GetKeyword(IdOrValue)?.ToString(),
-				AI_InterpretType.Procedure => aiTypes.GetProcedure(IdOrValue),
+				AI_InterpretType.Procedure => aiTypes.GetProcedure(IdOrValue)?.ToString(),
 				AI_InterpretType.Function => aiTypes.GetFunction(IdOrValue)?.ToString(),
 				AI_InterpretType.Field => aiTypes.GetField(IdOrValue)?.ToString(),
 				AI_InterpretType.Operator => aiTypes.GetOperator(IdOrValue)?.ToString(),
