@@ -1542,5 +1542,42 @@
 		[AI_Definition(SCR: "Proc_AddObjectInInventory")] AddObjectInInventory,
 
 		#endregion
+
+		#region R2 iOS & DC
+		iOS__Placeholder__StringProc_SaveOptions,
+		iOS__Placeholder__StringProc_LinkTwitter,
+		iOS__Placeholder__StringProc_StatusBarOrientation,
+		iOS__Placeholder__StringProc_SoundRelated,
+
+		ChangeStateForSoftReset, // DC
+		SetAllPadsActive,
+
+		RunDemo,
+
+		LaunchInternetBrowser,
+		LaunchIGP,
+		ActivateRumblePakInPort1,
+		ActivateRumblePakInPort2,
+		DeactivateRumblePak,
+		ShiftScreenToTheLeft,
+		ShiftScreenToTheRight,
+		ShiftScreenToTheTop,
+		ShiftScreenToTheBottom,
+
+		MultiInput,
+		SetHighScoreDisc,
+
+		MenuInit,
+		MenuUpdate,
+		IngameMenuInit,
+		StatusBar,
+		StopBackgroundMusic,
+		GameButtonEnable,
+
+		RumblePak, // params: (Freq, Force, On/Off. 0 = On)
+		ChangeVideoMode__Placeholder,
+		ChangeScreenSizeValue,
+
+		#endregion
 	}
 }

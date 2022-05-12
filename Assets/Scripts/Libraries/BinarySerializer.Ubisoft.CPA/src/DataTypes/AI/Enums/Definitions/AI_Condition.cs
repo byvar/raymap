@@ -374,5 +374,19 @@
 		#region Largo (Custom name)
 		AKeyJustPressedAlphanumeric,
 		#endregion
+
+		#region R2 iOS & DC
+		IsInternetAvailable,
+		IsRumblePakInPort1,
+		IsRumblePakInPort2,
+		IsRumblePakInPort1_Active,
+		IsRumblePakInPort2_Active,
+		IsStartButtonPressed,
+		DC_IsNTSC,
+		DC_OptionLoaded1,
+		DC_OptionLoaded2,
+		DC_Video1,
+		DC_Video2,
+		#endregion
 	}
 }

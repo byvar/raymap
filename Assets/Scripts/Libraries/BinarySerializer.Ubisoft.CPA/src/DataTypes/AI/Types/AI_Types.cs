@@ -1,6 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	/* TODO: Add the following
-	 * - R2 iOS
 	 * - TT PC final
 	 * - R2 3DS
 	 * - R2 N64: there are some DS exclusive functions, conditions etc.

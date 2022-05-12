@@ -914,5 +914,15 @@
 		CurrentNetworkGetNbOfArcsForWP, // Gets MSWay.Graph, finds WP in it, gets number of arcs defined for that graph node
 		CurrentNetworkGetWPAtArcIndexForWP, // Gets MSWay.Graph, finds WP in it, gets arc index i, gets WP for that graph node
 		#endregion
+
+		#region R2 iOS & DC
+		CheckVmsStatus, // Get Visual Memory System status code. -1: Not connected, -3: Not enough room, 1: OK
+		SetActiveVms,
+		GetActiveVms,
+		SaveOptions, // Saves current game options
+		LoadOptions,
+		GetHighScoreDisc,
+		DC_MagicBox, // Is PS2_MagicBox is anything to go by this is a terrible function that does completely different things depending on the arguments
+		#endregion
 	}
 }

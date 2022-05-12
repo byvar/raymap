@@ -56,5 +56,9 @@
 		#region R3 PS2
 		[AI_Definition(SCR: "Operator_Modulo", ED: "%")] ScalarModulo,
 		#endregion
+
+		#region R2 iOS (Custiom names and SCR)
+		[AI_Definition(SCR: "Operator_DivAllowZero", ED: "_/")] ScalarDivScalarAllowZero, // Allow division by zero?
+		#endregion
 	}
 }
