@@ -423,6 +423,9 @@
 		[AI_Definition(SCR: "Proc_SetHangingLimit", EN: "MEC_SetHangingLimit", FR: "MEC_ActiveMecaAccrochage")] MecSetHangingLimit,
 		[AI_Definition(SCR: "Proc_SetHangingOff", EN: "MEC_SetHangingOff", FR: "MEC_DesactiveMecaAccrochage")] MecSetHangingOff,
 
+		// These two are not in Rayman_Z U64
+		[AI_Definition(SCR: "Proc_SetBaseCoeff", EN: "MEC_SetBaseCoef", FR: "MEC_FixeCoeffSaut")] MecSetBaseCoeff,
+		[AI_Definition(SCR: "Proc_SetWalkCoeff", EN: "MEC_SetWalkCoeff", FR: "MEC_FixeCoeffMarche")] MecSetWalkCoeff,
 
 		//********************************************************************************************************************************************************************************************************************************************************
 		// Hierarchy - Platform 
@@ -790,8 +793,6 @@
 		[AI_Definition(SCR: "Proc_CreateTextWithParamFormat")] CreateTextWithParamFormat,
 		[AI_Definition(SCR: "Proc_CreateTextWith2ParamsFormat")] CreateTextWith2ParamsFormat,
 		[AI_Definition(SCR: "Proc_RealToText")] FloatToText,
-		[AI_Definition(SCR: "Proc_SetBaseCoeff")] MecSetBaseCoeff,
-		[AI_Definition(SCR: "Proc_SetWalkCoeff")] MecSetWalkCoeff,
 		[AI_Definition(SCR: "Proc_ChangeGameMaterialZDE")] ChangeGameMaterialZDE,
 		[AI_Definition(SCR: "Proc_SPO_ChangeFlagRecursively")] SPO_ChangeFlagRecursively,
 		ChangeScreenPosPerThousand,
