@@ -1016,7 +1016,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Procedure.SetGlobalCounter,
 				AI_Procedure.ReadAnalogJoystick,
 				AI_Procedure.SetAnalogJoystickAxes,
-				AI_Procedure.SetPadReadingDsgvars,
 				AI_Procedure.CancelKeyboardInertia,
 				AI_Procedure.GetPadCalibration,
 				AI_Procedure.SetPadCalibration,
@@ -1024,13 +1023,13 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Procedure.SetDefaultFormatCharacter,
 				AI_Procedure.SelectDriver,
 				AI_Procedure.SelectShapnessMax,
+				AI_Procedure.CenterScreen,
 
 				// DC & iOS v
 				AI_Procedure.ChangeStateForSoftReset,
 				AI_Procedure.SetAllPadsActive,
 				// DC & iOS ^
 
-				AI_Procedure.CenterScreen,
 				AI_Procedure.SelectResolution,
 				AI_Procedure.ChangeBrightness,
 				AI_Procedure.TexteEntier,
@@ -1038,6 +1037,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Procedure.SetTextureFiltering,
 				AI_Procedure.SetAntiAliasing,
 				AI_Procedure.SetInStereoMode,
+				AI_Procedure.SND_SetPrevMusicFadeOut,
 				AI_Procedure.SetSaturationBackGroundDistance,
 				AI_Procedure.SaveSoundEventInSlotMemory,
 				AI_Procedure.RestoreSoundEventInSlotMemory,

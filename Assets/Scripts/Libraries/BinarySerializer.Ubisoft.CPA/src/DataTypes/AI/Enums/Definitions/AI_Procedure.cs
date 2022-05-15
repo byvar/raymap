@@ -1579,5 +1579,62 @@
 		ChangeScreenSizeValue,
 
 		#endregion
+
+		#region R2 PS2 & Largo
+		Placeholder__SetRevolutionStdGamePlusC, // Sets ((byte)(StdGame + 0xC) & 0x7F
+		Placeholder__Revolution__SaveGame_1,
+		Placeholder__Revolution__SaveGame_2,
+		Placeholder__Revolution__SaveGame_3,
+		Placeholder__Revolution__SaveGame_4,
+		Placeholder__Revolution__SaveGame_5,
+		Placeholder__Revolution__SaveGame_6,
+		Placeholder__Revolution__SaveGame_7__LargoOnly,
+
+		SendSoundRequestWithChannelId,
+		SendVoiceRequestWithoutSpeaker,
+		SendVoiceRequestWithChannelId,
+
+		SND_StopSoundWithChannelId,
+		SND_StopVoiceWithoutSpeaker,
+		SND_StopVoiceWithChannelId,
+		ChangeVoiceLanguage,
+
+		Placeholder__Revolution__Shadow_1,
+		Placeholder__Revolution__Shadow_2_Does3And4,
+		Placeholder__Revolution__Shadow_3,
+		Placeholder__Revolution__Shadow_4,
+		Placeholder__Revolution__Shadow_5,
+		ReadAnalogJoystick2,
+		GetPadCalibration2,
+		SetPadCalibration2,
+		Placeholder__Revolution__Pad_1,
+		Placeholder__Revolution__PadRelated,
+		Placeholder__Revolution__SetAnalogJoystickAxes_1,
+		Placeholder__Revolution__SetAnalogJoystickAxes_2,
+		Placeholder__Revolution__AfterPad,
+		Placeholder__Revolution__DummyAfterKeyboardDirections_1,
+		Placeholder__Revolution__DummyAfterKeyboardDirections_2,
+		Placeholder__Revolution__DummyAfterKeyboardDirections_3,
+		Placeholder__Revolution__DummyAfterKeyboardDirections_4,
+		Placeholder__Revolution__DummyAfterKeyboardDirections_5,
+		Placeholder__Revolution__DummyAfterKeyboardDirections_6,
+		Placeholder__Revolution__AfterTextSuperimposed,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_1,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_2,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_3,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_4,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_5,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_6,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_7,
+		Placeholder__Revolution__DummyAfterTextSuperimposed_8,
+		Placeholder__Revolution__FinalAfterTextSuperimposed,
+		Placeholder__Revolution__LargoAfterTextSuperimposed_1,
+		Placeholder__Revolution__LargoAfterTextSuperimposed_2,
+		Placeholder__Revolution__LargoAfterTextSuperimposed_3,
+		Placeholder__Revolution__AfterLaunchAGO_1,
+		Placeholder__Revolution__AfterLaunchAGO_2,
+		Placeholder__Revolution__AfterLaunchAGO_3,
+		Placeholder__Revolution__AfterLaunchAGO_4,
+		#endregion
 	}
 }
