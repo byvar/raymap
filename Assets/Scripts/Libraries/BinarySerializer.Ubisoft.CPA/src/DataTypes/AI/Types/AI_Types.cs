@@ -3,6 +3,8 @@
 	 * - TT PC final
 	 * - R2 3DS
 	 * - R2 N64: there are some DS exclusive functions, conditions etc.
+	 * - R2 DC: there are some iOS exclusive functions, conditions etc.
+	 * - R3 PC & PC demo (probably the same as PS2. Procedures, function and condition lists match between demo and PS2. Procedures also match between final and PS2.)
 	 * - RRR DS proto
 	 * - RRR DS final
 	 * - Donald PC
@@ -11,6 +13,7 @@
 	 * - Rayman M PS2 demo
 	 * - Rayman Arena GC/Xb
 	 * - Dinosaur PS2
+	 * - PK PS2
 	 */
 
     public abstract class AI_Types {

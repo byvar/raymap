@@ -1697,5 +1697,19 @@
 		Placeholder__Largo_LastProcedures_24,
 		Placeholder__Largo_LastProcedures_25,
 		#endregion
+
+		#region R3 GC
+		FixePositionPerso_R3GCOnlyVariant,
+		Placeholder__R3SetGCOnly_1,
+		Placeholder__R3SetGCOnly_2,
+		Placeholder__R3GCOnly__LastProcs_1,
+		Placeholder__R3GCOnly__LastProcs_2,
+		Placeholder__R3GCOnly__LastProcs_3,
+		Placeholder__R3GCOnly__LastProcs_4,
+		Placeholder__R3GCOnly__LastProcs_5,
+		Placeholder__R3GCOnly__LastProcs_6,
+		Placeholder__R3GCOnly__LastProcs_7,
+		Placeholder__R3GCOnly__LastProcs_8,
+		#endregion
 	}
 }
