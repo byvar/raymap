@@ -762,6 +762,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Procedure.ActivateObject,
 				AI_Procedure.DesactivateObject,
 				AI_Procedure.ChangeMap,
+				AI_Procedure.ChangeMapByIndex,
 				AI_Procedure.ChangeMapNoAutosave,
 				AI_Procedure.SetActionReturn,
 				AI_Procedure.FactorAnimationFrameRate,
@@ -779,8 +780,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Procedure.Placeholder__Revolution__SaveGame_2,
 				AI_Procedure.Placeholder__Revolution__SaveGame_3,
 				AI_Procedure.Placeholder__Revolution__SaveGame_4,
-				AI_Procedure.Placeholder__Revolution__SaveGame_5,
-				AI_Procedure.Placeholder__Revolution__SaveGame_6,
+				AI_Procedure.Placeholder__Revolution__SaveGame_5a,
+				AI_Procedure.Placeholder__Revolution__SaveGame_5b,
 				AI_Procedure.QuitGame,
 				AI_Procedure.ActivateChannel,
 				AI_Procedure.DeactivateChannel,
@@ -1059,12 +1060,11 @@ namespace BinarySerializer.Ubisoft.CPA {
 				AI_Procedure.SetSaturationBackGroundDistance,
 				AI_Procedure.SaveSoundEventInSlotMemory,
 				AI_Procedure.RestoreSoundEventInSlotMemory,
-
-				AI_Procedure.RunDemo, // Or something else
 				AI_Procedure.DrawSegment,
-
-				AI_Procedure.UpdateChecksum,
 				AI_Procedure.ShellExecute,
+				AI_Procedure.ChangeSightingAccordingTime,
+				AI_Procedure.Placeholder__Revolution__AfterChangeSightingAccordingTime,
+
 				AI_Procedure.FixePointsDeMagie,
 				AI_Procedure.FixePointsDeMagieMax,
 				AI_Procedure.InitPointsDeMagie,
