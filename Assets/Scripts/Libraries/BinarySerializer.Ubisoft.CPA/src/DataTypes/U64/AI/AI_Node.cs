@@ -17,6 +17,14 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<GAM_State> ValueActionRef { get; set; }
 		public U64_Reference<WAY_WayPoint> ValueWayPointRef { get; set; }
 		public U64_Reference<AI_Comport> ValueComportRef { get; set; }
+		public U64_Reference<IPT_InputAction> ValueButton { get; set; }
+		public U64_Reference<AI_Node_String> ValueString { get; set; }
+		public U64_Reference<HIE_SuperObject> ValueSuperObject { get; set; }
+		public U64_Reference<GAM_Family> ValueFamilyRef { get; set; }
+		public U64_Reference<AI_Node_Long> ValueSoundEventRef { get; set; }
+		public U64_Reference<GAM_ObjectsTable> ValueObjectTableRef { get; set; }
+		public U64_Reference<GMT_GameMaterial> ValueGameMaterialRef { get; set; }
+		public U64_Reference<GLI_Light> ValueLight { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			Type = s.Serialize<byte>(Type, name: nameof(Type));
@@ -64,7 +72,30 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 					case AI_InterpretType.ComportRef:
 						ValueComportRef = s.SerializeObject<U64_Reference<AI_Comport>>(ValueComportRef, name: nameof(ValueComportRef))?.Resolve(s);
 						break;
-
+					case AI_InterpretType.Button:
+						ValueButton = s.SerializeObject<U64_Reference<IPT_InputAction>>(ValueButton, name: nameof(ValueButton))?.Resolve(s);
+						break;
+					case AI_InterpretType.String:
+						ValueString = s.SerializeObject<U64_Reference<AI_Node_String>>(ValueString, name: nameof(ValueString))?.Resolve(s);
+						break;
+					case AI_InterpretType.SuperObjectRef:
+						ValueSuperObject = s.SerializeObject<U64_Reference<HIE_SuperObject>>(ValueSuperObject, name: nameof(ValueSuperObject))?.Resolve(s);
+						break;
+					case AI_InterpretType.FamilyRef:
+						ValueFamilyRef = s.SerializeObject<U64_Reference<GAM_Family>>(ValueFamilyRef, name: nameof(ValueFamilyRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.SoundEventRef:
+						ValueSoundEventRef = s.SerializeObject<U64_Reference<AI_Node_Long>>(ValueSoundEventRef, name: nameof(ValueSoundEventRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.ObjectTableRef:
+						ValueObjectTableRef = s.SerializeObject<U64_Reference<GAM_ObjectsTable>>(ValueObjectTableRef, name: nameof(ValueObjectTableRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.GameMaterialRef:
+						ValueGameMaterialRef = s.SerializeObject<U64_Reference<GMT_GameMaterial>>(ValueGameMaterialRef, name: nameof(ValueGameMaterialRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.Light:
+						ValueLight = s.SerializeObject<U64_Reference<GLI_Light>>(ValueLight, name: nameof(ValueLight))?.Resolve(s);
+						break;
 					default:
 						break;
 				}

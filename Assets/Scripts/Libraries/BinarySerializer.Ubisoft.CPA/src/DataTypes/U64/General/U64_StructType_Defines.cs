@@ -198,6 +198,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(MTH3D_ShortVector)] = U64_StructType.Vertex,
 			[typeof(U64_TripledIndex)] = U64_StructType.AllTripledIndex,
 			[typeof(U64_BoundingVolume)] = U64_StructType.BoundingVolume,
+			[typeof(U64_StringChunk)] = U64_StructType.StringChunk,
 
 			// GAM
 			[typeof(GAM_Fix)] = U64_StructType.FixData,
@@ -227,6 +228,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_ActivationZone)] = U64_StructType.ActivationZone,
 			[typeof(LST_ReferenceElement<GAM_State>)] = U64_StructType.StateRefList,
 			[typeof(LST_ReferenceElement<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
+
+			// HIE
+			[typeof(HIE_SuperObject)] = U64_StructType.SuperObject,
+			[typeof(LST_ReferenceElement<HIE_SuperObject>)] = U64_StructType.SuperObjectChildList,
 
 			// PO
 			[typeof(PO_PhysicalObject)] = U64_StructType.PhysicalObject,
@@ -279,6 +284,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(AI_Node_Long)] = U64_StructType.Node_Long,
 			[typeof(AI_Node_Float)] = U64_StructType.Node_Float,
 			[typeof(AI_Node_Vector3D)] = U64_StructType.Node_Vector3D,
+			[typeof(AI_Node_String)] = U64_StructType.Node_String,
 			[typeof(AI_Declaration_UnsignedLong)] = U64_StructType.Declaration_UnsignedLong,
 
 			[typeof(LST_ReferenceElement<AI_Comport>)] = U64_StructType.ListOfComport,
@@ -292,6 +298,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(WAY_WayPoint)] = U64_StructType.Waypoint,
 			[typeof(LST_ReferenceElement<WAY_WayPoint>)] = U64_StructType.LST_WaypointIndex,
 			[typeof(LST_ReferenceElement<WAY_GraphNode>)] = U64_StructType.LST_NodeIndex_and_NoCtrlTextureList,
+
+			// IPT
+			[typeof(IPT_InputAction)] = U64_StructType.InputAction,
+			[typeof(IPT_InputElement)] = U64_StructType.InputList,
 
 			// TODO
 		};
