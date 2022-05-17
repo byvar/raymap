@@ -34,15 +34,14 @@
         ParticleGenerator,
         VisualMaterialRef,
         ModelRef,
-        DataType42,
         CustomBits,
         Caps,
         MacroRef__Subroutine,
         Null,
         GraphRef,
         // Types below here added for engineversions < R2
-        ConstantRef,
-        RealRef,
+        //ConstantRef,
+        //RealRef,
         SurfaceRef,
         Way,
         DsgVar,
@@ -51,7 +50,7 @@
         FontRef,
         Color,
         Module, // Different from ModuleRef
-        LightInfoRef,
+        //LightInfoRef,
 
         // R3:
         EndTree,

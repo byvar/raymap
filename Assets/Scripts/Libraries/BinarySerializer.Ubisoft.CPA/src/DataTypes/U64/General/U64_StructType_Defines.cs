@@ -275,8 +275,23 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(AI_Rule)] = U64_StructType.Rule,
 			[typeof(AI_Node)] = U64_StructType.ScriptNodeArray__Node,
 			[typeof(AI_NodeInterpretFull)] = U64_StructType.NODFile,
+
+			[typeof(AI_Node_Long)] = U64_StructType.Node_Long,
+			[typeof(AI_Node_Float)] = U64_StructType.Node_Float,
+			[typeof(AI_Node_Vector3D)] = U64_StructType.Node_Vector3D,
+			[typeof(AI_Declaration_UnsignedLong)] = U64_StructType.Declaration_UnsignedLong,
+
 			[typeof(LST_ReferenceElement<AI_Comport>)] = U64_StructType.ListOfComport,
 			[typeof(LST_ReferenceElement<AI_Rule>)] = U64_StructType.ListOfRules,
+
+			// WAY
+			[typeof(WAY_Graph)] = U64_StructType.WayGraph,
+			[typeof(WAY_GraphNode)] = U64_StructType.WayGraphNode,
+			[typeof(WAY_Capacity)] = U64_StructType.LST_Capacity,
+			[typeof(WAY_Valuation)] = U64_StructType.LST_Valuation,
+			[typeof(WAY_WayPoint)] = U64_StructType.Waypoint,
+			[typeof(LST_ReferenceElement<WAY_WayPoint>)] = U64_StructType.LST_WaypointIndex,
+			[typeof(LST_ReferenceElement<WAY_GraphNode>)] = U64_StructType.LST_NodeIndex_and_NoCtrlTextureList,
 
 			// TODO
 		};

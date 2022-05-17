@@ -5,11 +5,14 @@
 	 * - R2 N64: there are some DS exclusive functions, conditions etc.
 	 * - R2 DC: there are some iOS exclusive functions, conditions etc.
 	 * - R3 PC & PC demo (probably the same as PS2. Procedures, function and condition lists match between demo and PS2. Procedures also match between final and PS2.)
+	 * - R3 HD (definitely has new functions/procedures for the new menu pages mainly)
+	 * - R3 PS2 proto(s) & PC early demos?
 	 * - RRR DS proto
 	 * - RRR DS final
+	 * - Red Planet
 	 * - Donald PC
 	 * - Donald N64
-	 * - Laura & Alex
+	 * - Laura & Alex (like hype, SCR names are in the exe)
 	 * - Rayman M PS2 demo
 	 * - Rayman Arena GC/Xb
 	 * - Dinosaur PS2

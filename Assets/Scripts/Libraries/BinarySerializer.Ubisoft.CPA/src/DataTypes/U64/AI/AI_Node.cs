@@ -6,6 +6,18 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public byte Depth { get; set; }
 		public ushort IdOrValue { get; set; }
 
+		public U64_Reference<AI_Node_Long> ValueConstant { get; set; }
+		public U64_Reference<AI_Node_Float> ValueFloat { get; set; }
+		public U64_Reference<AI_Node_Vector3D> ValueVector { get; set; }
+		public U64_Reference<AI_AIModel> ValueModelRef { get; set; }
+		public U64_Reference<WAY_Graph> ValueGraph { get; set; }
+		public U64_Reference<AI_Declaration_UnsignedLong> ValueCaps { get; set; }
+		public U64_Reference<AI_Rule> ValueMacroRef { get; set; }
+		public U64_Reference<GAM_Character> ValuePersoRef { get; set; }
+		public U64_Reference<GAM_State> ValueActionRef { get; set; }
+		public U64_Reference<WAY_WayPoint> ValueWayPointRef { get; set; }
+		public U64_Reference<AI_Comport> ValueComportRef { get; set; }
+
 		public override void SerializeImpl(SerializerObject s) {
 			Type = s.Serialize<byte>(Type, name: nameof(Type));
 			Depth = s.Serialize<byte>(Depth, name: nameof(Depth));
@@ -13,8 +25,50 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		}
 
 		private void SerializeValue(SerializerObject s) {
-			// TODO: Serialize differently depending on type
 			IdOrValue = s.Serialize<ushort>(IdOrValue, name: nameof(IdOrValue));
+			s.DoAt(Offset + 2, () => {
+				// Serialize differently depending on type
+				var aiTypes = Context.GetCPASettings().AITypes;
+				var nodeType = aiTypes.GetNodeType(Type);
+				switch (nodeType) {
+					case AI_InterpretType.Constant:
+						ValueConstant = s.SerializeObject<U64_Reference<AI_Node_Long>>(ValueConstant, name: nameof(ValueConstant))?.Resolve(s);
+						break;
+					case AI_InterpretType.Real:
+						ValueFloat = s.SerializeObject<U64_Reference<AI_Node_Float>>(ValueFloat, name: nameof(ValueFloat))?.Resolve(s);
+						break;
+					case AI_InterpretType.ConstantVector:
+						ValueVector = s.SerializeObject<U64_Reference<AI_Node_Vector3D>>(ValueVector, name: nameof(ValueVector))?.Resolve(s);
+						break;
+					case AI_InterpretType.ModelRef:
+						ValueModelRef = s.SerializeObject<U64_Reference<AI_AIModel>>(ValueModelRef, name: nameof(ValueModelRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.Graph:
+						ValueGraph = s.SerializeObject<U64_Reference<WAY_Graph>>(ValueGraph, name: nameof(ValueGraph))?.Resolve(s);
+						break;
+					case AI_InterpretType.Caps:
+						ValueCaps = s.SerializeObject<U64_Reference<AI_Declaration_UnsignedLong>>(ValueCaps, name: nameof(ValueCaps))?.Resolve(s);
+						break;
+					case AI_InterpretType.MacroRef__Subroutine:
+						ValueMacroRef = s.SerializeObject<U64_Reference<AI_Rule>>(ValueMacroRef, name: nameof(ValueMacroRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.PersoRef:
+						ValuePersoRef = s.SerializeObject<U64_Reference<GAM_Character>>(ValuePersoRef, name: nameof(ValuePersoRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.ActionRef:
+						ValueActionRef = s.SerializeObject<U64_Reference<GAM_State>>(ValueActionRef, name: nameof(ValueActionRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.WayPointRef:
+						ValueWayPointRef = s.SerializeObject<U64_Reference<WAY_WayPoint>>(ValueWayPointRef, name: nameof(ValueWayPointRef))?.Resolve(s);
+						break;
+					case AI_InterpretType.ComportRef:
+						ValueComportRef = s.SerializeObject<U64_Reference<AI_Comport>>(ValueComportRef, name: nameof(ValueComportRef))?.Resolve(s);
+						break;
+
+					default:
+						break;
+				}
+			});
 		}
 
 		public override bool UseShortLog => true;
