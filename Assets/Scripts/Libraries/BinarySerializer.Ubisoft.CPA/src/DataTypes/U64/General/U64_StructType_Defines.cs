@@ -82,7 +82,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.MechanicalEnvironment,
 				U64_StructType.VisualEnvironment,
 				U64_StructType.BitmapInfo, // size: 14
-				U64_StructType.DsgVar__Declaration,
+				U64_StructType.Declaration,
 				U64_StructType.StateList,
 				U64_StructType.CharacterBrain,
 				U64_StructType.CharacterCineInfo,
@@ -94,13 +94,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.CharacterWorld,
 				U64_StructType.CharacterSound,
 				U64_StructType.ObjectsTableList,
-				U64_StructType.DsgVarInfo__DeclarationVariable,
+				U64_StructType.DeclarationVariable,
 				U64_StructType.Intelligence,
 				U64_StructType.ListOfComport,
 				U64_StructType.ListOfRules,
 				U64_StructType.Rule,
 				U64_StructType.Reflex,
-				U64_StructType.ScriptNodeArray__Node,
+				U64_StructType.Node,
 				U64_StructType.LST_GeometricObject,
 				U64_StructType.LST_GeometricElementAlignedBoxes,
 				U64_StructType.LST_GeometricElementSpheres,
@@ -278,8 +278,11 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(AI_Intelligence)] = U64_StructType.Intelligence,
 			[typeof(AI_Comport)] = U64_StructType.Comport,
 			[typeof(AI_Rule)] = U64_StructType.Rule,
-			[typeof(AI_Node)] = U64_StructType.ScriptNodeArray__Node,
+			[typeof(AI_Node)] = U64_StructType.Node,
 			[typeof(AI_NodeInterpretFull)] = U64_StructType.NODFile,
+			[typeof(AI_Declaration)] = U64_StructType.Declaration,
+			[typeof(AI_DeclarationVariable)] = U64_StructType.DeclarationVariable,
+			[typeof(AI_TypeVariable)] = U64_StructType.TypeVariable,
 
 			[typeof(AI_Node_Long)] = U64_StructType.Node_Long,
 			[typeof(AI_Node_Float)] = U64_StructType.Node_Float,
@@ -289,6 +292,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			[typeof(LST_ReferenceElement<AI_Comport>)] = U64_StructType.ListOfComport,
 			[typeof(LST_ReferenceElement<AI_Rule>)] = U64_StructType.ListOfRules,
+			[typeof(LST_ReferenceElement<AI_TypeVariable>)] = U64_StructType.TypeVariableIdList,
 
 			// WAY
 			[typeof(WAY_Graph)] = U64_StructType.WayGraph,

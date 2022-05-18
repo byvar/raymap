@@ -1,4 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
+	// TODO: Add Save & Init Types
 	/* TODO: Add the following
 	 * - TT PC final
 	 * - R2 3DS

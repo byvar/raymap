@@ -2,7 +2,7 @@
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class AI_AIModel : U64_Struct {
-		public U64_Reference<U64_Placeholder> VariableDeclaration { get; set; }
+		public U64_Reference<AI_Declaration> VariableDeclaration { get; set; }
 		public U64_Reference<AI_Intelligence> Intelligence { get; set; }
 		public U64_Reference<AI_Intelligence> Reflex { get; set; }
 
@@ -14,7 +14,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public bool CFast_IsC { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			VariableDeclaration = s.SerializeObject<U64_Reference<U64_Placeholder>>(VariableDeclaration, name: nameof(VariableDeclaration));
+			VariableDeclaration = s.SerializeObject<U64_Reference<AI_Declaration>>(VariableDeclaration, name: nameof(VariableDeclaration))?.Resolve(s);
 			Intelligence = s.SerializeObject<U64_Reference<AI_Intelligence>>(Intelligence, name: nameof(Intelligence))?.Resolve(s);
 			Reflex = s.SerializeObject<U64_Reference<AI_Intelligence>>(Reflex, name: nameof(Reflex))?.Resolve(s);
 
