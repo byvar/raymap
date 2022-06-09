@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Raymap {
+﻿namespace Raymap {
     /// <summary>
     /// The available games
     /// </summary>
@@ -12,6 +10,8 @@ namespace Raymap {
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (iOS)")] Rayman2IOS,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (iOS) Demo")] Rayman2IOSDemo,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1)")] Rayman2PS1,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1) Demo")] Rayman2PS1Demo,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1) Demo (SLUS_90095)")] Rayman2PS1Demo_SLUS_90095,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (PS2)")] Rayman2PS2,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_U64Manager), "Rayman 2 (N64)")] Rayman2N64,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_U64Manager), "Rayman 2 (DS)")] Rayman2DS,

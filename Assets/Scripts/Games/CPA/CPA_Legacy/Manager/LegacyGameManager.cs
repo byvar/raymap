@@ -146,6 +146,8 @@ namespace Raymap {
 				GameModeSelection.Rayman2IOS => Legacy_Settings.Mode.Rayman2IOS,
 				GameModeSelection.Rayman2IOSDemo => Legacy_Settings.Mode.Rayman2IOSDemo,
 				GameModeSelection.Rayman2PS1 => Legacy_Settings.Mode.Rayman2PS1,
+				GameModeSelection.Rayman2PS1Demo => Legacy_Settings.Mode.Rayman2PS1Demo,
+				GameModeSelection.Rayman2PS1Demo_SLUS_90095 => Legacy_Settings.Mode.Rayman2PS1Demo_SLUS_90095,
 				GameModeSelection.Rayman2PS2 => Legacy_Settings.Mode.Rayman2PS2,
 				GameModeSelection.Rayman2N64 => Legacy_Settings.Mode.Rayman2N64,
 				GameModeSelection.Rayman2DS => Legacy_Settings.Mode.Rayman2DS,

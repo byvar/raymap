@@ -22,6 +22,8 @@ namespace Raymap {
 				GameModeSelection.Rayman2IOS => CPA_GameMode.Rayman2IOS,
 				GameModeSelection.Rayman2IOSDemo => CPA_GameMode.Rayman2IOSDemo,
 				GameModeSelection.Rayman2PS1 => CPA_GameMode.Rayman2PS1,
+				GameModeSelection.Rayman2PS1Demo => CPA_GameMode.Rayman2PS1Demo,
+				GameModeSelection.Rayman2PS1Demo_SLUS_90095 => CPA_GameMode.Rayman2PS1Demo_SLUS_90095,
 				GameModeSelection.Rayman2PS2 => CPA_GameMode.Rayman2PS2,
 				GameModeSelection.Rayman2N64 => CPA_GameMode.Rayman2N64,
 				GameModeSelection.Rayman2DS => CPA_GameMode.Rayman2DS,

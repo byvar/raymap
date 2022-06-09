@@ -94,6 +94,22 @@ namespace Raymap
 							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vignette.tim"), fileData);
 							break;
 
+						case PackedFileType.TIM_Demo1:
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vignette_demo1.tim"), fileData);
+							break;
+
+						case PackedFileType.TIM_Demo2:
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vignette_demo2.tim"), fileData);
+							break;
+
+						case PackedFileType.TIM_Demo3:
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vignette_demo3.tim"), fileData);
+							break;
+
+						case PackedFileType.TIM_Demo4:
+							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "vignette_demo4.tim"), fileData);
+							break;
+
 						case PackedFileType.VB:
 						{
 							Util.ByteArrayToFile(Path.Combine(lvlExportDir, "sounds.vb"), fileData);
@@ -463,8 +479,20 @@ namespace Raymap
 
 			if (fileInfo.type == PS1GameInfo.File.Type.Map)
 			{
-				if (settings.EngineVersion != EngineVersion.RaymanRush_PS1 && !b.exeOnly)
+				// TODO: Potentially find a better, less hacky, way of dealing with multiple vignette files?
+				if (settings.Mode is CPA_GameMode.Rayman2PS1Demo or CPA_GameMode.Rayman2PS1Demo_SLUS_90095)
+				{
+					types.Add(PackedFileType.TIM_Demo1);
+					types.Add(PackedFileType.TIM_Demo2);
+					types.Add(PackedFileType.TIM_Demo3);
+
+					if (b.vignettes == 4)
+						types.Add(PackedFileType.TIM_Demo4);
+				}
+				else if (settings.EngineVersion != EngineVersion.RaymanRush_PS1 && !b.exeOnly)
+				{
 					types.Add(PackedFileType.TIM);
+				}
 
 				if (!b.exeOnly && b.inEngine)
 				{
@@ -537,6 +565,10 @@ namespace Raymap
 		public enum PackedFileType
 		{
 			TIM, // Vignette
+			TIM_Demo1, // Vignette
+			TIM_Demo2, // Vignette
+			TIM_Demo3, // Vignette
+			TIM_Demo4, // Vignette
 			VB, // Sound
 			XTP, // VRAM
 			SYS, // Level header

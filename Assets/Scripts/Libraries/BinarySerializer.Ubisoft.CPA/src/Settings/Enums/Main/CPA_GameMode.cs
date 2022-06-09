@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BinarySerializer.Ubisoft.CPA {
+﻿namespace BinarySerializer.Ubisoft.CPA {
 	public enum CPA_GameMode {
 		Rayman2PC,
 		Rayman2PCDemo_1999_08_18,
@@ -13,6 +7,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 		Rayman2IOS,
 		Rayman2IOSDemo,
 		Rayman2PS1,
+		Rayman2PS1Demo,
+		Rayman2PS1Demo_SLUS_90095,
 		Rayman2PS2,
 		Rayman2N64,
 		Rayman2DS,

@@ -902,6 +902,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 				CPA_GameMode.Rayman2IOS => R2IOS,
 				CPA_GameMode.Rayman2IOSDemo => R2IOS,
 				CPA_GameMode.Rayman2PS1 => R2PS1,
+				CPA_GameMode.Rayman2PS1Demo => R2PS1,
+				CPA_GameMode.Rayman2PS1Demo_SLUS_90095 => R2PS1,
 				CPA_GameMode.Rayman2PS2 => R2PS2,
 				CPA_GameMode.Rayman2N64 => R2N64,
 				CPA_GameMode.TonicTroubleN64 => TTN64,

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using BinarySerializer;
-using BinarySerializer.Unity;
 using UnityEngine;
 
 namespace BinarySerializer.Unity
@@ -17,10 +15,10 @@ namespace BinarySerializer.Unity
 		/// <param name="outputPath">The path to export to</param>
 		/// <param name="name">The palette name</param>
 		/// <param name="palette">The palette</param>
-		public static void ExportPaletteToGimp(string outputPath, string name, BaseColor[] palette)
+		public static void ExportToGimp(string outputPath, string name, BaseColor[] palette)
 		{
 			// Create the file
-			using var fileStream = File.Create(outputPath);
+			using FileStream fileStream = File.Create(outputPath);
 
 			// Use a writer
 			using var writer = new StreamWriter(fileStream);
@@ -36,22 +34,34 @@ namespace BinarySerializer.Unity
 		}
 
 		/// <summary>
-		/// Exports a palette to a file
+		/// Exports a palette to a .png file
 		/// </summary>
 		/// <param name="outputPath">The path to export to</param>
 		/// <param name="palette">The palette</param>
-		public static void ExportPalette(string outputPath, IList<BaseColor> palette, int scale = 16, int offset = 0, int? optionalLength = null, int? optionalWrap = null, bool reverseY = false)
+		/// <param name="scale">The palette scale on the resulting texture</param>
+		/// <param name="start">The color index to start from</param>
+		/// <param name="length">The length of the palette to use or null to use the length of the color array</param>
+		/// <param name="wrap">Optional color wrapping on the resulting texture or null to not wrap</param>
+		/// <param name="reverseY">Indicates if the y-axis should be reversed</param>
+		public static void ExportToPNG(
+			string outputPath, 
+			IList<BaseColor> palette, int scale = 16, 
+			int start = 0, int? length = null, 
+			int? wrap = null, bool reverseY = false)
 		{
-			int length = optionalLength ?? palette.Count;
-			int wrap = optionalWrap ?? length;
-			var tex = TextureHelpers.CreateTexture2D(Mathf.Min(length, wrap) * scale, Mathf.CeilToInt(length / (float)wrap) * scale, clear: true);
+			int palLength = length ?? palette.Count;
+			int palWrap = wrap ?? palLength;
+			Texture2D tex = TextureHelpers.CreateTexture2D(
+				Mathf.Min(palLength, palWrap) * scale, 
+				Mathf.CeilToInt(palLength / (float)palWrap) * scale, 
+				clear: true);
 
-			for (int i = 0; i < length; i++)
+			for (int i = 0; i < palLength; i++)
 			{
-				int mainY = (tex.height / scale) - 1 - (i / wrap);
-				int mainX = i % wrap;
+				int mainY = (tex.height / scale) - 1 - (i / palWrap);
+				int mainX = i % palWrap;
 
-				Color col = palette[offset + i].GetColor();
+				Color col = palette[start + i].GetColor();
 
 				// Remove transparency
 				col = new Color(col.r, col.g, col.b);

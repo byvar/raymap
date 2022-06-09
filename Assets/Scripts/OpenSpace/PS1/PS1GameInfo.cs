@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BinarySerializer;
+using BinarySerializer.Ubisoft.CPA.PS1;
+using BinarySerializer.Unity;
+using Raymap;
 
 namespace OpenSpace.PS1 {
 
@@ -60,6 +65,7 @@ namespace OpenSpace.PS1 {
 				public uint? overrideActor1Address;
 				public uint? overrideActor2Address;
 				public ushort cineOffset;
+				public int vignettes = 1;
 
 				public MemoryBlock(uint address, bool hasSoundEffects, LBA main_compressed, LBA overlay_game, LBA overlay_cine, LBA[] cutscenes = null, bool inEngine = true) {
 					this.address = address;
@@ -276,6 +282,61 @@ namespace OpenSpace.PS1 {
 						new File.MemoryBlock(0x800BF514, true, new File.LBA(0x1C27E, 0x2E1), new File.LBA(0x1C55F, 0x463A4), new File.LBA(0x1C5EC, 0x13A4), new File.LBA[] { new File.LBA(0x1C5EF, 0x6F5800), new File.LBA(0x1D3DA, 0x405800), new File.LBA(0x1DBE5, 0x6B800), new File.LBA(0x1DCBC, 0x3BD000), new File.LBA(0x1E436, 0x7000), new File.LBA(0x1E444, 0x466000), new File.LBA(0x1ED10, 0x2D4800), new File.LBA(0x1F2B9, 0x173800), new File.LBA(0x1F5A0, 0x30F000), new File.LBA(0x1FBBE, 0x7800), new File.LBA(0x1FBCD, 0x58C800), new File.LBA(0x206E6, 0x2FE800), new File.LBA(0x20CE3, 0x11C800), new File.LBA(0x20F1C, 0x357000), new File.LBA(0x215CA, 0x7000), new File.LBA(0x215D8, 0x674800), new File.LBA(0x222C1, 0x3CD800), new File.LBA(0x22A5C, 0xE8800), new File.LBA(0x22C2D, 0x353000), new File.LBA(0x232D3, 0x7800) }) { cineOffset = 0x32 },
 						new File.MemoryBlock(0x80146184, true, new File.LBA(0x232E2, 0x1B3), new File.LBA(0x23495, 0x36000), new File.LBA(0, 0)),
 						new File.MemoryBlock(0x80127458, true, new File.LBA(0x23501, 0x9D), new File.LBA(0x23495, 0x36000), new File.LBA(0, 0), inEngine: false)
+					}
+				}
+			}
+		};
+
+		// Checked for SCUS_94599, SCED-03458, SCED_02636
+		public static PS1GameInfo R2_PS1_Demo = new PS1GameInfo() {
+			maps = new string[] {
+				"batam_10",
+				"chase_10",
+			},
+			cines = new Dictionary<string, string[]>() {
+				{ "batam_10", new string[] { "batam10a", "batam10b", "batam10c", "batam10d" } },
+			},
+			files = new File[] {
+				new File() {
+					fileID = 0,
+					bigfile = "COMBIN",
+					extension = "DAT",
+					baseLBA = 0x1F4,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(0x8010F388, false, new File.LBA(0x1F4, 0x1F6), new File.LBA(0x3EA, 0x45000), new File.LBA(0x0, 0x0), new File.LBA[] { new File.LBA(0x474, 0x344800), new File.LBA(0xAFD, 0x375800), new File.LBA(0x11E8, 0x17A800), new File.LBA(0x14DD, 0x163000), }) {
+							cineOffset = 0x32,
+							vignettes = 4,
+						},
+						new File.MemoryBlock(0x800CB240, true, new File.LBA(0x17A3, 0x34C), new File.LBA(0x1AEF, 0x36000), new File.LBA(0x0, 0x0), new File.LBA[] { }) {
+							vignettes = 3,
+						},
+					}
+				}
+			}
+		};
+
+		public static PS1GameInfo R2_PS1_Demo_SLUS_90095 = new PS1GameInfo() {
+			maps = new string[] {
+				"batam_10",
+				"chase_10",
+			},
+			cines = new Dictionary<string, string[]>() {
+				{ "batam_10", new string[] { "batam10a", "batam10b", "batam10c", "batam10d" } },
+			},
+			files = new File[] {
+				new File() {
+					fileID = 0,
+					bigfile = "COMBIN",
+					extension = "DAT",
+					baseLBA = 0x1F4,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(0x8010F388, false, new File.LBA(0x1F4, 0x1F5), new File.LBA(0x3E9, 0x45000), new File.LBA(0x0, 0x0), new File.LBA[] { new File.LBA(0x473, 0x344800), new File.LBA(0xAFC, 0x375800), new File.LBA(0x11E7, 0x17A800), new File.LBA(0x14DC, 0x163000), }) {
+							cineOffset = 0x32,
+							vignettes = 4,
+						},
+						new File.MemoryBlock(0x800CB240, true, new File.LBA(0x17A2, 0x34C), new File.LBA(0x1AEE, 0x36000), new File.LBA(0x0, 0x0), new File.LBA[] { }) { 
+							vignettes = 3,
+						},
 					}
 				}
 			}
@@ -801,10 +862,58 @@ namespace OpenSpace.PS1 {
 
 		public static Dictionary<Legacy_Settings.Mode, PS1GameInfo> Games = new Dictionary<Legacy_Settings.Mode, PS1GameInfo>() {
 			{ Legacy_Settings.Mode.Rayman2PS1, R2_PS1_US },
+			{ Legacy_Settings.Mode.Rayman2PS1Demo, R2_PS1_Demo },
+			{ Legacy_Settings.Mode.Rayman2PS1Demo_SLUS_90095, R2_PS1_Demo_SLUS_90095 },
 			{ Legacy_Settings.Mode.RaymanRushPS1, RR_PS1_US },
 			{ Legacy_Settings.Mode.DonaldDuckPS1, DD_PS1_US },
 			{ Legacy_Settings.Mode.VIPPS1, VIP_PS1_US },
 			{ Legacy_Settings.Mode.JungleBookPS1, JB_PS1_US },
 		};
+
+		public static void GenerateR2Table(string exeFilePath, uint offset, long count)
+		{
+			using MapViewerContext context = new(new MapViewerSettings(GameModeSelection.Rayman2PS1, Path.GetDirectoryName(exeFilePath), String.Empty));
+			LinearFile file = context.AddFile(new LinearFile(context, Path.GetFileName(exeFilePath)));
+			var refs = FileFactory.Read<ObjectArray<PackedFileArchiveReference>>(context, file.StartPointer + offset, 
+				(_, x) => x.Pre_Length = count);
+
+			StringBuilder str = new();
+
+			str.AppendLine(@"public static PS1GameInfo GAME_NAME = new PS1GameInfo() {");
+			str.AppendLine(@"	maps = new string[] {");
+			str.AppendLine(@"	},");
+			str.AppendLine(@"	cines = new Dictionary<string, string[]>() {");
+			str.AppendLine(@"	},");
+			str.AppendLine(@"	files = new File[] {");
+			str.AppendLine(@"		new File() {");
+			str.AppendLine(@"			fileID = 0,");
+			str.AppendLine(@"			bigfile = ""COMBIN"",");
+			str.AppendLine(@"			extension = ""DAT"",");
+			str.AppendLine(@$"			baseLBA = 0x{refs.Value.First().Main.LBA:X},");
+			str.AppendLine(@"			memoryBlocks = new File.MemoryBlock[] {");
+
+			foreach (PackedFileArchiveReference r in refs.Value)
+			{
+				const string ind = "					";
+				str.Append($@"{ind}new File.MemoryBlock(0x{r.Destination:X8}, {(r.Uint_0C == 0 ? "false" : "true")}");
+				str.Append($@", new File.LBA(0x{r.Main.LBA:X}, 0x{r.Main.Length:X})");
+				str.Append($@", new File.LBA(0x{r.OverlayGame.LBA:X}, 0x{r.OverlayGame.Length:X})");
+				str.Append($@", new File.LBA(0x{r.OverlayCine.LBA:X}, 0x{r.OverlayCine.Length:X})");
+				str.Append(@", new File.LBA[] { ");
+
+				foreach (PackedFileArchiveReference.BlockRef cine in r.Cinematics.TakeWhile(x => x.LBA != 0 && x.Length != 0))
+					str.Append(@$"new File.LBA(0x{cine.LBA:X}, 0x{cine.Length:X}), ");
+
+				str.Append(@"}) { cineOffset = 0x1E },");
+				str.AppendLine();
+			}
+
+			str.AppendLine(@"			}");
+			str.AppendLine(@"		}");
+			str.AppendLine(@"	}");
+			str.AppendLine(@"};");
+
+			str.ToString().CopyToClipboard();
+		}
 	}
 }
