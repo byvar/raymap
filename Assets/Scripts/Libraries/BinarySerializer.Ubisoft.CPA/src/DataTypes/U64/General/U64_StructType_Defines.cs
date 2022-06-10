@@ -264,6 +264,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_BitmapRGBA16)] = U64_StructType.BitmapRGBA16,
 			[typeof(GLI_PaletteRGBA16)] = U64_StructType.PaletteRGBA16,
 
+			[typeof(LST_ReferenceElement<GLI_Texture>)] = U64_StructType.LST_NodeIndex_and_NoCtrlTextureList,
+
 			// GMT
 			[typeof(GMT_GameMaterial)] = U64_StructType.GameMaterial,
 			[typeof(GMT_CollideMaterial)] = U64_StructType.CollideMaterial,
@@ -311,8 +313,11 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(LST_ReferenceElement<WAY_GraphNode>)] = U64_StructType.LST_NodeIndex_and_NoCtrlTextureList,
 
 			// IPT
+			[typeof(IPT_DscInput)] = U64_StructType.DscInput,
 			[typeof(IPT_InputAction)] = U64_StructType.InputAction,
 			[typeof(IPT_InputElement)] = U64_StructType.InputList,
+
+			[typeof(LST_ReferenceElement<IPT_InputAction>)] = U64_StructType.DscInputActionList,
 
 			// TODO
 		};

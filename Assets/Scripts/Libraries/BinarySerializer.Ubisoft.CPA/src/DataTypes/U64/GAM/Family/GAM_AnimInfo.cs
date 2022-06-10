@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public ushort InterpolatedAnimationIndex { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			AnimListTable = s.SerializeObject<U64_Reference<U64_Placeholder>>(AnimListTable, name: nameof(AnimListTable));
+			AnimListTable = s.SerializeObject<U64_Reference<U64_Placeholder>>(AnimListTable, name: nameof(AnimListTable))?.Resolve(s);
 			ChannelsCount = s.Serialize<ushort>(ChannelsCount, name: nameof(ChannelsCount));
 			FramesCount = s.Serialize<ushort>(FramesCount, name: nameof(FramesCount));
 			InterpolatedAnimationIndex = s.Serialize<ushort>(InterpolatedAnimationIndex, name: nameof(InterpolatedAnimationIndex)); // Index in CutTable
