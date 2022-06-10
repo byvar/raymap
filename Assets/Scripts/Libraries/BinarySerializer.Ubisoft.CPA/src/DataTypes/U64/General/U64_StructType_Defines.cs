@@ -129,7 +129,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.StateRefList,
 				U64_StructType.BoundingVolume,
 				U64_StructType.LipsSynchro,
-				U64_StructType.DsgMem__Initialization,
+				U64_StructType.Initialization,
 				U64_StructType.InitVariable,
 				U64_StructType.InitVariableIdList,
 				U64_StructType.TypeVariable,
@@ -282,17 +282,24 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(AI_NodeInterpretFull)] = U64_StructType.NODFile,
 			[typeof(AI_Declaration)] = U64_StructType.Declaration,
 			[typeof(AI_DeclarationVariable)] = U64_StructType.DeclarationVariable,
+			[typeof(AI_Initialization)] = U64_StructType.Initialization,
+			[typeof(AI_InitializationVariable)] = U64_StructType.InitVariable,
 			[typeof(AI_TypeVariable)] = U64_StructType.TypeVariable,
 
 			[typeof(AI_Node_Long)] = U64_StructType.Node_Long,
 			[typeof(AI_Node_Float)] = U64_StructType.Node_Float,
 			[typeof(AI_Node_Vector3D)] = U64_StructType.Node_Vector3D,
 			[typeof(AI_Node_String)] = U64_StructType.Node_String,
+			[typeof(AI_Declaration_Long)] = U64_StructType.Declaration_Long,
 			[typeof(AI_Declaration_UnsignedLong)] = U64_StructType.Declaration_UnsignedLong,
+			[typeof(AI_Declaration_Float)] = U64_StructType.Declaration_Float,
+			[typeof(AI_Declaration_Vector3D)] = U64_StructType.Declaration_Vector3D,
+			[typeof(AI_Declaration_ArrayEntry)] = U64_StructType.ArrayEntry,
 
 			[typeof(LST_ReferenceElement<AI_Comport>)] = U64_StructType.ListOfComport,
 			[typeof(LST_ReferenceElement<AI_Rule>)] = U64_StructType.ListOfRules,
 			[typeof(LST_ReferenceElement<AI_TypeVariable>)] = U64_StructType.TypeVariableIdList,
+			[typeof(LST_ReferenceElement<AI_InitializationVariable>)] = U64_StructType.InitVariableIdList,
 
 			// WAY
 			[typeof(WAY_Graph)] = U64_StructType.WayGraph,

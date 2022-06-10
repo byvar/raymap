@@ -157,7 +157,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		Declaration_UnsignedLong,
 		Declaration_Float,
 		Declaration_Vector3D,
-		DsgMem__Initialization,
+		Initialization,
 		InitVariable,
 		InitVariableIdList,
 		TypeVariable,

@@ -27,6 +27,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<GAM_ObjectsTable> ValueObjectTableRef { get; set; }
 		public U64_Reference<GMT_GameMaterial> ValueGameMaterialRef { get; set; }
 		public U64_Reference<GLI_Light> ValueLight { get; set; }
+		public U64_Index<U64_Placeholder> ValueTextRef { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			Type = s.Serialize<byte>(Type, name: nameof(Type));
@@ -95,6 +96,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 					break;
 				case AI_InterpretType.Light:
 					ValueLight = s.SerializeObject<U64_Reference<GLI_Light>>(ValueLight, name: nameof(ValueLight))?.Resolve(s);
+					break;
+				case AI_InterpretType.TextRef:
+					ValueTextRef = s.SerializeObject<U64_Index<U64_Placeholder>>(ValueTextRef, name: nameof(ValueTextRef));
 					break;
 				default:
 					IdOrValue = s.Serialize<ushort>(IdOrValue, name: nameof(IdOrValue));
