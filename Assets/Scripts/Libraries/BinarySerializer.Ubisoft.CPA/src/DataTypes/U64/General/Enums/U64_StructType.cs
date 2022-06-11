@@ -174,5 +174,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		NODFile,
 		VignetteCount,
 		CPakFont,
+
+		RRRDS_Unknown1,
+		RRRDS_Unknown2,
+		RRRDS_Unknown1List, // Referenced from GAM_Level, references all other Unknowns
+		RRRDS_Unknown3,
 	}
 }

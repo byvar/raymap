@@ -202,6 +202,8 @@ namespace Raymap {
 
 			loader.FixPreloadSection = new U64_Reference<GAM_FixPreloadSection>(context, 0);
 			loader.FixPreloadSection.Resolve(s);
+
+			loader.Level?.Resolve(s);
 		}
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {

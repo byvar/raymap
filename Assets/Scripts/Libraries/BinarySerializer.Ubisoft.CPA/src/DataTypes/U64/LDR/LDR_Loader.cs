@@ -23,6 +23,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		// TODO: Move to globals?
 		public U64_Reference<GAM_Fix> Fix { get; set; }
 		public U64_Reference<GAM_FixPreloadSection> FixPreloadSection { get; set; }
+		public U64_Reference<GAM_Level> Level => LevelIndex.HasValue ? Fix?.Value?.LevelsNameList?.Value[LevelIndex.Value]?.Level : null;
 
 
 		public LDR_Loader(Context c) {

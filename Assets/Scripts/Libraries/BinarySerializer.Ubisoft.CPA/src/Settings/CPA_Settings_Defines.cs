@@ -602,7 +602,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#endregion
 
 		#region Rayman Raving Rabbids DS
-		public static CPA_Settings RRRDS_20060525 => new CPA_Settings(EngineVersion.RaymanRavingRabbids, Platform.DS) {
+		public static CPA_Settings RRRDS_20060525 => new CPA_Settings(EngineVersion.Rayman4DS_20060525, Platform.DS) {
 			StaticListType = LST2_ListType.DoubleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,

@@ -28,7 +28,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			} else if (s.GetCPASettings().Platform == Platform.DS) {
 				GraphicsList = s.SerializeObject<U64_Reference<GEO_GraphicsList>>(GraphicsList, name: nameof(GraphicsList));
 				GraphicsListSize = s.Serialize<ushort>(GraphicsListSize, name: nameof(GraphicsListSize));
-				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.RaymanRavingRabbids)) {
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman4DS)) {
 					CompressedGraphicsList = s.SerializeObject<U64_Reference<GEO_CompressedGraphicsListDS>>(CompressedGraphicsList, name: nameof(CompressedGraphicsList));
 					CompressedGraphicsListSize = s.Serialize<ushort>(CompressedGraphicsListSize, name: nameof(CompressedGraphicsListSize));
 				}
@@ -41,7 +41,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				g.Pre_VerticesCount = VerticesCount;
 				g.Pre_FacesCount = FacesCount;
 			});
-			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.RaymanRavingRabbids))
+			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman4DS))
 				GraphicsList?.Resolve(s, onPreSerialize: (_, g) => g.Pre_Size = GraphicsListSize);
 			CompressedGraphicsList?.Resolve(s, onPreSerialize: (_, g) => g.Pre_CompressedSize = CompressedGraphicsListSize);
 		}

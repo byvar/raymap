@@ -36,7 +36,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			Types.Add(U64_StructType.U64VertexList);
 			if (s.Platform == Platform._3DS) {
 				Types.Add(U64_StructType.GraphicsList3DS);
-			} else if (s.EngineVersionTree.HasParent(EngineVersion.RaymanRavingRabbids)) {
+			} else if (s.EngineVersionTree.HasParent(EngineVersion.Rayman4DS)) {
 				Types.Add(U64_StructType.CompressedDSGraphicsList);
 			} else {
 				Types.Add(U64_StructType.U64GraphicsList);
@@ -177,14 +177,28 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.TextureList,
 				U64_StructType.StringChunk,
 				U64_StructType.ArrayEntry,
-				U64_StructType.BackgroundCI8,
-				U64_StructType.BackgroundPaletteList,
+			});
+			if (s.Platform != Platform._3DS)
+				Types.AddRange(new U64_StructType[] {
+					U64_StructType.BackgroundCI8,
+					U64_StructType.BackgroundPaletteList,
+				});
+			Types.AddRange(new U64_StructType[] {
 				U64_StructType.BackgroundInfo,
 				U64_StructType.NODFile,
 				U64_StructType.VignetteCount,
 				U64_StructType.CPakFont,
-				// TOOD: Add other entries? DontSaveStructStart starts here
 			});
+			if (s.EngineVersionTree.HasParent(EngineVersion.RaymanRavingRabbids)) {
+				Types.AddRange(new U64_StructType[] {
+					U64_StructType.RRRDS_Unknown1,
+					U64_StructType.RRRDS_Unknown2,
+					U64_StructType.RRRDS_Unknown1List,
+					U64_StructType.RRRDS_Unknown3,
+				});
+			}
+			// TOOD: Add other entries? DontSaveStructStart starts here
+
 			Dictionary<ushort, U64_StructType> dict = new Dictionary<ushort, U64_StructType>();
 			for(ushort i = 0; i < Types.Count; i++) {
 				dict[i] = Types[i];
@@ -202,6 +216,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			// GAM
 			[typeof(GAM_Fix)] = U64_StructType.FixData,
+			[typeof(GAM_Level)] = U64_StructType.Level,
+			[typeof(GAM_LevelDescription)] = U64_StructType.LevelDescription,
+			[typeof(GAM_LevelEntry)] = U64_StructType.LevelEntry,
+			[typeof(GAM_DscLevel)] = U64_StructType.DscLvl,
 			[typeof(GAM_GenericMemory)] = U64_StructType.Mem,
 			[typeof(GAM_FixMemory)] = U64_StructType.FixMem,
 			[typeof(GAM_LevelMemory)] = U64_StructType.LevelMem,
@@ -229,6 +247,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_ZoneSetArray)] = U64_StructType.ArrayOfZoneSet,
 			[typeof(GAM_ZoneSet)] = U64_StructType.LST_ZoneSet,
 			[typeof(GAM_ActivationZone)] = U64_StructType.ActivationZone,
+
+			[typeof(LST_ReferenceElement<GAM_LevelEntry>)] = U64_StructType.LevelEntryList,
 			[typeof(LST_ReferenceElement<GAM_State>)] = U64_StructType.StateRefList,
 			[typeof(LST_ReferenceElement<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
 
@@ -324,6 +344,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			[typeof(IPT_InputLinkElement)] = U64_StructType.InputLinkList,
 			[typeof(IPT_DscInputAction)] = U64_StructType.DscInputActionList,
+
+			// Unknown
+
 
 			// TODO
 		};

@@ -24,7 +24,7 @@
 			Dynamics = s.SerializeObject<U64_Reference<GAM_CharacterDynamics>>(Dynamics, name: nameof(Dynamics))?.Resolve(s);
 			Sound = s.SerializeObject<U64_Reference<GAM_CharacterSound>>(Sound, name: nameof(Sound))?.Resolve(s);
 			AllocWay = s.Serialize<byte>(AllocWay, name: nameof(AllocWay));
-			s.SerializePadding(1, logIfNotNull: true);
+			s.SerializePadding(1, logIfNotNull: false); // Can be 0xFF
 		}
 	}
 }

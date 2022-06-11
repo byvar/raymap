@@ -25,6 +25,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			Action<SerializerObject, T> onPreSerialize = null) {
 
 			if(IsNull) return this;
+			if (typeof(T) == typeof(U64_Placeholder)) {
+				s.LogWarning("Trying to resolve Placeholder - skipping");
+				return this;
+			}
 
 			var loader = s.GetLoader();
 			ushort index = Index;

@@ -11,6 +11,8 @@
         Rayman2,
         Rayman2Demo,
         Rayman2Revolution,
+		Rayman4DS,
+		Rayman4DS_20060525,
         RaymanRavingRabbids,
         Rayman2_3D,
         DonaldDuckQuackAttack,
