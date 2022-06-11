@@ -90,6 +90,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.GeometricElementSpheres => Serialize<GEO_ElementSpheres>(),
 				U64_StructType.IdCardBase => Serialize<MEC_IdCardBase>(),
 				U64_StructType.IdCardCamera => Serialize<MEC_IdCardCamera>(),
+				U64_StructType.LevelMem => Serialize<GAM_LevelMemory>(),
+				U64_StructType.FixMem => Serialize<GAM_FixMemory>(),
 				_ => throw new BinarySerializableException(this, $"Type {type} is not implemented in {GetType()}")
 			};
 		}

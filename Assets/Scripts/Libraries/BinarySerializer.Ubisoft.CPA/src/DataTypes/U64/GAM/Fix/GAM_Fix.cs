@@ -2,12 +2,12 @@
 	public class GAM_Fix : U64_Struct {
 		public U64_ArrayReference<GAM_LevelsNameList> LevelsNameList { get; set; }
 		public U64_Reference<IPT_DscInput> DscInput { get; set; }
-		public U64_Reference<U64_Placeholder> InputLink { get; set; }
+		public U64_Reference<IPT_InputLink> InputLink { get; set; } // = 3DOS_EntryActions
 		public U64_ArrayReference<MTH3D_Vector> Vector3D { get; set; }
 		public U64_ArrayReference<U64_TripledIndex> TripledIndex { get; set; }
-		public U64_Reference<U64_Placeholder> Memory { get; set; }
-		public U64_Reference<U64_Placeholder> ShadowTexture { get; set; }
-		public U64_Reference<U64_Placeholder> LightTexture { get; set; }
+		public U64_Reference<GAM_GenericMemory> Memory { get; set; }
+		public U64_Reference<GLI_Texture> ShadowTexture { get; set; }
+		public U64_Reference<GLI_Texture> LightTexture { get; set; }
 		public U64_Reference<GLI_VisualMaterial> VisualMaterialController { get; set; } // "No Controller" material
 		public U64_ArrayReference<LST_ReferenceElement<GLI_Texture>> NoCtrlList { get; set; } // "No Controller" textures
 
@@ -20,19 +20,19 @@
 		public ushort GlobalVector3DCount { get; set; }
 		public ushort GlobalTripledIndexCount { get; set; }
 
-		public U64_Reference<U64_Placeholder> PakFont { get; set; }
+		public U64_Reference<GLI_CPakFont> PakFont { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			// No resolving in this. Only load what's absolutely necessary, because this is loaded to find which levels are in the ROM.
+			// No resolving in this. Only load what's absolutely necessary, because this is loaded to create the level list.
 
 			LevelsNameList = s.SerializeObject<U64_ArrayReference<GAM_LevelsNameList>>(LevelsNameList, name: nameof(LevelsNameList));
 			DscInput = s.SerializeObject<U64_Reference<IPT_DscInput>>(DscInput, name: nameof(DscInput));
-			InputLink = s.SerializeObject<U64_Reference<U64_Placeholder>>(InputLink, name: nameof(InputLink));
+			InputLink = s.SerializeObject<U64_Reference<IPT_InputLink>>(InputLink, name: nameof(InputLink));
 			Vector3D = s.SerializeObject<U64_ArrayReference<MTH3D_Vector>>(Vector3D, name: nameof(Vector3D));
 			TripledIndex = s.SerializeObject<U64_ArrayReference<U64_TripledIndex>>(TripledIndex, name: nameof(TripledIndex));
-			Memory = s.SerializeObject<U64_Reference<U64_Placeholder>>(Memory, name: nameof(Memory));
-			ShadowTexture = s.SerializeObject<U64_Reference<U64_Placeholder>>(ShadowTexture, name: nameof(ShadowTexture));
-			LightTexture = s.SerializeObject<U64_Reference<U64_Placeholder>>(LightTexture, name: nameof(LightTexture));
+			Memory = s.SerializeObject<U64_Reference<GAM_GenericMemory>>(Memory, name: nameof(Memory));
+			ShadowTexture = s.SerializeObject<U64_Reference<GLI_Texture>>(ShadowTexture, name: nameof(ShadowTexture));
+			LightTexture = s.SerializeObject<U64_Reference<GLI_Texture>>(LightTexture, name: nameof(LightTexture));
 			VisualMaterialController = s.SerializeObject<U64_Reference<GLI_VisualMaterial>>(VisualMaterialController, name: nameof(VisualMaterialController));
 			NoCtrlList = s.SerializeObject<U64_ArrayReference<LST_ReferenceElement<GLI_Texture>>>(NoCtrlList, name: nameof(NoCtrlList));
 
@@ -45,7 +45,7 @@
 			GlobalVector3DCount = s.Serialize<ushort>(GlobalVector3DCount, name: nameof(GlobalVector3DCount));
 			GlobalTripledIndexCount = s.Serialize<ushort>(GlobalTripledIndexCount, name: nameof(GlobalTripledIndexCount));
 
-			PakFont = s.SerializeObject<U64_Reference<U64_Placeholder>>(PakFont, name: nameof(PakFont));
+			PakFont = s.SerializeObject<U64_Reference<GLI_CPakFont>>(PakFont, name: nameof(PakFont));
 
 			// Resolve level list
 			LevelsNameList.Resolve(s, LevelsCount, isInFixFixFat: true);
@@ -60,8 +60,13 @@
 			TripledIndex.Resolve(s, TripledIndexCount);
 			
 			DscInput?.Resolve(s);
+			InputLink?.Resolve(s);
+			Memory?.Resolve(s);
+			ShadowTexture?.Resolve(s);
+			LightTexture?.Resolve(s);
 			VisualMaterialController?.Resolve(s);
 			NoCtrlList?.Resolve(s, 5);
+			PakFont?.Resolve(s);
 
 			return this;
 		}

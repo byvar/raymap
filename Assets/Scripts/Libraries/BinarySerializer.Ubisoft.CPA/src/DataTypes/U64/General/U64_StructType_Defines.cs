@@ -202,6 +202,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			// GAM
 			[typeof(GAM_Fix)] = U64_StructType.FixData,
+			[typeof(GAM_GenericMemory)] = U64_StructType.Mem,
+			[typeof(GAM_FixMemory)] = U64_StructType.FixMem,
+			[typeof(GAM_LevelMemory)] = U64_StructType.LevelMem,
 			[typeof(GAM_LevelsNameList)] = U64_StructType.LevelsNameList,
 			[typeof(GAM_FixPreloadSection)] = U64_StructType.FixPreloadSection,
 			[typeof(GAM_Character)] = U64_StructType.Character,
@@ -258,6 +261,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_TextureListEntry)] = U64_StructType.TextureList,
 			[typeof(GLI_Texture)] = U64_StructType.Texture,
 			[typeof(GLI_BitmapInfo)] = U64_StructType.BitmapInfo,
+			[typeof(GLI_CPakFont)] = U64_StructType.CPakFont,
 
 			[typeof(GLI_BitmapCI4)] = U64_StructType.BitmapCI4,
 			[typeof(GLI_BitmapCI8)] = U64_StructType.BitmapCI8,
@@ -316,8 +320,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(IPT_DscInput)] = U64_StructType.DscInput,
 			[typeof(IPT_InputAction)] = U64_StructType.InputAction,
 			[typeof(IPT_InputElement)] = U64_StructType.InputList,
+			[typeof(IPT_InputLink)] = U64_StructType.InputLink,
 
-			[typeof(LST_ReferenceElement<IPT_InputAction>)] = U64_StructType.DscInputActionList,
+			[typeof(IPT_InputLinkElement)] = U64_StructType.InputLinkList,
+			[typeof(IPT_DscInputAction)] = U64_StructType.DscInputActionList,
 
 			// TODO
 		};
