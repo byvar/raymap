@@ -64,7 +64,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 				U64_StructType.LevelsNameList,
 				U64_StructType.Level,
 				U64_StructType.SubLevel,
-				U64_StructType.SubLevelList,
+				U64_StructType.SubLevelList_and_StartMatrixList,
 				U64_StructType.LevelEntry,
 				U64_StructType.LevelEntryList,
 				U64_StructType.SuperObjectChildList,
@@ -213,10 +213,12 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(U64_TripledIndex)] = U64_StructType.AllTripledIndex,
 			[typeof(U64_BoundingVolume)] = U64_StructType.BoundingVolume,
 			[typeof(U64_StringChunk)] = U64_StructType.StringChunk,
+			[typeof(POS_CompletePosition)] = U64_StructType.SubLevelList_and_StartMatrixList, // the devs decided they didn't need another type for this :(
 
 			// GAM
 			[typeof(GAM_Fix)] = U64_StructType.FixData,
 			[typeof(GAM_Level)] = U64_StructType.Level,
+			[typeof(GAM_SubLevel)] = U64_StructType.SubLevel,
 			[typeof(GAM_LevelDescription)] = U64_StructType.LevelDescription,
 			[typeof(GAM_LevelEntry)] = U64_StructType.LevelEntry,
 			[typeof(GAM_DscLevel)] = U64_StructType.DscLvl,
@@ -248,6 +250,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_ZoneSet)] = U64_StructType.LST_ZoneSet,
 			[typeof(GAM_ActivationZone)] = U64_StructType.ActivationZone,
 
+			[typeof(LST_ReferenceElement<GAM_SubLevel>)] = U64_StructType.SubLevelList_and_StartMatrixList,
 			[typeof(LST_ReferenceElement<GAM_LevelEntry>)] = U64_StructType.LevelEntryList,
 			[typeof(LST_ReferenceElement<GAM_State>)] = U64_StructType.StateRefList,
 			[typeof(LST_ReferenceElement<GAM_Character>)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
@@ -268,7 +271,9 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GEO_CollisionElementListEntry)] = U64_StructType.GeometricElementCollideList,
 			[typeof(GEO_ElementCollisionIndexedTriangles)] = U64_StructType.GeometricElementCollideIndexedTriangles,
 			[typeof(GEO_ElementSpheres)] = U64_StructType.GeometricElementSpheres,
+			[typeof(GEO_ElementAlignedBoxes)] = U64_StructType.GeometricElementAlignedBoxes,
 			[typeof(GEO_Sphere)] = U64_StructType.LST_GeometricElementSpheres,
+			[typeof(GEO_AlignedBox)] = U64_StructType.LST_GeometricElementAlignedBoxes,
 			[typeof(GEO_TripledIndex)] = U64_StructType.GeometricElementCollideTrianglesData__ColFacesPnt,
 			[typeof(GEO_VerticesList)] = U64_StructType.U64VertexList,
 			[typeof(GEO_GraphicsList3DS)] = U64_StructType.GraphicsList3DS,
@@ -277,6 +282,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(LST_ReferenceElement<GEO_GeometricObject>)] = U64_StructType.LST_GeometricObject,
 
 			// GLI
+			[typeof(GLI_Light)] = U64_StructType.Light,
 			[typeof(GLI_VisualMaterial)] = U64_StructType.VisualMaterial,
 			[typeof(GLI_TextureListEntry)] = U64_StructType.TextureList,
 			[typeof(GLI_Texture)] = U64_StructType.Texture,
@@ -289,6 +295,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_PaletteRGBA16)] = U64_StructType.PaletteRGBA16,
 
 			[typeof(LST_ReferenceElement<GLI_Texture>)] = U64_StructType.LST_NodeIndex_and_NoCtrlTextureList,
+			[typeof(LST_ReferenceElement<GLI_Light>)] = U64_StructType.LST_SectorStaticLights,
 
 			// GMT
 			[typeof(GMT_GameMaterial)] = U64_StructType.GameMaterial,
@@ -296,6 +303,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 
 			// MEC
+			[typeof(MEC_MechanicalMaterial)] = U64_StructType.MechanicalMaterial,
 			[typeof(MEC_IdCardBase)] = U64_StructType.IdCardBase,
 			[typeof(MEC_IdCardCamera)] = U64_StructType.IdCardCamera,
 
@@ -344,6 +352,19 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			[typeof(IPT_InputLinkElement)] = U64_StructType.InputLinkList,
 			[typeof(IPT_DscInputAction)] = U64_StructType.DscInputActionList,
+
+			// SCT
+			[typeof(SCT_Sector)] = U64_StructType.Sector,
+
+			[typeof(SCT_SectorGraphic)] = U64_StructType.LST_SectorGraphic_and_LST_Character,
+			[typeof(SCT_SectorActivity)] = U64_StructType.LST_SectorActivity,
+			[typeof(SCT_SectorCollision)] = U64_StructType.LST_SectorCollision,
+			[typeof(SCT_SectorSound)] = U64_StructType.LST_SectorSound,
+			[typeof(SCT_SectorSoundEvent)] = U64_StructType.LST_SectorSoundEvent,
+
+			[typeof(SCT_SectorGraphicParam)] = U64_StructType.LST_SectorGraphicParam,
+			[typeof(SCT_SectorSoundParam)] = U64_StructType.LST_SectorSoundParam,
+			[typeof(SCT_SectorSoundEventParam)] = U64_StructType.LST_SectorSoundEventParam,
 
 			// Unknown
 

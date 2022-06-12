@@ -2,8 +2,8 @@
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GAM_Level : U64_Struct {
-		public U64_Reference<U64_Placeholder> EntireLevel { get; set; }
-		public U64_ArrayReference<U64_Placeholder> SubLevelList { get; set; }
+		public U64_Reference<GAM_SubLevel> EntireLevel { get; set; }
+		public U64_ArrayReference<LST_ReferenceElement<GAM_SubLevel>> SubLevelList { get; set; }
 		public U64_ArrayReference<LST_ReferenceElement<GAM_LevelEntry>> AlwaysEntryList { get; set; }
 		public U64_Reference<GAM_LevelDescription> LevelDescription { get; set; }
 		public U64_Reference<GAM_GenericMemory> MemoryDescription { get; set; }
@@ -43,8 +43,8 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<GLI_VisualMaterial> Background_BottomRight { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			EntireLevel = s.SerializeObject<U64_Reference<U64_Placeholder>>(EntireLevel, name: nameof(EntireLevel))?.Resolve(s);
-			SubLevelList = s.SerializeObject<U64_ArrayReference<U64_Placeholder>>(SubLevelList, name: nameof(SubLevelList));
+			EntireLevel = s.SerializeObject<U64_Reference<GAM_SubLevel>>(EntireLevel, name: nameof(EntireLevel))?.Resolve(s);
+			SubLevelList = s.SerializeObject<U64_ArrayReference<LST_ReferenceElement<GAM_SubLevel>>>(SubLevelList, name: nameof(SubLevelList));
 			AlwaysEntryList = s.SerializeObject<U64_ArrayReference<LST_ReferenceElement<GAM_LevelEntry>>>(AlwaysEntryList, name: nameof(AlwaysEntryList));
 			LevelDescription = s.SerializeObject<U64_Reference<GAM_LevelDescription>>(LevelDescription, name: nameof(LevelDescription))?.Resolve(s);
 			MemoryDescription = s.SerializeObject<U64_Reference<GAM_GenericMemory>>(MemoryDescription, name: nameof(MemoryDescription))?.Resolve(s);

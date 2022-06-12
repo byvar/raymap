@@ -84,10 +84,13 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			U64_Struct Serialize<T>() where T : U64_Struct, new() => s.SerializeObject<T>((T)Value, onPreSerialize: onPreSerialize, name: name);
 			Value = type switch {
 				U64_StructType.PhysicalObject => Serialize<PO_PhysicalObject>(),
+				U64_StructType.Sector => Serialize<SCT_Sector>(),
 				U64_StructType.GeometricElementU64IndexedTriangles => Serialize<GEO_ElementVisualIndexedTriangles>(),
 				U64_StructType.GeometricElementSprites => Serialize<GEO_ElementSprites>(),
 				U64_StructType.GeometricElementCollideIndexedTriangles => Serialize<GEO_ElementCollisionIndexedTriangles>(),
 				U64_StructType.GeometricElementSpheres => Serialize<GEO_ElementSpheres>(),
+				U64_StructType.GeometricElementAlignedBoxes => Serialize<GEO_ElementAlignedBoxes>(),
+				U64_StructType.GameMaterial => Serialize<GMT_GameMaterial>(),
 				U64_StructType.IdCardBase => Serialize<MEC_IdCardBase>(),
 				U64_StructType.IdCardCamera => Serialize<MEC_IdCardCamera>(),
 				U64_StructType.LevelMem => Serialize<GAM_LevelMemory>(),

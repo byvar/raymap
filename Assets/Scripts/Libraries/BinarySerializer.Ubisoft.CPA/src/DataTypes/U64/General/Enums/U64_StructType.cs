@@ -83,7 +83,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		Sector,
 		SuperObjectChildList,
 		SubLevel,
-		SubLevelList,
+		SubLevelList_and_StartMatrixList,
 		LevelEntry,
 		LevelEntryList,
 		Character,

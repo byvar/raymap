@@ -37,6 +37,11 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			var type = U64_StructType_Defines.GetType(typeof(T));
 			var name = $"{type.Value}_{index:X4}";
 
+			if (count == 0) {
+				Value = s.SerializeObjectArray<T>(Value, 0, name: name);
+				return this;
+			}
+
 			loader.RequestFile(s, type.Value, index, null, (ser, configureAction) => {
 				Value = ser.SerializeObjectArray<T>(Value, count, onPreSerialize: (t, ind_in_array) => {
 					configureAction(t, ind_in_array); onPreSerialize?.Invoke(ser, t);
