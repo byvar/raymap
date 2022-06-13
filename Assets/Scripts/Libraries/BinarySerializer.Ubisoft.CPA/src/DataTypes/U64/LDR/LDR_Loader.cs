@@ -188,7 +188,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 				for (int i = 0; i < Fat.Levels.Length; i++) {
 					if (LevelIndex.HasValue && i == LevelIndex.Value) continue;
-					var entry = Fat.Levels[i].Fat.Value.GetEntry(type, ind);
+					var entry = Fat.Levels[i].Fat?.Value?.GetEntry(type, ind);
 					if (entry != null) return entry;
 				}
 			}

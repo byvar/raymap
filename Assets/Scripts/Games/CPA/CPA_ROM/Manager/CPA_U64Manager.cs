@@ -117,24 +117,31 @@ namespace Raymap {
 				loader.DscMiscInfo.Resolve(s);
 				await LoadLevel(context, loader.DscMiscInfo.Value.FirstLevelName);*/
 
-				var lookup = loader.Fat.FixFix.Fat?.Value?.EntriesLookup;
-				if (lookup?.ContainsKey(U64_StructType.BackgroundInfo) ?? false) {
-					foreach (var bkgInfoId in lookup[U64_StructType.BackgroundInfo].Keys) {
-						U64_Reference<GLI_BackgroundInfo> bkgInfo = 
-							new U64_Reference<GLI_BackgroundInfo>(context, bkgInfoId)
-							?.Resolve(s, isInFixFixFat: true);
+				ExportForLookup(loader.Fat.FixFix.Fat?.Value?.EntriesLookup);
+				ExportForLookup(loader.Fat.Levels[loader.LevelIndex.Value]?.Fat?.Value?.EntriesLookup);
+				void ExportForLookup(Dictionary<U64_StructType, Dictionary<ushort, LDR_EntryRef>> lookup) {
+					if (lookup?.ContainsKey(U64_StructType.BackgroundInfo) ?? false) {
+						foreach (var bkgInfoId in lookup[U64_StructType.BackgroundInfo].Keys) {
+							try {
+								U64_Reference<GLI_BackgroundInfo> bkgInfo =
+									new U64_Reference<GLI_BackgroundInfo>(context, bkgInfoId)
+									?.Resolve(s, isInFixFixFat: true);
 
-						for (int i = 0; i < bkgInfo.Value.PalettesCount; i++) {
-							var bkg = bkgInfo?.Value?.Background?.Value;
-							var pal = bkgInfo?.Value?.Palettes?.Value?[i].Entry?.Value?.Palette;
+								for (int i = 0; i < bkgInfo.Value.PalettesCount; i++) {
+									var bkg = bkgInfo?.Value?.Background?.Value;
+									var pal = bkgInfo?.Value?.Palettes?.Value?[i].Entry?.Value?.Palette;
 
-							var tex = TextureHelpers.CreateTexture2D((int)bkg.ScreenWidth, (int)bkg.ScreenHeight);
-							tex.FillRegion(bkg.Bitmap, 0, pal.Select(p => p.GetColor()).ToArray(),
-								BinarySerializer.Unity.Util.TileEncoding.Linear_8bpp,
-								0, 0, tex.width, tex.height, flipRegionY: true);
-							tex.Apply();
+									var tex = TextureHelpers.CreateTexture2D((int)bkg.ScreenWidth, (int)bkg.ScreenHeight);
+									tex.FillRegion(bkg.Bitmap, 0, pal.Select(p => p.GetColor()).ToArray(),
+										BinarySerializer.Unity.Util.TileEncoding.Linear_8bpp,
+										0, 0, tex.width, tex.height, flipRegionY: true);
+									tex.Apply();
 
-							tex.Export(Path.Combine(outputDir, $"{bkgInfo?.Index:X4}_{i}"));
+									tex.Export(Path.Combine(outputDir, $"{bkgInfo?.Index:X4}_{i}"));
+								}
+							} catch (Exception ex) {
+								s.LogWarning(ex.ToString());
+							}
 						}
 					}
 				}
