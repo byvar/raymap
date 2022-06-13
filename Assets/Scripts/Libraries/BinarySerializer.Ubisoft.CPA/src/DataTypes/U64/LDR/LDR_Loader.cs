@@ -24,7 +24,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<GAM_Fix> Fix { get; set; }
 		public U64_Reference<GAM_FixPreloadSection> FixPreloadSection { get; set; }
 		public U64_Reference<GAM_Level> Level => LevelIndex.HasValue ? Fix?.Value?.LevelsNameList?.Value[LevelIndex.Value]?.Level : null;
-
+		public U64_Reference<GAM_DscMiscInfo> DscMiscInfo { get; set; }
 
 		public LDR_Loader(Context c) {
 			Context = c;
@@ -41,8 +41,16 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 				var off_struct = GetStructPointer(currentRef.Type, currentRef.Index, global: currentRef.IsGlobal);
 				if (off_struct == null) {
-					s.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name}");
-					continue;
+					if (!currentRef.IsGlobal) {
+						off_struct = GetStructPointer(currentRef.Type, currentRef.Index, global: true);
+						if (off_struct != null) {
+							s.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name} normally, successfully resolved globally");
+						}
+					}
+					if (off_struct == null) {
+						s.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name}");
+						continue;
+					}
 				}
 				Pointer off_current = s.CurrentPointer;
 				s.Goto(off_struct);

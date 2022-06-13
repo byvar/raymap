@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BinarySerializer.Ubisoft.CPA.U64 {
+﻿namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GAM_LevelsNameList : U64_Struct {
 		public U64_Reference<GAM_Level> Level { get; set; }
 		public string Name { get; set; }

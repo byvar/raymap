@@ -222,6 +222,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GAM_LevelDescription)] = U64_StructType.LevelDescription,
 			[typeof(GAM_LevelEntry)] = U64_StructType.LevelEntry,
 			[typeof(GAM_DscLevel)] = U64_StructType.DscLvl,
+			[typeof(GAM_DscMiscInfo)] = U64_StructType.DscMiscInfo,
 			[typeof(GAM_GenericMemory)] = U64_StructType.Mem,
 			[typeof(GAM_FixMemory)] = U64_StructType.FixMem,
 			[typeof(GAM_LevelMemory)] = U64_StructType.LevelMem,
@@ -288,14 +289,17 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_Texture)] = U64_StructType.Texture,
 			[typeof(GLI_BitmapInfo)] = U64_StructType.BitmapInfo,
 			[typeof(GLI_CPakFont)] = U64_StructType.CPakFont,
+			[typeof(GLI_BackgroundInfo)] = U64_StructType.BackgroundInfo,
 
 			[typeof(GLI_BitmapCI4)] = U64_StructType.BitmapCI4,
 			[typeof(GLI_BitmapCI8)] = U64_StructType.BitmapCI8,
+			[typeof(GLI_BackgroundCI8)] = U64_StructType.BackgroundCI8,
 			[typeof(GLI_BitmapRGBA16)] = U64_StructType.BitmapRGBA16,
 			[typeof(GLI_PaletteRGBA16)] = U64_StructType.PaletteRGBA16,
 
 			[typeof(LST_ReferenceElement<GLI_Texture>)] = U64_StructType.LST_NodeIndex_and_NoCtrlTextureList,
 			[typeof(LST_ReferenceElement<GLI_Light>)] = U64_StructType.LST_SectorStaticLights,
+			[typeof(LST_ReferenceElement<GLI_PaletteRGBA16>)] = U64_StructType.BackgroundPaletteList,
 
 			// GMT
 			[typeof(GMT_GameMaterial)] = U64_StructType.GameMaterial,

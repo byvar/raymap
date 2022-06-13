@@ -23,6 +23,7 @@ namespace Raymap {
 		#region Game actions
 		public override GameAction[] GetGameActions(MapViewerSettings settings) => new GameAction[] {
 			new GameAction("Export Blocks", false, true, (input, output) => ExportBlocksAsync(settings, output)),
+			new GameAction("Export Backgrounds", false, true, (input, output) => ExportBackgroundsAsync(settings, output)),
 
 		};
 		public async UniTask ExportBlocksAsync(MapViewerSettings settings, string outputDir) {
@@ -94,6 +95,52 @@ namespace Raymap {
 			}
 
 			UnityEngine.Debug.Log("Finished exporting structs");
+		}
+
+		public async UniTask ExportBackgroundsAsync(MapViewerSettings settings, string outputDir) {
+			using (var context = new MapViewerContext(settings)) {
+				// Get the deserializer
+				var s = context.Deserializer;
+
+				// Load the ROM
+				await LoadFilesAsync(context);
+
+				await LoadFix(context);
+
+				// Load menu (level index 0)
+				var loader = s.GetLoader();
+				var levels = loader.Fix.Value.LevelsNameList.Value;
+				GAM_LevelsNameList ChosenLevel = levels[0];
+				await LoadLevel(context, ChosenLevel.Name);
+
+				/*loader.DscMiscInfo = new U64_Reference<GAM_DscMiscInfo>(context, 0);
+				loader.DscMiscInfo.Resolve(s);
+				await LoadLevel(context, loader.DscMiscInfo.Value.FirstLevelName);*/
+
+				var lookup = loader.Fat.FixFix.Fat?.Value?.EntriesLookup;
+				if (lookup?.ContainsKey(U64_StructType.BackgroundInfo) ?? false) {
+					foreach (var bkgInfoId in lookup[U64_StructType.BackgroundInfo].Keys) {
+						U64_Reference<GLI_BackgroundInfo> bkgInfo = 
+							new U64_Reference<GLI_BackgroundInfo>(context, bkgInfoId)
+							?.Resolve(s, isInFixFixFat: true);
+
+						for (int i = 0; i < bkgInfo.Value.PalettesCount; i++) {
+							var bkg = bkgInfo?.Value?.Background?.Value;
+							var pal = bkgInfo?.Value?.Palettes?.Value?[i].Entry?.Value?.Palette;
+
+							var tex = TextureHelpers.CreateTexture2D((int)bkg.ScreenWidth, (int)bkg.ScreenHeight);
+							tex.FillRegion(bkg.Bitmap, 0, pal.Select(p => p.GetColor()).ToArray(),
+								BinarySerializer.Unity.Util.TileEncoding.Linear_8bpp,
+								0, 0, tex.width, tex.height, flipRegionY: true);
+							tex.Apply();
+
+							tex.Export(Path.Combine(outputDir, $"{bkgInfo?.Index:X4}_{i}"));
+						}
+					}
+				}
+			}
+
+			UnityEngine.Debug.Log("Finished exporting backgrounds");
 		}
 		#endregion
 
@@ -172,7 +219,7 @@ namespace Raymap {
 			await UniTask.CompletedTask;
 		}
 
-		public async UniTask LoadLevel(Context context) {
+		public async UniTask LoadLevel(Context context, string levelName) {
 			GlobalLoadState.DetailedState = "Loading level";
 			await TimeController.WaitIfNecessary();
 
@@ -181,7 +228,6 @@ namespace Raymap {
 
 			// Determine level index
 			var levels = loader.Fix.Value.LevelsNameList.Value;
-			var levelName = context.GetMapViewerSettings().Map;
 			GAM_LevelsNameList ChosenLevel = null;
 			foreach (var level in levels) {
 				if (level.Name.ToLower() == levelName.ToLower()) {
@@ -204,6 +250,12 @@ namespace Raymap {
 			loader.FixPreloadSection.Resolve(s);
 
 			loader.Level?.Resolve(s);
+
+			// TODO: FON
+
+			// DscMiscInfo
+			loader.DscMiscInfo = new U64_Reference<GAM_DscMiscInfo>(context, 0);
+			loader.DscMiscInfo.Resolve(s);
 		}
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {
@@ -211,7 +263,7 @@ namespace Raymap {
 			await LoadFix(context);
 
 			// Load level
-			await LoadLevel(context);
+			await LoadLevel(context, context.GetMapViewerSettings().Map);
 
 			// Load animations
 			//await LoadAnimations(context);
