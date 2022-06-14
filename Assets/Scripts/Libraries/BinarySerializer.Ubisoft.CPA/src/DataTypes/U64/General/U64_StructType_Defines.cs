@@ -370,6 +370,15 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(SCT_SectorSoundParam)] = U64_StructType.LST_SectorSoundParam,
 			[typeof(SCT_SectorSoundEventParam)] = U64_StructType.LST_SectorSoundEventParam,
 
+			// FON
+			[typeof(FON_LanguagesCount)] = U64_StructType.NbOfLanguages,
+			[typeof(FON_LanguageString)] = U64_StructType.LanguageString,
+			[typeof(FON_TextString)] = U64_StructType.TextString,
+			[typeof(FON_StringLength)] = U64_StructType.StringLength,
+
+			[typeof(LST_ReferenceElement<FON_TextString>)] = U64_StructType.TextStringList,
+			[typeof(LST_ReferenceElement<FON_StringLength>)] = U64_StructType.StringLengthList,
+
 			// Unknown
 
 

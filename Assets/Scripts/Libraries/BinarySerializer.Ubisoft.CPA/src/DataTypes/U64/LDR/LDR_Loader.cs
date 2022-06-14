@@ -26,6 +26,10 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public U64_Reference<GAM_Level> Level => LevelIndex.HasValue ? Fix?.Value?.LevelsNameList?.Value[LevelIndex.Value]?.Level : null;
 		public U64_Reference<GAM_DscMiscInfo> DscMiscInfo { get; set; }
 
+		// FON
+		public U64_Reference<FON_LanguagesCount> LanguagesCount { get; set; }
+		public U64_Reference<FON_LanguageString>[] Languages { get; set; }
+
 		public LDR_Loader(Context c) {
 			Context = c;
 			c.StoreObject<LDR_Loader>(ContextKey, this);

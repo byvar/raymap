@@ -258,7 +258,18 @@ namespace Raymap {
 
 			loader.Level?.Resolve(s);
 
-			// TODO: FON
+			// FON: Localization table
+			loader.LanguagesCount = new U64_Reference<FON_LanguagesCount>(context, 0);
+			loader.LanguagesCount.Resolve(s);
+			loader.Languages = new U64_Reference<FON_LanguageString>[loader.LanguagesCount?.Value?.LanguagesCount ?? 0];
+			for (ushort i = 0; i < loader.Languages.Length; i++) {
+				GlobalLoadState.DetailedState = $"Loading language table {i+1}/{loader.Languages.Length}";
+				await TimeController.WaitIfNecessary();
+				loader.Languages[i] = new U64_Reference<FON_LanguageString>(context, i)?.Resolve(s);
+				if (loader.Languages[i]?.Value != null) {
+					context.Logger?.Log(loader.Languages[i]?.Value.LanguageName);
+				}
+			}
 
 			// DscMiscInfo
 			loader.DscMiscInfo = new U64_Reference<GAM_DscMiscInfo>(context, 0);
