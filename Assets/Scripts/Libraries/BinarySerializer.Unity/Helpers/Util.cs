@@ -142,6 +142,8 @@ namespace BinarySerializer.Unity {
                 case TileEncoding.Linear_4bpp_ReverseOrder:
                     bpp = 4; break;
                 case TileEncoding.Linear_8bpp:
+				case TileEncoding.Linear_8bpp_A3i5:
+				case TileEncoding.Linear_8bpp_A5i3:
                     bpp = 8; break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(encoding), encoding, null);
@@ -213,13 +215,34 @@ namespace BinarySerializer.Unity {
                     if (xx < 0 || xx >= tex.width) continue;
                     Color? c = null;
 
-                    if (encoding == TileEncoding.Linear_8bpp) {
-                        int index = imgDataOffset + (((flipRegionY ? (regionHeight - y - 1) : y) * regionWidth + (flipRegionX ? (regionWidth - x - 1) : x)));
+					if (encoding == TileEncoding.Linear_8bpp) {
+						int index = imgDataOffset + (((flipRegionY ? (regionHeight - y - 1) : y) * regionWidth + (flipRegionX ? (regionWidth - x - 1) : x)));
 
-                        var b = imgData[index];
+						var b = imgData[index];
 
-                        c = paletteFunction != null ? paletteFunction.Invoke(b, xx, yy) : pal[b];
-                    } else if (encoding == TileEncoding.Linear_4bpp || encoding == TileEncoding.Linear_4bpp_ReverseOrder) {
+						c = paletteFunction != null ? paletteFunction.Invoke(b, xx, yy) : pal[b];
+					} else if(encoding == TileEncoding.Linear_8bpp_A3i5 || encoding == TileEncoding.Linear_8bpp_A5i3) {
+						int index = imgDataOffset + (((flipRegionY ? (regionHeight - y - 1) : y) * regionWidth + (flipRegionX ? (regionWidth - x - 1) : x)));
+						var b = imgData[index];
+						int al, ci, alMax;
+
+						switch (encoding) {
+							case TileEncoding.Linear_8bpp_A3i5:
+								ci = BitHelpers.ExtractBits(b, 5, 0);
+								al = BitHelpers.ExtractBits(b, 3, 5);
+								alMax = 8;
+								break;
+							case TileEncoding.Linear_8bpp_A5i3:
+								ci = BitHelpers.ExtractBits(b, 3, 0);
+								al = BitHelpers.ExtractBits(b, 5, 3);
+								alMax = 32;
+								break;
+							default:
+								throw new NotImplementedException("Invalid tile encoding");
+						}
+						c = paletteFunction != null ? paletteFunction.Invoke(ci, xx, yy) : pal[ci];
+						c = new Color(c.Value.r, c.Value.g, c.Value.b, (float)al / (alMax - 1));
+					} else if (encoding == TileEncoding.Linear_4bpp || encoding == TileEncoding.Linear_4bpp_ReverseOrder) {
                         int index = imgDataOffset + (((flipRegionY ? (regionHeight - y - 1) : y) * regionWidth + (flipRegionX ? (regionWidth - x - 1) : x)) / 2);
 
                         var b = imgData[index];
@@ -395,6 +418,8 @@ namespace BinarySerializer.Unity {
             Linear_4bpp,
             Linear_4bpp_ReverseOrder,
             Linear_8bpp,
+			Linear_8bpp_A3i5,
+			Linear_8bpp_A5i3,
             Linear_32bpp_RGBA,
             Linear_32bpp_BGRA,
             Linear_16bpp_4444_ABGR,

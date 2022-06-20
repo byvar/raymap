@@ -14,8 +14,8 @@
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1) Demo (SLUS_90095)")] Rayman2PS1Demo_SLUS_90095,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (PS2)")] Rayman2PS2,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_U64Manager), "Rayman 2 (N64)")] Rayman2N64,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_U64Manager), "Rayman 2 (DS)")] Rayman2DS,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_U64Manager), "Rayman 2 (3DS)")] Rayman23DS,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_R2DS_Manager), "Rayman 2 (DS)")] Rayman2DS,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_R23DS_Manager), "Rayman 2 (3DS)")] Rayman23DS,
 
         [GameMode(EngineCategory.CPA_RaymanM, typeof(LegacyGameManager), "Rayman M (PC)")] RaymanMPC,
         [GameMode(EngineCategory.CPA_RaymanM, typeof(LegacyGameManager), "Rayman M (PS2)")] RaymanMPS2,
@@ -44,7 +44,7 @@
         [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "Rayman 3 (Xbox 360)")] Rayman3Xbox360,
         [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "Rayman 3 (PS3)")] Rayman3PS3,
 
-        [GameMode(EngineCategory.CPA_RaymanRavingRabbids, typeof(CPA_U64Manager), "Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
+        [GameMode(EngineCategory.CPA_RaymanRavingRabbids, typeof(CPA_RRRDS_Manager), "Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
         [GameMode(EngineCategory.CPA_RaymanRavingRabbids, typeof(CPA_U64Manager), "Rayman Raving Rabbids (DS) Dev Build (2006/05/25)")] RaymanRavingRabbidsDSDevBuild_2006_05_25,
         
         [GameMode(EngineCategory.CPA_TonicTrouble, typeof(LegacyGameManager), "Tonic Trouble (PC)")] TonicTroublePC,

@@ -290,6 +290,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			[typeof(GLI_BitmapInfo)] = U64_StructType.BitmapInfo,
 			[typeof(GLI_CPakFont)] = U64_StructType.CPakFont,
 			[typeof(GLI_BackgroundInfo)] = U64_StructType.BackgroundInfo,
+			[typeof(GLI_VignettesCount)] = U64_StructType.VignetteCount,
 
 			[typeof(GLI_BitmapCI4)] = U64_StructType.BitmapCI4,
 			[typeof(GLI_BitmapCI8)] = U64_StructType.BitmapCI8,

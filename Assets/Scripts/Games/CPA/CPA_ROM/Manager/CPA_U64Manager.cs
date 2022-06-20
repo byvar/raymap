@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Raymap {
 	public class CPA_U64Manager : LegacyGameManager {
@@ -24,6 +25,7 @@ namespace Raymap {
 		public override GameAction[] GetGameActions(MapViewerSettings settings) => new GameAction[] {
 			new GameAction("Export Blocks", false, true, (input, output) => ExportBlocksAsync(settings, output)),
 			new GameAction("Export Backgrounds", false, true, (input, output) => ExportBackgroundsAsync(settings, output)),
+			new GameAction("Export Textures", false, true, (input, output) => ExportTexturesAsync(settings, output)),
 
 		};
 		public async UniTask ExportBlocksAsync(MapViewerSettings settings, string outputDir) {
@@ -132,7 +134,7 @@ namespace Raymap {
 									var pal = bkgInfo?.Value?.Palettes?.Value?[i].Entry?.Value?.Palette;
 
 									var tex = TextureHelpers.CreateTexture2D((int)bkg.ScreenWidth, (int)bkg.ScreenHeight);
-									tex.FillRegion(bkg.Bitmap, 0, pal.Select(p => p.GetColor()).ToArray(),
+									tex.FillRegion(bkg.Bitmap, 0, pal.GetColors().ToArray(),
 										BinarySerializer.Unity.Util.TileEncoding.Linear_8bpp,
 										0, 0, tex.width, tex.height, flipRegionY: true);
 									tex.Apply();
@@ -148,6 +150,113 @@ namespace Raymap {
 			}
 
 			UnityEngine.Debug.Log("Finished exporting backgrounds");
+		}
+
+		public virtual async UniTask ExportTexturesAsync(MapViewerSettings settings, string outputDir) {
+
+			using (var context = new MapViewerContext(settings)) {
+				// Get the deserializer
+				var s = context.Deserializer;
+
+				// Load the ROM
+				await LoadFilesAsync(context);
+
+				await LoadFix(context);
+
+				var loader = s.GetLoader();
+				var levels = loader.Fix.Value.LevelsNameList.Value;
+
+				HashSet<Pointer> texturesExported = new HashSet<Pointer>();
+
+				async UniTask ExportForFat(LDR_Fat fat, bool isFixFix = false) {
+					var lookup = fat?.Fat?.Value?.EntriesLookup.TryGetItem(U64_StructType.BitmapInfo);
+					if(lookup == null) return;
+
+					foreach (var bitmapInfoRef in lookup) {
+						var ptr = loader.GetStructPointer(bitmapInfoRef.Value);
+						if(texturesExported.Contains(ptr)) continue;
+						texturesExported.Add(ptr);
+						U64_Reference<GLI_BitmapInfo> bitmapInfo = new U64_Reference<GLI_BitmapInfo>(context, bitmapInfoRef.Key);
+						bitmapInfo?.Resolve(s, isInFixFixFat: isFixFix);
+						Texture2D tex = bitmapInfo?.Value?.GetTexture(flip: context?.GetCPASettings().Platform != Platform.N64);
+						tex.Export(Path.Combine(outputDir, $"{ptr.AbsoluteOffset:X8}"));
+					}
+					await TimeController.WaitIfNecessary();
+				}
+
+				// Export for fix fats
+				// Set level index
+				loader.LevelIndex = BitHelpers.ExtractBits(levels[0].Level.Index, 15, 0);
+				// Load Level FAT
+				loader.Fat.Levels[loader.LevelIndex.Value].SerializeFat(s);
+
+				await ExportForFat(loader.Fat.FixFix, isFixFix: true);
+				await ExportForFat(loader.Fat.FixLevels, isFixFix: false);
+
+				// Export for level fats
+				for (int i = 0; i < levels.Length; i++) {
+					if (i > 0) {
+						// Set level index
+						loader.LevelIndex = BitHelpers.ExtractBits(levels[i].Level.Index, 15, 0);
+						// Load Level FAT
+						loader.Fat.Levels[loader.LevelIndex.Value].SerializeFat(s);
+					}
+
+					await ExportForFat(loader.Fat.Levels[loader.LevelIndex.Value]);
+				}
+				//
+				//loader.Data.MainTablesDictionary[U64_StructType.BitmapCI4];
+			}
+			// Textures in data.bin
+			/*texturesTableSeen = new bool[texturesTable.Length];
+			for (int i = 0; i < fatTables.Length; i++) {
+				for (int j = 0; j < fatTables[i].entries.Length; j++) {
+					if (fatTables[i].entries[j].EntryType != FATEntry.Type.TextureInfo) continue;
+					LegacyPointer ptr = new LegacyPointer(fatTables[i].entries[j].off_data, files_array[SMem.Data]);
+					TextureInfo texInfo = new TextureInfo();
+					texInfo.Init(ptr, fatTables[i].entries[j].index);
+					texInfo.Read(reader);
+				}
+			}
+			for (int i = 0; i < texturesTable.Length; i++) {
+				if (!texturesTableSeen[i]) {
+					print("Unused Texture: " + i + " - " + texturesTable[i] + ". Est. length: " + (texturesTable[i + 1].offset - texturesTable[i].offset));
+					uint size = (texturesTable[i + 1].offset - texturesTable[i].offset);
+					float logSize = Mathf.Log(size, 2);
+					if (i < ind_textureTable_i8) {
+						// I4
+						for (int w = 3; w < 15; w++) {
+							for (int h = 3; h < 15; h++) {
+								if (w + h == (int)logSize + 1) {
+									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I4, null, 16);
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + GF64.Format.I4 + "_T" + (i - ind_textureTable_i4) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+								}
+							}
+						}
+					} else if (i < ind_textureTable_rgba) {
+						// I8
+						for (int w = 3; w < 15; w++) {
+							for (int h = 3; h < 15; h++) {
+								if (w + h == (int)logSize) {
+									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.I8, null, 32);
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + GF64.Format.I8 + "_T" + (i - ind_textureTable_i8) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+								}
+							}
+						}
+					} else {
+						// RGBA16
+						for (int w = 3; w < 15; w++) {
+							for (int h = 3; h < 15; h++) {
+								if (w + h == (int)logSize - 1) {
+									GF64 gf = new GF64(reader, texturesTable[i], 1 << w, 1 << h, GF64.Format.RGBA, null, 32);
+									Util.ByteArrayToFile(gameDataBinFolder + "/textures/unused/" + GF64.Format.RGBA + "_T" + (i - ind_textureTable_rgba) + "_" + gf.texture.width + "x" + gf.texture.height + ".png", gf.texture.EncodeToPNG());
+								}
+							}
+						}
+					}
+				}
+			}*/
+			await UniTask.CompletedTask;
 		}
 		#endregion
 
@@ -284,7 +393,7 @@ namespace Raymap {
 			await LoadLevel(context, context.GetMapViewerSettings().Map);
 
 			// Load animations
-			//await LoadAnimations(context);
+			await LoadAnimations(context);
 
 			throw new NotImplementedException();
 		}

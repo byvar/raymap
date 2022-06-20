@@ -148,7 +148,7 @@ namespace Raymap
 			if (tim.Region.XPos == 0 && tim.Region.YPos == 0)
 				return null;
 
-			var pal = noPal ? null : palette ?? tim.Clut?.Palette?.Select(x => x.GetColor()).ToArray();
+			var pal = noPal ? null : palette ?? tim.Clut?.Palette?.GetColors().ToArray();
 
 			if (onlyFirstTransparent && pal != null)
 				for (int i = 0; i < pal.Length; i++)
@@ -181,7 +181,7 @@ namespace Raymap
 					throw new ArgumentOutOfRangeException();
 			}
 
-			pal ??= PaletteHelpers.CreateDummyPalette(palLength).Select(x => x.GetColor()).ToArray();
+			pal ??= PaletteHelpers.CreateDummyPalette(palLength).GetColors().ToArray();
 
 			var tex = TextureHelpers.CreateTexture2D(width, height);
 
