@@ -3,6 +3,7 @@ using BinarySerializer.Ubisoft.CPA;
 using BinarySerializer.Ubisoft.CPA.U64;
 using BinarySerializer.Unity;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using OpenSpace;
 using OpenSpace.Loader;
 using System;
@@ -26,6 +27,7 @@ namespace Raymap {
 			new GameAction("Export Blocks", false, true, (input, output) => ExportBlocksAsync(settings, output)),
 			new GameAction("Export Backgrounds", false, true, (input, output) => ExportBackgroundsAsync(settings, output)),
 			new GameAction("Export Textures", false, true, (input, output) => ExportTexturesAsync(settings, output)),
+			new GameAction("Export Localization", false, true, (input, output) => ExportLocalizationAsync(settings, output)),
 
 		};
 		public async UniTask ExportBlocksAsync(MapViewerSettings settings, string outputDir) {
@@ -258,6 +260,37 @@ namespace Raymap {
 			}*/
 			await UniTask.CompletedTask;
 		}
+
+		public virtual async UniTask ExportLocalizationAsync(MapViewerSettings settings, string outputDir) {
+
+			using (var context = new MapViewerContext(settings)) {
+				// Get the deserializer
+				var s = context.Deserializer;
+
+				// Load the ROM
+				await LoadFilesAsync(context);
+
+				await LoadFix(context);
+
+				// Load menu (level index 0)
+				var loader = s.GetLoader();
+				var levels = loader.Fix.Value.LevelsNameList.Value;
+				GAM_LevelsNameList ChosenLevel = levels[0];
+				await LoadLevel(context, ChosenLevel.Name);
+
+				// Export loc
+				string filePath = Path.Combine(outputDir, $"localization_{context.GetCPASettings().Mode}.json");
+				if (loader?.Languages != null) {
+					var output = Enumerable.Range(0, loader.Languages.Length).Select(ind => new {
+						Language = loader.Languages?[ind]?.Value?.LanguageName ?? ("Language " + ind),
+						Text = loader.Languages?[ind]?.Value?.StringList.List?.Value?.Select(str => str?.Entry?.Value?.String?.Value?.Value?.StringValue ?? ""),
+						StringLength = loader.Languages?[ind]?.Value?.StringLengthList?.List?.Value?.Select(str => str?.Entry?.Value?.Length ?? 0),
+					});
+					string json = JsonConvert.SerializeObject(output, Formatting.Indented);
+					BinarySerializer.Unity.Util.ByteArrayToFile(filePath, Encoding.UTF8.GetBytes(json));
+				}
+			}
+		}
 		#endregion
 
 		protected override List<string> FindFiles(MapViewerSettings settings) {
@@ -391,6 +424,8 @@ namespace Raymap {
 
 			// Load level
 			await LoadLevel(context, context.GetMapViewerSettings().Map);
+
+			// TODO: Load remaining unreferenced elements: objectTables, wayPoints, graphs, 
 
 			// Load animations
 			await LoadAnimations(context);
