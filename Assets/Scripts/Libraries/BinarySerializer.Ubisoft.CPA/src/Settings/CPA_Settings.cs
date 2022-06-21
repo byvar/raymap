@@ -61,5 +61,29 @@ namespace BinarySerializer.Ubisoft.CPA {
         public Dictionary<PathCapitalizationType, PathCapitalization> PathCapitalization { get; set; } = new Dictionary<PathCapitalizationType, PathCapitalization>();
         public LevelTranslation LevelTranslation { get; set; } = null;
         public bool LinkUncategorizedObjectsToScriptFamily { get; set; } = false;
-    }
+
+		public string ApplyPathCapitalization(string path, PathCapitalizationType capsType) {
+			PathCapitalization caps = CPA.PathCapitalization.Normal;
+			if (PathCapitalization != null) {
+				if (PathCapitalization.ContainsKey(capsType)) {
+					caps = PathCapitalization[capsType];
+				} else if (PathCapitalization.ContainsKey(PathCapitalizationType.All)) {
+					caps = PathCapitalization[PathCapitalizationType.All];
+				}
+			}
+			switch (caps) {
+				case CPA.PathCapitalization.All:
+					return path.ToUpper();
+				case CPA.PathCapitalization.None:
+					return path.ToLower();
+				case CPA.PathCapitalization.AllExceptExtension:
+					if (path.LastIndexOf('.') > 0) {
+						string pathWithoutExtension = path.Substring(0, path.LastIndexOf('.')).ToUpper();
+						return pathWithoutExtension + path.Substring(path.LastIndexOf('.'));
+					} else return path.ToUpper();
+				default:
+					return path;
+			}
+		}
+	}
 }

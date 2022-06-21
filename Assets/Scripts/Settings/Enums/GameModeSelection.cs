@@ -3,12 +3,12 @@
     /// The available games
     /// </summary>
     public enum GameModeSelection {
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (PC)")] Rayman2PC,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "R2 (PC) Demo (1999/08/19)")] Rayman2PCDemo_1999_08_18,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "R2 (PC) Demo (1999/09/11)")] Rayman2PCDemo_1999_09_04,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "Rayman 2 (PC)")] Rayman2PC,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "R2 (PC) Demo (1999/08/19)")] Rayman2PCDemo_1999_08_18,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "R2 (PC) Demo (1999/09/11)")] Rayman2PCDemo_1999_09_04,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (DC)")] Rayman2DC,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (iOS)")] Rayman2IOS,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (iOS) Demo")] Rayman2IOSDemo,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "Rayman 2 (iOS)")] Rayman2IOS,
+        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "Rayman 2 (iOS) Demo")] Rayman2IOSDemo,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1)")] Rayman2PS1,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1) Demo")] Rayman2PS1Demo,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_PS1Manager), "Rayman 2 (PS1) Demo (SLUS_90095)")] Rayman2PS1Demo_SLUS_90095,
@@ -47,12 +47,12 @@
         [GameMode(EngineCategory.CPA_RaymanRavingRabbids, typeof(CPA_RRRDS_Manager), "Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
         [GameMode(EngineCategory.CPA_RaymanRavingRabbids, typeof(CPA_U64Manager), "Rayman Raving Rabbids (DS) Dev Build (2006/05/25)")] RaymanRavingRabbidsDSDevBuild_2006_05_25,
         
-        [GameMode(EngineCategory.CPA_TonicTrouble, typeof(LegacyGameManager), "Tonic Trouble (PC)")] TonicTroublePC,
-        [GameMode(EngineCategory.CPA_TonicTrouble, typeof(LegacyGameManager), "Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
+        [GameMode(EngineCategory.CPA_TonicTrouble, typeof(CPA_SNAManager), "Tonic Trouble (PC)")] TonicTroublePC,
+        [GameMode(EngineCategory.CPA_TonicTrouble, typeof(CPA_SNAManager), "Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
         [GameMode(EngineCategory.CPA_TonicTrouble, typeof(CPA_U64Manager), "Tonic Trouble (N64 NTSC)")] TonicTroubleN64,
 
-        [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
-        [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: Quack Attack (PC) Demo")] DonaldDuckPCDemo,
+        [GameMode(EngineCategory.CPA_Disney, typeof(CPA_SNAManager), "Donald Duck: Quack Attack (PC)")] DonaldDuckPC,
+        [GameMode(EngineCategory.CPA_Disney, typeof(CPA_SNAManager), "Donald Duck: Quack Attack (PC) Demo")] DonaldDuckPCDemo,
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: Quack Attack (DC)")] DonaldDuckDC,
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_U64Manager), "Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_PS1Manager), "Donald Duck: Quack Attack (PS1)")] DonaldDuckPS1,
@@ -60,12 +60,12 @@
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Disney's Dinosaur (PC)")] DinosaurPC,
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_PS1Manager), "Jungle Book: Groove Party (PS1)")] JungleBookPS1,
 
-        [GameMode(EngineCategory.CPA_Playmobil, typeof(LegacyGameManager), "Playmobil: Hype (PC)")] PlaymobilHypePC,
-        [GameMode(EngineCategory.CPA_Playmobil, typeof(LegacyGameManager), "Playmobil: Laura (PC)")] PlaymobilLauraPC,
-        [GameMode(EngineCategory.CPA_Playmobil, typeof(LegacyGameManager), "Playmobil: Alex (PC)")] PlaymobilAlexPC,
+        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_SNAManager), "Playmobil: Hype (PC)")] PlaymobilHypePC,
+        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_SNAManager), "Playmobil: Laura (PC)")] PlaymobilLauraPC,
+        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_SNAManager), "Playmobil: Alex (PC)")] PlaymobilAlexPC,
 
         [GameMode(EngineCategory.CPA_Other, typeof(LegacyGameManager), "Largo Winch (PC)")] LargoWinchPC,
         [GameMode(EngineCategory.CPA_Other, typeof(CPA_PS1Manager), "VIP (PS1)")] VIPPS1,
-        [GameMode(EngineCategory.CPA_Other, typeof(LegacyGameManager), "Red Planet (PC)")] RedPlanetPC,
+        [GameMode(EngineCategory.CPA_Other, typeof(CPA_SNAManager), "Red Planet (PC)")] RedPlanetPC,
     }
 }
