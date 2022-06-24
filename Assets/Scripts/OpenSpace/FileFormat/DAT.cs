@@ -46,40 +46,46 @@ namespace OpenSpace.FileFormat {
             number = reader.ReadInt32();
             header.field_0 += header.field_8;
             header.field_4 += header.field_C;
+
             number = reader.ReadInt32();
-            uint levels0DatValue_0 = (uint)(header.field_4 ^ (number - header.field_0));
+            uint _TotalSector = (uint)(header.field_4 ^ (number - header.field_0));
             header.field_0 += header.field_8;
             header.field_4 += header.field_C;
+
             number = reader.ReadInt32();
-            uint levels0DatValue_1 = (uint)((header.field_4 ^ (uint)(number - header.field_0)) >> 2);
+            uint MapsCount = (uint)((header.field_4 ^ (uint)(number - header.field_0)) >> 2);
             header.field_0 += header.field_8;
             header.field_4 += header.field_C;
+
             number = reader.ReadInt32();
             header.field_0 += header.field_8;
             header.field_4 += header.field_C;
+
             number = reader.ReadInt32();
             int v4 = header.field_4 ^ (number - header.field_0);
             header.field_0 += header.field_8;
             header.field_4 += header.field_C;
-            uint levels0DatValue_2 = (uint)v4;
+            uint _NumberOfOccur = (uint)v4;
+
             number = reader.ReadInt32();
-            int v5 = header.field_4 ^ (number - header.field_0);
+            int SectorSize = header.field_4 ^ (number - header.field_0);
             header.field_0 += header.field_8;
-            uint levels0DatValue_3 = (uint)v5;
             header.field_4 += header.field_C;
+
             number = reader.ReadInt32();
             int v6 = header.field_4 ^ (number - header.field_0);
             header.field_0 += header.field_8;
             header.field_4 += header.field_C;
-            uint levels0DatValue_4 = (uint)v6;
+            uint _FirstHeaderSize = (uint)v6;
+
             number = reader.ReadInt32();
-            int levels0DatValue_5 = header.field_4 ^ (number - header.field_0);
+            int _HeaderSize = header.field_4 ^ (number - header.field_0);
             header.field_0 += header.field_8;
             header.field_4 += header.field_C;
 
             // Get offset with sinus header - SNA_fn_hGetOffSetInBigFileWithSinusHeader
             
-            rtref.levelId = (byte)(rtref.levelId % levels0DatValue_1);
+            rtref.levelId = (byte)(rtref.levelId % MapsCount);
             rtref.relocationType &= 3; // can only be 0, 1, 2 or 3. No RTL? or another relocation type?
 
             v6 = 4 * rtref.levelId;
@@ -104,7 +110,7 @@ namespace OpenSpace.FileFormat {
                     break;
             }
 
-            uint v8 = rtref.byte2 % levels0DatValue_2;
+            uint v8 = rtref.byte2 % _NumberOfOccur;
             float v9 = 1.06913f;
             float v30 = 1.06913f;
             rtref.byte2 = (byte)v8;
@@ -129,10 +135,10 @@ namespace OpenSpace.FileFormat {
             double v12 = v30 % 1f;
             double v13 = Math.Floor(v12 * 1000000.0) / 1000000.0;
             //R3Loader.Loader.print("Double v13: " + v13);
-            ulong v24 = levels0DatValue_0;
-            long v14 = (long)Math.Floor(levels0DatValue_0 * v13);
+            ulong v24 = _TotalSector;
+            long v14 = (long)Math.Floor(_TotalSector * v13);
 
-            reader.BaseStream.Seek(levels0DatValue_4 + levels0DatValue_5 * v14, SeekOrigin.Begin);
+            reader.BaseStream.Seek(_FirstHeaderSize + _HeaderSize * v14, SeekOrigin.Begin);
 			if (httpStream != null) await httpStream.FillCacheForRead(4 * 4);
 
 			header.field_0 = reader.ReadInt32();

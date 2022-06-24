@@ -47,10 +47,12 @@ namespace BinarySerializer.Ubisoft.CPA {
                         )
                     ),
                     new Node(EngineVersion.CPA_Montreal).SetChildren(
-                        new Node(EngineVersion.PlaymobilAlex),
-                        new Node(EngineVersion.PlaymobilLaura),
-                        new Node(EngineVersion.PlaymobilHype)
-                    )
+                        new Node(EngineVersion.PlaymobilLaura).SetChildren(
+							new Node(EngineVersion.PlaymobilHype).SetChildren(
+								new Node(EngineVersion.PlaymobilAlex)
+							)
+						)
+					)
                 )
             };
             tree.Init();
