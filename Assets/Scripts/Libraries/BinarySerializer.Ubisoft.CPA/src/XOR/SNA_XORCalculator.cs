@@ -48,26 +48,26 @@
 			}
 		}
 
-		public static uint GetCryptKey(long value)      => GetPseudoRandomKey(value, 123459876, 127773, 16807, 2836);
-		public static uint GetProtectionKey(long value) => GetPseudoRandomKey(value, 123459876, 44488,  48271, 3399);
+		public static uint GetCryptKey(long value)      => GetPseudoRandomKey(value, 16807); // 7*7*7*7*7
+		public static uint GetProtectionKey(long value) => GetPseudoRandomKey(value, 48271); // prime
 
 		/// <summary>
 		/// Pseudo-random generator based on Minimal Standard by Lewis, Goodman, and Miller in 1969.
+		/// Algorithm presented in "Random Number Generators: Good Ones Are Hard To Find".
 		/// </summary>
-		/// <param name="value">Starting value</param>
-		/// <param name="seed">Seed</param>
-		/// <param name="divisor">Divisor</param>
-		/// <param name="loFactor">Factor of low component after division</param>
-		/// <param name="hiFactor">Factor of high component after division</param>
+		/// <param name="seed">Starting value</param>
+		/// <param name="a">Factor of low component after division</param>
 		/// <returns></returns>
-		private static uint GetPseudoRandomKey(long value, long seed, long divisor, long loFactor, long hiFactor) {
-			value ^= seed;
-			long hi = value / divisor;
-			long lo = value % divisor;
-			value = loFactor * lo - hiFactor * hi;
-			return (uint)BitHelpers.ExtractBits64(value, 32, 0);
-			//if (value < 0) value += 0x7FFFFFFF;
-			//return (uint)value;
+		private static uint GetPseudoRandomKey(long seed, long a) {
+			const long seedXOR = 123459876;
+			long q = int.MaxValue / a; // For CryptKey: 127773
+			long r = int.MaxValue % a; // For CryptKey: 2836
+
+			seed ^= seedXOR;
+			long hi = seed / q;
+			long lo = seed % q;
+			seed = a * lo - r * hi;
+			return (uint)BitHelpers.ExtractBits64(seed, 32, 0);
 		}
 	}
 }

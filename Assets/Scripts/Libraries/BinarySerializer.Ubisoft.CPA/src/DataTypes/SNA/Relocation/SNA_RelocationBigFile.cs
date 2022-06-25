@@ -73,16 +73,20 @@ namespace BinarySerializer.Ubisoft.CPA {
 			var oldProtectionKey = ProtectionKey;
 			SNA_RelocationTable RelocationTable = table;
 
-
-			s.DoAt(off, () => {
+			Pointer curOff = s.CurrentPointer;
+			try {
+				s.Goto(off);
+				await s.FillCacheForReadAsync(1024 * 1024); // 1 MB cache
 				s.DoXOR(new SNA_XORCalculator(SNA_XORCalculator.GetCryptKey(key)), () => {
 					ProtectionKey = s.Serialize<uint>(ProtectionKey, name: nameof(ProtectionKey));
-					if(oldProtectionKey != ProtectionKey) {
+					if (oldProtectionKey != ProtectionKey) {
 						s.LogWarning($"SNA: Incorrect protection key algorithm. Calculated {oldProtectionKey:X8}, but read {ProtectionKey}");
 					}
 					RelocationTable = s.SerializeObject<SNA_RelocationTable>(RelocationTable, name: nameof(RelocationTable));
 				});
-			});
+			} finally {
+				s.Goto(curOff);
+			}
 
 			return RelocationTable;
 		}
