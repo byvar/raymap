@@ -110,6 +110,8 @@ namespace Raymap {
 			GlobalLoadState.DetailedState = "Loading DSC";
 			await TimeController.WaitIfNecessary();
 
+			SNA_File<SNA_Description> DSB = FileFactory.Read<SNA_File<SNA_Description>>(context, GameDSCAlias);
+
 			throw new NotImplementedException();
 		}
 
@@ -128,9 +130,6 @@ namespace Raymap {
 		}
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {
-			// TEST
-			await LoadBigFile(context);
-
 			// Load DSC
 			await LoadDSC(context);
 

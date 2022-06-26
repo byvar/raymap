@@ -5,13 +5,14 @@
     /// </summary>
     public class SNA_XORCalculator : IXORCalculator 
     {
-        public SNA_XORCalculator(uint key = 0x6AB5CC79, DecodeMode mode = DecodeMode.Rayman2)
+        public SNA_XORCalculator(uint key = DefaultCryptKey, DecodeMode mode = DecodeMode.Rayman2)
         {
             CryptKey = key;
 			Mode = mode;
         }
 
-        public uint CryptKey { get; protected set; }
+		public const uint DefaultCryptKey = 0x6AB5CC79;
+		public uint CryptKey { get; protected set; }
 		public byte GetKeyByte(int i) => (byte)BitHelpers.ExtractBits64(CryptKey, 8, i*8);
 		public void SetKeyByte(int i, byte b) {
 			CryptKey = (uint)BitHelpers.SetBits64(CryptKey, b, 8, i * 8);
@@ -48,7 +49,7 @@
 			}
 		}
 
-		public static uint GetCryptKey(long value)      => GetPseudoRandomKey(value, 16807); // 7*7*7*7*7
+		public static uint GetCryptKey(long value)      => GetPseudoRandomKey(value, 16807); // = 7*7*7*7*7
 		public static uint GetProtectionKey(long value) => GetPseudoRandomKey(value, 48271); // prime
 
 		/// <summary>
@@ -56,7 +57,7 @@
 		/// Algorithm presented in "Random Number Generators: Good Ones Are Hard To Find".
 		/// </summary>
 		/// <param name="seed">Starting value</param>
-		/// <param name="a">Factor of low component after division</param>
+		/// <param name="a">Multiplier</param>
 		/// <returns></returns>
 		private static uint GetPseudoRandomKey(long seed, long a) {
 			const long seedXOR = 123459876;
