@@ -105,7 +105,7 @@ namespace Raymap {
 			throw new NotImplementedException();
 		}
 
-		public async UniTask LoadDSC(Context context) {
+		public virtual async UniTask LoadDSC(Context context) {
 			// The DSC file contains information about directories which we need to load the files
 			GlobalLoadState.DetailedState = "Loading DSC";
 			await TimeController.WaitIfNecessary();

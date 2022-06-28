@@ -107,8 +107,20 @@
 		TT_FontMemory = 0x10000 + 3,
 		TT_InventoryMemory = 0x10000 + 13,
 		TT_LipsSynchMemory = 0x10000 + 16,
+		TT_PLAMaxSuperObject = 0x10000 + 17,
+		TT_PLAMaxMatrix = 0x10000 + 18,
 		TT_BigFileCredits = 0x10000 + 19,
 		TT_CreditsLevelName = 0x10000 + 22,
 		TT_SkipMainMenu = 0x10000 + 23,
+
+		// Tonic Trouble (Directories)
+		DirectoryOfMenu = 0x20000 + 0,
+		DirectoryOfMenuAnimations = 0x20000 + 1,
+		DirectoryOfCollideMaterials = 0x20000 + 2, // all DirectoryOfMaterials
+		DirectoryOfSoundMaterials = 0x20000 + 3,
+		DirectoryOfMechanicsMaterials = 0x20000 + 4,
+		DirectoryOfGameMaterials = 0x20000 + 5,
+		DirectoryOfFixTexture = 0x20000 + 6,
+		DirectoryOfInventory = 0x20000 + 7,
 	}
 }

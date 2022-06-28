@@ -22,8 +22,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 				[14] = SNA_DescriptionType.PositionMemory,
 				[15] = SNA_DescriptionType.ScriptMemory,
 				[16] = SNA_DescriptionType.TT_LipsSynchMemory,
-
-				// ??? gap
+				[17] = SNA_DescriptionType.TT_PLAMaxSuperObject,
+				[18] = SNA_DescriptionType.TT_PLAMaxMatrix,
 
 				// BigFiles
 				[19] = SNA_DescriptionType.BigFileVignettes,
@@ -36,7 +36,38 @@ namespace BinarySerializer.Ubisoft.CPA {
 				[24] = SNA_DescriptionType.DefaultFile,
 				[25] = SNA_DescriptionType.CurrentFile,
 
-				[0xffff] = SNA_DescriptionType.EndOfDescSection
+				[0xffff] = SNA_DescriptionType.EndOfDescSection,
+
+				[0x10000] = SNA_DescriptionType.DirectoryOfEngineDLL,
+				[0x10001] = SNA_DescriptionType.DirectoryOfMenu,
+				[0x10002] = SNA_DescriptionType.DirectoryOfMenuAnimations,
+				[0x10003] = SNA_DescriptionType.DirectoryOfGameData,
+				[0x10004] = SNA_DescriptionType.DirectoryOfTexts,
+				[0x10005] = SNA_DescriptionType.DirectoryOfWorld,
+				[0x10006] = SNA_DescriptionType.DirectoryOfLevels,
+				[0x10007] = SNA_DescriptionType.DirectoryOfFamilies,
+				[0x10008] = SNA_DescriptionType.DirectoryOfCharacters,
+				[0x10009] = SNA_DescriptionType.DirectoryOfAnimations,
+				[0x1000A] = SNA_DescriptionType.DirectoryOfGraphicsClasses,
+				[0x1000B] = SNA_DescriptionType.DirectoryOfGraphicsBanks,
+				[0x1000C] = SNA_DescriptionType.DirectoryOfMechanics,
+				[0x1000D] = SNA_DescriptionType.DirectoryOfSound,
+				[0x1000E] = SNA_DescriptionType.DirectoryOfVisuals,
+				[0x1000F] = SNA_DescriptionType.DirectoryOfEnvironment,
+				[0x10010] = SNA_DescriptionType.DirectoryOfCollideMaterials, // all DirectoryOfMaterials
+				[0x10011] = SNA_DescriptionType.DirectoryOfSoundMaterials,
+				[0x10012] = SNA_DescriptionType.DirectoryOfMechanicsMaterials,
+				[0x10013] = SNA_DescriptionType.DirectoryOfGameMaterials,
+				[0x10014] = SNA_DescriptionType.DirectoryOfSaveGame,
+				[0x10015] = SNA_DescriptionType.DirectoryOfExtras,
+				[0x10016] = SNA_DescriptionType.DirectoryOfTexture,
+				[0x10017] = SNA_DescriptionType.DirectoryOfFixTexture,
+				[0x10018] = SNA_DescriptionType.DirectoryOfVignettes,
+				[0x10019] = SNA_DescriptionType.DirectoryOfOptions,
+				[0x1001A] = SNA_DescriptionType.DirectoryOfLipsSync,
+				[0x1001B] = SNA_DescriptionType.DirectoryOfZdx,
+				[0x1001C] = SNA_DescriptionType.DirectoryOfEffects,
+				[0x1001D] = SNA_DescriptionType.DirectoryOfInventory,
 			};
 		}
 	}

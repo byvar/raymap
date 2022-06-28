@@ -47,7 +47,7 @@
         [GameMode(EngineCategory.CPA_RaymanRavingRabbids, typeof(CPA_RRRDS_Manager), "Rayman Raving Rabbids (DS)")] RaymanRavingRabbidsDS,
         [GameMode(EngineCategory.CPA_RaymanRavingRabbids, typeof(CPA_U64Manager), "Rayman Raving Rabbids (DS) Dev Build (2006/05/25)")] RaymanRavingRabbidsDSDevBuild_2006_05_25,
         
-        [GameMode(EngineCategory.CPA_TonicTrouble, typeof(CPA_SNAManager), "Tonic Trouble (PC)")] TonicTroublePC,
+        [GameMode(EngineCategory.CPA_TonicTrouble, typeof(CPA_TTPC_Manager), "Tonic Trouble (PC)")] TonicTroublePC,
         [GameMode(EngineCategory.CPA_TonicTrouble, typeof(CPA_SNAManager), "Tonic Trouble: SE (PC)")] TonicTroubleSEPC,
         [GameMode(EngineCategory.CPA_TonicTrouble, typeof(CPA_U64Manager), "Tonic Trouble (N64 NTSC)")] TonicTroubleN64,
 

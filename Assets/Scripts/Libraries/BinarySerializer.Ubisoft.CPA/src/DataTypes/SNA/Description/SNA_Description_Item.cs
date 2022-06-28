@@ -63,6 +63,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 				case SNA_DescriptionType.SAILevelMemory:
 				case SNA_DescriptionType.TMPLevelMemory:
 				case SNA_DescriptionType.TT_LipsSynchMemory:
+				case SNA_DescriptionType.TT_PLAMaxSuperObject:
+				case SNA_DescriptionType.TT_PLAMaxMatrix:
 
 				case SNA_DescriptionType.MaxValueBar:
 
@@ -117,6 +119,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				case SNA_DescriptionType.CurrentFile:
 
 				case SNA_DescriptionType.LevelName:
+				case SNA_DescriptionType.TT_CreditsLevelName:
 					SerializeData<SNA_Description_String>();
 					break;
 
