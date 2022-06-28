@@ -70,6 +70,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 				case SNA_DescriptionType.ActivatePadAction: // PadNumber
 				case SNA_DescriptionType.ActivateJoystickAction: // PadNumber
+
+				case SNA_DescriptionType.LevelLoadSoundBank: // Bank index
 					SerializeData<SNA_Description_Long>();
 					break;
 
@@ -140,6 +142,10 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 				case SNA_DescriptionType.FrameSynchro:
 					SerializeData<SNA_Description_FrameSynchro>();
+					break;
+
+				case SNA_DescriptionType.LevelLoadMap:
+					SerializeData<SNA_Description_SoundBanksArray>();
 					break;
 
 				case SNA_DescriptionType.EndOfDescSection:
