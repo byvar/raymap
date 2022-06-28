@@ -101,5 +101,14 @@
 
 		// Final section
 		EndOfDescSection = 0xffff,
+
+		// Tonic Trouble
+		TT_MenuMemory = 0x10000 + 2,
+		TT_FontMemory = 0x10000 + 3,
+		TT_InventoryMemory = 0x10000 + 13,
+		TT_LipsSynchMemory = 0x10000 + 16,
+		TT_BigFileCredits = 0x10000 + 19,
+		TT_CreditsLevelName = 0x10000 + 22,
+		TT_SkipMainMenu = 0x10000 + 23,
 	}
 }

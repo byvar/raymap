@@ -497,9 +497,9 @@ namespace OpenSpace.FileFormat {
             uint id = reader.ReadUInt32();
             while (id != 0xFFFF) {
                 switch (id) {
-                    case 24: ReadString(); break; // Default.cfg
+					case 22: ReadString(); break; // outro
+					case 24: ReadString(); break; // Default.cfg
                     case 25: ReadString(); break; // Current.cfg
-                    case 22: ReadString(); break; // outro
                 }
                 id = reader.ReadUInt32();
             }
