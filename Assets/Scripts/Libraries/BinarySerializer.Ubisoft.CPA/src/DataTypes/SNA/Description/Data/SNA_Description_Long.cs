@@ -5,5 +5,8 @@
 		public override void SerializeImpl(SerializerObject s) {
 			Value = s.Serialize<int>(Value, name: nameof(Value));
 		}
+
+		public override string ShortLog => Value.ToString();
+		public override bool UseShortLog => true;
 	}
 }

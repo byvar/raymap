@@ -5,5 +5,7 @@
 		public override void SerializeImpl(SerializerObject s) {
 			Value = s.SerializeObject<GLI_FloatColor>(Value, name: nameof(Value));
 		}
+		public override string ShortLog => Value.ToString();
+		public override bool UseShortLog => true;
 	}
 }
