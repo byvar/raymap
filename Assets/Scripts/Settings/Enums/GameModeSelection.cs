@@ -60,9 +60,9 @@
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Disney's Dinosaur (PC)")] DinosaurPC,
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_PS1Manager), "Jungle Book: Groove Party (PS1)")] JungleBookPS1,
 
-        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_SNAManager), "Playmobil: Hype (PC)")] PlaymobilHypePC,
-        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_SNAManager), "Playmobil: Laura (PC)")] PlaymobilLauraPC,
-        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_SNAManager), "Playmobil: Alex (PC)")] PlaymobilAlexPC,
+        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_Montreal_Manager), "Playmobil: Hype (PC)")] PlaymobilHypePC,
+        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_Montreal_Manager), "Playmobil: Laura (PC)")] PlaymobilLauraPC,
+        [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_Montreal_Manager), "Playmobil: Alex (PC)")] PlaymobilAlexPC,
 
         [GameMode(EngineCategory.CPA_Other, typeof(LegacyGameManager), "Largo Winch (PC)")] LargoWinchPC,
         [GameMode(EngineCategory.CPA_Other, typeof(CPA_PS1Manager), "VIP (PS1)")] VIPPS1,
