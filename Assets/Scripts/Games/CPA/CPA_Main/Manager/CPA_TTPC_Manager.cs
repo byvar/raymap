@@ -13,9 +13,9 @@ namespace Raymap {
 			GlobalLoadState.DetailedState = "Loading DSC";
 			await TimeController.WaitIfNecessary();
 
-			SNA_File<SNA_Description_TT_Game> DSB = FileFactory.Read<SNA_File<SNA_Description_TT_Game>>(context, GameDSCAlias);
-
-			throw new NotImplementedException();
+			var cpaGlobals = (CPA_Globals_TTPC)context.GetCPAGlobals();
+			cpaGlobals.GameDSB_TTPC = FileFactory.Read<SNA_File<SNA_Description_TT_Game>>(context, CPA_Path.GameDSC.ToString());
 		}
+		public override void InitGlobals(Context context) => new CPA_Globals_TTPC(context, context.GetMapViewerSettings().Map);
 	}
 }

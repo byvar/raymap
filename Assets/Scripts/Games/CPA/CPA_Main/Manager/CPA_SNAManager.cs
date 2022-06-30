@@ -22,11 +22,13 @@ namespace Raymap {
 				// Load the ROM
 				await LoadFilesAsync(context);
 
-				SNA_RelocationBigFile bigFile = null;
-				s.DoAt(context.FilePointer(LevelsBigFile), () => {
-					s.FillCacheForReadAsync(PTC_BigFileEncoder.KeysSize + SNA_RelocationBigFile.MainHeaderSize);
-					bigFile = FileFactory.Read<SNA_RelocationBigFile>(context, LevelsBigFile);
-				});
+				// Download all possible files
+				await LoadPathsAsync(context);
+
+				// Load DSC & bigfile
+				await LoadDSC(context);
+
+				var bigFile = ((CPA_Globals_SNA)s.GetCPAGlobals()).RelocationBigFile;
 
 				for (int occurIndex = 0; occurIndex < bigFile.OccurCount; occurIndex++) {
 					for (int mapIndex = 0; mapIndex < bigFile.RelocationTablesCount / 4; mapIndex++) {
@@ -61,48 +63,76 @@ namespace Raymap {
 		}
 		#endregion
 
-		// TODO: Replace with GAMEDATA / GAMEDATABIN / ... later. This exists so we can use the top directory instead of GAMEDATA later on.
-		public string GetGameDataFolder(CPA_Settings settings) => "/";
-
-		public string GameDSCAlias => "game.dsc";
-
-		public string LevelsBigFile => "World/Levels/LEVELS0.DAT";
-
 		protected override List<string> FindFiles(MapViewerSettings settings) {
 			return base.FindFiles(settings);
 			// TODO
 		}
 
-		public override async UniTask LoadFilesAsync(Context context) {
+		public async UniTask LoadPathsAsync(Context context) {
+			// Init globals if it doesn't exist yet, we need that to get access to the paths
+			if (context.GetCPAGlobals(throwIfNotFound: false) == null) {
+				InitGlobals(context);
+			}
+
 			Endian endian = context.GetCPASettings().GetEndian;
 			var cpaSettings = context.GetCPASettings();
-			string GameDataFolder = GetGameDataFolder(cpaSettings);
 
-			// At this point we can only load the DSB file
-			string gameDscPath;
-			if (cpaSettings.EngineVersionTree.HasParent(EngineVersion.CPA_Montreal)) {
-				gameDscPath = Path.Combine(GameDataFolder, cpaSettings.ApplyPathCapitalization("gamedsc.bin", PathCapitalizationType.DSB));
-			} else if (cpaSettings.EngineVersion == EngineVersion.TonicTroubleSE) {
-				gameDscPath = Path.Combine(GameDataFolder, cpaSettings.ApplyPathCapitalization("GAME.DSC", PathCapitalizationType.DSB));
-			} else {
-				gameDscPath = Path.Combine(GameDataFolder, cpaSettings.ApplyPathCapitalization("Game.dsb", PathCapitalizationType.DSB));
+			var cpaGlobals = context.GetCPAGlobals();
+			var paths = cpaGlobals.Paths;
+
+			foreach (var p in paths) {
+				if(p.Value == null) continue;
+				var path = HackPath(p.Value); // Temporary hack: remove "GameData" from start of path.
+
+				if(context.FileExists(path)) continue;
+				switch (p.Key) {
+					case CPA_Path.RelocationBigFile:
+						var bigf = await context.AddLinearFileAsync(path, endian, bigFileCacheLength: 0);
+						UnityEngine.Debug.Log($"{p.Key}: {path}");
+						if (bigf != null) bigf.Alias = p.Key.ToString();
+						break;
+					default:
+						var linf = await context.AddLinearFileAsync(path, endian);
+						UnityEngine.Debug.Log($"{p.Key}: {path}");
+						if(linf != null) linf.Alias = p.Key.ToString();
+						break;
+				}
 			}
-			var gameDsc = await context.AddLinearFileAsync(gameDscPath, endian);
-			gameDsc.Alias = GameDSCAlias;
-
-			// TEST: Load bigfile
-			var bigFile = await context.AddLinearFileAsync(LevelsBigFile, endian, bigFileCacheLength: 0);
 		}
+
+		private string HackPath(string path) {
+			// Temporary hack: remove "GameData" from start of path.
+			// Later we'll change the configured paths in raymap so they point to where the exe is.
+			if (path.ToLower().StartsWith("gamedata/")) {
+				path = path.Substring("gamedata/".Length);
+			} else if (path.ToLower().StartsWith("/gamedata/")) {
+				path = path.Substring("/gamedata/".Length);
+			} else {
+				path = $"../{path}";
+			}
+			return path;
+		}
+
 		public async UniTask LoadBigFile(Context context) {
 			GlobalLoadState.DetailedState = "Loading BigFile";
 			await TimeController.WaitIfNecessary();
 
-			var s = context.Deserializer;
-			s.DoAt(context.FilePointer(LevelsBigFile), () => {
-				s.FillCacheForReadAsync(PTC_BigFileEncoder.KeysSize + SNA_RelocationBigFile.MainHeaderSize);
-				SNA_RelocationBigFile bigFile = FileFactory.Read<SNA_RelocationBigFile>(context, LevelsBigFile);
-			});
-			throw new NotImplementedException();
+			var cpaGlobals = (CPA_Globals_SNA)context.GetCPAGlobals();
+			var relocBigfilePath = HackPath(context.NormalizePath(cpaGlobals.RelocationBigFilePath, false));
+			//if (context.FileManager.FileExists(context.GetAbsoluteFilePath(relocBigfilePath))) {
+			var bigf = await context.AddLinearFileAsync(relocBigfilePath, context.GetCPASettings().GetEndian, bigFileCacheLength: 0);
+			UnityEngine.Debug.Log(relocBigfilePath);
+			if (bigf != null) bigf.Alias = CPA_Path.RelocationBigFile.ToString();
+			//}
+			if (context.FileExists(CPA_Path.RelocationBigFile.ToString())) {
+				var s = context.Deserializer;
+				s.Goto(context.FilePointer(CPA_Path.RelocationBigFile.ToString()));
+				await s.FillCacheForReadAsync(PTC_BigFileEncoder.KeysSize + SNA_RelocationBigFile.MainHeaderSize);
+				
+				s.DoAt(context.FilePointer(CPA_Path.RelocationBigFile.ToString()), () => {
+					cpaGlobals.RelocationBigFile = FileFactory.Read<SNA_RelocationBigFile>(context, CPA_Path.RelocationBigFile.ToString());
+				});
+			}
 		}
 
 		public virtual async UniTask LoadDSC(Context context) {
@@ -110,28 +140,50 @@ namespace Raymap {
 			GlobalLoadState.DetailedState = "Loading DSC";
 			await TimeController.WaitIfNecessary();
 
-			SNA_File<SNA_Description> DSB = FileFactory.Read<SNA_File<SNA_Description>>(context, GameDSCAlias);
+			var cpaGlobals = (CPA_Globals_SNA)context.GetCPAGlobals();
+			cpaGlobals.GameDSB = FileFactory.Read<SNA_File<SNA_Description>>(context, CPA_Path.GameDSC.ToString());
 
-			throw new NotImplementedException();
+			// Also load relocation bigfile here
+			await LoadBigFile(context);
 		}
 
 		public async UniTask LoadFix(Context context) {
 			GlobalLoadState.DetailedState = "Loading fix";
 			await TimeController.WaitIfNecessary();
 
-			throw new NotImplementedException();
+			SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.FixSNA.ToString());
+			SNA_PointerFile<SNA_RelocationTable> rtb = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTB.ToString());
 		}
 
 		public async UniTask LoadLevel(Context context, string levelName) {
 			GlobalLoadState.DetailedState = "Loading level";
 			await TimeController.WaitIfNecessary();
 
+			var cpaGlobals = (CPA_Globals_SNA)context.GetCPAGlobals();
+			SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.LevelSNA.ToString());
+			if (cpaGlobals.RelocationBigFile != null) {
+				var mapIndex = cpaGlobals?.MapIndex;
+				if(!mapIndex.HasValue)
+					throw new Exception($"Map {cpaGlobals?.Map} does not occur in Game.DSB and cannot be loaded");
+				SNA_RelocationTable rtb = await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, SNA_RelocationType.SNA);
+			} else {
+				SNA_PointerFile<SNA_RelocationTable> rtb = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.LevelRTB.ToString());
+			}
+
 			throw new NotImplementedException();
 		}
 
+		public virtual void InitGlobals(Context context) => new CPA_Globals_SNA(context, context.GetMapViewerSettings().Map);
+
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {
+			// Download all possible files
+			await LoadPathsAsync(context);
+
 			// Load DSC
 			await LoadDSC(context);
+
+			// Now that the DSC is loaded, download other files
+			await LoadPathsAsync(context);
 
 			// Load fix
 			await LoadFix(context);

@@ -57,8 +57,8 @@ namespace BinarySerializer.Ubisoft.CPA
 			writer.Write(reader.ReadBytes((int)CompressedSize));
 		}
 
-		public static SNA_LZOEncoder GetIfRequired(CPA_Settings s) {
-			if (s.EngineVersionTree.HasParent(EngineVersion.PlaymobilHype)) {
+		public static SNA_LZOEncoder GetIfRequired(CPA_Settings s, uint sizeOrCount) {
+			if (sizeOrCount != 0 && s.EngineVersionTree.HasParent(EngineVersion.PlaymobilHype)) {
 				return new SNA_LZOEncoder();
 			} else {
 				return null;

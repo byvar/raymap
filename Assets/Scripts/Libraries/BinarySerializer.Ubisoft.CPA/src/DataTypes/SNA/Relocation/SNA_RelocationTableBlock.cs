@@ -15,7 +15,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Block = s.Serialize<byte>(Block, name: nameof(Block));
 			Count = s.Serialize<uint>(Count, name: nameof(Count));
 
-			s.DoEncoded(SNA_LZOEncoder.GetIfRequired(s.GetCPASettings()), () => {
+			s.DoEncoded(SNA_LZOEncoder.GetIfRequired(s.GetCPASettings(), Count), () => {
 				Pointers = s.SerializeObjectArray<SNA_RelocationTablePointer>(Pointers, Count, name: nameof(Pointers));
 			});
 		}

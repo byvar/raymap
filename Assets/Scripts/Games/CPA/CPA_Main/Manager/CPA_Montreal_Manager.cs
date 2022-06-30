@@ -13,12 +13,13 @@ namespace Raymap {
 			GlobalLoadState.DetailedState = "Loading DSC";
 			await TimeController.WaitIfNecessary();
 
-			SNA_File<SNA_Description_Montreal_Game> DSB = FileFactory.Read<SNA_File<SNA_Description_Montreal_Game>>(context, GameDSCAlias);
+			var cpaGlobals = (CPA_Globals_Montreal)context.GetCPAGlobals();
+			cpaGlobals.GameDSB_Montreal = FileFactory.Read<SNA_File<SNA_Description_Montreal_Game>>(context, CPA_Path.GameDSC.ToString());
 
 			// Test:
 			//await context.AddLinearFileAsync($"World/Levels/{context.GetMapViewerSettings().Map}/{context.GetMapViewerSettings().Map}pgb.bin");
 			//SNA_File <SNA_Description_Montreal_LevelPGB> LevelPGB = FileFactory.Read<SNA_File<SNA_Description_Montreal_LevelPGB>>(context, $"World/Levels/{context.GetMapViewerSettings().Map}/{context.GetMapViewerSettings().Map}pgb.bin");
-			throw new NotImplementedException();
 		}
+		public override void InitGlobals(Context context) => new CPA_Globals_Montreal(context, context.GetMapViewerSettings().Map);
 	}
 }

@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class SNA_Description_Montreal_Game : BinarySerializable {
+	public class SNA_Description_Montreal_Game : BinarySerializable, SNA_IDescription {
 		public SNA_Description_String[] Directories { get; set; }
 		public SNA_Description_String BigFileVignettes { get; set; }
 		public SNA_Description_String BigFileTextures { get; set; }
@@ -27,6 +27,12 @@
 			GameOptionsDefaultFile = s.SerializeObject<SNA_Description_String>(GameOptionsDefaultFile, name: nameof(GameOptionsDefaultFile));
 			GameOptionsCurrentFile = s.SerializeObject<SNA_Description_String>(GameOptionsCurrentFile, name: nameof(GameOptionsCurrentFile));
 			FirstLevelName = s.SerializeObject<SNA_Description_String>(FirstLevelName, name: nameof(FirstLevelName));
+		}
+
+		public string GetDirectory(SNA_DescriptionType type) {
+			var ind = DirectoryIndex(type);
+
+			return Directories[ind]?.Value;
 		}
 	}
 }

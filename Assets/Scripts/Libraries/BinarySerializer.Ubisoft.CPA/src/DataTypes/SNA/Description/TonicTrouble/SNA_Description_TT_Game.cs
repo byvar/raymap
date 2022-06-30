@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class SNA_Description_TT_Game : SNA_Description_TT_Level {
+	public class SNA_Description_TT_Game : SNA_Description_TT_Level, SNA_IDescription {
 		public SNA_Description_String[] Directories { get; set; }
 		public SNA_Description_Section BigFiles { get; set; }
 		public SNA_Description_String LoadVignette { get; set; }
@@ -26,6 +26,13 @@
 			GameOptionsFile = s.SerializeObject<SNA_Description_Section>(GameOptionsFile, name: nameof(GameOptionsFile));
 			Unknown = s.SerializeObject<SNA_Description_String>(Unknown, name: nameof(Unknown));
 			FirstLevelName = s.SerializeObject<SNA_Description_String>(FirstLevelName, name: nameof(FirstLevelName));
+		}
+
+
+		public string GetDirectory(SNA_DescriptionType type) {
+			var ind = DirectoryIndex(type);
+
+			return Directories[ind]?.Value;
 		}
 	}
 }
