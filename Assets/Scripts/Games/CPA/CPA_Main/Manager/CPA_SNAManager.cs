@@ -86,7 +86,6 @@ namespace Raymap {
 				SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.FixSNA.ToString());
 				await ExportSNA(sna?.Value, "Fix");
 				foreach (var map in levels.Children.Select(l => l.Id)) {
-					context.GetCPAGlobals().Map = map;
 					// Now that the DSC is loaded, download other files
 					await LoadPathsAsync(context, mapName: map);
 

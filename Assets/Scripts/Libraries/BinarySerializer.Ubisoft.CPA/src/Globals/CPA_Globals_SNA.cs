@@ -74,7 +74,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 
 			// Prepare level folder names
-			string lvlName = Map;
+			string lvlName = levelName;
 			if(lvlName == null) return paths;
 			string lvlFolder = ConvertCase($"{lvlName}/", PathCapitalizationType.LevelFolder);
 			string langLvlFolder = ConvertCase($"{lvlName}/", PathCapitalizationType.LangLevelFolder);
