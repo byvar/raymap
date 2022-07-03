@@ -8,14 +8,13 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public abstract string GameDataDirectory { get; }
 		public abstract string LevelsDirectory { get; }
 
-		public CPA_Globals(Context c, string map) {
+		public CPA_Globals(Context c) {
 			Context = c;
-			Map = map;
 			c.StoreObject<CPA_Globals>(ContextKey, this);
 		}
 
 		public static string ContextKey => nameof(CPA_Globals);
 
-		public abstract Dictionary<CPA_Path, string> Paths { get; }
+		public abstract Dictionary<CPA_Path, string> GetPaths(string levelName);
 	}
 }

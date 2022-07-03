@@ -69,6 +69,32 @@ namespace BinarySerializer.Ubisoft.CPA {
 				[0x1001C] = SNA_DescriptionType.DirectoryOfEffects,
 				[0x1001D] = SNA_DescriptionType.DirectoryOfInventory,
 			};
+
+			Modules = new SNA_Module[] {
+				SNA_Module.ERM,
+				SNA_Module.MMG,
+				SNA_Module.GMT,
+				SNA_Module.SCR,
+				SNA_Module.GAM,
+				SNA_Module.GEO,
+				SNA_Module.IPT,
+				SNA_Module.RND,
+				SNA_Module.CMP,
+				SNA_Module.INV,
+				SNA_Module.SAI,
+				SNA_Module.TMP,
+				SNA_Module.FIL,
+				SNA_Module.VIG,
+				SNA_Module.POS,
+				SNA_Module.PO ,
+				SNA_Module.AI ,
+				SNA_Module.MNU,
+				SNA_Module.FON,
+				SNA_Module.LS ,
+				SNA_Module.GLD,
+				SNA_Module.TMR,
+				SNA_Module.SND,
+			};
 		}
 	}
 }

@@ -4,7 +4,7 @@ using System.Linq;
 namespace BinarySerializer.Ubisoft.CPA {
 	public class CPA_Globals_Montreal : CPA_Globals_SNA {
 
-		public CPA_Globals_Montreal(Context c, string map) : base(c, map) { }
+		public CPA_Globals_Montreal(Context c) : base(c) { }
 
 		public SNA_File<SNA_Description_Montreal_Game> GameDSB_Montreal { get; set; }
 		public override SNA_IDescription DirectoryDescription => GameDSB_Montreal?.Value;

@@ -10,10 +10,10 @@
 		public SNA_Description_String FirstLevelName { get; set; }
 
 		public int DirectoryIndex(SNA_DescriptionType directoryType) {
-			return Context.GetCPASettings().SNATypes.GetInt(directoryType) - 0x10000;
+			return Context.GetCPASettings().SNATypes.GetDescriptionInt(directoryType) - 0x10000;
 		}
 		public SNA_DescriptionType DirectoryType(int directoryIndex) {
-			return Context.GetCPASettings().SNATypes.GetType(directoryIndex + 0x10000);
+			return Context.GetCPASettings().SNATypes.GetDescriptionType(directoryIndex + 0x10000);
 		}
 
 		public override void SerializeImpl(SerializerObject s) {

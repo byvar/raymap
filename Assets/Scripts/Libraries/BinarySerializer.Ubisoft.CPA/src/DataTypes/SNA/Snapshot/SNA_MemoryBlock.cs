@@ -20,8 +20,13 @@
 
 		public const uint InvalidBeginBlock = uint.MaxValue;
 
+		public SNA_Module? ModuleTranslation => Context.GetCPASettings().SNATypes?.GetModule(Module);
+
 		public override void SerializeImpl(SerializerObject s) {
 			Module = s.Serialize<byte>(Module, name: nameof(Module));
+			if (ModuleTranslation != null) {
+				s.Log($"Module: {ModuleTranslation}");
+			}
 			Bloc = s.Serialize<byte>(Bloc, name: nameof(Bloc));
 
 			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2))

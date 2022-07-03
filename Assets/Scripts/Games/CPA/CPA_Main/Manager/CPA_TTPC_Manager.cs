@@ -16,6 +16,6 @@ namespace Raymap {
 			var cpaGlobals = (CPA_Globals_TTPC)context.GetCPAGlobals();
 			cpaGlobals.GameDSB_TTPC = FileFactory.Read<SNA_File<SNA_Description_TT_Game>>(context, CPA_Path.GameDSC.ToString());
 		}
-		public override void InitGlobals(Context context) => new CPA_Globals_TTPC(context, context.GetMapViewerSettings().Map);
+		public override void InitGlobals(Context context) => new CPA_Globals_TTPC(context);
 	}
 }

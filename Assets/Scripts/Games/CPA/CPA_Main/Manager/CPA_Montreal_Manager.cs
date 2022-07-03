@@ -20,6 +20,6 @@ namespace Raymap {
 			//await context.AddLinearFileAsync($"World/Levels/{context.GetMapViewerSettings().Map}/{context.GetMapViewerSettings().Map}pgb.bin");
 			//SNA_File <SNA_Description_Montreal_LevelPGB> LevelPGB = FileFactory.Read<SNA_File<SNA_Description_Montreal_LevelPGB>>(context, $"World/Levels/{context.GetMapViewerSettings().Map}/{context.GetMapViewerSettings().Map}pgb.bin");
 		}
-		public override void InitGlobals(Context context) => new CPA_Globals_Montreal(context, context.GetMapViewerSettings().Map);
+		public override void InitGlobals(Context context) => new CPA_Globals_Montreal(context);
 	}
 }

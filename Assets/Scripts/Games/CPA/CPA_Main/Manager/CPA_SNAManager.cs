@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Raymap {
 	// TODO: This will be the equivalent of the R2Loader
@@ -13,6 +14,7 @@ namespace Raymap {
 		#region Game actions
 		public override GameAction[] GetGameActions(MapViewerSettings settings) => new GameAction[] {
 			new GameAction("Export Relocation Table BigFile", false, true, (input, output) => ExportPTCAsync(settings, output)),
+			new GameAction("Export SNA Blocks", false, true, (input, output) => ExportSNABlocksAsync(settings, output)),
 		};
 		public async UniTask ExportPTCAsync(MapViewerSettings settings, string outputDir) {
 			using (var context = new MapViewerContext(settings)) {
@@ -61,6 +63,54 @@ namespace Raymap {
 
 			UnityEngine.Debug.Log("Finished exporting PTC");
 		}
+
+		public async UniTask ExportSNABlocksAsync(MapViewerSettings settings, string outputDir) {
+			using (var context = new MapViewerContext(settings)) {
+				// Get the deserializer
+				var s = context.Deserializer;
+
+				// Load the ROM
+				await LoadFilesAsync(context);
+
+				// Download all possible files
+				await LoadPathsAsync(context);
+
+				// Load DSC & bigfile
+				await LoadDSC(context);
+
+				// Download all possible files
+				await LoadPathsAsync(context);
+
+				var levels = GetLevels(settings);
+
+				SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.FixSNA.ToString());
+				await ExportSNA(sna?.Value, "Fix");
+				foreach (var map in levels.Children.Select(l => l.Id)) {
+					context.GetCPAGlobals().Map = map;
+					// Now that the DSC is loaded, download other files
+					await LoadPathsAsync(context, mapName: map);
+
+					// Load level SNA
+					sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.LevelSNA.ToString());
+					await ExportSNA(sna?.Value, map);
+					context.RemoveFile(sna.Offset.File);
+
+				}
+
+				async UniTask ExportSNA(SNA_MemorySnapshot sna, string mapName) {
+					if(sna == null) return;
+					int blockIndex = 0;
+					foreach (var blk in sna.Blocks) {
+						if (blk.BlockSize == 0) continue;
+						Util.ByteArrayToFile(Path.Combine(outputDir, mapName, $"{blockIndex} - {blk.Module}_{blk.Bloc} - {blk.ModuleTranslation?.ToString() ?? ("Undefined")}.bin"), blk.Block);
+						blockIndex++;
+					}
+					await TimeController.WaitIfNecessary();
+				}
+			}
+
+			UnityEngine.Debug.Log("Finished exporting SNA blocks");
+		}
 		#endregion
 
 		protected override List<string> FindFiles(MapViewerSettings settings) {
@@ -68,7 +118,7 @@ namespace Raymap {
 			// TODO
 		}
 
-		public async UniTask LoadPathsAsync(Context context) {
+		public async UniTask LoadPathsAsync(Context context, string mapName = null) {
 			// Init globals if it doesn't exist yet, we need that to get access to the paths
 			if (context.GetCPAGlobals(throwIfNotFound: false) == null) {
 				InitGlobals(context);
@@ -78,7 +128,7 @@ namespace Raymap {
 			var cpaSettings = context.GetCPASettings();
 
 			var cpaGlobals = context.GetCPAGlobals();
-			var paths = cpaGlobals.Paths;
+			var paths = cpaGlobals.GetPaths(mapName);
 
 			foreach (var p in paths) {
 				if(p.Value == null) continue;
@@ -160,9 +210,10 @@ namespace Raymap {
 			await TimeController.WaitIfNecessary();
 
 			var cpaGlobals = (CPA_Globals_SNA)context.GetCPAGlobals();
+			cpaGlobals.Map = levelName;
 			SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.LevelSNA.ToString());
 			if (cpaGlobals.RelocationBigFile != null) {
-				var mapIndex = cpaGlobals?.MapIndex;
+				var mapIndex = cpaGlobals.MapIndex;
 				if(!mapIndex.HasValue)
 					throw new Exception($"Map {cpaGlobals?.Map} does not occur in Game.DSB and cannot be loaded");
 				SNA_RelocationTable rtb = await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, SNA_RelocationType.SNA);
@@ -173,7 +224,7 @@ namespace Raymap {
 			throw new NotImplementedException();
 		}
 
-		public virtual void InitGlobals(Context context) => new CPA_Globals_SNA(context, context.GetMapViewerSettings().Map);
+		public virtual void InitGlobals(Context context) => new CPA_Globals_SNA(context);
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {
 			// Download all possible files
@@ -183,7 +234,7 @@ namespace Raymap {
 			await LoadDSC(context);
 
 			// Now that the DSC is loaded, download other files
-			await LoadPathsAsync(context);
+			await LoadPathsAsync(context, mapName: context.GetMapViewerSettings().Map);
 
 			// Load fix
 			await LoadFix(context);

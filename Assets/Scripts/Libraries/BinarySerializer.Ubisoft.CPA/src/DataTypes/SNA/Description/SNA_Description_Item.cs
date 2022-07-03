@@ -8,11 +8,11 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public SNA_DescriptionType Type {
 			get {
 				var snaTypes = Context.GetCPASettings().SNATypes;
-				return snaTypes.GetType(TypeInt);
+				return snaTypes.GetDescriptionType(TypeInt);
 			}
 			set {
 				var snaTypes = Context.GetCPASettings().SNATypes;
-				TypeInt = snaTypes.GetInt(value);
+				TypeInt = snaTypes.GetDescriptionInt(value);
 			}
 		}
 		public SNA_Description_Data Data { get; set; }
@@ -22,7 +22,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			s.Log("Type: {0}", Type);
 
 			var snaTypes = Context.GetCPASettings().SNATypes;
-			var type = snaTypes.GetType(TypeInt);
+			var type = snaTypes.GetDescriptionType(TypeInt);
 
 			void SerializeData<T>() where T : SNA_Description_Data, new() {
 				Data = s.SerializeObject<T>((T)Data, name: nameof(Data));
