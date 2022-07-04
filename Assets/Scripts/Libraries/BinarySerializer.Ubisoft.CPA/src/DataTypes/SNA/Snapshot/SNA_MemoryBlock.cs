@@ -1,7 +1,7 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	public class SNA_MemoryBlock : BinarySerializable {
-		public byte Module { get; set; }
-		public byte Bloc { get; set; }
+		public virtual byte Module { get; set; }
+		public virtual byte Block { get; set; }
 		public SNA_MemoryBlockType Type { get; set; } // Unused
 		public uint BeginBlock { get; set; } // Absolute start position of the block
 		public uint EndBlock { get; set; } // Absolute end position of the block
@@ -11,7 +11,7 @@
 
 		public uint BlockSize { get; set; } // Memory data size. 0 if this is an "info", otherwise = MaxMem-BeginBlock+1+8 (8 for the BlockInfo)
 
-		public byte[] Block { get; set; } // Memory data
+		public byte[] Data { get; set; } // Memory data
 
 		// For testing purposes: to read allocations separately
 		public static bool TestAllocations = false;
@@ -20,14 +20,23 @@
 
 		public const uint InvalidBeginBlock = uint.MaxValue;
 
-		public SNA_Module? ModuleTranslation => Context.GetCPASettings().SNATypes?.GetModule(Module);
+		public virtual SNA_Module? ModuleTranslation {
+			get => Context.GetCPASettings().SNATypes?.GetModule(Module);
+			set {
+				if(!value.HasValue) return;
+				var val = value.Value;
+				var newModule = Context.GetCPASettings().SNATypes?.GetModuleInt(val);
+				if(newModule.HasValue) Module = (byte)newModule.Value;
+			}
+		}
+
+		public virtual string BlockName => $"{ModuleTranslation?.ToString() ?? Module.ToString()}_{Block}";
 
 		public override void SerializeImpl(SerializerObject s) {
 			Module = s.Serialize<byte>(Module, name: nameof(Module));
-			if (ModuleTranslation != null) {
-				s.Log($"Module: {ModuleTranslation}");
-			}
-			Bloc = s.Serialize<byte>(Bloc, name: nameof(Bloc));
+			if (ModuleTranslation != null) s.Log($"Module: {ModuleTranslation}");
+
+			Block = s.Serialize<byte>(Block, name: nameof(Block));
 
 			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2))
 				Type = s.Serialize<SNA_MemoryBlockType>(Type, name: nameof(Type));
@@ -45,15 +54,15 @@
 				s.DoEncoded(SNA_LZOEncoder.GetIfRequired(s.GetCPASettings(), BlockSize), () => {
 					var blockStart = s.CurrentAbsoluteOffset;
 					if (!TestAllocations) {
-						Block = s.SerializeArray<byte>(Block, BlockSize, name: nameof(Block));
+						Data = s.SerializeArray<byte>(Data, BlockSize, name: nameof(Data));
 					} else {
 						if (BlockSize > 0) {
 							if (FirstFree == 0xFFFFFFFF) {
 								HeaderWithoutFree = s.SerializeObject<MMG_HeaderBlockWithoutFree>(HeaderWithoutFree, name: nameof(HeaderWithoutFree));
-								Block = s.SerializeArray<byte>(Block, BlockSize - 4, name: nameof(Block));
+								Data = s.SerializeArray<byte>(Data, BlockSize - 4, name: nameof(Data));
 							} else {
 								Allocations = s.SerializeObjectArrayUntil<MMG_Allocation>(Allocations, a => s.CurrentAbsoluteOffset >= blockStart + BlockSize - 8, name: nameof(Allocations));
-								Block = s.SerializeArray<byte>(Block, 8, name: nameof(Block));
+								Data = s.SerializeArray<byte>(Data, 8, name: nameof(Data));
 							}
 						}
 					}

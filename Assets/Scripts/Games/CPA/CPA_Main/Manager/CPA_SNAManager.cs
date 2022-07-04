@@ -101,7 +101,7 @@ namespace Raymap {
 					int blockIndex = 0;
 					foreach (var blk in sna.Blocks) {
 						if (blk.BlockSize == 0) continue;
-						Util.ByteArrayToFile(Path.Combine(outputDir, mapName, $"{blockIndex} - {blk.Module}_{blk.Bloc} - {blk.ModuleTranslation?.ToString() ?? ("Undefined")}.bin"), blk.Block);
+						Util.ByteArrayToFile(Path.Combine(outputDir, mapName, $"{blockIndex} - {blk.Module}_{blk.Block} - {blk.ModuleTranslation?.ToString() ?? ("Undefined")}.bin"), blk.Data);
 						blockIndex++;
 					}
 					await TimeController.WaitIfNecessary();
@@ -200,9 +200,19 @@ namespace Raymap {
 			GlobalLoadState.DetailedState = "Loading fix";
 			await TimeController.WaitIfNecessary();
 
+			// Load SNA and relocation table
 			SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.FixSNA.ToString());
 			SNA_PointerFile<SNA_RelocationTable> rtb = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTB.ToString());
+			ProcessSNA(context, sna?.Value, rtb?.Value);
+
+			SNA_PointerFile<SNA_TemporaryMemoryBlock> gpt = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.FixGPT.ToString());
+			SNA_PointerFile<SNA_RelocationTable> rtp = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTP.ToString());
+			var gptFile = ProcessTMP(context, gpt?.Value, rtp?.Value);
+
+			var gptContents = FileFactory.Read<GAM_GlobalPointers>(context, gptFile?.FilePath);
 		}
+
+		public string ContentID(CPA_Path path) => $"{path}_Content";
 
 		public async UniTask LoadLevel(Context context, string levelName) {
 			GlobalLoadState.DetailedState = "Loading level";
@@ -216,11 +226,25 @@ namespace Raymap {
 				if(!mapIndex.HasValue)
 					throw new Exception($"Map {cpaGlobals?.Map} does not occur in Game.DSB and cannot be loaded");
 				SNA_RelocationTable rtb = await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, SNA_RelocationType.SNA);
+				ProcessSNA(context, sna?.Value, rtb);
 			} else {
 				SNA_PointerFile<SNA_RelocationTable> rtb = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.LevelRTB.ToString());
+				ProcessSNA(context, sna?.Value, rtb?.Value);
 			}
 
 			throw new NotImplementedException();
+		}
+
+		public void ProcessSNA(Context context, SNA_MemorySnapshot snapshot, SNA_RelocationTable relocationTable) {
+			foreach (var block in snapshot.Blocks) {
+				if (block.BlockSize == 0) continue;
+				var relBlock = relocationTable.Blocks.FirstOrDefault(r => r.Block == block.Block && r.Module == block.Module);
+				SNA_BlockFile bf = context.AddFile(new SNA_BlockFile(context, block, relBlock));
+			}
+		}
+		public SNA_BlockFile ProcessTMP(Context context, SNA_TemporaryMemoryBlock block, SNA_RelocationTable relocationTable) {
+			var relBlock = relocationTable.Blocks[0];
+			return context.AddFile(new SNA_BlockFile(context, block, relBlock, mode: SNA_BlockFile.PointerMode.Relocation));
 		}
 
 		public virtual void InitGlobals(Context context) => new CPA_Globals_SNA(context);
@@ -239,7 +263,7 @@ namespace Raymap {
 			await LoadFix(context);
 
 			// Load level
-			await LoadLevel(context, context.GetMapViewerSettings().Map);
+			//await LoadLevel(context, context.GetMapViewerSettings().Map);
 
 			throw new NotImplementedException();
 		}
