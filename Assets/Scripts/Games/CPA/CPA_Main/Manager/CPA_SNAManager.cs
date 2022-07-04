@@ -209,7 +209,7 @@ namespace Raymap {
 			SNA_PointerFile<SNA_RelocationTable> rtp = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTP.ToString());
 			var gptFile = ProcessTMP(context, gpt?.Value, rtp?.Value);
 
-			var gptContents = FileFactory.Read<GAM_GlobalPointers>(context, gptFile?.FilePath);
+			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, gptFile?.FilePath);
 		}
 
 		public string ContentID(CPA_Path path) => $"{path}_Content";
@@ -238,8 +238,8 @@ namespace Raymap {
 		public void ProcessSNA(Context context, SNA_MemorySnapshot snapshot, SNA_RelocationTable relocationTable) {
 			foreach (var block in snapshot.Blocks) {
 				if (block.BlockSize == 0) continue;
-				var relBlock = relocationTable.Blocks.FirstOrDefault(r => r.Block == block.Block && r.Module == block.Module);
-				SNA_BlockFile bf = context.AddFile(new SNA_BlockFile(context, block, relBlock));
+				var relBlock = relocationTable.Blocks.FirstOrDefault(r => r.Block == block.Block && r.Module == block.Module && !r.IsInvalidBlock);
+				SNA_BlockFile bf = context.AddFile(new SNA_BlockFile(context, block, relBlock, mode: SNA_BlockFile.PointerMode.Relocation));
 			}
 		}
 		public SNA_BlockFile ProcessTMP(Context context, SNA_TemporaryMemoryBlock block, SNA_RelocationTable relocationTable) {

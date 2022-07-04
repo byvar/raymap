@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
 	public class SNA_RelocationTableBlock : BinarySerializable {
+		public bool IsInvalidBlock { get; set; } = false;
+
 		public byte Module { get; set; }
 		public byte Block { get; set; }
 		public uint Count { get; set; }
@@ -20,6 +22,11 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 
 		public override void SerializeImpl(SerializerObject s) {
+			if (s.CurrentFileOffset >= s.CurrentLength) {
+				IsInvalidBlock = true;
+				return; // Somehow, the iOS version of R2 has bad relocation blocks.
+			}
+
 			Module = s.Serialize<byte>(Module, name: nameof(Module));
 			if (ModuleTranslation != null) s.Log($"Module: {ModuleTranslation}");
 
