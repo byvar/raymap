@@ -14,7 +14,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64
 		}
 
         public void SerializeFat(SerializerObject s) {
-            Fat?.Resolve(s, onPreSerialize: f => f.Pre_ObjectsCount = ObjectsCount);
+            Fat?.ResolveObject(s, onPreSerialize: f => f.Pre_ObjectsCount = ObjectsCount);
         }
     }
 }

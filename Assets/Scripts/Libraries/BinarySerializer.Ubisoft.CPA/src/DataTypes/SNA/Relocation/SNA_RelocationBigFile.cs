@@ -49,7 +49,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			s.Goto(Occurs[i]);
 			await s.FillCacheForReadAsync(RelocationTablesCount * 4 + PTC_BigFileEncoder.KeysSize);
 			s.Goto(curPos);
-			Occurs[i].Resolve(s, onPreSerialize: o => o.Pre_OffsetsCount = RelocationTablesCount);
+			Occurs[i].ResolveObject(s, onPreSerialize: o => o.Pre_OffsetsCount = RelocationTablesCount);
 		}
 
 		public async Task<SNA_RelocationTable> SerializeRelocationTable(SerializerObject s, SNA_RelocationTable table, int occur, int mapNumber, SNA_RelocationType type) {

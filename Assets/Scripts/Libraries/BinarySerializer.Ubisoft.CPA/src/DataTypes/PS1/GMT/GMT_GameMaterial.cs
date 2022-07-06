@@ -12,7 +12,7 @@
 		{
 			Ushort_00 = s.Serialize<ushort>(Ushort_00, name: nameof(Ushort_00));
 			Ushort_02 = s.Serialize<ushort>(Ushort_02, name: nameof(Ushort_02));
-			CollideMaterial = s.SerializePointer(CollideMaterial, name: nameof(CollideMaterial))?.Resolve(s);
+			CollideMaterial = s.SerializePointer(CollideMaterial, name: nameof(CollideMaterial))?.ResolveObject(s);
 			Int_08 = s.Serialize<int>(Int_08, name: nameof(Int_08));
 			Uint_0C = s.Serialize<uint>(Uint_0C, name: nameof(Uint_0C));
 		}

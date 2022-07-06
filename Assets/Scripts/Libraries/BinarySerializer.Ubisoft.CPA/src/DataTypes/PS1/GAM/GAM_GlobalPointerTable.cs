@@ -303,9 +303,9 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			}
 
 			// Serialize data from pointers
-			DynamicWorld?.Resolve(s);
-			FatherSector?.Resolve(s);
-			InactiveDynamicWorld?.Resolve(s);
+			DynamicWorld?.ResolveObject(s);
+			FatherSector?.ResolveObject(s);
+			InactiveDynamicWorld?.ResolveObject(s);
 
 			s.DoAt(AlwaysPointer, () => 
 				Always = s.SerializeObjectArray<ALW_AlwaysList>(Always, AlwaysCount, name: nameof(Always)));
@@ -318,7 +318,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			s.DoAt(PersosPointer, () =>
 				Persos = s.SerializeObjectArray<PERSO_Perso>(Persos, PersosCount, name: nameof(Persos)));
 			s.DoAt(StatesPointer, () =>
-				States = s.SerializePointerArray<PLA_State>(States, StatesCount, resolve: true, name: nameof(States)));
+				States = s.SerializePointerArray<PLA_State>(States, StatesCount, name: nameof(States)))?.ResolveObject(s);
 
 			long animPosCount = (AnimationRotationsPointer.FileOffset - AnimationPositionsPointer.FileOffset) / 6;
 			long animRotCount = (AnimationScalesPointer.FileOffset - AnimationRotationsPointer.FileOffset) / 8;
@@ -339,7 +339,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				AnimationScales = s.SerializeObjectArray<ANIM_Vector>(AnimationScales, animScaleCount, name: nameof(AnimationScales)));
 
 			s.DoAt(UITexturesNamesPointer, () =>
-				UITexturesNames = s.SerializePointerArray(UITexturesNames, UITexturesCount, resolve: true, name: nameof(UITexturesNames)));
+				UITexturesNames = s.SerializePointerArray(UITexturesNames, UITexturesCount, name: nameof(UITexturesNames)))?.ResolveObject(s);
 			s.DoAt(UITexturesWidthsPointer, () =>
 				UITexturesWidths = s.SerializeArray<ushort>(UITexturesWidths, UITexturesCount, name: nameof(UITexturesWidths)));
 			s.DoAt(UITexturesHeightsPointer, () =>

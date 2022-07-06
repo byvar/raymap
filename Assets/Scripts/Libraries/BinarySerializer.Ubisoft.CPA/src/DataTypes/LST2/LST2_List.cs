@@ -76,7 +76,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 						list[elementIndex] = s.SerializeObject<T>(list[elementIndex], name: $"{name}[{elementIndex}]");
 					});
 					Element.Value = list[elementIndex];
-					Element?.Value?.LST2_Previous?.Resolve(s); // Resolve previous pointer if it exists
+					Element?.Value?.LST2_Previous?.ResolveObject(s); // Resolve previous pointer if it exists
 
 					list[elementIndex] = Element?.Value;
 					elementIndex++;

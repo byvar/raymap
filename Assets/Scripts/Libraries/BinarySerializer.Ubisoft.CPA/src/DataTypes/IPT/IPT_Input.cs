@@ -14,10 +14,10 @@
 		public byte[] MouseButtonsCounter { get; set; }
 		public byte[] UnknownBytes0 { get; set; }
 		public uint EntryElementsCount { get; set; }
-		public ArrayPointer<IPT_EntryElement> EntryElements { get; set; }
+		public Pointer<IPT_EntryElement[]> EntryElements { get; set; }
 		public LST2_DynamicList<IPT_EntryElement> EntryElementList { get; set; } // Unused?
 		public short EventHistorySize { get; set; }
-		public ArrayPointer<IPT_EventHistoryElement> EventHistory { get; set; } // TODO
+		public Pointer<IPT_EventHistoryElement[]> EventHistory { get; set; } // TODO
 
 
 
@@ -68,11 +68,11 @@
 			}
 			s.Align(4, Offset);
 			EntryElementsCount = s.Serialize<uint>(EntryElementsCount, name: nameof(EntryElementsCount));
-			EntryElements = s.SerializeArrayPointer<IPT_EntryElement>(EntryElements, name: nameof(EntryElements))?.Resolve(s, EntryElementsCount);
+			EntryElements = s.SerializePointer<IPT_EntryElement[]>(EntryElements, name: nameof(EntryElements))?.ResolveObjectArray(s, EntryElementsCount);
 			EntryElementList = s.SerializeObject<LST2_DynamicList<IPT_EntryElement>>(EntryElementList, name: nameof(EntryElementList));
 			EventHistorySize = s.Serialize<short>(EventHistorySize, name: nameof(EventHistorySize));
 			s.Align(4, Offset);
-			EventHistory = s.SerializeArrayPointer<IPT_EventHistoryElement>(EventHistory, name: nameof(EventHistory))?.Resolve(s, EventHistorySize);
+			EventHistory = s.SerializePointer<IPT_EventHistoryElement[]>(EventHistory, name: nameof(EventHistory))?.ResolveObjectArray(s, EventHistorySize);
 		}
 	}
 }

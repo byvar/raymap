@@ -54,9 +54,9 @@
 				}
 			}
 
-			Father?.Resolve(s);
-			NextBrother?.Resolve(s);
-			PreviousBrother?.Resolve(s);
+			Father?.ResolveObject(s);
+			NextBrother?.ResolveObject(s);
+			PreviousBrother?.ResolveObject(s);
 		}
 	}
 }

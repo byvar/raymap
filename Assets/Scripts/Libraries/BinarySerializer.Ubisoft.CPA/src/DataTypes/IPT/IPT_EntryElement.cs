@@ -3,7 +3,7 @@
 		public LST2_DynamicListElement<IPT_EntryElement> LST2_Element { get; set; }
 		public LST2_DynamicList<IPT_KeyWordElement> KeyWordsList { get; set; }
 		public uint KeyWordElementsCount { get; set; }
-		public ArrayPointer<IPT_KeyWordElement> KeyWordElements { get; set; }
+		public Pointer<IPT_KeyWordElement[]> KeyWordElements { get; set; }
 
 		public int State { get; set; }
 		public float AnalogicValue { get; set; }
@@ -29,7 +29,7 @@
 
 			if (s.GetCPASettings().EngineVersion != EngineVersion.TonicTroubleSE) {
 				KeyWordElementsCount = s.Serialize<uint>(KeyWordElementsCount, name: nameof(KeyWordElementsCount));
-				KeyWordElements = s.SerializeArrayPointer<IPT_KeyWordElement>(KeyWordElements, name: nameof(KeyWordElements))?.Resolve(s, KeyWordElementsCount);
+				KeyWordElements = s.SerializePointer<IPT_KeyWordElement[]>(KeyWordElements, name: nameof(KeyWordElements))?.ResolveObjectArray(s, KeyWordElementsCount);
 			}
 
 			if(!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2) &&

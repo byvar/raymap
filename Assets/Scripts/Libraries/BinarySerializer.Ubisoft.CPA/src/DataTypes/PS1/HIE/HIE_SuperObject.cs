@@ -46,11 +46,11 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			NextBrother = s.SerializePointer<HIE_SuperObject>(NextBrother, name: nameof(NextBrother));
 			PreviousBrother = s.SerializePointer<HIE_SuperObject>(PreviousBrother, name: nameof(PreviousBrother));
 			Parent = s.SerializePointer<HIE_SuperObject>(Parent, name: nameof(Parent));
-			LocalMatrix = s.SerializePointer(LocalMatrix, name: nameof(LocalMatrix))?.Resolve(s);
+			LocalMatrix = s.SerializePointer(LocalMatrix, name: nameof(LocalMatrix))?.ResolveObject(s);
 
 			if (settings.EngineVersion != EngineVersion.RaymanRush_PS1)
 			{
-				GlobalMatrix = s.SerializePointer(GlobalMatrix, name: nameof(GlobalMatrix))?.Resolve(s);
+				GlobalMatrix = s.SerializePointer(GlobalMatrix, name: nameof(GlobalMatrix))?.ResolveObject(s);
 				Short_28 = s.Serialize<short>(Short_28, name: nameof(Short_28));
 				Short_2A = s.Serialize<short>(Short_2A, name: nameof(Short_2A));
 				Short_2C = s.Serialize<short>(Short_2C, name: nameof(Short_2C));
@@ -78,10 +78,10 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			// Resolve hierarchy
 			Children?.Resolve(s, name: nameof(Children));
 			if (Parent?.PointerValue == null) {
-				NextBrother?.Resolve(s);
-				PreviousBrother?.Resolve(s);
+				NextBrother?.ResolveObject(s);
+				PreviousBrother?.ResolveObject(s);
 			}
-			Parent?.Resolve(s);
+			Parent?.ResolveObject(s);
 		}
 
 		public BinarySerializable LinkedObject {

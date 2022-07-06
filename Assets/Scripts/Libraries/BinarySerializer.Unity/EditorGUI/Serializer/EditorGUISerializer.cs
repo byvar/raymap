@@ -253,7 +253,7 @@ namespace BinarySerializer.Unity
 			return obj;
 		}
 
-		public override Pointer<T> SerializePointer<T>(Pointer<T> obj, PointerSize size = PointerSize.Pointer32, Pointer anchor = null, bool resolve = false, Action<T> onPreSerialize = null,
+		public override Pointer<T> SerializePointer<T>(Pointer<T> obj, PointerSize size = PointerSize.Pointer32, Pointer anchor = null,
 			bool allowInvalid = false, long? nullValue = null, string name = null)
 		{
 			name ??= DefaultName;
@@ -262,25 +262,9 @@ namespace BinarySerializer.Unity
 			EditorGUILayout.TextField(name, $"{obj}");
 			EditorGUI.EndDisabledGroup();
 
-			if (resolve)
-				DoAt(obj, () => obj.Value = SerializeObject<T>(obj.Value, onPreSerialize: onPreSerialize, name: $"{name}.Value"));
-
 			return obj;
 		}
-		public override ArrayPointer<T> SerializeArrayPointer<T>(ArrayPointer<T> obj, PointerSize size = PointerSize.Pointer32, Pointer anchor = null, bool resolve = false, long count = 0, Action<T> onPreSerialize = null,
-			bool allowInvalid = false, long? nullValue = null, string name = null) {
-			name ??= DefaultName;
-
-			EditorGUI.BeginDisabledGroup(true);
-			EditorGUILayout.TextField(name, $"{obj}");
-			EditorGUI.EndDisabledGroup();
-
-			if (resolve)
-				DoAt(obj, () => obj.Value = SerializeObjectArray<T>(obj.Value, count, onPreSerialize: onPreSerialize, name: $"{name}.Value"));
-
-			return obj;
-		}
-
+		
 		public override string SerializeString(string obj, long? length = null, Encoding encoding = null, string name = null)
 		{
 			name ??= DefaultName;
@@ -374,8 +358,8 @@ namespace BinarySerializer.Unity
 			return obj;
 		}
 
-		public override Pointer<T>[] SerializePointerArray<T>(Pointer<T>[] obj, long count, PointerSize size = PointerSize.Pointer32, Pointer anchor = null, bool resolve = false,
-			Action<T, int> onPreSerialize = null, bool allowInvalid = false, long? nullValue = null, string name = null)
+		public override Pointer<T>[] SerializePointerArray<T>(Pointer<T>[] obj, long count, PointerSize size = PointerSize.Pointer32, Pointer anchor = null,
+			bool allowInvalid = false, long? nullValue = null, string name = null)
 		{
 			name ??= DefaultName;
 
@@ -387,7 +371,7 @@ namespace BinarySerializer.Unity
 			DoFoldout($"{name}[{obj.Length}]", () =>
 			{
 				for (int i = 0; i < obj.Length; i++)
-					SerializePointer(obj[i], size: size, anchor: anchor, resolve: resolve, onPreSerialize: onPreSerialize == null ? null : x => onPreSerialize(x, i), allowInvalid: allowInvalid, nullValue: nullValue, name: $"{name}[{i}]");
+					SerializePointer(obj[i], size: size, anchor: anchor, allowInvalid: allowInvalid, nullValue: nullValue, name: $"{name}[{i}]");
 			});
 
 			return obj;
