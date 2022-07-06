@@ -11,8 +11,8 @@
 		public bool IsActive { get; set; }
 
 		public Pointer UnknownPointer { get; set; }
-		public Pointer ActionName { get; set; }
-		public Pointer EntryName { get; set; } // For options
+		public Pointer<string> ActionName { get; set; }
+		public Pointer<string> EntryName { get; set; } // For options
 
 		// LST2_IEntry implementation
 		public Pointer<IPT_EntryElement> LST2_Next => ((LST2_IEntry<IPT_EntryElement>)LST2_Element).LST2_Next;
@@ -36,11 +36,11 @@
 				s.GetCPASettings().EngineVersion != EngineVersion.TonicTroubleSE)
 				UnknownPointer = s.SerializePointer(UnknownPointer, name: nameof(UnknownPointer));
 
-			ActionName = s.SerializePointer(ActionName, name: nameof(ActionName));
+			ActionName = s.SerializePointer<string>(ActionName, name: nameof(ActionName))?.ResolveString(s);
 			if(s.GetCPASettings().HasExtraInputData
 				|| s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)
 				|| s.GetCPASettings().Platform == Platform.DC)
-				EntryName = s.SerializePointer(EntryName, name: nameof(EntryName));
+				EntryName = s.SerializePointer<string>(EntryName, name: nameof(EntryName))?.ResolveString(s);
 
 			State = s.Serialize<int>(State, name: nameof(State));
 			if (s.GetCPASettings().EngineVersion == EngineVersion.TonicTroubleSE) {
