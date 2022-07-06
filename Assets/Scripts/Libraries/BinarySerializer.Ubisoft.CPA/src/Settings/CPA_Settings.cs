@@ -34,6 +34,8 @@ namespace BinarySerializer.Ubisoft.CPA {
             _                => Endian.Little
         };
 
+		public bool ShouldAlign => EngineVersionTree.HasParent(EngineVersion.CPA_3) && Platform == Platform.PS2;
+
         /// <summary>
         /// Engine version tree. CPA has a complex history and evolved with many branches
         /// </summary>

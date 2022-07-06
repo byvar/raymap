@@ -207,7 +207,7 @@ namespace Raymap {
 
 			SNA_PointerFile<SNA_TemporaryMemoryBlock> gpt = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.FixGPT.ToString());
 			SNA_PointerFile<SNA_RelocationTable> rtp = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTP.ToString());
-			var gptFile = ProcessTMP(context, gpt?.Value, rtp?.Value);
+			var gptFile = ProcessTMP(context, ContentID(CPA_Path.FixGPT), gpt?.Value, rtp?.Value);
 
 			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, gptFile?.FilePath);
 		}
@@ -241,10 +241,18 @@ namespace Raymap {
 				var relBlock = relocationTable.Blocks.FirstOrDefault(r => r.Block == block.Block && r.Module == block.Module && !r.IsInvalidBlock);
 				SNA_BlockFile bf = context.AddFile(new SNA_BlockFile(context, block, relBlock, mode: SNA_BlockFile.PointerMode.Relocation));
 			}
+			// Also add empty blocks, those can be pointed to but never read
+			foreach (var block in snapshot.Blocks.Reverse()) {
+				if (block.BlockSize == 0 && !context.FileExists(block.BlockName)
+					&& block.BeginBlock != block.EndBlock
+					&& block.BeginBlock != SNA_MemoryBlock.InvalidBeginBlock) {
+					SNA_BlockFile bf = context.AddFile(new SNA_BlockFile(context, block, null, mode: SNA_BlockFile.PointerMode.Relocation));
+				}
+			}
 		}
-		public SNA_BlockFile ProcessTMP(Context context, SNA_TemporaryMemoryBlock block, SNA_RelocationTable relocationTable) {
+		public SNA_BlockPointerFile ProcessTMP(Context context, string name, SNA_TemporaryMemoryBlock block, SNA_RelocationTable relocationTable) {
 			var relBlock = relocationTable.Blocks[0];
-			return context.AddFile(new SNA_BlockFile(context, block, relBlock, mode: SNA_BlockFile.PointerMode.Relocation));
+			return context.AddFile(new SNA_BlockPointerFile(context, name, block.Data, relBlock));
 		}
 
 		public virtual void InitGlobals(Context context) => new CPA_Globals_SNA(context);

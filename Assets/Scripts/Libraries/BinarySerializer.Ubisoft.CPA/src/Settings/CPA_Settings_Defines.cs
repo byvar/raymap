@@ -663,6 +663,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			HasLinkedListHeaderPointers = true,
 			Luminosity = 0.5f,
 			Saturate = true,
+			HasExtraInputData = true,
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.All }
 			}

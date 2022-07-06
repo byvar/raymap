@@ -8,6 +8,7 @@
 		public Pointer<IPT_EntryElement>[] EntryActions_3DOS { get; set; }
 		public Pointer<IPT_KeyAndPadDefineArray> KeyAndPadDefine { get; set; }
 		public IPT_Input InputStructure { get; set; }
+		public ArrayPointer<IPT_EntryElement> EntryElementList { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
@@ -16,9 +17,11 @@
 				MatrixCountInStack = s.Serialize<uint>(MatrixCountInStack, name: nameof(MatrixCountInStack));
 				CollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject));
 				StaticCollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject));
-				EntryActions_3DOS = s.SerializePointerArray<IPT_EntryElement>(EntryActions_3DOS, s.GetCPASettings().EntryActionsCount, name: nameof(EntryActions_3DOS));
+				EntryActions_3DOS = s.SerializePointerArray<IPT_EntryElement>(EntryActions_3DOS, s.GetCPASettings().EntryActionsCount, name: nameof(EntryActions_3DOS))?.Resolve(s);
 				KeyAndPadDefine = s.SerializePointer<IPT_KeyAndPadDefineArray>(KeyAndPadDefine, name: nameof(KeyAndPadDefine))?.Resolve(s);
 				InputStructure = s.SerializeObject<IPT_Input>(InputStructure, name: nameof(InputStructure));
+				EntryElementList = s.SerializeArrayPointer<IPT_EntryElement>(EntryElementList, name: nameof(EntryElementList))?.Resolve(s, InputStructure.EntryElementsCount);
+
 			}
 		}
 	}

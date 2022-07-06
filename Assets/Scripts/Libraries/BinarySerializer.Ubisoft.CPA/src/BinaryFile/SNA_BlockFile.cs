@@ -9,7 +9,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public PointerMode Mode { get; set; }
 
 		public SNA_BlockFile(Context context, SNA_MemoryBlock block, SNA_RelocationTableBlock relocationBlock, PointerMode mode = PointerMode.MemoryMapped)
-			: base(context, block.BlockName, block.BeginBlock, block.Data, endianness: context.GetCPASettings().GetEndian) {
+			: base(context, block.BlockName, block.BeginBlock, block.ExpandedData, endianness: context.GetCPASettings().GetEndian) {
 			Block = block;
 			Mode = mode;
 			RelocationBlock = relocationBlock;
@@ -44,7 +44,17 @@ namespace BinarySerializer.Ubisoft.CPA {
 				}
 			}
 
-			return null;
+			// Fallback: memory mapped
+
+			// Get all memory mapped files
+			var files = Context.MemoryMap.Files.Where(x => x is SNA_BlockFile b).Select(x => (SNA_BlockFile)x);
+
+			// Sort based on the base address
+			files = files.OrderByDescending(file => file.BaseAddress)
+				.Where(f => serializedValue <= f.Block.MaxMem && serializedValue >= f.BaseAddress);
+
+			// Return the first pointer within the range
+			return files.FirstOrDefault();
 		}
 
 		public enum PointerMode {

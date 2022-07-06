@@ -13,6 +13,15 @@
 
 		public byte[] Data { get; set; } // Memory data
 
+		public byte[] ExpandedData {
+			get {
+				var data = Data;
+				var newData = new byte[EndBlock + 1 - BeginBlock];
+				System.Array.Copy(data, newData, data.Length);
+				return newData;
+			}
+		}
+
 		// For testing purposes: to read allocations separately
 		public static bool TestAllocations = false;
 		public MMG_HeaderBlockWithoutFree HeaderWithoutFree { get; set; }

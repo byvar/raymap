@@ -267,6 +267,19 @@ namespace BinarySerializer.Unity
 
 			return obj;
 		}
+		public override ArrayPointer<T> SerializeArrayPointer<T>(ArrayPointer<T> obj, PointerSize size = PointerSize.Pointer32, Pointer anchor = null, bool resolve = false, long count = 0, Action<T> onPreSerialize = null,
+			bool allowInvalid = false, long? nullValue = null, string name = null) {
+			name ??= DefaultName;
+
+			EditorGUI.BeginDisabledGroup(true);
+			EditorGUILayout.TextField(name, $"{obj}");
+			EditorGUI.EndDisabledGroup();
+
+			if (resolve)
+				DoAt(obj, () => obj.Value = SerializeObjectArray<T>(obj.Value, count, onPreSerialize: onPreSerialize, name: $"{name}.Value"));
+
+			return obj;
+		}
 
 		public override string SerializeString(string obj, long? length = null, Encoding encoding = null, string name = null)
 		{

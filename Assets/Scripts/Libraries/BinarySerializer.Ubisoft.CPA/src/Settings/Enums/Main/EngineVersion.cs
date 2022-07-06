@@ -11,6 +11,7 @@
         Rayman2,
         Rayman2Demo,
         Rayman2Revolution,
+		LargoWinch,
 		Rayman4DS,
 		Rayman4DS_20060525,
         RaymanRavingRabbids,
@@ -34,11 +35,12 @@
         Rayman3,
         DonaldDuckPK,
         Dinosaur,
-        LargoWinch,
 
         CPA_Montreal,
         PlaymobilHype,
         PlaymobilAlex,
         PlaymobilLaura,
+
+		CPA_Montreal2,
     }
 }
