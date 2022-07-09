@@ -13,7 +13,7 @@
 		public IPT_KeyboardType KeyboardType { get; set; }
 		public byte[] MouseButtonsCounter { get; set; }
 		public LST2_DynamicList<IPT_EntryElement> ScriptEntryElementList { get; set; } // Only used for scripts
-		public LST2_DynamicList<IPT_CommandElement> ScriptCommandElementList { get; set; } // Only used for scripts
+		public LST2_DynamicList<IPT_CommandElementList> ScriptCommandElementList { get; set; } // Only used for scripts
 		public uint EntryElementsCount { get; set; }
 		public Pointer<IPT_EntryElement[]> EntryElements { get; set; }
 		public uint CommandElementsCount { get; set; }
@@ -77,8 +77,8 @@
 				MouseButtonsCounter = s.SerializeArray<byte>(MouseButtonsCounter, 9, name: nameof(MouseButtonsCounter));
 
 				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
-					ScriptEntryElementList = s.SerializeObject<LST2_DynamicList<IPT_EntryElement>>(ScriptEntryElementList, name: nameof(ScriptEntryElementList));
-					ScriptCommandElementList = s.SerializeObject<LST2_DynamicList<IPT_CommandElement>>(ScriptCommandElementList, name: nameof(ScriptCommandElementList));
+					ScriptEntryElementList = s.SerializeObject<LST2_DynamicList<IPT_EntryElement>>(ScriptEntryElementList, name: nameof(ScriptEntryElementList))?.Resolve(s);
+					ScriptCommandElementList = s.SerializeObject<LST2_DynamicList<IPT_CommandElementList>>(ScriptCommandElementList, name: nameof(ScriptCommandElementList))?.Resolve(s);
 				}
 			}
 			s.Align(4, Offset);
