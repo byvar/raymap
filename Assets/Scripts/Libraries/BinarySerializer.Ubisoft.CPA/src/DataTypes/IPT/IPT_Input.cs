@@ -77,8 +77,8 @@
 				MouseButtonsCounter = s.SerializeArray<byte>(MouseButtonsCounter, 9, name: nameof(MouseButtonsCounter));
 
 				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
-					ScriptEntryElementList = s.SerializeObject<LST2_DynamicList<IPT_EntryElement>>(ScriptEntryElementList, name: nameof(ScriptEntryElementList))?.Resolve(s);
-					ScriptCommandElementList = s.SerializeObject<LST2_DynamicList<IPT_CommandElementList>>(ScriptCommandElementList, name: nameof(ScriptCommandElementList))?.Resolve(s);
+					ScriptEntryElementList = s.SerializeObject<LST2_DynamicList<IPT_EntryElement>>(ScriptEntryElementList, name: nameof(ScriptEntryElementList))?.Resolve(s, name: nameof(ScriptEntryElementList));
+					ScriptCommandElementList = s.SerializeObject<LST2_DynamicList<IPT_CommandElementList>>(ScriptCommandElementList, name: nameof(ScriptCommandElementList))?.Resolve(s, name: nameof(ScriptCommandElementList));
 				}
 			}
 			s.Align(4, Offset);
