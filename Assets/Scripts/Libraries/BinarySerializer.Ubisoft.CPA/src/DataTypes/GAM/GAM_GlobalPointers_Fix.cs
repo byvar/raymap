@@ -9,6 +9,7 @@
 		public Pointer<IPT_KeyAndPadDefineArray> KeyAndPadDefine { get; set; }
 		public IPT_Input InputStructure { get; set; }
 		public Pointer<IPT_EntryElement[]> EntryElementList { get; set; }
+		public FON_General Text { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
@@ -21,7 +22,7 @@
 				KeyAndPadDefine = s.SerializePointer<IPT_KeyAndPadDefineArray>(KeyAndPadDefine, name: nameof(KeyAndPadDefine))?.ResolveObject(s);
 				InputStructure = s.SerializeObject<IPT_Input>(InputStructure, name: nameof(InputStructure));
 				EntryElementList = s.SerializePointer<IPT_EntryElement[]>(EntryElementList, name: nameof(EntryElementList))?.ResolveObjectArray(s, InputStructure.EntryElementsCount);
-
+				Text = s.SerializeObject<FON_General>(Text, name: nameof(Text));
 			}
 		}
 	}
