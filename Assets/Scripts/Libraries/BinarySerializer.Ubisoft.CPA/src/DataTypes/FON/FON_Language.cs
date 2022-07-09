@@ -9,7 +9,7 @@
 			MaxTextCount = s.Serialize<ushort>(MaxTextCount, name: nameof(MaxTextCount));
 			TextCount = s.Serialize<ushort>(TextCount, name: nameof(TextCount));
 
-			Text?.ResolvePointerArray(s, TextCount);
+			Text?.ResolvePointerArray(s, MaxTextCount);
 			Text.Value.ResolveString(s);
 		}
 	}
