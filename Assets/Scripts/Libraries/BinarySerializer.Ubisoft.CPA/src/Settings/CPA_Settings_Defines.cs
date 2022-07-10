@@ -492,7 +492,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings R2PCDemo1 => new CPA_Settings(EngineVersion.Rayman2Demo, Platform.PC) {
-			StaticListType = LST2_ListType.DoubleLinked,
+			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -507,7 +507,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2PCDemo2 => new CPA_Settings(EngineVersion.Rayman2Demo, Platform.PC) {
 			EntryActionsCount = 7,
-			StaticListType = LST2_ListType.DoubleLinked,
+			StaticListType = LST2_ListType.SingleLinked,
 			AITypes = new AI_Types_R2_PC(),
 			COLTypes = new COL_Types_R2(),
 			SNATypes = new SNA_Types_R2_Demo(),
