@@ -196,8 +196,8 @@ namespace Raymap {
 			await LoadBigFile(context);
 		}
 
-		public async UniTask LoadFix(Context context) {
-			GlobalLoadState.DetailedState = "Loading fix";
+		public async UniTask InitFixMemory(Context context) {
+			GlobalLoadState.DetailedState = "Loading fix memory";
 			await TimeController.WaitIfNecessary();
 
 			// Load SNA and relocation table
@@ -208,31 +208,41 @@ namespace Raymap {
 			SNA_PointerFile<SNA_TemporaryMemoryBlock> gpt = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.FixGPT.ToString());
 			SNA_PointerFile<SNA_RelocationTable> rtp = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTP.ToString());
 			var gptFile = ProcessTMP(context, ContentID(CPA_Path.FixGPT), gpt?.Value, rtp?.Value);
-
-			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, gptFile?.FilePath);
 		}
 
 		public string ContentID(CPA_Path path) => $"{path}_Content";
 
-		public async UniTask LoadLevel(Context context, string levelName) {
-			GlobalLoadState.DetailedState = "Loading level";
+		public async UniTask InitLevelMemory(Context context, string levelName) {
+			GlobalLoadState.DetailedState = "Loading level memory";
 			await TimeController.WaitIfNecessary();
 
 			var cpaGlobals = (CPA_Globals_SNA)context.GetCPAGlobals();
 			cpaGlobals.Map = levelName;
 			SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.LevelSNA.ToString());
+			SNA_PointerFile<SNA_TemporaryMemoryBlock> gpt = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.LevelGPT.ToString());
 			if (cpaGlobals.RelocationBigFile != null) {
 				var mapIndex = cpaGlobals.MapIndex;
 				if(!mapIndex.HasValue)
 					throw new Exception($"Map {cpaGlobals?.Map} does not occur in Game.DSB and cannot be loaded");
 				SNA_RelocationTable rtb = await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, SNA_RelocationType.SNA);
 				ProcessSNA(context, sna?.Value, rtb);
+				SNA_RelocationTable rtp = await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, SNA_RelocationType.GlobalPointers);
+				ProcessTMP(context, ContentID(CPA_Path.LevelGPT), gpt?.Value, rtp);
 			} else {
 				SNA_PointerFile<SNA_RelocationTable> rtb = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.LevelRTB.ToString());
 				ProcessSNA(context, sna?.Value, rtb?.Value);
+				SNA_PointerFile<SNA_RelocationTable> rtp = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.LevelRTP.ToString());
+				ProcessTMP(context, ContentID(CPA_Path.LevelGPT), gpt?.Value, rtp?.Value);
 			}
+		}
 
-			throw new NotImplementedException();
+
+		public async UniTask LoadFix(Context context) {
+			GlobalLoadState.DetailedState = "Loading fix";
+			await TimeController.WaitIfNecessary();
+
+			// Load SNA and relocation table
+			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, ContentID(CPA_Path.FixGPT));
 		}
 
 		public void ProcessSNA(Context context, SNA_MemorySnapshot snapshot, SNA_RelocationTable relocationTable) {
@@ -267,11 +277,12 @@ namespace Raymap {
 			// Now that the DSC is loaded, download other files
 			await LoadPathsAsync(context, mapName: context.GetMapViewerSettings().Map);
 
-			// Load fix
-			await LoadFix(context);
+			// Load SNA files, init memory
+			await InitFixMemory(context);
+			await InitLevelMemory(context, context.GetMapViewerSettings().Map);
 
-			// Load level
-			//await LoadLevel(context, context.GetMapViewerSettings().Map);
+			// Load content of SNA files
+			await LoadFix(context);
 
 			throw new NotImplementedException();
 		}

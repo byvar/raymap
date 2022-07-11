@@ -19,20 +19,24 @@
 				IdentityMatrix = s.SerializePointer<POS_CompletePosition>(IdentityMatrix, name: nameof(IdentityMatrix))?.ResolveObject(s);
 				MatrixStack = s.SerializePointerArray<POS_CompletePosition>(MatrixStack, 50, name: nameof(MatrixStack))?.ResolveObject(s);
 				MatrixCountInStack = s.Serialize<uint>(MatrixCountInStack, name: nameof(MatrixCountInStack));
-				CollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject));
-				StaticCollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject));
+				CollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject))?.ResolveObject(s);
+				StaticCollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject))?.ResolveObject(s);
 				EntryActions_3DOS = s.SerializePointerArray<IPT_EntryElement>(EntryActions_3DOS, s.GetCPASettings().EntryActionsCount, name: nameof(EntryActions_3DOS))?.ResolveObject(s);
 				KeyAndPadDefine = s.SerializePointer<IPT_KeyAndPadDefineArray>(KeyAndPadDefine, name: nameof(KeyAndPadDefine))?.ResolveObject(s);
 				InputStructure = s.SerializeObject<IPT_Input>(InputStructure, name: nameof(InputStructure));
 				EntryElementList = s.SerializePointer<IPT_EntryElement[]>(EntryElementList, name: nameof(EntryElementList))?.ResolveObjectArray(s, InputStructure.EntryElementsCount);
 				Text = s.SerializeObject<FON_General>(Text, name: nameof(Text));
 				Animations = s.SerializeObject<A3D_Stacks>(Animations, name: nameof(Animations));
-				LastAlwaysInFix = s.SerializePointer<GAM_AlwaysModelList>(LastAlwaysInFix, name: nameof(LastAlwaysInFix)); //?.ResolveObject(s);
+				LastAlwaysInFix = s.SerializePointer<GAM_AlwaysModelList>(LastAlwaysInFix, name: nameof(LastAlwaysInFix));
 				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2)) {
 					DemoGMTList = s.SerializePointer<LST2_StaticList<GMT_DemoGMTList>>(DemoGMTList, name: nameof(DemoGMTList))?.ResolveObject(s);
 					DemoGMTList?.Value?.Resolve(s, name: nameof(DemoGMTList));
 				}
 			}
+		}
+
+		public void ResolveFixLevelReferences(SerializerObject s) {
+			LastAlwaysInFix?.ResolveObject(s);
 		}
 	}
 }
