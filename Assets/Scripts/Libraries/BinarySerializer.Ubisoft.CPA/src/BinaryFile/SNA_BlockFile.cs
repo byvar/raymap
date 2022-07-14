@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -13,6 +14,14 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Block = block;
 			Mode = mode;
 			RelocationBlock = relocationBlock;
+
+			foreach (var f in Context.MemoryMap.Files) {
+				if(f is SNA_BlockFile bf)
+					bf.InvalidatePointerFileDictionary();
+				else if(f is SNA_BlockPointerFile bpf)
+					bpf.InvalidatePointerFileDictionary();
+			}
+				
 		}
 
 		/*public SNA_BlockFile(Context context, SNA_MemoryBlock block, SNA_RelocationTableBlock relocationBlock, PointerMode mode = PointerMode.MemoryMapped)
@@ -24,6 +33,27 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public override bool IsMemoryMapped => Mode == PointerMode.MemoryMapped;
 
+		private Dictionary<uint, BinaryFile> PointerFileDictionary { get; set; }
+		public void InvalidatePointerFileDictionary() {
+			PointerFileDictionary = null;
+		}
+		private void CreatePointerFileDictionary() {
+			PointerFileDictionary = new Dictionary<uint, BinaryFile>();
+			foreach (var ptr in RelocationBlock.Pointers) {
+				PointerFileDictionary[ptr.Pointer] = Context.MemoryMap.Files.FirstOrDefault(
+						x => x is SNA_BlockFile b
+						&& b.Block.Module == ptr.TargetModule
+						&& b.Block.Block == ptr.TargetBlock);
+			}
+		}
+		private BinaryFile GetFileFromDictionary(uint serializedValue) {
+			if (PointerFileDictionary == null) CreatePointerFileDictionary();
+			if (PointerFileDictionary.TryGetValue(serializedValue, out BinaryFile f))
+				return f;
+			return null;
+		}
+
+
 		/// <summary>
 		/// Retrieves the <see cref="BinaryFile"/> for a serialized <see cref="Pointer"/> value
 		/// </summary>
@@ -34,15 +64,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 			if(IsMemoryMapped)
 				return base.GetPointerFile(serializedValue, anchor: anchor);
 
-			foreach (var ptr in RelocationBlock.Pointers) {
-				if (ptr.Pointer == serializedValue) {
-					// Get file this points to
-					return Context.MemoryMap.Files.FirstOrDefault(
-						x => x is SNA_BlockFile b
-						&& b.Block.Module == ptr.TargetModule
-						&& b.Block.Block == ptr.TargetBlock);
-				}
-			}
+			var f = GetFileFromDictionary((uint)serializedValue);
+			if(f != null) return f;
 
 			// Fallback: memory mapped
 
