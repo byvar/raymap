@@ -41,6 +41,15 @@ namespace BinarySerializer.Ubisoft.CPA {
         /// </summary>
         public EngineVersionTree EngineVersionTree { get; }
 
+		public EngineBranch Branch => Platform switch
+		{
+			Platform.N64  => EngineBranch.U64,
+			Platform.DS   => EngineBranch.U64,
+			Platform._3DS => EngineBranch.U64,
+			Platform.PS1  => EngineBranch.PS1,
+			_             => EngineBranch.Main // TODO: not entirely correct. VIP has a PC version in the PS1 branch
+		};
+
         // Legacy. TODO: Remove those that become useless
         public CPA_GameMode Mode { get; set; } = CPA_GameMode.Rayman3PC;
         public LST2_ListType StaticListType { get; set; } = LST2_ListType.DoubleLinked;

@@ -23,7 +23,7 @@
 
 		// Serialized from pointers
 		public ANIM_AnimationChannel[] Channels { get; set; }
-		public ANIM_AnimationHierarchy[] Hierarchies { get; set; }
+		public ANIM_Hierarchy[] Hierarchies { get; set; }
 		public string Name { get; set; }
 		public ANIM_AnimationBoneChannelLinks[] Bones { get; set; }
 
@@ -86,7 +86,7 @@
 				Channels = s.SerializeObjectArray<ANIM_AnimationChannel>(Channels, ChannelsCount, name: nameof(Channels)));
 
 			s.DoAt(HierarchiesPointer, () =>
-				Hierarchies = s.SerializeObjectArray<ANIM_AnimationHierarchy>(Hierarchies, HierarchiesCount, name: nameof(Hierarchies)));
+				Hierarchies = s.SerializeObjectArray<ANIM_Hierarchy>(Hierarchies, HierarchiesCount, name: nameof(Hierarchies)));
 
 			if (HierarchiesPointer != null)
 				s.DoAt(HierarchiesPointer - (settings.EngineVersion == EngineVersion.DonaldDuckQuackAttack_PS1 ? 0x14 : 0x10), () =>

@@ -26,10 +26,11 @@ namespace BinarySerializer.Ubisoft.CPA {
                                             new Node(EngineVersion.CPA_3).SetChildren(
                                                 new Node(EngineVersion.Dinosaur).SetChildren(
                                                     new Node(EngineVersion.RaymanM).SetChildren(
-                                                        new Node(EngineVersion.RaymanArena),
-                                                        new Node(EngineVersion.Rayman3).SetChildren(
-                                                            new Node(EngineVersion.DonaldDuckPK)
-                                                        )
+                                                        new Node(EngineVersion.RaymanArena).SetChildren(
+															new Node(EngineVersion.Rayman3).SetChildren(
+																new Node(EngineVersion.DonaldDuckPK)
+															)
+														)
                                                     )
                                                 )
                                             ),

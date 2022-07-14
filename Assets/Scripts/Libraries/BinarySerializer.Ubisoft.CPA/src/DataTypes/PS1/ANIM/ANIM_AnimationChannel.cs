@@ -2,22 +2,18 @@
 {
 	public class ANIM_AnimationChannel : BinarySerializable
 	{
-		public Pointer FramesPointer { get; set; }
+		public Pointer<ANIM_AnimationKeyframe[]> Frames { get; set; }
 		public ushort FramesCount { get; set; }
 		public ushort ID { get; set; }
 
-		// Serialized from pointers
-		public ANIM_AnimationKeyframe[] Frames { get; set; }
-
 		public override void SerializeImpl(SerializerObject s)
 		{
-			FramesPointer = s.SerializePointer(FramesPointer, name: nameof(FramesPointer));
+			Frames = s.SerializePointer<ANIM_AnimationKeyframe[]>(Frames, name: nameof(Frames));
 			FramesCount = s.Serialize<ushort>(FramesCount, name: nameof(FramesCount));
 			ID = s.Serialize<ushort>(ID, name: nameof(ID));
 
 			// Serialize data from pointers
-			s.DoAt(FramesPointer, () => 
-				Frames = s.SerializeObjectArray<ANIM_AnimationKeyframe>(Frames, FramesCount, name: nameof(Frames)));
+			Frames?.ResolveObjectArray(s, FramesCount);
 		}
 	}
 }

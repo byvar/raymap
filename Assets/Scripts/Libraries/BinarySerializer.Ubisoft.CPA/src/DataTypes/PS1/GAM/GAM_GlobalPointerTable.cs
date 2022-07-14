@@ -105,7 +105,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public PERSO_Perso[] Persos { get; set; }
 		public Pointer<PLA_State>[] States { get; set; }
 		public ANIM_Vector[] AnimationPositions { get; set; }
-		public ANIM_Quaternion[] AnimationRotations { get; set; }
+		public A3D_Quaternion[] AnimationRotations { get; set; }
 		public ANIM_Vector[] AnimationScales { get; set; }
 
 		// UI textures
@@ -327,14 +327,14 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				SelectMany(x => x.Perso3DData.Family.Animations).
 				Where(x => x.Channels != null).
 				SelectMany(x => x.Channels).
-				Where(x => x.Frames != null).
-				SelectMany(x => x.Frames).
+				Where(x => x.Frames?.Value != null).
+				SelectMany(x => x.Frames?.Value).
 				Max(x => x.Scale) + 1 ?? 0;
 
 			s.DoAt(AnimationPositionsPointer, () =>
 				AnimationPositions = s.SerializeObjectArray<ANIM_Vector>(AnimationPositions, animPosCount, name: nameof(AnimationPositions)));
 			s.DoAt(AnimationRotationsPointer, () =>
-				AnimationRotations = s.SerializeObjectArray<ANIM_Quaternion>(AnimationRotations, animRotCount, name: nameof(AnimationRotations)));
+				AnimationRotations = s.SerializeObjectArray<A3D_Quaternion>(AnimationRotations, animRotCount, name: nameof(AnimationRotations)));
 			s.DoAt(AnimationScalesPointer, () =>
 				AnimationScales = s.SerializeObjectArray<ANIM_Vector>(AnimationScales, animScaleCount, name: nameof(AnimationScales)));
 
