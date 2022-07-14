@@ -54,6 +54,7 @@ namespace BinarySerializer.Ubisoft.CPA
 			ChannelsCount = s.Serialize<ushort>(ChannelsCount, name: nameof(ChannelsCount));
 			FramesCount = s.Serialize<ushort>(FramesCount, name: nameof(FramesCount));
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2) && s.GetCPASettings().Branch != EngineBranch.U64) {
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) s.Align(4, Offset);
 				KeyFramesCount = s.Serialize<uint>(KeyFramesCount, name: nameof(KeyFramesCount));
 			} else {
 				KeyFramesCount = s.Serialize<ushort>((ushort)KeyFramesCount, name: nameof(KeyFramesCount));

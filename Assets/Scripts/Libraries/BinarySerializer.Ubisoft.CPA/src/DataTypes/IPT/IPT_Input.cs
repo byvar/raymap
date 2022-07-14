@@ -93,7 +93,7 @@
 			s.Align(4, Offset);
 			EventHistory = s.SerializePointer<IPT_EventHistoryElement[]>(EventHistory, name: nameof(EventHistory))?.ResolveObjectArray(s, EventHistorySize);
 
-			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.RedPlanet)) {
+			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.RedPlanet) && s.GetCPASettings().Platform != Platform.iOS) {
 				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
 					AtLeastOneActionIsValidated = s.Serialize<bool>(AtLeastOneActionIsValidated, name: nameof(AtLeastOneActionIsValidated));
 
