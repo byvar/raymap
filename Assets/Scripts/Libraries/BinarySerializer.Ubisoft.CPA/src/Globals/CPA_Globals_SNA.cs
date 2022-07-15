@@ -57,6 +57,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 			paths[CPA_Path.FixRTP] = levelsFolder + ConvertCase("Fix.rtp", PathCapitalizationType.FixRelocation);
 			paths[CPA_Path.FixPTX] = levelsFolder + ConvertCase("Fix.ptx", PathCapitalizationType.Fix);
 			paths[CPA_Path.FixRTT] = levelsFolder + ConvertCase("Fix.rtt", PathCapitalizationType.FixRelocation);
+			paths[CPA_Path.FixSND] = levelsFolder + ConvertCase("Fix.snd", PathCapitalizationType.Fix);
+			paths[CPA_Path.FixRTS] = levelsFolder + ConvertCase("Fix.rts", PathCapitalizationType.FixRelocation);
 
 			if (cpaSettings.EngineVersionTree.HasParent(EngineVersion.CPA_Montreal)) {
 				paths[CPA_Path.FixSDA] = levelsFolder + ConvertCase("Fix.sda", PathCapitalizationType.Fix);
@@ -95,14 +97,17 @@ namespace BinarySerializer.Ubisoft.CPA {
 			paths[CPA_Path.LevelSNA] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sna", PathCapitalizationType.LevelFile);
 			paths[CPA_Path.LevelGPT] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".gpt", PathCapitalizationType.LevelFile);
 			paths[CPA_Path.LevelPTX] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".ptx", PathCapitalizationType.LevelFile);
+			paths[CPA_Path.LevelSND] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".snd", PathCapitalizationType.LevelFile);
 			if (RelocationBigFile == null) {
 				paths[CPA_Path.LevelRTB] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtb", PathCapitalizationType.LevelRelocation);
 				paths[CPA_Path.LevelRTP] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtp", PathCapitalizationType.LevelRelocation);
 				paths[CPA_Path.LevelRTT] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rtt", PathCapitalizationType.LevelRelocation);
+				paths[CPA_Path.LevelRTS] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".rts", PathCapitalizationType.LevelRelocation);
 			} else {
 				paths[CPA_Path.LevelRTB] = null;
 				paths[CPA_Path.LevelRTP] = null;
 				paths[CPA_Path.LevelRTT] = null;
+				paths[CPA_Path.LevelRTS] = null;
 			}
 			if (cpaSettings.EngineVersionTree.HasParent(EngineVersion.CPA_Montreal)) {
 				paths[CPA_Path.LevelSDA] = levelsFolder + lvlFolder + ConvertCase(lvlName + ".sda", PathCapitalizationType.LevelFile);

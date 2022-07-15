@@ -17,6 +17,9 @@
 		FixPTX,
 		FixRTT,
 
+		FixSND,
+		FixRTS,
+
 		FixSDA,
 		FixLNG,
 		FixRTG,
@@ -31,6 +34,9 @@
 
 		LevelPTX,
 		LevelRTT,
+
+		LevelSND,
+		LevelRTS,
 
 		LevelSDA,
 		LevelLNG,

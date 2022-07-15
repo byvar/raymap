@@ -202,12 +202,19 @@ namespace Raymap {
 
 			// Load SNA and relocation table
 			SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.FixSNA.ToString());
-			SNA_PointerFile<SNA_RelocationTable> rtb = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTB.ToString());
-			ProcessSNA(context, sna?.Value, rtb?.Value);
-
 			SNA_PointerFile<SNA_TemporaryMemoryBlock> gpt = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.FixGPT.ToString());
-			SNA_PointerFile<SNA_RelocationTable> rtp = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.FixRTP.ToString());
-			var gptFile = ProcessTMP(context, ContentID(CPA_Path.FixGPT), gpt?.Value, rtp?.Value);
+			SNA_PointerFile<SNA_TemporaryMemoryBlock> ptx = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.FixPTX.ToString());
+			SNA_PointerFile<SNA_TemporaryMemoryBlock> snd = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.FixSND.ToString());
+			
+			ProcessSNA(context, sna?.Value, LoadRelocationFile(CPA_Path.FixRTB)); // SNA
+			ProcessTMP(context, ContentID(CPA_Path.FixGPT), gpt?.Value, LoadRelocationFile(CPA_Path.FixRTP)); // GlobalPointers
+			ProcessTMP(context, ContentID(CPA_Path.FixPTX), ptx?.Value, LoadRelocationFile(CPA_Path.FixRTT)); // Textures
+			ProcessTMP(context, ContentID(CPA_Path.FixSND), snd?.Value, LoadRelocationFile(CPA_Path.FixRTS)); // Sound
+
+			SNA_RelocationTable LoadRelocationFile(CPA_Path path) {
+				SNA_PointerFile<SNA_RelocationTable> rt = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, path.ToString());
+				return rt?.Value;
+			}
 		}
 
 		public string ContentID(CPA_Path path) => $"{path}_Content";
@@ -220,19 +227,24 @@ namespace Raymap {
 			cpaGlobals.Map = levelName;
 			SNA_File<SNA_MemorySnapshot> sna = FileFactory.Read<SNA_File<SNA_MemorySnapshot>>(context, CPA_Path.LevelSNA.ToString());
 			SNA_PointerFile<SNA_TemporaryMemoryBlock> gpt = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.LevelGPT.ToString());
-			if (cpaGlobals.RelocationBigFile != null) {
-				var mapIndex = cpaGlobals.MapIndex;
-				if(!mapIndex.HasValue)
-					throw new Exception($"Map {cpaGlobals?.Map} does not occur in Game.DSB and cannot be loaded");
-				SNA_RelocationTable rtb = await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, SNA_RelocationType.SNA);
-				ProcessSNA(context, sna?.Value, rtb);
-				SNA_RelocationTable rtp = await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, SNA_RelocationType.GlobalPointers);
-				ProcessTMP(context, ContentID(CPA_Path.LevelGPT), gpt?.Value, rtp);
-			} else {
-				SNA_PointerFile<SNA_RelocationTable> rtb = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.LevelRTB.ToString());
-				ProcessSNA(context, sna?.Value, rtb?.Value);
-				SNA_PointerFile<SNA_RelocationTable> rtp = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, CPA_Path.LevelRTP.ToString());
-				ProcessTMP(context, ContentID(CPA_Path.LevelGPT), gpt?.Value, rtp?.Value);
+			SNA_PointerFile<SNA_TemporaryMemoryBlock> ptx = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.LevelPTX.ToString());
+			SNA_PointerFile<SNA_TemporaryMemoryBlock> snd = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.LevelSND.ToString());
+
+			ProcessSNA(context, sna?.Value, await LoadRelocationFile(CPA_Path.LevelRTB, SNA_RelocationType.SNA));
+			ProcessTMP(context, ContentID(CPA_Path.LevelGPT), gpt?.Value, await LoadRelocationFile(CPA_Path.LevelRTP, SNA_RelocationType.GlobalPointers));
+			ProcessTMP(context, ContentID(CPA_Path.LevelPTX), ptx?.Value, await LoadRelocationFile(CPA_Path.LevelRTT, SNA_RelocationType.Textures));
+			ProcessTMP(context, ContentID(CPA_Path.LevelSND), snd?.Value, await LoadRelocationFile(CPA_Path.LevelRTS, SNA_RelocationType.Sound));
+
+			async UniTask<SNA_RelocationTable> LoadRelocationFile(CPA_Path path, SNA_RelocationType type) {
+				if (cpaGlobals.RelocationBigFile != null) {
+					var mapIndex = cpaGlobals.MapIndex;
+					if (!mapIndex.HasValue)
+						throw new Exception($"Map {cpaGlobals?.Map} does not occur in Game.DSB and cannot be loaded");
+					return await cpaGlobals.RelocationBigFile.SerializeRelocationTable(context.Deserializer, default, 0, mapIndex.Value, type);
+				} else {
+					SNA_PointerFile<SNA_RelocationTable> rt = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, path.ToString());
+					return rt?.Value;
+				}
 			}
 		}
 
@@ -243,6 +255,8 @@ namespace Raymap {
 
 			// Load SNA and relocation table
 			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, ContentID(CPA_Path.FixGPT));
+			var ptxContents = FileFactory.Read<GLI_GlobalTextures>(context, ContentID(CPA_Path.FixPTX), onPreSerialize: (_,p) => p.Pre_IsFix = true);
+			var sndContents = FileFactory.Read<SND_SoundPointers>(context, ContentID(CPA_Path.FixSND));
 		}
 
 		public void ProcessSNA(Context context, SNA_MemorySnapshot snapshot, SNA_RelocationTable relocationTable) {

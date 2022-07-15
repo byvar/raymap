@@ -10,6 +10,7 @@
 
 		// Parameters specific for graphics card
 		public Pointer SpecParam { get; set; }
+		public uint SpecParam_UInt { get; set; } // With the OpenGL driver, this is actually the texture ID
 
 		public GLI_TextureCaps TextureCaps { get; set; }
 
@@ -51,7 +52,10 @@
 
 			BitMap = s.SerializePointer(BitMap, name: nameof(BitMap));
 			ColorTable = s.SerializePointer(ColorTable, name: nameof(ColorTable));
-			SpecParam = s.SerializePointer(SpecParam, name: nameof(SpecParam));
+			s.DoAt(s.CurrentPointer, () => {
+				SpecParam_UInt = s.Serialize<uint>(SpecParam_UInt, name: nameof(SpecParam_UInt));
+			});
+			SpecParam = s.SerializePointer(SpecParam, allowInvalid: true, name: nameof(SpecParam));
 
 			TextureCaps = s.Serialize<GLI_TextureCaps>(TextureCaps, name: nameof(TextureCaps));
 			Height = s.Serialize<ushort>(Height, name: nameof(Height));
