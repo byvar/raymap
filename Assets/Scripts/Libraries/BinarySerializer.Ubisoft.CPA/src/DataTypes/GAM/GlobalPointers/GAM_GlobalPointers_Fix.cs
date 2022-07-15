@@ -1,7 +1,7 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	public class GAM_GlobalPointers_Fix : BinarySerializable {
-		public Pointer<POS_CompletePosition> IdentityMatrix { get; set; }
-		public Pointer<POS_CompletePosition>[] MatrixStack { get; set; }
+		public Pointer<MAT_Transformation> IdentityMatrix { get; set; }
+		public Pointer<MAT_Transformation>[] MatrixStack { get; set; }
 		public uint MatrixCountInStack { get; set; }
 		public Pointer<GEO_GeometricObject> CollisionGeometricObject { get; set; }
 		public Pointer<GEO_GeometricObject> StaticCollisionGeometricObject { get; set; }
@@ -16,8 +16,8 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
-				IdentityMatrix = s.SerializePointer<POS_CompletePosition>(IdentityMatrix, name: nameof(IdentityMatrix))?.ResolveObject(s);
-				MatrixStack = s.SerializePointerArray<POS_CompletePosition>(MatrixStack, 50, name: nameof(MatrixStack))?.ResolveObject(s);
+				IdentityMatrix = s.SerializePointer<MAT_Transformation>(IdentityMatrix, name: nameof(IdentityMatrix))?.ResolveObject(s);
+				MatrixStack = s.SerializePointerArray<MAT_Transformation>(MatrixStack, 50, name: nameof(MatrixStack))?.ResolveObject(s);
 				MatrixCountInStack = s.Serialize<uint>(MatrixCountInStack, name: nameof(MatrixCountInStack));
 				CollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject))?.ResolveObject(s);
 				StaticCollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject))?.ResolveObject(s);

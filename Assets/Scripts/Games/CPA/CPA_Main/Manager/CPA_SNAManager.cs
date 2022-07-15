@@ -196,6 +196,7 @@ namespace Raymap {
 			await LoadBigFile(context);
 		}
 
+		#region Memory
 		public async UniTask InitFixMemory(Context context) {
 			GlobalLoadState.DetailedState = "Loading fix memory";
 			await TimeController.WaitIfNecessary();
@@ -216,8 +217,6 @@ namespace Raymap {
 				return rt?.Value;
 			}
 		}
-
-		public string ContentID(CPA_Path path) => $"{path}_Content";
 
 		public async UniTask InitLevelMemory(Context context, string levelName) {
 			GlobalLoadState.DetailedState = "Loading level memory";
@@ -248,17 +247,6 @@ namespace Raymap {
 			}
 		}
 
-
-		public async UniTask LoadFix(Context context) {
-			GlobalLoadState.DetailedState = "Loading fix";
-			await TimeController.WaitIfNecessary();
-
-			// Load SNA and relocation table
-			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, ContentID(CPA_Path.FixGPT));
-			var ptxContents = FileFactory.Read<GLI_GlobalTextures>(context, ContentID(CPA_Path.FixPTX), onPreSerialize: (_,p) => p.Pre_IsFix = true);
-			var sndContents = FileFactory.Read<SND_SoundPointers>(context, ContentID(CPA_Path.FixSND));
-		}
-
 		public void ProcessSNA(Context context, SNA_MemorySnapshot snapshot, SNA_RelocationTable relocationTable) {
 			foreach (var block in snapshot.Blocks) {
 				if (block.BlockSize == 0) continue;
@@ -278,8 +266,29 @@ namespace Raymap {
 			var relBlock = relocationTable.Blocks[0];
 			return context.AddFile(new SNA_BlockPointerFile(context, name, block.Data, relBlock));
 		}
+#endregion
 
+		public string ContentID(CPA_Path path) => $"{path}_Content";
 		public virtual void InitGlobals(Context context) => new CPA_Globals_SNA(context);
+
+		public async UniTask LoadFix(Context context) {
+			GlobalLoadState.DetailedState = "Loading fix";
+			await TimeController.WaitIfNecessary();
+
+			// Load SNA and relocation table
+			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, ContentID(CPA_Path.FixGPT));
+			var ptxContents = FileFactory.Read<GLI_GlobalTextures>(context, ContentID(CPA_Path.FixPTX), onPreSerialize: (_, p) => p.Pre_IsFix = true);
+			var sndContents = FileFactory.Read<SND_SoundPointers>(context, ContentID(CPA_Path.FixSND));
+		}
+		public async UniTask LoadLevel(Context context, string mapName) {
+			GlobalLoadState.DetailedState = "Loading level";
+			await TimeController.WaitIfNecessary();
+
+			// Load SNA and relocation table
+			var gptContents = FileFactory.Read<GAM_GlobalPointers_Level>(context, ContentID(CPA_Path.LevelGPT));
+			var ptxContents = FileFactory.Read<GLI_GlobalTextures>(context, ContentID(CPA_Path.LevelPTX), onPreSerialize: (_, p) => p.Pre_IsFix = false);
+			var sndContents = FileFactory.Read<SND_SoundPointers>(context, ContentID(CPA_Path.LevelSND));
+		}
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {
 			// Download all possible files
@@ -291,12 +300,13 @@ namespace Raymap {
 			// Now that the DSC is loaded, download other files
 			await LoadPathsAsync(context, mapName: context.GetMapViewerSettings().Map);
 
-			// Load SNA files, init memory
+			// Load SNA files, init virtual SNA block files
 			await InitFixMemory(context);
 			await InitLevelMemory(context, context.GetMapViewerSettings().Map);
 
 			// Load content of SNA files
 			await LoadFix(context);
+			await LoadLevel(context, context.GetMapViewerSettings().Map);
 
 			throw new NotImplementedException();
 		}
