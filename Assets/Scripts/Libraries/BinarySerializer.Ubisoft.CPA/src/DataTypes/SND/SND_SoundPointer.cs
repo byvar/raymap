@@ -9,5 +9,7 @@
 
 			// TODO: At SoundEventPointer, it writes a new pointer to the loaded sound event with this ID.
 		}
+
+		public static uint StructSize => 8;
 	}
 }

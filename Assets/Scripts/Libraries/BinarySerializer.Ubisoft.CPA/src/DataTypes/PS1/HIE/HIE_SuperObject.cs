@@ -2,7 +2,7 @@
 
 namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class HIE_SuperObject : BinarySerializable, LST2_IEntry<HIE_SuperObject>
+	public class HIE_SuperObject : BinarySerializable, ILST2_DynamicEntry<HIE_SuperObject>
 	{
 		public bool Pre_IsDynamic { get; set; }
 
@@ -33,6 +33,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public short Short_48 { get; set; }
 		public short Short_4A { get; set; }
 
+		public Pointer<LST2_DynamicList<HIE_SuperObject>> LST2_Parent => throw new NotImplementedException();
 		public Pointer<HIE_SuperObject> LST2_Next => NextBrother;
 		public Pointer<HIE_SuperObject> LST2_Previous => PreviousBrother;
 

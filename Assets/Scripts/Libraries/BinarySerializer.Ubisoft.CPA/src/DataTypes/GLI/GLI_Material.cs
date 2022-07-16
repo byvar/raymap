@@ -1,10 +1,10 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	public class GLI_Material : BinarySerializable {
 		public GLI_DrawMask MaterialType { get; set; }
-		public GLI_FloatColor Ambient { get; set; }
-		public GLI_FloatColor Diffuse { get; set; }
-		public GLI_FloatColor Specular { get; set; }
-		public GLI_FloatColor Color { get; set; }
+		public GLI_FloatColor_RGBA Ambient { get; set; }
+		public GLI_FloatColor_RGBA Diffuse { get; set; }
+		public GLI_FloatColor_RGBA Specular { get; set; }
+		public GLI_FloatColor_RGBA Color { get; set; }
 		public uint MaterialAdditionalType { get; set; }
 		public int SpecularExponent { get; set; }
 		public Pointer<GLI_Texture> Texture { get; set; }
@@ -30,10 +30,10 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 			MaterialType = s.Serialize<GLI_DrawMask>(MaterialType, name: nameof(MaterialType));
-			Ambient = s.SerializeObject<GLI_FloatColor>(Ambient, name: nameof(Ambient));
-			Diffuse = s.SerializeObject<GLI_FloatColor>(Diffuse, name: nameof(Diffuse));
-			Specular = s.SerializeObject<GLI_FloatColor>(Specular, name: nameof(Specular));
-			Color = s.SerializeObject<GLI_FloatColor>(Color, name: nameof(Color));
+			Ambient = s.SerializeObject<GLI_FloatColor_RGBA>(Ambient, name: nameof(Ambient));
+			Diffuse = s.SerializeObject<GLI_FloatColor_RGBA>(Diffuse, name: nameof(Diffuse));
+			Specular = s.SerializeObject<GLI_FloatColor_RGBA>(Specular, name: nameof(Specular));
+			Color = s.SerializeObject<GLI_FloatColor_RGBA>(Color, name: nameof(Color));
 
 			if(s.GetCPASettings().EngineVersion == EngineVersion.Rayman3 && s.GetCPASettings().Platform == Platform.PS2)
 				MaterialAdditionalType = s.Serialize<uint>(MaterialAdditionalType, name: nameof(MaterialAdditionalType));

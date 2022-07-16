@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class GLI_FloatColor : BaseColor {
-		public GLI_FloatColor() { }
-		public GLI_FloatColor(float r, float g, float b, float a = 1f) : base(r, g, b, a) { }
+	public class GLI_FloatColor_RGBA : BaseColor {
+		public GLI_FloatColor_RGBA() { }
+		public GLI_FloatColor_RGBA(float r, float g, float b, float a = 1f) : base(r, g, b, a) { }
 
 		public override void SerializeImpl(SerializerObject s) {
 			Red = s.Serialize<float>(Red, name: nameof(Red));

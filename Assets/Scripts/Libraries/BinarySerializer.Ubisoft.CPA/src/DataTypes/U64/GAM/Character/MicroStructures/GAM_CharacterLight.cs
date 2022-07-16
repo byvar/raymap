@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public float BigAlpha { get; set; }
 		public float LittleTangent { get; set; }
 		public float BigTangent { get; set; }
-		public GLI_FloatColor Color { get; set; }
+		public GLI_FloatColor_RGBA Color { get; set; }
 		public float Gyrophare { get; set; }
 		public float PulseStep { get; set; }
 		public float PulseMaxRange { get; set; }
@@ -38,7 +38,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			BigAlpha = s.Serialize<float>(BigAlpha, name: nameof(BigAlpha));
 			LittleTangent = s.Serialize<float>(LittleTangent, name: nameof(LittleTangent));
 			BigTangent = s.Serialize<float>(BigTangent, name: nameof(BigTangent));
-			Color = s.SerializeObject<GLI_FloatColor>(Color, name: nameof(Color));
+			Color = s.SerializeObject<GLI_FloatColor_RGBA>(Color, name: nameof(Color));
 			Gyrophare = s.Serialize<float>(Gyrophare, name: nameof(Gyrophare));
 			PulseStep = s.Serialize<float>(PulseStep, name: nameof(PulseStep));
 			PulseMaxRange = s.Serialize<float>(PulseMaxRange, name: nameof(PulseMaxRange));

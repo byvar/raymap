@@ -7,7 +7,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public Pointer<MTH3D_Vector[]> PointsNormals { get; set; }
 		public Pointer<Pointer<GMT_GameMaterial>[]> PointsMaterials { get; set; }
 		public Pointer<Pointer<float[]>[]> VertexTransparency { get; set; }
-		public Pointer<GLI_FloatColor[]> PointsReceivedLightIntensity { get; set; }
+		public Pointer<GLI_FloatColor_RGBA[]> PointsReceivedLightIntensity { get; set; }
 
 		// Elements
 		public Pointer<GEO_ElementType[]> ElementTypes { get; set; }
@@ -55,7 +55,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			if ((s.GetCPASettings().Platform != Platform.GC || s.GetCPASettings().EngineVersion == EngineVersion.Rayman3) // Only present in R3 GC, not in other GC games
 				&& (s.GetCPASettings().Platform != Platform.PS2 || s.GetCPASettings().EngineVersion != EngineVersion.Rayman3) // Not present in R3 PS2
 				&& s.GetCPASettings().EngineVersion != EngineVersion.RaymanM) {
-				PointsReceivedLightIntensity = s.SerializePointer<GLI_FloatColor[]>(PointsReceivedLightIntensity, name: nameof(PointsReceivedLightIntensity));
+				PointsReceivedLightIntensity = s.SerializePointer<GLI_FloatColor_RGBA[]>(PointsReceivedLightIntensity, name: nameof(PointsReceivedLightIntensity));
 			}
 
 			// Elements

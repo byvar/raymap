@@ -8,8 +8,8 @@
 		public int YMax { get; set; }
 		public int XMin { get; set; }
 		public int XMax { get; set; }
-		public GLI_FloatColor BarOutlineColor { get; set; }
-		public GLI_FloatColor BarInsideColor { get; set; }
+		public GLI_FloatColor_RGBA BarOutlineColor { get; set; }
+		public GLI_FloatColor_RGBA BarInsideColor { get; set; }
 		public SNA_Description_Gradient BarColor { get; set; }
 		public SNA_Description_Rectangle BarRectangle { get; set; }
 		public uint MaxValueBar { get; set; }
@@ -27,8 +27,8 @@
 			YMax = s.Serialize<int>(YMax, name: nameof(YMax));
 			XMin = s.Serialize<int>(XMin, name: nameof(XMin));
 			XMax = s.Serialize<int>(XMax, name: nameof(XMax));
-			BarOutlineColor = s.SerializeObject<GLI_FloatColor>(BarOutlineColor, name: nameof(BarOutlineColor));
-			BarInsideColor = s.SerializeObject<GLI_FloatColor>(BarInsideColor, name: nameof(BarInsideColor));
+			BarOutlineColor = s.SerializeObject<GLI_FloatColor_RGBA>(BarOutlineColor, name: nameof(BarOutlineColor));
+			BarInsideColor = s.SerializeObject<GLI_FloatColor_RGBA>(BarInsideColor, name: nameof(BarInsideColor));
 			BarColor = s.SerializeObject<SNA_Description_Gradient>(BarColor, name: nameof(BarColor));
 			BarRectangle = s.SerializeObject<SNA_Description_Rectangle>(BarRectangle, name: nameof(BarRectangle));
 			MaxValueBar = s.Serialize<uint>(MaxValueBar, name: nameof(MaxValueBar));

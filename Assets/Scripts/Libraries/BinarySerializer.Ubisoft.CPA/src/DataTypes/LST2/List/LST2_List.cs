@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class LST2_List<T> : BinarySerializable, IList<T> where T : BinarySerializable, LST2_IEntry<T>, new() {
+	public abstract class LST2_List<T> : BinarySerializable, IList<T>
+		where T : BinarySerializable, ILST2_Entry<T>, new() {
 		#region Constructors
 
 		public LST2_List() { }
@@ -17,7 +18,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Head = head;
 			Tail = tail;
 			ElementsCount = elementsCount;
-			list = new T[elementsCount];
+			ElementList = new T[elementsCount];
 
 			Type = type;
 		}
@@ -40,32 +41,27 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#endregion
 
 		#region Public Methods
-		public void Configure(Context c) {
-			switch (Type) {
-				case LST2_ListType.Dynamic:
-					Type = LST2_ListType.DoubleLinked;
-					break;
-				case LST2_ListType.Static:
-					Type = c.GetCPASettings().StaticListType;
-					break;
-			}
+		public abstract void Configure(Context c);
+
+		protected override void OnPreSerialize(SerializerObject s) {
+			base.OnPreSerialize(s);
+			Configure(s.Context);
 		}
 
 		public override void SerializeImpl(SerializerObject s) {
-			Configure(s.Context);
 			Head = s.SerializePointer<T>(Head, name: nameof(Head));
 			if (Type == LST2_ListType.DoubleLinked)
 				Tail = s.SerializePointer<T>(Tail, name: nameof(Tail));
 
 			ElementsCount = s.Serialize<uint>(ElementsCount, name: nameof(ElementsCount));
 			ActualElementsCount = ElementsCount;
-			list = new T[ActualElementsCount];
+			ElementList = new T[ActualElementsCount];
 		}
 
-		public LST2_List<T> Resolve(SerializerObject s, string name = null) {
+		protected void ResolveElements(SerializerObject s, string name = null) {
 			if (Type == LST2_ListType.Array || Type == LST2_ListType.Optimized) {
 				s.DoAt(Head, () => {
-					list = s.SerializeObjectArray<T>(list, ActualElementsCount, name: name);
+					ElementList = s.SerializeObjectArray<T>(ElementList, ActualElementsCount, name: name);
 				});
 			} else {
 				Pointer<T> Element = Head;
@@ -73,12 +69,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 				while (Element != null && elementIndex < ActualElementsCount) {
 					// Just so we can use the name, we do DoAt first
 					s.DoAt(Element?.PointerValue, () => {
-						list[elementIndex] = s.SerializeObject<T>(list[elementIndex], name: $"{name}[{elementIndex}]");
+						ElementList[elementIndex] = s.SerializeObject<T>(ElementList[elementIndex], name: $"{name}[{elementIndex}]");
 					});
-					Element.Value = list[elementIndex];
+					Element.Value = ElementList[elementIndex];
 					Element?.Value?.LST2_Previous?.ResolveObject(s); // Resolve previous pointer if it exists
 
-					list[elementIndex] = Element?.Value;
+					ElementList[elementIndex] = Element?.Value;
 					elementIndex++;
 					if (Type == LST2_ListType.DoubleLinked || Type == LST2_ListType.SingleLinked || Type == LST2_ListType.SemiOptimized) {
 						Element = Element?.Value?.LST2_Next;
@@ -88,7 +84,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 					}
 				}
 			}
-			return this;
 		}
 
 		#endregion
@@ -248,45 +243,45 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region IList implementation
 
-		private T[] list = null;
+		protected T[] ElementList = null;
 
 		public int Count {
 			get { return (int)ElementsCount; }
 			set {
 				ElementsCount = (uint)value;
-				if (list.Length != ElementsCount) {
-					Array.Resize(ref list, (int)ElementsCount);
+				if (ElementList.Length != ElementsCount) {
+					Array.Resize(ref ElementList, (int)ElementsCount);
 				}
 			}
 		}
 
 		public bool IsReadOnly {
-			get { return list.IsReadOnly; }
+			get { return ElementList.IsReadOnly; }
 		}
 
 		public T this[int index] {
-			get { return list[index]; }
-			set { list[index] = value; }
+			get { return ElementList[index]; }
+			set { ElementList[index] = value; }
 		}
 
 		public IEnumerator<T> GetEnumerator() {
-			return ((IEnumerable<T>)list).GetEnumerator();
+			return ((IEnumerable<T>)ElementList).GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator() {
-			return ((IEnumerable<T>)list).GetEnumerator();
+			return ((IEnumerable<T>)ElementList).GetEnumerator();
 		}
 
 		public int IndexOf(T item) {
-			return Array.IndexOf(list, item);
+			return Array.IndexOf(ElementList, item);
 		}
 
 		public bool Contains(T item) {
-			return Array.IndexOf(list, item) >= 0;
+			return Array.IndexOf(ElementList, item) >= 0;
 		}
 
 		public void CopyTo(T[] array, int arrayIndex) {
-			list.CopyTo(array, arrayIndex);
+			ElementList.CopyTo(array, arrayIndex);
 		}
 
 		void IList<T>.Insert(int index, T item) {
@@ -298,8 +293,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 
 		public void Add(T item) {
-			Array.Resize(ref list, list.Length + 1);
-			list[list.Length - 1] = item;
+			Array.Resize(ref ElementList, ElementList.Length + 1);
+			ElementList[ElementList.Length - 1] = item;
 			Count = Count + 1;
 		}
 

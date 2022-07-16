@@ -24,6 +24,23 @@ namespace BinarySerializer.Ubisoft.CPA {
 				
 		}
 
+		public void OverrideData(long offset, byte[] data) {
+			var pos = Stream.Position;
+			using (Writer writer = new Writer(Stream, isLittleEndian: Endianness == Endian.Little, leaveOpen: true)) {
+				writer.BaseStream.Position = offset;
+				writer.Write(data);
+			}
+			Stream.Position = pos;
+		}
+		public void OverrideUInt(long offset, uint data) {
+			var pos = Stream.Position;
+			using (Writer writer = new Writer(Stream, isLittleEndian: Endianness == Endian.Little, leaveOpen: true)) {
+				writer.BaseStream.Position = offset;
+				writer.Write(data);
+			}
+			Stream.Position = pos;
+		}
+
 		/*public SNA_BlockFile(Context context, SNA_MemoryBlock block, SNA_RelocationTableBlock relocationBlock, PointerMode mode = PointerMode.MemoryMapped)
 			: base(context, block.BlockName, block.BeginBlock, block.Data, endianness: context.GetCPASettings().GetEndian) {
 			Block = block;

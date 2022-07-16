@@ -3,7 +3,7 @@
 		public SND_SoundPointer[] Pointers { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			Pointers = s.SerializeObjectArrayUntil<SND_SoundPointer>(Pointers, _ => s.CurrentFileOffset >= s.CurrentLength, name: nameof(Pointers));
+			Pointers = s.SerializeObjectArray<SND_SoundPointer>(Pointers, s.CurrentLength / SND_SoundPointer.StructSize, name: nameof(Pointers));
 		}
 	}
 }
