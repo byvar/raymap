@@ -208,9 +208,9 @@ namespace Raymap {
 			SNA_PointerFile<SNA_TemporaryMemoryBlock> snd = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.FixSND.ToString());
 			
 			ProcessSNA(context, sna?.Value, LoadRelocationFile(CPA_Path.FixRTB)); // SNA
-			ProcessTMP(context, ContentID(CPA_Path.FixGPT), gpt?.Value, LoadRelocationFile(CPA_Path.FixRTP)); // GlobalPointers
-			ProcessTMP(context, ContentID(CPA_Path.FixPTX), ptx?.Value, LoadRelocationFile(CPA_Path.FixRTT)); // Textures
-			ProcessTMP(context, ContentID(CPA_Path.FixSND), snd?.Value, LoadRelocationFile(CPA_Path.FixRTS)); // Sound
+			ProcessTMP(context, sna?.Value, ContentID(CPA_Path.FixGPT), gpt?.Value, LoadRelocationFile(CPA_Path.FixRTP)); // GlobalPointers
+			ProcessTMP(context, sna?.Value, ContentID(CPA_Path.FixPTX), ptx?.Value, LoadRelocationFile(CPA_Path.FixRTT)); // Textures
+			ProcessTMP(context, sna?.Value, ContentID(CPA_Path.FixSND), snd?.Value, LoadRelocationFile(CPA_Path.FixRTS)); // Sound
 
 			SNA_RelocationTable LoadRelocationFile(CPA_Path path) {
 				SNA_PointerFile<SNA_RelocationTable> rt = FileFactory.Read<SNA_PointerFile<SNA_RelocationTable>>(context, path.ToString());
@@ -230,9 +230,9 @@ namespace Raymap {
 			SNA_PointerFile<SNA_TemporaryMemoryBlock> snd = FileFactory.Read<SNA_PointerFile<SNA_TemporaryMemoryBlock>>(context, CPA_Path.LevelSND.ToString());
 
 			ProcessSNA(context, sna?.Value, await LoadRelocationFile(CPA_Path.LevelRTB, SNA_RelocationType.SNA));
-			ProcessTMP(context, ContentID(CPA_Path.LevelGPT), gpt?.Value, await LoadRelocationFile(CPA_Path.LevelRTP, SNA_RelocationType.GlobalPointers));
-			ProcessTMP(context, ContentID(CPA_Path.LevelPTX), ptx?.Value, await LoadRelocationFile(CPA_Path.LevelRTT, SNA_RelocationType.Textures));
-			ProcessTMP(context, ContentID(CPA_Path.LevelSND), snd?.Value, await LoadRelocationFile(CPA_Path.LevelRTS, SNA_RelocationType.Sound));
+			ProcessTMP(context, sna?.Value, ContentID(CPA_Path.LevelGPT), gpt?.Value, await LoadRelocationFile(CPA_Path.LevelRTP, SNA_RelocationType.GlobalPointers));
+			ProcessTMP(context, sna?.Value, ContentID(CPA_Path.LevelPTX), ptx?.Value, await LoadRelocationFile(CPA_Path.LevelRTT, SNA_RelocationType.Textures));
+			ProcessTMP(context, sna?.Value, ContentID(CPA_Path.LevelSND), snd?.Value, await LoadRelocationFile(CPA_Path.LevelRTS, SNA_RelocationType.Sound));
 
 			async UniTask<SNA_RelocationTable> LoadRelocationFile(CPA_Path path, SNA_RelocationType type) {
 				if (cpaGlobals.RelocationBigFile != null) {
@@ -251,20 +251,20 @@ namespace Raymap {
 			foreach (var block in snapshot.Blocks) {
 				if (block.BlockSize == 0) continue;
 				var relBlock = relocationTable.Blocks.FirstOrDefault(r => r.Block == block.Block && r.Module == block.Module && !r.IsInvalidBlock);
-				SNA_BlockFile bf = context.AddFile(new SNA_BlockFile(context, block, relBlock, mode: SNA_BlockFile.PointerMode.Relocation));
+				SNA_DataBlockFile bf = context.AddFile(new SNA_DataBlockFile(context, snapshot, block, relBlock));
 			}
 			// Also add empty blocks, those can be pointed to but never read
 			foreach (var block in snapshot.Blocks.Reverse()) {
 				if (block.BlockSize == 0 && !context.FileExists(block.BlockName)
 					&& block.BeginBlock != block.EndBlock
 					&& block.BeginBlock != SNA_MemoryBlock.InvalidBeginBlock) {
-					SNA_BlockFile bf = context.AddFile(new SNA_BlockFile(context, block, null, mode: SNA_BlockFile.PointerMode.Relocation));
+					SNA_DataBlockFile bf = context.AddFile(new SNA_DataBlockFile(context, snapshot, block, null));
 				}
 			}
 		}
-		public SNA_BlockPointerFile ProcessTMP(Context context, string name, SNA_TemporaryMemoryBlock block, SNA_RelocationTable relocationTable) {
+		public SNA_PointerBlockFile ProcessTMP(Context context, SNA_MemorySnapshot snapshot, string name, SNA_TemporaryMemoryBlock block, SNA_RelocationTable relocationTable) {
 			var relBlock = relocationTable.Blocks[0];
-			return context.AddFile(new SNA_BlockPointerFile(context, name, block.Data, relBlock));
+			return context.AddFile(new SNA_PointerBlockFile(context, snapshot, name, block.Data, relBlock));
 		}
 #endregion
 

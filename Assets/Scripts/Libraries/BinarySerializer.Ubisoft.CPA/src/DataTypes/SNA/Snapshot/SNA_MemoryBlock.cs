@@ -2,7 +2,7 @@
 	public class SNA_MemoryBlock : BinarySerializable {
 		public virtual byte Module { get; set; }
 		public virtual byte Block { get; set; }
-		public SNA_MemoryBlockType Type { get; set; } // Unused
+		public SNA_MemoryBlockType Type { get; set; } // Unused when reading, but used when writing
 		public uint BeginBlock { get; set; } // Absolute start position of the block
 		public uint EndBlock { get; set; } // Absolute end position of the block
 		public uint FirstFree { get; set; } // First free memory entry inside block

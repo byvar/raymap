@@ -72,9 +72,6 @@
 
 				Transparency = s.Serialize<float>(Transparency, name: nameof(Transparency));
 				SemiLookAtVector = s.SerializeObject<MTH3D_Vector>(SemiLookAtVector, name: nameof(SemiLookAtVector));
-				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2)) {
-					s.SerializePadding(4, logIfNotNull: true);
-				}
 			}
 		}
 	}

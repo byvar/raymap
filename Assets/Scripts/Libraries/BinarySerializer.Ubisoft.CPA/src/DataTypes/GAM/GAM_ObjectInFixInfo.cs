@@ -32,7 +32,7 @@
 
 		public void Apply(SerializerObject s) {
 			if(!ShouldModifyData) return;
-			SNA_BlockFile f = null;
+			SNA_DataBlockFile f = null;
 			s.DoAt(SuperObjectOffset, () => {
 				var soType = s.Serialize<uint>(default, name: "Check_SOType");
 				var isPerso = s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2) ? soType == 2 : soType == 4;
@@ -41,7 +41,7 @@
 					s.DoAt(engineObject, () => {
 						var _3dData = s.SerializePointer(default, name: "Check_3dData");
 						s.DoAt(_3dData, () => {
-							f = (SNA_BlockFile)s.CurrentBinaryFile;
+							f = (SNA_DataBlockFile)s.CurrentBinaryFile;
 							f.OverrideData(
 								_3dData.FileOffset + (s.GetCPASettings().EngineVersion == EngineVersion.Rayman2Demo ? 0x1C : 0x18),
 								Matrix3DData);
@@ -50,14 +50,14 @@
 						if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
 							var stdGame = s.SerializePointer(default, name: "Check_StdGame");
 							s.DoAt(stdGame, () => {
-								f = (SNA_BlockFile)s.CurrentBinaryFile;
+								f = (SNA_DataBlockFile)s.CurrentBinaryFile;
 								f.AddOverridePointer(stdGame.AbsoluteOffset + 0xC, SuperObjectOffset);
 							});
 						}
 					});
 
 					if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
-						f = (SNA_BlockFile)SuperObjectOffset.File;
+						f = (SNA_DataBlockFile)SuperObjectOffset.File;
 						f.AddOverridePointer(SuperObjectOffset.AbsoluteOffset + 0x14, LST2_Next);
 						f.AddOverridePointer(SuperObjectOffset.AbsoluteOffset + 0x18, LST2_Previous);
 						f.AddOverridePointer(SuperObjectOffset.AbsoluteOffset + 0x1C, LST2_Father);

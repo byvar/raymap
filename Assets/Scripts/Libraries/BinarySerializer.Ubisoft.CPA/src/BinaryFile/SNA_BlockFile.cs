@@ -4,23 +4,14 @@ using System.IO;
 using System.Linq;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class SNA_BlockFile : MemoryMappedStreamFile {
-		public SNA_MemoryBlock Block { get; set; }
+	public abstract class SNA_BlockFile : MemoryMappedStreamFile {
 		public SNA_RelocationTableBlock RelocationBlock { get; set; }
-		public PointerMode Mode { get; set; }
+		public SNA_MemorySnapshot Snapshot { get; set; }
 
-		public SNA_BlockFile(Context context, SNA_MemoryBlock block, SNA_RelocationTableBlock relocationBlock, PointerMode mode = PointerMode.MemoryMapped)
-			: base(context, block.BlockName, block.BeginBlock, block.ExpandedData, endianness: context.GetCPASettings().GetEndian) {
-			Block = block;
-			Mode = mode;
+		public SNA_BlockFile(Context context, SNA_MemorySnapshot snapshot, SNA_RelocationTableBlock relocationBlock, string name, long baseAddress, byte[] data)
+			: base(context, name, baseAddress, data, endianness: context.GetCPASettings().GetEndian) {
+			Snapshot = snapshot;
 			RelocationBlock = relocationBlock;
-
-			foreach (var f in Context.MemoryMap.Files) {
-				if(f is SNA_BlockFile bf)
-					bf.InvalidatePointerFileDictionary();
-				else if(f is SNA_BlockPointerFile bpf)
-					bpf.InvalidatePointerFileDictionary();
-			}
 				
 		}
 
@@ -40,36 +31,78 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 			Stream.Position = pos;
 		}
+		public override bool IsMemoryMapped => false;
 
-		/*public SNA_BlockFile(Context context, SNA_MemoryBlock block, SNA_RelocationTableBlock relocationBlock, PointerMode mode = PointerMode.MemoryMapped)
-			: base(context, block.BlockName, block.BeginBlock, block.Data, endianness: context.GetCPASettings().GetEndian) {
-			Block = block;
-			Mode = mode;
-			RelocationBlock = relocationBlock;
-		}*/
-
-		public override bool IsMemoryMapped => Mode == PointerMode.MemoryMapped;
-
-		private Dictionary<uint, BinaryFile> PointerFileDictionary { get; set; }
-		public void InvalidatePointerFileDictionary() {
-			PointerFileDictionary = null;
-		}
-		private void CreatePointerFileDictionary() {
-			PointerFileDictionary = new Dictionary<uint, BinaryFile>();
+		#region Dictionaries
+		private Dictionary<uint, SNA_MemoryBlock> PointerBlockDictionary { get; set; }
+		private void CreatePointerBlockDictionary() {
+			PointerBlockDictionary = new Dictionary<uint, SNA_MemoryBlock>();
+			if(RelocationBlock?.Pointers == null) return;
 			foreach (var ptr in RelocationBlock.Pointers) {
-				PointerFileDictionary[ptr.Pointer] = Context.MemoryMap.Files.FirstOrDefault(
-						x => x is SNA_BlockFile b
-						&& b.Block.Module == ptr.TargetModule
-						&& b.Block.Block == ptr.TargetBlock);
+				PointerBlockDictionary[ptr.Pointer] = Snapshot.Blocks.LastOrDefault(
+						x => x.Module == ptr.TargetModule && x.Block == ptr.TargetBlock);
 			}
 		}
-		private BinaryFile GetFileFromDictionary(uint serializedValue) {
-			if (PointerFileDictionary == null) CreatePointerFileDictionary();
-			if (PointerFileDictionary.TryGetValue(serializedValue, out BinaryFile f))
+		private SNA_MemoryBlock GetBlockFromDictionary(uint serializedValue) {
+			if (PointerBlockDictionary == null) CreatePointerBlockDictionary();
+			if (PointerBlockDictionary.TryGetValue(serializedValue, out SNA_MemoryBlock b))
+				return b;
+			return null;
+		}
+		private Dictionary<SNA_MemoryBlock, BinaryFile> BlockFileDictionary { get; set; }
+		public void InvalidateBlockFileDictionary() {
+			BlockFileDictionary = null;
+		}
+		private void CreateBlockFileDictionary() {
+			BlockFileDictionary = new Dictionary<SNA_MemoryBlock, BinaryFile>();
+			foreach (var block in Snapshot.Blocks) {
+				BlockFileDictionary[block] = Context.MemoryMap.Files.FirstOrDefault(
+						x => x is SNA_DataBlockFile b
+						&& b.Block.Module == block.Module
+						&& b.Block.Block == block.Block);
+			}
+		}
+		private BinaryFile GetFileFromBlock(SNA_MemoryBlock b) {
+			if (BlockFileDictionary == null) CreateBlockFileDictionary();
+			if (BlockFileDictionary.TryGetValue(b, out BinaryFile f))
 				return f;
 			return null;
 		}
+		#endregion
 
+		public override bool TryGetPointer(long value, out Pointer result, Pointer anchor = null, bool allowInvalid = false, PointerSize size = PointerSize.Pointer32) {
+			Pointer ptr = null;
+
+			var anchorOffset = anchor?.AbsoluteOffset ?? 0;
+			uint absoluteValue = (uint)(value + anchorOffset);
+			var block = GetBlockFromDictionary(absoluteValue);
+
+			if (block == null) {
+				// Pointer isn't listed in relocation file - try memory mapped
+				block = Snapshot?.Blocks?.LastOrDefault(b => 
+					b.BeginBlock != SNA_MemoryBlock.InvalidBeginBlock
+					&& absoluteValue >= b.BeginBlock
+					&& absoluteValue < b.EndBlock + 1);
+			}
+
+			if (block != null) {
+				BinaryFile file = GetFileFromBlock(block);
+				if (file != null) {
+					// Use file offset
+					ptr = new Pointer(
+						absoluteValue - block.BeginBlock,
+						file, anchor: anchor,
+						offsetType: Pointer.OffsetType.File);
+
+				}
+			}
+
+			result = ptr;
+			if (ptr == null && value != 0 && !allowInvalid && !AllowInvalidPointer(value, anchor: anchor)) {
+				return false;
+			}
+			return true;
+		}
 
 		/// <summary>
 		/// Retrieves the <see cref="BinaryFile"/> for a serialized <see cref="Pointer"/> value
@@ -81,25 +114,23 @@ namespace BinarySerializer.Ubisoft.CPA {
 			if(IsMemoryMapped)
 				return base.GetPointerFile(serializedValue, anchor: anchor);
 
-			var f = GetFileFromDictionary((uint)serializedValue);
-			if(f != null) return f;
+			var anchorOffset = anchor?.AbsoluteOffset ?? 0;
+			uint absoluteValue = (uint)(serializedValue + anchorOffset);
+			var block = GetBlockFromDictionary(absoluteValue);
 
-			// Fallback: memory mapped
+			if (block == null) {
+				// Pointer isn't listed in relocation file - try memory mapped
+				block = Snapshot?.Blocks?.LastOrDefault(b =>
+					b.BeginBlock != SNA_MemoryBlock.InvalidBeginBlock
+					&& absoluteValue >= b.BeginBlock
+					&& absoluteValue < b.EndBlock + 1);
+			}
 
-			// Get all memory mapped files
-			var files = Context.MemoryMap.Files.Where(x => x is SNA_BlockFile b).Select(x => (SNA_BlockFile)x);
-
-			// Sort based on the base address
-			files = files.OrderByDescending(file => file.BaseAddress)
-				.Where(f => serializedValue <= f.Block.MaxMem && serializedValue >= f.BaseAddress);
-
-			// Return the first pointer within the range
-			return files.FirstOrDefault();
-		}
-
-		public enum PointerMode {
-			MemoryMapped,
-			Relocation,
+			if (block != null) {
+				return GetFileFromBlock(block);
+			}
+			
+			return null;
 		}
 	}
 }
