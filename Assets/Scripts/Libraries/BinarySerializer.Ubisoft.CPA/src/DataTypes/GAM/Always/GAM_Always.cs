@@ -8,10 +8,16 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 			MaxAlwaysCount = s.Serialize<uint>(MaxAlwaysCount, name: nameof(MaxAlwaysCount));
-			AlwaysModels = s.SerializeObject<LST2_DynamicList<GAM_AlwaysModelList>>(AlwaysModels, name: nameof(AlwaysModels));//?.Resolve(s, name: nameof(AlwaysModels));
+			AlwaysModels = s.SerializeObject<LST2_DynamicList<GAM_AlwaysModelList>>(AlwaysModels, name: nameof(AlwaysModels));
 			AlwaysSuperObjects = s.SerializePointer<HIE_SuperObject[]>(AlwaysSuperObjects, name: nameof(AlwaysSuperObjects))?.ResolveObjectArray(s, MaxAlwaysCount);
 			AlwaysEngineObjects = s.SerializePointer(AlwaysEngineObjects, name: nameof(AlwaysEngineObjects));
 			AlwaysGenerators = s.SerializePointer(AlwaysGenerators, name: nameof(AlwaysGenerators));
+		}
+
+		public GAM_Always Resolve(SerializerObject s) {
+			AlwaysModels?.Resolve(s, name: nameof(AlwaysModels));
+
+			return this;
 		}
 	}
 }

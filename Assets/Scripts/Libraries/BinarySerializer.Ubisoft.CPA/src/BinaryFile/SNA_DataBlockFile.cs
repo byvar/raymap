@@ -12,7 +12,10 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Block = block;
 
 			foreach (var f in Context.MemoryMap.Files) {
-				if(f is SNA_BlockFile bf) bf.InvalidateBlockFileDictionary();
+				if (f is SNA_BlockFile bf) {
+					bf.InvalidateBlockFileDictionary();
+					bf.InvalidateFileBlockDictionary();
+				}
 			}
 				
 		}

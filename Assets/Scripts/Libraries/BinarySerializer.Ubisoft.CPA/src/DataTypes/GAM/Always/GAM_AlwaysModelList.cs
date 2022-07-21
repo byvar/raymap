@@ -1,6 +1,8 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	public class GAM_AlwaysModelList : BinarySerializable, ILST2_DynamicEntry<GAM_AlwaysModelList> {
 		public LST2_DynamicListElement<GAM_AlwaysModelList> ListElement { get; set; }
+		public int ObjectModelType { get; set; }
+		public Pointer<GAM_EngineObject> AlwaysObject { get; set; }
 
 		// LST2 Implementation
 		public Pointer<LST2_DynamicList<GAM_AlwaysModelList>> LST2_Parent => ListElement?.LST2_Parent;
@@ -9,7 +11,13 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 			ListElement = s.SerializeObject<LST2_DynamicListElement<GAM_AlwaysModelList>>(ListElement, name: nameof(ListElement))?.Resolve(s);
-			throw new BinarySerializableException(this, $"{GetType()}: Not yet implemented");
+			if (s.GetCPASettings().EngineVersion == EngineVersion.Rayman2Revolution) {
+				AlwaysObject = s.SerializePointer<GAM_EngineObject>(AlwaysObject, name: nameof(AlwaysObject));
+				ObjectModelType = s.Serialize<int>(ObjectModelType, name: nameof(ObjectModelType));
+			} else {
+				ObjectModelType = s.Serialize<int>(ObjectModelType, name: nameof(ObjectModelType));
+				AlwaysObject = s.SerializePointer<GAM_EngineObject>(AlwaysObject, name: nameof(AlwaysObject));
+			}
 		}
 	}
 }

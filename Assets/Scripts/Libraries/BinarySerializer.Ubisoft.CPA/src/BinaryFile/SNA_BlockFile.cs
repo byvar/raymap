@@ -68,6 +68,28 @@ namespace BinarySerializer.Ubisoft.CPA {
 				return f;
 			return null;
 		}
+
+		private Dictionary<BinaryFile, SNA_MemoryBlock> FileBlockDictionary { get; set; }
+		public void InvalidateFileBlockDictionary() {
+			FileBlockDictionary = null;
+		}
+		private void CreateFileBlockDictionary() {
+			FileBlockDictionary = new Dictionary<BinaryFile, SNA_MemoryBlock>();
+			foreach (var f in Context.MemoryMap.Files) {
+				if (f is SNA_DataBlockFile snaf) {
+					FileBlockDictionary[snaf] = Snapshot?.Blocks?.LastOrDefault(
+							x => x.BeginBlock != SNA_MemoryBlock.InvalidBeginBlock
+							&& x.Module == snaf.Block.Module
+							&& x.Block == snaf.Block.Block);
+				}
+			}
+		}
+		private SNA_MemoryBlock GetBlockFromFile(BinaryFile b) {
+			if (FileBlockDictionary== null) CreateFileBlockDictionary();
+			if (FileBlockDictionary.TryGetValue(b, out SNA_MemoryBlock f))
+				return f;
+			return null;
+		}
 		#endregion
 
 		public override bool TryGetPointer(long value, out Pointer result, Pointer anchor = null, bool allowInvalid = false, PointerSize size = PointerSize.Pointer32) {
@@ -102,6 +124,18 @@ namespace BinarySerializer.Ubisoft.CPA {
 				return false;
 			}
 			return true;
+		}
+
+		public override long GetPointerValueToSerialize(Pointer obj, Pointer anchor = null, long? nullValue = null) {
+			if(obj == null)
+				return nullValue ?? 0;
+
+			var b = GetBlockFromFile(obj?.File);
+			if(b == null)
+				throw new Exception($"Pointer file is not present in Snapshot in {FilePath}");
+
+			long relocation = b.BeginBlock - obj.File.BaseAddress;
+			return obj.SerializedOffset + relocation;
 		}
 
 		/// <summary>

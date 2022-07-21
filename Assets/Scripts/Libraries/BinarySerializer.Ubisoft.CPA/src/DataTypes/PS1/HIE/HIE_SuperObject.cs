@@ -2,16 +2,14 @@
 
 namespace BinarySerializer.Ubisoft.CPA.PS1
 {
-	public class HIE_SuperObject : BinarySerializable, ILST2_DynamicEntry<HIE_SuperObject>
+	public class HIE_SuperObject : BinarySerializable, ILST2_Child<HIE_SuperObject, HIE_SuperObject>
 	{
 		public bool Pre_IsDynamic { get; set; }
 
 		public HIE_ObjectType_98 Type { get; set; }
 		public int DataIndex { get; set; }
-		public LST2_DynamicList<HIE_SuperObject> Children { get; set; }
-		public Pointer<HIE_SuperObject> NextBrother { get; set; }
-		public Pointer<HIE_SuperObject> PreviousBrother { get; set; }
-		public Pointer<HIE_SuperObject> Parent { get; set; }
+		public LST2_DynamicParentElement<HIE_SuperObject, HIE_SuperObject> Children { get; set; }
+		public LST2_DynamicChildElement<HIE_SuperObject, HIE_SuperObject> ListElement { get; set; }
 		public Pointer<MAT_Transformation> LocalMatrix { get; set; }
 		public Pointer<MAT_Transformation> GlobalMatrix { get; set; }
 		public short Short_28 { get; set; }
@@ -33,9 +31,10 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public short Short_48 { get; set; }
 		public short Short_4A { get; set; }
 
-		public Pointer<LST2_DynamicList<HIE_SuperObject>> LST2_Parent => throw new NotImplementedException();
-		public Pointer<HIE_SuperObject> LST2_Next => NextBrother;
-		public Pointer<HIE_SuperObject> LST2_Previous => PreviousBrother;
+		// LST2 Implementation
+		public Pointer<HIE_SuperObject> LST2_Parent => ListElement?.Father;
+		public Pointer<HIE_SuperObject> LST2_Next => ListElement?.LST2_Next;
+		public Pointer<HIE_SuperObject> LST2_Previous => ListElement?.LST2_Previous;
 
 		public override void SerializeImpl(SerializerObject s)
 		{
@@ -43,10 +42,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 
 			Type = s.Serialize<HIE_ObjectType_98>(Type, name: nameof(Type));
 			DataIndex = s.Serialize<int>(DataIndex, name: nameof(DataIndex));
-			Children = s.SerializeObject<LST2_DynamicList<HIE_SuperObject>>(Children, name: nameof(Children));
-			NextBrother = s.SerializePointer<HIE_SuperObject>(NextBrother, name: nameof(NextBrother));
-			PreviousBrother = s.SerializePointer<HIE_SuperObject>(PreviousBrother, name: nameof(PreviousBrother));
-			Parent = s.SerializePointer<HIE_SuperObject>(Parent, name: nameof(Parent));
+			Children = s.SerializeObject<LST2_DynamicParentElement<HIE_SuperObject, HIE_SuperObject>>(Children, name: nameof(Children))?.Resolve(s, name: nameof(Children));
+			ListElement = s.SerializeObject<LST2_DynamicChildElement<HIE_SuperObject, HIE_SuperObject>>(ListElement, name: nameof(ListElement))?.Resolve(s);
 			LocalMatrix = s.SerializePointer(LocalMatrix, name: nameof(LocalMatrix))?.ResolveObject(s);
 
 			if (settings.EngineVersion != EngineVersion.RaymanRush_PS1)
@@ -75,14 +72,6 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				Short_48 = s.Serialize<short>(Short_48, name: nameof(Short_48));
 				Short_4A = s.Serialize<short>(Short_4A, name: nameof(Short_4A));
 			}
-
-			// Resolve hierarchy
-			Children?.Resolve(s, name: nameof(Children));
-			if (Parent?.PointerValue == null) {
-				NextBrother?.ResolveObject(s);
-				PreviousBrother?.ResolveObject(s);
-			}
-			Parent?.ResolveObject(s);
 		}
 
 		public BinarySerializable LinkedObject {

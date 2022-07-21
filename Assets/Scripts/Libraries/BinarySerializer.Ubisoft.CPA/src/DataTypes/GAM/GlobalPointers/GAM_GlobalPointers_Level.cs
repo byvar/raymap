@@ -7,8 +7,10 @@
 		public Pointer<HIE_SuperObject> FatherSector { get; set; }
 		public Pointer<GAM_SubMapPosition> FirstSubmapPosition { get; set; }
 		public GAM_Always Always { get; set; }
-		public Pointer First { get; set; }
-		public Pointer Last { get; set; }
+		public GAM_AlwaysListInfo AlwaysListInfo { get; set; }
+		public GAM_ObjectTypeListInfo ObjectTypeListInfo { get; set; }
+		public GAM_ObjectType ObjectType { get; set; }
+		public GAM_EngineStructure EngineStructure { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
@@ -19,8 +21,15 @@
 				FatherSector = s.SerializePointer<HIE_SuperObject>(FatherSector, name: nameof(FatherSector))?.ResolveObject(s);
 				FirstSubmapPosition = s.SerializePointer<GAM_SubMapPosition>(FirstSubmapPosition, name: nameof(FirstSubmapPosition))?.ResolveObject(s);
 				Always = s.SerializeObject<GAM_Always>(Always, name: nameof(Always));
-				First = s.SerializePointer(First, name: nameof(First));
-				Last = s.SerializePointer(Last, name: nameof(Last));
+				AlwaysListInfo = s.SerializeObject<GAM_AlwaysListInfo>(AlwaysListInfo, name: nameof(AlwaysListInfo))
+					?.RepairLists(s, Always)
+					?.Resolve(s);
+				Always?.Resolve(s);
+				ObjectTypeListInfo = s.SerializeObject<GAM_ObjectTypeListInfo>(ObjectTypeListInfo, name: nameof(ObjectTypeListInfo));
+				ObjectType = s.SerializeObject<GAM_ObjectType>(ObjectType, name: nameof(ObjectType))
+					?.RepairLists(s)
+					?.Resolve(s);
+				EngineStructure = s.SerializeObject<GAM_EngineStructure>(EngineStructure, name: nameof(EngineStructure));
 			}
 		}
 	}

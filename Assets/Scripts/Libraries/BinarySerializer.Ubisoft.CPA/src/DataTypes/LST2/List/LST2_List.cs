@@ -86,6 +86,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		}
 
+		public void Validate(SerializerObject s, Pointer parent = null,
+			uint nextOffset = 0, uint prevOffset = 4, uint fatherOffset = 8) {
+			LST2_ListHelpers.Validate(s, Tail, parent ?? Offset, Type,
+				nextOffset: nextOffset, prevOffset: prevOffset, fatherOffset: fatherOffset);
+		}
+
 		#endregion
 
 		// TODO: Read entries implementation
