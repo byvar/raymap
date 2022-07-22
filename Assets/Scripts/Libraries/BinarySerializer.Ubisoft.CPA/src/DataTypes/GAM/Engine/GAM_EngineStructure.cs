@@ -36,6 +36,9 @@
 		public GLI_SpecificAttributesFor3D[] GameAttributes3D { get; set; }
 		public Pointer<GAM_ViewportManagement[]> ViewportArray { get; set; }
 
+		public LST2_DynamicList<GAM_CameraNode> CameraList { get; set; }
+		public LST2_DynamicList<GAM_Family> FamilyList { get; set; }
+
 		private int LevelNameSize =>
 			Context.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2) ? 30 : 260;
 		private int MaxSubLevelsCount => 2;
@@ -93,6 +96,16 @@
 
 			ViewportArray = s.SerializePointer<GAM_ViewportManagement[]>(ViewportArray, name: nameof(ViewportArray))
 				?.ResolveObjectArray(s, MaxViewportCount * 2);
+
+			CameraList = s.SerializeObject<LST2_DynamicList<GAM_CameraNode>>(CameraList, name: nameof(CameraList));
+			CameraList?.Validate(s, nextOffset: 4, prevOffset: 8, fatherOffset: 12);
+			CameraList?.Resolve(s, name: nameof(CameraList));
+			FamilyList = s.SerializeObject<LST2_DynamicList<GAM_Family>>(FamilyList, name: nameof(FamilyList));
+			FamilyList?.Validate(s);
+			FamilyList?.Resolve(s, name: nameof(FamilyList));
+
+
+
 
 			throw new BinarySerializableException(this, $"{GetType()}: Not yet implemented");
 		}
