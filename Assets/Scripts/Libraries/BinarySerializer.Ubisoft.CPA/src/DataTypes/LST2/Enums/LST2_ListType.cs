@@ -8,8 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 	public enum LST2_ListType {
 		DoubleLinked,
 		SingleLinked,
-		Array,
 		SemiOptimized, // Not fully implemented, a mixture between array & double linked?
-		Optimized,  // Array
+		OptimizedArray,  // Array
 	}
 }

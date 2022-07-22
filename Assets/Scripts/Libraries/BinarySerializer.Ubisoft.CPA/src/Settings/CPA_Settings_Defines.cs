@@ -168,7 +168,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2Demo_20020517 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -183,7 +183,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			HasNames = true
 		};
 		public static CPA_Settings R3PS2Demo_20020807 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -197,7 +197,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2DevBuild => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -211,7 +211,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2Demo_20021029 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -225,7 +225,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings R3PS2Demo_20021218 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -304,7 +304,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RMPS2 => new CPA_Settings(EngineVersion.RaymanM, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -318,7 +318,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RMPS2Demo => new CPA_Settings(EngineVersion.RaymanM, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -379,7 +379,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAPS2 => new CPA_Settings(EngineVersion.RaymanM, Platform.PS2) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -393,7 +393,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAGC => new CPA_Settings(EngineVersion.RaymanArena, Platform.GC) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
 			HasDeformations = true,
@@ -408,7 +408,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings RAGCDemo => new CPA_Settings(EngineVersion.RaymanArena, Platform.GC) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
 			HasDeformations = true,
@@ -439,7 +439,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 
 		public static CPA_Settings RRushPS1 => new CPA_Settings(EngineVersion.RaymanRush_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -452,7 +452,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#region Rayman 2
 		public static CPA_Settings R2PC => new CPA_Settings(EngineVersion.Rayman2, Platform.PC) {
 			EntryActionsCount = 43,
-			StaticListType = LST2_ListType.DoubleLinked,
+			StaticListType = LST2_ListType.SingleLinked,
 			AITypes = new AI_Types_R2_PC(),
 			COLTypes = new COL_Types_R2(),
 			SNATypes = new SNA_Types_R2_PC(),
@@ -521,7 +521,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2DC => new CPA_Settings(EngineVersion.Rayman2, Platform.DC) {
 			EntryActionsCount = 43,
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.None,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -535,7 +535,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2PS2 => new CPA_Settings(EngineVersion.Rayman2Revolution, Platform.PS2) {
 			EntryActionsCount = 42,
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.None,
 			Luminosity = 0.5f,
 			Saturate = false,
@@ -564,7 +564,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 		public static CPA_Settings R2PS1 => new CPA_Settings(EngineVersion.Rayman2_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -730,7 +730,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#region Donald Duck Quack Attack
 		public static CPA_Settings DDPC => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.PC) {
 			EntryActionsCount = 44, // 43 for demo
-			StaticListType = LST2_ListType.DoubleLinked,
+			StaticListType = LST2_ListType.SingleLinked,
 			AITypes = new AI_Types_R2_PC(),
 			COLTypes = new COL_Types_R2(),
 			SNATypes = new SNA_Types_R2(),
@@ -773,7 +773,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public static CPA_Settings DDPCDemo = new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.PC) {
 			EntryActionsCount = 43,
-			StaticListType = LST2_ListType.DoubleLinked,
+			StaticListType = LST2_ListType.SingleLinked,
 			AITypes = new AI_Types_R2_PC(),
 			COLTypes = new COL_Types_R2(),
 			SNATypes = new SNA_Types_R2(),
@@ -787,7 +787,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public static CPA_Settings DDDC => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.DC) {
 			EntryActionsCount = 43,
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.None,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -808,7 +808,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			EntryActionsCount = 1
 		};
 		public static CPA_Settings DDPS1 => new CPA_Settings(EngineVersion.DonaldDuckQuackAttack_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -820,7 +820,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		#region Other Disney
 		public static CPA_Settings DDPKGC => new CPA_Settings(EngineVersion.DonaldDuckPK, Platform.GC) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_PS2(),
 			COLTypes = new COL_Types_R2(),
@@ -847,7 +847,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			},
 		};
 		public static CPA_Settings JungleBookPS1 => new CPA_Settings(EngineVersion.JungleBook_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
@@ -876,7 +876,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			HasDeformations = true
 		};
 		public static CPA_Settings VIPPS1 => new CPA_Settings(EngineVersion.VIP_PS1, Platform.PS1) {
-			StaticListType = LST2_ListType.Optimized,
+			StaticListType = LST2_ListType.OptimizedArray,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,

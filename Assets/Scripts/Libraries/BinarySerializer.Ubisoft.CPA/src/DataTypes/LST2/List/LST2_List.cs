@@ -50,7 +50,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public override void SerializeImpl(SerializerObject s) {
 			Head = s.SerializePointer<T>(Head, name: nameof(Head));
-			if (Type == LST2_ListType.DoubleLinked)
+			if (Type != LST2_ListType.OptimizedArray)
 				Tail = s.SerializePointer<T>(Tail, name: nameof(Tail));
 
 			ElementsCount = s.Serialize<uint>(ElementsCount, name: nameof(ElementsCount));
@@ -59,7 +59,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		}
 
 		protected void ResolveElements(SerializerObject s, string name = null) {
-			if (Type == LST2_ListType.Array || Type == LST2_ListType.Optimized) {
+			if (Type == LST2_ListType.OptimizedArray) {
 				s.DoAt(Head, () => {
 					ElementList = s.SerializeObjectArray<T>(ElementList, ActualElementsCount, name: name);
 				});

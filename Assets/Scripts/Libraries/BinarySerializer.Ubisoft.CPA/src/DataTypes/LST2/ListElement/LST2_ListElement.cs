@@ -39,7 +39,7 @@
 			Configure(s.Context);
 		}
 		public override void SerializeImpl(SerializerObject s) {
-			if (Type != LST2_ListType.Array && Type != LST2_ListType.Optimized) {
+			if (Type != LST2_ListType.OptimizedArray) {
 				NextBrother = s.SerializePointer<T>(NextBrother, name: nameof(NextBrother));
 				if (Type != LST2_ListType.SingleLinked) {
 					PreviousBrother = s.SerializePointer<T>(PreviousBrother, name: nameof(PreviousBrother));
@@ -47,7 +47,7 @@
 			}
 		}
 
-		protected bool HasFather => Type != LST2_ListType.Array && Type != LST2_ListType.Optimized && Type != LST2_ListType.SingleLinked;
+		protected bool HasFather => Type != LST2_ListType.OptimizedArray && Type != LST2_ListType.SingleLinked;
 
 		protected void ResolveSiblings(SerializerObject s) {
 			NextBrother?.ResolveObject(s);
