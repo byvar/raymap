@@ -104,13 +104,13 @@ namespace BinarySerializer.Ubisoft.CPA {
 			PointsNormals?.ResolveObjectArray(s, PointsCount);
 			PointsMaterials?.ResolvePointerArray(s, PointsCount);
 			PointsMaterials?.Value?.ResolveObject(s);
-			VertexTransparency?.Value?.ResolveValueArray(s, PointsCount);
+			VertexTransparency?.Value?.ResolveArray(s, PointsCount);
 			PointsReceivedLightIntensity?.ResolveObjectArray(s, PointsCount);
 
 			// Resolve elements
-			ElementTypes?.ResolveValueArray(s, ElementsCount);
+			ElementTypes?.ResolveArray(s, ElementsCount);
 			Elements?.ResolvePointerArray(s, ElementsCount);
-			Elements?.Value?.Resolve(s, SerializeElement());
+			Elements?.Value?.ResolveValue(s, SerializeElement());
 
 			// Resolve edges
 			EdgesDI?.ResolveObjectArray(s, EdgesCount);

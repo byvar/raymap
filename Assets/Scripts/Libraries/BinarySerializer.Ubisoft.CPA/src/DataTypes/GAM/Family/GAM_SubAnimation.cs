@@ -11,7 +11,7 @@
 		public override void SerializeImpl(SerializerObject s) {
 			ListElement = s.SerializeObject<LST2_StaticListElement<GAM_SubAnimation>>(ListElement, name: nameof(ListElement));
 			Animation = s.SerializePointer<A3D_Animation>(Animation, name: nameof(Animation))
-				?.Resolve(s, (s, val, name) => {
+				?.ResolveValue(s, (s, val, name) => {
 					if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.TonicTrouble)) {
 						return s.SerializeObject<A3D_Animation_A3I>((A3D_Animation_A3I)val, name: name);
 					} else {

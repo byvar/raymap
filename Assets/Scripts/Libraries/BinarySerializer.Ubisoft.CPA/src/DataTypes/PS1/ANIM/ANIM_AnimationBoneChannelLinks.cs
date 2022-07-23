@@ -10,7 +10,7 @@
 		{
 			NTTOChannelIndex = s.Serialize<ushort>(NTTOChannelIndex, name: nameof(NTTOChannelIndex));
 			IndicesCount = s.Serialize<ushort>(IndicesCount, name: nameof(IndicesCount));
-			Indices = s.SerializePointer(Indices, name: nameof(Indices))?.ResolveValueArray(s, IndicesCount);
+			Indices = s.SerializePointer(Indices, name: nameof(Indices))?.ResolveArray(s, IndicesCount);
 		}
 	}
 }

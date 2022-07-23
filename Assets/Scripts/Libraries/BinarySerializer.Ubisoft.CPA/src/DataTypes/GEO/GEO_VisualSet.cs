@@ -14,7 +14,7 @@
 			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
 				Type = s.Serialize<ushort>(Type, name: nameof(Type));
 			s.Align(4, Offset);
-			Thresholds = s.SerializePointer<float[]>(Thresholds, name: nameof(Thresholds))?.ResolveValueArray(s, LodDefinitionsCount);
+			Thresholds = s.SerializePointer<float[]>(Thresholds, name: nameof(Thresholds))?.ResolveArray(s, LodDefinitionsCount);
 			LodDefinitions = s.SerializePointer<Pointer<GEO_GeometricObject>[]>(LodDefinitions, name: nameof(LodDefinitions))
 				?.ResolvePointerArray(s, LodDefinitionsCount);
 			LodDefinitions?.Value?.ResolveObject(s);

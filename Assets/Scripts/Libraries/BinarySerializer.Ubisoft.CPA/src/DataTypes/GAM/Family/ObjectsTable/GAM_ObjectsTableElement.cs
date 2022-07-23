@@ -22,7 +22,7 @@
 			Expression = s.Serialize<byte?>(Expression, name: nameof(Expression));
 			s.Align(4, Offset);
 
-			Target?.Resolve(s, (s, value, name) => {
+			Target?.ResolveValue(s, (s, value, name) => {
 				return TargetType switch {
 					GAM_ObjectsTableTargetType.PhysicalObject => SerializeTarget<PO_PhysicalObject>(s, value, name),
 					GAM_ObjectsTableTargetType.Event => SerializeTarget<A3D_EventInTable>(s, value, name),

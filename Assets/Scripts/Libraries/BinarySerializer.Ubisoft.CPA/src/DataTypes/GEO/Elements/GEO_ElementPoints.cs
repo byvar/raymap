@@ -19,7 +19,7 @@
 				PointIndices = s.SerializePointer<ushort[]>(PointIndices, name: nameof(PointIndices));
 				GameMaterial = s.SerializePointer<GMT_GameMaterial>(GameMaterial, name: nameof(GameMaterial))?.ResolveObject(s);
 			}
-			PointIndices?.ResolveValueArray(s, PointsCount);
+			PointIndices?.ResolveArray(s, PointsCount);
 		}
 	}
 }
