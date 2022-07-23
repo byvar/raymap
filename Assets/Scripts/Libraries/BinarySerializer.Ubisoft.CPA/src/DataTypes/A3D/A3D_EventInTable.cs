@@ -2,7 +2,7 @@
 	/// <summary>
 	/// Event data in object table
 	/// </summary>
-	public class A3D_EventInTable : BinarySerializable {
+	public class A3D_EventInTable : BinarySerializable, IGAM_ObjectsTableTarget {
 		public uint Event { get; set; }
 		public Pointer<SND_BlockEvent> SoundEvent { get; set; }
 		public A3D_GenericEvent GenericEvent { get; set; }
