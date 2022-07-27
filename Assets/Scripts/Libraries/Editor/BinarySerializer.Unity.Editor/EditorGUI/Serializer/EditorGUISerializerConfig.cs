@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using UnityEditor;
 
-namespace BinarySerializer.Unity
-{
+namespace BinarySerializer.Unity.Editor {
 	public class EditorGUISerializerConfig
 	{
-		internal const string ConfigKey = nameof(EditorGUISerializerConfig);
+		// Singleton
+		private static EditorGUISerializerConfig _Instance { get; set; }
+		public static EditorGUISerializerConfig Instance {
+			get {
+				if (_Instance == null) _Instance = new EditorGUISerializerConfig();
+				return _Instance;
+			}
+		}
 
 		private readonly Dictionary<Type, SerializableObjectHandler> _handlers = new Dictionary<Type, SerializableObjectHandler>();
 

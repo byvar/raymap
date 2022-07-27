@@ -60,10 +60,5 @@ namespace BinarySerializer.Unity {
 
             return file;
         }
-
-		public static EditorGUISerializerConfig AddEditorGUISerializerConfig(this Context context, EditorGUISerializerConfig config) => 
-			context.StoreObject(EditorGUISerializerConfig.ConfigKey, config);
-		public static EditorGUISerializerConfig GetEditorGUISerializerConfig(this Context context) => 
-			context.GetStoredObject<EditorGUISerializerConfig>(EditorGUISerializerConfig.ConfigKey);
 	}
 }

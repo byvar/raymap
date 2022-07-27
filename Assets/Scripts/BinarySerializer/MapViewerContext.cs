@@ -15,9 +15,6 @@ namespace Raymap
 			// Add the game settings
 			AddSettings(settings);
 
-			// Add an editor GUI serializer config
-			this.AddEditorGUISerializerConfig(new EditorGUISerializerConfig());
-
 			// Add settings and pointers from the current manager
 			settings.GetGameManager.AddContextSettings(this);
 			settings.GetGameManager.AddContextPointers(this);

@@ -1,10 +1,10 @@
 ﻿using UnityEditor;
 
-namespace BinarySerializer.Unity
+namespace BinarySerializer.Unity.Editor
 {
 	[CustomEditor(typeof(BinarySerializableDataComponent))]
 	[CanEditMultipleObjects]
-	public class BinarySerializableDataEditor : Editor
+	public class BinarySerializableDataEditor : UnityEditor.Editor
 	{
 		private EditorGUISerializer _serializer;
 		private bool _dataFoldout = true;

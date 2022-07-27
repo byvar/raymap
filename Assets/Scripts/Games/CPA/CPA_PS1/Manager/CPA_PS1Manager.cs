@@ -8,7 +8,6 @@ using BinarySerializer.Ubisoft.CPA;
 using BinarySerializer.Ubisoft.CPA.PS1;
 using BinarySerializer.Unity;
 using Cysharp.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using PS1GameInfo = OpenSpace.PS1.PS1GameInfo; // TODO: Remove this
@@ -352,21 +351,6 @@ namespace Raymap
 		#endregion
 
 		#region Manager Methods
-
-		public override void AddContextSettings(Context context)
-		{
-			base.AddContextSettings(context);
-
-			EditorGUISerializerConfig editorConfig = context.GetEditorGUISerializerConfig();
-			editorConfig.AddObjectHandler<MTH3D_Vector_PS1_Short, Vector3>(
-				(obj, name) => EditorGUILayout.Vector3Field(name, new Vector3(obj.X, obj.Y, obj.Z)),
-				(obj, value) =>
-				{
-					obj.X = value.x;
-					obj.Y = value.y;
-					obj.Z = value.z;
-				});
-		}
 
 		protected override List<string> FindFiles(MapViewerSettings settings) => GetGameInfo(settings).maps.ToList();
 

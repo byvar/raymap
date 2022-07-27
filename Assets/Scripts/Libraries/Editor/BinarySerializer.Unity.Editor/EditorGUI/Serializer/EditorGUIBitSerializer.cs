@@ -1,4 +1,4 @@
-﻿namespace BinarySerializer.Unity
+﻿namespace BinarySerializer.Unity.Editor
 {
 	public class EditorGUIBitSerializer : BitSerializerObject
 	{

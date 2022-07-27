@@ -5,8 +5,7 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace BinarySerializer.Unity
-{
+namespace BinarySerializer.Unity.Editor {
 	// TODO: Rather than using the name to keep track of the value states we could use an index. That way resolved generic pointers will work.
 	public class EditorGUISerializer : SerializerObject
 	{
@@ -230,7 +229,7 @@ namespace BinarySerializer.Unity
 			}
 			else
 			{
-				EditorGUISerializerConfig config = Context.GetEditorGUISerializerConfig();
+				EditorGUISerializerConfig config = EditorGUISerializerConfig.Instance;
 				EditorGUISerializerConfig.SerializableObjectHandler handler = config?.GetHandler<T>();
 
 				if (handler != null)
