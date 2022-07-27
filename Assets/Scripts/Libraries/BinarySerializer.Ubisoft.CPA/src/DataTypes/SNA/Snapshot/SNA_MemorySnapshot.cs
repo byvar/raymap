@@ -30,9 +30,9 @@
 				b => s.CurrentAbsoluteOffset >= s.CurrentLength,
 				name: nameof(Blocks));
 			if (Blocks != null) {
-				s.LogWarning("Blocks:");
+				s.SystemLog?.LogWarning("Blocks:");
 				foreach (var b in Blocks) {
-					s.LogWarning($"{b.BlockName} - {b.BlockSize}");
+					s.SystemLog?.LogWarning($"{b.BlockName} - {b.BlockSize}");
 				}
 			}
 		}

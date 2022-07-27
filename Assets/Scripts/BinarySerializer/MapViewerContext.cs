@@ -10,7 +10,7 @@ namespace Raymap
 			settings: new MapViewerSerializerSettings(), // Pass in the settings
 			serializerLog: log ? new MapViewerSerializerLog() : null, // Use map viewer serializer log for logging to a file
 			fileManager: new MapViewerFileManager(), // Use map viewer file manager for use with FileSystem
-			logger: new UnityLogger()) // Use Unity logger
+			systemLog: new UnitySystemLog()) // Use Unity logger
 		{
 			// Add the game settings
 			AddSettings(settings);

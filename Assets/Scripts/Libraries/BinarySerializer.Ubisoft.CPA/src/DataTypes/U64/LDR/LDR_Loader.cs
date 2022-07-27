@@ -48,11 +48,11 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 					if (!currentRef.IsGlobal) {
 						off_struct = GetStructPointer(currentRef.Type, currentRef.Index, global: true);
 						if (off_struct != null) {
-							s.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name} normally, successfully resolved globally");
+							s.SystemLog?.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name} normally, successfully resolved globally");
 						}
 					}
 					if (off_struct == null) {
-						s.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name}");
+						s.SystemLog?.LogWarning($"Couldn't resolve Struct Reference {currentRef.Name}");
 						continue;
 					}
 				}

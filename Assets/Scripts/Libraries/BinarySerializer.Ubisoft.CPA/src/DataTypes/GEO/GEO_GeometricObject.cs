@@ -130,6 +130,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 					var elTypes = ElementTypes?.Value;
 					return elTypes[index] switch {
+						GEO_ElementType.IndexedTriangles => SerializeElement<GEO_ElementIndexedTriangles>(),
 						GEO_ElementType.Points => SerializeElement<GEO_ElementPoints>(),
 						GEO_ElementType.Spheres => SerializeElement<GEO_ElementSpheres>(),
 						GEO_ElementType.AlignedBoxes => SerializeElement<GEO_ElementAlignedBoxes>(),

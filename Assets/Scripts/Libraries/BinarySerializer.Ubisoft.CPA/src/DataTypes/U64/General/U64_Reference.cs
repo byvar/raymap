@@ -25,7 +25,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			if (IsNull) return this;
 			if (typeof(T) == typeof(U64_Placeholder)) {
-				s.LogWarning("Trying to resolve Placeholder - skipping");
+				s.SystemLog?.LogWarning("Trying to resolve Placeholder - skipping");
 				return this;
 			}
 
