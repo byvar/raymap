@@ -3,7 +3,8 @@
 		public Pointer<GEO_VisualSet> VisualSet { get; set; }
 		public Pointer<GEO_GeometricObject> GeometricObject { get; set; }
 
-		public Pointer<GAM_Placeholder> CollideSet { get; set; }
+		public Pointer<PO_PhysicalCollideSet> CollideSet { get; set; }
+		public Pointer<COL_CollideObject> CollideObject { get; set; }
 
 		public Pointer<GEO_BoundingSphere> BoundingVolume { get; set; }
 		public Pointer<GEO_BoundingSphere> VisualBoundingVolume { get; set; }
@@ -16,7 +17,11 @@
 				VisualSet = s.SerializePointer<GEO_VisualSet>(VisualSet, name: nameof(VisualSet))?.ResolveObject(s);
 			}
 
-			CollideSet = s.SerializePointer<GAM_Placeholder>(CollideSet, name: nameof(CollideSet))?.ResolveObject(s);
+			if(s.GetCPASettings().EngineVersion == EngineVersion.Rayman2Revolution) {
+				CollideObject = s.SerializePointer<COL_CollideObject>(CollideObject, name: nameof(CollideObject))?.ResolveObject(s);
+			} else {
+				CollideSet = s.SerializePointer<PO_PhysicalCollideSet>(CollideSet, name: nameof(CollideSet))?.ResolveObject(s);
+			}
 
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
 				VisualBoundingVolume = s.SerializePointer<GEO_BoundingSphere>(VisualBoundingVolume, name: nameof(VisualBoundingVolume))?.ResolveObject(s);

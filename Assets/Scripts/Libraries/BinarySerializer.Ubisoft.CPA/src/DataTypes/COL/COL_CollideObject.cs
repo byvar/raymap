@@ -1,12 +1,11 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class GEO_GeometricObject : BinarySerializable {
+	public class COL_CollideObject : BinarySerializable {
 		// Vertices
 		public Pointer<MTH3D_Vector[]> Points { get; set; }
 		public Pointer<MTH3D_Vector[]> PointsNormals { get; set; }
 		public Pointer<Pointer<GMT_GameMaterial>[]> PointsMaterials { get; set; }
-		public Pointer<Pointer<float[]>[]> VertexTransparency { get; set; }
 		public Pointer<GLI_FloatColor_RGBA[]> PointsReceivedLightIntensity { get; set; }
 
 		// Elements
@@ -40,61 +39,65 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public override void SerializeImpl(SerializerObject s) {
 			// Points
-			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
+			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)
+				|| s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2Revolution)) {
 				PointsCount = s.Serialize<ushort>(PointsCount, name: nameof(PointsCount));
-				s.Align(4, Offset);
-			}
-			Points = s.SerializePointer<MTH3D_Vector[]>(Points, name: nameof(Points));
-			PointsNormals = s.SerializePointer<MTH3D_Vector[]>(PointsNormals, name: nameof(PointsNormals));
-			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
-				VertexTransparency = s.SerializePointer<Pointer<float[]>[]>(VertexTransparency, name: nameof(VertexTransparency))
-					?.ResolvePointerArray(s, 4);
-			} else {
-				PointsMaterials = s.SerializePointer<Pointer<GMT_GameMaterial>[]>(PointsMaterials, name: nameof(PointsMaterials));
-			}
-			if ((s.GetCPASettings().Platform != Platform.GC || s.GetCPASettings().EngineVersion == EngineVersion.Rayman3) // Only present in R3 GC, not in other GC games
-				&& (s.GetCPASettings().Platform != Platform.PS2 || s.GetCPASettings().EngineVersion != EngineVersion.Rayman3) // Not present in R3 PS2
-				&& s.GetCPASettings().EngineVersion != EngineVersion.RaymanM) {
-				PointsReceivedLightIntensity = s.SerializePointer<GLI_FloatColor_RGBA[]>(PointsReceivedLightIntensity, name: nameof(PointsReceivedLightIntensity));
-			}
-
-			// Elements
-			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
 				ElementsCount = s.Serialize<ushort>(ElementsCount, name: nameof(ElementsCount));
-				s.Align(4, Offset);
-			}
-			ElementTypes = s.SerializePointer<GEO_ElementType[]>(ElementTypes, name: nameof(ElementTypes));
-			Elements = s.SerializePointer<Pointer<GEO_Element>[]>(Elements, name: nameof(Elements));
 
-			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2) && !s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
+					ParallelBoxesCount = s.Serialize<ushort>(ParallelBoxesCount, name: nameof(ParallelBoxesCount));
+
+				s.Align(4, Offset);
+
+				ElementTypes = s.SerializePointer<GEO_ElementType[]>(ElementTypes, name: nameof(ElementTypes));
+				Elements = s.SerializePointer<Pointer<GEO_Element>[]>(Elements, name: nameof(Elements));
 				Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree))?.ResolveObject(s);
 
-			// Edges
-			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
-				EdgesCount = s.Serialize<ushort>(EdgesCount, name: nameof(EdgesCount));
-				s.Align(4, Offset);
-			}
-			EdgesDI = s.SerializePointer<GEO_DoubledIndex[]>(EdgesDI, name: nameof(EdgesDI));
-			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
+				if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
+					ParallelBoxes = s.SerializePointer<GEO_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
+			} else {
+				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
+					PointsCount = s.Serialize<ushort>(PointsCount, name: nameof(PointsCount));
+					s.Align(4, Offset);
+				}
+				Points = s.SerializePointer<MTH3D_Vector[]>(Points, name: nameof(Points));
+				PointsNormals = s.SerializePointer<MTH3D_Vector[]>(PointsNormals, name: nameof(PointsNormals));
+				PointsMaterials = s.SerializePointer<Pointer<GMT_GameMaterial>[]>(PointsMaterials, name: nameof(PointsMaterials));
+				PointsReceivedLightIntensity = s.SerializePointer<GLI_FloatColor_RGBA[]>(PointsReceivedLightIntensity, name: nameof(PointsReceivedLightIntensity));
+
+				// Elements
+				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
+					ElementsCount = s.Serialize<ushort>(ElementsCount, name: nameof(ElementsCount));
+					s.Align(4, Offset);
+				}
+				ElementTypes = s.SerializePointer<GEO_ElementType[]>(ElementTypes, name: nameof(ElementTypes));
+				Elements = s.SerializePointer<Pointer<GEO_Element>[]>(Elements, name: nameof(Elements));
+
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2))
+					Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree))?.ResolveObject(s);
+
+				// Edges
+				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
+					EdgesCount = s.Serialize<ushort>(EdgesCount, name: nameof(EdgesCount));
+					s.Align(4, Offset);
+				}
+				EdgesDI = s.SerializePointer<GEO_DoubledIndex[]>(EdgesDI, name: nameof(EdgesDI));
 				EdgesMaterials = s.SerializePointer<Pointer<GMT_GameMaterial>[]>(EdgesMaterials, name: nameof(EdgesMaterials));
 
-			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
-				ParallelBoxes = s.SerializePointer<GEO_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
-				
-				Type = s.Serialize<GEO_LookAtMode>(Type, name: nameof(Type));
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
+					ParallelBoxes = s.SerializePointer<GEO_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
 
-				PointsCount = s.Serialize<ushort>(PointsCount, name: nameof(PointsCount));
-				ElementsCount = s.Serialize<ushort>(ElementsCount, name: nameof(ElementsCount));
-				EdgesCount = s.Serialize<ushort>(EdgesCount, name: nameof(EdgesCount));
-				ParallelBoxesCount = s.Serialize<ushort>(ParallelBoxesCount, name: nameof(ParallelBoxesCount));
+					Type = s.Serialize<GEO_LookAtMode>(Type, name: nameof(Type));
 
-				BoundingSphere = s.SerializeObject<GEO_BoundingSphere>(BoundingSphere, name: nameof(BoundingSphere));
+					PointsCount = s.Serialize<ushort>(PointsCount, name: nameof(PointsCount));
+					ElementsCount = s.Serialize<ushort>(ElementsCount, name: nameof(ElementsCount));
+					EdgesCount = s.Serialize<ushort>(EdgesCount, name: nameof(EdgesCount));
+					ParallelBoxesCount = s.Serialize<ushort>(ParallelBoxesCount, name: nameof(ParallelBoxesCount));
 
-				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
-					throw new BinarySerializableException(this, $"{GetType()}: Not yet implemented");
+					BoundingSphere = s.SerializeObject<GEO_BoundingSphere>(BoundingSphere, name: nameof(BoundingSphere));
+				} else {
+					SpecialValue = s.SerializePointer(SpecialValue, name: nameof(SpecialValue));
 				}
-			} else {
-				SpecialValue = s.SerializePointer(SpecialValue, name: nameof(SpecialValue));
 			}
 
 			// Resolve
@@ -104,7 +107,6 @@ namespace BinarySerializer.Ubisoft.CPA {
 			PointsNormals?.ResolveObjectArray(s, PointsCount);
 			PointsMaterials?.ResolvePointerArray(s, PointsCount);
 			PointsMaterials?.Value?.ResolveObject(s);
-			VertexTransparency?.Value?.ResolveArray(s, PointsCount);
 			PointsReceivedLightIntensity?.ResolveObjectArray(s, PointsCount);
 
 			// Resolve elements
@@ -130,7 +132,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 					var elTypes = ElementTypes?.Value;
 					return elTypes[index] switch {
-						GEO_ElementType.IndexedTriangles => SerializeElement<GEO_ElementIndexedTriangles>(),
+						GEO_ElementType.IndexedTriangles => SerializeElement<COL_ElementIndexedTriangles>(),
 						GEO_ElementType.Sprites => SerializeElement<GEO_ElementSprites>(),
 						GEO_ElementType.Points => SerializeElement<GEO_ElementPoints>(),
 						GEO_ElementType.Spheres => SerializeElement<GEO_ElementSpheres>(),

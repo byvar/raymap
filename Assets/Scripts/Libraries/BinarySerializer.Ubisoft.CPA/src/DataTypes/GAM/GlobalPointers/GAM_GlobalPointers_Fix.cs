@@ -3,8 +3,8 @@
 		public Pointer<MAT_Transformation> IdentityMatrix { get; set; }
 		public Pointer<MAT_Transformation>[] MatrixStack { get; set; }
 		public uint MatrixCountInStack { get; set; }
-		public Pointer<GEO_GeometricObject> CollisionGeometricObject { get; set; }
-		public Pointer<GEO_GeometricObject> StaticCollisionGeometricObject { get; set; }
+		public Pointer<COL_CollideObject> CollisionGeometricObject { get; set; }
+		public Pointer<COL_CollideObject> StaticCollisionGeometricObject { get; set; }
 		public Pointer<IPT_EntryElement>[] EntryActions_3DOS { get; set; }
 		public Pointer<IPT_KeyAndPadDefineArray> KeyAndPadDefine { get; set; }
 		public IPT_Input InputStructure { get; set; }
@@ -19,8 +19,8 @@
 				IdentityMatrix = s.SerializePointer<MAT_Transformation>(IdentityMatrix, name: nameof(IdentityMatrix))?.ResolveObject(s);
 				MatrixStack = s.SerializePointerArray<MAT_Transformation>(MatrixStack, 50, name: nameof(MatrixStack))?.ResolveObject(s);
 				MatrixCountInStack = s.Serialize<uint>(MatrixCountInStack, name: nameof(MatrixCountInStack));
-				CollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject))?.ResolveObject(s);
-				StaticCollisionGeometricObject = s.SerializePointer<GEO_GeometricObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject))?.ResolveObject(s);
+				CollisionGeometricObject = s.SerializePointer<COL_CollideObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject))?.ResolveObject(s);
+				StaticCollisionGeometricObject = s.SerializePointer<COL_CollideObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject))?.ResolveObject(s);
 				EntryActions_3DOS = s.SerializePointerArray<IPT_EntryElement>(EntryActions_3DOS, s.GetCPASettings().EntryActionsCount, name: nameof(EntryActions_3DOS))?.ResolveObject(s);
 				KeyAndPadDefine = s.SerializePointer<IPT_KeyAndPadDefineArray>(KeyAndPadDefine, name: nameof(KeyAndPadDefine))?.ResolveObject(s);
 				InputStructure = s.SerializeObject<IPT_Input>(InputStructure, name: nameof(InputStructure));
