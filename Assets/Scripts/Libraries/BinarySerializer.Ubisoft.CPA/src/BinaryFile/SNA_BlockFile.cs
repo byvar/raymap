@@ -44,6 +44,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		}
 		private SNA_MemoryBlock GetBlockFromDictionary(uint serializedValue) {
+			return null; // Relocation tables aren't reliable
 			if (PointerBlockDictionary == null) CreatePointerBlockDictionary();
 			if (PointerBlockDictionary.TryGetValue(serializedValue, out SNA_MemoryBlock b))
 				return b;

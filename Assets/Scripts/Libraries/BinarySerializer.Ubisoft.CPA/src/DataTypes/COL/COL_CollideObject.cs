@@ -51,7 +51,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 				ElementTypes = s.SerializePointer<GEO_ElementType[]>(ElementTypes, name: nameof(ElementTypes));
 				Elements = s.SerializePointer<Pointer<GEO_Element>[]>(Elements, name: nameof(Elements));
-				Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree))?.ResolveObject(s);
+				Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree));
 
 				if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
 					ParallelBoxes = s.SerializePointer<GEO_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
@@ -74,7 +74,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				Elements = s.SerializePointer<Pointer<GEO_Element>[]>(Elements, name: nameof(Elements));
 
 				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2))
-					Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree))?.ResolveObject(s);
+					Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree));
 
 				// Edges
 				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
@@ -118,6 +118,9 @@ namespace BinarySerializer.Ubisoft.CPA {
 			EdgesDI?.ResolveObjectArray(s, EdgesCount);
 			EdgesMaterials?.ResolvePointerArray(s, EdgesCount);
 			EdgesMaterials?.Value?.ResolveObject(s);
+
+			// Resolve octree
+			Octree?.ResolveObject(s, onPreSerialize: o => o.Pre_ElementsCount = ElementsCount);
 
 			// Resolve parallel boxes
 			ParallelBoxes?.ResolveObjectArray(s, ParallelBoxesCount);

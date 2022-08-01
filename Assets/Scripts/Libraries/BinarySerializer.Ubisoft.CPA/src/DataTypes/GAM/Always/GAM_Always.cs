@@ -5,6 +5,7 @@
 		public Pointer<HIE_SuperObject[]> AlwaysSuperObjects { get; set; }
 		public Pointer AlwaysEngineObjects { get; set; }
 		public Pointer AlwaysGenerators { get; set; }
+		public uint DonaldDuckUnknown { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			MaxAlwaysCount = s.Serialize<uint>(MaxAlwaysCount, name: nameof(MaxAlwaysCount));
@@ -12,6 +13,9 @@
 			AlwaysSuperObjects = s.SerializePointer<HIE_SuperObject[]>(AlwaysSuperObjects, name: nameof(AlwaysSuperObjects))?.ResolveObjectArray(s, MaxAlwaysCount);
 			AlwaysEngineObjects = s.SerializePointer(AlwaysEngineObjects, name: nameof(AlwaysEngineObjects));
 			AlwaysGenerators = s.SerializePointer(AlwaysGenerators, name: nameof(AlwaysGenerators));
+
+			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.DonaldDuckQuackAttack))
+				DonaldDuckUnknown = s.Serialize<uint>(DonaldDuckUnknown, name: nameof(DonaldDuckUnknown));
 		}
 
 		public GAM_Always Resolve(SerializerObject s) {
