@@ -550,7 +550,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		};
 		public static CPA_Settings R2IOS => new CPA_Settings(EngineVersion.Rayman2, Platform.iOS) {
 			EntryActionsCount = 43,
-			StaticListType = LST2_ListType.DoubleLinked,
+			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			AITypes = new AI_Types_R2_PC(),
 			COLTypes = new COL_Types_R2(),

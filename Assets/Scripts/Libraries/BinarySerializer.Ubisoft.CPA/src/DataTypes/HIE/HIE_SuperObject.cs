@@ -16,6 +16,8 @@
 		public float Transparency { get; set; }
 		public MTH3D_Vector SemiLookAtVector { get; set; }
 
+		public uint R2iOSUnknown { get; set; }
+
 		// CPA_3
 		public GLI_RGBA8888Color OutlineColor { get; set; }
 		public int DisplayPriority { get; set; }
@@ -72,6 +74,9 @@
 
 				Transparency = s.Serialize<float>(Transparency, name: nameof(Transparency));
 				SemiLookAtVector = s.SerializeObject<MTH3D_Vector>(SemiLookAtVector, name: nameof(SemiLookAtVector));
+
+				if(s.GetCPASettings().Platform == Platform.iOS)
+					R2iOSUnknown = s.Serialize<uint>(R2iOSUnknown, name: nameof(R2iOSUnknown));
 			}
 		}
 	}
