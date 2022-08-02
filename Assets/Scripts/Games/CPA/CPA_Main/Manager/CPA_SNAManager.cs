@@ -245,6 +245,29 @@ namespace Raymap {
 					return rt?.Value;
 				}
 			}
+
+			//LogIncorrectReloctaion(context);
+		}
+
+		public void LogIncorrectReloctaion(Context context) {
+			foreach (var f in context.MemoryMap.Files) {
+				if (f is SNA_BlockFile bf) {
+					var relocBlock = bf.RelocationBlock;
+					if (relocBlock == null) continue;
+					foreach (var ptr in relocBlock.Pointers) {
+						var absoluteValue = ptr.Pointer;
+						var relocFile = bf?.Snapshot?.Blocks?.LastOrDefault(
+								x => x.Module == ptr.TargetModule && x.Block == ptr.TargetBlock);
+						var memoryMappedFile = bf?.Snapshot?.Blocks?.LastOrDefault(b =>
+							b.BeginBlock != SNA_MemoryBlock.InvalidBeginBlock
+							&& absoluteValue >= b.BeginBlock
+							&& absoluteValue < b.EndBlock + 1);
+						if (relocFile?.BlockName != memoryMappedFile?.BlockName) {
+							context.SerializerLog?.Log($"{bf.FilePath} - Incorrect relocation: {absoluteValue:X8} - relocated to {relocFile?.BlockName} (base: {relocFile?.BeginBlock:X8}), should be {memoryMappedFile?.BlockName} (base: {memoryMappedFile?.BeginBlock:X8})");
+						}
+					}
+				}
+			}
 		}
 
 		public void ProcessSNA(Context context, SNA_MemorySnapshot snapshot, SNA_RelocationTable relocationTable) {

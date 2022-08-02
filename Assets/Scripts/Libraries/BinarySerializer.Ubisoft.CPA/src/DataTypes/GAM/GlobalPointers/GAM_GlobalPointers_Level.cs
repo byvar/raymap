@@ -11,6 +11,7 @@
 		public GAM_ObjectTypeListInfo ObjectTypeListInfo { get; set; }
 		public GAM_ObjectType ObjectType { get; set; }
 		public GAM_EngineStructure EngineStructure { get; set; }
+		public Pointer<GLI_Light> Light { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
@@ -30,6 +31,7 @@
 					?.RepairLists(s)
 					?.Resolve(s);
 				EngineStructure = s.SerializeObject<GAM_EngineStructure>(EngineStructure, name: nameof(EngineStructure));
+				Light = s.SerializePointer<GLI_Light>(Light, name: nameof(Light))?.ResolveObject(s);
 			}
 		}
 	}
