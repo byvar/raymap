@@ -890,7 +890,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		#region Other
 		public static CPA_Settings RedPlanetPC => new CPA_Settings(EngineVersion.RedPlanet, Platform.PC) {
 			EntryActionsCount = 31,
-			StaticListType = LST2_ListType.DoubleLinked,
+			StaticListType = LST2_ListType.SingleLinked,
 			AITypes = new AI_Types_R2_PC(),
 			SNATypes = new SNA_Types_R2_Demo(),
 			Encryption = Encryption.RedPlanet,

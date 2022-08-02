@@ -17,6 +17,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public Pointer<COL_Octree> Octree { get; set; }
 
 		// Edges
+		public Pointer<GEO_Edge[]> Edges { get; set; }
 		public Pointer<GEO_DoubledIndex[]> EdgesDI { get; set; }
 		public Pointer<Pointer<GMT_GameMaterial>[]> EdgesMaterials { get; set; }
 
@@ -31,9 +32,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public ushort ElementsCount { get; set; }
 		public ushort EdgesCount { get; set; }
 		public ushort ParallelBoxesCount { get; set; }
+		public ushort EdgesDICount { get; set; }
+		public ushort OctreeEdgesCount { get; set; }
 
 		// Bounding sphere
-		public GEO_BoundingSphere BoundingSphere { get; set; }
+		public float BoundingSphereRadius { get; set; }
+		public MTH3D_Vector BoundingSphereCenter { get; set; }
 
 		// CPA1
 		public Pointer SpecialValue { get; set; }
@@ -66,7 +70,9 @@ namespace BinarySerializer.Ubisoft.CPA {
 			ElementTypes = s.SerializePointer<GEO_ElementType[]>(ElementTypes, name: nameof(ElementTypes));
 			Elements = s.SerializePointer<Pointer<GEO_Element>[]>(Elements, name: nameof(Elements));
 
-			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2) && !s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
+			if((s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2)
+				|| s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.RedPlanet))
+				&& !s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
 				Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree));
 
 			// Edges
@@ -74,10 +80,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 				EdgesCount = s.Serialize<ushort>(EdgesCount, name: nameof(EdgesCount));
 				s.Align(4, Offset);
 			}
-			EdgesDI = s.SerializePointer<GEO_DoubledIndex[]>(EdgesDI, name: nameof(EdgesDI));
-			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
+			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
+				Edges = s.SerializePointer<GEO_Edge[]>(Edges, name: nameof(Edges));
+			} else {
+				EdgesDI = s.SerializePointer<GEO_DoubledIndex[]>(EdgesDI, name: nameof(EdgesDI));
 				EdgesMaterials = s.SerializePointer<Pointer<GMT_GameMaterial>[]>(EdgesMaterials, name: nameof(EdgesMaterials));
-
+			}
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
 				ParallelBoxes = s.SerializePointer<GEO_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
 				
@@ -88,9 +96,13 @@ namespace BinarySerializer.Ubisoft.CPA {
 				EdgesCount = s.Serialize<ushort>(EdgesCount, name: nameof(EdgesCount));
 				ParallelBoxesCount = s.Serialize<ushort>(ParallelBoxesCount, name: nameof(ParallelBoxesCount));
 
-				BoundingSphere = s.SerializeObject<GEO_BoundingSphere>(BoundingSphere, name: nameof(BoundingSphere));
+				BoundingSphereRadius = s.Serialize<float>(BoundingSphereRadius, name: nameof(BoundingSphereRadius));
+				BoundingSphereCenter = s.SerializeObject<MTH3D_Vector>(BoundingSphereCenter, name: nameof(BoundingSphereCenter));
 
 				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
+					EdgesDI = s.SerializePointer<GEO_DoubledIndex[]>(EdgesDI, name: nameof(EdgesDI));
+					EdgesDICount = s.Serialize<ushort>(EdgesDICount, name: nameof(EdgesDICount));
+					OctreeEdgesCount = s.Serialize<ushort>(OctreeEdgesCount, name: nameof(OctreeEdgesCount));
 					throw new BinarySerializableException(this, $"{GetType()}: Not yet implemented");
 				}
 			} else {
@@ -113,7 +125,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Elements?.Value?.ResolveValue(s, SerializeElement());
 
 			// Resolve edges
-			EdgesDI?.ResolveObjectArray(s, EdgesCount);
+			Edges?.ResolveObjectArray(s, EdgesCount);
+			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
+				EdgesDI?.ResolveObjectArray(s, EdgesDICount);
+			} else {
+				EdgesDI?.ResolveObjectArray(s, EdgesCount);
+			}
 			EdgesMaterials?.ResolvePointerArray(s, EdgesCount);
 			EdgesMaterials?.Value?.ResolveObject(s);
 
