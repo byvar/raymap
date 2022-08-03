@@ -87,7 +87,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			CoordinateScale = s.Serialize<ushort>(CoordinateScale, name: nameof(CoordinateScale));
 
-			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.DonaldDuckQuackAttack)) {
+			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.DonaldDuckQuackAttackDemo)) {
 				Background_TopLeft = s.SerializeObject<U64_Reference<GLI_VisualMaterial>>(Background_TopLeft, name: nameof(Background_TopLeft))?.Resolve(s);
 				Background_TopRight = s.SerializeObject<U64_Reference<GLI_VisualMaterial>>(Background_TopRight, name: nameof(Background_TopRight))?.Resolve(s);
 				Background_BottomLeft = s.SerializeObject<U64_Reference<GLI_VisualMaterial>>(Background_BottomLeft, name: nameof(Background_BottomLeft))?.Resolve(s);

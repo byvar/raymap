@@ -16,6 +16,7 @@
 		Rayman4DS_20060525,
         RaymanRavingRabbids,
         Rayman2_3D,
+		DonaldDuckQuackAttackDemo,
         DonaldDuckQuackAttack,
         RedPlanet,
 

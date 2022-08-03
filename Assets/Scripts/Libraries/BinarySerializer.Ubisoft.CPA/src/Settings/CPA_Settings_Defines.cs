@@ -771,7 +771,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		};
 
-		public static CPA_Settings DDPCDemo = new CPA_Settings(EngineVersion.DonaldDuckQuackAttack, Platform.PC) {
+		public static CPA_Settings DDPCDemo = new CPA_Settings(EngineVersion.DonaldDuckQuackAttackDemo, Platform.PC) {
 			EntryActionsCount = 43,
 			StaticListType = LST2_ListType.SingleLinked,
 			AITypes = new AI_Types_R2_PC(),

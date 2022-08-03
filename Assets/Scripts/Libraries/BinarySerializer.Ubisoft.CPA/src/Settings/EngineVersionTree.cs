@@ -15,7 +15,9 @@ namespace BinarySerializer.Ubisoft.CPA {
                                             new Node(EngineVersion.Rayman2Revolution).SetChildren(
 												new Node(EngineVersion.LargoWinch)
 											),
-                                            new Node(EngineVersion.DonaldDuckQuackAttack),
+											new Node(EngineVersion.DonaldDuckQuackAttackDemo).SetChildren(
+												new Node(EngineVersion.DonaldDuckQuackAttack)
+											),
 											new Node(EngineVersion.Rayman4DS).SetChildren(
 												new Node(EngineVersion.Rayman4DS_20060525).SetChildren(
 													new Node(EngineVersion.RaymanRavingRabbids).SetChildren(

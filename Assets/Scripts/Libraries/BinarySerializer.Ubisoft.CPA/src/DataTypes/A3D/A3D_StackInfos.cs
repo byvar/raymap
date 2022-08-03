@@ -16,8 +16,7 @@
 			}
 		}
 
-		public uint Count(bool append = false) => StackPos - (append ? FamilyPos : 0);
-		public uint MaxCount(bool append = false) => MaxPos;
+		public uint Count(bool append = false) => append ? (StackPos - ResetPos) : MaxPos;
 		// TODO: Use MaxPos when serializing Fix. Maybe for level too.
 	}
 }

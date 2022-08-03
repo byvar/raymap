@@ -14,7 +14,7 @@
 			AlwaysEngineObjects = s.SerializePointer(AlwaysEngineObjects, name: nameof(AlwaysEngineObjects));
 			AlwaysGenerators = s.SerializePointer(AlwaysGenerators, name: nameof(AlwaysGenerators));
 
-			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.DonaldDuckQuackAttack))
+			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.DonaldDuckQuackAttackDemo))
 				DonaldDuckUnknown = s.Serialize<uint>(DonaldDuckUnknown, name: nameof(DonaldDuckUnknown));
 		}
 

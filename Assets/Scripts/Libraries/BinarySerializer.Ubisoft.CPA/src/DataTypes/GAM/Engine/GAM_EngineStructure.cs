@@ -233,7 +233,7 @@
 
 				CameraMode = s.Serialize<GAM_CameraMode>(CameraMode, name: nameof(CameraMode));
 
-				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.DonaldDuckQuackAttack)) {
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.DonaldDuckQuackAttackDemo)) {
 					s.Align(4, Offset);
 					DonaldDuckUnknown = s.SerializePointer(DonaldDuckUnknown, name: nameof(DonaldDuckUnknown));
 				}
