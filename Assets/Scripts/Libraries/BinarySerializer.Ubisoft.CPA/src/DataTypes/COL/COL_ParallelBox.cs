@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class GEO_ParallelBox : BinarySerializable {
+	public class COL_ParallelBox : BinarySerializable, ICOL_BoundingVolume {
 		public MTH3D_Vector Min { get; set; }
 		public MTH3D_Vector Max { get; set; }
 

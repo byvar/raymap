@@ -1,8 +1,10 @@
-﻿namespace BinarySerializer.Ubisoft.CPA {
+﻿using System;
+
+namespace BinarySerializer.Ubisoft.CPA {
 	public class HIE_SuperObject : BinarySerializable, ILST2_Child<HIE_SuperObject, HIE_SuperObject> {
 		public HIE_ObjectType LinkedObjectType { get; set; }
 		public HIE_ObjectType_98 LinkedObjectType_98 { get; set; }
-		public Pointer LinkedObject { get; set; }
+		public Pointer<IHIE_LinkedObject> LinkedObject { get; set; }
 		public LST2_DynamicParentElement<HIE_SuperObject, HIE_SuperObject> Children { get; set; }
 		public LST2_DynamicChildElement<HIE_SuperObject, HIE_SuperObject> ListElement { get; set; }
 		public Pointer<MAT_Transformation> LocalMatrix { get; set; }
@@ -10,9 +12,9 @@
 		public int LastComputeFrame { get; set; }
 		public GLI_DrawMask SuperObjectDrawMask { get; set; }
 		public HIE_SuperObjectFlags Flags { get; set; }
-		public Pointer BoundingVolume { get; set; }
-		public Pointer VisualBoundingVolume { get; set; }
-		public Pointer CollideBoundingVolume { get; set; }
+		public Pointer<ICOL_BoundingVolume> BoundingVolume { get; set; }
+		public Pointer<COL_BoundingSphere> VisualBoundingVolume { get; set; }
+		public Pointer<ICOL_BoundingVolume> CollideBoundingVolume { get; set; }
 		public float Transparency { get; set; }
 		public MTH3D_Vector SemiLookAtVector { get; set; }
 
@@ -42,7 +44,8 @@
 			} else {
 				LinkedObjectType_98 = s.Serialize<HIE_ObjectType_98>(LinkedObjectType_98, name: nameof(LinkedObjectType_98));
 			}
-			LinkedObject = s.SerializePointer(LinkedObject, name: nameof(LinkedObject));
+			LinkedObject = s.SerializePointer<IHIE_LinkedObject>(LinkedObject, name: nameof(LinkedObject))
+				?.ResolveValue(s, SerializeLinkedObject());
 			Children = s.SerializeObject<LST2_DynamicParentElement<HIE_SuperObject, HIE_SuperObject>>(Children, name: nameof(Children))?.Resolve(s, name: nameof(Children));
 			ListElement = s.SerializeObject<LST2_DynamicChildElement<HIE_SuperObject, HIE_SuperObject>>(ListElement, name: nameof(ListElement))?.Resolve(s);
 			LocalMatrix = s.SerializePointer<MAT_Transformation>(LocalMatrix, name: nameof(LocalMatrix))?.ResolveObject(s);
@@ -51,8 +54,9 @@
 			SuperObjectDrawMask = s.Serialize<GLI_DrawMask>(SuperObjectDrawMask, name: nameof(SuperObjectDrawMask));
 			Flags = s.Serialize<HIE_SuperObjectFlags>(Flags, name: nameof(Flags));
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
-				VisualBoundingVolume = s.SerializePointer(VisualBoundingVolume, name: nameof(VisualBoundingVolume));
-				CollideBoundingVolume = s.SerializePointer(CollideBoundingVolume, name: nameof(CollideBoundingVolume));
+				VisualBoundingVolume = s.SerializePointer<COL_BoundingSphere>(VisualBoundingVolume, name: nameof(VisualBoundingVolume))?.ResolveObject(s);
+				CollideBoundingVolume = s.SerializePointer<ICOL_BoundingVolume>(CollideBoundingVolume, name: nameof(CollideBoundingVolume))
+					?.ResolveValue(s, SerializeBoundingVolume());
 
 				SemiLookAtVector = s.SerializeObject<MTH3D_Vector>(SemiLookAtVector, name: nameof(SemiLookAtVector));
 				Transparency = s.Serialize<float>(Transparency, name: nameof(Transparency));
@@ -70,7 +74,8 @@
 				Transition = s.Serialize<byte>(Transition, name: nameof(Transition));
 				s.Align(4, Offset);
 			} else {
-				BoundingVolume = s.SerializePointer(BoundingVolume, name: nameof(BoundingVolume));
+				BoundingVolume = s.SerializePointer<ICOL_BoundingVolume>(BoundingVolume, name: nameof(BoundingVolume))
+					?.ResolveValue(s, SerializeBoundingVolume());
 
 				Transparency = s.Serialize<float>(Transparency, name: nameof(Transparency));
 				SemiLookAtVector = s.SerializeObject<MTH3D_Vector>(SemiLookAtVector, name: nameof(SemiLookAtVector));
@@ -78,6 +83,57 @@
 				if(s.GetCPASettings().Platform == Platform.iOS)
 					R2iOSUnknown = s.Serialize<uint>(R2iOSUnknown, name: nameof(R2iOSUnknown));
 			}
+		}
+
+		private PointerFunctions.SerializeFunction<IHIE_LinkedObject> SerializeLinkedObject(Action<IHIE_LinkedObject> onPreSerialize = null) {
+			return (s, value, name) => {
+				T SerializeObject<T>() where T : BinarySerializable, IHIE_LinkedObject, new() {
+					return s.SerializeObject<T>((T)value, onPreSerialize: onPreSerialize, name: name);
+				}
+
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
+					return LinkedObjectType switch {
+						HIE_ObjectType.SuperObject => null,
+						HIE_ObjectType.Actor => SerializeObject<GAM_EngineObject>(),
+						HIE_ObjectType.Sector => SerializeObject<SCT_Sector>(),
+						HIE_ObjectType.PO => SerializeObject<PO_PhysicalObject>(),
+						HIE_ObjectType.PO_Mirror => SerializeObject<PO_PhysicalObject>(),
+						HIE_ObjectType.IPO => SerializeObject<IPO_InstanciatedPhysicalObject>(),
+						HIE_ObjectType.IPO_Mirror => SerializeObject<IPO_InstanciatedPhysicalObject>(),
+						HIE_ObjectType.SpecialEffect => SerializeObject<GEO_GeometricObject>(),
+						HIE_ObjectType.NoAction => null,
+						HIE_ObjectType.Mirror => SerializeObject<GEO_GeometricObject>(),
+						HIE_ObjectType.EDT_Geometric => SerializeObject<GEO_GeometricObject>(),
+						_ => throw new BinarySerializableException(this, $"Unsupported LinkedObjectType {LinkedObjectType}")
+					};
+				} else {
+					return LinkedObjectType_98 switch {
+						HIE_ObjectType_98.SuperObject => null,
+						HIE_ObjectType_98.Character => SerializeObject<GAM_EngineObject>(),
+						HIE_ObjectType_98.Sector => SerializeObject<SCT_Sector>(),
+						HIE_ObjectType_98.InstanciatedPhysicalObject => SerializeObject<IPO_InstanciatedPhysicalObject>(),
+						_ => throw new BinarySerializableException(this, $"Unsupported LinkedObjectType {LinkedObjectType_98}")
+					};
+				}
+			};
+		}
+
+		private PointerFunctions.SerializeFunction<ICOL_BoundingVolume> SerializeBoundingVolume(Action<ICOL_BoundingVolume> onPreSerialize = null) {
+			return (s, value, name) => {
+				T SerializeObject<T>() where T : BinarySerializable, ICOL_BoundingVolume, new() {
+					return s.SerializeObject<T>((T)value, onPreSerialize: onPreSerialize, name: name);
+				}
+
+				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
+					if (Flags.HasFlag(HIE_SuperObjectFlags.TypeOfBoundingVolume)) {
+						return SerializeObject<COL_BoundingSphere>();
+					} else {
+						return SerializeObject<COL_ParallelBox>();
+					}
+				} else {
+					return SerializeObject<COL_CollideObject>();
+				}
+			};
 		}
 	}
 }

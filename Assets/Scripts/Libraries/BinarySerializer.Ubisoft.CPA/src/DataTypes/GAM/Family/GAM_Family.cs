@@ -6,7 +6,7 @@
 		public LST2_StaticList<GAM_SubAnimation> SubAnimations { get; set; }
 		public Pointer<GAM_ObjectsTable> DefaultObjectsTable { get; set; }
 		public LST2_StaticList<GAM_ObjectsTable> ObjectsTables { get; set; }
-		public Pointer<GEO_BoundingSphere> BoundingSphere { get; set; }
+		public Pointer<COL_BoundingSphere> BoundingSphere { get; set; }
 
 		// LipsSynch
 		public Pointer<LS_LipsSynchValue[]> LipsSynchValues { get; set; }
@@ -47,7 +47,7 @@
                 && f.objectLists.Count > 1) f.objectLists.Count = 1; // Correction for Rayman 2
 			 * */
 
-			BoundingSphere = s.SerializePointer<GEO_BoundingSphere>(BoundingSphere, name: nameof(BoundingSphere))?.ResolveObject(s);
+			BoundingSphere = s.SerializePointer<COL_BoundingSphere>(BoundingSphere, name: nameof(BoundingSphere))?.ResolveObject(s);
 
 			if (s.GetCPASettings().EngineVersion == EngineVersion.Rayman3) {
 				// LipsSynch

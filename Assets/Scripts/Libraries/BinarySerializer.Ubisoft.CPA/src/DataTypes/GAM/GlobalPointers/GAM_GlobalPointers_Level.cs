@@ -88,10 +88,10 @@
 				Animations?.SerializeData(s, A3D_AnimationBank.SerializeMode.Inline, append: true);
 
 				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2Demo)) {
-					AlphabetCharacter = s.SerializePointer<GAM_EngineObject>(AlphabetCharacter, name: nameof(AlphabetCharacter));
+					AlphabetCharacter = s.SerializePointer<GAM_EngineObject>(AlphabetCharacter, name: nameof(AlphabetCharacter))?.ResolveObject(s);
 					if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2)) {
 						if (s.GetCPASettings().Platform == Platform.iOS)
-							AlphabetCharacterNew = s.SerializePointer<GAM_EngineObject>(AlphabetCharacterNew, name: nameof(AlphabetCharacterNew));
+							AlphabetCharacterNew = s.SerializePointer<GAM_EngineObject>(AlphabetCharacterNew, name: nameof(AlphabetCharacterNew))?.ResolveObject(s);
 
 						MenuBackgroundObject = s.SerializePointer<GEO_GeometricObject>(MenuBackgroundObject, name: nameof(MenuBackgroundObject))?.ResolveObject(s);
 

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class COL_CollideObject : BinarySerializable {
+	public class COL_CollideObject : BinarySerializable, ICOL_BoundingVolume {
 		// Vertices
 		public Pointer<MTH3D_Vector[]> Points { get; set; }
 
@@ -13,7 +13,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public Pointer<COL_Octree> Octree { get; set; }
 
 		// Bounding volumes
-		public Pointer<GEO_ParallelBox[]> ParallelBoxes { get; set; }
+		public Pointer<COL_ParallelBox[]> ParallelBoxes { get; set; }
 
 		// Type
 		public GEO_LookAtMode Type { get; set; }
@@ -48,7 +48,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				Octree = s.SerializePointer<COL_Octree>(Octree, name: nameof(Octree));
 
 				if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
-					ParallelBoxes = s.SerializePointer<GEO_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
+					ParallelBoxes = s.SerializePointer<COL_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
 
 				BoundingSphereRadius = s.Serialize<float>(BoundingSphereRadius, name: nameof(BoundingSphereRadius));
 				BoundingSphereCenter = s.SerializeObject<MTH3D_Vector>(BoundingSphereCenter, name: nameof(BoundingSphereCenter));

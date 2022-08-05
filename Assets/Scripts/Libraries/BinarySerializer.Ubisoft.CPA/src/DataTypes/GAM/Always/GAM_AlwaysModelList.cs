@@ -12,11 +12,11 @@
 		public override void SerializeImpl(SerializerObject s) {
 			ListElement = s.SerializeObject<LST2_DynamicListElement<GAM_AlwaysModelList>>(ListElement, name: nameof(ListElement))?.Resolve(s);
 			if (s.GetCPASettings().EngineVersion == EngineVersion.Rayman2Revolution) {
-				AlwaysObject = s.SerializePointer<GAM_EngineObject>(AlwaysObject, name: nameof(AlwaysObject));
+				AlwaysObject = s.SerializePointer<GAM_EngineObject>(AlwaysObject, name: nameof(AlwaysObject))?.ResolveObject(s);
 				ObjectModelType = s.Serialize<int>(ObjectModelType, name: nameof(ObjectModelType));
 			} else {
 				ObjectModelType = s.Serialize<int>(ObjectModelType, name: nameof(ObjectModelType));
-				AlwaysObject = s.SerializePointer<GAM_EngineObject>(AlwaysObject, name: nameof(AlwaysObject));
+				AlwaysObject = s.SerializePointer<GAM_EngineObject>(AlwaysObject, name: nameof(AlwaysObject))?.ResolveObject(s);
 			}
 		}
 	}

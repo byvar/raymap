@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class GEO_GeometricObject : BinarySerializable {
+	public class GEO_GeometricObject : BinarySerializable, IHIE_LinkedObject {
 		// Vertices
 		public Pointer<MTH3D_Vector[]> Points { get; set; }
 		public Pointer<MTH3D_Vector[]> PointsNormals { get; set; }
@@ -22,7 +22,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public Pointer<Pointer<GMT_GameMaterial>[]> EdgesMaterials { get; set; }
 
 		// Bounding volumes
-		public Pointer<GEO_ParallelBox[]> ParallelBoxes { get; set; }
+		public Pointer<COL_ParallelBox[]> ParallelBoxes { get; set; }
 
 		// Type
 		public GEO_LookAtMode Type { get; set; }
@@ -87,7 +87,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				EdgesMaterials = s.SerializePointer<Pointer<GMT_GameMaterial>[]>(EdgesMaterials, name: nameof(EdgesMaterials));
 			}
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
-				ParallelBoxes = s.SerializePointer<GEO_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
+				ParallelBoxes = s.SerializePointer<COL_ParallelBox[]>(ParallelBoxes, name: nameof(ParallelBoxes));
 				
 				Type = s.Serialize<GEO_LookAtMode>(Type, name: nameof(Type));
 

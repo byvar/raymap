@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class GEO_BoundingSphere : BinarySerializable {
+	public class COL_BoundingSphere : BinarySerializable, ICOL_BoundingVolume {
 		public MTH3D_Vector Center { get; set; }
 		public float Radius { get; set; }
 
