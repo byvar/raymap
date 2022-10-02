@@ -85,7 +85,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			}
 		}
 
-		private PointerFunctions.SerializeFunction<IHIE_LinkedObject> SerializeLinkedObject(Action<IHIE_LinkedObject> onPreSerialize = null) {
+		private SerializeFunction<IHIE_LinkedObject> SerializeLinkedObject(Action<IHIE_LinkedObject> onPreSerialize = null) {
 			return (s, value, name) => {
 				T SerializeObject<T>() where T : BinarySerializable, IHIE_LinkedObject, new() {
 					return s.SerializeObject<T>((T)value, onPreSerialize: onPreSerialize, name: name);
@@ -118,7 +118,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			};
 		}
 
-		private PointerFunctions.SerializeFunction<ICOL_BoundingVolume> SerializeBoundingVolume(Action<ICOL_BoundingVolume> onPreSerialize = null) {
+		private SerializeFunction<ICOL_BoundingVolume> SerializeBoundingVolume(Action<ICOL_BoundingVolume> onPreSerialize = null) {
 			return (s, value, name) => {
 				T SerializeObject<T>() where T : BinarySerializable, ICOL_BoundingVolume, new() {
 					return s.SerializeObject<T>((T)value, onPreSerialize: onPreSerialize, name: name);

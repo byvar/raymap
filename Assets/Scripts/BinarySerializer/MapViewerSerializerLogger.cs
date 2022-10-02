@@ -4,7 +4,7 @@ using BinarySerializer;
 
 namespace Raymap
 {
-	public class MapViewerSerializerLog : ISerializerLog
+	public class MapViewerSerializerLogger : ISerializerLogger
 	{
 		public bool IsEnabled => UnitySettings.Log;
 

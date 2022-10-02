@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class A3D_FrameKF : BinarySerializable {
+	public class A3D_FrameKF : BinarySerializable, ISerializerShortLog {
 		public uint KeyFrameIndex { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
@@ -14,7 +14,7 @@
 			c.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2)
 			&& c.GetCPASettings().EngineVersion != EngineVersion.Rayman2Revolution;
 
-		public override bool UseShortLog => true;
+		public string ShortLog => ToString();
 		public override string ToString() => $"FrameKF(KeyFrame: {KeyFrameIndex})";
 	}
 }

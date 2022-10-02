@@ -1,15 +1,14 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class MTH3D_Matrix : U64_Struct {
+	public class MTH3D_Matrix : U64_Struct, ISerializerShortLog {
 		public U64_Index<U64_TripledIndex> Index { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			Index = s.SerializeObject<U64_Index<U64_TripledIndex>>(Index, name: nameof(Index)); // TODO: Set action
 		}
 
-		public override bool UseShortLog => true;
-		public override string ShortLog => Index.ShortLog;
+		public string ShortLog => Index.ShortLog;
 
 		#region Properties
 		public MTH3D_Vector Column0 {

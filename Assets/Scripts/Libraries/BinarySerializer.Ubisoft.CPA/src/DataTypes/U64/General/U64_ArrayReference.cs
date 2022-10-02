@@ -1,7 +1,8 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class U64_ArrayReference<T> : BinarySerializable where T : U64_Struct, new() {
+	public class U64_ArrayReference<T> : BinarySerializable, ISerializerShortLog
+		where T : U64_Struct, new() {
 		public ushort Index { get; set; }
 		public T[] Value { get; set; }
 
@@ -26,7 +27,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 			if(IsNull) return this;
 			if (typeof(T) == typeof(U64_Placeholder)) {
-				s.SystemLog?.LogWarning("Trying to resolve Placeholder - skipping");
+				s.SystemLogger?.LogWarning("Trying to resolve Placeholder - skipping");
 				return this;
 			}
 
@@ -63,7 +64,6 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		}
 
 
-		public override bool UseShortLog => true;
-		public override string ShortLog => $"{Index:X4}";
+		public string ShortLog => $"{Index:X4}";
 	}
 }

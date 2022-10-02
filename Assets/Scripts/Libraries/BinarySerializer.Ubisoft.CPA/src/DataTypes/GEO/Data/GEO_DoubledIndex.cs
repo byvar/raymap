@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class GEO_DoubledIndex : BinarySerializable {
+	public class GEO_DoubledIndex : BinarySerializable, ISerializerShortLog {
 		public ushort Index0 { get; set; }
 		public ushort Index1 { get; set; }
 
@@ -8,7 +8,7 @@
 			Index1 = s.Serialize<ushort>(Index1, name: nameof(Index1));
 		}
 
-		public override bool UseShortLog => true;
+		public string ShortLog => ToString();
 		public override string ToString() => $"{GetType().Name}({Index0}, {Index1})";
 	}
 }

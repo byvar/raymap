@@ -73,21 +73,21 @@ namespace BinarySerializer.Ubisoft.CPA {
 			ParallelBoxes?.ResolveObjectArray(s, ParallelBoxesCount);
 		}
 
-		private Func<int, PointerFunctions.SerializeFunction<GEO_Element>> SerializeElement(Action<GEO_Element> onPreSerialize = null) {
+		private Func<int, SerializeFunction<GEO_Element>> SerializeElement(Action<GEO_Element> onPreSerialize = null) {
 			return (index) => {
 				return (s, value, name) => {
-					T SerializeElement<T>() where T : GEO_Element, new() {
+					T serializeElement<T>() where T : GEO_Element, new() {
 						return s.SerializeObject<T>((T)value, onPreSerialize: onPreSerialize, name: name);
 					}
 
 					var elTypes = ElementTypes?.Value;
 					return elTypes[index] switch {
-						GEO_ElementType.IndexedTriangles => SerializeElement<COL_ElementIndexedTriangles>(),
-						GEO_ElementType.Sprites => SerializeElement<GEO_ElementSprites>(),
-						GEO_ElementType.Points => SerializeElement<GEO_ElementPoints>(),
-						GEO_ElementType.Spheres => SerializeElement<GEO_ElementSpheres>(),
-						GEO_ElementType.AlignedBoxes => SerializeElement<GEO_ElementAlignedBoxes>(),
-						GEO_ElementType.Cones => SerializeElement<GEO_ElementCones>(),
+						GEO_ElementType.IndexedTriangles => serializeElement<COL_ElementIndexedTriangles>(),
+						GEO_ElementType.Sprites => serializeElement<GEO_ElementSprites>(),
+						GEO_ElementType.Points => serializeElement<GEO_ElementPoints>(),
+						GEO_ElementType.Spheres => serializeElement<GEO_ElementSpheres>(),
+						GEO_ElementType.AlignedBoxes => serializeElement<GEO_ElementAlignedBoxes>(),
+						GEO_ElementType.Cones => serializeElement<GEO_ElementCones>(),
 						_ => throw new BinarySerializableException(this, $"Unsupported element type {elTypes[index]}")
 					};
 				};

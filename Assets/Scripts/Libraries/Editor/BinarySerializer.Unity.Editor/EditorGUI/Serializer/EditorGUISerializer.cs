@@ -5,7 +5,8 @@ using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace BinarySerializer.Unity.Editor {
+namespace BinarySerializer.Unity.Editor 
+{
 	// TODO: Rather than using the name to keep track of the value states we could use an index. That way resolved generic pointers will work.
 	public class EditorGUISerializer : SerializerObject
 	{
@@ -31,6 +32,7 @@ namespace BinarySerializer.Unity.Editor {
 
 		public override bool FullSerialize => false;
 		public override long CurrentLength => 0;
+		public override bool HasCurrentPointer => false;
 		public override BinaryFile CurrentBinaryFile => null;
 		public override long CurrentFileOffset => 0;
 		public override long CurrentAbsoluteOffset => 0;
@@ -94,6 +96,7 @@ namespace BinarySerializer.Unity.Editor {
 		#region Positioning
 
 		public override void Goto(Pointer offset) { }
+		public override void Align(int alignBytes = 4, Pointer baseOffset = null, bool? logIfNotNull = null) { }
 
 		public override void DoAt(Pointer offset, Action action)
 		{
@@ -206,6 +209,11 @@ namespace BinarySerializer.Unity.Editor {
 
 		}
 
+		public override T? SerializeNullable<T>(T? obj, string name = null)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override T SerializeObject<T>(T obj, Action<T> onPreSerialize = null, string name = null)
 		{
 			if (obj == null)
@@ -310,6 +318,25 @@ namespace BinarySerializer.Unity.Editor {
 			return obj;
 		}
 
+		public override T?[] SerializeNullableArray<T>(T?[] obj, long count, string name = null)
+		{
+			name ??= DefaultName;
+
+			if (obj == null)
+				obj = new T?[count];
+
+			else if (count != obj.Length)
+				Array.Resize(ref obj, (int)count);
+
+			DoFoldout($"{name}[{obj.Length}]", () =>
+			{
+				for (int i = 0; i < obj.Length; i++)
+					SerializeNullable<T>(obj[i], name: $"{name}[{i}]");
+			});
+
+			return obj;
+		}
+
 		public override T[] SerializeObjectArray<T>(T[] obj, long count, Action<T, int> onPreSerialize = null, string name = null)
 		{
 			name ??= DefaultName;
@@ -333,9 +360,22 @@ namespace BinarySerializer.Unity.Editor {
 			return SerializeArray<T>(obj, obj.Length, name: name);
 		}
 
+		public override T?[] SerializeNullableArrayUntil<T>(T?[] obj, Func<T?, bool> conditionCheckFunc, Func<T?> getLastObjFunc = null,
+			string name = null)
+		{
+			return SerializeNullableArray<T>(obj, obj.Length, name: name);
+		}
+
 		public override T[] SerializeObjectArrayUntil<T>(T[] obj, Func<T, bool> conditionCheckFunc, Func<T> getLastObjFunc = null, Action<T, int> onPreSerialize = null, string name = null)
 		{
 			return SerializeObjectArray<T>(obj, obj.Length, onPreSerialize: onPreSerialize, name: name);
+		}
+
+		public override Pointer[] SerializePointerArrayUntil(Pointer[] obj, Func<Pointer, bool> conditionCheckFunc, Func<Pointer> getLastObjFunc = null,
+			PointerSize size = PointerSize.Pointer32, Pointer anchor = null, bool allowInvalid = false, long? nullValue = null,
+			string name = null)
+		{
+			return SerializePointerArray(obj, obj.Length, size: size, anchor: anchor, allowInvalid: allowInvalid, nullValue: nullValue, name: name);
 		}
 
 		public override Pointer[] SerializePointerArray(Pointer[] obj, long count, PointerSize size = PointerSize.Pointer32, Pointer anchor = null, bool allowInvalid = false, long? nullValue = null,

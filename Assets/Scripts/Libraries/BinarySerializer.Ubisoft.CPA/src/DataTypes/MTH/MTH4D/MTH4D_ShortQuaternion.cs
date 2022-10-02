@@ -1,6 +1,6 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA
 {
-    public class MTH4D_ShortQuaternion : BinarySerializable
+    public class MTH4D_ShortQuaternion : BinarySerializable, ISerializerShortLog
     {
 		public short X { get; set; } // Divide by Int16.Max to get float
 		public short Y { get; set; }
@@ -14,7 +14,7 @@
 			Z = s.Serialize<short>(Z, name: nameof(Z));
 			W = s.Serialize<short>(W, name: nameof(W));
 		}
-		public override bool UseShortLog => true;
+		public string ShortLog => ToString();
 		public override string ToString() =>
 			$"ShortQuaternion({X / (float)short.MaxValue}, {Y / (float)short.MaxValue}, {Z / (float)short.MaxValue}, {W / (float)short.MaxValue})";
 	}

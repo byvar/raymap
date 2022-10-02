@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		public byte Type { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			s.SystemLog?.LogWarning($"{GetType()} is being serialized! Check if serialized correctly");
+			s.SystemLogger?.LogWarning($"{GetType()} is being serialized! Check if serialized correctly");
 			Param = s.Serialize<uint>(Param, name: nameof(Param));
 			NodesToSkip = s.Serialize<ushort>(NodesToSkip, name: nameof(NodesToSkip));
 			Type = s.Serialize<byte>(Type, name: nameof(Type));
