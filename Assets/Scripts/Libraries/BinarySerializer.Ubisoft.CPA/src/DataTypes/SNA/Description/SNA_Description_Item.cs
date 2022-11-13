@@ -74,6 +74,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 				case SNA_DescriptionType.ActivateJoystickAction: // PadNumber
 
 				case SNA_DescriptionType.LevelLoadSoundBank: // Bank index
+
+				case SNA_DescriptionType.NumberOfAlways:
 					SerializeData<SNA_Description_Long>();
 					break;
 

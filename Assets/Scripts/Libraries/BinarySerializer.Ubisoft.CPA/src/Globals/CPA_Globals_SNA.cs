@@ -9,6 +9,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public CPA_Globals_SNA(Context c) : base(c) { }
 
 		public SNA_File<SNA_Description> GameDSB { get; set; }
+		public SNA_File<SNA_Description> LevelDSB { get; set; }
 		public SNA_RelocationBigFile RelocationBigFile { get; set; }
 
 		public override string GameDataDirectory =>

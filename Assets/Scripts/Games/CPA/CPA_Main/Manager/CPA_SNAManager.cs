@@ -307,6 +307,10 @@ namespace Raymap {
 			GlobalLoadState.DetailedState = "Loading level";
 			await TimeController.WaitIfNecessary();
 
+			// The DSC file contains information about directories which we need to load the files
+			var cpaGlobals = (CPA_Globals_SNA)context.GetCPAGlobals();
+			cpaGlobals.LevelDSB = FileFactory.Read<SNA_File<SNA_Description>>(context, CPA_Path.LevelDSC.ToString());
+
 			// Load SNA and relocation table
 			var gptContents = FileFactory.Read<GAM_GlobalPointers_Level>(context, ContentID(CPA_Path.LevelGPT));
 			var ptxContents = FileFactory.Read<GLI_GlobalTextures>(context, ContentID(CPA_Path.LevelPTX), onPreSerialize: (_, p) => p.Pre_IsFix = false);
