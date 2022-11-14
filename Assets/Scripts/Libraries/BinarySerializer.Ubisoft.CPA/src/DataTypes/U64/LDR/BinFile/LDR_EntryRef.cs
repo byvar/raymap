@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace BinarySerializer.Ubisoft.CPA.U64
+﻿namespace BinarySerializer.Ubisoft.CPA.U64
 {
-    public class LDR_EntryRef : BinarySerializable
+	public class LDR_EntryRef : BinarySerializable, ISerializerShortLog
     {
         public uint Address { get; set; }
         public ushort Type { get; set; }
@@ -15,8 +13,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64
 			Index = s.Serialize<ushort>(Index, name: nameof(Index));
 		}
 
-		public override bool UseShortLog => true;
-		public override string ShortLog => $"LDR_EntryRef({U64_StructType_Defines.GetType(Context, Type)?.ToString() ?? Type.ToString()}, {Index}, {Context.GetLoader().GetStructPointer(this)})";
+		public string ShortLog => $"LDR_EntryRef({U64_StructType_Defines.GetType(Context, Type)?.ToString() ?? Type.ToString()}, {Index}, {Context.GetLoader().GetStructPointer(this)})";
 
 
         public static string DataKey => "data";

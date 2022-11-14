@@ -1,11 +1,14 @@
-﻿using BinarySerializer;
+﻿namespace BinarySerializer.Ubisoft.CPA
+{
+	public class EngineVersionTree : VersionTree<EngineVersion> 
+    {
+	    public EngineVersionTree(Node root) : base(root) { }
 
-namespace BinarySerializer.Ubisoft.CPA {
-    public class EngineVersionTree : VersionTree<EngineVersion> {
-        public static EngineVersionTree Create(CPA_Settings settings) {
-            EngineVersionTree tree = new EngineVersionTree() {
-                Root = new Node(EngineVersion.CPA).SetChildren(
-                    new Node(EngineVersion.CPA_1).SetChildren(
+		public static EngineVersionTree Create(CPA_Settings settings) 
+        {
+            EngineVersionTree tree = new(
+	            root: new Node(EngineVersion.CPA).SetChildren(
+		            new Node(EngineVersion.CPA_1).SetChildren(
                         new Node(EngineVersion.TonicTroubleSE).SetChildren(
                             new Node(EngineVersion.TonicTrouble).SetChildren(
                                 new Node(EngineVersion.CPA_2).SetChildren(
@@ -59,7 +62,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 						)
 					)
                 )
-            };
+            );
             tree.Init();
             tree.Current = tree.FindVersion(settings.EngineVersion);
 

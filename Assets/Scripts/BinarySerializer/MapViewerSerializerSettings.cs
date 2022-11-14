@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using BinarySerializer;
+using BinarySerializer.Unity;
 using OpenSpace;
 
 namespace Raymap
@@ -25,6 +26,11 @@ namespace Raymap
 		/// Indicates if caching read objects should be ignored
 		/// </summary>
 		public bool IgnoreCacheOnRead => false;
+
+		/// <summary>
+		/// Indicates if the default should be to check and log if bytes skipped for an alignment are not null
+		/// </summary>
+		public bool LogAlignIfNotNull => FileSystem.mode != FileSystem.Mode.Web;
 
 		/// <summary>
 		/// The pointer size to use when logging a <see cref="LegacyPointer"/>. Set to <see langword="null"/> to dynamically determine the appropriate size.

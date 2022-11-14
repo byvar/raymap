@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class COL_OctreeIndex : BinarySerializable {
+	public class COL_OctreeIndex : BinarySerializable, ISerializerShortLog {
 		public byte Byte0 { get; set; }
 		public bool IsOverflow { get; set; }
 		public byte Byte1 { get; set; }
@@ -22,7 +22,7 @@
 			}
 		}
 
-		public override bool UseShortLog => true;
+		public string ShortLog => ToString();
 		public override string ToString() => Value.ToString();
 	}
 }

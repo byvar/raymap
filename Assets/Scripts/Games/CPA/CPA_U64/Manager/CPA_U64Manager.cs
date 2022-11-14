@@ -144,7 +144,7 @@ namespace Raymap {
 									tex.Export(Path.Combine(outputDir, $"{bkgInfo?.Index:X4}_{i}"));
 								}
 							} catch (Exception ex) {
-								s.SystemLog?.LogWarning(ex.ToString());
+								s.SystemLogger?.LogWarning(ex.ToString());
 							}
 						}
 					}
@@ -409,7 +409,7 @@ namespace Raymap {
 				await TimeController.WaitIfNecessary();
 				loader.Languages[i] = new U64_Reference<FON_LanguageString>(context, i)?.Resolve(s);
 				if (loader.Languages[i]?.Value != null) {
-					context.SystemLog?.LogDebug(loader.Languages[i]?.Value.LanguageName);
+					context.SystemLogger?.LogDebug(loader.Languages[i]?.Value.LanguageName);
 				}
 			}
 

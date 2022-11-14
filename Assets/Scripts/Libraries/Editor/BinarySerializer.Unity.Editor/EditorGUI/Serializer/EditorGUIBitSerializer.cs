@@ -1,4 +1,6 @@
-﻿namespace BinarySerializer.Unity.Editor
+﻿using System;
+
+namespace BinarySerializer.Unity.Editor
 {
 	public class EditorGUIBitSerializer : BitSerializerObject
 	{
@@ -10,6 +12,11 @@
 			T t = SerializerObject.Serialize<T>(value, name);
 			Position += length;
 			return t;
+		}
+
+		public override T SerializeObject<T>(T obj, Action<T> onPreSerialize = null, string name = null) 
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

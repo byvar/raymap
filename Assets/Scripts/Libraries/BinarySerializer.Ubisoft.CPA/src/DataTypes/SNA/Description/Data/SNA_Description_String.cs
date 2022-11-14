@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class SNA_Description_String : SNA_Description_Data {
+	public class SNA_Description_String : SNA_Description_Data, ISerializerShortLog {
 		public ushort Length { get; set; }
 		public string Value { get; set; }
 
@@ -12,7 +12,6 @@
 			Value = s.SerializeString(Value, length: Length, name: nameof(Value));
 		}
 
-		public override string ShortLog => Value.ToString();
-		public override bool UseShortLog => true;
+		public string ShortLog => Value;
 	}
 }

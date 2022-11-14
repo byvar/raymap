@@ -263,7 +263,7 @@ namespace Raymap {
 							&& absoluteValue >= b.BeginBlock
 							&& absoluteValue < b.EndBlock + 1);
 						if (relocFile?.BlockName != memoryMappedFile?.BlockName) {
-							context.SerializerLog?.Log($"{bf.FilePath} - Incorrect relocation: {absoluteValue:X8} - relocated to {relocFile?.BlockName} (base: {relocFile?.BeginBlock:X8}), should be {memoryMappedFile?.BlockName} (base: {memoryMappedFile?.BeginBlock:X8})");
+							context.SerializerLogger?.Log($"{bf.FilePath} - Incorrect relocation: {absoluteValue:X8} - relocated to {relocFile?.BlockName} (base: {relocFile?.BeginBlock:X8}), should be {memoryMappedFile?.BlockName} (base: {memoryMappedFile?.BeginBlock:X8})");
 						}
 					}
 				}

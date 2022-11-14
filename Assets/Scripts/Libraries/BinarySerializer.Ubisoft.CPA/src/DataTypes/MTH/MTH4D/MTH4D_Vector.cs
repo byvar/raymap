@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA {
-	public class MTH4D_Vector : BinarySerializable {
+	public class MTH4D_Vector : BinarySerializable, ISerializerShortLog {
 		public float X { get; set; }
 		public float Y { get; set; }
 		public float Z { get; set; }
@@ -13,7 +13,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Z = s.Serialize<float>(Z, name: nameof(Z));
 			W = s.Serialize<float>(W, name: nameof(W));
 		}
-		public override bool UseShortLog => true;
+		public string ShortLog => ToString();
 		public override string ToString() => $"Vector({X}, {Y}, {Z}, {W})";
 
 		public MTH4D_Vector() { }

@@ -17,9 +17,9 @@
 			ChannelIndex = s.Serialize<uint>(ChannelIndex, name: nameof(ChannelIndex));
 			TargetType = s.Serialize<GAM_ObjectsTableTargetType>(TargetType, name: nameof(TargetType));
 
-			Phoneme = s.Serialize<byte?>(Phoneme, name: nameof(Phoneme));
-			Intensity = s.Serialize<byte?>(Intensity, name: nameof(Intensity));
-			Expression = s.Serialize<byte?>(Expression, name: nameof(Expression));
+			Phoneme = s.SerializeNullable<byte>(Phoneme, name: nameof(Phoneme));
+			Intensity = s.SerializeNullable<byte>(Intensity, name: nameof(Intensity));
+			Expression = s.SerializeNullable<byte>(Expression, name: nameof(Expression));
 			s.Align(4, Offset);
 
 			Target?.ResolveValue(s, (s, value, name) => {

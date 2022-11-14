@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1 {
-	public class MTH3D_Vector_PS1_Short : BinarySerializable {
+	public class MTH3D_Vector_PS1_Short : BinarySerializable, ISerializerShortLog {
 		public float? Pre_CoordinateScale { get; set; }
 
 		public short X_Short { get; set; }
@@ -28,7 +28,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			Z_Short = s.Serialize<short>(Z_Short, name: nameof(Z_Short));
 		}
 
-		public override bool UseShortLog => true;
+		public string ShortLog => ToString();
 		public override string ToString() => $"Vector({X}, {Y}, {Z})";
 
 		public MTH3D_Vector_PS1_Short() { }

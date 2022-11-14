@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class U64_GenericReference : BinarySerializable {
+	public class U64_GenericReference : BinarySerializable, ISerializerShortLog {
 		public ushort Index { get; set; }
 		public ushort Type { get; set; }
 
@@ -100,8 +100,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 		}
 
 
-		public override bool UseShortLog => true;
-		public override string ShortLog {
+		public string ShortLog {
 			get {
 				var type = U64_StructType_Defines.GetType(Context, Type);
 				if (!type.HasValue)

@@ -1,20 +1,20 @@
 ﻿using System;
+using BinarySerializer;
 using UnityEngine;
-using ISystemLog = BinarySerializer.ISystemLog;
 
 namespace Raymap
 {
-	public class UnitySystemLog : ISystemLog
+	public class UnitySystemLogger : ISystemLogger
 	{
-		public void Log(BinarySerializer.LogLevel logLevel, object log, params object[] args) {
+		public void Log(LogLevel logLevel, object log, params object[] args) {
 			switch (logLevel) {
-				case BinarySerializer.LogLevel.Error:
+				case LogLevel.Error:
 					Debug.LogError(String.Format(log?.ToString() ?? String.Empty, args));
 					break;
-				case BinarySerializer.LogLevel.Warning:
+				case LogLevel.Warning:
 					Debug.LogWarning(String.Format(log?.ToString() ?? String.Empty, args));
 					break;
-				case BinarySerializer.LogLevel.Info:
+				case LogLevel.Info:
 					Debug.Log(String.Format(log?.ToString() ?? String.Empty, args));
 					break;
 			}

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class AI_Node : U64_Struct {
+	public class AI_Node : U64_Struct, ISerializerShortLog {
 		// Main struct
 		public byte Type { get; set; }
 		public byte Depth { get; set; }
@@ -106,8 +106,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 			}
 		}
 
-		public override bool UseShortLog => true;
-		public override string ShortLog => ToString();
+		public string ShortLog => ToString();
 
 		public override string ToString() {
 			var aiTypes = Context.GetCPASettings().AITypes;

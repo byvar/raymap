@@ -8,9 +8,9 @@ namespace Raymap
 		public MapViewerContext(string basePath, MapViewerSettings settings, bool log = true) : base(
 			basePath: basePath, // Pass in the base path
 			settings: new MapViewerSerializerSettings(), // Pass in the settings
-			serializerLog: log ? new MapViewerSerializerLog() : null, // Use map viewer serializer log for logging to a file
+			serializerLogger: log ? new MapViewerSerializerLogger() : null, // Use map viewer serializer log for logging to a file
 			fileManager: new MapViewerFileManager(), // Use map viewer file manager for use with FileSystem
-			systemLog: new UnitySystemLog()) // Use Unity logger
+			systemLogger: new UnitySystemLogger()) // Use Unity logger
 		{
 			// Add the game settings
 			AddSettings(settings);
@@ -21,6 +21,6 @@ namespace Raymap
 		}
 		public MapViewerContext(MapViewerSettings settings, bool log = true) : this(settings.GameDirectory, settings, log: log) { }
 
-		public MapViewerSettings GameSettings => GetSettings<MapViewerSettings>();
+		public MapViewerSettings GameSettings => GetRequiredSettings<MapViewerSettings>();
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace BinarySerializer.Ubisoft.CPA.U64 {
-	public class U64_Index<T> : BinarySerializable {
+	public class U64_Index<T> : BinarySerializable, ISerializerShortLog {
 		public ushort Index { get; set; }
 		public T Value {
 			get {
@@ -34,7 +34,6 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 
 
-		public override bool UseShortLog => true;
-		public override string ShortLog => $"{Index:X4}";
+		public string ShortLog => $"{Index:X4}";
 	}
 }
