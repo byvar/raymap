@@ -152,15 +152,17 @@
 			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3))
 				GameAttributes3D = s.SerializeObjectArray<GLI_SpecificAttributesFor3D>(GameAttributes3D, MaxViewportCount, name: nameof(GameAttributes3D));
 
-			ViewportArray = s.SerializePointer<GAM_ViewportManagement[]>(ViewportArray, name: nameof(ViewportArray))
-				?.ResolveObjectArray(s, MaxViewportCount * 2);
+			ViewportArray = s.SerializePointer<GAM_ViewportManagement[]>(ViewportArray, name: nameof(ViewportArray));
 
 			CameraList = s.SerializeObject<LST2_DynamicList<GAM_CameraNode>>(CameraList, name: nameof(CameraList));
 			CameraList?.Validate(s, nextOffset: 4, prevOffset: 8, fatherOffset: 12);
-			CameraList?.Resolve(s, name: nameof(CameraList));
 			FamilyList = s.SerializeObject<LST2_DynamicList<GAM_Family>>(FamilyList, name: nameof(FamilyList));
 			FamilyList?.Validate(s);
 			FamilyList?.Resolve(s, name: nameof(FamilyList));
+
+			// Now that family list is resolved, resolve ViewportArray and CameraList
+			ViewportArray?.ResolveObjectArray(s, MaxViewportCount * 2);
+			CameraList?.Resolve(s);
 
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2)
 				|| s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
