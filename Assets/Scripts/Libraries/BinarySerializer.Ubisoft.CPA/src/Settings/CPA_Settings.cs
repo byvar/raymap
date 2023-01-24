@@ -74,6 +74,7 @@ namespace BinarySerializer.Ubisoft.CPA {
         public Dictionary<PathCapitalizationType, PathCapitalization> PathCapitalization { get; set; } = new Dictionary<PathCapitalizationType, PathCapitalization>();
         public LevelTranslation LevelTranslation { get; set; } = null;
         public bool LinkUncategorizedObjectsToScriptFamily { get; set; } = false;
+		public bool IsPressDemo { get; set; } = false; // Thank you Ubisoft for changing structs on purpose in demo versions of the engine so release data wouldn't be usable in these
 
 		public string ApplyPathCapitalization(string path, PathCapitalizationType capsType) {
 			PathCapitalization caps = CPA.PathCapitalization.Normal;

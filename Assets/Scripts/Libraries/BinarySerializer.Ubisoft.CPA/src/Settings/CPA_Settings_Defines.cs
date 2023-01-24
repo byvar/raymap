@@ -500,6 +500,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			COLTypes = new COL_Types_R2(),
 			SNATypes = new SNA_Types_R2_Demo(),
 			EntryActionsCount = 1,
+			IsPressDemo = true,
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.FixRelocation, PathCapitalization.AllExceptExtension },
 				{ PathCapitalizationType.LevelRelocation, PathCapitalization.AllExceptExtension },
@@ -514,6 +515,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
+			IsPressDemo = true,
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.FixRelocation, PathCapitalization.AllExceptExtension },
 				{ PathCapitalizationType.LevelRelocation, PathCapitalization.AllExceptExtension },

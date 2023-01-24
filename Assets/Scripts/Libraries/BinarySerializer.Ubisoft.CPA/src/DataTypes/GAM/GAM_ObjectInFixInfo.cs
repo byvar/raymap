@@ -43,7 +43,7 @@
 						s.DoAt(_3dData, () => {
 							f = (SNA_DataBlockFile)s.CurrentBinaryFile;
 							f.OverrideData(
-								_3dData.FileOffset + (s.GetCPASettings().EngineVersion == EngineVersion.Rayman2Demo ? 0x1C : 0x18),
+								_3dData.FileOffset + (s.GetCPASettings().IsPressDemo ? 0x1C : 0x18),
 								Matrix3DData);
 						});
 						// Tonic Trouble only
