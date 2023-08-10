@@ -5,8 +5,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public class GLI_Texture {
 		public Context Context { get; private set; }
 
-		public PS1_TSB TSB; // Page Info
-		public PS1_CBA CBA; // Palette info
+		public TSB TSB; // Page Info
+		public CBA CBA; // Palette info
 		public int xMin;
 		public int xMax;
 		public int yMin;
@@ -14,7 +14,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 		public int Width => xMax - xMin;
 		public int Height => yMax - yMin;
 
-		public PS1_TSB.TexturePageTP BitDepth => TSB.TP;
+		public TSB.TexturePageTP BitDepth => TSB.TP;
 
 		public GLI_Texture(Context c) {
 			Context = c;

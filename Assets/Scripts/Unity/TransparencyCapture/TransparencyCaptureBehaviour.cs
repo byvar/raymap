@@ -28,7 +28,7 @@ public class TransparencyCaptureBehaviour : MonoBehaviour
         {
             width = Camera.main.pixelWidth,
             height = Camera.main.pixelHeight,
-            refreshRate = Screen.currentResolution.refreshRate,
+			refreshRateRatio = Screen.currentResolution.refreshRateRatio,
         };
     }
 

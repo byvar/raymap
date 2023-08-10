@@ -69,7 +69,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 			var off = Occurs[occur].Value.Entries[mapNumber * 4 + (int)type];
 			var key = GetKey();
-			uint ProtectionKey = SNA_XORCalculator.GetProtectionKey(key);
+			uint ProtectionKey = SNA_XorProcessor.GetProtectionKey(key);
 			var oldProtectionKey = ProtectionKey;
 			SNA_RelocationTable RelocationTable = table;
 
@@ -77,7 +77,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			try {
 				s.Goto(off);
 				await s.FillCacheForReadAsync(1024 * 1024); // 1 MB cache
-				s.DoXOR(new SNA_XORCalculator(SNA_XORCalculator.GetCryptKey(key)), () => {
+				s.DoProcessed<SNA_XorProcessor>(new SNA_XorProcessor(SNA_XorProcessor.GetCryptKey(key)), () => {
 					ProtectionKey = s.Serialize<uint>(ProtectionKey, name: nameof(ProtectionKey));
 					if (oldProtectionKey != ProtectionKey) {
 						s.SystemLogger?.LogWarning($"SNA: Incorrect protection key algorithm. Calculated {oldProtectionKey:X8}, but read {ProtectionKey}");

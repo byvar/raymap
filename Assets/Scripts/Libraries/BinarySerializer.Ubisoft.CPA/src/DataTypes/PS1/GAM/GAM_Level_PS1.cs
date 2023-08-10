@@ -8,7 +8,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 		public float CoordinateFactor { get; set; } = 100f;
 		public GAM_GlobalPointerTable GlobalPointerTable { get; set; }
 		public GLI_TextureCache TextureCache { get; set; }
-		public PS1_VRAM VRAM { get; set; }
+		public VRAM VRAM { get; set; }
 
 		public GAM_Level_PS1(Context c) {
 			Context = c;

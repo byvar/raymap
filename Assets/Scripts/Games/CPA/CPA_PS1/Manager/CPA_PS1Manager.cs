@@ -229,8 +229,8 @@ namespace Raymap
 					string name = gpt.UITexturesNames[i].Value.Name;
 					int width = gpt.UITexturesWidths[i];
 					int height = gpt.UITexturesHeights[i];
-					PS1_TSB tsb = gpt.UITexturesTSB[i];
-					PS1_CBA cba = gpt.UITexturesCBA[i];
+					TSB tsb = gpt.UITexturesTSB[i];
+					CBA cba = gpt.UITexturesCBA[i];
 					byte x = gpt.UITexturesX[i];
 					byte y = gpt.UITexturesY[i];
 
@@ -244,8 +244,8 @@ namespace Raymap
 				{
 					int width = gpt.Rush_AGOTexturesWidths?[i] ?? -1;
 					int height = gpt.Rush_AGOTexturesHeights?[i] ?? -1;
-					PS1_TSB tsb = gpt.AGOTexturesTSB[i];
-					PS1_CBA cba = gpt.AGOTexturesCBA[i];
+					TSB tsb = gpt.AGOTexturesTSB[i];
+					CBA cba = gpt.AGOTexturesCBA[i];
 					byte x = gpt.AGOTexturesX[i];
 					byte y = gpt.AGOTexturesY[i];
 
@@ -258,8 +258,8 @@ namespace Raymap
 					{
 						int pageW = tsb.TP switch
 						{
-							PS1_TSB.TexturePageTP.CLUT_8Bit => 128,
-							PS1_TSB.TexturePageTP.CLUT_4Bit => 256,
+							TSB.TexturePageTP.CLUT_8Bit => 128,
+							TSB.TexturePageTP.CLUT_4Bit => 256,
 							_ => 64
 						};
 
@@ -506,14 +506,14 @@ namespace Raymap
 			return types.ToArray();
 		}
 
-		public PS1_VRAM LoadVRAM(CPA_Settings settings, byte[] xtp)
+		public VRAM LoadVRAM(CPA_Settings settings, byte[] xtp)
 		{
-			PS1_VRAM vram = new PS1_VRAM();
+			VRAM vram = new VRAM();
 
 			int startXPage = settings.EngineVersion != EngineVersion.JungleBook_PS1 ? 5 : 8;
 			vram.CurrentXPage = startXPage;
 
-			int width = Mathf.CeilToInt(xtp.Length / (float)(PS1_VRAM.PageHeight * 2));
+			int width = Mathf.CeilToInt(xtp.Length / (float)(VRAM.PageHeight * 2));
 			vram.AddData(xtp, width);
 
 			return vram;

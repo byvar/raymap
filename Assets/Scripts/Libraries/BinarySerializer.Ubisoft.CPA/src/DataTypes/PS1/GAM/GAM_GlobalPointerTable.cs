@@ -112,8 +112,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public Pointer<UITextureName>[] UITexturesNames { get; set; }
 		public ushort[] UITexturesWidths { get; set; }
 		public ushort[] UITexturesHeights { get; set; }
-		public PS1_TSB[] UITexturesTSB { get; set; }
-		public PS1_CBA[] UITexturesCBA { get; set; }
+		public TSB[] UITexturesTSB { get; set; }
+		public CBA[] UITexturesCBA { get; set; }
 		public byte[] UITexturesX { get; set; }
 		public byte[] UITexturesY { get; set; }
 
@@ -126,8 +126,8 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 		public GMT_GameMaterial[] GameMaterials { get; set; }
 
 		// AGO textures
-		public PS1_TSB[] AGOTexturesTSB { get; set; }
-		public PS1_CBA[] AGOTexturesCBA { get; set; }
+		public TSB[] AGOTexturesTSB { get; set; }
+		public CBA[] AGOTexturesCBA { get; set; }
 		public byte[] AGOTexturesX { get; set; }
 		public byte[] AGOTexturesY { get; set; }
 		public ushort[] AGOTexturesAbsoluteX { get; set; }
@@ -345,9 +345,9 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 			s.DoAt(UITexturesHeightsPointer, () =>
 				UITexturesHeights = s.SerializeArray<ushort>(UITexturesHeights, UITexturesCount, name: nameof(UITexturesHeights)));
 			s.DoAt(UITexturesTSBPointer, () =>
-				UITexturesTSB = s.SerializeObjectArray<PS1_TSB>(UITexturesTSB, UITexturesCount, name: nameof(UITexturesTSB)));
+				UITexturesTSB = s.SerializeObjectArray<TSB>(UITexturesTSB, UITexturesCount, name: nameof(UITexturesTSB)));
 			s.DoAt(UITexturesCBAPointer, () =>
-				UITexturesCBA = s.SerializeObjectArray<PS1_CBA>(UITexturesCBA, UITexturesCount, name: nameof(UITexturesCBA)));
+				UITexturesCBA = s.SerializeObjectArray<CBA>(UITexturesCBA, UITexturesCount, name: nameof(UITexturesCBA)));
 			s.DoAt(UITexturesXPointer, () =>
 				UITexturesX = s.SerializeArray<byte>(UITexturesX, UITexturesCount, name: nameof(UITexturesX)));
 			s.DoAt(UITexturesYPointer, () =>
@@ -376,9 +376,9 @@ namespace BinarySerializer.Ubisoft.CPA.PS1
 				GameMaterials = s.SerializeObjectArray<GMT_GameMaterial>(GameMaterials, GameMaterialsCount, name: nameof(GameMaterials)));
 
 			s.DoAt(AGOTexturesTSBPointer, () =>
-				AGOTexturesTSB = s.SerializeObjectArray<PS1_TSB>(AGOTexturesTSB, AGOTexturesCount, name: nameof(AGOTexturesTSB)));
+				AGOTexturesTSB = s.SerializeObjectArray<TSB>(AGOTexturesTSB, AGOTexturesCount, name: nameof(AGOTexturesTSB)));
 			s.DoAt(AGOTexturesCBAPointer, () =>
-				AGOTexturesCBA = s.SerializeObjectArray<PS1_CBA>(AGOTexturesCBA, AGOTexturesCount, name: nameof(AGOTexturesCBA)));
+				AGOTexturesCBA = s.SerializeObjectArray<CBA>(AGOTexturesCBA, AGOTexturesCount, name: nameof(AGOTexturesCBA)));
 			s.DoAt(AGOTexturesXPointer, () =>
 				AGOTexturesX = s.SerializeArray<byte>(AGOTexturesX, AGOTexturesCount, name: nameof(AGOTexturesX)));
 			s.DoAt(AGOTexturesYPointer, () =>

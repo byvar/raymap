@@ -38,5 +38,9 @@ namespace Raymap
 		public PointerSize? LoggingPointerSize => PointerSize.Pointer32;
 
 		public Endian DefaultEndianness => Endian.Little;
+
+		public bool AutoInitReadMap => UnitySettings.ExportReadMaps;
+
+		public bool AutoExportReadMap => UnitySettings.ExportReadMaps;
 	}
 }

@@ -3,9 +3,8 @@
     /// <summary>
     /// Class for XOR operations with a multi-byte key
     /// </summary>
-    public class SNA_XORCalculator : IXORCalculator 
-    {
-        public SNA_XORCalculator(uint key = DefaultCryptKey, DecodeMode mode = DecodeMode.Rayman2)
+    public class SNA_XorProcessor : XorProcessor {
+        public SNA_XorProcessor(uint key = DefaultCryptKey, DecodeMode mode = DecodeMode.Rayman2)
         {
             CryptKey = key;
 			Mode = mode;
@@ -37,6 +36,14 @@
 				return (byte)((GetKeyByte(1) ^ ((toDecode + 0x100) - GetKeyByte(0))) & 0xFF);
 			} else {
 				return (byte)(toDecode ^ GetKeyByte(1));
+			}
+		}
+
+
+		public override void ProcessBytes(byte[] buffer, int offset, int count) {
+			int end = offset + count;
+			for (int i = offset; i < end; i++) {
+				buffer[i] = XORByte(buffer[i]);
 			}
 		}
 

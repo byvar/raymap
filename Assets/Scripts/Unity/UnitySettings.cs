@@ -99,6 +99,7 @@ public class UnitySettings {
     public static float ScreenshotScale { get; set; }
     public static string HighlightObjectsFilter { get; set; }
     public static string HighlightObjectsTextFormat { get; set; }
+	public static bool ExportReadMaps { get; set; }
 
     /// <summary>
     /// Static constructor loads in editor data at editor startup.

@@ -22,7 +22,7 @@
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersion == EngineVersion.TonicTrouble) {
 				TT_PathLength = s.Serialize<ushort>(TT_PathLength, name: nameof(TT_PathLength));
-				s.DoXOR(TT_NameXORKey, () => {
+				s.DoProcessed<Xor8Processor>(new Xor8Processor(TT_NameXORKey), () => {
 					TT_Path = s.SerializeString(TT_Path, length: TT_PathLength-1, name: nameof(TT_Path));
 				});
 			}

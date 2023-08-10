@@ -17,7 +17,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			textures.Clear();
 		}
 
-		public void RegisterTexture(PS1_TSB tsb, PS1_CBA cba, int xMin, int xMax, int yMin, int yMax) {
+		public void RegisterTexture(TSB tsb, CBA cba, int xMin, int xMax, int yMin, int yMax) {
 			GLI_Texture b = new GLI_Texture(Context) {
 				TSB = tsb,
 				CBA = cba,
@@ -62,7 +62,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 			}
 		}*/
 
-		public GLI_Texture GetTexture(PS1_TSB tsb, PS1_CBA cba, int x, int y) {
+		public GLI_Texture GetTexture(TSB tsb, CBA cba, int x, int y) {
 			return textures.FirstOrDefault(
 				t => t.CBA == cba && t.TSB == tsb &&
 				x >= t.xMin && x < t.xMax &&

@@ -37,11 +37,13 @@ namespace BinarySerializer.Unity.Editor
 		public override long CurrentFileOffset => 0;
 		public override long CurrentAbsoluteOffset => 0;
 
+		public override bool UsesSerializeNames => throw new NotImplementedException();
+
 		#endregion
 
 		#region Private Editor Helpers
 
-		private void DoFoldout(string name, Action action)
+		public void DoFoldout(string name, Action action)
 		{
 			CurrentName.Push(name);
 
@@ -105,12 +107,6 @@ namespace BinarySerializer.Unity.Editor
 
 			DoFoldout(offset.ToString(), action);
 		}
-
-		#endregion
-
-		#region Checksum
-
-		public override T SerializeChecksum<T>(T calculatedChecksum, string name = null) => default;
 
 		#endregion
 
@@ -451,6 +447,38 @@ namespace BinarySerializer.Unity.Editor
 		public override void DoBits<T>(Action<BitSerializerObject> serializeFunc)
 		{
 			serializeFunc(new EditorGUIBitSerializer(this, CurrentPointer));
+		}
+
+		public override void BeginProcessed(BinaryProcessor processor) {
+			throw new NotImplementedException();
+		}
+
+		public override void EndProcessed(BinaryProcessor processor) {
+			throw new NotImplementedException();
+		}
+
+		public override T GetProcessor<T>() {
+			throw new NotImplementedException();
+		}
+
+		public override bool SerializeBoolean<T>(bool obj, string name = null) {
+			return EditorGUILayout.Toggle(name, obj);
+		}
+
+		public override string SerializeLengthPrefixedString<T>(string obj, Encoding encoding = null, string name = null) {
+			return SerializeString(obj, encoding: encoding, name: name);
+		}
+
+		public override T SerializeInto<T>(T obj, SerializeInto<T> serializeFunc, string name = null) where T : default {
+			throw new NotImplementedException();
+		}
+
+		public override string[] SerializeLengthPrefixedStringArray<T>(string[] obj, long count, Encoding encoding = null, string name = null) {
+			return SerializeStringArray(obj, count, encoding: encoding, name: name);
+		}
+
+		public override T[] SerializeIntoArray<T>(T[] obj, long count, SerializeInto<T> serializeFunc, string name = null) where T : default {
+			throw new NotImplementedException();
 		}
 
 		#endregion

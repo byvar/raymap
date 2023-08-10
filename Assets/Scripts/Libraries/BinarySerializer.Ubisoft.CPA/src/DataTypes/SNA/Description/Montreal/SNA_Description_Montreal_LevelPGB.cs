@@ -16,11 +16,11 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 			VignetteNameLength = s.Serialize<uint>(VignetteNameLength, name: nameof(VignetteNameLength));
-			s.DoXOR(new SNA_MontrealXORCalculator(3, -7), () => {
+			s.DoProcessed<SNA_MontrealXorProcessor>(new SNA_MontrealXorProcessor(3, -7), () => {
 				VignetteName = s.SerializeString(VignetteName, length: VignetteNameLength, name: nameof(VignetteName));
 			});
 			UnknownLength = s.Serialize<uint>(UnknownLength, name: nameof(UnknownLength));
-			s.DoXOR(new SNA_MontrealXORCalculator(6, -11), () => {
+			s.DoProcessed<SNA_MontrealXorProcessor>(new SNA_MontrealXorProcessor(6, -11), () => {
 				UnknownName = s.SerializeString(UnknownName, length: UnknownLength, name: nameof(UnknownName));
 			});
 			YMin = s.Serialize<int>(YMin, name: nameof(YMin));
