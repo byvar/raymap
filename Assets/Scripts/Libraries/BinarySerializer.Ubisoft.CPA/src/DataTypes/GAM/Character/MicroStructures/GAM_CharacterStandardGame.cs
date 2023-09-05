@@ -1,5 +1,5 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
-	public class GAM_StandardGame : BinarySerializable {
+	public class GAM_CharacterStandardGame : BinarySerializable {
 		public const int AlwaysObjectType = 0x10000;
 		public const int InvalidObjectType = -1;
 
