@@ -15,7 +15,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		ActorHasAShadow = 1 << 8,
 		ShadowOnMe = 1 << 9,
 		Prunable = 1 << 10,
-		OutOfVisibility = 1 << 11,
+		OutOfVisibility = 1 << 11, // Internal use only, unchangeable
 		UnseenFrozen = 1 << 12,
 		NoAnimPlayer = 1 << 13,
 		Fightable = 1 << 14,
@@ -28,13 +28,13 @@ namespace BinarySerializer.Ubisoft.CPA {
 		UsesTransparencyZone = 1 << 21,
 		NoMecaWhenTooFar = 1 << 22,
 		SoundWhenInvisible = 1 << 23,
-		CustomBit_25 = 1 << 24,
+		Protection = 1 << 24, // Internal use only, unchangeable
 		CameraHit = 1 << 25,
 		CanPushPrincipalActor = 1 << 26,
 		DesignerBit1 = 1 << 27,
 		DesignerBit2 = 1 << 28,
 		DesignerBit3 = 1 << 29,
 		DesignerBit4 = 1 << 30,
-		PrincipalActor = (uint)1 << 31,
+		PrincipalActor = (uint)1 << 31, // Internal use only, unchangeable
 	}
 }

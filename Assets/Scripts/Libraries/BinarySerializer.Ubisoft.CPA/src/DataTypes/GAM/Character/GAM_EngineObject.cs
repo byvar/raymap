@@ -1,7 +1,7 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	public class GAM_EngineObject : BinarySerializable, IHIE_LinkedObject {
 		public Pointer<GAM_Character3dData> _3dData { get; set; }
-		public Pointer StandardGame { get; set; }
+		public Pointer<GAM_StandardGame> StandardGame { get; set; }
 		public Pointer Dynam { get; set; }
 		public Pointer DynamPoly { get; set; }
 		public Pointer Brain { get; set; }
@@ -23,7 +23,7 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 			_3dData = s.SerializePointer<GAM_Character3dData>(_3dData, name: nameof(_3dData))?.ResolveObject(s);
-			StandardGame = s.SerializePointer(StandardGame, name: nameof(StandardGame));
+			StandardGame = s.SerializePointer<GAM_StandardGame>(StandardGame, name: nameof(StandardGame))?.ResolveObject(s);
 			Dynam = s.SerializePointer(Dynam, name: nameof(Dynam));
 			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_Montreal))
 				DynamPoly = s.SerializePointer(DynamPoly, name: nameof(DynamPoly));

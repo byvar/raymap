@@ -3,7 +3,7 @@
 namespace BinarySerializer.Ubisoft.CPA.U64 {
 	public class GAM_CharacterStandardGame : U64_Struct {
 		public GAM_CustomBits CustomBitsInit { get; set; }
-		public uint Capabilities { get; set; }
+		public GAM_ActorCapabilities Capabilities { get; set; }
 		public U64_Reference<GAM_Family> Family { get; set; }
 		public short HitPointsInit { get; set; }
 		public short HitPointsMaxInit { get; set; }
@@ -17,7 +17,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 
 		public override void SerializeImpl(SerializerObject s) {
 			CustomBitsInit = s.Serialize<GAM_CustomBits>(CustomBitsInit, name: nameof(CustomBitsInit));
-			Capabilities = s.Serialize<uint>(Capabilities, name: nameof(Capabilities));
+			Capabilities = s.Serialize<GAM_ActorCapabilities>(Capabilities, name: nameof(Capabilities));
 			Family = s.SerializeObject<U64_Reference<GAM_Family>>(Family, name: nameof(Family))?.Resolve(s);
 			HitPointsInit = s.Serialize<short>(HitPointsInit, name: nameof(HitPointsInit));
 			HitPointsMaxInit = s.Serialize<short>(HitPointsMaxInit, name: nameof(HitPointsMaxInit));
