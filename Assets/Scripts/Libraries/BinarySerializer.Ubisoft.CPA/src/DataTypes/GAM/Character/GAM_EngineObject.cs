@@ -11,9 +11,9 @@
 		public Pointer Way { get; set; }
 		public Pointer Light { get; set; }
 		public Pointer SectInfo { get; set; }
-		public Pointer Micro { get; set; }
-		public Pointer World { get; set; }
-		public Pointer TakPut { get; set; }
+		public Pointer<GAM_CharacterMicro> Micro { get; set; }
+		public Pointer<GAM_CharacterWorld> World { get; set; }
+		public Pointer<GAM_CharacterTakePut> TakePut { get; set; }
 		public Pointer StockList { get; set; }
 		public Pointer Stream { get; set; }
 		public Pointer ParticleSource { get; set; }
@@ -35,10 +35,10 @@
 			Way = s.SerializePointer(Way, name: nameof(Way));
 			Light = s.SerializePointer(Light, name: nameof(Light));
 			SectInfo = s.SerializePointer(SectInfo, name: nameof(SectInfo));
-			Micro = s.SerializePointer(Micro, name: nameof(Micro));
+			Micro = s.SerializePointer<GAM_CharacterMicro>(Micro, name: nameof(Micro))?.ResolveObject(s);
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
-				World = s.SerializePointer(World, name: nameof(World));
-				TakPut = s.SerializePointer(TakPut, name: nameof(TakPut));
+				World = s.SerializePointer<GAM_CharacterWorld>(World, name: nameof(World))?.ResolveObject(s);
+				TakePut = s.SerializePointer<GAM_CharacterTakePut>(TakePut, name: nameof(TakePut))?.ResolveObject(s);
 				StockList = s.SerializePointer(StockList, name: nameof(StockList));
 				Stream = s.SerializePointer(Stream, name: nameof(Stream));
 			}
