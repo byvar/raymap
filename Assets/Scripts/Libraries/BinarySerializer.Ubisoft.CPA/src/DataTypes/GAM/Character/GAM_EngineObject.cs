@@ -10,7 +10,7 @@
 		public Pointer AimData { get; set; }
 		public Pointer Way { get; set; }
 		public Pointer Light { get; set; }
-		public Pointer SectInfo { get; set; }
+		public Pointer<GAM_CharacterSectorInfo> SectorInfo { get; set; }
 		public Pointer<GAM_CharacterMicro> Micro { get; set; }
 		public Pointer<GAM_CharacterWorld> World { get; set; }
 		public Pointer<GAM_CharacterTakePut> TakePut { get; set; }
@@ -34,7 +34,7 @@
 				AimData = s.SerializePointer(AimData, name: nameof(AimData));
 			Way = s.SerializePointer(Way, name: nameof(Way));
 			Light = s.SerializePointer(Light, name: nameof(Light));
-			SectInfo = s.SerializePointer(SectInfo, name: nameof(SectInfo));
+			SectorInfo = s.SerializePointer<GAM_CharacterSectorInfo>(SectorInfo, name: nameof(SectorInfo))?.ResolveObject(s);
 			Micro = s.SerializePointer<GAM_CharacterMicro>(Micro, name: nameof(Micro))?.ResolveObject(s);
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
 				World = s.SerializePointer<GAM_CharacterWorld>(World, name: nameof(World))?.ResolveObject(s);
