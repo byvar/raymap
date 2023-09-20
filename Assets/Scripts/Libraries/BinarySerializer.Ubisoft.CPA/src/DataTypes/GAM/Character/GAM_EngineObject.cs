@@ -17,9 +17,9 @@
 		public Pointer StockList { get; set; }
 		public Pointer Stream { get; set; }
 		public Pointer ParticleSource { get; set; }
-		public Pointer Sound { get; set; }
-		public Pointer AnimEffect { get; set; }
-		public Pointer Magnet { get; set; }
+		public Pointer<GAM_CharacterSound> Sound { get; set; }
+		public Pointer<GAM_CharacterAnimEffect> AnimEffect { get; set; }
+		public Pointer<GAM_CharacterMagnet> Magnet { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			_3dData = s.SerializePointer<GAM_Character3dData>(_3dData, name: nameof(_3dData))?.ResolveObject(s);
@@ -45,11 +45,11 @@
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
 				ParticleSource = s.SerializePointer(ParticleSource, name: nameof(ParticleSource));
 			}
-			Sound = s.SerializePointer(Sound, name: nameof(Sound));
+			Sound = s.SerializePointer<GAM_CharacterSound>(Sound, name: nameof(Sound))?.ResolveObject(s);
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_3)) {
-				AnimEffect = s.SerializePointer(AnimEffect, name: nameof(AnimEffect));
+				AnimEffect = s.SerializePointer<GAM_CharacterAnimEffect>(AnimEffect, name: nameof(AnimEffect))?.ResolveObject(s);
 				if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
-					Magnet = s.SerializePointer(Magnet, name: nameof(Magnet));
+					Magnet = s.SerializePointer<GAM_CharacterMagnet>(Magnet, name: nameof(Magnet))?.ResolveObject(s);
 				}
 			}
 		}
