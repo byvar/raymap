@@ -7,9 +7,9 @@
 		public Pointer Brain { get; set; }
 		public Pointer CineInfo { get; set; }
 		public Pointer CollSet { get; set; }
-		public Pointer AimData { get; set; }
-		public Pointer Way { get; set; }
-		public Pointer Light { get; set; }
+		public Pointer<GAM_CharacterAimData> AimData { get; set; }
+		public Pointer<GAM_CharacterWay> Way { get; set; }
+		public Pointer<GAM_CharacterLight> Light { get; set; }
 		public Pointer<GAM_CharacterSectorInfo> SectorInfo { get; set; }
 		public Pointer<GAM_CharacterMicro> Micro { get; set; }
 		public Pointer<GAM_CharacterWorld> World { get; set; }
@@ -31,9 +31,9 @@
 			CineInfo = s.SerializePointer(CineInfo, name: nameof(CineInfo));
 			CollSet = s.SerializePointer(CollSet, name: nameof(CollSet));
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2))
-				AimData = s.SerializePointer(AimData, name: nameof(AimData));
-			Way = s.SerializePointer(Way, name: nameof(Way));
-			Light = s.SerializePointer(Light, name: nameof(Light));
+				AimData = s.SerializePointer<GAM_CharacterAimData>(AimData, name: nameof(AimData))?.ResolveObject(s);
+			Way = s.SerializePointer<GAM_CharacterWay>(Way, name: nameof(Way))?.ResolveObject(s);
+			Light = s.SerializePointer<GAM_CharacterLight>(Light, name: nameof(Light))?.ResolveObject(s);
 			SectorInfo = s.SerializePointer<GAM_CharacterSectorInfo>(SectorInfo, name: nameof(SectorInfo))?.ResolveObject(s);
 			Micro = s.SerializePointer<GAM_CharacterMicro>(Micro, name: nameof(Micro))?.ResolveObject(s);
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {

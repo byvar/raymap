@@ -21,7 +21,7 @@
 			AirFogAttributes = s.SerializeObject<MTH3D_Vector>(AirFogAttributes, name: nameof(AirFogAttributes));
 			WaterFogAttributes = s.SerializeObject<MTH3D_Vector>(WaterFogAttributes, name: nameof(WaterFogAttributes));
 			AirFogColor = s.SerializeObject<GLI_FloatColor_RGBA>(AirFogColor, name: nameof(AirFogColor));
-			WaterFogAttributes = s.SerializeObject<GLI_FloatColor_RGBA>(WaterFogAttributes, name: nameof(WaterFogAttributes));
+			WaterFogColor = s.SerializeObject<GLI_FloatColor_RGBA>(WaterFogColor, name: nameof(WaterFogColor));
 		}
 	}
 }
