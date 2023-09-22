@@ -6,6 +6,8 @@
 		public Pointer<GMT_CollideMaterial> CollideMaterial { get; set; }
 
 		public const uint InvalidCollideMaterial = 0xFFFFFFFF;
+		public const uint InvalidSoundMaterial = 0xFFFFFFFF;
+		public const uint InvalidGameMaterial = 0xCDCDCDCD;
 
 		public override void SerializeImpl(SerializerObject s) {
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2Revolution)

@@ -4,7 +4,7 @@
 		public Pointer<GAM_CharacterStandardGame> StandardGame { get; set; }
 		public Pointer<GAM_CharacterDynamics> Dynam { get; set; }
 		public Pointer DynamPoly { get; set; }
-		public Pointer Brain { get; set; }
+		public Pointer<GAM_CharacterBrain> Brain { get; set; }
 		public Pointer CineInfo { get; set; }
 		public Pointer CollSet { get; set; }
 		public Pointer<GAM_CharacterAimData> AimData { get; set; }
@@ -27,7 +27,7 @@
 			Dynam = s.SerializePointer<GAM_CharacterDynamics>(Dynam, name: nameof(Dynam))?.ResolveObject(s);
 			if(s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_Montreal))
 				DynamPoly = s.SerializePointer(DynamPoly, name: nameof(DynamPoly));
-			Brain = s.SerializePointer(Brain, name: nameof(Brain));
+			Brain = s.SerializePointer<GAM_CharacterBrain>(Brain, name: nameof(Brain))?.ResolveObject(s);
 			CineInfo = s.SerializePointer(CineInfo, name: nameof(CineInfo));
 			CollSet = s.SerializePointer(CollSet, name: nameof(CollSet));
 			if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2))
