@@ -137,7 +137,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public static CPA_Settings R3GC => new CPA_Settings(EngineVersion.Rayman3, Platform.GC) {
 			StaticListType = LST2_ListType.DoubleLinked,
-			HasNames = true,
+			Defines = CPA_EngineDefines.AllDebug,
 			HasDeformations = true,
 			AITypes = new AI_Types_R3_GC(),
 			COLTypes = new COL_Types_R2(),
@@ -180,7 +180,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.All }
 			},
-			HasNames = true
+			Defines = CPA_EngineDefines.AllDebug
 		};
 		public static CPA_Settings R3PS2Demo_20020807 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS2) {
 			StaticListType = LST2_ListType.OptimizedArray,
@@ -234,7 +234,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Luminosity = 0.5f,
 			Saturate = false,
 			LevelTranslation = LevelTranslation.levelTranslation_r3,
-			HasNames = true,
+			Defines = CPA_EngineDefines.AllDebug,
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.All }
 			},
@@ -268,7 +268,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.None }
 			},
-			HasNames = true,
+			Defines = CPA_EngineDefines.AllDebug,
 		};
 		public static CPA_Settings R3PS3 => new CPA_Settings(EngineVersion.Rayman3, Platform.PS3) {
 			StaticListType = LST2_ListType.DoubleLinked,
@@ -283,7 +283,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.None }
 			},
-			HasNames = true,
+			Defines = CPA_EngineDefines.AllDebug,
 		};
 		#endregion
 
@@ -312,7 +312,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Luminosity = 0.5f,
 			Saturate = false,
 			LevelTranslation = LevelTranslation.levelTranslation_rarena_pc,
-			HasNames = true,
+			Defines = CPA_EngineDefines.AllDebug,
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.All }
 			},
@@ -326,7 +326,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Luminosity = 0.5f,
 			Saturate = false,
 			LevelTranslation = LevelTranslation.levelTranslation_rarena_pc,
-			HasNames = true,
+			Defines = CPA_EngineDefines.AllDebug,
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.All }
 			},
@@ -387,7 +387,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Luminosity = 0.5f,
 			Saturate = false,
 			LevelTranslation = LevelTranslation.levelTranslation_rarena_pc,
-			HasNames = true,
+			Defines = CPA_EngineDefines.AllDebug,
 			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
 				{ PathCapitalizationType.All, PathCapitalization.All }
 			},

@@ -5,6 +5,8 @@
 		public SAI_Flags SaveType { get; set; }
 		public AI_ObjectTreeInit InitType { get; set; }
 
+		public AI_DsgVarType? LinkedType => Context.GetCPASettings().AITypes?.GetDsgVarType(DsgVarType);
+
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2Revolution)) {
 				throw new System.NotImplementedException();
@@ -16,7 +18,7 @@
 				InitType = s.Serialize<AI_ObjectTreeInit>(InitType, name: nameof(InitType));
 			}
 
-			s?.Log($"Linked Type: {s.GetCPASettings().AITypes?.GetDsgVarType(DsgVarType)}");
+			s?.Log($"Linked Type: {LinkedType}");
 		}
 	}
 }

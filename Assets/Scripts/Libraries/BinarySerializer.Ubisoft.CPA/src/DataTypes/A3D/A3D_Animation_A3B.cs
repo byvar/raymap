@@ -15,7 +15,7 @@
 				Pad = s.Serialize<float>(Pad, name: nameof(Pad));
 			}
 
-			if (s.GetCPASettings().HasNames)
+			if (s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.DebugStringForPLA))
 				AnimationName = s.SerializeString(AnimationName, length: 80, name: nameof(AnimationName));
 
 			Frames = s.SerializePointer<A3B_Frame[]>(Frames, name: nameof(Frames));

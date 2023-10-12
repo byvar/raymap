@@ -73,7 +73,7 @@
 
 			SkyVisualMaterial = s.SerializePointer<GLI_Material>(SkyVisualMaterial, name: nameof(SkyVisualMaterial))?.ResolveObject(s);
 			FogIntensity = s.Serialize<byte>(FogIntensity, name: nameof(FogIntensity));
-			if (s.GetCPASettings().HasNames) {
+			if (s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.Debug)) {
 				Name = s.SerializeString(Name, length: 255, name: nameof(Name));
 			}
 			s.Align(4, Offset);

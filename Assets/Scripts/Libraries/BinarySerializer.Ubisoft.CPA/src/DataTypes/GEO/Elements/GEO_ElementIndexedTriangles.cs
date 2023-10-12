@@ -118,7 +118,7 @@
 					OptimizedIsolatedTrianglesCount = s.Serialize<ushort>(OptimizedIsolatedTrianglesCount, name: nameof(OptimizedIsolatedTrianglesCount));
 					OptimizedPointsInStrip = s.SerializePointer<ushort[]>(OptimizedPointsInStrip, name: nameof(OptimizedPointsInStrip))?.ResolveArray(s, OptimizedPointsInStripCount);
 					OptimizedIsolatedTriangles = s.SerializePointer<GEO_TripledIndex[]>(OptimizedIsolatedTriangles, name: nameof(OptimizedIsolatedTriangles))?.ResolveObjectArray(s, OptimizedIsolatedTrianglesCount);
-					if(s.GetCPASettings().HasNames)
+					if(s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.Debug))
 						ElementName = s.SerializeString(ElementName, length: 52, name: nameof(ElementName));
 				}
 

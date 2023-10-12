@@ -54,7 +54,10 @@ namespace BinarySerializer.Ubisoft.CPA {
         public CPA_GameMode Mode { get; set; } = CPA_GameMode.Rayman3PC;
         public LST2_ListType StaticListType { get; set; } = LST2_ListType.DoubleLinked;
         public bool HasObjectTypes { get; set; } = true;
-        public bool HasNames { get; set; } = false;
+
+		public CPA_EngineDefines Defines { get; set; }
+
+
         public bool HasDeformations { get; set; } = false;
         public int EntryActionsCount { get; set; } = 0;
         public bool HasExtraInputData { get; set; } = false;

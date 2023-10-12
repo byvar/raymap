@@ -12,7 +12,7 @@
 
 		public override void SerializeImpl(SerializerObject s) {
 
-			if (s.GetCPASettings().HasNames)
+			if (s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.DebugStringForPLA))
 				AnimationName = s.SerializeString(AnimationName, length: 80, name: nameof(AnimationName));
 
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2Revolution))

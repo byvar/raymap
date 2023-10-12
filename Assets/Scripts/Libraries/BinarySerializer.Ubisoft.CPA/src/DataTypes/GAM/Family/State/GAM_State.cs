@@ -31,7 +31,7 @@
 		public Pointer<GAM_State> LST2_Previous => ((ILST2_Entry<GAM_State>)ListElement).LST2_Previous;
 
 		public override void SerializeImpl(SerializerObject s) {
-			if (s.GetCPASettings().HasNames)
+			if (s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.DebugStringForPLA))
 				StateName = s.SerializeString(StateName, length: 80, name: nameof(StateName));
 
 			ListElement = s.SerializeObject<LST2_StaticListElement<GAM_State>>(ListElement, name: nameof(ListElement));

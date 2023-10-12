@@ -9,7 +9,8 @@
         MetaAction,
         BeginMacro,
         EndMacro,
-        Field,
+		EndTree,
+		Field,
         DsgVarRef,
         Constant,
         Real,
@@ -53,7 +54,6 @@
         //LightInfoRef,
 
         // R3:
-        EndTree,
         SOLinksRef,
         Light,
         Graph,

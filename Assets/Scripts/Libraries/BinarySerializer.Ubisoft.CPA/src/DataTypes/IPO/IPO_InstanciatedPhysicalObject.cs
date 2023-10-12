@@ -20,7 +20,7 @@
 				PortalCamera = s.SerializePointer<HIE_SuperObject>(PortalCamera, name: nameof(PortalCamera))?.ResolveObject(s);
 				LastTransitionID = s.Serialize<uint>(LastTransitionID, name: nameof(LastTransitionID));
 				LastRatioUsed = s.Serialize<float>(LastRatioUsed, name: nameof(LastRatioUsed));
-				if (s.GetCPASettings().HasNames) {
+				if (s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.Debug)) {
 					Unknown0 = s.Serialize<uint>(Unknown0, name: nameof(Unknown0));
 					Name = s.SerializeString(Name, length: 50, name: nameof(Name));
 				}
