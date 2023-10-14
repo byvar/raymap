@@ -5,7 +5,7 @@
 		public Pointer<AI_Comport> CurrentComport { get; set; }
 		public Pointer<AI_Comport> PreviousComport { get; set; }
 		public Pointer<AI_ActionTable> ActionTable { get; set; }
-		public uint InitComportIndex { get; set; } // If 0, it takes the default index from the ScriptAI
+		public Pointer<AI_Comport> InitComport { get; set; } // If 0, it takes the default index from the ScriptAI
 
 		public override void SerializeImpl(SerializerObject s) {
 			ScriptAI = s.SerializePointer<Pointer<AI_ScriptAI>>(ScriptAI, name: nameof(ScriptAI))?.ResolvePointer<AI_ScriptAI>(s);
@@ -15,7 +15,7 @@
 			CurrentComport = s.SerializePointer<AI_Comport>(CurrentComport, name: nameof(CurrentComport))?.ResolveObject(s);
 			PreviousComport = s.SerializePointer<AI_Comport>(PreviousComport, name: nameof(PreviousComport))?.ResolveObject(s);
 			ActionTable = s.SerializePointer<AI_ActionTable>(ActionTable, name: nameof(ActionTable))?.ResolveObject(s);
-			InitComportIndex = s.Serialize<uint>(InitComportIndex, name: nameof(InitComportIndex));
+			InitComport = s.SerializePointer<AI_Comport>(InitComport, name: nameof(InitComport))?.ResolveObject(s);
 		}
 	}
 }
