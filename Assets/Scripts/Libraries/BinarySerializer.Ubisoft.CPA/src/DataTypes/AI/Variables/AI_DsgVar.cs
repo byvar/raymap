@@ -1,12 +1,12 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	public class AI_DsgVar : BinarySerializable {
-		public Pointer DefaultMemoryInit { get; set; }
+		public Pointer<AI_DsgVarBuffer> DefaultMemoryInit { get; set; }
 		public Pointer<AI_DsgVarInfo[]> Variables { get; set; }
 		public uint BufferSize { get; set; } // Size of the buffer pointed to by DsgMemDefaultInit, and the buffers in the DsgMem structs that use this DsgVar
 		public uint VariablesCount { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			DefaultMemoryInit = s.SerializePointer(DefaultMemoryInit, name: nameof(DefaultMemoryInit));
+			DefaultMemoryInit = s.SerializePointer<AI_DsgVarBuffer>(DefaultMemoryInit, name: nameof(DefaultMemoryInit));
 			Variables = s.SerializePointer<AI_DsgVarInfo[]>(Variables, name: nameof(Variables));
 			if(s.GetCPASettings().EngineVersion == EngineVersion.Rayman2Revolution) {
 				BufferSize = s.Serialize<ushort>((ushort)BufferSize, name: nameof(BufferSize));
@@ -17,6 +17,8 @@
 			}
 
 			Variables?.ResolveObjectArray(s, VariablesCount);
+
+			DefaultMemoryInit?.ResolveObject(s, onPreSerialize: b => b.Pre_DsgVar = this);
 		}
 	}
 }

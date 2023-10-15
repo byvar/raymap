@@ -9,7 +9,7 @@
 		public byte RulesCount { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
-			if (s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.DebugAI)) {
+			if (s.GetCPASettings().Defines.HasFlag(CPA_EngineDefines.DebugAI) && s.GetCPASettings().Platform != Platform.PS2) {
 				Name = s.SerializeString(Name, length: 0x100, name: nameof(Name));
 			}
 			Rules = s.SerializePointer<AI_TreeInterpret[]>(Rules, name: nameof(Rules));

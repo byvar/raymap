@@ -42,7 +42,6 @@
 		VisualMatArray,
 		#endregion
 
-		TextRefArray,
         ActionArray, // Hype
 
 		Placeholder__R2PS2__Type2E,
