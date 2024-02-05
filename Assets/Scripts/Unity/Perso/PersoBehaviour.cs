@@ -807,6 +807,21 @@ public class PersoBehaviour : BasePersoBehaviour, IReferenceable {
 		}
 	}
 
+	public int GetCurrentStateFramesCount()
+	{
+		if (a3d != null)
+		{
+			return a3d.num_onlyFrames;
+        } else if (animMontreal != null)
+		{
+			return animMontreal.num_frames;
+        } else if (animLargo != null)
+		{
+			return animLargo.num_onlyFrames;
+        }
+		throw new InvalidOperationException("Could not fetch frames count for the animation state.");
+	}
+
 	public void UpdateAnimation() {
 		if (IsLoaded && a3d != null && channelObjects != null & subObjects != null) {
 			if (currentFrame >= a3d.num_onlyFrames) currentFrame %= a3d.num_onlyFrames;
