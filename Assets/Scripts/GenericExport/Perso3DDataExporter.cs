@@ -1,3 +1,5 @@
+using Assets.Scripts.GenericExport.Capturing;
+using Assets.Scripts.GenericExport.Model;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -26,7 +28,8 @@ namespace Assets.Scripts.GenericExport
             {
                 while (PersoStateFramesHelper.HasFramesLeftInCurrentState(persoBehaviour))
                 {
-
+                    Perso3DFrameExportData perso3DFrameExportData = 
+                        Perso3DFrameExportDataCapturer.Capture3DFrameExportData(persoBehaviour);
                     PersoStateFramesHelper.GoToNextFrame(persoBehaviour);
                     yield return null;
                 }
