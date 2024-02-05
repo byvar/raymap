@@ -111,6 +111,8 @@ public class PersoBehaviourEditor : Editor {
 		if (GUILayout.Button("Export Meshes and Animations Data (including cleanup)")) ExportMeshesAndAnimationsData();
 		if (GUILayout.Button("Export Meshes Data")) ExportMeshesData();
 		if (GUILayout.Button("Export Animations Data")) ExportAnimationsData();
+
+        if (GUILayout.Button("Generic Export (3D Screenshots)")) ExportAsMuchNeededDataAsPossibleForGenericExport();
     }
 
 	IList<StateTransitionsTreeElement> GetData() {
@@ -157,7 +159,14 @@ public class PersoBehaviourEditor : Editor {
 		}
 	}
 
-	void ExportMeshesAndAnimationsData()
+	void ExportAsMuchNeededDataAsPossibleForGenericExport()
+	{
+		Perso3DDataExporter perso3DDataExporter = new Perso3DDataExporter(pb);
+		perso3DDataExporter.ExportPersoAnimated3DData();
+	}
+
+
+    void ExportMeshesAndAnimationsData()
 	{
 		ObjectsExportLibraryInterface.ClearExportObjectsLibrary();
 		ExportMeshesData();
