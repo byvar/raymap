@@ -12,10 +12,14 @@ namespace Assets.Scripts.GenericExport.Capturing
 
             foreach (Tuple<GameObject, GameObject> parentChildFrameObjects in PersoTraverser.GetChannelsHierarchy(persoBehaviour))
             {
-                result.frameHierarchyTree.Add(parentChildFrameObjects.Item1?.name, parentChildFrameObjects.Item2.name);      
+                result.frameHierarchyTree.Add(
+                    parentKey: parentChildFrameObjects.Item1?.name,
+                    key: parentChildFrameObjects.Item2.name,
+                    value: ExportObject.ChannelObjectFrom(parentChildFrameObjects.Item2)
+                );      
             }
 
-            throw new InvalidOperationException();
+            throw new NotImplementedException();
         }
     }
 }
