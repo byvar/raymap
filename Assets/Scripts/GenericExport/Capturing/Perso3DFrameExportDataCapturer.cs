@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.GenericExport.Model;
 using System;
+using UnityEngine;
 
 namespace Assets.Scripts.GenericExport.Capturing
 {
@@ -7,7 +8,14 @@ namespace Assets.Scripts.GenericExport.Capturing
     {
         public static Perso3DFrameExportData Capture3DFrameExportData(PersoBehaviour persoBehaviour)
         {
-            throw new NotImplementedException();
+            var result = new Perso3DFrameExportData();
+
+            foreach (Tuple<GameObject, GameObject> parentChildFrameObjects in PersoTraverser.GetChannelsHierarchy(persoBehaviour))
+            {
+                result.frameHierarchyTree.Add(parentChildFrameObjects.Item1?.name, parentChildFrameObjects.Item2.name);      
+            }
+
+            throw new InvalidOperationException();
         }
     }
 }
