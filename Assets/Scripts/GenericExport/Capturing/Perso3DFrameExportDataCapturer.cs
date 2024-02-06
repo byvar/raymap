@@ -10,13 +10,22 @@ namespace Assets.Scripts.GenericExport.Capturing
         {
             var result = new Perso3DFrameExportData();
 
-            foreach (Tuple<GameObject, GameObject> parentChildFrameObjects in PersoTraverser.GetChannelsHierarchy(persoBehaviour))
+            foreach (Tuple<GameObject, GameObject> parentChildFrameChannels in PersoTraverser.GetChannelsHierarchy(persoBehaviour))
             {
                 result.frameHierarchyTree.Add(
-                    parentKey: parentChildFrameObjects.Item1?.name,
-                    key: parentChildFrameObjects.Item2.name,
-                    value: ExportObject.ChannelObjectFrom(parentChildFrameObjects.Item2)
+                    parentKey: parentChildFrameChannels.Item1?.name,
+                    key: parentChildFrameChannels.Item2.name,
+                    value: ExportObject.ChannelObjectFrom(parentChildFrameChannels.Item2)
                 );      
+            }
+
+            foreach (Tuple<GameObject, GameObject> parentChildChannelMesh in PersoTraverser.GetChannelsMeshesHierarchy(persoBehaviour))
+            {
+                result.frameHierarchyTree.Add(
+                    parentKey: parentChildChannelMesh.Item1?.name,
+                    key: parentChildChannelMesh.Item2.name,
+                    value: ExportObject.MeshObjectFrom(parentChildChannelMesh.Item2)
+                );
             }
 
             throw new NotImplementedException();

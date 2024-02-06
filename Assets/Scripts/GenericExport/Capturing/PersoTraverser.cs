@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.GenericExport.Capturing
@@ -12,6 +9,24 @@ namespace Assets.Scripts.GenericExport.Capturing
         public static bool IsChannel(Transform transform)
         {
             return transform.gameObject.name.StartsWith("Channel");
+        }
+
+        public static bool IsMesh(Transform transform)
+        {
+            return transform.GetComponent<Renderer>() != null && transform.GetComponent<Renderer>().enabled;
+        }
+    }
+
+    public static class ChannelForMeshObtainer
+    {
+        public static GameObject GetClosestParentChannel(Transform baseTransform)
+        {
+            Transform baseT = baseTransform;
+            while (!ObjectKindDeterminer.IsChannel(baseT))
+            {
+                baseT = baseT.parent;
+            }
+            return baseT.gameObject;
         }
     }
 
@@ -29,6 +44,21 @@ namespace Assets.Scripts.GenericExport.Capturing
                 } else if (ObjectKindDeterminer.IsChannel(transform))
                 {
                     result.Add(Tuple.Create<GameObject, GameObject>(null, transform.gameObject));
+                }
+            }
+
+            return result;
+        }
+
+        public static List<Tuple<GameObject, GameObject>> GetChannelsMeshesHierarchy(PersoBehaviour persoBehaviour)
+        {
+            var result = new List<Tuple<GameObject, GameObject>>();
+
+            foreach (Transform transform in persoBehaviour.GetComponentsInChildren<Transform>())
+            {
+                if (ObjectKindDeterminer.IsMesh(transform))
+                {
+                    result.Add(Tuple.Create(ChannelForMeshObtainer.GetClosestParentChannel(transform), transform.gameObject));
                 }
             }
 
