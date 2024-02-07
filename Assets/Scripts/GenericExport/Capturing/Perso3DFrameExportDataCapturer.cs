@@ -29,9 +29,9 @@ namespace Assets.Scripts.GenericExport.Capturing
             }
 
             result.persoTransform = new ObjectTransform();
-            result.persoTransform.position = persoBehaviour.transform.position;
-            result.persoTransform.rotation = persoBehaviour.transform.rotation;
-            result.persoTransform.scale = persoBehaviour.transform.lossyScale;
+            result.persoTransform.position = ExportVector3.FromVector3(persoBehaviour.transform.position);
+            result.persoTransform.rotation = ExportQuaternion.FromQuaternion(persoBehaviour.transform.rotation);
+            result.persoTransform.scale = ExportVector3.FromVector3(persoBehaviour.transform.lossyScale);
 
             return result;
         }

@@ -13,8 +13,8 @@ namespace Assets.Scripts.GenericExport.Capturing
 
         public static bool IsMesh(Transform transform)
         {
-            return transform.GetComponent<Renderer>() != null && transform.GetComponent<Renderer>().enabled
-                && transform.GetComponent<MeshFilter>() != null;
+            return (transform.GetComponent<Renderer>() != null && transform.GetComponent<Renderer>().enabled)
+                && (transform.GetComponent<SkinnedMeshRenderer>() != null || transform.GetComponent<MeshFilter>() != null);
         }
     }
 
