@@ -9,6 +9,7 @@ namespace Assets.Scripts.GenericExport.Model
 {
     public class Perso3DFrameExportData
     {
+        public ObjectTransform persoTransform = new ObjectTransform ();
         public Tree<string, ExportObject> frameHierarchyTree = new Tree<string, ExportObject>();
     }
 }

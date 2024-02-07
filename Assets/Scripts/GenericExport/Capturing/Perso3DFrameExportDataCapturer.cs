@@ -28,7 +28,12 @@ namespace Assets.Scripts.GenericExport.Capturing
                 );
             }
 
-            throw new NotImplementedException();
+            result.persoTransform = new ObjectTransform();
+            result.persoTransform.position = persoBehaviour.transform.position;
+            result.persoTransform.rotation = persoBehaviour.transform.rotation;
+            result.persoTransform.scale = persoBehaviour.transform.lossyScale;
+
+            return result;
         }
     }
 }
