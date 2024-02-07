@@ -23,7 +23,7 @@ namespace Assets.Scripts.GenericExport
         {
             string dirPath = Path.Combine(UnitySettings.ExportPath, "ModelExport");
             Directory.CreateDirectory(dirPath);
-            return Path.Combine(UnitySettings.ExportPath, "ModelExport", RemoveInvalidChars(fileName));
+            return Path.Combine(UnitySettings.ExportPath, "ModelExport", RemoveInvalidChars(fileName).Replace(" ", "_"));
         }
     }
 
