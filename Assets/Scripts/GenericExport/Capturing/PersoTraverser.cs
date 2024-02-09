@@ -65,5 +65,22 @@ namespace Assets.Scripts.GenericExport.Capturing
 
             return result;
         }
+
+        public static string GetChainedChannelsKeyForSubmesh(GameObject submesh)
+        {
+            string key = submesh.name;
+            Transform baseT = submesh.transform;
+            while (baseT.GetComponent<PersoBehaviour>() == null)
+            {
+                while (!ObjectKindDeterminer.IsChannel(baseT))
+                {
+                    baseT = baseT.parent;
+                }
+                key = baseT.name + ">" + key;
+                baseT = baseT.parent;
+            }
+            
+            return key;
+        }
     }
 }

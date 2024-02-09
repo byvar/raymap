@@ -23,7 +23,7 @@ namespace Assets.Scripts.GenericExport.Capturing
             {
                 result.frameHierarchyTree.Add(
                     parentKey: parentChildChannelMesh.Item1?.name,
-                    key: parentChildChannelMesh.Item2.name,
+                    key: PersoTraverser.GetChainedChannelsKeyForSubmesh(parentChildChannelMesh.Item2),
                     value: ExportObject.MeshObjectFrom(parentChildChannelMesh.Item2)
                 );
             }
