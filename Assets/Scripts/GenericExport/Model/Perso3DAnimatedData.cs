@@ -38,6 +38,36 @@ namespace Assets.Scripts.GenericExport.Model
     public class DataBlock
     {
         public string key;
+
+        public static DataBlock DifferenceDataBlockBetween(DataBlock a, DataBlock b)
+        {
+            if (a is ConcreteWholeSubmeshInPoseDataBlock && b is ConcreteWholeSubmeshInPoseDataBlock)
+            {
+                ConcreteWholeSubmeshInPoseDataBlock aa = a as ConcreteWholeSubmeshInPoseDataBlock;
+                ConcreteWholeSubmeshInPoseDataBlock bb = b as ConcreteWholeSubmeshInPoseDataBlock;
+
+                var verticesDifference = aa.vertices.Select(x => new ExportVector3(x.x, x.y, x.z)).ToList();
+
+                for (int i = 0; i < bb.vertices.Count; i++)
+                {
+                    verticesDifference[i] = bb.vertices[i] - aa.vertices[i];
+                }
+
+                var result = new ConcreteWholeSubmeshInPoseDataBlock(
+                    transform: new ObjectTransform(
+                        position: bb.transform.position - aa.transform.position,
+                        rotation: ExportQuaternion.RotationDifference(aa.transform.rotation, bb.transform.rotation),
+                        scale: bb.transform.scale - aa.transform.scale
+                        ),
+                    vertices: verticesDifference,
+                    triangles: new List<int>()
+                    );
+                return result;
+            } else
+            {
+                throw new InvalidOperationException("Operation implemented only for two ConcreteWholeSubmeshInPoseDataBlock blocks!");
+            }
+        }
     }
 
     public class ExportVector3
@@ -60,6 +90,15 @@ namespace Assets.Scripts.GenericExport.Model
                 y: vec.y,
                 z: vec.z
             );
+        }
+
+        public static ExportVector3 operator-(ExportVector3 v1, ExportVector3 v2)
+        {
+            return new ExportVector3(
+                x: v1.x - v2.x,
+                y: v1.y - v2.y,
+                z: v1.z - v2.z
+                );
         }
     }
 
@@ -86,6 +125,11 @@ namespace Assets.Scripts.GenericExport.Model
                 z: quat.z,
                 w: quat.w
                 );
+        }
+
+        public static ExportQuaternion RotationDifference(ExportQuaternion rotation1, ExportQuaternion rotation2)
+        {
+            return rotation1;
         }
     }
 
@@ -134,14 +178,17 @@ namespace Assets.Scripts.GenericExport.Model
         }
     }
 
+    public class SubmeshDifferenceDataBlock : ConcreteWholeSubmeshInPoseDataBlock {
+        public SubmeshDifferenceDataBlock(
+            ObjectTransform transform, List<ExportVector3> vertices, List<int> triangles) : base(transform, vertices, triangles)
+        {}
+    }
+
     public class FrameDataBlock
     {
         public Dictionary<string, DataBlock> dataBlocks = new Dictionary<string, DataBlock>();
 
-        public static FrameDataBlock GetConsolidated(
-            Dictionary<int, FrameDataBlock> currentFrameDataBlocks,
-            int currentFrame,
-            PersoBehaviour persoBehaviour)
+        public static FrameDataBlock GetConcreteWholeSubmeshesInPoseFrameDataBlock(PersoBehaviour persoBehaviour)
         {
             Dictionary<string, ConcreteWholeSubmeshInPoseDataBlock> wholeSubmeshes = new Dictionary<string, ConcreteWholeSubmeshInPoseDataBlock>();
 
@@ -149,7 +196,7 @@ namespace Assets.Scripts.GenericExport.Model
             {
                 if (ObjectDeterminer.IsSubmesh(child))
                 {
-                    wholeSubmeshes[ObjectDeterminer.GetChainedChannelsKey(child)] = 
+                    wholeSubmeshes[ObjectDeterminer.GetChainedChannelsKey(child)] =
                         ConcreteWholeSubmeshInPoseDataBlock.FromSubmesh(child);
                 }
             }
@@ -157,6 +204,45 @@ namespace Assets.Scripts.GenericExport.Model
             var result = new FrameDataBlock();
             result.dataBlocks = wholeSubmeshes.ToDictionary(x => x.Key, x => x.Value as DataBlock);
             return result;
+        }
+
+        public static FrameDataBlock DifferenceFrameDataBlockBetween(
+            FrameDataBlock a,
+            FrameDataBlock b
+            )
+        {
+            var commonKeys = a.dataBlocks.Keys.Intersect(b.dataBlocks.Keys).ToList();
+
+
+            var result = new FrameDataBlock();
+
+            foreach (var key in commonKeys)
+            {
+                var dataBlockA = a.dataBlocks[key];
+                var dataBlockB = b.dataBlocks[key];
+
+                result.dataBlocks[key] = DataBlock.DifferenceDataBlockBetween(dataBlockA, dataBlockB);
+            }
+
+            return result;
+        }
+
+        public static FrameDataBlock GetConsolidated(
+            Dictionary<int, FrameDataBlock> currentFrameDataBlocks,
+            int currentFrame,
+            PersoBehaviour persoBehaviour)
+        {
+            var dataToBeConsideredNow = FrameDataBlock.GetConcreteWholeSubmeshesInPoseFrameDataBlock(persoBehaviour);
+
+            if (currentFrame == 0)
+            {
+                return dataToBeConsideredNow;
+            } else
+            {
+                var previousFrameDataBlock = currentFrameDataBlocks[currentFrame - 1];
+                var differenceFrameDataBlock = FrameDataBlock.DifferenceFrameDataBlockBetween(previousFrameDataBlock, dataToBeConsideredNow);
+                return differenceFrameDataBlock;
+            }
         }
     }
 
