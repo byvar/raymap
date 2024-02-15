@@ -1,4 +1,3 @@
-using Assets.Scripts.GenericExport.Capturing;
 using Assets.Scripts.GenericExport.Model;
 using Newtonsoft.Json;
 using System.Collections;
@@ -50,13 +49,13 @@ namespace Assets.Scripts.GenericExport
 
             while (PersoStatesHelper.HasStatesLeft(currentState, persoBehaviour))
             {
-                result.states[currentState] = new Dictionary<int, Perso3DFrameExportData>();
+                result.states[currentState] = new Dictionary<int, FrameDataBlock>();
                 int currentFrame = 0;
                 while (PersoStateFramesHelper.HasFramesLeftInCurrentState(persoBehaviour))
                 {
-                    Perso3DFrameExportData perso3DFrameExportData = 
-                        Perso3DFrameExportDataCapturer.Capture3DFrameExportData(persoBehaviour);
-                    result.states[currentState][currentFrame] = perso3DFrameExportData;
+                    result.states[currentState][currentFrame] =
+                        FrameDataBlock.GetConsolidated(result.states[currentState], currentFrame, persoBehaviour);
+
                     PersoStateFramesHelper.GoToNextFrame(persoBehaviour);
                     currentFrame++;
                     yield return null;
