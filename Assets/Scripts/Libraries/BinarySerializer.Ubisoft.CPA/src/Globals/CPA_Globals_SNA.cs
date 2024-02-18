@@ -67,6 +67,18 @@ namespace BinarySerializer.Ubisoft.CPA {
 				paths[CPA_Path.FixRTG] = langDataPath + ConvertCase("Fix.rtg", PathCapitalizationType.FixRelocation);
 				paths[CPA_Path.FixDLG] = langDataPath + ConvertCase("Fix.dlg", PathCapitalizationType.LangFix);
 				paths[CPA_Path.FixRTD] = langDataPath + ConvertCase("Fix.rtd", PathCapitalizationType.FixRelocation);
+
+				if (cpaSettings.EngineVersion == EngineVersion.PlaymobilLauraPentiumIII) {
+					paths[CPA_Path.FixSNA] = langDataPath + ConvertCase("Fix.sna", PathCapitalizationType.Fix);
+					paths[CPA_Path.FixRTB] = langDataPath + ConvertCase("Fix.rtb", PathCapitalizationType.FixRelocation);
+					paths[CPA_Path.FixGPT] = langDataPath + ConvertCase("Fix.gpt", PathCapitalizationType.Fix);
+					paths[CPA_Path.FixRTP] = langDataPath + ConvertCase("Fix.rtp", PathCapitalizationType.FixRelocation);
+					paths[CPA_Path.FixPTX] = langDataPath + ConvertCase("Fix.ptx", PathCapitalizationType.Fix);
+					paths[CPA_Path.FixRTT] = langDataPath + ConvertCase("Fix.rtt", PathCapitalizationType.FixRelocation);
+					paths[CPA_Path.FixSND] = langDataPath + ConvertCase("Fix.snd", PathCapitalizationType.Fix);
+					paths[CPA_Path.FixRTS] = langDataPath + ConvertCase("Fix.rts", PathCapitalizationType.FixRelocation);
+					paths[CPA_Path.FixSDA] = langDataPath + ConvertCase("Fix.sda", PathCapitalizationType.Fix);
+				}
 			} else {
 				paths[CPA_Path.FixSDA] = null;
 				paths[CPA_Path.FixLNG] = null;

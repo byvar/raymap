@@ -727,6 +727,27 @@ namespace BinarySerializer.Ubisoft.CPA {
 				{ PathCapitalizationType.LangLevelFolder, PathCapitalization.None }
 			}
 		};
+		public static CPA_Settings PlaymobilLauraPC_PentiumIII => new CPA_Settings(EngineVersion.PlaymobilLauraPentiumIII, Platform.PC) {
+			StaticListType = LST2_ListType.DoubleLinked,
+			EntryActionsCount = 1,
+			AITypes = new AI_Types_Hype_PS2(),
+			COLTypes = new COL_Types_R2(),
+			SNATypes = new SNA_Types_Montreal(),
+			HasLinkedListHeaderPointers = true,
+			SNA_Compression = false,
+			Luminosity = 0.5f,
+			Saturate = true,
+			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
+				{ PathCapitalizationType.LevelFile, PathCapitalization.None },
+				{ PathCapitalizationType.LevelRelocation, PathCapitalization.None },
+				{ PathCapitalizationType.FixRelocation, PathCapitalization.None },
+				{ PathCapitalizationType.LangFix, PathCapitalization.None },
+				{ PathCapitalizationType.LangLevelFile, PathCapitalization.None },
+				{ PathCapitalizationType.LangLevelRelocation, PathCapitalization.None },
+				{ PathCapitalizationType.LangLevelFolder, PathCapitalization.None },
+				{ PathCapitalizationType.LevelFolder, PathCapitalization.None }
+			}
+		};
 		#endregion
 
 		#region Donald Duck Quack Attack
@@ -961,6 +982,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				CPA_GameMode.DonaldDuckPKGC => DDPKGC,
 				CPA_GameMode.PlaymobilHypePC => PlaymobilHypePC,
 				CPA_GameMode.PlaymobilLauraPC => PlaymobilLauraPC,
+				CPA_GameMode.PlaymobilLauraPCPentiumIII => PlaymobilLauraPC_PentiumIII,
 				CPA_GameMode.PlaymobilAlexPC => PlaymobilAlexPC,
 				CPA_GameMode.DinosaurPC => DinosaurPC,
 				CPA_GameMode.LargoWinchPC => LargoWinchPC,

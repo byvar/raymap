@@ -95,6 +95,7 @@ namespace OpenSpace {
 			DonaldDuckPKGC,
 			PlaymobilHypePC,
 			PlaymobilLauraPC,
+			PlaymobilLauraPCPentiumIII,
 			PlaymobilAlexPC,
 			DinosaurPC,
 			LargoWinchPC,
@@ -1112,6 +1113,29 @@ namespace OpenSpace {
 				{ CapsType.LangLevelFolder, Caps.None }
 			}
         };
+		public static Legacy_Settings PlaymobilLauraPC_PentiumIII => new Legacy_Settings() {
+			engineVersion = EngineVersion.Montreal,
+			game = Game.PlaymobilLaura,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			numEntryActions = 1,
+			aiTypes = AITypes.Hype,
+			hasLinkedListHeaderPointers = true,
+			snaCompression = true,
+			luminosity = 0.5f,
+			saturate = true,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.LevelRelocation, Caps.None },
+				{ CapsType.FixRelocation, Caps.None },
+				{ CapsType.LangFix, Caps.None },
+				{ CapsType.LangLevelFile, Caps.None },
+				{ CapsType.LangLevelRelocation, Caps.None },
+				{ CapsType.LangLevelFolder, Caps.None },
+				{ CapsType.LevelFolder, Caps.None }
+			}
+		};
 
 		public static Legacy_Settings DDPKGC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
@@ -1247,6 +1271,7 @@ namespace OpenSpace {
 			{ Mode.DonaldDuckPKGC, DDPKGC },
 			{ Mode.PlaymobilHypePC, PlaymobilHypePC },
 			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },
+			{ Mode.PlaymobilLauraPCPentiumIII, PlaymobilLauraPC_PentiumIII },
 			{ Mode.PlaymobilAlexPC, PlaymobilAlexPC },
 			{ Mode.DinosaurPC, DinosaurPC },
 			{ Mode.LargoWinchPC, LargoWinchPC },

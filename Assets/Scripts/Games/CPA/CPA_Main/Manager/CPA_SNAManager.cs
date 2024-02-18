@@ -274,6 +274,7 @@ namespace Raymap {
 			foreach (var block in snapshot.Blocks) {
 				if (block.BlockSize == 0) continue;
 				var relBlock = relocationTable.Blocks.FirstOrDefault(r => r.Block == block.Block && r.Module == block.Module && !r.IsInvalidBlock);
+				context.RemoveFile(block.BlockName); // If a block with this module & blockID exists, then it's a placeholder. Overwrite it with this new block memory.
 				SNA_DataBlockFile bf = context.AddFile(new SNA_DataBlockFile(context, snapshot, block, relBlock));
 			}
 			// Also add empty blocks, those can be pointed to but never read

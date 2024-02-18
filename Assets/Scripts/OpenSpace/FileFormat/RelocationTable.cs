@@ -226,7 +226,8 @@ namespace OpenSpace.FileFormat {
                 pointerBlock.pointers[j].offsetInMemory = reader.ReadUInt32();
 				pointerBlock.pointers[j].module = reader.ReadByte();
                 pointerBlock.pointers[j].id = reader.ReadByte();
-                if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT && Legacy_Settings.s.game != Legacy_Settings.Game.PlaymobilLaura) {
+                if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.TT
+					&& Legacy_Settings.s.mode != Legacy_Settings.Mode.PlaymobilLauraPC) {
                     pointerBlock.pointers[j].byte6 = reader.ReadByte();
                     pointerBlock.pointers[j].byte7 = reader.ReadByte();
                 }

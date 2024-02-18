@@ -75,6 +75,7 @@ namespace Raymap {
 
 				GameModeSelection.PlaymobilHypePC => CPA_GameMode.PlaymobilHypePC,
 				GameModeSelection.PlaymobilLauraPC => CPA_GameMode.PlaymobilLauraPC,
+				GameModeSelection.PlaymobilLauraPCPentiumIII => CPA_GameMode.PlaymobilLauraPCPentiumIII,
 				GameModeSelection.PlaymobilAlexPC => CPA_GameMode.PlaymobilAlexPC,
 
 				GameModeSelection.VIPPS1 => CPA_GameMode.VIPPS1,

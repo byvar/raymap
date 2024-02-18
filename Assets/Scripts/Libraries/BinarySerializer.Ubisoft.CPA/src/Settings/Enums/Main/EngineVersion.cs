@@ -41,6 +41,7 @@
         PlaymobilHype,
         PlaymobilAlex,
         PlaymobilLaura,
+		PlaymobilLauraPentiumIII,
 
 		CPA_Montreal2,
     }

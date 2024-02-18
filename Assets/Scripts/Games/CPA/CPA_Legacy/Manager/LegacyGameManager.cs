@@ -190,6 +190,7 @@ namespace Raymap {
 				GameModeSelection.DonaldDuckPKGC => Legacy_Settings.Mode.DonaldDuckPKGC,
 				GameModeSelection.PlaymobilHypePC => Legacy_Settings.Mode.PlaymobilHypePC,
 				GameModeSelection.PlaymobilLauraPC => Legacy_Settings.Mode.PlaymobilLauraPC,
+				GameModeSelection.PlaymobilLauraPCPentiumIII => Legacy_Settings.Mode.PlaymobilLauraPCPentiumIII,
 				GameModeSelection.PlaymobilAlexPC => Legacy_Settings.Mode.PlaymobilAlexPC,
 				GameModeSelection.DinosaurPC => Legacy_Settings.Mode.DinosaurPC,
 				GameModeSelection.LargoWinchPC => Legacy_Settings.Mode.LargoWinchPC,

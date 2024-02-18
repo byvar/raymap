@@ -12,7 +12,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			TargetModule = s.Serialize<byte>(TargetModule, name: nameof(TargetModule));
 			TargetBlock = s.Serialize<byte>(TargetBlock, name: nameof(TargetBlock));
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)
-				|| (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.PlaymobilHype))) {
+				|| (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.PlaymobilLauraPentiumIII))) {
 				s.SerializePadding(2); // 0xCD 0xCD
 			}
 		}

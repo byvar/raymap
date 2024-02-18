@@ -118,6 +118,16 @@ namespace OpenSpace.Loader {
 						paths["fix.dlg"] = langDataPath + ConvertCase("Fix.dlg", Legacy_Settings.CapsType.LangFix);
 						paths["fix.rtd"] = langDataPath + ConvertCase("Fix.rtd", Legacy_Settings.CapsType.FixRelocation);
 						paths["fixlvl.rtg"] = langDataPath + langLvlFolder + ConvertCase("FixLvl.rtg", Legacy_Settings.CapsType.FixLvl);
+
+						if (Legacy_Settings.s.mode == Legacy_Settings.Mode.PlaymobilLauraPCPentiumIII) {
+							paths["fix.sna"] = langDataPath + ConvertCase("Fix.sna", Legacy_Settings.CapsType.Fix);
+							paths["fix.rtb"] = langDataPath + ConvertCase("Fix.rtb", Legacy_Settings.CapsType.FixRelocation);
+							paths["fix.gpt"] = langDataPath + ConvertCase("Fix.gpt", Legacy_Settings.CapsType.Fix);
+							paths["fix.rtp"] = langDataPath + ConvertCase("Fix.rtp", Legacy_Settings.CapsType.FixRelocation);
+							paths["fix.ptx"] = langDataPath + ConvertCase("Fix.ptx", Legacy_Settings.CapsType.Fix);
+							paths["fix.rtt"] = langDataPath + ConvertCase("Fix.rtt", Legacy_Settings.CapsType.FixRelocation);
+							paths["fix.sda"] = langDataPath + ConvertCase("Fix.sda", Legacy_Settings.CapsType.Fix);
+						}
 					} else {
 						paths["fix.sda"] = null;
 						paths["fix.lng"] = null;

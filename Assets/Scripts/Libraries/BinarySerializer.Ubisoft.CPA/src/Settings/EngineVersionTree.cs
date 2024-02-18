@@ -55,8 +55,10 @@
 					},
                     new Node(EngineVersion.CPA_Montreal) {
                         new Node(EngineVersion.PlaymobilLaura) {
-							new Node(EngineVersion.PlaymobilHype) {
-								new Node(EngineVersion.PlaymobilAlex)
+							new Node(EngineVersion.PlaymobilLauraPentiumIII) {
+								new Node(EngineVersion.PlaymobilHype) {
+									new Node(EngineVersion.PlaymobilAlex)
+								}
 							}
 						}
 					}

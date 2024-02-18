@@ -59,7 +59,7 @@ namespace BinarySerializer.Ubisoft.CPA
 		}
 
 		public static SNA_LZOEncoder GetIfRequired(CPA_Settings s, uint sizeOrCount) {
-			if (sizeOrCount != 0 && s.EngineVersionTree.HasParent(EngineVersion.PlaymobilHype)) {
+			if (sizeOrCount != 0 && s.EngineVersionTree.HasParent(EngineVersion.PlaymobilLauraPentiumIII)) {
 				return new SNA_LZOEncoder();
 			} else {
 				return null;

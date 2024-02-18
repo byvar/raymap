@@ -60,6 +60,7 @@
 
 		PlaymobilHypePC,
 		PlaymobilLauraPC,
+		PlaymobilLauraPCPentiumIII,
 		PlaymobilAlexPC,
 
 		VIPPS1,
