@@ -140,7 +140,8 @@ namespace OpenSpace.Object {
 					po.visualSet[0].off_data = po.off_visualSet;
 					po.visualSet[0].LODdistance = 5f;
 				} else {
-					if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC) {
+					if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC 
+					|| Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman2DCDevBuild_1999_11_22) {
 						reader.ReadUInt32(); // 0
 						numberOfLOD = reader.ReadUInt16();
 						//if (numberOfLOD > 1) MapLoader.Loader.print("Found a PO with " + numberOfLOD + " levels of detail @ " + offset);

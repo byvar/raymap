@@ -143,6 +143,7 @@ namespace Raymap {
 				GameModeSelection.Rayman2PCDemo_1999_08_18 => Legacy_Settings.Mode.Rayman2PCDemo_1999_08_18,
 				GameModeSelection.Rayman2PCDemo_1999_09_04 => Legacy_Settings.Mode.Rayman2PCDemo_1999_09_04,
 				GameModeSelection.Rayman2DC => Legacy_Settings.Mode.Rayman2DC,
+				GameModeSelection.Rayman2DCDevBuild_1999_11_22 => Legacy_Settings.Mode.Rayman2DCDevBuild_1999_11_22,
 				GameModeSelection.Rayman2IOS => Legacy_Settings.Mode.Rayman2IOS,
 				GameModeSelection.Rayman2IOSDemo => Legacy_Settings.Mode.Rayman2IOSDemo,
 				GameModeSelection.Rayman2PS1 => Legacy_Settings.Mode.Rayman2PS1,

@@ -19,6 +19,7 @@ namespace Raymap {
 				GameModeSelection.Rayman2PCDemo_1999_08_18 => CPA_GameMode.Rayman2PCDemo_1999_08_18,
 				GameModeSelection.Rayman2PCDemo_1999_09_04 => CPA_GameMode.Rayman2PCDemo_1999_09_04,
 				GameModeSelection.Rayman2DC => CPA_GameMode.Rayman2DC,
+				GameModeSelection.Rayman2DCDevBuild_1999_11_22 => CPA_GameMode.Rayman2DCDevBuild_1999_11_22,
 				GameModeSelection.Rayman2IOS => CPA_GameMode.Rayman2IOS,
 				GameModeSelection.Rayman2IOSDemo => CPA_GameMode.Rayman2IOSDemo,
 				GameModeSelection.Rayman2PS1 => CPA_GameMode.Rayman2PS1,

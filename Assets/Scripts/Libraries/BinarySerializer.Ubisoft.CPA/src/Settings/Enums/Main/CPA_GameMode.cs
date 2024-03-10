@@ -4,6 +4,7 @@
 		Rayman2PCDemo_1999_08_18,
 		Rayman2PCDemo_1999_09_04,
 		Rayman2DC,
+		Rayman2DCDevBuild_1999_11_22,
 		Rayman2IOS,
 		Rayman2IOSDemo,
 		Rayman2PS1,

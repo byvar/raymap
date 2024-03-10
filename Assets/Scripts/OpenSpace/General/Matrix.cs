@@ -266,6 +266,7 @@ namespace OpenSpace {
                 sclMatrix.SetColumn(2, new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), Legacy_Settings.s.platform == Legacy_Settings.Platform.DC ? reader.ReadSingle() : 0f));
                 if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) {
                     pos = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+					reader.ReadSingle(); // 4x4 matrix
                 }
 
                 mat.m.SetColumn(3, new Vector4(pos.x, pos.y, pos.z, 1f));

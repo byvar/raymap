@@ -131,7 +131,7 @@ namespace OpenSpace.Visual {
             } else {
                 giroPhare = reader.ReadByte();
                 pulse = reader.ReadByte();
-                if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC) reader.ReadUInt32();
+                if (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC || Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman2DCDevBuild_1999_11_22) reader.ReadUInt32();
                 type = reader.ReadUInt16();
                 reader.ReadUInt16();
             }
@@ -149,18 +149,19 @@ namespace OpenSpace.Visual {
             }
             if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) reader.ReadUInt32();
             transMatrix = Matrix.Read(reader, LegacyPointer.Current(reader));
-            if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2 && Legacy_Settings.s.platform != Legacy_Settings.Platform.DC && Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
+            if (Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2 &&
+				(Legacy_Settings.s.platform != Legacy_Settings.Platform.DC || Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman2DCDevBuild_1999_11_22) &&
+				Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch) {
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
                 reader.ReadUInt32(); // 0
             }
             if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.Montreal) {
-                if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC) {
-                    reader.ReadSingle();
-                } else if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution
+               if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Revolution
                     && Legacy_Settings.s.game != Legacy_Settings.Game.LargoWinch
-                    && Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2) {
+                    && Legacy_Settings.s.platform != Legacy_Settings.Platform.PS2
+					&& (Legacy_Settings.s.platform != Legacy_Settings.Platform.DC || Legacy_Settings.s.mode == Legacy_Settings.Mode.Rayman2DCDevBuild_1999_11_22)) {
                     reader.ReadUInt32(); // 0
                     reader.ReadUInt32(); // 0
                 }

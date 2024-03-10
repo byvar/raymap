@@ -246,10 +246,10 @@ namespace Raymap {
 				}
 			}
 
-			//LogIncorrectReloctaion(context);
+			//LogIncorrectRelocation(context);
 		}
 
-		public void LogIncorrectReloctaion(Context context) {
+		public void LogIncorrectRelocation(Context context) {
 			foreach (var f in context.MemoryMap.Files) {
 				if (f is SNA_BlockFile bf) {
 					var relocBlock = bf.RelocationBlock;

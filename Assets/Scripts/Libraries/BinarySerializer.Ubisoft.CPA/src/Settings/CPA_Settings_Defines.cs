@@ -535,6 +535,20 @@ namespace BinarySerializer.Ubisoft.CPA {
 				{ PathCapitalizationType.All, PathCapitalization.All }
 			}
 		};
+		public static CPA_Settings R2DCDevBuild_1999_11_22 => new CPA_Settings(EngineVersion.Rayman2, Platform.DC) {
+			EntryActionsCount = 43,
+			StaticListType = LST2_ListType.OptimizedArray,
+			Encryption = Encryption.None,
+			Luminosity = 0.5f,
+			Saturate = true,
+			AITypes = new AI_Types_R2_PC(),
+			COLTypes = new COL_Types_R2(),
+			HasExtraInputData = false,
+			LevelTranslation = LevelTranslation.levelTranslation_r2,
+			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
+				{ PathCapitalizationType.All, PathCapitalization.All }
+			}
+		};
 		public static CPA_Settings R2PS2 => new CPA_Settings(EngineVersion.Rayman2Revolution, Platform.PS2) {
 			EntryActionsCount = 42,
 			StaticListType = LST2_ListType.OptimizedArray,
@@ -935,6 +949,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				CPA_GameMode.Rayman2PCDemo_1999_08_18 => R2PCDemo1,
 				CPA_GameMode.Rayman2PCDemo_1999_09_04 => R2PCDemo2,
 				CPA_GameMode.Rayman2DC => R2DC,
+				CPA_GameMode.Rayman2DCDevBuild_1999_11_22 => R2DCDevBuild_1999_11_22,
 				CPA_GameMode.Rayman2IOS => R2IOS,
 				CPA_GameMode.Rayman2IOSDemo => R2IOS,
 				CPA_GameMode.Rayman2PS1 => R2PS1,

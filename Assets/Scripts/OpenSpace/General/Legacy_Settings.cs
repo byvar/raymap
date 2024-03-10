@@ -48,6 +48,7 @@ namespace OpenSpace {
 			Rayman2PCDemo_1999_08_18,
 			Rayman2PCDemo_1999_09_04,
 			Rayman2DC,
+			Rayman2DCDevBuild_1999_11_22,
 			Rayman2IOS,
 			Rayman2IOSDemo,
 			Rayman2PS1,
@@ -766,6 +767,23 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.All }
 			}
         };
+		public static Legacy_Settings R2DCDevBuild_1999_11_22 => new Legacy_Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.R2,
+			platform = Platform.DC,
+			endian = Endian.Little,
+			numEntryActions = 43,
+			linkedListType = LinkedListType.Minimize,
+			encryption = Encryption.None,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			hasExtraInputData = false,
+			levelTranslation = LevelTranslation.levelTranslation_r2,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.All }
+			}
+		};
 		public static Legacy_Settings R2PS2 => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2Revolution,
@@ -1224,6 +1242,7 @@ namespace OpenSpace {
 			{ Mode.Rayman2PCDemo_1999_08_18, R2PCDemo1 },
 			{ Mode.Rayman2PCDemo_1999_09_04, R2PCDemo2 },
 			{ Mode.Rayman2DC, R2DC },
+			{ Mode.Rayman2DCDevBuild_1999_11_22, R2DCDevBuild_1999_11_22 },
 			{ Mode.Rayman2IOS, R2IOS },
 			{ Mode.Rayman2IOSDemo, R2IOS },
 			{ Mode.Rayman2PS1, R2PS1 },
