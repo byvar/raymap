@@ -94,6 +94,7 @@ namespace OpenSpace {
 			DonaldDuckN64,
 			DonaldDuckPS1,
 			DonaldDuckPKGC,
+			DonaldDuckPKPS2,
 			PlaymobilHypePC,
 			PlaymobilLauraPC,
 			PlaymobilLauraPCPentiumIII,
@@ -1173,6 +1174,24 @@ namespace OpenSpace {
 			},
 		};
 
+		public static Legacy_Settings DDPKPS2 => new Legacy_Settings() {
+			engineVersion = EngineVersion.R3,
+			game = Game.DDPK,
+			platform = Platform.PS2,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Minimize,
+			hasDeformations = true,
+			aiTypes = AITypes.R3,
+			textureAnimationSpeedModifier = -10f,
+			luminosity = 0.1f,
+			saturate = false,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.LevelFile, Caps.None },
+				{ CapsType.Fix, Caps.None },
+				{ CapsType.TextureFile, Caps.Normal },
+			},
+		};
+
 		public static Legacy_Settings DinosaurPC => new Legacy_Settings() {
 			engineVersion = EngineVersion.R3,
 			game = Game.Dinosaur,
@@ -1288,6 +1307,7 @@ namespace OpenSpace {
 			{ Mode.DonaldDuckN64, DDN64 },
 			{ Mode.DonaldDuckPS1, DDPS1 },
 			{ Mode.DonaldDuckPKGC, DDPKGC },
+			{ Mode.DonaldDuckPKPS2, DDPKPS2 },
 			{ Mode.PlaymobilHypePC, PlaymobilHypePC },
 			{ Mode.PlaymobilLauraPC, PlaymobilLauraPC },
 			{ Mode.PlaymobilLauraPCPentiumIII, PlaymobilLauraPC_PentiumIII },

@@ -457,6 +457,13 @@ MonoBehaviour.print(str);
 					Util.ByteArrayToFile(gameDataBinFolder + textureFolder + tbf.headers[i].name.ToLower().Substring(0, tbf.headers[i].name.LastIndexOf('.')) + ".png", tbf.headers[i].texture.EncodeToPNG());
 				}
 			}
+			if (Legacy_Settings.s.mode == Legacy_Settings.Mode.DonaldDuckPKPS2 && exportTextures) {
+				TBF tbf = new TBF(gameDataBinFolder + ConvertCase("TEXTURES.TXC", Legacy_Settings.CapsType.All), hasNames: true);
+				string textureFolder = "textures_txc/";
+				for (int i = 0; i < tbf.headers.Length; i++) {
+					Util.ByteArrayToFile(gameDataBinFolder + textureFolder + tbf.headers[i].name.ToLower().Substring(0, tbf.headers[i].name.LastIndexOf('.')) + ".png", tbf.headers[i].texture.EncodeToPNG());
+				}
+			}
 			if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) {
 				cntPaths = new string[1];
 				cntPaths[0] = gameDataBinFolder + "Vignette.cnt";

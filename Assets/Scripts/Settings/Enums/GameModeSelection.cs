@@ -58,7 +58,8 @@
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_U64Manager), "Donald Duck: Quack Attack (N64)")] DonaldDuckN64,
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_PS1Manager), "Donald Duck: Quack Attack (PS1)")] DonaldDuckPS1,
         [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: PK (GC)")] DonaldDuckPKGC,
-        [GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Disney's Dinosaur (PC)")] DinosaurPC,
+		[GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Donald Duck: PK (PS2)")] DonaldDuckPKPS2,
+		[GameMode(EngineCategory.CPA_Disney, typeof(LegacyGameManager), "Disney's Dinosaur (PC)")] DinosaurPC,
         [GameMode(EngineCategory.CPA_Disney, typeof(CPA_PS1Manager), "Jungle Book: Groove Party (PS1)")] JungleBookPS1,
 
         [GameMode(EngineCategory.CPA_Playmobil, typeof(CPA_Montreal_Manager), "Playmobil: Hype (PC)")] PlaymobilHypePC,

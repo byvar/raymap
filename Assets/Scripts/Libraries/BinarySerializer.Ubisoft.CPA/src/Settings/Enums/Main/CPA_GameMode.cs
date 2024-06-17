@@ -55,6 +55,7 @@
 		DonaldDuckN64,
 		DonaldDuckPS1,
 		DonaldDuckPKGC,
+		DonaldDuckPKPS2,
 		DinosaurPC,
 		LargoWinchPC,
 		JungleBookPS1,

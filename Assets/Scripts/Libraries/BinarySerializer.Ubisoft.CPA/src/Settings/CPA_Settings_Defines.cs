@@ -870,6 +870,20 @@ namespace BinarySerializer.Ubisoft.CPA {
 				{ PathCapitalizationType.TextureFile, PathCapitalization.Normal },
 			},
 		};
+		public static CPA_Settings DDPKPS2 => new CPA_Settings(EngineVersion.DonaldDuckPK, Platform.PS2) {
+			StaticListType = LST2_ListType.OptimizedArray,
+			HasDeformations = true,
+			AITypes = new AI_Types_R3_PS2(),
+			COLTypes = new COL_Types_R2(),
+			TextureAnimationSpeedModifier = -10f,
+			Luminosity = 0.1f,
+			Saturate = false,
+			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
+				{ PathCapitalizationType.LevelFile, PathCapitalization.None },
+				{ PathCapitalizationType.Fix, PathCapitalization.None },
+				{ PathCapitalizationType.TextureFile, PathCapitalization.Normal },
+			},
+		};
 
 		public static CPA_Settings DinosaurPC => new CPA_Settings(EngineVersion.Dinosaur, Platform.PC) {
 			StaticListType = LST2_ListType.DoubleLinked,
@@ -995,6 +1009,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				CPA_GameMode.DonaldDuckN64 => DDN64,
 				CPA_GameMode.DonaldDuckPS1 => DDPS1,
 				CPA_GameMode.DonaldDuckPKGC => DDPKGC,
+				CPA_GameMode.DonaldDuckPKPS2 => DDPKPS2,
 				CPA_GameMode.PlaymobilHypePC => PlaymobilHypePC,
 				CPA_GameMode.PlaymobilLauraPC => PlaymobilLauraPC,
 				CPA_GameMode.PlaymobilLauraPCPentiumIII => PlaymobilLauraPC_PentiumIII,

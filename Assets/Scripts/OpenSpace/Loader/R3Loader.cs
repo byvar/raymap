@@ -189,6 +189,8 @@ namespace OpenSpace.Loader {
 							ExportR3PS2Textures();
 						} else if (Legacy_Settings.s.game == Legacy_Settings.Game.RM || Legacy_Settings.s.game == Legacy_Settings.Game.RA) {
 							ExportRAPS2Textures();
+						} else if (Legacy_Settings.s.game == Legacy_Settings.Game.DDPK) {
+							ExportDDPKPS2Textures();
 						}
 					}
 
@@ -293,6 +295,24 @@ namespace OpenSpace.Loader {
 			ExportVIG("LOADING", "SCR", 512, 512);
 			ExportVIG("SONYDEMO", "SCR", 512, 512);
 			ExportVIG("UBISOFT", "SCR", 512, 512);
+			ExportVIG("UBITEX", "SCR", 256, 256);
+		}
+
+		void ExportDDPKPS2Textures() {
+			ExportSingleFileTBF("VIG/RASTFNT", "TXR");
+			ExportVIG("FLAGS1", "SCR", 512, 512);
+			ExportVIG("FLAGS2", "SCR", 512, 512);
+			ExportVIG("LOADING", "SCR", 512, 512);
+			ExportVIG("LOADOFF", "SCR", 512, 512);
+			ExportVIG("PKSTART", "SCR", 512, 512);
+			ExportVIG("UBISOFT", "SCR", 512, 512);
+			ExportVIG("__PKSTXT", "SCR", 256, 256);
+			ExportVIG("D_PKSTXT", "SCR", 256, 256);
+			ExportVIG("E_PKSTXT", "SCR", 256, 256);
+			ExportVIG("F_PKSTXT", "SCR", 256, 256);
+			ExportVIG("I_PKSTXT", "SCR", 256, 256);
+			ExportVIG("S_PKSTXT", "SCR", 256, 256);
+			ExportVIG("LOADON", "SCR", 256, 256);
 			ExportVIG("UBITEX", "SCR", 256, 256);
 		}
 		void ExportSingleFileTBF(string name, string ext) {

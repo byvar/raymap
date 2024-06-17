@@ -189,6 +189,7 @@ namespace Raymap {
 				GameModeSelection.DonaldDuckN64 => Legacy_Settings.Mode.DonaldDuckN64,
 				GameModeSelection.DonaldDuckPS1 => Legacy_Settings.Mode.DonaldDuckPS1,
 				GameModeSelection.DonaldDuckPKGC => Legacy_Settings.Mode.DonaldDuckPKGC,
+				GameModeSelection.DonaldDuckPKPS2 => Legacy_Settings.Mode.DonaldDuckPKPS2,
 				GameModeSelection.PlaymobilHypePC => Legacy_Settings.Mode.PlaymobilHypePC,
 				GameModeSelection.PlaymobilLauraPC => Legacy_Settings.Mode.PlaymobilLauraPC,
 				GameModeSelection.PlaymobilLauraPCPentiumIII => Legacy_Settings.Mode.PlaymobilLauraPCPentiumIII,

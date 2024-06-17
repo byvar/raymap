@@ -70,6 +70,7 @@ namespace Raymap {
 				GameModeSelection.DonaldDuckN64 => CPA_GameMode.DonaldDuckN64,
 				GameModeSelection.DonaldDuckPS1 => CPA_GameMode.DonaldDuckPS1,
 				GameModeSelection.DonaldDuckPKGC => CPA_GameMode.DonaldDuckPKGC,
+				GameModeSelection.DonaldDuckPKPS2 => CPA_GameMode.DonaldDuckPKPS2,
 				GameModeSelection.DinosaurPC => CPA_GameMode.DinosaurPC,
 				GameModeSelection.LargoWinchPC => CPA_GameMode.LargoWinchPC,
 				GameModeSelection.JungleBookPS1 => CPA_GameMode.JungleBookPS1,
