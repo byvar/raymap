@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
+using System;
 
 namespace OpenSpace.Text {
     public class LocalizationStructure : OpenSpaceStruct {
@@ -22,6 +23,9 @@ namespace OpenSpace.Text {
         public TextTable misc;
 
 		protected override void ReadInternal(Reader reader) {
+			Func<Reader, string> ReadString;
+			ReadString = (Reader r) => r.ReadNullDelimitedString();
+			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadJapaneseString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman2DC);
 			MapLoader l = MapLoader.Loader;
 			field0 = reader.ReadUInt32();
 			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
@@ -42,7 +46,7 @@ namespace OpenSpace.Text {
 					for (int j = 0; j < misc.num_entries; j++) {
 						LegacyPointer off_text = LegacyPointer.Read(reader);
 						LegacyPointer.DoAt(ref reader, off_text, () => {
-							misc.entries[j] = reader.ReadNullDelimitedString();
+							misc.entries[j] = ReadString(reader);
 						});
 					}
 				});
@@ -54,7 +58,7 @@ namespace OpenSpace.Text {
 					for (int j = 0; j < languages[0].num_entries; j++) {
 						LegacyPointer off_text = LegacyPointer.Read(reader);
 						LegacyPointer.DoAt(ref reader, off_text, () => {
-							languages[0].entries[j] = reader.ReadNullDelimitedString();
+							languages[0].entries[j] = ReadString(reader);
 						});
 					}
 				});
@@ -84,7 +88,7 @@ namespace OpenSpace.Text {
 							for (int j = 0; j < languages[i].num_entries; j++) {
 								LegacyPointer off_text = LegacyPointer.Read(reader);
 								LegacyPointer.DoAt(ref reader, off_text, () => {
-									languages[i].entries[j] = reader.ReadNullDelimitedString();
+									languages[i].entries[j] = ReadString(reader);
 									//l.print(languages[i].entries[j]);
 								});
 							}
@@ -103,7 +107,7 @@ namespace OpenSpace.Text {
 						for (int j = 0; j < misc.num_entries; j++) {
 							LegacyPointer off_text = LegacyPointer.Read(reader);
 							LegacyPointer.DoAt(ref reader, off_text, () => {
-								misc.entries[j] = reader.ReadNullDelimitedString();
+								misc.entries[j] = ReadString(reader);
 							});
 						}
 					});
@@ -113,19 +117,25 @@ namespace OpenSpace.Text {
 		}
 
         public void ReadLanguageTableDreamcast(Reader reader, int index, ushort num_entries) {
-            languages[index].off_textTable = LegacyPointer.Current(reader);
+			Func<Reader, string> ReadString;
+			ReadString = (Reader r) => r.ReadNullDelimitedString();
+			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadJapaneseString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman2DC);
+			languages[index].off_textTable = LegacyPointer.Current(reader);
             languages[index].num_entries = num_entries;
             languages[index].num_entries_max = num_entries;
             languages[index].entries = new string[num_entries];
             for (int j = 0; j < languages[index].num_entries; j++) {
                 LegacyPointer off_text = LegacyPointer.Read(reader);
                 LegacyPointer.DoAt(ref reader, off_text, () => {
-                    languages[index].entries[j] = reader.ReadNullDelimitedString();
-                });
+                    languages[index].entries[j] = ReadString(reader);
+				});
             }
         }
 
 		public void ReadLanguageTablePS2(Reader reader, int index) {
+			Func<Reader, string> ReadString;
+			ReadString = (Reader r) => r.ReadNullDelimitedString();
+			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadJapaneseString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman2PS2);
 			languages[index].off_textTable = LegacyPointer.Read(reader);
 			languages[index].num_entries_max = reader.ReadUInt16();
 			languages[index].num_entries = reader.ReadUInt16();
@@ -133,7 +143,7 @@ namespace OpenSpace.Text {
 			for (int j = 0; j < languages[index].num_entries; j++) {
 				LegacyPointer off_text = LegacyPointer.Read(reader);
 				LegacyPointer.DoAt(ref reader, off_text, () => {
-					languages[index].entries[j] = reader.ReadNullDelimitedString();
+					languages[index].entries[j] = ReadString(reader);
 				});
 			}
 		}
