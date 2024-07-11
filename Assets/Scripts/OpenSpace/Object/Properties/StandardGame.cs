@@ -4,6 +4,8 @@ using UnityEditor;
 namespace OpenSpace.Object.Properties {
     public class StandardGame {
         public Pointer offset;
+        public ushort ps2_saveid;
+        public ushort ps2_saveid_isFix;
         public uint[] objectTypes = new uint[3];
         public Pointer off_superobject;
 
@@ -110,7 +112,10 @@ namespace OpenSpace.Object.Properties {
 				stdGame.objectTypes[0] = reader.ReadUInt16();
 				stdGame.objectTypes[1] = reader.ReadUInt16();
 				stdGame.objectTypes[2] = reader.ReadUInt16();
-				reader.ReadUInt32();
+                ushort saveId = reader.ReadUInt16();
+                stdGame.ps2_saveid = (ushort)(saveId & 0x1FF);
+                stdGame.ps2_saveid_isFix = (ushort)(saveId >> 9);
+                reader.ReadUInt16();
 				stdGame.off_superobject = Pointer.Read(reader);
 				reader.ReadBytes(0xC);
 				stdGame.platformType = reader.ReadByte();

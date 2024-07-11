@@ -10,6 +10,7 @@ namespace OpenSpace.AI {
 
         public uint offsetInBuffer; // offset in DsgMemBuffer
         public uint typeNumber;
+        public ushort ps2_save;
         public uint saveType;
         public uint initType;
         public uint number;
@@ -40,8 +41,8 @@ namespace OpenSpace.AI {
 				reader.ReadByte();
 			} else if (Settings.s.game == Settings.Game.R2Revolution) {
 				d.offsetInBuffer = reader.ReadUInt16();
-				reader.ReadUInt16();
-				d.typeNumber = reader.ReadByte();
+                d.ps2_save = reader.ReadUInt16();
+                d.typeNumber = reader.ReadByte();
 				d.saveType = reader.ReadByte();
 				d.initType = d.saveType;
 			} else {

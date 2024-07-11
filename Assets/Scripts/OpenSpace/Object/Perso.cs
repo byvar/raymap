@@ -243,6 +243,35 @@ namespace OpenSpace.Object {
                 p.sectInfo = PersoSectorInfo.Read(reader, p.off_sectInfo);
             });
 
+            if (Settings.s.game == Settings.Game.R2Revolution)
+            {
+                bool savesVars = p.brain?.mind?.dsgMem?.dsgVar?.dsgVarInfos?.Any(x => x.ps2_save != 0) == true;
+
+                if (savesVars)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    sb.AppendLine($"Memory card save data {p.stdGame.ps2_saveid} ({(p.stdGame.ps2_saveid_isFix != 0 ? "fix" : "level")})");
+                    sb.AppendLine();
+
+                    for (int i = 0; i < p.brain.mind.dsgMem.dsgVar.dsgVarInfos.Length; i++)
+                    {
+                        DsgVarInfoEntry info = p.brain.mind.dsgMem.dsgVar.dsgVarInfos[i];
+                        DsgVarValue value = p.brain.mind.dsgMem.values[i];
+
+                        if (info.ps2_save != 0)
+                        {
+                            if (value.valueArray != null)
+                                sb.AppendLine($"{value.type}_{i} (Length: {value.arrayLength})");
+                            else
+                                sb.AppendLine($"{value.type}_{i}");
+                        }
+                    }
+
+                    Debug.Log(sb.ToString());
+                }
+            }
+
             return p;
         }
 
