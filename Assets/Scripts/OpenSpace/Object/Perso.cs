@@ -271,6 +271,36 @@ namespace OpenSpace.Object {
                     Debug.Log(sb.ToString());
                 }
             }
+            else if (Settings.s.game == Settings.Game.R2) // Might work for more platforms too
+            {
+                // SAI_ePlayerSaveTableValue|SAI_ePlayerSaveCurrentValue
+                uint type = 0x40 | 0x80;
+                bool savesVars = p.brain?.mind?.dsgMem?.dsgVar?.dsgVarInfos?.Any(x => (x.saveType & type) != 0) == true;
+
+                if (savesVars)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    sb.AppendLine($"Save data {p.namePerso} - {p.nameModel} - {p.nameFamily}");
+                    sb.AppendLine();
+
+                    for (int i = p.brain.mind.dsgMem.dsgVar.dsgVarInfos.Length - 1; i >= 0; i--)
+                    {
+                        DsgVarInfoEntry info = p.brain.mind.dsgMem.dsgVar.dsgVarInfos[i];
+                        DsgVarValue value = p.brain.mind.dsgMem.values[i];
+
+                        if ((info.saveType & type) != 0)
+                        {
+                            if (value.valueArray != null)
+                                sb.AppendLine($"{value.type}_{i} (Length: {value.arrayLength})");
+                            else
+                                sb.AppendLine($"{value.type}_{i}");
+                        }
+                    }
+
+                    Debug.Log(sb.ToString());
+                }
+            }
 
             return p;
         }
