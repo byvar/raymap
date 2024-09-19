@@ -687,6 +687,17 @@
 		[AI_Definition(SCR: "Func_ORB_ButtonSet_GetSeparator")] ORB_ButtonSet_GetSeparator,
 		#endregion
 
+		#region RA PC (Custom names)
+		Placeholder__NetGetUnknown1,
+		Placeholder__NetGetUnknown2,
+		Placeholder__NetGetUnknown3,
+		NetGetServerGameParamInt,
+		Placeholder__NetGetUnknown4,
+		Placeholder__NetGetUnknown5,
+		Placeholder__NetGetUnknown6,
+		Placeholder__NetGetUnknown7,
+		#endregion
+
 		#region Hype PS2 (SCR from PC demo)
 		[AI_Definition(SCR: "Func_GetAngleAroundZToPosition")] GetAngleAroundZToPosition,
 		[AI_Definition(SCR: "Func_CloserWP")] CloserWP,

@@ -17,6 +17,7 @@ public class SuperObjectComponent : MonoBehaviour, IReferenceable {
     public string flagPreview;
 	public string drawFlagsPreview;
     public string spoOffset;
+	public string matrixOffset;
 
     public ReferenceFields References { get => ((IReferenceable)so).References; set => ((IReferenceable)so).References = value; }
 
@@ -26,6 +27,7 @@ public class SuperObjectComponent : MonoBehaviour, IReferenceable {
             this.flagPreview = so.flags.flags.ToString();
 			this.drawFlagsPreview = so.drawFlags.flags.ToString();
             this.spoOffset = so.offset.ToString();
+			this.matrixOffset = so.matrix.offset.ToString();
 
 			if (MapLoader.Loader is OpenSpace.Loader.R3Loader) {
 				// Set mirror flag

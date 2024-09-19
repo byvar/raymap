@@ -102,10 +102,18 @@ namespace OpenSpace.AI {
                                     return prefix + firstChildNode;*/
 
                                 default:
+                                    string cnd = scriptNode.ToString(perso, ts.settings);
+									{
+										var newT = Legacy_Settings.s.newAITypes;
+										if (newT != null) {
+											if (newT.Procedures == null) newT.Init();
+											cnd = newT.GetCondition(param)?.ToString() ?? $"Cond_{param}";
+										}
+									}
                                     if (firstChildNode != null)
-                                        return prefix + scriptNode.ToString(perso, ts.settings) + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
+                                        return prefix + cnd + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                                     else
-                                        return prefix + scriptNode.ToString(perso, ts.settings) + "()";
+                                        return prefix + cnd + "()";
 
 
                             }
@@ -150,6 +158,13 @@ namespace OpenSpace.AI {
 
                                 default:
                                     string func = scriptNode.ToString(perso, ts.settings);
+									{
+										var newT = Legacy_Settings.s.newAITypes;
+										if (newT != null) {
+											if (newT.Procedures == null) newT.Init();
+											func = newT.GetFunction(param)?.ToString() ?? $"Func_{param}";
+										}
+									}
                                     return prefix + func + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ")";
                             }
 
@@ -164,6 +179,13 @@ namespace OpenSpace.AI {
 
                                 default:
                                     string proc = scriptNode.ToString(perso, ts.settings);
+									{
+										var newT = Legacy_Settings.s.newAITypes;
+										if (newT != null) {
+											if (newT.Procedures == null) newT.Init();
+											proc = newT.GetProcedure(param)?.ToString() ?? $"Proc_{param}";
+										}
+									}
                                     return prefix + proc + "(" + string.Join(", ", Array.ConvertAll<Node, String>(this.children.ToArray(), x => x.ToString())) + ");";
 
                             }

@@ -1,4 +1,5 @@
-﻿using OpenSpace.AI;
+﻿using BinarySerializer.Ubisoft.CPA;
+using OpenSpace.AI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -143,6 +144,7 @@ namespace OpenSpace {
         public bool hasLinkedListHeaderPointers = false;
         public bool snaCompression = false;
         public AITypes aiTypes;
+		public AI_Types newAITypes;
         public float textureAnimationSpeedModifier = 1f;
         public float luminosity = 0.5f;
         public bool saturate = true;
@@ -561,6 +563,7 @@ namespace OpenSpace {
             endian = Endian.Little,
             linkedListType = LinkedListType.Double,
             aiTypes = AITypes.R3,
+			newAITypes = new AI_Types_RA_PC(),
             hasDeformations = true,
             textureAnimationSpeedModifier = 10f,
             luminosity = 0.3f,

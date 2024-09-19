@@ -367,6 +367,12 @@
 		[AI_Definition(SCR: "Func_NetIsPlayerConnected")] NetIsPlayerConnected,
 		#endregion
 
+		#region RA PC (Custom name)
+		NetPing1,
+		NetPing2,
+		NetHasInstalledUbiGameService,
+		#endregion
+
 		#region TT:SE PC
 		[AI_Definition(SCR: "Cond_CanIAddObjectInInventory")] CanIAddObjectInInventory,
 		#endregion

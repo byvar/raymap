@@ -1217,6 +1217,21 @@
 		[AI_Definition(SCR: "Proc_ORB_Disc_GenerateSeparators")] ORB_Disc_GenerateSeparators,
 		#endregion
 
+		#region RA PC (custom names)
+		Placeholder__NetDescribeVar1_Unknown,
+		Placeholder__NetDescribeVar2_Unknown1,
+		Placeholder__NetDescribeVar2_Unknown2,
+		Placeholder__NetDescribeVar2_Unknown3,
+		Placeholder__NetDescribeVar2_Unknown4,
+		Placeholder__NetUnknown1_1,
+		Placeholder__NetUnknown1_2,
+		Placeholder__NetUnknown2,
+		Placeholder__NetActionUnknown1,
+		SetServerGameParamInt,
+		Placeholder__NetActionUnknown2,
+		Placeholder__OpenGameService,
+		#endregion
+
 		#region Hype PS2 (SCR from Hype PC)
 		[AI_Definition(SCR: "Proc_ChangeInitPosition")] ChangeInitPosition,
 		[AI_Definition(SCR: "Proc_BecomesSonOfPerso")] BecomesSonOfPerso,
