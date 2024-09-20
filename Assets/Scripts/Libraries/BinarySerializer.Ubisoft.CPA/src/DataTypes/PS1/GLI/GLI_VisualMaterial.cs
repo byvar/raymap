@@ -1,5 +1,5 @@
 ﻿using System;
-using BinarySerializer.PS1;
+using BinarySerializer.PlayStation.PS1;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1 {
 	public class GLI_VisualMaterial : IEquatable<GLI_VisualMaterial> {

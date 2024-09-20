@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BinarySerializer;
-using BinarySerializer.PS1;
+using BinarySerializer.PlayStation.PS1;
 using BinarySerializer.Ubisoft.CPA;
 using BinarySerializer.Ubisoft.CPA.PS1;
 using BinarySerializer.Unity;

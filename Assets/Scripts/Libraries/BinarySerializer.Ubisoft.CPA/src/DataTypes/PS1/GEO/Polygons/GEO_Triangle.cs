@@ -1,4 +1,4 @@
-﻿using BinarySerializer.PS1;
+﻿using BinarySerializer.PlayStation.PS1;
 using System.Linq;
 
 namespace BinarySerializer.Ubisoft.CPA.PS1

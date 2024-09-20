@@ -1,5 +1,5 @@
 ﻿using BinarySerializer;
-using BinarySerializer.PS1;
+using BinarySerializer.PlayStation.PS1;
 using System;
 using System.Linq;
 using BinarySerializer.Unity;
