@@ -16,7 +16,7 @@ namespace BinarySerializer.Ubisoft.CPA.PS1 {
 		public SemiTransparentMode BlendMode {
 			get {
 				if (Texture == null) return SemiTransparentMode.One;
-				int abr = Texture.TSB.ABR;
+				int abr = (int)Texture.TSB.ABR;
 				return (SemiTransparentMode)abr;
 			}
 
