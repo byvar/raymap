@@ -65,9 +65,11 @@ namespace OpenSpace.Waypoints {
             node.off_wayPoint = LegacyPointer.Read(reader);
             if (Legacy_Settings.s.engineVersion != Legacy_Settings.EngineVersion.Montreal) {
                 node.typeOfWP = reader.ReadUInt32();
-                node.typeOfWPInit = reader.ReadUInt32();
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) {
+					node.typeOfWPInit = reader.ReadUInt32();
+				}
             }
-            node.off_arcList = LegacyPointer.Read(reader);
+			node.off_arcList = LegacyPointer.Read(reader);
 
             //MapLoader.Loader.print("ArcList: "+node.off_arcList);
 

@@ -113,7 +113,8 @@ namespace OpenSpace.AI {
             off_scheduleScript = LegacyPointer.Read(reader);
             if (Legacy_Settings.s.platform == Legacy_Settings.Platform.DC || 
                 Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet
-                || Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo) {
+                || Legacy_Settings.s.game == Legacy_Settings.Game.R2Demo
+				|| Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                 reader.ReadUInt32();
             }
             num_scripts = reader.ReadByte();

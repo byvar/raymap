@@ -4,7 +4,8 @@
     /// </summary>
     public enum GameModeSelection {
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "Rayman 2 (PC)")] Rayman2PC,
-        [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "R2 (PC) Demo (1999/08/19)")] Rayman2PCDemo_1999_08_18,
+		[GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "R2 (PC) Beta (1998/07/22)")] Rayman2PCBeta_1998_07_22,
+		[GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "R2 (PC) Demo (1999/08/19)")] Rayman2PCDemo_1999_08_18,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(CPA_SNAManager), "R2 (PC) Demo (1999/09/11)")] Rayman2PCDemo_1999_09_04,
         [GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (DC)")] Rayman2DC,
 		[GameMode(EngineCategory.CPA_Rayman2, typeof(LegacyGameManager), "Rayman 2 (DC) Dev Build (1999/11/22)")] Rayman2DCDevBuild_1999_11_22,

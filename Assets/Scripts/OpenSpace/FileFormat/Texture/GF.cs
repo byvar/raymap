@@ -72,7 +72,7 @@ namespace OpenSpace.FileFormat.Texture {
                 format = 1555;
             } else {
                 format = 8888;
-                if (Legacy_Settings.s.platform != Legacy_Settings.Platform.iOS && Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) format = reader.ReadUInt32();
+                if (Legacy_Settings.s.platform != Legacy_Settings.Platform.iOS && Legacy_Settings.s.game != Legacy_Settings.Game.TTSE && Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) format = reader.ReadUInt32();
             }
 
             width = reader.ReadUInt32();

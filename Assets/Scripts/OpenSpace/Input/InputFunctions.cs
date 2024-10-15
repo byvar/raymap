@@ -344,7 +344,7 @@ namespace OpenSpace.Input {
 
         public static FunctionType GetFunctionType(uint index) {
             try {
-				if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) return functionTypesSE[index];
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) return functionTypesSE[index];
                 if (Legacy_Settings.s.game == Legacy_Settings.Game.TT) return functionTypesTT[index];
                 if (Legacy_Settings.s.game == Legacy_Settings.Game.LargoWinch) return functionTypesLargo[index];
                 if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) return functionTypesRevolution[index];

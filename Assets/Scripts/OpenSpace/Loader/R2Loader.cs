@@ -35,7 +35,7 @@ namespace OpenSpace.Loader {
                 string gameDsbPath = gameDataBinFolder + ConvertCase("Game.dsb", Legacy_Settings.CapsType.DSB);
                 if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
                     gameDsbPath = gameDataBinFolder + ConvertCase("gamedsc.bin", Legacy_Settings.CapsType.DSB);
-                } else if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+                } else if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                     gameDsbPath = gameDataBinFolder + ConvertCase("GAME.DSC", Legacy_Settings.CapsType.DSB);
 				}
 				await PrepareFile(gameDsbPath);
@@ -299,144 +299,146 @@ namespace OpenSpace.Loader {
             print("FIX GPT offset: " + LegacyPointer.Current(reader));
             SNA sna = (SNA)files_array[Mem.Fix];
 
-            if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.TT) {
-                // Tonic Trouble
-                inputStruct = new InputStructure(null);
-                uint stringCount = Legacy_Settings.s.game == Legacy_Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
-                LegacyPointer.Read(reader);
-                LegacyPointer.Read(reader);
-                LegacyPointer.Read(reader);
-                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
-                    for (int i = 0; i < 50; i++) LegacyPointer.Read(reader);
-                } else {
-                    for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
-                }
-                reader.ReadUInt32(); // 0x35
-                if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
-                reader.ReadBytes(0x90);
-                LegacyPointer.Read(reader);
-                reader.ReadUInt32(); // 0x28
-                reader.ReadUInt32(); // 0x1
-                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) LegacyPointer.Read(reader);
-                for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
-                for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
-                reader.ReadUInt32(); // 0x1
-                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
-                    reader.ReadBytes(0xB4);
-                } else {
-                    if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
-                        reader.ReadBytes(0x2CC);
-                    } else { // French version: 598
-                        reader.ReadBytes(0x2C0);
-                    }
-                }
-                reader.ReadBytes(0x1C);
+			if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.TT && Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) {
+				// Tonic Trouble
+				inputStruct = new InputStructure(null);
+				uint stringCount = Legacy_Settings.s.game == Legacy_Settings.Game.TTSE ? 351 : (uint)gameDsb.textFiles.Sum(t => t.strings.Count);
+				LegacyPointer.Read(reader);
+				LegacyPointer.Read(reader);
+				LegacyPointer.Read(reader);
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+					for (int i = 0; i < 50; i++) LegacyPointer.Read(reader);
+				} else {
+					for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
+				}
+				reader.ReadUInt32(); // 0x35
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) reader.ReadBytes(0x80); // contains strings like MouseXPos, input related. first dword of this is a pointer to inputstructure probably
+				reader.ReadBytes(0x90);
+				LegacyPointer.Read(reader);
+				reader.ReadUInt32(); // 0x28
+				reader.ReadUInt32(); // 0x1
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) LegacyPointer.Read(reader);
+				for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
+				for (int i = 0; i < 100; i++) LegacyPointer.Read(reader);
+				reader.ReadUInt32(); // 0x1
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+					reader.ReadBytes(0xB4);
+				} else {
+					if (stringCount != 598) { // English version and probably other versions have 603 strings. It's a hacky way to check which version.
+						reader.ReadBytes(0x2CC);
+					} else { // French version: 598
+						reader.ReadBytes(0x2C0);
+					}
+				}
+				reader.ReadBytes(0x1C);
 
-                // Init strings
-                reader.ReadUInt32(); // 0
-                reader.ReadUInt32(); // 1
-                reader.ReadUInt32(); // ???
-                LegacyPointer.Read(reader);
-                for (int i = 0; i < stringCount; i++) LegacyPointer.Read(reader); // read num_loaded_strings pointers here
-                reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
-                if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) { // There's more but what is even the point in reading all this
-                    reader.ReadUInt32();
-                    LegacyPointer.Read(reader);
-                    reader.ReadBytes(0x14);
-                    LegacyPointer.Read(reader);
-                    LegacyPointer.Read(reader);
-                    LegacyPointer.Read(reader);
-                    LegacyPointer.Read(reader);
-                    LegacyPointer.Read(reader);
-                    LegacyPointer.Read(reader);
-                    LegacyPointer.Read(reader);
-                    LegacyPointer.Read(reader);
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadUInt32(); // 0, so can be pointer too
-                    reader.ReadBytes(0x30);
-                    reader.ReadBytes(0x960);
-                }
-            } else if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
-                uint num_strings = 0;
-                inputStruct = new InputStructure(null);
+				// Init strings
+				reader.ReadUInt32(); // 0
+				reader.ReadUInt32(); // 1
+				reader.ReadUInt32(); // ???
+				LegacyPointer.Read(reader);
+				for (int i = 0; i < stringCount; i++) LegacyPointer.Read(reader); // read num_loaded_strings pointers here
+				reader.ReadBytes(0xC); // dword_51A728. probably a table of some sort: 2 ptrs and a number
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) { // There's more but what is even the point in reading all this
+					reader.ReadUInt32();
+					LegacyPointer.Read(reader);
+					reader.ReadBytes(0x14);
+					LegacyPointer.Read(reader);
+					LegacyPointer.Read(reader);
+					LegacyPointer.Read(reader);
+					LegacyPointer.Read(reader);
+					LegacyPointer.Read(reader);
+					LegacyPointer.Read(reader);
+					LegacyPointer.Read(reader);
+					LegacyPointer.Read(reader);
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadUInt32(); // 0, so can be pointer too
+					reader.ReadBytes(0x30);
+					reader.ReadBytes(0x960);
+				}
+			} else if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
+				uint num_strings = 0;
+				inputStruct = new InputStructure(null);
 
-                // SDA
-                LegacyPointer.DoAt(ref reader, sna.SDA, () => {
-                    print(LegacyPointer.Current(reader));
-                    reader.ReadUInt32();
-                    reader.ReadUInt32(); // same as next
-                    num_strings = reader.ReadUInt32();
-                    uint indexOfTextGlobal = reader.ReadUInt32(); // dword_6EEE78
-                    uint dword_83EC58 = reader.ReadUInt32();
-                    print(num_strings + " - " + LegacyPointer.Current(reader));
-                });
+				// SDA
+				LegacyPointer.DoAt(ref reader, sna.SDA, () => {
+					print(LegacyPointer.Current(reader));
+					reader.ReadUInt32();
+					reader.ReadUInt32(); // same as next
+					num_strings = reader.ReadUInt32();
+					uint indexOfTextGlobal = reader.ReadUInt32(); // dword_6EEE78
+					uint dword_83EC58 = reader.ReadUInt32();
+					print(num_strings + " - " + LegacyPointer.Current(reader));
+				});
 
-                // DLG
-                LegacyPointer.DoAt(ref reader, sna.DLG, () => {
-                    LegacyPointer off_strings = LegacyPointer.Read(reader);
-                    for (int i = 0; i < num_strings; i++) {
-                        LegacyPointer.Read(reader);
-                    }
-                    reader.ReadUInt32();
-                });
+				// DLG
+				LegacyPointer.DoAt(ref reader, sna.DLG, () => {
+					LegacyPointer off_strings = LegacyPointer.Read(reader);
+					for (int i = 0; i < num_strings; i++) {
+						LegacyPointer.Read(reader);
+					}
+					reader.ReadUInt32();
+				});
 
-                // GPT
-                sna.GotoHeader();
-                LegacyPointer.Read(reader);
-                LegacyPointer off_mainLight = LegacyPointer.Read(reader);
-                uint lpPerformanceCount = reader.ReadUInt32();
-                LegacyPointer.Read(reader);
-                LegacyPointer off_defaultMaterial = LegacyPointer.Read(reader);
-                LegacyPointer off_geometricObject1 = LegacyPointer.Read(reader);
-                LegacyPointer off_geometricObject2 = LegacyPointer.Read(reader);
-                LegacyPointer off_geometricObject3 = LegacyPointer.Read(reader);
-                reader.ReadBytes(0x90); // FON_ related
-                reader.ReadBytes(0x3D54); // FON_ related
-                for (int i = 0; i < 100; i++) LegacyPointer.Read(reader); // matrix in stack
-                uint matrixInStack = reader.ReadUInt32(); // number of matrix in stack
-                reader.ReadBytes(0xC);
-                reader.ReadBytes(0x20);
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                LegacyPointer.Read(reader);
-                LegacyPointer.Read(reader);
-                for (int i = 0; i < num_strings; i++) {
-                    LegacyPointer.Read(reader);
-                }
-                LinkedList<int> fontDefinitions = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader));
-                LegacyPointer.Read(reader);
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                reader.ReadUInt32();
-                LegacyPointer off_geometricObject4 = LegacyPointer.Read(reader);
-                LegacyPointer off_geometricObject5 = LegacyPointer.Read(reader);
-                LegacyPointer off_geometricObject6 = LegacyPointer.Read(reader);
-                LegacyPointer off_visualmaterial1 = LegacyPointer.Read(reader);
-                LegacyPointer off_visualmaterial2 = LegacyPointer.Read(reader);
-                for (int i = 0; i < 10; i++) {
-                    LegacyPointer off_texture = LegacyPointer.Read(reader);
-                }
-                LegacyPointer off_visualmaterial3 = LegacyPointer.Read(reader);
-                LegacyPointer off_gamematerial = LegacyPointer.Read(reader);
-                uint geometricElementIndexGlobal = reader.ReadUInt32();
-                LegacyPointer off_texture2 = LegacyPointer.Read(reader);
-                LegacyPointer off_geometricObject7 = LegacyPointer.Read(reader);
-                for (uint i = 0; i < 7; i++) {
-                    LegacyPointer.Read(reader); // Material for stencils. Order: corner, border, center, side, redarrow, bullet, and another one
-                }
-                LegacyPointer dword_5DCB9C = LegacyPointer.Read(reader);
+				// GPT
+				sna.GotoHeader();
+				LegacyPointer.Read(reader);
+				LegacyPointer off_mainLight = LegacyPointer.Read(reader);
+				uint lpPerformanceCount = reader.ReadUInt32();
+				LegacyPointer.Read(reader);
+				LegacyPointer off_defaultMaterial = LegacyPointer.Read(reader);
+				LegacyPointer off_geometricObject1 = LegacyPointer.Read(reader);
+				LegacyPointer off_geometricObject2 = LegacyPointer.Read(reader);
+				LegacyPointer off_geometricObject3 = LegacyPointer.Read(reader);
+				reader.ReadBytes(0x90); // FON_ related
+				reader.ReadBytes(0x3D54); // FON_ related
+				for (int i = 0; i < 100; i++) LegacyPointer.Read(reader); // matrix in stack
+				uint matrixInStack = reader.ReadUInt32(); // number of matrix in stack
+				reader.ReadBytes(0xC);
+				reader.ReadBytes(0x20);
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				LegacyPointer.Read(reader);
+				LegacyPointer.Read(reader);
+				for (int i = 0; i < num_strings; i++) {
+					LegacyPointer.Read(reader);
+				}
+				LinkedList<int> fontDefinitions = LinkedList<int>.ReadHeader(reader, LegacyPointer.Current(reader));
+				LegacyPointer.Read(reader);
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				reader.ReadUInt32();
+				LegacyPointer off_geometricObject4 = LegacyPointer.Read(reader);
+				LegacyPointer off_geometricObject5 = LegacyPointer.Read(reader);
+				LegacyPointer off_geometricObject6 = LegacyPointer.Read(reader);
+				LegacyPointer off_visualmaterial1 = LegacyPointer.Read(reader);
+				LegacyPointer off_visualmaterial2 = LegacyPointer.Read(reader);
+				for (int i = 0; i < 10; i++) {
+					LegacyPointer off_texture = LegacyPointer.Read(reader);
+				}
+				LegacyPointer off_visualmaterial3 = LegacyPointer.Read(reader);
+				LegacyPointer off_gamematerial = LegacyPointer.Read(reader);
+				uint geometricElementIndexGlobal = reader.ReadUInt32();
+				LegacyPointer off_texture2 = LegacyPointer.Read(reader);
+				LegacyPointer off_geometricObject7 = LegacyPointer.Read(reader);
+				for (uint i = 0; i < 7; i++) {
+					LegacyPointer.Read(reader); // Material for stencils. Order: corner, border, center, side, redarrow, bullet, and another one
+				}
+				LegacyPointer dword_5DCB9C = LegacyPointer.Read(reader);
 
-                // Now comes INV_fn_vSnaMultilanguageLoading
+				// Now comes INV_fn_vSnaMultilanguageLoading
 
 
-                print(LegacyPointer.Current(reader));
-            } else {
+				print(LegacyPointer.Current(reader));
+			} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
+				// Nothing
+			} else {
                 LegacyPointer off_identityMatrix = LegacyPointer.Read(reader);
                 reader.ReadBytes(50 * 4);
                 uint matrixInStack = reader.ReadUInt32();
@@ -614,8 +616,10 @@ namespace OpenSpace.Loader {
                 globals.off_actualWorld = LegacyPointer.Read(reader);
                 globals.off_dynamicWorld = LegacyPointer.Read(reader);
                 globals.off_fatherSector = LegacyPointer.Read(reader);
-                uint soundEventIndex = reader.ReadUInt32(); // In Montreal version this is a pointer, also sound event related
-                if (Legacy_Settings.s.game == Legacy_Settings.Game.PlaymobilLaura) {
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) {
+					uint soundEventIndex = reader.ReadUInt32(); // In Montreal version this is a pointer, also sound event related
+				}
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.PlaymobilLaura) {
                     LegacyPointer.Read(reader);
                 }
             }
@@ -623,9 +627,12 @@ namespace OpenSpace.Loader {
             globals.num_always = reader.ReadUInt32();
             globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
             globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
+            if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                 globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
                 globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
+					globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
+				}
             } else {
                 reader.ReadUInt32(); // 0x6F. In Montreal version this is a pointer to a pointer table for always
                 globals.spawnablePersos.FillPointers(reader, globals.spawnablePersos.off_tail, globals.spawnablePersos.offset);
@@ -661,6 +668,9 @@ namespace OpenSpace.Loader {
 
                 FillLinkedListPointers(reader, off_names_last, off_names_header);
                 ReadObjectNamesTable(reader, off_names_first, num_names, i);
+				//if(i == 0)
+				//foreach(var t in objectTypes[i])
+				//	print(t.name);
             }
 
             // Begin of engineStructure
@@ -684,10 +694,12 @@ namespace OpenSpace.Loader {
                     reader.ReadChars(0x104);
                 }
                 string mapName3 = reader.ReadString(0x104);
-                if (Legacy_Settings.s.game == Legacy_Settings.Game.TT) {
-                    reader.ReadBytes(0x47F7); // don't know what this data is
-                } else if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
-                    reader.ReadBytes(0x240F);
+				if (Legacy_Settings.s.game == Legacy_Settings.Game.TT) {
+					reader.ReadBytes(0x47F7); // don't know what this data is
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+					reader.ReadBytes(0x240F);
+				} else if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
+					reader.ReadBytes(0x2E77);
                 } else if (Legacy_Settings.s.game == Legacy_Settings.Game.PlaymobilLaura) {
                     reader.ReadBytes(0x240F); // don't know what this data is
                 } else { // Hype & Alex

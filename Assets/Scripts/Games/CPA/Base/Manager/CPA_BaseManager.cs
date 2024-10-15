@@ -16,6 +16,7 @@ namespace Raymap {
 			return settings.GameModeSelection switch {
 
 				GameModeSelection.Rayman2PC => CPA_GameMode.Rayman2PC,
+				GameModeSelection.Rayman2PCBeta_1998_07_22 => CPA_GameMode.Rayman2PCBeta_1998_07_22,
 				GameModeSelection.Rayman2PCDemo_1999_08_18 => CPA_GameMode.Rayman2PCDemo_1999_08_18,
 				GameModeSelection.Rayman2PCDemo_1999_09_04 => CPA_GameMode.Rayman2PCDemo_1999_09_04,
 				GameModeSelection.Rayman2DC => CPA_GameMode.Rayman2DC,

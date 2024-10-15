@@ -47,7 +47,9 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
                     lr.useWorldSpace = true;
                     WayPointBehaviour tar = manager.waypoints.FirstOrDefault(w => w.nodes.Contains(arc.graphNode));
                     lr.SetPositions(new Vector3[] { transform.position, tar.transform.position });
-                    lr.widthMultiplier = (arc.weight > 0 ? arc.weight : 30f) / 30f;
+                    var divisor = 30f;
+					if(Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) divisor = 1;
+					lr.widthMultiplier = (arc.weight > 0 ? arc.weight : divisor) / divisor;
                     lines.Add(lr);
                     targets.Add(tar);
                     targetPositions.Add(tar.transform.position);

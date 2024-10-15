@@ -48,7 +48,7 @@ namespace OpenSpace.Input {
             //l.print("EntryAction " + offset);
 			l.entryActions.Add(ea);
 
-            if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+            if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                 ea.off_entryAction_next = LegacyPointer.Read(reader);
                 ea.off_entryAction_prev = LegacyPointer.Read(reader);
                 reader.ReadUInt32(); //element.off_entryAction_hdr = Pointer.Read(reader); // hdr pointer doesn't work here
@@ -56,7 +56,7 @@ namespace OpenSpace.Input {
                     (off_element) => {
                         return KeyWord.Read(reader, off_element);
                     },
-                    flags: Legacy_Settings.s.hasLinkedListHeaderPointers ?
+                    flags: (Legacy_Settings.s.hasLinkedListHeaderPointers || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) ?
                             LinkedList.Flags.HasHeaderPointers :
                             LinkedList.Flags.NoPreviousPointersForDouble,
                     type: LinkedList.Type.Default);

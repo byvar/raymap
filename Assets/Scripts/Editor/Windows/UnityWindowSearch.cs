@@ -70,7 +70,7 @@ public class UnityWindowSearch : UnityWindow {
     {
         if (!EditorApplication.isPlaying || Legacy_Settings.s == null) return new List<SearchableString>();
         var results = new List<SearchableString>();
-        return MapLoader.Loader?.searchableStrings.Where(s => s.String.ToLower().Contains(query.ToLower())).ToList() ?? new List<SearchableString>();
+        return MapLoader.Loader?.searchableStrings.Where(s => (s?.String?.ToLower() ?? "").Contains(query.ToLower())).ToList() ?? new List<SearchableString>();
 
     }
 }

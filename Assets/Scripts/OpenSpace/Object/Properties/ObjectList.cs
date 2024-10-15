@@ -83,7 +83,7 @@ namespace OpenSpace.Object.Properties {
         public static ObjectList Read(Reader reader, LegacyPointer offset) {
             MapLoader l = MapLoader.Loader;
             ObjectList ol = new ObjectList(offset);
-            //l.print("ObjectList: " + Pointer.Current(reader));
+            //l.print("ObjectList: " + LegacyPointer.Current(reader));
             if(Legacy_Settings.s.linkedListType != LinkedList.Type.Minimize) ol.off_objList_next = LegacyPointer.Read(reader);
 			if (Legacy_Settings.s.hasLinkedListHeaderPointers) {
                 ol.off_objList_prev = LegacyPointer.Read(reader);
@@ -117,7 +117,7 @@ namespace OpenSpace.Object.Properties {
 						}
 					}
                     // TODO: Figure out what this points to: if(off_po != null && lastvalue == 0) l.print(off_po);
-                    if (/*ol.entries[i].unk0 == 0 || ol.entries[i].unk0 == 4*/ ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.TT) {
+                    if (/*ol.entries[i].unk0 == 0 || ol.entries[i].unk0 == 4*/ ol.entries[i].lastvalue != 0 || ol.entries[i].thirdvalue != 0 || (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.TT && Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta)) {
                         ol.entries[i].po = null;
                         ol.entries[i].scale = null;
                         LegacyPointer.DoAt(ref reader, ol.entries[i].off_scale, () => {

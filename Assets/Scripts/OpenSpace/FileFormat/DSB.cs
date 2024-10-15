@@ -1,6 +1,7 @@
 ﻿using BinarySerializer.Unity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -82,7 +83,7 @@ namespace OpenSpace.FileFormat {
         public void ReadAllSections() {
             reader.BaseStream.Seek(0, SeekOrigin.Begin);
             if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.TT) {
-                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+                if (Legacy_Settings.s.game == Legacy_Settings.Game.TTSE || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                     ReadAllAsText();
                 } else {
                     ReadMemoryDesc();
@@ -130,7 +131,7 @@ namespace OpenSpace.FileFormat {
 
                 string methodPattern = @"(?<method>.+?)\((?<value>.+?)\)";
                 Match methodMatch = Regex.Match(line, methodPattern, RegexOptions.IgnoreCase);
-                if (methodMatch.Success) {
+				if (methodMatch.Success) {
                     string method = methodMatch.Groups["method"].Value.Trim();
                     string value = methodMatch.Groups["value"].Value;
                     Match stringValueMatch = Regex.Match(value, @"""(?<value>.+?)""", RegexOptions.IgnoreCase);

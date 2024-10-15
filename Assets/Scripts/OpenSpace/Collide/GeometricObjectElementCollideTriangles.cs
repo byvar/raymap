@@ -161,7 +161,7 @@ namespace OpenSpace.Collide {
 					if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
 						reader.ReadUInt32();
 					}
-					if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) {
+					if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE && Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) {
 						LegacyPointer.Read(reader); // table of num_unk vertex indices (vertices, because max = num_vertices - 1)
 						reader.ReadUInt16(); // num_unk
 						sm.ind_parallelBox = reader.ReadInt16();

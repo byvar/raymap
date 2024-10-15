@@ -13,7 +13,7 @@ namespace OpenSpace {
 
         public SearchableString(string String, GameObject RelatedGameObject, string LocationString)
         {
-            this.String = String;
+            this.String = String ?? "";
             this.RelatedGameObject = RelatedGameObject;
             this.LocationString = LocationString;
         }

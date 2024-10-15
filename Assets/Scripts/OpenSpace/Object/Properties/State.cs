@@ -127,7 +127,7 @@ namespace OpenSpace.Object.Properties {
 			LegacyPointer.DoAt(ref reader, s.off_cine_name, () => {
 				s.cine_name = reader.ReadNullDelimitedString();
 			});
-            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal || Legacy_Settings.s.game == Legacy_Settings.Game.TTSE) {
+            if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal || Legacy_Settings.s.game == Legacy_Settings.Game.TTSE || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                 s.anim_refMontreal = l.FromOffsetOrRead<AnimationMontreal>(reader, s.off_anim_ref);
             } else {
                 s.anim_ref = l.FromOffsetOrRead<AnimationReference>(reader, s.off_anim_ref);

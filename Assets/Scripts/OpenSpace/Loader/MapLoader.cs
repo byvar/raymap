@@ -964,7 +964,7 @@ MonoBehaviour.print(str);
 					textures[i].Texture = tex;
 					texturesSeenFile[file_texture]++;
 				}
-			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS || Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet) {
+			} else if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS || Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                 // Load textures from separate GF files
                 for (uint i = num_textures_fix; i < num_textures_total; i++) {
 					if (textures[i] == null) continue;

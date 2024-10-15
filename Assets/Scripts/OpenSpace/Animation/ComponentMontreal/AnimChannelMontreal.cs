@@ -25,10 +25,12 @@ namespace OpenSpace.Animation.ComponentMontreal {
 			objectIndex = reader.ReadByte();
 			unk1 = reader.ReadByte();
 			unk2 = reader.ReadInt16();
-			unk3 = reader.ReadInt16();
-			unkByte1 = reader.ReadByte();
-			unkByte2 = reader.ReadByte();
-			unkUint = reader.ReadUInt32();
+			if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) {
+				unk3 = reader.ReadInt16();
+				unkByte1 = reader.ReadByte();
+				unkByte2 = reader.ReadByte();
+				unkUint = reader.ReadUInt32();
+			}
 
 			// Read compressed matrix
 			if (isIdentity != 1 && isIdentity != 0) {

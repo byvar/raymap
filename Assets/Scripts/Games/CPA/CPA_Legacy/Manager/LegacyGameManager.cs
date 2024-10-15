@@ -140,6 +140,7 @@ namespace Raymap {
 			var raymapMode = settings.GameModeSelection;
 			Legacy_Settings.Mode legacyMode = raymapMode switch {
 				GameModeSelection.Rayman2PC => Legacy_Settings.Mode.Rayman2PC,
+				GameModeSelection.Rayman2PCBeta_1998_07_22 => Legacy_Settings.Mode.Rayman2PCBeta_1998_07_22,
 				GameModeSelection.Rayman2PCDemo_1999_08_18 => Legacy_Settings.Mode.Rayman2PCDemo_1999_08_18,
 				GameModeSelection.Rayman2PCDemo_1999_09_04 => Legacy_Settings.Mode.Rayman2PCDemo_1999_09_04,
 				GameModeSelection.Rayman2DC => Legacy_Settings.Mode.Rayman2DC,

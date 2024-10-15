@@ -26,7 +26,7 @@ namespace OpenSpace.AI {
             off_behaviors_normal = LegacyPointer.Read(reader);
             off_behaviors_reflex = LegacyPointer.Read(reader);
             off_dsgVar = LegacyPointer.Read(reader);
-            if (Legacy_Settings.s.engineVersion >= Legacy_Settings.EngineVersion.R2) {
+            if (Legacy_Settings.s.engineVersion >= Legacy_Settings.EngineVersion.R2 ||Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                 off_macros = LegacyPointer.Read(reader);
                 flags = reader.ReadUInt32();
             }

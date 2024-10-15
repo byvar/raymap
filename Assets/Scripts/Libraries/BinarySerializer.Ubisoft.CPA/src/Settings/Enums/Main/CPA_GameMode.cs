@@ -1,6 +1,7 @@
 ﻿namespace BinarySerializer.Ubisoft.CPA {
 	public enum CPA_GameMode {
 		Rayman2PC,
+		Rayman2PCBeta_1998_07_22,
 		Rayman2PCDemo_1999_08_18,
 		Rayman2PCDemo_1999_09_04,
 		Rayman2DC,

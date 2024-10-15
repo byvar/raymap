@@ -491,6 +491,21 @@ namespace BinarySerializer.Ubisoft.CPA {
 				{ "localizationStructure", 0x00500260 }
 			}
 		};
+		public static CPA_Settings R2PCBeta_1998_07_22 => new CPA_Settings(EngineVersion.Rayman2Demo, Platform.PC) {
+			StaticListType = LST2_ListType.SingleLinked,
+			Encryption = Encryption.ReadInit,
+			Luminosity = 0.5f,
+			Saturate = true,
+			AITypes = new AI_Types_R2_PC_Demo1(),
+			COLTypes = new COL_Types_R2(),
+			SNATypes = new SNA_Types_R2_Demo(),
+			EntryActionsCount = 1,
+			IsPressDemo = true,
+			PathCapitalization = new Dictionary<PathCapitalizationType, PathCapitalization>() {
+				{ PathCapitalizationType.FixRelocation, PathCapitalization.AllExceptExtension },
+				{ PathCapitalizationType.LevelRelocation, PathCapitalization.AllExceptExtension },
+			}
+		};
 		public static CPA_Settings R2PCDemo1 => new CPA_Settings(EngineVersion.Rayman2Demo, Platform.PC) {
 			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
@@ -960,6 +975,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public static CPA_Settings GetSettings(CPA_GameMode mode) {
 			CPA_Settings settings = mode switch {
 				CPA_GameMode.Rayman2PC => R2PC,
+				CPA_GameMode.Rayman2PCBeta_1998_07_22 => R2PCBeta_1998_07_22,
 				CPA_GameMode.Rayman2PCDemo_1999_08_18 => R2PCDemo1,
 				CPA_GameMode.Rayman2PCDemo_1999_09_04 => R2PCDemo2,
 				CPA_GameMode.Rayman2DC => R2DC,

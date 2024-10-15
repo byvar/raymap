@@ -832,7 +832,7 @@ namespace OpenSpace.Visual {
 				} else if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal) {
 					reader.ReadUInt32();
 				}
-				if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE) {
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.TTSE && Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) {
 					sm.off_vertex_indices = LegacyPointer.Read(reader);
 					sm.num_vertex_indices = reader.ReadUInt16();
 					sm.parallelBox = reader.ReadUInt16();

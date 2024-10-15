@@ -542,7 +542,9 @@ namespace OpenSpace.FileFormat {
                     for (uint i = 0; i < pf.size / 4; i++) {
                         uint ptrValue = reader.ReadUInt32();
                         RelocationPointerInfo info = null;
-                        if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal ||Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet) {
+                        if (Legacy_Settings.s.engineVersion == Legacy_Settings.EngineVersion.Montreal 
+							||Legacy_Settings.s.game == Legacy_Settings.Game.RedPlanet
+							|| Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
                             foreach (RelocationPointerInfo info_new in ptrList.pointers) {
                                 if (info_new.offsetInMemory == ptrValue) {
                                     info = info_new;

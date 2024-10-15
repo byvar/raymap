@@ -46,6 +46,7 @@ namespace OpenSpace {
         #region Enums
         public enum Mode {
 			Rayman2PC,
+			Rayman2PCBeta_1998_07_22,
 			Rayman2PCDemo_1999_08_18,
 			Rayman2PCDemo_1999_09_04,
 			Rayman2DC,
@@ -112,7 +113,7 @@ namespace OpenSpace {
             R2 = 2,
             R3 = 3
         };
-        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch, JungleBook, VIP, RedPlanet };
+        public enum Game { R3, RA, RM, RRush, R2, TT, TTSE, R2Beta, R2Demo, R2Revolution, DD, DDPK, PlaymobilHype, PlaymobilLaura, PlaymobilAlex, RRR, Dinosaur, LargoWinch, JungleBook, VIP, RedPlanet };
         public enum Platform { PC, MacOS, iOS, GC, DC, PS1, PS2, PS3, Xbox, Xbox360, DS, _3DS, N64 };
         public enum Endian { Little, Big };
         public enum Encryption { None, ReadInit, FixedInit, CalculateInit, Window, RedPlanet };
@@ -722,7 +723,24 @@ namespace OpenSpace {
                 { "localizationStructure", 0x00500260 }
             }
         };
-        public static Legacy_Settings R2PCDemo1 => new Legacy_Settings() {
+		public static Legacy_Settings R2PCBeta_1998_07_22 => new Legacy_Settings() {
+			engineVersion = EngineVersion.TT,
+			game = Game.R2Beta,
+			platform = Platform.PC,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Double,
+			encryption = Encryption.None,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2Beta,
+			numEntryActions = 1,
+			caps = new Dictionary<CapsType, Caps>() {
+				{ CapsType.All, Caps.AllExceptExtension },
+				{ CapsType.FixRelocation, Caps.AllExceptExtension },
+				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
+			}
+		};
+		public static Legacy_Settings R2PCDemo1 => new Legacy_Settings() {
             engineVersion = EngineVersion.R2,
             game = Game.R2Demo,
             platform = Platform.PC,
@@ -1261,6 +1279,7 @@ namespace OpenSpace {
 
 		public static Dictionary<Mode, Legacy_Settings> settingsDict = new Dictionary<Mode, Legacy_Settings>() {
 			{ Mode.Rayman2PC, R2PC },
+			{ Mode.Rayman2PCBeta_1998_07_22, R2PCBeta_1998_07_22 },
 			{ Mode.Rayman2PCDemo_1999_08_18, R2PCDemo1 },
 			{ Mode.Rayman2PCDemo_1999_09_04, R2PCDemo2 },
 			{ Mode.Rayman2DC, R2DC },
