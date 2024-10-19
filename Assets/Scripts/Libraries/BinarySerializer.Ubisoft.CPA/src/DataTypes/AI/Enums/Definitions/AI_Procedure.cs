@@ -1726,5 +1726,9 @@
 		Placeholder__R3GCOnly__LastProcs_7,
 		Placeholder__R3GCOnly__LastProcs_8,
 		#endregion
+
+		#region R2 Beta
+		[AI_Definition(SCR: "Proc_AcceptPersoZoom")] AcceptPersoZoom,
+		#endregion
 	}
 }

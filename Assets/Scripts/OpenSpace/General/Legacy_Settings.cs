@@ -733,6 +733,7 @@ namespace OpenSpace {
 			luminosity = 0.5f,
 			saturate = true,
 			aiTypes = AITypes.R2Beta,
+			newAITypes = new AI_Types_R2_PC_Beta_1998_07_22(),
 			numEntryActions = 1,
 			caps = new Dictionary<CapsType, Caps>() {
 				{ CapsType.All, Caps.AllExceptExtension },

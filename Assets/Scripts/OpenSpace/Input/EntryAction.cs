@@ -34,7 +34,7 @@ namespace OpenSpace.Input {
         {
             get
             {
-                return (name != null && name != "") ? name : "EntryAction_" + this.offset.offset;
+                return (name != null && name != "") ? name : $"EntryAction_{this.offset.offset:X8}";
             }
         }
 
