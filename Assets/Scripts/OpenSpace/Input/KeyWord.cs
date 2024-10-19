@@ -256,7 +256,7 @@ namespace OpenSpace.Input {
 				case InputFunctions.FunctionType.ActionJustInvalidated:
 					subkeywords = new KeyWord[1];
 					subkeywords[0] = keywords[thisIndex + keywordsRead];
-					if (subkeywords[0] != null && Legacy_Settings.s.game == Legacy_Settings.Game.TT) {
+					if (subkeywords[0] != null && (Legacy_Settings.s.game == Legacy_Settings.Game.TT || Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta)) {
 						EntryAction.FromOffsetOrRead(subkeywords[0].valueAsPointer, reader);
 					}
 					keywordsRead += 1;
@@ -329,8 +329,10 @@ namespace OpenSpace.Input {
 					case InputFunctions.FunctionType.ActionJustValidated:
 					case InputFunctions.FunctionType.ActionJustInvalidated:
 						LegacyPointer off_action = subkeywords[0].valueAsPointer;
-						if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) return FunctionType + "()";
 						EntryAction action = EntryAction.FromOffset(off_action);
+						if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) {
+							return FunctionType + "{" + (action != null ? action.ExportName : "null") + "}";
+						}
 						return FunctionType + "{" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + "}";
 					default:
                         return FunctionType.ToString() + "()";
