@@ -258,8 +258,12 @@ public class WayPointBehaviour : MonoBehaviour, IReferenceable {
     }*/
     public void SaveChanges(Writer writer)
     {
-        LegacyPointer.Goto(ref writer, wp.offset);
-        writer.Write(transform.position.x);
+		if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) {
+			LegacyPointer.Goto(ref writer, wp.offset + 4);
+		} else {
+			LegacyPointer.Goto(ref writer, wp.offset);
+		}
+		writer.Write(transform.position.x);
         writer.Write(transform.position.z);
         writer.Write(transform.position.y);
     }

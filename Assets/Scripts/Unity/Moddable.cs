@@ -33,15 +33,12 @@ public class Moddable : MonoBehaviour {
             }
             mat.Write(writer);
         }
-
         if (persoBehaviour!=null && persoBehaviour.perso!=null) {
             persoBehaviour.perso.Write(writer);
         }
-
         if (mindComponent!=null) {
             mindComponent.Write(writer);
         }
-
         if (dsgVarComponent!=null) {
             dsgVarComponent.Write(writer);
         }

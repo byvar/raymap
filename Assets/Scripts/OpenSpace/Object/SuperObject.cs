@@ -181,6 +181,9 @@ namespace OpenSpace.Object {
             LegacyPointer off_boundingVolume = LegacyPointer.Read(reader);
             //l.print("SuperObject T" + so.typeCode + ": " + off_so + " - " + so.off_matrix);
 
+			if(Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta && so.typeCode == 11)
+				return so;
+
             LegacyPointer.DoAt(ref reader, so.off_matrix, () => {
                 so.matrix = Matrix.Read(reader, so.off_matrix);
             });
@@ -303,6 +306,8 @@ namespace OpenSpace.Object {
                     case 0x0: type = Type.World; break;
                     case 0x4: type = Type.Perso; break;
                     case 0x8: type = Type.Sector; break;
+					case 10: type = Type.GeometricObject; break;
+					case 11: type = Type.PhysicalObject; break;
                     case 0xD: type = Type.IPO; break;
                     case 0x15: type = Type.IPO_2; break;
                 }

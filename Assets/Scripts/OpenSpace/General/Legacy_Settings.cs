@@ -739,6 +739,22 @@ namespace OpenSpace {
 				{ CapsType.All, Caps.AllExceptExtension },
 				{ CapsType.FixRelocation, Caps.AllExceptExtension },
 				{ CapsType.LevelRelocation, Caps.AllExceptExtension },
+			},
+			hasMemorySupport = true,
+			memoryAddresses = new Dictionary<string, uint> {
+				{ "actualWorld", 0x006712B4 },
+				{ "dynamicWorld", 0x0066AD74 },
+				//{ "inactiveDynamicWorld", 0x00500FC4 },
+				{ "fatherSector", 0x0066AC40 },
+				//{ "firstSubmapPosition", 0x004FF760 },
+				{ "always", 0x005E8B50 },
+				{ "engineStructure", 0x006671A0 },
+				{ "families", 0x0066A434 },
+				{ "objectTypes", 0x006A1460 },
+				{ "textures", 0x00774720 },
+				{ "textureMemoryChannels", 0x00753700 },
+				//{ "inputStructure", 0x00509E60 },
+				//{ "localizationStructure", 0x00500260 }
 			}
 		};
 		public static Legacy_Settings R2PCDemo1 => new Legacy_Settings() {

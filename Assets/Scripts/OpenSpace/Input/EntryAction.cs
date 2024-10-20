@@ -62,7 +62,9 @@ namespace OpenSpace.Input {
                     type: LinkedList.Type.Default);
                 ea.off_name = LegacyPointer.Read(reader);
                 reader.ReadInt32(); // -2
-                reader.ReadUInt32();
+				if (Legacy_Settings.s.game != Legacy_Settings.Game.R2Beta) {
+					reader.ReadUInt32();
+				}
                 reader.ReadByte();
                 ea.active = reader.ReadByte();
                 reader.ReadBytes(2);

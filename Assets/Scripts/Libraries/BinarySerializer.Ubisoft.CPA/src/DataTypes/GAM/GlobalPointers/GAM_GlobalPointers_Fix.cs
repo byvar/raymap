@@ -17,7 +17,7 @@
 		public override void SerializeImpl(SerializerObject s) {
 			if (s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.CPA_2)) {
 				IdentityMatrix = s.SerializePointer<MAT_Transformation>(IdentityMatrix, name: nameof(IdentityMatrix))?.ResolveObject(s);
-				MatrixStack = s.SerializePointerArray<MAT_Transformation>(MatrixStack, 50, name: nameof(MatrixStack))?.ResolveObject(s);
+				MatrixStack = s.SerializePointerArray<MAT_Transformation>(MatrixStack, MaxMatrixInStack, name: nameof(MatrixStack))?.ResolveObject(s);
 				MatrixCountInStack = s.Serialize<uint>(MatrixCountInStack, name: nameof(MatrixCountInStack));
 				CollisionGeometricObject = s.SerializePointer<COL_CollideObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject))?.ResolveObject(s);
 				StaticCollisionGeometricObject = s.SerializePointer<COL_CollideObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject))?.ResolveObject(s);
@@ -32,11 +32,29 @@
 				if (!s.GetCPASettings().EngineVersionTree.HasParent(EngineVersion.Rayman2)) {
 					DemoGMTList = s.SerializePointer<GAM_DemoGMTList>(DemoGMTList, name: nameof(DemoGMTList))?.ResolveObject(s);
 				}
+			} else if (s.GetCPASettings().EngineVersion == EngineVersion.Rayman2Beta_19980722) {
+				IdentityMatrix = s.SerializePointer<MAT_Transformation>(IdentityMatrix, name: nameof(IdentityMatrix))?.ResolveObject(s);
+				MatrixStack = s.SerializePointerArray<MAT_Transformation>(MatrixStack, MaxMatrixInStack, name: nameof(MatrixStack))?.ResolveObject(s);
+				MatrixCountInStack = s.Serialize<uint>(MatrixCountInStack, name: nameof(MatrixCountInStack));
+				CollisionGeometricObject = s.SerializePointer<COL_CollideObject>(CollisionGeometricObject, name: nameof(CollisionGeometricObject))?.ResolveObject(s);
+				StaticCollisionGeometricObject = s.SerializePointer<COL_CollideObject>(StaticCollisionGeometricObject, name: nameof(StaticCollisionGeometricObject))?.ResolveObject(s);
 			}
 		}
 
 		public void ResolveFixLevelReferences(SerializerObject s) {
 			LastAlwaysInFix?.ResolveObject(s);
+		}
+
+		public int MaxMatrixInStack {
+			get {
+				switch (Context.GetCPASettings().EngineVersion) {
+					case EngineVersion.Rayman2Beta_19980722:
+					case EngineVersion.TonicTroubleSE:
+						return 100;
+					default:
+						return 50;
+				}
+			}
 		}
 	}
 }

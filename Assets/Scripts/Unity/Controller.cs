@@ -1208,6 +1208,7 @@ public class Controller : MonoBehaviour {
 			if (so.off_matrix == null) {
 				continue;
 			}
+			if(Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta && so.typeCode == 11) continue;
 			LegacyPointer.Goto(ref reader, so.off_matrix);
 			so.matrix = Matrix.Read(MapLoader.Loader.livePreviewReader, so.off_matrix);
 			if (so.data != null && so.data.Gao != null) {

@@ -491,12 +491,12 @@ namespace BinarySerializer.Ubisoft.CPA {
 				{ "localizationStructure", 0x00500260 }
 			}
 		};
-		public static CPA_Settings R2PCBeta_1998_07_22 => new CPA_Settings(EngineVersion.Rayman2Demo, Platform.PC) {
+		public static CPA_Settings R2PCBeta_1998_07_22 => new CPA_Settings(EngineVersion.Rayman2Beta_19980722, Platform.PC) {
 			StaticListType = LST2_ListType.SingleLinked,
 			Encryption = Encryption.ReadInit,
 			Luminosity = 0.5f,
 			Saturate = true,
-			AITypes = new AI_Types_R2_PC_Demo1(),
+			AITypes = new AI_Types_R2_PC_Beta_1998_07_22(),
 			COLTypes = new COL_Types_R2(),
 			SNATypes = new SNA_Types_R2_Demo(),
 			EntryActionsCount = 1,

@@ -273,89 +273,141 @@ namespace OpenSpace {
             MemoryFile mem = (MemoryFile)files_array[0];
             if (mem == null || mem.reader == null) throw new NullReferenceException("File not initialized!");
             Reader reader = mem.reader;
+			var memoryAddresses = Legacy_Settings.s.memoryAddresses;
+			if(memoryAddresses == null) throw new NullReferenceException("Memory addresses undefined");
 
-            // Read object names
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["objectTypes"], mem));
-            objectTypes = new ObjectType[3][];
-            for (uint i = 0; i < 3; i++) {
-                LegacyPointer off_names_header = LegacyPointer.Current(reader);
-                LegacyPointer off_names_first = LegacyPointer.Read(reader);
-                LegacyPointer off_names_last = LegacyPointer.Read(reader);
-                uint num_names = reader.ReadUInt32();
+			void ReadAt(string type, Func<Task> act) {
+				if (memoryAddresses.ContainsKey(type)) {
+					LegacyPointer.Goto(ref reader, new LegacyPointer(memoryAddresses[type], mem));
+					act();
+				}
+			}
 
-                ReadObjectNamesTable(reader, off_names_first, num_names, i);
-            }
+			// Read object names
+			ReadAt("objectTypes", async () => {
+				await Task.CompletedTask;
+				objectTypes = new ObjectType[3][];
+				for (uint i = 0; i < 3; i++) {
+					LegacyPointer off_names_header = LegacyPointer.Current(reader);
+					LegacyPointer off_names_first = LegacyPointer.Read(reader);
+					LegacyPointer off_names_last = LegacyPointer.Read(reader);
+					uint num_names = reader.ReadUInt32();
 
-            // Read globals
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["actualWorld"], mem));
-            globals.off_actualWorld = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["dynamicWorld"], mem));
-            globals.off_dynamicWorld = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["inactiveDynamicWorld"], mem));
-            globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["fatherSector"], mem));
-            globals.off_fatherSector = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["firstSubmapPosition"], mem));
-            globals.off_firstSubMapPosition = LegacyPointer.Read(reader);
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["always"], mem));
-            globals.num_always = reader.ReadUInt32();
-            globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
-            globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
-            globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
-            globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["families"], mem));
-            families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
+					ReadObjectNamesTable(reader, off_names_first, num_names, i);
+				}
+			});
 
-            animationBanks = new AnimationBank[2];
+			// Read globals
+			ReadAt("actualWorld", async () => {
+				await Task.CompletedTask;
+				globals.off_actualWorld = LegacyPointer.Read(reader);
+			});
+            ReadAt("dynamicWorld", async () => {
+				await Task.CompletedTask;
+				globals.off_dynamicWorld = LegacyPointer.Read(reader);
+			});
+			ReadAt("inactiveDynamicWorld", async () => {
+				await Task.CompletedTask;
+				globals.off_inactiveDynamicWorld = LegacyPointer.Read(reader);
+			});
+			ReadAt("fatherSector", async () => {
+				await Task.CompletedTask;
+				globals.off_fatherSector = LegacyPointer.Read(reader);
+			});
+			ReadAt("firstSubmapPosition", async () => {
+				await Task.CompletedTask;
+				globals.off_firstSubMapPosition = LegacyPointer.Read(reader);
+			});
+			ReadAt("always", async () => {
+				await Task.CompletedTask;
+				globals.num_always = reader.ReadUInt32();
+				globals.spawnablePersos = LinkedList<Perso>.ReadHeader(reader, LegacyPointer.Current(reader), LinkedList.Type.Double);
+				globals.off_always_reusableSO = LegacyPointer.Read(reader); // There are (num_always) empty SuperObjects starting with this one.
+				globals.off_always_reusableUnknown1 = LegacyPointer.Read(reader); // (num_always) * 0x2c blocks
+				globals.off_always_reusableUnknown2 = LegacyPointer.Read(reader); // (num_always) * 0x4 blocks
+			});
+			ReadAt("families", async () => {
+				await Task.CompletedTask;
+				families = LinkedList<Family>.ReadHeader(reader, LegacyPointer.Current(reader), type: LinkedList.Type.Double);
+			});
+			animationBanks = new AnimationBank[2];
 
-            // Read animations
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["anim_stacks"], mem));
-            if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
-                animationBanks[0] = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 1, null)[0];
-                animationBanks[1] = animationBanks[0];
-            } else {
-                animationBanks = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 5, null);
-            }
+			// Read animations
+			if (Legacy_Settings.s.engineVersion > Legacy_Settings.EngineVersion.Montreal) {
+				ReadAt("anim_stacks", async () => {
+					await Task.CompletedTask;
+					if (Legacy_Settings.s.engineVersion < Legacy_Settings.EngineVersion.R3) {
+						animationBanks[0] = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 1, null)[0];
+						animationBanks[1] = animationBanks[0];
+					} else {
+						animationBanks = AnimationBank.Read(reader, LegacyPointer.Current(reader), 0, 5, null);
+					}
+				});
+			}
 
             // Read textures
             uint[] texMemoryChannels = new uint[1024];
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["textureMemoryChannels"], mem));
-            for (int i = 0; i < 1024; i++) {
-                texMemoryChannels[i] = reader.ReadUInt32();
-            }
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["textures"], mem));
-            List<TextureInfo> textureInfos = new List<TextureInfo>();
-            for (int i = 0; i < 1024; i++) {
-                LegacyPointer off_texture = LegacyPointer.Read(reader);
-                if (off_texture != null && texMemoryChannels[i] != 0xC0DE0005) {
-                    LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_texture);
-                    TextureInfo texInfo = TextureInfo.Read(reader, off_texture);
-                    //texInfo.ReadTextureFromData(reader); // Reading from GL memory doesn't seem to be possible sadly
-                    // texInfo.Texture = Util.CreateDummyTexture();
-                    GF gf = cnt.GetGFByTGAName(texInfo.name);
-                    texInfo.Texture = gf != null ? gf.GetTexture() : null;
-                    textureInfos.Add(texInfo);
-                    LegacyPointer.Goto(ref reader, off_current);
-                }
-            }
-            textures = textureInfos.ToArray();
-            
-            // Parse materials list
-            if (Legacy_Settings.s.memoryAddresses.ContainsKey("visualMaterials") && Legacy_Settings.s.memoryAddresses.ContainsKey("num_visualMaterials")) {
-                LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["num_visualMaterials"], mem));
-                uint num_visual_materials = reader.ReadUInt32();
-                LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["visualMaterials"], mem));
-                LegacyPointer off_visualMaterials = LegacyPointer.Read(reader);
-                if (off_visualMaterials != null) {
-                    LegacyPointer.Goto(ref reader, off_visualMaterials);
-                    for (uint i = 0; i < num_visual_materials; i++) {
-                        LegacyPointer off_material = LegacyPointer.Read(reader);
-                        LegacyPointer off_current_mat = LegacyPointer.Goto(ref reader, off_material);
-                        visualMaterials.Add(VisualMaterial.Read(reader, off_material));
-                        LegacyPointer.Goto(ref reader, off_current_mat);
-                    }
-                }
-            }
+            ReadAt("textureMemoryChannels", async () => {
+				await Task.CompletedTask;
+				for (int i = 0; i < 1024; i++) {
+					texMemoryChannels[i] = reader.ReadUInt32();
+				}
+			});
+			ReadAt("textures", async () => {
+				await Task.CompletedTask;
+				List<TextureInfo> textureInfos = new List<TextureInfo>();
+				for (int i = 0; i < 1024; i++) {
+					LegacyPointer off_texture = LegacyPointer.Read(reader);
+					if (off_texture != null && texMemoryChannels[i] != 0xC0DE0005) {
+						LegacyPointer off_current = LegacyPointer.Goto(ref reader, off_texture);
+						TextureInfo texInfo = TextureInfo.Read(reader, off_texture);
+						//texInfo.ReadTextureFromData(reader); // Reading from GL memory doesn't seem to be possible sadly
+						// texInfo.Texture = Util.CreateDummyTexture();
+						GF gf = null;
+						if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Beta) {
+
+							string texturePath = "World/Graphics/Textures/" + texInfo.name.Substring(0, texInfo.name.LastIndexOf('.')) + ".gf";
+							texturePath = texturePath.Replace('\\', '/');
+							/*if (Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS) {
+								texturePath = texturePath.ToUpper();
+							}*/
+							texturePath = gameDataBinFolder + texturePath;
+							await PrepareFile(texturePath);
+							if (FileSystem.FileExists(texturePath)) {
+								gf = new GF(texturePath);
+							}
+						} else {
+							gf = cnt.GetGFByTGAName(texInfo.name);
+						}
+						if (gf != null) texInfo.Texture = gf.GetTexture();
+						textureInfos.Add(texInfo);
+						LegacyPointer.Goto(ref reader, off_current);
+					}
+				}
+				textures = textureInfos.ToArray();
+			});
+
+			// Parse materials list
+			if (memoryAddresses.ContainsKey("visualMaterials") && memoryAddresses.ContainsKey("num_visualMaterials")) {
+                uint num_visual_materials = 0;
+				ReadAt("num_visualMaterials", async () => {
+					await Task.CompletedTask;
+					num_visual_materials = reader.ReadUInt32();
+				});
+				ReadAt("visualMaterials", async () => {
+					await Task.CompletedTask;
+					LegacyPointer off_visualMaterials = LegacyPointer.Read(reader);
+					if (off_visualMaterials != null) {
+						LegacyPointer.Goto(ref reader, off_visualMaterials);
+						for (uint i = 0; i < num_visual_materials; i++) {
+							LegacyPointer off_material = LegacyPointer.Read(reader);
+							LegacyPointer off_current_mat = LegacyPointer.Goto(ref reader, off_material);
+							visualMaterials.Add(VisualMaterial.Read(reader, off_material));
+							LegacyPointer.Goto(ref reader, off_current_mat);
+						}
+					}
+				});
+			}
 
             /*if (Settings.s.memoryAddresses.ContainsKey("brightness")) {
                 Pointer.Goto(ref reader, new Pointer(Settings.s.memoryAddresses["brightness"], mem));
@@ -363,15 +415,18 @@ namespace OpenSpace {
                 Debug.LogError("BRIGHTNESS IS " + brightness);
             }*/
 
-            LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["inputStructure"], mem));
-            inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
-			foreach (EntryAction ea in inputStruct.entryActions) {
-				print(ea.ToString());
-			}
+            ReadAt("inputStructure", async () => {
+				await Task.CompletedTask;
+				inputStruct = InputStructure.Read(reader, LegacyPointer.Current(reader));
+				foreach (EntryAction ea in inputStruct.entryActions) {
+					print(ea.ToString());
+				}
+			});
 
-			LegacyPointer.Goto(ref reader, new LegacyPointer(Legacy_Settings.s.memoryAddresses["localizationStructure"], mem));
-			localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
-
+			ReadAt("localizationStructure", async () => {
+				await Task.CompletedTask;
+				localization = FromOffsetOrRead<LocalizationStructure>(reader, LegacyPointer.Current(reader), inline: true);
+			});
 			// Parse actual world & always structure
 			ReadFamilies(reader);
 			await ReadSuperObjects(reader);

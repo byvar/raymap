@@ -9,6 +9,7 @@
 				root: new Node(EngineVersion.CPA) {
 					new Node(EngineVersion.CPA_1) {
 						new Node(EngineVersion.TonicTroubleSE) {
+							new Node(EngineVersion.Rayman2Beta_19980722),
 							new Node(EngineVersion.TonicTrouble) {
 								new Node(EngineVersion.CPA_2) {
 									new Node(EngineVersion.Rayman2Demo) {

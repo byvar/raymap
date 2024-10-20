@@ -6,9 +6,10 @@
         CPA_1,
         TonicTrouble,
         TonicTroubleSE,
+		Rayman2Beta_19980722,
 
-        CPA_2,
-        Rayman2,
+		CPA_2,
+		Rayman2,
         Rayman2Demo,
         Rayman2Revolution,
 		LargoWinch,

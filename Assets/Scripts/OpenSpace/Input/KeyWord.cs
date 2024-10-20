@@ -331,7 +331,7 @@ namespace OpenSpace.Input {
 						LegacyPointer off_action = subkeywords[0].valueAsPointer;
 						EntryAction action = EntryAction.FromOffset(off_action);
 						if (Legacy_Settings.s.engineVersion <= Legacy_Settings.EngineVersion.Montreal) {
-							return FunctionType + "{" + (action != null ? action.ExportName : "null") + "}";
+							return FunctionType + "(" + (action != null ? action.ExportName : "null") + ")";
 						}
 						return FunctionType + "{" + (action != null ? ((action.name != null && action.name.Trim() != "") ? ("\"" + action.name + "\"") : action.ToBasicString()) : "null") + "}";
 					default:
