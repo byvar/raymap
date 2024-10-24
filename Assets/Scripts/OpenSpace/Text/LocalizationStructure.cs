@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.Text;
 
 namespace OpenSpace.Text {
     public class LocalizationStructure : OpenSpaceStruct {
@@ -24,8 +25,9 @@ namespace OpenSpace.Text {
 
 		protected override void ReadInternal(Reader reader) {
 			Func<Reader, string> ReadString;
-			ReadString = (Reader r) => r.ReadNullDelimitedString();
-			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadJapaneseString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman2DC);
+			ReadString = (Reader r) => r.ReadNullDelimitedString(encoding: Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS ? Encoding.UTF8 : null);
+			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadSpecialEncodedString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman2DC);
+			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadSpecialEncodedString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman3PC, lang: BinarySerializer.Ubisoft.CPA.VersionLanguage.Hebrew);
 			MapLoader l = MapLoader.Loader;
 			field0 = reader.ReadUInt32();
 			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {

@@ -105,7 +105,7 @@ namespace OpenSpace {
         protected string[] ptrPaths = new string[7];
         protected string[] texPaths = new string[7];
         protected string[] cntPaths = null;
-        protected CNT cnt = null;
+        public CNT cnt = null;
         protected DSB gameDsb = null;
         protected DSB lvlDsb = null;
 		protected Dictionary<string, string> paths = new Dictionary<string, string>();

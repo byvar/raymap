@@ -115,10 +115,46 @@ namespace OpenSpace.Exporter {
                     Util.ByteArrayToFile(filePath, Encoding.UTF8.GetBytes(json));
                 }
             }
-        }
+		}
+		public static void ExportFonts() {
+			MapLoader l = MapLoader.Loader;
+			if (l.fonts?.fontsBitmap != null && l.cnt != null) {
+				Texture2D[] fontTex = new Texture2D[l.fonts.fontsBitmap.Length];
+				for (int i = 0; i < l.fonts.fontsBitmap.Length; i++) {
+					string filePath = $"{l.gameDataBinFolder}/export_fonts/bitmapfonts/{i}.png";
+					var tex = TextureInfo.FromOffset(l.fonts.fontsBitmap[i]);
+					fontTex[i] = tex.Texture;
+					Util.ByteArrayToFile(filePath, fontTex[i].EncodeToPNG());
+				}
+				if(!l.fonts.fontsBitmap.Any()) return;
+				for (int j = 0; j < l.fonts.fonts.Length; j++) {
+					var font = l.fonts.fonts[j];
+					var name = font.name != null ? font.name : $"font_{j}";
+					for (int i = 0; i < font.characters.Length; i++) {
+						var ch = font.characters[i];
+						if(ch.isDefined == 0 || ch.ind_fontBitmap < 0) continue;
+						var ft = fontTex[ch.ind_fontBitmap];
+						string filePath = $"{l.gameDataBinFolder}/export_fonts/{name}/{i:X2}.png";
+						//Debug.Log($"{i} - ({ch.x},{ch.y}) - {ch.width}x{ch.height} - {ch.isDefined}");
+						int w = ch.width;
+						int h = ch.height;
+						w = Math.Min(w, ft.width - ch.x);
+						h = Math.Min(h, ft.height - ch.y);
+						Texture2D tex = new Texture2D(w, h);
+						var pixels = ft.GetPixels(ch.x, ft.height - ch.y - h, w, h);
+						for (int k = 0; k < pixels.Length; k++) {
+							pixels[k] = new Color(1 - pixels[k].r, 1 - pixels[k].g, 1 - pixels[k].b, pixels[k].a);
+						}
+						tex.SetPixels(pixels);
+						tex.Apply();
+						Util.ByteArrayToFile(filePath, tex.EncodeToPNG());
+					}
+				}
+			}
+		}
 
-        // Function used to transfer object names between similar versions
-        public void ExportNames() {
+		// Function used to transfer object names between similar versions
+		public void ExportNames() {
             string filePath = "objectNames_" + loader.lvlName.ToLower() + ".json";
             if (File.Exists(filePath)) {
                 File.Delete(filePath);

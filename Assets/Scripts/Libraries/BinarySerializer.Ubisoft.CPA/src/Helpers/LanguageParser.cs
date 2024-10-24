@@ -8,9 +8,31 @@ using System.Threading.Tasks;
 
 namespace BinarySerializer.Ubisoft.CPA {
     public class LanguageParser {
-		public static string ReadJapaneseString(BinaryReader r, CPA_GameMode mode, bool includeFormat = false) {
+		public static string ReadNullDelimitedString(BinaryReader r, Encoding encoding) {
+			List<byte> bytes = new();
+			byte b = r.ReadByte();
+
+			while (b != 0x0) {
+				bytes.Add(b);
+				b = r.ReadByte();
+			}
+
+			if (bytes.Count > 0) {
+				if (encoding == null)
+					throw new ArgumentNullException(nameof(encoding));
+				return encoding.GetString(bytes.ToArray());
+			}
+
+			return String.Empty;
+		}
+		public static string ReadSpecialEncodedString(BinaryReader r, CPA_GameMode mode, VersionLanguage lang = VersionLanguage.Japanese, bool includeFormat = false) {
 			Encoding wind1252 = Encoding.GetEncoding(1252);
+			Encoding wind1255 = lang == VersionLanguage.Hebrew ? Encoding.GetEncoding(1255) : null;
 			int curObjectTableOffset = 0;
+
+			if (mode == CPA_GameMode.Rayman2IOS) {
+				return ReadNullDelimitedString(r, Encoding.UTF8);
+			}
 
 			bool isEnd = false;
 			StringBuilder build = new StringBuilder();
@@ -42,36 +64,43 @@ namespace BinarySerializer.Ubisoft.CPA {
 				} else if(b == '\0') {
 					isEnd = true;
 				} else {
-					if (mode == CPA_GameMode.Rayman2DC) {
-						if (b < 32) continue;
-						if (b == 32) {
-							build.Append(' ');
-							continue;
-							//b -= 32;
-						} else {
-							b -= 33;
+					if (lang == VersionLanguage.Japanese) {
+						if (mode == CPA_GameMode.Rayman2DC) {
+							if (b < 32) continue;
+							if (b == 32) {
+								build.Append(' ');
+								continue;
+								//b -= 32;
+							} else {
+								b -= 33;
+							}
+							var newStr = JapaneseR2DC[b];
+							if (newStr != null) {
+								build.Append(newStr);
+							} else {
+								build.Append($"[BYTE_{b}_{curObjectTableOffset}]");
+							}
+						} else if (mode == CPA_GameMode.Rayman2PS2) {
+							if (b < 32) continue;
+							int objectTableIndex = b - 32;
+							if (objectTableIndex == 0) {
+								build.Append(' ');
+								continue;
+							}
+							if (curObjectTableOffset == 800)
+								objectTableIndex += curObjectTableOffset;
+							var newStr = JapaneseR2PS2[objectTableIndex];
+							if (newStr != null) {
+								build.Append(newStr);
+							} else {
+								build.Append($"[BYTE_{b}_{curObjectTableOffset}]");
+							}
 						}
-						var newStr = JapaneseR2DC[b];
-						if (newStr != null) {
-							build.Append(newStr);
-						} else {
-							build.Append($"[BYTE_{b}_{curObjectTableOffset}]");
-						}
-					} else if (mode == CPA_GameMode.Rayman2PS2) {
-						if (b < 32) continue;
-						int objectTableIndex = b - 32;
-						if (objectTableIndex == 0) {
-							build.Append(' ');
-							continue;
-						}
-						if (curObjectTableOffset == 800)
-							objectTableIndex += curObjectTableOffset;
-						var newStr = JapaneseR2PS2[objectTableIndex];
-						if (newStr != null) {
-							build.Append(newStr);
-						} else {
-							build.Append($"[BYTE_{b}_{curObjectTableOffset}]");
-						}
+					} else if (lang == VersionLanguage.Hebrew) {
+						if (b < 0xE0)
+							build.Append(wind1252.GetChars(new byte[] { b }));
+						else
+							build.Append(wind1255.GetChars(new byte[] { b }));
 					}
 				}
 			}

@@ -189,6 +189,7 @@ public class Controller : MonoBehaviour {
 
 		if (ExportText) {
 			MapExporter.ExportText();
+			//MapExporter.ExportFonts();
 		}
 
         if (ExportAfterLoad) {
