@@ -36,14 +36,22 @@ namespace OpenSpace.Exporter {
 
             if (ai.behaviors_normal != null) {
                 for (int i = 0; i < ai.behaviors_normal.Length; i++) {
-                    if (ai.behaviors_normal[i].scripts != null) {
+                    if (ai.behaviors_normal[i].scripts != null || ai.behaviors_normal[i].scheduleScript != null) {
                         string combinedScript = "public async Task Rule_" + i + "_" + ai.behaviors_normal[i].name + "() {" + Environment.NewLine;
                         ruleStatesInitializer.Add("Rule_" + i + "_" + ai.behaviors_normal[i].name);
-                        for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
-                            TranslatedScript ts = new TranslatedScript(ai.behaviors_normal[i].scripts[j], null);
-                            ts.settings = translationSettings;
-                            combinedScript += "// Script " + j + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
-                        }
+						if(ai.behaviors_normal[i].scheduleScript != null)
+						{
+							TranslatedScript ts = new TranslatedScript(ai.behaviors_normal[i].scheduleScript, null);
+							ts.settings = translationSettings;
+							combinedScript += "// Schedule script" + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
+						}
+						if (ai.behaviors_normal[i].scripts != null) {
+							for (int j = 0; j < ai.behaviors_normal[i].scripts.Length; j++) {
+								TranslatedScript ts = new TranslatedScript(ai.behaviors_normal[i].scripts[j], null);
+								ts.settings = translationSettings;
+								combinedScript += "// Script " + j + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
+							}
+						}
                         combinedScript += "}";
                         behaviorsNormal += combinedScript + Environment.NewLine;
                     }
@@ -56,13 +64,21 @@ namespace OpenSpace.Exporter {
                 for (int i = 0; i < ai.behaviors_reflex.Length; i++) {
                     if (ai.behaviors_reflex[i].scripts != null) {
                         string combinedScript = "public async Task Reflex_" + i + "_" + ai.behaviors_reflex[i].name + "() {" + Environment.NewLine;
-                        for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
-                            reflexStatesInitializer.Add("Reflex_" + i + "_" + ai.behaviors_reflex[i].name);
-                            TranslatedScript ts = new TranslatedScript(ai.behaviors_reflex[i].scripts[j], null);
-                            ts.settings = translationSettings;
-                            combinedScript += "// Script " + j + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
-                        }
-                        combinedScript += "}";
+						if (ai.behaviors_reflex[i].scheduleScript != null) {
+							reflexStatesInitializer.Add("Reflex_" + i + "_" + ai.behaviors_reflex[i].name);
+							TranslatedScript ts = new TranslatedScript(ai.behaviors_reflex[i].scheduleScript, null);
+							ts.settings = translationSettings;
+							combinedScript += "// Schedule script" + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
+						}
+						if (ai.behaviors_reflex[i].scripts != null) {
+							for (int j = 0; j < ai.behaviors_reflex[i].scripts.Length; j++) {
+								reflexStatesInitializer.Add("Reflex_" + i + "_" + ai.behaviors_reflex[i].name);
+								TranslatedScript ts = new TranslatedScript(ai.behaviors_reflex[i].scripts[j], null);
+								ts.settings = translationSettings;
+								combinedScript += "// Script " + j + Environment.NewLine + ts.ToCSharpString_R2() + Environment.NewLine;
+							}
+						}
+						combinedScript += "}";
                         behaviorsReflex += combinedScript + Environment.NewLine;
                     }
                 }
