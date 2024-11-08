@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.GenericExport.Manipulation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,7 +35,17 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
             FrameDataBlock b
             )
         {
-
+            foreach (var subobjectA in SubobjectsFetcher.FetchSubobjectsInfo(a))
+            {
+                foreach (var subobjectB in SubobjectsFetcher.FetchSubobjectsInfo(b))
+                {
+                    if (SubobjectsComparator.AreSubobjectsCompliant(subobjectA, subobjectB))
+                    {
+                        var keyChangeIndicator = SubobjectKeyChangeDeterminer.DetermineKeyChange(subobjectA, subobjectB);
+                        var verticesDifference = SubobjectsVerticesDifferentiator.Difference(subobjectA, subobjectB);
+                    }
+                }
+            }
 
 
             //var commonKeys = a.dataBlocks.Keys.Intersect(b.dataBlocks.Keys).ToList();
