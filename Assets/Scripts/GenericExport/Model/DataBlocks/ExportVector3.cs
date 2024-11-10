@@ -20,6 +20,11 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
             this.z = z;
         }
 
+        public float magnitude { get {
+                return Mathf.Sqrt(this.x * this.x + this.y * this.y + this.z * this.z);          
+            } 
+        }
+
         public static ExportVector3 FromVector3(Vector3 vec)
         {
             return new ExportVector3(

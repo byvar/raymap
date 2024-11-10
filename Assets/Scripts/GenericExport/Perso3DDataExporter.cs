@@ -1,4 +1,5 @@
 using Assets.Scripts.GenericExport.Checks;
+using Assets.Scripts.GenericExport.Manipulation;
 using Assets.Scripts.GenericExport.Model;
 using Assets.Scripts.GenericExport.Model.DataBlocks;
 using Newtonsoft.Json;
@@ -73,10 +74,11 @@ namespace Assets.Scripts.GenericExport
 
             // assuming we can fit that into the memory at least..
             // we need to analyze our data model to validate some assumptions we have about its constraints/expected invariants..
-            //KeysConsistencyChecker.CheckForKeysConsistency(result);
-
             KeysSubobjectsMorphConsistencyChecker.CheckForKeysSubobjectsMorphConsistency(result);
             UnityEngine.Debug.Log("Passed KeysSubobjectsMorphConsistencyCheck!");
+
+            SubobjectsInStatesTrendsInfo subobjectsInStatesTrendsInfo =
+                SubobjectsTrendsWithinStateObtainer.ObtainSubobjectsTrendsWithinStateInfo(result);
 
             //string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(result, settings);
 
