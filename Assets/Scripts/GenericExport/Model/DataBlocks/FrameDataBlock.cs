@@ -35,17 +35,20 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
             FrameDataBlock b
             )
         {
-            foreach (var subobjectA in SubobjectsFetcher.FetchSubobjectsInfo(a))
-            {
-                foreach (var subobjectB in SubobjectsFetcher.FetchSubobjectsInfo(b))
-                {
-                    if (SubobjectsComparator.AreSubobjectsCompliant(subobjectA, subobjectB))
-                    {
-                        var keyChangeIndicator = SubobjectKeyChangeDeterminer.DetermineKeyChange(subobjectA, subobjectB);
-                        var verticesDifference = SubobjectsVerticesDifferentiator.Difference(subobjectA, subobjectB);
-                    }
-                }
-            }
+
+            throw new NotImplementedException();
+            //foreach (var subobjectA in SubobjectsFetcher.FetchSubobjectsInfo(a))
+            //{
+            //    foreach (var subobjectB in SubobjectsFetcher.FetchSubobjectsInfo(b))
+            //    {
+            //        if (SubobjectsComparator.AreSubobjectsCompliant(subobjectA, subobjectB))
+            //        {
+            //            var keyChangeIndicator = SubobjectKeyChangeDeterminer.DetermineKeyChange(subobjectA, subobjectB);
+            //            var verticesDifference = SubobjectsVerticesDifferentiator.Difference(subobjectA, subobjectB);
+                        
+            //        }
+            //    }
+            //}
 
 
             //var commonKeys = a.dataBlocks.Keys.Intersect(b.dataBlocks.Keys).ToList();
@@ -70,17 +73,18 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
             PersoBehaviour persoBehaviour)
         {
             var dataToBeConsideredNow = FrameDataBlock.GetConcreteWholeSubmeshesInPoseFrameDataBlock(persoBehaviour);
+            return dataToBeConsideredNow;
 
-            if (currentFrame == 0)
-            {
-                return dataToBeConsideredNow;
-            }
-            else
-            {
-                var previousFrameDataBlock = currentFrameDataBlocks[currentFrame - 1];
-                var differenceFrameDataBlock = FrameDataBlock.DifferenceFrameDataBlockBetween(previousFrameDataBlock, dataToBeConsideredNow);
-                return differenceFrameDataBlock;
-            }
+            //if (currentFrame == 0)
+            //{
+            //    return dataToBeConsideredNow;
+            //}
+            //else
+            //{
+            //    var previousFrameDataBlock = currentFrameDataBlocks[currentFrame - 1];
+            //    var differenceFrameDataBlock = FrameDataBlock.DifferenceFrameDataBlockBetween(previousFrameDataBlock, dataToBeConsideredNow);
+            //    return differenceFrameDataBlock;
+            //}
         }
     }
 }

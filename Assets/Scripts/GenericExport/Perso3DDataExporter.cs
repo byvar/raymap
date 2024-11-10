@@ -1,8 +1,10 @@
+using Assets.Scripts.GenericExport.Checks;
 using Assets.Scripts.GenericExport.Model;
 using Assets.Scripts.GenericExport.Model.DataBlocks;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Assets.Scripts.GenericExport
@@ -68,9 +70,17 @@ namespace Assets.Scripts.GenericExport
             }
 
             var settings = new JsonSerializerSettings { Formatting = Formatting.Indented };
-            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(result, settings);
 
-            ToFileSaver.Save($"{persoBehaviour.name}.perso3d", jsonString);
+            // assuming we can fit that into the memory at least..
+            // we need to analyze our data model to validate some assumptions we have about its constraints/expected invariants..
+            //KeysConsistencyChecker.CheckForKeysConsistency(result);
+
+            KeysSubobjectsMorphConsistencyChecker.CheckForKeysSubobjectsMorphConsistency(result);
+            UnityEngine.Debug.Log("Passed KeysSubobjectsMorphConsistencyCheck!");
+
+            //string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(result, settings);
+
+            //ToFileSaver.Save($"{persoBehaviour.name}.perso3d", jsonString);
         }
     }
 }
