@@ -1,6 +1,8 @@
 using Assets.Scripts.GenericExport.Checks;
 using Assets.Scripts.GenericExport.Manipulation;
+using Assets.Scripts.GenericExport.Manipulation.Compression;
 using Assets.Scripts.GenericExport.Model;
+using Assets.Scripts.GenericExport.Model.Compressed;
 using Assets.Scripts.GenericExport.Model.DataBlocks;
 using Newtonsoft.Json;
 using System.Collections;
@@ -77,12 +79,15 @@ namespace Assets.Scripts.GenericExport
             KeysSubobjectsMorphConsistencyChecker.CheckForKeysSubobjectsMorphConsistency(result);
             UnityEngine.Debug.Log("Passed KeysSubobjectsMorphConsistencyCheck!");
 
-            SubobjectsInStatesTrendsInfo subobjectsInStatesTrendsInfo =
-                SubobjectsTrendsWithinStateObtainer.ObtainSubobjectsTrendsWithinStateInfo(result);
+            //SubobjectsInStatesTrendsInfo subobjectsInStatesTrendsInfo =
+            //    SubobjectsTrendsWithinStateObtainer.ObtainSubobjectsTrendsWithinStateInfo(result);
 
-            //string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(result, settings);
+            SubobjectsCompressedPerso3DAnimatedData subobjectsCompressedPerso3DAnimatedData =
+                SubobjectsCompressedPerso3DAnimatedDataTransformer.Transform(result);
 
-            //ToFileSaver.Save($"{persoBehaviour.name}.perso3d", jsonString);
+            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(subobjectsCompressedPerso3DAnimatedData, settings);
+
+            ToFileSaver.Save($"{persoBehaviour.name}.perso3d", jsonString);
         }
     }
 }

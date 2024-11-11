@@ -14,9 +14,9 @@ namespace Assets.Scripts.GenericExport.Manipulation
         {
             var subobjectsHistoryBuilder = new SubobjectsHistoryBuilder();
 
-            foreach (var state in perso3DAnimatedData.states)
+            foreach (var state in perso3DAnimatedData.states.OrderBy(x => x.Key))
             {
-                foreach (var frame in state.Value)
+                foreach (var frame in state.Value.OrderBy(x => x.Key))
                 {
                     foreach (var subobject in frame.Value.dataBlocks)
                     {

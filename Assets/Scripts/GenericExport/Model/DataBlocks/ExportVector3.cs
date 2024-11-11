@@ -34,12 +34,28 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
             );
         }
 
+        public List<byte> GetBytes()
+        {
+            return BitConverter.GetBytes(x)
+                .Concat(BitConverter.GetBytes(y))
+                .Concat(BitConverter.GetBytes(z)).ToList();
+        }
+
         public static ExportVector3 operator -(ExportVector3 v1, ExportVector3 v2)
         {
             return new ExportVector3(
                 x: v1.x - v2.x,
                 y: v1.y - v2.y,
                 z: v1.z - v2.z
+                );
+        }
+
+        public static ExportVector3 operator +(ExportVector3 v1, ExportVector3 v2)
+        {
+            return new ExportVector3(
+                x: v1.x + v2.x,
+                y: v1.y + v2.y,
+                z: v1.z + v2.z
                 );
         }
     }
