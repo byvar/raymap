@@ -10,9 +10,12 @@ namespace Assets.Scripts.GenericExport.Manipulation.Meshes
 {
     public class MeshUVMapFetcher
     {
-        public static ExportUVMap GetUVMap(Transform meshObject)
+        public static ExportUVMap GetUVMap(Mesh mesh)
         {
-            throw new NotImplementedException();
+            List<Vector2> uvMap = mesh.uv.ToList();
+            var result = new ExportUVMap();
+            result.uv = uvMap.Select(x => new ExportVector2(x.x, x.y)).ToList();
+            return result;
         }
     }
 }

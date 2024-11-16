@@ -37,13 +37,17 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
         public ObjectTransform transform;
         public List<ExportVector3> vertices = new List<ExportVector3>();
         public List<int> triangles = new List<int>();
+        public ExportUVMap uvMap = new ExportUVMap();
+        public ExportTexture texture = new ExportTexture();
 
         public ConcreteWholeSubmeshInPoseDataBlock(
-            ObjectTransform transform, List<ExportVector3> vertices, List<int> triangles)
+            ObjectTransform transform, List<ExportVector3> vertices, List<int> triangles, ExportUVMap uvMap, ExportTexture texture)
         {
             this.transform = transform;
             this.vertices = vertices;
             this.triangles = triangles;
+            this.uvMap = uvMap;
+            this.texture = texture;
         }
 
         public static ConcreteWholeSubmeshInPoseDataBlock FromSubmesh(Transform child)
@@ -51,7 +55,7 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
             Mesh mesh = child.GetComponent<SkinnedMeshRenderer>() != null ?
                 child.GetComponent<SkinnedMeshRenderer>().sharedMesh : child.GetComponent<MeshFilter>().mesh;
             ExportTexture texture = MeshTextureFetcher.GetTexture(child);
-            ExportUVMap uvMap = MeshUVMapFetcher.GetUVMap(child);
+            ExportUVMap uvMap = MeshUVMapFetcher.GetUVMap(mesh);
 
             return new ConcreteWholeSubmeshInPoseDataBlock(
                 transform: new ObjectTransform(
@@ -60,7 +64,9 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
                     scale: ExportVector3.FromVector3(child.lossyScale)
                     ),
                 vertices: mesh.vertices.Select(x => new ExportVector3(x.x, x.y, x.z)).ToList(),
-                triangles: mesh.triangles.ToList()
+                triangles: mesh.triangles.ToList(),
+                uvMap: uvMap,
+                texture: texture
             );
         }
 

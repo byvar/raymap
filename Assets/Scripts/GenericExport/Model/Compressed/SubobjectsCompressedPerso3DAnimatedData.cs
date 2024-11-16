@@ -30,13 +30,18 @@ namespace Assets.Scripts.GenericExport.Model.Compressed
         public List<ExportVector3> vertices = new List<ExportVector3>();
         public List<int> triangles = new List<int>();
 
+        public ExportUVMap uvMap = new ExportUVMap();
+        public ExportTexture texture = new ExportTexture();
+
         public static SubobjectGeometryData FromConcreteWholeSubmeshInPoseDataBlock(ConcreteWholeSubmeshInPoseDataBlock concreteWholeSubmeshInPoseDataBlock)
         {
             return new SubobjectGeometryData()
             {
                 vertices = concreteWholeSubmeshInPoseDataBlock.vertices,
                 triangles = concreteWholeSubmeshInPoseDataBlock.triangles,
-                key = concreteWholeSubmeshInPoseDataBlock.GetGeometryDataHash()
+                key = concreteWholeSubmeshInPoseDataBlock.GetGeometryDataHash(),
+                uvMap = concreteWholeSubmeshInPoseDataBlock.uvMap,
+                texture = concreteWholeSubmeshInPoseDataBlock.texture
             };
         }
     }
