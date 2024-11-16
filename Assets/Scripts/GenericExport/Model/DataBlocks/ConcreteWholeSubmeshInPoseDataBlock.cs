@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.GenericExport.Manipulation.Meshes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -49,6 +50,8 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
         {
             Mesh mesh = child.GetComponent<SkinnedMeshRenderer>() != null ?
                 child.GetComponent<SkinnedMeshRenderer>().sharedMesh : child.GetComponent<MeshFilter>().mesh;
+            ExportTexture texture = MeshTextureFetcher.GetTexture(child);
+            ExportUVMap uvMap = MeshUVMapFetcher.GetUVMap(child);
 
             return new ConcreteWholeSubmeshInPoseDataBlock(
                 transform: new ObjectTransform(
