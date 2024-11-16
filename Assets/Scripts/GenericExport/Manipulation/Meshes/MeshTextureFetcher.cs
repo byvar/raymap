@@ -14,8 +14,17 @@ namespace Assets.Scripts.GenericExport.Manipulation.Meshes
         {
             Renderer renderer = meshObject.GetComponent<Renderer>();
             Material material = renderer.material;
-            Texture texture = material.mainTexture;
-            throw new NotImplementedException();
+            Texture2D texture = material.GetTexture("_Tex0") as Texture2D;
+            Color[] pixels = texture.GetPixels();
+            int width = texture.width;
+            int height = texture.height;
+
+            var result = new ExportTexture();
+            result.width = width;
+            result.height = height;
+            result.pixels = pixels.Select(x => ExportColor.FromColor(x)).ToList();
+
+            return result;
         }
     }
 }
