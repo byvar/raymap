@@ -44,6 +44,7 @@ namespace Assets.Scripts.GenericExport
         public void ExportPersoAnimated3DData()
         {
             persoBehaviour.playAnimation = false;
+            persoBehaviour.transform.position = new UnityEngine.Vector3(0, 0, 0);
             persoBehaviour.StartCoroutine(ExportPersoAnimated3DDataCoroutine());
         }
 
