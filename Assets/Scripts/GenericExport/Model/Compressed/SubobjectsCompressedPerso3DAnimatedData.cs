@@ -28,6 +28,7 @@ namespace Assets.Scripts.GenericExport.Model.Compressed
     {
         public string key;
         public List<ExportVector3> vertices = new List<ExportVector3>();
+        public List<ExportVector3> normals = new List<ExportVector3>();
         public List<int> triangles = new List<int>();
 
         public ExportUVMap uvMap = new ExportUVMap();
@@ -41,7 +42,8 @@ namespace Assets.Scripts.GenericExport.Model.Compressed
                 triangles = concreteWholeSubmeshInPoseDataBlock.triangles,
                 key = concreteWholeSubmeshInPoseDataBlock.GetGeometryDataHash(),
                 uvMap = concreteWholeSubmeshInPoseDataBlock.uvMap,
-                texture = concreteWholeSubmeshInPoseDataBlock.texture
+                texture = concreteWholeSubmeshInPoseDataBlock.texture,
+                normals = concreteWholeSubmeshInPoseDataBlock.normals
             };
         }
     }

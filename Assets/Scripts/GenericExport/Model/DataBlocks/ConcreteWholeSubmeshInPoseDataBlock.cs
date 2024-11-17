@@ -36,18 +36,20 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
     {
         public ObjectTransform transform;
         public List<ExportVector3> vertices = new List<ExportVector3>();
+        public List<ExportVector3> normals = new List<ExportVector3>();
         public List<int> triangles = new List<int>();
         public ExportUVMap uvMap = new ExportUVMap();
         public ExportTexture texture = new ExportTexture();
 
         public ConcreteWholeSubmeshInPoseDataBlock(
-            ObjectTransform transform, List<ExportVector3> vertices, List<int> triangles, ExportUVMap uvMap, ExportTexture texture)
+            ObjectTransform transform, List<ExportVector3> vertices, List<int> triangles, List<ExportVector3> normals, ExportUVMap uvMap, ExportTexture texture)
         {
             this.transform = transform;
             this.vertices = vertices;
             this.triangles = triangles;
             this.uvMap = uvMap;
             this.texture = texture;
+            this.normals = normals;
         }
 
         public static ConcreteWholeSubmeshInPoseDataBlock FromSubmesh(Transform child)
@@ -65,6 +67,7 @@ namespace Assets.Scripts.GenericExport.Model.DataBlocks
                     ),
                 vertices: mesh.vertices.Select(x => new ExportVector3(x.x, x.y, x.z)).ToList(),
                 triangles: mesh.triangles.ToList(),
+                normals: mesh.normals.Select(x => new ExportVector3(x.x, x.y, x.z)).ToList(),
                 uvMap: uvMap,
                 texture: texture
             );
