@@ -9,6 +9,7 @@ using OpenSpace.Object.Properties;
 using UnityEditor.IMGUI.Controls;
 using ModelExport.R3.PersoStatesArmatureAnimationsExporting;
 using ModelExport.R3.SkinnedAnimatedMeshesExporting;
+using Assets.Scripts.GenericExport;
 
 [CustomEditor(typeof(PersoBehaviour))]
 public class PersoBehaviourEditor : Editor {
@@ -111,6 +112,8 @@ public class PersoBehaviourEditor : Editor {
 		if (GUILayout.Button("Export Meshes and Animations Data (including cleanup)")) ExportMeshesAndAnimationsData();
 		if (GUILayout.Button("Export Meshes Data")) ExportMeshesData();
 		if (GUILayout.Button("Export Animations Data")) ExportAnimationsData();
+
+        if (GUILayout.Button("Generic Export (3D Screenshots)")) ExportAsMuchNeededDataAsPossibleForGenericExport();
     }
 
 	IList<StateTransitionsTreeElement> GetData() {
@@ -157,7 +160,15 @@ public class PersoBehaviourEditor : Editor {
 		}
 	}
 
-	void ExportMeshesAndAnimationsData()
+	void ExportAsMuchNeededDataAsPossibleForGenericExport()
+	{
+        PersoBehaviour pb = (PersoBehaviour)target;
+        Perso3DDataExporter perso3DDataExporter = new Perso3DDataExporter(pb);
+		perso3DDataExporter.ExportPersoAnimated3DData();
+	}
+
+
+    void ExportMeshesAndAnimationsData()
 	{
 		ObjectsExportLibraryInterface.ClearExportObjectsLibrary();
 		ExportMeshesData();
