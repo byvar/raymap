@@ -253,12 +253,20 @@ namespace OpenSpace.Exporter {
 
         private void ExportTextures(string texturePath)
         {
+            int textureIndex = 0;
             foreach (TextureInfo texture in loader.textures) {
 
                 if (texture == null) {
                     continue;
                 }
                 string path = Path.Combine(texturePath, texture.name + ".png");
+				
+                if (texture.name == null)
+                {
+                    path = Path.Combine(texturePath, textureIndex + ".png");
+                    textureIndex++;
+                }
+				
                 if (!Directory.Exists(Path.GetDirectoryName(path))) {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
                 }
