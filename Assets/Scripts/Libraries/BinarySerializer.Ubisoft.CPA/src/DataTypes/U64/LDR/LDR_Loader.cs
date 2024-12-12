@@ -56,7 +56,7 @@ namespace BinarySerializer.Ubisoft.CPA.U64 {
 						continue;
 					}
 				}
-				Pointer off_current = s.CurrentPointer;
+				Pointer off_current = s.HasCurrentPointer ? s.CurrentPointer : null;
 				s.Goto(off_struct);
 
 				//s.Log("LDR: Resolving struct: {0}", currentRef.Name);
