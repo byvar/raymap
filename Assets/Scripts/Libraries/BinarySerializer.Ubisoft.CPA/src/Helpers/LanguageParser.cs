@@ -28,6 +28,8 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public static string ReadSpecialEncodedString(BinaryReader r, CPA_GameMode mode, VersionLanguage lang = VersionLanguage.Japanese, bool includeFormat = false) {
 			Encoding wind1252 = Encoding.GetEncoding(1252);
 			Encoding wind1255 = lang == VersionLanguage.Hebrew ? Encoding.GetEncoding(1255) : null;
+			Encoding wind1251 = lang == VersionLanguage.Russian ? Encoding.GetEncoding(1251) : null;
+			Encoding wind1250 = (lang == VersionLanguage.Czech || lang == VersionLanguage.Polish || lang == VersionLanguage.Slovak) ? Encoding.GetEncoding(1250) : null;
 			int curObjectTableOffset = 0;
 
 			if (mode == CPA_GameMode.Rayman2IOS) {
@@ -101,6 +103,47 @@ namespace BinarySerializer.Ubisoft.CPA {
 							build.Append(wind1252.GetChars(new byte[] { b }));
 						else
 							build.Append(wind1255.GetChars(new byte[] { b }));
+					} else if (lang == VersionLanguage.Czech) {
+						build.Append(wind1250.GetChars(new byte[] { b }));
+					} else if (lang == VersionLanguage.Polish) {
+						if (b == 0xB5)
+							build.Append("œ");
+						else if (b == 0xD1 || b == 0xE6 || b == 0xEA || b == 0xF1 || b == 0xB3 || b == 0xB9 || b == 0xBF || b == 0xA3 || b == 0xA5 || b == 0xAF
+							|| b < 0xA0)
+							build.Append(wind1250.GetChars(new byte[] { b }));
+						else
+							build.Append(wind1252.GetChars(new byte[] { b }));
+					} else if (lang == VersionLanguage.Russian) {
+						if (b < 0xC0)
+							build.Append(wind1252.GetChars(new byte[] { b }));
+						else
+							build.Append(wind1251.GetChars(new byte[] { b }));
+					} else if (lang == VersionLanguage.Slovak) {
+						if(b == 0xDF)
+							build.Append("Ţ");
+						else if (b == 0xB5)
+							build.Append("ţ");
+						else if (b == 0xC7)
+							build.Append("Đ");
+						else if (b == 0xF5)
+							build.Append("ö");
+						else if (b == 0xF6)
+							build.Append("ŕ");
+						else if(b == 0xF9)
+							build.Append("đ");
+						else if (b == 0xFB)
+							build.Append("š");
+						else if (b == 0xFF)
+							build.Append("ý");
+						else if (b < 0xA0
+							|| b == 0xBC || b == 0xBE
+							|| b == 0xC0 || b == 0xC6 || b == 0xC8 || b == 0xCF
+							|| b == 0xD1 || b == 0xD2
+							|| b == 0xE0 || b == 0xE5 || b == 0xE8 || b == 0xEF
+							|| b == 0xF1 || b == 0xF2)
+							build.Append(wind1250.GetChars(new byte[] { b }));
+						else
+							build.Append(wind1252.GetChars(new byte[] { b }));
 					}
 				}
 			}

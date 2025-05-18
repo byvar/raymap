@@ -8,6 +8,10 @@ namespace BinarySerializer.Ubisoft.CPA {
 	public enum VersionLanguage {
 		English,
 		Japanese,
-		Hebrew
+		Hebrew,
+		Czech,
+		Polish,
+		Russian,
+		Slovak
 	}
 }

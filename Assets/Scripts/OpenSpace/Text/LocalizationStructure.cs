@@ -27,7 +27,7 @@ namespace OpenSpace.Text {
 			Func<Reader, string> ReadString;
 			ReadString = (Reader r) => r.ReadNullDelimitedString(encoding: Legacy_Settings.s.platform == Legacy_Settings.Platform.iOS ? Encoding.UTF8 : null);
 			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadSpecialEncodedString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman2DC);
-			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadSpecialEncodedString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman3PC, lang: BinarySerializer.Ubisoft.CPA.VersionLanguage.Hebrew);
+			//ReadString = (Reader r) => BinarySerializer.Ubisoft.CPA.LanguageParser.ReadSpecialEncodedString(r, BinarySerializer.Ubisoft.CPA.CPA_GameMode.Rayman3PC, lang: BinarySerializer.Ubisoft.CPA.VersionLanguage.Slovak);
 			MapLoader l = MapLoader.Loader;
 			field0 = reader.ReadUInt32();
 			if (Legacy_Settings.s.game == Legacy_Settings.Game.R2Revolution) {
