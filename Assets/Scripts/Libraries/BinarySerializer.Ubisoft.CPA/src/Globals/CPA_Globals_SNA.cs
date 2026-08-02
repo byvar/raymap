@@ -12,6 +12,11 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public SNA_File<SNA_Description> LevelDSB { get; set; }
 		public SNA_RelocationBigFile RelocationBigFile { get; set; }
 
+		public GAM_GlobalPointers_Fix GlobalPointers_Fix { get; set; }
+		public GAM_GlobalPointers_Level GlobalPointers_Level { get; set; }
+		public GLI_GlobalTextures GlobalTextures_Fix { get; set; }
+		public GLI_GlobalTextures GlobalTextures_Level { get; set; }
+
 		public override string GameDataDirectory =>
 			Context.GetCPASettings().ApplyPathCapitalization(DirectoryDescription?.GetDirectory(SNA_DescriptionType.DirectoryOfGameData) ?? "GameData", PathCapitalizationType.All);
 

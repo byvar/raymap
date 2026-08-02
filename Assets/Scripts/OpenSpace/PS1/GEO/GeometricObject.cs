@@ -344,12 +344,14 @@ namespace OpenSpace.PS1 {
 						smr.material = vm.CreateMaterial();
 						smr.sharedMesh = m;
 					}
-					try {
-						MeshCollider mc = gao.AddComponent<MeshCollider>();
-						mc.isTrigger = false;
-						//mc.cookingOptions = MeshColliderCookingOptions.None;
-						//mc.sharedMesh = mesh;
-					} catch (Exception) { }
+					if (vertIndices.Select(vi => mainVertices[vi]).Distinct().Count() >= 3) {
+						try {
+							MeshCollider mc = gao.AddComponent<MeshCollider>();
+							mc.isTrigger = false;
+							//mc.cookingOptions = MeshColliderCookingOptions.None;
+							//mc.sharedMesh = mesh;
+						} catch (Exception) { }
+					}
 				}
 			}
 			// Untextured (some skyboxes, etc)

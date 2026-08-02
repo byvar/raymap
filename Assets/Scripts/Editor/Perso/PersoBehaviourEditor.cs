@@ -41,7 +41,8 @@ public class PersoBehaviourEditor : Editor {
         GUILayout.Label("Considered on screen (bit 5): " + consideredOnScreen);
         GUILayout.Label("Considered too far away (bit 7): " + consideredTooFarAway);
         GUILayout.Label("Always considered on screen (bit 12): " + consideredAlwaysOnScreen);
-        GUILayout.Label("State custom bits: " + Convert.ToString(pb.state != null ? pb.state.customStateBits : 0, 2).PadLeft(8, '0'));
+		GUILayout.Label("Animation index: " + pb?.state?.anim_ref?.anim_index);
+		GUILayout.Label("State custom bits: " + Convert.ToString(pb.state != null ? pb.state.customStateBits : 0, 2).PadLeft(8, '0'));
 
 		/* // Only enable when working on morph data, it prevents from using the buttons properly otherwise
         if (pb.a3d != null && pb.morphDataArray != null) {

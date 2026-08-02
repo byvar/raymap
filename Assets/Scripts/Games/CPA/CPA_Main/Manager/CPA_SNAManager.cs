@@ -303,6 +303,10 @@ namespace Raymap {
 			var gptContents = FileFactory.Read<GAM_GlobalPointers_Fix>(context, ContentID(CPA_Path.FixGPT));
 			var ptxContents = FileFactory.Read<GLI_GlobalTextures>(context, ContentID(CPA_Path.FixPTX), onPreSerialize: (_, p) => p.Pre_IsFix = true);
 			var sndContents = FileFactory.Read<SND_SoundPointers>(context, ContentID(CPA_Path.FixSND));
+
+			var cpaGlobals = (CPA_Globals_SNA)context.GetCPAGlobals();
+			cpaGlobals.GlobalPointers_Fix = gptContents;
+			cpaGlobals.GlobalTextures_Fix = ptxContents;
 		}
 		public async UniTask LoadLevel(Context context, string mapName) {
 			GlobalLoadState.DetailedState = "Loading level";
@@ -316,6 +320,9 @@ namespace Raymap {
 			var gptContents = FileFactory.Read<GAM_GlobalPointers_Level>(context, ContentID(CPA_Path.LevelGPT));
 			var ptxContents = FileFactory.Read<GLI_GlobalTextures>(context, ContentID(CPA_Path.LevelPTX), onPreSerialize: (_, p) => p.Pre_IsFix = false);
 			var sndContents = FileFactory.Read<SND_SoundPointers>(context, ContentID(CPA_Path.LevelSND));
+
+			cpaGlobals.GlobalPointers_Level = gptContents;
+			cpaGlobals.GlobalTextures_Level = ptxContents;
 		}
 
 		public override async UniTask<Unity_Level> LoadAsync(Context context) {
@@ -336,7 +343,9 @@ namespace Raymap {
 			await LoadFix(context);
 			await LoadLevel(context, context.GetMapViewerSettings().Map);
 
-			throw new NotImplementedException();
+			return new Unity_Level_CPA() {
+				LevelData = (CPA_Globals_SNA)context.GetCPAGlobals()
+			};
 		}
 	}
 }

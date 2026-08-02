@@ -23,7 +23,12 @@ public class DsgVarComponentEditor : Editor {
 
         DsgVarComponent c = (DsgVarComponent)target;
 
-        if (c.editableEntries != null) {
+		/*GUILayout.Label(c.dsgVar.off_dsgVarInfo.ToString());
+		GUILayout.Label(c.dsgVar.off_dsgMemBuffer.ToString());
+		GUILayout.Label(c.dsgMem.memBuffer.ToString());
+		GUILayout.Label(c.dsgMem.memBufferInitial.ToString());
+		GUILayout.Label(c.dsgVar.dsgMemBufferLength.ToString());*/
+		if (c.editableEntries != null) {
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 400f);
             InitDsgVarsTreeIfNeeded(rect, c);
             if (treeviewDsgVars.target != c) {

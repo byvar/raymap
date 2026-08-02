@@ -18,10 +18,12 @@ namespace OpenSpace.Visual {
         [JsonIgnore] public GeometricObject mesh = null;
         public PatchGeometricObjectProperty[] properties;
 
+		public static bool showPatchGEO = false;
+
 
         public GameObject Gao {
             get {
-                //if (mesh != null) return mesh.Gao;
+                if (mesh != null) return mesh.Gao;
                 return null;
             }
         }
@@ -53,10 +55,12 @@ namespace OpenSpace.Visual {
                     //l.print(mod.off_geometricObject + ": " + mod.properties[i].ind_vertex + " - " + mod.properties[i].unk + " - " + mod.properties[i].pos);
                 }
             });
-            /*Pointer.DoAt(ref reader, mod.off_geometricObject, () => {
-                mod.mesh = GeometricObject.Read(reader, mod.off_geometricObject);
-                mod.mesh.Gao.name += " - " + mod.offset;
-            });*/
+			if(showPatchGEO) {
+				LegacyPointer.DoAt(ref reader, patch.off_geometricObject, () => {
+					patch.mesh = GeometricObject.Read(reader, patch.off_geometricObject, mod: patch);
+					patch.mesh.Gao.name += " - " + patch.offset;
+				});
+			}
             return patch;
         }
 
