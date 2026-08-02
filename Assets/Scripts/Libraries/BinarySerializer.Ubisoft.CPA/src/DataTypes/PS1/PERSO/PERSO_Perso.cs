@@ -4,8 +4,8 @@
 	{
 		public Pointer P3DDataPointer { get; set; }
 		public Pointer SuperObjectReferencePointer { get; set; }
-		public Pointer Pointer_08 { get; set; } // Dynamics
-		public Pointer Pointer_0C { get; set; } // Struct with size 0x18
+		public Pointer<GAM_CharacterDynamics> Dynamics { get; set; } // Dynamics
+		public Pointer<PERSO_Brain> BrainPointer { get; set; } // Struct with size 0x18
 		public Pointer CollSetPointer { get; set; }
 		public Pointer SectorSuperObjectPointer { get; set; }
 
@@ -21,8 +21,8 @@
 		{
 			P3DDataPointer = s.SerializePointer(P3DDataPointer, name: nameof(P3DDataPointer));
 			SuperObjectReferencePointer = s.SerializePointer(SuperObjectReferencePointer, name: nameof(SuperObjectReferencePointer));
-			Pointer_08 = s.SerializePointer(Pointer_08, name: nameof(Pointer_08));
-			Pointer_0C = s.SerializePointer(Pointer_0C, name: nameof(Pointer_0C));
+			Dynamics = s.SerializePointer<GAM_CharacterDynamics>(Dynamics, name: nameof(Dynamics))?.ResolveObject(s);
+			BrainPointer = s.SerializePointer<PERSO_Brain>(BrainPointer, name: nameof(BrainPointer))?.ResolveObject(s);
 			CollSetPointer = s.SerializePointer(CollSetPointer, name: nameof(CollSetPointer));
 			SectorSuperObjectPointer = s.SerializePointer(SectorSuperObjectPointer, name: nameof(SectorSuperObjectPointer));
 

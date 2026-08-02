@@ -32,6 +32,7 @@ namespace Raymap
 		{
 			new GameAction("Export Big Files", false, true, (input, output) => ExportBigFiles(settings, output)),
 			new GameAction("Export UI/AGO Textures", false, true, (input, output) => ExportUIAndAGOTextures(settings, output)),
+			new GameAction("Get Rayman Addresses", false, false, (input, output) => GetRaymanAddresses(settings)),
 		};
 
 		public async UniTask ExportBigFiles(MapViewerSettings settings, string outputDir)
@@ -346,6 +347,29 @@ namespace Raymap
 			}
 			cutsceneAudio = cutsceneAudioList.SelectMany(i => i).ToArray();
 			cutsceneFrames = cutsceneFramesList.SelectMany(i => i).ToArray();
+		}
+
+		public async UniTask GetRaymanAddresses(MapViewerSettings settings) {
+			PS1GameInfo gameInfo = GetGameInfo(settings);
+			PS1GameInfo.File mainFileInfo = gameInfo.files.First(x => x.fileID == 0);
+			foreach (var map in gameInfo.maps) {
+				if(map == "menu_st") continue;
+				var mapSettings = new MapViewerSettings(settings.GameModeSelection, settings.GameDirectory, map);
+				using var context = new MapViewerContext(mapSettings);
+				await LoadFilesAsync(context);
+				var unityLevel = await LoadAsync(context) as Unity_Level_CPAPS1;
+				var data = unityLevel.LevelData;
+				foreach (var perso in data.GlobalPointerTable.Persos) {
+					if (perso.Name == "Rayman") {
+						var var1 = perso.BrainPointer?.Value?.Pointer_0C?.AbsoluteOffset ?? 0;
+						var var2 = perso.BrainPointer?.Value?.Pointer_10?.AbsoluteOffset ?? 0;
+						var code = perso.BrainPointer?.Value?.Pointer_14 ?? 0;
+						var dynam = perso.Dynamics?.Value?.Dynamics?.PointerValue?.AbsoluteOffset ?? 0;
+						context?.SystemLogger?.LogInfo($"{map} - VAR1: {var1:X8} - VAR2: {var2:X8} - CODE: {code:X8} - DYNAM: {dynam:X8}");
+					}
+				}
+			}
+			Debug.Log("Finished exporting data");
 		}
 
 		#endregion

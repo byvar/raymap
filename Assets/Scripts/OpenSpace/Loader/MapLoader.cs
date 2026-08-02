@@ -114,7 +114,7 @@ namespace OpenSpace {
 		public Globals globals = null;
         public Legacy_Settings settings = null;
         public List<SearchableString> searchableStrings = new List<SearchableString>();
-		public Dictionary<LegacyPointer, LegacyPointer.PointerTrace> pointerTraces = new Dictionary<LegacyPointer, LegacyPointer.PointerTrace>();
+		public List<LegacyPointer.PointerTrace> pointerTraces = new List<LegacyPointer.PointerTrace>();
 
         public static class Mem {
             public const int Fix = 0;

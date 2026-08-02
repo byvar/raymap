@@ -138,11 +138,12 @@ namespace OpenSpace {
         {
             if (UnitySettings.TracePointers && pointer!=null)
             {
-                if (!loader.pointerTraces.ContainsKey(pointer))
+                //if (!loader.pointerTraces.ContainsKey(pointer))
                 {
                     var sf = new StackFrame(2, true);
-                    loader.pointerTraces.Add(pointer, new PointerTrace()
+                    loader.pointerTraces.Add(new PointerTrace()
                     {
+						pointer = pointer,
                         lineNumber = sf.GetFileLineNumber(),
                         column = sf.GetFileColumnNumber(),
                         fileName = sf.GetFileName(),
@@ -231,6 +232,7 @@ namespace OpenSpace {
 
         public struct PointerTrace
         {
+			public LegacyPointer pointer;
             public string methodName;
             public string fileName;
             public int column;

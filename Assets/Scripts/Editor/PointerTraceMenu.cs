@@ -16,7 +16,7 @@ namespace Assets.Scripts.Editor
 
         Vector2 scrollPos = new Vector2();
         string searchString = "";
-        private List<KeyValuePair<LegacyPointer, LegacyPointer.PointerTrace>> results;
+        private List<LegacyPointer.PointerTrace> results;
         private bool searched = false;
         private int resultCount = 0;
         private static int resultLimit = 1000;
@@ -45,7 +45,7 @@ namespace Assets.Scripts.Editor
             searchString = GUILayout.TextField(searchString, EditorStyles.toolbarSearchField);
             if (GUILayout.Button("Search"))
             {
-                results = MapLoader.Loader.pointerTraces.Where(k => k.Key.ToString().Contains(searchString)).ToList();
+                results = MapLoader.Loader.pointerTraces.Where(k => k.pointer.ToString().Contains(searchString)).ToList();
                 resultCount = results.Count;
                 if (resultCount> resultLimit)
                 {
@@ -75,8 +75,8 @@ namespace Assets.Scripts.Editor
 
             foreach (var pair in results)
             {
-                GUILayout.Label($"Pointer {pair.Key}", EditorStyles.boldLabel);
-                GUILayout.Label(pair.Value.ToString());
+                GUILayout.Label($"Pointer {pair.pointer}", EditorStyles.boldLabel);
+                GUILayout.Label(pair.ToString());
             }
 
             GUILayout.EndScrollView();
