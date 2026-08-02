@@ -25,6 +25,7 @@
 		RaymanArenaGCDemo_2002_03_07,
 		RaymanArenaXbox,
 		RaymanRushPS1,
+		RaymanRushPS1_2001_12_13,
 
 		Rayman3PC,
 		Rayman3PCDemo_2002_10_01,

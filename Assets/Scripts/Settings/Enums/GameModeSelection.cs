@@ -28,8 +28,9 @@
         [GameMode(EngineCategory.CPA_RaymanM, typeof(LegacyGameManager), "RA (GC) Demo (2002/03/07)")] RaymanArenaGCDemo_2002_03_07,
         [GameMode(EngineCategory.CPA_RaymanM, typeof(LegacyGameManager), "Rayman Arena (Xbox)")] RaymanArenaXbox,
         [GameMode(EngineCategory.CPA_RaymanM, typeof(CPA_PS1Manager), "Rayman Rush (PS1)")] RaymanRushPS1,
+		[GameMode(EngineCategory.CPA_RaymanM, typeof(CPA_PS1Manager), "Rayman Rush (PS1) Prototype (2001/12/13)")] RaymanRushPS1_2001_12_13,
 
-        [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "Rayman 3 (PC)")] Rayman3PC,
+		[GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "Rayman 3 (PC)")] Rayman3PC,
         [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "R3 (PC) Demo (2002/10/01)")] Rayman3PCDemo_2002_10_01,
         [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "R3 (PC) Demo (2002/10/21)")] Rayman3PCDemo_2002_10_21,
         [GameMode(EngineCategory.CPA_Rayman3, typeof(LegacyGameManager), "R3 (PC) Demo (2002/12/09)")] Rayman3PCDemo_2002_12_09,

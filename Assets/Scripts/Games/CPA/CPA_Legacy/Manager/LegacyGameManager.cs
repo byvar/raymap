@@ -163,6 +163,7 @@ namespace Raymap {
 				GameModeSelection.RaymanArenaGCDemo_2002_03_07 => Legacy_Settings.Mode.RaymanArenaGCDemo_2002_03_07,
 				GameModeSelection.RaymanArenaXbox => Legacy_Settings.Mode.RaymanArenaXbox,
 				GameModeSelection.RaymanRushPS1 => Legacy_Settings.Mode.RaymanRushPS1,
+				GameModeSelection.RaymanRushPS1_2001_12_13 => Legacy_Settings.Mode.RaymanRushPS1_2001_12_13,
 				GameModeSelection.Rayman3PC => Legacy_Settings.Mode.Rayman3PC,
 				GameModeSelection.Rayman3PCDemo_2002_10_01 => Legacy_Settings.Mode.Rayman3PCDemo_2002_10_01,
 				GameModeSelection.Rayman3PCDemo_2002_10_21 => Legacy_Settings.Mode.Rayman3PCDemo_2002_10_21,

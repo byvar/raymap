@@ -25,7 +25,8 @@
         Rayman2_PS1,
         DonaldDuckQuackAttack_PS1,
         RaymanRush_PS1,
-        VIP_PS1,
+		RaymanRush_PS1_20011213,
+		VIP_PS1,
         JungleBook_PS1,
 
 

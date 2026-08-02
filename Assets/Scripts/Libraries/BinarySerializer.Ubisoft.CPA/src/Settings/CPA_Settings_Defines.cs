@@ -447,6 +447,16 @@ namespace BinarySerializer.Ubisoft.CPA {
 			COLTypes = new COL_Types_R2(),
 			EntryActionsCount = 1
 		};
+
+		public static CPA_Settings RRushPS1_20011213 => new CPA_Settings(EngineVersion.RaymanRush_PS1, Platform.PS1) {
+			StaticListType = LST2_ListType.OptimizedArray,
+			Encryption = Encryption.ReadInit,
+			Luminosity = 0.5f,
+			Saturate = true,
+			AITypes = new AI_Types_R2_PC(),
+			COLTypes = new COL_Types_R2(),
+			EntryActionsCount = 1
+		};
 		#endregion
 
 		#region Rayman 2
@@ -999,6 +1009,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 				CPA_GameMode.RaymanArenaGCDemo_2002_03_07 => RAGCDemo,
 				CPA_GameMode.RaymanArenaXbox => RAXbox,
 				CPA_GameMode.RaymanRushPS1 => RRushPS1,
+				CPA_GameMode.RaymanRushPS1_2001_12_13 => RRushPS1_20011213,
 				CPA_GameMode.Rayman3PC => R3PC,
 				CPA_GameMode.Rayman3PCDemo_2002_10_01 => R3PCDemo20021001,
 				CPA_GameMode.Rayman3PCDemo_2002_10_21 => R3PCDemo20021021,

@@ -860,11 +860,146 @@ namespace OpenSpace.PS1 {
 			}
 		};
 
+		public static PS1GameInfo RR_PS1_PAL_20011213 = new PS1GameInfo() {
+			maps = new string[] {
+				"canopy1",
+				"crypt",
+				"crypt1",
+				"crypt3",
+				"factory0",
+				"factory1",
+				"factory2",
+				"lagoon0",
+				"lagoon1",
+				"lagoon2",
+				"pirate1",
+				"pirate2",
+				"mainmenu",
+			},
+			actors = new Actor[] {
+				new Actor() { actor = "globox" },
+				new Actor() { actor = "hunchman" },
+				new Actor() { actor = "mhunch" },
+				new Actor() { actor = "rayman" },
+				new Actor() { actor = "raz" },
+				new Actor() { actor = "tily" },
+				new Actor() { actor = "wife" },
+				new Actor() { actor = "mglobette" },
+				new Actor() { actor = "menubox1", isSelectable = false },
+				new Actor() { actor = "menubox2", isSelectable = false },
+			},
+			actor1Address = 0x80165000,
+			actor2Address = 0x80190C00,
+			files = new File[] {
+				new File() {
+					fileID = 0,
+					type = File.Type.Map,
+					bigfile = "MAPS",
+					extension = "DAT",
+					baseLBA = 0x1F4,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(0x800F40D0, false, new File.LBA(0x1F4, 0x165)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800DD5E4, false, new File.LBA(0x359, 0x192)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x80104398, false, new File.LBA(0x4EB, 0x169)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800E7D44, false, new File.LBA(0x654, 0x19C)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x80113C2C, false, new File.LBA(0x7F0, 0x12F)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800EB64C, false, new File.LBA(0x91F, 0x161)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800E6CF4, false, new File.LBA(0xA80, 0x15D)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x8010FD60, false, new File.LBA(0xBDD, 0x14C)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800E5AC0, false, new File.LBA(0xD29, 0x18B)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800DA430, false, new File.LBA(0xEB4, 0x180)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800FB3D0, false, new File.LBA(0x1034, 0x164)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800E0354, false, new File.LBA(0x1198, 0x185)) { loadActor = true, relocateActor = true },
+						new File.MemoryBlock(0x800C4268, false, new File.LBA(0x131D, 0x186)) {
+							loadActor = true,
+							relocateActor = true,
+							overrideActor1Address = 0x8019c000,
+							overrideActor2Address = 0x801ac400,
+							isActorSelectable = false
+						}, // menu
+						new File.MemoryBlock(0x80110000, false, new File.LBA(0x14A3, 0x1D), inEngine: false) { exeOnly = true },
+					}
+				},
+				new File() {
+					fileID = 1,
+					type = File.Type.Actor,
+					bigfile = "ACTOR1",
+					extension = "DAT",
+					baseLBA = 0x1770,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1770, 0x3B)),
+						new File.MemoryBlock(new File.LBA(0x17AB, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x17E4, 0x38)),
+						new File.MemoryBlock(new File.LBA(0x181C, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x1855, 0x33)),
+						new File.MemoryBlock(new File.LBA(0x1888, 0x3C)),
+						new File.MemoryBlock(new File.LBA(0x18C4, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x18FD, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x1936, 0x15)),
+						new File.MemoryBlock(new File.LBA(0x194B, 0x15))
+					}
+				},
+				new File() {
+					fileID = 2,
+					type = File.Type.Actor,
+					bigfile = "ACTOR2",
+					extension = "DAT",
+					baseLBA = 0x1B58,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1B58, 0x3B)),
+						new File.MemoryBlock(new File.LBA(0x1B93, 0x37)),
+						new File.MemoryBlock(new File.LBA(0x1BCA, 0x37)),
+						new File.MemoryBlock(new File.LBA(0x1C01, 0x37)),
+						new File.MemoryBlock(new File.LBA(0x1C38, 0x33)),
+						new File.MemoryBlock(new File.LBA(0x1C6B, 0x3B)),
+						new File.MemoryBlock(new File.LBA(0x1CA6, 0x38)),
+						new File.MemoryBlock(new File.LBA(0x1CDE, 0x39)),
+						new File.MemoryBlock(new File.LBA(0x1D17, 0x10)),
+						new File.MemoryBlock(new File.LBA(0x1D27, 0x10))
+					}
+				},
+				new File() {
+					fileID = 3,
+					type = File.Type.Sound,
+					bigfile = "SNDBANKS",
+					extension = "DAT",
+					baseLBA = 0x1F40,
+					memoryBlocks = new File.MemoryBlock[] {
+						new File.MemoryBlock(new File.LBA(0x1F40, 0x1E)),
+						new File.MemoryBlock(new File.LBA(0x1F5E, 0x21)),
+						new File.MemoryBlock(new File.LBA(0x1F7F, 0x11)),
+						new File.MemoryBlock(new File.LBA(0x1F90, 0x31)),
+						new File.MemoryBlock(new File.LBA(0x1FC1, 0x20)),
+						new File.MemoryBlock(new File.LBA(0x1FE1, 0x23)),
+						new File.MemoryBlock(new File.LBA(0x2004, 0x31)),
+						new File.MemoryBlock(new File.LBA(0x2035, 0xE)),
+						new File.MemoryBlock(new File.LBA(0x2043, 0x22)),
+						new File.MemoryBlock(new File.LBA(0x2065, 0x29)),
+						new File.MemoryBlock(new File.LBA(0x208E, 0x12)),
+						new File.MemoryBlock(new File.LBA(0x20A0, 0x1B)),
+						new File.MemoryBlock(new File.LBA(0x20BB, 0x64)),
+						new File.MemoryBlock(new File.LBA(0x211F, 0x20)),
+						new File.MemoryBlock(new File.LBA(0x213F, 0x1F)),
+						new File.MemoryBlock(new File.LBA(0x215E, 0x10)),
+						new File.MemoryBlock(new File.LBA(0x216E, 0x12)),
+						new File.MemoryBlock(new File.LBA(0x2180, 0x15)),
+						new File.MemoryBlock(new File.LBA(0x2195, 0x2D)),
+						new File.MemoryBlock(new File.LBA(0x21C2, 0x5)),
+						new File.MemoryBlock(new File.LBA(0x21C7, 0x1B)),
+						new File.MemoryBlock(new File.LBA(0x21E2, 0x24)),
+						new File.MemoryBlock(new File.LBA(0x2206, 0x16)),
+						new File.MemoryBlock(new File.LBA(0x221C, 0x27)),
+					}
+				},
+			}
+		};
+
 		public static Dictionary<Legacy_Settings.Mode, PS1GameInfo> Games = new Dictionary<Legacy_Settings.Mode, PS1GameInfo>() {
 			{ Legacy_Settings.Mode.Rayman2PS1, R2_PS1_US },
 			{ Legacy_Settings.Mode.Rayman2PS1Demo, R2_PS1_Demo },
 			{ Legacy_Settings.Mode.Rayman2PS1Demo_SLUS_90095, R2_PS1_Demo_SLUS_90095 },
 			{ Legacy_Settings.Mode.RaymanRushPS1, RR_PS1_US },
+			{ Legacy_Settings.Mode.RaymanRushPS1_2001_12_13, RR_PS1_PAL_20011213 },
 			{ Legacy_Settings.Mode.DonaldDuckPS1, DD_PS1_US },
 			{ Legacy_Settings.Mode.VIPPS1, VIP_PS1_US },
 			{ Legacy_Settings.Mode.JungleBookPS1, JB_PS1_US },

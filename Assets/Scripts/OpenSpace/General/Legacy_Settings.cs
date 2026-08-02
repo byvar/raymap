@@ -69,6 +69,7 @@ namespace OpenSpace {
 			RaymanArenaGCDemo_2002_03_07,
 			RaymanArenaXbox,
 			RaymanRushPS1,
+			RaymanRushPS1_2001_12_13,
 			Rayman3PC,
 			Rayman3PCDemo_2002_10_01,
 			Rayman3PCDemo_2002_10_21,
@@ -884,6 +885,19 @@ namespace OpenSpace {
 			numEntryActions = 1
 		};
 
+		public static Legacy_Settings RRushPS1_20011213 => new Legacy_Settings() {
+			engineVersion = EngineVersion.R2,
+			game = Game.RRush,
+			platform = Platform.PS1,
+			endian = Endian.Little,
+			linkedListType = LinkedListType.Single,
+			encryption = Encryption.ReadInit,
+			luminosity = 0.5f,
+			saturate = true,
+			aiTypes = AITypes.R2,
+			numEntryActions = 1
+		};
+
 		public static Legacy_Settings R2DS => new Legacy_Settings() {
 			engineVersion = EngineVersion.R2,
 			game = Game.R2,
@@ -1320,6 +1334,7 @@ namespace OpenSpace {
 			{ Mode.RaymanArenaGCDemo_2002_03_07, RAGCDemo },
 			{ Mode.RaymanArenaXbox, RAXbox },
 			{ Mode.RaymanRushPS1, RRushPS1 },
+			{ Mode.RaymanRushPS1_2001_12_13, RRushPS1_20011213 },
 			{ Mode.Rayman3PC, R3PC },
 			{ Mode.Rayman3PCDemo_2002_10_01, R3PCDemo20021001 },
 			{ Mode.Rayman3PCDemo_2002_10_21, R3PCDemo20021021 },

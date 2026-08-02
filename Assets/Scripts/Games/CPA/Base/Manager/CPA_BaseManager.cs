@@ -40,6 +40,7 @@ namespace Raymap {
 				GameModeSelection.RaymanArenaGCDemo_2002_03_07 => CPA_GameMode.RaymanArenaGCDemo_2002_03_07,
 				GameModeSelection.RaymanArenaXbox => CPA_GameMode.RaymanArenaXbox,
 				GameModeSelection.RaymanRushPS1 => CPA_GameMode.RaymanRushPS1,
+				GameModeSelection.RaymanRushPS1_2001_12_13 => CPA_GameMode.RaymanRushPS1_2001_12_13,
 
 				GameModeSelection.Rayman3PC => CPA_GameMode.Rayman3PC,
 				GameModeSelection.Rayman3PCDemo_2002_10_01 => CPA_GameMode.Rayman3PCDemo_2002_10_01,
