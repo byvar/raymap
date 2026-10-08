@@ -6,7 +6,7 @@
 		public string Name { get; set; }
 
 		// Type and the resource to control
-		public EventType Type { get; set; }
+		public USND_EventType Type { get; set; }
 		public USND_UUID TargetRes { get; set; }
 
 		public float CoeffA { get; set; }
@@ -21,22 +21,12 @@
 				Name = s.SerializeLengthPrefixedString<uint>(Name, name: nameof(Name));
 			}
 
-			Type = s.Serialize<EventType>(Type, name: nameof(Type));
+			Type = s.Serialize<USND_EventType>(Type, name: nameof(Type));
 			TargetRes = s.SerializeObject<USND_UUID>(TargetRes, name: nameof(TargetRes));
 			CoeffA = s.Serialize<float>(CoeffA, name: nameof(CoeffA));
 			CoeffB = s.Serialize<float>(CoeffB, name: nameof(CoeffB));
 			CoeffC = s.Serialize<float>(CoeffC, name: nameof(CoeffC));
 			CoeffD = s.Serialize<float>(CoeffD, name: nameof(CoeffD));
-		}
-
-		public enum EventType : uint {
-			Play = 0,
-			Stop = 1,
-			Pitch = 2,
-			Volume = 3,
-			Extra = 4,
-			StopAll = 5,
-			StopAndGo = 6
 		}
 	}
 }

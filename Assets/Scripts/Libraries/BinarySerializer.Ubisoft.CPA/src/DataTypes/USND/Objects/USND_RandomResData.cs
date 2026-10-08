@@ -6,16 +6,16 @@
 		public uint Uint_08 { get; set; }
 		public float Float_0C { get; set; }
 
-		public uint RandomElementsCount { get; set; }
-		public RandomElement[] RandomElements { get; set; }
+		public uint ElementsCount { get; set; }
+		public RandomElement[] Elements { get; set; }
 
 		public override void SerializeImpl(SerializerObject s) {
 			base.SerializeImpl(s);
 
 			Uint_08 = s.Serialize<uint>(Uint_08, name: nameof(Uint_08));
 			Float_0C = s.Serialize<float>(Float_0C, name: nameof(Float_0C));
-			RandomElementsCount = s.Serialize<uint>(RandomElementsCount, name: nameof(RandomElementsCount));
-			RandomElements = s.SerializeObjectArray<RandomElement>(RandomElements, RandomElementsCount, name: nameof(RandomElements));
+			ElementsCount = s.Serialize<uint>(ElementsCount, name: nameof(ElementsCount));
+			Elements = s.SerializeObjectArray<RandomElement>(Elements, ElementsCount, name: nameof(Elements));
 		}
 
 		public class RandomElement : BinarySerializable {

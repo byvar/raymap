@@ -31,6 +31,7 @@
 				switch (IdObjClassName) {
 					case USND_EventResData.ClassName: SerializeObject<USND_EventResData>(s); break;
 					case USND_RandomResData.ClassName: SerializeObject<USND_RandomResData>(s); break;
+					case USND_SwitchResData.ClassName: SerializeObject<USND_SwitchResData>(s); break;
 					case USND_PCWaveFileIdObj.ClassName: SerializeObject<USND_PCWaveFileIdObj>(s); break;
 					case USND_PS2WaveFileIdObj.ClassName: SerializeObject<USND_PS2WaveFileIdObj>(s); break;
 					case USND_PCWavResData.ClassName: SerializeObject<USND_PCWavResData>(s); break;

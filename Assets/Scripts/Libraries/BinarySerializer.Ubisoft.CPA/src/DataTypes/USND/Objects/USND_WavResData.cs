@@ -9,7 +9,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 		public float Float2 { get; set; }
 		public float Float3 { get; set; }
 
-		public WavResDataFlags Flags { get; set; }
+		public USND_WavResDataFlags Flags { get; set; }
 		public USND_UUID FileId { get; set; } // Default language if localized, usually English
 		public uint LocalizedFileIdsCount { get; set; }
 		public LocalizedFileId[] LocalizedFileIds { get; set; }
@@ -26,7 +26,7 @@ namespace BinarySerializer.Ubisoft.CPA {
 			Float3 = s.Serialize<float>(Float3, name: nameof(Float3));
 
 			if (Version >= 3) {
-				Flags = s.Serialize<WavResDataFlags>(Flags, name: nameof(Flags));
+				Flags = s.Serialize<USND_WavResDataFlags>(Flags, name: nameof(Flags));
 			} else {
 				throw new NotImplementedException();
 			}
@@ -37,23 +37,10 @@ namespace BinarySerializer.Ubisoft.CPA {
 				throw new NotImplementedException();
 			}
 
-			if (Flags.HasFlag(WavResDataFlags.Localized)) {
+			if (Flags.HasFlag(USND_WavResDataFlags.Localized)) {
 				LocalizedFileIdsCount = s.Serialize<uint>(LocalizedFileIdsCount, name: nameof(LocalizedFileIdsCount));
 				LocalizedFileIds = s.SerializeObjectArray<LocalizedFileId>(LocalizedFileIds, LocalizedFileIdsCount, name: nameof(LocalizedFileIds));
 			}
-		}
-
-		[Flags]
-		public enum WavResDataFlags : byte {
-			None = 0,
-			Flag0 = 1 << 0,
-			Localized = 1 << 1,
-			Flag2 = 1 << 2,
-			Flag3 = 1 << 3,
-			Flag4 = 1 << 4,
-			Flag5 = 1 << 5,
-			Flag6 = 1 << 6,
-			Flag7 = 1 << 7,
 		}
 
 		public class LocalizedFileId : BinarySerializable {

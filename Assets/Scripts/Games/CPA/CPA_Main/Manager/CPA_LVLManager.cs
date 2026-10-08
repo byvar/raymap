@@ -1,4 +1,5 @@
 ﻿using BinarySerializer;
+using BinarySerializer.Audio.RIFF;
 using BinarySerializer.Ubisoft.CPA;
 using BinarySerializer.Unity;
 using Cysharp.Threading.Tasks;
@@ -20,6 +21,11 @@ namespace Raymap {
 			using (var context = new MapViewerContext(inputDir, settings)) {
 				// Get the deserializer
 				var s = context.Deserializer;
+				s.Context.AddSettings<RIFFSettings>(new RIFFSettings());
+				RIFFSettings riff = s.GetRequiredSettings<RIFFSettings>();
+				riff.RegisterWAV();
+				riff.RegisterUSND();
+				riff.AlignChunks = false;
 
 				await LoadFilesAsync(context);
 
@@ -95,7 +101,7 @@ namespace Raymap {
 					if (info.Value.IdObj is USND_WaveFileIdObj obj) {
 						var name = names[obj.Id];
 						var extension = "lol";
-						Util.ByteArrayToFile(Path.Combine(outputDir, $"{name}.{extension}"), obj.WaveFile.ChunksData);
+						//Util.ByteArrayToFile(Path.Combine(outputDir, $"{name}.{extension}"), obj.WaveFile.WaveFile);
 					}
 				}
 			}
