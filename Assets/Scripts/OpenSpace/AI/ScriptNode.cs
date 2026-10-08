@@ -273,7 +273,7 @@ namespace OpenSpace.AI {
                     string stateName = state == null ? "ERR_STATE_NOTFOUND" : state.ShortName;
                     if (advanced) return "ActionRef: " + param_ptr + " " + stateName;
                     if (ts.useStateIndex) {
-                        return "GetAction("+state.index.ToString()+")";
+                        return "GetAction("+state?.index.ToString() ?? "unknown"+")";
                     }
 					return stateName;
                 case ScriptNode.NodeType.SuperObjectRef:

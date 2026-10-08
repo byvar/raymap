@@ -1597,11 +1597,11 @@
 
 		#region R2 PS2 & Largo
 		Placeholder__SetRevolutionStdGamePlusC, // Sets ((byte)(StdGame + 0xC) & 0x7F
-		Placeholder__Revolution__SaveGame_1,
-		Placeholder__Revolution__SaveGame_2,
+		Placeholder__Revolution__SaveGame_1_SetSlotIndex,
+		Placeholder__Revolution__SaveGame_2_SetComment,
 		Placeholder__Revolution__SaveGame_3,
 		Placeholder__Revolution__SaveGame_3b__LargoOnly,
-		Placeholder__Revolution__SaveGame_4,
+		Placeholder__Revolution__SaveGame_4_SetPlaytime,
 		Placeholder__Revolution__SaveGame_5a,
 		Placeholder__Revolution__SaveGame_5b,
 

@@ -70,7 +70,7 @@ namespace Raymap {
 				case BinarySerializer.Ubisoft.CPA.Platform.Xbox360:
 				case BinarySerializer.Ubisoft.CPA.Platform.PS3:
 				case BinarySerializer.Ubisoft.CPA.Platform.MacOS:
-					if (!cpaSettings.EngineVersionTree.HasParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_3)) {
+					if (!cpaSettings.EngineVersionTree.HasAnyParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_3, BinarySerializer.Ubisoft.CPA.EngineVersion.LargoWinch)) {
 						extension = "*.sna";
 					} else {
 						extension = "*.lvl";
@@ -79,7 +79,7 @@ namespace Raymap {
 				case BinarySerializer.Ubisoft.CPA.Platform.DC: extension = "*.DAT"; break;
 				case BinarySerializer.Ubisoft.CPA.Platform.PS2:
 					if (!cpaSettings.EngineVersionTree.HasParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_3)) {
-						if (!cpaSettings.EngineVersionTree.HasParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_Montreal)) {
+						if (cpaSettings.EngineVersionTree.HasParent(BinarySerializer.Ubisoft.CPA.EngineVersion.CPA_Montreal)) {
 							extension = "*.sna";
 						} else {
 							extension = "*.lv2";
