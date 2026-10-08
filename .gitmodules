@@ -7,3 +7,6 @@
 [submodule "Assets/Scripts/Libraries/BinarySerializer.PlayStation"]
 	path = Assets/Scripts/Libraries/BinarySerializer.PlayStation
 	url = https://github.com/BinarySerializer/BinarySerializer.PlayStation
+[submodule "Assets/Scripts/Libraries/BinarySerializer.Audio"]
+	path = Assets/Scripts/Libraries/BinarySerializer.Audio
+	url = https://github.com/BinarySerializer/BinarySerializer.Audio
