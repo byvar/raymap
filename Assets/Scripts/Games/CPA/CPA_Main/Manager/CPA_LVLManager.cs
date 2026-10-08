@@ -1,4 +1,5 @@
 ﻿using BinarySerializer;
+using BinarySerializer.Audio;
 using BinarySerializer.Audio.RIFF;
 using BinarySerializer.Ubisoft.CPA;
 using BinarySerializer.Unity;
@@ -41,8 +42,7 @@ namespace Raymap {
 							infos[i.Id] = i;
 					}
 				}
-				UnityEngine.Debug.Log("Finished exporting audio");
-				return;
+
 				const string bnhPattern = @"^cuuid\( 0x(?<hw>........), 0x(?<lw>........) \).*file (?<name>.*)";
 				foreach (string file in Directory.EnumerateFiles(context.BasePath, "*.bnh", SearchOption.AllDirectories)) {
 					var lines = File.ReadAllLines(file, System.Text.Encoding.UTF8);
@@ -54,7 +54,7 @@ namespace Raymap {
 								var hw = uint.Parse(bnhMatch.Groups["hw"].Value, System.Globalization.NumberStyles.HexNumber);
 								var lw = uint.Parse(bnhMatch.Groups["lw"].Value, System.Globalization.NumberStyles.HexNumber);
 								var cuuid = new USND_UUID() { HighWord = hw, LowWord = lw };
-								context.SystemLogger?.LogInfo($"{cuuid} - {name}");
+								//context.SystemLogger?.LogInfo($"{cuuid} - {name}");
 								if (!names.ContainsKey(cuuid))
 									names[cuuid] = name;
 							}
@@ -100,8 +100,62 @@ namespace Raymap {
 					// Export
 					if (info.Value.IdObj is USND_WaveFileIdObj obj) {
 						var name = names[obj.Id];
-						var extension = "lol";
-						//Util.ByteArrayToFile(Path.Combine(outputDir, $"{name}.{extension}"), obj.WaveFile.WaveFile);
+						var extension = context.GetCPASettings().Platform == Platform.PS2 ? "mib" : "wav";
+						var outputFilePath = Path.Combine(outputDir, $"{name}.{extension}");
+						var txthPath = Path.Combine(outputDir, $"{name}.{extension}.txth");
+
+						// Only external supported for now...
+						if (!obj.Flags.HasFlag(USND_WaveFileFlags.External)) continue;
+						var ogWav = obj.WaveFile.WaveFile;
+						var absolutePath = obj.Offset.File.AbsolutePath;
+						var externalFilePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(absolutePath), obj.ExternalFileName);
+						var datX = ogWav.Riff.GetRequiredChunk<RIFF_Chunk_DatX>();
+						byte[] data = new byte[datX.SizeInExternalFile];
+
+						using (BinaryReader reader = new BinaryReader(new FileStream(externalFilePath, FileMode.Open))) {
+							reader.BaseStream.Seek(datX.OffsetInExternalFile, SeekOrigin.Begin);
+							reader.Read(data, 0, data.Length);
+						}
+
+						// Create and open the output file
+						using (var outputStream = File.Create(outputFilePath)) {
+							// Create a context
+							using (var wavContext = new MapViewerContext(settings)) {
+								// Create a key
+								const string wavKey = "wav";
+								wavContext.AddSettings<RIFFSettings>(new RIFFSettings());
+								RIFFSettings riffOutput = wavContext.GetRequiredSettings<RIFFSettings>();
+								riffOutput.AlignChunks = true;
+								riffOutput.RegisterWAV();
+
+								// Add the file to the context
+								wavContext.AddFile(new StreamFile(wavContext, wavKey, outputStream));
+
+								var wav = new WAV();
+								List<RIFF_Chunk> chunks = new List<RIFF_Chunk>();
+								chunks.Add(ogWav.Format.CreateChunk());
+								// TODO: add label stuff. needs to be converted to labl and cue chunks...
+								chunks.Add(new RIFF_Chunk_Data() {
+									Data = data
+								}.CreateChunk());
+
+								wav.Riff.Chunks = chunks.ToArray();
+
+								// Write the data
+								FileFactory.Write<WAV>(wavContext, wavKey, wav);
+
+								if (context.GetCPASettings().Platform == Platform.PS2) {
+									string[] txthContent = {
+										"codec = PSX",
+										$"sample_rate = {wav.Format.SampleRate}",
+										$"channels = {wav.Format.ChannelCount}",
+										$"start_offset = {wav.Data.Offset.FileOffset + (0x10 * wav.Format.ChannelCount)}",
+										"num_samples = data_size"
+									};
+									File.WriteAllLines(txthPath, txthContent);
+								}
+							}
+						}
 					}
 				}
 			}
