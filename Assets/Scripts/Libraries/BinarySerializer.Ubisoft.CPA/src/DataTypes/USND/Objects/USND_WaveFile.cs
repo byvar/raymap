@@ -8,7 +8,9 @@ namespace BinarySerializer.Ubisoft.CPA {
 
 		public override void SerializeImpl(SerializerObject s) {
 			WaveFile = s.SerializeObject<WAV>(WaveFile, name: nameof(WaveFile));
-			DataSize = s.Serialize<uint>(DataSize, name: nameof(DataSize));
+			if (s.GetCPASettings().Platform == Platform.PS2) {
+				DataSize = s.Serialize<uint>(DataSize, name: nameof(DataSize));
+			}
 		}
 	}
 }
