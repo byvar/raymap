@@ -34,6 +34,7 @@ namespace Raymap {
 
 				Dictionary<USND_UUID, USND_IdObjInfo> infos = new Dictionary<USND_UUID, USND_IdObjInfo>();
 				Dictionary<USND_UUID, string> names = new Dictionary<USND_UUID, string>();
+				Dictionary<USND_UUID, int> subsongIndex = new Dictionary<USND_UUID, int>();
 
 				string[] hxExtensions = { "*.hx2", "*.hxc" };
 
@@ -42,9 +43,17 @@ namespace Raymap {
 						string fileName = file.Substring(context.BasePath.Length);
 						var linf = await context.AddLinearFileAsync(fileName, endianness: context.GetCPASettings().GetEndian);
 						var soundbank = FileFactory.Read<USND_SoundBank>(context, fileName);
+						int waveFileIdIndex = 0;
 						foreach (var i in soundbank.IdObjInfos) {
-							if (!infos.ContainsKey(i.Id))
+							if (!infos.ContainsKey(i.Id)) {
 								infos[i.Id] = i;
+								if (i.IdObj is USND_WaveFileIdObj) {
+									subsongIndex[i.Id] = waveFileIdIndex;
+								}
+							}
+							if (i.IdObj is USND_WaveFileIdObj) {
+								waveFileIdIndex++;
+							}
 						}
 					}
 				}
@@ -123,7 +132,7 @@ namespace Raymap {
 						};
 						var extension = codec switch {
 							"PCM" => "wav",
-							"UBI" => "mib", // just random extension since we'll use txth
+							"UBI" => "wav", // just random extension since we'll use txth
 							"PSX" => "mib",
 							"DSP" => "dsp",
 							"XIMA" => "xima",
@@ -145,57 +154,68 @@ namespace Raymap {
 							reader.Read(data, 0, data.Length);
 						}
 
-						// Create and open the output file
-						using (var outputStream = File.Create(outputFilePath)) {
-							// Create a context
-							using (var wavContext = new MapViewerContext(settings, log: false)) {
-								// Create a key
-								const string wavKey = "wav";
-								wavContext.AddSettings<RIFFSettings>(new RIFFSettings());
-								RIFFSettings riffOutput = wavContext.GetRequiredSettings<RIFFSettings>();
-								riffOutput.AlignChunks = true;
-								riffOutput.RegisterWAV();
+						if (codec == "UBI") {
+							// Perhaps we can convert it later, but for now we just create a txtp... sigh
+							var absPath = obj.Offset.File.AbsolutePath;
+							var vgmstreamIndex = subsongIndex[obj.Id] + 1;
+							string[] txtpContent = {
+								$"{absPath} #{vgmstreamIndex}"
+							};
+							var txtpPath = Path.Combine(outputDir, $"{name}.txtp");
+							File.WriteAllLines(txtpPath, txtpContent);
+						} else {
+							// Create and open the output file
+							using (var outputStream = File.Create(outputFilePath)) {
+								// Create a context
+								using (var wavContext = new MapViewerContext(settings, log: false)) {
+									// Create a key
+									const string wavKey = "wav";
+									wavContext.AddSettings<RIFFSettings>(new RIFFSettings());
+									RIFFSettings riffOutput = wavContext.GetRequiredSettings<RIFFSettings>();
+									riffOutput.AlignChunks = true;
+									riffOutput.RegisterWAV();
 
-								// Add the file to the context
-								wavContext.AddFile(new StreamFile(wavContext, wavKey, outputStream));
+									// Add the file to the context
+									wavContext.AddFile(new StreamFile(wavContext, wavKey, outputStream));
 
-								var wav = new WAV();
-								List<RIFF_Chunk> chunks = new List<RIFF_Chunk>();
-								chunks.Add(ogWav.Format.CreateChunk());
-								foreach (var ck in ogWav.Riff.Chunks) {
-									switch (ck.Data) {
-										case RIFF_Chunk_Label:
-										case RIFF_Chunk_LabeledText:
-										case RIFF_Chunk_List:
-										case RIFF_Chunk_Cue:
-											chunks.Add(ck.Data.CreateChunk());
-											break;
+									var wav = new WAV();
+									List<RIFF_Chunk> chunks = new List<RIFF_Chunk>();
+									chunks.Add(ogWav.Format.CreateChunk());
+									foreach (var ck in ogWav.Riff.Chunks) {
+										switch (ck.Data) {
+											case RIFF_Chunk_Label:
+											case RIFF_Chunk_LabeledText:
+											case RIFF_Chunk_List:
+											case RIFF_Chunk_Cue:
+												chunks.Add(ck.Data.CreateChunk());
+												break;
+										}
 									}
-								}
-								// TODO: add label stuff. needs to be converted to labl and cue chunks...
-								chunks.Add(new RIFF_Chunk_Data() {
-									Data = data
-								}.CreateChunk());
+									// TODO: add label stuff. needs to be converted to labl and cue chunks...
+									chunks.Add(new RIFF_Chunk_Data() {
+										Data = data
+									}.CreateChunk());
 
-								wav.Riff.Chunks = chunks.ToArray();
+									wav.Riff.Chunks = chunks.ToArray();
 
-								// Write the data
-								FileFactory.Write<WAV>(wavContext, wavKey, wav);
+									// Write the data
+									FileFactory.Write<WAV>(wavContext, wavKey, wav);
 
-								if (codec == "PSX" || codec == "UBI") {
-									var headerSkip = 0;
 									if (codec == "PSX") {
-										headerSkip = (0x10 * wav.Format.ChannelCount);
-										// arguably also skip the last 0x10 * channelcount as it looks like garbage data
+										var headerSkip = 0;
+										if (codec == "PSX") {
+											headerSkip = (0x10 * wav.Format.ChannelCount);
+											// arguably also skip the last 0x10 * channelcount as it looks like garbage data
+										}
+										string[] txthContent = {
+											$"codec = {codec}",
+											$"sample_rate = {wav.Format.SampleRate}",
+											$"channels = {wav.Format.ChannelCount}",
+											$"start_offset = {wav.Data.Offset.FileOffset + headerSkip}",
+											"num_samples = data_size"
+										};
+										File.WriteAllLines(txthPath, txthContent);
 									}
-									string[] txthContent = {
-										$"codec = {codec}",
-										$"sample_rate = {wav.Format.SampleRate}",
-										$"channels = {wav.Format.ChannelCount}",
-										$"start_offset = {wav.Data.Offset.FileOffset + headerSkip}",
-										"num_samples = data_size"
-									};
-									File.WriteAllLines(txthPath, txthContent);
 								}
 							}
 						}
