@@ -168,6 +168,8 @@ namespace OpenSpace.AI {
                 "Cond_ChangeActionEnable",
                 "Cond_IsInAction",
                 "Cond_IsTypeOfGMTCollide",
+                "Cond_IsTypeOfGMTCollide_Wall",
+                "Cond_IsTypeOfGMTCollide_Obstacle",
                 "Cond_IsThereMechEvent",
                 "Cond_IsValidObject",
                 "Cond_IsValidWayPoint",
@@ -580,6 +582,7 @@ namespace OpenSpace.AI {
                 "ReturnToMainMenu",
                 "DisplayVignetteAndReturnToMainMenu",
                 "DisplayVignetteAndQuitGame",
+                "PlayAvi",
                 "Proc_ActivateOptionnalSectors",
                 "Proc_DeactivateOptionnalSectors",
                 "Proc_SetGameState",
@@ -657,6 +660,7 @@ namespace OpenSpace.AI {
                 "Proc_SND_KillVoice",
                 "Proc_SND_KillAllSounds",
                 "Proc_SND_ChangeMyVolumeEffects",
+                "Proc_SND_PersoChangeVolEffects",
                 "Proc_SND_ChangeVolumeEffects",
                 "Proc_SND_ChangeMyVolumeVoice",
                 "Proc_SND_ChangeVolumeVoice",
@@ -673,6 +677,7 @@ namespace OpenSpace.AI {
                 "Proc_SND_SetEffectSound",
                 "Proc_SND_SwitchMicroPerso",
                 "Proc_SND_SwitchOldMicroPerso",
+                "Proc_SND_SetMicroOrientationPerso",
                 "SetVignetteIndex",
                 "Proc_SND_SaveMusic",
                 "Proc_SND_LoadMusic",
@@ -932,6 +937,7 @@ namespace OpenSpace.AI {
                 "Func_Inv_GetObjectMaximumCapacity",
                 "Proc_GetLaserPointerDirection",
                 "Proc_GetLaserPointerDistance",
+                "Proc_GetLaserPointerDistanceWithMap",
                 "Func_SpeedChannel",
                 "Func_ExecuteFloorGame",
                 "Func_GPI_DifferentFromCurrentImage",
@@ -941,6 +947,7 @@ namespace OpenSpace.AI {
                 "ReduceIndexOfVectorArray",
                 "Func_TBL_InitArray",
                 "SND_GetMicroPerso",
+                "SND_GetMicroOrientationPerso",
                 "Fight_RemoveHitPointsMainActorWithArmor",
                 "Fight_RemoveAndReadHitPointsEnemy",
                 "Fight_ReadArmorResistance",
@@ -958,7 +965,8 @@ namespace OpenSpace.AI {
                 "Func_SendSoundRequest",
                 "Func_SendVoiceRequest",
                 "Func_SendMusicRequest",
-                "GiveMeTheGround"
+                "GiveMeTheGround",
+                "Proc_PlayerIsDead"
             },
             #endregion
 
