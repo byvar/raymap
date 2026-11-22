@@ -34,12 +34,14 @@ namespace ModelExport.R3.SkinnedAnimatedMeshesExporting {
         {
             var settings = new JsonSerializerSettings { Formatting = Formatting.Indented };
             var jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(exportObjectsLibrary, settings);
+            Directory.CreateDirectory(Path.GetDirectoryName(objectsExportLibraryPath));
             System.IO.File.WriteAllText(objectsExportLibraryPath, jsonString);
         }
 
         public static void ClearExportObjectsLibrary()
         {
             string exportObjectsLibraryPath = GetExportObjectsLibraryPath();
+            Directory.CreateDirectory(Path.GetDirectoryName(exportObjectsLibraryPath));
             File.Delete(exportObjectsLibraryPath);
         }
     }

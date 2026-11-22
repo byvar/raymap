@@ -96,23 +96,34 @@ namespace ModelExport.R3.PersoStatesArmatureAnimationsExporting.DataManipulation
 
         private ChannelInHierarchyInfo GetParentChannelName(short channelId, int animationFrameNumber, AnimA3DGeneral animA3DGeneral)
         {
-            bool existsAtAll = false;
+            // Mirrors PersoBehaviour.UpdateAnimation: a channel that has no parent entry in this frame's hierarchy
+            // is NOT absent, it is parented directly to the Perso root (e.g. CagouSnipe's leg channels 2 and 3,
+            // which never appear in any hierarchy entry). Previously such channels were dropped from the frame,
+            // so the addon left their bones in rest pose. Hierarchy entries whose parent is not a channel of this
+            // animation are ignored, like Raymap does for engine versions above TT.
             AnimOnlyFrame animOnlyFrame = animA3DGeneral.onlyFrames[animA3DGeneral.start_onlyFrames + animationFrameNumber];
             for (int i = animOnlyFrame.start_hierarchies_for_frame;
                 i < animOnlyFrame.start_hierarchies_for_frame + animOnlyFrame.num_hierarchies_for_frame; i++)
             {
                 AnimHierarchy hierarchy = animA3DGeneral.hierarchies[i];
-                if (hierarchy.childChannelID == channelId)
+                if (hierarchy.childChannelID == channelId && IsChannelOfAnimation(hierarchy.parentChannelID, animA3DGeneral))
                 {
                     return new ChannelInHierarchyInfo(true, "Channel " + hierarchy.parentChannelID);
                 }
+            }
+            return new ChannelInHierarchyInfo(true, null);
+        }
 
-                if (hierarchy.childChannelID == channelId || hierarchy.parentChannelID == channelId)
+        private static bool IsChannelOfAnimation(short channelId, AnimA3DGeneral animA3DGeneral)
+        {
+            for (int i = 0; i < animA3DGeneral.num_channels; i++)
+            {
+                if (animA3DGeneral.channels[animA3DGeneral.start_channels + i].id == channelId)
                 {
-                    existsAtAll = true;
+                    return true;
                 }
             }
-            return new ChannelInHierarchyInfo(existsAtAll, null);
+            return false;
         }
     }
 }

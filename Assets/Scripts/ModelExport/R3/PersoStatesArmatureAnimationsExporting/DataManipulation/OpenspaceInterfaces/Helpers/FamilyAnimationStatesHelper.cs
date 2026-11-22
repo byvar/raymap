@@ -74,7 +74,7 @@ namespace ModelExport.R3.PersoStatesArmatureAnimationsExporting.DataManipulation
 
         public int GetFirstValidStateAnimationKeyframeFrameNumber()
         {
-            return 1;
+            return 0;
         }
 
         private int GetFirstPersoStateIndex()

@@ -16,6 +16,7 @@ namespace ModelExport.R3.PersoStatesArmatureAnimationsExporting
         {
             var settings = new JsonSerializerSettings { Formatting = Formatting.Indented };
             string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(animationsModel, settings);
+            Directory.CreateDirectory(Path.GetDirectoryName(GetAnimationModelExportPath()));
             System.IO.File.WriteAllText(GetAnimationModelExportPath(), jsonString);
         }
 
